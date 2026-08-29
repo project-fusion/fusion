@@ -71,10 +71,10 @@ export class HelixHeadlessCarousel extends HelixElement {
   }
 
   /**
-   * Accessible name for the carousel.
+   * Whether the carousel advances on its own.
    */
-  @property()
-  label = 'Carousel'
+  @property({ type: Boolean })
+  autoplay = false
 
   /**
    * The slide in view, counted from zero.
@@ -101,23 +101,6 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.indexState = next
     this.requestUpdate('index', previous)
   }
-
-  /**
-   * Which way the track runs.
-   *
-   * Behavior rather than presentation, which is why it is here: the scroll
-   * position and the nearest-slide arithmetic are both single-axis, and a
-   * styled-tier attribute cannot change which one they read. Two sites branch
-   * on it, `scrollTo` and the drag settle, and nothing else in the component
-   * knows about the axis at all.
-   *
-   * A vertical track needs a height, which a horizontal one does not: width
-   * comes from the page and height does not, so the styled tier gives it
-   * `--carousel-block-size` and a consumer sets that to whatever the slides
-   * want.
-   */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
 
   /**
    * Whether the previous and next controls are shown.
@@ -153,8 +136,20 @@ export class HelixHeadlessCarousel extends HelixElement {
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
 
+  /**
+   * How long each slide is held, in milliseconds.
+   */
+  @property({ type: Number })
+  interval = 5000
+
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
+
+  /**
+   * Accessible name for the carousel.
+   */
+  @property()
+  label = 'Carousel'
 
   /**
    * Whether moving past either end wraps to the other.
@@ -163,16 +158,21 @@ export class HelixHeadlessCarousel extends HelixElement {
   loop = false
 
   /**
-   * Whether the carousel advances on its own.
+   * Which way the track runs.
+   *
+   * Behavior rather than presentation, which is why it is here: the scroll
+   * position and the nearest-slide arithmetic are both single-axis, and a
+   * styled-tier attribute cannot change which one they read. Two sites branch
+   * on it, `scrollTo` and the drag settle, and nothing else in the component
+   * knows about the axis at all.
+   *
+   * A vertical track needs a height, which a horizontal one does not: width
+   * comes from the page and height does not, so the styled tier gives it
+   * `--carousel-block-size` and a consumer sets that to whatever the slides
+   * want.
    */
-  @property({ type: Boolean })
-  autoplay = false
-
-  /**
-   * How long each slide is held, in milliseconds.
-   */
-  @property({ type: Number })
-  interval = 5000
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * Whether rotation is running.

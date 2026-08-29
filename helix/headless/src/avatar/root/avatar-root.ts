@@ -52,20 +52,20 @@ export const initialsOf = (name: string): string => {
 @customElement('helix-headless-avatar')
 export class HelixHeadlessAvatar extends HelixElement {
   /**
-   * Image to show.
-   *
-   * Falls back to the slot, or to initials, if it fails.
-   */
-  @property()
-  src = ''
-
-  /**
    * Name of the person or entity.
    *
    * Used for the label and the initials.
    */
   @property()
   name = ''
+
+  /**
+   * Image to show.
+   *
+   * Falls back to the slot, or to initials, if it fails.
+   */
+  @property()
+  src = ''
 
   /**
    * Whether the image failed.

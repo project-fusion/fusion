@@ -63,18 +63,10 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
 @customElement('helix-headless-menu')
 export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {
   /**
-   * Preferred side.
-   *
-   * It moves if that side does not fit.
+   * What the row returning from a submenu reads.
    */
-  @property()
-  placement: Placement = 'bottom-start'
-
-  /**
-   * Space between the trigger and the surface, in pixels.
-   */
-  @property({ type: Number })
-  offset = 4
+  @property({ attribute: 'back-label' })
+  backLabel = 'Back'
 
   /**
    * Accessible name for the surface.
@@ -83,10 +75,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   label = 'Menu'
 
   /**
-   * What the row returning from a submenu reads.
+   * Space between the trigger and the surface, in pixels.
    */
-  @property({ attribute: 'back-label' })
-  backLabel = 'Back'
+  @property({ type: Number })
+  offset = 4
+
+  /**
+   * Preferred side.
+   *
+   * It moves if that side does not fit.
+   */
+  @property()
+  placement: Placement = 'bottom-start'
 
   /**
    * Which page is showing, and what is on it.

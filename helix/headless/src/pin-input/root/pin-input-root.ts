@@ -79,35 +79,16 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   autocomplete = 'one-time-code'
 
   /**
+   * Accessible name for one box, with `{index}` and `{length}` filled in.
+   */
+  @property({ attribute: 'cell-label' })
+  cellLabel = 'Character {index} of {length}'
+
+  /**
    * How many characters the code has.
    */
   @property({ type: Number })
   length = 6
-
-  /**
-   * What a box accepts, which decides the keyboard a phone offers.
-   *
-   * `numeric` and `alphanumeric` also refuse anything else on the way in,
-   * because a code that is digits is digits: letting a letter into a box a
-   * reader cannot submit is a mistake they have to find and undo themselves.
-   * `text` refuses nothing and only trims, so it is the mode for a code with a
-   * hyphen in it.
-   *
-   * **`alphanumeric` is ASCII letters and digits**, which is narrower than the
-   * word is in general and is the right narrowness here. A code of this kind
-   * comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
-   * a filter that accepted it would let through a character the service on the
-   * other end is going to reject. A consumer whose codes really do carry
-   * marked letters wants `text`, which judges nothing.
-   *
-   * **Not reflected**: nothing selects on it, so reflecting only writes
-   * `type="numeric"` onto every `<helix-pin-input>` ever rendered, an attribute
-   * no consumer's markup had. The area rules carry the sentence "reflect only
-   * what CSS selects on". The real inputs take it as a binding, which is what
-   * makes the keyboard follow.
-   */
-  @property()
-  type: PinType = 'numeric'
 
   /**
    * Whether the characters are hidden, the way a password is.
@@ -136,10 +117,29 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   readOnly = false
 
   /**
-   * Accessible name for one box, with `{index}` and `{length}` filled in.
+   * What a box accepts, which decides the keyboard a phone offers.
+   *
+   * `numeric` and `alphanumeric` also refuse anything else on the way in,
+   * because a code that is digits is digits: letting a letter into a box a
+   * reader cannot submit is a mistake they have to find and undo themselves.
+   * `text` refuses nothing and only trims, so it is the mode for a code with a
+   * hyphen in it.
+   *
+   * **`alphanumeric` is ASCII letters and digits**, which is narrower than the
+   * word is in general and is the right narrowness here. A code of this kind
+   * comes off a keypad, an SMS or an authenticator, and none of them emit `é`;
+   * a filter that accepted it would let through a character the service on the
+   * other end is going to reject. A consumer whose codes really do carry
+   * marked letters wants `text`, which judges nothing.
+   *
+   * **Not reflected**: nothing selects on it, so reflecting only writes
+   * `type="numeric"` onto every `<helix-pin-input>` ever rendered, an attribute
+   * no consumer's markup had. The area rules carry the sentence "reflect only
+   * what CSS selects on". The real inputs take it as a binding, which is what
+   * makes the keyboard follow.
    */
-  @property({ attribute: 'cell-label' })
-  cellLabel = 'Character {index} of {length}'
+  @property()
+  type: PinType = 'numeric'
 
   /** Focus is delegated, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {

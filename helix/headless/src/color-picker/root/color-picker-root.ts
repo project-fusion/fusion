@@ -134,6 +134,15 @@ interface EyeDropperConstructor {
 @customElement('helix-headless-color-picker')
 export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElement) {
   /**
+   * Whether the color carries an alpha channel.
+   *
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
+   */
+  @property({ reflect: true, type: Boolean })
+  alpha = false
+
+  /**
    * What the browser may autofill in the text field, as a platform token.
    *
    * **Defaults to `off`, which is not the platform's default and is the
@@ -143,6 +152,15 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property()
   autocomplete = 'off'
+
+  /**
+   * The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a picker on
+   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   */
+  @property({ reflect: true })
+  format?: ColorFormat
 
   /**
    * Whether the current selection fails validation.
@@ -157,22 +175,16 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   invalid = false
 
   /**
-   * Whether the color carries an alpha channel.
-   *
-   * Off by default, because it widens every value written, and a consumer who
-   * did not ask for transparency should not have to strip a byte off each one.
+   * Whether the eyedropper is offered where the browser has one.
    */
-  @property({ reflect: true, type: Boolean })
-  alpha = false
+  @property({ attribute: 'no-eyedropper', type: Boolean })
+  noEyedropper = false
 
   /**
-   * The syntax the value is written in: `hex`, `rgb` or `hsl`.
-   *
-   * Only what is written. Everything is read whatever this says, so a picker on
-   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * Whether the reader may change the format.
    */
-  @property({ reflect: true })
-  format?: ColorFormat
+  @property({ attribute: 'no-format', type: Boolean })
+  noFormat = false
 
   /**
    * Whether to leave the value out, for a picker whose value is stated elsewhere.
@@ -190,18 +202,6 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
    */
   @property({ attribute: 'no-value', type: Boolean })
   noValue = false
-
-  /**
-   * Whether the reader may change the format.
-   */
-  @property({ attribute: 'no-format', type: Boolean })
-  noFormat = false
-
-  /**
-   * Whether the eyedropper is offered where the browser has one.
-   */
-  @property({ attribute: 'no-eyedropper', type: Boolean })
-  noEyedropper = false
 
   /**
    * Colors offered under the picker, as a comma-separated list.

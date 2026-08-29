@@ -127,22 +127,34 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   autocomplete = ''
 
   /**
-   * Whether the panel is one list of times or a column each.
+   * Language tag the times are written in.
    *
-   * `list` offers whole times, which is what a product with slots or opening
-   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
-   * the locale uses one, which is the only way to reach `23:45` without
-   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
-   *
-   * **Optional rather than defaulted, which is not a style preference.** A
-   * reflecting property with a default writes its attribute onto every host the
-   * moment the element upgrades, including the ones a consumer rendered and did
-   * not touch, and React reads that as a hydration mismatch. The absent
-   * attribute *is* the list, which the stylesheet reads as the base rule, so
-   * only the departure has to be named.
+   * Absent uses the runtime's own.
    */
-  @property({ reflect: true })
-  variant?: 'list' | 'wheels'
+  @property()
+  locale = ''
+
+  /**
+   * Latest time that can be chosen, as `HH:mm`.
+   */
+  @property()
+  max = '23:59'
+
+  /**
+   * How many times are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default, for the reason Date Input gives: how
+   * many fit depends on the width of the field and the length of what is in it,
+   * and this element knows neither.
+   */
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
+
+  /**
+   * Earliest time that can be chosen, as `HH:mm`.
+   */
+  @property()
+  min = '00:00'
 
   /**
    * How many times can be held at once.
@@ -156,32 +168,32 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   mode?: 'multiple' | 'range'
 
   /**
-   * How many times are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default, for the reason Date Input gives: how
-   * many fit depends on the width of the field and the length of what is in it,
-   * and this element knows neither.
+   * What the field says before a time is in it.
    */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
+  @property()
+  placeholder = 'HH:mm'
+
+  /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /**
    * How far apart the offered times are, in minutes.
    */
   @property({ type: Number })
   step = 15
-
-  /**
-   * Earliest time that can be chosen, as `HH:mm`.
-   */
-  @property()
-  min = '00:00'
-
-  /**
-   * Latest time that can be chosen, as `HH:mm`.
-   */
-  @property()
-  max = '23:59'
 
   /**
    * Whether the field writes the time out, or holds the value as it is.
@@ -193,20 +205,6 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    */
   @property({ attribute: 'time-style' })
   timeStyle: 'iso' | 'local' = 'local'
-
-  /**
-   * Language tag the times are written in.
-   *
-   * Absent uses the runtime's own.
-   */
-  @property()
-  locale = ''
-
-  /**
-   * What the field says before a time is in it.
-   */
-  @property()
-  placeholder = 'HH:mm'
 
   /**
    * Accessible name for the control that opens the list.
@@ -474,20 +472,22 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   }
 
   /**
-   * Whether the control refuses changes while still submitting its value.
+   * Whether the panel is one list of times or a column each.
    *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
+   * `list` offers whole times, which is what a product with slots or opening
+   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
+   * the locale uses one, which is the only way to reach `23:45` without
+   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
    *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * **Optional rather than defaulted, which is not a style preference.** A
+   * reflecting property with a default writes its attribute onto every host the
+   * moment the element upgrades, including the ones a consumer rendered and did
+   * not touch, and React reads that as a hydration mismatch. The absent
+   * attribute *is* the list, which the stylesheet reads as the base rule, so
+   * only the departure has to be named.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ reflect: true })
+  variant?: 'list' | 'wheels'
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {

@@ -99,6 +99,45 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   autocomplete = ''
 
   /**
+   * Whether the field offers a button that empties it.
+   *
+   * Shown only while there is something to clear, because a control that does
+   * nothing is worse than no control: a reader who presses it and sees no
+   * change has to work out whether the field was already empty or the button
+   * is broken.
+   */
+  @property({ type: Boolean })
+  clearable = false
+
+  /**
+   * What the clear button is called, since an icon has no name of its own.
+   */
+  @property({ attribute: 'clear-label' })
+  clearLabel = 'Clear'
+
+  /**
+   * Most characters the value may have.
+   */
+  @property({ attribute: 'maxlength', type: Number })
+  maxLength?: number
+
+  /**
+   * Fewest characters the value may have.
+   */
+  @property({ attribute: 'minlength', type: Number })
+  minLength?: number
+
+  /**
+   * A regular expression the value has to match, as the platform reads it.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
+   */
+  @property()
+  pattern = ''
+
+  /**
    * Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
@@ -124,58 +163,6 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
-
-  /**
-   * What the field accepts, which decides the keyboard and the validation.
-   *
-   * **Not reflected.** Reflection exists so a selector can reach a value, and
-   * no stylesheet in this repository selects on `type`. Reflecting it writes
-   * `type="text"` onto every `<helix-input>` ever rendered, an attribute no
-   * consumer's markup has, which is the fault the area rules write up under
-   * `Button`'s `href`, `target` and `rel`.
-   *
-   * Nothing reads it from the attribute either. The real `<input>` inside takes
-   * it as a property binding, which is what makes the keyboard and the
-   * validation follow.
-   */
-  @property()
-  type: InputType = 'text'
-
-  /**
-   * Whether the field offers a button that empties it.
-   *
-   * Shown only while there is something to clear, because a control that does
-   * nothing is worse than no control: a reader who presses it and sees no
-   * change has to work out whether the field was already empty or the button
-   * is broken.
-   */
-  @property({ type: Boolean })
-  clearable = false
-
-  /**
-   * What the clear button is called, since an icon has no name of its own.
-   */
-  @property({ attribute: 'clear-label' })
-  clearLabel = 'Clear'
-
-  /**
-   * Whether a password field offers a toggle that shows what was typed.
-   *
-   * Ignored on every other type. A reveal on an email field would be a button
-   * that does nothing visible, and guarding it here rather than asking the
-   * consumer not to means the property can be set once on a component that
-   * changes type.
-   */
-  @property({ type: Boolean })
-  reveal = false
-
-  /**
-   * What the reveal toggle is called.
-   *
-   * The state is `aria-pressed`, not this.
-   */
-  @property({ attribute: 'reveal-label' })
-  revealLabel = 'Show password'
 
   /**
    * Whether the password is currently showing.
@@ -388,26 +375,39 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   }
 
   /**
-   * A regular expression the value has to match, as the platform reads it.
+   * Whether a password field offers a toggle that shows what was typed.
    *
-   * Forwarded rather than checked here, which is the whole reason validity is
-   * the platform's: the browser knows what a `pattern` means, anchors it at both
-   * ends, and produces the message in the reader's own language.
+   * Ignored on every other type. A reveal on an email field would be a button
+   * that does nothing visible, and guarding it here rather than asking the
+   * consumer not to means the property can be set once on a component that
+   * changes type.
+   */
+  @property({ type: Boolean })
+  reveal = false
+
+  /**
+   * What the reveal toggle is called.
+   *
+   * The state is `aria-pressed`, not this.
+   */
+  @property({ attribute: 'reveal-label' })
+  revealLabel = 'Show password'
+
+  /**
+   * What the field accepts, which decides the keyboard and the validation.
+   *
+   * **Not reflected.** Reflection exists so a selector can reach a value, and
+   * no stylesheet in this repository selects on `type`. Reflecting it writes
+   * `type="text"` onto every `<helix-input>` ever rendered, an attribute no
+   * consumer's markup has, which is the fault the area rules write up under
+   * `Button`'s `href`, `target` and `rel`.
+   *
+   * Nothing reads it from the attribute either. The real `<input>` inside takes
+   * it as a property binding, which is what makes the keyboard and the
+   * validation follow.
    */
   @property()
-  pattern = ''
-
-  /**
-   * Fewest characters the value may have.
-   */
-  @property({ attribute: 'minlength', type: Number })
-  minLength?: number
-
-  /**
-   * Most characters the value may have.
-   */
-  @property({ attribute: 'maxlength', type: Number })
-  maxLength?: number
+  type: InputType = 'text'
 
   protected override render(): TemplateResult {
     /* Label, field, and one line under it.

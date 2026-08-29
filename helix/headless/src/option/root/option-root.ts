@@ -45,93 +45,12 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-option')
 export class HelixHeadlessOption extends HelixElement {
   /**
-   * Whether this choice can be made.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
-
-  /**
-   * A second line under the words, for what the choice actually is.
-   *
-   * A palette row reads better as a name and a caption than as one sentence
-   * carrying both: "Helix" and "the design system" are two facts, and a comma
-   * between them makes a reader parse the punctuation to find where the name
-   * ends. Matching still reads the label, so what somebody types is matched
-   * against the name rather than against prose about it.
-   *
-   * **A property and not a slot, which is the departure worth explaining.** The
-   * area rules say a content property is its slot's fallback, and that holds for
-   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
-   * usually absent, and a wrapped slot generates a box whether or not it is
-   * filled, so every option without a caption would carry an empty line. The
-   * detection that would avoid it does not exist, `:host(:has())` being invalid
-   * and the server having no children to inspect. A property is known at render
-   * time, so the component can decline to draw the box at all.
-   *
-   * It does not reflect, per the rule that payload state stays off the host: a
-   * string is not a fact a selector needs.
-   */
-  @property()
-  description?: string
-
-  /**
    * Whether this is the option the keyboard is on.
    *
    * Written by the listbox.
    */
   @property({ attribute: 'data-active', reflect: true, type: Boolean })
   active = false
-
-  /**
-   * Whether the markup declared this one chosen, which is what a reset returns to.
-   *
-   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
-   * live state that does not reflect, and those are two different facts. This
-   * element has one `selected` doing both jobs, so what is captured here is what
-   * the markup said at upgrade, before anything could overwrite it: read the
-   * attribute later and the listbox's own writes answer instead.
-   *
-   * **The deeper half is 302 and is not this.** State reflecting under the
-   * declaration's name is the fault `TreeItem` already avoids by mirroring to
-   * `data-selected`, and four families here still write `selected` back into a
-   * consumer's markup. Splitting them means moving what every stylesheet selects
-   * on, which is a change of its own rather than a property being added.
-   */
-  get defaultSelected(): boolean {
-    return this.seeded
-  }
-
-  set defaultSelected(next: boolean) {
-    this.seeded = next
-  }
-
-  /** What the markup said, read once at construction for the reason above. */
-  private seeded = this.hasAttribute('selected')
-
-  /**
-   * Whether this choice is currently chosen.
-   *
-   * Written by the listbox.
-   */
-  @property({ type: Boolean })
-  selected = false
-
-  /**
-   * A shorter name for this choice, for where the row does not fit.
-   *
-   * `<option label>`'s own meaning: the text a chooser shows when it has less
-   * room than the row does, which is what a select's closed trigger has. Empty
-   * means the row's own content, which is the common case and is why this is not
-   * simply the accessible name.
-   */
-  @property()
-  label = ''
-
-  /**
-   * Identifies this choice, and is what a form submits.
-   */
-  @property()
-  value = ''
 
   /**
    * A second destination for this row, taken with the modifier held.
@@ -164,6 +83,87 @@ export class HelixHeadlessOption extends HelixElement {
    */
   @property({ attribute: 'alternate-label' })
   alternateLabel = ''
+
+  /**
+   * Whether the markup declared this one chosen, which is what a reset returns to.
+   *
+   * `<option selected>` reflects to `defaultSelected` and `option.selected` is
+   * live state that does not reflect, and those are two different facts. This
+   * element has one `selected` doing both jobs, so what is captured here is what
+   * the markup said at upgrade, before anything could overwrite it: read the
+   * attribute later and the listbox's own writes answer instead.
+   *
+   * **The deeper half is 302 and is not this.** State reflecting under the
+   * declaration's name is the fault `TreeItem` already avoids by mirroring to
+   * `data-selected`, and four families here still write `selected` back into a
+   * consumer's markup. Splitting them means moving what every stylesheet selects
+   * on, which is a change of its own rather than a property being added.
+   */
+  get defaultSelected(): boolean {
+    return this.seeded
+  }
+
+  set defaultSelected(next: boolean) {
+    this.seeded = next
+  }
+
+  /** What the markup said, read once at construction for the reason above. */
+  private seeded = this.hasAttribute('selected')
+
+  /**
+   * A second line under the words, for what the choice actually is.
+   *
+   * A palette row reads better as a name and a caption than as one sentence
+   * carrying both: "Helix" and "the design system" are two facts, and a comma
+   * between them makes a reader parse the punctuation to find where the name
+   * ends. Matching still reads the label, so what somebody types is matched
+   * against the name rather than against prose about it.
+   *
+   * **A property and not a slot, which is the departure worth explaining.** The
+   * area rules say a content property is its slot's fallback, and that holds for
+   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+   * usually absent, and a wrapped slot generates a box whether or not it is
+   * filled, so every option without a caption would carry an empty line. The
+   * detection that would avoid it does not exist, `:host(:has())` being invalid
+   * and the server having no children to inspect. A property is known at render
+   * time, so the component can decline to draw the box at all.
+   *
+   * It does not reflect, per the rule that payload state stays off the host: a
+   * string is not a fact a selector needs.
+   */
+  @property()
+  description?: string
+
+  /**
+   * Whether this choice can be made.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
+  /**
+   * A shorter name for this choice, for where the row does not fit.
+   *
+   * `<option label>`'s own meaning: the text a chooser shows when it has less
+   * room than the row does, which is what a select's closed trigger has. Empty
+   * means the row's own content, which is the common case and is why this is not
+   * simply the accessible name.
+   */
+  @property()
+  label = ''
+
+  /**
+   * Whether this choice is currently chosen.
+   *
+   * Written by the listbox.
+   */
+  @property({ type: Boolean })
+  selected = false
+
+  /**
+   * Identifies this choice, and is what a form submits.
+   */
+  @property()
+  value = ''
 
   /**
    * The words, for a listbox that has to match text against them.

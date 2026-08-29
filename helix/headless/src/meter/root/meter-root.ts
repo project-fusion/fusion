@@ -58,64 +58,6 @@ export type MeterBand = 'fair' | 'good' | 'poor'
 @customElement('helix-headless-meter')
 export class HelixHeadlessMeter extends HelixElement {
   /**
-   * Accessible name for the reading.
-   */
-  @property()
-  label = 'Meter'
-
-  /**
-   * Bottom of the range.
-   */
-  @property({ type: Number })
-  min = 0
-
-  /**
-   * Top of the range.
-   *
-   * A hundred rather than the platform's one, which is what `Progress` already
-   * takes and what a consumer writing `value="72"` means. A range of zero to one
-   * is a fraction, and a component that reads `value="72"` as seventy-two times
-   * over its maximum is a trap that costs nothing to avoid.
-   */
-  @property({ type: Number })
-  max = 100
-
-  /**
-   * Where the reading sits between `min` and `max`.
-   *
-   * Outside them, it clamps.
-   */
-  @property({ type: Number })
-  value = 0
-
-  /**
-   * Top of the low band.
-   *
-   * Absent leaves the range unbanded.
-   */
-  @property({ type: Number })
-  low?: number
-
-  /**
-   * Bottom of the high band.
-   *
-   * Absent leaves the range unbanded.
-   */
-  @property({ type: Number })
-  high?: number
-
-  /**
-   * Where in the range it is best to be.
-   *
-   * Defaults to the middle of whatever bands are declared, which is the
-   * platform's own default and the right one for a score. A meter where low is
-   * good, like disk usage, says `optimum="0"`; one where high is good, like a
-   * battery, says `optimum="100"`.
-   */
-  @property({ type: Number })
-  optimum?: number
-
-  /**
    * The band, said outright, where the three thresholds cannot say it.
    *
    * **The specification's model has a shape, and it is worth knowing before
@@ -145,6 +87,56 @@ export class HelixHeadlessMeter extends HelixElement {
   band?: MeterBand
 
   /**
+   * Bottom of the high band.
+   *
+   * Absent leaves the range unbanded.
+   */
+  @property({ type: Number })
+  high?: number
+
+  /**
+   * Accessible name for the reading.
+   */
+  @property()
+  label = 'Meter'
+
+  /**
+   * Top of the low band.
+   *
+   * Absent leaves the range unbanded.
+   */
+  @property({ type: Number })
+  low?: number
+
+  /**
+   * Top of the range.
+   *
+   * A hundred rather than the platform's one, which is what `Progress` already
+   * takes and what a consumer writing `value="72"` means. A range of zero to one
+   * is a fraction, and a component that reads `value="72"` as seventy-two times
+   * over its maximum is a trap that costs nothing to avoid.
+   */
+  @property({ type: Number })
+  max = 100
+
+  /**
+   * Bottom of the range.
+   */
+  @property({ type: Number })
+  min = 0
+
+  /**
+   * Where in the range it is best to be.
+   *
+   * Defaults to the middle of whatever bands are declared, which is the
+   * platform's own default and the right one for a score. A meter where low is
+   * good, like disk usage, says `optimum="0"`; one where high is good, like a
+   * battery, says `optimum="100"`.
+   */
+  @property({ type: Number })
+  optimum?: number
+
+  /**
    * Whether the reading is drawn as a bar, a ring or an arc.
    *
    * A gauge and a meter are the same thing measured: a value in a range, with
@@ -170,6 +162,14 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
+
+  /**
+   * Where the reading sits between `min` and `max`.
+   *
+   * Outside them, it clamps.
+   */
+  @property({ type: Number })
+  value = 0
 
   /**
    * What the reading says, where a number is not the whole story.

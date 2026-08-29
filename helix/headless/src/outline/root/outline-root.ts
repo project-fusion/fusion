@@ -66,22 +66,6 @@ export class HelixHeadlessOutline extends HelixElement {
   })
 
   /**
-   * Accessible name for the navigation.
-   */
-  @property()
-  label = 'On this page'
-
-  /**
-   * How far below the top of the window a heading counts as reached, in pixels.
-   *
-   * The reading line. A page with a sticky masthead sets this to its height, or
-   * a little more: without it the current section changes as a heading slides
-   * under the chrome rather than as it reaches the top of what can be seen.
-   */
-  @property({ type: Number })
-  offset = 0
-
-  /**
    * How a click on one of these links travels to its section.
    *
    * The platform's own vocabulary, because this is the platform's own option:
@@ -104,6 +88,22 @@ export class HelixHeadlessOutline extends HelixElement {
    */
   @property()
   behavior: ScrollBehavior = 'auto'
+
+  /**
+   * Accessible name for the navigation.
+   */
+  @property()
+  label = 'On this page'
+
+  /**
+   * How far below the top of the window a heading counts as reached, in pixels.
+   *
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
+   */
+  @property({ type: Number })
+  offset = 0
 
   /**
    * The id of the section being read, or empty before anything is measured.

@@ -139,83 +139,6 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   autocomplete = ''
 
   /**
-   * How many dates can be held at once.
-   *
-   * Absent is one. `range` holds a start and an end, `multiple` holds any
-   * number, and both are carried as one comma-separated value: a form field
-   * submits a string, and two fields for one question is a different control.
-   */
-  @property({ reflect: true })
-  mode?: 'range' | 'multiple'
-
-  /**
-   * How many months the calendar shows, side by side.
-   *
-   * Worth more than one mainly for a range, where picking a start in March and
-   * an end in April otherwise means paging between them and losing sight of the
-   * first. The panel is sized by its content, so this widens it.
-   */
-  @property({ type: Number })
-  months = 1
-
-  /**
-   * How many dates are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default: a cap that guesses is worse than no
-   * cap, because the number that fits depends on the width of the field and the
-   * length of what is in it, neither of which this element knows. What a cap is
-   * genuinely for is a field in a row or a table cell, where a set of twelve
-   * dates would push everything below it down a line at a time.
-   *
-   * The remainder is counted rather than hidden. `+3` is a fact a reader can
-   * act on, where a row that silently stops is a field that appears to have lost
-   * what was put in it, and the count is what tells them there is more to see.
-   */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
-
-  /**
-   * Earliest date that can be chosen, as `YYYY-MM-DD`.
-   */
-  @property()
-  min = ''
-
-  /**
-   * How far apart the selectable dates are, in days.
-   *
-   * `<input type="date" step>`'s own unit, handed to the calendar this renders
-   * so the field and the grid agree about which dates exist. Counted from `min`
-   * where there is one and from 1 January 1970 where there is not, which is the
-   * platform's base.
-   */
-  @property({ type: Number })
-  step = 1
-
-  /**
-   * Latest date that can be chosen, as `YYYY-MM-DD`.
-   */
-  @property()
-  max = ''
-
-  /**
-   * Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
-   */
-  @property({ attribute: 'disable-dates' })
-  disableDates = ''
-
-  /**
-   * Days of the week that cannot be chosen, `0` for Sunday through `6`.
-   */
-  @property({ attribute: 'disable-days' })
-  disableDays = ''
-
-  /**
-   * First column of the week in the calendar, `0` for Sunday through `6`.
-   */
-  @property({ attribute: 'first-day-of-week', type: Number })
-  firstDayOfWeek = 0
-
-  /**
    * How a date is written in the field: `short` through `full`, or ISO.
    *
    * **The field renders when it is idle and holds the value when it is being
@@ -243,10 +166,76 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   dateStyle: 'full' | 'iso' | 'long' | 'medium' | 'short' = 'long'
 
   /**
+   * Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   */
+  @property({ attribute: 'disable-dates' })
+  disableDates = ''
+
+  /**
+   * Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   */
+  @property({ attribute: 'disable-days' })
+  disableDays = ''
+
+  /**
+   * First column of the week in the calendar, `0` for Sunday through `6`.
+   */
+  @property({ attribute: 'first-day-of-week', type: Number })
+  firstDayOfWeek = 0
+
+  /**
    * Language tag the calendar names its months and days in.
    */
   @property()
   locale = ''
+
+  /**
+   * Latest date that can be chosen, as `YYYY-MM-DD`.
+   */
+  @property()
+  max = ''
+
+  /**
+   * How many dates are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * dates would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can
+   * act on, where a row that silently stops is a field that appears to have lost
+   * what was put in it, and the count is what tells them there is more to see.
+   */
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
+
+  /**
+   * Earliest date that can be chosen, as `YYYY-MM-DD`.
+   */
+  @property()
+  min = ''
+
+  /**
+   * How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   */
+  @property({ reflect: true })
+  mode?: 'range' | 'multiple'
+
+  /**
+   * How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
+   */
+  @property({ type: Number })
+  months = 1
 
   /**
    * What the field says before a date is in it.
@@ -255,10 +244,31 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   placeholder = 'YYYY-MM-DD'
 
   /**
-   * Accessible name for the control that opens the calendar.
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    */
-  @property({ attribute: 'trigger-label' })
-  triggerLabel = 'Choose a date'
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
+   * How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, handed to the calendar this renders
+   * so the field and the grid agree about which dates exist. Counted from `min`
+   * where there is one and from 1 January 1970 where there is not, which is the
+   * platform's base.
+   */
+  @property({ type: Number })
+  step = 1
 
   /**
    * The overlay, placed against the field rather than the trigger.
@@ -516,20 +526,10 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   }
 
   /**
-   * Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * Accessible name for the control that opens the calendar.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ attribute: 'trigger-label' })
+  triggerLabel = 'Choose a date'
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {

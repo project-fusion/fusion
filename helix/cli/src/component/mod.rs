@@ -54,6 +54,7 @@ pub mod pairings;
 pub mod parts;
 pub mod platform_fidelity;
 pub mod print;
+pub mod properties;
 pub mod reachable;
 pub mod reflected;
 pub mod reflected_defaults;
@@ -334,6 +335,13 @@ impl Report {
 }
 
 pub struct Rule {
+    /// `None` for a rule that judges and cannot write, which is most of them.
+    ///
+    /// **A rule that can write still judges first.** The verb decides which half
+    /// runs, so a `fix` is never a second opinion about what is wrong: it is the
+    /// same reading, applied. Only an ordering rule has one here, because an
+    /// order is the one kind of finding whose repair is mechanical.
+    pub fix: Option<fn(&Context) -> Vec<String>>,
     pub name: &'static str,
     pub run: Runner,
     pub summary: &'static str,
@@ -371,196 +379,241 @@ make the set harder to read, which is the opposite of what the lint is for. */
 pub fn all() -> Vec<Rule> {
     vec![
         Rule {
+            fix: None,
             name: "attribute-names",
             run: Runner::Source(attribute_names::run),
             summary: "a property mirroring a platform attribute uses the platform's spelling",
         },
         Rule {
+            fix: None,
             name: "floors",
             run: Runner::Meta(floors::run),
             summary: "every rule counted something",
         },
         Rule {
+            fix: None,
             name: "attributes",
             run: Runner::Source(attributes::run),
             summary: "a document rule selects a component only by an attribute it reflects",
         },
         Rule {
+            fix: None,
             name: "axes",
             run: Runner::Source(axes::run),
             summary: "every visual value a component declares is drawn from a registered axis",
         },
         Rule {
+            fix: None,
             name: "cancelable",
             run: Runner::Source(cancelable::run),
             summary: "an event that can be refused says so, and one that cannot does not",
         },
         Rule {
+            fix: None,
             name: "categories",
             run: Runner::Source(categories::run),
             summary: "both layers give one answer about what a family is for",
         },
         Rule {
+            fix: None,
             name: "composed",
             run: Runner::Source(composed::run),
             summary: "a component renders a tag it imports, and never names one literally",
         },
         Rule {
+            fix: None,
             name: "disabled",
             run: Runner::Source(disabled::run),
             summary: "a form control reads `:host(:disabled)` rather than the attribute",
         },
         Rule {
+            fix: None,
             name: "events",
             run: Runner::Source(events::run),
             summary: "an event a component dispatches is one it declares",
         },
         Rule {
+            fix: None,
             name: "example-values",
             run: Runner::Source(example_values::run),
             summary: "every attribute value in an example is one its component states",
         },
         Rule {
+            fix: None,
             name: "examples",
             run: Runner::Source(examples::run),
             summary: "every example is checked against the manifest it documents",
         },
         Rule {
+            fix: None,
             name: "examples-paired",
             run: Runner::Source(examples_paired::run),
             summary: "every example is authored on both layers and in both syntaxes",
         },
         Rule {
+            fix: None,
             name: "exportparts",
             run: Runner::Source(exportparts::run),
             summary: "a composed child's parts are forwarded, prefixed and reachable",
         },
         Rule {
+            fix: None,
             name: "fallbacks",
             run: Runner::Source(fallbacks::run),
             summary: "a slot's fallback markup sits behind a seam a tier can move",
         },
         Rule {
+            fix: None,
             name: "glyphs",
             run: Runner::Source(glyphs::run),
             summary: "no component renders the icon element for itself",
         },
         Rule {
+            fix: None,
             name: "grounds",
             run: Runner::Source(grounds::run),
             summary: "a component painting the page's color can be corrected",
         },
         Rule {
+            fix: None,
             name: "hook-names",
             run: Runner::Source(hook_names::run),
             summary: "a component hook spells one idea one way",
         },
         Rule {
+            fix: None,
             name: "hooks",
             run: Runner::Source(hooks::run),
             summary: "a documented CSS hook is read, named after its family, and owned by one",
         },
         Rule {
+            fix: None,
             name: "leaks",
             run: Runner::Source(leaks::run),
             summary: "a subscription an element takes out does not outlive the element",
         },
         Rule {
+            fix: None,
             name: "motion",
             run: Runner::Source(motion::run),
             summary: "a stylesheet that moves answers `prefers-reduced-motion`",
         },
         Rule {
+            fix: None,
             name: "observers",
             run: Runner::Source(observers::run),
             summary: "an observer torn down on disconnect is registered again on reconnect",
         },
         Rule {
+            fix: None,
             name: "overruled",
             run: Runner::Source(overruled::run),
             summary: "a component's own CSS is not silently beaten by a document rule",
         },
         Rule {
+            fix: None,
             name: "pairings",
             run: Runner::Source(pairings::run),
             summary: "every ink-on-ground pair a component paints is one the model measures",
         },
         Rule {
+            fix: None,
             name: "parts",
             run: Runner::Source(parts::run),
             summary: "a documented part is rendered, and a rendered part is documented",
         },
         Rule {
+            fix: None,
             name: "platform-fidelity",
             run: Runner::Source(platform_fidelity::run),
             summary: "a component standing in for a native element mirrors what it has",
         },
         Rule {
+            fix: None,
             name: "print",
             run: Runner::Source(print::run),
             summary: "every family with a stylesheet says what it does on paper",
         },
         Rule {
+            fix: Some(properties::fix),
+            name: "properties",
+            run: Runner::Source(properties::run),
+            summary: "a component declares its reactive properties in one order",
+        },
+        Rule {
+            fix: None,
             name: "reachable",
             run: Runner::Source(reachable::run),
             summary: "every attribute a stylesheet selects on the host reflects from a property",
         },
         Rule {
+            fix: None,
             name: "reflected",
             run: Runner::Source(reflected::run),
             summary: "no reflected property carries a default",
         },
         Rule {
+            fix: None,
             name: "reflected-defaults",
             run: Runner::Source(reflected_defaults::run),
             summary: "a reflected property is silent until something sets it",
         },
         Rule {
+            fix: None,
             name: "seams",
             run: Runner::Source(seams::run),
             summary: "a base component renders another family behind an overridable method",
         },
         Rule {
+            fix: None,
             name: "seeds",
             run: Runner::Source(seeds::run),
             summary: "every name the theme engine emits is one the stylesheet reads",
         },
         Rule {
+            fix: None,
             name: "selectors",
             run: Runner::Source(selectors::run),
             summary: "every selector a component writes matches something it renders",
         },
         Rule {
+            fix: None,
             name: "separation",
             run: Runner::Source(separation::run),
             summary: "a surface hooks both its edge and its lift",
         },
         Rule {
+            fix: None,
             name: "ssr",
             run: Runner::Source(ssr::run),
             summary: "a server-rendered assertion is made against structure, not the string",
         },
         Rule {
+            fix: None,
             name: "stable",
             run: Runner::Source(stable::run),
             summary: "`@status stable` means what stable has to mean",
         },
         Rule {
+            fix: None,
             name: "tier",
             run: Runner::Source(tier::run),
             summary: "a component that renders a child renders one from its own layer",
         },
         Rule {
+            fix: None,
             name: "token-defaults",
             run: Runner::Source(token_defaults::run),
             summary: "a token a component reads resolves on a page matching no state",
         },
         Rule {
+            fix: None,
             name: "tokens",
             run: Runner::Source(tokens::run),
             summary: "no raw value where a token belongs, and none reached for or dangling",
         },
         Rule {
+            fix: None,
             name: "vocabulary",
             run: Runner::Source(vocabulary::run),
             summary: "one spelling for each role a part name can play",

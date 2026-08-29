@@ -107,15 +107,6 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   min = 0
 
   /**
-   * The smallest part of a mark that can be chosen.
-   *
-   * `0.5` is the half star, and it is the reason the value is a number rather
-   * than an index: with halves, five marks are ten answers.
-   */
-  @property({ type: Number })
-  step = 1
-
-  /**
    * Whether this shows a score rather than asks for one.
    *
    * A readout is not a control that has been switched off. It takes no focus,
@@ -123,17 +114,6 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
-
-  /**
-   * How the score is read out, where "3.5 out of 5" is not what it should say.
-   *
-   * A rating out of five is one of the few places a screen reader gets a worse
-   * answer from the value than from a sentence: "3.5" alone is a number without
-   * a subject. This names the readout, where a control is named by its `label`
-   * and each of its options by the score that option is.
-   */
-  @property({ attribute: 'value-text' })
-  valueText = ''
 
   /**
    * Whether the score is written out beside the marks.
@@ -149,6 +129,26 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
+
+  /**
+   * The smallest part of a mark that can be chosen.
+   *
+   * `0.5` is the half star, and it is the reason the value is a number rather
+   * than an index: with halves, five marks are ten answers.
+   */
+  @property({ type: Number })
+  step = 1
+
+  /**
+   * How the score is read out, where "3.5 out of 5" is not what it should say.
+   *
+   * A rating out of five is one of the few places a screen reader gets a worse
+   * answer from the value than from a sentence: "3.5" alone is a number without
+   * a subject. This names the readout, where a control is named by its `label`
+   * and each of its options by the score that option is.
+   */
+  @property({ attribute: 'value-text' })
+  valueText = ''
 
   /**
    * The shape a consumer slotted, if they slotted one.

@@ -65,6 +65,12 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   label = 'Actions'
 
   /**
+   * Space between the trigger and the actions, in pixels.
+   */
+  @property({ type: Number })
+  offset = 12
+
+  /**
    * Which way the actions fan out. They move if that side does not fit.
    *
    * Up by default, because the control this hangs off is usually docked to the
@@ -72,12 +78,6 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    */
   @property()
   placement: Placement = 'top-end'
-
-  /**
-   * Space between the trigger and the actions, in pixels.
-   */
-  @property({ type: Number })
-  offset = 12
 
   /* Nothing reserved: see the note above. `selects` is false because arriving at
      Delete must not delete, which is the difference between a set of commands

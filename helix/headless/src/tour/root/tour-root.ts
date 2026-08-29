@@ -71,10 +71,10 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
 @customElement('helix-headless-tour')
 export class HelixHeadlessTour extends HelixElement {
   /**
-   * Whether the tour is running.
+   * Label for the control that goes back, handed to every stop.
    */
-  @property({ reflect: true, type: Boolean })
-  open = false
+  @property({ attribute: 'back-label' })
+  backLabel = ''
 
   /**
    * Which stop the reader is on.
@@ -109,22 +109,16 @@ export class HelixHeadlessTour extends HelixElement {
   private indexState: number | undefined = undefined
 
   /**
+   * Label for the control that goes on from the last stop.
+   */
+  @property({ attribute: 'done-label' })
+  doneLabel = ''
+
+  /**
    * Accessible name for the run, such as "Getting started".
    */
   @property()
   label = ''
-
-  /**
-   * Space left around the target when it is lit, in pixels.
-   */
-  @property({ attribute: 'spotlight-padding', type: Number })
-  spotlightPadding = 8
-
-  /**
-   * Label for the control that goes back, handed to every stop.
-   */
-  @property({ attribute: 'back-label' })
-  backLabel = ''
 
   /**
    * Label for the control that goes on.
@@ -133,16 +127,22 @@ export class HelixHeadlessTour extends HelixElement {
   nextLabel = ''
 
   /**
-   * Label for the control that goes on from the last stop.
+   * Whether the tour is running.
    */
-  @property({ attribute: 'done-label' })
-  doneLabel = ''
+  @property({ reflect: true, type: Boolean })
+  open = false
 
   /**
    * Label for the control that leaves the tour.
    */
   @property({ attribute: 'skip-label' })
   skipLabel = ''
+
+  /**
+   * Space left around the target when it is lit, in pixels.
+   */
+  @property({ attribute: 'spotlight-padding', type: Number })
+  spotlightPadding = 8
 
   @queryAssignedElements({ flatten: true })
   private assigned!: HTMLElement[]

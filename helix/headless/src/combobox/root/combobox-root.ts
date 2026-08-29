@@ -179,25 +179,6 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   autocomplete = 'off'
 
   /**
-   * Text shown while nothing has been chosen.
-   */
-  @property()
-  placeholder = ''
-
-  /**
-   * Whether more than one option can be chosen.
-   *
-   * The list already does the work: `value` comes apart on commas, a press
-   * toggles rather than replaces, and the arrows move without choosing. What
-   * this adds is the tags, and keeping the panel open between picks.
-   *
-   * A comma is therefore not available inside an option's value, which is the
-   * listbox's contract and not this element's to change.
-   */
-  @property({ type: Boolean })
-  multiple = false
-
-  /**
    * Whether the reader may answer with something the list does not hold.
    *
    * The row appears while what is typed matches no option's words exactly, so
@@ -209,44 +190,16 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   creatable = false
 
   /**
-   * Whether the field finishes the word as it is typed.
-   *
-   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
-   * element already sets on the input it renders, and two things of one name
-   * meaning different things on the same control is a question a consumer
-   * should not have to ask.
-   */
-  @property({ type: Boolean })
-  suggest = false
-
-  /**
    * What the create row says, before the words it would add.
    */
   @property({ attribute: 'create-label' })
   createLabel = 'Add'
 
   /**
-   * What a tag's remove control is called, since the mark has no name.
+   * Words shown where the filter has hidden everything.
    */
-  @property({ attribute: 'remove-label' })
-  removeLabel = 'Remove'
-
-  /**
-   * How many tags to draw before the rest become a count. `multiple` only.
-   *
-   * `0` is all of them, and is the default: a cap that guesses is worse than no
-   * cap, because the number that fits depends on the width of the field and the
-   * length of what is in it, neither of which this element knows. What a cap is
-   * genuinely for is a field in a row or a table cell, where a set of twelve
-   * choices would push everything below it down a line at a time.
-   *
-   * The remainder is counted rather than hidden. `+3` is a fact a reader can act
-   * on, where a row that silently stops is a field that appears to have lost
-   * what was put in it. Date Input and Time Input carry the same property and
-   * the same reasoning.
-   */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No matches'
 
   /**
    * Accessible name for the list, which has no visible one of its own.
@@ -270,10 +223,57 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   loadingText = 'Loading'
 
   /**
-   * Words shown where the filter has hidden everything.
+   * How many tags to draw before the rest become a count. `multiple` only.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * choices would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can act
+   * on, where a row that silently stops is a field that appears to have lost
+   * what was put in it. Date Input and Time Input carry the same property and
+   * the same reasoning.
    */
-  @property({ attribute: 'empty-text' })
-  emptyText = 'No matches'
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
+
+  /**
+   * Whether more than one option can be chosen.
+   *
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   */
+  @property({ type: Boolean })
+  multiple = false
+
+  /**
+   * Text shown while nothing has been chosen.
+   */
+  @property()
+  placeholder = ''
+
+  /**
+   * What a tag's remove control is called, since the mark has no name.
+   */
+  @property({ attribute: 'remove-label' })
+  removeLabel = 'Remove'
+
+  /**
+   * Whether the field finishes the word as it is typed.
+   *
+   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
+   * element already sets on the input it renders, and two things of one name
+   * meaning different things on the same control is a question a consumer
+   * should not have to ask.
+   */
+  @property({ type: Boolean })
+  suggest = false
 
   /**
    * What the reader has typed, which narrows the list and is not the value.

@@ -137,40 +137,6 @@ const isTwelveHour = (locale?: string): boolean =>
 @customElement('helix-headless-time-picker')
 export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormElement) {
   /**
-   * Whether the current selection fails validation.
-   *
-   * A flag rather than a message, the same split Date Picker draws. A flat
-   * picker has no room of its own for a sentence: the field that wraps one owns
-   * the label, the hint and the feedback, and a second message inside the panel
-   * would be the same error said twice. What is left for the picker is the one
-   * thing the field cannot draw from outside, the mark on the answer itself.
-   */
-  @property({ reflect: true, type: Boolean })
-  invalid = false
-
-  /**
-   * How far apart the offered times are, in minutes.
-   *
-   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
-   * reader scrolls rather than hunts, and few enough that the list is a list.
-   * Anything under five is a thousand rows and wants a field instead.
-   */
-  @property({ type: Number })
-  step = 15
-
-  /**
-   * Earliest time offered, as `HH:mm`.
-   */
-  @property()
-  min = '00:00'
-
-  /**
-   * Latest time offered, as `HH:mm`.
-   */
-  @property()
-  max = '23:59'
-
-  /**
    * Times that cannot be chosen, comma separated, as `HH:mm`.
    *
    * The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -186,6 +152,24 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   disableTimes = ''
 
   /**
+   * Whether the current selection fails validation.
+   *
+   * A flag rather than a message, the same split Date Picker draws. A flat
+   * picker has no room of its own for a sentence: the field that wraps one owns
+   * the label, the hint and the feedback, and a second message inside the panel
+   * would be the same error said twice. What is left for the picker is the one
+   * thing the field cannot draw from outside, the mark on the answer itself.
+   */
+  @property({ reflect: true, type: Boolean })
+  invalid = false
+
+  /**
+   * Accessible name for the list, which has no visible one of its own.
+   */
+  @property()
+  label = 'Time'
+
+  /**
    * Language tag the times are written in.
    *
    * Absent uses the runtime's own.
@@ -194,10 +178,16 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   locale = ''
 
   /**
-   * Accessible name for the list, which has no visible one of its own.
+   * Latest time offered, as `HH:mm`.
    */
   @property()
-  label = 'Time'
+  max = '23:59'
+
+  /**
+   * Earliest time offered, as `HH:mm`.
+   */
+  @property()
+  min = '00:00'
 
   /**
    * How many times can be held at once.
@@ -222,33 +212,26 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   mode?: 'multiple' | 'range'
 
   /**
-   * Whether the times are one list or a column each.
+   * Whether the control refuses changes while still submitting its value.
    *
-   * `list` is the default and offers whole times, which is what a product with
-   * opening hours or slots actually has. `wheels` splits them into an hour, a
-   * minute and, where the locale uses one, a meridiem: three short columns
-   * instead of ninety-six rows, and the only way to reach `23:45` without
-   * scrolling most of a day.
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
    *
-   * The trade is that a wheel cannot say which *combinations* are on offer. A
-   * list of half hours from nine to five is seventeen rows and every one of them
-   * is a time the product has; the same thing as columns is an hour column and a
-   * minute column, and nothing in either says the two are only valid together.
-   * The bounds are still enforced, so a reader can be refused after the fact,
-   * which is worse than not being offered it.
-   *
-   * So: `list` where the set is the point, `wheels` where any time is allowed
-   * and the range is a whole day.
-   *
-   * **Optional rather than defaulted, which is not a style preference.** A
-   * reflecting property with a default writes its attribute onto every host the
-   * moment the element upgrades, including the ones a consumer rendered and did
-   * not touch, and React reads that as a hydration mismatch. The absent
-   * attribute *is* the list, which the stylesheet reads as the base rule, so
-   * only the departure has to be named.
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    */
-  @property({ reflect: true })
-  variant?: 'list' | 'wheels'
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
+   * Whether the form refuses to submit while nothing is chosen.
+   */
+  @property({ reflect: true, type: Boolean })
+  required = false
 
   /**
    * Every time on offer, as minutes since midnight.
@@ -452,20 +435,14 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Whether the control refuses changes while still submitting its value.
+   * How far apart the offered times are, in minutes.
    *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+   * reader scrolls rather than hunts, and few enough that the list is a list.
+   * Anything under five is a thousand rows and wants a field instead.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ type: Number })
+  step = 15
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -476,10 +453,33 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Whether the form refuses to submit while nothing is chosen.
+   * Whether the times are one list or a column each.
+   *
+   * `list` is the default and offers whole times, which is what a product with
+   * opening hours or slots actually has. `wheels` splits them into an hour, a
+   * minute and, where the locale uses one, a meridiem: three short columns
+   * instead of ninety-six rows, and the only way to reach `23:45` without
+   * scrolling most of a day.
+   *
+   * The trade is that a wheel cannot say which *combinations* are on offer. A
+   * list of half hours from nine to five is seventeen rows and every one of them
+   * is a time the product has; the same thing as columns is an hour column and a
+   * minute column, and nothing in either says the two are only valid together.
+   * The bounds are still enforced, so a reader can be refused after the fact,
+   * which is worse than not being offered it.
+   *
+   * So: `list` where the set is the point, `wheels` where any time is allowed
+   * and the range is a whole day.
+   *
+   * **Optional rather than defaulted, which is not a style preference.** A
+   * reflecting property with a default writes its attribute onto every host the
+   * moment the element upgrades, including the ones a consumer rendered and did
+   * not touch, and React reads that as a hydration mismatch. The absent
+   * attribute *is* the list, which the stylesheet reads as the base rule, so
+   * only the departure has to be named.
    */
-  @property({ reflect: true, type: Boolean })
-  required = false
+  @property({ reflect: true })
+  variant?: 'list' | 'wheels'
 
   /**
    * Reports "required and empty", or clears it.

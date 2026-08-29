@@ -37,26 +37,6 @@ export class HelixRadio extends HelixHeadlessRadio {
   static override styles: CSSResultGroup = styles
 
   /**
-   * How the choice presents itself.
-   *
-   * - `plain` is the default and is never written: a circle beside its words,
-   *   which is what a list of choices should be almost always.
-   * - `card` puts it in a bounded surface, for options that need room to
-   *   explain themselves: a description, an icon, a price. It is the half a
-   *   `data-card` link cannot do, because a link reports no value and belongs
-   *   to no group, so a card that is genuinely an answer has to be this.
-   * - `chip` is the answer as its own small surface, for a row of short
-   *   choices read at a glance. It hides the circle, the surface being the
-   *   whole mark, which is why `hide-control` says it is unnecessary here.
-   *
-   * The circle stays in both. A card whose only marker was its own border would
-   * ask a reader to compare surfaces across a row to find the answer, and would
-   * leave nothing for a high-contrast display.
-   */
-  @property({ reflect: true })
-  variant?: 'chip' | 'plain' | 'card'
-
-  /**
    * Takes the circle away, leaving the card as the whole control.
    *
    * Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -76,6 +56,26 @@ export class HelixRadio extends HelixHeadlessRadio {
    */
   @property({ attribute: 'hide-control', reflect: true, type: Boolean })
   hideControl = false
+
+  /**
+   * How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a circle beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   * - `chip` is the answer as its own small surface, for a row of short
+   *   choices read at a glance. It hides the circle, the surface being the
+   *   whole mark, which is why `hide-control` says it is unnecessary here.
+   *
+   * The circle stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
+   */
+  @property({ reflect: true })
+  variant?: 'chip' | 'plain' | 'card'
 }
 
 declare global {

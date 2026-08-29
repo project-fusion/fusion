@@ -52,17 +52,17 @@ export class HelixHeadlessListItem extends HelixElement {
   href = ''
 
   /**
-   * Where the link opens, for the rare row that leaves the site.
-   */
-  @property()
-  target = ''
-
-  /**
    * What the link declares about where it goes. The consumer's decision rather
    * than one derived from `target`, for the reason `Tree.Item` gives.
    */
   @property()
   rel = ''
+
+  /**
+   * Where the link opens, for the rare row that leaves the site.
+   */
+  @property()
+  target = ''
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

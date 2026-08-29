@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { optimize } from 'svgo'
 
 /**
  * Generates the icon set.
@@ -18,6 +19,21 @@ import { fileURLToPath } from 'node:url'
  * carries its own stroke and fill. Flattening that to one `d` attribute would
  * lose those, so the inner markup is kept verbatim and the component renders
  * it.
+ *
+ * **Every glyph goes through svgo before its markup is taken.** What ships is a
+ * string in a module a browser parses, so the attributes an authoring tool
+ * leaves behind are bytes on the wire for every consumer: a `width` and a
+ * `height` the component overrides, an `xmlns` that means nothing inside an
+ * inlined fragment, coordinates carrying more precision than a 256-unit box can
+ * show.
+ *
+ * **Two of its defaults are wrong here and are turned off.** `removeViewBox`
+ * would take the one attribute the component needs to scale by, and it is on by
+ * default precisely because most callers keep the whole `<svg>` element where a
+ * width and height suffice — this one keeps the inside and supplies its own box.
+ * `cleanupIds` would rewrite `fusion.svg`'s gradient ids to single letters,
+ * which is safe today for the reason below and would stop being safe the moment
+ * two icons with minified ids met in one tree.
  *
  * `fusion.svg` defines gradients by id and is not skipped for it. Ids are
  * scoped to their *tree*, and a shadow root is a tree: `helix-icon` renders
@@ -66,6 +82,17 @@ const sourceFor = (slug) => {
   throw new Error(`icons: no SVG for "${slug}" in @phosphor-icons/core or helix/icons/raw`)
 }
 
+/* `removeViewBox` and `cleanupIds` off, for the reasons in the docblock. */
+const SVGO = {
+  multipass: true,
+  plugins: [
+    {
+      name: 'preset-default',
+      params: { overrides: { cleanupIds: false, removeViewBox: false } },
+    },
+  ],
+}
+
 /** `caret-down` becomes `caretDown`, which is what a consumer imports. */
 const camel = (slug) => slug.replace(/-([a-z0-9])/g, (_, char) => char.toUpperCase())
 
@@ -75,7 +102,7 @@ const entries = readFileSync(LIST, 'utf8')
   .filter((line) => line !== '' && !line.startsWith('#'))
   .sort()
   .map((slug) => {
-    const source = sourceFor(slug)
+    const source = optimize(sourceFor(slug), SVGO).data
 
     const viewBox = /viewBox="([^"]+)"/.exec(source)?.[1] ?? '0 0 256 256'
     const inner = source

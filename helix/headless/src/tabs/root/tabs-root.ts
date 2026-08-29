@@ -60,6 +60,22 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   })
 
   /**
+   * Accessible name for the tab list.
+   */
+  @property()
+  label = 'Tabs'
+
+  /**
+   * Whether arrowing to a tab also selects it.
+   *
+   * Automatic is the default because showing a panel is usually cheap. Set this
+   * where it is not, so a reader arrowing past four tabs does not load four
+   * panels on the way.
+   */
+  @property({ reflect: true, type: Boolean })
+  manual = false
+
+  /**
    * How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -77,22 +93,6 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    */
   @property({ reflect: true })
   variant?: 'segmented' | 'underlined'
-
-  /**
-   * Accessible name for the tab list.
-   */
-  @property()
-  label = 'Tabs'
-
-  /**
-   * Whether arrowing to a tab also selects it.
-   *
-   * Automatic is the default because showing a panel is usually cheap. Set this
-   * where it is not, so a reader arrowing past four tabs does not load four
-   * panels on the way.
-   */
-  @property({ reflect: true, type: Boolean })
-  manual = false
 
   /** Watches for anything that moves a tab, since none of it is a property. */
   private observer: ResizeObserver | undefined

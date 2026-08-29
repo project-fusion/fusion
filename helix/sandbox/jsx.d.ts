@@ -212,16 +212,14 @@ export type HelixSandboxEditorHelixCaretElementEvent =
   HelixSandboxEditorElementEvent<HelixCaretEvent>;
 
 export type HelixSandboxEditorProps = {
-  /** The source being edited. */
-  value?: HelixSandboxEditor["value"];
-  /** Which source this pane holds, echoed in every change. */
-  name?: HelixSandboxEditor["name"];
-  /** How to highlight it. */
-  language?: HelixSandboxEditor["language"];
   /** Accessible name for the editable region. */
   "field-label"?: HelixSandboxEditor["fieldLabel"];
   /** Accessible name for the editable region. */
   fieldLabel?: HelixSandboxEditor["fieldLabel"];
+  /** How to highlight it. */
+  language?: HelixSandboxEditor["language"];
+  /** Which source this pane holds, echoed in every change. */
+  name?: HelixSandboxEditor["name"];
   /** Whether the text can be changed.
 
 `EditorState.readOnly` rather than removing the editor's focus or its
@@ -234,6 +232,8 @@ cursor in it to read a long line. What it stops is the typing. */
 keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
   readOnly?: HelixSandboxEditor["readOnly"];
+  /** The source being edited. */
+  value?: HelixSandboxEditor["value"];
 
   /** Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-edit"?: (
@@ -244,16 +244,14 @@ cursor in it to read a long line. What it stops is the typing. */
 };
 
 export type HelixSandboxEditorSolidJsProps = {
-  /** The source being edited. */
-  "prop:value"?: HelixSandboxEditor["value"];
-  /** Which source this pane holds, echoed in every change. */
-  "prop:name"?: HelixSandboxEditor["name"];
-  /** How to highlight it. */
-  "prop:language"?: HelixSandboxEditor["language"];
   /** Accessible name for the editable region. */
   "attr:field-label"?: HelixSandboxEditor["fieldLabel"];
   /** Accessible name for the editable region. */
   "prop:fieldLabel"?: HelixSandboxEditor["fieldLabel"];
+  /** How to highlight it. */
+  "prop:language"?: HelixSandboxEditor["language"];
+  /** Which source this pane holds, echoed in every change. */
+  "prop:name"?: HelixSandboxEditor["name"];
   /** Whether the text can be changed.
 
 `EditorState.readOnly` rather than removing the editor's focus or its
@@ -266,6 +264,8 @@ cursor in it to read a long line. What it stops is the typing. */
 keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
   "prop:readOnly"?: HelixSandboxEditor["readOnly"];
+  /** The source being edited. */
+  "prop:value"?: HelixSandboxEditor["value"];
   /** Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-edit"?: (
     e: HelixSandboxEditorHelixBeforeEditElementEvent,
@@ -284,12 +284,12 @@ export type HelixSandboxSpecsProps = {
 
 Changing it runs them. */
   family?: HelixSandboxSpecs["family"];
+  /** Accessible name for the results. */
+  label?: HelixSandboxSpecs["label"];
   /** The document that runs them.
 
 Same origin, and it must stay that way. */
   src?: HelixSandboxSpecs["src"];
-  /** Accessible name for the results. */
-  label?: HelixSandboxSpecs["label"];
 };
 
 export type HelixSandboxSpecsSolidJsProps = {
@@ -297,12 +297,12 @@ export type HelixSandboxSpecsSolidJsProps = {
 
 Changing it runs them. */
   "prop:family"?: HelixSandboxSpecs["family"];
+  /** Accessible name for the results. */
+  "prop:label"?: HelixSandboxSpecs["label"];
   /** The document that runs them.
 
 Same origin, and it must stay that way. */
   "prop:src"?: HelixSandboxSpecs["src"];
-  /** Accessible name for the results. */
-  "prop:label"?: HelixSandboxSpecs["label"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -329,15 +329,15 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every change.
-   * - `language`: How to highlight it.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `language`: How to highlight it.
+   * - `name`: Which source this pane holds, echoed in every change.
    * - `readonly`/`readOnly`: Whether the text can be changed.
    *
    * `EditorState.readOnly` rather than removing the editor's focus or its
    * keymap: a reader still needs to select the text, scroll it, and put a
    * cursor in it to read a long line. What it stops is the typing.
+   * - `value`: The source being edited.
    * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -421,10 +421,10 @@ export type CustomElements = {
    * - `family`: Which family's specs to run.
    *
    * Changing it runs them.
+   * - `label`: Accessible name for the results.
    * - `src`: The document that runs them.
    *
    * Same origin, and it must stay that way.
-   * - `label`: Accessible name for the results.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -498,15 +498,15 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The source being edited.
-   * - `name`: Which source this pane holds, echoed in every change.
-   * - `language`: How to highlight it.
    * - `field-label`/`fieldLabel`: Accessible name for the editable region.
+   * - `language`: How to highlight it.
+   * - `name`: Which source this pane holds, echoed in every change.
    * - `readonly`/`readOnly`: Whether the text can be changed.
    *
    * `EditorState.readOnly` rather than removing the editor's focus or its
    * keymap: a reader still needs to select the text, scroll it, and put a
    * cursor in it to read a long line. What it stops is the typing.
+   * - `value`: The source being edited.
    * - `caret`: Where the cursor is, counted from one, as an editor reports it. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -593,10 +593,10 @@ export type CustomElementsSolidJs = {
    * - `family`: Which family's specs to run.
    *
    * Changing it runs them.
+   * - `label`: Accessible name for the results.
    * - `src`: The document that runs them.
    *
    * Same origin, and it must stay that way.
-   * - `label`: Accessible name for the results.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image

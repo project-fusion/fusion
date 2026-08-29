@@ -42,12 +42,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-menu-item')
 export class HelixHeadlessMenuItem extends HelixElement {
   /**
-   * What this row stands for, carried in the event when it is chosen.
-   */
-  @property()
-  value = ''
-
-  /**
    * Whether the row is one of a set of choices.
    *
    * Separate from `checked`, and it has to be. A row that is off is still a
@@ -74,6 +68,16 @@ export class HelixHeadlessMenuItem extends HelixElement {
   disabled = false
 
   /**
+   * Whether the link saves the file rather than opening it.
+   *
+   * Only meaningful beside an `href`, and only for a file served from this
+   * origin: the attribute is ignored cross-origin, which is the browser's rule
+   * about who may name a file on somebody's disk rather than a gap here.
+   */
+  @property({ type: Boolean })
+  download = false
+
+  /**
    * Where the row goes, which makes it a real link.
    *
    * **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -97,28 +101,6 @@ export class HelixHeadlessMenuItem extends HelixElement {
   href = ''
 
   /**
-   * Where the link opens, for the rows that should leave the page.
-   */
-  @property()
-  target = ''
-
-  /**
-   * The relationship, which `target="_blank"` should always set.
-   */
-  @property()
-  rel = ''
-
-  /**
-   * Whether the link saves the file rather than opening it.
-   *
-   * Only meaningful beside an `href`, and only for a file served from this
-   * origin: the attribute is ignored cross-origin, which is the browser's rule
-   * about who may name a file on somebody's disk rather than a gap here.
-   */
-  @property({ type: Boolean })
-  download = false
-
-  /**
    * Whether this row is on the page currently showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
@@ -127,6 +109,12 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   @property({ attribute: false })
   onPage = true
+
+  /**
+   * The relationship, which `target="_blank"` should always set.
+   */
+  @property()
+  rel = ''
 
   /**
    * Whether this row's submenu is the page showing.
@@ -139,6 +127,18 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   @property({ attribute: false })
   showingSubmenu = false
+
+  /**
+   * Where the link opens, for the rows that should leave the page.
+   */
+  @property()
+  target = ''
+
+  /**
+   * What this row stands for, carried in the event when it is chosen.
+   */
+  @property()
+  value = ''
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,

@@ -91,18 +91,6 @@ const parse = (hotkey: string) => {
 @customElement('helix-headless-command')
 export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   /**
-   * Accessible name for the overlay, which has no visible heading.
-   */
-  @property()
-  label = 'Commands'
-
-  /**
-   * Shown in the field before anything is typed.
-   */
-  @property()
-  placeholder = 'Search commands'
-
-  /**
    * Words shown where the filter has matched nothing.
    */
   @property({ attribute: 'empty-text' })
@@ -117,6 +105,18 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property()
   hotkey = 'mod+k'
+
+  /**
+   * Accessible name for the overlay, which has no visible heading.
+   */
+  @property()
+  label = 'Commands'
+
+  /**
+   * Shown in the field before anything is typed.
+   */
+  @property()
+  placeholder = 'Search commands'
 
   /**
    * Whether the consumer put anything under the list.

@@ -96,31 +96,10 @@ export class HelixAura extends HelixElement {
   static override styles: CSSResultGroup = [styles]
 
   /**
-   * Which form the light takes. Absent is `braid`.
-   *
-   * Reflected because the fallback gradient selects on it, and given no default
-   * for the same reason every axis here has none: a default on a reflected
-   * property writes the attribute onto every host anybody renders.
-   *
-   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
-   * against `square`, `arc` against `ring`, and it is registered as one.
-   * Aurora, braid and caustics are not geometries; they are eleven names for a
-   * look, which is what `variant` is for by the rule the registry already
-   * states.
+   * How soft the falloff is, `0` tight and `1` diffuse.
    */
-  @property({ reflect: true })
-  variant?:
-    | 'aurora'
-    | 'braid'
-    | 'caustics'
-    | 'flow'
-    | 'fracture'
-    | 'lattice'
-    | 'particles'
-    | 'rays'
-    | 'streaks'
-    | 'threads'
-    | 'waves'
+  @property({ type: Number })
+  bloom = 0.5
 
   /**
    * How far the settings wander on their own, `0` still and `1` restless.
@@ -140,6 +119,12 @@ export class HelixAura extends HelixElement {
   drift = 0
 
   /**
+   * Overall brightness, as a multiplier on the field.
+   */
+  @property({ type: Number })
+  gain = 1
+
+  /**
    * What the pointer does, where the shape's own answer is not wanted.
    *
    * Absent is `native`, which is each shape answering in the terms it is made
@@ -156,16 +141,6 @@ export class HelixAura extends HelixElement {
   interaction?: 'light' | 'none' | 'ripple' | 'shadow'
 
   /**
-   * How far the pointer reaches into the field, `0` upward.
-   *
-   * Multiplied into the presence the pointer already fades in and out with, so
-   * it scales the whole response rather than any one part of it, whichever
-   * interaction is in play.
-   */
-  @property({ type: Number })
-  reach = 1
-
-  /**
    * Whether the pointer shifts and lifts the field.
    *
    * Reflected because the stylesheet selects on it: a background is not
@@ -177,16 +152,14 @@ export class HelixAura extends HelixElement {
   interactive = false
 
   /**
-   * How soft the falloff is, `0` tight and `1` diffuse.
+   * How far the pointer reaches into the field, `0` upward.
+   *
+   * Multiplied into the presence the pointer already fades in and out with, so
+   * it scales the whole response rather than any one part of it, whichever
+   * interaction is in play.
    */
   @property({ type: Number })
-  bloom = 0.5
-
-  /**
-   * Overall brightness, as a multiplier on the field.
-   */
-  @property({ type: Number })
-  gain = 1
+  reach = 1
 
   /**
    * Feature size, as a multiplier on the sampled coordinates.
@@ -199,12 +172,6 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Number })
   speed = 1
-
-  /**
-   * The field's rotation, in degrees.
-   */
-  @property({ type: Number })
-  tilt = 14
 
   /**
    * Where the axis crosses the top edge, as a fraction of the width.
@@ -232,6 +199,12 @@ export class HelixAura extends HelixElement {
   terminus?: number
 
   /**
+   * The field's rotation, in degrees.
+   */
+  @property({ type: Number })
+  tilt = 14
+
+  /**
    * How much the members of a population differ from one another, `0` a set
    * that is uniform and `1` the resting amount. Clamped to that range: these
    * are interpolations, so a larger number extrapolates rather than
@@ -248,6 +221,33 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Number })
   variance = 1
+
+  /**
+   * Which form the light takes. Absent is `braid`.
+   *
+   * Reflected because the fallback gradient selects on it, and given no default
+   * for the same reason every axis here has none: a default on a reflected
+   * property writes the attribute onto every host anybody renders.
+   *
+   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
+   * against `square`, `arc` against `ring`, and it is registered as one.
+   * Aurora, braid and caustics are not geometries; they are eleven names for a
+   * look, which is what `variant` is for by the rule the registry already
+   * states.
+   */
+  @property({ reflect: true })
+  variant?:
+    | 'aurora'
+    | 'braid'
+    | 'caustics'
+    | 'flow'
+    | 'fracture'
+    | 'lattice'
+    | 'particles'
+    | 'rays'
+    | 'streaks'
+    | 'threads'
+    | 'waves'
 
   /** Repaints when the palette moves, which no re-render would do on its own. */
   private readonly tokens = new TokenColorController(this, () => {

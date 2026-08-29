@@ -95,21 +95,16 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Whether to open pinned, where nothing declared it.
+   */
+  @property({ attribute: 'default-pinned', type: Boolean })
+  defaultPinned = true
+
+  /**
    * Accessible name for the conversation.
    */
   @property()
   label = ''
-
-  /**
-   * How near the bottom still counts as being at it, in pixels.
-   *
-   * A hook rather than a constant, because the right number depends on how tall
-   * a turn is: a transcript of one-line replies wants a smaller threshold than
-   * one of paragraphs, and a reader who has scrolled up by half a message has
-   * not left.
-   */
-  @property({ type: Number })
-  threshold = 48
 
   /**
    * Whether the transcript follows new turns to the bottom.
@@ -141,10 +136,15 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Whether to open pinned, where nothing declared it.
+   * How near the bottom still counts as being at it, in pixels.
+   *
+   * A hook rather than a constant, because the right number depends on how tall
+   * a turn is: a transcript of one-line replies wants a smaller threshold than
+   * one of paragraphs, and a reader who has scrolled up by half a message has
+   * not left.
    */
-  @property({ attribute: 'default-pinned', type: Boolean })
-  defaultPinned = true
+  @property({ type: Number })
+  threshold = 48
 
   @state()
   private pinnedState: boolean | undefined = undefined

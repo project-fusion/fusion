@@ -76,38 +76,6 @@ const readValues = (input: string): number[] =>
 @customElement('helix-headless-sparkline')
 export class HelixHeadlessSparkline extends HelixElement {
   /**
-   * What the readings are drawn as.
-   *
-   * Absent is a line, `area` is a line with the region beneath it washed, and
-   * `bar` is a column per reading.
-   *
-   * **A bar plot measures from zero and the other two measure from the data's
-   * own range**, which is the one way the plots are not interchangeable. A line
-   * says where the readings sit relative to each other, so a scale over their
-   * extent uses the whole box and claims nothing about absolute size. A bar's
-   * length *is* the value, so any baseline but zero makes the lengths
-   * proportional to nothing.
-   *
-   * **Which is a reason to prefer a line for readings in a narrow band far from
-   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
-   * seven columns of nearly the same height, and that is the true picture: they
-   * *are* nearly the same. The same readings as a line fill the box and show
-   * the movement, because a line is only ever claiming a shape.
-   *
-   * **Absent is `area`**, which is the departure from the rule that a resting
-   * arrangement is the plainest thing. At the size a sparkline is actually
-   * drawn, a hairline in a wide box is mostly box: the wash under it is what
-   * gives the shape a body and lets a reader see it at a glance rather than
-   * hunting for it, which is the entire job. `line` is the bare stroke for
-   * anywhere the fill would be noise, several of them in one box for instance.
-   *
-   * This tier rather than the one above: a plot type is geometry and geometry
-   * is markup, the same reason `curve` lives here.
-   */
-  @property({ reflect: true })
-  plot?: 'area' | 'bar' | 'line'
-
-  /**
    * How the line gets from one reading to the next.
    *
    * **`smooth` is the resting curve.** A straight segment asserts nothing about
@@ -155,6 +123,38 @@ export class HelixHeadlessSparkline extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * What the readings are drawn as.
+   *
+   * Absent is a line, `area` is a line with the region beneath it washed, and
+   * `bar` is a column per reading.
+   *
+   * **A bar plot measures from zero and the other two measure from the data's
+   * own range**, which is the one way the plots are not interchangeable. A line
+   * says where the readings sit relative to each other, so a scale over their
+   * extent uses the whole box and claims nothing about absolute size. A bar's
+   * length *is* the value, so any baseline but zero makes the lengths
+   * proportional to nothing.
+   *
+   * **Which is a reason to prefer a line for readings in a narrow band far from
+   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+   * seven columns of nearly the same height, and that is the true picture: they
+   * *are* nearly the same. The same readings as a line fill the box and show
+   * the movement, because a line is only ever claiming a shape.
+   *
+   * **Absent is `area`**, which is the departure from the rule that a resting
+   * arrangement is the plainest thing. At the size a sparkline is actually
+   * drawn, a hairline in a wide box is mostly box: the wash under it is what
+   * gives the shape a body and lets a reader see it at a glance rather than
+   * hunting for it, which is the entire job. `line` is the bare stroke for
+   * anywhere the fill would be noise, several of them in one box for instance.
+   *
+   * This tier rather than the one above: a plot type is geometry and geometry
+   * is markup, the same reason `curve` lives here.
+   */
+  @property({ reflect: true })
+  plot?: 'area' | 'bar' | 'line'
 
   /**
    * The numbers, separated by whitespace or by commas.

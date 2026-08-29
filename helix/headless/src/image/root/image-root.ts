@@ -52,12 +52,6 @@ import { property, state } from 'lit/decorators.js'
 @customElement('helix-headless-image')
 export class HelixHeadlessImage extends HelixElement {
   /**
-   * Where the picture is.
-   */
-  @property()
-  src = ''
-
-  /**
    * What it shows, for a reader who cannot see it.
    *
    * Empty is a real answer and means decoration. Omitting the attribute is not
@@ -67,26 +61,21 @@ export class HelixHeadlessImage extends HelixElement {
   alt = ''
 
   /**
-   * Whether to wait until it is nearly on screen.
+   * How the picture is fetched across origins, which decides whether a canvas
+   * can read it.
+   */
+  @property({ attribute: 'crossorigin' })
+  crossOrigin: 'anonymous' | 'use-credentials' | null = null
+
+  /**
+   * Whether the browser may decode off the main thread.
    *
-   * `lazy` by default, which is the opposite of the platform's, because a
-   * picture worth putting in a component is usually below the fold and the one
-   * that is not is the exception worth writing down.
-   */
-  @property({ reflect: true })
-  loading?: 'eager' | 'lazy'
-
-  /**
-   * The candidate widths, passed through to the picture.
+   * `async` is the resting value and right for a picture in a page. `sync` is
+   * what a consumer reaches for when the picture is about to be composited with
+   * something else and a tear would show.
    */
   @property()
-  srcset = ''
-
-  /**
-   * How much of the line it will take, passed through to the picture.
-   */
-  @property()
-  sizes = ''
+  decoding: 'async' | 'auto' | 'sync' = 'async'
 
   /**
    * How urgently to fetch it, for the one picture that is the page.
@@ -101,27 +90,38 @@ export class HelixHeadlessImage extends HelixElement {
   fetchPriority: 'auto' | 'high' | 'low' = 'auto'
 
   /**
-   * Whether the browser may decode off the main thread.
+   * Whether to wait until it is nearly on screen.
    *
-   * `async` is the resting value and right for a picture in a page. `sync` is
-   * what a consumer reaches for when the picture is about to be composited with
-   * something else and a tear would show.
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
    */
-  @property()
-  decoding: 'async' | 'auto' | 'sync' = 'async'
-
-  /**
-   * How the picture is fetched across origins, which decides whether a canvas
-   * can read it.
-   */
-  @property({ attribute: 'crossorigin' })
-  crossOrigin: 'anonymous' | 'use-credentials' | null = null
+  @property({ reflect: true })
+  loading?: 'eager' | 'lazy'
 
   /**
    * How much of the referring URL to send with the request.
    */
   @property({ attribute: 'referrerpolicy' })
   referrerPolicy = ''
+
+  /**
+   * How much of the line it will take, passed through to the picture.
+   */
+  @property()
+  sizes = ''
+
+  /**
+   * Where the picture is.
+   */
+  @property()
+  src = ''
+
+  /**
+   * The candidate widths, passed through to the picture.
+   */
+  @property()
+  srcset = ''
 
   /**
    * Whether the picture is on its way, here, or never coming.

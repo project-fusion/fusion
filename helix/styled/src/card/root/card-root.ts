@@ -52,35 +52,6 @@ import { styles } from './card-root.css.js'
 @customElement('helix-card')
 export class HelixCard extends HelixHeadlessCard {
   /**
-   * How the card separates itself from the page.
-   *
-   * **One value per mechanism, and the theme has the same four.**
-   * `ThemeIntent.separation` is `border | fill | shadow | space`, so these are
-   * the component's words for what a theme states as a policy, one to one.
-   *
-   * - `outlined` is the default, and a hairline is usually enough. It costs
-   *   less attention than a shadow: a screen of shadowed cards reads as a stack
-   *   of things floating, none of them settled.
-   * - `elevated` is lifted off the page instead of framed, for a card on a
-   *   colored or busy background, where a line has to compete with whatever is
-   *   behind it and a shadow does not.
-   * - `filled` is told apart by its own color, with neither edge nor lift. For
-   *   a dense surface where a border on every card is a grid of lines, and for
-   *   a theme whose `separation` policy is `fill`, which pushes the surface
-   *   ladder away from the page precisely so this reads.
-   * - `plain` has no frame at all: the card is a layout and whatever it sits in
-   *   is the surface. For a card inside something already bounded, where a
-   *   second box adds a line and no meaning.
-   *
-   * `filled` closes a hole `plain` cannot: `plain` clears the ground *and* the
-   * edge, so a surface with its own color and neither edge nor lift would
-   * otherwise be unsayable while being one of the four things a theme can ask
-   * for.
-   */
-  @property({ reflect: true })
-  separation?: 'elevated' | 'filled' | 'outlined' | 'plain'
-
-  /**
    * What the card is made of.
    *
    * **A third axis, and it passes the test the other two answer to.**
@@ -111,6 +82,35 @@ export class HelixCard extends HelixHeadlessCard {
    */
   @property({ reflect: true })
   orientation?: 'vertical' | 'horizontal'
+
+  /**
+   * How the card separates itself from the page.
+   *
+   * **One value per mechanism, and the theme has the same four.**
+   * `ThemeIntent.separation` is `border | fill | shadow | space`, so these are
+   * the component's words for what a theme states as a policy, one to one.
+   *
+   * - `outlined` is the default, and a hairline is usually enough. It costs
+   *   less attention than a shadow: a screen of shadowed cards reads as a stack
+   *   of things floating, none of them settled.
+   * - `elevated` is lifted off the page instead of framed, for a card on a
+   *   colored or busy background, where a line has to compete with whatever is
+   *   behind it and a shadow does not.
+   * - `filled` is told apart by its own color, with neither edge nor lift. For
+   *   a dense surface where a border on every card is a grid of lines, and for
+   *   a theme whose `separation` policy is `fill`, which pushes the surface
+   *   ladder away from the page precisely so this reads.
+   * - `plain` has no frame at all: the card is a layout and whatever it sits in
+   *   is the surface. For a card inside something already bounded, where a
+   *   second box adds a line and no meaning.
+   *
+   * `filled` closes a hole `plain` cannot: `plain` clears the ground *and* the
+   * edge, so a surface with its own color and neither edge nor lift would
+   * otherwise be unsayable while being one of the four things a theme can ask
+   * for.
+   */
+  @property({ reflect: true })
+  separation?: 'elevated' | 'filled' | 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = styles
 }

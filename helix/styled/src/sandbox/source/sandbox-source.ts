@@ -40,10 +40,10 @@ import { styles } from './sandbox-source.css.js'
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
   /**
-   * The source being edited.
+   * Accessible name for the editable region.
    */
-  @property()
-  value = ''
+  @property({ attribute: 'field-label' })
+  fieldLabel = 'Example source'
 
   /**
    * Which source this pane holds, echoed in every `helix-before-edit`.
@@ -57,16 +57,16 @@ export class HelixSandboxSource extends HelixElement {
   name = 'html'
 
   /**
-   * Accessible name for the editable region.
-   */
-  @property({ attribute: 'field-label' })
-  fieldLabel = 'Example source'
-
-  /**
    * Whether Tab indents rather than moving focus.
    */
   @property({ attribute: 'tab-indents', converter: onUnlessFalse })
   tabIndents = true
+
+  /**
+   * The source being edited.
+   */
+  @property()
+  value = ''
 
   /** Set by Escape, so the next Tab leaves the field. */
   private escaped = false

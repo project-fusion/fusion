@@ -79,12 +79,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-tree-item')
 export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /**
-   * Identifies the item to the consumer, carried in `helix-select`.
-   */
-  @property()
-  value = ''
-
-  /**
    * Where this node goes, which makes its row a real link.
    *
    * Unset by default, and unreflected: a tree of choosable nodes is not a tree
@@ -95,10 +89,15 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   href = ''
 
   /**
-   * Where the link opens, for the rare row that leaves the site.
+   * Depth from the root, set by the tree so indentation needs no CSS nesting.
+   *
+   * Not reflected. The tree assigns this after it upgrades, so an attribute
+   * here would be a change to markup the consumer rendered and hydration would
+   * report it. The indent it drives is written onto the row instead, inside the
+   * shadow root, which is not part of the tree React hydrates.
    */
-  @property()
-  target = ''
+  @property({ attribute: 'level', type: Number })
+  level?: number
 
   /**
    * What the link declares about where it goes.
@@ -126,15 +125,16 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   selected = false
 
   /**
-   * Depth from the root, set by the tree so indentation needs no CSS nesting.
-   *
-   * Not reflected. The tree assigns this after it upgrades, so an attribute
-   * here would be a change to markup the consumer rendered and hydration would
-   * report it. The indent it drives is written onto the row instead, inside the
-   * shadow root, which is not part of the tree React hydrates.
+   * Where the link opens, for the rare row that leaves the site.
    */
-  @property({ attribute: 'level', type: Number })
-  level?: number
+  @property()
+  target = ''
+
+  /**
+   * Identifies the item to the consumer, carried in `helix-select`.
+   */
+  @property()
+  value = ''
 
   /**
    * Whether this item holds the tree's single tab stop.

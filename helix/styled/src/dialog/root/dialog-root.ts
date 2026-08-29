@@ -38,6 +38,21 @@ import { styles } from './dialog-root.css.js'
 @customElement('helix-dialog')
 export class HelixDialog extends HelixHeadlessDialog {
   /**
+   * Which way the panel's contents read.
+   *
+   * One property for the whole panel rather than one per region. The regions are
+   * never mixed in practice: a dialog that asks a short question centers its
+   * mark, its title, its sentence and its buttons together, and a dialog holding
+   * a form runs all four from the start. Three properties would be three ways to
+   * write the same two arrangements, and a fourth way to get one of them wrong.
+   *
+   * Unset is `start` and stays unset, so a reflected default cannot appear on a
+   * host whose server output never had it.
+   */
+  @property({ reflect: true })
+  align?: 'center' | 'start'
+
+  /**
    * How wide the panel is allowed to be.
    *
    * Steps rather than a number, because a dialog's width is a fact about what is
@@ -60,21 +75,6 @@ export class HelixDialog extends HelixHeadlessDialog {
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg' | 'full'
-
-  /**
-   * Which way the panel's contents read.
-   *
-   * One property for the whole panel rather than one per region. The regions are
-   * never mixed in practice: a dialog that asks a short question centers its
-   * mark, its title, its sentence and its buttons together, and a dialog holding
-   * a form runs all four from the start. Three properties would be three ways to
-   * write the same two arrangements, and a fourth way to get one of them wrong.
-   *
-   * Unset is `start` and stays unset, so a reflected default cannot appear on a
-   * host whose server output never had it.
-   */
-  @property({ reflect: true })
-  align?: 'center' | 'start'
 
   static override styles: CSSResultGroup = styles
 }

@@ -81,18 +81,18 @@ export class HelixSandboxSpecs extends HelixElement {
   family = ''
 
   /**
+   * Accessible name for the results.
+   */
+  @property()
+  label = 'Spec results'
+
+  /**
    * The document that runs them.
    *
    * Same origin, and it must stay that way.
    */
   @property()
   src = ''
-
-  /**
-   * Accessible name for the results.
-   */
-  @property()
-  label = 'Spec results'
 
   @state()
   private results: SpecResult[] = []

@@ -145,22 +145,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   accept = ''
 
   /**
-   * Whether more than one file can be chosen.
-   */
-  @property({ reflect: true, type: Boolean })
-  multiple = false
-
-  /**
    * Which camera or microphone a mobile picker should offer, if any.
    */
   @property()
   capture?: 'environment' | 'user'
-
-  /**
-   * What the trigger reads, where nothing is slotted into it.
-   */
-  @property({ attribute: 'trigger-label' })
-  triggerLabel = 'Choose files'
 
   /**
    * Language tag the sizes are written in.
@@ -171,10 +159,22 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   locale = ''
 
   /**
+   * Whether more than one file can be chosen.
+   */
+  @property({ reflect: true, type: Boolean })
+  multiple = false
+
+  /**
    * What the control removing one file is called, per file.
    */
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove'
+
+  /**
+   * What the trigger reads, where nothing is slotted into it.
+   */
+  @property({ attribute: 'trigger-label' })
+  triggerLabel = 'Choose files'
 
   /**
    * Whether something is being dragged over the field.

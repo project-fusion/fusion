@@ -78,60 +78,6 @@ const at = (row: Readonly<Record<string, unknown>>, path: string): unknown => {
 @customElement('helix-headless-table-column')
 export class HelixHeadlessTableColumn extends HelixElement {
   /**
-   * The track this column takes, as CSS.
-   *
-   * A single track value, so anything valid in `grid-template-columns` works:
-   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-   * left over equally, as `minmax(max-content, 1fr)`.
-   *
-   * **The floor is `max-content`, never `0` and never `min-content`.** A zero
-   * floor lets a track shrink under its own content: at 375 the columns squeeze
-   * to 75px and `eu-central-1` wraps across lines, which reads as corrupt data
-   * rather than as a table that ran out of room. A `min-content` floor still
-   * breaks it, a hyphen being a wrap opportunity.
-   *
-   * The overflow has somewhere to go: `@fusion.dev/helix` scrolls the table's
-   * own box, so a long value pushes past the container and the table scrolls
-   * instead of the value being destroyed. Measured at 375: tracks of 192, 89 and
-   * 102 against a 343 box, so the table scrolls 384 and the page does not move.
-   *
-   * The cost is that a column of prose asks for its longest paragraph on one
-   * line, so a column holding sentences rather than values wants
-   * `width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
-   * the overflow either way, that being paint, and gets the honest track list.
-   */
-  @property()
-  width = ''
-
-  /**
-   * The key this column reads out of a row.
-   *
-   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
-   * from an API arrives shaped the way the API shaped it, and requiring a flat
-   * row would push a mapping pass onto every consumer.
-   *
-   * **It is also the sort and filter identity**, which is why sorting is by
-   * field and not by column index: a reordered or hidden column would otherwise
-   * change what `sort="2:asc"` means, and a sort that means something different
-   * after a column moves is a sort a consumer cannot store in a URL.
-   *
-   * Empty on a column that is purely presentational, an actions column say, and
-   * such a column is never sortable however it is marked.
-   */
-  @property()
-  field = ''
-
-  /**
-   * Whether a reader may reorder the set by this column.
-   *
-   * Ignored without a `field`, and silently: a column with nothing to sort by
-   * has no order to offer, and refusing loudly would mean an actions column
-   * carrying `sortable` breaks a table rather than doing nothing.
-   */
-  @property({ type: Boolean })
-  sortable = false
-
-  /**
    * Which edge the values line up against.
    *
    * `end` is what a column of numbers wants, so digits of the same magnitude sit
@@ -163,6 +109,60 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property({ attribute: false })
   compare: CellReader | undefined = undefined
+
+  /**
+   * The key this column reads out of a row.
+   *
+   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+   * from an API arrives shaped the way the API shaped it, and requiring a flat
+   * row would push a mapping pass onto every consumer.
+   *
+   * **It is also the sort and filter identity**, which is why sorting is by
+   * field and not by column index: a reordered or hidden column would otherwise
+   * change what `sort="2:asc"` means, and a sort that means something different
+   * after a column moves is a sort a consumer cannot store in a URL.
+   *
+   * Empty on a column that is purely presentational, an actions column say, and
+   * such a column is never sortable however it is marked.
+   */
+  @property()
+  field = ''
+
+  /**
+   * Whether a reader may reorder the set by this column.
+   *
+   * Ignored without a `field`, and silently: a column with nothing to sort by
+   * has no order to offer, and refusing loudly would mean an actions column
+   * carrying `sortable` breaks a table rather than doing nothing.
+   */
+  @property({ type: Boolean })
+  sortable = false
+
+  /**
+   * The track this column takes, as CSS.
+   *
+   * A single track value, so anything valid in `grid-template-columns` works:
+   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
+   * left over equally, as `minmax(max-content, 1fr)`.
+   *
+   * **The floor is `max-content`, never `0` and never `min-content`.** A zero
+   * floor lets a track shrink under its own content: at 375 the columns squeeze
+   * to 75px and `eu-central-1` wraps across lines, which reads as corrupt data
+   * rather than as a table that ran out of room. A `min-content` floor still
+   * breaks it, a hyphen being a wrap opportunity.
+   *
+   * The overflow has somewhere to go: `@fusion.dev/helix` scrolls the table's
+   * own box, so a long value pushes past the container and the table scrolls
+   * instead of the value being destroyed. Measured at 375: tracks of 192, 89 and
+   * 102 against a 343 box, so the table scrolls 384 and the page does not move.
+   *
+   * The cost is that a column of prose asks for its longest paragraph on one
+   * line, so a column holding sentences rather than values wants
+   * `width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
+   * the overflow either way, that being paint, and gets the honest track list.
+   */
+  @property()
+  width = ''
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,

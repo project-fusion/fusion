@@ -54,6 +54,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
   /**
+   * When it was said, as anything `Date` parses.
+   */
+  @property()
+  at = ''
+
+  /**
    * Who said it.
    *
    * Free text rather than a two-value union, because a conversation is not
@@ -71,22 +77,10 @@ export class HelixHeadlessChatMessage extends HelixElement {
   author?: string
 
   /**
-   * What has happened to it.
-   *
-   * Reflected, because every one of the four is a visual state and a stylesheet
-   * has no other way to know. Absent is a settled message with nothing to
-   * report, which is what most of a transcript is, and it is the absence of the
-   * attribute rather than a value of it: there is no initializer, so nothing is
-   * reflected until something happens.
+   * Label for a message that did not send.
    */
-  @property({ reflect: true })
-  state?: 'failed' | 'sending' | 'sent' | 'streaming'
-
-  /**
-   * When it was said, as anything `Date` parses.
-   */
-  @property()
-  at = ''
+  @property({ attribute: 'failed-label' })
+  failedLabel = 'Not sent'
 
   /**
    * Locale for the timestamp.
@@ -97,22 +91,28 @@ export class HelixHeadlessChatMessage extends HelixElement {
   locale = ''
 
   /**
+   * Label for the control offered on a failed message.
+   */
+  @property({ attribute: 'retry-label' })
+  retryLabel = 'Try again'
+
+  /**
    * What to call each state, for a reader who cannot see it.
    */
   @property({ attribute: 'sending-label' })
   sendingLabel = 'Sending'
 
   /**
-   * Label for a message that did not send.
+   * What has happened to it.
+   *
+   * Reflected, because every one of the four is a visual state and a stylesheet
+   * has no other way to know. Absent is a settled message with nothing to
+   * report, which is what most of a transcript is, and it is the absence of the
+   * attribute rather than a value of it: there is no initializer, so nothing is
+   * reflected until something happens.
    */
-  @property({ attribute: 'failed-label' })
-  failedLabel = 'Not sent'
-
-  /**
-   * Label for the control offered on a failed message.
-   */
-  @property({ attribute: 'retry-label' })
-  retryLabel = 'Try again'
+  @property({ reflect: true })
+  state?: 'failed' | 'sending' | 'sent' | 'streaming'
 
   /**
    * @internal Read by the transcript to identify its children across the light

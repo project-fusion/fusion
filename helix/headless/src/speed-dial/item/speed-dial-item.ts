@@ -35,16 +35,16 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-speed-dial-item')
 export class HelixHeadlessSpeedDialItem extends HelixElement {
   /**
-   * What this action stands for, carried in the event when it is chosen.
-   */
-  @property()
-  value = ''
-
-  /**
    * Whether the action can be chosen.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
+
+  /**
+   * What this action stands for, carried in the event when it is chosen.
+   */
+  @property()
+  value = ''
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,

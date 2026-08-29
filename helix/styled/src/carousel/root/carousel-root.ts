@@ -31,23 +31,38 @@ import { styles } from './carousel-root.css.js'
 @customElement('helix-carousel')
 export class HelixCarousel extends HelixHeadlessCarousel {
   /**
-   * Which side of the slides the dots sit on.
+   * Where along that side the arrows sit. See `indicatorAlign`.
    *
-   * Unset is `block-end`, under them. `block-start` puts them above,
-   * `inline-start` and `inline-end` beside, where a run of dots becomes a
-   * column.
-   *
-   * **The sides of the content, not positions along a bar**, and logical names
-   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
-   * the right in Arabic without being told.
-   *
-   * Independent of `controlsPlacement`. Both default to the block end, where
-   * they share the row and split it, dots to the start and arrows to the end,
-   * arrived at by two defaults rather than by a rule about the pair, so moving
-   * one leaves the other alone.
+   * `overlay` answers it too, and the edge there is the whole slide: the bar is
+   * stretched across the picture, so this moves the arrows up and down within
+   * it rather than moving the bar. Centered unless asked otherwise, which is
+   * where an arrow over a photograph belongs.
    */
-  @property({ attribute: 'indicator-placement', reflect: true })
-  indicatorPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start'
+  @property({ attribute: 'controls-align', reflect: true })
+  controlsAlign?: 'center' | 'end' | 'start'
+
+  /**
+   * Which side of the slides the arrows sit on.
+   *
+   * The same four sides as `indicatorPlacement` and the same default, so a
+   * carousel that moves only one of them keeps the other where it was.
+   * `inline-start` or `inline-end` stacks the arrows into a column, which is
+   * what a vertical track usually wants.
+   *
+   * `overlay` puts them on the slides, at the track's own edges, which is what a
+   * full-bleed carousel wants: the slide is the page and the controls are on it
+   * rather than in a bar beneath it. It carries its own treatment with it, a
+   * surface and a shadow under each arrow, because a glyph drawn straight onto a
+   * photograph is legible against about half of one.
+   *
+   * **It is a value here rather than an axis of its own.** "The controls are
+   * over the content" is the whole of what a `hero` appearance would say, and
+   * the surface, the edge-to-edge arrows and the bar that catches no presses all
+   * follow from it. These two placements are the whole of where a carousel's
+   * chrome can go.
+   */
+  @property({ attribute: 'controls-placement', reflect: true })
+  controlsPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay'
 
   /**
    * Where along that side the dots sit.
@@ -78,38 +93,23 @@ export class HelixCarousel extends HelixHeadlessCarousel {
   indicatorAlign?: 'center' | 'end' | 'start'
 
   /**
-   * Which side of the slides the arrows sit on.
+   * Which side of the slides the dots sit on.
    *
-   * The same four sides as `indicatorPlacement` and the same default, so a
-   * carousel that moves only one of them keeps the other where it was.
-   * `inline-start` or `inline-end` stacks the arrows into a column, which is
-   * what a vertical track usually wants.
+   * Unset is `block-end`, under them. `block-start` puts them above,
+   * `inline-start` and `inline-end` beside, where a run of dots becomes a
+   * column.
    *
-   * `overlay` puts them on the slides, at the track's own edges, which is what a
-   * full-bleed carousel wants: the slide is the page and the controls are on it
-   * rather than in a bar beneath it. It carries its own treatment with it, a
-   * surface and a shadow under each arrow, because a glyph drawn straight onto a
-   * photograph is legible against about half of one.
+   * **The sides of the content, not positions along a bar**, and logical names
+   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
+   * the right in Arabic without being told.
    *
-   * **It is a value here rather than an axis of its own.** "The controls are
-   * over the content" is the whole of what a `hero` appearance would say, and
-   * the surface, the edge-to-edge arrows and the bar that catches no presses all
-   * follow from it. These two placements are the whole of where a carousel's
-   * chrome can go.
+   * Independent of `controlsPlacement`. Both default to the block end, where
+   * they share the row and split it, dots to the start and arrows to the end,
+   * arrived at by two defaults rather than by a rule about the pair, so moving
+   * one leaves the other alone.
    */
-  @property({ attribute: 'controls-placement', reflect: true })
-  controlsPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start' | 'overlay'
-
-  /**
-   * Where along that side the arrows sit. See `indicatorAlign`.
-   *
-   * `overlay` answers it too, and the edge there is the whole slide: the bar is
-   * stretched across the picture, so this moves the arrows up and down within
-   * it rather than moving the bar. Centered unless asked otherwise, which is
-   * where an arrow over a photograph belongs.
-   */
-  @property({ attribute: 'controls-align', reflect: true })
-  controlsAlign?: 'center' | 'end' | 'start'
+  @property({ attribute: 'indicator-placement', reflect: true })
+  indicatorPlacement?: 'block-end' | 'block-start' | 'inline-end' | 'inline-start'
 
   static override styles: CSSResultGroup = styles
 }

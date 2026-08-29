@@ -101,6 +101,28 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   content = ''
 
   /**
+   * How long the pointer must rest before the bubble appears, in milliseconds.
+   *
+   * Without one, sweeping across a row of controls flashes a tooltip for each
+   * of them, which is noise rather than help. Focus opens with no delay: a
+   * keyboard reader arriving on a control has already committed to it.
+   */
+  @property({ attribute: 'delay', type: Number })
+  delay = 400
+
+  /**
+   * How long the bubble stays after the pointer leaves, in milliseconds.
+   */
+  @property({ attribute: 'delay-out', type: Number })
+  delayOut = 100
+
+  /**
+   * Whether the tooltip never shows.
+   */
+  @property({ reflect: true, type: Boolean })
+  disabled = false
+
+  /**
    * The id of the element this describes, in this tooltip's own tree.
    *
    * Set it and the tooltip stops wrapping: it renders no trigger, listens on
@@ -123,14 +145,6 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   for = ''
 
   /**
-   * Preferred side.
-   *
-   * It moves if that side does not fit.
-   */
-  @property()
-  placement: Placement = 'top'
-
-  /**
    * Space between the trigger and the point of the bubble, in pixels.
    *
    * **Measured from the point, which is what the arrow being back changed.**
@@ -143,28 +157,6 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    */
   @property({ type: Number })
   offset = 8
-
-  /**
-   * The id of a box to keep the bubble inside, instead of the viewport.
-   *
-   * Resolved the way `for` is, so an id in the same tree, which is what lets a
-   * component name a box in its own shadow root. A chart does: its bubble is
-   * centered on a reading, and the first and last readings sit at the ends of
-   * the plot, so half the box hangs past the drawing and, measured on a chart
-   * in a 320px card, three pixels past the card itself.
-   *
-   * Clamping is on the cross axis only, which is what makes this safe to point
-   * at a box the bubble genuinely does not fit inside. See `within` on
-   * `FloatingController` for what happens if it is applied to the rest.
-   */
-  @property()
-  within = ''
-
-  /**
-   * Whether the tooltip never shows.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
 
   /**
    * Whether the bubble survives the trigger being used.
@@ -186,20 +178,28 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   persist = false
 
   /**
-   * How long the pointer must rest before the bubble appears, in milliseconds.
+   * Preferred side.
    *
-   * Without one, sweeping across a row of controls flashes a tooltip for each
-   * of them, which is noise rather than help. Focus opens with no delay: a
-   * keyboard reader arriving on a control has already committed to it.
+   * It moves if that side does not fit.
    */
-  @property({ attribute: 'delay', type: Number })
-  delay = 400
+  @property()
+  placement: Placement = 'top'
 
   /**
-   * How long the bubble stays after the pointer leaves, in milliseconds.
+   * The id of a box to keep the bubble inside, instead of the viewport.
+   *
+   * Resolved the way `for` is, so an id in the same tree, which is what lets a
+   * component name a box in its own shadow root. A chart does: its bubble is
+   * centered on a reading, and the first and last readings sit at the ends of
+   * the plot, so half the box hangs past the drawing and, measured on a chart
+   * in a 320px card, three pixels past the card itself.
+   *
+   * Clamping is on the cross axis only, which is what makes this safe to point
+   * at a box the bubble genuinely does not fit inside. See `within` on
+   * `FloatingController` for what happens if it is applied to the rest.
    */
-  @property({ attribute: 'delay-out', type: Number })
-  delayOut = 100
+  @property()
+  within = ''
 
   private timer: ReturnType<typeof setTimeout> | undefined
 

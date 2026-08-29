@@ -120,22 +120,10 @@ export class HelixSandboxPreview extends HelixElement {
   colorMode?: 'dark' | 'light'
 
   /**
-   * Document the frame loads, which brings the styles and the elements.
+   * Writing direction inside the frame.
    */
-  @property()
-  src = ''
-
-  /**
-   * Markup to render.
-   */
-  @property()
-  source = ''
-
-  /**
-   * Stylesheet applied inside the frame, alongside the markup.
-   */
-  @property()
-  styles = ''
+  @property({ reflect: true })
+  direction?: 'rtl'
 
   /**
    * Accessible name for the frame.
@@ -144,16 +132,28 @@ export class HelixSandboxPreview extends HelixElement {
   label = 'Preview'
 
   /**
-   * Writing direction inside the frame.
-   */
-  @property({ reflect: true })
-  direction?: 'rtl'
-
-  /**
    * How the example is placed in the frame.
    */
   @property({ reflect: true })
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
+
+  /**
+   * Markup to render.
+   */
+  @property()
+  source = ''
+
+  /**
+   * Document the frame loads, which brings the styles and the elements.
+   */
+  @property()
+  src = ''
+
+  /**
+   * Stylesheet applied inside the frame, alongside the markup.
+   */
+  @property()
+  styles = ''
 
   /** Whether the frame has said it is listening. */
   private ready = false

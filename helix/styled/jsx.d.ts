@@ -827,18 +827,8 @@ the property carries the part's name, `content`. */
 };
 
 export type HelixAuraProps = {
-  /** Which form the light takes. Absent is `braid`.
-
-Reflected because the fallback gradient selects on it, and given no default
-for the same reason every axis here has none: a default on a reflected
-property writes the attribute onto every host anybody renders.
-
-**`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
-against `square`, `arc` against `ring`, and it is registered as one.
-Aurora, braid and caustics are not geometries; they are eleven names for a
-look, which is what `variant` is for by the rule the registry already
-states. */
-  variant?: HelixAura["variant"];
+  /** How soft the falloff is, `0` tight and `1` diffuse. */
+  bloom?: HelixAura["bloom"];
   /** How far the settings wander on their own, `0` still and `1` restless.
 
 **One property rather than a range on each of the five.** A range per axis
@@ -852,6 +842,8 @@ back into phase and the field has no cycle a reader can count. That is the
 difference between a background that breathes and one that is obviously on
 a timer. */
   drift?: HelixAura["drift"];
+  /** Overall brightness, as a multiplier on the field. */
+  gain?: HelixAura["gain"];
   /** What the pointer does, where the shape's own answer is not wanted.
 
 Absent is `native`, which is each shape answering in the terms it is made
@@ -864,12 +856,6 @@ They exist because a consumer may want the quieter, more conventional
 answer, and because `none` is a real requirement. Not because any of them
 is the better default. */
   interaction?: HelixAura["interaction"];
-  /** How far the pointer reaches into the field, `0` upward.
-
-Multiplied into the presence the pointer already fades in and out with, so
-it scales the whole response rather than any one part of it, whichever
-interaction is in play. */
-  reach?: HelixAura["reach"];
   /** Whether the pointer shifts and lifts the field.
 
 Reflected because the stylesheet selects on it: a background is not
@@ -877,16 +863,16 @@ hit-testable at rest, or it would swallow clicks meant for what is over it,
 and an element that is not hit-testable never receives the `pointermove`
 this listens for. Asking for the pointer is asking for the hit test. */
   interactive?: HelixAura["interactive"];
-  /** How soft the falloff is, `0` tight and `1` diffuse. */
-  bloom?: HelixAura["bloom"];
-  /** Overall brightness, as a multiplier on the field. */
-  gain?: HelixAura["gain"];
+  /** How far the pointer reaches into the field, `0` upward.
+
+Multiplied into the presence the pointer already fades in and out with, so
+it scales the whole response rather than any one part of it, whichever
+interaction is in play. */
+  reach?: HelixAura["reach"];
   /** Feature size, as a multiplier on the sampled coordinates. */
   scale?: HelixAura["scale"];
   /** How fast it drifts, as a multiplier on time. */
   speed?: HelixAura["speed"];
-  /** The field's rotation, in degrees. */
-  tilt?: HelixAura["tilt"];
   /** Where the axis crosses the top edge, as a fraction of the width.
 
 **An angle does not say what a consumer means, and this does.** The axis
@@ -908,6 +894,8 @@ layout read per frame, and the drift is applied to the result rather than
 to the angle behind it: the field still wanders, around a bearing that
 holds the exit where it was put. */
   terminus?: HelixAura["terminus"];
+  /** The field's rotation, in degrees. */
+  tilt?: HelixAura["tilt"];
   /** How much the members of a population differ from one another, `0` a set
 that is uniform and `1` the resting amount. Clamped to that range: these
 are interpolations, so a larger number extrapolates rather than
@@ -922,9 +910,6 @@ folds widen or even out. `braid`, `waves` and `flow` have a
 single subject and nothing to vary, and `threads` is even on purpose, so on
 those four this is inert. */
   variance?: HelixAura["variance"];
-};
-
-export type HelixAuraSolidJsProps = {
   /** Which form the light takes. Absent is `braid`.
 
 Reflected because the fallback gradient selects on it, and given no default
@@ -936,7 +921,12 @@ against `square`, `arc` against `ring`, and it is registered as one.
 Aurora, braid and caustics are not geometries; they are eleven names for a
 look, which is what `variant` is for by the rule the registry already
 states. */
-  "prop:variant"?: HelixAura["variant"];
+  variant?: HelixAura["variant"];
+};
+
+export type HelixAuraSolidJsProps = {
+  /** How soft the falloff is, `0` tight and `1` diffuse. */
+  "prop:bloom"?: HelixAura["bloom"];
   /** How far the settings wander on their own, `0` still and `1` restless.
 
 **One property rather than a range on each of the five.** A range per axis
@@ -950,6 +940,8 @@ back into phase and the field has no cycle a reader can count. That is the
 difference between a background that breathes and one that is obviously on
 a timer. */
   "prop:drift"?: HelixAura["drift"];
+  /** Overall brightness, as a multiplier on the field. */
+  "prop:gain"?: HelixAura["gain"];
   /** What the pointer does, where the shape's own answer is not wanted.
 
 Absent is `native`, which is each shape answering in the terms it is made
@@ -962,12 +954,6 @@ They exist because a consumer may want the quieter, more conventional
 answer, and because `none` is a real requirement. Not because any of them
 is the better default. */
   "prop:interaction"?: HelixAura["interaction"];
-  /** How far the pointer reaches into the field, `0` upward.
-
-Multiplied into the presence the pointer already fades in and out with, so
-it scales the whole response rather than any one part of it, whichever
-interaction is in play. */
-  "prop:reach"?: HelixAura["reach"];
   /** Whether the pointer shifts and lifts the field.
 
 Reflected because the stylesheet selects on it: a background is not
@@ -975,16 +961,16 @@ hit-testable at rest, or it would swallow clicks meant for what is over it,
 and an element that is not hit-testable never receives the `pointermove`
 this listens for. Asking for the pointer is asking for the hit test. */
   "prop:interactive"?: HelixAura["interactive"];
-  /** How soft the falloff is, `0` tight and `1` diffuse. */
-  "prop:bloom"?: HelixAura["bloom"];
-  /** Overall brightness, as a multiplier on the field. */
-  "prop:gain"?: HelixAura["gain"];
+  /** How far the pointer reaches into the field, `0` upward.
+
+Multiplied into the presence the pointer already fades in and out with, so
+it scales the whole response rather than any one part of it, whichever
+interaction is in play. */
+  "prop:reach"?: HelixAura["reach"];
   /** Feature size, as a multiplier on the sampled coordinates. */
   "prop:scale"?: HelixAura["scale"];
   /** How fast it drifts, as a multiplier on time. */
   "prop:speed"?: HelixAura["speed"];
-  /** The field's rotation, in degrees. */
-  "prop:tilt"?: HelixAura["tilt"];
   /** Where the axis crosses the top edge, as a fraction of the width.
 
 **An angle does not say what a consumer means, and this does.** The axis
@@ -1006,6 +992,8 @@ layout read per frame, and the drift is applied to the result rather than
 to the angle behind it: the field still wanders, around a bearing that
 holds the exit where it was put. */
   "prop:terminus"?: HelixAura["terminus"];
+  /** The field's rotation, in degrees. */
+  "prop:tilt"?: HelixAura["tilt"];
   /** How much the members of a population differ from one another, `0` a set
 that is uniform and `1` the resting amount. Clamped to that range: these
 are interpolations, so a larger number extrapolates rather than
@@ -1020,6 +1008,18 @@ folds widen or even out. `braid`, `waves` and `flow` have a
 single subject and nothing to vary, and `threads` is even on purpose, so on
 those four this is inert. */
   "prop:variance"?: HelixAura["variance"];
+  /** Which form the light takes. Absent is `braid`.
+
+Reflected because the fallback gradient selects on it, and given no default
+for the same reason every axis here has none: a default on a reflected
+property writes the attribute onto every host anybody renders.
+
+**`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
+against `square`, `arc` against `ring`, and it is registered as one.
+Aurora, braid and caustics are not geometries; they are eleven names for a
+look, which is what `variant` is for by the rule the registry already
+states. */
+  "prop:variant"?: HelixAura["variant"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1084,14 +1084,14 @@ export type HelixAvatarProps = {
   shape?: HelixAvatar["shape"];
   /** Edge length of the avatar. */
   size?: HelixAvatar["size"];
-  /** Image to show.
-
-Falls back to the slot, or to initials, if it fails. */
-  src?: HelixAvatar["src"];
   /** Name of the person or entity.
 
 Used for the label and the initials. */
   name?: HelixAvatar["name"];
+  /** Image to show.
+
+Falls back to the slot, or to initials, if it fails. */
+  src?: HelixAvatar["src"];
 
   /** Relayed from the image when it fails. */
   onerror?: (e: HelixAvatarElementEvent) => void;
@@ -1104,14 +1104,14 @@ export type HelixAvatarSolidJsProps = {
   "prop:shape"?: HelixAvatar["shape"];
   /** Edge length of the avatar. */
   "prop:size"?: HelixAvatar["size"];
-  /** Image to show.
-
-Falls back to the slot, or to initials, if it fails. */
-  "prop:src"?: HelixAvatar["src"];
   /** Name of the person or entity.
 
 Used for the label and the initials. */
   "prop:name"?: HelixAvatar["name"];
+  /** Image to show.
+
+Falls back to the slot, or to initials, if it fails. */
+  "prop:src"?: HelixAvatar["src"];
   /** Relayed from the image when it fails. */
   "on:error"?: (e: HelixAvatarElementEvent) => void;
   /** Relayed from the image once it has loaded. */
@@ -1131,18 +1131,18 @@ fill by what the count *is*, not by how loudly it is drawn. Filed under
 `appearance` it would read as a treatment, which is the confusion the split
 exists to stop. */
   tone?: HelixBadge["tone"];
-  /** The count or short text to show.
-
-Absent shows a dot, zero shows nothing. */
-  value?: HelixBadge["value"];
-  /** Cap for a numeric value.
-
-Past it the indicator reads `{max}+`. */
-  max?: HelixBadge["max"];
   /** Accessible name.
 
 Required for a dot, which has no text to read. */
   label?: HelixBadge["label"];
+  /** Cap for a numeric value.
+
+Past it the indicator reads `{max}+`. */
+  max?: HelixBadge["max"];
+  /** The count or short text to show.
+
+Absent shows a dot, zero shows nothing. */
+  value?: HelixBadge["value"];
 };
 
 export type HelixBadgeSolidJsProps = {
@@ -1153,18 +1153,18 @@ fill by what the count *is*, not by how loudly it is drawn. Filed under
 `appearance` it would read as a treatment, which is the confusion the split
 exists to stop. */
   "prop:tone"?: HelixBadge["tone"];
-  /** The count or short text to show.
-
-Absent shows a dot, zero shows nothing. */
-  "prop:value"?: HelixBadge["value"];
-  /** Cap for a numeric value.
-
-Past it the indicator reads `{max}+`. */
-  "prop:max"?: HelixBadge["max"];
   /** Accessible name.
 
 Required for a dot, which has no text to read. */
   "prop:label"?: HelixBadge["label"];
+  /** Cap for a numeric value.
+
+Past it the indicator reads `{max}+`. */
+  "prop:max"?: HelixBadge["max"];
+  /** The count or short text to show.
+
+Absent shows a dot, zero shows nothing. */
+  "prop:value"?: HelixBadge["value"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1173,6 +1173,31 @@ Required for a dot, which has no text to read. */
 };
 
 export type HelixBarChartProps = {
+  /** How much ink the columns claim.
+
+The chart's treatment, which every series takes unless `outlined` or
+`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+of the series color with that edge on it, and absent is the filled column,
+per the rule that a reflected property takes no default.
+
+**It composes with `material` rather than competing with it.** Emphasis
+decides what is drawn and material decides how much of it comes through, so
+`glass` thins whatever emphasis put there: the fill on a solid column, the
+stroke on an outlined one. Without that the corner is inert, `glass` setting
+a fill opacity on a mark whose fill is `none`, and a combination that
+silently does nothing is the worst shape this can take. */
+  emphasis?: HelixBarChart["emphasis"];
+  /** Which series are glass rather than solid, by name.
+
+Matched the way `outlined` is, against the column headings the table gives.
+
+**Per series for the reason `emphasis` is.** A
+chart-wide material puts every column in the same substance, which is right
+when the whole chart is joining the page's language and wrong the moment one
+series is a different kind of fact from the others. The two axes take the
+same shape because they answer the same question about the same thing: what
+is *this series* made of, and how much ink does *this series* claim. */
+  glass?: HelixBarChart["glass"];
   /** What the columns are made of.
 
 **A third axis on the chart, not on the bar.** A bar is a mark inside a
@@ -1209,43 +1234,6 @@ chart and a card mean the same thing by the word.
 material choice, it is an absent series, and a chart says that by not
 having the datum rather than by painting it invisibly. */
   material?: HelixBarChart["material"];
-  /** How a column's fill is distributed across it.
-
-`gradient` fades each column toward its base, into the wash the headless
-tier draws whether or not anything points at it.
-
-**A chart-domain axis and deliberately not a library one.** It lives on this
-family alone, and here it is a way of encoding data rather than a way of
-expressing a theme: promoted to the registry it would put an attribute on
-eighty-eight components that means nothing on eighty-seven. `wash` because
-that is what the tier below already calls it, in `--chart-bar-wash` and in
-the `bar-wash-start` and `bar-wash-end` stops. */
-  wash?: HelixBarChart["wash"];
-  /** Which series are glass rather than solid, by name.
-
-Matched the way `outlined` is, against the column headings the table gives.
-
-**Per series for the reason `emphasis` is.** A
-chart-wide material puts every column in the same substance, which is right
-when the whole chart is joining the page's language and wrong the moment one
-series is a different kind of fact from the others. The two axes take the
-same shape because they answer the same question about the same thing: what
-is *this series* made of, and how much ink does *this series* claim. */
-  glass?: HelixBarChart["glass"];
-  /** How much ink the columns claim.
-
-The chart's treatment, which every series takes unless `outlined` or
-`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-of the series color with that edge on it, and absent is the filled column,
-per the rule that a reflected property takes no default.
-
-**It composes with `material` rather than competing with it.** Emphasis
-decides what is drawn and material decides how much of it comes through, so
-`glass` thins whatever emphasis put there: the fill on a solid column, the
-stroke on an outlined one. Without that the corner is inert, `glass` setting
-a fill opacity on a mark whose fill is `none`, and a combination that
-silently does nothing is the worst shape this can take. */
-  emphasis?: HelixBarChart["emphasis"];
   /** Which series are drawn as an outline rather than a fill, by name.
 
 Space separated and matched against the column headings the table gives,
@@ -1266,6 +1254,18 @@ the chart. */
 
 Matched as `outlined` is. */
   subtle?: HelixBarChart["subtle"];
+  /** How a column's fill is distributed across it.
+
+`gradient` fades each column toward its base, into the wash the headless
+tier draws whether or not anything points at it.
+
+**A chart-domain axis and deliberately not a library one.** It lives on this
+family alone, and here it is a way of encoding data rather than a way of
+expressing a theme: promoted to the registry it would put an attribute on
+eighty-eight components that means nothing on eighty-seven. `wash` because
+that is what the tier below already calls it, in `--chart-bar-wash` and in
+the `bar-wash-start` and `bar-wash-end` stops. */
+  wash?: HelixBarChart["wash"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -1354,6 +1354,31 @@ of any scale question the picture raises. */
 };
 
 export type HelixBarChartSolidJsProps = {
+  /** How much ink the columns claim.
+
+The chart's treatment, which every series takes unless `outlined` or
+`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+of the series color with that edge on it, and absent is the filled column,
+per the rule that a reflected property takes no default.
+
+**It composes with `material` rather than competing with it.** Emphasis
+decides what is drawn and material decides how much of it comes through, so
+`glass` thins whatever emphasis put there: the fill on a solid column, the
+stroke on an outlined one. Without that the corner is inert, `glass` setting
+a fill opacity on a mark whose fill is `none`, and a combination that
+silently does nothing is the worst shape this can take. */
+  "prop:emphasis"?: HelixBarChart["emphasis"];
+  /** Which series are glass rather than solid, by name.
+
+Matched the way `outlined` is, against the column headings the table gives.
+
+**Per series for the reason `emphasis` is.** A
+chart-wide material puts every column in the same substance, which is right
+when the whole chart is joining the page's language and wrong the moment one
+series is a different kind of fact from the others. The two axes take the
+same shape because they answer the same question about the same thing: what
+is *this series* made of, and how much ink does *this series* claim. */
+  "prop:glass"?: HelixBarChart["glass"];
   /** What the columns are made of.
 
 **A third axis on the chart, not on the bar.** A bar is a mark inside a
@@ -1390,43 +1415,6 @@ chart and a card mean the same thing by the word.
 material choice, it is an absent series, and a chart says that by not
 having the datum rather than by painting it invisibly. */
   "prop:material"?: HelixBarChart["material"];
-  /** How a column's fill is distributed across it.
-
-`gradient` fades each column toward its base, into the wash the headless
-tier draws whether or not anything points at it.
-
-**A chart-domain axis and deliberately not a library one.** It lives on this
-family alone, and here it is a way of encoding data rather than a way of
-expressing a theme: promoted to the registry it would put an attribute on
-eighty-eight components that means nothing on eighty-seven. `wash` because
-that is what the tier below already calls it, in `--chart-bar-wash` and in
-the `bar-wash-start` and `bar-wash-end` stops. */
-  "prop:wash"?: HelixBarChart["wash"];
-  /** Which series are glass rather than solid, by name.
-
-Matched the way `outlined` is, against the column headings the table gives.
-
-**Per series for the reason `emphasis` is.** A
-chart-wide material puts every column in the same substance, which is right
-when the whole chart is joining the page's language and wrong the moment one
-series is a different kind of fact from the others. The two axes take the
-same shape because they answer the same question about the same thing: what
-is *this series* made of, and how much ink does *this series* claim. */
-  "prop:glass"?: HelixBarChart["glass"];
-  /** How much ink the columns claim.
-
-The chart's treatment, which every series takes unless `outlined` or
-`subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-of the series color with that edge on it, and absent is the filled column,
-per the rule that a reflected property takes no default.
-
-**It composes with `material` rather than competing with it.** Emphasis
-decides what is drawn and material decides how much of it comes through, so
-`glass` thins whatever emphasis put there: the fill on a solid column, the
-stroke on an outlined one. Without that the corner is inert, `glass` setting
-a fill opacity on a mark whose fill is `none`, and a combination that
-silently does nothing is the worst shape this can take. */
-  "prop:emphasis"?: HelixBarChart["emphasis"];
   /** Which series are drawn as an outline rather than a fill, by name.
 
 Space separated and matched against the column headings the table gives,
@@ -1447,6 +1435,18 @@ the chart. */
 
 Matched as `outlined` is. */
   "prop:subtle"?: HelixBarChart["subtle"];
+  /** How a column's fill is distributed across it.
+
+`gradient` fades each column toward its base, into the wash the headless
+tier draws whether or not anything points at it.
+
+**A chart-domain axis and deliberately not a library one.** It lives on this
+family alone, and here it is a way of encoding data rather than a way of
+expressing a theme: promoted to the registry it would put an attribute on
+eighty-eight components that means nothing on eighty-seven. `wash` because
+that is what the tier below already calls it, in `--chart-bar-wash` and in
+the `bar-wash-start` and `bar-wash-end` stops. */
+  "prop:wash"?: HelixBarChart["wash"];
   /** The id of the table to read.
 
 Resolved through `getRootNode()`, so a chart inside another component's
@@ -1574,12 +1574,12 @@ Reading cannot catch this and the picture comparison can. React assigns a
 matching property instead of an attribute, so every crumb in the React twin
 of `breadcrumbs/links` lost its padding at once. */
   href?: HelixBreadcrumb["href"];
-  /** Where the link opens, for the rare crumb that leaves the site. */
-  target?: HelixBreadcrumb["target"];
   /** What the link declares about where it goes.
 
 The consumer's decision. */
   rel?: HelixBreadcrumb["rel"];
+  /** Where the link opens, for the rare crumb that leaves the site. */
+  target?: HelixBreadcrumb["target"];
 };
 
 export type HelixBreadcrumbSolidJsProps = {
@@ -1602,12 +1602,12 @@ Reading cannot catch this and the picture comparison can. React assigns a
 matching property instead of an attribute, so every crumb in the React twin
 of `breadcrumbs/links` lost its padding at once. */
   "prop:href"?: HelixBreadcrumb["href"];
-  /** Where the link opens, for the rare crumb that leaves the site. */
-  "prop:target"?: HelixBreadcrumb["target"];
   /** What the link declares about where it goes.
 
 The consumer's decision. */
   "prop:rel"?: HelixBreadcrumb["rel"];
+  /** Where the link opens, for the rare crumb that leaves the site. */
+  "prop:target"?: HelixBreadcrumb["target"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -1760,22 +1760,26 @@ of a control means nothing in particular. `accent` is the second
 emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixButton["tone"];
-  /** What activating the button does to its form. */
-  type?: HelixButton["type"];
-  /** What this button submits under its own `name`, the way a native submitter does.
+  /** What to send when the button is activated, and what to send it to.
 
-**Reported for exactly the submission this button starts and not otherwise.**
-A native submit button contributes `name=value` only when it is the one
-that submitted, and every other button on the form contributes nothing. A
-form-associated element reporting a value continuously would contribute on
-every submission whoever started it, which is a different feature wearing
-the same name, so `submit` below sets it, submits, and clears it inside one
-synchronous call.
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
 
-`CopyButton` has a `value` of its own meaning the text to put on the
-clipboard, which is not this and is why it is declared there rather than
-inherited. */
-  value?: HelixButton["value"];
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  command?: HelixButton["command"];
+  /** The id of the element the command is sent to. */
+  commandfor?: HelixButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  commandFor?: HelixButton["commandFor"];
   /** Where this button's submission goes, overriding the form's own.
 
 **The five `form*` overrides work by writing the form and putting it back**,
@@ -1828,26 +1832,22 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   label?: HelixButton["label"];
-  /** What to send when the button is activated, and what to send it to.
+  /** What activating the button does to its form. */
+  type?: HelixButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
 
-The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognized as an
-invoker, so `commandfor` written on a custom element resolves nothing and
-the trigger silently does nothing at all. A wrapper has to hand them down,
-the same way `label` becomes `aria-label` in there.
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
 
-```html
-<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-```
-
-`commandFor` spells its attribute out, because Lit lowercases a property
-name to derive one rather than dash-casing it, and what a consumer writes
-is the platform's `commandfor`. */
-  command?: HelixButton["command"];
-  /** The id of the element the command is sent to. */
-  commandfor?: HelixButton["commandFor"];
-  /** The id of the element the command is sent to. */
-  commandFor?: HelixButton["commandFor"];
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  value?: HelixButton["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -1874,17 +1874,6 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control. */
   name?: HelixButton["name"];
-  /** Whether the button holds its group's tab stop.
-
-A toolbar keeps one tab stop across its children, and the obvious way to do
-that is to write `tabindex` onto each of them. That is a change to markup
-the consumer rendered, so a React consumer's hydration reports it and does
-not patch it up. A parent sets this property instead, which writes nothing,
-and the stop lands on the inner control inside the shadow root.
-
-No attribute, because it is coordination between elements rather than
-anything a consumer sets. */
-  focusable?: HelixButton["focusable"];
   /** Whether this button is a disclosure trigger, and whether its panel is open.
 
 **Set by whatever owns the panel, and a property rather than an attribute
@@ -1910,6 +1899,17 @@ which is the rule every reflected property here follows.
 A consumer who wants to say this statically writes `aria-expanded` on the
 host instead, which `AriaForwardController` carries to the same place. */
   expanded?: HelixButton["expanded"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  focusable?: HelixButton["focusable"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, because the resolution is otherwise kept
@@ -1975,22 +1975,26 @@ of a control means nothing in particular. `accent` is the second
 emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   "prop:tone"?: HelixButton["tone"];
-  /** What activating the button does to its form. */
-  "prop:type"?: HelixButton["type"];
-  /** What this button submits under its own `name`, the way a native submitter does.
+  /** What to send when the button is activated, and what to send it to.
 
-**Reported for exactly the submission this button starts and not otherwise.**
-A native submit button contributes `name=value` only when it is the one
-that submitted, and every other button on the form contributes nothing. A
-form-associated element reporting a value continuously would contribute on
-every submission whoever started it, which is a different feature wearing
-the same name, so `submit` below sets it, submits, and clears it inside one
-synchronous call.
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
 
-`CopyButton` has a `value` of its own meaning the text to put on the
-clipboard, which is not this and is why it is declared there rather than
-inherited. */
-  "prop:value"?: HelixButton["value"];
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  "prop:command"?: HelixButton["command"];
+  /** The id of the element the command is sent to. */
+  "attr:commandfor"?: HelixButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  "prop:commandFor"?: HelixButton["commandFor"];
   /** Where this button's submission goes, overriding the form's own.
 
 **The five `form*` overrides work by writing the form and putting it back**,
@@ -2043,26 +2047,22 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   "prop:label"?: HelixButton["label"];
-  /** What to send when the button is activated, and what to send it to.
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
 
-The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognized as an
-invoker, so `commandfor` written on a custom element resolves nothing and
-the trigger silently does nothing at all. A wrapper has to hand them down,
-the same way `label` becomes `aria-label` in there.
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
 
-```html
-<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-```
-
-`commandFor` spells its attribute out, because Lit lowercases a property
-name to derive one rather than dash-casing it, and what a consumer writes
-is the platform's `commandfor`. */
-  "prop:command"?: HelixButton["command"];
-  /** The id of the element the command is sent to. */
-  "attr:commandfor"?: HelixButton["commandFor"];
-  /** The id of the element the command is sent to. */
-  "prop:commandFor"?: HelixButton["commandFor"];
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  "prop:value"?: HelixButton["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -2089,17 +2089,6 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control. */
   "prop:name"?: HelixButton["name"];
-  /** Whether the button holds its group's tab stop.
-
-A toolbar keeps one tab stop across its children, and the obvious way to do
-that is to write `tabindex` onto each of them. That is a change to markup
-the consumer rendered, so a React consumer's hydration reports it and does
-not patch it up. A parent sets this property instead, which writes nothing,
-and the stop lands on the inner control inside the shadow root.
-
-No attribute, because it is coordination between elements rather than
-anything a consumer sets. */
-  "prop:focusable"?: HelixButton["focusable"];
   /** Whether this button is a disclosure trigger, and whether its panel is open.
 
 **Set by whatever owns the panel, and a property rather than an attribute
@@ -2125,6 +2114,17 @@ which is the rule every reflected property here follows.
 A consumer who wants to say this statically writes `aria-expanded` on the
 host instead, which `AriaForwardController` carries to the same place. */
   "prop:expanded"?: HelixButton["expanded"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  "prop:focusable"?: HelixButton["focusable"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, because the resolution is otherwise kept
@@ -2166,6 +2166,30 @@ there is no `severity` beside it. */
 };
 
 export type HelixCardProps = {
+  /** What the card is made of.
+
+**A third axis, and it passes the test the other two answer to.**
+`separation` is where the surface ends and `tone` is what it means; both of
+those can be true at once with this, an elevated glass card being a
+perfectly ordinary thing to want, so it is not a value of either.
+
+**An attribute rather than a hook, because glass is not one declaration.**
+It is a translucent ground *and* a backdrop filter, and either without the
+other does nothing: a blur behind an opaque background is invisible, and a
+translucent card over an unfiltered page is a smear. `--card-backdrop` on
+its own is that trap, a published hook a consumer could set and see nothing
+happen. The component owns the pair; a theme owns how strong it is.
+
+Absent is opaque, per the rule that a reflected property takes no default,
+so the stylesheet only describes the departure.
+
+**The whole axis, not one point of it.** `frosted` is the same pair turned
+up, the heavier ground under the heavier blur, for a card that has to stay
+readable over a busy page; `transparent` drops both, for one that is
+structure and spacing with the page showing through. */
+  material?: HelixCard["material"];
+  /** Whether media sits above the content stack or beside it. */
+  orientation?: HelixCard["orientation"];
   /** How the card separates itself from the page.
 
 **One value per mechanism, and the theme has the same four.**
@@ -2191,30 +2215,6 @@ edge, so a surface with its own color and neither edge nor lift would
 otherwise be unsayable while being one of the four things a theme can ask
 for. */
   separation?: HelixCard["separation"];
-  /** What the card is made of.
-
-**A third axis, and it passes the test the other two answer to.**
-`separation` is where the surface ends and `tone` is what it means; both of
-those can be true at once with this, an elevated glass card being a
-perfectly ordinary thing to want, so it is not a value of either.
-
-**An attribute rather than a hook, because glass is not one declaration.**
-It is a translucent ground *and* a backdrop filter, and either without the
-other does nothing: a blur behind an opaque background is invisible, and a
-translucent card over an unfiltered page is a smear. `--card-backdrop` on
-its own is that trap, a published hook a consumer could set and see nothing
-happen. The component owns the pair; a theme owns how strong it is.
-
-Absent is opaque, per the rule that a reflected property takes no default,
-so the stylesheet only describes the departure.
-
-**The whole axis, not one point of it.** `frosted` is the same pair turned
-up, the heavier ground under the heavier blur, for a card that has to stay
-readable over a busy page; `transparent` drops both, for one that is
-structure and spacing with the page showing through. */
-  material?: HelixCard["material"];
-  /** Whether media sits above the content stack or beside it. */
-  orientation?: HelixCard["orientation"];
   /** Puts the media after the content instead of before it.
 
 **A figure that concludes a card is the same region as one that opens it**,
@@ -2242,6 +2242,30 @@ with no attribute on it and the stylesheet only describes the departure. */
 };
 
 export type HelixCardSolidJsProps = {
+  /** What the card is made of.
+
+**A third axis, and it passes the test the other two answer to.**
+`separation` is where the surface ends and `tone` is what it means; both of
+those can be true at once with this, an elevated glass card being a
+perfectly ordinary thing to want, so it is not a value of either.
+
+**An attribute rather than a hook, because glass is not one declaration.**
+It is a translucent ground *and* a backdrop filter, and either without the
+other does nothing: a blur behind an opaque background is invisible, and a
+translucent card over an unfiltered page is a smear. `--card-backdrop` on
+its own is that trap, a published hook a consumer could set and see nothing
+happen. The component owns the pair; a theme owns how strong it is.
+
+Absent is opaque, per the rule that a reflected property takes no default,
+so the stylesheet only describes the departure.
+
+**The whole axis, not one point of it.** `frosted` is the same pair turned
+up, the heavier ground under the heavier blur, for a card that has to stay
+readable over a busy page; `transparent` drops both, for one that is
+structure and spacing with the page showing through. */
+  "prop:material"?: HelixCard["material"];
+  /** Whether media sits above the content stack or beside it. */
+  "prop:orientation"?: HelixCard["orientation"];
   /** How the card separates itself from the page.
 
 **One value per mechanism, and the theme has the same four.**
@@ -2267,30 +2291,6 @@ edge, so a surface with its own color and neither edge nor lift would
 otherwise be unsayable while being one of the four things a theme can ask
 for. */
   "prop:separation"?: HelixCard["separation"];
-  /** What the card is made of.
-
-**A third axis, and it passes the test the other two answer to.**
-`separation` is where the surface ends and `tone` is what it means; both of
-those can be true at once with this, an elevated glass card being a
-perfectly ordinary thing to want, so it is not a value of either.
-
-**An attribute rather than a hook, because glass is not one declaration.**
-It is a translucent ground *and* a backdrop filter, and either without the
-other does nothing: a blur behind an opaque background is invisible, and a
-translucent card over an unfiltered page is a smear. `--card-backdrop` on
-its own is that trap, a published hook a consumer could set and see nothing
-happen. The component owns the pair; a theme owns how strong it is.
-
-Absent is opaque, per the rule that a reflected property takes no default,
-so the stylesheet only describes the departure.
-
-**The whole axis, not one point of it.** `frosted` is the same pair turned
-up, the heavier ground under the heavier blur, for a card that has to stay
-readable over a busy page; `transparent` drops both, for one that is
-structure and spacing with the page showing through. */
-  "prop:material"?: HelixCard["material"];
-  /** Whether media sits above the content stack or beside it. */
-  "prop:orientation"?: HelixCard["orientation"];
   /** Puts the media after the content instead of before it.
 
 **A figure that concludes a card is the same region as one that opens it**,
@@ -2329,36 +2329,58 @@ export type HelixCarouselHelixSelectElementEvent =
   HelixCarouselElementEvent<HelixSelectEvent>;
 
 export type HelixCarouselProps = {
-  /** Which side of the slides the dots sit on.
+  /** Where along that side the arrows sit. See `indicatorAlign`.
 
-Unset is `block-end`, under them. `block-start` puts them above,
-`inline-start` and `inline-end` beside, where a run of dots becomes a
-column.
+`overlay` answers it too, and the edge there is the whole slide: the bar is
+stretched across the picture, so this moves the arrows up and down within
+it rather than moving the bar. Centered unless asked otherwise, which is
+where an arrow over a photograph belongs. */
+  "controls-align"?: HelixCarousel["controlsAlign"];
+  /** Where along that side the arrows sit. See `indicatorAlign`.
 
-**The sides of the content, not positions along a bar**, and logical names
-rather than `top`/`left`: an `inline-start` carousel should put its dots on
-the right in Arabic without being told.
+`overlay` answers it too, and the edge there is the whole slide: the bar is
+stretched across the picture, so this moves the arrows up and down within
+it rather than moving the bar. Centered unless asked otherwise, which is
+where an arrow over a photograph belongs. */
+  controlsAlign?: HelixCarousel["controlsAlign"];
+  /** Which side of the slides the arrows sit on.
 
-Independent of `controlsPlacement`. Both default to the block end, where
-they share the row and split it, dots to the start and arrows to the end,
-arrived at by two defaults rather than by a rule about the pair, so moving
-one leaves the other alone. */
-  "indicator-placement"?: HelixCarousel["indicatorPlacement"];
-  /** Which side of the slides the dots sit on.
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants.
 
-Unset is `block-end`, under them. `block-start` puts them above,
-`inline-start` and `inline-end` beside, where a run of dots becomes a
-column.
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
 
-**The sides of the content, not positions along a bar**, and logical names
-rather than `top`/`left`: an `inline-start` carousel should put its dots on
-the right in Arabic without being told.
+**It is a value here rather than an axis of its own.** "The controls are
+over the content" is the whole of what a `hero` appearance would say, and
+the surface, the edge-to-edge arrows and the bar that catches no presses all
+follow from it. These two placements are the whole of where a carousel's
+chrome can go. */
+  "controls-placement"?: HelixCarousel["controlsPlacement"];
+  /** Which side of the slides the arrows sit on.
 
-Independent of `controlsPlacement`. Both default to the block end, where
-they share the row and split it, dots to the start and arrows to the end,
-arrived at by two defaults rather than by a rule about the pair, so moving
-one leaves the other alone. */
-  indicatorPlacement?: HelixCarousel["indicatorPlacement"];
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants.
+
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
+
+**It is a value here rather than an axis of its own.** "The controls are
+over the content" is the whole of what a `hero` appearance would say, and
+the surface, the edge-to-edge arrows and the bar that catches no presses all
+follow from it. These two placements are the whole of where a carousel's
+chrome can go. */
+  controlsPlacement?: HelixCarousel["controlsPlacement"];
   /** Where along that side the dots sit.
 
 The second half of the answer to "where do they go". `indicatorPlacement`
@@ -2407,60 +2429,38 @@ nothing to split the edge with. Putting both groups on the same edge with
 the same alignment overlaps them, which is what the two different defaults
 exist to avoid. */
   indicatorAlign?: HelixCarousel["indicatorAlign"];
-  /** Which side of the slides the arrows sit on.
+  /** Which side of the slides the dots sit on.
 
-The same four sides as `indicatorPlacement` and the same default, so a
-carousel that moves only one of them keeps the other where it was.
-`inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-`overlay` puts them on the slides, at the track's own edges, which is what a
-full-bleed carousel wants: the slide is the page and the controls are on it
-rather than in a bar beneath it. It carries its own treatment with it, a
-surface and a shadow under each arrow, because a glyph drawn straight onto a
-photograph is legible against about half of one.
+**The sides of the content, not positions along a bar**, and logical names
+rather than `top`/`left`: an `inline-start` carousel should put its dots on
+the right in Arabic without being told.
 
-**It is a value here rather than an axis of its own.** "The controls are
-over the content" is the whole of what a `hero` appearance would say, and
-the surface, the edge-to-edge arrows and the bar that catches no presses all
-follow from it. These two placements are the whole of where a carousel's
-chrome can go. */
-  "controls-placement"?: HelixCarousel["controlsPlacement"];
-  /** Which side of the slides the arrows sit on.
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end,
+arrived at by two defaults rather than by a rule about the pair, so moving
+one leaves the other alone. */
+  "indicator-placement"?: HelixCarousel["indicatorPlacement"];
+  /** Which side of the slides the dots sit on.
 
-The same four sides as `indicatorPlacement` and the same default, so a
-carousel that moves only one of them keeps the other where it was.
-`inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-`overlay` puts them on the slides, at the track's own edges, which is what a
-full-bleed carousel wants: the slide is the page and the controls are on it
-rather than in a bar beneath it. It carries its own treatment with it, a
-surface and a shadow under each arrow, because a glyph drawn straight onto a
-photograph is legible against about half of one.
+**The sides of the content, not positions along a bar**, and logical names
+rather than `top`/`left`: an `inline-start` carousel should put its dots on
+the right in Arabic without being told.
 
-**It is a value here rather than an axis of its own.** "The controls are
-over the content" is the whole of what a `hero` appearance would say, and
-the surface, the edge-to-edge arrows and the bar that catches no presses all
-follow from it. These two placements are the whole of where a carousel's
-chrome can go. */
-  controlsPlacement?: HelixCarousel["controlsPlacement"];
-  /** Where along that side the arrows sit. See `indicatorAlign`.
-
-`overlay` answers it too, and the edge there is the whole slide: the bar is
-stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centered unless asked otherwise, which is
-where an arrow over a photograph belongs. */
-  "controls-align"?: HelixCarousel["controlsAlign"];
-  /** Where along that side the arrows sit. See `indicatorAlign`.
-
-`overlay` answers it too, and the edge there is the whole slide: the bar is
-stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centered unless asked otherwise, which is
-where an arrow over a photograph belongs. */
-  controlsAlign?: HelixCarousel["controlsAlign"];
-  /** Accessible name for the carousel. */
-  label?: HelixCarousel["label"];
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end,
+arrived at by two defaults rather than by a rule about the pair, so moving
+one leaves the other alone. */
+  indicatorPlacement?: HelixCarousel["indicatorPlacement"];
+  /** Whether the carousel advances on its own. */
+  autoplay?: HelixCarousel["autoplay"];
   /** The slide in view, counted from zero.
 
 Reading gives the real slide, in either mode. Writing sets it, the way a
@@ -2475,19 +2475,6 @@ extracted, because a slide is addressed by position and every one of those
 mixins is keyed by a name. One consumer is not a mixin: if a second numeric
 state turns up, this is what it is extracted from. */
   index?: HelixCarousel["index"];
-  /** Which way the track runs.
-
-Behavior rather than presentation, which is why it is here: the scroll
-position and the nearest-slide arithmetic are both single-axis, and a
-styled-tier attribute cannot change which one they read. Two sites branch
-on it, `scrollTo` and the drag settle, and nothing else in the component
-knows about the axis at all.
-
-A vertical track needs a height, which a horizontal one does not: width
-comes from the page and height does not, so the styled tier gives it
-`--carousel-block-size` and a consumer sets that to whatever the slides
-want. */
-  orientation?: HelixCarousel["orientation"];
   /** Whether the previous and next controls are shown.
 
 `auto`, which is the resting behavior and what an absent attribute means,
@@ -2516,12 +2503,25 @@ touch device exactly as it does on a desktop. */
   "default-index"?: HelixCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
   defaultIndex?: HelixCarousel["defaultIndex"];
-  /** Whether moving past either end wraps to the other. */
-  loop?: HelixCarousel["loop"];
-  /** Whether the carousel advances on its own. */
-  autoplay?: HelixCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
   interval?: HelixCarousel["interval"];
+  /** Accessible name for the carousel. */
+  label?: HelixCarousel["label"];
+  /** Whether moving past either end wraps to the other. */
+  loop?: HelixCarousel["loop"];
+  /** Which way the track runs.
+
+Behavior rather than presentation, which is why it is here: the scroll
+position and the nearest-slide arithmetic are both single-axis, and a
+styled-tier attribute cannot change which one they read. Two sites branch
+on it, `scrollTo` and the drag settle, and nothing else in the component
+knows about the axis at all.
+
+A vertical track needs a height, which a horizontal one does not: width
+comes from the page and height does not, so the styled tier gives it
+`--carousel-block-size` and a consumer sets that to whatever the slides
+want. */
+  orientation?: HelixCarousel["orientation"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
@@ -2560,36 +2560,58 @@ case is the absent attribute, and the styles read it that way. */
 };
 
 export type HelixCarouselSolidJsProps = {
-  /** Which side of the slides the dots sit on.
+  /** Where along that side the arrows sit. See `indicatorAlign`.
 
-Unset is `block-end`, under them. `block-start` puts them above,
-`inline-start` and `inline-end` beside, where a run of dots becomes a
-column.
+`overlay` answers it too, and the edge there is the whole slide: the bar is
+stretched across the picture, so this moves the arrows up and down within
+it rather than moving the bar. Centered unless asked otherwise, which is
+where an arrow over a photograph belongs. */
+  "attr:controls-align"?: HelixCarousel["controlsAlign"];
+  /** Where along that side the arrows sit. See `indicatorAlign`.
 
-**The sides of the content, not positions along a bar**, and logical names
-rather than `top`/`left`: an `inline-start` carousel should put its dots on
-the right in Arabic without being told.
+`overlay` answers it too, and the edge there is the whole slide: the bar is
+stretched across the picture, so this moves the arrows up and down within
+it rather than moving the bar. Centered unless asked otherwise, which is
+where an arrow over a photograph belongs. */
+  "prop:controlsAlign"?: HelixCarousel["controlsAlign"];
+  /** Which side of the slides the arrows sit on.
 
-Independent of `controlsPlacement`. Both default to the block end, where
-they share the row and split it, dots to the start and arrows to the end,
-arrived at by two defaults rather than by a rule about the pair, so moving
-one leaves the other alone. */
-  "attr:indicator-placement"?: HelixCarousel["indicatorPlacement"];
-  /** Which side of the slides the dots sit on.
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants.
 
-Unset is `block-end`, under them. `block-start` puts them above,
-`inline-start` and `inline-end` beside, where a run of dots becomes a
-column.
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
 
-**The sides of the content, not positions along a bar**, and logical names
-rather than `top`/`left`: an `inline-start` carousel should put its dots on
-the right in Arabic without being told.
+**It is a value here rather than an axis of its own.** "The controls are
+over the content" is the whole of what a `hero` appearance would say, and
+the surface, the edge-to-edge arrows and the bar that catches no presses all
+follow from it. These two placements are the whole of where a carousel's
+chrome can go. */
+  "attr:controls-placement"?: HelixCarousel["controlsPlacement"];
+  /** Which side of the slides the arrows sit on.
 
-Independent of `controlsPlacement`. Both default to the block end, where
-they share the row and split it, dots to the start and arrows to the end,
-arrived at by two defaults rather than by a rule about the pair, so moving
-one leaves the other alone. */
-  "prop:indicatorPlacement"?: HelixCarousel["indicatorPlacement"];
+The same four sides as `indicatorPlacement` and the same default, so a
+carousel that moves only one of them keeps the other where it was.
+`inline-start` or `inline-end` stacks the arrows into a column, which is
+what a vertical track usually wants.
+
+`overlay` puts them on the slides, at the track's own edges, which is what a
+full-bleed carousel wants: the slide is the page and the controls are on it
+rather than in a bar beneath it. It carries its own treatment with it, a
+surface and a shadow under each arrow, because a glyph drawn straight onto a
+photograph is legible against about half of one.
+
+**It is a value here rather than an axis of its own.** "The controls are
+over the content" is the whole of what a `hero` appearance would say, and
+the surface, the edge-to-edge arrows and the bar that catches no presses all
+follow from it. These two placements are the whole of where a carousel's
+chrome can go. */
+  "prop:controlsPlacement"?: HelixCarousel["controlsPlacement"];
   /** Where along that side the dots sit.
 
 The second half of the answer to "where do they go". `indicatorPlacement`
@@ -2638,60 +2660,38 @@ nothing to split the edge with. Putting both groups on the same edge with
 the same alignment overlaps them, which is what the two different defaults
 exist to avoid. */
   "prop:indicatorAlign"?: HelixCarousel["indicatorAlign"];
-  /** Which side of the slides the arrows sit on.
+  /** Which side of the slides the dots sit on.
 
-The same four sides as `indicatorPlacement` and the same default, so a
-carousel that moves only one of them keeps the other where it was.
-`inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-`overlay` puts them on the slides, at the track's own edges, which is what a
-full-bleed carousel wants: the slide is the page and the controls are on it
-rather than in a bar beneath it. It carries its own treatment with it, a
-surface and a shadow under each arrow, because a glyph drawn straight onto a
-photograph is legible against about half of one.
+**The sides of the content, not positions along a bar**, and logical names
+rather than `top`/`left`: an `inline-start` carousel should put its dots on
+the right in Arabic without being told.
 
-**It is a value here rather than an axis of its own.** "The controls are
-over the content" is the whole of what a `hero` appearance would say, and
-the surface, the edge-to-edge arrows and the bar that catches no presses all
-follow from it. These two placements are the whole of where a carousel's
-chrome can go. */
-  "attr:controls-placement"?: HelixCarousel["controlsPlacement"];
-  /** Which side of the slides the arrows sit on.
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end,
+arrived at by two defaults rather than by a rule about the pair, so moving
+one leaves the other alone. */
+  "attr:indicator-placement"?: HelixCarousel["indicatorPlacement"];
+  /** Which side of the slides the dots sit on.
 
-The same four sides as `indicatorPlacement` and the same default, so a
-carousel that moves only one of them keeps the other where it was.
-`inline-start` or `inline-end` stacks the arrows into a column, which is
-what a vertical track usually wants.
+Unset is `block-end`, under them. `block-start` puts them above,
+`inline-start` and `inline-end` beside, where a run of dots becomes a
+column.
 
-`overlay` puts them on the slides, at the track's own edges, which is what a
-full-bleed carousel wants: the slide is the page and the controls are on it
-rather than in a bar beneath it. It carries its own treatment with it, a
-surface and a shadow under each arrow, because a glyph drawn straight onto a
-photograph is legible against about half of one.
+**The sides of the content, not positions along a bar**, and logical names
+rather than `top`/`left`: an `inline-start` carousel should put its dots on
+the right in Arabic without being told.
 
-**It is a value here rather than an axis of its own.** "The controls are
-over the content" is the whole of what a `hero` appearance would say, and
-the surface, the edge-to-edge arrows and the bar that catches no presses all
-follow from it. These two placements are the whole of where a carousel's
-chrome can go. */
-  "prop:controlsPlacement"?: HelixCarousel["controlsPlacement"];
-  /** Where along that side the arrows sit. See `indicatorAlign`.
-
-`overlay` answers it too, and the edge there is the whole slide: the bar is
-stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centered unless asked otherwise, which is
-where an arrow over a photograph belongs. */
-  "attr:controls-align"?: HelixCarousel["controlsAlign"];
-  /** Where along that side the arrows sit. See `indicatorAlign`.
-
-`overlay` answers it too, and the edge there is the whole slide: the bar is
-stretched across the picture, so this moves the arrows up and down within
-it rather than moving the bar. Centered unless asked otherwise, which is
-where an arrow over a photograph belongs. */
-  "prop:controlsAlign"?: HelixCarousel["controlsAlign"];
-  /** Accessible name for the carousel. */
-  "prop:label"?: HelixCarousel["label"];
+Independent of `controlsPlacement`. Both default to the block end, where
+they share the row and split it, dots to the start and arrows to the end,
+arrived at by two defaults rather than by a rule about the pair, so moving
+one leaves the other alone. */
+  "prop:indicatorPlacement"?: HelixCarousel["indicatorPlacement"];
+  /** Whether the carousel advances on its own. */
+  "prop:autoplay"?: HelixCarousel["autoplay"];
   /** The slide in view, counted from zero.
 
 Reading gives the real slide, in either mode. Writing sets it, the way a
@@ -2706,19 +2706,6 @@ extracted, because a slide is addressed by position and every one of those
 mixins is keyed by a name. One consumer is not a mixin: if a second numeric
 state turns up, this is what it is extracted from. */
   "prop:index"?: HelixCarousel["index"];
-  /** Which way the track runs.
-
-Behavior rather than presentation, which is why it is here: the scroll
-position and the nearest-slide arithmetic are both single-axis, and a
-styled-tier attribute cannot change which one they read. Two sites branch
-on it, `scrollTo` and the drag settle, and nothing else in the component
-knows about the axis at all.
-
-A vertical track needs a height, which a horizontal one does not: width
-comes from the page and height does not, so the styled tier gives it
-`--carousel-block-size` and a consumer sets that to whatever the slides
-want. */
-  "prop:orientation"?: HelixCarousel["orientation"];
   /** Whether the previous and next controls are shown.
 
 `auto`, which is the resting behavior and what an absent attribute means,
@@ -2747,12 +2734,25 @@ touch device exactly as it does on a desktop. */
   "attr:default-index"?: HelixCarousel["defaultIndex"];
   /** Slide to start on, where nothing declared one. */
   "prop:defaultIndex"?: HelixCarousel["defaultIndex"];
-  /** Whether moving past either end wraps to the other. */
-  "prop:loop"?: HelixCarousel["loop"];
-  /** Whether the carousel advances on its own. */
-  "prop:autoplay"?: HelixCarousel["autoplay"];
   /** How long each slide is held, in milliseconds. */
   "prop:interval"?: HelixCarousel["interval"];
+  /** Accessible name for the carousel. */
+  "prop:label"?: HelixCarousel["label"];
+  /** Whether moving past either end wraps to the other. */
+  "prop:loop"?: HelixCarousel["loop"];
+  /** Which way the track runs.
+
+Behavior rather than presentation, which is why it is here: the scroll
+position and the nearest-slide arithmetic are both single-axis, and a
+styled-tier attribute cannot change which one they read. Two sites branch
+on it, `scrollTo` and the drag settle, and nothing else in the component
+knows about the axis at all.
+
+A vertical track needs a height, which a horizontal one does not: width
+comes from the page and height does not, so the styled tier gives it
+`--carousel-block-size` and a consumer sets that to whatever the slides
+want. */
+  "prop:orientation"?: HelixCarousel["orientation"];
   /** How many slides are shown across the track at once. Absent shows one.
 
 **Here rather than on the styled tier, because it decides how many places
@@ -2804,12 +2804,20 @@ export type HelixChatComposerHelixSendElementEvent =
   HelixChatComposerElementEvent<HelixSendEvent>;
 
 export type HelixChatComposerProps = {
-  /** What the reader has written.
-
-Read it, or set it to seed a draft. */
-  value?: HelixChatComposer["value"];
+  /** Whether the composer refuses input, while a turn is in flight say. */
+  disabled?: HelixChatComposer["disabled"];
+  /** Accessible name for the field. */
+  label?: HelixChatComposer["label"];
   /** Shown in an empty field. */
   placeholder?: HelixChatComposer["placeholder"];
+  /** How many rows the field opens at.
+
+It grows from there. */
+  rows?: HelixChatComposer["rows"];
+  /** Label for the control that sends. */
+  "send-label"?: HelixChatComposer["sendLabel"];
+  /** Label for the control that sends. */
+  sendLabel?: HelixChatComposer["sendLabel"];
   /** What sends: pressing Enter, or only the control.
 
 `enter` is the messaging convention and makes Shift+Enter the line break.
@@ -2822,30 +2830,30 @@ has to mean a new line and nothing else. */
 `button` is what a composer holding several paragraphs wants, where Enter
 has to mean a new line and nothing else. */
   submitOn?: HelixChatComposer["submitOn"];
-  /** Whether the composer refuses input, while a turn is in flight say. */
-  disabled?: HelixChatComposer["disabled"];
-  /** Accessible name for the field. */
-  label?: HelixChatComposer["label"];
-  /** Label for the control that sends. */
-  "send-label"?: HelixChatComposer["sendLabel"];
-  /** Label for the control that sends. */
-  sendLabel?: HelixChatComposer["sendLabel"];
-  /** How many rows the field opens at.
+  /** What the reader has written.
 
-It grows from there. */
-  rows?: HelixChatComposer["rows"];
+Read it, or set it to seed a draft. */
+  value?: HelixChatComposer["value"];
 
   /** Fired when the reader offers their turn, and cancelable. */
   "onhelix-send"?: (e: HelixChatComposerHelixSendElementEvent) => void;
 };
 
 export type HelixChatComposerSolidJsProps = {
-  /** What the reader has written.
-
-Read it, or set it to seed a draft. */
-  "prop:value"?: HelixChatComposer["value"];
+  /** Whether the composer refuses input, while a turn is in flight say. */
+  "prop:disabled"?: HelixChatComposer["disabled"];
+  /** Accessible name for the field. */
+  "prop:label"?: HelixChatComposer["label"];
   /** Shown in an empty field. */
   "prop:placeholder"?: HelixChatComposer["placeholder"];
+  /** How many rows the field opens at.
+
+It grows from there. */
+  "prop:rows"?: HelixChatComposer["rows"];
+  /** Label for the control that sends. */
+  "attr:send-label"?: HelixChatComposer["sendLabel"];
+  /** Label for the control that sends. */
+  "prop:sendLabel"?: HelixChatComposer["sendLabel"];
   /** What sends: pressing Enter, or only the control.
 
 `enter` is the messaging convention and makes Shift+Enter the line break.
@@ -2858,18 +2866,10 @@ has to mean a new line and nothing else. */
 `button` is what a composer holding several paragraphs wants, where Enter
 has to mean a new line and nothing else. */
   "prop:submitOn"?: HelixChatComposer["submitOn"];
-  /** Whether the composer refuses input, while a turn is in flight say. */
-  "prop:disabled"?: HelixChatComposer["disabled"];
-  /** Accessible name for the field. */
-  "prop:label"?: HelixChatComposer["label"];
-  /** Label for the control that sends. */
-  "attr:send-label"?: HelixChatComposer["sendLabel"];
-  /** Label for the control that sends. */
-  "prop:sendLabel"?: HelixChatComposer["sendLabel"];
-  /** How many rows the field opens at.
+  /** What the reader has written.
 
-It grows from there. */
-  "prop:rows"?: HelixChatComposer["rows"];
+Read it, or set it to seed a draft. */
+  "prop:value"?: HelixChatComposer["value"];
   /** Fired when the reader offers their turn, and cancelable. */
   "on:helix-send"?: (e: HelixChatComposerHelixSendElementEvent) => void;
 
@@ -2908,6 +2908,8 @@ no ground to end. The two values are a subset of the registry's four:
 `elevated` reads as a card and `outlined` as an input, so neither is a
 thing a turn should be. */
   separation?: HelixChatMessage["separation"];
+  /** When it was said, as anything `Date` parses. */
+  at?: HelixChatMessage["at"];
   /** Who said it.
 
 Free text rather than a two-value union, because a conversation is not
@@ -2916,6 +2918,22 @@ participants is the ordinary case for anything worth building this for.
 `me` and `them` are the conventional values and the stylesheet knows them;
 anything else is a name the consumer styles. */
   author?: HelixChatMessage["author"];
+  /** Label for a message that did not send. */
+  "failed-label"?: HelixChatMessage["failedLabel"];
+  /** Label for a message that did not send. */
+  failedLabel?: HelixChatMessage["failedLabel"];
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
+  locale?: HelixChatMessage["locale"];
+  /** Label for the control offered on a failed message. */
+  "retry-label"?: HelixChatMessage["retryLabel"];
+  /** Label for the control offered on a failed message. */
+  retryLabel?: HelixChatMessage["retryLabel"];
+  /** What to call each state, for a reader who cannot see it. */
+  "sending-label"?: HelixChatMessage["sendingLabel"];
+  /** What to call each state, for a reader who cannot see it. */
+  sendingLabel?: HelixChatMessage["sendingLabel"];
   /** What has happened to it.
 
 Reflected, because every one of the four is a visual state and a stylesheet
@@ -2924,24 +2942,6 @@ report, which is what most of a transcript is, and it is the absence of the
 attribute rather than a value of it: there is no initializer, so nothing is
 reflected until something happens. */
   state?: HelixChatMessage["state"];
-  /** When it was said, as anything `Date` parses. */
-  at?: HelixChatMessage["at"];
-  /** Locale for the timestamp.
-
-Empty is the runtime's own. */
-  locale?: HelixChatMessage["locale"];
-  /** What to call each state, for a reader who cannot see it. */
-  "sending-label"?: HelixChatMessage["sendingLabel"];
-  /** What to call each state, for a reader who cannot see it. */
-  sendingLabel?: HelixChatMessage["sendingLabel"];
-  /** Label for a message that did not send. */
-  "failed-label"?: HelixChatMessage["failedLabel"];
-  /** Label for a message that did not send. */
-  failedLabel?: HelixChatMessage["failedLabel"];
-  /** Label for the control offered on a failed message. */
-  "retry-label"?: HelixChatMessage["retryLabel"];
-  /** Label for the control offered on a failed message. */
-  retryLabel?: HelixChatMessage["retryLabel"];
 
   /** Fired when the reader asks to send a failed message again, and cancelable. */
   "onhelix-send"?: (e: HelixChatMessageHelixSendElementEvent) => void;
@@ -2967,6 +2967,8 @@ no ground to end. The two values are a subset of the registry's four:
 `elevated` reads as a card and `outlined` as an input, so neither is a
 thing a turn should be. */
   "prop:separation"?: HelixChatMessage["separation"];
+  /** When it was said, as anything `Date` parses. */
+  "prop:at"?: HelixChatMessage["at"];
   /** Who said it.
 
 Free text rather than a two-value union, because a conversation is not
@@ -2975,6 +2977,22 @@ participants is the ordinary case for anything worth building this for.
 `me` and `them` are the conventional values and the stylesheet knows them;
 anything else is a name the consumer styles. */
   "prop:author"?: HelixChatMessage["author"];
+  /** Label for a message that did not send. */
+  "attr:failed-label"?: HelixChatMessage["failedLabel"];
+  /** Label for a message that did not send. */
+  "prop:failedLabel"?: HelixChatMessage["failedLabel"];
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
+  "prop:locale"?: HelixChatMessage["locale"];
+  /** Label for the control offered on a failed message. */
+  "attr:retry-label"?: HelixChatMessage["retryLabel"];
+  /** Label for the control offered on a failed message. */
+  "prop:retryLabel"?: HelixChatMessage["retryLabel"];
+  /** What to call each state, for a reader who cannot see it. */
+  "attr:sending-label"?: HelixChatMessage["sendingLabel"];
+  /** What to call each state, for a reader who cannot see it. */
+  "prop:sendingLabel"?: HelixChatMessage["sendingLabel"];
   /** What has happened to it.
 
 Reflected, because every one of the four is a visual state and a stylesheet
@@ -2983,24 +3001,6 @@ report, which is what most of a transcript is, and it is the absence of the
 attribute rather than a value of it: there is no initializer, so nothing is
 reflected until something happens. */
   "prop:state"?: HelixChatMessage["state"];
-  /** When it was said, as anything `Date` parses. */
-  "prop:at"?: HelixChatMessage["at"];
-  /** Locale for the timestamp.
-
-Empty is the runtime's own. */
-  "prop:locale"?: HelixChatMessage["locale"];
-  /** What to call each state, for a reader who cannot see it. */
-  "attr:sending-label"?: HelixChatMessage["sendingLabel"];
-  /** What to call each state, for a reader who cannot see it. */
-  "prop:sendingLabel"?: HelixChatMessage["sendingLabel"];
-  /** Label for a message that did not send. */
-  "attr:failed-label"?: HelixChatMessage["failedLabel"];
-  /** Label for a message that did not send. */
-  "prop:failedLabel"?: HelixChatMessage["failedLabel"];
-  /** Label for the control offered on a failed message. */
-  "attr:retry-label"?: HelixChatMessage["retryLabel"];
-  /** Label for the control offered on a failed message. */
-  "prop:retryLabel"?: HelixChatMessage["retryLabel"];
   /** Fired when the reader asks to send a failed message again, and cancelable. */
   "on:helix-send"?: (e: HelixChatMessageHelixSendElementEvent) => void;
 
@@ -3017,6 +3017,10 @@ export type HelixChatHelixBeforePinElementEvent =
   HelixChatElementEvent<HelixBeforePinEvent>;
 
 export type HelixChatProps = {
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixChat["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixChat["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -3027,19 +3031,12 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixChat["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixChat["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixChat["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixChat["emptyText"];
+  /** Whether to open pinned, where nothing declared it. */
+  "default-pinned"?: HelixChat["defaultPinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  defaultPinned?: HelixChat["defaultPinned"];
   /** Accessible name for the conversation. */
   label?: HelixChat["label"];
-  /** How near the bottom still counts as being at it, in pixels.
-
-A hook rather than a constant, because the right number depends on how tall
-a turn is: a transcript of one-line replies wants a smaller threshold than
-one of paragraphs, and a reader who has scrolled up by half a message has
-not left. */
-  threshold?: HelixChat["threshold"];
   /** Whether the transcript follows new turns to the bottom.
 
 The reader's scrolling asks first: `helix-before-pin` is cancelable, so a
@@ -3057,16 +3054,23 @@ that is a part inside the shadow tree where a stylesheet can already reach
 it. Measured rather than assumed: `label, pinned` after upgrade against
 `label` from the server. */
   pinned?: HelixChat["pinned"];
-  /** Whether to open pinned, where nothing declared it. */
-  "default-pinned"?: HelixChat["defaultPinned"];
-  /** Whether to open pinned, where nothing declared it. */
-  defaultPinned?: HelixChat["defaultPinned"];
+  /** How near the bottom still counts as being at it, in pixels.
+
+A hook rather than a constant, because the right number depends on how tall
+a turn is: a transcript of one-line replies wants a smaller threshold than
+one of paragraphs, and a reader who has scrolled up by half a message has
+not left. */
+  threshold?: HelixChat["threshold"];
 
   /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
   "onhelix-before-pin"?: (e: HelixChatHelixBeforePinElementEvent) => void;
 };
 
 export type HelixChatSolidJsProps = {
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixChat["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixChat["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -3077,19 +3081,12 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixChat["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixChat["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixChat["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixChat["emptyText"];
+  /** Whether to open pinned, where nothing declared it. */
+  "bool:default-pinned"?: HelixChat["defaultPinned"];
+  /** Whether to open pinned, where nothing declared it. */
+  "prop:defaultPinned"?: HelixChat["defaultPinned"];
   /** Accessible name for the conversation. */
   "prop:label"?: HelixChat["label"];
-  /** How near the bottom still counts as being at it, in pixels.
-
-A hook rather than a constant, because the right number depends on how tall
-a turn is: a transcript of one-line replies wants a smaller threshold than
-one of paragraphs, and a reader who has scrolled up by half a message has
-not left. */
-  "prop:threshold"?: HelixChat["threshold"];
   /** Whether the transcript follows new turns to the bottom.
 
 The reader's scrolling asks first: `helix-before-pin` is cancelable, so a
@@ -3107,10 +3104,13 @@ that is a part inside the shadow tree where a stylesheet can already reach
 it. Measured rather than assumed: `label, pinned` after upgrade against
 `label` from the server. */
   "prop:pinned"?: HelixChat["pinned"];
-  /** Whether to open pinned, where nothing declared it. */
-  "bool:default-pinned"?: HelixChat["defaultPinned"];
-  /** Whether to open pinned, where nothing declared it. */
-  "prop:defaultPinned"?: HelixChat["defaultPinned"];
+  /** How near the bottom still counts as being at it, in pixels.
+
+A hook rather than a constant, because the right number depends on how tall
+a turn is: a transcript of one-line replies wants a smaller threshold than
+one of paragraphs, and a reader who has scrolled up by half a message has
+not left. */
+  "prop:threshold"?: HelixChat["threshold"];
   /** Fired when the reader pins or unpins the transcript by scrolling. Cancelable. */
   "on:helix-before-pin"?: (e: HelixChatHelixBeforePinElementEvent) => void;
 
@@ -3132,10 +3132,10 @@ export type HelixCheckboxGroupHelixBeforeChangeElementEvent =
 export type HelixCheckboxGroupProps = {
   /** Which way the boxes run. */
   orientation?: HelixCheckboxGroup["orientation"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixCheckboxGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixCheckboxGroup["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixCheckboxGroup["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -3182,10 +3182,10 @@ Here rather than on each control. */
 export type HelixCheckboxGroupSolidJsProps = {
   /** Which way the boxes run. */
   "prop:orientation"?: HelixCheckboxGroup["orientation"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixCheckboxGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixCheckboxGroup["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixCheckboxGroup["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixCheckboxGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -3266,20 +3266,20 @@ stylesheets. */
   "default-checked"?: HelixCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
   defaultChecked?: HelixCheckbox["defaultChecked"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixCheckbox["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixCheckbox["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixCheckbox["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixCheckbox["required"];
-  /** Value submitted when the box is checked. */
-  value?: HelixCheckbox["value"];
   /** Whether the box shows as neither checked nor unchecked.
 
 Presentation only. It never submits, and the first change resolves it. */
   indeterminate?: HelixCheckbox["indeterminate"];
+  /** Value submitted when the box is checked. */
+  value?: HelixCheckbox["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3344,20 +3344,20 @@ stylesheets. */
   "bool:default-checked"?: HelixCheckbox["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
   "prop:defaultChecked"?: HelixCheckbox["defaultChecked"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixCheckbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixCheckbox["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixCheckbox["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixCheckbox["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixCheckbox["required"];
-  /** Value submitted when the box is checked. */
-  "prop:value"?: HelixCheckbox["value"];
   /** Whether the box shows as neither checked nor unchecked.
 
 Presentation only. It never submits, and the first change resolves it. */
   "prop:indeterminate"?: HelixCheckbox["indeterminate"];
+  /** Value submitted when the box is checked. */
+  "prop:value"?: HelixCheckbox["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3547,14 +3547,16 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixColorInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixColorInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixColorInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixColorInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixColorInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixColorInput["required"];
+  /** Whether the color carries an alpha channel. */
+  alpha?: HelixColorInput["alpha"];
   /** What the browser may autofill in the text field, as a platform token.
 
 **Defaults to `off`, which is not the platform's default and is the
@@ -3562,24 +3564,6 @@ point.** The field holds a color, so a browser offering to fill it with a
 saved address is competing for the same keystrokes as the picker. A
 consumer who wants autofill can still ask. */
   autocomplete?: HelixColorInput["autocomplete"];
-  /** Whether the field is a text box with a swatch on it, or only the swatch.
-
-`swatch` is the native control's shape: a block of color that opens a
-picker, with no text beside it. It is what a toolbar wants, and a form that
-asks for a color among twenty other questions, where a hex in a box is
-eleven characters of noise next to the thing itself.
-
-It also settles where the value is stated. The default field *is* the input,
-so the panel is told `no-value` and would otherwise show a second one. A
-swatch states nothing, so the panel keeps its own row and the value is
-readable and typeable exactly once, in whichever of the two is present.
-
-The trade is real and is the reason this is not the default: a swatch cannot
-be read or pasted into without opening the panel, which is worse for a form
-where the color is the answer rather than a setting. */
-  variant?: HelixColorInput["variant"];
-  /** Whether the color carries an alpha channel. */
-  alpha?: HelixColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 **Undefaulted, because it reflects.** The two together stamp an attribute
@@ -3602,6 +3586,22 @@ value spelled out. */
   "trigger-label"?: HelixColorInput["triggerLabel"];
   /** Accessible name for the control that opens the panel. */
   triggerLabel?: HelixColorInput["triggerLabel"];
+  /** Whether the field is a text box with a swatch on it, or only the swatch.
+
+`swatch` is the native control's shape: a block of color that opens a
+picker, with no text beside it. It is what a toolbar wants, and a form that
+asks for a color among twenty other questions, where a hex in a box is
+eleven characters of noise next to the thing itself.
+
+It also settles where the value is stated. The default field *is* the input,
+so the panel is told `no-value` and would otherwise show a second one. A
+swatch states nothing, so the panel keeps its own row and the value is
+readable and typeable exactly once, in whichever of the two is present.
+
+The trade is real and is the reason this is not the default: a swatch cannot
+be read or pasted into without opening the panel, which is worse for a form
+where the color is the answer rather than a setting. */
+  variant?: HelixColorInput["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3678,14 +3678,16 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixColorInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixColorInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixColorInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixColorInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixColorInput["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixColorInput["required"];
+  /** Whether the color carries an alpha channel. */
+  "prop:alpha"?: HelixColorInput["alpha"];
   /** What the browser may autofill in the text field, as a platform token.
 
 **Defaults to `off`, which is not the platform's default and is the
@@ -3693,24 +3695,6 @@ point.** The field holds a color, so a browser offering to fill it with a
 saved address is competing for the same keystrokes as the picker. A
 consumer who wants autofill can still ask. */
   "prop:autocomplete"?: HelixColorInput["autocomplete"];
-  /** Whether the field is a text box with a swatch on it, or only the swatch.
-
-`swatch` is the native control's shape: a block of color that opens a
-picker, with no text beside it. It is what a toolbar wants, and a form that
-asks for a color among twenty other questions, where a hex in a box is
-eleven characters of noise next to the thing itself.
-
-It also settles where the value is stated. The default field *is* the input,
-so the panel is told `no-value` and would otherwise show a second one. A
-swatch states nothing, so the panel keeps its own row and the value is
-readable and typeable exactly once, in whichever of the two is present.
-
-The trade is real and is the reason this is not the default: a swatch cannot
-be read or pasted into without opening the panel, which is worse for a form
-where the color is the answer rather than a setting. */
-  "prop:variant"?: HelixColorInput["variant"];
-  /** Whether the color carries an alpha channel. */
-  "prop:alpha"?: HelixColorInput["alpha"];
   /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
 
 **Undefaulted, because it reflects.** The two together stamp an attribute
@@ -3733,6 +3717,22 @@ value spelled out. */
   "attr:trigger-label"?: HelixColorInput["triggerLabel"];
   /** Accessible name for the control that opens the panel. */
   "prop:triggerLabel"?: HelixColorInput["triggerLabel"];
+  /** Whether the field is a text box with a swatch on it, or only the swatch.
+
+`swatch` is the native control's shape: a block of color that opens a
+picker, with no text beside it. It is what a toolbar wants, and a form that
+asks for a color among twenty other questions, where a hex in a box is
+eleven characters of noise next to the thing itself.
+
+It also settles where the value is stated. The default field *is* the input,
+so the panel is told `no-value` and would otherwise show a second one. A
+swatch states nothing, so the panel keeps its own row and the value is
+readable and typeable exactly once, in whichever of the two is present.
+
+The trade is real and is the reason this is not the default: a swatch cannot
+be read or pasted into without opening the panel, which is worse for a form
+where the color is the answer rather than a setting. */
+  "prop:variant"?: HelixColorInput["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -3814,6 +3814,11 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixColorPicker["value"];
+  /** Whether the color carries an alpha channel.
+
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
+  alpha?: HelixColorPicker["alpha"];
   /** What the browser may autofill in the text field, as a platform token.
 
 **Defaults to `off`, which is not the platform's default and is the
@@ -3821,6 +3826,11 @@ point.** The field holds a color, so a browser offering to fill it with a
 saved address is competing for the same keystrokes as the square and the
 ramps. A consumer who wants autofill can still ask. */
   autocomplete?: HelixColorPicker["autocomplete"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a picker on
+`hex` still takes an `rgb()` handed to it and stores the hex for it. */
+  format?: HelixColorPicker["format"];
   /** Whether the current selection fails validation.
 
 A flag rather than a message, the split Date Picker also draws. A flat
@@ -3829,16 +3839,14 @@ the label, the hint and the feedback, and a second message inside the panel
 would be the same error said twice. What is left for the picker is the one
 thing the field cannot draw from outside, the mark on the answer itself. */
   invalid?: HelixColorPicker["invalid"];
-  /** Whether the color carries an alpha channel.
-
-Off by default, because it widens every value written, and a consumer who
-did not ask for transparency should not have to strip a byte off each one. */
-  alpha?: HelixColorPicker["alpha"];
-  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
-
-Only what is written. Everything is read whatever this says, so a picker on
-`hex` still takes an `rgb()` handed to it and stores the hex for it. */
-  format?: HelixColorPicker["format"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  "no-eyedropper"?: HelixColorPicker["noEyedropper"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  noEyedropper?: HelixColorPicker["noEyedropper"];
+  /** Whether the reader may change the format. */
+  "no-format"?: HelixColorPicker["noFormat"];
+  /** Whether the reader may change the format. */
+  noFormat?: HelixColorPicker["noFormat"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the color as text and lets it be typed or pasted, which is
@@ -3865,14 +3873,6 @@ answer to which one is authoritative or which has the caret. Do not close it
 the other way round, with Color Input dropping its own field: the value
 would then be unreadable and unpasteable without opening a panel. */
   noValue?: HelixColorPicker["noValue"];
-  /** Whether the reader may change the format. */
-  "no-format"?: HelixColorPicker["noFormat"];
-  /** Whether the reader may change the format. */
-  noFormat?: HelixColorPicker["noFormat"];
-  /** Whether the eyedropper is offered where the browser has one. */
-  "no-eyedropper"?: HelixColorPicker["noEyedropper"];
-  /** Whether the eyedropper is offered where the browser has one. */
-  noEyedropper?: HelixColorPicker["noEyedropper"];
   /** Colors offered under the picker, as a comma-separated list. */
   swatches?: HelixColorPicker["swatches"];
   /** Whether the control is non-interactive.
@@ -3934,6 +3934,11 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixColorPicker["value"];
+  /** Whether the color carries an alpha channel.
+
+Off by default, because it widens every value written, and a consumer who
+did not ask for transparency should not have to strip a byte off each one. */
+  "prop:alpha"?: HelixColorPicker["alpha"];
   /** What the browser may autofill in the text field, as a platform token.
 
 **Defaults to `off`, which is not the platform's default and is the
@@ -3941,6 +3946,11 @@ point.** The field holds a color, so a browser offering to fill it with a
 saved address is competing for the same keystrokes as the square and the
 ramps. A consumer who wants autofill can still ask. */
   "prop:autocomplete"?: HelixColorPicker["autocomplete"];
+  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
+
+Only what is written. Everything is read whatever this says, so a picker on
+`hex` still takes an `rgb()` handed to it and stores the hex for it. */
+  "prop:format"?: HelixColorPicker["format"];
   /** Whether the current selection fails validation.
 
 A flag rather than a message, the split Date Picker also draws. A flat
@@ -3949,16 +3959,14 @@ the label, the hint and the feedback, and a second message inside the panel
 would be the same error said twice. What is left for the picker is the one
 thing the field cannot draw from outside, the mark on the answer itself. */
   "prop:invalid"?: HelixColorPicker["invalid"];
-  /** Whether the color carries an alpha channel.
-
-Off by default, because it widens every value written, and a consumer who
-did not ask for transparency should not have to strip a byte off each one. */
-  "prop:alpha"?: HelixColorPicker["alpha"];
-  /** The syntax the value is written in: `hex`, `rgb` or `hsl`.
-
-Only what is written. Everything is read whatever this says, so a picker on
-`hex` still takes an `rgb()` handed to it and stores the hex for it. */
-  "prop:format"?: HelixColorPicker["format"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  "bool:no-eyedropper"?: HelixColorPicker["noEyedropper"];
+  /** Whether the eyedropper is offered where the browser has one. */
+  "prop:noEyedropper"?: HelixColorPicker["noEyedropper"];
+  /** Whether the reader may change the format. */
+  "bool:no-format"?: HelixColorPicker["noFormat"];
+  /** Whether the reader may change the format. */
+  "prop:noFormat"?: HelixColorPicker["noFormat"];
   /** Whether to leave the value out, for a picker whose value is stated elsewhere.
 
 The row reads the color as text and lets it be typed or pasted, which is
@@ -3985,14 +3993,6 @@ answer to which one is authoritative or which has the caret. Do not close it
 the other way round, with Color Input dropping its own field: the value
 would then be unreadable and unpasteable without opening a panel. */
   "prop:noValue"?: HelixColorPicker["noValue"];
-  /** Whether the reader may change the format. */
-  "bool:no-format"?: HelixColorPicker["noFormat"];
-  /** Whether the reader may change the format. */
-  "prop:noFormat"?: HelixColorPicker["noFormat"];
-  /** Whether the eyedropper is offered where the browser has one. */
-  "bool:no-eyedropper"?: HelixColorPicker["noEyedropper"];
-  /** Whether the eyedropper is offered where the browser has one. */
-  "prop:noEyedropper"?: HelixColorPicker["noEyedropper"];
   /** Colors offered under the picker, as a comma-separated list. */
   "prop:swatches"?: HelixColorPicker["swatches"];
   /** Whether the control is non-interactive.
@@ -4090,10 +4090,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixCombobox["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixCombobox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixCombobox["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixCombobox["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixCombobox["label"];
   /** Whether the form refuses to submit without it. */
@@ -4105,17 +4105,6 @@ point.** The field filters a list rather than collecting a value, so a
 browser offering to fill it with a saved address is competing for the same
 keystrokes as the listbox. A consumer who wants autofill can still ask. */
   autocomplete?: HelixCombobox["autocomplete"];
-  /** Text shown while nothing has been chosen. */
-  placeholder?: HelixCombobox["placeholder"];
-  /** Whether more than one option can be chosen.
-
-The list already does the work: `value` comes apart on commas, a press
-toggles rather than replaces, and the arrows move without choosing. What
-this adds is the tags, and keeping the panel open between picks.
-
-A comma is therefore not available inside an option's value, which is the
-listbox's contract and not this element's to change. */
-  multiple?: HelixCombobox["multiple"];
   /** Whether the reader may answer with something the list does not hold.
 
 The row appears while what is typed matches no option's words exactly, so
@@ -4123,21 +4112,27 @@ it is offered next to near misses too: a reader typing "Ruby on Rails" with
 "Ruby" in the list wants the one they are typing, not the one they are
 halfway through. */
   creatable?: HelixCombobox["creatable"];
-  /** Whether the field finishes the word as it is typed.
-
-`suggest` rather than `autocomplete`, which is a real HTML attribute this
-element already sets on the input it renders, and two things of one name
-meaning different things on the same control is a question a consumer
-should not have to ask. */
-  suggest?: HelixCombobox["suggest"];
   /** What the create row says, before the words it would add. */
   "create-label"?: HelixCombobox["createLabel"];
   /** What the create row says, before the words it would add. */
   createLabel?: HelixCombobox["createLabel"];
-  /** What a tag's remove control is called, since the mark has no name. */
-  "remove-label"?: HelixCombobox["removeLabel"];
-  /** What a tag's remove control is called, since the mark has no name. */
-  removeLabel?: HelixCombobox["removeLabel"];
+  /** Words shown where the filter has hidden everything. */
+  "empty-text"?: HelixCombobox["emptyText"];
+  /** Words shown where the filter has hidden everything. */
+  emptyText?: HelixCombobox["emptyText"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "list-label"?: HelixCombobox["listLabel"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  listLabel?: HelixCombobox["listLabel"];
+  /** Whether the options are still on their way.
+
+Passed straight to the list, which is where the rows are and so where the
+message belongs. */
+  loading?: HelixCombobox["loading"];
+  /** What the list says while they are on their way. */
+  "loading-text"?: HelixCombobox["loadingText"];
+  /** What the list says while they are on their way. */
+  loadingText?: HelixCombobox["loadingText"];
   /** How many tags to draw before the rest become a count. `multiple` only.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -4164,23 +4159,28 @@ on, where a row that silently stops is a field that appears to have lost
 what was put in it. Date Input and Time Input carry the same property and
 the same reasoning. */
   maxTags?: HelixCombobox["maxTags"];
-  /** Accessible name for the list, which has no visible one of its own. */
-  "list-label"?: HelixCombobox["listLabel"];
-  /** Accessible name for the list, which has no visible one of its own. */
-  listLabel?: HelixCombobox["listLabel"];
-  /** Whether the options are still on their way.
+  /** Whether more than one option can be chosen.
 
-Passed straight to the list, which is where the rows are and so where the
-message belongs. */
-  loading?: HelixCombobox["loading"];
-  /** What the list says while they are on their way. */
-  "loading-text"?: HelixCombobox["loadingText"];
-  /** What the list says while they are on their way. */
-  loadingText?: HelixCombobox["loadingText"];
-  /** Words shown where the filter has hidden everything. */
-  "empty-text"?: HelixCombobox["emptyText"];
-  /** Words shown where the filter has hidden everything. */
-  emptyText?: HelixCombobox["emptyText"];
+The list already does the work: `value` comes apart on commas, a press
+toggles rather than replaces, and the arrows move without choosing. What
+this adds is the tags, and keeping the panel open between picks.
+
+A comma is therefore not available inside an option's value, which is the
+listbox's contract and not this element's to change. */
+  multiple?: HelixCombobox["multiple"];
+  /** Text shown while nothing has been chosen. */
+  placeholder?: HelixCombobox["placeholder"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "remove-label"?: HelixCombobox["removeLabel"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  removeLabel?: HelixCombobox["removeLabel"];
+  /** Whether the field finishes the word as it is typed.
+
+`suggest` rather than `autocomplete`, which is a real HTML attribute this
+element already sets on the input it renders, and two things of one name
+meaning different things on the same control is a question a consumer
+should not have to ask. */
+  suggest?: HelixCombobox["suggest"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4264,10 +4264,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixCombobox["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixCombobox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixCombobox["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixCombobox["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixCombobox["label"];
   /** Whether the form refuses to submit without it. */
@@ -4279,17 +4279,6 @@ point.** The field filters a list rather than collecting a value, so a
 browser offering to fill it with a saved address is competing for the same
 keystrokes as the listbox. A consumer who wants autofill can still ask. */
   "prop:autocomplete"?: HelixCombobox["autocomplete"];
-  /** Text shown while nothing has been chosen. */
-  "prop:placeholder"?: HelixCombobox["placeholder"];
-  /** Whether more than one option can be chosen.
-
-The list already does the work: `value` comes apart on commas, a press
-toggles rather than replaces, and the arrows move without choosing. What
-this adds is the tags, and keeping the panel open between picks.
-
-A comma is therefore not available inside an option's value, which is the
-listbox's contract and not this element's to change. */
-  "prop:multiple"?: HelixCombobox["multiple"];
   /** Whether the reader may answer with something the list does not hold.
 
 The row appears while what is typed matches no option's words exactly, so
@@ -4297,21 +4286,27 @@ it is offered next to near misses too: a reader typing "Ruby on Rails" with
 "Ruby" in the list wants the one they are typing, not the one they are
 halfway through. */
   "prop:creatable"?: HelixCombobox["creatable"];
-  /** Whether the field finishes the word as it is typed.
-
-`suggest` rather than `autocomplete`, which is a real HTML attribute this
-element already sets on the input it renders, and two things of one name
-meaning different things on the same control is a question a consumer
-should not have to ask. */
-  "prop:suggest"?: HelixCombobox["suggest"];
   /** What the create row says, before the words it would add. */
   "attr:create-label"?: HelixCombobox["createLabel"];
   /** What the create row says, before the words it would add. */
   "prop:createLabel"?: HelixCombobox["createLabel"];
-  /** What a tag's remove control is called, since the mark has no name. */
-  "attr:remove-label"?: HelixCombobox["removeLabel"];
-  /** What a tag's remove control is called, since the mark has no name. */
-  "prop:removeLabel"?: HelixCombobox["removeLabel"];
+  /** Words shown where the filter has hidden everything. */
+  "attr:empty-text"?: HelixCombobox["emptyText"];
+  /** Words shown where the filter has hidden everything. */
+  "prop:emptyText"?: HelixCombobox["emptyText"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "attr:list-label"?: HelixCombobox["listLabel"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "prop:listLabel"?: HelixCombobox["listLabel"];
+  /** Whether the options are still on their way.
+
+Passed straight to the list, which is where the rows are and so where the
+message belongs. */
+  "prop:loading"?: HelixCombobox["loading"];
+  /** What the list says while they are on their way. */
+  "attr:loading-text"?: HelixCombobox["loadingText"];
+  /** What the list says while they are on their way. */
+  "prop:loadingText"?: HelixCombobox["loadingText"];
   /** How many tags to draw before the rest become a count. `multiple` only.
 
 `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -4338,23 +4333,28 @@ on, where a row that silently stops is a field that appears to have lost
 what was put in it. Date Input and Time Input carry the same property and
 the same reasoning. */
   "prop:maxTags"?: HelixCombobox["maxTags"];
-  /** Accessible name for the list, which has no visible one of its own. */
-  "attr:list-label"?: HelixCombobox["listLabel"];
-  /** Accessible name for the list, which has no visible one of its own. */
-  "prop:listLabel"?: HelixCombobox["listLabel"];
-  /** Whether the options are still on their way.
+  /** Whether more than one option can be chosen.
 
-Passed straight to the list, which is where the rows are and so where the
-message belongs. */
-  "prop:loading"?: HelixCombobox["loading"];
-  /** What the list says while they are on their way. */
-  "attr:loading-text"?: HelixCombobox["loadingText"];
-  /** What the list says while they are on their way. */
-  "prop:loadingText"?: HelixCombobox["loadingText"];
-  /** Words shown where the filter has hidden everything. */
-  "attr:empty-text"?: HelixCombobox["emptyText"];
-  /** Words shown where the filter has hidden everything. */
-  "prop:emptyText"?: HelixCombobox["emptyText"];
+The list already does the work: `value` comes apart on commas, a press
+toggles rather than replaces, and the arrows move without choosing. What
+this adds is the tags, and keeping the panel open between picks.
+
+A comma is therefore not available inside an option's value, which is the
+listbox's contract and not this element's to change. */
+  "prop:multiple"?: HelixCombobox["multiple"];
+  /** Text shown while nothing has been chosen. */
+  "prop:placeholder"?: HelixCombobox["placeholder"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "attr:remove-label"?: HelixCombobox["removeLabel"];
+  /** What a tag's remove control is called, since the mark has no name. */
+  "prop:removeLabel"?: HelixCombobox["removeLabel"];
+  /** Whether the field finishes the word as it is typed.
+
+`suggest` rather than `autocomplete`, which is a real HTML attribute this
+element already sets on the input it renders, and two things of one name
+meaning different things on the same control is a question a consumer
+should not have to ask. */
+  "prop:suggest"?: HelixCombobox["suggest"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4445,10 +4445,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "default-open"?: HelixCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixCommand["defaultOpen"];
-  /** Accessible name for the overlay, which has no visible heading. */
-  label?: HelixCommand["label"];
-  /** Shown in the field before anything is typed. */
-  placeholder?: HelixCommand["placeholder"];
   /** Words shown where the filter has matched nothing. */
   "empty-text"?: HelixCommand["emptyText"];
   /** Words shown where the filter has matched nothing. */
@@ -4459,6 +4455,10 @@ Empty turns it off, for a consumer who opens the palette from a button or
 from their own shortcut handler. There is no list of defaults to fight
 with: one key, said once. */
   hotkey?: HelixCommand["hotkey"];
+  /** Accessible name for the overlay, which has no visible heading. */
+  label?: HelixCommand["label"];
+  /** Shown in the field before anything is typed. */
+  placeholder?: HelixCommand["placeholder"];
 
   /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-close"?: (
@@ -4490,10 +4490,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "bool:default-open"?: HelixCommand["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixCommand["defaultOpen"];
-  /** Accessible name for the overlay, which has no visible heading. */
-  "prop:label"?: HelixCommand["label"];
-  /** Shown in the field before anything is typed. */
-  "prop:placeholder"?: HelixCommand["placeholder"];
   /** Words shown where the filter has matched nothing. */
   "attr:empty-text"?: HelixCommand["emptyText"];
   /** Words shown where the filter has matched nothing. */
@@ -4504,6 +4500,10 @@ Empty turns it off, for a consumer who opens the palette from a button or
 from their own shortcut handler. There is no list of defaults to fight
 with: one key, said once. */
   "prop:hotkey"?: HelixCommand["hotkey"];
+  /** Accessible name for the overlay, which has no visible heading. */
+  "prop:label"?: HelixCommand["label"];
+  /** Shown in the field before anything is typed. */
+  "prop:placeholder"?: HelixCommand["placeholder"];
   /** Fired before it closes. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-close"?: (
     e: HelixCommandHelixBeforeCloseElementEvent,
@@ -4551,21 +4551,6 @@ of a control means nothing in particular. `accent` is the second
 emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixCopyButton["tone"];
-  /** What goes on the clipboard.
-
-**Narrows `Button.value`, which is the submit value, and the two agree.**
-A copy button is `type="button"` and never submits, so the inherited
-meaning has nothing to act on; where a consumer changes the type, what it
-submits is what it copies, which is the reading anybody would expect of one
-property called `value`. Declared here rather than inherited because the
-clipboard is what this component is about and its own page should say so. */
-  value?: HelixCopyButton["value"];
-  /** What it is called, and says, before a press.
-
-Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgment call: every copy button in the
-world is called Copy. A consumer with a better word still sets it. */
-  label?: HelixCopyButton["label"];
   /** What it is called, and says, after one.
 
 `attribute` written out, because Lit lowercases a property name rather than
@@ -4576,8 +4561,41 @@ dash-casing it, and `copiedlabel` is not what anyone would type. */
 `attribute` written out, because Lit lowercases a property name rather than
 dash-casing it, and `copiedlabel` is not what anyone would type. */
   copiedLabel?: HelixCopyButton["copiedLabel"];
-  /** What activating the button does to its form. */
-  type?: HelixCopyButton["type"];
+  /** What it is called, and says, before a press.
+
+Defaulted rather than left empty. An icon-only control must be named, and
+the name of this one is not a judgment call: every copy button in the
+world is called Copy. A consumer with a better word still sets it. */
+  label?: HelixCopyButton["label"];
+  /** What goes on the clipboard.
+
+**Narrows `Button.value`, which is the submit value, and the two agree.**
+A copy button is `type="button"` and never submits, so the inherited
+meaning has nothing to act on; where a consumer changes the type, what it
+submits is what it copies, which is the reading anybody would expect of one
+property called `value`. Declared here rather than inherited because the
+clipboard is what this component is about and its own page should say so. */
+  value?: HelixCopyButton["value"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  command?: HelixCopyButton["command"];
+  /** The id of the element the command is sent to. */
+  commandfor?: HelixCopyButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  commandFor?: HelixCopyButton["commandFor"];
   /** Where this button's submission goes, overriding the form's own.
 
 **The five `form*` overrides work by writing the form and putting it back**,
@@ -4624,26 +4642,8 @@ native submitter would have given it, which is the point. */
   formtarget?: HelixCopyButton["formTarget"];
   /** Which browsing context the response lands in, overriding the form's own. */
   formTarget?: HelixCopyButton["formTarget"];
-  /** What to send when the button is activated, and what to send it to.
-
-The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognized as an
-invoker, so `commandfor` written on a custom element resolves nothing and
-the trigger silently does nothing at all. A wrapper has to hand them down,
-the same way `label` becomes `aria-label` in there.
-
-```html
-<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-```
-
-`commandFor` spells its attribute out, because Lit lowercases a property
-name to derive one rather than dash-casing it, and what a consumer writes
-is the platform's `commandfor`. */
-  command?: HelixCopyButton["command"];
-  /** The id of the element the command is sent to. */
-  commandfor?: HelixCopyButton["commandFor"];
-  /** The id of the element the command is sent to. */
-  commandFor?: HelixCopyButton["commandFor"];
+  /** What activating the button does to its form. */
+  type?: HelixCopyButton["type"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4670,17 +4670,6 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control. */
   name?: HelixCopyButton["name"];
-  /** Whether the button holds its group's tab stop.
-
-A toolbar keeps one tab stop across its children, and the obvious way to do
-that is to write `tabindex` onto each of them. That is a change to markup
-the consumer rendered, so a React consumer's hydration reports it and does
-not patch it up. A parent sets this property instead, which writes nothing,
-and the stop lands on the inner control inside the shadow root.
-
-No attribute, because it is coordination between elements rather than
-anything a consumer sets. */
-  focusable?: HelixCopyButton["focusable"];
   /** Whether this button is a disclosure trigger, and whether its panel is open.
 
 **Set by whatever owns the panel, and a property rather than an attribute
@@ -4706,6 +4695,17 @@ which is the rule every reflected property here follows.
 A consumer who wants to say this statically writes `aria-expanded` on the
 host instead, which `AriaForwardController` carries to the same place. */
   expanded?: HelixCopyButton["expanded"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  focusable?: HelixCopyButton["focusable"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, because the resolution is otherwise kept
@@ -4740,21 +4740,6 @@ of a control means nothing in particular. `accent` is the second
 emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   "prop:tone"?: HelixCopyButton["tone"];
-  /** What goes on the clipboard.
-
-**Narrows `Button.value`, which is the submit value, and the two agree.**
-A copy button is `type="button"` and never submits, so the inherited
-meaning has nothing to act on; where a consumer changes the type, what it
-submits is what it copies, which is the reading anybody would expect of one
-property called `value`. Declared here rather than inherited because the
-clipboard is what this component is about and its own page should say so. */
-  "prop:value"?: HelixCopyButton["value"];
-  /** What it is called, and says, before a press.
-
-Defaulted rather than left empty. An icon-only control must be named, and
-the name of this one is not a judgment call: every copy button in the
-world is called Copy. A consumer with a better word still sets it. */
-  "prop:label"?: HelixCopyButton["label"];
   /** What it is called, and says, after one.
 
 `attribute` written out, because Lit lowercases a property name rather than
@@ -4765,8 +4750,41 @@ dash-casing it, and `copiedlabel` is not what anyone would type. */
 `attribute` written out, because Lit lowercases a property name rather than
 dash-casing it, and `copiedlabel` is not what anyone would type. */
   "prop:copiedLabel"?: HelixCopyButton["copiedLabel"];
-  /** What activating the button does to its form. */
-  "prop:type"?: HelixCopyButton["type"];
+  /** What it is called, and says, before a press.
+
+Defaulted rather than left empty. An icon-only control must be named, and
+the name of this one is not a judgment call: every copy button in the
+world is called Copy. A consumer with a better word still sets it. */
+  "prop:label"?: HelixCopyButton["label"];
+  /** What goes on the clipboard.
+
+**Narrows `Button.value`, which is the submit value, and the two agree.**
+A copy button is `type="button"` and never submits, so the inherited
+meaning has nothing to act on; where a consumer changes the type, what it
+submits is what it copies, which is the reading anybody would expect of one
+property called `value`. Declared here rather than inherited because the
+clipboard is what this component is about and its own page should say so. */
+  "prop:value"?: HelixCopyButton["value"];
+  /** What to send when the button is activated, and what to send it to.
+
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
+
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  "prop:command"?: HelixCopyButton["command"];
+  /** The id of the element the command is sent to. */
+  "attr:commandfor"?: HelixCopyButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  "prop:commandFor"?: HelixCopyButton["commandFor"];
   /** Where this button's submission goes, overriding the form's own.
 
 **The five `form*` overrides work by writing the form and putting it back**,
@@ -4813,26 +4831,8 @@ native submitter would have given it, which is the point. */
   "attr:formtarget"?: HelixCopyButton["formTarget"];
   /** Which browsing context the response lands in, overriding the form's own. */
   "prop:formTarget"?: HelixCopyButton["formTarget"];
-  /** What to send when the button is activated, and what to send it to.
-
-The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognized as an
-invoker, so `commandfor` written on a custom element resolves nothing and
-the trigger silently does nothing at all. A wrapper has to hand them down,
-the same way `label` becomes `aria-label` in there.
-
-```html
-<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-```
-
-`commandFor` spells its attribute out, because Lit lowercases a property
-name to derive one rather than dash-casing it, and what a consumer writes
-is the platform's `commandfor`. */
-  "prop:command"?: HelixCopyButton["command"];
-  /** The id of the element the command is sent to. */
-  "attr:commandfor"?: HelixCopyButton["commandFor"];
-  /** The id of the element the command is sent to. */
-  "prop:commandFor"?: HelixCopyButton["commandFor"];
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixCopyButton["type"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -4859,17 +4859,6 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control. */
   "prop:name"?: HelixCopyButton["name"];
-  /** Whether the button holds its group's tab stop.
-
-A toolbar keeps one tab stop across its children, and the obvious way to do
-that is to write `tabindex` onto each of them. That is a change to markup
-the consumer rendered, so a React consumer's hydration reports it and does
-not patch it up. A parent sets this property instead, which writes nothing,
-and the stop lands on the inner control inside the shadow root.
-
-No attribute, because it is coordination between elements rather than
-anything a consumer sets. */
-  "prop:focusable"?: HelixCopyButton["focusable"];
   /** Whether this button is a disclosure trigger, and whether its panel is open.
 
 **Set by whatever owns the panel, and a property rather than an attribute
@@ -4895,6 +4884,17 @@ which is the rule every reflected property here follows.
 A consumer who wants to say this statically writes `aria-expanded` on the
 host instead, which `AriaForwardController` carries to the same place. */
   "prop:expanded"?: HelixCopyButton["expanded"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  "prop:focusable"?: HelixCopyButton["focusable"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, because the resolution is otherwise kept
@@ -4928,6 +4928,10 @@ export type HelixDataTableHelixSortElementEvent =
   HelixDataTableElementEvent<HelixSortEvent>;
 
 export type HelixDataTableProps = {
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixDataTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixDataTable["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -4938,10 +4942,22 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixDataTable["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixDataTable["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixDataTable["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixDataTable["emptyText"];
+  /** Query to open with, where nothing declared one. */
+  "default-filter"?: HelixDataTable["defaultFilter"];
+  /** Query to open with, where nothing declared one. */
+  defaultFilter?: HelixDataTable["defaultFilter"];
+  /** Page to open on, where nothing declared one. */
+  "default-page"?: HelixDataTable["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  defaultPage?: HelixDataTable["defaultPage"];
+  /** Page size to open with, where nothing declared one. */
+  "default-page-size"?: HelixDataTable["defaultPageSize"];
+  /** Page size to open with, where nothing declared one. */
+  defaultPageSize?: HelixDataTable["defaultPageSize"];
+  /** Order to open on, where nothing declared one. */
+  "default-sort"?: HelixDataTable["defaultSort"];
+  /** Order to open on, where nothing declared one. */
+  defaultSort?: HelixDataTable["defaultSort"];
   /** The field naming a row's stable identity.
 
 **Needed before selection exists, not after.** Lit keys the rendered rows by
@@ -4951,6 +4967,20 @@ attached to the row it belongs to. Left unset the index is the key, which is
 correct only while nothing reorders: it is why this defaults to something
 that works and is worth setting anyway. */
   key?: HelixDataTable["key"];
+  /** The order, as `field:direction`.
+
+Set it and this element defers: a reader's click fires `helix-sort` and
+changes nothing until a new value arrives. `default-sort` seeds an order this
+element then owns. */
+  sort?: HelixDataTable["sort"];
+  /** Accessible name for the grid. */
+  label?: HelixDataTable["label"];
+  /** What the rows are narrowed to, as one query across every column.
+
+One query rather than a predicate per column, which is what a reader means
+by a search box above a table. It matches on each column's ordering value,
+so search and sort cannot disagree about what a column holds. */
+  filter?: HelixDataTable["filter"];
   /** Whether this element does the work or asks the consumer to.
 
 `client` filters, sorts and pages `rows` itself. `server` applies none of
@@ -4960,45 +4990,12 @@ the client cannot hold the data, so this is not an optimization, it is the
 only mode that works, and it is here from the start because adding it later
 inverts the data flow. */
   mode?: HelixDataTable["mode"];
-  /** How many rows the whole result has, where this element cannot count them.
-
-Only read in `server` mode, where `rows` is one page and its length says
-nothing about the result. Ignored in `client` mode rather than trusted,
-because two sources for one count is the mistake, and here the array is the
-one that cannot be stale. */
-  total?: HelixDataTable["total"];
-  /** Accessible name for the grid. */
-  label?: HelixDataTable["label"];
-  /** The order, as `field:direction`.
-
-Set it and this element defers: a reader's click fires `helix-sort` and
-changes nothing until a new value arrives. `default-sort` seeds an order this
-element then owns. */
-  sort?: HelixDataTable["sort"];
-  /** Order to open on, where nothing declared one. */
-  "default-sort"?: HelixDataTable["defaultSort"];
-  /** Order to open on, where nothing declared one. */
-  defaultSort?: HelixDataTable["defaultSort"];
-  /** What the rows are narrowed to, as one query across every column.
-
-One query rather than a predicate per column, which is what a reader means
-by a search box above a table. It matches on each column's ordering value,
-so search and sort cannot disagree about what a column holds. */
-  filter?: HelixDataTable["filter"];
-  /** Query to open with, where nothing declared one. */
-  "default-filter"?: HelixDataTable["defaultFilter"];
-  /** Query to open with, where nothing declared one. */
-  defaultFilter?: HelixDataTable["defaultFilter"];
   /** The page on show, from 1.
 
 Clamped on the way out, so what this reports is the page it drew: a
 bookmarked link to page 99 of a result that has since shrunk reads back as
 the last page rather than as 99. */
   page?: HelixDataTable["page"];
-  /** Page to open on, where nothing declared one. */
-  "default-page"?: HelixDataTable["defaultPage"];
-  /** Page to open on, where nothing declared one. */
-  defaultPage?: HelixDataTable["defaultPage"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
 **It announces nothing, and that is not an omission.** Nothing in this
@@ -5015,10 +5012,13 @@ element ever asks for a different page size: a size selector is
 answers themselves. Routing this through `requestChange` would announce an
 event the element never has cause to fire. */
   pageSize?: HelixDataTable["pageSize"];
-  /** Page size to open with, where nothing declared one. */
-  "default-page-size"?: HelixDataTable["defaultPageSize"];
-  /** Page size to open with, where nothing declared one. */
-  defaultPageSize?: HelixDataTable["defaultPageSize"];
+  /** How many rows the whole result has, where this element cannot count them.
+
+Only read in `server` mode, where `rows` is one page and its length says
+nothing about the result. Ignored in `client` mode rather than trusted,
+because two sources for one count is the mistake, and here the array is the
+one that cannot be stale. */
+  total?: HelixDataTable["total"];
   /** Whether to draw a pagination under the grid.
 
 On by default once a page size is set, because a paged table with no way to
@@ -5046,6 +5046,10 @@ holds and reordering it under them is a mutation they did not ask for. */
 };
 
 export type HelixDataTableSolidJsProps = {
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixDataTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixDataTable["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -5056,10 +5060,22 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixDataTable["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixDataTable["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixDataTable["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixDataTable["emptyText"];
+  /** Query to open with, where nothing declared one. */
+  "attr:default-filter"?: HelixDataTable["defaultFilter"];
+  /** Query to open with, where nothing declared one. */
+  "prop:defaultFilter"?: HelixDataTable["defaultFilter"];
+  /** Page to open on, where nothing declared one. */
+  "attr:default-page"?: HelixDataTable["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  "prop:defaultPage"?: HelixDataTable["defaultPage"];
+  /** Page size to open with, where nothing declared one. */
+  "attr:default-page-size"?: HelixDataTable["defaultPageSize"];
+  /** Page size to open with, where nothing declared one. */
+  "prop:defaultPageSize"?: HelixDataTable["defaultPageSize"];
+  /** Order to open on, where nothing declared one. */
+  "attr:default-sort"?: HelixDataTable["defaultSort"];
+  /** Order to open on, where nothing declared one. */
+  "prop:defaultSort"?: HelixDataTable["defaultSort"];
   /** The field naming a row's stable identity.
 
 **Needed before selection exists, not after.** Lit keys the rendered rows by
@@ -5069,6 +5085,20 @@ attached to the row it belongs to. Left unset the index is the key, which is
 correct only while nothing reorders: it is why this defaults to something
 that works and is worth setting anyway. */
   "prop:key"?: HelixDataTable["key"];
+  /** The order, as `field:direction`.
+
+Set it and this element defers: a reader's click fires `helix-sort` and
+changes nothing until a new value arrives. `default-sort` seeds an order this
+element then owns. */
+  "prop:sort"?: HelixDataTable["sort"];
+  /** Accessible name for the grid. */
+  "prop:label"?: HelixDataTable["label"];
+  /** What the rows are narrowed to, as one query across every column.
+
+One query rather than a predicate per column, which is what a reader means
+by a search box above a table. It matches on each column's ordering value,
+so search and sort cannot disagree about what a column holds. */
+  "prop:filter"?: HelixDataTable["filter"];
   /** Whether this element does the work or asks the consumer to.
 
 `client` filters, sorts and pages `rows` itself. `server` applies none of
@@ -5078,45 +5108,12 @@ the client cannot hold the data, so this is not an optimization, it is the
 only mode that works, and it is here from the start because adding it later
 inverts the data flow. */
   "prop:mode"?: HelixDataTable["mode"];
-  /** How many rows the whole result has, where this element cannot count them.
-
-Only read in `server` mode, where `rows` is one page and its length says
-nothing about the result. Ignored in `client` mode rather than trusted,
-because two sources for one count is the mistake, and here the array is the
-one that cannot be stale. */
-  "prop:total"?: HelixDataTable["total"];
-  /** Accessible name for the grid. */
-  "prop:label"?: HelixDataTable["label"];
-  /** The order, as `field:direction`.
-
-Set it and this element defers: a reader's click fires `helix-sort` and
-changes nothing until a new value arrives. `default-sort` seeds an order this
-element then owns. */
-  "prop:sort"?: HelixDataTable["sort"];
-  /** Order to open on, where nothing declared one. */
-  "attr:default-sort"?: HelixDataTable["defaultSort"];
-  /** Order to open on, where nothing declared one. */
-  "prop:defaultSort"?: HelixDataTable["defaultSort"];
-  /** What the rows are narrowed to, as one query across every column.
-
-One query rather than a predicate per column, which is what a reader means
-by a search box above a table. It matches on each column's ordering value,
-so search and sort cannot disagree about what a column holds. */
-  "prop:filter"?: HelixDataTable["filter"];
-  /** Query to open with, where nothing declared one. */
-  "attr:default-filter"?: HelixDataTable["defaultFilter"];
-  /** Query to open with, where nothing declared one. */
-  "prop:defaultFilter"?: HelixDataTable["defaultFilter"];
   /** The page on show, from 1.
 
 Clamped on the way out, so what this reports is the page it drew: a
 bookmarked link to page 99 of a result that has since shrunk reads back as
 the last page rather than as 99. */
   "prop:page"?: HelixDataTable["page"];
-  /** Page to open on, where nothing declared one. */
-  "attr:default-page"?: HelixDataTable["defaultPage"];
-  /** Page to open on, where nothing declared one. */
-  "prop:defaultPage"?: HelixDataTable["defaultPage"];
   /** How many rows a page holds. Zero is every row, which is what "no paging" means.
 
 **It announces nothing, and that is not an omission.** Nothing in this
@@ -5133,10 +5130,13 @@ element ever asks for a different page size: a size selector is
 answers themselves. Routing this through `requestChange` would announce an
 event the element never has cause to fire. */
   "prop:pageSize"?: HelixDataTable["pageSize"];
-  /** Page size to open with, where nothing declared one. */
-  "attr:default-page-size"?: HelixDataTable["defaultPageSize"];
-  /** Page size to open with, where nothing declared one. */
-  "prop:defaultPageSize"?: HelixDataTable["defaultPageSize"];
+  /** How many rows the whole result has, where this element cannot count them.
+
+Only read in `server` mode, where `rows` is one page and its length says
+nothing about the result. Ignored in `client` mode rather than trusted,
+because two sources for one count is the mistake, and here the array is the
+one that cannot be stale. */
+  "prop:total"?: HelixDataTable["total"];
   /** Whether to draw a pagination under the grid.
 
 On by default once a page size is set, because a paged table with no way to
@@ -5211,10 +5211,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixDateInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixDateInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixDateInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixDateInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixDateInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -5225,65 +5225,6 @@ Empty leaves the attribute off, which is the browser's default and is what
 lets autofill work at all: hardcoding `off` here means a birthday or a
 postal code can never be filled in for a reader. */
   autocomplete?: HelixDateInput["autocomplete"];
-  /** How many dates can be held at once.
-
-Absent is one. `range` holds a start and an end, `multiple` holds any
-number, and both are carried as one comma-separated value: a form field
-submits a string, and two fields for one question is a different control. */
-  mode?: HelixDateInput["mode"];
-  /** How many months the calendar shows, side by side.
-
-Worth more than one mainly for a range, where picking a start in March and
-an end in April otherwise means paging between them and losing sight of the
-first. The panel is sized by its content, so this widens it. */
-  months?: HelixDateInput["months"];
-  /** How many dates are shown as tags before the rest are counted, in `multiple`.
-
-`0` is all of them, and is the default: a cap that guesses is worse than no
-cap, because the number that fits depends on the width of the field and the
-length of what is in it, neither of which this element knows. What a cap is
-genuinely for is a field in a row or a table cell, where a set of twelve
-dates would push everything below it down a line at a time.
-
-The remainder is counted rather than hidden. `+3` is a fact a reader can
-act on, where a row that silently stops is a field that appears to have lost
-what was put in it, and the count is what tells them there is more to see. */
-  "max-tags"?: HelixDateInput["maxTags"];
-  /** How many dates are shown as tags before the rest are counted, in `multiple`.
-
-`0` is all of them, and is the default: a cap that guesses is worse than no
-cap, because the number that fits depends on the width of the field and the
-length of what is in it, neither of which this element knows. What a cap is
-genuinely for is a field in a row or a table cell, where a set of twelve
-dates would push everything below it down a line at a time.
-
-The remainder is counted rather than hidden. `+3` is a fact a reader can
-act on, where a row that silently stops is a field that appears to have lost
-what was put in it, and the count is what tells them there is more to see. */
-  maxTags?: HelixDateInput["maxTags"];
-  /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
-  min?: HelixDateInput["min"];
-  /** How far apart the selectable dates are, in days.
-
-`<input type="date" step>`'s own unit, handed to the calendar this renders
-so the field and the grid agree about which dates exist. Counted from `min`
-where there is one and from 1 January 1970 where there is not, which is the
-platform's base. */
-  step?: HelixDateInput["step"];
-  /** Latest date that can be chosen, as `YYYY-MM-DD`. */
-  max?: HelixDateInput["max"];
-  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  "disable-dates"?: HelixDateInput["disableDates"];
-  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  disableDates?: HelixDateInput["disableDates"];
-  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  "disable-days"?: HelixDateInput["disableDays"];
-  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  disableDays?: HelixDateInput["disableDays"];
-  /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  "first-day-of-week"?: HelixDateInput["firstDayOfWeek"];
-  /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  firstDayOfWeek?: HelixDateInput["firstDayOfWeek"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
 **The field renders when it is idle and holds the value when it is being
@@ -5330,14 +5271,62 @@ rather than reading it, or where the ISO form is itself the point.
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
   dateStyle?: HelixDateInput["dateStyle"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  "disable-dates"?: HelixDateInput["disableDates"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  disableDates?: HelixDateInput["disableDates"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  "disable-days"?: HelixDateInput["disableDays"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  disableDays?: HelixDateInput["disableDays"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  "first-day-of-week"?: HelixDateInput["firstDayOfWeek"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  firstDayOfWeek?: HelixDateInput["firstDayOfWeek"];
   /** Language tag the calendar names its months and days in. */
   locale?: HelixDateInput["locale"];
+  /** Latest date that can be chosen, as `YYYY-MM-DD`. */
+  max?: HelixDateInput["max"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  "max-tags"?: HelixDateInput["maxTags"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  maxTags?: HelixDateInput["maxTags"];
+  /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
+  min?: HelixDateInput["min"];
+  /** How many dates can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value: a form field
+submits a string, and two fields for one question is a different control. */
+  mode?: HelixDateInput["mode"];
+  /** How many months the calendar shows, side by side.
+
+Worth more than one mainly for a range, where picking a start in March and
+an end in April otherwise means paging between them and losing sight of the
+first. The panel is sized by its content, so this widens it. */
+  months?: HelixDateInput["months"];
   /** What the field says before a date is in it. */
   placeholder?: HelixDateInput["placeholder"];
-  /** Accessible name for the control that opens the calendar. */
-  "trigger-label"?: HelixDateInput["triggerLabel"];
-  /** Accessible name for the control that opens the calendar. */
-  triggerLabel?: HelixDateInput["triggerLabel"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -5362,6 +5351,17 @@ submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
   readOnly?: HelixDateInput["readOnly"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, handed to the calendar this renders
+so the field and the grid agree about which dates exist. Counted from `min`
+where there is one and from 1 January 1970 where there is not, which is the
+platform's base. */
+  step?: HelixDateInput["step"];
+  /** Accessible name for the control that opens the calendar. */
+  "trigger-label"?: HelixDateInput["triggerLabel"];
+  /** Accessible name for the control that opens the calendar. */
+  triggerLabel?: HelixDateInput["triggerLabel"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5452,10 +5452,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixDateInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixDateInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixDateInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixDateInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixDateInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -5466,65 +5466,6 @@ Empty leaves the attribute off, which is the browser's default and is what
 lets autofill work at all: hardcoding `off` here means a birthday or a
 postal code can never be filled in for a reader. */
   "prop:autocomplete"?: HelixDateInput["autocomplete"];
-  /** How many dates can be held at once.
-
-Absent is one. `range` holds a start and an end, `multiple` holds any
-number, and both are carried as one comma-separated value: a form field
-submits a string, and two fields for one question is a different control. */
-  "prop:mode"?: HelixDateInput["mode"];
-  /** How many months the calendar shows, side by side.
-
-Worth more than one mainly for a range, where picking a start in March and
-an end in April otherwise means paging between them and losing sight of the
-first. The panel is sized by its content, so this widens it. */
-  "prop:months"?: HelixDateInput["months"];
-  /** How many dates are shown as tags before the rest are counted, in `multiple`.
-
-`0` is all of them, and is the default: a cap that guesses is worse than no
-cap, because the number that fits depends on the width of the field and the
-length of what is in it, neither of which this element knows. What a cap is
-genuinely for is a field in a row or a table cell, where a set of twelve
-dates would push everything below it down a line at a time.
-
-The remainder is counted rather than hidden. `+3` is a fact a reader can
-act on, where a row that silently stops is a field that appears to have lost
-what was put in it, and the count is what tells them there is more to see. */
-  "attr:max-tags"?: HelixDateInput["maxTags"];
-  /** How many dates are shown as tags before the rest are counted, in `multiple`.
-
-`0` is all of them, and is the default: a cap that guesses is worse than no
-cap, because the number that fits depends on the width of the field and the
-length of what is in it, neither of which this element knows. What a cap is
-genuinely for is a field in a row or a table cell, where a set of twelve
-dates would push everything below it down a line at a time.
-
-The remainder is counted rather than hidden. `+3` is a fact a reader can
-act on, where a row that silently stops is a field that appears to have lost
-what was put in it, and the count is what tells them there is more to see. */
-  "prop:maxTags"?: HelixDateInput["maxTags"];
-  /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
-  "prop:min"?: HelixDateInput["min"];
-  /** How far apart the selectable dates are, in days.
-
-`<input type="date" step>`'s own unit, handed to the calendar this renders
-so the field and the grid agree about which dates exist. Counted from `min`
-where there is one and from 1 January 1970 where there is not, which is the
-platform's base. */
-  "prop:step"?: HelixDateInput["step"];
-  /** Latest date that can be chosen, as `YYYY-MM-DD`. */
-  "prop:max"?: HelixDateInput["max"];
-  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  "attr:disable-dates"?: HelixDateInput["disableDates"];
-  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
-  "prop:disableDates"?: HelixDateInput["disableDates"];
-  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  "attr:disable-days"?: HelixDateInput["disableDays"];
-  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
-  "prop:disableDays"?: HelixDateInput["disableDays"];
-  /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  "attr:first-day-of-week"?: HelixDateInput["firstDayOfWeek"];
-  /** First column of the week in the calendar, `0` for Sunday through `6`. */
-  "prop:firstDayOfWeek"?: HelixDateInput["firstDayOfWeek"];
   /** How a date is written in the field: `short` through `full`, or ISO.
 
 **The field renders when it is idle and holds the value when it is being
@@ -5571,14 +5512,62 @@ rather than reading it, or where the ISO form is itself the point.
 The value is always `YYYY-MM-DD` regardless, because that is what a form
 submits and what `min` and `max` compare against. */
   "prop:dateStyle"?: HelixDateInput["dateStyle"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  "attr:disable-dates"?: HelixDateInput["disableDates"];
+  /** Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list. */
+  "prop:disableDates"?: HelixDateInput["disableDates"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  "attr:disable-days"?: HelixDateInput["disableDays"];
+  /** Days of the week that cannot be chosen, `0` for Sunday through `6`. */
+  "prop:disableDays"?: HelixDateInput["disableDays"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  "attr:first-day-of-week"?: HelixDateInput["firstDayOfWeek"];
+  /** First column of the week in the calendar, `0` for Sunday through `6`. */
+  "prop:firstDayOfWeek"?: HelixDateInput["firstDayOfWeek"];
   /** Language tag the calendar names its months and days in. */
   "prop:locale"?: HelixDateInput["locale"];
+  /** Latest date that can be chosen, as `YYYY-MM-DD`. */
+  "prop:max"?: HelixDateInput["max"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  "attr:max-tags"?: HelixDateInput["maxTags"];
+  /** How many dates are shown as tags before the rest are counted, in `multiple`.
+
+`0` is all of them, and is the default: a cap that guesses is worse than no
+cap, because the number that fits depends on the width of the field and the
+length of what is in it, neither of which this element knows. What a cap is
+genuinely for is a field in a row or a table cell, where a set of twelve
+dates would push everything below it down a line at a time.
+
+The remainder is counted rather than hidden. `+3` is a fact a reader can
+act on, where a row that silently stops is a field that appears to have lost
+what was put in it, and the count is what tells them there is more to see. */
+  "prop:maxTags"?: HelixDateInput["maxTags"];
+  /** Earliest date that can be chosen, as `YYYY-MM-DD`. */
+  "prop:min"?: HelixDateInput["min"];
+  /** How many dates can be held at once.
+
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value: a form field
+submits a string, and two fields for one question is a different control. */
+  "prop:mode"?: HelixDateInput["mode"];
+  /** How many months the calendar shows, side by side.
+
+Worth more than one mainly for a range, where picking a start in March and
+an end in April otherwise means paging between them and losing sight of the
+first. The panel is sized by its content, so this widens it. */
+  "prop:months"?: HelixDateInput["months"];
   /** What the field says before a date is in it. */
   "prop:placeholder"?: HelixDateInput["placeholder"];
-  /** Accessible name for the control that opens the calendar. */
-  "attr:trigger-label"?: HelixDateInput["triggerLabel"];
-  /** Accessible name for the control that opens the calendar. */
-  "prop:triggerLabel"?: HelixDateInput["triggerLabel"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -5603,6 +5592,17 @@ submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
   "prop:readOnly"?: HelixDateInput["readOnly"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, handed to the calendar this renders
+so the field and the grid agree about which dates exist. Counted from `min`
+where there is one and from 1 January 1970 where there is not, which is the
+platform's base. */
+  "prop:step"?: HelixDateInput["step"];
+  /** Accessible name for the control that opens the calendar. */
+  "attr:trigger-label"?: HelixDateInput["triggerLabel"];
+  /** Accessible name for the control that opens the calendar. */
+  "prop:triggerLabel"?: HelixDateInput["triggerLabel"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5692,14 +5692,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixDatePicker["value"];
-  /** How many dates can be held at once. */
-  mode?: HelixDatePicker["mode"];
-  /** How many months to show, side by side. */
-  months?: HelixDatePicker["months"];
-  /** Locale for month and day names.
-
-Absent uses the runtime's own. */
-  locale?: HelixDatePicker["locale"];
+  /** Month to open on, where nothing declared one. */
+  "default-month"?: HelixDatePicker["defaultMonth"];
+  /** Month to open on, where nothing declared one. */
+  defaultMonth?: HelixDatePicker["defaultMonth"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
   "disable-dates"?: HelixDatePicker["disableDates"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
@@ -5708,14 +5704,36 @@ Absent uses the runtime's own. */
   "disable-days"?: HelixDatePicker["disableDays"];
   /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
   disableDays?: HelixDatePicker["disableDays"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  firstDayOfWeek?: HelixDatePicker["firstDayOfWeek"];
   /** Whether the current selection fails validation. */
   invalid?: HelixDatePicker["invalid"];
+  /** Accessible name for the grid. */
+  label?: HelixDatePicker["label"];
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
 
 Separate from `value` on purpose, so paging selects nothing and a consumer
 can drive the view. Reading gives the month on show; writing sets it, and
 `default-month` seeds one the calendar keeps until somebody does. */
   month?: HelixDatePicker["month"];
+  /** Locale for month and day names.
+
+Absent uses the runtime's own. */
+  locale?: HelixDatePicker["locale"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  max?: HelixDatePicker["max"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  min?: HelixDatePicker["min"];
+  /** How many dates can be held at once. */
+  mode?: HelixDatePicker["mode"];
+  /** How many months to show, side by side. */
+  months?: HelixDatePicker["months"];
+  /** Accessible name for the control that pages forward. */
+  "next-label"?: HelixDatePicker["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  nextLabel?: HelixDatePicker["nextLabel"];
   /** Accessible name for the control that pages back.
 
 A property because a calendar rendering its own month names from `locale`
@@ -5730,36 +5748,6 @@ would otherwise still announce its controls in English. `attribute:`
 spelled out, since Lit lowercases a camelCase name rather than dash-casing
 it. */
   previousLabel?: HelixDatePicker["previousLabel"];
-  /** Accessible name for the control that pages forward. */
-  "next-label"?: HelixDatePicker["nextLabel"];
-  /** Accessible name for the control that pages forward. */
-  nextLabel?: HelixDatePicker["nextLabel"];
-  /** Month to open on, where nothing declared one. */
-  "default-month"?: HelixDatePicker["defaultMonth"];
-  /** Month to open on, where nothing declared one. */
-  defaultMonth?: HelixDatePicker["defaultMonth"];
-  /** Earliest selectable date, as `YYYY-MM-DD`. */
-  min?: HelixDatePicker["min"];
-  /** How far apart the selectable dates are, in days.
-
-`<input type="date" step>`'s own unit, counted from `min` where there is
-one and from 1 January 1970 where there is not, which is the platform's own
-base. A booking calendar that only takes Mondays is `step="7"` with a `min`
-on a Monday, which `disable-dates` cannot express: it takes a list, and a
-year of Mondays is not a list anybody writes.
-
-One is every date and needs no rule, which is why anything below one is
-treated as one rather than as an error: a step of zero would block every
-date including the one already chosen. */
-  step?: HelixDatePicker["step"];
-  /** Latest selectable date, as `YYYY-MM-DD`. */
-  max?: HelixDatePicker["max"];
-  /** Accessible name for the grid. */
-  label?: HelixDatePicker["label"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  firstDayOfWeek?: HelixDatePicker["firstDayOfWeek"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -5786,6 +5774,18 @@ else set needs. */
   readOnly?: HelixDatePicker["readOnly"];
   /** Whether the form refuses to submit while nothing is chosen. */
   required?: HelixDatePicker["required"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, counted from `min` where there is
+one and from 1 January 1970 where there is not, which is the platform's own
+base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+on a Monday, which `disable-dates` cannot express: it takes a list, and a
+year of Mondays is not a list anybody writes.
+
+One is every date and needs no rule, which is why anything below one is
+treated as one rather than as an error: a step of zero would block every
+date including the one already chosen. */
+  step?: HelixDatePicker["step"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -5851,14 +5851,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixDatePicker["value"];
-  /** How many dates can be held at once. */
-  "prop:mode"?: HelixDatePicker["mode"];
-  /** How many months to show, side by side. */
-  "prop:months"?: HelixDatePicker["months"];
-  /** Locale for month and day names.
-
-Absent uses the runtime's own. */
-  "prop:locale"?: HelixDatePicker["locale"];
+  /** Month to open on, where nothing declared one. */
+  "attr:default-month"?: HelixDatePicker["defaultMonth"];
+  /** Month to open on, where nothing declared one. */
+  "prop:defaultMonth"?: HelixDatePicker["defaultMonth"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
   "attr:disable-dates"?: HelixDatePicker["disableDates"];
   /** Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`. */
@@ -5867,14 +5863,36 @@ Absent uses the runtime's own. */
   "attr:disable-days"?: HelixDatePicker["disableDays"];
   /** Days of the week that cannot be chosen, comma separated, `0` to `6`. */
   "prop:disableDays"?: HelixDatePicker["disableDays"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "attr:first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
+  /** First column of the week, `0` for Sunday through `6` for Saturday. */
+  "prop:firstDayOfWeek"?: HelixDatePicker["firstDayOfWeek"];
   /** Whether the current selection fails validation. */
   "prop:invalid"?: HelixDatePicker["invalid"];
+  /** Accessible name for the grid. */
+  "prop:label"?: HelixDatePicker["label"];
   /** The month on show, as `YYYY-MM`. Follows `value`, then the current month.
 
 Separate from `value` on purpose, so paging selects nothing and a consumer
 can drive the view. Reading gives the month on show; writing sets it, and
 `default-month` seeds one the calendar keeps until somebody does. */
   "prop:month"?: HelixDatePicker["month"];
+  /** Locale for month and day names.
+
+Absent uses the runtime's own. */
+  "prop:locale"?: HelixDatePicker["locale"];
+  /** Latest selectable date, as `YYYY-MM-DD`. */
+  "prop:max"?: HelixDatePicker["max"];
+  /** Earliest selectable date, as `YYYY-MM-DD`. */
+  "prop:min"?: HelixDatePicker["min"];
+  /** How many dates can be held at once. */
+  "prop:mode"?: HelixDatePicker["mode"];
+  /** How many months to show, side by side. */
+  "prop:months"?: HelixDatePicker["months"];
+  /** Accessible name for the control that pages forward. */
+  "attr:next-label"?: HelixDatePicker["nextLabel"];
+  /** Accessible name for the control that pages forward. */
+  "prop:nextLabel"?: HelixDatePicker["nextLabel"];
   /** Accessible name for the control that pages back.
 
 A property because a calendar rendering its own month names from `locale`
@@ -5889,36 +5907,6 @@ would otherwise still announce its controls in English. `attribute:`
 spelled out, since Lit lowercases a camelCase name rather than dash-casing
 it. */
   "prop:previousLabel"?: HelixDatePicker["previousLabel"];
-  /** Accessible name for the control that pages forward. */
-  "attr:next-label"?: HelixDatePicker["nextLabel"];
-  /** Accessible name for the control that pages forward. */
-  "prop:nextLabel"?: HelixDatePicker["nextLabel"];
-  /** Month to open on, where nothing declared one. */
-  "attr:default-month"?: HelixDatePicker["defaultMonth"];
-  /** Month to open on, where nothing declared one. */
-  "prop:defaultMonth"?: HelixDatePicker["defaultMonth"];
-  /** Earliest selectable date, as `YYYY-MM-DD`. */
-  "prop:min"?: HelixDatePicker["min"];
-  /** How far apart the selectable dates are, in days.
-
-`<input type="date" step>`'s own unit, counted from `min` where there is
-one and from 1 January 1970 where there is not, which is the platform's own
-base. A booking calendar that only takes Mondays is `step="7"` with a `min`
-on a Monday, which `disable-dates` cannot express: it takes a list, and a
-year of Mondays is not a list anybody writes.
-
-One is every date and needs no rule, which is why anything below one is
-treated as one rather than as an error: a step of zero would block every
-date including the one already chosen. */
-  "prop:step"?: HelixDatePicker["step"];
-  /** Latest selectable date, as `YYYY-MM-DD`. */
-  "prop:max"?: HelixDatePicker["max"];
-  /** Accessible name for the grid. */
-  "prop:label"?: HelixDatePicker["label"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "attr:first-day-of-week"?: HelixDatePicker["firstDayOfWeek"];
-  /** First column of the week, `0` for Sunday through `6` for Saturday. */
-  "prop:firstDayOfWeek"?: HelixDatePicker["firstDayOfWeek"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -5945,6 +5933,18 @@ else set needs. */
   "prop:readOnly"?: HelixDatePicker["readOnly"];
   /** Whether the form refuses to submit while nothing is chosen. */
   "prop:required"?: HelixDatePicker["required"];
+  /** How far apart the selectable dates are, in days.
+
+`<input type="date" step>`'s own unit, counted from `min` where there is
+one and from 1 January 1970 where there is not, which is the platform's own
+base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+on a Monday, which `disable-dates` cannot express: it takes a list, and a
+year of Mondays is not a list anybody writes.
+
+One is every date and needs no rule, which is why anything below one is
+treated as one rather than as an error: a step of zero would block every
+date including the one already chosen. */
+  "prop:step"?: HelixDatePicker["step"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -6012,10 +6012,10 @@ export type HelixDialogHelixBeforeOpenElementEvent =
   HelixDialogElementEvent<HelixBeforeOpenEvent>;
 
 export type HelixDialogProps = {
-  /** How wide the panel is allowed to be. */
-  size?: HelixDialog["size"];
   /** Whether the panel's contents run from the start or center on it. */
   align?: HelixDialog["align"];
+  /** How wide the panel is allowed to be. */
+  size?: HelixDialog["size"];
   /** Whether the element is open.
 
 One property, not two, so `dialog.open` answers the question anyone
@@ -6033,18 +6033,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "default-open"?: HelixDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixDialog["defaultOpen"];
-  /** Accessible name for the dialog. */
-  label?: HelixDialog["label"];
-  /** Whether Escape or a press on the backdrop can close it.
-
-Off for a dialog that must be answered. It does not disable the close
-control a consumer slots in: refusing to be dismissed is not the same as
-refusing to be closed, and a dialog with no way out at all is a trap.
-
-A persistent dialog does not ignore that press. It answers it: see
-`refuse`, which is the only way a dialog that will not be dismissed can say
-so at the moment a reader asks. */
-  persistent?: HelixDialog["persistent"];
   /** Which close requests the browser answers on its own.
 
 `<dialog closedby>`, forwarded, and safe to forward because every path it
@@ -6067,6 +6055,18 @@ the property this component exists to keep.
 Absent by default, which is the platform's `auto` and this library's rule
 that a resting value is an attribute's absence. */
   closedBy?: HelixDialog["closedBy"];
+  /** Accessible name for the dialog. */
+  label?: HelixDialog["label"];
+  /** Whether Escape or a press on the backdrop can close it.
+
+Off for a dialog that must be answered. It does not disable the close
+control a consumer slots in: refusing to be dismissed is not the same as
+refusing to be closed, and a dialog with no way out at all is a trap.
+
+A persistent dialog does not ignore that press. It answers it: see
+`refuse`, which is the only way a dialog that will not be dismissed can say
+so at the moment a reader asks. */
+  persistent?: HelixDialog["persistent"];
   /** What the dialog closed with, the way `<dialog>` reports it.
 
 **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -6090,10 +6090,10 @@ survives to it and a consumer reading one back gets what they wrote. */
 };
 
 export type HelixDialogSolidJsProps = {
-  /** How wide the panel is allowed to be. */
-  "prop:size"?: HelixDialog["size"];
   /** Whether the panel's contents run from the start or center on it. */
   "prop:align"?: HelixDialog["align"];
+  /** How wide the panel is allowed to be. */
+  "prop:size"?: HelixDialog["size"];
   /** Whether the element is open.
 
 One property, not two, so `dialog.open` answers the question anyone
@@ -6111,18 +6111,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "bool:default-open"?: HelixDialog["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixDialog["defaultOpen"];
-  /** Accessible name for the dialog. */
-  "prop:label"?: HelixDialog["label"];
-  /** Whether Escape or a press on the backdrop can close it.
-
-Off for a dialog that must be answered. It does not disable the close
-control a consumer slots in: refusing to be dismissed is not the same as
-refusing to be closed, and a dialog with no way out at all is a trap.
-
-A persistent dialog does not ignore that press. It answers it: see
-`refuse`, which is the only way a dialog that will not be dismissed can say
-so at the moment a reader asks. */
-  "prop:persistent"?: HelixDialog["persistent"];
   /** Which close requests the browser answers on its own.
 
 `<dialog closedby>`, forwarded, and safe to forward because every path it
@@ -6145,6 +6133,18 @@ the property this component exists to keep.
 Absent by default, which is the platform's `auto` and this library's rule
 that a resting value is an attribute's absence. */
   "prop:closedBy"?: HelixDialog["closedBy"];
+  /** Accessible name for the dialog. */
+  "prop:label"?: HelixDialog["label"];
+  /** Whether Escape or a press on the backdrop can close it.
+
+Off for a dialog that must be answered. It does not disable the close
+control a consumer slots in: refusing to be dismissed is not the same as
+refusing to be closed, and a dialog with no way out at all is a trap.
+
+A persistent dialog does not ignore that press. It answers it: see
+`refuse`, which is the only way a dialog that will not be dismissed can say
+so at the moment a reader asks. */
+  "prop:persistent"?: HelixDialog["persistent"];
   /** What the dialog closed with, the way `<dialog>` reports it.
 
 **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -6174,8 +6174,6 @@ survives to it and a consumer reading one back gets what they wrote. */
 };
 
 export type HelixDividerProps = {
-  /** Which way the rule runs. */
-  orientation?: HelixDivider["orientation"];
   /** Whether the rule is announced as a separator.
 
 Off by default, and out of the accessibility tree. Most rules on a page
@@ -6189,11 +6187,11 @@ quiet default out of reach from HTML and leave it settable only as a
 property. An opt-in is absent by default, which every reflected property
 here has to be. */
   announced?: HelixDivider["announced"];
+  /** Which way the rule runs. */
+  orientation?: HelixDivider["orientation"];
 };
 
 export type HelixDividerSolidJsProps = {
-  /** Which way the rule runs. */
-  "prop:orientation"?: HelixDivider["orientation"];
   /** Whether the rule is announced as a separator.
 
 Off by default, and out of the accessibility tree. Most rules on a page
@@ -6207,6 +6205,8 @@ quiet default out of reach from HTML and leave it settable only as a
 property. An opt-in is absent by default, which every reflected property
 here has to be. */
   "prop:announced"?: HelixDivider["announced"];
+  /** Which way the rule runs. */
+  "prop:orientation"?: HelixDivider["orientation"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -6457,27 +6457,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "default-open"?: HelixDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixDrawer["defaultOpen"];
-  /** Which edge the drawer comes from.
-
-Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
-beside `:host([placement="end"])` rather than as a value written here: a
-default assigned to the property would reflect onto every host and put a
-`placement="end"` into markup no consumer wrote. */
-  placement?: HelixDrawer["placement"];
-  /** Accessible name for the panel. */
-  label?: HelixDrawer["label"];
-  /** Whether the drawer blocks the page behind it.
-
-Turning this off removes the focus trap and the scrim together, because
-they are one decision: a panel that traps focus without covering the page
-strands the reader, and one that covers without trapping lets them tab
-behind the cover.
-
-Not reflected. It stays `true` by default, since a drawer that silently
-lost its focus trap because a consumer forgot a word would be worse than an
-attribute on the host, and nothing selects on it: the scrim is rendered or
-not, rather than shown or hidden by CSS. */
-  modal?: HelixDrawer["modal"];
   /** Which close requests the browser answers on its own.
 
 `<dialog closedby>`, forwarded, and safe to forward because every path it
@@ -6500,6 +6479,27 @@ the property this component exists to keep.
 Absent by default, which is the platform's `auto` and this library's rule
 that a resting value is an attribute's absence. */
   closedBy?: HelixDrawer["closedBy"];
+  /** Accessible name for the panel. */
+  label?: HelixDrawer["label"];
+  /** Whether the drawer blocks the page behind it.
+
+Turning this off removes the focus trap and the scrim together, because
+they are one decision: a panel that traps focus without covering the page
+strands the reader, and one that covers without trapping lets them tab
+behind the cover.
+
+Not reflected. It stays `true` by default, since a drawer that silently
+lost its focus trap because a consumer forgot a word would be worse than an
+attribute on the host, and nothing selects on it: the scrim is rendered or
+not, rather than shown or hidden by CSS. */
+  modal?: HelixDrawer["modal"];
+  /** Which edge the drawer comes from.
+
+Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+beside `:host([placement="end"])` rather than as a value written here: a
+default assigned to the property would reflect onto every host and put a
+`placement="end"` into markup no consumer wrote. */
+  placement?: HelixDrawer["placement"];
   /** What the dialog closed with, the way `<dialog>` reports it.
 
 **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -6559,27 +6559,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "bool:default-open"?: HelixDrawer["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixDrawer["defaultOpen"];
-  /** Which edge the drawer comes from.
-
-Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
-beside `:host([placement="end"])` rather than as a value written here: a
-default assigned to the property would reflect onto every host and put a
-`placement="end"` into markup no consumer wrote. */
-  "prop:placement"?: HelixDrawer["placement"];
-  /** Accessible name for the panel. */
-  "prop:label"?: HelixDrawer["label"];
-  /** Whether the drawer blocks the page behind it.
-
-Turning this off removes the focus trap and the scrim together, because
-they are one decision: a panel that traps focus without covering the page
-strands the reader, and one that covers without trapping lets them tab
-behind the cover.
-
-Not reflected. It stays `true` by default, since a drawer that silently
-lost its focus trap because a consumer forgot a word would be worse than an
-attribute on the host, and nothing selects on it: the scrim is rendered or
-not, rather than shown or hidden by CSS. */
-  "prop:modal"?: HelixDrawer["modal"];
   /** Which close requests the browser answers on its own.
 
 `<dialog closedby>`, forwarded, and safe to forward because every path it
@@ -6602,6 +6581,27 @@ the property this component exists to keep.
 Absent by default, which is the platform's `auto` and this library's rule
 that a resting value is an attribute's absence. */
   "prop:closedBy"?: HelixDrawer["closedBy"];
+  /** Accessible name for the panel. */
+  "prop:label"?: HelixDrawer["label"];
+  /** Whether the drawer blocks the page behind it.
+
+Turning this off removes the focus trap and the scrim together, because
+they are one decision: a panel that traps focus without covering the page
+strands the reader, and one that covers without trapping lets them tab
+behind the cover.
+
+Not reflected. It stays `true` by default, since a drawer that silently
+lost its focus trap because a consumer forgot a word would be worse than an
+attribute on the host, and nothing selects on it: the scrim is rendered or
+not, rather than shown or hidden by CSS. */
+  "prop:modal"?: HelixDrawer["modal"];
+  /** Which edge the drawer comes from.
+
+Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+beside `:host([placement="end"])` rather than as a value written here: a
+default assigned to the property would reflect onto every host and put a
+`placement="end"` into markup no consumer wrote. */
+  "prop:placement"?: HelixDrawer["placement"];
   /** What the dialog closed with, the way `<dialog>` reports it.
 
 **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -6648,14 +6648,6 @@ export type HelixDrilldownItemProps = {
   disabled?: HelixDrilldownItem["disabled"];
   /** Identifies the row to whatever is listening. */
   value?: HelixDrilldownItem["value"];
-  /** Whether the page showing is the one this row is on.
-
-Written by the stack. */
-  onPage?: HelixDrilldownItem["onPage"];
-  /** Whether this row's own page is the one showing.
-
-Written by the stack. */
-  showingPage?: HelixDrilldownItem["showingPage"];
   /** Whether this row holds the region's tab stop. Written by the stack.
 
 A drill-down keeps one stop and moves within it on the arrows, so every
@@ -6668,6 +6660,14 @@ elements, and writing `tabindex` onto a host the consumer rendered is a
 change a React consumer's hydration reports and does not patch up. The stop
 lands inside this shadow root instead. */
   focusable?: HelixDrilldownItem["focusable"];
+  /** Whether the page showing is the one this row is on.
+
+Written by the stack. */
+  onPage?: HelixDrilldownItem["onPage"];
+  /** Whether this row's own page is the one showing.
+
+Written by the stack. */
+  showingPage?: HelixDrilldownItem["showingPage"];
 
   /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixDrilldownItemHelixSelectElementEvent) => void;
@@ -6678,14 +6678,6 @@ export type HelixDrilldownItemSolidJsProps = {
   "prop:disabled"?: HelixDrilldownItem["disabled"];
   /** Identifies the row to whatever is listening. */
   "prop:value"?: HelixDrilldownItem["value"];
-  /** Whether the page showing is the one this row is on.
-
-Written by the stack. */
-  "prop:onPage"?: HelixDrilldownItem["onPage"];
-  /** Whether this row's own page is the one showing.
-
-Written by the stack. */
-  "prop:showingPage"?: HelixDrilldownItem["showingPage"];
   /** Whether this row holds the region's tab stop. Written by the stack.
 
 A drill-down keeps one stop and moves within it on the arrows, so every
@@ -6698,6 +6690,14 @@ elements, and writing `tabindex` onto a host the consumer rendered is a
 change a React consumer's hydration reports and does not patch up. The stop
 lands inside this shadow root instead. */
   "prop:focusable"?: HelixDrilldownItem["focusable"];
+  /** Whether the page showing is the one this row is on.
+
+Written by the stack. */
+  "prop:onPage"?: HelixDrilldownItem["onPage"];
+  /** Whether this row's own page is the one showing.
+
+Written by the stack. */
+  "prop:showingPage"?: HelixDrilldownItem["showingPage"];
   /** Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixDrilldownItemHelixSelectElementEvent) => void;
 
@@ -6717,6 +6717,10 @@ export type HelixDrilldownHelixSelectElementEvent =
   HelixDrilldownElementEvent<HelixSelectEvent>;
 
 export type HelixDrilldownProps = {
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixDrilldown["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixDrilldown["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -6727,10 +6731,6 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixDrilldown["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixDrilldown["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixDrilldown["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixDrilldown["emptyText"];
   /** Accessible name for the region. */
   label?: HelixDrilldown["label"];
   /** What the control returning from a page reads. */
@@ -6743,6 +6743,10 @@ say that without the component knowing what a row looks like. */
 };
 
 export type HelixDrilldownSolidJsProps = {
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixDrilldown["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixDrilldown["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -6753,10 +6757,6 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixDrilldown["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixDrilldown["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixDrilldown["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixDrilldown["emptyText"];
   /** Accessible name for the region. */
   "prop:label"?: HelixDrilldown["label"];
   /** What the control returning from a page reads. */
@@ -6817,32 +6817,32 @@ export type HelixFileInputHelixBeforeChangeElementEvent =
   HelixFileInputElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixFileInputProps = {
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixFileInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixFileInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixFileInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixFileInput["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixFileInput["required"];
   /** Which files the picker offers, as a native `accept` list. */
   accept?: HelixFileInput["accept"];
-  /** Whether more than one file can be chosen. */
-  multiple?: HelixFileInput["multiple"];
   /** Which camera or microphone a mobile picker should offer, if any. */
   capture?: HelixFileInput["capture"];
-  /** What the trigger reads, where nothing is slotted into it. */
-  "trigger-label"?: HelixFileInput["triggerLabel"];
-  /** What the trigger reads, where nothing is slotted into it. */
-  triggerLabel?: HelixFileInput["triggerLabel"];
   /** Language tag the sizes are written in.
 
 Absent uses the runtime's own. */
   locale?: HelixFileInput["locale"];
+  /** Whether more than one file can be chosen. */
+  multiple?: HelixFileInput["multiple"];
   /** What the control removing one file is called, per file. */
   "remove-label"?: HelixFileInput["removeLabel"];
   /** What the control removing one file is called, per file. */
   removeLabel?: HelixFileInput["removeLabel"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  "trigger-label"?: HelixFileInput["triggerLabel"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  triggerLabel?: HelixFileInput["triggerLabel"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -6881,32 +6881,32 @@ Here rather than on each control. */
 };
 
 export type HelixFileInputSolidJsProps = {
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixFileInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixFileInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixFileInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixFileInput["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixFileInput["required"];
   /** Which files the picker offers, as a native `accept` list. */
   "prop:accept"?: HelixFileInput["accept"];
-  /** Whether more than one file can be chosen. */
-  "prop:multiple"?: HelixFileInput["multiple"];
   /** Which camera or microphone a mobile picker should offer, if any. */
   "prop:capture"?: HelixFileInput["capture"];
-  /** What the trigger reads, where nothing is slotted into it. */
-  "attr:trigger-label"?: HelixFileInput["triggerLabel"];
-  /** What the trigger reads, where nothing is slotted into it. */
-  "prop:triggerLabel"?: HelixFileInput["triggerLabel"];
   /** Language tag the sizes are written in.
 
 Absent uses the runtime's own. */
   "prop:locale"?: HelixFileInput["locale"];
+  /** Whether more than one file can be chosen. */
+  "prop:multiple"?: HelixFileInput["multiple"];
   /** What the control removing one file is called, per file. */
   "attr:remove-label"?: HelixFileInput["removeLabel"];
   /** What the control removing one file is called, per file. */
   "prop:removeLabel"?: HelixFileInput["removeLabel"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  "attr:trigger-label"?: HelixFileInput["triggerLabel"];
+  /** What the trigger reads, where nothing is slotted into it. */
+  "prop:triggerLabel"?: HelixFileInput["triggerLabel"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -6949,33 +6949,33 @@ Here rather than on each control. */
 };
 
 export type HelixFlexProps = {
+  /** Alignment across the direction. */
+  align?: HelixFlex["align"];
   /** Whether items run across or down. */
   direction?: HelixFlex["direction"];
   /** Space between items, named on the space scale. */
   gap?: HelixFlex["gap"];
-  /** Alignment across the direction. */
-  align?: HelixFlex["align"];
+  /** Flows with surrounding text instead of taking the full width. */
+  inline?: HelixFlex["inline"];
   /** Distribution along the direction. */
   justify?: HelixFlex["justify"];
   /** Whether items wrap onto more lines. */
   wrap?: HelixFlex["wrap"];
-  /** Flows with surrounding text instead of taking the full width. */
-  inline?: HelixFlex["inline"];
 };
 
 export type HelixFlexSolidJsProps = {
+  /** Alignment across the direction. */
+  "prop:align"?: HelixFlex["align"];
   /** Whether items run across or down. */
   "prop:direction"?: HelixFlex["direction"];
   /** Space between items, named on the space scale. */
   "prop:gap"?: HelixFlex["gap"];
-  /** Alignment across the direction. */
-  "prop:align"?: HelixFlex["align"];
+  /** Flows with surrounding text instead of taking the full width. */
+  "prop:inline"?: HelixFlex["inline"];
   /** Distribution along the direction. */
   "prop:justify"?: HelixFlex["justify"];
   /** Whether items wrap onto more lines. */
   "prop:wrap"?: HelixFlex["wrap"];
-  /** Flows with surrounding text instead of taking the full width. */
-  "prop:inline"?: HelixFlex["inline"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7097,31 +7097,31 @@ Empty is the runtime's own. */
 };
 
 export type HelixGridProps = {
+  /** Alignment of each cell within its row. */
+  align?: HelixGrid["align"];
   /** Fixed number of equal columns. */
   columns?: HelixGrid["columns"];
+  /** Space between cells, named on the space scale. */
+  gap?: HelixGrid["gap"];
   /** Minimum column width, filling as many as fit.
 
 Takes precedence over `columns`: a grid that both fixes a count and reflows
 is two intentions in one element. */
   min?: HelixGrid["min"];
-  /** Space between cells, named on the space scale. */
-  gap?: HelixGrid["gap"];
-  /** Alignment of each cell within its row. */
-  align?: HelixGrid["align"];
 };
 
 export type HelixGridSolidJsProps = {
+  /** Alignment of each cell within its row. */
+  "prop:align"?: HelixGrid["align"];
   /** Fixed number of equal columns. */
   "prop:columns"?: HelixGrid["columns"];
+  /** Space between cells, named on the space scale. */
+  "prop:gap"?: HelixGrid["gap"];
   /** Minimum column width, filling as many as fit.
 
 Takes precedence over `columns`: a grid that both fixes a count and reflows
 is two intentions in one element. */
   "prop:min"?: HelixGrid["min"];
-  /** Space between cells, named on the space scale. */
-  "prop:gap"?: HelixGrid["gap"];
-  /** Alignment of each cell within its row. */
-  "prop:align"?: HelixGrid["align"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7150,31 +7150,13 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   label?: HelixHeatmap["label"];
-  /** How many rows the strip has.
-
-`1` is a status strip and `7` is a calendar week, which are the two readings
-this covers. Cells fill down the column and then across, which is what a
-calendar heatmap does: a week is a column, so the strip reads left to right
-in weeks and top to bottom in days. */
-  rows?: HelixHeatmap["rows"];
-  /** Lower bounds for the tone buckets, in the order the tones are given.
-
-`thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
-first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
-fourth. A value below the first bound gets no tone at all: an empty day in a
-contribution graph is a day with nothing in it, and painting it as the
-lowest bucket claims a reading that does not exist. */
-  thresholds?: HelixHeatmap["thresholds"];
-  /** Tone per bucket, in the same order as `thresholds`.
-
-A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
-**`"1"` through `"5"` are a ramp and everything else is a category**, which
-is the distinction a heatmap lives or dies on: magnitude has to be one hue
-getting louder, because a reader compares two cells by weight and cannot
-compare two hues at all. `tones="surface info accent success primary"` for a
-commit count is five unrelated hues for five amounts, which is confetti with
-no order in it. */
-  tones?: HelixHeatmap["tones"];
+  /** Shown when the table has no readings in it. */
+  "empty-text"?: HelixHeatmap["emptyText"];
+  /** Shown when the table has no readings in it. */
+  emptyText?: HelixHeatmap["emptyText"];
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a
+number. */
+  gap?: HelixHeatmap["gap"];
   /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
 **Set this only to overrule what the strip actually draws.** The arithmetic
@@ -7211,13 +7193,31 @@ arithmetic should plan around.
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   minCell?: HelixHeatmap["minCell"];
-  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a
-number. */
-  gap?: HelixHeatmap["gap"];
-  /** Shown when the table has no readings in it. */
-  "empty-text"?: HelixHeatmap["emptyText"];
-  /** Shown when the table has no readings in it. */
-  emptyText?: HelixHeatmap["emptyText"];
+  /** How many rows the strip has.
+
+`1` is a status strip and `7` is a calendar week, which are the two readings
+this covers. Cells fill down the column and then across, which is what a
+calendar heatmap does: a week is a column, so the strip reads left to right
+in weeks and top to bottom in days. */
+  rows?: HelixHeatmap["rows"];
+  /** Lower bounds for the tone buckets, in the order the tones are given.
+
+`thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+fourth. A value below the first bound gets no tone at all: an empty day in a
+contribution graph is a day with nothing in it, and painting it as the
+lowest bucket claims a reading that does not exist. */
+  thresholds?: HelixHeatmap["thresholds"];
+  /** Tone per bucket, in the same order as `thresholds`.
+
+A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+**`"1"` through `"5"` are a ramp and everything else is a category**, which
+is the distinction a heatmap lives or dies on: magnitude has to be one hue
+getting louder, because a reader compares two cells by weight and cannot
+compare two hues at all. `tones="surface info accent success primary"` for a
+commit count is five unrelated hues for five amounts, which is confetti with
+no order in it. */
+  tones?: HelixHeatmap["tones"];
 
   /** Fired when the number of cells drawn changes, carrying that number. */
   "onhelix-resize"?: (e: HelixHeatmapHelixResizeElementEvent) => void;
@@ -7238,31 +7238,13 @@ shadow root names a table in that root rather than in the document. A
 Absent falls back to the table's own caption, which is usually the right
 words and is already written. */
   "prop:label"?: HelixHeatmap["label"];
-  /** How many rows the strip has.
-
-`1` is a status strip and `7` is a calendar week, which are the two readings
-this covers. Cells fill down the column and then across, which is what a
-calendar heatmap does: a week is a column, so the strip reads left to right
-in weeks and top to bottom in days. */
-  "prop:rows"?: HelixHeatmap["rows"];
-  /** Lower bounds for the tone buckets, in the order the tones are given.
-
-`thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
-first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
-fourth. A value below the first bound gets no tone at all: an empty day in a
-contribution graph is a day with nothing in it, and painting it as the
-lowest bucket claims a reading that does not exist. */
-  "prop:thresholds"?: HelixHeatmap["thresholds"];
-  /** Tone per bucket, in the same order as `thresholds`.
-
-A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
-**`"1"` through `"5"` are a ramp and everything else is a category**, which
-is the distinction a heatmap lives or dies on: magnitude has to be one hue
-getting louder, because a reader compares two cells by weight and cannot
-compare two hues at all. `tones="surface info accent success primary"` for a
-commit count is five unrelated hues for five amounts, which is confetti with
-no order in it. */
-  "prop:tones"?: HelixHeatmap["tones"];
+  /** Shown when the table has no readings in it. */
+  "attr:empty-text"?: HelixHeatmap["emptyText"];
+  /** Shown when the table has no readings in it. */
+  "prop:emptyText"?: HelixHeatmap["emptyText"];
+  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a
+number. */
+  "prop:gap"?: HelixHeatmap["gap"];
   /** The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
 
 **Set this only to overrule what the strip actually draws.** The arithmetic
@@ -7299,13 +7281,31 @@ arithmetic should plan around.
 Zero turns the dropping off altogether, which is right for a strip in a
 container that cannot get narrow. */
   "prop:minCell"?: HelixHeatmap["minCell"];
-  /** Space between cells, in CSS pixels, for the same reason `min-cell` is a
-number. */
-  "prop:gap"?: HelixHeatmap["gap"];
-  /** Shown when the table has no readings in it. */
-  "attr:empty-text"?: HelixHeatmap["emptyText"];
-  /** Shown when the table has no readings in it. */
-  "prop:emptyText"?: HelixHeatmap["emptyText"];
+  /** How many rows the strip has.
+
+`1` is a status strip and `7` is a calendar week, which are the two readings
+this covers. Cells fill down the column and then across, which is what a
+calendar heatmap does: a week is a column, so the strip reads left to right
+in weeks and top to bottom in days. */
+  "prop:rows"?: HelixHeatmap["rows"];
+  /** Lower bounds for the tone buckets, in the order the tones are given.
+
+`thresholds="1 3 6 9"` with `tones="1 2 3 4"` puts 1 and 2 in the ramp's
+first step, 3 to 5 in the second, 6 to 8 in the third, and 9 upward in the
+fourth. A value below the first bound gets no tone at all: an empty day in a
+contribution graph is a day with nothing in it, and painting it as the
+lowest bucket claims a reading that does not exist. */
+  "prop:thresholds"?: HelixHeatmap["thresholds"];
+  /** Tone per bucket, in the same order as `thresholds`.
+
+A name, resolved as `--heatmap-tone-<name>` by whichever tier answers.
+**`"1"` through `"5"` are a ramp and everything else is a category**, which
+is the distinction a heatmap lives or dies on: magnitude has to be one hue
+getting louder, because a reader compares two cells by weight and cannot
+compare two hues at all. `tones="surface info accent success primary"` for a
+commit count is five unrelated hues for five amounts, which is confetti with
+no order in it. */
+  "prop:tones"?: HelixHeatmap["tones"];
   /** Fired when the number of cells drawn changes, carrying that number. */
   "on:helix-resize"?: (e: HelixHeatmapHelixResizeElementEvent) => void;
 
@@ -7316,6 +7316,13 @@ number. */
 };
 
 export type HelixIconButtonProps = {
+  /** Whether it is raised off the page it sits on.
+
+Separate from `shape`, because they are separate facts: a docked control is
+raised whatever its outline, and a circle inside a toolbar is not raised at
+all. Shadow rather than a border, since what is under a floating control is
+the page and a line drawn on the page is not the same as being above it. */
+  raised?: HelixIconButton["raised"];
   /** The outline it is cut to, which is an axis of its own and not a value on one.
 
 `emphasis` says how filled it is and `tone` says what it means; neither of
@@ -7331,13 +7338,6 @@ them, and because the same shape is wanted by an avatar's overlay, a media
 control and a map's own buttons. Where it sits is the page's business: see
 `data-dock` in the base layer. */
   shape?: HelixIconButton["shape"];
-  /** Whether it is raised off the page it sits on.
-
-Separate from `shape`, because they are separate facts: a docked control is
-raised whatever its outline, and a circle inside a toolbar is not raised at
-all. Shadow rather than a border, since what is under a floating control is
-the page and a line drawn on the page is not the same as being above it. */
-  raised?: HelixIconButton["raised"];
   /** How filled it is drawn.
 
 Not `separation`: a Card's `outlined` says where a surface ends, and this
@@ -7358,22 +7358,26 @@ of a control means nothing in particular. `accent` is the second
 emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   tone?: HelixIconButton["tone"];
-  /** What activating the button does to its form. */
-  type?: HelixIconButton["type"];
-  /** What this button submits under its own `name`, the way a native submitter does.
+  /** What to send when the button is activated, and what to send it to.
 
-**Reported for exactly the submission this button starts and not otherwise.**
-A native submit button contributes `name=value` only when it is the one
-that submitted, and every other button on the form contributes nothing. A
-form-associated element reporting a value continuously would contribute on
-every submission whoever started it, which is a different feature wearing
-the same name, so `submit` below sets it, submits, and clears it inside one
-synchronous call.
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
 
-`CopyButton` has a `value` of its own meaning the text to put on the
-clipboard, which is not this and is why it is declared there rather than
-inherited. */
-  value?: HelixIconButton["value"];
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  command?: HelixIconButton["command"];
+  /** The id of the element the command is sent to. */
+  commandfor?: HelixIconButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  commandFor?: HelixIconButton["commandFor"];
   /** Where this button's submission goes, overriding the form's own.
 
 **The five `form*` overrides work by writing the form and putting it back**,
@@ -7426,26 +7430,22 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   label?: HelixIconButton["label"];
-  /** What to send when the button is activated, and what to send it to.
+  /** What activating the button does to its form. */
+  type?: HelixIconButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
 
-The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognized as an
-invoker, so `commandfor` written on a custom element resolves nothing and
-the trigger silently does nothing at all. A wrapper has to hand them down,
-the same way `label` becomes `aria-label` in there.
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
 
-```html
-<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-```
-
-`commandFor` spells its attribute out, because Lit lowercases a property
-name to derive one rather than dash-casing it, and what a consumer writes
-is the platform's `commandfor`. */
-  command?: HelixIconButton["command"];
-  /** The id of the element the command is sent to. */
-  commandfor?: HelixIconButton["commandFor"];
-  /** The id of the element the command is sent to. */
-  commandFor?: HelixIconButton["commandFor"];
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  value?: HelixIconButton["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7472,17 +7472,6 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control. */
   name?: HelixIconButton["name"];
-  /** Whether the button holds its group's tab stop.
-
-A toolbar keeps one tab stop across its children, and the obvious way to do
-that is to write `tabindex` onto each of them. That is a change to markup
-the consumer rendered, so a React consumer's hydration reports it and does
-not patch it up. A parent sets this property instead, which writes nothing,
-and the stop lands on the inner control inside the shadow root.
-
-No attribute, because it is coordination between elements rather than
-anything a consumer sets. */
-  focusable?: HelixIconButton["focusable"];
   /** Whether this button is a disclosure trigger, and whether its panel is open.
 
 **Set by whatever owns the panel, and a property rather than an attribute
@@ -7508,6 +7497,17 @@ which is the rule every reflected property here follows.
 A consumer who wants to say this statically writes `aria-expanded` on the
 host instead, which `AriaForwardController` carries to the same place. */
   expanded?: HelixIconButton["expanded"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  focusable?: HelixIconButton["focusable"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, because the resolution is otherwise kept
@@ -7519,6 +7519,13 @@ invoker without an id in the same tree needs. */
 };
 
 export type HelixIconButtonSolidJsProps = {
+  /** Whether it is raised off the page it sits on.
+
+Separate from `shape`, because they are separate facts: a docked control is
+raised whatever its outline, and a circle inside a toolbar is not raised at
+all. Shadow rather than a border, since what is under a floating control is
+the page and a line drawn on the page is not the same as being above it. */
+  "prop:raised"?: HelixIconButton["raised"];
   /** The outline it is cut to, which is an axis of its own and not a value on one.
 
 `emphasis` says how filled it is and `tone` says what it means; neither of
@@ -7534,13 +7541,6 @@ them, and because the same shape is wanted by an avatar's overlay, a media
 control and a map's own buttons. Where it sits is the page's business: see
 `data-dock` in the base layer. */
   "prop:shape"?: HelixIconButton["shape"];
-  /** Whether it is raised off the page it sits on.
-
-Separate from `shape`, because they are separate facts: a docked control is
-raised whatever its outline, and a circle inside a toolbar is not raised at
-all. Shadow rather than a border, since what is under a floating control is
-the page and a line drawn on the page is not the same as being above it. */
-  "prop:raised"?: HelixIconButton["raised"];
   /** How filled it is drawn.
 
 Not `separation`: a Card's `outlined` says where a surface ends, and this
@@ -7561,22 +7561,26 @@ of a control means nothing in particular. `accent` is the second
 emphasis, a rotation off the brand seed rather than a color of its own,
 so it stays in relation when somebody rethemes. */
   "prop:tone"?: HelixIconButton["tone"];
-  /** What activating the button does to its form. */
-  "prop:type"?: HelixIconButton["type"];
-  /** What this button submits under its own `name`, the way a native submitter does.
+  /** What to send when the button is activated, and what to send it to.
 
-**Reported for exactly the submission this button starts and not otherwise.**
-A native submit button contributes `name=value` only when it is the one
-that submitted, and every other button on the form contributes nothing. A
-form-associated element reporting a value continuously would contribute on
-every submission whoever started it, which is a different feature wearing
-the same name, so `submit` below sets it, submits, and clears it inside one
-synchronous call.
+The platform's invoker attributes, forwarded onto the inner `<button>`
+rather than left on the host: only a real button is recognized as an
+invoker, so `commandfor` written on a custom element resolves nothing and
+the trigger silently does nothing at all. A wrapper has to hand them down,
+the same way `label` becomes `aria-label` in there.
 
-`CopyButton` has a `value` of its own meaning the text to put on the
-clipboard, which is not this and is why it is declared there rather than
-inherited. */
-  "prop:value"?: HelixIconButton["value"];
+```html
+<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+```
+
+`commandFor` spells its attribute out, because Lit lowercases a property
+name to derive one rather than dash-casing it, and what a consumer writes
+is the platform's `commandfor`. */
+  "prop:command"?: HelixIconButton["command"];
+  /** The id of the element the command is sent to. */
+  "attr:commandfor"?: HelixIconButton["commandFor"];
+  /** The id of the element the command is sent to. */
+  "prop:commandFor"?: HelixIconButton["commandFor"];
   /** Where this button's submission goes, overriding the form's own.
 
 **The five `form*` overrides work by writing the form and putting it back**,
@@ -7629,26 +7633,22 @@ Lives here rather than only on `IconButton` so the two share one render.
 An icon-only button without it is a control a screen reader announces as
 "button" and nothing else. */
   "prop:label"?: HelixIconButton["label"];
-  /** What to send when the button is activated, and what to send it to.
+  /** What activating the button does to its form. */
+  "prop:type"?: HelixIconButton["type"];
+  /** What this button submits under its own `name`, the way a native submitter does.
 
-The platform's invoker attributes, forwarded onto the inner `<button>`
-rather than left on the host: only a real button is recognized as an
-invoker, so `commandfor` written on a custom element resolves nothing and
-the trigger silently does nothing at all. A wrapper has to hand them down,
-the same way `label` becomes `aria-label` in there.
+**Reported for exactly the submission this button starts and not otherwise.**
+A native submit button contributes `name=value` only when it is the one
+that submitted, and every other button on the form contributes nothing. A
+form-associated element reporting a value continuously would contribute on
+every submission whoever started it, which is a different feature wearing
+the same name, so `submit` below sets it, submits, and clears it inside one
+synchronous call.
 
-```html
-<helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-```
-
-`commandFor` spells its attribute out, because Lit lowercases a property
-name to derive one rather than dash-casing it, and what a consumer writes
-is the platform's `commandfor`. */
-  "prop:command"?: HelixIconButton["command"];
-  /** The id of the element the command is sent to. */
-  "attr:commandfor"?: HelixIconButton["commandFor"];
-  /** The id of the element the command is sent to. */
-  "prop:commandFor"?: HelixIconButton["commandFor"];
+`CopyButton` has a `value` of its own meaning the text to put on the
+clipboard, which is not this and is why it is declared there rather than
+inherited. */
+  "prop:value"?: HelixIconButton["value"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -7675,17 +7675,6 @@ imperatively later, and nothing is hydrating by then.
 
 Here rather than on each control. */
   "prop:name"?: HelixIconButton["name"];
-  /** Whether the button holds its group's tab stop.
-
-A toolbar keeps one tab stop across its children, and the obvious way to do
-that is to write `tabindex` onto each of them. That is a change to markup
-the consumer rendered, so a React consumer's hydration reports it and does
-not patch it up. A parent sets this property instead, which writes nothing,
-and the stop lands on the inner control inside the shadow root.
-
-No attribute, because it is coordination between elements rather than
-anything a consumer sets. */
-  "prop:focusable"?: HelixIconButton["focusable"];
   /** Whether this button is a disclosure trigger, and whether its panel is open.
 
 **Set by whatever owns the panel, and a property rather than an attribute
@@ -7711,6 +7700,17 @@ which is the rule every reflected property here follows.
 A consumer who wants to say this statically writes `aria-expanded` on the
 host instead, which `AriaForwardController` carries to the same place. */
   "prop:expanded"?: HelixIconButton["expanded"];
+  /** Whether the button holds its group's tab stop.
+
+A toolbar keeps one tab stop across its children, and the obvious way to do
+that is to write `tabindex` onto each of them. That is a change to markup
+the consumer rendered, so a React consumer's hydration reports it and does
+not patch it up. A parent sets this property instead, which writes nothing,
+and the stop lands on the inner control inside the shadow root.
+
+No attribute, because it is coordination between elements rather than
+anything a consumer sets. */
+  "prop:focusable"?: HelixIconButton["focusable"];
   /** The element this button's command is sent to, resolved.
 
 The platform's own accessor, because the resolution is otherwise kept
@@ -7727,17 +7727,17 @@ invoker without an id in the same tree needs. */
 };
 
 export type HelixIconProps = {
-  /** Name of the icon in the Helix set. */
-  name?: HelixIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   label?: HelixIcon["label"];
+  /** Name of the icon in the Helix set. */
+  name?: HelixIcon["name"];
 };
 
 export type HelixIconSolidJsProps = {
-  /** Name of the icon in the Helix set. */
-  "prop:name"?: HelixIcon["name"];
   /** Accessible name, for an icon that is not decorative. */
   "prop:label"?: HelixIcon["label"];
+  /** Name of the icon in the Helix set. */
+  "prop:name"?: HelixIcon["name"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -7756,23 +7756,23 @@ question a consumer is answering is whether this picture is a card's
 surface or a page's. `--image-radius` moves it for the case that is
 neither. */
   rounded?: HelixImage["rounded"];
-  /** Where the picture is. */
-  src?: HelixImage["src"];
   /** What it shows, for a reader who cannot see it.
 
 Empty is a real answer and means decoration. Omitting the attribute is not
 the same thing: a reader with nothing to read announces the file name. */
   alt?: HelixImage["alt"];
-  /** Whether to wait until it is nearly on screen.
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
+  crossorigin?: HelixImage["crossOrigin"];
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
+  crossOrigin?: HelixImage["crossOrigin"];
+  /** Whether the browser may decode off the main thread.
 
-`lazy` by default, which is the opposite of the platform's, because a
-picture worth putting in a component is usually below the fold and the one
-that is not is the exception worth writing down. */
-  loading?: HelixImage["loading"];
-  /** The candidate widths, passed through to the picture. */
-  srcset?: HelixImage["srcset"];
-  /** How much of the line it will take, passed through to the picture. */
-  sizes?: HelixImage["sizes"];
+`async` is the resting value and right for a picture in a page. `sync` is
+what a consumer reaches for when the picture is about to be composited with
+something else and a tear would show. */
+  decoding?: HelixImage["decoding"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -7789,22 +7789,22 @@ viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
   fetchPriority?: HelixImage["fetchPriority"];
-  /** Whether the browser may decode off the main thread.
+  /** Whether to wait until it is nearly on screen.
 
-`async` is the resting value and right for a picture in a page. `sync` is
-what a consumer reaches for when the picture is about to be composited with
-something else and a tear would show. */
-  decoding?: HelixImage["decoding"];
-  /** How the picture is fetched across origins, which decides whether a canvas
-can read it. */
-  crossorigin?: HelixImage["crossOrigin"];
-  /** How the picture is fetched across origins, which decides whether a canvas
-can read it. */
-  crossOrigin?: HelixImage["crossOrigin"];
+`lazy` by default, which is the opposite of the platform's, because a
+picture worth putting in a component is usually below the fold and the one
+that is not is the exception worth writing down. */
+  loading?: HelixImage["loading"];
   /** How much of the referring URL to send with the request. */
   referrerpolicy?: HelixImage["referrerPolicy"];
   /** How much of the referring URL to send with the request. */
   referrerPolicy?: HelixImage["referrerPolicy"];
+  /** How much of the line it will take, passed through to the picture. */
+  sizes?: HelixImage["sizes"];
+  /** Where the picture is. */
+  src?: HelixImage["src"];
+  /** The candidate widths, passed through to the picture. */
+  srcset?: HelixImage["srcset"];
   /** Whether the picture is on its way, here, or never coming.
 
 Read-only to a consumer: it is a report rather than a setting.
@@ -7839,23 +7839,23 @@ question a consumer is answering is whether this picture is a card's
 surface or a page's. `--image-radius` moves it for the case that is
 neither. */
   "prop:rounded"?: HelixImage["rounded"];
-  /** Where the picture is. */
-  "prop:src"?: HelixImage["src"];
   /** What it shows, for a reader who cannot see it.
 
 Empty is a real answer and means decoration. Omitting the attribute is not
 the same thing: a reader with nothing to read announces the file name. */
   "prop:alt"?: HelixImage["alt"];
-  /** Whether to wait until it is nearly on screen.
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
+  "attr:crossorigin"?: HelixImage["crossOrigin"];
+  /** How the picture is fetched across origins, which decides whether a canvas
+can read it. */
+  "prop:crossOrigin"?: HelixImage["crossOrigin"];
+  /** Whether the browser may decode off the main thread.
 
-`lazy` by default, which is the opposite of the platform's, because a
-picture worth putting in a component is usually below the fold and the one
-that is not is the exception worth writing down. */
-  "prop:loading"?: HelixImage["loading"];
-  /** The candidate widths, passed through to the picture. */
-  "prop:srcset"?: HelixImage["srcset"];
-  /** How much of the line it will take, passed through to the picture. */
-  "prop:sizes"?: HelixImage["sizes"];
+`async` is the resting value and right for a picture in a page. `sync` is
+what a consumer reaches for when the picture is about to be composited with
+something else and a tear would show. */
+  "prop:decoding"?: HelixImage["decoding"];
   /** How urgently to fetch it, for the one picture that is the page.
 
 The hero of a page is usually its largest contentful paint, and the fix is
@@ -7872,22 +7872,22 @@ viewport, and this stops it queueing behind everything else the parser
 found first. Left alone the browser decides, which is right for the other
 ninety-nine pictures. */
   "prop:fetchPriority"?: HelixImage["fetchPriority"];
-  /** Whether the browser may decode off the main thread.
+  /** Whether to wait until it is nearly on screen.
 
-`async` is the resting value and right for a picture in a page. `sync` is
-what a consumer reaches for when the picture is about to be composited with
-something else and a tear would show. */
-  "prop:decoding"?: HelixImage["decoding"];
-  /** How the picture is fetched across origins, which decides whether a canvas
-can read it. */
-  "attr:crossorigin"?: HelixImage["crossOrigin"];
-  /** How the picture is fetched across origins, which decides whether a canvas
-can read it. */
-  "prop:crossOrigin"?: HelixImage["crossOrigin"];
+`lazy` by default, which is the opposite of the platform's, because a
+picture worth putting in a component is usually below the fold and the one
+that is not is the exception worth writing down. */
+  "prop:loading"?: HelixImage["loading"];
   /** How much of the referring URL to send with the request. */
   "attr:referrerpolicy"?: HelixImage["referrerPolicy"];
   /** How much of the referring URL to send with the request. */
   "prop:referrerPolicy"?: HelixImage["referrerPolicy"];
+  /** How much of the line it will take, passed through to the picture. */
+  "prop:sizes"?: HelixImage["sizes"];
+  /** Where the picture is. */
+  "prop:src"?: HelixImage["src"];
+  /** The candidate widths, passed through to the picture. */
+  "prop:srcset"?: HelixImage["srcset"];
   /** Whether the picture is on its way, here, or never coming.
 
 Read-only to a consumer: it is a report rather than a setting.
@@ -7936,10 +7936,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -7949,6 +7949,31 @@ a reset should return to. */
 Empty leaves the attribute off, which is the browser's default. Set it to
 a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   autocomplete?: HelixInput["autocomplete"];
+  /** Whether the field offers a button that empties it.
+
+Shown only while there is something to clear, because a control that does
+nothing is worse than no control: a reader who presses it and sees no
+change has to work out whether the field was already empty or the button
+is broken. */
+  clearable?: HelixInput["clearable"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  "clear-label"?: HelixInput["clearLabel"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  clearLabel?: HelixInput["clearLabel"];
+  /** Most characters the value may have. */
+  maxlength?: HelixInput["maxLength"];
+  /** Most characters the value may have. */
+  maxLength?: HelixInput["maxLength"];
+  /** Fewest characters the value may have. */
+  minlength?: HelixInput["minLength"];
+  /** Fewest characters the value may have. */
+  minLength?: HelixInput["minLength"];
+  /** A regular expression the value has to match, as the platform reads it.
+
+Forwarded rather than checked here, which is the whole reason validity is
+the platform's: the browser knows what a `pattern` means, anchors it at both
+ends, and produces the message in the reader's own language. */
+  pattern?: HelixInput["pattern"];
   /** Shown while the field is empty.
 
 Not a label: it goes when typing starts. */
@@ -7983,29 +8008,6 @@ the same kind of reason: there is no `helix-v` tag, so no consumer is
 holding the old spelling, and this is free today and a deprecation after
 the first release. */
   readOnly?: HelixInput["readOnly"];
-  /** What the field accepts, which decides the keyboard and the validation.
-
-**Not reflected.** Reflection exists so a selector can reach a value, and
-no stylesheet in this repository selects on `type`. Reflecting it writes
-`type="text"` onto every `<helix-input>` ever rendered, an attribute no
-consumer's markup has, which is the fault the area rules write up under
-`Button`'s `href`, `target` and `rel`.
-
-Nothing reads it from the attribute either. The real `<input>` inside takes
-it as a property binding, which is what makes the keyboard and the
-validation follow. */
-  type?: HelixInput["type"];
-  /** Whether the field offers a button that empties it.
-
-Shown only while there is something to clear, because a control that does
-nothing is worse than no control: a reader who presses it and sees no
-change has to work out whether the field was already empty or the button
-is broken. */
-  clearable?: HelixInput["clearable"];
-  /** What the clear button is called, since an icon has no name of its own. */
-  "clear-label"?: HelixInput["clearLabel"];
-  /** What the clear button is called, since an icon has no name of its own. */
-  clearLabel?: HelixInput["clearLabel"];
   /** Whether a password field offers a toggle that shows what was typed.
 
 Ignored on every other type. A reveal on an email field would be a button
@@ -8021,20 +8023,18 @@ The state is `aria-pressed`, not this. */
 
 The state is `aria-pressed`, not this. */
   revealLabel?: HelixInput["revealLabel"];
-  /** A regular expression the value has to match, as the platform reads it.
+  /** What the field accepts, which decides the keyboard and the validation.
 
-Forwarded rather than checked here, which is the whole reason validity is
-the platform's: the browser knows what a `pattern` means, anchors it at both
-ends, and produces the message in the reader's own language. */
-  pattern?: HelixInput["pattern"];
-  /** Fewest characters the value may have. */
-  minlength?: HelixInput["minLength"];
-  /** Fewest characters the value may have. */
-  minLength?: HelixInput["minLength"];
-  /** Most characters the value may have. */
-  maxlength?: HelixInput["maxLength"];
-  /** Most characters the value may have. */
-  maxLength?: HelixInput["maxLength"];
+**Not reflected.** Reflection exists so a selector can reach a value, and
+no stylesheet in this repository selects on `type`. Reflecting it writes
+`type="text"` onto every `<helix-input>` ever rendered, an attribute no
+consumer's markup has, which is the fault the area rules write up under
+`Button`'s `href`, `target` and `rel`.
+
+Nothing reads it from the attribute either. The real `<input>` inside takes
+it as a property binding, which is what makes the keyboard and the
+validation follow. */
+  type?: HelixInput["type"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8100,10 +8100,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -8113,6 +8113,31 @@ a reset should return to. */
 Empty leaves the attribute off, which is the browser's default. Set it to
 a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "prop:autocomplete"?: HelixInput["autocomplete"];
+  /** Whether the field offers a button that empties it.
+
+Shown only while there is something to clear, because a control that does
+nothing is worse than no control: a reader who presses it and sees no
+change has to work out whether the field was already empty or the button
+is broken. */
+  "prop:clearable"?: HelixInput["clearable"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  "attr:clear-label"?: HelixInput["clearLabel"];
+  /** What the clear button is called, since an icon has no name of its own. */
+  "prop:clearLabel"?: HelixInput["clearLabel"];
+  /** Most characters the value may have. */
+  "attr:maxlength"?: HelixInput["maxLength"];
+  /** Most characters the value may have. */
+  "prop:maxLength"?: HelixInput["maxLength"];
+  /** Fewest characters the value may have. */
+  "attr:minlength"?: HelixInput["minLength"];
+  /** Fewest characters the value may have. */
+  "prop:minLength"?: HelixInput["minLength"];
+  /** A regular expression the value has to match, as the platform reads it.
+
+Forwarded rather than checked here, which is the whole reason validity is
+the platform's: the browser knows what a `pattern` means, anchors it at both
+ends, and produces the message in the reader's own language. */
+  "prop:pattern"?: HelixInput["pattern"];
   /** Shown while the field is empty.
 
 Not a label: it goes when typing starts. */
@@ -8147,29 +8172,6 @@ the same kind of reason: there is no `helix-v` tag, so no consumer is
 holding the old spelling, and this is free today and a deprecation after
 the first release. */
   "prop:readOnly"?: HelixInput["readOnly"];
-  /** What the field accepts, which decides the keyboard and the validation.
-
-**Not reflected.** Reflection exists so a selector can reach a value, and
-no stylesheet in this repository selects on `type`. Reflecting it writes
-`type="text"` onto every `<helix-input>` ever rendered, an attribute no
-consumer's markup has, which is the fault the area rules write up under
-`Button`'s `href`, `target` and `rel`.
-
-Nothing reads it from the attribute either. The real `<input>` inside takes
-it as a property binding, which is what makes the keyboard and the
-validation follow. */
-  "prop:type"?: HelixInput["type"];
-  /** Whether the field offers a button that empties it.
-
-Shown only while there is something to clear, because a control that does
-nothing is worse than no control: a reader who presses it and sees no
-change has to work out whether the field was already empty or the button
-is broken. */
-  "prop:clearable"?: HelixInput["clearable"];
-  /** What the clear button is called, since an icon has no name of its own. */
-  "attr:clear-label"?: HelixInput["clearLabel"];
-  /** What the clear button is called, since an icon has no name of its own. */
-  "prop:clearLabel"?: HelixInput["clearLabel"];
   /** Whether a password field offers a toggle that shows what was typed.
 
 Ignored on every other type. A reveal on an email field would be a button
@@ -8185,20 +8187,18 @@ The state is `aria-pressed`, not this. */
 
 The state is `aria-pressed`, not this. */
   "prop:revealLabel"?: HelixInput["revealLabel"];
-  /** A regular expression the value has to match, as the platform reads it.
+  /** What the field accepts, which decides the keyboard and the validation.
 
-Forwarded rather than checked here, which is the whole reason validity is
-the platform's: the browser knows what a `pattern` means, anchors it at both
-ends, and produces the message in the reader's own language. */
-  "prop:pattern"?: HelixInput["pattern"];
-  /** Fewest characters the value may have. */
-  "attr:minlength"?: HelixInput["minLength"];
-  /** Fewest characters the value may have. */
-  "prop:minLength"?: HelixInput["minLength"];
-  /** Most characters the value may have. */
-  "attr:maxlength"?: HelixInput["maxLength"];
-  /** Most characters the value may have. */
-  "prop:maxLength"?: HelixInput["maxLength"];
+**Not reflected.** Reflection exists so a selector can reach a value, and
+no stylesheet in this repository selects on `type`. Reflecting it writes
+`type="text"` onto every `<helix-input>` ever rendered, an attribute no
+consumer's markup has, which is the fault the area rules write up under
+`Button`'s `href`, `target` and `rel`.
+
+Nothing reads it from the attribute either. The real `<input>` inside takes
+it as a property binding, which is what makes the keyboard and the
+validation follow. */
+  "prop:type"?: HelixInput["type"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -8309,22 +8309,6 @@ lint failure and a word in the DOM that already means something narrower.
 };
 
 export type HelixLegendProps = {
-  /** Where the legend sits and which way its entries run.
-
-Absent is a wrapping row, which is what sits under a chart. `start` and
-`end` stack the entries in a column, for a legend beside one.
-
-**This says which way the entries run and not where the element is**, which
-is the honest limit of a component that is a sibling of the chart rather
-than part of it. A legend cannot place itself relative to something it is
-not inside, so the consumer still puts it above, below or beside and this
-makes it lay out correctly once it is there.
-
-A `legend` slot on every chart is the obvious alternative and is worse: it
-makes the legend's position a fact about the chart, so two charts sharing
-one legend becomes impossible, and it puts a list inside a drawing that is
-`aria-hidden`. */
-  placement?: HelixLegend["placement"];
   /** How much ink the swatches claim.
 
 **The same axis as the chart's, with the same values, because a legend that
@@ -8342,6 +8326,10 @@ independently. Giving it a chart to read would make a list of names depend
 on a drawing it is deliberately not part of, and would still not answer the
 per-series case, where `outlined` is a set of names rather than one value. */
   emphasis?: HelixLegend["emphasis"];
+  /** Which entries are glass rather than solid, by name.
+
+Matched as `outlined` is. */
+  glass?: HelixLegend["glass"];
   /** What the swatches are made of.
 
 `glass` thins whatever emphasis drew, the way it does on a column, so a
@@ -8368,14 +8356,26 @@ showing, which are the same names the chart matches its own `outlined`
 against, since both read one table. So a chart and its key say the same
 thing the same way: `outlined="Forecast"` on both. */
   outlined?: HelixLegend["outlined"];
+  /** Where the legend sits and which way its entries run.
+
+Absent is a wrapping row, which is what sits under a chart. `start` and
+`end` stack the entries in a column, for a legend beside one.
+
+**This says which way the entries run and not where the element is**, which
+is the honest limit of a component that is a sibling of the chart rather
+than part of it. A legend cannot place itself relative to something it is
+not inside, so the consumer still puts it above, below or beside and this
+makes it lay out correctly once it is there.
+
+A `legend` slot on every chart is the obvious alternative and is worse: it
+makes the legend's position a fact about the chart, so two charts sharing
+one legend becomes impossible, and it puts a list inside a drawing that is
+`aria-hidden`. */
+  placement?: HelixLegend["placement"];
   /** Which entries are drawn as a wash of their color, by name.
 
 Matched as `outlined` is. */
   subtle?: HelixLegend["subtle"];
-  /** Which entries are glass rather than solid, by name.
-
-Matched as `outlined` is. */
-  glass?: HelixLegend["glass"];
   /** Which way to read the table.
 
 Absent is `series`, one entry per data column. `categories` reads one entry
@@ -8392,22 +8392,6 @@ shadow root names a table in that root rather than in the document.
 };
 
 export type HelixLegendSolidJsProps = {
-  /** Where the legend sits and which way its entries run.
-
-Absent is a wrapping row, which is what sits under a chart. `start` and
-`end` stack the entries in a column, for a legend beside one.
-
-**This says which way the entries run and not where the element is**, which
-is the honest limit of a component that is a sibling of the chart rather
-than part of it. A legend cannot place itself relative to something it is
-not inside, so the consumer still puts it above, below or beside and this
-makes it lay out correctly once it is there.
-
-A `legend` slot on every chart is the obvious alternative and is worse: it
-makes the legend's position a fact about the chart, so two charts sharing
-one legend becomes impossible, and it puts a list inside a drawing that is
-`aria-hidden`. */
-  "prop:placement"?: HelixLegend["placement"];
   /** How much ink the swatches claim.
 
 **The same axis as the chart's, with the same values, because a legend that
@@ -8425,6 +8409,10 @@ independently. Giving it a chart to read would make a list of names depend
 on a drawing it is deliberately not part of, and would still not answer the
 per-series case, where `outlined` is a set of names rather than one value. */
   "prop:emphasis"?: HelixLegend["emphasis"];
+  /** Which entries are glass rather than solid, by name.
+
+Matched as `outlined` is. */
+  "prop:glass"?: HelixLegend["glass"];
   /** What the swatches are made of.
 
 `glass` thins whatever emphasis drew, the way it does on a column, so a
@@ -8451,14 +8439,26 @@ showing, which are the same names the chart matches its own `outlined`
 against, since both read one table. So a chart and its key say the same
 thing the same way: `outlined="Forecast"` on both. */
   "prop:outlined"?: HelixLegend["outlined"];
+  /** Where the legend sits and which way its entries run.
+
+Absent is a wrapping row, which is what sits under a chart. `start` and
+`end` stack the entries in a column, for a legend beside one.
+
+**This says which way the entries run and not where the element is**, which
+is the honest limit of a component that is a sibling of the chart rather
+than part of it. A legend cannot place itself relative to something it is
+not inside, so the consumer still puts it above, below or beside and this
+makes it lay out correctly once it is there.
+
+A `legend` slot on every chart is the obvious alternative and is worse: it
+makes the legend's position a fact about the chart, so two charts sharing
+one legend becomes impossible, and it puts a list inside a drawing that is
+`aria-hidden`. */
+  "prop:placement"?: HelixLegend["placement"];
   /** Which entries are drawn as a wash of their color, by name.
 
 Matched as `outlined` is. */
   "prop:subtle"?: HelixLegend["subtle"];
-  /** Which entries are glass rather than solid, by name.
-
-Matched as `outlined` is. */
-  "prop:glass"?: HelixLegend["glass"];
   /** Which way to read the table.
 
 Absent is `series`, one entry per data column. `categories` reads one entry
@@ -8580,13 +8580,6 @@ the attribute being absent, which is the one thing a reader cannot debug.
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
   gridlines?: HelixLineChart["gridlines"];
-  /** Whether zero is forced into the range.
-
-Absent measures from the data's own extent, which is what a line is for.
-Set it where the distance from nothing is the point rather than the shape,
-and accept that a series which never approaches zero becomes a flat rule
-near the top of the box. */
-  zero?: HelixLineChart["zero"];
   /** The shape of the mark on each series' last reading.
 
 Absent is a dot, and absent rather than defaulted because a reflecting
@@ -8609,6 +8602,13 @@ masked with one disc per series and every stroke stops at its own ring's
 inner edge. `mask-composite: intersect` is what makes N holes out of N
 layers; a single `mask-image` would only ever cut the last one. */
   terminus?: HelixLineChart["terminus"];
+  /** Whether zero is forced into the range.
+
+Absent measures from the data's own extent, which is what a line is for.
+Set it where the distance from nothing is the point rather than the shape,
+and accept that a series which never approaches zero becomes a flat rule
+near the top of the box. */
+  zero?: HelixLineChart["zero"];
 };
 
 export type HelixLineChartSolidJsProps = {
@@ -8712,13 +8712,6 @@ the attribute being absent, which is the one thing a reader cannot debug.
 Furniture rather than data, so the rules are inside the `aria-hidden` plot
 and reach no reader through the table. */
   "prop:gridlines"?: HelixLineChart["gridlines"];
-  /** Whether zero is forced into the range.
-
-Absent measures from the data's own extent, which is what a line is for.
-Set it where the distance from nothing is the point rather than the shape,
-and accept that a series which never approaches zero becomes a flat rule
-near the top of the box. */
-  "prop:zero"?: HelixLineChart["zero"];
   /** The shape of the mark on each series' last reading.
 
 Absent is a dot, and absent rather than defaulted because a reflecting
@@ -8741,6 +8734,13 @@ masked with one disc per series and every stroke stops at its own ring's
 inner edge. `mask-composite: intersect` is what makes N holes out of N
 layers; a single `mask-image` would only ever cut the last one. */
   "prop:terminus"?: HelixLineChart["terminus"];
+  /** Whether zero is forced into the range.
+
+Absent measures from the data's own extent, which is what a line is for.
+Set it where the distance from nothing is the point rather than the shape,
+and accept that a series which never approaches zero becomes a flat rule
+near the top of the box. */
+  "prop:zero"?: HelixLineChart["zero"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8755,11 +8755,11 @@ Empty rather than optional, and unset by default: a list is not always a
 list of links, and an empty `href` written onto every row would be a link
 to the current page on every row a consumer never asked to be one. */
   href?: HelixListItem["href"];
-  /** Where the link opens, for the rare row that leaves the site. */
-  target?: HelixListItem["target"];
   /** What the link declares about where it goes. The consumer's decision rather
 than one derived from `target`, for the reason `Tree.Item` gives. */
   rel?: HelixListItem["rel"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  target?: HelixListItem["target"];
 };
 
 export type HelixListItemSolidJsProps = {
@@ -8769,11 +8769,11 @@ Empty rather than optional, and unset by default: a list is not always a
 list of links, and an empty `href` written onto every row would be a link
 to the current page on every row a consumer never asked to be one. */
   "prop:href"?: HelixListItem["href"];
-  /** Where the link opens, for the rare row that leaves the site. */
-  "prop:target"?: HelixListItem["target"];
   /** What the link declares about where it goes. The consumer's decision rather
 than one derived from `target`, for the reason `Tree.Item` gives. */
   "prop:rel"?: HelixListItem["rel"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  "prop:target"?: HelixListItem["target"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -8799,8 +8799,6 @@ fact about the content, which `kind` carries on the headless tier, and
 A rail replaces the marker rather than joining it, so it applies to
 `unordered` too, where it numbers what a bullet did not. */
   marker?: HelixList["marker"];
-  /** Accessible name for the set. */
-  label?: HelixList["label"];
   /** What kind of list this is, which is a fact about the content.
 
 On the headless tier because it is meaning rather than decoration, the same
@@ -8822,6 +8820,8 @@ has to survive with the stylesheet turned off.
   pair is drawn and nothing about what a consumer writes. A separate
   `List.Term` element would be a second row shape for one attribute's sake. */
   kind?: HelixList["kind"];
+  /** Accessible name for the set. */
+  label?: HelixList["label"];
   /** Which markers an ordered list draws, in `<ol type>`'s own five values.
 
 Reflected, because this is one of the things a stylesheet selects on and
@@ -8858,8 +8858,6 @@ fact about the content, which `kind` carries on the headless tier, and
 A rail replaces the marker rather than joining it, so it applies to
 `unordered` too, where it numbers what a bullet did not. */
   "prop:marker"?: HelixList["marker"];
-  /** Accessible name for the set. */
-  "prop:label"?: HelixList["label"];
   /** What kind of list this is, which is a fact about the content.
 
 On the headless tier because it is meaning rather than decoration, the same
@@ -8881,6 +8879,8 @@ has to survive with the stylesheet turned off.
   pair is drawn and nothing about what a consumer writes. A separate
   `List.Term` element would be a second row shape for one attribute's sake. */
   "prop:kind"?: HelixList["kind"];
+  /** Accessible name for the set. */
+  "prop:label"?: HelixList["label"];
   /** Which markers an ordered list draws, in `<ol type>`'s own five values.
 
 Reflected, because this is one of the things a stylesheet selects on and
@@ -8914,6 +8914,10 @@ export type HelixListboxHelixFilterElementEvent =
   HelixListboxElementEvent<HelixFilterEvent>;
 
 export type HelixListboxProps = {
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixListbox["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixListbox["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -8924,10 +8928,6 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixListbox["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixListbox["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixListbox["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixListbox["emptyText"];
   /** The value the markup declared, which is where a reset returns to. */
   "default-value"?: HelixListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -8939,10 +8939,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixListbox["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixListbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixListbox["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixListbox["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixListbox["label"];
   /** Whether the form refuses to submit without it. */
@@ -9029,6 +9029,10 @@ that can. */
 };
 
 export type HelixListboxSolidJsProps = {
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixListbox["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixListbox["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -9039,10 +9043,6 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixListbox["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixListbox["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixListbox["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixListbox["emptyText"];
   /** The value the markup declared, which is where a reset returns to. */
   "attr:default-value"?: HelixListbox["defaultValue"];
   /** The value the markup declared, which is where a reset returns to. */
@@ -9054,10 +9054,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixListbox["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixListbox["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixListbox["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixListbox["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixListbox["label"];
   /** Whether the form refuses to submit without it. */
@@ -9148,6 +9148,8 @@ that can. */
 };
 
 export type HelixLoaderProps = {
+  /** Diameter relative to the surrounding text. */
+  size?: HelixLoader["size"];
   /** How the waiting is drawn.
 
 Unset is the turning arc, which is what most waits want.
@@ -9158,13 +9160,13 @@ swells with it, in step. It is the shape for a wait that has a mark to
 show, a splash or a first paint behind a wordmark, where a rotating rim
 around a logo reads as chrome bolted to the brand. */
   variant?: HelixLoader["variant"];
-  /** Diameter relative to the surrounding text. */
-  size?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
   label?: HelixLoader["label"];
 };
 
 export type HelixLoaderSolidJsProps = {
+  /** Diameter relative to the surrounding text. */
+  "prop:size"?: HelixLoader["size"];
   /** How the waiting is drawn.
 
 Unset is the turning arc, which is what most waits want.
@@ -9175,8 +9177,6 @@ swells with it, in step. It is the shape for a wait that has a mark to
 show, a splash or a first paint behind a wordmark, where a rotating rim
 around a logo reads as chrome bolted to the brand. */
   "prop:variant"?: HelixLoader["variant"];
-  /** Diameter relative to the surrounding text. */
-  "prop:size"?: HelixLoader["size"];
   /** Accessible name, announced while the work is outstanding. */
   "prop:label"?: HelixLoader["label"];
 
@@ -9213,36 +9213,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "default-open"?: HelixMegamenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixMegamenu["defaultOpen"];
-  /** The section's name, which names the default trigger and the panel. */
-  label?: HelixMegamenu["label"];
-  /** Whether the panel is a card under the trigger or a band across the page.
-
-The resting one is the card, hanging off the trigger and as wide as it
-needs to be. `full` is the other shape navigations use: a band from edge to
-edge under the header, with its contents held to the page's own measure, so
-a set of destinations too wide to sit under one word gets the whole width
-to lay out in.
-
-It changes where the panel goes as well as how it looks, which is why this
-tier knows about it at all: a band spans the viewport, so there is nothing
-to measure it against and nothing to flip or shift to, and the placing pass
-is told not to run. Everything else the popover gives, the top layer and
-the dismissal, is exactly what such a band needs. */
-  variant?: HelixMegamenu["variant"];
-  /** Whether hovering the trigger opens the panel, or only a press does.
-
-A press always works. This says whether a mouse also opens it by resting on
-the trigger, and it is the default because that is what a navigation bar
-does. `click` is for a trigger that does something else as well, or a panel
-heavy enough that opening it on the way past is rude. */
-  "open-on"?: HelixMegamenu["openOn"];
-  /** Whether hovering the trigger opens the panel, or only a press does.
-
-A press always works. This says whether a mouse also opens it by resting on
-the trigger, and it is the default because that is what a navigation bar
-does. `click` is for a trigger that does something else as well, or a panel
-heavy enough that opening it on the way past is rude. */
-  openOn?: HelixMegamenu["openOn"];
   /** The width, in pixels, under which a card becomes a band. Zero never does.
 
 A card is a panel hung off one word, and there is no room to hang anything
@@ -9275,6 +9245,36 @@ whatever the stylesheet says. Writing the width in both places would be one
 number in two languages, drifting the first time either moved. This sets
 `data-narrow` on the host and the stylesheet arranges itself off that. */
   fullBelow?: HelixMegamenu["fullBelow"];
+  /** The section's name, which names the default trigger and the panel. */
+  label?: HelixMegamenu["label"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "open-on"?: HelixMegamenu["openOn"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  openOn?: HelixMegamenu["openOn"];
+  /** Whether the panel is a card under the trigger or a band across the page.
+
+The resting one is the card, hanging off the trigger and as wide as it
+needs to be. `full` is the other shape navigations use: a band from edge to
+edge under the header, with its contents held to the page's own measure, so
+a set of destinations too wide to sit under one word gets the whole width
+to lay out in.
+
+It changes where the panel goes as well as how it looks, which is why this
+tier knows about it at all: a band spans the viewport, so there is nothing
+to measure it against and nothing to flip or shift to, and the placing pass
+is told not to run. Everything else the popover gives, the top layer and
+the dismissal, is exactly what such a band needs. */
+  variant?: HelixMegamenu["variant"];
 
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (
@@ -9304,36 +9304,6 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "bool:default-open"?: HelixMegamenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixMegamenu["defaultOpen"];
-  /** The section's name, which names the default trigger and the panel. */
-  "prop:label"?: HelixMegamenu["label"];
-  /** Whether the panel is a card under the trigger or a band across the page.
-
-The resting one is the card, hanging off the trigger and as wide as it
-needs to be. `full` is the other shape navigations use: a band from edge to
-edge under the header, with its contents held to the page's own measure, so
-a set of destinations too wide to sit under one word gets the whole width
-to lay out in.
-
-It changes where the panel goes as well as how it looks, which is why this
-tier knows about it at all: a band spans the viewport, so there is nothing
-to measure it against and nothing to flip or shift to, and the placing pass
-is told not to run. Everything else the popover gives, the top layer and
-the dismissal, is exactly what such a band needs. */
-  "prop:variant"?: HelixMegamenu["variant"];
-  /** Whether hovering the trigger opens the panel, or only a press does.
-
-A press always works. This says whether a mouse also opens it by resting on
-the trigger, and it is the default because that is what a navigation bar
-does. `click` is for a trigger that does something else as well, or a panel
-heavy enough that opening it on the way past is rude. */
-  "attr:open-on"?: HelixMegamenu["openOn"];
-  /** Whether hovering the trigger opens the panel, or only a press does.
-
-A press always works. This says whether a mouse also opens it by resting on
-the trigger, and it is the default because that is what a navigation bar
-does. `click` is for a trigger that does something else as well, or a panel
-heavy enough that opening it on the way past is rude. */
-  "prop:openOn"?: HelixMegamenu["openOn"];
   /** The width, in pixels, under which a card becomes a band. Zero never does.
 
 A card is a panel hung off one word, and there is no room to hang anything
@@ -9366,6 +9336,36 @@ whatever the stylesheet says. Writing the width in both places would be one
 number in two languages, drifting the first time either moved. This sets
 `data-narrow` on the host and the stylesheet arranges itself off that. */
   "prop:fullBelow"?: HelixMegamenu["fullBelow"];
+  /** The section's name, which names the default trigger and the panel. */
+  "prop:label"?: HelixMegamenu["label"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "attr:open-on"?: HelixMegamenu["openOn"];
+  /** Whether hovering the trigger opens the panel, or only a press does.
+
+A press always works. This says whether a mouse also opens it by resting on
+the trigger, and it is the default because that is what a navigation bar
+does. `click` is for a trigger that does something else as well, or a panel
+heavy enough that opening it on the way past is rude. */
+  "prop:openOn"?: HelixMegamenu["openOn"];
+  /** Whether the panel is a card under the trigger or a band across the page.
+
+The resting one is the card, hanging off the trigger and as wide as it
+needs to be. `full` is the other shape navigations use: a band from edge to
+edge under the header, with its contents held to the page's own measure, so
+a set of destinations too wide to sit under one word gets the whole width
+to lay out in.
+
+It changes where the panel goes as well as how it looks, which is why this
+tier knows about it at all: a band spans the viewport, so there is nothing
+to measure it against and nothing to flip or shift to, and the placing pass
+is told not to run. Everything else the popover gives, the top layer and
+the dismissal, is exactly what such a band needs. */
+  "prop:variant"?: HelixMegamenu["variant"];
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixMegamenuHelixBeforeCloseElementEvent,
@@ -9390,8 +9390,6 @@ export type HelixMenuItemHelixSelectElementEvent =
   HelixMenuItemElementEvent<HelixSelectEvent>;
 
 export type HelixMenuItemProps = {
-  /** What this row stands for, carried in the event when it is chosen. */
-  value?: HelixMenuItem["value"];
   /** Whether the row is one of a set of choices.
 
 Separate from `checked`, and it has to be. A row that is off is still a
@@ -9406,6 +9404,12 @@ thing they are not.
   checked?: HelixMenuItem["checked"];
   /** Whether the row can be chosen. */
   disabled?: HelixMenuItem["disabled"];
+  /** Whether the link saves the file rather than opening it.
+
+Only meaningful beside an `href`, and only for a file served from this
+origin: the attribute is ignored cross-origin, which is the browser's rule
+about who may name a file on somebody's disk rather than a gap here. */
+  download?: HelixMenuItem["download"];
   /** Where the row goes, which makes it a real link.
 
 **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -9425,16 +9429,12 @@ back `null`. So `role="option"` is pinned to the host, and an anchor under
 it hits the naming failure above. A menu has no such constraint because
 focus really moves to the row. */
   href?: HelixMenuItem["href"];
-  /** Where the link opens, for the rows that should leave the page. */
-  target?: HelixMenuItem["target"];
   /** The relationship, which `target="_blank"` should always set. */
   rel?: HelixMenuItem["rel"];
-  /** Whether the link saves the file rather than opening it.
-
-Only meaningful beside an `href`, and only for a file served from this
-origin: the attribute is ignored cross-origin, which is the browser's rule
-about who may name a file on somebody's disk rather than a gap here. */
-  download?: HelixMenuItem["download"];
+  /** Where the link opens, for the rows that should leave the page. */
+  target?: HelixMenuItem["target"];
+  /** What this row stands for, carried in the event when it is chosen. */
+  value?: HelixMenuItem["value"];
   /** Whether this row is on the page currently showing.
 
 Set by the menu, and a property rather than an attribute for that reason.
@@ -9455,8 +9455,6 @@ page has to keep the slot even when it shows no row of its own. */
 };
 
 export type HelixMenuItemSolidJsProps = {
-  /** What this row stands for, carried in the event when it is chosen. */
-  "prop:value"?: HelixMenuItem["value"];
   /** Whether the row is one of a set of choices.
 
 Separate from `checked`, and it has to be. A row that is off is still a
@@ -9471,6 +9469,12 @@ thing they are not.
   "prop:checked"?: HelixMenuItem["checked"];
   /** Whether the row can be chosen. */
   "prop:disabled"?: HelixMenuItem["disabled"];
+  /** Whether the link saves the file rather than opening it.
+
+Only meaningful beside an `href`, and only for a file served from this
+origin: the attribute is ignored cross-origin, which is the browser's rule
+about who may name a file on somebody's disk rather than a gap here. */
+  "prop:download"?: HelixMenuItem["download"];
   /** Where the row goes, which makes it a real link.
 
 **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -9490,16 +9494,12 @@ back `null`. So `role="option"` is pinned to the host, and an anchor under
 it hits the naming failure above. A menu has no such constraint because
 focus really moves to the row. */
   "prop:href"?: HelixMenuItem["href"];
-  /** Where the link opens, for the rows that should leave the page. */
-  "prop:target"?: HelixMenuItem["target"];
   /** The relationship, which `target="_blank"` should always set. */
   "prop:rel"?: HelixMenuItem["rel"];
-  /** Whether the link saves the file rather than opening it.
-
-Only meaningful beside an `href`, and only for a file served from this
-origin: the attribute is ignored cross-origin, which is the browser's rule
-about who may name a file on somebody's disk rather than a gap here. */
-  "prop:download"?: HelixMenuItem["download"];
+  /** Where the link opens, for the rows that should leave the page. */
+  "prop:target"?: HelixMenuItem["target"];
+  /** What this row stands for, carried in the event when it is chosen. */
+  "prop:value"?: HelixMenuItem["value"];
   /** Whether this row is on the page currently showing.
 
 Set by the menu, and a property rather than an attribute for that reason.
@@ -9536,6 +9536,10 @@ export type HelixMenuHelixSelectElementEvent =
   HelixMenuElementEvent<HelixSelectEvent>;
 
 export type HelixMenuProps = {
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixMenu["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixMenu["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -9546,10 +9550,6 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixMenu["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixMenu["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixMenu["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixMenu["emptyText"];
   /** Whether the element is open.
 
 One property, not two, so `dialog.open` answers the question anyone
@@ -9567,18 +9567,18 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "default-open"?: HelixMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixMenu["defaultOpen"];
-  /** Preferred side.
-
-It moves if that side does not fit. */
-  placement?: HelixMenu["placement"];
-  /** Space between the trigger and the surface, in pixels. */
-  offset?: HelixMenu["offset"];
-  /** Accessible name for the surface. */
-  label?: HelixMenu["label"];
   /** What the row returning from a submenu reads. */
   "back-label"?: HelixMenu["backLabel"];
   /** What the row returning from a submenu reads. */
   backLabel?: HelixMenu["backLabel"];
+  /** Accessible name for the surface. */
+  label?: HelixMenu["label"];
+  /** Space between the trigger and the surface, in pixels. */
+  offset?: HelixMenu["offset"];
+  /** Preferred side.
+
+It moves if that side does not fit. */
+  placement?: HelixMenu["placement"];
 
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (e: HelixMenuHelixBeforeCloseElementEvent) => void;
@@ -9591,6 +9591,10 @@ It moves if that side does not fit. */
 };
 
 export type HelixMenuSolidJsProps = {
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixMenu["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixMenu["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -9601,10 +9605,6 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixMenu["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixMenu["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixMenu["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixMenu["emptyText"];
   /** Whether the element is open.
 
 One property, not two, so `dialog.open` answers the question anyone
@@ -9622,18 +9622,18 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "bool:default-open"?: HelixMenu["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixMenu["defaultOpen"];
-  /** Preferred side.
-
-It moves if that side does not fit. */
-  "prop:placement"?: HelixMenu["placement"];
-  /** Space between the trigger and the surface, in pixels. */
-  "prop:offset"?: HelixMenu["offset"];
-  /** Accessible name for the surface. */
-  "prop:label"?: HelixMenu["label"];
   /** What the row returning from a submenu reads. */
   "attr:back-label"?: HelixMenu["backLabel"];
   /** What the row returning from a submenu reads. */
   "prop:backLabel"?: HelixMenu["backLabel"];
+  /** Accessible name for the surface. */
+  "prop:label"?: HelixMenu["label"];
+  /** Space between the trigger and the surface, in pixels. */
+  "prop:offset"?: HelixMenu["offset"];
+  /** Preferred side.
+
+It moves if that side does not fit. */
+  "prop:placement"?: HelixMenu["placement"];
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (e: HelixMenuHelixBeforeCloseElementEvent) => void;
   /** Fired before it opens, and cancelable. */
@@ -9667,36 +9667,6 @@ part of that range it is in, so there is no second kind of fact for an
 outline to name. `solid` is the resting state and is written by not writing
 it, per the rule that a reflected property takes no default. */
   emphasis?: HelixMeter["emphasis"];
-  /** Accessible name for the reading. */
-  label?: HelixMeter["label"];
-  /** Bottom of the range. */
-  min?: HelixMeter["min"];
-  /** Top of the range.
-
-A hundred rather than the platform's one, which is what `Progress` already
-takes and what a consumer writing `value="72"` means. A range of zero to one
-is a fraction, and a component that reads `value="72"` as seventy-two times
-over its maximum is a trap that costs nothing to avoid. */
-  max?: HelixMeter["max"];
-  /** Where the reading sits between `min` and `max`.
-
-Outside them, it clamps. */
-  value?: HelixMeter["value"];
-  /** Top of the low band.
-
-Absent leaves the range unbanded. */
-  low?: HelixMeter["low"];
-  /** Bottom of the high band.
-
-Absent leaves the range unbanded. */
-  high?: HelixMeter["high"];
-  /** Where in the range it is best to be.
-
-Defaults to the middle of whatever bands are declared, which is the
-platform's own default and the right one for a score. A meter where low is
-good, like disk usage, says `optimum="0"`; one where high is good, like a
-battery, says `optimum="100"`. */
-  optimum?: HelixMeter["optimum"];
   /** The band, said outright, where the three thresholds cannot say it.
 
 **The specification's model has a shape, and it is worth knowing before
@@ -9722,6 +9692,32 @@ Not reflected. Nothing selects on it: the band reaches the stylesheet as
 `data-band` on the fill, because that is the element being colored, so
 reflecting here would write an attribute onto the host for no reader. */
   band?: HelixMeter["band"];
+  /** Bottom of the high band.
+
+Absent leaves the range unbanded. */
+  high?: HelixMeter["high"];
+  /** Accessible name for the reading. */
+  label?: HelixMeter["label"];
+  /** Top of the low band.
+
+Absent leaves the range unbanded. */
+  low?: HelixMeter["low"];
+  /** Top of the range.
+
+A hundred rather than the platform's one, which is what `Progress` already
+takes and what a consumer writing `value="72"` means. A range of zero to one
+is a fraction, and a component that reads `value="72"` as seventy-two times
+over its maximum is a trap that costs nothing to avoid. */
+  max?: HelixMeter["max"];
+  /** Bottom of the range. */
+  min?: HelixMeter["min"];
+  /** Where in the range it is best to be.
+
+Defaults to the middle of whatever bands are declared, which is the
+platform's own default and the right one for a score. A meter where low is
+good, like disk usage, says `optimum="0"`; one where high is good, like a
+battery, says `optimum="100"`. */
+  optimum?: HelixMeter["optimum"];
   /** Whether the reading is drawn as a bar, a ring or an arc.
 
 A gauge and a meter are the same thing measured: a value in a range, with
@@ -9743,6 +9739,10 @@ it says nothing the end of the arc does not already say. */
   "show-value"?: HelixMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
   showValue?: HelixMeter["showValue"];
+  /** Where the reading sits between `min` and `max`.
+
+Outside them, it clamps. */
+  value?: HelixMeter["value"];
   /** What the reading says, where a number is not the whole story.
 
 `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
@@ -9775,36 +9775,6 @@ part of that range it is in, so there is no second kind of fact for an
 outline to name. `solid` is the resting state and is written by not writing
 it, per the rule that a reflected property takes no default. */
   "prop:emphasis"?: HelixMeter["emphasis"];
-  /** Accessible name for the reading. */
-  "prop:label"?: HelixMeter["label"];
-  /** Bottom of the range. */
-  "prop:min"?: HelixMeter["min"];
-  /** Top of the range.
-
-A hundred rather than the platform's one, which is what `Progress` already
-takes and what a consumer writing `value="72"` means. A range of zero to one
-is a fraction, and a component that reads `value="72"` as seventy-two times
-over its maximum is a trap that costs nothing to avoid. */
-  "prop:max"?: HelixMeter["max"];
-  /** Where the reading sits between `min` and `max`.
-
-Outside them, it clamps. */
-  "prop:value"?: HelixMeter["value"];
-  /** Top of the low band.
-
-Absent leaves the range unbanded. */
-  "prop:low"?: HelixMeter["low"];
-  /** Bottom of the high band.
-
-Absent leaves the range unbanded. */
-  "prop:high"?: HelixMeter["high"];
-  /** Where in the range it is best to be.
-
-Defaults to the middle of whatever bands are declared, which is the
-platform's own default and the right one for a score. A meter where low is
-good, like disk usage, says `optimum="0"`; one where high is good, like a
-battery, says `optimum="100"`. */
-  "prop:optimum"?: HelixMeter["optimum"];
   /** The band, said outright, where the three thresholds cannot say it.
 
 **The specification's model has a shape, and it is worth knowing before
@@ -9830,6 +9800,32 @@ Not reflected. Nothing selects on it: the band reaches the stylesheet as
 `data-band` on the fill, because that is the element being colored, so
 reflecting here would write an attribute onto the host for no reader. */
   "prop:band"?: HelixMeter["band"];
+  /** Bottom of the high band.
+
+Absent leaves the range unbanded. */
+  "prop:high"?: HelixMeter["high"];
+  /** Accessible name for the reading. */
+  "prop:label"?: HelixMeter["label"];
+  /** Top of the low band.
+
+Absent leaves the range unbanded. */
+  "prop:low"?: HelixMeter["low"];
+  /** Top of the range.
+
+A hundred rather than the platform's one, which is what `Progress` already
+takes and what a consumer writing `value="72"` means. A range of zero to one
+is a fraction, and a component that reads `value="72"` as seventy-two times
+over its maximum is a trap that costs nothing to avoid. */
+  "prop:max"?: HelixMeter["max"];
+  /** Bottom of the range. */
+  "prop:min"?: HelixMeter["min"];
+  /** Where in the range it is best to be.
+
+Defaults to the middle of whatever bands are declared, which is the
+platform's own default and the right one for a score. A meter where low is
+good, like disk usage, says `optimum="0"`; one where high is good, like a
+battery, says `optimum="100"`. */
+  "prop:optimum"?: HelixMeter["optimum"];
   /** Whether the reading is drawn as a bar, a ring or an arc.
 
 A gauge and a meter are the same thing measured: a value in a range, with
@@ -9851,6 +9847,10 @@ it says nothing the end of the arc does not already say. */
   "bool:show-value"?: HelixMeter["showValue"];
   /** Whether the reading is shown beside the bar. */
   "prop:showValue"?: HelixMeter["showValue"];
+  /** Where the reading sits between `min` and `max`.
+
+Outside them, it clamps. */
+  "prop:value"?: HelixMeter["value"];
   /** What the reading says, where a number is not the whole story.
 
 `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
@@ -9925,14 +9925,14 @@ declaration. `:state(read)` is what the stylesheet reads.
   defaultRead?: HelixNotification["defaultRead"];
   /** Whether a reader may remove it. */
   dismissible?: HelixNotification["dismissible"];
-  /** Locale for the timestamp.
-
-Empty is the runtime's own. */
-  locale?: HelixNotification["locale"];
   /** Accessible name for the dismiss control. */
   "dismiss-label"?: HelixNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
   dismissLabel?: HelixNotification["dismissLabel"];
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
+  locale?: HelixNotification["locale"];
 
   /** Fired when a reader asks to remove it, and cancelable. */
   "onhelix-dismiss"?: (e: HelixNotificationHelixDismissElementEvent) => void;
@@ -9968,14 +9968,14 @@ declaration. `:state(read)` is what the stylesheet reads.
   "prop:defaultRead"?: HelixNotification["defaultRead"];
   /** Whether a reader may remove it. */
   "prop:dismissible"?: HelixNotification["dismissible"];
-  /** Locale for the timestamp.
-
-Empty is the runtime's own. */
-  "prop:locale"?: HelixNotification["locale"];
   /** Accessible name for the dismiss control. */
   "attr:dismiss-label"?: HelixNotification["dismissLabel"];
   /** Accessible name for the dismiss control. */
   "prop:dismissLabel"?: HelixNotification["dismissLabel"];
+  /** Locale for the timestamp.
+
+Empty is the runtime's own. */
+  "prop:locale"?: HelixNotification["locale"];
   /** Fired when a reader asks to remove it, and cancelable. */
   "on:helix-dismiss"?: (e: HelixNotificationHelixDismissElementEvent) => void;
   /** Fired when the item is marked read or unread, and cancelable. */
@@ -9997,6 +9997,10 @@ export type HelixNotificationsHelixReadElementEvent =
   HelixNotificationsElementEvent<HelixReadEvent>;
 
 export type HelixNotificationsProps = {
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixNotifications["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixNotifications["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -10007,10 +10011,6 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixNotifications["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixNotifications["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixNotifications["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixNotifications["emptyText"];
   /** Accessible name for the feed. */
   label?: HelixNotifications["label"];
   /** Whether to draw a control that marks everything read. */
@@ -10027,6 +10027,10 @@ say that without the component knowing what a row looks like. */
 };
 
 export type HelixNotificationsSolidJsProps = {
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixNotifications["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixNotifications["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -10037,10 +10041,6 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixNotifications["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixNotifications["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixNotifications["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixNotifications["emptyText"];
   /** Accessible name for the feed. */
   "prop:label"?: HelixNotifications["label"];
   /** Whether to draw a control that marks everything read. */
@@ -10081,10 +10081,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixNumberInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixNumberInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixNumberInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixNumberInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixNumberInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -10096,16 +10096,14 @@ lets autofill work at all. Hardcoding `off` here is what stops a reader
 having a birthday or a postal code filled in for them, with no way for a
 consumer to ask for it. */
   autocomplete?: HelixNumberInput["autocomplete"];
-  /** Smallest value the reader may reach.
-
-Absent has no floor. */
-  min?: HelixNumberInput["min"];
-  /** Largest value the reader may reach.
-
-Absent has no ceiling. */
-  max?: HelixNumberInput["max"];
-  /** How far one step moves. */
-  step?: HelixNumberInput["step"];
+  /** Accessible name for the control that steps down. */
+  "decrement-label"?: HelixNumberInput["decrementLabel"];
+  /** Accessible name for the control that steps down. */
+  decrementLabel?: HelixNumberInput["decrementLabel"];
+  /** Accessible name for the control that steps up. */
+  "increment-label"?: HelixNumberInput["incrementLabel"];
+  /** Accessible name for the control that steps up. */
+  incrementLabel?: HelixNumberInput["incrementLabel"];
   /** How far `PageUp` and `PageDown` move.
 
 Ten steps, which is the convention every spinner on the platform follows,
@@ -10118,6 +10116,14 @@ Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
   largeStep?: HelixNumberInput["largeStep"];
+  /** Largest value the reader may reach.
+
+Absent has no ceiling. */
+  max?: HelixNumberInput["max"];
+  /** Smallest value the reader may reach.
+
+Absent has no floor. */
+  min?: HelixNumberInput["min"];
   /** Shown while the field is empty.
 
 Not a label: it goes when typing starts. */
@@ -10135,14 +10141,8 @@ been asked for. Where it earns its place is a value a reader tunes rather
 than states: a duration, a weight, a count they are looking for rather than
 one they already know. */
   scrub?: HelixNumberInput["scrub"];
-  /** Accessible name for the control that steps down. */
-  "decrement-label"?: HelixNumberInput["decrementLabel"];
-  /** Accessible name for the control that steps down. */
-  decrementLabel?: HelixNumberInput["decrementLabel"];
-  /** Accessible name for the control that steps up. */
-  "increment-label"?: HelixNumberInput["incrementLabel"];
-  /** Accessible name for the control that steps up. */
-  incrementLabel?: HelixNumberInput["incrementLabel"];
+  /** How far one step moves. */
+  step?: HelixNumberInput["step"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -10198,10 +10198,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixNumberInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixNumberInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixNumberInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixNumberInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixNumberInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -10213,16 +10213,14 @@ lets autofill work at all. Hardcoding `off` here is what stops a reader
 having a birthday or a postal code filled in for them, with no way for a
 consumer to ask for it. */
   "prop:autocomplete"?: HelixNumberInput["autocomplete"];
-  /** Smallest value the reader may reach.
-
-Absent has no floor. */
-  "prop:min"?: HelixNumberInput["min"];
-  /** Largest value the reader may reach.
-
-Absent has no ceiling. */
-  "prop:max"?: HelixNumberInput["max"];
-  /** How far one step moves. */
-  "prop:step"?: HelixNumberInput["step"];
+  /** Accessible name for the control that steps down. */
+  "attr:decrement-label"?: HelixNumberInput["decrementLabel"];
+  /** Accessible name for the control that steps down. */
+  "prop:decrementLabel"?: HelixNumberInput["decrementLabel"];
+  /** Accessible name for the control that steps up. */
+  "attr:increment-label"?: HelixNumberInput["incrementLabel"];
+  /** Accessible name for the control that steps up. */
+  "prop:incrementLabel"?: HelixNumberInput["incrementLabel"];
   /** How far `PageUp` and `PageDown` move.
 
 Ten steps, which is the convention every spinner on the platform follows,
@@ -10235,6 +10233,14 @@ Ten steps, which is the convention every spinner on the platform follows,
 and a property because ten of a step of `0.01` is a hundredth and rarely
 what a reader wants from a whole key. */
   "prop:largeStep"?: HelixNumberInput["largeStep"];
+  /** Largest value the reader may reach.
+
+Absent has no ceiling. */
+  "prop:max"?: HelixNumberInput["max"];
+  /** Smallest value the reader may reach.
+
+Absent has no floor. */
+  "prop:min"?: HelixNumberInput["min"];
   /** Shown while the field is empty.
 
 Not a label: it goes when typing starts. */
@@ -10252,14 +10258,8 @@ been asked for. Where it earns its place is a value a reader tunes rather
 than states: a duration, a weight, a count they are looking for rather than
 one they already know. */
   "prop:scrub"?: HelixNumberInput["scrub"];
-  /** Accessible name for the control that steps down. */
-  "attr:decrement-label"?: HelixNumberInput["decrementLabel"];
-  /** Accessible name for the control that steps down. */
-  "prop:decrementLabel"?: HelixNumberInput["decrementLabel"];
-  /** Accessible name for the control that steps up. */
-  "attr:increment-label"?: HelixNumberInput["incrementLabel"];
-  /** Accessible name for the control that steps up. */
-  "prop:incrementLabel"?: HelixNumberInput["incrementLabel"];
+  /** How far one step moves. */
+  "prop:step"?: HelixNumberInput["step"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -10329,28 +10329,6 @@ export type HelixOptionHelixSelectElementEvent =
   HelixOptionElementEvent<HelixSelectEvent>;
 
 export type HelixOptionProps = {
-  /** Whether this choice can be made. */
-  disabled?: HelixOption["disabled"];
-  /** A second line under the words, for what the choice actually is.
-
-A palette row reads better as a name and a caption than as one sentence
-carrying both: "Helix" and "the design system" are two facts, and a comma
-between them makes a reader parse the punctuation to find where the name
-ends. Matching still reads the label, so what somebody types is matched
-against the name rather than against prose about it.
-
-**A property and not a slot, which is the departure worth explaining.** The
-area rules say a content property is its slot's fallback, and that holds for
-a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
-usually absent, and a wrapped slot generates a box whether or not it is
-filled, so every option without a caption would carry an empty line. The
-detection that would avoid it does not exist, `:host(:has())` being invalid
-and the server having no children to inspect. A property is known at render
-time, so the component can decline to draw the box at all.
-
-It does not reflect, per the rule that payload state stays off the host: a
-string is not a fact a selector needs. */
-  description?: HelixOption["description"];
   /** Whether this is the option the keyboard is on.
 
 Written by the listbox. */
@@ -10359,19 +10337,6 @@ Written by the listbox. */
 
 Written by the listbox. */
   active?: HelixOption["active"];
-  /** Whether this choice is currently chosen.
-
-Written by the listbox. */
-  selected?: HelixOption["selected"];
-  /** A shorter name for this choice, for where the row does not fit.
-
-`<option label>`'s own meaning: the text a chooser shows when it has less
-room than the row does, which is what a select's closed trigger has. Empty
-means the row's own content, which is the common case and is why this is not
-simply the accessible name. */
-  label?: HelixOption["label"];
-  /** Identifies this choice, and is what a form submits. */
-  value?: HelixOption["value"];
   /** A second destination for this row, taken with the modifier held.
 
 **An attribute rather than a second row, which is the whole point.** A
@@ -10404,6 +10369,41 @@ about one of them and the other is a key nobody mentioned. It goes to
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
   alternateLabel?: HelixOption["alternateLabel"];
+  /** A second line under the words, for what the choice actually is.
+
+A palette row reads better as a name and a caption than as one sentence
+carrying both: "Helix" and "the design system" are two facts, and a comma
+between them makes a reader parse the punctuation to find where the name
+ends. Matching still reads the label, so what somebody types is matched
+against the name rather than against prose about it.
+
+**A property and not a slot, which is the departure worth explaining.** The
+area rules say a content property is its slot's fallback, and that holds for
+a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+usually absent, and a wrapped slot generates a box whether or not it is
+filled, so every option without a caption would carry an empty line. The
+detection that would avoid it does not exist, `:host(:has())` being invalid
+and the server having no children to inspect. A property is known at render
+time, so the component can decline to draw the box at all.
+
+It does not reflect, per the rule that payload state stays off the host: a
+string is not a fact a selector needs. */
+  description?: HelixOption["description"];
+  /** Whether this choice can be made. */
+  disabled?: HelixOption["disabled"];
+  /** A shorter name for this choice, for where the row does not fit.
+
+`<option label>`'s own meaning: the text a chooser shows when it has less
+room than the row does, which is what a select's closed trigger has. Empty
+means the row's own content, which is the common case and is why this is not
+simply the accessible name. */
+  label?: HelixOption["label"];
+  /** Whether this choice is currently chosen.
+
+Written by the listbox. */
+  selected?: HelixOption["selected"];
+  /** Identifies this choice, and is what a form submits. */
+  value?: HelixOption["value"];
   /** Whether the markup declared this one chosen, which is what a reset returns to.
 
 `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -10424,28 +10424,6 @@ on, which is a change of its own rather than a property being added. */
 };
 
 export type HelixOptionSolidJsProps = {
-  /** Whether this choice can be made. */
-  "prop:disabled"?: HelixOption["disabled"];
-  /** A second line under the words, for what the choice actually is.
-
-A palette row reads better as a name and a caption than as one sentence
-carrying both: "Helix" and "the design system" are two facts, and a comma
-between them makes a reader parse the punctuation to find where the name
-ends. Matching still reads the label, so what somebody types is matched
-against the name rather than against prose about it.
-
-**A property and not a slot, which is the departure worth explaining.** The
-area rules say a content property is its slot's fallback, and that holds for
-a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
-usually absent, and a wrapped slot generates a box whether or not it is
-filled, so every option without a caption would carry an empty line. The
-detection that would avoid it does not exist, `:host(:has())` being invalid
-and the server having no children to inspect. A property is known at render
-time, so the component can decline to draw the box at all.
-
-It does not reflect, per the rule that payload state stays off the host: a
-string is not a fact a selector needs. */
-  "prop:description"?: HelixOption["description"];
   /** Whether this is the option the keyboard is on.
 
 Written by the listbox. */
@@ -10454,19 +10432,6 @@ Written by the listbox. */
 
 Written by the listbox. */
   "prop:active"?: HelixOption["active"];
-  /** Whether this choice is currently chosen.
-
-Written by the listbox. */
-  "prop:selected"?: HelixOption["selected"];
-  /** A shorter name for this choice, for where the row does not fit.
-
-`<option label>`'s own meaning: the text a chooser shows when it has less
-room than the row does, which is what a select's closed trigger has. Empty
-means the row's own content, which is the common case and is why this is not
-simply the accessible name. */
-  "prop:label"?: HelixOption["label"];
-  /** Identifies this choice, and is what a form submits. */
-  "prop:value"?: HelixOption["value"];
   /** A second destination for this row, taken with the modifier held.
 
 **An attribute rather than a second row, which is the whole point.** A
@@ -10499,6 +10464,41 @@ about one of them and the other is a key nobody mentioned. It goes to
 words and stays what a reader searched for, and the second destination is a
 fact about what pressing a key would do, which is what a description is. */
   "prop:alternateLabel"?: HelixOption["alternateLabel"];
+  /** A second line under the words, for what the choice actually is.
+
+A palette row reads better as a name and a caption than as one sentence
+carrying both: "Helix" and "the design system" are two facts, and a comma
+between them makes a reader parse the punctuation to find where the name
+ends. Matching still reads the label, so what somebody types is matched
+against the name rather than against prose about it.
+
+**A property and not a slot, which is the departure worth explaining.** The
+area rules say a content property is its slot's fallback, and that holds for
+a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+usually absent, and a wrapped slot generates a box whether or not it is
+filled, so every option without a caption would carry an empty line. The
+detection that would avoid it does not exist, `:host(:has())` being invalid
+and the server having no children to inspect. A property is known at render
+time, so the component can decline to draw the box at all.
+
+It does not reflect, per the rule that payload state stays off the host: a
+string is not a fact a selector needs. */
+  "prop:description"?: HelixOption["description"];
+  /** Whether this choice can be made. */
+  "prop:disabled"?: HelixOption["disabled"];
+  /** A shorter name for this choice, for where the row does not fit.
+
+`<option label>`'s own meaning: the text a chooser shows when it has less
+room than the row does, which is what a select's closed trigger has. Empty
+means the row's own content, which is the common case and is why this is not
+simply the accessible name. */
+  "prop:label"?: HelixOption["label"];
+  /** Whether this choice is currently chosen.
+
+Written by the listbox. */
+  "prop:selected"?: HelixOption["selected"];
+  /** Identifies this choice, and is what a form submits. */
+  "prop:value"?: HelixOption["value"];
   /** Whether the markup declared this one chosen, which is what a reset returns to.
 
 `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -10529,14 +10529,6 @@ export type HelixOutlineHelixBeforeActivateElementEvent =
   HelixOutlineElementEvent<HelixBeforeActivateEvent>;
 
 export type HelixOutlineProps = {
-  /** Accessible name for the navigation. */
-  label?: HelixOutline["label"];
-  /** How far below the top of the window a heading counts as reached, in pixels.
-
-The reading line. A page with a sticky masthead sets this to its height, or
-a little more: without it the current section changes as a heading slides
-under the chrome rather than as it reaches the top of what can be seen. */
-  offset?: HelixOutline["offset"];
   /** How a click on one of these links travels to its section.
 
 The platform's own vocabulary, because this is the platform's own option:
@@ -10557,6 +10549,14 @@ read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   behavior?: HelixOutline["behavior"];
+  /** Accessible name for the navigation. */
+  label?: HelixOutline["label"];
+  /** How far below the top of the window a heading counts as reached, in pixels.
+
+The reading line. A page with a sticky masthead sets this to its height, or
+a little more: without it the current section changes as a heading slides
+under the chrome rather than as it reaches the top of what can be seen. */
+  offset?: HelixOutline["offset"];
 
   /** The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-activate"?: (
@@ -10565,14 +10565,6 @@ JavaScript rather than CSS decides. */
 };
 
 export type HelixOutlineSolidJsProps = {
-  /** Accessible name for the navigation. */
-  "prop:label"?: HelixOutline["label"];
-  /** How far below the top of the window a heading counts as reached, in pixels.
-
-The reading line. A page with a sticky masthead sets this to its height, or
-a little more: without it the current section changes as a heading slides
-under the chrome rather than as it reaches the top of what can be seen. */
-  "prop:offset"?: HelixOutline["offset"];
   /** How a click on one of these links travels to its section.
 
 The platform's own vocabulary, because this is the platform's own option:
@@ -10593,6 +10585,14 @@ read at the click rather than cached, because a reader can change it while
 the page is open and this is the only motion in the component that
 JavaScript rather than CSS decides. */
   "prop:behavior"?: HelixOutline["behavior"];
+  /** Accessible name for the navigation. */
+  "prop:label"?: HelixOutline["label"];
+  /** How far below the top of the window a heading counts as reached, in pixels.
+
+The reading line. A page with a sticky masthead sets this to its height, or
+a little more: without it the current section changes as a heading slides
+under the chrome rather than as it reaches the top of what can be seen. */
+  "prop:offset"?: HelixOutline["offset"];
   /** The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-activate"?: (
     e: HelixOutlineHelixBeforeActivateElementEvent,
@@ -10614,36 +10614,22 @@ export type HelixPaginationHelixNavigateElementEvent =
   HelixPaginationElementEvent<HelixNavigateEvent>;
 
 export type HelixPaginationProps = {
-  /** How many pages there are in total.
+  /** How many pages to show at each end, whatever the current one is. */
+  boundaries?: HelixPagination["boundaries"];
+  /** Where the numbers are replaced by a reading of the two.
 
-Clamped to at least one wherever it is read, so a result that has not
-loaded yet renders a single page rather than an empty control that then
-appears and pushes the layout down.
+A different structure rather than a different look, which is why it is
+here: the run of pages is gone and a single status line stands in its
+place. This is the shape a narrow screen wants, and the only shape possible
+where the total is large enough that no window over it is useful.
 
-Left unset where `total` and `page-size` are both given, since the two of
-them already say it. A fallback rather than an override: writing this wins,
-so there is never a question of which of two sources is current. */
-  pages?: HelixPagination["pages"];
-  /** How many items there are across every page.
-
-What `pages` falls back to together with `page-size`. Unset is the common
-case, where a consumer knows the page total and not the item total.
-
-Nothing is rendered from it. `Pagination.Summary` is what reads a total out
-to a reader, and takes its own. */
-  total?: HelixPagination["total"];
-  /** How many items are on a page.
-
-Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns `total` into a page count, and nothing
-else. */
-  "page-size"?: HelixPagination["pageSize"];
-  /** How many items are on a page.
-
-Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns `total` into a page count, and nothing
-else. */
-  pageSize?: HelixPagination["pageSize"];
+Not reflected, for the reason `ends` is not: it decides what renders, so
+nothing has to select on it. */
+  compact?: HelixPagination["compact"];
+  /** Page to open on, where nothing declared one. */
+  "default-page"?: HelixPagination["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  defaultPage?: HelixPagination["defaultPage"];
   /** Whether to offer a jump to the first and last pages.
 
 Off by default. The gaps already reach any page in a few presses and the
@@ -10672,32 +10658,26 @@ far-fetched value: it is a bookmarked link after the result shrank.
 
 Rounded here too, so `2.7` reads as the 2 it renders. */
   page?: HelixPagination["page"];
-  /** Page to open on, where nothing declared one. */
-  "default-page"?: HelixPagination["defaultPage"];
-  /** Page to open on, where nothing declared one. */
-  defaultPage?: HelixPagination["defaultPage"];
-  /** How many pages to show either side of the current one. */
-  siblings?: HelixPagination["siblings"];
-  /** How many pages to show at each end, whatever the current one is. */
-  boundaries?: HelixPagination["boundaries"];
+  /** Accessible name for the control that jumps to the first page. */
+  "first-label"?: HelixPagination["firstLabel"];
+  /** Accessible name for the control that jumps to the first page. */
+  firstLabel?: HelixPagination["firstLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  "gap-label"?: HelixPagination["gapLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  gapLabel?: HelixPagination["gapLabel"];
   /** Address for a page, with `{page}` standing in for its number.
 
 Absent renders buttons. Present renders links, which is what a paged result
 with its own URL should be: a crawler follows them, a middle click opens
 one, and the back button works without the consumer wiring anything. */
   href?: HelixPagination["href"];
-  /** Where the numbers are replaced by a reading of the two.
-
-A different structure rather than a different look, which is why it is
-here: the run of pages is gone and a single status line stands in its
-place. This is the shape a narrow screen wants, and the only shape possible
-where the total is large enough that no window over it is useful.
-
-Not reflected, for the reason `ends` is not: it decides what renders, so
-nothing has to select on it. */
-  compact?: HelixPagination["compact"];
   /** Accessible name for the navigation landmark. */
   label?: HelixPagination["label"];
+  /** Accessible name for the control that jumps to the last page. */
+  "last-label"?: HelixPagination["lastLabel"];
+  /** Accessible name for the control that jumps to the last page. */
+  lastLabel?: HelixPagination["lastLabel"];
   /** Locale for the page numbers. Absent uses the runtime's own.
 
 The same property the calendar takes, doing the same job one layer down:
@@ -10710,10 +10690,42 @@ digits into it has done half the job.
 Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
 different address from `?page=1234`. */
   locale?: HelixPagination["locale"];
+  /** Accessible name for the control that moves forward. */
+  "next-label"?: HelixPagination["nextLabel"];
+  /** Accessible name for the control that moves forward. */
+  nextLabel?: HelixPagination["nextLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   "page-label"?: HelixPagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   pageLabel?: HelixPagination["pageLabel"];
+  /** How many pages there are in total.
+
+Clamped to at least one wherever it is read, so a result that has not
+loaded yet renders a single page rather than an empty control that then
+appears and pushes the layout down.
+
+Left unset where `total` and `page-size` are both given, since the two of
+them already say it. A fallback rather than an override: writing this wins,
+so there is never a question of which of two sources is current. */
+  pages?: HelixPagination["pages"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
+  "page-size"?: HelixPagination["pageSize"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
+  pageSize?: HelixPagination["pageSize"];
+  /** Accessible name for the control that moves back. */
+  "previous-label"?: HelixPagination["previousLabel"];
+  /** Accessible name for the control that moves back. */
+  previousLabel?: HelixPagination["previousLabel"];
+  /** How many pages to show either side of the current one. */
+  siblings?: HelixPagination["siblings"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
 No noun: the landmark this sits in is already named "Pagination", so
@@ -10728,42 +10740,6 @@ No noun: the landmark this sits in is already named "Pagination", so
 width from a control whose whole reason for existing is that the row is
 narrow. The numbers are the reading. */
   statusLabel?: HelixPagination["statusLabel"];
-  /** Accessible name for the control that moves back. */
-  "previous-label"?: HelixPagination["previousLabel"];
-  /** Accessible name for the control that moves back. */
-  previousLabel?: HelixPagination["previousLabel"];
-  /** Accessible name for the control that moves forward. */
-  "next-label"?: HelixPagination["nextLabel"];
-  /** Accessible name for the control that moves forward. */
-  nextLabel?: HelixPagination["nextLabel"];
-  /** Accessible name for the control that jumps to the first page. */
-  "first-label"?: HelixPagination["firstLabel"];
-  /** Accessible name for the control that jumps to the first page. */
-  firstLabel?: HelixPagination["firstLabel"];
-  /** Accessible name for the control that jumps to the last page. */
-  "last-label"?: HelixPagination["lastLabel"];
-  /** Accessible name for the control that jumps to the last page. */
-  lastLabel?: HelixPagination["lastLabel"];
-  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  "gap-label"?: HelixPagination["gapLabel"];
-  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  gapLabel?: HelixPagination["gapLabel"];
-
-  /** Fired before the page changes, and cancelable. The only way to refuse one. */
-  "onhelix-navigate"?: (e: HelixPaginationHelixNavigateElementEvent) => void;
-};
-
-export type HelixPaginationSolidJsProps = {
-  /** How many pages there are in total.
-
-Clamped to at least one wherever it is read, so a result that has not
-loaded yet renders a single page rather than an empty control that then
-appears and pushes the layout down.
-
-Left unset where `total` and `page-size` are both given, since the two of
-them already say it. A fallback rather than an override: writing this wins,
-so there is never a question of which of two sources is current. */
-  "prop:pages"?: HelixPagination["pages"];
   /** How many items there are across every page.
 
 What `pages` falls back to together with `page-size`. Unset is the common
@@ -10771,19 +10747,29 @@ case, where a consumer knows the page total and not the item total.
 
 Nothing is rendered from it. `Pagination.Summary` is what reads a total out
 to a reader, and takes its own. */
-  "prop:total"?: HelixPagination["total"];
-  /** How many items are on a page.
+  total?: HelixPagination["total"];
 
-Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns `total` into a page count, and nothing
-else. */
-  "attr:page-size"?: HelixPagination["pageSize"];
-  /** How many items are on a page.
+  /** Fired before the page changes, and cancelable. The only way to refuse one. */
+  "onhelix-navigate"?: (e: HelixPaginationHelixNavigateElementEvent) => void;
+};
 
-Only arithmetic: this does not slice anything, because the component never
-sees the items. It is what turns `total` into a page count, and nothing
-else. */
-  "prop:pageSize"?: HelixPagination["pageSize"];
+export type HelixPaginationSolidJsProps = {
+  /** How many pages to show at each end, whatever the current one is. */
+  "prop:boundaries"?: HelixPagination["boundaries"];
+  /** Where the numbers are replaced by a reading of the two.
+
+A different structure rather than a different look, which is why it is
+here: the run of pages is gone and a single status line stands in its
+place. This is the shape a narrow screen wants, and the only shape possible
+where the total is large enough that no window over it is useful.
+
+Not reflected, for the reason `ends` is not: it decides what renders, so
+nothing has to select on it. */
+  "prop:compact"?: HelixPagination["compact"];
+  /** Page to open on, where nothing declared one. */
+  "attr:default-page"?: HelixPagination["defaultPage"];
+  /** Page to open on, where nothing declared one. */
+  "prop:defaultPage"?: HelixPagination["defaultPage"];
   /** Whether to offer a jump to the first and last pages.
 
 Off by default. The gaps already reach any page in a few presses and the
@@ -10812,32 +10798,26 @@ far-fetched value: it is a bookmarked link after the result shrank.
 
 Rounded here too, so `2.7` reads as the 2 it renders. */
   "prop:page"?: HelixPagination["page"];
-  /** Page to open on, where nothing declared one. */
-  "attr:default-page"?: HelixPagination["defaultPage"];
-  /** Page to open on, where nothing declared one. */
-  "prop:defaultPage"?: HelixPagination["defaultPage"];
-  /** How many pages to show either side of the current one. */
-  "prop:siblings"?: HelixPagination["siblings"];
-  /** How many pages to show at each end, whatever the current one is. */
-  "prop:boundaries"?: HelixPagination["boundaries"];
+  /** Accessible name for the control that jumps to the first page. */
+  "attr:first-label"?: HelixPagination["firstLabel"];
+  /** Accessible name for the control that jumps to the first page. */
+  "prop:firstLabel"?: HelixPagination["firstLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  "attr:gap-label"?: HelixPagination["gapLabel"];
+  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
+  "prop:gapLabel"?: HelixPagination["gapLabel"];
   /** Address for a page, with `{page}` standing in for its number.
 
 Absent renders buttons. Present renders links, which is what a paged result
 with its own URL should be: a crawler follows them, a middle click opens
 one, and the back button works without the consumer wiring anything. */
   "prop:href"?: HelixPagination["href"];
-  /** Where the numbers are replaced by a reading of the two.
-
-A different structure rather than a different look, which is why it is
-here: the run of pages is gone and a single status line stands in its
-place. This is the shape a narrow screen wants, and the only shape possible
-where the total is large enough that no window over it is useful.
-
-Not reflected, for the reason `ends` is not: it decides what renders, so
-nothing has to select on it. */
-  "prop:compact"?: HelixPagination["compact"];
   /** Accessible name for the navigation landmark. */
   "prop:label"?: HelixPagination["label"];
+  /** Accessible name for the control that jumps to the last page. */
+  "attr:last-label"?: HelixPagination["lastLabel"];
+  /** Accessible name for the control that jumps to the last page. */
+  "prop:lastLabel"?: HelixPagination["lastLabel"];
   /** Locale for the page numbers. Absent uses the runtime's own.
 
 The same property the calendar takes, doing the same job one layer down:
@@ -10850,10 +10830,42 @@ digits into it has done half the job.
 Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
 different address from `?page=1234`. */
   "prop:locale"?: HelixPagination["locale"];
+  /** Accessible name for the control that moves forward. */
+  "attr:next-label"?: HelixPagination["nextLabel"];
+  /** Accessible name for the control that moves forward. */
+  "prop:nextLabel"?: HelixPagination["nextLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   "attr:page-label"?: HelixPagination["pageLabel"];
   /** Accessible name for one page, with `{page}` and `{pages}` filled in. */
   "prop:pageLabel"?: HelixPagination["pageLabel"];
+  /** How many pages there are in total.
+
+Clamped to at least one wherever it is read, so a result that has not
+loaded yet renders a single page rather than an empty control that then
+appears and pushes the layout down.
+
+Left unset where `total` and `page-size` are both given, since the two of
+them already say it. A fallback rather than an override: writing this wins,
+so there is never a question of which of two sources is current. */
+  "prop:pages"?: HelixPagination["pages"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
+  "attr:page-size"?: HelixPagination["pageSize"];
+  /** How many items are on a page.
+
+Only arithmetic: this does not slice anything, because the component never
+sees the items. It is what turns `total` into a page count, and nothing
+else. */
+  "prop:pageSize"?: HelixPagination["pageSize"];
+  /** Accessible name for the control that moves back. */
+  "attr:previous-label"?: HelixPagination["previousLabel"];
+  /** Accessible name for the control that moves back. */
+  "prop:previousLabel"?: HelixPagination["previousLabel"];
+  /** How many pages to show either side of the current one. */
+  "prop:siblings"?: HelixPagination["siblings"];
   /** The reading shown in `compact`, with `{page}` and `{pages}` filled in.
 
 No noun: the landmark this sits in is already named "Pagination", so
@@ -10868,26 +10880,14 @@ No noun: the landmark this sits in is already named "Pagination", so
 width from a control whose whole reason for existing is that the row is
 narrow. The numbers are the reading. */
   "prop:statusLabel"?: HelixPagination["statusLabel"];
-  /** Accessible name for the control that moves back. */
-  "attr:previous-label"?: HelixPagination["previousLabel"];
-  /** Accessible name for the control that moves back. */
-  "prop:previousLabel"?: HelixPagination["previousLabel"];
-  /** Accessible name for the control that moves forward. */
-  "attr:next-label"?: HelixPagination["nextLabel"];
-  /** Accessible name for the control that moves forward. */
-  "prop:nextLabel"?: HelixPagination["nextLabel"];
-  /** Accessible name for the control that jumps to the first page. */
-  "attr:first-label"?: HelixPagination["firstLabel"];
-  /** Accessible name for the control that jumps to the first page. */
-  "prop:firstLabel"?: HelixPagination["firstLabel"];
-  /** Accessible name for the control that jumps to the last page. */
-  "attr:last-label"?: HelixPagination["lastLabel"];
-  /** Accessible name for the control that jumps to the last page. */
-  "prop:lastLabel"?: HelixPagination["lastLabel"];
-  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  "attr:gap-label"?: HelixPagination["gapLabel"];
-  /** Accessible name for a gap, with `{page}` filled in as where it goes. */
-  "prop:gapLabel"?: HelixPagination["gapLabel"];
+  /** How many items there are across every page.
+
+What `pages` falls back to together with `page-size`. Unset is the common
+case, where a consumer knows the page total and not the item total.
+
+Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+to a reader, and takes its own. */
+  "prop:total"?: HelixPagination["total"];
   /** Fired before the page changes, and cancelable. The only way to refuse one. */
   "on:helix-navigate"?: (e: HelixPaginationHelixNavigateElementEvent) => void;
 
@@ -10907,28 +10907,28 @@ export type HelixPaginationSizeHelixBeforeChangeElementEvent =
   HelixPaginationSizeElementEvent<HelixBeforeChangeEvent>;
 
 export type HelixPaginationSizeProps = {
-  /** The sizes offered, comma separated.
-
-A string rather than an array, so the whole control is expressible in
-markup and survives a server render. Anything that is not a positive number
-is dropped rather than rendered as an option that cannot mean anything. */
-  sizes?: HelixPaginationSize["sizes"];
+  /** Size to start on, where nothing declared one. */
+  "default-value"?: HelixPaginationSize["defaultValue"];
+  /** Size to start on, where nothing declared one. */
+  defaultValue?: HelixPaginationSize["defaultValue"];
   /** The size in force.
 
 Reading gives the real one; writing declares it the consumer's, and
 `default-value` seeds one this element owns. Same accessor pair as
 `Pagination.page` and the calendar's `month`. */
   value?: HelixPaginationSize["value"];
-  /** Size to start on, where nothing declared one. */
-  "default-value"?: HelixPaginationSize["defaultValue"];
-  /** Size to start on, where nothing declared one. */
-  defaultValue?: HelixPaginationSize["defaultValue"];
   /** The words beside the control. */
   label?: HelixPaginationSize["label"];
   /** Locale for the numbers.
 
 Absent uses the runtime's own. */
   locale?: HelixPaginationSize["locale"];
+  /** The sizes offered, comma separated.
+
+A string rather than an array, so the whole control is expressible in
+markup and survives a server render. Anything that is not a positive number
+is dropped rather than rendered as an option that cannot mean anything. */
+  sizes?: HelixPaginationSize["sizes"];
 
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
   "onhelix-before-change"?: (
@@ -10937,28 +10937,28 @@ Absent uses the runtime's own. */
 };
 
 export type HelixPaginationSizeSolidJsProps = {
-  /** The sizes offered, comma separated.
-
-A string rather than an array, so the whole control is expressible in
-markup and survives a server render. Anything that is not a positive number
-is dropped rather than rendered as an option that cannot mean anything. */
-  "prop:sizes"?: HelixPaginationSize["sizes"];
+  /** Size to start on, where nothing declared one. */
+  "attr:default-value"?: HelixPaginationSize["defaultValue"];
+  /** Size to start on, where nothing declared one. */
+  "prop:defaultValue"?: HelixPaginationSize["defaultValue"];
   /** The size in force.
 
 Reading gives the real one; writing declares it the consumer's, and
 `default-value` seeds one this element owns. Same accessor pair as
 `Pagination.page` and the calendar's `month`. */
   "prop:value"?: HelixPaginationSize["value"];
-  /** Size to start on, where nothing declared one. */
-  "attr:default-value"?: HelixPaginationSize["defaultValue"];
-  /** Size to start on, where nothing declared one. */
-  "prop:defaultValue"?: HelixPaginationSize["defaultValue"];
   /** The words beside the control. */
   "prop:label"?: HelixPaginationSize["label"];
   /** Locale for the numbers.
 
 Absent uses the runtime's own. */
   "prop:locale"?: HelixPaginationSize["locale"];
+  /** The sizes offered, comma separated.
+
+A string rather than an array, so the whole control is expressible in
+markup and survives a server render. Anything that is not a positive number
+is dropped rather than rendered as an option that cannot mean anything. */
+  "prop:sizes"?: HelixPaginationSize["sizes"];
   /** Fired before the size changes, and cancelable. The only way to refuse one. */
   "on:helix-before-change"?: (
     e: HelixPaginationSizeHelixBeforeChangeElementEvent,
@@ -10971,14 +10971,6 @@ Absent uses the runtime's own. */
 };
 
 export type HelixPaginationSummaryProps = {
-  /** The page on show, one-based. */
-  page?: HelixPaginationSummary["page"];
-  /** How many items are on a page. */
-  "page-size"?: HelixPaginationSummary["pageSize"];
-  /** How many items are on a page. */
-  pageSize?: HelixPaginationSummary["pageSize"];
-  /** How many items there are across every page. */
-  total?: HelixPaginationSummary["total"];
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
@@ -10997,17 +10989,17 @@ which each label something; this labels nothing, it *is* the thing. */
 
 Absent uses the runtime's own. */
   locale?: HelixPaginationSummary["locale"];
+  /** The page on show, one-based. */
+  page?: HelixPaginationSummary["page"];
+  /** How many items are on a page. */
+  "page-size"?: HelixPaginationSummary["pageSize"];
+  /** How many items are on a page. */
+  pageSize?: HelixPaginationSummary["pageSize"];
+  /** How many items there are across every page. */
+  total?: HelixPaginationSummary["total"];
 };
 
 export type HelixPaginationSummarySolidJsProps = {
-  /** The page on show, one-based. */
-  "prop:page"?: HelixPaginationSummary["page"];
-  /** How many items are on a page. */
-  "attr:page-size"?: HelixPaginationSummary["pageSize"];
-  /** How many items are on a page. */
-  "prop:pageSize"?: HelixPaginationSummary["pageSize"];
-  /** How many items there are across every page. */
-  "prop:total"?: HelixPaginationSummary["total"];
   /** The reading, with `{from}`, `{to}` and `{total}` filled in.
 
 A template rather than a prefix and a suffix, because word order is not
@@ -11026,6 +11018,14 @@ which each label something; this labels nothing, it *is* the thing. */
 
 Absent uses the runtime's own. */
   "prop:locale"?: HelixPaginationSummary["locale"];
+  /** The page on show, one-based. */
+  "prop:page"?: HelixPaginationSummary["page"];
+  /** How many items are on a page. */
+  "attr:page-size"?: HelixPaginationSummary["pageSize"];
+  /** How many items are on a page. */
+  "prop:pageSize"?: HelixPaginationSummary["pageSize"];
+  /** How many items there are across every page. */
+  "prop:total"?: HelixPaginationSummary["total"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11054,10 +11054,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixPinInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixPinInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixPinInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixPinInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixPinInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -11069,8 +11069,28 @@ that lets a phone offer the code out of a message. Later cells stay `off`
 for the reason in the class comment above, that six cells each offering
 the same code is one offer made six times. */
   autocomplete?: HelixPinInput["autocomplete"];
+  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
+  "cell-label"?: HelixPinInput["cellLabel"];
+  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
+  cellLabel?: HelixPinInput["cellLabel"];
   /** How many characters the code has. */
   length?: HelixPinInput["length"];
+  /** Whether the characters are hidden, the way a password is. */
+  mask?: HelixPinInput["mask"];
+  /** What an empty box shows, usually a single dot.
+
+The platform's own placeholder, on each cell, rather than a character
+drawn behind the field: it clears the moment anything is typed, it is
+already excluded from the accessible value, and it works the same under
+`mask`, where the cell is a password input and a hand-drawn glyph would
+have to know that.
+
+Empty by default, because a row of boxes already reads as a row of boxes. */
+  placeholder?: HelixPinInput["placeholder"];
+  /** Whether the boxes refuse input while still submitting their value. */
+  readonly?: HelixPinInput["readOnly"];
+  /** Whether the boxes refuse input while still submitting their value. */
+  readOnly?: HelixPinInput["readOnly"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
 `numeric` and `alphanumeric` also refuse anything else on the way in,
@@ -11092,26 +11112,6 @@ no consumer's markup had. The area rules carry the sentence "reflect only
 what CSS selects on". The real inputs take it as a binding, which is what
 makes the keyboard follow. */
   type?: HelixPinInput["type"];
-  /** Whether the characters are hidden, the way a password is. */
-  mask?: HelixPinInput["mask"];
-  /** What an empty box shows, usually a single dot.
-
-The platform's own placeholder, on each cell, rather than a character
-drawn behind the field: it clears the moment anything is typed, it is
-already excluded from the accessible value, and it works the same under
-`mask`, where the cell is a password input and a hand-drawn glyph would
-have to know that.
-
-Empty by default, because a row of boxes already reads as a row of boxes. */
-  placeholder?: HelixPinInput["placeholder"];
-  /** Whether the boxes refuse input while still submitting their value. */
-  readonly?: HelixPinInput["readOnly"];
-  /** Whether the boxes refuse input while still submitting their value. */
-  readOnly?: HelixPinInput["readOnly"];
-  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  "cell-label"?: HelixPinInput["cellLabel"];
-  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  cellLabel?: HelixPinInput["cellLabel"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -11163,10 +11163,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixPinInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixPinInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixPinInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixPinInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixPinInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -11178,8 +11178,28 @@ that lets a phone offer the code out of a message. Later cells stay `off`
 for the reason in the class comment above, that six cells each offering
 the same code is one offer made six times. */
   "prop:autocomplete"?: HelixPinInput["autocomplete"];
+  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
+  "attr:cell-label"?: HelixPinInput["cellLabel"];
+  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
+  "prop:cellLabel"?: HelixPinInput["cellLabel"];
   /** How many characters the code has. */
   "prop:length"?: HelixPinInput["length"];
+  /** Whether the characters are hidden, the way a password is. */
+  "prop:mask"?: HelixPinInput["mask"];
+  /** What an empty box shows, usually a single dot.
+
+The platform's own placeholder, on each cell, rather than a character
+drawn behind the field: it clears the moment anything is typed, it is
+already excluded from the accessible value, and it works the same under
+`mask`, where the cell is a password input and a hand-drawn glyph would
+have to know that.
+
+Empty by default, because a row of boxes already reads as a row of boxes. */
+  "prop:placeholder"?: HelixPinInput["placeholder"];
+  /** Whether the boxes refuse input while still submitting their value. */
+  "bool:readonly"?: HelixPinInput["readOnly"];
+  /** Whether the boxes refuse input while still submitting their value. */
+  "prop:readOnly"?: HelixPinInput["readOnly"];
   /** What a box accepts, which decides the keyboard a phone offers.
 
 `numeric` and `alphanumeric` also refuse anything else on the way in,
@@ -11201,26 +11221,6 @@ no consumer's markup had. The area rules carry the sentence "reflect only
 what CSS selects on". The real inputs take it as a binding, which is what
 makes the keyboard follow. */
   "prop:type"?: HelixPinInput["type"];
-  /** Whether the characters are hidden, the way a password is. */
-  "prop:mask"?: HelixPinInput["mask"];
-  /** What an empty box shows, usually a single dot.
-
-The platform's own placeholder, on each cell, rather than a character
-drawn behind the field: it clears the moment anything is typed, it is
-already excluded from the accessible value, and it works the same under
-`mask`, where the cell is a password input and a hand-drawn glyph would
-have to know that.
-
-Empty by default, because a row of boxes already reads as a row of boxes. */
-  "prop:placeholder"?: HelixPinInput["placeholder"];
-  /** Whether the boxes refuse input while still submitting their value. */
-  "bool:readonly"?: HelixPinInput["readOnly"];
-  /** Whether the boxes refuse input while still submitting their value. */
-  "prop:readOnly"?: HelixPinInput["readOnly"];
-  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  "attr:cell-label"?: HelixPinInput["cellLabel"];
-  /** Accessible name for one box, with `{index}` and `{length}` filled in. */
-  "prop:cellLabel"?: HelixPinInput["cellLabel"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -11390,8 +11390,6 @@ from, so an outline there costs legibility and buys no distinction. `solid`
 is the resting state and is written by not writing it, per the rule that a
 reflected property takes no default. */
   emphasis?: HelixProgress["emphasis"];
-  /** Accessible name for what is in progress. */
-  label?: HelixProgress["label"];
   /** Whether the work has a knowable end.
 
 On the headless tier rather than as a treatment, because it is
@@ -11404,6 +11402,8 @@ Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
   indeterminate?: HelixProgress["indeterminate"];
+  /** Accessible name for what is in progress. */
+  label?: HelixProgress["label"];
   /** The total the work is measured against. */
   max?: HelixProgress["max"];
   /** Whether the value is drawn as a bar or as a ring.
@@ -11478,8 +11478,6 @@ from, so an outline there costs legibility and buys no distinction. `solid`
 is the resting state and is written by not writing it, per the rule that a
 reflected property takes no default. */
   "prop:emphasis"?: HelixProgress["emphasis"];
-  /** Accessible name for what is in progress. */
-  "prop:label"?: HelixProgress["label"];
   /** Whether the work has a knowable end.
 
 On the headless tier rather than as a treatment, because it is
@@ -11492,6 +11490,8 @@ Not `Loader`, which is the other thing this could be. A loader says the
 page is busy; a bar says a named piece of work is running, and keeps its
 place in the layout when the answer arrives and it becomes determinate. */
   "prop:indeterminate"?: HelixProgress["indeterminate"];
+  /** Accessible name for what is in progress. */
+  "prop:label"?: HelixProgress["label"];
   /** The total the work is measured against. */
   "prop:max"?: HelixProgress["max"];
   /** Whether the value is drawn as a bar or as a ring.
@@ -11555,8 +11555,14 @@ report progress. */
 };
 
 export type HelixQrCodeProps = {
-  /** What the code encodes, which is usually a URL. */
-  value?: HelixQrCode["value"];
+  /** How much of the code can be lost and still read.
+
+`M` by default, which is the level almost every code in the world uses and
+costs about fifteen percent redundancy. `H` where a mark covers the center,
+chosen automatically when the slot is filled: it is the level that makes
+covering safe, and a consumer who fills the slot has said what they want
+without having to know that. */
+  correction?: HelixQrCode["correction"];
   /** What the image is called.
 
 Falling back to the value is deliberate: a code almost always holds a URL,
@@ -11574,6 +11580,11 @@ A scanner reads contrast between cells, not their shape, so all three
 scan. `dots` sits a little under half a module so neighbors do not touch,
 which is what makes it read as dots rather than as a softened square code. */
   shape?: HelixQrCode["shape"];
+  /** What the code encodes, which is usually a URL. */
+  value?: HelixQrCode["value"];
+};
+
+export type HelixQrCodeSolidJsProps = {
   /** How much of the code can be lost and still read.
 
 `M` by default, which is the level almost every code in the world uses and
@@ -11581,12 +11592,7 @@ costs about fifteen percent redundancy. `H` where a mark covers the center,
 chosen automatically when the slot is filled: it is the level that makes
 covering safe, and a consumer who fills the slot has said what they want
 without having to know that. */
-  correction?: HelixQrCode["correction"];
-};
-
-export type HelixQrCodeSolidJsProps = {
-  /** What the code encodes, which is usually a URL. */
-  "prop:value"?: HelixQrCode["value"];
+  "prop:correction"?: HelixQrCode["correction"];
   /** What the image is called.
 
 Falling back to the value is deliberate: a code almost always holds a URL,
@@ -11604,14 +11610,8 @@ A scanner reads contrast between cells, not their shape, so all three
 scan. `dots` sits a little under half a module so neighbors do not touch,
 which is what makes it read as dots rather than as a softened square code. */
   "prop:shape"?: HelixQrCode["shape"];
-  /** How much of the code can be lost and still read.
-
-`M` by default, which is the level almost every code in the world uses and
-costs about fifteen percent redundancy. `H` where a mark covers the center,
-chosen automatically when the slot is filled: it is the level that makes
-covering safe, and a consumer who fills the slot has said what they want
-without having to know that. */
-  "prop:correction"?: HelixQrCode["correction"];
+  /** What the code encodes, which is usually a URL. */
+  "prop:value"?: HelixQrCode["value"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -11655,10 +11655,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixRadioGroup["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixRadioGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixRadioGroup["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixRadioGroup["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixRadioGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -11721,10 +11721,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixRadioGroup["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixRadioGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixRadioGroup["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixRadioGroup["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixRadioGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -11786,22 +11786,6 @@ export type HelixRadioHelixSelectElementEvent =
   HelixRadioElementEvent<HelixSelectEvent>;
 
 export type HelixRadioProps = {
-  /** How the choice presents itself.
-
-- `plain` is the default and is never written: a circle beside its words,
-  which is what a list of choices should be almost always.
-- `card` puts it in a bounded surface, for options that need room to
-  explain themselves: a description, an icon, a price. It is the half a
-  `data-card` link cannot do, because a link reports no value and belongs
-  to no group, so a card that is genuinely an answer has to be this.
-- `chip` is the answer as its own small surface, for a row of short
-  choices read at a glance. It hides the circle, the surface being the
-  whole mark, which is why `hide-control` says it is unnecessary here.
-
-The circle stays in both. A card whose only marker was its own border would
-ask a reader to compare surfaces across a row to find the answer, and would
-leave nothing for a high-contrast display. */
-  variant?: HelixRadio["variant"];
   /** Takes the circle away, leaving the card as the whole control.
 
 Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -11836,6 +11820,22 @@ Not on `Checkbox`, deliberately. A radio card with no circle is still
 unmistakably one-of-many because its siblings behave that way; a checkbox
 card with no box loses the only thing that says you may pick several. */
   hideControl?: HelixRadio["hideControl"];
+  /** How the choice presents itself.
+
+- `plain` is the default and is never written: a circle beside its words,
+  which is what a list of choices should be almost always.
+- `card` puts it in a bounded surface, for options that need room to
+  explain themselves: a description, an icon, a price. It is the half a
+  `data-card` link cannot do, because a link reports no value and belongs
+  to no group, so a card that is genuinely an answer has to be this.
+- `chip` is the answer as its own small surface, for a row of short
+  choices read at a glance. It hides the circle, the surface being the
+  whole mark, which is why `hide-control` says it is unnecessary here.
+
+The circle stays in both. A card whose only marker was its own border would
+ask a reader to compare surfaces across a row to find the answer, and would
+leave nothing for a high-contrast display. */
+  variant?: HelixRadio["variant"];
   /** Whether this choice can be made. */
   disabled?: HelixRadio["disabled"];
   /** Whether this is the current choice.
@@ -11863,22 +11863,6 @@ change of its own rather than a property being added. */
 };
 
 export type HelixRadioSolidJsProps = {
-  /** How the choice presents itself.
-
-- `plain` is the default and is never written: a circle beside its words,
-  which is what a list of choices should be almost always.
-- `card` puts it in a bounded surface, for options that need room to
-  explain themselves: a description, an icon, a price. It is the half a
-  `data-card` link cannot do, because a link reports no value and belongs
-  to no group, so a card that is genuinely an answer has to be this.
-- `chip` is the answer as its own small surface, for a row of short
-  choices read at a glance. It hides the circle, the surface being the
-  whole mark, which is why `hide-control` says it is unnecessary here.
-
-The circle stays in both. A card whose only marker was its own border would
-ask a reader to compare surfaces across a row to find the answer, and would
-leave nothing for a high-contrast display. */
-  "prop:variant"?: HelixRadio["variant"];
   /** Takes the circle away, leaving the card as the whole control.
 
 Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -11913,6 +11897,22 @@ Not on `Checkbox`, deliberately. A radio card with no circle is still
 unmistakably one-of-many because its siblings behave that way; a checkbox
 card with no box loses the only thing that says you may pick several. */
   "prop:hideControl"?: HelixRadio["hideControl"];
+  /** How the choice presents itself.
+
+- `plain` is the default and is never written: a circle beside its words,
+  which is what a list of choices should be almost always.
+- `card` puts it in a bounded surface, for options that need room to
+  explain themselves: a description, an icon, a price. It is the half a
+  `data-card` link cannot do, because a link reports no value and belongs
+  to no group, so a card that is genuinely an answer has to be this.
+- `chip` is the answer as its own small surface, for a row of short
+  choices read at a glance. It hides the circle, the surface being the
+  whole mark, which is why `hide-control` says it is unnecessary here.
+
+The circle stays in both. A card whose only marker was its own border would
+ask a reader to compare surfaces across a row to find the answer, and would
+leave nothing for a high-contrast display. */
+  "prop:variant"?: HelixRadio["variant"];
   /** Whether this choice can be made. */
   "prop:disabled"?: HelixRadio["disabled"];
   /** Whether this is the current choice.
@@ -11978,10 +11978,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixRating["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixRating["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixRating["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixRating["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixRating["label"];
   /** Whether the form refuses to submit without it. */
@@ -11995,11 +11995,6 @@ different answers and a control that cannot express the first has to
 pretend the second. A survey that requires an answer says so with
 `required`, not by making one unreachable. */
   min?: HelixRating["min"];
-  /** The smallest part of a mark that can be chosen.
-
-`0.5` is the half star, and it is the reason the value is a number rather
-than an index: with halves, five marks are ten answers. */
-  step?: HelixRating["step"];
   /** Whether this shows a score rather than asks for one.
 
 A readout is not a control that has been switched off. It takes no focus,
@@ -12010,20 +12005,6 @@ answers no keys, and reads as one thing: see the note on the class. */
 A readout is not a control that has been switched off. It takes no focus,
 answers no keys, and reads as one thing: see the note on the class. */
   readOnly?: HelixRating["readOnly"];
-  /** How the score is read out, where "3.5 out of 5" is not what it should say.
-
-A rating out of five is one of the few places a screen reader gets a worse
-answer from the value than from a sentence: "3.5" alone is a number without
-a subject. This names the readout, where a control is named by its `label`
-and each of its options by the score that option is. */
-  "value-text"?: HelixRating["valueText"];
-  /** How the score is read out, where "3.5 out of 5" is not what it should say.
-
-A rating out of five is one of the few places a screen reader gets a worse
-answer from the value than from a sentence: "3.5" alone is a number without
-a subject. This names the readout, where a control is named by its `label`
-and each of its options by the score that option is. */
-  valueText?: HelixRating["valueText"];
   /** Whether the score is written out beside the marks.
 
 Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -12046,6 +12027,25 @@ It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
   showValue?: HelixRating["showValue"];
+  /** The smallest part of a mark that can be chosen.
+
+`0.5` is the half star, and it is the reason the value is a number rather
+than an index: with halves, five marks are ten answers. */
+  step?: HelixRating["step"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  "value-text"?: HelixRating["valueText"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  valueText?: HelixRating["valueText"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -12118,10 +12118,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixRating["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixRating["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixRating["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixRating["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixRating["label"];
   /** Whether the form refuses to submit without it. */
@@ -12135,11 +12135,6 @@ different answers and a control that cannot express the first has to
 pretend the second. A survey that requires an answer says so with
 `required`, not by making one unreachable. */
   "prop:min"?: HelixRating["min"];
-  /** The smallest part of a mark that can be chosen.
-
-`0.5` is the half star, and it is the reason the value is a number rather
-than an index: with halves, five marks are ten answers. */
-  "prop:step"?: HelixRating["step"];
   /** Whether this shows a score rather than asks for one.
 
 A readout is not a control that has been switched off. It takes no focus,
@@ -12150,20 +12145,6 @@ answers no keys, and reads as one thing: see the note on the class. */
 A readout is not a control that has been switched off. It takes no focus,
 answers no keys, and reads as one thing: see the note on the class. */
   "prop:readOnly"?: HelixRating["readOnly"];
-  /** How the score is read out, where "3.5 out of 5" is not what it should say.
-
-A rating out of five is one of the few places a screen reader gets a worse
-answer from the value than from a sentence: "3.5" alone is a number without
-a subject. This names the readout, where a control is named by its `label`
-and each of its options by the score that option is. */
-  "attr:value-text"?: HelixRating["valueText"];
-  /** How the score is read out, where "3.5 out of 5" is not what it should say.
-
-A rating out of five is one of the few places a screen reader gets a worse
-answer from the value than from a sentence: "3.5" alone is a number without
-a subject. This names the readout, where a control is named by its `label`
-and each of its options by the score that option is. */
-  "prop:valueText"?: HelixRating["valueText"];
   /** Whether the score is written out beside the marks.
 
 Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -12186,6 +12167,25 @@ It follows the pointer, because it labels what the marks are showing rather
 than what the form holds: a label that disagreed with the marks under the
 reader's own cursor would be worse than no label. */
   "prop:showValue"?: HelixRating["showValue"];
+  /** The smallest part of a mark that can be chosen.
+
+`0.5` is the half star, and it is the reason the value is a number rather
+than an index: with halves, five marks are ten answers. */
+  "prop:step"?: HelixRating["step"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  "attr:value-text"?: HelixRating["valueText"];
+  /** How the score is read out, where "3.5 out of 5" is not what it should say.
+
+A rating out of five is one of the few places a screen reader gets a worse
+answer from the value than from a sentence: "3.5" alone is a number without
+a subject. This names the readout, where a control is named by its `label`
+and each of its options by the score that option is. */
+  "prop:valueText"?: HelixRating["valueText"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -12274,18 +12274,18 @@ keyed on this attribute, and of the 56 tokens that differ by scheme the
 theme engine emits 19. The other 37 would stay light in a dark preview,
 including every one of the 24 series colors a chart reads. */
   colorMode?: HelixSandboxPreview["colorMode"];
-  /** Document the frame loads, which brings the styles and the elements. */
-  src?: HelixSandboxPreview["src"];
-  /** Markup to render. */
-  source?: HelixSandboxPreview["source"];
-  /** Stylesheet applied inside the frame, alongside the markup. */
-  styles?: HelixSandboxPreview["styles"];
-  /** Accessible name for the frame. */
-  label?: HelixSandboxPreview["label"];
   /** Writing direction inside the frame. */
   direction?: HelixSandboxPreview["direction"];
+  /** Accessible name for the frame. */
+  label?: HelixSandboxPreview["label"];
   /** How the example is placed in the frame. */
   layout?: HelixSandboxPreview["layout"];
+  /** Markup to render. */
+  source?: HelixSandboxPreview["source"];
+  /** Document the frame loads, which brings the styles and the elements. */
+  src?: HelixSandboxPreview["src"];
+  /** Stylesheet applied inside the frame, alongside the markup. */
+  styles?: HelixSandboxPreview["styles"];
 
   /** Relayed from the frame, one per console call. */
   "onhelix-console"?: (e: HelixSandboxPreviewHelixConsoleElementEvent) => void;
@@ -12322,18 +12322,18 @@ keyed on this attribute, and of the 56 tokens that differ by scheme the
 theme engine emits 19. The other 37 would stay light in a dark preview,
 including every one of the 24 series colors a chart reads. */
   "prop:colorMode"?: HelixSandboxPreview["colorMode"];
-  /** Document the frame loads, which brings the styles and the elements. */
-  "prop:src"?: HelixSandboxPreview["src"];
-  /** Markup to render. */
-  "prop:source"?: HelixSandboxPreview["source"];
-  /** Stylesheet applied inside the frame, alongside the markup. */
-  "prop:styles"?: HelixSandboxPreview["styles"];
-  /** Accessible name for the frame. */
-  "prop:label"?: HelixSandboxPreview["label"];
   /** Writing direction inside the frame. */
   "prop:direction"?: HelixSandboxPreview["direction"];
+  /** Accessible name for the frame. */
+  "prop:label"?: HelixSandboxPreview["label"];
   /** How the example is placed in the frame. */
   "prop:layout"?: HelixSandboxPreview["layout"];
+  /** Markup to render. */
+  "prop:source"?: HelixSandboxPreview["source"];
+  /** Document the frame loads, which brings the styles and the elements. */
+  "prop:src"?: HelixSandboxPreview["src"];
+  /** Stylesheet applied inside the frame, alongside the markup. */
+  "prop:styles"?: HelixSandboxPreview["styles"];
   /** Relayed from the frame, one per console call. */
   "on:helix-console"?: (e: HelixSandboxPreviewHelixConsoleElementEvent) => void;
   /** How tall the frame's content is, whenever it changes. */
@@ -12355,26 +12355,18 @@ export type HelixSandboxHelixBeforeSplitElementEvent =
   HelixSandboxElementEvent<HelixBeforeSplitEvent>;
 
 export type HelixSandboxProps = {
-  /** Whether the panes sit side by side or stacked. */
-  orientation?: HelixSandbox["orientation"];
-  /** Which pane comes first, before the divider.
+  /** Accessible name for the divider that moves both at once. */
+  "corner-label"?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  cornerLabel?: HelixSandbox["cornerLabel"];
+  /** What a reset makes the panel, in pixels.
 
-A sandbox is read in one of two directions and the two are not a
-preference. A workbench is a place to write, so the source leads and the
-preview answers it. A reference page is a place to look, so the preview
-leads and the source is what a reader opens if they want to know how it was
-done. Same component, opposite reading order, and no consumer should have
-to slot a preview into a hole named `source` to get it.
+The pair to `panel-size`. */
+  "default-panel-size"?: HelixSandbox["defaultPanelSize"];
+  /** What a reset makes the panel, in pixels.
 
-Not reflected, because no rule selects on it: the panes already carry
-`data-pane`, which is what the stylesheet reaches for, and swapping the
-names below keeps that true whichever way round they sit.
-
-`split` follows the lead pane rather than the source, so `split="30"` means
-the same thing in both directions: thirty percent to whatever comes first. */
-  lead?: HelixSandbox["lead"];
-  /** Percentage of the sandbox given to the source pane. */
-  split?: HelixSandbox["split"];
+The pair to `panel-size`. */
+  defaultPanelSize?: HelixSandbox["defaultPanelSize"];
   /** Where a reset puts the divider, where nothing declared it.
 
 Separate from `split` for the reason `Splitter` keeps `default-position`
@@ -12399,18 +12391,24 @@ sandbox back to the size it already was.
 Declared rather than captured, so it is a number a consumer states and can
 change, and it needs no first frame to be read on. */
   defaultSplit?: HelixSandbox["defaultSplit"];
-  /** Height of the panel, in pixels. */
-  "panel-size"?: HelixSandbox["panelSize"];
-  /** Height of the panel, in pixels. */
-  panelSize?: HelixSandbox["panelSize"];
-  /** What a reset makes the panel, in pixels.
+  /** Which pane comes first, before the divider.
 
-The pair to `panel-size`. */
-  "default-panel-size"?: HelixSandbox["defaultPanelSize"];
-  /** What a reset makes the panel, in pixels.
+A sandbox is read in one of two directions and the two are not a
+preference. A workbench is a place to write, so the source leads and the
+preview answers it. A reference page is a place to look, so the preview
+leads and the source is what a reader opens if they want to know how it was
+done. Same component, opposite reading order, and no consumer should have
+to slot a preview into a hole named `source` to get it.
 
-The pair to `panel-size`. */
-  defaultPanelSize?: HelixSandbox["defaultPanelSize"];
+Not reflected, because no rule selects on it: the panes already carry
+`data-pane`, which is what the stylesheet reaches for, and swapping the
+names below keeps that true whichever way round they sit.
+
+`split` follows the lead pane rather than the source, so `split="30"` means
+the same thing in both directions: thirty percent to whatever comes first. */
+  lead?: HelixSandbox["lead"];
+  /** Whether the panes sit side by side or stacked. */
+  orientation?: HelixSandbox["orientation"];
   /** What the panel's height becomes when it is closed.
 
 Zero closes it outright. A panel whose contents include the control that
@@ -12427,14 +12425,16 @@ and only whoever slotted it knows how tall that is. */
   "panel-label"?: HelixSandbox["panelLabel"];
   /** Accessible name for the panel's divider. */
   panelLabel?: HelixSandbox["panelLabel"];
-  /** Accessible name for the divider that moves both at once. */
-  "corner-label"?: HelixSandbox["cornerLabel"];
-  /** Accessible name for the divider that moves both at once. */
-  cornerLabel?: HelixSandbox["cornerLabel"];
+  /** Height of the panel, in pixels. */
+  "panel-size"?: HelixSandbox["panelSize"];
+  /** Height of the panel, in pixels. */
+  panelSize?: HelixSandbox["panelSize"];
   /** Accessible name for the divider. */
   "separator-label"?: HelixSandbox["separatorLabel"];
   /** Accessible name for the divider. */
   separatorLabel?: HelixSandbox["separatorLabel"];
+  /** Percentage of the sandbox given to the source pane. */
+  split?: HelixSandbox["split"];
 
   /** Fired before the panel's divider is let go, with its height in pixels. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-panel-resize"?: (
@@ -12447,26 +12447,18 @@ and only whoever slotted it knows how tall that is. */
 };
 
 export type HelixSandboxSolidJsProps = {
-  /** Whether the panes sit side by side or stacked. */
-  "prop:orientation"?: HelixSandbox["orientation"];
-  /** Which pane comes first, before the divider.
+  /** Accessible name for the divider that moves both at once. */
+  "attr:corner-label"?: HelixSandbox["cornerLabel"];
+  /** Accessible name for the divider that moves both at once. */
+  "prop:cornerLabel"?: HelixSandbox["cornerLabel"];
+  /** What a reset makes the panel, in pixels.
 
-A sandbox is read in one of two directions and the two are not a
-preference. A workbench is a place to write, so the source leads and the
-preview answers it. A reference page is a place to look, so the preview
-leads and the source is what a reader opens if they want to know how it was
-done. Same component, opposite reading order, and no consumer should have
-to slot a preview into a hole named `source` to get it.
+The pair to `panel-size`. */
+  "attr:default-panel-size"?: HelixSandbox["defaultPanelSize"];
+  /** What a reset makes the panel, in pixels.
 
-Not reflected, because no rule selects on it: the panes already carry
-`data-pane`, which is what the stylesheet reaches for, and swapping the
-names below keeps that true whichever way round they sit.
-
-`split` follows the lead pane rather than the source, so `split="30"` means
-the same thing in both directions: thirty percent to whatever comes first. */
-  "prop:lead"?: HelixSandbox["lead"];
-  /** Percentage of the sandbox given to the source pane. */
-  "prop:split"?: HelixSandbox["split"];
+The pair to `panel-size`. */
+  "prop:defaultPanelSize"?: HelixSandbox["defaultPanelSize"];
   /** Where a reset puts the divider, where nothing declared it.
 
 Separate from `split` for the reason `Splitter` keeps `default-position`
@@ -12491,18 +12483,24 @@ sandbox back to the size it already was.
 Declared rather than captured, so it is a number a consumer states and can
 change, and it needs no first frame to be read on. */
   "prop:defaultSplit"?: HelixSandbox["defaultSplit"];
-  /** Height of the panel, in pixels. */
-  "attr:panel-size"?: HelixSandbox["panelSize"];
-  /** Height of the panel, in pixels. */
-  "prop:panelSize"?: HelixSandbox["panelSize"];
-  /** What a reset makes the panel, in pixels.
+  /** Which pane comes first, before the divider.
 
-The pair to `panel-size`. */
-  "attr:default-panel-size"?: HelixSandbox["defaultPanelSize"];
-  /** What a reset makes the panel, in pixels.
+A sandbox is read in one of two directions and the two are not a
+preference. A workbench is a place to write, so the source leads and the
+preview answers it. A reference page is a place to look, so the preview
+leads and the source is what a reader opens if they want to know how it was
+done. Same component, opposite reading order, and no consumer should have
+to slot a preview into a hole named `source` to get it.
 
-The pair to `panel-size`. */
-  "prop:defaultPanelSize"?: HelixSandbox["defaultPanelSize"];
+Not reflected, because no rule selects on it: the panes already carry
+`data-pane`, which is what the stylesheet reaches for, and swapping the
+names below keeps that true whichever way round they sit.
+
+`split` follows the lead pane rather than the source, so `split="30"` means
+the same thing in both directions: thirty percent to whatever comes first. */
+  "prop:lead"?: HelixSandbox["lead"];
+  /** Whether the panes sit side by side or stacked. */
+  "prop:orientation"?: HelixSandbox["orientation"];
   /** What the panel's height becomes when it is closed.
 
 Zero closes it outright. A panel whose contents include the control that
@@ -12519,14 +12517,16 @@ and only whoever slotted it knows how tall that is. */
   "attr:panel-label"?: HelixSandbox["panelLabel"];
   /** Accessible name for the panel's divider. */
   "prop:panelLabel"?: HelixSandbox["panelLabel"];
-  /** Accessible name for the divider that moves both at once. */
-  "attr:corner-label"?: HelixSandbox["cornerLabel"];
-  /** Accessible name for the divider that moves both at once. */
-  "prop:cornerLabel"?: HelixSandbox["cornerLabel"];
+  /** Height of the panel, in pixels. */
+  "attr:panel-size"?: HelixSandbox["panelSize"];
+  /** Height of the panel, in pixels. */
+  "prop:panelSize"?: HelixSandbox["panelSize"];
   /** Accessible name for the divider. */
   "attr:separator-label"?: HelixSandbox["separatorLabel"];
   /** Accessible name for the divider. */
   "prop:separatorLabel"?: HelixSandbox["separatorLabel"];
+  /** Percentage of the sandbox given to the source pane. */
+  "prop:split"?: HelixSandbox["split"];
   /** Fired before the panel's divider is let go, with its height in pixels. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-panel-resize"?: (
     e: HelixSandboxHelixBeforePanelResizeElementEvent,
@@ -12555,8 +12555,10 @@ export type HelixSandboxSourceHelixCaretElementEvent =
   HelixSandboxSourceElementEvent<HelixCaretEvent>;
 
 export type HelixSandboxSourceProps = {
-  /** The source being edited. */
-  value?: HelixSandboxSource["value"];
+  /** Accessible name for the editable region. */
+  "field-label"?: HelixSandboxSource["fieldLabel"];
+  /** Accessible name for the editable region. */
+  fieldLabel?: HelixSandboxSource["fieldLabel"];
   /** Which source this pane holds, echoed in every `helix-before-edit`.
 
 `html` and `css` are what the sandbox root routes on; any other name is
@@ -12564,14 +12566,12 @@ passed through untouched for a consumer wiring their own panes.
 
 Not reflected: nothing selects on it, so it keeps a real default instead. */
   name?: HelixSandboxSource["name"];
-  /** Accessible name for the editable region. */
-  "field-label"?: HelixSandboxSource["fieldLabel"];
-  /** Accessible name for the editable region. */
-  fieldLabel?: HelixSandboxSource["fieldLabel"];
   /** Whether Tab indents rather than moving focus. */
   "tab-indents"?: HelixSandboxSource["tabIndents"];
   /** Whether Tab indents rather than moving focus. */
   tabIndents?: HelixSandboxSource["tabIndents"];
+  /** The source being edited. */
+  value?: HelixSandboxSource["value"];
 
   /** Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-edit"?: (
@@ -12582,8 +12582,10 @@ Not reflected: nothing selects on it, so it keeps a real default instead. */
 };
 
 export type HelixSandboxSourceSolidJsProps = {
-  /** The source being edited. */
-  "prop:value"?: HelixSandboxSource["value"];
+  /** Accessible name for the editable region. */
+  "attr:field-label"?: HelixSandboxSource["fieldLabel"];
+  /** Accessible name for the editable region. */
+  "prop:fieldLabel"?: HelixSandboxSource["fieldLabel"];
   /** Which source this pane holds, echoed in every `helix-before-edit`.
 
 `html` and `css` are what the sandbox root routes on; any other name is
@@ -12591,14 +12593,12 @@ passed through untouched for a consumer wiring their own panes.
 
 Not reflected: nothing selects on it, so it keeps a real default instead. */
   "prop:name"?: HelixSandboxSource["name"];
-  /** Accessible name for the editable region. */
-  "attr:field-label"?: HelixSandboxSource["fieldLabel"];
-  /** Accessible name for the editable region. */
-  "prop:fieldLabel"?: HelixSandboxSource["fieldLabel"];
   /** Whether Tab indents rather than moving focus. */
   "bool:tab-indents"?: HelixSandboxSource["tabIndents"];
   /** Whether Tab indents rather than moving focus. */
   "prop:tabIndents"?: HelixSandboxSource["tabIndents"];
+  /** The source being edited. */
+  "prop:value"?: HelixSandboxSource["value"];
   /** Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-edit"?: (
     e: HelixSandboxSourceHelixBeforeEditElementEvent,
@@ -12765,14 +12765,18 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixSelect["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixSelect["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixSelect["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixSelect["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixSelect["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixSelect["required"];
+  /** What it says where there are none. */
+  "empty-text"?: HelixSelect["emptyText"];
+  /** What it says where there are none. */
+  emptyText?: HelixSelect["emptyText"];
   /** Whether the list can be narrowed by typing.
 
 Passed to the listbox rather than acted on here, because the listbox owns
@@ -12788,10 +12792,6 @@ consumer wiring the same flag twice. */
   "loading-text"?: HelixSelect["loadingText"];
   /** What the list says while they are on their way. */
   loadingText?: HelixSelect["loadingText"];
-  /** What it says where there are none. */
-  "empty-text"?: HelixSelect["emptyText"];
-  /** What it says where there are none. */
-  emptyText?: HelixSelect["emptyText"];
   /** Whether more than one option can be the answer. */
   multiple?: HelixSelect["multiple"];
   /** Shown on the trigger while nothing is chosen. */
@@ -12905,14 +12905,18 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixSelect["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixSelect["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixSelect["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixSelect["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixSelect["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixSelect["required"];
+  /** What it says where there are none. */
+  "attr:empty-text"?: HelixSelect["emptyText"];
+  /** What it says where there are none. */
+  "prop:emptyText"?: HelixSelect["emptyText"];
   /** Whether the list can be narrowed by typing.
 
 Passed to the listbox rather than acted on here, because the listbox owns
@@ -12928,10 +12932,6 @@ consumer wiring the same flag twice. */
   "attr:loading-text"?: HelixSelect["loadingText"];
   /** What the list says while they are on their way. */
   "prop:loadingText"?: HelixSelect["loadingText"];
-  /** What it says where there are none. */
-  "attr:empty-text"?: HelixSelect["emptyText"];
-  /** What it says where there are none. */
-  "prop:emptyText"?: HelixSelect["emptyText"];
   /** Whether more than one option can be the answer. */
   "prop:multiple"?: HelixSelect["multiple"];
   /** Shown on the trigger while nothing is chosen. */
@@ -13029,28 +13029,18 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixSlider["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixSlider["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixSlider["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixSlider["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixSlider["label"];
   /** Whether the form refuses to submit without it. */
   required?: HelixSlider["required"];
-  /** Whether there are two thumbs and the value is a pair.
-
-The pair is one string, `"10,50"`, which is what a form submits and what
-`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
-the two, since a range has no single number. */
-  range?: HelixSlider["range"];
-  /** The largest value the reader can choose. */
-  max?: HelixSlider["max"];
-  /** The smallest value the reader can choose. */
-  min?: HelixSlider["min"];
-  /** Whether the chosen value is shown beside the track. */
-  "show-value"?: HelixSlider["showValue"];
-  /** Whether the chosen value is shown beside the track. */
-  showValue?: HelixSlider["showValue"];
+  /** Whether each mark says which value it stands at. */
+  "marker-labels"?: HelixSlider["markerLabels"];
+  /** Whether each mark says which value it stands at. */
+  markerLabels?: HelixSlider["markerLabels"];
   /** How many marks to draw along the track, evenly spaced, ends included.
 
 `0` or `1` draws none: one mark on a track says nothing about a range.
@@ -13065,12 +13055,10 @@ one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
   markers?: HelixSlider["markers"];
-  /** Whether each mark says which value it stands at. */
-  "marker-labels"?: HelixSlider["markerLabels"];
-  /** Whether each mark says which value it stands at. */
-  markerLabels?: HelixSlider["markerLabels"];
-  /** How far one press of an arrow key moves it. */
-  step?: HelixSlider["step"];
+  /** The largest value the reader can choose. */
+  max?: HelixSlider["max"];
+  /** The smallest value the reader can choose. */
+  min?: HelixSlider["min"];
   /** Which way the track runs, `vertical` standing it on end.
 
 For a level rather than a quantity: a fader, a channel, anything a reader
@@ -13082,6 +13070,18 @@ takes the width of the row it is in. `--slider-length` is that number and
 defaults to nine rem, so one dropped into a layout is a usable height
 rather than a thumb sitting on nothing. */
   orientation?: HelixSlider["orientation"];
+  /** Whether there are two thumbs and the value is a pair.
+
+The pair is one string, `"10,50"`, which is what a form submits and what
+`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+the two, since a range has no single number. */
+  range?: HelixSlider["range"];
+  /** Whether the chosen value is shown beside the track. */
+  "show-value"?: HelixSlider["showValue"];
+  /** Whether the chosen value is shown beside the track. */
+  showValue?: HelixSlider["showValue"];
+  /** How far one press of an arrow key moves it. */
+  step?: HelixSlider["step"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -13131,28 +13131,18 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixSlider["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixSlider["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixSlider["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixSlider["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixSlider["label"];
   /** Whether the form refuses to submit without it. */
   "prop:required"?: HelixSlider["required"];
-  /** Whether there are two thumbs and the value is a pair.
-
-The pair is one string, `"10,50"`, which is what a form submits and what
-`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
-the two, since a range has no single number. */
-  "prop:range"?: HelixSlider["range"];
-  /** The largest value the reader can choose. */
-  "prop:max"?: HelixSlider["max"];
-  /** The smallest value the reader can choose. */
-  "prop:min"?: HelixSlider["min"];
-  /** Whether the chosen value is shown beside the track. */
-  "bool:show-value"?: HelixSlider["showValue"];
-  /** Whether the chosen value is shown beside the track. */
-  "prop:showValue"?: HelixSlider["showValue"];
+  /** Whether each mark says which value it stands at. */
+  "bool:marker-labels"?: HelixSlider["markerLabels"];
+  /** Whether each mark says which value it stands at. */
+  "prop:markerLabels"?: HelixSlider["markerLabels"];
   /** How many marks to draw along the track, evenly spaced, ends included.
 
 `0` or `1` draws none: one mark on a track says nothing about a range.
@@ -13167,12 +13157,10 @@ one thing a mark must not be, so the spacing gives way rather than the
 step, and marks may come out unevenly spaced when the two disagree. That
 is the honest picture of the range being offered. */
   "prop:markers"?: HelixSlider["markers"];
-  /** Whether each mark says which value it stands at. */
-  "bool:marker-labels"?: HelixSlider["markerLabels"];
-  /** Whether each mark says which value it stands at. */
-  "prop:markerLabels"?: HelixSlider["markerLabels"];
-  /** How far one press of an arrow key moves it. */
-  "prop:step"?: HelixSlider["step"];
+  /** The largest value the reader can choose. */
+  "prop:max"?: HelixSlider["max"];
+  /** The smallest value the reader can choose. */
+  "prop:min"?: HelixSlider["min"];
   /** Which way the track runs, `vertical` standing it on end.
 
 For a level rather than a quantity: a fader, a channel, anything a reader
@@ -13184,6 +13172,18 @@ takes the width of the row it is in. `--slider-length` is that number and
 defaults to nine rem, so one dropped into a layout is a usable height
 rather than a thumb sitting on nothing. */
   "prop:orientation"?: HelixSlider["orientation"];
+  /** Whether there are two thumbs and the value is a pair.
+
+The pair is one string, `"10,50"`, which is what a form submits and what
+`MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+the two, since a range has no single number. */
+  "prop:range"?: HelixSlider["range"];
+  /** Whether the chosen value is shown beside the track. */
+  "bool:show-value"?: HelixSlider["showValue"];
+  /** Whether the chosen value is shown beside the track. */
+  "prop:showValue"?: HelixSlider["showValue"];
+  /** How far one press of an arrow key moves it. */
+  "prop:step"?: HelixSlider["step"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -13249,17 +13249,6 @@ says nothing about a bare line.
 behind a mark reads through it, and at the size a sparkline draws there is
 nothing behind it a reader could resolve. */
   emphasis?: HelixSparkline["emphasis"];
-  /** How heavy the line is drawn.
-
-Absent is the weight a sparkline is usually drawn at. `thin` suits one set
-in a table row among many; `thick` suits one standing on its own, where a
-hairline reads as an accident.
-
-Three steps rather than a number, because `--sparkline-width` is already
-the number and an attribute earns its place by being the thing a consumer
-reaches for without reading the stylesheet. The hook stays for anything the
-three do not cover. */
-  weight?: HelixSparkline["weight"];
   /** The shape of the mark on the last reading.
 
 Absent is a dot, which is how a line is usually ended, and absent rather
@@ -13282,34 +13271,17 @@ of the `<svg>`, so the line stops at the ring's inner edge rather than
 running on to the reading at its center, and the middle shows whatever the
 chart is drawn over rather than a guess at it. */
   terminus?: HelixSparkline["terminus"];
-  /** What the readings are drawn as.
+  /** How heavy the line is drawn.
 
-Absent is a line, `area` is a line with the region beneath it washed, and
-`bar` is a column per reading.
+Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+in a table row among many; `thick` suits one standing on its own, where a
+hairline reads as an accident.
 
-**A bar plot measures from zero and the other two measure from the data's
-own range**, which is the one way the plots are not interchangeable. A line
-says where the readings sit relative to each other, so a scale over their
-extent uses the whole box and claims nothing about absolute size. A bar's
-length *is* the value, so any baseline but zero makes the lengths
-proportional to nothing.
-
-**Which is a reason to prefer a line for readings in a narrow band far from
-zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
-seven columns of nearly the same height, and that is the true picture: they
-*are* nearly the same. The same readings as a line fill the box and show
-the movement, because a line is only ever claiming a shape.
-
-**Absent is `area`**, which is the departure from the rule that a resting
-arrangement is the plainest thing. At the size a sparkline is actually
-drawn, a hairline in a wide box is mostly box: the wash under it is what
-gives the shape a body and lets a reader see it at a glance rather than
-hunting for it, which is the entire job. `line` is the bare stroke for
-anywhere the fill would be noise, several of them in one box for instance.
-
-This tier rather than the one above: a plot type is geometry and geometry
-is markup, the same reason `curve` lives here. */
-  plot?: HelixSparkline["plot"];
+Three steps rather than a number, because `--sparkline-width` is already
+the number and an attribute earns its place by being the thing a consumer
+reaches for without reading the stylesheet. The hook stays for anything the
+three do not cover. */
+  weight?: HelixSparkline["weight"];
   /** How the line gets from one reading to the next.
 
 **`smooth` is the resting curve.** A straight segment asserts nothing about
@@ -13347,6 +13319,34 @@ the accessible representation of a sparkline, and a list of the fourteen
 numbers is not. Absent, the drawing is hidden from a screen reader rather
 than announced without a name. */
   label?: HelixSparkline["label"];
+  /** What the readings are drawn as.
+
+Absent is a line, `area` is a line with the region beneath it washed, and
+`bar` is a column per reading.
+
+**A bar plot measures from zero and the other two measure from the data's
+own range**, which is the one way the plots are not interchangeable. A line
+says where the readings sit relative to each other, so a scale over their
+extent uses the whole box and claims nothing about absolute size. A bar's
+length *is* the value, so any baseline but zero makes the lengths
+proportional to nothing.
+
+**Which is a reason to prefer a line for readings in a narrow band far from
+zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+seven columns of nearly the same height, and that is the true picture: they
+*are* nearly the same. The same readings as a line fill the box and show
+the movement, because a line is only ever claiming a shape.
+
+**Absent is `area`**, which is the departure from the rule that a resting
+arrangement is the plainest thing. At the size a sparkline is actually
+drawn, a hairline in a wide box is mostly box: the wash under it is what
+gives the shape a body and lets a reader see it at a glance rather than
+hunting for it, which is the entire job. `line` is the bare stroke for
+anywhere the fill would be noise, several of them in one box for instance.
+
+This tier rather than the one above: a plot type is geometry and geometry
+is markup, the same reason `curve` lives here. */
+  plot?: HelixSparkline["plot"];
   /** The numbers, separated by whitespace or by commas.
 
 Both separators, so `values="1240 1318"` and an array assigned to the
@@ -13380,17 +13380,6 @@ says nothing about a bare line.
 behind a mark reads through it, and at the size a sparkline draws there is
 nothing behind it a reader could resolve. */
   "prop:emphasis"?: HelixSparkline["emphasis"];
-  /** How heavy the line is drawn.
-
-Absent is the weight a sparkline is usually drawn at. `thin` suits one set
-in a table row among many; `thick` suits one standing on its own, where a
-hairline reads as an accident.
-
-Three steps rather than a number, because `--sparkline-width` is already
-the number and an attribute earns its place by being the thing a consumer
-reaches for without reading the stylesheet. The hook stays for anything the
-three do not cover. */
-  "prop:weight"?: HelixSparkline["weight"];
   /** The shape of the mark on the last reading.
 
 Absent is a dot, which is how a line is usually ended, and absent rather
@@ -13413,34 +13402,17 @@ of the `<svg>`, so the line stops at the ring's inner edge rather than
 running on to the reading at its center, and the middle shows whatever the
 chart is drawn over rather than a guess at it. */
   "prop:terminus"?: HelixSparkline["terminus"];
-  /** What the readings are drawn as.
+  /** How heavy the line is drawn.
 
-Absent is a line, `area` is a line with the region beneath it washed, and
-`bar` is a column per reading.
+Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+in a table row among many; `thick` suits one standing on its own, where a
+hairline reads as an accident.
 
-**A bar plot measures from zero and the other two measure from the data's
-own range**, which is the one way the plots are not interchangeable. A line
-says where the readings sit relative to each other, so a scale over their
-extent uses the whole box and claims nothing about absolute size. A bar's
-length *is* the value, so any baseline but zero makes the lengths
-proportional to nothing.
-
-**Which is a reason to prefer a line for readings in a narrow band far from
-zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
-seven columns of nearly the same height, and that is the true picture: they
-*are* nearly the same. The same readings as a line fill the box and show
-the movement, because a line is only ever claiming a shape.
-
-**Absent is `area`**, which is the departure from the rule that a resting
-arrangement is the plainest thing. At the size a sparkline is actually
-drawn, a hairline in a wide box is mostly box: the wash under it is what
-gives the shape a body and lets a reader see it at a glance rather than
-hunting for it, which is the entire job. `line` is the bare stroke for
-anywhere the fill would be noise, several of them in one box for instance.
-
-This tier rather than the one above: a plot type is geometry and geometry
-is markup, the same reason `curve` lives here. */
-  "prop:plot"?: HelixSparkline["plot"];
+Three steps rather than a number, because `--sparkline-width` is already
+the number and an attribute earns its place by being the thing a consumer
+reaches for without reading the stylesheet. The hook stays for anything the
+three do not cover. */
+  "prop:weight"?: HelixSparkline["weight"];
   /** How the line gets from one reading to the next.
 
 **`smooth` is the resting curve.** A straight segment asserts nothing about
@@ -13478,6 +13450,34 @@ the accessible representation of a sparkline, and a list of the fourteen
 numbers is not. Absent, the drawing is hidden from a screen reader rather
 than announced without a name. */
   "prop:label"?: HelixSparkline["label"];
+  /** What the readings are drawn as.
+
+Absent is a line, `area` is a line with the region beneath it washed, and
+`bar` is a column per reading.
+
+**A bar plot measures from zero and the other two measure from the data's
+own range**, which is the one way the plots are not interchangeable. A line
+says where the readings sit relative to each other, so a scale over their
+extent uses the whole box and claims nothing about absolute size. A bar's
+length *is* the value, so any baseline but zero makes the lengths
+proportional to nothing.
+
+**Which is a reason to prefer a line for readings in a narrow band far from
+zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+seven columns of nearly the same height, and that is the true picture: they
+*are* nearly the same. The same readings as a line fill the box and show
+the movement, because a line is only ever claiming a shape.
+
+**Absent is `area`**, which is the departure from the rule that a resting
+arrangement is the plainest thing. At the size a sparkline is actually
+drawn, a hairline in a wide box is mostly box: the wash under it is what
+gives the shape a body and lets a reader see it at a glance rather than
+hunting for it, which is the entire job. `line` is the bare stroke for
+anywhere the fill would be noise, several of them in one box for instance.
+
+This tier rather than the one above: a plot type is geometry and geometry
+is markup, the same reason `curve` lives here. */
+  "prop:plot"?: HelixSparkline["plot"];
   /** The numbers, separated by whitespace or by commas.
 
 Both separators, so `values="1240 1318"` and an array assigned to the
@@ -13502,20 +13502,20 @@ export type HelixSpeedDialItemHelixSelectElementEvent =
   HelixSpeedDialItemElementEvent<HelixSelectEvent>;
 
 export type HelixSpeedDialItemProps = {
-  /** What this action stands for, carried in the event when it is chosen. */
-  value?: HelixSpeedDialItem["value"];
   /** Whether the action can be chosen. */
   disabled?: HelixSpeedDialItem["disabled"];
+  /** What this action stands for, carried in the event when it is chosen. */
+  value?: HelixSpeedDialItem["value"];
 
   /** Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixSpeedDialItemHelixSelectElementEvent) => void;
 };
 
 export type HelixSpeedDialItemSolidJsProps = {
-  /** What this action stands for, carried in the event when it is chosen. */
-  "prop:value"?: HelixSpeedDialItem["value"];
   /** Whether the action can be chosen. */
   "prop:disabled"?: HelixSpeedDialItem["disabled"];
+  /** What this action stands for, carried in the event when it is chosen. */
+  "prop:value"?: HelixSpeedDialItem["value"];
   /** Fired when the action is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixSpeedDialItemHelixSelectElementEvent) => void;
 
@@ -13557,13 +13557,13 @@ the resolved state for stylesheets, which is what the mirror is for. */
   defaultOpen?: HelixSpeedDial["defaultOpen"];
   /** Names the trigger and the set of actions it opens. */
   label?: HelixSpeedDial["label"];
+  /** Space between the trigger and the actions, in pixels. */
+  offset?: HelixSpeedDial["offset"];
   /** Which way the actions fan out. They move if that side does not fit.
 
 Up by default, because the control this hangs off is usually docked to the
 bottom of the window and there is nothing below it to fan into. */
   placement?: HelixSpeedDial["placement"];
-  /** Space between the trigger and the actions, in pixels. */
-  offset?: HelixSpeedDial["offset"];
 
   /** Fired before it closes, and cancelable. */
   "onhelix-before-close"?: (
@@ -13597,13 +13597,13 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "prop:defaultOpen"?: HelixSpeedDial["defaultOpen"];
   /** Names the trigger and the set of actions it opens. */
   "prop:label"?: HelixSpeedDial["label"];
+  /** Space between the trigger and the actions, in pixels. */
+  "prop:offset"?: HelixSpeedDial["offset"];
   /** Which way the actions fan out. They move if that side does not fit.
 
 Up by default, because the control this hangs off is usually docked to the
 bottom of the window and there is nothing below it to fan into. */
   "prop:placement"?: HelixSpeedDial["placement"];
-  /** Space between the trigger and the actions, in pixels. */
-  "prop:offset"?: HelixSpeedDial["offset"];
   /** Fired before it closes, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixSpeedDialHelixBeforeCloseElementEvent,
@@ -13647,6 +13647,72 @@ line can be grabbed. The grip adds no hit area of its own.
 Both are writable, so a generated page can say which it means rather than
 relying on the absence of an attribute. */
   variant?: HelixSplitter["variant"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  "collapsed-size"?: HelixSplitter["collapsedSize"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  collapsedSize?: HelixSplitter["collapsedSize"];
+  /** Where the divider sits, as a percentage of the whole.
+
+Reading gives where it is; writing declares it the consumer's, and
+`default-position` seeds one this element owns. The same accessor pair
+`Pagination.page` and the calendar's `month` carry. */
+  position?: HelixSplitter["position"];
+  /** Accessible name for the handle where two dividers cross. */
+  "corner-label"?: HelixSplitter["cornerLabel"];
+  /** Accessible name for the handle where two dividers cross. */
+  cornerLabel?: HelixSplitter["cornerLabel"];
+  /** Which pane is shut, if either.
+
+The same accessor pair as `position`, and deliberately a second state
+rather than a reading of the first. A pane shut by dragging the divider to
+the edge and a pane shut on purpose look identical in geometry and are not
+the same thing: only the second knows where to go back to. Kept apart, the
+open position is simply the one collapsing never overwrote, so restoring
+needs no memory of its own.
+
+It overrides `min` and `max`, which is the point of it. Those keep a sliver
+of a pane during a drag; this is the thing that says the sliver can go. */
+  collapsed?: HelixSplitter["collapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  "default-collapsed"?: HelixSplitter["defaultCollapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  defaultCollapsed?: HelixSplitter["defaultCollapsed"];
+  /** Where the divider starts, where nothing declared it. */
+  "default-position"?: HelixSplitter["defaultPosition"];
+  /** Where the divider starts, where nothing declared it. */
+  defaultPosition?: HelixSplitter["defaultPosition"];
+  /** Accessible name for the divider. */
+  label?: HelixSplitter["label"];
+  /** Nearest it may come to the end, on the same terms as `min`. */
+  max?: HelixSplitter["max"];
+  /** Nearest the divider may come to the start.
+
+A bare number is a percentage, which is what this always took. A CSS length
+is resolved against the splitter's own box along its axis, so `min="15rem"`
+means fifteen rem of pane whatever the container is doing.
+
+**The length is the one that holds.** A percentage minimum does not: twenty
+per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
+number a consumer picked was almost certainly about how much text fits
+rather than about a ratio. The pane that a percentage protects at desk
+width is squeezed past reading at half of it.
+
+**It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
+the class docstring says, so a pane can still be shut and reopened. What a
+minimum forbids is the space between shut and usable: a pane wide enough to
+be there and too narrow to read is the state nobody wants and every drag
+passes through. */
+  min?: HelixSplitter["min"];
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -13672,74 +13738,8 @@ no room for two panes side by side, and a media query would hand it the
 desktop branch. A `ResizeObserver` on the host asks the only question that
 has an honest answer. */
   orientation?: HelixSplitter["orientation"];
-  /** Where the divider sits, as a percentage of the whole.
-
-Reading gives where it is; writing declares it the consumer's, and
-`default-position` seeds one this element owns. The same accessor pair
-`Pagination.page` and the calendar's `month` carry. */
-  position?: HelixSplitter["position"];
-  /** Where the divider starts, where nothing declared it. */
-  "default-position"?: HelixSplitter["defaultPosition"];
-  /** Where the divider starts, where nothing declared it. */
-  defaultPosition?: HelixSplitter["defaultPosition"];
-  /** Which pane is shut, if either.
-
-The same accessor pair as `position`, and deliberately a second state
-rather than a reading of the first. A pane shut by dragging the divider to
-the edge and a pane shut on purpose look identical in geometry and are not
-the same thing: only the second knows where to go back to. Kept apart, the
-open position is simply the one collapsing never overwrote, so restoring
-needs no memory of its own.
-
-It overrides `min` and `max`, which is the point of it. Those keep a sliver
-of a pane during a drag; this is the thing that says the sliver can go. */
-  collapsed?: HelixSplitter["collapsed"];
-  /** Which pane starts shut, where nothing declared it. */
-  "default-collapsed"?: HelixSplitter["defaultCollapsed"];
-  /** Which pane starts shut, where nothing declared it. */
-  defaultCollapsed?: HelixSplitter["defaultCollapsed"];
-  /** How much of a shut pane is still shown, as a percentage.
-
-Zero by default, which is a pane fully gone. A tab strip or a title bar
-that should survive its own collapse says how much of itself to keep, and
-only whoever put it there knows that, which is the same reason `min` is a
-consumer's to set. */
-  "collapsed-size"?: HelixSplitter["collapsedSize"];
-  /** How much of a shut pane is still shown, as a percentage.
-
-Zero by default, which is a pane fully gone. A tab strip or a title bar
-that should survive its own collapse says how much of itself to keep, and
-only whoever put it there knows that, which is the same reason `min` is a
-consumer's to set. */
-  collapsedSize?: HelixSplitter["collapsedSize"];
-  /** Nearest the divider may come to the start.
-
-A bare number is a percentage, which is what this always took. A CSS length
-is resolved against the splitter's own box along its axis, so `min="15rem"`
-means fifteen rem of pane whatever the container is doing.
-
-**The length is the one that holds.** A percentage minimum does not: twenty
-per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
-number a consumer picked was almost certainly about how much text fits
-rather than about a ratio. The pane that a percentage protects at desk
-width is squeezed past reading at half of it.
-
-**It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
-the class docstring says, so a pane can still be shut and reopened. What a
-minimum forbids is the space between shut and usable: a pane wide enough to
-be there and too narrow to read is the state nobody wants and every drag
-passes through. */
-  min?: HelixSplitter["min"];
-  /** Nearest it may come to the end, on the same terms as `min`. */
-  max?: HelixSplitter["max"];
   /** How far one arrow press moves it, as a percentage. */
   step?: HelixSplitter["step"];
-  /** Accessible name for the divider. */
-  label?: HelixSplitter["label"];
-  /** Accessible name for the handle where two dividers cross. */
-  "corner-label"?: HelixSplitter["cornerLabel"];
-  /** Accessible name for the handle where two dividers cross. */
-  cornerLabel?: HelixSplitter["cornerLabel"];
 
   /** Fired before a pane shuts or reopens, and cancelable. */
   "onhelix-before-collapse"?: (
@@ -13768,6 +13768,72 @@ line can be grabbed. The grip adds no hit area of its own.
 Both are writable, so a generated page can say which it means rather than
 relying on the absence of an attribute. */
   "prop:variant"?: HelixSplitter["variant"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  "attr:collapsed-size"?: HelixSplitter["collapsedSize"];
+  /** How much of a shut pane is still shown, as a percentage.
+
+Zero by default, which is a pane fully gone. A tab strip or a title bar
+that should survive its own collapse says how much of itself to keep, and
+only whoever put it there knows that, which is the same reason `min` is a
+consumer's to set. */
+  "prop:collapsedSize"?: HelixSplitter["collapsedSize"];
+  /** Where the divider sits, as a percentage of the whole.
+
+Reading gives where it is; writing declares it the consumer's, and
+`default-position` seeds one this element owns. The same accessor pair
+`Pagination.page` and the calendar's `month` carry. */
+  "prop:position"?: HelixSplitter["position"];
+  /** Accessible name for the handle where two dividers cross. */
+  "attr:corner-label"?: HelixSplitter["cornerLabel"];
+  /** Accessible name for the handle where two dividers cross. */
+  "prop:cornerLabel"?: HelixSplitter["cornerLabel"];
+  /** Which pane is shut, if either.
+
+The same accessor pair as `position`, and deliberately a second state
+rather than a reading of the first. A pane shut by dragging the divider to
+the edge and a pane shut on purpose look identical in geometry and are not
+the same thing: only the second knows where to go back to. Kept apart, the
+open position is simply the one collapsing never overwrote, so restoring
+needs no memory of its own.
+
+It overrides `min` and `max`, which is the point of it. Those keep a sliver
+of a pane during a drag; this is the thing that says the sliver can go. */
+  "prop:collapsed"?: HelixSplitter["collapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  "attr:default-collapsed"?: HelixSplitter["defaultCollapsed"];
+  /** Which pane starts shut, where nothing declared it. */
+  "prop:defaultCollapsed"?: HelixSplitter["defaultCollapsed"];
+  /** Where the divider starts, where nothing declared it. */
+  "attr:default-position"?: HelixSplitter["defaultPosition"];
+  /** Where the divider starts, where nothing declared it. */
+  "prop:defaultPosition"?: HelixSplitter["defaultPosition"];
+  /** Accessible name for the divider. */
+  "prop:label"?: HelixSplitter["label"];
+  /** Nearest it may come to the end, on the same terms as `min`. */
+  "prop:max"?: HelixSplitter["max"];
+  /** Nearest the divider may come to the start.
+
+A bare number is a percentage, which is what this always took. A CSS length
+is resolved against the splitter's own box along its axis, so `min="15rem"`
+means fifteen rem of pane whatever the container is doing.
+
+**The length is the one that holds.** A percentage minimum does not: twenty
+per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
+number a consumer picked was almost certainly about how much text fits
+rather than about a ratio. The pane that a percentage protects at desk
+width is squeezed past reading at half of it.
+
+**It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
+the class docstring says, so a pane can still be shut and reopened. What a
+minimum forbids is the space between shut and usable: a pane wide enough to
+be there and too narrow to read is the state nobody wants and every drag
+passes through. */
+  "prop:min"?: HelixSplitter["min"];
   /** Which way the panes are laid out.
 
 `horizontal` is side by side with an upright divider between them, and
@@ -13793,74 +13859,8 @@ no room for two panes side by side, and a media query would hand it the
 desktop branch. A `ResizeObserver` on the host asks the only question that
 has an honest answer. */
   "prop:orientation"?: HelixSplitter["orientation"];
-  /** Where the divider sits, as a percentage of the whole.
-
-Reading gives where it is; writing declares it the consumer's, and
-`default-position` seeds one this element owns. The same accessor pair
-`Pagination.page` and the calendar's `month` carry. */
-  "prop:position"?: HelixSplitter["position"];
-  /** Where the divider starts, where nothing declared it. */
-  "attr:default-position"?: HelixSplitter["defaultPosition"];
-  /** Where the divider starts, where nothing declared it. */
-  "prop:defaultPosition"?: HelixSplitter["defaultPosition"];
-  /** Which pane is shut, if either.
-
-The same accessor pair as `position`, and deliberately a second state
-rather than a reading of the first. A pane shut by dragging the divider to
-the edge and a pane shut on purpose look identical in geometry and are not
-the same thing: only the second knows where to go back to. Kept apart, the
-open position is simply the one collapsing never overwrote, so restoring
-needs no memory of its own.
-
-It overrides `min` and `max`, which is the point of it. Those keep a sliver
-of a pane during a drag; this is the thing that says the sliver can go. */
-  "prop:collapsed"?: HelixSplitter["collapsed"];
-  /** Which pane starts shut, where nothing declared it. */
-  "attr:default-collapsed"?: HelixSplitter["defaultCollapsed"];
-  /** Which pane starts shut, where nothing declared it. */
-  "prop:defaultCollapsed"?: HelixSplitter["defaultCollapsed"];
-  /** How much of a shut pane is still shown, as a percentage.
-
-Zero by default, which is a pane fully gone. A tab strip or a title bar
-that should survive its own collapse says how much of itself to keep, and
-only whoever put it there knows that, which is the same reason `min` is a
-consumer's to set. */
-  "attr:collapsed-size"?: HelixSplitter["collapsedSize"];
-  /** How much of a shut pane is still shown, as a percentage.
-
-Zero by default, which is a pane fully gone. A tab strip or a title bar
-that should survive its own collapse says how much of itself to keep, and
-only whoever put it there knows that, which is the same reason `min` is a
-consumer's to set. */
-  "prop:collapsedSize"?: HelixSplitter["collapsedSize"];
-  /** Nearest the divider may come to the start.
-
-A bare number is a percentage, which is what this always took. A CSS length
-is resolved against the splitter's own box along its axis, so `min="15rem"`
-means fifteen rem of pane whatever the container is doing.
-
-**The length is the one that holds.** A percentage minimum does not: twenty
-per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
-number a consumer picked was almost certainly about how much text fits
-rather than about a ratio. The pane that a percentage protects at desk
-width is squeezed past reading at half of it.
-
-**It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
-the class docstring says, so a pane can still be shut and reopened. What a
-minimum forbids is the space between shut and usable: a pane wide enough to
-be there and too narrow to read is the state nobody wants and every drag
-passes through. */
-  "prop:min"?: HelixSplitter["min"];
-  /** Nearest it may come to the end, on the same terms as `min`. */
-  "prop:max"?: HelixSplitter["max"];
   /** How far one arrow press moves it, as a percentage. */
   "prop:step"?: HelixSplitter["step"];
-  /** Accessible name for the divider. */
-  "prop:label"?: HelixSplitter["label"];
-  /** Accessible name for the handle where two dividers cross. */
-  "attr:corner-label"?: HelixSplitter["cornerLabel"];
-  /** Accessible name for the handle where two dividers cross. */
-  "prop:cornerLabel"?: HelixSplitter["cornerLabel"];
   /** Fired before a pane shuts or reopens, and cancelable. */
   "on:helix-before-collapse"?: (
     e: HelixSplitterHelixBeforeCollapseElementEvent,
@@ -14131,10 +14131,10 @@ stylesheets. */
   "default-checked"?: HelixSwitch["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
   defaultChecked?: HelixSwitch["defaultChecked"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixSwitch["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixSwitch["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixSwitch["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixSwitch["label"];
   /** Whether the form refuses to submit without it. */
@@ -14192,10 +14192,10 @@ stylesheets. */
   "bool:default-checked"?: HelixSwitch["defaultChecked"];
   /** Initial checked state for uncontrolled use, where nothing declared one. */
   "prop:defaultChecked"?: HelixSwitch["defaultChecked"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixSwitch["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixSwitch["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixSwitch["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixSwitch["label"];
   /** Whether the form refuses to submit without it. */
@@ -14259,6 +14259,32 @@ export type HelixTableCellSolidJsProps = {
 };
 
 export type HelixTableColumnProps = {
+  /** Which edge the values line up against.
+
+`end` is what a column of numbers wants, so digits of the same magnitude sit
+above each other. Left unset the cell inherits the table's own alignment,
+which is `start` for text in either writing direction. */
+  align?: HelixTableColumn["align"];
+  /** The key this column reads out of a row.
+
+Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+from an API arrives shaped the way the API shaped it, and requiring a flat
+row would push a mapping pass onto every consumer.
+
+**It is also the sort and filter identity**, which is why sorting is by
+field and not by column index: a reordered or hidden column would otherwise
+change what `sort="2:asc"` means, and a sort that means something different
+after a column moves is a sort a consumer cannot store in a URL.
+
+Empty on a column that is purely presentational, an actions column say, and
+such a column is never sortable however it is marked. */
+  field?: HelixTableColumn["field"];
+  /** Whether a reader may reorder the set by this column.
+
+Ignored without a `field`, and silently: a column with nothing to sort by
+has no order to offer, and refusing loudly would mean an actions column
+carrying `sortable` breaks a table rather than doing nothing. */
+  sortable?: HelixTableColumn["sortable"];
   /** The track this column takes, as CSS.
 
 A single track value, so anything valid in `grid-template-columns` works:
@@ -14281,32 +14307,6 @@ line, so a column holding sentences rather than values wants
 `width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
 the overflow either way, that being paint, and gets the honest track list. */
   width?: HelixTableColumn["width"];
-  /** The key this column reads out of a row.
-
-Dot paths resolve, so `field="owner.name"` reads a nested value: a result
-from an API arrives shaped the way the API shaped it, and requiring a flat
-row would push a mapping pass onto every consumer.
-
-**It is also the sort and filter identity**, which is why sorting is by
-field and not by column index: a reordered or hidden column would otherwise
-change what `sort="2:asc"` means, and a sort that means something different
-after a column moves is a sort a consumer cannot store in a URL.
-
-Empty on a column that is purely presentational, an actions column say, and
-such a column is never sortable however it is marked. */
-  field?: HelixTableColumn["field"];
-  /** Whether a reader may reorder the set by this column.
-
-Ignored without a `field`, and silently: a column with nothing to sort by
-has no order to offer, and refusing loudly would mean an actions column
-carrying `sortable` breaks a table rather than doing nothing. */
-  sortable?: HelixTableColumn["sortable"];
-  /** Which edge the values line up against.
-
-`end` is what a column of numbers wants, so digits of the same magnitude sit
-above each other. Left unset the cell inherits the table's own alignment,
-which is `start` for text in either writing direction. */
-  align?: HelixTableColumn["align"];
   /** How to read the cell, where the field alone will not do.
 
 A property and not an attribute, because it is a function. Set it from a Lit
@@ -14325,6 +14325,32 @@ correct default: the raw value is what an API sorted by. */
 };
 
 export type HelixTableColumnSolidJsProps = {
+  /** Which edge the values line up against.
+
+`end` is what a column of numbers wants, so digits of the same magnitude sit
+above each other. Left unset the cell inherits the table's own alignment,
+which is `start` for text in either writing direction. */
+  "prop:align"?: HelixTableColumn["align"];
+  /** The key this column reads out of a row.
+
+Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+from an API arrives shaped the way the API shaped it, and requiring a flat
+row would push a mapping pass onto every consumer.
+
+**It is also the sort and filter identity**, which is why sorting is by
+field and not by column index: a reordered or hidden column would otherwise
+change what `sort="2:asc"` means, and a sort that means something different
+after a column moves is a sort a consumer cannot store in a URL.
+
+Empty on a column that is purely presentational, an actions column say, and
+such a column is never sortable however it is marked. */
+  "prop:field"?: HelixTableColumn["field"];
+  /** Whether a reader may reorder the set by this column.
+
+Ignored without a `field`, and silently: a column with nothing to sort by
+has no order to offer, and refusing loudly would mean an actions column
+carrying `sortable` breaks a table rather than doing nothing. */
+  "prop:sortable"?: HelixTableColumn["sortable"];
   /** The track this column takes, as CSS.
 
 A single track value, so anything valid in `grid-template-columns` works:
@@ -14347,32 +14373,6 @@ line, so a column holding sentences rather than values wants
 `width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
 the overflow either way, that being paint, and gets the honest track list. */
   "prop:width"?: HelixTableColumn["width"];
-  /** The key this column reads out of a row.
-
-Dot paths resolve, so `field="owner.name"` reads a nested value: a result
-from an API arrives shaped the way the API shaped it, and requiring a flat
-row would push a mapping pass onto every consumer.
-
-**It is also the sort and filter identity**, which is why sorting is by
-field and not by column index: a reordered or hidden column would otherwise
-change what `sort="2:asc"` means, and a sort that means something different
-after a column moves is a sort a consumer cannot store in a URL.
-
-Empty on a column that is purely presentational, an actions column say, and
-such a column is never sortable however it is marked. */
-  "prop:field"?: HelixTableColumn["field"];
-  /** Whether a reader may reorder the set by this column.
-
-Ignored without a `field`, and silently: a column with nothing to sort by
-has no order to offer, and refusing loudly would mean an actions column
-carrying `sortable` breaks a table rather than doing nothing. */
-  "prop:sortable"?: HelixTableColumn["sortable"];
-  /** Which edge the values line up against.
-
-`end` is what a column of numbers wants, so digits of the same magnitude sit
-above each other. Left unset the cell inherits the table's own alignment,
-which is `start` for text in either writing direction. */
-  "prop:align"?: HelixTableColumn["align"];
   /** How to read the cell, where the field alone will not do.
 
 A property and not an attribute, because it is a function. Set it from a Lit
@@ -14396,6 +14396,10 @@ correct default: the raw value is what an API sorted by. */
 };
 
 export type HelixTableProps = {
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixTable["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -14406,10 +14410,6 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixTable["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixTable["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixTable["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixTable["emptyText"];
   /** Column track list, as CSS. Deprecated: declare columns instead.
 
 Kept for a table that has no `helix-table-column` children, and ignored the
@@ -14425,6 +14425,10 @@ and said nothing. Columns carry both halves now. */
 };
 
 export type HelixTableSolidJsProps = {
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixTable["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixTable["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -14435,10 +14439,6 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixTable["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixTable["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixTable["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixTable["emptyText"];
   /** Column track list, as CSS. Deprecated: declare columns instead.
 
 Kept for a table that has no `helix-table-column` children, and ignored the
@@ -14468,10 +14468,10 @@ export type HelixTableRowSolidJsProps = {
 };
 
 export type HelixTabPanelProps = {
-  /** Pairs the panel with the tab of the same value. */
-  value?: HelixTabPanel["value"];
   /** Whether this panel is the visible one. */
   selected?: HelixTabPanel["selected"];
+  /** Pairs the panel with the tab of the same value. */
+  value?: HelixTabPanel["value"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -14487,10 +14487,10 @@ anyway. */
 };
 
 export type HelixTabPanelSolidJsProps = {
-  /** Pairs the panel with the tab of the same value. */
-  "prop:value"?: HelixTabPanel["value"];
   /** Whether this panel is the visible one. */
   "prop:selected"?: HelixTabPanel["selected"];
+  /** Pairs the panel with the tab of the same value. */
+  "prop:value"?: HelixTabPanel["value"];
   /** The name of the panel, which is the text of the tab that opens it.
 
 Set by the root, which is the only thing that sees both. No attribute,
@@ -14540,6 +14540,14 @@ Ignored once `active` is written. */
 
 Ignored once `active` is written. */
   defaultActive?: HelixTabs["defaultActive"];
+  /** Accessible name for the tab list. */
+  label?: HelixTabs["label"];
+  /** Whether arrowing to a tab also selects it.
+
+Automatic is the default because showing a panel is usually cheap. Set this
+where it is not, so a reader arrowing past four tabs does not load four
+panels on the way. */
+  manual?: HelixTabs["manual"];
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -14555,14 +14563,6 @@ Accordion does.
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
   variant?: HelixTabs["variant"];
-  /** Accessible name for the tab list. */
-  label?: HelixTabs["label"];
-  /** Whether arrowing to a tab also selects it.
-
-Automatic is the default because showing a panel is usually cheap. Set this
-where it is not, so a reader arrowing past four tabs does not load four
-panels on the way. */
-  manual?: HelixTabs["manual"];
 
   /** Fired once the current one has moved, so the element already holds it. */
   "onhelix-activate"?: (e: HelixTabsHelixActivateElementEvent) => void;
@@ -14592,6 +14592,14 @@ Ignored once `active` is written. */
 
 Ignored once `active` is written. */
   "prop:defaultActive"?: HelixTabs["defaultActive"];
+  /** Accessible name for the tab list. */
+  "prop:label"?: HelixTabs["label"];
+  /** Whether arrowing to a tab also selects it.
+
+Automatic is the default because showing a panel is usually cheap. Set this
+where it is not, so a reader arrowing past four tabs does not load four
+panels on the way. */
+  "prop:manual"?: HelixTabs["manual"];
   /** How the row reads.
 
 Unset is a raised pill on the selected tab with nothing behind the row,
@@ -14607,14 +14615,6 @@ Accordion does.
 Reflected and left unset by default, so the host carries nothing a
 consumer's server markup does not already have. */
   "prop:variant"?: HelixTabs["variant"];
-  /** Accessible name for the tab list. */
-  "prop:label"?: HelixTabs["label"];
-  /** Whether arrowing to a tab also selects it.
-
-Automatic is the default because showing a panel is usually cheap. Set this
-where it is not, so a reader arrowing past four tabs does not load four
-panels on the way. */
-  "prop:manual"?: HelixTabs["manual"];
   /** Fired once the current one has moved, so the element already holds it. */
   "on:helix-activate"?: (e: HelixTabsHelixActivateElementEvent) => void;
   /** Fired before the current tab moves, and cancelable. The only way to refuse one. */
@@ -14637,24 +14637,24 @@ export type HelixTabHelixSelectElementEvent =
   HelixTabElementEvent<HelixSelectEvent>;
 
 export type HelixTabProps = {
-  /** Identifies the tab, and pairs it with the panel of the same value. */
-  value?: HelixTab["value"];
-  /** Whether this tab is the current one. */
-  selected?: HelixTab["selected"];
   /** Whether the tab can be chosen. */
   disabled?: HelixTab["disabled"];
+  /** Whether this tab is the current one. */
+  selected?: HelixTab["selected"];
+  /** Identifies the tab, and pairs it with the panel of the same value. */
+  value?: HelixTab["value"];
 
   /** Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-select"?: (e: HelixTabHelixSelectElementEvent) => void;
 };
 
 export type HelixTabSolidJsProps = {
-  /** Identifies the tab, and pairs it with the panel of the same value. */
-  "prop:value"?: HelixTab["value"];
-  /** Whether this tab is the current one. */
-  "prop:selected"?: HelixTab["selected"];
   /** Whether the tab can be chosen. */
   "prop:disabled"?: HelixTab["disabled"];
+  /** Whether this tab is the current one. */
+  "prop:selected"?: HelixTab["selected"];
+  /** Identifies the tab, and pairs it with the panel of the same value. */
+  "prop:value"?: HelixTab["value"];
   /** Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-select"?: (e: HelixTabHelixSelectElementEvent) => void;
 
@@ -14671,11 +14671,6 @@ export type HelixTagHelixDismissElementEvent =
   HelixTagElementEvent<HelixDismissEvent>;
 
 export type HelixTagProps = {
-  /** Which status the tag reports.
-
-`tone` is semantic color, which is what these are and what `helix-text`
-already calls them. `helix component`'s `axes` holds the vocabulary. */
-  tone?: HelixTag["tone"];
   /** How much of the tone the tag wears.
 
 - `subtle` is the default: a wash of the tone with the label in it, for a
@@ -14689,6 +14684,11 @@ Independent of `tone` on purpose: an outlined danger tag and a solid danger
 tag are both sensible, and one property welding color to fill can ask for
 neither. That is the test the whole axis registry answers to. */
   emphasis?: HelixTag["emphasis"];
+  /** Which status the tag reports.
+
+`tone` is semantic color, which is what these are and what `helix-text`
+already calls them. `helix component`'s `axes` holds the vocabulary. */
+  tone?: HelixTag["tone"];
   /** Whether it offers a control to take it away. */
   dismissible?: HelixTag["dismissible"];
   /** Accessible name for that control.
@@ -14711,11 +14711,6 @@ would catch. */
 };
 
 export type HelixTagSolidJsProps = {
-  /** Which status the tag reports.
-
-`tone` is semantic color, which is what these are and what `helix-text`
-already calls them. `helix component`'s `axes` holds the vocabulary. */
-  "prop:tone"?: HelixTag["tone"];
   /** How much of the tone the tag wears.
 
 - `subtle` is the default: a wash of the tone with the label in it, for a
@@ -14729,6 +14724,11 @@ Independent of `tone` on purpose: an outlined danger tag and a solid danger
 tag are both sensible, and one property welding color to fill can ask for
 neither. That is the test the whole axis registry answers to. */
   "prop:emphasis"?: HelixTag["emphasis"];
+  /** Which status the tag reports.
+
+`tone` is semantic color, which is what these are and what `helix-text`
+already calls them. `helix component`'s `axes` holds the vocabulary. */
+  "prop:tone"?: HelixTag["tone"];
   /** Whether it offers a control to take it away. */
   "prop:dismissible"?: HelixTag["dismissible"];
   /** Accessible name for that control.
@@ -14759,10 +14759,6 @@ export type HelixTextProps = {
 
 Decides the outline and the semantics. */
   as?: HelixText["as"];
-  /** Type treatment.
-
-Defaults to the one that matches `as`. */
-  variant?: HelixText["variant"];
   /** Color role. A separate axis from the type ramp, because color carries
 state: folding it in would mean `caption-danger` and the rest of the cross
 product.
@@ -14779,6 +14775,10 @@ nothing to be made of. `primary-subtle` is a tinted *ground* and not a
 quiet ink. That is #141's to derive, and until it does, folding the two
 halves apart would leave three of the four combinations unsayable. */
   tone?: HelixText["tone"];
+  /** Type treatment.
+
+Defaults to the one that matches `as`. */
+  variant?: HelixText["variant"];
 };
 
 export type HelixTextSolidJsProps = {
@@ -14786,10 +14786,6 @@ export type HelixTextSolidJsProps = {
 
 Decides the outline and the semantics. */
   "prop:as"?: HelixText["as"];
-  /** Type treatment.
-
-Defaults to the one that matches `as`. */
-  "prop:variant"?: HelixText["variant"];
   /** Color role. A separate axis from the type ramp, because color carries
 state: folding it in would mean `caption-danger` and the rest of the cross
 product.
@@ -14806,6 +14802,10 @@ nothing to be made of. `primary-subtle` is a tinted *ground* and not a
 quiet ink. That is #141's to derive, and until it does, folding the two
 halves apart would leave three of the four combinations unsayable. */
   "prop:tone"?: HelixText["tone"];
+  /** Type treatment.
+
+Defaults to the one that matches `as`. */
+  "prop:variant"?: HelixText["variant"];
 
   /** Set the innerHTML of the element */
   innerHTML?: string;
@@ -14831,10 +14831,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixTextarea["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixTextarea["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixTextarea["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixTextarea["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixTextarea["label"];
   /** Whether the form refuses to submit without it. */
@@ -14848,16 +14848,6 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "auto-grow"?: HelixTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
   autoGrow?: HelixTextarea["autoGrow"];
-  /** Shown while the field is empty.
-
-Not a label: it goes when typing starts. */
-  placeholder?: HelixTextarea["placeholder"];
-  /** Whether the field refuses input while still submitting its value. */
-  readonly?: HelixTextarea["readOnly"];
-  /** Whether the field refuses input while still submitting its value. */
-  readOnly?: HelixTextarea["readOnly"];
-  /** How many lines the box is before anything is typed. */
-  rows?: HelixTextarea["rows"];
   /** How many characters wide the box is, where the layout is not deciding.
 
 Optional and absent by default, which is the reflected-property rule: a
@@ -14884,9 +14874,10 @@ no form at all and forwarding the attribute would have looked right and
 submitted nothing. `ElementInternals` takes a `FormData`, which is how one
 element sends two entries, and that is what this does. */
   dirName?: HelixTextarea["dirName"];
-  /** How the browser wraps the text, and whether the breaks are submitted with
-it. */
-  wrap?: HelixTextarea["wrap"];
+  /** Most characters the value may have. */
+  maxlength?: HelixTextarea["maxLength"];
+  /** Most characters the value may have. */
+  maxLength?: HelixTextarea["maxLength"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -14901,10 +14892,19 @@ makes the message the browser's and therefore the reader's own language.
 No `pattern`: the platform does not give a textarea one, and inventing it
 would be this library guessing where the point is to stop guessing. */
   minLength?: HelixTextarea["minLength"];
-  /** Most characters the value may have. */
-  maxlength?: HelixTextarea["maxLength"];
-  /** Most characters the value may have. */
-  maxLength?: HelixTextarea["maxLength"];
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
+  placeholder?: HelixTextarea["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  readonly?: HelixTextarea["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  readOnly?: HelixTextarea["readOnly"];
+  /** How many lines the box is before anything is typed. */
+  rows?: HelixTextarea["rows"];
+  /** How the browser wraps the text, and whether the breaks are submitted with
+it. */
+  wrap?: HelixTextarea["wrap"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -14970,10 +14970,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixTextarea["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixTextarea["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixTextarea["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixTextarea["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixTextarea["label"];
   /** Whether the form refuses to submit without it. */
@@ -14987,16 +14987,6 @@ a token like `email` or `bday` to ask for autofill, or to `off` to refuse. */
   "bool:auto-grow"?: HelixTextarea["autoGrow"];
   /** Whether the box follows its own content rather than scrolling. */
   "prop:autoGrow"?: HelixTextarea["autoGrow"];
-  /** Shown while the field is empty.
-
-Not a label: it goes when typing starts. */
-  "prop:placeholder"?: HelixTextarea["placeholder"];
-  /** Whether the field refuses input while still submitting its value. */
-  "bool:readonly"?: HelixTextarea["readOnly"];
-  /** Whether the field refuses input while still submitting its value. */
-  "prop:readOnly"?: HelixTextarea["readOnly"];
-  /** How many lines the box is before anything is typed. */
-  "prop:rows"?: HelixTextarea["rows"];
   /** How many characters wide the box is, where the layout is not deciding.
 
 Optional and absent by default, which is the reflected-property rule: a
@@ -15023,9 +15013,10 @@ no form at all and forwarding the attribute would have looked right and
 submitted nothing. `ElementInternals` takes a `FormData`, which is how one
 element sends two entries, and that is what this does. */
   "prop:dirName"?: HelixTextarea["dirName"];
-  /** How the browser wraps the text, and whether the breaks are submitted with
-it. */
-  "prop:wrap"?: HelixTextarea["wrap"];
+  /** Most characters the value may have. */
+  "attr:maxlength"?: HelixTextarea["maxLength"];
+  /** Most characters the value may have. */
+  "prop:maxLength"?: HelixTextarea["maxLength"];
   /** Fewest characters the value may have.
 
 Forwarded to the real `<textarea>` rather than checked here, which is what
@@ -15040,10 +15031,19 @@ makes the message the browser's and therefore the reader's own language.
 No `pattern`: the platform does not give a textarea one, and inventing it
 would be this library guessing where the point is to stop guessing. */
   "prop:minLength"?: HelixTextarea["minLength"];
-  /** Most characters the value may have. */
-  "attr:maxlength"?: HelixTextarea["maxLength"];
-  /** Most characters the value may have. */
-  "prop:maxLength"?: HelixTextarea["maxLength"];
+  /** Shown while the field is empty.
+
+Not a label: it goes when typing starts. */
+  "prop:placeholder"?: HelixTextarea["placeholder"];
+  /** Whether the field refuses input while still submitting its value. */
+  "bool:readonly"?: HelixTextarea["readOnly"];
+  /** Whether the field refuses input while still submitting its value. */
+  "prop:readOnly"?: HelixTextarea["readOnly"];
+  /** How many lines the box is before anything is typed. */
+  "prop:rows"?: HelixTextarea["rows"];
+  /** How the browser wraps the text, and whether the breaks are submitted with
+it. */
+  "prop:wrap"?: HelixTextarea["wrap"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15145,10 +15145,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixTimeInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixTimeInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixTimeInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixTimeInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixTimeInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -15158,27 +15158,12 @@ a reset should return to. */
 Empty leaves the attribute off, which is the browser's default and is what
 lets autofill work at all. */
   autocomplete?: HelixTimeInput["autocomplete"];
-  /** Whether the panel is one list of times or a column each.
+  /** Language tag the times are written in.
 
-`list` offers whole times, which is what a product with slots or opening
-hours has. `wheels` splits them into an hour, a minute and a meridiem where
-the locale uses one, which is the only way to reach `23:45` without
-scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
-
-**Optional rather than defaulted, which is not a style preference.** A
-reflecting property with a default writes its attribute onto every host the
-moment the element upgrades, including the ones a consumer rendered and did
-not touch, and React reads that as a hydration mismatch. The absent
-attribute *is* the list, which the stylesheet reads as the base rule, so
-only the departure has to be named. */
-  variant?: HelixTimeInput["variant"];
-  /** How many times can be held at once.
-
-Absent is one. `range` holds a start and an end, `multiple` holds any
-number, and both are carried as one comma-separated value, which is what a
-form submits. `helix-time-picker` carries the longer note on the interaction and on
-why a wheel cannot do either. */
-  mode?: HelixTimeInput["mode"];
+Absent uses the runtime's own. */
+  locale?: HelixTimeInput["locale"];
+  /** Latest time that can be chosen, as `HH:mm`. */
+  max?: HelixTimeInput["max"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default, for the reason Date Input gives: how
@@ -15191,36 +15176,17 @@ and this element knows neither. */
 many fit depends on the width of the field and the length of what is in it,
 and this element knows neither. */
   maxTags?: HelixTimeInput["maxTags"];
-  /** How far apart the offered times are, in minutes. */
-  step?: HelixTimeInput["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
   min?: HelixTimeInput["min"];
-  /** Latest time that can be chosen, as `HH:mm`. */
-  max?: HelixTimeInput["max"];
-  /** Whether the field writes the time out, or holds the value as it is.
+  /** How many times can be held at once.
 
-`local` is the reader's own convention from `Intl`, which is what a time is
-for reading; `iso` is `HH:mm`, which is what it is for typing. The field
-swaps to the value while the caret is in it either way, so the rendering is
-never something this element would refuse to read back. */
-  "time-style"?: HelixTimeInput["timeStyle"];
-  /** Whether the field writes the time out, or holds the value as it is.
-
-`local` is the reader's own convention from `Intl`, which is what a time is
-for reading; `iso` is `HH:mm`, which is what it is for typing. The field
-swaps to the value while the caret is in it either way, so the rendering is
-never something this element would refuse to read back. */
-  timeStyle?: HelixTimeInput["timeStyle"];
-  /** Language tag the times are written in.
-
-Absent uses the runtime's own. */
-  locale?: HelixTimeInput["locale"];
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value, which is what a
+form submits. `helix-time-picker` carries the longer note on the interaction and on
+why a wheel cannot do either. */
+  mode?: HelixTimeInput["mode"];
   /** What the field says before a time is in it. */
   placeholder?: HelixTimeInput["placeholder"];
-  /** Accessible name for the control that opens the list. */
-  "trigger-label"?: HelixTimeInput["triggerLabel"];
-  /** Accessible name for the control that opens the list. */
-  triggerLabel?: HelixTimeInput["triggerLabel"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -15245,6 +15211,40 @@ submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
   readOnly?: HelixTimeInput["readOnly"];
+  /** How far apart the offered times are, in minutes. */
+  step?: HelixTimeInput["step"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  "time-style"?: HelixTimeInput["timeStyle"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  timeStyle?: HelixTimeInput["timeStyle"];
+  /** Accessible name for the control that opens the list. */
+  "trigger-label"?: HelixTimeInput["triggerLabel"];
+  /** Accessible name for the control that opens the list. */
+  triggerLabel?: HelixTimeInput["triggerLabel"];
+  /** Whether the panel is one list of times or a column each.
+
+`list` offers whole times, which is what a product with slots or opening
+hours has. `wheels` splits them into an hour, a minute and a meridiem where
+the locale uses one, which is the only way to reach `23:45` without
+scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
+
+**Optional rather than defaulted, which is not a style preference.** A
+reflecting property with a default writes its attribute onto every host the
+moment the element upgrades, including the ones a consumer rendered and did
+not touch, and React reads that as a hydration mismatch. The absent
+attribute *is* the list, which the stylesheet reads as the base rule, so
+only the departure has to be named. */
+  variant?: HelixTimeInput["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15331,10 +15331,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixTimeInput["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixTimeInput["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixTimeInput["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixTimeInput["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixTimeInput["label"];
   /** Whether the form refuses to submit without it. */
@@ -15344,27 +15344,12 @@ a reset should return to. */
 Empty leaves the attribute off, which is the browser's default and is what
 lets autofill work at all. */
   "prop:autocomplete"?: HelixTimeInput["autocomplete"];
-  /** Whether the panel is one list of times or a column each.
+  /** Language tag the times are written in.
 
-`list` offers whole times, which is what a product with slots or opening
-hours has. `wheels` splits them into an hour, a minute and a meridiem where
-the locale uses one, which is the only way to reach `23:45` without
-scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
-
-**Optional rather than defaulted, which is not a style preference.** A
-reflecting property with a default writes its attribute onto every host the
-moment the element upgrades, including the ones a consumer rendered and did
-not touch, and React reads that as a hydration mismatch. The absent
-attribute *is* the list, which the stylesheet reads as the base rule, so
-only the departure has to be named. */
-  "prop:variant"?: HelixTimeInput["variant"];
-  /** How many times can be held at once.
-
-Absent is one. `range` holds a start and an end, `multiple` holds any
-number, and both are carried as one comma-separated value, which is what a
-form submits. `helix-time-picker` carries the longer note on the interaction and on
-why a wheel cannot do either. */
-  "prop:mode"?: HelixTimeInput["mode"];
+Absent uses the runtime's own. */
+  "prop:locale"?: HelixTimeInput["locale"];
+  /** Latest time that can be chosen, as `HH:mm`. */
+  "prop:max"?: HelixTimeInput["max"];
   /** How many times are shown as tags before the rest are counted, in `multiple`.
 
 `0` is all of them, and is the default, for the reason Date Input gives: how
@@ -15377,36 +15362,17 @@ and this element knows neither. */
 many fit depends on the width of the field and the length of what is in it,
 and this element knows neither. */
   "prop:maxTags"?: HelixTimeInput["maxTags"];
-  /** How far apart the offered times are, in minutes. */
-  "prop:step"?: HelixTimeInput["step"];
   /** Earliest time that can be chosen, as `HH:mm`. */
   "prop:min"?: HelixTimeInput["min"];
-  /** Latest time that can be chosen, as `HH:mm`. */
-  "prop:max"?: HelixTimeInput["max"];
-  /** Whether the field writes the time out, or holds the value as it is.
+  /** How many times can be held at once.
 
-`local` is the reader's own convention from `Intl`, which is what a time is
-for reading; `iso` is `HH:mm`, which is what it is for typing. The field
-swaps to the value while the caret is in it either way, so the rendering is
-never something this element would refuse to read back. */
-  "attr:time-style"?: HelixTimeInput["timeStyle"];
-  /** Whether the field writes the time out, or holds the value as it is.
-
-`local` is the reader's own convention from `Intl`, which is what a time is
-for reading; `iso` is `HH:mm`, which is what it is for typing. The field
-swaps to the value while the caret is in it either way, so the rendering is
-never something this element would refuse to read back. */
-  "prop:timeStyle"?: HelixTimeInput["timeStyle"];
-  /** Language tag the times are written in.
-
-Absent uses the runtime's own. */
-  "prop:locale"?: HelixTimeInput["locale"];
+Absent is one. `range` holds a start and an end, `multiple` holds any
+number, and both are carried as one comma-separated value, which is what a
+form submits. `helix-time-picker` carries the longer note on the interaction and on
+why a wheel cannot do either. */
+  "prop:mode"?: HelixTimeInput["mode"];
   /** What the field says before a time is in it. */
   "prop:placeholder"?: HelixTimeInput["placeholder"];
-  /** Accessible name for the control that opens the list. */
-  "attr:trigger-label"?: HelixTimeInput["triggerLabel"];
-  /** Accessible name for the control that opens the list. */
-  "prop:triggerLabel"?: HelixTimeInput["triggerLabel"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -15431,6 +15397,40 @@ submits nothing and leaves the tab order, and a read-only one submits its
 value and stays reachable, which is what a form showing a value somebody
 else set needs. */
   "prop:readOnly"?: HelixTimeInput["readOnly"];
+  /** How far apart the offered times are, in minutes. */
+  "prop:step"?: HelixTimeInput["step"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  "attr:time-style"?: HelixTimeInput["timeStyle"];
+  /** Whether the field writes the time out, or holds the value as it is.
+
+`local` is the reader's own convention from `Intl`, which is what a time is
+for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+swaps to the value while the caret is in it either way, so the rendering is
+never something this element would refuse to read back. */
+  "prop:timeStyle"?: HelixTimeInput["timeStyle"];
+  /** Accessible name for the control that opens the list. */
+  "attr:trigger-label"?: HelixTimeInput["triggerLabel"];
+  /** Accessible name for the control that opens the list. */
+  "prop:triggerLabel"?: HelixTimeInput["triggerLabel"];
+  /** Whether the panel is one list of times or a column each.
+
+`list` offers whole times, which is what a product with slots or opening
+hours has. `wheels` splits them into an hour, a minute and a meridiem where
+the locale uses one, which is the only way to reach `23:45` without
+scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
+
+**Optional rather than defaulted, which is not a style preference.** A
+reflecting property with a default writes its attribute onto every host the
+moment the element upgrades, including the ones a consumer rendered and did
+not touch, and React reads that as a hydration mismatch. The absent
+attribute *is* the list, which the stylesheet reads as the base rule, so
+only the departure has to be named. */
+  "prop:variant"?: HelixTimeInput["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15513,24 +15513,6 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixTimePicker["value"];
-  /** Whether the current selection fails validation.
-
-A flag rather than a message, the same split Date Picker draws. A flat
-picker has no room of its own for a sentence: the field that wraps one owns
-the label, the hint and the feedback, and a second message inside the panel
-would be the same error said twice. What is left for the picker is the one
-thing the field cannot draw from outside, the mark on the answer itself. */
-  invalid?: HelixTimePicker["invalid"];
-  /** How far apart the offered times are, in minutes.
-
-Fifteen, which is four rows an hour and ninety-six in a day: enough that a
-reader scrolls rather than hunts, and few enough that the list is a list.
-Anything under five is a thousand rows and wants a field instead. */
-  step?: HelixTimePicker["step"];
-  /** Earliest time offered, as `HH:mm`. */
-  min?: HelixTimePicker["min"];
-  /** Latest time offered, as `HH:mm`. */
-  max?: HelixTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -15553,12 +15535,24 @@ A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
   disableTimes?: HelixTimePicker["disableTimes"];
+  /** Whether the current selection fails validation.
+
+A flag rather than a message, the same split Date Picker draws. A flat
+picker has no room of its own for a sentence: the field that wraps one owns
+the label, the hint and the feedback, and a second message inside the panel
+would be the same error said twice. What is left for the picker is the one
+thing the field cannot draw from outside, the mark on the answer itself. */
+  invalid?: HelixTimePicker["invalid"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  label?: HelixTimePicker["label"];
   /** Language tag the times are written in.
 
 Absent uses the runtime's own. */
   locale?: HelixTimePicker["locale"];
-  /** Accessible name for the list, which has no visible one of its own. */
-  label?: HelixTimePicker["label"];
+  /** Latest time offered, as `HH:mm`. */
+  max?: HelixTimePicker["max"];
+  /** Earliest time offered, as `HH:mm`. */
+  min?: HelixTimePicker["min"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end with everything between
@@ -15577,31 +15571,6 @@ and a wheel has exactly one value by construction. Rather than draw
 something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
   mode?: HelixTimePicker["mode"];
-  /** Whether the times are one list or a column each.
-
-`list` is the default and offers whole times, which is what a product with
-opening hours or slots actually has. `wheels` splits them into an hour, a
-minute and, where the locale uses one, a meridiem: three short columns
-instead of ninety-six rows, and the only way to reach `23:45` without
-scrolling most of a day.
-
-The trade is that a wheel cannot say which *combinations* are on offer. A
-list of half hours from nine to five is seventeen rows and every one of them
-is a time the product has; the same thing as columns is an hour column and a
-minute column, and nothing in either says the two are only valid together.
-The bounds are still enforced, so a reader can be refused after the fact,
-which is worse than not being offered it.
-
-So: `list` where the set is the point, `wheels` where any time is allowed
-and the range is a whole day.
-
-**Optional rather than defaulted, which is not a style preference.** A
-reflecting property with a default writes its attribute onto every host the
-moment the element upgrades, including the ones a consumer rendered and did
-not touch, and React reads that as a hydration mismatch. The absent
-attribute *is* the list, which the stylesheet reads as the base rule, so
-only the departure has to be named. */
-  variant?: HelixTimePicker["variant"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -15628,6 +15597,37 @@ else set needs. */
   readOnly?: HelixTimePicker["readOnly"];
   /** Whether the form refuses to submit while nothing is chosen. */
   required?: HelixTimePicker["required"];
+  /** How far apart the offered times are, in minutes.
+
+Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+reader scrolls rather than hunts, and few enough that the list is a list.
+Anything under five is a thousand rows and wants a field instead. */
+  step?: HelixTimePicker["step"];
+  /** Whether the times are one list or a column each.
+
+`list` is the default and offers whole times, which is what a product with
+opening hours or slots actually has. `wheels` splits them into an hour, a
+minute and, where the locale uses one, a meridiem: three short columns
+instead of ninety-six rows, and the only way to reach `23:45` without
+scrolling most of a day.
+
+The trade is that a wheel cannot say which *combinations* are on offer. A
+list of half hours from nine to five is seventeen rows and every one of them
+is a time the product has; the same thing as columns is an hour column and a
+minute column, and nothing in either says the two are only valid together.
+The bounds are still enforced, so a reader can be refused after the fact,
+which is worse than not being offered it.
+
+So: `list` where the set is the point, `wheels` where any time is allowed
+and the range is a whole day.
+
+**Optional rather than defaulted, which is not a style preference.** A
+reflecting property with a default writes its attribute onto every host the
+moment the element upgrades, including the ones a consumer rendered and did
+not touch, and React reads that as a hydration mismatch. The absent
+attribute *is* the list, which the stylesheet reads as the base rule, so
+only the departure has to be named. */
+  variant?: HelixTimePicker["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -15687,24 +15687,6 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixTimePicker["value"];
-  /** Whether the current selection fails validation.
-
-A flag rather than a message, the same split Date Picker draws. A flat
-picker has no room of its own for a sentence: the field that wraps one owns
-the label, the hint and the feedback, and a second message inside the panel
-would be the same error said twice. What is left for the picker is the one
-thing the field cannot draw from outside, the mark on the answer itself. */
-  "prop:invalid"?: HelixTimePicker["invalid"];
-  /** How far apart the offered times are, in minutes.
-
-Fifteen, which is four rows an hour and ninety-six in a day: enough that a
-reader scrolls rather than hunts, and few enough that the list is a list.
-Anything under five is a thousand rows and wants a field instead. */
-  "prop:step"?: HelixTimePicker["step"];
-  /** Earliest time offered, as `HH:mm`. */
-  "prop:min"?: HelixTimePicker["min"];
-  /** Latest time offered, as `HH:mm`. */
-  "prop:max"?: HelixTimePicker["max"];
   /** Times that cannot be chosen, comma separated, as `HH:mm`.
 
 The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -15727,12 +15709,24 @@ A time not on the step is simply never offered, so it is not an error to
 name one, and naming every time in the list is how the empty state is
 reached honestly rather than by handing over an empty range. */
   "prop:disableTimes"?: HelixTimePicker["disableTimes"];
+  /** Whether the current selection fails validation.
+
+A flag rather than a message, the same split Date Picker draws. A flat
+picker has no room of its own for a sentence: the field that wraps one owns
+the label, the hint and the feedback, and a second message inside the panel
+would be the same error said twice. What is left for the picker is the one
+thing the field cannot draw from outside, the mark on the answer itself. */
+  "prop:invalid"?: HelixTimePicker["invalid"];
+  /** Accessible name for the list, which has no visible one of its own. */
+  "prop:label"?: HelixTimePicker["label"];
   /** Language tag the times are written in.
 
 Absent uses the runtime's own. */
   "prop:locale"?: HelixTimePicker["locale"];
-  /** Accessible name for the list, which has no visible one of its own. */
-  "prop:label"?: HelixTimePicker["label"];
+  /** Latest time offered, as `HH:mm`. */
+  "prop:max"?: HelixTimePicker["max"];
+  /** Earliest time offered, as `HH:mm`. */
+  "prop:min"?: HelixTimePicker["min"];
   /** How many times can be held at once.
 
 Absent is one. `range` holds a start and an end with everything between
@@ -15751,31 +15745,6 @@ and a wheel has exactly one value by construction. Rather than draw
 something that cannot say what it holds, `wheels` renders as a list
 whenever a mode is set. */
   "prop:mode"?: HelixTimePicker["mode"];
-  /** Whether the times are one list or a column each.
-
-`list` is the default and offers whole times, which is what a product with
-opening hours or slots actually has. `wheels` splits them into an hour, a
-minute and, where the locale uses one, a meridiem: three short columns
-instead of ninety-six rows, and the only way to reach `23:45` without
-scrolling most of a day.
-
-The trade is that a wheel cannot say which *combinations* are on offer. A
-list of half hours from nine to five is seventeen rows and every one of them
-is a time the product has; the same thing as columns is an hour column and a
-minute column, and nothing in either says the two are only valid together.
-The bounds are still enforced, so a reader can be refused after the fact,
-which is worse than not being offered it.
-
-So: `list` where the set is the point, `wheels` where any time is allowed
-and the range is a whole day.
-
-**Optional rather than defaulted, which is not a style preference.** A
-reflecting property with a default writes its attribute onto every host the
-moment the element upgrades, including the ones a consumer rendered and did
-not touch, and React reads that as a hydration mismatch. The absent
-attribute *is* the list, which the stylesheet reads as the base rule, so
-only the departure has to be named. */
-  "prop:variant"?: HelixTimePicker["variant"];
   /** Whether the control refuses changes while still submitting its value.
 
 **Enforced by refusing every request in one place**, which is the seam this
@@ -15802,6 +15771,37 @@ else set needs. */
   "prop:readOnly"?: HelixTimePicker["readOnly"];
   /** Whether the form refuses to submit while nothing is chosen. */
   "prop:required"?: HelixTimePicker["required"];
+  /** How far apart the offered times are, in minutes.
+
+Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+reader scrolls rather than hunts, and few enough that the list is a list.
+Anything under five is a thousand rows and wants a field instead. */
+  "prop:step"?: HelixTimePicker["step"];
+  /** Whether the times are one list or a column each.
+
+`list` is the default and offers whole times, which is what a product with
+opening hours or slots actually has. `wheels` splits them into an hour, a
+minute and, where the locale uses one, a meridiem: three short columns
+instead of ninety-six rows, and the only way to reach `23:45` without
+scrolling most of a day.
+
+The trade is that a wheel cannot say which *combinations* are on offer. A
+list of half hours from nine to five is seventeen rows and every one of them
+is a time the product has; the same thing as columns is an hour column and a
+minute column, and nothing in either says the two are only valid together.
+The bounds are still enforced, so a reader can be refused after the fact,
+which is worse than not being offered it.
+
+So: `list` where the set is the point, `wheels` where any time is allowed
+and the range is a whole day.
+
+**Optional rather than defaulted, which is not a style preference.** A
+reflecting property with a default writes its attribute onto every host the
+moment the element upgrades, including the ones a consumer rendered and did
+not touch, and React reads that as a hydration mismatch. The absent
+attribute *is* the list, which the stylesheet reads as the base rule, so
+only the departure has to be named. */
+  "prop:variant"?: HelixTimePicker["variant"];
   /** Whether the control is non-interactive.
 
 Reflected, because the styled tier selects on it, and mirrored to
@@ -16068,10 +16068,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   value?: HelixToggleGroup["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  hint?: HelixToggleGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   feedback?: HelixToggleGroup["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  hint?: HelixToggleGroup["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   label?: HelixToggleGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -16166,10 +16166,10 @@ asking it meant. Writing always applies; `<helix-input value="x">` is the
 same statement in markup, and `default-value` is how markup seeds a value
 a reset should return to. */
   "prop:value"?: HelixToggleGroup["value"];
-  /** Help under the control, shown while there is nothing wrong. */
-  "prop:hint"?: HelixToggleGroup["hint"];
   /** What is wrong, in the reader's words rather than the browser's. */
   "prop:feedback"?: HelixToggleGroup["feedback"];
+  /** Help under the control, shown while there is nothing wrong. */
+  "prop:hint"?: HelixToggleGroup["hint"];
   /** The accessible name, and the fallback for the `label` slot. */
   "prop:label"?: HelixToggleGroup["label"];
   /** Whether the form refuses to submit without it. */
@@ -16254,12 +16254,12 @@ export type HelixToggleHelixSelectElementEvent =
   HelixToggleElementEvent<HelixSelectEvent>;
 
 export type HelixToggleProps = {
-  /** Identifies the item to the group. */
-  value?: HelixToggle["value"];
-  /** Whether this item is the current one. */
-  selected?: HelixToggle["selected"];
   /** Whether the item can be chosen. */
   disabled?: HelixToggle["disabled"];
+  /** Whether this item is the current one. */
+  selected?: HelixToggle["selected"];
+  /** Identifies the item to the group. */
+  value?: HelixToggle["value"];
   /** Whether the markup declared this one chosen, which is what a reset returns to.
 
 `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -16287,12 +16287,12 @@ hydration reports and does not patch up. */
 };
 
 export type HelixToggleSolidJsProps = {
-  /** Identifies the item to the group. */
-  "prop:value"?: HelixToggle["value"];
-  /** Whether this item is the current one. */
-  "prop:selected"?: HelixToggle["selected"];
   /** Whether the item can be chosen. */
   "prop:disabled"?: HelixToggle["disabled"];
+  /** Whether this item is the current one. */
+  "prop:selected"?: HelixToggle["selected"];
+  /** Identifies the item to the group. */
+  "prop:value"?: HelixToggle["value"];
   /** Whether the markup declared this one chosen, which is what a reset returns to.
 
 `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -16403,6 +16403,18 @@ The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
   content?: HelixTooltip["content"];
+  /** How long the pointer must rest before the bubble appears, in milliseconds.
+
+Without one, sweeping across a row of controls flashes a tooltip for each
+of them, which is noise rather than help. Focus opens with no delay: a
+keyboard reader arriving on a control has already committed to it. */
+  delay?: HelixTooltip["delay"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  "delay-out"?: HelixTooltip["delayOut"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  delayOut?: HelixTooltip["delayOut"];
+  /** Whether the tooltip never shows. */
+  disabled?: HelixTooltip["disabled"];
   /** The id of the element this describes, in this tooltip's own tree.
 
 Set it and the tooltip stops wrapping: it renders no trigger, listens on
@@ -16421,10 +16433,6 @@ through as attributes. Both paths reach the same place through Lit, so
 nothing is broken by it; a `[for]` selector would find nothing, which is
 why this does not reflect and nothing styles on it. */
   for?: HelixTooltip["for"];
-  /** Preferred side.
-
-It moves if that side does not fit. */
-  placement?: HelixTooltip["placement"];
   /** Space between the trigger and the point of the bubble, in pixels.
 
 **Measured from the point, which is what the arrow being back changed.**
@@ -16435,20 +16443,6 @@ given this plus however far the arrow actually protrudes, so eight means
 eight from whatever is nearest, arrow or edge, and a consumer who changes
 it changes the visible gap rather than a number the arrow then eats into. */
   offset?: HelixTooltip["offset"];
-  /** The id of a box to keep the bubble inside, instead of the viewport.
-
-Resolved the way `for` is, so an id in the same tree, which is what lets a
-component name a box in its own shadow root. A chart does: its bubble is
-centered on a reading, and the first and last readings sit at the ends of
-the plot, so half the box hangs past the drawing and, measured on a chart
-in a 320px card, three pixels past the card itself.
-
-Clamping is on the cross axis only, which is what makes this safe to point
-at a box the bubble genuinely does not fit inside. See `within` on
-`FloatingController` for what happens if it is applied to the rest. */
-  within?: HelixTooltip["within"];
-  /** Whether the tooltip never shows. */
-  disabled?: HelixTooltip["disabled"];
   /** Whether the bubble survives the trigger being used.
 
 **Activation takes a tooltip down, because a hint about what a control will
@@ -16464,16 +16458,22 @@ everywhere else. Escape, blur and pointer-leave still close it, because
 those are a reader saying they are done rather than a control saying it
 worked. */
   persist?: HelixTooltip["persist"];
-  /** How long the pointer must rest before the bubble appears, in milliseconds.
+  /** Preferred side.
 
-Without one, sweeping across a row of controls flashes a tooltip for each
-of them, which is noise rather than help. Focus opens with no delay: a
-keyboard reader arriving on a control has already committed to it. */
-  delay?: HelixTooltip["delay"];
-  /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  "delay-out"?: HelixTooltip["delayOut"];
-  /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  delayOut?: HelixTooltip["delayOut"];
+It moves if that side does not fit. */
+  placement?: HelixTooltip["placement"];
+  /** The id of a box to keep the bubble inside, instead of the viewport.
+
+Resolved the way `for` is, so an id in the same tree, which is what lets a
+component name a box in its own shadow root. A chart does: its bubble is
+centered on a reading, and the first and last readings sit at the ends of
+the plot, so half the box hangs past the drawing and, measured on a chart
+in a 320px card, three pixels past the card itself.
+
+Clamping is on the cross axis only, which is what makes this safe to point
+at a box the bubble genuinely does not fit inside. See `within` on
+`FloatingController` for what happens if it is applied to the rest. */
+  within?: HelixTooltip["within"];
 
   /** Fired before it hides, and cancelable. */
   "onhelix-before-close"?: (
@@ -16537,6 +16537,18 @@ The common case, and the fallback for the `content` slot: slot something
 there and it replaces this. Both cannot show at once, which is the point
 of using fallback content rather than rendering whichever is present. */
   "prop:content"?: HelixTooltip["content"];
+  /** How long the pointer must rest before the bubble appears, in milliseconds.
+
+Without one, sweeping across a row of controls flashes a tooltip for each
+of them, which is noise rather than help. Focus opens with no delay: a
+keyboard reader arriving on a control has already committed to it. */
+  "prop:delay"?: HelixTooltip["delay"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  "attr:delay-out"?: HelixTooltip["delayOut"];
+  /** How long the bubble stays after the pointer leaves, in milliseconds. */
+  "prop:delayOut"?: HelixTooltip["delayOut"];
+  /** Whether the tooltip never shows. */
+  "prop:disabled"?: HelixTooltip["disabled"];
   /** The id of the element this describes, in this tooltip's own tree.
 
 Set it and the tooltip stops wrapping: it renders no trigger, listens on
@@ -16555,10 +16567,6 @@ through as attributes. Both paths reach the same place through Lit, so
 nothing is broken by it; a `[for]` selector would find nothing, which is
 why this does not reflect and nothing styles on it. */
   "prop:for"?: HelixTooltip["for"];
-  /** Preferred side.
-
-It moves if that side does not fit. */
-  "prop:placement"?: HelixTooltip["placement"];
   /** Space between the trigger and the point of the bubble, in pixels.
 
 **Measured from the point, which is what the arrow being back changed.**
@@ -16569,20 +16577,6 @@ given this plus however far the arrow actually protrudes, so eight means
 eight from whatever is nearest, arrow or edge, and a consumer who changes
 it changes the visible gap rather than a number the arrow then eats into. */
   "prop:offset"?: HelixTooltip["offset"];
-  /** The id of a box to keep the bubble inside, instead of the viewport.
-
-Resolved the way `for` is, so an id in the same tree, which is what lets a
-component name a box in its own shadow root. A chart does: its bubble is
-centered on a reading, and the first and last readings sit at the ends of
-the plot, so half the box hangs past the drawing and, measured on a chart
-in a 320px card, three pixels past the card itself.
-
-Clamping is on the cross axis only, which is what makes this safe to point
-at a box the bubble genuinely does not fit inside. See `within` on
-`FloatingController` for what happens if it is applied to the rest. */
-  "prop:within"?: HelixTooltip["within"];
-  /** Whether the tooltip never shows. */
-  "prop:disabled"?: HelixTooltip["disabled"];
   /** Whether the bubble survives the trigger being used.
 
 **Activation takes a tooltip down, because a hint about what a control will
@@ -16598,16 +16592,22 @@ everywhere else. Escape, blur and pointer-leave still close it, because
 those are a reader saying they are done rather than a control saying it
 worked. */
   "prop:persist"?: HelixTooltip["persist"];
-  /** How long the pointer must rest before the bubble appears, in milliseconds.
+  /** Preferred side.
 
-Without one, sweeping across a row of controls flashes a tooltip for each
-of them, which is noise rather than help. Focus opens with no delay: a
-keyboard reader arriving on a control has already committed to it. */
-  "prop:delay"?: HelixTooltip["delay"];
-  /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  "attr:delay-out"?: HelixTooltip["delayOut"];
-  /** How long the bubble stays after the pointer leaves, in milliseconds. */
-  "prop:delayOut"?: HelixTooltip["delayOut"];
+It moves if that side does not fit. */
+  "prop:placement"?: HelixTooltip["placement"];
+  /** The id of a box to keep the bubble inside, instead of the viewport.
+
+Resolved the way `for` is, so an id in the same tree, which is what lets a
+component name a box in its own shadow root. A chart does: its bubble is
+centered on a reading, and the first and last readings sit at the ends of
+the plot, so half the box hangs past the drawing and, measured on a chart
+in a 320px card, three pixels past the card itself.
+
+Clamping is on the cross axis only, which is what makes this safe to point
+at a box the bubble genuinely does not fit inside. See `within` on
+`FloatingController` for what happens if it is applied to the rest. */
+  "prop:within"?: HelixTooltip["within"];
   /** Fired before it hides, and cancelable. */
   "on:helix-before-close"?: (
     e: HelixTooltipHelixBeforeCloseElementEvent,
@@ -16636,8 +16636,10 @@ export type HelixTourHelixCompleteElementEvent =
   HelixTourElementEvent<HelixCompleteEvent>;
 
 export type HelixTourProps = {
-  /** Whether the tour is running. */
-  open?: HelixTour["open"];
+  /** Label for the control that goes back, handed to every stop. */
+  "back-label"?: HelixTour["backLabel"];
+  /** Label for the control that goes back, handed to every stop. */
+  backLabel?: HelixTour["backLabel"];
   /** Which stop the reader is on.
 
 **Moved through `requestChange`, never by assignment from `move`.** That
@@ -16653,28 +16655,26 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   "default-index"?: HelixTour["defaultIndex"];
   /** Stop to start on, where nothing declared one. */
   defaultIndex?: HelixTour["defaultIndex"];
-  /** Accessible name for the run, such as "Getting started". */
-  label?: HelixTour["label"];
-  /** Space left around the target when it is lit, in pixels. */
-  "spotlight-padding"?: HelixTour["spotlightPadding"];
-  /** Space left around the target when it is lit, in pixels. */
-  spotlightPadding?: HelixTour["spotlightPadding"];
-  /** Label for the control that goes back, handed to every stop. */
-  "back-label"?: HelixTour["backLabel"];
-  /** Label for the control that goes back, handed to every stop. */
-  backLabel?: HelixTour["backLabel"];
-  /** Label for the control that goes on. */
-  "next-label"?: HelixTour["nextLabel"];
-  /** Label for the control that goes on. */
-  nextLabel?: HelixTour["nextLabel"];
   /** Label for the control that goes on from the last stop. */
   "done-label"?: HelixTour["doneLabel"];
   /** Label for the control that goes on from the last stop. */
   doneLabel?: HelixTour["doneLabel"];
+  /** Accessible name for the run, such as "Getting started". */
+  label?: HelixTour["label"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixTour["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixTour["nextLabel"];
+  /** Whether the tour is running. */
+  open?: HelixTour["open"];
   /** Label for the control that leaves the tour. */
   "skip-label"?: HelixTour["skipLabel"];
   /** Label for the control that leaves the tour. */
   skipLabel?: HelixTour["skipLabel"];
+  /** Space left around the target when it is lit, in pixels. */
+  "spotlight-padding"?: HelixTour["spotlightPadding"];
+  /** Space left around the target when it is lit, in pixels. */
+  spotlightPadding?: HelixTour["spotlightPadding"];
 
   /** Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves. */
   "onhelix-before-activate"?: (
@@ -16689,8 +16689,10 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
 };
 
 export type HelixTourSolidJsProps = {
-  /** Whether the tour is running. */
-  "prop:open"?: HelixTour["open"];
+  /** Label for the control that goes back, handed to every stop. */
+  "attr:back-label"?: HelixTour["backLabel"];
+  /** Label for the control that goes back, handed to every stop. */
+  "prop:backLabel"?: HelixTour["backLabel"];
   /** Which stop the reader is on.
 
 **Moved through `requestChange`, never by assignment from `move`.** That
@@ -16706,28 +16708,26 @@ The shape is `Carousel`'s, which is the nearest thing in the library: a
   "attr:default-index"?: HelixTour["defaultIndex"];
   /** Stop to start on, where nothing declared one. */
   "prop:defaultIndex"?: HelixTour["defaultIndex"];
-  /** Accessible name for the run, such as "Getting started". */
-  "prop:label"?: HelixTour["label"];
-  /** Space left around the target when it is lit, in pixels. */
-  "attr:spotlight-padding"?: HelixTour["spotlightPadding"];
-  /** Space left around the target when it is lit, in pixels. */
-  "prop:spotlightPadding"?: HelixTour["spotlightPadding"];
-  /** Label for the control that goes back, handed to every stop. */
-  "attr:back-label"?: HelixTour["backLabel"];
-  /** Label for the control that goes back, handed to every stop. */
-  "prop:backLabel"?: HelixTour["backLabel"];
-  /** Label for the control that goes on. */
-  "attr:next-label"?: HelixTour["nextLabel"];
-  /** Label for the control that goes on. */
-  "prop:nextLabel"?: HelixTour["nextLabel"];
   /** Label for the control that goes on from the last stop. */
   "attr:done-label"?: HelixTour["doneLabel"];
   /** Label for the control that goes on from the last stop. */
   "prop:doneLabel"?: HelixTour["doneLabel"];
+  /** Accessible name for the run, such as "Getting started". */
+  "prop:label"?: HelixTour["label"];
+  /** Label for the control that goes on. */
+  "attr:next-label"?: HelixTour["nextLabel"];
+  /** Label for the control that goes on. */
+  "prop:nextLabel"?: HelixTour["nextLabel"];
+  /** Whether the tour is running. */
+  "prop:open"?: HelixTour["open"];
   /** Label for the control that leaves the tour. */
   "attr:skip-label"?: HelixTour["skipLabel"];
   /** Label for the control that leaves the tour. */
   "prop:skipLabel"?: HelixTour["skipLabel"];
+  /** Space left around the target when it is lit, in pixels. */
+  "attr:spotlight-padding"?: HelixTour["spotlightPadding"];
+  /** Space left around the target when it is lit, in pixels. */
+  "prop:spotlightPadding"?: HelixTour["spotlightPadding"];
   /** Fired before the current stop moves, carrying the new index. Cancelable: refusing it takes the decision and nothing moves. */
   "on:helix-before-activate"?: (
     e: HelixTourHelixBeforeActivateElementEvent,
@@ -16752,10 +16752,10 @@ export type HelixTourStopHelixTourAskElementEvent =
   HelixTourStopElementEvent<HelixTourAskEvent>;
 
 export type HelixTourStopProps = {
-  /** The id of the element this stop is about. */
-  for?: HelixTourStop["for"];
-  /** Which side of the target the panel prefers. */
-  placement?: HelixTourStop["placement"];
+  /** Label for the control that goes back. */
+  "back-label"?: HelixTourStop["backLabel"];
+  /** Label for the control that goes back. */
+  backLabel?: HelixTourStop["backLabel"];
   /** Whether this is the stop the reader is on.
 
 Written by the root rather than by a consumer, which is the one place this
@@ -16764,22 +16764,22 @@ reason that did not hold for the trail or the avatar group: a tour starts
 closed, so there is no server state to get wrong. The server renders a
 closed tour, a closed tour shows nothing, and nothing can disagree. */
   current?: HelixTourStop["current"];
-  /** Whether this is the last stop, so the control says Done. */
-  last?: HelixTourStop["last"];
-  /** Whether this is the first stop, so there is nowhere back to. */
-  first?: HelixTourStop["first"];
-  /** Label for the control that goes back. */
-  "back-label"?: HelixTourStop["backLabel"];
-  /** Label for the control that goes back. */
-  backLabel?: HelixTourStop["backLabel"];
-  /** Label for the control that goes on. */
-  "next-label"?: HelixTourStop["nextLabel"];
-  /** Label for the control that goes on. */
-  nextLabel?: HelixTourStop["nextLabel"];
   /** Label for the control that goes on from the last stop. */
   "done-label"?: HelixTourStop["doneLabel"];
   /** Label for the control that goes on from the last stop. */
   doneLabel?: HelixTourStop["doneLabel"];
+  /** Whether this is the first stop, so there is nowhere back to. */
+  first?: HelixTourStop["first"];
+  /** The id of the element this stop is about. */
+  for?: HelixTourStop["for"];
+  /** Whether this is the last stop, so the control says Done. */
+  last?: HelixTourStop["last"];
+  /** Label for the control that goes on. */
+  "next-label"?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on. */
+  nextLabel?: HelixTourStop["nextLabel"];
+  /** Which side of the target the panel prefers. */
+  placement?: HelixTourStop["placement"];
   /** Label for the control that leaves the tour. */
   "skip-label"?: HelixTourStop["skipLabel"];
   /** Label for the control that leaves the tour. */
@@ -16790,10 +16790,10 @@ closed tour, a closed tour shows nothing, and nothing can disagree. */
 };
 
 export type HelixTourStopSolidJsProps = {
-  /** The id of the element this stop is about. */
-  "prop:for"?: HelixTourStop["for"];
-  /** Which side of the target the panel prefers. */
-  "prop:placement"?: HelixTourStop["placement"];
+  /** Label for the control that goes back. */
+  "attr:back-label"?: HelixTourStop["backLabel"];
+  /** Label for the control that goes back. */
+  "prop:backLabel"?: HelixTourStop["backLabel"];
   /** Whether this is the stop the reader is on.
 
 Written by the root rather than by a consumer, which is the one place this
@@ -16802,22 +16802,22 @@ reason that did not hold for the trail or the avatar group: a tour starts
 closed, so there is no server state to get wrong. The server renders a
 closed tour, a closed tour shows nothing, and nothing can disagree. */
   "prop:current"?: HelixTourStop["current"];
-  /** Whether this is the last stop, so the control says Done. */
-  "prop:last"?: HelixTourStop["last"];
-  /** Whether this is the first stop, so there is nowhere back to. */
-  "prop:first"?: HelixTourStop["first"];
-  /** Label for the control that goes back. */
-  "attr:back-label"?: HelixTourStop["backLabel"];
-  /** Label for the control that goes back. */
-  "prop:backLabel"?: HelixTourStop["backLabel"];
-  /** Label for the control that goes on. */
-  "attr:next-label"?: HelixTourStop["nextLabel"];
-  /** Label for the control that goes on. */
-  "prop:nextLabel"?: HelixTourStop["nextLabel"];
   /** Label for the control that goes on from the last stop. */
   "attr:done-label"?: HelixTourStop["doneLabel"];
   /** Label for the control that goes on from the last stop. */
   "prop:doneLabel"?: HelixTourStop["doneLabel"];
+  /** Whether this is the first stop, so there is nowhere back to. */
+  "prop:first"?: HelixTourStop["first"];
+  /** The id of the element this stop is about. */
+  "prop:for"?: HelixTourStop["for"];
+  /** Whether this is the last stop, so the control says Done. */
+  "prop:last"?: HelixTourStop["last"];
+  /** Label for the control that goes on. */
+  "attr:next-label"?: HelixTourStop["nextLabel"];
+  /** Label for the control that goes on. */
+  "prop:nextLabel"?: HelixTourStop["nextLabel"];
+  /** Which side of the target the panel prefers. */
+  "prop:placement"?: HelixTourStop["placement"];
   /** Label for the control that leaves the tour. */
   "attr:skip-label"?: HelixTourStop["skipLabel"];
   /** Label for the control that leaves the tour. */
@@ -16861,16 +16861,19 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "default-open"?: HelixTreeItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   defaultOpen?: HelixTreeItem["defaultOpen"];
-  /** Identifies the item to the consumer, carried in `helix-select`. */
-  value?: HelixTreeItem["value"];
   /** Where this node goes, which makes its row a real link.
 
 Unset by default, and unreflected: a tree of choosable nodes is not a tree
 of links, and an empty `href` written onto every row would be a link to the
 current page on every item a consumer never asked to be one. */
   href?: HelixTreeItem["href"];
-  /** Where the link opens, for the rare row that leaves the site. */
-  target?: HelixTreeItem["target"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
+
+Not reflected. The tree assigns this after it upgrades, so an attribute
+here would be a change to markup the consumer rendered and hydration would
+report it. The indent it drives is written onto the row instead, inside the
+shadow root, which is not part of the tree React hydrates. */
+  level?: HelixTreeItem["level"];
   /** What the link declares about where it goes.
 
 Set by the consumer rather than derived from `target`: `noreferrer` is a
@@ -16888,13 +16891,10 @@ consumer rendered and hydration would report it. Mirroring to
 The stylesheet reads it from the row inside this shadow root, because the
 row is not part of the tree React hydrates. */
   selected?: HelixTreeItem["selected"];
-  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
-
-Not reflected. The tree assigns this after it upgrades, so an attribute
-here would be a change to markup the consumer rendered and hydration would
-report it. The indent it drives is written onto the row instead, inside the
-shadow root, which is not part of the tree React hydrates. */
-  level?: HelixTreeItem["level"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  target?: HelixTreeItem["target"];
+  /** Identifies the item to the consumer, carried in `helix-select`. */
+  value?: HelixTreeItem["value"];
   /** Whether this item holds the tree's single tab stop. */
   focusable?: HelixTreeItem["focusable"];
 
@@ -16928,16 +16928,19 @@ the resolved state for stylesheets, which is what the mirror is for. */
   "bool:default-open"?: HelixTreeItem["defaultOpen"];
   /** Initial open state for uncontrolled use, where nothing declared one. */
   "prop:defaultOpen"?: HelixTreeItem["defaultOpen"];
-  /** Identifies the item to the consumer, carried in `helix-select`. */
-  "prop:value"?: HelixTreeItem["value"];
   /** Where this node goes, which makes its row a real link.
 
 Unset by default, and unreflected: a tree of choosable nodes is not a tree
 of links, and an empty `href` written onto every row would be a link to the
 current page on every item a consumer never asked to be one. */
   "prop:href"?: HelixTreeItem["href"];
-  /** Where the link opens, for the rare row that leaves the site. */
-  "prop:target"?: HelixTreeItem["target"];
+  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
+
+Not reflected. The tree assigns this after it upgrades, so an attribute
+here would be a change to markup the consumer rendered and hydration would
+report it. The indent it drives is written onto the row instead, inside the
+shadow root, which is not part of the tree React hydrates. */
+  "prop:level"?: HelixTreeItem["level"];
   /** What the link declares about where it goes.
 
 Set by the consumer rather than derived from `target`: `noreferrer` is a
@@ -16955,13 +16958,10 @@ consumer rendered and hydration would report it. Mirroring to
 The stylesheet reads it from the row inside this shadow root, because the
 row is not part of the tree React hydrates. */
   "prop:selected"?: HelixTreeItem["selected"];
-  /** Depth from the root, set by the tree so indentation needs no CSS nesting.
-
-Not reflected. The tree assigns this after it upgrades, so an attribute
-here would be a change to markup the consumer rendered and hydration would
-report it. The indent it drives is written onto the row instead, inside the
-shadow root, which is not part of the tree React hydrates. */
-  "prop:level"?: HelixTreeItem["level"];
+  /** Where the link opens, for the rare row that leaves the site. */
+  "prop:target"?: HelixTreeItem["target"];
+  /** Identifies the item to the consumer, carried in `helix-select`. */
+  "prop:value"?: HelixTreeItem["value"];
   /** Whether this item holds the tree's single tab stop. */
   "prop:focusable"?: HelixTreeItem["focusable"];
   /** Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves. */
@@ -17040,6 +17040,10 @@ and the row's `end` slot already carries an auto margin of its own, so the
 two split the free space and the chevron lands halfway along. Measured at
 70px short. That is the kind of thing a component should absorb once. */
   chevronPlacement?: HelixTree["chevronPlacement"];
+  /** What is said where there are none, and none are coming. */
+  "empty-text"?: HelixTree["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  emptyText?: HelixTree["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -17050,10 +17054,6 @@ say that without the component knowing what a row looks like. */
   "loading-text"?: HelixTree["loadingText"];
   /** What is said while they are on their way. */
   loadingText?: HelixTree["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "empty-text"?: HelixTree["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  emptyText?: HelixTree["emptyText"];
   /** Which item is current, by its `value`.
 
 Not `option.active`, which is the option the keyboard is on: that is a
@@ -17129,6 +17129,10 @@ and the row's `end` slot already carries an auto margin of its own, so the
 two split the free space and the chevron lands halfway along. Measured at
 70px short. That is the kind of thing a component should absorb once. */
   "prop:chevronPlacement"?: HelixTree["chevronPlacement"];
+  /** What is said where there are none, and none are coming. */
+  "attr:empty-text"?: HelixTree["emptyText"];
+  /** What is said where there are none, and none are coming. */
+  "prop:emptyText"?: HelixTree["emptyText"];
   /** Whether the rows are still on their way.
 
 Reflected, because a stylesheet needs it: the rows that are already there
@@ -17139,10 +17143,6 @@ say that without the component knowing what a row looks like. */
   "attr:loading-text"?: HelixTree["loadingText"];
   /** What is said while they are on their way. */
   "prop:loadingText"?: HelixTree["loadingText"];
-  /** What is said where there are none, and none are coming. */
-  "attr:empty-text"?: HelixTree["emptyText"];
-  /** What is said where there are none, and none are coming. */
-  "prop:emptyText"?: HelixTree["emptyText"];
   /** Which item is current, by its `value`.
 
 Not `option.active`, which is the option the keyboard is on: that is a
@@ -17230,10 +17230,8 @@ export type HelixVideoPlaylistItemHelixSelectElementEvent =
   HelixVideoPlaylistItemElementEvent<HelixSelectEvent>;
 
 export type HelixVideoPlaylistItemProps = {
-  /** What identifies the entry, and what `active` is compared against. */
-  value?: HelixVideoPlaylistItem["value"];
-  /** The file this entry plays. */
-  src?: HelixVideoPlaylistItem["src"];
+  /** Whether the entry can be chosen. */
+  disabled?: HelixVideoPlaylistItem["disabled"];
   /** What covers the picture before this entry plays, and the row's thumbnail.
 
 One property doing both, because they are the same picture: the frame that
@@ -17242,8 +17240,10 @@ fallback rather than something drawn beside it, which is this library's rule
 for a content property, so a consumer with something better to show slots it
 and the two can never both appear. */
   poster?: HelixVideoPlaylistItem["poster"];
-  /** Whether the entry can be chosen. */
-  disabled?: HelixVideoPlaylistItem["disabled"];
+  /** The file this entry plays. */
+  src?: HelixVideoPlaylistItem["src"];
+  /** What identifies the entry, and what `active` is compared against. */
+  value?: HelixVideoPlaylistItem["value"];
   /** Whether the player is on this entry.
 
 Written by the playlist rather than by the entry, the way an option's
@@ -17256,10 +17256,8 @@ which one is playing. */
 };
 
 export type HelixVideoPlaylistItemSolidJsProps = {
-  /** What identifies the entry, and what `active` is compared against. */
-  "prop:value"?: HelixVideoPlaylistItem["value"];
-  /** The file this entry plays. */
-  "prop:src"?: HelixVideoPlaylistItem["src"];
+  /** Whether the entry can be chosen. */
+  "prop:disabled"?: HelixVideoPlaylistItem["disabled"];
   /** What covers the picture before this entry plays, and the row's thumbnail.
 
 One property doing both, because they are the same picture: the frame that
@@ -17268,8 +17266,10 @@ fallback rather than something drawn beside it, which is this library's rule
 for a content property, so a consumer with something better to show slots it
 and the two can never both appear. */
   "prop:poster"?: HelixVideoPlaylistItem["poster"];
-  /** Whether the entry can be chosen. */
-  "prop:disabled"?: HelixVideoPlaylistItem["disabled"];
+  /** The file this entry plays. */
+  "prop:src"?: HelixVideoPlaylistItem["src"];
+  /** What identifies the entry, and what `active` is compared against. */
+  "prop:value"?: HelixVideoPlaylistItem["value"];
   /** Whether the player is on this entry.
 
 Written by the playlist rather than by the entry, the way an option's
@@ -17422,14 +17422,24 @@ export type HelixVideoHelixPreviousElementEvent =
 export type HelixVideoProps = {
   /** Whether the bar floats on the picture or sits on its own ground. */
   separation?: HelixVideo["separation"];
-  /** Where the video is, for the common case of one file. */
-  src?: HelixVideo["src"];
-  /** A still shown before it plays, which the platform draws itself. */
-  poster?: HelixVideo["poster"];
-  /** Accessible name, since a video is not described by its filename. */
-  label?: HelixVideo["label"];
-  /** Whether it starts again at the end. */
-  loop?: HelixVideo["loop"];
+  /** Whether it starts on its own, which a browser only allows while silent.
+
+Forwarded rather than acted on. Whether an unprompted play is permitted is
+the browser's policy and not this element's, and `play()` already swallows
+the refusal: what follows a refused autoplay is a paused player showing its
+start control, which is the correct thing to be looking at. */
+  autoplay?: HelixVideo["autoplay"];
+  /** Whether the browser draws the controls instead of this element.
+
+A fallback rather than a default. Two bars over one video is worse than
+either alone, so this one is not drawn at all when it is set. */
+  controls?: HelixVideo["controls"];
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
+  crossorigin?: HelixVideo["crossOrigin"];
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
+  crossOrigin?: HelixVideo["crossOrigin"];
   /** Whether it *starts* silent, which is what an autoplaying video must do.
 
 **Named for the platform's split, which is real.** The `muted` content
@@ -17448,30 +17458,6 @@ reader's click moves without touching the attribute. One property called
 whether there is sound, which is a name matching the platform's while
 meaning something else. */
   defaultMuted?: HelixVideo["defaultMuted"];
-  /** Whether it plays where it sits rather than taking over the screen. */
-  playsinline?: HelixVideo["playsInline"];
-  /** Whether it plays where it sits rather than taking over the screen. */
-  playsInline?: HelixVideo["playsInline"];
-  /** Whether the browser draws the controls instead of this element.
-
-A fallback rather than a default. Two bars over one video is worse than
-either alone, so this one is not drawn at all when it is set. */
-  controls?: HelixVideo["controls"];
-  /** How much to fetch before anything is asked for. */
-  preload?: HelixVideo["preload"];
-  /** Whether it starts on its own, which a browser only allows while silent.
-
-Forwarded rather than acted on. Whether an unprompted play is permitted is
-the browser's policy and not this element's, and `play()` already swallows
-the refusal: what follows a refused autoplay is a paused player showing its
-start control, which is the correct thing to be looking at. */
-  autoplay?: HelixVideo["autoplay"];
-  /** How the media is fetched across origins, which decides whether a track can
-be read. */
-  crossorigin?: HelixVideo["crossOrigin"];
-  /** How the media is fetched across origins, which decides whether a track can
-be read. */
-  crossOrigin?: HelixVideo["crossOrigin"];
   /** Whether the browser may offer picture in picture. */
   disablepictureinpicture?: HelixVideo["disablePictureInPicture"];
   /** Whether the browser may offer picture in picture. */
@@ -17480,6 +17466,10 @@ be read. */
   disableremoteplayback?: HelixVideo["disableRemotePlayback"];
   /** Whether the browser may offer playback on a remote device. */
   disableRemotePlayback?: HelixVideo["disableRemotePlayback"];
+  /** And what they are told when it will not play at all. */
+  "error-label"?: HelixVideo["errorLabel"];
+  /** And what they are told when it will not play at all. */
+  errorLabel?: HelixVideo["errorLabel"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -17522,6 +17512,34 @@ ours to promise: the attribute is ignored cross-origin, so a file served
 from somewhere else opens rather than saves, which is the browser's rule
 and not something a player can work around. */
   extraControls?: HelixVideo["extraControls"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+A wait rather than leaving with the pointer, or a reader moving across the
+picture to reach a control watches the bar vanish under them. Zero turns
+the wait off and the bar goes immediately; a large number keeps it up for
+as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  "idle-delay"?: HelixVideo["idleDelay"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+A wait rather than leaving with the pointer, or a reader moving across the
+picture to reach a control watches the bar vanish under them. Zero turns
+the wait off and the bar goes immediately; a large number keeps it up for
+as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  idleDelay?: HelixVideo["idleDelay"];
+  /** Accessible name, since a video is not described by its filename. */
+  label?: HelixVideo["label"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  "loading-label"?: HelixVideo["loadingLabel"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  loadingLabel?: HelixVideo["loadingLabel"];
+  /** Whether it starts again at the end. */
+  loop?: HelixVideo["loop"];
   /** Controls that go behind one button instead of onto the bar, named the same
 way.
 
@@ -17554,6 +17572,26 @@ So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
   overflowControls?: HelixVideo["overflowControls"];
+  /** And while it would stop it. */
+  "pause-label"?: HelixVideo["pauseLabel"];
+  /** And while it would stop it. */
+  pauseLabel?: HelixVideo["pauseLabel"];
+  /** What the play control is called while it would start the video. */
+  "play-label"?: HelixVideo["playLabel"];
+  /** What the play control is called while it would start the video. */
+  playLabel?: HelixVideo["playLabel"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  playsinline?: HelixVideo["playsInline"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  playsInline?: HelixVideo["playsInline"];
+  /** A still shown before it plays, which the platform draws itself. */
+  poster?: HelixVideo["poster"];
+  /** How much to fetch before anything is asked for. */
+  preload?: HelixVideo["preload"];
+  /** The speeds offered, slowest first, as multipliers of normal. */
+  speeds?: HelixVideo["speeds"];
+  /** Where the video is, for the common case of one file. */
+  src?: HelixVideo["src"];
   /** The big mark over the picture whenever it is not playing, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
@@ -17586,44 +17624,6 @@ A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
 negation. */
   startControl?: HelixVideo["startControl"];
-  /** The speeds offered, slowest first, as multipliers of normal. */
-  speeds?: HelixVideo["speeds"];
-  /** How long the bar waits after the pointer stops before it goes, in ms.
-
-A wait rather than leaving with the pointer, or a reader moving across the
-picture to reach a control watches the bar vanish under them. Zero turns
-the wait off and the bar goes immediately; a large number keeps it up for
-as long as anyone is likely to look.
-
-The wait is only ever about *idling*. A video that is paused keeps its bar
-regardless, because a reader who stopped it is deciding what to do next. */
-  "idle-delay"?: HelixVideo["idleDelay"];
-  /** How long the bar waits after the pointer stops before it goes, in ms.
-
-A wait rather than leaving with the pointer, or a reader moving across the
-picture to reach a control watches the bar vanish under them. Zero turns
-the wait off and the bar goes immediately; a large number keeps it up for
-as long as anyone is likely to look.
-
-The wait is only ever about *idling*. A video that is paused keeps its bar
-regardless, because a reader who stopped it is deciding what to do next. */
-  idleDelay?: HelixVideo["idleDelay"];
-  /** What the play control is called while it would start the video. */
-  "play-label"?: HelixVideo["playLabel"];
-  /** What the play control is called while it would start the video. */
-  playLabel?: HelixVideo["playLabel"];
-  /** And while it would stop it. */
-  "pause-label"?: HelixVideo["pauseLabel"];
-  /** And while it would stop it. */
-  pauseLabel?: HelixVideo["pauseLabel"];
-  /** What a reader is told while the picture is waiting for more of itself. */
-  "loading-label"?: HelixVideo["loadingLabel"];
-  /** What a reader is told while the picture is waiting for more of itself. */
-  loadingLabel?: HelixVideo["loadingLabel"];
-  /** And what they are told when it will not play at all. */
-  "error-label"?: HelixVideo["errorLabel"];
-  /** And what they are told when it will not play at all. */
-  errorLabel?: HelixVideo["errorLabel"];
   /** Where playback has reached, in seconds.
 
 Writing seeks, through the same clamp `seek` uses, because a `currentTime`
@@ -17653,14 +17653,24 @@ past the end is the one write the platform answers with an exception. */
 export type HelixVideoSolidJsProps = {
   /** Whether the bar floats on the picture or sits on its own ground. */
   "prop:separation"?: HelixVideo["separation"];
-  /** Where the video is, for the common case of one file. */
-  "prop:src"?: HelixVideo["src"];
-  /** A still shown before it plays, which the platform draws itself. */
-  "prop:poster"?: HelixVideo["poster"];
-  /** Accessible name, since a video is not described by its filename. */
-  "prop:label"?: HelixVideo["label"];
-  /** Whether it starts again at the end. */
-  "prop:loop"?: HelixVideo["loop"];
+  /** Whether it starts on its own, which a browser only allows while silent.
+
+Forwarded rather than acted on. Whether an unprompted play is permitted is
+the browser's policy and not this element's, and `play()` already swallows
+the refusal: what follows a refused autoplay is a paused player showing its
+start control, which is the correct thing to be looking at. */
+  "prop:autoplay"?: HelixVideo["autoplay"];
+  /** Whether the browser draws the controls instead of this element.
+
+A fallback rather than a default. Two bars over one video is worse than
+either alone, so this one is not drawn at all when it is set. */
+  "prop:controls"?: HelixVideo["controls"];
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
+  "attr:crossorigin"?: HelixVideo["crossOrigin"];
+  /** How the media is fetched across origins, which decides whether a track can
+be read. */
+  "prop:crossOrigin"?: HelixVideo["crossOrigin"];
   /** Whether it *starts* silent, which is what an autoplaying video must do.
 
 **Named for the platform's split, which is real.** The `muted` content
@@ -17679,30 +17689,6 @@ reader's click moves without touching the attribute. One property called
 whether there is sound, which is a name matching the platform's while
 meaning something else. */
   "prop:defaultMuted"?: HelixVideo["defaultMuted"];
-  /** Whether it plays where it sits rather than taking over the screen. */
-  "bool:playsinline"?: HelixVideo["playsInline"];
-  /** Whether it plays where it sits rather than taking over the screen. */
-  "prop:playsInline"?: HelixVideo["playsInline"];
-  /** Whether the browser draws the controls instead of this element.
-
-A fallback rather than a default. Two bars over one video is worse than
-either alone, so this one is not drawn at all when it is set. */
-  "prop:controls"?: HelixVideo["controls"];
-  /** How much to fetch before anything is asked for. */
-  "prop:preload"?: HelixVideo["preload"];
-  /** Whether it starts on its own, which a browser only allows while silent.
-
-Forwarded rather than acted on. Whether an unprompted play is permitted is
-the browser's policy and not this element's, and `play()` already swallows
-the refusal: what follows a refused autoplay is a paused player showing its
-start control, which is the correct thing to be looking at. */
-  "prop:autoplay"?: HelixVideo["autoplay"];
-  /** How the media is fetched across origins, which decides whether a track can
-be read. */
-  "attr:crossorigin"?: HelixVideo["crossOrigin"];
-  /** How the media is fetched across origins, which decides whether a track can
-be read. */
-  "prop:crossOrigin"?: HelixVideo["crossOrigin"];
   /** Whether the browser may offer picture in picture. */
   "bool:disablepictureinpicture"?: HelixVideo["disablePictureInPicture"];
   /** Whether the browser may offer picture in picture. */
@@ -17711,6 +17697,10 @@ be read. */
   "bool:disableremoteplayback"?: HelixVideo["disableRemotePlayback"];
   /** Whether the browser may offer playback on a remote device. */
   "prop:disableRemotePlayback"?: HelixVideo["disableRemotePlayback"];
+  /** And what they are told when it will not play at all. */
+  "attr:error-label"?: HelixVideo["errorLabel"];
+  /** And what they are told when it will not play at all. */
+  "prop:errorLabel"?: HelixVideo["errorLabel"];
   /** Controls beyond the ones every player has, named in the order they appear.
 
 A list rather than a property apiece. A bar is a row with a budget, and a
@@ -17753,6 +17743,34 @@ ours to promise: the attribute is ignored cross-origin, so a file served
 from somewhere else opens rather than saves, which is the browser's rule
 and not something a player can work around. */
   "prop:extraControls"?: HelixVideo["extraControls"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+A wait rather than leaving with the pointer, or a reader moving across the
+picture to reach a control watches the bar vanish under them. Zero turns
+the wait off and the bar goes immediately; a large number keeps it up for
+as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  "attr:idle-delay"?: HelixVideo["idleDelay"];
+  /** How long the bar waits after the pointer stops before it goes, in ms.
+
+A wait rather than leaving with the pointer, or a reader moving across the
+picture to reach a control watches the bar vanish under them. Zero turns
+the wait off and the bar goes immediately; a large number keeps it up for
+as long as anyone is likely to look.
+
+The wait is only ever about *idling*. A video that is paused keeps its bar
+regardless, because a reader who stopped it is deciding what to do next. */
+  "prop:idleDelay"?: HelixVideo["idleDelay"];
+  /** Accessible name, since a video is not described by its filename. */
+  "prop:label"?: HelixVideo["label"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  "attr:loading-label"?: HelixVideo["loadingLabel"];
+  /** What a reader is told while the picture is waiting for more of itself. */
+  "prop:loadingLabel"?: HelixVideo["loadingLabel"];
+  /** Whether it starts again at the end. */
+  "prop:loop"?: HelixVideo["loop"];
   /** Controls that go behind one button instead of onto the bar, named the same
 way.
 
@@ -17785,6 +17803,26 @@ So the consumer says where the fold is, which they can, having already
 named the controls in order. A name in both lists is drawn once, on the
 bar: two of the same control is worse than either placement. */
   "prop:overflowControls"?: HelixVideo["overflowControls"];
+  /** And while it would stop it. */
+  "attr:pause-label"?: HelixVideo["pauseLabel"];
+  /** And while it would stop it. */
+  "prop:pauseLabel"?: HelixVideo["pauseLabel"];
+  /** What the play control is called while it would start the video. */
+  "attr:play-label"?: HelixVideo["playLabel"];
+  /** What the play control is called while it would start the video. */
+  "prop:playLabel"?: HelixVideo["playLabel"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  "bool:playsinline"?: HelixVideo["playsInline"];
+  /** Whether it plays where it sits rather than taking over the screen. */
+  "prop:playsInline"?: HelixVideo["playsInline"];
+  /** A still shown before it plays, which the platform draws itself. */
+  "prop:poster"?: HelixVideo["poster"];
+  /** How much to fetch before anything is asked for. */
+  "prop:preload"?: HelixVideo["preload"];
+  /** The speeds offered, slowest first, as multipliers of normal. */
+  "prop:speeds"?: HelixVideo["speeds"];
+  /** Where the video is, for the common case of one file. */
+  "prop:src"?: HelixVideo["src"];
   /** The big mark over the picture whenever it is not playing, or `none`.
 
 **On unless it is turned off, because a stopped video has nothing else.**
@@ -17817,44 +17855,6 @@ A value rather than a boolean, so the resting state is the attribute's
 absence: a boolean defaulting to on would have to be spelled as its own
 negation. */
   "prop:startControl"?: HelixVideo["startControl"];
-  /** The speeds offered, slowest first, as multipliers of normal. */
-  "prop:speeds"?: HelixVideo["speeds"];
-  /** How long the bar waits after the pointer stops before it goes, in ms.
-
-A wait rather than leaving with the pointer, or a reader moving across the
-picture to reach a control watches the bar vanish under them. Zero turns
-the wait off and the bar goes immediately; a large number keeps it up for
-as long as anyone is likely to look.
-
-The wait is only ever about *idling*. A video that is paused keeps its bar
-regardless, because a reader who stopped it is deciding what to do next. */
-  "attr:idle-delay"?: HelixVideo["idleDelay"];
-  /** How long the bar waits after the pointer stops before it goes, in ms.
-
-A wait rather than leaving with the pointer, or a reader moving across the
-picture to reach a control watches the bar vanish under them. Zero turns
-the wait off and the bar goes immediately; a large number keeps it up for
-as long as anyone is likely to look.
-
-The wait is only ever about *idling*. A video that is paused keeps its bar
-regardless, because a reader who stopped it is deciding what to do next. */
-  "prop:idleDelay"?: HelixVideo["idleDelay"];
-  /** What the play control is called while it would start the video. */
-  "attr:play-label"?: HelixVideo["playLabel"];
-  /** What the play control is called while it would start the video. */
-  "prop:playLabel"?: HelixVideo["playLabel"];
-  /** And while it would stop it. */
-  "attr:pause-label"?: HelixVideo["pauseLabel"];
-  /** And while it would stop it. */
-  "prop:pauseLabel"?: HelixVideo["pauseLabel"];
-  /** What a reader is told while the picture is waiting for more of itself. */
-  "attr:loading-label"?: HelixVideo["loadingLabel"];
-  /** What a reader is told while the picture is waiting for more of itself. */
-  "prop:loadingLabel"?: HelixVideo["loadingLabel"];
-  /** And what they are told when it will not play at all. */
-  "attr:error-label"?: HelixVideo["errorLabel"];
-  /** And what they are told when it will not play at all. */
-  "prop:errorLabel"?: HelixVideo["errorLabel"];
   /** Where playback has reached, in seconds.
 
 Writing seeks, through the same clamp `seek` uses, because a `currentTime`
@@ -18385,17 +18385,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `variant`: Which form the light takes. Absent is `braid`.
-   *
-   * Reflected because the fallback gradient selects on it, and given no default
-   * for the same reason every axis here has none: a default on a reflected
-   * property writes the attribute onto every host anybody renders.
-   *
-   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
-   * against `square`, `arc` against `ring`, and it is registered as one.
-   * Aurora, braid and caustics are not geometries; they are eleven names for a
-   * look, which is what `variant` is for by the rule the registry already
-   * states.
+   * - `bloom`: How soft the falloff is, `0` tight and `1` diffuse.
    * - `drift`: How far the settings wander on their own, `0` still and `1` restless.
    *
    * **One property rather than a range on each of the five.** A range per axis
@@ -18408,6 +18398,7 @@ export type CustomElements = {
    * back into phase and the field has no cycle a reader can count. That is the
    * difference between a background that breathes and one that is obviously on
    * a timer.
+   * - `gain`: Overall brightness, as a multiplier on the field.
    * - `interaction`: What the pointer does, where the shape's own answer is not wanted.
    *
    * Absent is `native`, which is each shape answering in the terms it is made
@@ -18419,22 +18410,19 @@ export type CustomElements = {
    * They exist because a consumer may want the quieter, more conventional
    * answer, and because `none` is a real requirement. Not because any of them
    * is the better default.
-   * - `reach`: How far the pointer reaches into the field, `0` upward.
-   *
-   * Multiplied into the presence the pointer already fades in and out with, so
-   * it scales the whole response rather than any one part of it, whichever
-   * interaction is in play.
    * - `interactive`: Whether the pointer shifts and lifts the field.
    *
    * Reflected because the stylesheet selects on it: a background is not
    * hit-testable at rest, or it would swallow clicks meant for what is over it,
    * and an element that is not hit-testable never receives the `pointermove`
    * this listens for. Asking for the pointer is asking for the hit test.
-   * - `bloom`: How soft the falloff is, `0` tight and `1` diffuse.
-   * - `gain`: Overall brightness, as a multiplier on the field.
+   * - `reach`: How far the pointer reaches into the field, `0` upward.
+   *
+   * Multiplied into the presence the pointer already fades in and out with, so
+   * it scales the whole response rather than any one part of it, whichever
+   * interaction is in play.
    * - `scale`: Feature size, as a multiplier on the sampled coordinates.
    * - `speed`: How fast it drifts, as a multiplier on time.
-   * - `tilt`: The field's rotation, in degrees.
    * - `terminus`: Where the axis crosses the top edge, as a fraction of the width.
    *
    * **An angle does not say what a consumer means, and this does.** The axis
@@ -18455,6 +18443,7 @@ export type CustomElements = {
    * layout read per frame, and the drift is applied to the result rather than
    * to the angle behind it: the field still wanders, around a bearing that
    * holds the exit where it was put.
+   * - `tilt`: The field's rotation, in degrees.
    * - `variance`: How much the members of a population differ from one another, `0` a set
    * that is uniform and `1` the resting amount. Clamped to that range: these
    * are interpolations, so a larger number extrapolates rather than
@@ -18468,6 +18457,17 @@ export type CustomElements = {
    * folds widen or even out. `braid`, `waves` and `flow` have a
    * single subject and nothing to vary, and `threads` is even on purpose, so on
    * those four this is inert.
+   * - `variant`: Which form the light takes. Absent is `braid`.
+   *
+   * Reflected because the fallback gradient selects on it, and given no default
+   * for the same reason every axis here has none: a default on a reflected
+   * property writes the attribute onto every host anybody renders.
+   *
+   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
+   * against `square`, `arc` against `ring`, and it is registered as one.
+   * Aurora, braid and caustics are not geometries; they are eleven names for a
+   * look, which is what `variant` is for by the rule the registry already
+   * states.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -18600,12 +18600,12 @@ export type CustomElements = {
    *
    * - `shape`: Whether the avatar is a circle or a rounded square.
    * - `size`: Edge length of the avatar.
-   * - `src`: Image to show.
-   *
-   * Falls back to the slot, or to initials, if it fails.
    * - `name`: Name of the person or entity.
    *
    * Used for the label and the initials.
+   * - `src`: Image to show.
+   *
+   * Falls back to the slot, or to initials, if it fails.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -18676,15 +18676,15 @@ export type CustomElements = {
    * fill by what the count *is*, not by how loudly it is drawn. Filed under
    * `appearance` it would read as a treatment, which is the confusion the split
    * exists to stop.
-   * - `value`: The count or short text to show.
-   *
-   * Absent shows a dot, zero shows nothing.
-   * - `max`: Cap for a numeric value.
-   *
-   * Past it the indicator reads `{max}+`.
    * - `label`: Accessible name.
    *
    * Required for a dot, which has no text to read.
+   * - `max`: Cap for a numeric value.
+   *
+   * Past it the indicator reads `{max}+`.
+   * - `value`: The count or short text to show.
+   *
+   * Absent shows a dot, zero shows nothing.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -18741,6 +18741,29 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `emphasis`: How much ink the columns claim.
+   *
+   * The chart's treatment, which every series takes unless `outlined` or
+   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+   * of the series color with that edge on it, and absent is the filled column,
+   * per the rule that a reflected property takes no default.
+   *
+   * **It composes with `material` rather than competing with it.** Emphasis
+   * decides what is drawn and material decides how much of it comes through, so
+   * `glass` thins whatever emphasis put there: the fill on a solid column, the
+   * stroke on an outlined one. Without that the corner is inert, `glass` setting
+   * a fill opacity on a mark whose fill is `none`, and a combination that
+   * silently does nothing is the worst shape this can take.
+   * - `glass`: Which series are glass rather than solid, by name.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `emphasis` is.** A
+   * chart-wide material puts every column in the same substance, which is right
+   * when the whole chart is joining the page's language and wrong the moment one
+   * series is a different kind of fact from the others. The two axes take the
+   * same shape because they answer the same question about the same thing: what
+   * is *this series* made of, and how much ink does *this series* claim.
    * - `material`: What the columns are made of.
    *
    * **A third axis on the chart, not on the bar.** A bar is a mark inside a
@@ -18776,40 +18799,6 @@ export type CustomElements = {
    * **`transparent` is where this one stops.** A mark with no ink is not a
    * material choice, it is an absent series, and a chart says that by not
    * having the datum rather than by painting it invisibly.
-   * - `wash`: How a column's fill is distributed across it.
-   *
-   * `gradient` fades each column toward its base, into the wash the headless
-   * tier draws whether or not anything points at it.
-   *
-   * **A chart-domain axis and deliberately not a library one.** It lives on this
-   * family alone, and here it is a way of encoding data rather than a way of
-   * expressing a theme: promoted to the registry it would put an attribute on
-   * eighty-eight components that means nothing on eighty-seven. `wash` because
-   * that is what the tier below already calls it, in `--chart-bar-wash` and in
-   * the `bar-wash-start` and `bar-wash-end` stops.
-   * - `glass`: Which series are glass rather than solid, by name.
-   *
-   * Matched the way `outlined` is, against the column headings the table gives.
-   *
-   * **Per series for the reason `emphasis` is.** A
-   * chart-wide material puts every column in the same substance, which is right
-   * when the whole chart is joining the page's language and wrong the moment one
-   * series is a different kind of fact from the others. The two axes take the
-   * same shape because they answer the same question about the same thing: what
-   * is *this series* made of, and how much ink does *this series* claim.
-   * - `emphasis`: How much ink the columns claim.
-   *
-   * The chart's treatment, which every series takes unless `outlined` or
-   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-   * of the series color with that edge on it, and absent is the filled column,
-   * per the rule that a reflected property takes no default.
-   *
-   * **It composes with `material` rather than competing with it.** Emphasis
-   * decides what is drawn and material decides how much of it comes through, so
-   * `glass` thins whatever emphasis put there: the fill on a solid column, the
-   * stroke on an outlined one. Without that the corner is inert, `glass` setting
-   * a fill opacity on a mark whose fill is `none`, and a combination that
-   * silently does nothing is the worst shape this can take.
    * - `outlined`: Which series are drawn as an outline rather than a fill, by name.
    *
    * Space separated and matched against the column headings the table gives,
@@ -18828,6 +18817,17 @@ export type CustomElements = {
    * - `subtle`: Which series are drawn as a wash of their color, by name.
    *
    * Matched as `outlined` is.
+   * - `wash`: How a column's fill is distributed across it.
+   *
+   * `gradient` fades each column toward its base, into the wash the headless
+   * tier draws whether or not anything points at it.
+   *
+   * **A chart-domain axis and deliberately not a library one.** It lives on this
+   * family alone, and here it is a way of encoding data rather than a way of
+   * expressing a theme: promoted to the registry it would put an attribute on
+   * eighty-eight components that means nothing on eighty-seven. `wash` because
+   * that is what the tier below already calls it, in `--chart-bar-wash` and in
+   * the `bar-wash-start` and `bar-wash-end` stops.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -19093,10 +19093,10 @@ export type CustomElements = {
    * Reading cannot catch this and the picture comparison can. React assigns a
    * matching property instead of an attribute, so every crumb in the React twin
    * of `breadcrumbs/links` lost its padding at once.
-   * - `target`: Where the link opens, for the rare crumb that leaves the site.
    * - `rel`: What the link declares about where it goes.
    *
    * The consumer's decision.
+   * - `target`: Where the link opens, for the rare crumb that leaves the site.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -19353,20 +19353,22 @@ export type CustomElements = {
    * of a control means nothing in particular. `accent` is the second
    * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
-   * - `type`: What activating the button does to its form.
-   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   * - `command`: What to send when the button is activated, and what to send it to.
    *
-   * **Reported for exactly the submission this button starts and not otherwise.**
-   * A native submit button contributes `name=value` only when it is the one
-   * that submitted, and every other button on the form contributes nothing. A
-   * form-associated element reporting a value continuously would contribute on
-   * every submission whoever started it, which is a different feature wearing
-   * the same name, so `submit` below sets it, submits, and clears it inside one
-   * synchronous call.
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
    *
-   * `CopyButton` has a `value` of its own meaning the text to put on the
-   * clipboard, which is not this and is why it is declared there rather than
-   * inherited.
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
    *
    * **The five `form*` overrides work by writing the form and putting it back**,
@@ -19390,22 +19392,20 @@ export type CustomElements = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
-   * - `command`: What to send when the button is activated, and what to send it to.
+   * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
    *
-   * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognized as an
-   * invoker, so `commandfor` written on a custom element resolves nothing and
-   * the trigger silently does nothing at all. A wrapper has to hand them down,
-   * the same way `label` becomes `aria-label` in there.
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
    *
-   * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-   * ```
-   *
-   * `commandFor` spells its attribute out, because Lit lowercases a property
-   * name to derive one rather than dash-casing it, and what a consumer writes
-   * is the platform's `commandfor`.
-   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -19430,16 +19430,6 @@ export type CustomElements = {
    * imperatively later, and nothing is hydrating by then.
    *
    * Here rather than on each control.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
    * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
    *
    * **Set by whatever owns the panel, and a property rather than an attribute
@@ -19464,6 +19454,16 @@ export type CustomElements = {
    *
    * A consumer who wants to say this statically writes `aria-expanded` on the
    * host instead, which `AriaForwardController` carries to the same place. (property only)
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, because the resolution is otherwise kept
@@ -19658,6 +19658,28 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `material`: What the card is made of.
+   *
+   * **A third axis, and it passes the test the other two answer to.**
+   * `separation` is where the surface ends and `tone` is what it means; both of
+   * those can be true at once with this, an elevated glass card being a
+   * perfectly ordinary thing to want, so it is not a value of either.
+   *
+   * **An attribute rather than a hook, because glass is not one declaration.**
+   * It is a translucent ground *and* a backdrop filter, and either without the
+   * other does nothing: a blur behind an opaque background is invisible, and a
+   * translucent card over an unfiltered page is a smear. `--card-backdrop` on
+   * its own is that trap, a published hook a consumer could set and see nothing
+   * happen. The component owns the pair; a theme owns how strong it is.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
+   *
+   * **The whole axis, not one point of it.** `frosted` is the same pair turned
+   * up, the heavier ground under the heavier blur, for a card that has to stay
+   * readable over a busy page; `transparent` drops both, for one that is
+   * structure and spacing with the page showing through.
+   * - `orientation`: Whether media sits above the content stack or beside it.
    * - `separation`: How the card separates itself from the page.
    *
    * **One value per mechanism, and the theme has the same four.**
@@ -19682,28 +19704,6 @@ export type CustomElements = {
    * edge, so a surface with its own color and neither edge nor lift would
    * otherwise be unsayable while being one of the four things a theme can ask
    * for.
-   * - `material`: What the card is made of.
-   *
-   * **A third axis, and it passes the test the other two answer to.**
-   * `separation` is where the surface ends and `tone` is what it means; both of
-   * those can be true at once with this, an elevated glass card being a
-   * perfectly ordinary thing to want, so it is not a value of either.
-   *
-   * **An attribute rather than a hook, because glass is not one declaration.**
-   * It is a translucent ground *and* a backdrop filter, and either without the
-   * other does nothing: a blur behind an opaque background is invisible, and a
-   * translucent card over an unfiltered page is a smear. `--card-backdrop` on
-   * its own is that trap, a published hook a consumer could set and see nothing
-   * happen. The component owns the pair; a theme owns how strong it is.
-   *
-   * Absent is opaque, per the rule that a reflected property takes no default,
-   * so the stylesheet only describes the departure.
-   *
-   * **The whole axis, not one point of it.** `frosted` is the same pair turned
-   * up, the heavier ground under the heavier blur, for a card that has to stay
-   * readable over a busy page; `transparent` drops both, for one that is
-   * structure and spacing with the page showing through.
-   * - `orientation`: Whether media sits above the content stack or beside it.
    * - `media-placement`/`mediaPlacement`: Puts the media after the content instead of before it.
    *
    * **A figure that concludes a card is the same region as one that opens it**,
@@ -19778,20 +19778,30 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
+   * - `controls-align`/`controlsAlign`: Where along that side the arrows sit. See `indicatorAlign`.
    *
-   * Unset is `block-end`, under them. `block-start` puts them above,
-   * `inline-start` and `inline-end` beside, where a run of dots becomes a
-   * column.
+   * `overlay` answers it too, and the edge there is the whole slide: the bar is
+   * stretched across the picture, so this moves the arrows up and down within
+   * it rather than moving the bar. Centered unless asked otherwise, which is
+   * where an arrow over a photograph belongs.
+   * - `controls-placement`/`controlsPlacement`: Which side of the slides the arrows sit on.
    *
-   * **The sides of the content, not positions along a bar**, and logical names
-   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
-   * the right in Arabic without being told.
+   * The same four sides as `indicatorPlacement` and the same default, so a
+   * carousel that moves only one of them keeps the other where it was.
+   * `inline-start` or `inline-end` stacks the arrows into a column, which is
+   * what a vertical track usually wants.
    *
-   * Independent of `controlsPlacement`. Both default to the block end, where
-   * they share the row and split it, dots to the start and arrows to the end,
-   * arrived at by two defaults rather than by a rule about the pair, so moving
-   * one leaves the other alone.
+   * `overlay` puts them on the slides, at the track's own edges, which is what a
+   * full-bleed carousel wants: the slide is the page and the controls are on it
+   * rather than in a bar beneath it. It carries its own treatment with it, a
+   * surface and a shadow under each arrow, because a glyph drawn straight onto a
+   * photograph is legible against about half of one.
+   *
+   * **It is a value here rather than an axis of its own.** "The controls are
+   * over the content" is the whole of what a `hero` appearance would say, and
+   * the surface, the edge-to-edge arrows and the bar that catches no presses all
+   * follow from it. These two placements are the whole of where a carousel's
+   * chrome can go.
    * - `indicator-align`/`indicatorAlign`: Where along that side the dots sit.
    *
    * The second half of the answer to "where do they go". `indicatorPlacement`
@@ -19815,31 +19825,21 @@ export type CustomElements = {
    * nothing to split the edge with. Putting both groups on the same edge with
    * the same alignment overlaps them, which is what the two different defaults
    * exist to avoid.
-   * - `controls-placement`/`controlsPlacement`: Which side of the slides the arrows sit on.
+   * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
    *
-   * The same four sides as `indicatorPlacement` and the same default, so a
-   * carousel that moves only one of them keeps the other where it was.
-   * `inline-start` or `inline-end` stacks the arrows into a column, which is
-   * what a vertical track usually wants.
+   * Unset is `block-end`, under them. `block-start` puts them above,
+   * `inline-start` and `inline-end` beside, where a run of dots becomes a
+   * column.
    *
-   * `overlay` puts them on the slides, at the track's own edges, which is what a
-   * full-bleed carousel wants: the slide is the page and the controls are on it
-   * rather than in a bar beneath it. It carries its own treatment with it, a
-   * surface and a shadow under each arrow, because a glyph drawn straight onto a
-   * photograph is legible against about half of one.
+   * **The sides of the content, not positions along a bar**, and logical names
+   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
+   * the right in Arabic without being told.
    *
-   * **It is a value here rather than an axis of its own.** "The controls are
-   * over the content" is the whole of what a `hero` appearance would say, and
-   * the surface, the edge-to-edge arrows and the bar that catches no presses all
-   * follow from it. These two placements are the whole of where a carousel's
-   * chrome can go.
-   * - `controls-align`/`controlsAlign`: Where along that side the arrows sit. See `indicatorAlign`.
-   *
-   * `overlay` answers it too, and the edge there is the whole slide: the bar is
-   * stretched across the picture, so this moves the arrows up and down within
-   * it rather than moving the bar. Centered unless asked otherwise, which is
-   * where an arrow over a photograph belongs.
-   * - `label`: Accessible name for the carousel.
+   * Independent of `controlsPlacement`. Both default to the block end, where
+   * they share the row and split it, dots to the start and arrows to the end,
+   * arrived at by two defaults rather than by a rule about the pair, so moving
+   * one leaves the other alone.
+   * - `autoplay`: Whether the carousel advances on its own.
    * - `index`: The slide in view, counted from zero.
    *
    * Reading gives the real slide, in either mode. Writing sets it, the way a
@@ -19853,18 +19853,6 @@ export type CustomElements = {
    * extracted, because a slide is addressed by position and every one of those
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
-   * - `orientation`: Which way the track runs.
-   *
-   * Behavior rather than presentation, which is why it is here: the scroll
-   * position and the nearest-slide arithmetic are both single-axis, and a
-   * styled-tier attribute cannot change which one they read. Two sites branch
-   * on it, `scrollTo` and the drag settle, and nothing else in the component
-   * knows about the axis at all.
-   *
-   * A vertical track needs a height, which a horizontal one does not: width
-   * comes from the page and height does not, so the styled tier gives it
-   * `--carousel-block-size` and a consumer sets that to whatever the slides
-   * want.
    * - `controls`: Whether the previous and next controls are shown.
    *
    * `auto`, which is the resting behavior and what an absent attribute means,
@@ -19889,9 +19877,21 @@ export type CustomElements = {
    * way to stop it, so an autoplaying carousel keeps its pause control on a
    * touch device exactly as it does on a desktop.
    * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
-   * - `loop`: Whether moving past either end wraps to the other.
-   * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
+   * - `label`: Accessible name for the carousel.
+   * - `loop`: Whether moving past either end wraps to the other.
+   * - `orientation`: Which way the track runs.
+   *
+   * Behavior rather than presentation, which is why it is here: the scroll
+   * position and the nearest-slide arithmetic are both single-axis, and a
+   * styled-tier attribute cannot change which one they read. Two sites branch
+   * on it, `scrollTo` and the drag settle, and nothing else in the component
+   * knows about the axis at all.
+   *
+   * A vertical track needs a height, which a horizontal one does not: width
+   * comes from the page and height does not, so the styled tier gives it
+   * `--carousel-block-size` and a consumer sets that to whatever the slides
+   * want.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * **Here rather than on the styled tier, because it decides how many places
@@ -19995,21 +19995,21 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What the reader has written.
-   *
-   * Read it, or set it to seed a draft.
+   * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
+   * - `label`: Accessible name for the field.
    * - `placeholder`: Shown in an empty field.
+   * - `rows`: How many rows the field opens at.
+   *
+   * It grows from there.
+   * - `send-label`/`sendLabel`: Label for the control that sends.
    * - `submit-on`/`submitOn`: What sends: pressing Enter, or only the control.
    *
    * `enter` is the messaging convention and makes Shift+Enter the line break.
    * `button` is what a composer holding several paragraphs wants, where Enter
    * has to mean a new line and nothing else.
-   * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
-   * - `label`: Accessible name for the field.
-   * - `send-label`/`sendLabel`: Label for the control that sends.
-   * - `rows`: How many rows the field opens at.
+   * - `value`: What the reader has written.
    *
-   * It grows from there.
+   * Read it, or set it to seed a draft.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -20112,6 +20112,7 @@ export type CustomElements = {
    * no ground to end. The two values are a subset of the registry's four:
    * `elevated` reads as a card and `outlined` as an input, so neither is a
    * thing a turn should be.
+   * - `at`: When it was said, as anything `Date` parses.
    * - `author`: Who said it.
    *
    * Free text rather than a two-value union, because a conversation is not
@@ -20119,6 +20120,12 @@ export type CustomElements = {
    * participants is the ordinary case for anything worth building this for.
    * `me` and `them` are the conventional values and the stylesheet knows them;
    * anything else is a name the consumer styles.
+   * - `failed-label`/`failedLabel`: Label for a message that did not send.
+   * - `locale`: Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
+   * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
+   * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
    * - `state`: What has happened to it.
    *
    * Reflected, because every one of the four is a visual state and a stylesheet
@@ -20126,13 +20133,6 @@ export type CustomElements = {
    * report, which is what most of a transcript is, and it is the absence of the
    * attribute rather than a value of it: there is no initializer, so nothing is
    * reflected until something happens.
-   * - `at`: When it was said, as anything `Date` parses.
-   * - `locale`: Locale for the timestamp.
-   *
-   * Empty is the runtime's own.
-   * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
-   * - `failed-label`/`failedLabel`: Label for a message that did not send.
-   * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -20218,20 +20218,15 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
    * - `label`: Accessible name for the conversation.
-   * - `threshold`: How near the bottom still counts as being at it, in pixels.
-   *
-   * A hook rather than a constant, because the right number depends on how tall
-   * a turn is: a transcript of one-line replies wants a smaller threshold than
-   * one of paragraphs, and a reader who has scrolled up by half a message has
-   * not left.
    * - `pinned`: Whether the transcript follows new turns to the bottom.
    *
    * The reader's scrolling asks first: `helix-before-pin` is cancelable, so a
@@ -20248,7 +20243,12 @@ export type CustomElements = {
    * that is a part inside the shadow tree where a stylesheet can already reach
    * it. Measured rather than assumed: `label, pinned` after upgrade against
    * `label` from the server.
-   * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
+   * - `threshold`: How near the bottom still counts as being at it, in pixels.
+   *
+   * A hook rather than a constant, because the right number depends on how tall
+   * a turn is: a transcript of one-line replies wants a smaller threshold than
+   * one of paragraphs, and a reader who has scrolled up by half a message has
+   * not left.
    * - `messages`: The turns declared as children, in the order they are written. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -20337,8 +20337,8 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `orientation`: Which way the boxes run.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `value`: The checked values, comma separated.
@@ -20499,14 +20499,14 @@ export type CustomElements = {
    * wrote it, and `:state(checked)` carries the resolved state for
    * stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `value`: Value submitted when the box is checked.
    * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
    *
    * Presentation only. It never submits, and the first change resolves it.
+   * - `value`: Value submitted when the box is checked.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -20843,16 +20843,30 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `alpha`: Whether the color carries an alpha channel.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
    *
    * **Defaults to `off`, which is not the platform's default and is the
    * point.** The field holds a color, so a browser offering to fill it with a
    * saved address is competing for the same keystrokes as the picker. A
    * consumer who wants autofill can still ask.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * **Undefaulted, because it reflects.** The two together stamp an attribute
+   * onto every host anybody renders, including the ones nobody configured: the
+   * server writes `format="hex"` on every color input on the page, and React,
+   * holding no such prop, reports a hydration mismatch for each one.
+   * `helix component`'s `reflected-defaults` holds it. Hex is still what an unset one
+   * writes; the resting arrangement is the attribute's absence rather than a
+   * value spelled out.
+   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
+   * - `placeholder`: What the field says before a color is in it.
+   * - `swatches`: Colors offered under the picker, as a comma-separated list.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
@@ -20868,20 +20882,6 @@ export type CustomElements = {
    * The trade is real and is the reason this is not the default: a swatch cannot
    * be read or pasted into without opening the panel, which is worse for a form
    * where the color is the answer rather than a setting.
-   * - `alpha`: Whether the color carries an alpha channel.
-   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
-   *
-   * **Undefaulted, because it reflects.** The two together stamp an attribute
-   * onto every host anybody renders, including the ones nobody configured: the
-   * server writes `format="hex"` on every color input on the page, and React,
-   * holding no such prop, reports a hydration mismatch for each one.
-   * `helix component`'s `reflected-defaults` holds it. Hex is still what an unset one
-   * writes; the resting arrangement is the attribute's absence rather than a
-   * value spelled out.
-   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
-   * - `placeholder`: What the field says before a color is in it.
-   * - `swatches`: Colors offered under the picker, as a comma-separated list.
-   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -21109,12 +21109,20 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
+   * - `alpha`: Whether the color carries an alpha channel.
+   *
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
    *
    * **Defaults to `off`, which is not the platform's default and is the
    * point.** The field holds a color, so a browser offering to fill it with a
    * saved address is competing for the same keystrokes as the square and the
    * ramps. A consumer who wants autofill can still ask.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a picker on
+   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
    * - `invalid`: Whether the current selection fails validation.
    *
    * A flag rather than a message, the split Date Picker also draws. A flat
@@ -21122,14 +21130,8 @@ export type CustomElements = {
    * the label, the hint and the feedback, and a second message inside the panel
    * would be the same error said twice. What is left for the picker is the one
    * thing the field cannot draw from outside, the mark on the answer itself.
-   * - `alpha`: Whether the color carries an alpha channel.
-   *
-   * Off by default, because it widens every value written, and a consumer who
-   * did not ask for transparency should not have to strip a byte off each one.
-   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
-   *
-   * Only what is written. Everything is read whatever this says, so a picker on
-   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
+   * - `no-format`/`noFormat`: Whether the reader may change the format.
    * - `no-value`/`noValue`: Whether to leave the value out, for a picker whose value is stated elsewhere.
    *
    * The row reads the color as text and lets it be typed or pasted, which is
@@ -21142,8 +21144,6 @@ export type CustomElements = {
    * answer to which one is authoritative or which has the caret. Do not close it
    * the other way round, with Color Input dropping its own field: the value
    * would then be unreadable and unpasteable without opening a panel.
-   * - `no-format`/`noFormat`: Whether the reader may change the format.
-   * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
    * - `swatches`: Colors offered under the picker, as a comma-separated list.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -21347,8 +21347,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
@@ -21357,29 +21357,20 @@ export type CustomElements = {
    * point.** The field filters a list rather than collecting a value, so a
    * browser offering to fill it with a saved address is competing for the same
    * keystrokes as the listbox. A consumer who wants autofill can still ask.
-   * - `placeholder`: Text shown while nothing has been chosen.
-   * - `multiple`: Whether more than one option can be chosen.
-   *
-   * The list already does the work: `value` comes apart on commas, a press
-   * toggles rather than replaces, and the arrows move without choosing. What
-   * this adds is the tags, and keeping the panel open between picks.
-   *
-   * A comma is therefore not available inside an option's value, which is the
-   * listbox's contract and not this element's to change.
    * - `creatable`: Whether the reader may answer with something the list does not hold.
    *
    * The row appears while what is typed matches no option's words exactly, so
    * it is offered next to near misses too: a reader typing "Ruby on Rails" with
    * "Ruby" in the list wants the one they are typing, not the one they are
    * halfway through.
-   * - `suggest`: Whether the field finishes the word as it is typed.
-   *
-   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
-   * element already sets on the input it renders, and two things of one name
-   * meaning different things on the same control is a question a consumer
-   * should not have to ask.
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
-   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
+   * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
+   * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
+   * - `loading`: Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs.
+   * - `loading-text`/`loadingText`: What the list says while they are on their way.
    * - `max-tags`/`maxTags`: How many tags to draw before the rest become a count. `multiple` only.
    *
    * `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -21392,13 +21383,22 @@ export type CustomElements = {
    * on, where a row that silently stops is a field that appears to have lost
    * what was put in it. Date Input and Time Input carry the same property and
    * the same reasoning.
-   * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
-   * - `loading`: Whether the options are still on their way.
+   * - `multiple`: Whether more than one option can be chosen.
    *
-   * Passed straight to the list, which is where the rows are and so where the
-   * message belongs.
-   * - `loading-text`/`loadingText`: What the list says while they are on their way.
-   * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   * - `placeholder`: Text shown while nothing has been chosen.
+   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
+   * - `suggest`: Whether the field finishes the word as it is typed.
+   *
+   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
+   * element already sets on the input it renders, and two things of one name
+   * meaning different things on the same control is a question a consumer
+   * should not have to ask.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -21609,14 +21609,14 @@ export type CustomElements = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `label`: Accessible name for the overlay, which has no visible heading.
-   * - `placeholder`: Shown in the field before anything is typed.
    * - `empty-text`/`emptyText`: Words shown where the filter has matched nothing.
    * - `hotkey`: The key that opens it, as `mod+k` or `shift+p` or plain `k`.
    *
    * Empty turns it off, for a consumer who opens the palette from a button or
    * from their own shortcut handler. There is no list of defaults to fight
    * with: one key, said once.
+   * - `label`: Accessible name for the overlay, which has no visible heading.
+   * - `placeholder`: Shown in the field before anything is typed.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -21727,6 +21727,15 @@ export type CustomElements = {
    * of a control means nothing in particular. `accent` is the second
    * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
+   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   *
+   * `attribute` written out, because Lit lowercases a property name rather than
+   * dash-casing it, and `copiedlabel` is not what anyone would type.
+   * - `label`: What it is called, and says, before a press.
+   *
+   * Defaulted rather than left empty. An icon-only control must be named, and
+   * the name of this one is not a judgment call: every copy button in the
+   * world is called Copy. A consumer with a better word still sets it.
    * - `value`: What goes on the clipboard.
    *
    * **Narrows `Button.value`, which is the submit value, and the two agree.**
@@ -21735,16 +21744,22 @@ export type CustomElements = {
    * submits is what it copies, which is the reading anybody would expect of one
    * property called `value`. Declared here rather than inherited because the
    * clipboard is what this component is about and its own page should say so.
-   * - `label`: What it is called, and says, before a press.
+   * - `command`: What to send when the button is activated, and what to send it to.
    *
-   * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgment call: every copy button in the
-   * world is called Copy. A consumer with a better word still sets it.
-   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
    *
-   * `attribute` written out, because Lit lowercases a property name rather than
-   * dash-casing it, and `copiedlabel` is not what anyone would type.
-   * - `type`: What activating the button does to its form.
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
    *
    * **The five `form*` overrides work by writing the form and putting it back**,
@@ -21763,22 +21778,7 @@ export type CustomElements = {
    * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
    * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
    * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
-   * - `command`: What to send when the button is activated, and what to send it to.
-   *
-   * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognized as an
-   * invoker, so `commandfor` written on a custom element resolves nothing and
-   * the trigger silently does nothing at all. A wrapper has to hand them down,
-   * the same way `label` becomes `aria-label` in there.
-   *
-   * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-   * ```
-   *
-   * `commandFor` spells its attribute out, because Lit lowercases a property
-   * name to derive one rather than dash-casing it, and what a consumer writes
-   * is the platform's `commandfor`.
-   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * - `type`: What activating the button does to its form.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -21803,16 +21803,6 @@ export type CustomElements = {
    * imperatively later, and nothing is hydrating by then.
    *
    * Here rather than on each control.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
    * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
    *
    * **Set by whatever owns the panel, and a property rather than an attribute
@@ -21837,6 +21827,16 @@ export type CustomElements = {
    *
    * A consumer who wants to say this statically writes `aria-expanded` on the
    * host instead, which `AriaForwardController` carries to the same place. (property only)
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, because the resolution is otherwise kept
@@ -21961,13 +21961,17 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `default-filter`/`defaultFilter`: Query to open with, where nothing declared one.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
+   * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
+   * - `default-sort`/`defaultSort`: Order to open on, where nothing declared one.
    * - `key`: The field naming a row's stable identity.
    *
    * **Needed before selection exists, not after.** Lit keys the rendered rows by
@@ -21976,6 +21980,17 @@ export type CustomElements = {
    * attached to the row it belongs to. Left unset the index is the key, which is
    * correct only while nothing reorders: it is why this defaults to something
    * that works and is worth setting anyway.
+   * - `sort`: The order, as `field:direction`.
+   *
+   * Set it and this element defers: a reader's click fires `helix-sort` and
+   * changes nothing until a new value arrives. `default-sort` seeds an order this
+   * element then owns.
+   * - `label`: Accessible name for the grid.
+   * - `filter`: What the rows are narrowed to, as one query across every column.
+   *
+   * One query rather than a predicate per column, which is what a reader means
+   * by a search box above a table. It matches on each column's ordering value,
+   * so search and sort cannot disagree about what a column holds.
    * - `mode`: Whether this element does the work or asks the consumer to.
    *
    * `client` filters, sorts and pages `rows` itself. `server` applies none of
@@ -21984,31 +21999,11 @@ export type CustomElements = {
    * the client cannot hold the data, so this is not an optimization, it is the
    * only mode that works, and it is here from the start because adding it later
    * inverts the data flow.
-   * - `total`: How many rows the whole result has, where this element cannot count them.
-   *
-   * Only read in `server` mode, where `rows` is one page and its length says
-   * nothing about the result. Ignored in `client` mode rather than trusted,
-   * because two sources for one count is the mistake, and here the array is the
-   * one that cannot be stale.
-   * - `label`: Accessible name for the grid.
-   * - `sort`: The order, as `field:direction`.
-   *
-   * Set it and this element defers: a reader's click fires `helix-sort` and
-   * changes nothing until a new value arrives. `default-sort` seeds an order this
-   * element then owns.
-   * - `default-sort`/`defaultSort`: Order to open on, where nothing declared one.
-   * - `filter`: What the rows are narrowed to, as one query across every column.
-   *
-   * One query rather than a predicate per column, which is what a reader means
-   * by a search box above a table. It matches on each column's ordering value,
-   * so search and sort cannot disagree about what a column holds.
-   * - `default-filter`/`defaultFilter`: Query to open with, where nothing declared one.
    * - `page`: The page on show, from 1.
    *
    * Clamped on the way out, so what this reports is the page it drew: a
    * bookmarked link to page 99 of a result that has since shrunk reads back as
    * the last page rather than as 99.
-   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `page-size`/`pageSize`: How many rows a page holds. Zero is every row, which is what "no paging" means.
    *
    * **It announces nothing, and that is not an omission.** Nothing in this
@@ -22016,7 +22011,12 @@ export type CustomElements = {
    * `helix-pagination-size`, which a consumer puts in the `footer` slot and
    * answers themselves. Routing this through `requestChange` would announce an
    * event the element never has cause to fire.
-   * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
+   * - `total`: How many rows the whole result has, where this element cannot count them.
+   *
+   * Only read in `server` mode, where `rows` is one page and its length says
+   * nothing about the result. Ignored in `client` mode rather than trusted,
+   * because two sources for one count is the mistake, and here the array is the
+   * one that cannot be stale.
    * - `paginated`: Whether to draw a pagination under the grid.
    *
    * On by default once a page size is set, because a paged table with no way to
@@ -22156,8 +22156,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
@@ -22165,38 +22165,6 @@ export type CustomElements = {
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all: hardcoding `off` here means a birthday or a
    * postal code can never be filled in for a reader.
-   * - `mode`: How many dates can be held at once.
-   *
-   * Absent is one. `range` holds a start and an end, `multiple` holds any
-   * number, and both are carried as one comma-separated value: a form field
-   * submits a string, and two fields for one question is a different control.
-   * - `months`: How many months the calendar shows, side by side.
-   *
-   * Worth more than one mainly for a range, where picking a start in March and
-   * an end in April otherwise means paging between them and losing sight of the
-   * first. The panel is sized by its content, so this widens it.
-   * - `max-tags`/`maxTags`: How many dates are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default: a cap that guesses is worse than no
-   * cap, because the number that fits depends on the width of the field and the
-   * length of what is in it, neither of which this element knows. What a cap is
-   * genuinely for is a field in a row or a table cell, where a set of twelve
-   * dates would push everything below it down a line at a time.
-   *
-   * The remainder is counted rather than hidden. `+3` is a fact a reader can
-   * act on, where a row that silently stops is a field that appears to have lost
-   * what was put in it, and the count is what tells them there is more to see.
-   * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
-   * - `step`: How far apart the selectable dates are, in days.
-   *
-   * `<input type="date" step>`'s own unit, handed to the calendar this renders
-   * so the field and the grid agree about which dates exist. Counted from `min`
-   * where there is one and from 1 January 1970 where there is not, which is the
-   * platform's base.
-   * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
-   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
-   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
-   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
    * - `date-style`/`dateStyle`: How a date is written in the field: `short` through `full`, or ISO.
    *
    * **The field renders when it is idle and holds the value when it is being
@@ -22219,9 +22187,34 @@ export type CustomElements = {
    *
    * The value is always `YYYY-MM-DD` regardless, because that is what a form
    * submits and what `min` and `max` compare against.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
    * - `locale`: Language tag the calendar names its months and days in.
+   * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
+   * - `max-tags`/`maxTags`: How many dates are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * dates would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can
+   * act on, where a row that silently stops is a field that appears to have lost
+   * what was put in it, and the count is what tells them there is more to see.
+   * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
+   * - `mode`: How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   * - `months`: How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
    * - `placeholder`: What the field says before a date is in it.
-   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
    * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
@@ -22233,6 +22226,13 @@ export type CustomElements = {
    * submits nothing and leaves the tab order, and a read-only one submits its
    * value and stays reachable, which is what a form showing a value somebody
    * else set needs.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, handed to the calendar this renders
+   * so the field and the grid agree about which dates exist. Counted from `min`
+   * where there is one and from 1 January 1970 where there is not, which is the
+   * platform's base.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -22446,42 +22446,31 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `mode`: How many dates can be held at once.
-   * - `months`: How many months to show, side by side.
-   * - `locale`: Locale for month and day names.
-   *
-   * Absent uses the runtime's own.
+   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
    * - `invalid`: Whether the current selection fails validation.
+   * - `label`: Accessible name for the grid.
    * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
    *
    * Separate from `value` on purpose, so paging selects nothing and a consumer
    * can drive the view. Reading gives the month on show; writing sets it, and
    * `default-month` seeds one the calendar keeps until somebody does.
+   * - `locale`: Locale for month and day names.
+   *
+   * Absent uses the runtime's own.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `mode`: How many dates can be held at once.
+   * - `months`: How many months to show, side by side.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
    *
    * A property because a calendar rendering its own month names from `locale`
    * would otherwise still announce its controls in English. `attribute:`
    * spelled out, since Lit lowercases a camelCase name rather than dash-casing
    * it.
-   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
-   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
-   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
-   * - `step`: How far apart the selectable dates are, in days.
-   *
-   * `<input type="date" step>`'s own unit, counted from `min` where there is
-   * one and from 1 January 1970 where there is not, which is the platform's own
-   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
-   * on a Monday, which `disable-dates` cannot express: it takes a list, and a
-   * year of Mondays is not a list anybody writes.
-   *
-   * One is every date and needs no rule, which is why anything below one is
-   * treated as one rather than as an error: a step of zero would block every
-   * date including the one already chosen.
-   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
-   * - `label`: Accessible name for the grid.
-   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
    * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
@@ -22494,6 +22483,17 @@ export type CustomElements = {
    * value and stays reachable, which is what a form showing a value somebody
    * else set needs.
    * - `required`: Whether the form refuses to submit while nothing is chosen.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, counted from `min` where there is
+   * one and from 1 January 1970 where there is not, which is the platform's own
+   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+   * on a Monday, which `disable-dates` cannot express: it takes a list, and a
+   * year of Mondays is not a list anybody writes.
+   *
+   * One is every date and needs no rule, which is why anything below one is
+   * treated as one rather than as an error: a step of zero would block every
+   * date including the one already chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -22671,8 +22671,8 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `size`: How wide the panel is allowed to be.
    * - `align`: Whether the panel's contents run from the start or center on it.
+   * - `size`: How wide the panel is allowed to be.
    * - `open`: Whether the element is open.
    *
    * One property, not two, so `dialog.open` answers the question anyone
@@ -22686,16 +22686,6 @@ export type CustomElements = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `label`: Accessible name for the dialog.
-   * - `persistent`: Whether Escape or a press on the backdrop can close it.
-   *
-   * Off for a dialog that must be answered. It does not disable the close
-   * control a consumer slots in: refusing to be dismissed is not the same as
-   * refusing to be closed, and a dialog with no way out at all is a trap.
-   *
-   * A persistent dialog does not ignore that press. It answers it: see
-   * `refuse`, which is the only way a dialog that will not be dismissed can say
-   * so at the moment a reader asks.
    * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
    *
    * `<dialog closedby>`, forwarded, and safe to forward because every path it
@@ -22706,6 +22696,16 @@ export type CustomElements = {
    *
    * Absent by default, which is the platform's `auto` and this library's rule
    * that a resting value is an attribute's absence.
+   * - `label`: Accessible name for the dialog.
+   * - `persistent`: Whether Escape or a press on the backdrop can close it.
+   *
+   * Off for a dialog that must be answered. It does not disable the close
+   * control a consumer slots in: refusing to be dismissed is not the same as
+   * refusing to be closed, and a dialog with no way out at all is a trap.
+   *
+   * A persistent dialog does not ignore that press. It answers it: see
+   * `refuse`, which is the only way a dialog that will not be dismissed can say
+   * so at the moment a reader asks.
    * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -22814,7 +22814,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way the rule runs.
    * - `announced`: Whether the rule is announced as a separator.
    *
    * Off by default, and out of the accessibility tree. Most rules on a page
@@ -22827,6 +22826,7 @@ export type CustomElements = {
    * quiet default out of reach from HTML and leave it settable only as a
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
+   * - `orientation`: Which way the rule runs.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -23112,12 +23112,16 @@ export type CustomElements = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `placement`: Which edge the drawer comes from.
+   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
    *
-   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
-   * beside `:host([placement="end"])` rather than as a value written here: a
-   * default assigned to the property would reflect onto every host and put a
-   * `placement="end"` into markup no consumer wrote.
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
    *
@@ -23130,16 +23134,12 @@ export type CustomElements = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
-   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
+   * - `placement`: Which edge the drawer comes from.
    *
-   * `<dialog closedby>`, forwarded, and safe to forward because every path it
-   * opens still comes back through this element: a close request fires `cancel`
-   * first, `handleCancel` prevents it, and `requestOpen` decides. So
-   * `closedby="any"` gains light dismiss without giving up the refusal, which is
-   * the property this component exists to keep.
-   *
-   * Absent by default, which is the platform's `auto` and this library's rule
-   * that a resting value is an attribute's absence.
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -23245,12 +23245,6 @@ export type CustomElements = {
    *
    * - `disabled`: Whether the row can be reached at all.
    * - `value`: Identifies the row to whatever is listening.
-   * - `onPage`: Whether the page showing is the one this row is on.
-   *
-   * Written by the stack. (property only)
-   * - `showingPage`: Whether this row's own page is the one showing.
-   *
-   * Written by the stack. (property only)
    * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
    *
    * A drill-down keeps one stop and moves within it on the arrows, so every
@@ -23262,6 +23256,12 @@ export type CustomElements = {
    * elements, and writing `tabindex` onto a host the consumer rendered is a
    * change a React consumer's hydration reports and does not patch up. The stop
    * lands inside this shadow root instead. (property only)
+   * - `onPage`: Whether the page showing is the one this row is on.
+   *
+   * Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing.
+   *
+   * Written by the stack. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -23340,13 +23340,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `label`: Accessible name for the region.
    * - `back-label`/`backLabel`: What the control returning from a page reads.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -23493,18 +23493,18 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `accept`: Which files the picker offers, as a native `accept` list.
-   * - `multiple`: Whether more than one file can be chosen.
    * - `capture`: Which camera or microphone a mobile picker should offer, if any.
-   * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
    * - `locale`: Language tag the sizes are written in.
    *
    * Absent uses the runtime's own.
+   * - `multiple`: Whether more than one file can be chosen.
    * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
+   * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -23685,12 +23685,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `align`: Alignment across the direction.
    * - `direction`: Whether items run across or down.
    * - `gap`: Space between items, named on the space scale.
-   * - `align`: Alignment across the direction.
+   * - `inline`: Flows with surrounding text instead of taking the full width.
    * - `justify`: Distribution along the direction.
    * - `wrap`: Whether items wrap onto more lines.
-   * - `inline`: Flows with surrounding text instead of taking the full width.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -23815,13 +23815,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `align`: Alignment of each cell within its row.
    * - `columns`: Fixed number of equal columns.
+   * - `gap`: Space between cells, named on the space scale.
    * - `min`: Minimum column width, filling as many as fit.
    *
    * Takes precedence over `columns`: a grid that both fixes a count and reflows
    * is two intentions in one element.
-   * - `gap`: Space between cells, named on the space scale.
-   * - `align`: Alignment of each cell within its row.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -23891,6 +23891,26 @@ export type CustomElements = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
+   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a
+   * number.
+   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
+   *
+   * **Set this only to overrule what the strip actually draws.** The arithmetic
+   * needs a width in pixels and the width is a length the stylesheet resolves,
+   * so a number written here that disagrees with the sheet is a promise the
+   * consumer has to keep by hand, and the one number a summary is told to trust
+   * is the one it gets wrong.
+   *
+   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
+   * enough on their own and these two are the estimate used until the first
+   * measurement lands. Writing the attribute pins the value and stops the
+   * measurement being consulted, which is what a container query or a transition
+   * on the cell size wants, where what is drawn this frame is not what the
+   * arithmetic should plan around.
+   *
+   * Zero turns the dropping off altogether, which is right for a strip in a
+   * container that cannot get narrow.
    * - `rows`: How many rows the strip has.
    *
    * `1` is a status strip and `7` is a calendar week, which are the two readings
@@ -23913,26 +23933,6 @@ export type CustomElements = {
    * compare two hues at all. `tones="surface info accent success primary"` for a
    * commit count is five unrelated hues for five amounts, which is confetti with
    * no order in it.
-   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
-   *
-   * **Set this only to overrule what the strip actually draws.** The arithmetic
-   * needs a width in pixels and the width is a length the stylesheet resolves,
-   * so a number written here that disagrees with the sheet is a promise the
-   * consumer has to keep by hand, and the one number a summary is told to trust
-   * is the one it gets wrong.
-   *
-   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
-   * enough on their own and these two are the estimate used until the first
-   * measurement lands. Writing the attribute pins the value and stops the
-   * measurement being consulted, which is what a container query or a transition
-   * on the cell size wants, where what is drawn this frame is not what the
-   * arithmetic should plan around.
-   *
-   * Zero turns the dropping off altogether, which is right for a strip in a
-   * container that cannot get narrow.
-   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a
-   * number.
-   * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -24073,6 +24073,12 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `raised`: Whether it is raised off the page it sits on.
+   *
+   * Separate from `shape`, because they are separate facts: a docked control is
+   * raised whatever its outline, and a circle inside a toolbar is not raised at
+   * all. Shadow rather than a border, since what is under a floating control is
+   * the page and a line drawn on the page is not the same as being above it.
    * - `shape`: The outline it is cut to, which is an axis of its own and not a value on one.
    *
    * `emphasis` says how filled it is and `tone` says what it means; neither of
@@ -24087,12 +24093,6 @@ export type CustomElements = {
    * them, and because the same shape is wanted by an avatar's overlay, a media
    * control and a map's own buttons. Where it sits is the page's business: see
    * `data-dock` in the base layer.
-   * - `raised`: Whether it is raised off the page it sits on.
-   *
-   * Separate from `shape`, because they are separate facts: a docked control is
-   * raised whatever its outline, and a circle inside a toolbar is not raised at
-   * all. Shadow rather than a border, since what is under a floating control is
-   * the page and a line drawn on the page is not the same as being above it.
    * - `emphasis`: How filled it is drawn.
    *
    * Not `separation`: a Card's `outlined` says where a surface ends, and this
@@ -24111,20 +24111,22 @@ export type CustomElements = {
    * of a control means nothing in particular. `accent` is the second
    * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
-   * - `type`: What activating the button does to its form.
-   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   * - `command`: What to send when the button is activated, and what to send it to.
    *
-   * **Reported for exactly the submission this button starts and not otherwise.**
-   * A native submit button contributes `name=value` only when it is the one
-   * that submitted, and every other button on the form contributes nothing. A
-   * form-associated element reporting a value continuously would contribute on
-   * every submission whoever started it, which is a different feature wearing
-   * the same name, so `submit` below sets it, submits, and clears it inside one
-   * synchronous call.
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
    *
-   * `CopyButton` has a `value` of its own meaning the text to put on the
-   * clipboard, which is not this and is why it is declared there rather than
-   * inherited.
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
    *
    * **The five `form*` overrides work by writing the form and putting it back**,
@@ -24148,22 +24150,20 @@ export type CustomElements = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
-   * - `command`: What to send when the button is activated, and what to send it to.
+   * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
    *
-   * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognized as an
-   * invoker, so `commandfor` written on a custom element resolves nothing and
-   * the trigger silently does nothing at all. A wrapper has to hand them down,
-   * the same way `label` becomes `aria-label` in there.
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
    *
-   * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-   * ```
-   *
-   * `commandFor` spells its attribute out, because Lit lowercases a property
-   * name to derive one rather than dash-casing it, and what a consumer writes
-   * is the platform's `commandfor`.
-   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -24188,16 +24188,6 @@ export type CustomElements = {
    * imperatively later, and nothing is hydrating by then.
    *
    * Here rather than on each control.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
    * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
    *
    * **Set by whatever owns the panel, and a property rather than an attribute
@@ -24222,6 +24212,16 @@ export type CustomElements = {
    *
    * A consumer who wants to say this statically writes `aria-expanded` on the
    * host instead, which `AriaForwardController` carries to the same place. (property only)
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, because the resolution is otherwise kept
@@ -24329,8 +24329,8 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name of the icon in the Helix set.
    * - `label`: Accessible name, for an icon that is not decorative.
+   * - `name`: Name of the icon in the Helix set.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -24384,18 +24384,17 @@ export type CustomElements = {
    * question a consumer is answering is whether this picture is a card's
    * surface or a page's. `--image-radius` moves it for the case that is
    * neither.
-   * - `src`: Where the picture is.
    * - `alt`: What it shows, for a reader who cannot see it.
    *
    * Empty is a real answer and means decoration. Omitting the attribute is not
    * the same thing: a reader with nothing to read announces the file name.
-   * - `loading`: Whether to wait until it is nearly on screen.
+   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas
+   * can read it.
+   * - `decoding`: Whether the browser may decode off the main thread.
    *
-   * `lazy` by default, which is the opposite of the platform's, because a
-   * picture worth putting in a component is usually below the fold and the one
-   * that is not is the exception worth writing down.
-   * - `srcset`: The candidate widths, passed through to the picture.
-   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * `async` is the resting value and right for a picture in a page. `sync` is
+   * what a consumer reaches for when the picture is about to be composited with
+   * something else and a tear would show.
    * - `fetchpriority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
    *
    * The hero of a page is usually its largest contentful paint, and the fix is
@@ -24403,14 +24402,15 @@ export type CustomElements = {
    * viewport, and this stops it queueing behind everything else the parser
    * found first. Left alone the browser decides, which is right for the other
    * ninety-nine pictures.
-   * - `decoding`: Whether the browser may decode off the main thread.
+   * - `loading`: Whether to wait until it is nearly on screen.
    *
-   * `async` is the resting value and right for a picture in a page. `sync` is
-   * what a consumer reaches for when the picture is about to be composited with
-   * something else and a tear would show.
-   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas
-   * can read it.
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
    * - `referrerpolicy`/`referrerPolicy`: How much of the referring URL to send with the request.
+   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `src`: Where the picture is.
+   * - `srcset`: The candidate widths, passed through to the picture.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
    * Read-only to a consumer: it is a report rather than a setting.
@@ -24515,14 +24515,28 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
+   * - `clearable`: Whether the field offers a button that empties it.
+   *
+   * Shown only while there is something to clear, because a control that does
+   * nothing is worse than no control: a reader who presses it and sees no
+   * change has to work out whether the field was already empty or the button
+   * is broken.
+   * - `clear-label`/`clearLabel`: What the clear button is called, since an icon has no name of its own.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   * - `pattern`: A regular expression the value has to match, as the platform reads it.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
@@ -24540,6 +24554,15 @@ export type CustomElements = {
    * the same kind of reason: there is no `helix-v` tag, so no consumer is
    * holding the old spelling, and this is free today and a deprecation after
    * the first release.
+   * - `reveal`: Whether a password field offers a toggle that shows what was typed.
+   *
+   * Ignored on every other type. A reveal on an email field would be a button
+   * that does nothing visible, and guarding it here rather than asking the
+   * consumer not to means the property can be set once on a component that
+   * changes type.
+   * - `reveal-label`/`revealLabel`: What the reveal toggle is called.
+   *
+   * The state is `aria-pressed`, not this.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
    * **Not reflected.** Reflection exists so a selector can reach a value, and
@@ -24551,29 +24574,6 @@ export type CustomElements = {
    * Nothing reads it from the attribute either. The real `<input>` inside takes
    * it as a property binding, which is what makes the keyboard and the
    * validation follow.
-   * - `clearable`: Whether the field offers a button that empties it.
-   *
-   * Shown only while there is something to clear, because a control that does
-   * nothing is worse than no control: a reader who presses it and sees no
-   * change has to work out whether the field was already empty or the button
-   * is broken.
-   * - `clear-label`/`clearLabel`: What the clear button is called, since an icon has no name of its own.
-   * - `reveal`: Whether a password field offers a toggle that shows what was typed.
-   *
-   * Ignored on every other type. A reveal on an email field would be a button
-   * that does nothing visible, and guarding it here rather than asking the
-   * consumer not to means the property can be set once on a component that
-   * changes type.
-   * - `reveal-label`/`revealLabel`: What the reveal toggle is called.
-   *
-   * The state is `aria-pressed`, not this.
-   * - `pattern`: A regular expression the value has to match, as the platform reads it.
-   *
-   * Forwarded rather than checked here, which is the whole reason validity is
-   * the platform's: the browser knows what a `pattern` means, anchors it at both
-   * ends, and produces the message in the reader's own language.
-   * - `minlength`/`minLength`: Fewest characters the value may have.
-   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -24827,21 +24827,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `placement`: Where the legend sits and which way its entries run.
-   *
-   * Absent is a wrapping row, which is what sits under a chart. `start` and
-   * `end` stack the entries in a column, for a legend beside one.
-   *
-   * **This says which way the entries run and not where the element is**, which
-   * is the honest limit of a component that is a sibling of the chart rather
-   * than part of it. A legend cannot place itself relative to something it is
-   * not inside, so the consumer still puts it above, below or beside and this
-   * makes it lay out correctly once it is there.
-   *
-   * A `legend` slot on every chart is the obvious alternative and is worse: it
-   * makes the legend's position a fact about the chart, so two charts sharing
-   * one legend becomes impossible, and it puts a list inside a drawing that is
-   * `aria-hidden`.
    * - `emphasis`: How much ink the swatches claim.
    *
    * **The same axis as the chart's, with the same values, because a legend that
@@ -24858,6 +24843,9 @@ export type CustomElements = {
    * independently. Giving it a chart to read would make a list of names depend
    * on a drawing it is deliberately not part of, and would still not answer the
    * per-series case, where `outlined` is a set of names rather than one value.
+   * - `glass`: Which entries are glass rather than solid, by name.
+   *
+   * Matched as `outlined` is.
    * - `material`: What the swatches are made of.
    *
    * `glass` thins whatever emphasis drew, the way it does on a column, so a
@@ -24882,10 +24870,22 @@ export type CustomElements = {
    * showing, which are the same names the chart matches its own `outlined`
    * against, since both read one table. So a chart and its key say the same
    * thing the same way: `outlined="Forecast"` on both.
-   * - `subtle`: Which entries are drawn as a wash of their color, by name.
+   * - `placement`: Where the legend sits and which way its entries run.
    *
-   * Matched as `outlined` is.
-   * - `glass`: Which entries are glass rather than solid, by name.
+   * Absent is a wrapping row, which is what sits under a chart. `start` and
+   * `end` stack the entries in a column, for a legend beside one.
+   *
+   * **This says which way the entries run and not where the element is**, which
+   * is the honest limit of a component that is a sibling of the chart rather
+   * than part of it. A legend cannot place itself relative to something it is
+   * not inside, so the consumer still puts it above, below or beside and this
+   * makes it lay out correctly once it is there.
+   *
+   * A `legend` slot on every chart is the obvious alternative and is worse: it
+   * makes the legend's position a fact about the chart, so two charts sharing
+   * one legend becomes impossible, and it puts a list inside a drawing that is
+   * `aria-hidden`.
+   * - `subtle`: Which entries are drawn as a wash of their color, by name.
    *
    * Matched as `outlined` is.
    * - `entries`: Which way to read the table.
@@ -25055,12 +25055,6 @@ export type CustomElements = {
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
-   * - `zero`: Whether zero is forced into the range.
-   *
-   * Absent measures from the data's own extent, which is what a line is for.
-   * Set it where the distance from nothing is the point rather than the shape,
-   * and accept that a series which never approaches zero becomes a flat rule
-   * near the top of the box.
    * - `terminus`: The shape of the mark on each series' last reading.
    *
    * Absent is a dot, and absent rather than defaulted because a reflecting
@@ -25082,6 +25076,12 @@ export type CustomElements = {
    * masked with one disc per series and every stroke stops at its own ring's
    * inner edge. `mask-composite: intersect` is what makes N holes out of N
    * layers; a single `mask-image` would only ever cut the last one.
+   * - `zero`: Whether zero is forced into the range.
+   *
+   * Absent measures from the data's own extent, which is what a line is for.
+   * Set it where the distance from nothing is the point rather than the shape,
+   * and accept that a series which never approaches zero becomes a flat rule
+   * near the top of the box.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -25184,9 +25184,9 @@ export type CustomElements = {
    * Empty rather than optional, and unset by default: a list is not always a
    * list of links, and an empty `href` written onto every row would be a link
    * to the current page on every row a consumer never asked to be one.
-   * - `target`: Where the link opens, for the rare row that leaves the site.
    * - `rel`: What the link declares about where it goes. The consumer's decision rather
    * than one derived from `target`, for the reason `Tree.Item` gives.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -25265,7 +25265,6 @@ export type CustomElements = {
    *
    * A rail replaces the marker rather than joining it, so it applies to
    * `unordered` too, where it numbers what a bullet did not.
-   * - `label`: Accessible name for the set.
    * - `kind`: What kind of list this is, which is a fact about the content.
    *
    * On the headless tier because it is meaning rather than decoration, the same
@@ -25286,6 +25285,7 @@ export type CustomElements = {
    *   the supporting text `List.Item` already has, so the kind changes how the
    *   pair is drawn and nothing about what a consumer writes. A separate
    *   `List.Term` element would be a second row shape for one attribute's sake.
+   * - `label`: Accessible name for the set.
    * - `type`: Which markers an ordered list draws, in `<ol type>`'s own five values.
    *
    * Reflected, because this is one of the things a stylesheet selects on and
@@ -25355,13 +25355,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -25369,8 +25369,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
@@ -25602,6 +25602,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `size`: Diameter relative to the surrounding text.
    * - `variant`: How the waiting is drawn.
    *
    * Unset is the turning arc, which is what most waits want.
@@ -25611,7 +25612,6 @@ export type CustomElements = {
    * swells with it, in step. It is the shape for a wait that has a mark to
    * show, a splash or a first paint behind a wordmark, where a rotating rim
    * around a logo reads as chrome bolted to the brand.
-   * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -25685,26 +25685,6 @@ export type CustomElements = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `label`: The section's name, which names the default trigger and the panel.
-   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
-   *
-   * The resting one is the card, hanging off the trigger and as wide as it
-   * needs to be. `full` is the other shape navigations use: a band from edge to
-   * edge under the header, with its contents held to the page's own measure, so
-   * a set of destinations too wide to sit under one word gets the whole width
-   * to lay out in.
-   *
-   * It changes where the panel goes as well as how it looks, which is why this
-   * tier knows about it at all: a band spans the viewport, so there is nothing
-   * to measure it against and nothing to flip or shift to, and the placing pass
-   * is told not to run. Everything else the popover gives, the top layer and
-   * the dismissal, is exactly what such a band needs.
-   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
-   *
-   * A press always works. This says whether a mouse also opens it by resting on
-   * the trigger, and it is the default because that is what a navigation bar
-   * does. `click` is for a trigger that does something else as well, or a panel
-   * heavy enough that opening it on the way past is rude.
    * - `full-below`/`fullBelow`: The width, in pixels, under which a card becomes a band. Zero never does.
    *
    * A card is a panel hung off one word, and there is no room to hang anything
@@ -25720,6 +25700,26 @@ export type CustomElements = {
    * whatever the stylesheet says. Writing the width in both places would be one
    * number in two languages, drifting the first time either moved. This sets
    * `data-narrow` on the host and the stylesheet arranges itself off that.
+   * - `label`: The section's name, which names the default trigger and the panel.
+   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
+   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -25805,7 +25805,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What this row stands for, carried in the event when it is chosen.
    * - `checkable`: Whether the row is one of a set of choices.
    *
    * Separate from `checked`, and it has to be. A row that is off is still a
@@ -25817,6 +25816,11 @@ export type CustomElements = {
    * `checked` implies it, so a row that is on never has to say both.
    * - `checked`: Whether the row is ticked.
    * - `disabled`: Whether the row can be chosen.
+   * - `download`: Whether the link saves the file rather than opening it.
+   *
+   * Only meaningful beside an `href`, and only for a file served from this
+   * origin: the attribute is ignored cross-origin, which is the browser's rule
+   * about who may name a file on somebody's disk rather than a gap here.
    * - `href`: Where the row goes, which makes it a real link.
    *
    * **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -25835,13 +25839,9 @@ export type CustomElements = {
    * back `null`. So `role="option"` is pinned to the host, and an anchor under
    * it hits the naming failure above. A menu has no such constraint because
    * focus really moves to the row.
-   * - `target`: Where the link opens, for the rows that should leave the page.
    * - `rel`: The relationship, which `target="_blank"` should always set.
-   * - `download`: Whether the link saves the file rather than opening it.
-   *
-   * Only meaningful beside an `href`, and only for a file served from this
-   * origin: the attribute is ignored cross-origin, which is the browser's rule
-   * about who may name a file on somebody's disk rather than a gap here.
+   * - `target`: Where the link opens, for the rows that should leave the page.
+   * - `value`: What this row stands for, carried in the event when it is chosen.
    * - `onPage`: Whether this row is on the page currently showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
@@ -25950,13 +25950,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `open`: Whether the element is open.
    *
    * One property, not two, so `dialog.open` answers the question anyone
@@ -25970,12 +25970,12 @@ export type CustomElements = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `label`: Accessible name for the surface.
+   * - `offset`: Space between the trigger and the surface, in pixels.
    * - `placement`: Preferred side.
    *
    * It moves if that side does not fit.
-   * - `offset`: Space between the trigger and the surface, in pixels.
-   * - `label`: Accessible name for the surface.
-   * - `back-label`/`backLabel`: What the row returning from a submenu reads.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -26104,29 +26104,6 @@ export type CustomElements = {
    * part of that range it is in, so there is no second kind of fact for an
    * outline to name. `solid` is the resting state and is written by not writing
    * it, per the rule that a reflected property takes no default.
-   * - `label`: Accessible name for the reading.
-   * - `min`: Bottom of the range.
-   * - `max`: Top of the range.
-   *
-   * A hundred rather than the platform's one, which is what `Progress` already
-   * takes and what a consumer writing `value="72"` means. A range of zero to one
-   * is a fraction, and a component that reads `value="72"` as seventy-two times
-   * over its maximum is a trap that costs nothing to avoid.
-   * - `value`: Where the reading sits between `min` and `max`.
-   *
-   * Outside them, it clamps.
-   * - `low`: Top of the low band.
-   *
-   * Absent leaves the range unbanded.
-   * - `high`: Bottom of the high band.
-   *
-   * Absent leaves the range unbanded.
-   * - `optimum`: Where in the range it is best to be.
-   *
-   * Defaults to the middle of whatever bands are declared, which is the
-   * platform's own default and the right one for a score. A meter where low is
-   * good, like disk usage, says `optimum="0"`; one where high is good, like a
-   * battery, says `optimum="100"`.
    * - `band`: The band, said outright, where the three thresholds cannot say it.
    *
    * **The specification's model has a shape, and it is worth knowing before
@@ -26151,6 +26128,26 @@ export type CustomElements = {
    * Not reflected. Nothing selects on it: the band reaches the stylesheet as
    * `data-band` on the fill, because that is the element being colored, so
    * reflecting here would write an attribute onto the host for no reader.
+   * - `high`: Bottom of the high band.
+   *
+   * Absent leaves the range unbanded.
+   * - `label`: Accessible name for the reading.
+   * - `low`: Top of the low band.
+   *
+   * Absent leaves the range unbanded.
+   * - `max`: Top of the range.
+   *
+   * A hundred rather than the platform's one, which is what `Progress` already
+   * takes and what a consumer writing `value="72"` means. A range of zero to one
+   * is a fraction, and a component that reads `value="72"` as seventy-two times
+   * over its maximum is a trap that costs nothing to avoid.
+   * - `min`: Bottom of the range.
+   * - `optimum`: Where in the range it is best to be.
+   *
+   * Defaults to the middle of whatever bands are declared, which is the
+   * platform's own default and the right one for a score. A meter where low is
+   * good, like disk usage, says `optimum="0"`; one where high is good, like a
+   * battery, says `optimum="100"`.
    * - `shape`: Whether the reading is drawn as a bar, a ring or an arc.
    *
    * A gauge and a meter are the same thing measured: a value in a range, with
@@ -26168,6 +26165,9 @@ export type CustomElements = {
    * rather than a reading, it costs a rotation and a shape to draw it with, and
    * it says nothing the end of the arc does not already say.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
+   * - `value`: Where the reading sits between `min` and `max`.
+   *
+   * Outside them, it clamps.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *
    * `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
@@ -26331,10 +26331,10 @@ export type CustomElements = {
    * `hydration.dom.spec.ts` holds it.
    * - `default-read`/`defaultRead`: State to open with, where nothing declared one.
    * - `dismissible`: Whether a reader may remove it.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    * - `locale`: Locale for the timestamp.
    *
    * Empty is the runtime's own.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -26434,13 +26434,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `label`: Accessible name for the feed.
    * - `mark-all`/`markAll`: Whether to draw a control that marks everything read.
    * - `mark-all-label`/`markAllLabel`: Label for that control.
@@ -26554,8 +26554,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
@@ -26564,18 +26564,19 @@ export type CustomElements = {
    * lets autofill work at all. Hardcoding `off` here is what stops a reader
    * having a birthday or a postal code filled in for them, with no way for a
    * consumer to ask for it.
-   * - `min`: Smallest value the reader may reach.
-   *
-   * Absent has no floor.
-   * - `max`: Largest value the reader may reach.
-   *
-   * Absent has no ceiling.
-   * - `step`: How far one step moves.
+   * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
+   * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
    * - `large-step`/`largeStep`: How far `PageUp` and `PageDown` move.
    *
    * Ten steps, which is the convention every spinner on the platform follows,
    * and a property because ten of a step of `0.01` is a hundredth and rarely
    * what a reader wants from a whole key.
+   * - `max`: Largest value the reader may reach.
+   *
+   * Absent has no ceiling.
+   * - `min`: Smallest value the reader may reach.
+   *
+   * Absent has no floor.
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
@@ -26588,8 +26589,7 @@ export type CustomElements = {
    * been asked for. Where it earns its place is a value a reader tunes rather
    * than states: a duration, a weight, a count they are looking for rather than
    * one they already know.
-   * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
-   * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
+   * - `step`: How far one step moves.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -26803,39 +26803,9 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `disabled`: Whether this choice can be made.
-   * - `description`: A second line under the words, for what the choice actually is.
-   *
-   * A palette row reads better as a name and a caption than as one sentence
-   * carrying both: "Helix" and "the design system" are two facts, and a comma
-   * between them makes a reader parse the punctuation to find where the name
-   * ends. Matching still reads the label, so what somebody types is matched
-   * against the name rather than against prose about it.
-   *
-   * **A property and not a slot, which is the departure worth explaining.** The
-   * area rules say a content property is its slot's fallback, and that holds for
-   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
-   * usually absent, and a wrapped slot generates a box whether or not it is
-   * filled, so every option without a caption would carry an empty line. The
-   * detection that would avoid it does not exist, `:host(:has())` being invalid
-   * and the server having no children to inspect. A property is known at render
-   * time, so the component can decline to draw the box at all.
-   *
-   * It does not reflect, per the rule that payload state stays off the host: a
-   * string is not a fact a selector needs.
    * - `data-active`/`active`: Whether this is the option the keyboard is on.
    *
    * Written by the listbox.
-   * - `selected`: Whether this choice is currently chosen.
-   *
-   * Written by the listbox.
-   * - `label`: A shorter name for this choice, for where the row does not fit.
-   *
-   * `<option label>`'s own meaning: the text a chooser shows when it has less
-   * room than the row does, which is what a select's closed trigger has. Empty
-   * means the row's own content, which is the common case and is why this is not
-   * simply the accessible name.
-   * - `value`: Identifies this choice, and is what a form submits.
    * - `alternate`: A second destination for this row, taken with the modifier held.
    *
    * **An attribute rather than a second row, which is the whole point.** A
@@ -26858,6 +26828,36 @@ export type CustomElements = {
    * `aria-description` rather than into the name: the name is the row's own
    * words and stays what a reader searched for, and the second destination is a
    * fact about what pressing a key would do, which is what a description is.
+   * - `description`: A second line under the words, for what the choice actually is.
+   *
+   * A palette row reads better as a name and a caption than as one sentence
+   * carrying both: "Helix" and "the design system" are two facts, and a comma
+   * between them makes a reader parse the punctuation to find where the name
+   * ends. Matching still reads the label, so what somebody types is matched
+   * against the name rather than against prose about it.
+   *
+   * **A property and not a slot, which is the departure worth explaining.** The
+   * area rules say a content property is its slot's fallback, and that holds for
+   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+   * usually absent, and a wrapped slot generates a box whether or not it is
+   * filled, so every option without a caption would carry an empty line. The
+   * detection that would avoid it does not exist, `:host(:has())` being invalid
+   * and the server having no children to inspect. A property is known at render
+   * time, so the component can decline to draw the box at all.
+   *
+   * It does not reflect, per the rule that payload state stays off the host: a
+   * string is not a fact a selector needs.
+   * - `disabled`: Whether this choice can be made.
+   * - `label`: A shorter name for this choice, for where the row does not fit.
+   *
+   * `<option label>`'s own meaning: the text a chooser shows when it has less
+   * room than the row does, which is what a select's closed trigger has. Empty
+   * means the row's own content, which is the common case and is why this is not
+   * simply the accessible name.
+   * - `selected`: Whether this choice is currently chosen.
+   *
+   * Written by the listbox.
+   * - `value`: Identifies this choice, and is what a form submits.
    * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -26974,12 +26974,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `label`: Accessible name for the navigation.
-   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
-   *
-   * The reading line. A page with a sticky masthead sets this to its height, or
-   * a little more: without it the current section changes as a heading slides
-   * under the chrome rather than as it reaches the top of what can be seen.
    * - `behavior`: How a click on one of these links travels to its section.
    *
    * The platform's own vocabulary, because this is the platform's own option:
@@ -26999,6 +26993,12 @@ export type CustomElements = {
    * read at the click rather than cached, because a reader can change it while
    * the page is open and this is the only motion in the component that
    * JavaScript rather than CSS decides.
+   * - `label`: Accessible name for the navigation.
+   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
+   *
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
    * - `current`: The id of the section being read, or empty before anything is measured.
    *
    * Read-only, and a getter rather than a property for that reason: it is
@@ -27090,27 +27090,17 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `pages`: How many pages there are in total.
+   * - `boundaries`: How many pages to show at each end, whatever the current one is.
+   * - `compact`: Where the numbers are replaced by a reading of the two.
    *
-   * Clamped to at least one wherever it is read, so a result that has not
-   * loaded yet renders a single page rather than an empty control that then
-   * appears and pushes the layout down.
+   * A different structure rather than a different look, which is why it is
+   * here: the run of pages is gone and a single status line stands in its
+   * place. This is the shape a narrow screen wants, and the only shape possible
+   * where the total is large enough that no window over it is useful.
    *
-   * Left unset where `total` and `page-size` are both given, since the two of
-   * them already say it. A fallback rather than an override: writing this wins,
-   * so there is never a question of which of two sources is current.
-   * - `total`: How many items there are across every page.
-   *
-   * What `pages` falls back to together with `page-size`. Unset is the common
-   * case, where a consumer knows the page total and not the item total.
-   *
-   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
-   * to a reader, and takes its own.
-   * - `page-size`/`pageSize`: How many items are on a page.
-   *
-   * Only arithmetic: this does not slice anything, because the component never
-   * sees the items. It is what turns `total` into a page count, and nothing
-   * else.
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `ends`: Whether to offer a jump to the first and last pages.
    *
    * Off by default. The gaps already reach any page in a few presses and the
@@ -27137,24 +27127,15 @@ export type CustomElements = {
    * far-fetched value: it is a bookmarked link after the result shrank.
    *
    * Rounded here too, so `2.7` reads as the 2 it renders.
-   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
-   * - `siblings`: How many pages to show either side of the current one.
-   * - `boundaries`: How many pages to show at each end, whatever the current one is.
+   * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
+   * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    * - `href`: Address for a page, with `{page}` standing in for its number.
    *
    * Absent renders buttons. Present renders links, which is what a paged result
    * with its own URL should be: a crawler follows them, a middle click opens
    * one, and the back button works without the consumer wiring anything.
-   * - `compact`: Where the numbers are replaced by a reading of the two.
-   *
-   * A different structure rather than a different look, which is why it is
-   * here: the run of pages is gone and a single status line stands in its
-   * place. This is the shape a narrow screen wants, and the only shape possible
-   * where the total is large enough that no window over it is useful.
-   *
-   * Not reflected, for the reason `ends` is not: it decides what renders, so
-   * nothing has to select on it.
    * - `label`: Accessible name for the navigation landmark.
+   * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
    * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
    *
    * The same property the calendar takes, doing the same job one layer down:
@@ -27166,18 +27147,37 @@ export type CustomElements = {
    *
    * Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
    * different address from `?page=1234`.
+   * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
    * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
+   * - `pages`: How many pages there are in total.
+   *
+   * Clamped to at least one wherever it is read, so a result that has not
+   * loaded yet renders a single page rather than an empty control that then
+   * appears and pushes the layout down.
+   *
+   * Left unset where `total` and `page-size` are both given, since the two of
+   * them already say it. A fallback rather than an override: writing this wins,
+   * so there is never a question of which of two sources is current.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   *
+   * Only arithmetic: this does not slice anything, because the component never
+   * sees the items. It is what turns `total` into a page count, and nothing
+   * else.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
+   * - `siblings`: How many pages to show either side of the current one.
    * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
    *
    * No noun: the landmark this sits in is already named "Pagination", so
    * "Page 7 of 24" says it twice to a screen reader and takes a third of the
    * width from a control whose whole reason for existing is that the row is
    * narrow. The numbers are the reading.
-   * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
-   * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
-   * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
-   * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
-   * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
+   * - `total`: How many items there are across every page.
+   *
+   * What `pages` falls back to together with `page-size`. Unset is the common
+   * case, where a consumer knows the page total and not the item total.
+   *
+   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+   * to a reader, and takes its own.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -27258,21 +27258,21 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `sizes`: The sizes offered, comma separated.
-   *
-   * A string rather than an array, so the whole control is expressible in
-   * markup and survives a server render. Anything that is not a positive number
-   * is dropped rather than rendered as an option that cannot mean anything.
+   * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `value`: The size in force.
    *
    * Reading gives the real one; writing declares it the consumer's, and
    * `default-value` seeds one this element owns. Same accessor pair as
    * `Pagination.page` and the calendar's `month`.
-   * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `label`: The words beside the control.
    * - `locale`: Locale for the numbers.
    *
    * Absent uses the runtime's own.
+   * - `sizes`: The sizes offered, comma separated.
+   *
+   * A string rather than an array, so the whole control is expressible in
+   * markup and survives a server render. Anything that is not a positive number
+   * is dropped rather than rendered as an option that cannot mean anything.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -27325,9 +27325,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `page`: The page on show, one-based.
-   * - `page-size`/`pageSize`: How many items are on a page.
-   * - `total`: How many items there are across every page.
    * - `format`: The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
@@ -27344,6 +27341,9 @@ export type CustomElements = {
    * - `locale`: Locale for the numbers.
    *
    * Absent uses the runtime's own.
+   * - `page`: The page on show, one-based.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   * - `total`: How many items there are across every page.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -27396,8 +27396,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill, reaching the first cell only.
@@ -27406,7 +27406,19 @@ export type CustomElements = {
    * that lets a phone offer the code out of a message. Later cells stay `off`
    * for the reason in the class comment above, that six cells each offering
    * the same code is one offer made six times.
+   * - `cell-label`/`cellLabel`: Accessible name for one box, with `{index}` and `{length}` filled in.
    * - `length`: How many characters the code has.
+   * - `mask`: Whether the characters are hidden, the way a password is.
+   * - `placeholder`: What an empty box shows, usually a single dot.
+   *
+   * The platform's own placeholder, on each cell, rather than a character
+   * drawn behind the field: it clears the moment anything is typed, it is
+   * already excluded from the accessible value, and it works the same under
+   * `mask`, where the cell is a password input and a hand-drawn glyph would
+   * have to know that.
+   *
+   * Empty by default, because a row of boxes already reads as a row of boxes.
+   * - `readonly`/`readOnly`: Whether the boxes refuse input while still submitting their value.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
    * `numeric` and `alphanumeric` also refuse anything else on the way in,
@@ -27427,18 +27439,6 @@ export type CustomElements = {
    * no consumer's markup had. The area rules carry the sentence "reflect only
    * what CSS selects on". The real inputs take it as a binding, which is what
    * makes the keyboard follow.
-   * - `mask`: Whether the characters are hidden, the way a password is.
-   * - `placeholder`: What an empty box shows, usually a single dot.
-   *
-   * The platform's own placeholder, on each cell, rather than a character
-   * drawn behind the field: it clears the moment anything is typed, it is
-   * already excluded from the accessible value, and it works the same under
-   * `mask`, where the cell is a password input and a hand-drawn glyph would
-   * have to know that.
-   *
-   * Empty by default, because a row of boxes already reads as a row of boxes.
-   * - `readonly`/`readOnly`: Whether the boxes refuse input while still submitting their value.
-   * - `cell-label`/`cellLabel`: Accessible name for one box, with `{index}` and `{length}` filled in.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -27724,7 +27724,6 @@ export type CustomElements = {
    * from, so an outline there costs legibility and buys no distinction. `solid`
    * is the resting state and is written by not writing it, per the rule that a
    * reflected property takes no default.
-   * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *
    * On the headless tier rather than as a treatment, because it is
@@ -27736,6 +27735,7 @@ export type CustomElements = {
    * Not `Loader`, which is the other thing this could be. A loader says the
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
+   * - `label`: Accessible name for what is in progress.
    * - `max`: The total the work is measured against.
    * - `shape`: Whether the value is drawn as a bar or as a ring.
    *
@@ -27829,7 +27829,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What the code encodes, which is usually a URL.
+   * - `correction`: How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
    * - `label`: What the image is called.
    *
    * Falling back to the value is deliberate: a code almost always holds a URL,
@@ -27845,13 +27851,7 @@ export type CustomElements = {
    * A scanner reads contrast between cells, not their shape, so all three
    * scan. `dots` sits a little under half a module so neighbors do not touch,
    * which is what makes it read as dots rather than as a softened square code.
-   * - `correction`: How much of the code can be lost and still read.
-   *
-   * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the center,
-   * chosen automatically when the slot is filled: it is the level that makes
-   * covering safe, and a consumer who fills the slot has said what they want
-   * without having to know that.
+   * - `value`: What the code encodes, which is usually a URL.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -27976,8 +27976,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `orientation`: Which way the choices run. A column reads one line per answer.
@@ -28143,21 +28143,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `variant`: How the choice presents itself.
-   *
-   * - `plain` is the default and is never written: a circle beside its words,
-   *   which is what a list of choices should be almost always.
-   * - `card` puts it in a bounded surface, for options that need room to
-   *   explain themselves: a description, an icon, a price. It is the half a
-   *   `data-card` link cannot do, because a link reports no value and belongs
-   *   to no group, so a card that is genuinely an answer has to be this.
-   * - `chip` is the answer as its own small surface, for a row of short
-   *   choices read at a glance. It hides the circle, the surface being the
-   *   whole mark, which is why `hide-control` says it is unnecessary here.
-   *
-   * The circle stays in both. A card whose only marker was its own border would
-   * ask a reader to compare surfaces across a row to find the answer, and would
-   * leave nothing for a high-contrast display.
    * - `hide-control`/`hideControl`: Takes the circle away, leaving the card as the whole control.
    *
    * Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -28174,6 +28159,21 @@ export type CustomElements = {
    * Not on `Checkbox`, deliberately. A radio card with no circle is still
    * unmistakably one-of-many because its siblings behave that way; a checkbox
    * card with no box loses the only thing that says you may pick several.
+   * - `variant`: How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a circle beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   * - `chip` is the answer as its own small surface, for a row of short
+   *   choices read at a glance. It hides the circle, the surface being the
+   *   whole mark, which is why `hide-control` says it is unnecessary here.
+   *
+   * The circle stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice.
    *
@@ -28290,8 +28290,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `max`: How many marks there are.
@@ -28301,20 +28301,10 @@ export type CustomElements = {
    * different answers and a control that cannot express the first has to
    * pretend the second. A survey that requires an answer says so with
    * `required`, not by making one unreachable.
-   * - `step`: The smallest part of a mark that can be chosen.
-   *
-   * `0.5` is the half star, and it is the reason the value is a number rather
-   * than an index: with halves, five marks are ten answers.
    * - `readonly`/`readOnly`: Whether this shows a score rather than asks for one.
    *
    * A readout is not a control that has been switched off. It takes no focus,
    * answers no keys, and reads as one thing: see the note on the class.
-   * - `value-text`/`valueText`: How the score is read out, where "3.5 out of 5" is not what it should say.
-   *
-   * A rating out of five is one of the few places a screen reader gets a worse
-   * answer from the value than from a sentence: "3.5" alone is a number without
-   * a subject. This names the readout, where a control is named by its `label`
-   * and each of its options by the score that option is.
    * - `show-value`/`showValue`: Whether the score is written out beside the marks.
    *
    * Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -28325,6 +28315,16 @@ export type CustomElements = {
    * It follows the pointer, because it labels what the marks are showing rather
    * than what the form holds: a label that disagreed with the marks under the
    * reader's own cursor would be worse than no label.
+   * - `step`: The smallest part of a mark that can be chosen.
+   *
+   * `0.5` is the half star, and it is the reason the value is a number rather
+   * than an index: with halves, five marks are ten answers.
+   * - `value-text`/`valueText`: How the score is read out, where "3.5 out of 5" is not what it should say.
+   *
+   * A rating out of five is one of the few places a screen reader gets a worse
+   * answer from the value than from a sentence: "3.5" alone is a number without
+   * a subject. This names the readout, where a control is named by its `label`
+   * and each of its options by the score that option is.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -28536,12 +28536,12 @@ export type CustomElements = {
    * keyed on this attribute, and of the 56 tokens that differ by scheme the
    * theme engine emits 19. The other 37 would stay light in a dark preview,
    * including every one of the 24 series colors a chart reads.
-   * - `src`: Document the frame loads, which brings the styles and the elements.
-   * - `source`: Markup to render.
-   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
-   * - `label`: Accessible name for the frame.
    * - `direction`: Writing direction inside the frame.
+   * - `label`: Accessible name for the frame.
    * - `layout`: How the example is placed in the frame.
+   * - `source`: Markup to render.
+   * - `src`: Document the frame loads, which brings the styles and the elements.
+   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -28641,7 +28641,21 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Whether the panes sit side by side or stacked.
+   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
+   * - `default-panel-size`/`defaultPanelSize`: What a reset makes the panel, in pixels.
+   *
+   * The pair to `panel-size`.
+   * - `default-split`/`defaultSplit`: Where a reset puts the divider, where nothing declared it.
+   *
+   * Separate from `split` for the reason `Splitter` keeps `default-position`
+   * separate from `position`. Resetting to whatever `split` held on the first
+   * render is the declared arrangement only where nobody owns the property: the
+   * workbench does, and restores it from the address bar and from storage, so the
+   * first value it holds is the reader's last session and a reset puts the
+   * sandbox back to the size it already was.
+   *
+   * Declared rather than captured, so it is a number a consumer states and can
+   * change, and it needs no first frame to be read on.
    * - `lead`: Which pane comes first, before the divider.
    *
    * A sandbox is read in one of two directions and the two are not a
@@ -28657,30 +28671,16 @@ export type CustomElements = {
    *
    * `split` follows the lead pane rather than the source, so `split="30"` means
    * the same thing in both directions: thirty percent to whatever comes first.
-   * - `split`: Percentage of the sandbox given to the source pane.
-   * - `default-split`/`defaultSplit`: Where a reset puts the divider, where nothing declared it.
-   *
-   * Separate from `split` for the reason `Splitter` keeps `default-position`
-   * separate from `position`. Resetting to whatever `split` held on the first
-   * render is the declared arrangement only where nobody owns the property: the
-   * workbench does, and restores it from the address bar and from storage, so the
-   * first value it holds is the reader's last session and a reset puts the
-   * sandbox back to the size it already was.
-   *
-   * Declared rather than captured, so it is a number a consumer states and can
-   * change, and it needs no first frame to be read on.
-   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
-   * - `default-panel-size`/`defaultPanelSize`: What a reset makes the panel, in pixels.
-   *
-   * The pair to `panel-size`.
+   * - `orientation`: Whether the panes sit side by side or stacked.
    * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
    *
    * Zero closes it outright. A panel whose contents include the control that
    * reopens it, a row of tabs being the usual one, wants that row left showing,
    * and only whoever slotted it knows how tall that is.
    * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
-   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
+   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
+   * - `split`: Percentage of the sandbox given to the source pane.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -28759,15 +28759,15 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The source being edited.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `name`: Which source this pane holds, echoed in every `helix-before-edit`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
    *
    * Not reflected: nothing selects on it, so it keeps a real default instead.
-   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   * - `value`: The source being edited.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -29162,10 +29162,11 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `empty-text`/`emptyText`: What it says where there are none.
    * - `filterable`: Whether the list can be narrowed by typing.
    *
    * Passed to the listbox rather than acted on here, because the listbox owns
@@ -29176,7 +29177,6 @@ export type CustomElements = {
    * message belongs. Two components saying "Loading" about one request is a
    * consumer wiring the same flag twice.
    * - `loading-text`/`loadingText`: What the list says while they are on their way.
-   * - `empty-text`/`emptyText`: What it says where there are none.
    * - `multiple`: Whether more than one option can be the answer.
    * - `placeholder`: Shown on the trigger while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
@@ -29431,18 +29431,11 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `range`: Whether there are two thumbs and the value is a pair.
-   *
-   * The pair is one string, `"10,50"`, which is what a form submits and what
-   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
-   * the two, since a range has no single number.
-   * - `max`: The largest value the reader can choose.
-   * - `min`: The smallest value the reader can choose.
-   * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
    * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
    *
    * `0` or `1` draws none: one mark on a track says nothing about a range.
@@ -29456,8 +29449,8 @@ export type CustomElements = {
    * one thing a mark must not be, so the spacing gives way rather than the
    * step, and marks may come out unevenly spaced when the two disagree. That
    * is the honest picture of the range being offered.
-   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
-   * - `step`: How far one press of an arrow key moves it.
+   * - `max`: The largest value the reader can choose.
+   * - `min`: The smallest value the reader can choose.
    * - `orientation`: Which way the track runs, `vertical` standing it on end.
    *
    * For a level rather than a quantity: a fader, a channel, anything a reader
@@ -29468,6 +29461,13 @@ export type CustomElements = {
    * takes the width of the row it is in. `--slider-length` is that number and
    * defaults to nine rem, so one dropped into a layout is a usable height
    * rather than a thumb sitting on nothing.
+   * - `range`: Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
+   * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `step`: How far one press of an arrow key moves it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -29666,16 +29666,6 @@ export type CustomElements = {
    * `ghost` is an empty cell and there is no `material`. Glass exists so what is
    * behind a mark reads through it, and at the size a sparkline draws there is
    * nothing behind it a reader could resolve.
-   * - `weight`: How heavy the line is drawn.
-   *
-   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
-   * in a table row among many; `thick` suits one standing on its own, where a
-   * hairline reads as an accident.
-   *
-   * Three steps rather than a number, because `--sparkline-width` is already
-   * the number and an attribute earns its place by being the thing a consumer
-   * reaches for without reading the stylesheet. The hook stays for anything the
-   * three do not cover.
    * - `terminus`: The shape of the mark on the last reading.
    *
    * Absent is a dot, which is how a line is usually ended, and absent rather
@@ -29697,33 +29687,16 @@ export type CustomElements = {
    * of the `<svg>`, so the line stops at the ring's inner edge rather than
    * running on to the reading at its center, and the middle shows whatever the
    * chart is drawn over rather than a guess at it.
-   * - `plot`: What the readings are drawn as.
+   * - `weight`: How heavy the line is drawn.
    *
-   * Absent is a line, `area` is a line with the region beneath it washed, and
-   * `bar` is a column per reading.
+   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+   * in a table row among many; `thick` suits one standing on its own, where a
+   * hairline reads as an accident.
    *
-   * **A bar plot measures from zero and the other two measure from the data's
-   * own range**, which is the one way the plots are not interchangeable. A line
-   * says where the readings sit relative to each other, so a scale over their
-   * extent uses the whole box and claims nothing about absolute size. A bar's
-   * length *is* the value, so any baseline but zero makes the lengths
-   * proportional to nothing.
-   *
-   * **Which is a reason to prefer a line for readings in a narrow band far from
-   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
-   * seven columns of nearly the same height, and that is the true picture: they
-   * *are* nearly the same. The same readings as a line fill the box and show
-   * the movement, because a line is only ever claiming a shape.
-   *
-   * **Absent is `area`**, which is the departure from the rule that a resting
-   * arrangement is the plainest thing. At the size a sparkline is actually
-   * drawn, a hairline in a wide box is mostly box: the wash under it is what
-   * gives the shape a body and lets a reader see it at a glance rather than
-   * hunting for it, which is the entire job. `line` is the bare stroke for
-   * anywhere the fill would be noise, several of them in one box for instance.
-   *
-   * This tier rather than the one above: a plot type is geometry and geometry
-   * is markup, the same reason `curve` lives here.
+   * Three steps rather than a number, because `--sparkline-width` is already
+   * the number and an attribute earns its place by being the thing a consumer
+   * reaches for without reading the stylesheet. The hook stays for anything the
+   * three do not cover.
    * - `curve`: How the line gets from one reading to the next.
    *
    * **`smooth` is the resting curve.** A straight segment asserts nothing about
@@ -29758,6 +29731,33 @@ export type CustomElements = {
    * the accessible representation of a sparkline, and a list of the fourteen
    * numbers is not. Absent, the drawing is hidden from a screen reader rather
    * than announced without a name.
+   * - `plot`: What the readings are drawn as.
+   *
+   * Absent is a line, `area` is a line with the region beneath it washed, and
+   * `bar` is a column per reading.
+   *
+   * **A bar plot measures from zero and the other two measure from the data's
+   * own range**, which is the one way the plots are not interchangeable. A line
+   * says where the readings sit relative to each other, so a scale over their
+   * extent uses the whole box and claims nothing about absolute size. A bar's
+   * length *is* the value, so any baseline but zero makes the lengths
+   * proportional to nothing.
+   *
+   * **Which is a reason to prefer a line for readings in a narrow band far from
+   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+   * seven columns of nearly the same height, and that is the true picture: they
+   * *are* nearly the same. The same readings as a line fill the box and show
+   * the movement, because a line is only ever claiming a shape.
+   *
+   * **Absent is `area`**, which is the departure from the rule that a resting
+   * arrangement is the plainest thing. At the size a sparkline is actually
+   * drawn, a hairline in a wide box is mostly box: the wash under it is what
+   * gives the shape a body and lets a reader see it at a glance rather than
+   * hunting for it, which is the entire job. `line` is the bare stroke for
+   * anywhere the fill would be noise, several of them in one box for instance.
+   *
+   * This tier rather than the one above: a plot type is geometry and geometry
+   * is markup, the same reason `curve` lives here.
    * - `values`: The numbers, separated by whitespace or by commas.
    *
    * Both separators, so `values="1240 1318"` and an array assigned to the
@@ -29829,8 +29829,8 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What this action stands for, carried in the event when it is chosen.
    * - `disabled`: Whether the action can be chosen.
+   * - `value`: What this action stands for, carried in the event when it is chosen.
    * - `selected`: Whether this is the row the set is on, which here is where focus is.
    *
    * Asked of the document rather than of the shadow root: focus lands on the
@@ -29923,11 +29923,11 @@ export type CustomElements = {
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: Names the trigger and the set of actions it opens.
+   * - `offset`: Space between the trigger and the actions, in pixels.
    * - `placement`: Which way the actions fan out. They move if that side does not fit.
    *
    * Up by default, because the control this hangs off is usually docked to the
    * bottom of the window and there is nothing below it to fan into.
-   * - `offset`: Space between the trigger and the actions, in pixels.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -30044,6 +30044,50 @@ export type CustomElements = {
    *
    * Both are writable, so a generated page can say which it means rather than
    * relying on the absence of an attribute.
+   * - `collapsed-size`/`collapsedSize`: How much of a shut pane is still shown, as a percentage.
+   *
+   * Zero by default, which is a pane fully gone. A tab strip or a title bar
+   * that should survive its own collapse says how much of itself to keep, and
+   * only whoever put it there knows that, which is the same reason `min` is a
+   * consumer's to set.
+   * - `position`: Where the divider sits, as a percentage of the whole.
+   *
+   * Reading gives where it is; writing declares it the consumer's, and
+   * `default-position` seeds one this element owns. The same accessor pair
+   * `Pagination.page` and the calendar's `month` carry.
+   * - `corner-label`/`cornerLabel`: Accessible name for the handle where two dividers cross.
+   * - `collapsed`: Which pane is shut, if either.
+   *
+   * The same accessor pair as `position`, and deliberately a second state
+   * rather than a reading of the first. A pane shut by dragging the divider to
+   * the edge and a pane shut on purpose look identical in geometry and are not
+   * the same thing: only the second knows where to go back to. Kept apart, the
+   * open position is simply the one collapsing never overwrote, so restoring
+   * needs no memory of its own.
+   *
+   * It overrides `min` and `max`, which is the point of it. Those keep a sliver
+   * of a pane during a drag; this is the thing that says the sliver can go.
+   * - `default-collapsed`/`defaultCollapsed`: Which pane starts shut, where nothing declared it.
+   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `label`: Accessible name for the divider.
+   * - `max`: Nearest it may come to the end, on the same terms as `min`.
+   * - `min`: Nearest the divider may come to the start.
+   *
+   * A bare number is a percentage, which is what this always took. A CSS length
+   * is resolved against the splitter's own box along its axis, so `min="15rem"`
+   * means fifteen rem of pane whatever the container is doing.
+   *
+   * **The length is the one that holds.** A percentage minimum does not: twenty
+   * per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
+   * number a consumer picked was almost certainly about how much text fits
+   * rather than about a ratio. The pane that a percentage protects at desk
+   * width is squeezed past reading at half of it.
+   *
+   * **It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
+   * the class docstring says, so a pane can still be shut and reopened. What a
+   * minimum forbids is the space between shut and usable: a pane wide enough to
+   * be there and too narrow to read is the state nobody wants and every drag
+   * passes through.
    * - `orientation`: Which way the panes are laid out.
    *
    * `horizontal` is side by side with an upright divider between them, and
@@ -30068,51 +30112,7 @@ export type CustomElements = {
    * no room for two panes side by side, and a media query would hand it the
    * desktop branch. A `ResizeObserver` on the host asks the only question that
    * has an honest answer.
-   * - `position`: Where the divider sits, as a percentage of the whole.
-   *
-   * Reading gives where it is; writing declares it the consumer's, and
-   * `default-position` seeds one this element owns. The same accessor pair
-   * `Pagination.page` and the calendar's `month` carry.
-   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
-   * - `collapsed`: Which pane is shut, if either.
-   *
-   * The same accessor pair as `position`, and deliberately a second state
-   * rather than a reading of the first. A pane shut by dragging the divider to
-   * the edge and a pane shut on purpose look identical in geometry and are not
-   * the same thing: only the second knows where to go back to. Kept apart, the
-   * open position is simply the one collapsing never overwrote, so restoring
-   * needs no memory of its own.
-   *
-   * It overrides `min` and `max`, which is the point of it. Those keep a sliver
-   * of a pane during a drag; this is the thing that says the sliver can go.
-   * - `default-collapsed`/`defaultCollapsed`: Which pane starts shut, where nothing declared it.
-   * - `collapsed-size`/`collapsedSize`: How much of a shut pane is still shown, as a percentage.
-   *
-   * Zero by default, which is a pane fully gone. A tab strip or a title bar
-   * that should survive its own collapse says how much of itself to keep, and
-   * only whoever put it there knows that, which is the same reason `min` is a
-   * consumer's to set.
-   * - `min`: Nearest the divider may come to the start.
-   *
-   * A bare number is a percentage, which is what this always took. A CSS length
-   * is resolved against the splitter's own box along its axis, so `min="15rem"`
-   * means fifteen rem of pane whatever the container is doing.
-   *
-   * **The length is the one that holds.** A percentage minimum does not: twenty
-   * per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
-   * number a consumer picked was almost certainly about how much text fits
-   * rather than about a ratio. The pane that a percentage protects at desk
-   * width is squeezed past reading at half of it.
-   *
-   * **It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
-   * the class docstring says, so a pane can still be shut and reopened. What a
-   * minimum forbids is the space between shut and usable: a pane wide enough to
-   * be there and too narrow to read is the state nobody wants and every drag
-   * passes through.
-   * - `max`: Nearest it may come to the end, on the same terms as `min`.
    * - `step`: How far one arrow press moves it, as a percentage.
-   * - `label`: Accessible name for the divider.
-   * - `corner-label`/`cornerLabel`: Accessible name for the handle where two dividers cross.
    * - `vertical`: Public because a nested splitter compares axes with the one it is in.
    *
    * The one place the axis is decided, which is why `auto` costs a single line
@@ -30541,8 +30541,8 @@ export type CustomElements = {
    * wrote it, and `:state(checked)` carries the resolved state for
    * stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `value`: Value submitted when the switch is on.
@@ -30749,6 +30749,29 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `align`: Which edge the values line up against.
+   *
+   * `end` is what a column of numbers wants, so digits of the same magnitude sit
+   * above each other. Left unset the cell inherits the table's own alignment,
+   * which is `start` for text in either writing direction.
+   * - `field`: The key this column reads out of a row.
+   *
+   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+   * from an API arrives shaped the way the API shaped it, and requiring a flat
+   * row would push a mapping pass onto every consumer.
+   *
+   * **It is also the sort and filter identity**, which is why sorting is by
+   * field and not by column index: a reordered or hidden column would otherwise
+   * change what `sort="2:asc"` means, and a sort that means something different
+   * after a column moves is a sort a consumer cannot store in a URL.
+   *
+   * Empty on a column that is purely presentational, an actions column say, and
+   * such a column is never sortable however it is marked.
+   * - `sortable`: Whether a reader may reorder the set by this column.
+   *
+   * Ignored without a `field`, and silently: a column with nothing to sort by
+   * has no order to offer, and refusing loudly would mean an actions column
+   * carrying `sortable` breaks a table rather than doing nothing.
    * - `width`: The track this column takes, as CSS.
    *
    * A single track value, so anything valid in `grid-template-columns` works:
@@ -30770,29 +30793,6 @@ export type CustomElements = {
    * line, so a column holding sentences rather than values wants
    * `width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
    * the overflow either way, that being paint, and gets the honest track list.
-   * - `field`: The key this column reads out of a row.
-   *
-   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
-   * from an API arrives shaped the way the API shaped it, and requiring a flat
-   * row would push a mapping pass onto every consumer.
-   *
-   * **It is also the sort and filter identity**, which is why sorting is by
-   * field and not by column index: a reordered or hidden column would otherwise
-   * change what `sort="2:asc"` means, and a sort that means something different
-   * after a column moves is a sort a consumer cannot store in a URL.
-   *
-   * Empty on a column that is purely presentational, an actions column say, and
-   * such a column is never sortable however it is marked.
-   * - `sortable`: Whether a reader may reorder the set by this column.
-   *
-   * Ignored without a `field`, and silently: a column with nothing to sort by
-   * has no order to offer, and refusing loudly would mean an actions column
-   * carrying `sortable` breaks a table rather than doing nothing.
-   * - `align`: Which edge the values line up against.
-   *
-   * `end` is what a column of numbers wants, so digits of the same magnitude sit
-   * above each other. Left unset the cell inherits the table's own alignment,
-   * which is `start` for text in either writing direction.
    * - `cell`: How to read the cell, where the field alone will not do.
    *
    * A property and not an attribute, because it is a function. Set it from a Lit
@@ -30868,13 +30868,13 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `columns`: Column track list, as CSS. Deprecated: declare columns instead.
    *
    * Kept for a table that has no `helix-table-column` children, and ignored the
@@ -30986,8 +30986,8 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Pairs the panel with the tab of the same value.
    * - `selected`: Whether this panel is the visible one.
+   * - `value`: Pairs the panel with the tab of the same value.
    * - `label`: The name of the panel, which is the text of the tab that opens it.
    *
    * Set by the root, which is the only thing that sees both. No attribute,
@@ -31059,6 +31059,12 @@ export type CustomElements = {
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
    *
    * Ignored once `active` is written.
+   * - `label`: Accessible name for the tab list.
+   * - `manual`: Whether arrowing to a tab also selects it.
+   *
+   * Automatic is the default because showing a panel is usually cheap. Set this
+   * where it is not, so a reader arrowing past four tabs does not load four
+   * panels on the way.
    * - `variant`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -31073,12 +31079,6 @@ export type CustomElements = {
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
-   * - `label`: Accessible name for the tab list.
-   * - `manual`: Whether arrowing to a tab also selects it.
-   *
-   * Automatic is the default because showing a panel is usually cheap. Set this
-   * where it is not, so a reader arrowing past four tabs does not load four
-   * panels on the way.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -31150,9 +31150,9 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
-   * - `selected`: Whether this tab is the current one.
    * - `disabled`: Whether the tab can be chosen.
+   * - `selected`: Whether this tab is the current one.
+   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -31213,10 +31213,6 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `tone`: Which status the tag reports.
-   *
-   * `tone` is semantic color, which is what these are and what `helix-text`
-   * already calls them. `helix component`'s `axes` holds the vocabulary.
    * - `emphasis`: How much of the tone the tag wears.
    *
    * - `subtle` is the default: a wash of the tone with the label in it, for a
@@ -31229,6 +31225,10 @@ export type CustomElements = {
    * Independent of `tone` on purpose: an outlined danger tag and a solid danger
    * tag are both sensible, and one property welding color to fill can ask for
    * neither. That is the test the whole axis registry answers to.
+   * - `tone`: Which status the tag reports.
+   *
+   * `tone` is semantic color, which is what these are and what `helix-text`
+   * already calls them. `helix component`'s `axes` holds the vocabulary.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
@@ -31333,9 +31333,6 @@ export type CustomElements = {
    * - `as`: Which element to render.
    *
    * Decides the outline and the semantics.
-   * - `variant`: Type treatment.
-   *
-   * Defaults to the one that matches `as`.
    * - `tone`: Color role. A separate axis from the type ramp, because color carries
    * state: folding it in would mean `caption-danger` and the rest of the cross
    * product.
@@ -31351,6 +31348,9 @@ export type CustomElements = {
    * nothing to be made of. `primary-subtle` is a tinted *ground* and not a
    * quiet ink. That is #141's to derive, and until it does, folding the two
    * halves apart would leave three of the four combinations unsayable.
+   * - `variant`: Type treatment.
+   *
+   * Defaults to the one that matches `as`.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -31406,8 +31406,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
@@ -31415,11 +31415,6 @@ export type CustomElements = {
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
-   * - `placeholder`: Shown while the field is empty.
-   *
-   * Not a label: it goes when typing starts.
-   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
-   * - `rows`: How many lines the box is before anything is typed.
    * - `cols`: How many characters wide the box is, where the layout is not deciding.
    *
    * Optional and absent by default, which is the reflected-property rule: a
@@ -31435,15 +31430,20 @@ export type CustomElements = {
    * no form at all and forwarding the attribute would have looked right and
    * submitted nothing. `ElementInternals` takes a `FormData`, which is how one
    * element sends two entries, and that is what this does.
-   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with
-   * it.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `minlength`/`minLength`: Fewest characters the value may have.
    *
    * Forwarded to the real `<textarea>` rather than checked here, which is what
    * makes the message the browser's and therefore the reader's own language.
    * No `pattern`: the platform does not give a textarea one, and inventing it
    * would be this library guessing where the point is to stop guessing.
-   * - `maxlength`/`maxLength`: Most characters the value may have.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `rows`: How many lines the box is before anything is typed.
+   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with
+   * it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -31635,14 +31635,50 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all.
+   * - `locale`: Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
+   * - `max`: Latest time that can be chosen, as `HH:mm`.
+   * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default, for the reason Date Input gives: how
+   * many fit depends on the width of the field and the length of what is in it,
+   * and this element knows neither.
+   * - `min`: Earliest time that can be chosen, as `HH:mm`.
+   * - `mode`: How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value, which is what a
+   * form submits. `helix-time-picker` carries the longer note on the interaction and on
+   * why a wheel cannot do either.
+   * - `placeholder`: What the field says before a time is in it.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `step`: How far apart the offered times are, in minutes.
+   * - `time-style`/`timeStyle`: Whether the field writes the time out, or holds the value as it is.
+   *
+   * `local` is the reader's own convention from `Intl`, which is what a time is
+   * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+   * swaps to the value while the caret is in it either way, so the rendering is
+   * never something this element would refuse to read back.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
    * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
@@ -31656,42 +31692,6 @@ export type CustomElements = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
-   * - `mode`: How many times can be held at once.
-   *
-   * Absent is one. `range` holds a start and an end, `multiple` holds any
-   * number, and both are carried as one comma-separated value, which is what a
-   * form submits. `helix-time-picker` carries the longer note on the interaction and on
-   * why a wheel cannot do either.
-   * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default, for the reason Date Input gives: how
-   * many fit depends on the width of the field and the length of what is in it,
-   * and this element knows neither.
-   * - `step`: How far apart the offered times are, in minutes.
-   * - `min`: Earliest time that can be chosen, as `HH:mm`.
-   * - `max`: Latest time that can be chosen, as `HH:mm`.
-   * - `time-style`/`timeStyle`: Whether the field writes the time out, or holds the value as it is.
-   *
-   * `local` is the reader's own convention from `Intl`, which is what a time is
-   * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
-   * swaps to the value while the caret is in it either way, so the rendering is
-   * never something this element would refuse to read back.
-   * - `locale`: Language tag the times are written in.
-   *
-   * Absent uses the runtime's own.
-   * - `placeholder`: What the field says before a time is in it.
-   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
-   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -31914,20 +31914,6 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `invalid`: Whether the current selection fails validation.
-   *
-   * A flag rather than a message, the same split Date Picker draws. A flat
-   * picker has no room of its own for a sentence: the field that wraps one owns
-   * the label, the hint and the feedback, and a second message inside the panel
-   * would be the same error said twice. What is left for the picker is the one
-   * thing the field cannot draw from outside, the mark on the answer itself.
-   * - `step`: How far apart the offered times are, in minutes.
-   *
-   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
-   * reader scrolls rather than hunts, and few enough that the list is a list.
-   * Anything under five is a thousand rows and wants a field instead.
-   * - `min`: Earliest time offered, as `HH:mm`.
-   * - `max`: Latest time offered, as `HH:mm`.
    * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
    *
    * The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -31938,10 +31924,19 @@ export type CustomElements = {
    * A time not on the step is simply never offered, so it is not an error to
    * name one, and naming every time in the list is how the empty state is
    * reached honestly rather than by handing over an empty range.
+   * - `invalid`: Whether the current selection fails validation.
+   *
+   * A flag rather than a message, the same split Date Picker draws. A flat
+   * picker has no room of its own for a sentence: the field that wraps one owns
+   * the label, the hint and the feedback, and a second message inside the panel
+   * would be the same error said twice. What is left for the picker is the one
+   * thing the field cannot draw from outside, the mark on the answer itself.
+   * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `locale`: Language tag the times are written in.
    *
    * Absent uses the runtime's own.
-   * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `max`: Latest time offered, as `HH:mm`.
+   * - `min`: Earliest time offered, as `HH:mm`.
    * - `mode`: How many times can be held at once.
    *
    * Absent is one. `range` holds a start and an end with everything between
@@ -31959,6 +31954,23 @@ export type CustomElements = {
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `required`: Whether the form refuses to submit while nothing is chosen.
+   * - `step`: How far apart the offered times are, in minutes.
+   *
+   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+   * reader scrolls rather than hunts, and few enough that the list is a list.
+   * Anything under five is a thousand rows and wants a field instead.
    * - `variant`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
@@ -31983,18 +31995,6 @@ export type CustomElements = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
-   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
-   * - `required`: Whether the form refuses to submit while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -32515,8 +32515,8 @@ export type CustomElements = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
@@ -32684,9 +32684,9 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the item to the group.
-   * - `selected`: Whether this item is the current one.
    * - `disabled`: Whether the item can be chosen.
+   * - `selected`: Whether this item is the current one.
+   * - `value`: Identifies the item to the group.
    * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -32875,6 +32875,13 @@ export type CustomElements = {
    * The common case, and the fallback for the `content` slot: slot something
    * there and it replaces this. Both cannot show at once, which is the point
    * of using fallback content rather than rendering whichever is present.
+   * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
+   *
+   * Without one, sweeping across a row of controls flashes a tooltip for each
+   * of them, which is noise rather than help. Focus opens with no delay: a
+   * keyboard reader arriving on a control has already committed to it.
+   * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * - `disabled`: Whether the tooltip never shows.
    * - `for`: The id of the element this describes, in this tooltip's own tree.
    *
    * Set it and the tooltip stops wrapping: it renders no trigger, listens on
@@ -32892,9 +32899,6 @@ export type CustomElements = {
    * through as attributes. Both paths reach the same place through Lit, so
    * nothing is broken by it; a `[for]` selector would find nothing, which is
    * why this does not reflect and nothing styles on it.
-   * - `placement`: Preferred side.
-   *
-   * It moves if that side does not fit.
    * - `offset`: Space between the trigger and the point of the bubble, in pixels.
    *
    * **Measured from the point, which is what the arrow being back changed.**
@@ -32904,18 +32908,6 @@ export type CustomElements = {
    * given this plus however far the arrow actually protrudes, so eight means
    * eight from whatever is nearest, arrow or edge, and a consumer who changes
    * it changes the visible gap rather than a number the arrow then eats into.
-   * - `within`: The id of a box to keep the bubble inside, instead of the viewport.
-   *
-   * Resolved the way `for` is, so an id in the same tree, which is what lets a
-   * component name a box in its own shadow root. A chart does: its bubble is
-   * centered on a reading, and the first and last readings sit at the ends of
-   * the plot, so half the box hangs past the drawing and, measured on a chart
-   * in a 320px card, three pixels past the card itself.
-   *
-   * Clamping is on the cross axis only, which is what makes this safe to point
-   * at a box the bubble genuinely does not fit inside. See `within` on
-   * `FloatingController` for what happens if it is applied to the rest.
-   * - `disabled`: Whether the tooltip never shows.
    * - `persist`: Whether the bubble survives the trigger being used.
    *
    * **Activation takes a tooltip down, because a hint about what a control will
@@ -32930,12 +32922,20 @@ export type CustomElements = {
    * everywhere else. Escape, blur and pointer-leave still close it, because
    * those are a reader saying they are done rather than a control saying it
    * worked.
-   * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
+   * - `placement`: Preferred side.
    *
-   * Without one, sweeping across a row of controls flashes a tooltip for each
-   * of them, which is noise rather than help. Focus opens with no delay: a
-   * keyboard reader arriving on a control has already committed to it.
-   * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * It moves if that side does not fit.
+   * - `within`: The id of a box to keep the bubble inside, instead of the viewport.
+   *
+   * Resolved the way `for` is, so an id in the same tree, which is what lets a
+   * component name a box in its own shadow root. A chart does: its bubble is
+   * centered on a reading, and the first and last readings sit at the ends of
+   * the plot, so half the box hangs past the drawing and, measured on a chart
+   * in a 320px card, three pixels past the card itself.
+   *
+   * Clamping is on the cross axis only, which is what makes this safe to point
+   * at a box the bubble genuinely does not fit inside. See `within` on
+   * `FloatingController` for what happens if it is applied to the rest.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -33028,7 +33028,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the tour is running.
+   * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
    * - `index`: Which stop the reader is on.
    *
    * **Moved through `requestChange`, never by assignment from `move`.** That
@@ -33040,12 +33040,12 @@ export type CustomElements = {
    * `default-index` for markup that only seeds and a held state that is
    * `undefined` until somebody sets one.
    * - `default-index`/`defaultIndex`: Stop to start on, where nothing declared one.
-   * - `label`: Accessible name for the run, such as "Getting started".
-   * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
-   * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
-   * - `next-label`/`nextLabel`: Label for the control that goes on.
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `label`: Accessible name for the run, such as "Getting started".
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `open`: Whether the tour is running.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
+   * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
    * - `stops`: The stops, in the order they were written. (property only) (readonly)
    * - `length`: How many stops there are. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -33122,8 +33122,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `for`: The id of the element this stop is about.
-   * - `placement`: Which side of the target the panel prefers.
+   * - `back-label`/`backLabel`: Label for the control that goes back.
    * - `current`: Whether this is the stop the reader is on.
    *
    * Written by the root rather than by a consumer, which is the one place this
@@ -33131,11 +33130,12 @@ export type CustomElements = {
    * reason that did not hold for the trail or the avatar group: a tour starts
    * closed, so there is no server state to get wrong. The server renders a
    * closed tour, a closed tour shows nothing, and nothing can disagree.
-   * - `last`: Whether this is the last stop, so the control says Done.
-   * - `first`: Whether this is the first stop, so there is nowhere back to.
-   * - `back-label`/`backLabel`: Label for the control that goes back.
-   * - `next-label`/`nextLabel`: Label for the control that goes on.
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `first`: Whether this is the first stop, so there is nowhere back to.
+   * - `for`: The id of the element this stop is about.
+   * - `last`: Whether this is the last stop, so the control says Done.
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `placement`: Which side of the target the panel prefers.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -33232,13 +33232,17 @@ export type CustomElements = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `value`: Identifies the item to the consumer, carried in `helix-select`.
    * - `href`: Where this node goes, which makes its row a real link.
    *
    * Unset by default, and unreflected: a tree of choosable nodes is not a tree
    * of links, and an empty `href` written onto every row would be a link to the
    * current page on every item a consumer never asked to be one.
-   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   *
+   * Not reflected. The tree assigns this after it upgrades, so an attribute
+   * here would be a change to markup the consumer rendered and hydration would
+   * report it. The indent it drives is written onto the row instead, inside the
+   * shadow root, which is not part of the tree React hydrates.
    * - `rel`: What the link declares about where it goes.
    *
    * Set by the consumer rather than derived from `target`: `noreferrer` is a
@@ -33254,12 +33258,8 @@ export type CustomElements = {
    *
    * The stylesheet reads it from the row inside this shadow root, because the
    * row is not part of the tree React hydrates.
-   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
-   *
-   * Not reflected. The tree assigns this after it upgrades, so an attribute
-   * here would be a change to markup the consumer rendered and hydration would
-   * report it. The indent it drives is written onto the row instead, inside the
-   * shadow root, which is not part of the tree React hydrates.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `value`: Identifies the item to the consumer, carried in `helix-select`.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -33383,13 +33383,13 @@ export type CustomElements = {
    * and the row's `end` slot already carries an auto margin of its own, so the
    * two split the free space and the chevron lands halfway along. Measured at
    * 70px short. That is the kind of thing a component should absorb once.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `active`: Which item is current, by its `value`.
    *
    * Not `option.active`, which is the option the keyboard is on: that is a
@@ -33568,8 +33568,7 @@ export type CustomElements = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What identifies the entry, and what `active` is compared against.
-   * - `src`: The file this entry plays.
+   * - `disabled`: Whether the entry can be chosen.
    * - `poster`: What covers the picture before this entry plays, and the row's thumbnail.
    *
    * One property doing both, because they are the same picture: the frame that
@@ -33577,7 +33576,8 @@ export type CustomElements = {
    * fallback rather than something drawn beside it, which is this library's rule
    * for a content property, so a consumer with something better to show slots it
    * and the two can never both appear.
-   * - `disabled`: Whether the entry can be chosen.
+   * - `src`: The file this entry plays.
+   * - `value`: What identifies the entry, and what `active` is compared against.
    * - `current`: Whether the player is on this entry.
    *
    * Written by the playlist rather than by the entry, the way an option's
@@ -33857,10 +33857,18 @@ export type CustomElements = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `separation`: Whether the bar floats on the picture or sits on its own ground.
-   * - `src`: Where the video is, for the common case of one file.
-   * - `poster`: A still shown before it plays, which the platform draws itself.
-   * - `label`: Accessible name, since a video is not described by its filename.
-   * - `loop`: Whether it starts again at the end.
+   * - `autoplay`: Whether it starts on its own, which a browser only allows while silent.
+   *
+   * Forwarded rather than acted on. Whether an unprompted play is permitted is
+   * the browser's policy and not this element's, and `play()` already swallows
+   * the refusal: what follows a refused autoplay is a paused player showing its
+   * start control, which is the correct thing to be looking at.
+   * - `controls`: Whether the browser draws the controls instead of this element.
+   *
+   * A fallback rather than a default. Two bars over one video is worse than
+   * either alone, so this one is not drawn at all when it is set.
+   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
+   * be read.
    * - `muted`/`defaultMuted`: Whether it *starts* silent, which is what an autoplaying video must do.
    *
    * **Named for the platform's split, which is real.** The `muted` content
@@ -33869,22 +33877,9 @@ export type CustomElements = {
    * `muted` bound to the attribute answers what the author wrote rather than
    * whether there is sound, which is a name matching the platform's while
    * meaning something else.
-   * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
-   * - `controls`: Whether the browser draws the controls instead of this element.
-   *
-   * A fallback rather than a default. Two bars over one video is worse than
-   * either alone, so this one is not drawn at all when it is set.
-   * - `preload`: How much to fetch before anything is asked for.
-   * - `autoplay`: Whether it starts on its own, which a browser only allows while silent.
-   *
-   * Forwarded rather than acted on. Whether an unprompted play is permitted is
-   * the browser's policy and not this element's, and `play()` already swallows
-   * the refusal: what follows a refused autoplay is a paused player showing its
-   * start control, which is the correct thing to be looking at.
-   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
-   * be read.
    * - `disablepictureinpicture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
    * - `disableremoteplayback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
+   * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
    *
    * A list rather than a property apiece. A bar is a row with a budget, and a
@@ -33905,6 +33900,18 @@ export type CustomElements = {
    * ours to promise: the attribute is ignored cross-origin, so a file served
    * from somewhere else opens rather than saves, which is the browser's rule
    * and not something a player can work around.
+   * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
+   *
+   * A wait rather than leaving with the pointer, or a reader moving across the
+   * picture to reach a control watches the bar vanish under them. Zero turns
+   * the wait off and the bar goes immediately; a large number keeps it up for
+   * as long as anyone is likely to look.
+   *
+   * The wait is only ever about *idling*. A video that is paused keeps its bar
+   * regardless, because a reader who stopped it is deciding what to do next.
+   * - `label`: Accessible name, since a video is not described by its filename.
+   * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
+   * - `loop`: Whether it starts again at the end.
    * - `overflow-controls`/`overflowControls`: Controls that go behind one button instead of onto the bar, named the same
    * way.
    *
@@ -33920,6 +33927,13 @@ export type CustomElements = {
    * So the consumer says where the fold is, which they can, having already
    * named the controls in order. A name in both lists is drawn once, on the
    * bar: two of the same control is worse than either placement.
+   * - `pause-label`/`pauseLabel`: And while it would stop it.
+   * - `play-label`/`playLabel`: What the play control is called while it would start the video.
+   * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
+   * - `poster`: A still shown before it plays, which the platform draws itself.
+   * - `preload`: How much to fetch before anything is asked for.
+   * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
+   * - `src`: Where the video is, for the common case of one file.
    * - `start-control`/`startControl`: The big mark over the picture whenever it is not playing, or `none`.
    *
    * **On unless it is turned off, because a stopped video has nothing else.**
@@ -33935,20 +33949,6 @@ export type CustomElements = {
    * A value rather than a boolean, so the resting state is the attribute's
    * absence: a boolean defaulting to on would have to be spelled as its own
    * negation.
-   * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
-   * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
-   *
-   * A wait rather than leaving with the pointer, or a reader moving across the
-   * picture to reach a control watches the bar vanish under them. Zero turns
-   * the wait off and the bar goes immediately; a large number keeps it up for
-   * as long as anyone is likely to look.
-   *
-   * The wait is only ever about *idling*. A video that is paused keeps its bar
-   * regardless, because a reader who stopped it is deciding what to do next.
-   * - `play-label`/`playLabel`: What the play control is called while it would start the video.
-   * - `pause-label`/`pauseLabel`: And while it would stop it.
-   * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
-   * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
    * - `currentSrc`: The media's own state, under the platform's own names.
    *
    * **Published because there is no other way in.** The `<video>` is inside
@@ -34658,17 +34658,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `variant`: Which form the light takes. Absent is `braid`.
-   *
-   * Reflected because the fallback gradient selects on it, and given no default
-   * for the same reason every axis here has none: a default on a reflected
-   * property writes the attribute onto every host anybody renders.
-   *
-   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
-   * against `square`, `arc` against `ring`, and it is registered as one.
-   * Aurora, braid and caustics are not geometries; they are eleven names for a
-   * look, which is what `variant` is for by the rule the registry already
-   * states.
+   * - `bloom`: How soft the falloff is, `0` tight and `1` diffuse.
    * - `drift`: How far the settings wander on their own, `0` still and `1` restless.
    *
    * **One property rather than a range on each of the five.** A range per axis
@@ -34681,6 +34671,7 @@ export type CustomElementsSolidJs = {
    * back into phase and the field has no cycle a reader can count. That is the
    * difference between a background that breathes and one that is obviously on
    * a timer.
+   * - `gain`: Overall brightness, as a multiplier on the field.
    * - `interaction`: What the pointer does, where the shape's own answer is not wanted.
    *
    * Absent is `native`, which is each shape answering in the terms it is made
@@ -34692,22 +34683,19 @@ export type CustomElementsSolidJs = {
    * They exist because a consumer may want the quieter, more conventional
    * answer, and because `none` is a real requirement. Not because any of them
    * is the better default.
-   * - `reach`: How far the pointer reaches into the field, `0` upward.
-   *
-   * Multiplied into the presence the pointer already fades in and out with, so
-   * it scales the whole response rather than any one part of it, whichever
-   * interaction is in play.
    * - `interactive`: Whether the pointer shifts and lifts the field.
    *
    * Reflected because the stylesheet selects on it: a background is not
    * hit-testable at rest, or it would swallow clicks meant for what is over it,
    * and an element that is not hit-testable never receives the `pointermove`
    * this listens for. Asking for the pointer is asking for the hit test.
-   * - `bloom`: How soft the falloff is, `0` tight and `1` diffuse.
-   * - `gain`: Overall brightness, as a multiplier on the field.
+   * - `reach`: How far the pointer reaches into the field, `0` upward.
+   *
+   * Multiplied into the presence the pointer already fades in and out with, so
+   * it scales the whole response rather than any one part of it, whichever
+   * interaction is in play.
    * - `scale`: Feature size, as a multiplier on the sampled coordinates.
    * - `speed`: How fast it drifts, as a multiplier on time.
-   * - `tilt`: The field's rotation, in degrees.
    * - `terminus`: Where the axis crosses the top edge, as a fraction of the width.
    *
    * **An angle does not say what a consumer means, and this does.** The axis
@@ -34728,6 +34716,7 @@ export type CustomElementsSolidJs = {
    * layout read per frame, and the drift is applied to the result rather than
    * to the angle behind it: the field still wanders, around a bearing that
    * holds the exit where it was put.
+   * - `tilt`: The field's rotation, in degrees.
    * - `variance`: How much the members of a population differ from one another, `0` a set
    * that is uniform and `1` the resting amount. Clamped to that range: these
    * are interpolations, so a larger number extrapolates rather than
@@ -34741,6 +34730,17 @@ export type CustomElementsSolidJs = {
    * folds widen or even out. `braid`, `waves` and `flow` have a
    * single subject and nothing to vary, and `threads` is even on purpose, so on
    * those four this is inert.
+   * - `variant`: Which form the light takes. Absent is `braid`.
+   *
+   * Reflected because the fallback gradient selects on it, and given no default
+   * for the same reason every axis here has none: a default on a reflected
+   * property writes the attribute onto every host anybody renders.
+   *
+   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
+   * against `square`, `arc` against `ring`, and it is registered as one.
+   * Aurora, braid and caustics are not geometries; they are eleven names for a
+   * look, which is what `variant` is for by the rule the registry already
+   * states.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -34878,12 +34878,12 @@ export type CustomElementsSolidJs = {
    *
    * - `shape`: Whether the avatar is a circle or a rounded square.
    * - `size`: Edge length of the avatar.
-   * - `src`: Image to show.
-   *
-   * Falls back to the slot, or to initials, if it fails.
    * - `name`: Name of the person or entity.
    *
    * Used for the label and the initials.
+   * - `src`: Image to show.
+   *
+   * Falls back to the slot, or to initials, if it fails.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -34957,15 +34957,15 @@ export type CustomElementsSolidJs = {
    * fill by what the count *is*, not by how loudly it is drawn. Filed under
    * `appearance` it would read as a treatment, which is the confusion the split
    * exists to stop.
-   * - `value`: The count or short text to show.
-   *
-   * Absent shows a dot, zero shows nothing.
-   * - `max`: Cap for a numeric value.
-   *
-   * Past it the indicator reads `{max}+`.
    * - `label`: Accessible name.
    *
    * Required for a dot, which has no text to read.
+   * - `max`: Cap for a numeric value.
+   *
+   * Past it the indicator reads `{max}+`.
+   * - `value`: The count or short text to show.
+   *
+   * Absent shows a dot, zero shows nothing.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -35027,6 +35027,29 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `emphasis`: How much ink the columns claim.
+   *
+   * The chart's treatment, which every series takes unless `outlined` or
+   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+   * of the series color with that edge on it, and absent is the filled column,
+   * per the rule that a reflected property takes no default.
+   *
+   * **It composes with `material` rather than competing with it.** Emphasis
+   * decides what is drawn and material decides how much of it comes through, so
+   * `glass` thins whatever emphasis put there: the fill on a solid column, the
+   * stroke on an outlined one. Without that the corner is inert, `glass` setting
+   * a fill opacity on a mark whose fill is `none`, and a combination that
+   * silently does nothing is the worst shape this can take.
+   * - `glass`: Which series are glass rather than solid, by name.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `emphasis` is.** A
+   * chart-wide material puts every column in the same substance, which is right
+   * when the whole chart is joining the page's language and wrong the moment one
+   * series is a different kind of fact from the others. The two axes take the
+   * same shape because they answer the same question about the same thing: what
+   * is *this series* made of, and how much ink does *this series* claim.
    * - `material`: What the columns are made of.
    *
    * **A third axis on the chart, not on the bar.** A bar is a mark inside a
@@ -35062,40 +35085,6 @@ export type CustomElementsSolidJs = {
    * **`transparent` is where this one stops.** A mark with no ink is not a
    * material choice, it is an absent series, and a chart says that by not
    * having the datum rather than by painting it invisibly.
-   * - `wash`: How a column's fill is distributed across it.
-   *
-   * `gradient` fades each column toward its base, into the wash the headless
-   * tier draws whether or not anything points at it.
-   *
-   * **A chart-domain axis and deliberately not a library one.** It lives on this
-   * family alone, and here it is a way of encoding data rather than a way of
-   * expressing a theme: promoted to the registry it would put an attribute on
-   * eighty-eight components that means nothing on eighty-seven. `wash` because
-   * that is what the tier below already calls it, in `--chart-bar-wash` and in
-   * the `bar-wash-start` and `bar-wash-end` stops.
-   * - `glass`: Which series are glass rather than solid, by name.
-   *
-   * Matched the way `outlined` is, against the column headings the table gives.
-   *
-   * **Per series for the reason `emphasis` is.** A
-   * chart-wide material puts every column in the same substance, which is right
-   * when the whole chart is joining the page's language and wrong the moment one
-   * series is a different kind of fact from the others. The two axes take the
-   * same shape because they answer the same question about the same thing: what
-   * is *this series* made of, and how much ink does *this series* claim.
-   * - `emphasis`: How much ink the columns claim.
-   *
-   * The chart's treatment, which every series takes unless `outlined` or
-   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-   * of the series color with that edge on it, and absent is the filled column,
-   * per the rule that a reflected property takes no default.
-   *
-   * **It composes with `material` rather than competing with it.** Emphasis
-   * decides what is drawn and material decides how much of it comes through, so
-   * `glass` thins whatever emphasis put there: the fill on a solid column, the
-   * stroke on an outlined one. Without that the corner is inert, `glass` setting
-   * a fill opacity on a mark whose fill is `none`, and a combination that
-   * silently does nothing is the worst shape this can take.
    * - `outlined`: Which series are drawn as an outline rather than a fill, by name.
    *
    * Space separated and matched against the column headings the table gives,
@@ -35114,6 +35103,17 @@ export type CustomElementsSolidJs = {
    * - `subtle`: Which series are drawn as a wash of their color, by name.
    *
    * Matched as `outlined` is.
+   * - `wash`: How a column's fill is distributed across it.
+   *
+   * `gradient` fades each column toward its base, into the wash the headless
+   * tier draws whether or not anything points at it.
+   *
+   * **A chart-domain axis and deliberately not a library one.** It lives on this
+   * family alone, and here it is a way of encoding data rather than a way of
+   * expressing a theme: promoted to the registry it would put an attribute on
+   * eighty-eight components that means nothing on eighty-seven. `wash` because
+   * that is what the tier below already calls it, in `--chart-bar-wash` and in
+   * the `bar-wash-start` and `bar-wash-end` stops.
    * - `for`: The id of the table to read.
    *
    * Resolved through `getRootNode()`, so a chart inside another component's
@@ -35385,10 +35385,10 @@ export type CustomElementsSolidJs = {
    * Reading cannot catch this and the picture comparison can. React assigns a
    * matching property instead of an attribute, so every crumb in the React twin
    * of `breadcrumbs/links` lost its padding at once.
-   * - `target`: Where the link opens, for the rare crumb that leaves the site.
    * - `rel`: What the link declares about where it goes.
    *
    * The consumer's decision.
+   * - `target`: Where the link opens, for the rare crumb that leaves the site.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -35654,20 +35654,22 @@ export type CustomElementsSolidJs = {
    * of a control means nothing in particular. `accent` is the second
    * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
-   * - `type`: What activating the button does to its form.
-   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   * - `command`: What to send when the button is activated, and what to send it to.
    *
-   * **Reported for exactly the submission this button starts and not otherwise.**
-   * A native submit button contributes `name=value` only when it is the one
-   * that submitted, and every other button on the form contributes nothing. A
-   * form-associated element reporting a value continuously would contribute on
-   * every submission whoever started it, which is a different feature wearing
-   * the same name, so `submit` below sets it, submits, and clears it inside one
-   * synchronous call.
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
    *
-   * `CopyButton` has a `value` of its own meaning the text to put on the
-   * clipboard, which is not this and is why it is declared there rather than
-   * inherited.
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
    *
    * **The five `form*` overrides work by writing the form and putting it back**,
@@ -35691,22 +35693,20 @@ export type CustomElementsSolidJs = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
-   * - `command`: What to send when the button is activated, and what to send it to.
+   * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
    *
-   * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognized as an
-   * invoker, so `commandfor` written on a custom element resolves nothing and
-   * the trigger silently does nothing at all. A wrapper has to hand them down,
-   * the same way `label` becomes `aria-label` in there.
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
    *
-   * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-   * ```
-   *
-   * `commandFor` spells its attribute out, because Lit lowercases a property
-   * name to derive one rather than dash-casing it, and what a consumer writes
-   * is the platform's `commandfor`.
-   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -35731,16 +35731,6 @@ export type CustomElementsSolidJs = {
    * imperatively later, and nothing is hydrating by then.
    *
    * Here rather than on each control.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
    * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
    *
    * **Set by whatever owns the panel, and a property rather than an attribute
@@ -35765,6 +35755,16 @@ export type CustomElementsSolidJs = {
    *
    * A consumer who wants to say this statically writes `aria-expanded` on the
    * host instead, which `AriaForwardController` carries to the same place. (property only)
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, because the resolution is otherwise kept
@@ -35965,6 +35965,28 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `material`: What the card is made of.
+   *
+   * **A third axis, and it passes the test the other two answer to.**
+   * `separation` is where the surface ends and `tone` is what it means; both of
+   * those can be true at once with this, an elevated glass card being a
+   * perfectly ordinary thing to want, so it is not a value of either.
+   *
+   * **An attribute rather than a hook, because glass is not one declaration.**
+   * It is a translucent ground *and* a backdrop filter, and either without the
+   * other does nothing: a blur behind an opaque background is invisible, and a
+   * translucent card over an unfiltered page is a smear. `--card-backdrop` on
+   * its own is that trap, a published hook a consumer could set and see nothing
+   * happen. The component owns the pair; a theme owns how strong it is.
+   *
+   * Absent is opaque, per the rule that a reflected property takes no default,
+   * so the stylesheet only describes the departure.
+   *
+   * **The whole axis, not one point of it.** `frosted` is the same pair turned
+   * up, the heavier ground under the heavier blur, for a card that has to stay
+   * readable over a busy page; `transparent` drops both, for one that is
+   * structure and spacing with the page showing through.
+   * - `orientation`: Whether media sits above the content stack or beside it.
    * - `separation`: How the card separates itself from the page.
    *
    * **One value per mechanism, and the theme has the same four.**
@@ -35989,28 +36011,6 @@ export type CustomElementsSolidJs = {
    * edge, so a surface with its own color and neither edge nor lift would
    * otherwise be unsayable while being one of the four things a theme can ask
    * for.
-   * - `material`: What the card is made of.
-   *
-   * **A third axis, and it passes the test the other two answer to.**
-   * `separation` is where the surface ends and `tone` is what it means; both of
-   * those can be true at once with this, an elevated glass card being a
-   * perfectly ordinary thing to want, so it is not a value of either.
-   *
-   * **An attribute rather than a hook, because glass is not one declaration.**
-   * It is a translucent ground *and* a backdrop filter, and either without the
-   * other does nothing: a blur behind an opaque background is invisible, and a
-   * translucent card over an unfiltered page is a smear. `--card-backdrop` on
-   * its own is that trap, a published hook a consumer could set and see nothing
-   * happen. The component owns the pair; a theme owns how strong it is.
-   *
-   * Absent is opaque, per the rule that a reflected property takes no default,
-   * so the stylesheet only describes the departure.
-   *
-   * **The whole axis, not one point of it.** `frosted` is the same pair turned
-   * up, the heavier ground under the heavier blur, for a card that has to stay
-   * readable over a busy page; `transparent` drops both, for one that is
-   * structure and spacing with the page showing through.
-   * - `orientation`: Whether media sits above the content stack or beside it.
    * - `media-placement`/`mediaPlacement`: Puts the media after the content instead of before it.
    *
    * **A figure that concludes a card is the same region as one that opens it**,
@@ -36087,20 +36087,30 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
+   * - `controls-align`/`controlsAlign`: Where along that side the arrows sit. See `indicatorAlign`.
    *
-   * Unset is `block-end`, under them. `block-start` puts them above,
-   * `inline-start` and `inline-end` beside, where a run of dots becomes a
-   * column.
+   * `overlay` answers it too, and the edge there is the whole slide: the bar is
+   * stretched across the picture, so this moves the arrows up and down within
+   * it rather than moving the bar. Centered unless asked otherwise, which is
+   * where an arrow over a photograph belongs.
+   * - `controls-placement`/`controlsPlacement`: Which side of the slides the arrows sit on.
    *
-   * **The sides of the content, not positions along a bar**, and logical names
-   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
-   * the right in Arabic without being told.
+   * The same four sides as `indicatorPlacement` and the same default, so a
+   * carousel that moves only one of them keeps the other where it was.
+   * `inline-start` or `inline-end` stacks the arrows into a column, which is
+   * what a vertical track usually wants.
    *
-   * Independent of `controlsPlacement`. Both default to the block end, where
-   * they share the row and split it, dots to the start and arrows to the end,
-   * arrived at by two defaults rather than by a rule about the pair, so moving
-   * one leaves the other alone.
+   * `overlay` puts them on the slides, at the track's own edges, which is what a
+   * full-bleed carousel wants: the slide is the page and the controls are on it
+   * rather than in a bar beneath it. It carries its own treatment with it, a
+   * surface and a shadow under each arrow, because a glyph drawn straight onto a
+   * photograph is legible against about half of one.
+   *
+   * **It is a value here rather than an axis of its own.** "The controls are
+   * over the content" is the whole of what a `hero` appearance would say, and
+   * the surface, the edge-to-edge arrows and the bar that catches no presses all
+   * follow from it. These two placements are the whole of where a carousel's
+   * chrome can go.
    * - `indicator-align`/`indicatorAlign`: Where along that side the dots sit.
    *
    * The second half of the answer to "where do they go". `indicatorPlacement`
@@ -36124,31 +36134,21 @@ export type CustomElementsSolidJs = {
    * nothing to split the edge with. Putting both groups on the same edge with
    * the same alignment overlaps them, which is what the two different defaults
    * exist to avoid.
-   * - `controls-placement`/`controlsPlacement`: Which side of the slides the arrows sit on.
+   * - `indicator-placement`/`indicatorPlacement`: Which side of the slides the dots sit on.
    *
-   * The same four sides as `indicatorPlacement` and the same default, so a
-   * carousel that moves only one of them keeps the other where it was.
-   * `inline-start` or `inline-end` stacks the arrows into a column, which is
-   * what a vertical track usually wants.
+   * Unset is `block-end`, under them. `block-start` puts them above,
+   * `inline-start` and `inline-end` beside, where a run of dots becomes a
+   * column.
    *
-   * `overlay` puts them on the slides, at the track's own edges, which is what a
-   * full-bleed carousel wants: the slide is the page and the controls are on it
-   * rather than in a bar beneath it. It carries its own treatment with it, a
-   * surface and a shadow under each arrow, because a glyph drawn straight onto a
-   * photograph is legible against about half of one.
+   * **The sides of the content, not positions along a bar**, and logical names
+   * rather than `top`/`left`: an `inline-start` carousel should put its dots on
+   * the right in Arabic without being told.
    *
-   * **It is a value here rather than an axis of its own.** "The controls are
-   * over the content" is the whole of what a `hero` appearance would say, and
-   * the surface, the edge-to-edge arrows and the bar that catches no presses all
-   * follow from it. These two placements are the whole of where a carousel's
-   * chrome can go.
-   * - `controls-align`/`controlsAlign`: Where along that side the arrows sit. See `indicatorAlign`.
-   *
-   * `overlay` answers it too, and the edge there is the whole slide: the bar is
-   * stretched across the picture, so this moves the arrows up and down within
-   * it rather than moving the bar. Centered unless asked otherwise, which is
-   * where an arrow over a photograph belongs.
-   * - `label`: Accessible name for the carousel.
+   * Independent of `controlsPlacement`. Both default to the block end, where
+   * they share the row and split it, dots to the start and arrows to the end,
+   * arrived at by two defaults rather than by a rule about the pair, so moving
+   * one leaves the other alone.
+   * - `autoplay`: Whether the carousel advances on its own.
    * - `index`: The slide in view, counted from zero.
    *
    * Reading gives the real slide, in either mode. Writing sets it, the way a
@@ -36162,18 +36162,6 @@ export type CustomElementsSolidJs = {
    * extracted, because a slide is addressed by position and every one of those
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
-   * - `orientation`: Which way the track runs.
-   *
-   * Behavior rather than presentation, which is why it is here: the scroll
-   * position and the nearest-slide arithmetic are both single-axis, and a
-   * styled-tier attribute cannot change which one they read. Two sites branch
-   * on it, `scrollTo` and the drag settle, and nothing else in the component
-   * knows about the axis at all.
-   *
-   * A vertical track needs a height, which a horizontal one does not: width
-   * comes from the page and height does not, so the styled tier gives it
-   * `--carousel-block-size` and a consumer sets that to whatever the slides
-   * want.
    * - `controls`: Whether the previous and next controls are shown.
    *
    * `auto`, which is the resting behavior and what an absent attribute means,
@@ -36198,9 +36186,21 @@ export type CustomElementsSolidJs = {
    * way to stop it, so an autoplaying carousel keeps its pause control on a
    * touch device exactly as it does on a desktop.
    * - `default-index`/`defaultIndex`: Slide to start on, where nothing declared one.
-   * - `loop`: Whether moving past either end wraps to the other.
-   * - `autoplay`: Whether the carousel advances on its own.
    * - `interval`: How long each slide is held, in milliseconds.
+   * - `label`: Accessible name for the carousel.
+   * - `loop`: Whether moving past either end wraps to the other.
+   * - `orientation`: Which way the track runs.
+   *
+   * Behavior rather than presentation, which is why it is here: the scroll
+   * position and the nearest-slide arithmetic are both single-axis, and a
+   * styled-tier attribute cannot change which one they read. Two sites branch
+   * on it, `scrollTo` and the drag settle, and nothing else in the component
+   * knows about the axis at all.
+   *
+   * A vertical track needs a height, which a horizontal one does not: width
+   * comes from the page and height does not, so the styled tier gives it
+   * `--carousel-block-size` and a consumer sets that to whatever the slides
+   * want.
    * - `per-view`/`perView`: How many slides are shown across the track at once. Absent shows one.
    *
    * **Here rather than on the styled tier, because it decides how many places
@@ -36307,21 +36307,21 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What the reader has written.
-   *
-   * Read it, or set it to seed a draft.
+   * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
+   * - `label`: Accessible name for the field.
    * - `placeholder`: Shown in an empty field.
+   * - `rows`: How many rows the field opens at.
+   *
+   * It grows from there.
+   * - `send-label`/`sendLabel`: Label for the control that sends.
    * - `submit-on`/`submitOn`: What sends: pressing Enter, or only the control.
    *
    * `enter` is the messaging convention and makes Shift+Enter the line break.
    * `button` is what a composer holding several paragraphs wants, where Enter
    * has to mean a new line and nothing else.
-   * - `disabled`: Whether the composer refuses input, while a turn is in flight say.
-   * - `label`: Accessible name for the field.
-   * - `send-label`/`sendLabel`: Label for the control that sends.
-   * - `rows`: How many rows the field opens at.
+   * - `value`: What the reader has written.
    *
-   * It grows from there.
+   * Read it, or set it to seed a draft.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -36427,6 +36427,7 @@ export type CustomElementsSolidJs = {
    * no ground to end. The two values are a subset of the registry's four:
    * `elevated` reads as a card and `outlined` as an input, so neither is a
    * thing a turn should be.
+   * - `at`: When it was said, as anything `Date` parses.
    * - `author`: Who said it.
    *
    * Free text rather than a two-value union, because a conversation is not
@@ -36434,6 +36435,12 @@ export type CustomElementsSolidJs = {
    * participants is the ordinary case for anything worth building this for.
    * `me` and `them` are the conventional values and the stylesheet knows them;
    * anything else is a name the consumer styles.
+   * - `failed-label`/`failedLabel`: Label for a message that did not send.
+   * - `locale`: Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
+   * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
+   * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
    * - `state`: What has happened to it.
    *
    * Reflected, because every one of the four is a visual state and a stylesheet
@@ -36441,13 +36448,6 @@ export type CustomElementsSolidJs = {
    * report, which is what most of a transcript is, and it is the absence of the
    * attribute rather than a value of it: there is no initializer, so nothing is
    * reflected until something happens.
-   * - `at`: When it was said, as anything `Date` parses.
-   * - `locale`: Locale for the timestamp.
-   *
-   * Empty is the runtime's own.
-   * - `sending-label`/`sendingLabel`: What to call each state, for a reader who cannot see it.
-   * - `failed-label`/`failedLabel`: Label for a message that did not send.
-   * - `retry-label`/`retryLabel`: Label for the control offered on a failed message.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -36536,20 +36536,15 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
    * - `label`: Accessible name for the conversation.
-   * - `threshold`: How near the bottom still counts as being at it, in pixels.
-   *
-   * A hook rather than a constant, because the right number depends on how tall
-   * a turn is: a transcript of one-line replies wants a smaller threshold than
-   * one of paragraphs, and a reader who has scrolled up by half a message has
-   * not left.
    * - `pinned`: Whether the transcript follows new turns to the bottom.
    *
    * The reader's scrolling asks first: `helix-before-pin` is cancelable, so a
@@ -36566,7 +36561,12 @@ export type CustomElementsSolidJs = {
    * that is a part inside the shadow tree where a stylesheet can already reach
    * it. Measured rather than assumed: `label, pinned` after upgrade against
    * `label` from the server.
-   * - `default-pinned`/`defaultPinned`: Whether to open pinned, where nothing declared it.
+   * - `threshold`: How near the bottom still counts as being at it, in pixels.
+   *
+   * A hook rather than a constant, because the right number depends on how tall
+   * a turn is: a transcript of one-line replies wants a smaller threshold than
+   * one of paragraphs, and a reader who has scrolled up by half a message has
+   * not left.
    * - `messages`: The turns declared as children, in the order they are written. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -36657,8 +36657,8 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `orientation`: Which way the boxes run.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `value`: The checked values, comma separated.
@@ -36822,14 +36822,14 @@ export type CustomElementsSolidJs = {
    * wrote it, and `:state(checked)` carries the resolved state for
    * stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `value`: Value submitted when the box is checked.
    * - `indeterminate`: Whether the box shows as neither checked nor unchecked.
    *
    * Presentation only. It never submits, and the first change resolves it.
+   * - `value`: Value submitted when the box is checked.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -37174,16 +37174,30 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `alpha`: Whether the color carries an alpha channel.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
    *
    * **Defaults to `off`, which is not the platform's default and is the
    * point.** The field holds a color, so a browser offering to fill it with a
    * saved address is competing for the same keystrokes as the picker. A
    * consumer who wants autofill can still ask.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * **Undefaulted, because it reflects.** The two together stamp an attribute
+   * onto every host anybody renders, including the ones nobody configured: the
+   * server writes `format="hex"` on every color input on the page, and React,
+   * holding no such prop, reports a hydration mismatch for each one.
+   * `helix component`'s `reflected-defaults` holds it. Hex is still what an unset one
+   * writes; the resting arrangement is the attribute's absence rather than a
+   * value spelled out.
+   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
+   * - `placeholder`: What the field says before a color is in it.
+   * - `swatches`: Colors offered under the picker, as a comma-separated list.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `variant`: Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
@@ -37199,20 +37213,6 @@ export type CustomElementsSolidJs = {
    * The trade is real and is the reason this is not the default: a swatch cannot
    * be read or pasted into without opening the panel, which is worse for a form
    * where the color is the answer rather than a setting.
-   * - `alpha`: Whether the color carries an alpha channel.
-   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
-   *
-   * **Undefaulted, because it reflects.** The two together stamp an attribute
-   * onto every host anybody renders, including the ones nobody configured: the
-   * server writes `format="hex"` on every color input on the page, and React,
-   * holding no such prop, reports a hydration mismatch for each one.
-   * `helix component`'s `reflected-defaults` holds it. Hex is still what an unset one
-   * writes; the resting arrangement is the attribute's absence rather than a
-   * value spelled out.
-   * - `no-format`/`noFormat`: Whether the reader may change the format from the panel.
-   * - `placeholder`: What the field says before a color is in it.
-   * - `swatches`: Colors offered under the picker, as a comma-separated list.
-   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the panel.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -37443,12 +37443,20 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
+   * - `alpha`: Whether the color carries an alpha channel.
+   *
+   * Off by default, because it widens every value written, and a consumer who
+   * did not ask for transparency should not have to strip a byte off each one.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
    *
    * **Defaults to `off`, which is not the platform's default and is the
    * point.** The field holds a color, so a browser offering to fill it with a
    * saved address is competing for the same keystrokes as the square and the
    * ramps. A consumer who wants autofill can still ask.
+   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
+   *
+   * Only what is written. Everything is read whatever this says, so a picker on
+   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
    * - `invalid`: Whether the current selection fails validation.
    *
    * A flag rather than a message, the split Date Picker also draws. A flat
@@ -37456,14 +37464,8 @@ export type CustomElementsSolidJs = {
    * the label, the hint and the feedback, and a second message inside the panel
    * would be the same error said twice. What is left for the picker is the one
    * thing the field cannot draw from outside, the mark on the answer itself.
-   * - `alpha`: Whether the color carries an alpha channel.
-   *
-   * Off by default, because it widens every value written, and a consumer who
-   * did not ask for transparency should not have to strip a byte off each one.
-   * - `format`: The syntax the value is written in: `hex`, `rgb` or `hsl`.
-   *
-   * Only what is written. Everything is read whatever this says, so a picker on
-   * `hex` still takes an `rgb()` handed to it and stores the hex for it.
+   * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
+   * - `no-format`/`noFormat`: Whether the reader may change the format.
    * - `no-value`/`noValue`: Whether to leave the value out, for a picker whose value is stated elsewhere.
    *
    * The row reads the color as text and lets it be typed or pasted, which is
@@ -37476,8 +37478,6 @@ export type CustomElementsSolidJs = {
    * answer to which one is authoritative or which has the caret. Do not close it
    * the other way round, with Color Input dropping its own field: the value
    * would then be unreadable and unpasteable without opening a panel.
-   * - `no-format`/`noFormat`: Whether the reader may change the format.
-   * - `no-eyedropper`/`noEyedropper`: Whether the eyedropper is offered where the browser has one.
    * - `swatches`: Colors offered under the picker, as a comma-separated list.
    * - `disabled`: Whether the control is non-interactive.
    *
@@ -37684,8 +37684,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
@@ -37694,29 +37694,20 @@ export type CustomElementsSolidJs = {
    * point.** The field filters a list rather than collecting a value, so a
    * browser offering to fill it with a saved address is competing for the same
    * keystrokes as the listbox. A consumer who wants autofill can still ask.
-   * - `placeholder`: Text shown while nothing has been chosen.
-   * - `multiple`: Whether more than one option can be chosen.
-   *
-   * The list already does the work: `value` comes apart on commas, a press
-   * toggles rather than replaces, and the arrows move without choosing. What
-   * this adds is the tags, and keeping the panel open between picks.
-   *
-   * A comma is therefore not available inside an option's value, which is the
-   * listbox's contract and not this element's to change.
    * - `creatable`: Whether the reader may answer with something the list does not hold.
    *
    * The row appears while what is typed matches no option's words exactly, so
    * it is offered next to near misses too: a reader typing "Ruby on Rails" with
    * "Ruby" in the list wants the one they are typing, not the one they are
    * halfway through.
-   * - `suggest`: Whether the field finishes the word as it is typed.
-   *
-   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
-   * element already sets on the input it renders, and two things of one name
-   * meaning different things on the same control is a question a consumer
-   * should not have to ask.
    * - `create-label`/`createLabel`: What the create row says, before the words it would add.
-   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
+   * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
+   * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
+   * - `loading`: Whether the options are still on their way.
+   *
+   * Passed straight to the list, which is where the rows are and so where the
+   * message belongs.
+   * - `loading-text`/`loadingText`: What the list says while they are on their way.
    * - `max-tags`/`maxTags`: How many tags to draw before the rest become a count. `multiple` only.
    *
    * `0` is all of them, and is the default: a cap that guesses is worse than no
@@ -37729,13 +37720,22 @@ export type CustomElementsSolidJs = {
    * on, where a row that silently stops is a field that appears to have lost
    * what was put in it. Date Input and Time Input carry the same property and
    * the same reasoning.
-   * - `list-label`/`listLabel`: Accessible name for the list, which has no visible one of its own.
-   * - `loading`: Whether the options are still on their way.
+   * - `multiple`: Whether more than one option can be chosen.
    *
-   * Passed straight to the list, which is where the rows are and so where the
-   * message belongs.
-   * - `loading-text`/`loadingText`: What the list says while they are on their way.
-   * - `empty-text`/`emptyText`: Words shown where the filter has hidden everything.
+   * The list already does the work: `value` comes apart on commas, a press
+   * toggles rather than replaces, and the arrows move without choosing. What
+   * this adds is the tags, and keeping the panel open between picks.
+   *
+   * A comma is therefore not available inside an option's value, which is the
+   * listbox's contract and not this element's to change.
+   * - `placeholder`: Text shown while nothing has been chosen.
+   * - `remove-label`/`removeLabel`: What a tag's remove control is called, since the mark has no name.
+   * - `suggest`: Whether the field finishes the word as it is typed.
+   *
+   * `suggest` rather than `autocomplete`, which is a real HTML attribute this
+   * element already sets on the input it renders, and two things of one name
+   * meaning different things on the same control is a question a consumer
+   * should not have to ask.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -37949,14 +37949,14 @@ export type CustomElementsSolidJs = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `label`: Accessible name for the overlay, which has no visible heading.
-   * - `placeholder`: Shown in the field before anything is typed.
    * - `empty-text`/`emptyText`: Words shown where the filter has matched nothing.
    * - `hotkey`: The key that opens it, as `mod+k` or `shift+p` or plain `k`.
    *
    * Empty turns it off, for a consumer who opens the palette from a button or
    * from their own shortcut handler. There is no list of defaults to fight
    * with: one key, said once.
+   * - `label`: Accessible name for the overlay, which has no visible heading.
+   * - `placeholder`: Shown in the field before anything is typed.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -38070,6 +38070,15 @@ export type CustomElementsSolidJs = {
    * of a control means nothing in particular. `accent` is the second
    * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
+   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   *
+   * `attribute` written out, because Lit lowercases a property name rather than
+   * dash-casing it, and `copiedlabel` is not what anyone would type.
+   * - `label`: What it is called, and says, before a press.
+   *
+   * Defaulted rather than left empty. An icon-only control must be named, and
+   * the name of this one is not a judgment call: every copy button in the
+   * world is called Copy. A consumer with a better word still sets it.
    * - `value`: What goes on the clipboard.
    *
    * **Narrows `Button.value`, which is the submit value, and the two agree.**
@@ -38078,16 +38087,22 @@ export type CustomElementsSolidJs = {
    * submits is what it copies, which is the reading anybody would expect of one
    * property called `value`. Declared here rather than inherited because the
    * clipboard is what this component is about and its own page should say so.
-   * - `label`: What it is called, and says, before a press.
+   * - `command`: What to send when the button is activated, and what to send it to.
    *
-   * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgment call: every copy button in the
-   * world is called Copy. A consumer with a better word still sets it.
-   * - `copied-label`/`copiedLabel`: What it is called, and says, after one.
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
    *
-   * `attribute` written out, because Lit lowercases a property name rather than
-   * dash-casing it, and `copiedlabel` is not what anyone would type.
-   * - `type`: What activating the button does to its form.
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
    *
    * **The five `form*` overrides work by writing the form and putting it back**,
@@ -38106,22 +38121,7 @@ export type CustomElementsSolidJs = {
    * - `formmethod`/`formMethod`: Which HTTP method the submission uses, overriding the form's own.
    * - `formnovalidate`/`formNoValidate`: Whether this submission skips the form's validation.
    * - `formtarget`/`formTarget`: Which browsing context the response lands in, overriding the form's own.
-   * - `command`: What to send when the button is activated, and what to send it to.
-   *
-   * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognized as an
-   * invoker, so `commandfor` written on a custom element resolves nothing and
-   * the trigger silently does nothing at all. A wrapper has to hand them down,
-   * the same way `label` becomes `aria-label` in there.
-   *
-   * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-   * ```
-   *
-   * `commandFor` spells its attribute out, because Lit lowercases a property
-   * name to derive one rather than dash-casing it, and what a consumer writes
-   * is the platform's `commandfor`.
-   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * - `type`: What activating the button does to its form.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -38146,16 +38146,6 @@ export type CustomElementsSolidJs = {
    * imperatively later, and nothing is hydrating by then.
    *
    * Here rather than on each control.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
    * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
    *
    * **Set by whatever owns the panel, and a property rather than an attribute
@@ -38180,6 +38170,16 @@ export type CustomElementsSolidJs = {
    *
    * A consumer who wants to say this statically writes `aria-expanded` on the
    * host instead, which `AriaForwardController` carries to the same place. (property only)
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, because the resolution is otherwise kept
@@ -38307,13 +38307,17 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
+   * - `default-filter`/`defaultFilter`: Query to open with, where nothing declared one.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
+   * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
+   * - `default-sort`/`defaultSort`: Order to open on, where nothing declared one.
    * - `key`: The field naming a row's stable identity.
    *
    * **Needed before selection exists, not after.** Lit keys the rendered rows by
@@ -38322,6 +38326,17 @@ export type CustomElementsSolidJs = {
    * attached to the row it belongs to. Left unset the index is the key, which is
    * correct only while nothing reorders: it is why this defaults to something
    * that works and is worth setting anyway.
+   * - `sort`: The order, as `field:direction`.
+   *
+   * Set it and this element defers: a reader's click fires `helix-sort` and
+   * changes nothing until a new value arrives. `default-sort` seeds an order this
+   * element then owns.
+   * - `label`: Accessible name for the grid.
+   * - `filter`: What the rows are narrowed to, as one query across every column.
+   *
+   * One query rather than a predicate per column, which is what a reader means
+   * by a search box above a table. It matches on each column's ordering value,
+   * so search and sort cannot disagree about what a column holds.
    * - `mode`: Whether this element does the work or asks the consumer to.
    *
    * `client` filters, sorts and pages `rows` itself. `server` applies none of
@@ -38330,31 +38345,11 @@ export type CustomElementsSolidJs = {
    * the client cannot hold the data, so this is not an optimization, it is the
    * only mode that works, and it is here from the start because adding it later
    * inverts the data flow.
-   * - `total`: How many rows the whole result has, where this element cannot count them.
-   *
-   * Only read in `server` mode, where `rows` is one page and its length says
-   * nothing about the result. Ignored in `client` mode rather than trusted,
-   * because two sources for one count is the mistake, and here the array is the
-   * one that cannot be stale.
-   * - `label`: Accessible name for the grid.
-   * - `sort`: The order, as `field:direction`.
-   *
-   * Set it and this element defers: a reader's click fires `helix-sort` and
-   * changes nothing until a new value arrives. `default-sort` seeds an order this
-   * element then owns.
-   * - `default-sort`/`defaultSort`: Order to open on, where nothing declared one.
-   * - `filter`: What the rows are narrowed to, as one query across every column.
-   *
-   * One query rather than a predicate per column, which is what a reader means
-   * by a search box above a table. It matches on each column's ordering value,
-   * so search and sort cannot disagree about what a column holds.
-   * - `default-filter`/`defaultFilter`: Query to open with, where nothing declared one.
    * - `page`: The page on show, from 1.
    *
    * Clamped on the way out, so what this reports is the page it drew: a
    * bookmarked link to page 99 of a result that has since shrunk reads back as
    * the last page rather than as 99.
-   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `page-size`/`pageSize`: How many rows a page holds. Zero is every row, which is what "no paging" means.
    *
    * **It announces nothing, and that is not an omission.** Nothing in this
@@ -38362,7 +38357,12 @@ export type CustomElementsSolidJs = {
    * `helix-pagination-size`, which a consumer puts in the `footer` slot and
    * answers themselves. Routing this through `requestChange` would announce an
    * event the element never has cause to fire.
-   * - `default-page-size`/`defaultPageSize`: Page size to open with, where nothing declared one.
+   * - `total`: How many rows the whole result has, where this element cannot count them.
+   *
+   * Only read in `server` mode, where `rows` is one page and its length says
+   * nothing about the result. Ignored in `client` mode rather than trusted,
+   * because two sources for one count is the mistake, and here the array is the
+   * one that cannot be stale.
    * - `paginated`: Whether to draw a pagination under the grid.
    *
    * On by default once a page size is set, because a paged table with no way to
@@ -38505,8 +38505,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
@@ -38514,38 +38514,6 @@ export type CustomElementsSolidJs = {
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all: hardcoding `off` here means a birthday or a
    * postal code can never be filled in for a reader.
-   * - `mode`: How many dates can be held at once.
-   *
-   * Absent is one. `range` holds a start and an end, `multiple` holds any
-   * number, and both are carried as one comma-separated value: a form field
-   * submits a string, and two fields for one question is a different control.
-   * - `months`: How many months the calendar shows, side by side.
-   *
-   * Worth more than one mainly for a range, where picking a start in March and
-   * an end in April otherwise means paging between them and losing sight of the
-   * first. The panel is sized by its content, so this widens it.
-   * - `max-tags`/`maxTags`: How many dates are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default: a cap that guesses is worse than no
-   * cap, because the number that fits depends on the width of the field and the
-   * length of what is in it, neither of which this element knows. What a cap is
-   * genuinely for is a field in a row or a table cell, where a set of twelve
-   * dates would push everything below it down a line at a time.
-   *
-   * The remainder is counted rather than hidden. `+3` is a fact a reader can
-   * act on, where a row that silently stops is a field that appears to have lost
-   * what was put in it, and the count is what tells them there is more to see.
-   * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
-   * - `step`: How far apart the selectable dates are, in days.
-   *
-   * `<input type="date" step>`'s own unit, handed to the calendar this renders
-   * so the field and the grid agree about which dates exist. Counted from `min`
-   * where there is one and from 1 January 1970 where there is not, which is the
-   * platform's base.
-   * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
-   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
-   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
-   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
    * - `date-style`/`dateStyle`: How a date is written in the field: `short` through `full`, or ISO.
    *
    * **The field renders when it is idle and holds the value when it is being
@@ -38568,9 +38536,34 @@ export type CustomElementsSolidJs = {
    *
    * The value is always `YYYY-MM-DD` regardless, because that is what a form
    * submits and what `min` and `max` compare against.
+   * - `disable-dates`/`disableDates`: Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week in the calendar, `0` for Sunday through `6`.
    * - `locale`: Language tag the calendar names its months and days in.
+   * - `max`: Latest date that can be chosen, as `YYYY-MM-DD`.
+   * - `max-tags`/`maxTags`: How many dates are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * dates would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can
+   * act on, where a row that silently stops is a field that appears to have lost
+   * what was put in it, and the count is what tells them there is more to see.
+   * - `min`: Earliest date that can be chosen, as `YYYY-MM-DD`.
+   * - `mode`: How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   * - `months`: How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
    * - `placeholder`: What the field says before a date is in it.
-   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
    * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
@@ -38582,6 +38575,13 @@ export type CustomElementsSolidJs = {
    * submits nothing and leaves the tab order, and a read-only one submits its
    * value and stays reachable, which is what a form showing a value somebody
    * else set needs.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, handed to the calendar this renders
+   * so the field and the grid agree about which dates exist. Counted from `min`
+   * where there is one and from 1 January 1970 where there is not, which is the
+   * platform's base.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the calendar.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -38798,42 +38798,31 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `mode`: How many dates can be held at once.
-   * - `months`: How many months to show, side by side.
-   * - `locale`: Locale for month and day names.
-   *
-   * Absent uses the runtime's own.
+   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
    * - `disable-dates`/`disableDates`: Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
    * - `disable-days`/`disableDays`: Days of the week that cannot be chosen, comma separated, `0` to `6`.
+   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
    * - `invalid`: Whether the current selection fails validation.
+   * - `label`: Accessible name for the grid.
    * - `month`: The month on show, as `YYYY-MM`. Follows `value`, then the current month.
    *
    * Separate from `value` on purpose, so paging selects nothing and a consumer
    * can drive the view. Reading gives the month on show; writing sets it, and
    * `default-month` seeds one the calendar keeps until somebody does.
+   * - `locale`: Locale for month and day names.
+   *
+   * Absent uses the runtime's own.
+   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
+   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
+   * - `mode`: How many dates can be held at once.
+   * - `months`: How many months to show, side by side.
+   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
    * - `previous-label`/`previousLabel`: Accessible name for the control that pages back.
    *
    * A property because a calendar rendering its own month names from `locale`
    * would otherwise still announce its controls in English. `attribute:`
    * spelled out, since Lit lowercases a camelCase name rather than dash-casing
    * it.
-   * - `next-label`/`nextLabel`: Accessible name for the control that pages forward.
-   * - `default-month`/`defaultMonth`: Month to open on, where nothing declared one.
-   * - `min`: Earliest selectable date, as `YYYY-MM-DD`.
-   * - `step`: How far apart the selectable dates are, in days.
-   *
-   * `<input type="date" step>`'s own unit, counted from `min` where there is
-   * one and from 1 January 1970 where there is not, which is the platform's own
-   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
-   * on a Monday, which `disable-dates` cannot express: it takes a list, and a
-   * year of Mondays is not a list anybody writes.
-   *
-   * One is every date and needs no rule, which is why anything below one is
-   * treated as one rather than as an error: a step of zero would block every
-   * date including the one already chosen.
-   * - `max`: Latest selectable date, as `YYYY-MM-DD`.
-   * - `label`: Accessible name for the grid.
-   * - `first-day-of-week`/`firstDayOfWeek`: First column of the week, `0` for Sunday through `6` for Saturday.
    * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
@@ -38846,6 +38835,17 @@ export type CustomElementsSolidJs = {
    * value and stays reachable, which is what a form showing a value somebody
    * else set needs.
    * - `required`: Whether the form refuses to submit while nothing is chosen.
+   * - `step`: How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, counted from `min` where there is
+   * one and from 1 January 1970 where there is not, which is the platform's own
+   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+   * on a Monday, which `disable-dates` cannot express: it takes a list, and a
+   * year of Mondays is not a list anybody writes.
+   *
+   * One is every date and needs no rule, which is why anything below one is
+   * treated as one rather than as an error: a step of zero would block every
+   * date including the one already chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -39026,8 +39026,8 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `size`: How wide the panel is allowed to be.
    * - `align`: Whether the panel's contents run from the start or center on it.
+   * - `size`: How wide the panel is allowed to be.
    * - `open`: Whether the element is open.
    *
    * One property, not two, so `dialog.open` answers the question anyone
@@ -39041,16 +39041,6 @@ export type CustomElementsSolidJs = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `label`: Accessible name for the dialog.
-   * - `persistent`: Whether Escape or a press on the backdrop can close it.
-   *
-   * Off for a dialog that must be answered. It does not disable the close
-   * control a consumer slots in: refusing to be dismissed is not the same as
-   * refusing to be closed, and a dialog with no way out at all is a trap.
-   *
-   * A persistent dialog does not ignore that press. It answers it: see
-   * `refuse`, which is the only way a dialog that will not be dismissed can say
-   * so at the moment a reader asks.
    * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
    *
    * `<dialog closedby>`, forwarded, and safe to forward because every path it
@@ -39061,6 +39051,16 @@ export type CustomElementsSolidJs = {
    *
    * Absent by default, which is the platform's `auto` and this library's rule
    * that a resting value is an attribute's absence.
+   * - `label`: Accessible name for the dialog.
+   * - `persistent`: Whether Escape or a press on the backdrop can close it.
+   *
+   * Off for a dialog that must be answered. It does not disable the close
+   * control a consumer slots in: refusing to be dismissed is not the same as
+   * refusing to be closed, and a dialog with no way out at all is a trap.
+   *
+   * A persistent dialog does not ignore that press. It answers it: see
+   * `refuse`, which is the only way a dialog that will not be dismissed can say
+   * so at the moment a reader asks.
    * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -39172,7 +39172,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Which way the rule runs.
    * - `announced`: Whether the rule is announced as a separator.
    *
    * Off by default, and out of the accessibility tree. Most rules on a page
@@ -39185,6 +39184,7 @@ export type CustomElementsSolidJs = {
    * quiet default out of reach from HTML and leave it settable only as a
    * property. An opt-in is absent by default, which every reflected property
    * here has to be.
+   * - `orientation`: Which way the rule runs.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -39476,12 +39476,16 @@ export type CustomElementsSolidJs = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `placement`: Which edge the drawer comes from.
+   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
    *
-   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
-   * beside `:host([placement="end"])` rather than as a value written here: a
-   * default assigned to the property would reflect onto every host and put a
-   * `placement="end"` into markup no consumer wrote.
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
    * - `label`: Accessible name for the panel.
    * - `modal`: Whether the drawer blocks the page behind it.
    *
@@ -39494,16 +39498,12 @@ export type CustomElementsSolidJs = {
    * lost its focus trap because a consumer forgot a word would be worse than an
    * attribute on the host, and nothing selects on it: the scrim is rendered or
    * not, rather than shown or hidden by CSS.
-   * - `closedby`/`closedBy`: Which close requests the browser answers on its own.
+   * - `placement`: Which edge the drawer comes from.
    *
-   * `<dialog closedby>`, forwarded, and safe to forward because every path it
-   * opens still comes back through this element: a close request fires `cancel`
-   * first, `handleCancel` prevents it, and `requestOpen` decides. So
-   * `closedby="any"` gains light dismiss without giving up the refusal, which is
-   * the property this component exists to keep.
-   *
-   * Absent by default, which is the platform's `auto` and this library's rule
-   * that a resting value is an attribute's absence.
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    * - `returnValue`: What the dialog closed with, the way `<dialog>` reports it.
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
@@ -39612,12 +39612,6 @@ export type CustomElementsSolidJs = {
    *
    * - `disabled`: Whether the row can be reached at all.
    * - `value`: Identifies the row to whatever is listening.
-   * - `onPage`: Whether the page showing is the one this row is on.
-   *
-   * Written by the stack. (property only)
-   * - `showingPage`: Whether this row's own page is the one showing.
-   *
-   * Written by the stack. (property only)
    * - `focusable`: Whether this row holds the region's tab stop. Written by the stack.
    *
    * A drill-down keeps one stop and moves within it on the arrows, so every
@@ -39629,6 +39623,12 @@ export type CustomElementsSolidJs = {
    * elements, and writing `tabindex` onto a host the consumer rendered is a
    * change a React consumer's hydration reports and does not patch up. The stop
    * lands inside this shadow root instead. (property only)
+   * - `onPage`: Whether the page showing is the one this row is on.
+   *
+   * Written by the stack. (property only)
+   * - `showingPage`: Whether this row's own page is the one showing.
+   *
+   * Written by the stack. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -39710,13 +39710,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `label`: Accessible name for the region.
    * - `back-label`/`backLabel`: What the control returning from a page reads.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -39871,18 +39871,18 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `accept`: Which files the picker offers, as a native `accept` list.
-   * - `multiple`: Whether more than one file can be chosen.
    * - `capture`: Which camera or microphone a mobile picker should offer, if any.
-   * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
    * - `locale`: Language tag the sizes are written in.
    *
    * Absent uses the runtime's own.
+   * - `multiple`: Whether more than one file can be chosen.
    * - `remove-label`/`removeLabel`: What the control removing one file is called, per file.
+   * - `trigger-label`/`triggerLabel`: What the trigger reads, where nothing is slotted into it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -40066,12 +40066,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `align`: Alignment across the direction.
    * - `direction`: Whether items run across or down.
    * - `gap`: Space between items, named on the space scale.
-   * - `align`: Alignment across the direction.
+   * - `inline`: Flows with surrounding text instead of taking the full width.
    * - `justify`: Distribution along the direction.
    * - `wrap`: Whether items wrap onto more lines.
-   * - `inline`: Flows with surrounding text instead of taking the full width.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -40201,13 +40201,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `align`: Alignment of each cell within its row.
    * - `columns`: Fixed number of equal columns.
+   * - `gap`: Space between cells, named on the space scale.
    * - `min`: Minimum column width, filling as many as fit.
    *
    * Takes precedence over `columns`: a grid that both fixes a count and reflows
    * is two intentions in one element.
-   * - `gap`: Space between cells, named on the space scale.
-   * - `align`: Alignment of each cell within its row.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -40279,6 +40279,26 @@ export type CustomElementsSolidJs = {
    *
    * Absent falls back to the table's own caption, which is usually the right
    * words and is already written.
+   * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
+   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a
+   * number.
+   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
+   *
+   * **Set this only to overrule what the strip actually draws.** The arithmetic
+   * needs a width in pixels and the width is a length the stylesheet resolves,
+   * so a number written here that disagrees with the sheet is a promise the
+   * consumer has to keep by hand, and the one number a summary is told to trust
+   * is the one it gets wrong.
+   *
+   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
+   * enough on their own and these two are the estimate used until the first
+   * measurement lands. Writing the attribute pins the value and stops the
+   * measurement being consulted, which is what a container query or a transition
+   * on the cell size wants, where what is drawn this frame is not what the
+   * arithmetic should plan around.
+   *
+   * Zero turns the dropping off altogether, which is right for a strip in a
+   * container that cannot get narrow.
    * - `rows`: How many rows the strip has.
    *
    * `1` is a status strip and `7` is a calendar week, which are the two readings
@@ -40301,26 +40321,6 @@ export type CustomElementsSolidJs = {
    * compare two hues at all. `tones="surface info accent success primary"` for a
    * commit count is five unrelated hues for five amounts, which is confetti with
    * no order in it.
-   * - `min-cell`/`minCell`: The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
-   *
-   * **Set this only to overrule what the strip actually draws.** The arithmetic
-   * needs a width in pixels and the width is a length the stylesheet resolves,
-   * so a number written here that disagrees with the sheet is a promise the
-   * consumer has to keep by hand, and the one number a summary is told to trust
-   * is the one it gets wrong.
-   *
-   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
-   * enough on their own and these two are the estimate used until the first
-   * measurement lands. Writing the attribute pins the value and stops the
-   * measurement being consulted, which is what a container query or a transition
-   * on the cell size wants, where what is drawn this frame is not what the
-   * arithmetic should plan around.
-   *
-   * Zero turns the dropping off altogether, which is right for a strip in a
-   * container that cannot get narrow.
-   * - `gap`: Space between cells, in CSS pixels, for the same reason `min-cell` is a
-   * number.
-   * - `empty-text`/`emptyText`: Shown when the table has no readings in it.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -40464,6 +40464,12 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `raised`: Whether it is raised off the page it sits on.
+   *
+   * Separate from `shape`, because they are separate facts: a docked control is
+   * raised whatever its outline, and a circle inside a toolbar is not raised at
+   * all. Shadow rather than a border, since what is under a floating control is
+   * the page and a line drawn on the page is not the same as being above it.
    * - `shape`: The outline it is cut to, which is an axis of its own and not a value on one.
    *
    * `emphasis` says how filled it is and `tone` says what it means; neither of
@@ -40478,12 +40484,6 @@ export type CustomElementsSolidJs = {
    * them, and because the same shape is wanted by an avatar's overlay, a media
    * control and a map's own buttons. Where it sits is the page's business: see
    * `data-dock` in the base layer.
-   * - `raised`: Whether it is raised off the page it sits on.
-   *
-   * Separate from `shape`, because they are separate facts: a docked control is
-   * raised whatever its outline, and a circle inside a toolbar is not raised at
-   * all. Shadow rather than a border, since what is under a floating control is
-   * the page and a line drawn on the page is not the same as being above it.
    * - `emphasis`: How filled it is drawn.
    *
    * Not `separation`: a Card's `outlined` says where a surface ends, and this
@@ -40502,20 +40502,22 @@ export type CustomElementsSolidJs = {
    * of a control means nothing in particular. `accent` is the second
    * emphasis, a rotation off the brand seed rather than a color of its own,
    * so it stays in relation when somebody rethemes.
-   * - `type`: What activating the button does to its form.
-   * - `value`: What this button submits under its own `name`, the way a native submitter does.
+   * - `command`: What to send when the button is activated, and what to send it to.
    *
-   * **Reported for exactly the submission this button starts and not otherwise.**
-   * A native submit button contributes `name=value` only when it is the one
-   * that submitted, and every other button on the form contributes nothing. A
-   * form-associated element reporting a value continuously would contribute on
-   * every submission whoever started it, which is a different feature wearing
-   * the same name, so `submit` below sets it, submits, and clears it inside one
-   * synchronous call.
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
    *
-   * `CopyButton` has a `value` of its own meaning the text to put on the
-   * clipboard, which is not this and is why it is declared there rather than
-   * inherited.
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
    * - `formaction`/`formAction`: Where this button's submission goes, overriding the form's own.
    *
    * **The five `form*` overrides work by writing the form and putting it back**,
@@ -40539,22 +40541,20 @@ export type CustomElementsSolidJs = {
    * Lives here rather than only on `IconButton` so the two share one render.
    * An icon-only button without it is a control a screen reader announces as
    * "button" and nothing else.
-   * - `command`: What to send when the button is activated, and what to send it to.
+   * - `type`: What activating the button does to its form.
+   * - `value`: What this button submits under its own `name`, the way a native submitter does.
    *
-   * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognized as an
-   * invoker, so `commandfor` written on a custom element resolves nothing and
-   * the trigger silently does nothing at all. A wrapper has to hand them down,
-   * the same way `label` becomes `aria-label` in there.
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
    *
-   * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-   * ```
-   *
-   * `commandFor` spells its attribute out, because Lit lowercases a property
-   * name to derive one rather than dash-casing it, and what a consumer writes
-   * is the platform's `commandfor`.
-   * - `commandfor`/`commandFor`: The id of the element the command is sent to.
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -40579,16 +40579,6 @@ export type CustomElementsSolidJs = {
    * imperatively later, and nothing is hydrating by then.
    *
    * Here rather than on each control.
-   * - `focusable`: Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets. (property only)
    * - `expanded`: Whether this button is a disclosure trigger, and whether its panel is open.
    *
    * **Set by whatever owns the panel, and a property rather than an attribute
@@ -40613,6 +40603,16 @@ export type CustomElementsSolidJs = {
    *
    * A consumer who wants to say this statically writes `aria-expanded` on the
    * host instead, which `AriaForwardController` carries to the same place. (property only)
+   * - `focusable`: Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets. (property only)
    * - `commandForElement`: The element this button's command is sent to, resolved.
    *
    * The platform's own accessor, because the resolution is otherwise kept
@@ -40723,8 +40723,8 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `name`: Name of the icon in the Helix set.
    * - `label`: Accessible name, for an icon that is not decorative.
+   * - `name`: Name of the icon in the Helix set.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -40780,18 +40780,17 @@ export type CustomElementsSolidJs = {
    * question a consumer is answering is whether this picture is a card's
    * surface or a page's. `--image-radius` moves it for the case that is
    * neither.
-   * - `src`: Where the picture is.
    * - `alt`: What it shows, for a reader who cannot see it.
    *
    * Empty is a real answer and means decoration. Omitting the attribute is not
    * the same thing: a reader with nothing to read announces the file name.
-   * - `loading`: Whether to wait until it is nearly on screen.
+   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas
+   * can read it.
+   * - `decoding`: Whether the browser may decode off the main thread.
    *
-   * `lazy` by default, which is the opposite of the platform's, because a
-   * picture worth putting in a component is usually below the fold and the one
-   * that is not is the exception worth writing down.
-   * - `srcset`: The candidate widths, passed through to the picture.
-   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * `async` is the resting value and right for a picture in a page. `sync` is
+   * what a consumer reaches for when the picture is about to be composited with
+   * something else and a tear would show.
    * - `fetchpriority`/`fetchPriority`: How urgently to fetch it, for the one picture that is the page.
    *
    * The hero of a page is usually its largest contentful paint, and the fix is
@@ -40799,14 +40798,15 @@ export type CustomElementsSolidJs = {
    * viewport, and this stops it queueing behind everything else the parser
    * found first. Left alone the browser decides, which is right for the other
    * ninety-nine pictures.
-   * - `decoding`: Whether the browser may decode off the main thread.
+   * - `loading`: Whether to wait until it is nearly on screen.
    *
-   * `async` is the resting value and right for a picture in a page. `sync` is
-   * what a consumer reaches for when the picture is about to be composited with
-   * something else and a tear would show.
-   * - `crossorigin`/`crossOrigin`: How the picture is fetched across origins, which decides whether a canvas
-   * can read it.
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
    * - `referrerpolicy`/`referrerPolicy`: How much of the referring URL to send with the request.
+   * - `sizes`: How much of the line it will take, passed through to the picture.
+   * - `src`: Where the picture is.
+   * - `srcset`: The candidate widths, passed through to the picture.
    * - `status`: Whether the picture is on its way, here, or never coming.
    *
    * Read-only to a consumer: it is a report rather than a setting.
@@ -40916,14 +40916,28 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
+   * - `clearable`: Whether the field offers a button that empties it.
+   *
+   * Shown only while there is something to clear, because a control that does
+   * nothing is worse than no control: a reader who presses it and sees no
+   * change has to work out whether the field was already empty or the button
+   * is broken.
+   * - `clear-label`/`clearLabel`: What the clear button is called, since an icon has no name of its own.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
+   * - `minlength`/`minLength`: Fewest characters the value may have.
+   * - `pattern`: A regular expression the value has to match, as the platform reads it.
+   *
+   * Forwarded rather than checked here, which is the whole reason validity is
+   * the platform's: the browser knows what a `pattern` means, anchors it at both
+   * ends, and produces the message in the reader's own language.
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
@@ -40941,6 +40955,15 @@ export type CustomElementsSolidJs = {
    * the same kind of reason: there is no `helix-v` tag, so no consumer is
    * holding the old spelling, and this is free today and a deprecation after
    * the first release.
+   * - `reveal`: Whether a password field offers a toggle that shows what was typed.
+   *
+   * Ignored on every other type. A reveal on an email field would be a button
+   * that does nothing visible, and guarding it here rather than asking the
+   * consumer not to means the property can be set once on a component that
+   * changes type.
+   * - `reveal-label`/`revealLabel`: What the reveal toggle is called.
+   *
+   * The state is `aria-pressed`, not this.
    * - `type`: What the field accepts, which decides the keyboard and the validation.
    *
    * **Not reflected.** Reflection exists so a selector can reach a value, and
@@ -40952,29 +40975,6 @@ export type CustomElementsSolidJs = {
    * Nothing reads it from the attribute either. The real `<input>` inside takes
    * it as a property binding, which is what makes the keyboard and the
    * validation follow.
-   * - `clearable`: Whether the field offers a button that empties it.
-   *
-   * Shown only while there is something to clear, because a control that does
-   * nothing is worse than no control: a reader who presses it and sees no
-   * change has to work out whether the field was already empty or the button
-   * is broken.
-   * - `clear-label`/`clearLabel`: What the clear button is called, since an icon has no name of its own.
-   * - `reveal`: Whether a password field offers a toggle that shows what was typed.
-   *
-   * Ignored on every other type. A reveal on an email field would be a button
-   * that does nothing visible, and guarding it here rather than asking the
-   * consumer not to means the property can be set once on a component that
-   * changes type.
-   * - `reveal-label`/`revealLabel`: What the reveal toggle is called.
-   *
-   * The state is `aria-pressed`, not this.
-   * - `pattern`: A regular expression the value has to match, as the platform reads it.
-   *
-   * Forwarded rather than checked here, which is the whole reason validity is
-   * the platform's: the browser knows what a `pattern` means, anchors it at both
-   * ends, and produces the message in the reader's own language.
-   * - `minlength`/`minLength`: Fewest characters the value may have.
-   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -41235,21 +41235,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `placement`: Where the legend sits and which way its entries run.
-   *
-   * Absent is a wrapping row, which is what sits under a chart. `start` and
-   * `end` stack the entries in a column, for a legend beside one.
-   *
-   * **This says which way the entries run and not where the element is**, which
-   * is the honest limit of a component that is a sibling of the chart rather
-   * than part of it. A legend cannot place itself relative to something it is
-   * not inside, so the consumer still puts it above, below or beside and this
-   * makes it lay out correctly once it is there.
-   *
-   * A `legend` slot on every chart is the obvious alternative and is worse: it
-   * makes the legend's position a fact about the chart, so two charts sharing
-   * one legend becomes impossible, and it puts a list inside a drawing that is
-   * `aria-hidden`.
    * - `emphasis`: How much ink the swatches claim.
    *
    * **The same axis as the chart's, with the same values, because a legend that
@@ -41266,6 +41251,9 @@ export type CustomElementsSolidJs = {
    * independently. Giving it a chart to read would make a list of names depend
    * on a drawing it is deliberately not part of, and would still not answer the
    * per-series case, where `outlined` is a set of names rather than one value.
+   * - `glass`: Which entries are glass rather than solid, by name.
+   *
+   * Matched as `outlined` is.
    * - `material`: What the swatches are made of.
    *
    * `glass` thins whatever emphasis drew, the way it does on a column, so a
@@ -41290,10 +41278,22 @@ export type CustomElementsSolidJs = {
    * showing, which are the same names the chart matches its own `outlined`
    * against, since both read one table. So a chart and its key say the same
    * thing the same way: `outlined="Forecast"` on both.
-   * - `subtle`: Which entries are drawn as a wash of their color, by name.
+   * - `placement`: Where the legend sits and which way its entries run.
    *
-   * Matched as `outlined` is.
-   * - `glass`: Which entries are glass rather than solid, by name.
+   * Absent is a wrapping row, which is what sits under a chart. `start` and
+   * `end` stack the entries in a column, for a legend beside one.
+   *
+   * **This says which way the entries run and not where the element is**, which
+   * is the honest limit of a component that is a sibling of the chart rather
+   * than part of it. A legend cannot place itself relative to something it is
+   * not inside, so the consumer still puts it above, below or beside and this
+   * makes it lay out correctly once it is there.
+   *
+   * A `legend` slot on every chart is the obvious alternative and is worse: it
+   * makes the legend's position a fact about the chart, so two charts sharing
+   * one legend becomes impossible, and it puts a list inside a drawing that is
+   * `aria-hidden`.
+   * - `subtle`: Which entries are drawn as a wash of their color, by name.
    *
    * Matched as `outlined` is.
    * - `entries`: Which way to read the table.
@@ -41466,12 +41466,6 @@ export type CustomElementsSolidJs = {
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
-   * - `zero`: Whether zero is forced into the range.
-   *
-   * Absent measures from the data's own extent, which is what a line is for.
-   * Set it where the distance from nothing is the point rather than the shape,
-   * and accept that a series which never approaches zero becomes a flat rule
-   * near the top of the box.
    * - `terminus`: The shape of the mark on each series' last reading.
    *
    * Absent is a dot, and absent rather than defaulted because a reflecting
@@ -41493,6 +41487,12 @@ export type CustomElementsSolidJs = {
    * masked with one disc per series and every stroke stops at its own ring's
    * inner edge. `mask-composite: intersect` is what makes N holes out of N
    * layers; a single `mask-image` would only ever cut the last one.
+   * - `zero`: Whether zero is forced into the range.
+   *
+   * Absent measures from the data's own extent, which is what a line is for.
+   * Set it where the distance from nothing is the point rather than the shape,
+   * and accept that a series which never approaches zero becomes a flat rule
+   * near the top of the box.
    * - `pointer`: Which reading a pointer is nearest, for a tooltip to sit on.
    *
    * Public for the same reason `series` and `named` are: a protected member
@@ -41598,9 +41598,9 @@ export type CustomElementsSolidJs = {
    * Empty rather than optional, and unset by default: a list is not always a
    * list of links, and an empty `href` written onto every row would be a link
    * to the current page on every row a consumer never asked to be one.
-   * - `target`: Where the link opens, for the rare row that leaves the site.
    * - `rel`: What the link declares about where it goes. The consumer's decision rather
    * than one derived from `target`, for the reason `Tree.Item` gives.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -41682,7 +41682,6 @@ export type CustomElementsSolidJs = {
    *
    * A rail replaces the marker rather than joining it, so it applies to
    * `unordered` too, where it numbers what a bullet did not.
-   * - `label`: Accessible name for the set.
    * - `kind`: What kind of list this is, which is a fact about the content.
    *
    * On the headless tier because it is meaning rather than decoration, the same
@@ -41703,6 +41702,7 @@ export type CustomElementsSolidJs = {
    *   the supporting text `List.Item` already has, so the kind changes how the
    *   pair is drawn and nothing about what a consumer writes. A separate
    *   `List.Term` element would be a second row shape for one attribute's sake.
+   * - `label`: Accessible name for the set.
    * - `type`: Which markers an ordered list draws, in `<ol type>`'s own five values.
    *
    * Reflected, because this is one of the things a stylesheet selects on and
@@ -41774,13 +41774,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `default-value`/`defaultValue`: The value the markup declared, which is where a reset returns to.
    * - `value`: What the control holds now, and what its form submits.
    *
@@ -41788,8 +41788,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill in the text field, as a platform token.
@@ -42024,6 +42024,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `size`: Diameter relative to the surrounding text.
    * - `variant`: How the waiting is drawn.
    *
    * Unset is the turning arc, which is what most waits want.
@@ -42033,7 +42034,6 @@ export type CustomElementsSolidJs = {
    * swells with it, in step. It is the shape for a wait that has a mark to
    * show, a splash or a first paint behind a wordmark, where a rotating rim
    * around a logo reads as chrome bolted to the brand.
-   * - `size`: Diameter relative to the surrounding text.
    * - `label`: Accessible name, announced while the work is outstanding.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -42110,26 +42110,6 @@ export type CustomElementsSolidJs = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `label`: The section's name, which names the default trigger and the panel.
-   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
-   *
-   * The resting one is the card, hanging off the trigger and as wide as it
-   * needs to be. `full` is the other shape navigations use: a band from edge to
-   * edge under the header, with its contents held to the page's own measure, so
-   * a set of destinations too wide to sit under one word gets the whole width
-   * to lay out in.
-   *
-   * It changes where the panel goes as well as how it looks, which is why this
-   * tier knows about it at all: a band spans the viewport, so there is nothing
-   * to measure it against and nothing to flip or shift to, and the placing pass
-   * is told not to run. Everything else the popover gives, the top layer and
-   * the dismissal, is exactly what such a band needs.
-   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
-   *
-   * A press always works. This says whether a mouse also opens it by resting on
-   * the trigger, and it is the default because that is what a navigation bar
-   * does. `click` is for a trigger that does something else as well, or a panel
-   * heavy enough that opening it on the way past is rude.
    * - `full-below`/`fullBelow`: The width, in pixels, under which a card becomes a band. Zero never does.
    *
    * A card is a panel hung off one word, and there is no room to hang anything
@@ -42145,6 +42125,26 @@ export type CustomElementsSolidJs = {
    * whatever the stylesheet says. Writing the width in both places would be one
    * number in two languages, drifting the first time either moved. This sets
    * `data-narrow` on the host and the stylesheet arranges itself off that.
+   * - `label`: The section's name, which names the default trigger and the panel.
+   * - `open-on`/`openOn`: Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
+   * - `variant`: Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -42233,7 +42233,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What this row stands for, carried in the event when it is chosen.
    * - `checkable`: Whether the row is one of a set of choices.
    *
    * Separate from `checked`, and it has to be. A row that is off is still a
@@ -42245,6 +42244,11 @@ export type CustomElementsSolidJs = {
    * `checked` implies it, so a row that is on never has to say both.
    * - `checked`: Whether the row is ticked.
    * - `disabled`: Whether the row can be chosen.
+   * - `download`: Whether the link saves the file rather than opening it.
+   *
+   * Only meaningful beside an `href`, and only for a file served from this
+   * origin: the attribute is ignored cross-origin, which is the browser's rule
+   * about who may name a file on somebody's disk rather than a gap here.
    * - `href`: Where the row goes, which makes it a real link.
    *
    * **The row itself becomes an `<a>`, and the role goes with it.** A
@@ -42263,13 +42267,9 @@ export type CustomElementsSolidJs = {
    * back `null`. So `role="option"` is pinned to the host, and an anchor under
    * it hits the naming failure above. A menu has no such constraint because
    * focus really moves to the row.
-   * - `target`: Where the link opens, for the rows that should leave the page.
    * - `rel`: The relationship, which `target="_blank"` should always set.
-   * - `download`: Whether the link saves the file rather than opening it.
-   *
-   * Only meaningful beside an `href`, and only for a file served from this
-   * origin: the attribute is ignored cross-origin, which is the browser's rule
-   * about who may name a file on somebody's disk rather than a gap here.
+   * - `target`: Where the link opens, for the rows that should leave the page.
+   * - `value`: What this row stands for, carried in the event when it is chosen.
    * - `onPage`: Whether this row is on the page currently showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
@@ -42381,13 +42381,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `open`: Whether the element is open.
    *
    * One property, not two, so `dialog.open` answers the question anyone
@@ -42401,12 +42401,12 @@ export type CustomElementsSolidJs = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
+   * - `back-label`/`backLabel`: What the row returning from a submenu reads.
+   * - `label`: Accessible name for the surface.
+   * - `offset`: Space between the trigger and the surface, in pixels.
    * - `placement`: Preferred side.
    *
    * It moves if that side does not fit.
-   * - `offset`: Space between the trigger and the surface, in pixels.
-   * - `label`: Accessible name for the surface.
-   * - `back-label`/`backLabel`: What the row returning from a submenu reads.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -42537,29 +42537,6 @@ export type CustomElementsSolidJs = {
    * part of that range it is in, so there is no second kind of fact for an
    * outline to name. `solid` is the resting state and is written by not writing
    * it, per the rule that a reflected property takes no default.
-   * - `label`: Accessible name for the reading.
-   * - `min`: Bottom of the range.
-   * - `max`: Top of the range.
-   *
-   * A hundred rather than the platform's one, which is what `Progress` already
-   * takes and what a consumer writing `value="72"` means. A range of zero to one
-   * is a fraction, and a component that reads `value="72"` as seventy-two times
-   * over its maximum is a trap that costs nothing to avoid.
-   * - `value`: Where the reading sits between `min` and `max`.
-   *
-   * Outside them, it clamps.
-   * - `low`: Top of the low band.
-   *
-   * Absent leaves the range unbanded.
-   * - `high`: Bottom of the high band.
-   *
-   * Absent leaves the range unbanded.
-   * - `optimum`: Where in the range it is best to be.
-   *
-   * Defaults to the middle of whatever bands are declared, which is the
-   * platform's own default and the right one for a score. A meter where low is
-   * good, like disk usage, says `optimum="0"`; one where high is good, like a
-   * battery, says `optimum="100"`.
    * - `band`: The band, said outright, where the three thresholds cannot say it.
    *
    * **The specification's model has a shape, and it is worth knowing before
@@ -42584,6 +42561,26 @@ export type CustomElementsSolidJs = {
    * Not reflected. Nothing selects on it: the band reaches the stylesheet as
    * `data-band` on the fill, because that is the element being colored, so
    * reflecting here would write an attribute onto the host for no reader.
+   * - `high`: Bottom of the high band.
+   *
+   * Absent leaves the range unbanded.
+   * - `label`: Accessible name for the reading.
+   * - `low`: Top of the low band.
+   *
+   * Absent leaves the range unbanded.
+   * - `max`: Top of the range.
+   *
+   * A hundred rather than the platform's one, which is what `Progress` already
+   * takes and what a consumer writing `value="72"` means. A range of zero to one
+   * is a fraction, and a component that reads `value="72"` as seventy-two times
+   * over its maximum is a trap that costs nothing to avoid.
+   * - `min`: Bottom of the range.
+   * - `optimum`: Where in the range it is best to be.
+   *
+   * Defaults to the middle of whatever bands are declared, which is the
+   * platform's own default and the right one for a score. A meter where low is
+   * good, like disk usage, says `optimum="0"`; one where high is good, like a
+   * battery, says `optimum="100"`.
    * - `shape`: Whether the reading is drawn as a bar, a ring or an arc.
    *
    * A gauge and a meter are the same thing measured: a value in a range, with
@@ -42601,6 +42598,9 @@ export type CustomElementsSolidJs = {
    * rather than a reading, it costs a rotation and a shape to draw it with, and
    * it says nothing the end of the arc does not already say.
    * - `show-value`/`showValue`: Whether the reading is shown beside the bar.
+   * - `value`: Where the reading sits between `min` and `max`.
+   *
+   * Outside them, it clamps.
    * - `value-text`/`valueText`: What the reading says, where a number is not the whole story.
    *
    * `value-text="18 GB of 32 GB"` is announced and shown instead of `56%`. The
@@ -42772,10 +42772,10 @@ export type CustomElementsSolidJs = {
    * `hydration.dom.spec.ts` holds it.
    * - `default-read`/`defaultRead`: State to open with, where nothing declared one.
    * - `dismissible`: Whether a reader may remove it.
+   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    * - `locale`: Locale for the timestamp.
    *
    * Empty is the runtime's own.
-   * - `dismiss-label`/`dismissLabel`: Accessible name for the dismiss control.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -42878,13 +42878,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `label`: Accessible name for the feed.
    * - `mark-all`/`markAll`: Whether to draw a control that marks everything read.
    * - `mark-all-label`/`markAllLabel`: Label for that control.
@@ -43001,8 +43001,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
@@ -43011,18 +43011,19 @@ export type CustomElementsSolidJs = {
    * lets autofill work at all. Hardcoding `off` here is what stops a reader
    * having a birthday or a postal code filled in for them, with no way for a
    * consumer to ask for it.
-   * - `min`: Smallest value the reader may reach.
-   *
-   * Absent has no floor.
-   * - `max`: Largest value the reader may reach.
-   *
-   * Absent has no ceiling.
-   * - `step`: How far one step moves.
+   * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
+   * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
    * - `large-step`/`largeStep`: How far `PageUp` and `PageDown` move.
    *
    * Ten steps, which is the convention every spinner on the platform follows,
    * and a property because ten of a step of `0.01` is a hundredth and rarely
    * what a reader wants from a whole key.
+   * - `max`: Largest value the reader may reach.
+   *
+   * Absent has no ceiling.
+   * - `min`: Smallest value the reader may reach.
+   *
+   * Absent has no floor.
    * - `placeholder`: Shown while the field is empty.
    *
    * Not a label: it goes when typing starts.
@@ -43035,8 +43036,7 @@ export type CustomElementsSolidJs = {
    * been asked for. Where it earns its place is a value a reader tunes rather
    * than states: a duration, a weight, a count they are looking for rather than
    * one they already know.
-   * - `decrement-label`/`decrementLabel`: Accessible name for the control that steps down.
-   * - `increment-label`/`incrementLabel`: Accessible name for the control that steps up.
+   * - `step`: How far one step moves.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -43256,39 +43256,9 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `disabled`: Whether this choice can be made.
-   * - `description`: A second line under the words, for what the choice actually is.
-   *
-   * A palette row reads better as a name and a caption than as one sentence
-   * carrying both: "Helix" and "the design system" are two facts, and a comma
-   * between them makes a reader parse the punctuation to find where the name
-   * ends. Matching still reads the label, so what somebody types is matched
-   * against the name rather than against prose about it.
-   *
-   * **A property and not a slot, which is the departure worth explaining.** The
-   * area rules say a content property is its slot's fallback, and that holds for
-   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
-   * usually absent, and a wrapped slot generates a box whether or not it is
-   * filled, so every option without a caption would carry an empty line. The
-   * detection that would avoid it does not exist, `:host(:has())` being invalid
-   * and the server having no children to inspect. A property is known at render
-   * time, so the component can decline to draw the box at all.
-   *
-   * It does not reflect, per the rule that payload state stays off the host: a
-   * string is not a fact a selector needs.
    * - `data-active`/`active`: Whether this is the option the keyboard is on.
    *
    * Written by the listbox.
-   * - `selected`: Whether this choice is currently chosen.
-   *
-   * Written by the listbox.
-   * - `label`: A shorter name for this choice, for where the row does not fit.
-   *
-   * `<option label>`'s own meaning: the text a chooser shows when it has less
-   * room than the row does, which is what a select's closed trigger has. Empty
-   * means the row's own content, which is the common case and is why this is not
-   * simply the accessible name.
-   * - `value`: Identifies this choice, and is what a form submits.
    * - `alternate`: A second destination for this row, taken with the modifier held.
    *
    * **An attribute rather than a second row, which is the whole point.** A
@@ -43311,6 +43281,36 @@ export type CustomElementsSolidJs = {
    * `aria-description` rather than into the name: the name is the row's own
    * words and stays what a reader searched for, and the second destination is a
    * fact about what pressing a key would do, which is what a description is.
+   * - `description`: A second line under the words, for what the choice actually is.
+   *
+   * A palette row reads better as a name and a caption than as one sentence
+   * carrying both: "Helix" and "the design system" are two facts, and a comma
+   * between them makes a reader parse the punctuation to find where the name
+   * ends. Matching still reads the label, so what somebody types is matched
+   * against the name rather than against prose about it.
+   *
+   * **A property and not a slot, which is the departure worth explaining.** The
+   * area rules say a content property is its slot's fallback, and that holds for
+   * a region always drawn: `Avatar`'s initials, `Tooltip`'s text. This one is
+   * usually absent, and a wrapped slot generates a box whether or not it is
+   * filled, so every option without a caption would carry an empty line. The
+   * detection that would avoid it does not exist, `:host(:has())` being invalid
+   * and the server having no children to inspect. A property is known at render
+   * time, so the component can decline to draw the box at all.
+   *
+   * It does not reflect, per the rule that payload state stays off the host: a
+   * string is not a fact a selector needs.
+   * - `disabled`: Whether this choice can be made.
+   * - `label`: A shorter name for this choice, for where the row does not fit.
+   *
+   * `<option label>`'s own meaning: the text a chooser shows when it has less
+   * room than the row does, which is what a select's closed trigger has. Empty
+   * means the row's own content, which is the common case and is why this is not
+   * simply the accessible name.
+   * - `selected`: Whether this choice is currently chosen.
+   *
+   * Written by the listbox.
+   * - `value`: Identifies this choice, and is what a form submits.
    * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -43430,12 +43430,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `label`: Accessible name for the navigation.
-   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
-   *
-   * The reading line. A page with a sticky masthead sets this to its height, or
-   * a little more: without it the current section changes as a heading slides
-   * under the chrome rather than as it reaches the top of what can be seen.
    * - `behavior`: How a click on one of these links travels to its section.
    *
    * The platform's own vocabulary, because this is the platform's own option:
@@ -43455,6 +43449,12 @@ export type CustomElementsSolidJs = {
    * read at the click rather than cached, because a reader can change it while
    * the page is open and this is the only motion in the component that
    * JavaScript rather than CSS decides.
+   * - `label`: Accessible name for the navigation.
+   * - `offset`: How far below the top of the window a heading counts as reached, in pixels.
+   *
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
    * - `current`: The id of the section being read, or empty before anything is measured.
    *
    * Read-only, and a getter rather than a property for that reason: it is
@@ -43549,27 +43549,17 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `pages`: How many pages there are in total.
+   * - `boundaries`: How many pages to show at each end, whatever the current one is.
+   * - `compact`: Where the numbers are replaced by a reading of the two.
    *
-   * Clamped to at least one wherever it is read, so a result that has not
-   * loaded yet renders a single page rather than an empty control that then
-   * appears and pushes the layout down.
+   * A different structure rather than a different look, which is why it is
+   * here: the run of pages is gone and a single status line stands in its
+   * place. This is the shape a narrow screen wants, and the only shape possible
+   * where the total is large enough that no window over it is useful.
    *
-   * Left unset where `total` and `page-size` are both given, since the two of
-   * them already say it. A fallback rather than an override: writing this wins,
-   * so there is never a question of which of two sources is current.
-   * - `total`: How many items there are across every page.
-   *
-   * What `pages` falls back to together with `page-size`. Unset is the common
-   * case, where a consumer knows the page total and not the item total.
-   *
-   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
-   * to a reader, and takes its own.
-   * - `page-size`/`pageSize`: How many items are on a page.
-   *
-   * Only arithmetic: this does not slice anything, because the component never
-   * sees the items. It is what turns `total` into a page count, and nothing
-   * else.
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
+   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
    * - `ends`: Whether to offer a jump to the first and last pages.
    *
    * Off by default. The gaps already reach any page in a few presses and the
@@ -43596,24 +43586,15 @@ export type CustomElementsSolidJs = {
    * far-fetched value: it is a bookmarked link after the result shrank.
    *
    * Rounded here too, so `2.7` reads as the 2 it renders.
-   * - `default-page`/`defaultPage`: Page to open on, where nothing declared one.
-   * - `siblings`: How many pages to show either side of the current one.
-   * - `boundaries`: How many pages to show at each end, whatever the current one is.
+   * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
+   * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
    * - `href`: Address for a page, with `{page}` standing in for its number.
    *
    * Absent renders buttons. Present renders links, which is what a paged result
    * with its own URL should be: a crawler follows them, a middle click opens
    * one, and the back button works without the consumer wiring anything.
-   * - `compact`: Where the numbers are replaced by a reading of the two.
-   *
-   * A different structure rather than a different look, which is why it is
-   * here: the run of pages is gone and a single status line stands in its
-   * place. This is the shape a narrow screen wants, and the only shape possible
-   * where the total is large enough that no window over it is useful.
-   *
-   * Not reflected, for the reason `ends` is not: it decides what renders, so
-   * nothing has to select on it.
    * - `label`: Accessible name for the navigation landmark.
+   * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
    * - `locale`: Locale for the page numbers. Absent uses the runtime's own.
    *
    * The same property the calendar takes, doing the same job one layer down:
@@ -43625,18 +43606,37 @@ export type CustomElementsSolidJs = {
    *
    * Not applied to `href`. That one is machine-facing, and `?page=1,234` is a
    * different address from `?page=1234`.
+   * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
    * - `page-label`/`pageLabel`: Accessible name for one page, with `{page}` and `{pages}` filled in.
+   * - `pages`: How many pages there are in total.
+   *
+   * Clamped to at least one wherever it is read, so a result that has not
+   * loaded yet renders a single page rather than an empty control that then
+   * appears and pushes the layout down.
+   *
+   * Left unset where `total` and `page-size` are both given, since the two of
+   * them already say it. A fallback rather than an override: writing this wins,
+   * so there is never a question of which of two sources is current.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   *
+   * Only arithmetic: this does not slice anything, because the component never
+   * sees the items. It is what turns `total` into a page count, and nothing
+   * else.
+   * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
+   * - `siblings`: How many pages to show either side of the current one.
    * - `status-label`/`statusLabel`: The reading shown in `compact`, with `{page}` and `{pages}` filled in.
    *
    * No noun: the landmark this sits in is already named "Pagination", so
    * "Page 7 of 24" says it twice to a screen reader and takes a third of the
    * width from a control whose whole reason for existing is that the row is
    * narrow. The numbers are the reading.
-   * - `previous-label`/`previousLabel`: Accessible name for the control that moves back.
-   * - `next-label`/`nextLabel`: Accessible name for the control that moves forward.
-   * - `first-label`/`firstLabel`: Accessible name for the control that jumps to the first page.
-   * - `last-label`/`lastLabel`: Accessible name for the control that jumps to the last page.
-   * - `gap-label`/`gapLabel`: Accessible name for a gap, with `{page}` filled in as where it goes.
+   * - `total`: How many items there are across every page.
+   *
+   * What `pages` falls back to together with `page-size`. Unset is the common
+   * case, where a consumer knows the page total and not the item total.
+   *
+   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+   * to a reader, and takes its own.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -43720,21 +43720,21 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `sizes`: The sizes offered, comma separated.
-   *
-   * A string rather than an array, so the whole control is expressible in
-   * markup and survives a server render. Anything that is not a positive number
-   * is dropped rather than rendered as an option that cannot mean anything.
+   * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `value`: The size in force.
    *
    * Reading gives the real one; writing declares it the consumer's, and
    * `default-value` seeds one this element owns. Same accessor pair as
    * `Pagination.page` and the calendar's `month`.
-   * - `default-value`/`defaultValue`: Size to start on, where nothing declared one.
    * - `label`: The words beside the control.
    * - `locale`: Locale for the numbers.
    *
    * Absent uses the runtime's own.
+   * - `sizes`: The sizes offered, comma separated.
+   *
+   * A string rather than an array, so the whole control is expressible in
+   * markup and survives a server render. Anything that is not a positive number
+   * is dropped rather than rendered as an option that cannot mean anything.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -43790,9 +43790,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `page`: The page on show, one-based.
-   * - `page-size`/`pageSize`: How many items are on a page.
-   * - `total`: How many items there are across every page.
    * - `format`: The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
@@ -43809,6 +43806,9 @@ export type CustomElementsSolidJs = {
    * - `locale`: Locale for the numbers.
    *
    * Absent uses the runtime's own.
+   * - `page`: The page on show, one-based.
+   * - `page-size`/`pageSize`: How many items are on a page.
+   * - `total`: How many items there are across every page.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -43864,8 +43864,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill, reaching the first cell only.
@@ -43874,7 +43874,19 @@ export type CustomElementsSolidJs = {
    * that lets a phone offer the code out of a message. Later cells stay `off`
    * for the reason in the class comment above, that six cells each offering
    * the same code is one offer made six times.
+   * - `cell-label`/`cellLabel`: Accessible name for one box, with `{index}` and `{length}` filled in.
    * - `length`: How many characters the code has.
+   * - `mask`: Whether the characters are hidden, the way a password is.
+   * - `placeholder`: What an empty box shows, usually a single dot.
+   *
+   * The platform's own placeholder, on each cell, rather than a character
+   * drawn behind the field: it clears the moment anything is typed, it is
+   * already excluded from the accessible value, and it works the same under
+   * `mask`, where the cell is a password input and a hand-drawn glyph would
+   * have to know that.
+   *
+   * Empty by default, because a row of boxes already reads as a row of boxes.
+   * - `readonly`/`readOnly`: Whether the boxes refuse input while still submitting their value.
    * - `type`: What a box accepts, which decides the keyboard a phone offers.
    *
    * `numeric` and `alphanumeric` also refuse anything else on the way in,
@@ -43895,18 +43907,6 @@ export type CustomElementsSolidJs = {
    * no consumer's markup had. The area rules carry the sentence "reflect only
    * what CSS selects on". The real inputs take it as a binding, which is what
    * makes the keyboard follow.
-   * - `mask`: Whether the characters are hidden, the way a password is.
-   * - `placeholder`: What an empty box shows, usually a single dot.
-   *
-   * The platform's own placeholder, on each cell, rather than a character
-   * drawn behind the field: it clears the moment anything is typed, it is
-   * already excluded from the accessible value, and it works the same under
-   * `mask`, where the cell is a password input and a hand-drawn glyph would
-   * have to know that.
-   *
-   * Empty by default, because a row of boxes already reads as a row of boxes.
-   * - `readonly`/`readOnly`: Whether the boxes refuse input while still submitting their value.
-   * - `cell-label`/`cellLabel`: Accessible name for one box, with `{index}` and `{length}` filled in.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -44198,7 +44198,6 @@ export type CustomElementsSolidJs = {
    * from, so an outline there costs legibility and buys no distinction. `solid`
    * is the resting state and is written by not writing it, per the rule that a
    * reflected property takes no default.
-   * - `label`: Accessible name for what is in progress.
    * - `indeterminate`: Whether the work has a knowable end.
    *
    * On the headless tier rather than as a treatment, because it is
@@ -44210,6 +44209,7 @@ export type CustomElementsSolidJs = {
    * Not `Loader`, which is the other thing this could be. A loader says the
    * page is busy; a bar says a named piece of work is running, and keeps its
    * place in the layout when the answer arrives and it becomes determinate.
+   * - `label`: Accessible name for what is in progress.
    * - `max`: The total the work is measured against.
    * - `shape`: Whether the value is drawn as a bar or as a ring.
    *
@@ -44306,7 +44306,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What the code encodes, which is usually a URL.
+   * - `correction`: How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
    * - `label`: What the image is called.
    *
    * Falling back to the value is deliberate: a code almost always holds a URL,
@@ -44322,13 +44328,7 @@ export type CustomElementsSolidJs = {
    * A scanner reads contrast between cells, not their shape, so all three
    * scan. `dots` sits a little under half a module so neighbors do not touch,
    * which is what makes it read as dots rather than as a softened square code.
-   * - `correction`: How much of the code can be lost and still read.
-   *
-   * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the center,
-   * chosen automatically when the slot is filled: it is the level that makes
-   * covering safe, and a consumer who fills the slot has said what they want
-   * without having to know that.
+   * - `value`: What the code encodes, which is usually a URL.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -44461,8 +44461,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `orientation`: Which way the choices run. A column reads one line per answer.
@@ -44631,21 +44631,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `variant`: How the choice presents itself.
-   *
-   * - `plain` is the default and is never written: a circle beside its words,
-   *   which is what a list of choices should be almost always.
-   * - `card` puts it in a bounded surface, for options that need room to
-   *   explain themselves: a description, an icon, a price. It is the half a
-   *   `data-card` link cannot do, because a link reports no value and belongs
-   *   to no group, so a card that is genuinely an answer has to be this.
-   * - `chip` is the answer as its own small surface, for a row of short
-   *   choices read at a glance. It hides the circle, the surface being the
-   *   whole mark, which is why `hide-control` says it is unnecessary here.
-   *
-   * The circle stays in both. A card whose only marker was its own border would
-   * ask a reader to compare surfaces across a row to find the answer, and would
-   * leave nothing for a high-contrast display.
    * - `hide-control`/`hideControl`: Takes the circle away, leaving the card as the whole control.
    *
    * Unnecessary under `chip`, which has no room for a circle beside its mark
@@ -44662,6 +44647,21 @@ export type CustomElementsSolidJs = {
    * Not on `Checkbox`, deliberately. A radio card with no circle is still
    * unmistakably one-of-many because its siblings behave that way; a checkbox
    * card with no box loses the only thing that says you may pick several.
+   * - `variant`: How the choice presents itself.
+   *
+   * - `plain` is the default and is never written: a circle beside its words,
+   *   which is what a list of choices should be almost always.
+   * - `card` puts it in a bounded surface, for options that need room to
+   *   explain themselves: a description, an icon, a price. It is the half a
+   *   `data-card` link cannot do, because a link reports no value and belongs
+   *   to no group, so a card that is genuinely an answer has to be this.
+   * - `chip` is the answer as its own small surface, for a row of short
+   *   choices read at a glance. It hides the circle, the surface being the
+   *   whole mark, which is why `hide-control` says it is unnecessary here.
+   *
+   * The circle stays in both. A card whose only marker was its own border would
+   * ask a reader to compare surfaces across a row to find the answer, and would
+   * leave nothing for a high-contrast display.
    * - `disabled`: Whether this choice can be made.
    * - `selected`: Whether this is the current choice.
    *
@@ -44783,8 +44783,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `max`: How many marks there are.
@@ -44794,20 +44794,10 @@ export type CustomElementsSolidJs = {
    * different answers and a control that cannot express the first has to
    * pretend the second. A survey that requires an answer says so with
    * `required`, not by making one unreachable.
-   * - `step`: The smallest part of a mark that can be chosen.
-   *
-   * `0.5` is the half star, and it is the reason the value is a number rather
-   * than an index: with halves, five marks are ten answers.
    * - `readonly`/`readOnly`: Whether this shows a score rather than asks for one.
    *
    * A readout is not a control that has been switched off. It takes no focus,
    * answers no keys, and reads as one thing: see the note on the class.
-   * - `value-text`/`valueText`: How the score is read out, where "3.5 out of 5" is not what it should say.
-   *
-   * A rating out of five is one of the few places a screen reader gets a worse
-   * answer from the value than from a sentence: "3.5" alone is a number without
-   * a subject. This names the readout, where a control is named by its `label`
-   * and each of its options by the score that option is.
    * - `show-value`/`showValue`: Whether the score is written out beside the marks.
    *
    * Marks say roughly, and a number says exactly. Four and a bit stars is not a
@@ -44818,6 +44808,16 @@ export type CustomElementsSolidJs = {
    * It follows the pointer, because it labels what the marks are showing rather
    * than what the form holds: a label that disagreed with the marks under the
    * reader's own cursor would be worse than no label.
+   * - `step`: The smallest part of a mark that can be chosen.
+   *
+   * `0.5` is the half star, and it is the reason the value is a number rather
+   * than an index: with halves, five marks are ten answers.
+   * - `value-text`/`valueText`: How the score is read out, where "3.5 out of 5" is not what it should say.
+   *
+   * A rating out of five is one of the few places a screen reader gets a worse
+   * answer from the value than from a sentence: "3.5" alone is a number without
+   * a subject. This names the readout, where a control is named by its `label`
+   * and each of its options by the score that option is.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -45032,12 +45032,12 @@ export type CustomElementsSolidJs = {
    * keyed on this attribute, and of the 56 tokens that differ by scheme the
    * theme engine emits 19. The other 37 would stay light in a dark preview,
    * including every one of the 24 series colors a chart reads.
-   * - `src`: Document the frame loads, which brings the styles and the elements.
-   * - `source`: Markup to render.
-   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
-   * - `label`: Accessible name for the frame.
    * - `direction`: Writing direction inside the frame.
+   * - `label`: Accessible name for the frame.
    * - `layout`: How the example is placed in the frame.
+   * - `source`: Markup to render.
+   * - `src`: Document the frame loads, which brings the styles and the elements.
+   * - `styles`: Stylesheet applied inside the frame, alongside the markup.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -45140,7 +45140,21 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `orientation`: Whether the panes sit side by side or stacked.
+   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
+   * - `default-panel-size`/`defaultPanelSize`: What a reset makes the panel, in pixels.
+   *
+   * The pair to `panel-size`.
+   * - `default-split`/`defaultSplit`: Where a reset puts the divider, where nothing declared it.
+   *
+   * Separate from `split` for the reason `Splitter` keeps `default-position`
+   * separate from `position`. Resetting to whatever `split` held on the first
+   * render is the declared arrangement only where nobody owns the property: the
+   * workbench does, and restores it from the address bar and from storage, so the
+   * first value it holds is the reader's last session and a reset puts the
+   * sandbox back to the size it already was.
+   *
+   * Declared rather than captured, so it is a number a consumer states and can
+   * change, and it needs no first frame to be read on.
    * - `lead`: Which pane comes first, before the divider.
    *
    * A sandbox is read in one of two directions and the two are not a
@@ -45156,30 +45170,16 @@ export type CustomElementsSolidJs = {
    *
    * `split` follows the lead pane rather than the source, so `split="30"` means
    * the same thing in both directions: thirty percent to whatever comes first.
-   * - `split`: Percentage of the sandbox given to the source pane.
-   * - `default-split`/`defaultSplit`: Where a reset puts the divider, where nothing declared it.
-   *
-   * Separate from `split` for the reason `Splitter` keeps `default-position`
-   * separate from `position`. Resetting to whatever `split` held on the first
-   * render is the declared arrangement only where nobody owns the property: the
-   * workbench does, and restores it from the address bar and from storage, so the
-   * first value it holds is the reader's last session and a reset puts the
-   * sandbox back to the size it already was.
-   *
-   * Declared rather than captured, so it is a number a consumer states and can
-   * change, and it needs no first frame to be read on.
-   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
-   * - `default-panel-size`/`defaultPanelSize`: What a reset makes the panel, in pixels.
-   *
-   * The pair to `panel-size`.
+   * - `orientation`: Whether the panes sit side by side or stacked.
    * - `panel-collapsed-size`/`panelCollapsedSize`: What the panel's height becomes when it is closed.
    *
    * Zero closes it outright. A panel whose contents include the control that
    * reopens it, a row of tabs being the usual one, wants that row left showing,
    * and only whoever slotted it knows how tall that is.
    * - `panel-label`/`panelLabel`: Accessible name for the panel's divider.
-   * - `corner-label`/`cornerLabel`: Accessible name for the divider that moves both at once.
+   * - `panel-size`/`panelSize`: Height of the panel, in pixels.
    * - `separator-label`/`separatorLabel`: Accessible name for the divider.
+   * - `split`: Percentage of the sandbox given to the source pane.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -45261,15 +45261,15 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: The source being edited.
+   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `name`: Which source this pane holds, echoed in every `helix-before-edit`.
    *
    * `html` and `css` are what the sandbox root routes on; any other name is
    * passed through untouched for a consumer wiring their own panes.
    *
    * Not reflected: nothing selects on it, so it keeps a real default instead.
-   * - `field-label`/`fieldLabel`: Accessible name for the editable region.
    * - `tab-indents`/`tabIndents`: Whether Tab indents rather than moving focus.
+   * - `value`: The source being edited.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -45679,10 +45679,11 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
+   * - `empty-text`/`emptyText`: What it says where there are none.
    * - `filterable`: Whether the list can be narrowed by typing.
    *
    * Passed to the listbox rather than acted on here, because the listbox owns
@@ -45693,7 +45694,6 @@ export type CustomElementsSolidJs = {
    * message belongs. Two components saying "Loading" about one request is a
    * consumer wiring the same flag twice.
    * - `loading-text`/`loadingText`: What the list says while they are on their way.
-   * - `empty-text`/`emptyText`: What it says where there are none.
    * - `multiple`: Whether more than one option can be the answer.
    * - `placeholder`: Shown on the trigger while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
@@ -45954,18 +45954,11 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
-   * - `range`: Whether there are two thumbs and the value is a pair.
-   *
-   * The pair is one string, `"10,50"`, which is what a form submits and what
-   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
-   * the two, since a range has no single number.
-   * - `max`: The largest value the reader can choose.
-   * - `min`: The smallest value the reader can choose.
-   * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
    * - `markers`: How many marks to draw along the track, evenly spaced, ends included.
    *
    * `0` or `1` draws none: one mark on a track says nothing about a range.
@@ -45979,8 +45972,8 @@ export type CustomElementsSolidJs = {
    * one thing a mark must not be, so the spacing gives way rather than the
    * step, and marks may come out unevenly spaced when the two disagree. That
    * is the honest picture of the range being offered.
-   * - `marker-labels`/`markerLabels`: Whether each mark says which value it stands at.
-   * - `step`: How far one press of an arrow key moves it.
+   * - `max`: The largest value the reader can choose.
+   * - `min`: The smallest value the reader can choose.
    * - `orientation`: Which way the track runs, `vertical` standing it on end.
    *
    * For a level rather than a quantity: a fader, a channel, anything a reader
@@ -45991,6 +45984,13 @@ export type CustomElementsSolidJs = {
    * takes the width of the row it is in. `--slider-length` is that number and
    * defaults to nine rem, so one dropped into a layout is a usable height
    * rather than a thumb sitting on nothing.
+   * - `range`: Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
+   * - `show-value`/`showValue`: Whether the chosen value is shown beside the track.
+   * - `step`: How far one press of an arrow key moves it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -46192,16 +46192,6 @@ export type CustomElementsSolidJs = {
    * `ghost` is an empty cell and there is no `material`. Glass exists so what is
    * behind a mark reads through it, and at the size a sparkline draws there is
    * nothing behind it a reader could resolve.
-   * - `weight`: How heavy the line is drawn.
-   *
-   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
-   * in a table row among many; `thick` suits one standing on its own, where a
-   * hairline reads as an accident.
-   *
-   * Three steps rather than a number, because `--sparkline-width` is already
-   * the number and an attribute earns its place by being the thing a consumer
-   * reaches for without reading the stylesheet. The hook stays for anything the
-   * three do not cover.
    * - `terminus`: The shape of the mark on the last reading.
    *
    * Absent is a dot, which is how a line is usually ended, and absent rather
@@ -46223,33 +46213,16 @@ export type CustomElementsSolidJs = {
    * of the `<svg>`, so the line stops at the ring's inner edge rather than
    * running on to the reading at its center, and the middle shows whatever the
    * chart is drawn over rather than a guess at it.
-   * - `plot`: What the readings are drawn as.
+   * - `weight`: How heavy the line is drawn.
    *
-   * Absent is a line, `area` is a line with the region beneath it washed, and
-   * `bar` is a column per reading.
+   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+   * in a table row among many; `thick` suits one standing on its own, where a
+   * hairline reads as an accident.
    *
-   * **A bar plot measures from zero and the other two measure from the data's
-   * own range**, which is the one way the plots are not interchangeable. A line
-   * says where the readings sit relative to each other, so a scale over their
-   * extent uses the whole box and claims nothing about absolute size. A bar's
-   * length *is* the value, so any baseline but zero makes the lengths
-   * proportional to nothing.
-   *
-   * **Which is a reason to prefer a line for readings in a narrow band far from
-   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
-   * seven columns of nearly the same height, and that is the true picture: they
-   * *are* nearly the same. The same readings as a line fill the box and show
-   * the movement, because a line is only ever claiming a shape.
-   *
-   * **Absent is `area`**, which is the departure from the rule that a resting
-   * arrangement is the plainest thing. At the size a sparkline is actually
-   * drawn, a hairline in a wide box is mostly box: the wash under it is what
-   * gives the shape a body and lets a reader see it at a glance rather than
-   * hunting for it, which is the entire job. `line` is the bare stroke for
-   * anywhere the fill would be noise, several of them in one box for instance.
-   *
-   * This tier rather than the one above: a plot type is geometry and geometry
-   * is markup, the same reason `curve` lives here.
+   * Three steps rather than a number, because `--sparkline-width` is already
+   * the number and an attribute earns its place by being the thing a consumer
+   * reaches for without reading the stylesheet. The hook stays for anything the
+   * three do not cover.
    * - `curve`: How the line gets from one reading to the next.
    *
    * **`smooth` is the resting curve.** A straight segment asserts nothing about
@@ -46284,6 +46257,33 @@ export type CustomElementsSolidJs = {
    * the accessible representation of a sparkline, and a list of the fourteen
    * numbers is not. Absent, the drawing is hidden from a screen reader rather
    * than announced without a name.
+   * - `plot`: What the readings are drawn as.
+   *
+   * Absent is a line, `area` is a line with the region beneath it washed, and
+   * `bar` is a column per reading.
+   *
+   * **A bar plot measures from zero and the other two measure from the data's
+   * own range**, which is the one way the plots are not interchangeable. A line
+   * says where the readings sit relative to each other, so a scale over their
+   * extent uses the whole box and claims nothing about absolute size. A bar's
+   * length *is* the value, so any baseline but zero makes the lengths
+   * proportional to nothing.
+   *
+   * **Which is a reason to prefer a line for readings in a narrow band far from
+   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+   * seven columns of nearly the same height, and that is the true picture: they
+   * *are* nearly the same. The same readings as a line fill the box and show
+   * the movement, because a line is only ever claiming a shape.
+   *
+   * **Absent is `area`**, which is the departure from the rule that a resting
+   * arrangement is the plainest thing. At the size a sparkline is actually
+   * drawn, a hairline in a wide box is mostly box: the wash under it is what
+   * gives the shape a body and lets a reader see it at a glance rather than
+   * hunting for it, which is the entire job. `line` is the bare stroke for
+   * anywhere the fill would be noise, several of them in one box for instance.
+   *
+   * This tier rather than the one above: a plot type is geometry and geometry
+   * is markup, the same reason `curve` lives here.
    * - `values`: The numbers, separated by whitespace or by commas.
    *
    * Both separators, so `values="1240 1318"` and an array assigned to the
@@ -46358,8 +46358,8 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What this action stands for, carried in the event when it is chosen.
    * - `disabled`: Whether the action can be chosen.
+   * - `value`: What this action stands for, carried in the event when it is chosen.
    * - `selected`: Whether this is the row the set is on, which here is where focus is.
    *
    * Asked of the document rather than of the shadow root: focus lands on the
@@ -46455,11 +46455,11 @@ export type CustomElementsSolidJs = {
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
    * - `label`: Names the trigger and the set of actions it opens.
+   * - `offset`: Space between the trigger and the actions, in pixels.
    * - `placement`: Which way the actions fan out. They move if that side does not fit.
    *
    * Up by default, because the control this hangs off is usually docked to the
    * bottom of the window and there is nothing below it to fan into.
-   * - `offset`: Space between the trigger and the actions, in pixels.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -46579,6 +46579,50 @@ export type CustomElementsSolidJs = {
    *
    * Both are writable, so a generated page can say which it means rather than
    * relying on the absence of an attribute.
+   * - `collapsed-size`/`collapsedSize`: How much of a shut pane is still shown, as a percentage.
+   *
+   * Zero by default, which is a pane fully gone. A tab strip or a title bar
+   * that should survive its own collapse says how much of itself to keep, and
+   * only whoever put it there knows that, which is the same reason `min` is a
+   * consumer's to set.
+   * - `position`: Where the divider sits, as a percentage of the whole.
+   *
+   * Reading gives where it is; writing declares it the consumer's, and
+   * `default-position` seeds one this element owns. The same accessor pair
+   * `Pagination.page` and the calendar's `month` carry.
+   * - `corner-label`/`cornerLabel`: Accessible name for the handle where two dividers cross.
+   * - `collapsed`: Which pane is shut, if either.
+   *
+   * The same accessor pair as `position`, and deliberately a second state
+   * rather than a reading of the first. A pane shut by dragging the divider to
+   * the edge and a pane shut on purpose look identical in geometry and are not
+   * the same thing: only the second knows where to go back to. Kept apart, the
+   * open position is simply the one collapsing never overwrote, so restoring
+   * needs no memory of its own.
+   *
+   * It overrides `min` and `max`, which is the point of it. Those keep a sliver
+   * of a pane during a drag; this is the thing that says the sliver can go.
+   * - `default-collapsed`/`defaultCollapsed`: Which pane starts shut, where nothing declared it.
+   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
+   * - `label`: Accessible name for the divider.
+   * - `max`: Nearest it may come to the end, on the same terms as `min`.
+   * - `min`: Nearest the divider may come to the start.
+   *
+   * A bare number is a percentage, which is what this always took. A CSS length
+   * is resolved against the splitter's own box along its axis, so `min="15rem"`
+   * means fifteen rem of pane whatever the container is doing.
+   *
+   * **The length is the one that holds.** A percentage minimum does not: twenty
+   * per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
+   * number a consumer picked was almost certainly about how much text fits
+   * rather than about a ratio. The pane that a percentage protects at desk
+   * width is squeezed past reading at half of it.
+   *
+   * **It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
+   * the class docstring says, so a pane can still be shut and reopened. What a
+   * minimum forbids is the space between shut and usable: a pane wide enough to
+   * be there and too narrow to read is the state nobody wants and every drag
+   * passes through.
    * - `orientation`: Which way the panes are laid out.
    *
    * `horizontal` is side by side with an upright divider between them, and
@@ -46603,51 +46647,7 @@ export type CustomElementsSolidJs = {
    * no room for two panes side by side, and a media query would hand it the
    * desktop branch. A `ResizeObserver` on the host asks the only question that
    * has an honest answer.
-   * - `position`: Where the divider sits, as a percentage of the whole.
-   *
-   * Reading gives where it is; writing declares it the consumer's, and
-   * `default-position` seeds one this element owns. The same accessor pair
-   * `Pagination.page` and the calendar's `month` carry.
-   * - `default-position`/`defaultPosition`: Where the divider starts, where nothing declared it.
-   * - `collapsed`: Which pane is shut, if either.
-   *
-   * The same accessor pair as `position`, and deliberately a second state
-   * rather than a reading of the first. A pane shut by dragging the divider to
-   * the edge and a pane shut on purpose look identical in geometry and are not
-   * the same thing: only the second knows where to go back to. Kept apart, the
-   * open position is simply the one collapsing never overwrote, so restoring
-   * needs no memory of its own.
-   *
-   * It overrides `min` and `max`, which is the point of it. Those keep a sliver
-   * of a pane during a drag; this is the thing that says the sliver can go.
-   * - `default-collapsed`/`defaultCollapsed`: Which pane starts shut, where nothing declared it.
-   * - `collapsed-size`/`collapsedSize`: How much of a shut pane is still shown, as a percentage.
-   *
-   * Zero by default, which is a pane fully gone. A tab strip or a title bar
-   * that should survive its own collapse says how much of itself to keep, and
-   * only whoever put it there knows that, which is the same reason `min` is a
-   * consumer's to set.
-   * - `min`: Nearest the divider may come to the start.
-   *
-   * A bare number is a percentage, which is what this always took. A CSS length
-   * is resolved against the splitter's own box along its axis, so `min="15rem"`
-   * means fifteen rem of pane whatever the container is doing.
-   *
-   * **The length is the one that holds.** A percentage minimum does not: twenty
-   * per cent is 280px in a 1400px splitter and 100px in a 500px one, and the
-   * number a consumer picked was almost certainly about how much text fits
-   * rather than about a ratio. The pane that a percentage protects at desk
-   * width is squeezed past reading at half of it.
-   *
-   * **It does not fight `collapsed`.** Collapse overrides `min` and `max`, as
-   * the class docstring says, so a pane can still be shut and reopened. What a
-   * minimum forbids is the space between shut and usable: a pane wide enough to
-   * be there and too narrow to read is the state nobody wants and every drag
-   * passes through.
-   * - `max`: Nearest it may come to the end, on the same terms as `min`.
    * - `step`: How far one arrow press moves it, as a percentage.
-   * - `label`: Accessible name for the divider.
-   * - `corner-label`/`cornerLabel`: Accessible name for the handle where two dividers cross.
    * - `vertical`: Public because a nested splitter compares axes with the one it is in.
    *
    * The one place the axis is decided, which is why `auto` costs a single line
@@ -47091,8 +47091,8 @@ export type CustomElementsSolidJs = {
    * wrote it, and `:state(checked)` carries the resolved state for
    * stylesheets.
    * - `default-checked`/`defaultChecked`: Initial checked state for uncontrolled use, where nothing declared one.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `value`: Value submitted when the switch is on.
@@ -47305,6 +47305,29 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `align`: Which edge the values line up against.
+   *
+   * `end` is what a column of numbers wants, so digits of the same magnitude sit
+   * above each other. Left unset the cell inherits the table's own alignment,
+   * which is `start` for text in either writing direction.
+   * - `field`: The key this column reads out of a row.
+   *
+   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
+   * from an API arrives shaped the way the API shaped it, and requiring a flat
+   * row would push a mapping pass onto every consumer.
+   *
+   * **It is also the sort and filter identity**, which is why sorting is by
+   * field and not by column index: a reordered or hidden column would otherwise
+   * change what `sort="2:asc"` means, and a sort that means something different
+   * after a column moves is a sort a consumer cannot store in a URL.
+   *
+   * Empty on a column that is purely presentational, an actions column say, and
+   * such a column is never sortable however it is marked.
+   * - `sortable`: Whether a reader may reorder the set by this column.
+   *
+   * Ignored without a `field`, and silently: a column with nothing to sort by
+   * has no order to offer, and refusing loudly would mean an actions column
+   * carrying `sortable` breaks a table rather than doing nothing.
    * - `width`: The track this column takes, as CSS.
    *
    * A single track value, so anything valid in `grid-template-columns` works:
@@ -47326,29 +47349,6 @@ export type CustomElementsSolidJs = {
    * line, so a column holding sentences rather than values wants
    * `width="minmax(0, 1fr)"` to opt back into wrapping. A headless consumer owns
    * the overflow either way, that being paint, and gets the honest track list.
-   * - `field`: The key this column reads out of a row.
-   *
-   * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
-   * from an API arrives shaped the way the API shaped it, and requiring a flat
-   * row would push a mapping pass onto every consumer.
-   *
-   * **It is also the sort and filter identity**, which is why sorting is by
-   * field and not by column index: a reordered or hidden column would otherwise
-   * change what `sort="2:asc"` means, and a sort that means something different
-   * after a column moves is a sort a consumer cannot store in a URL.
-   *
-   * Empty on a column that is purely presentational, an actions column say, and
-   * such a column is never sortable however it is marked.
-   * - `sortable`: Whether a reader may reorder the set by this column.
-   *
-   * Ignored without a `field`, and silently: a column with nothing to sort by
-   * has no order to offer, and refusing loudly would mean an actions column
-   * carrying `sortable` breaks a table rather than doing nothing.
-   * - `align`: Which edge the values line up against.
-   *
-   * `end` is what a column of numbers wants, so digits of the same magnitude sit
-   * above each other. Left unset the cell inherits the table's own alignment,
-   * which is `start` for text in either writing direction.
    * - `cell`: How to read the cell, where the field alone will not do.
    *
    * A property and not an attribute, because it is a function. Set it from a Lit
@@ -47427,13 +47427,13 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `columns`: Column track list, as CSS. Deprecated: declare columns instead.
    *
    * Kept for a table that has no `helix-table-column` children, and ignored the
@@ -47553,8 +47553,8 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Pairs the panel with the tab of the same value.
    * - `selected`: Whether this panel is the visible one.
+   * - `value`: Pairs the panel with the tab of the same value.
    * - `label`: The name of the panel, which is the text of the tab that opens it.
    *
    * Set by the root, which is the only thing that sees both. No attribute,
@@ -47629,6 +47629,12 @@ export type CustomElementsSolidJs = {
    * - `default-active`/`defaultActive`: Initial item for uncontrolled use.
    *
    * Ignored once `active` is written.
+   * - `label`: Accessible name for the tab list.
+   * - `manual`: Whether arrowing to a tab also selects it.
+   *
+   * Automatic is the default because showing a panel is usually cheap. Set this
+   * where it is not, so a reader arrowing past four tabs does not load four
+   * panels on the way.
    * - `variant`: How the row reads.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -47643,12 +47649,6 @@ export type CustomElementsSolidJs = {
    *
    * Reflected and left unset by default, so the host carries nothing a
    * consumer's server markup does not already have.
-   * - `label`: Accessible name for the tab list.
-   * - `manual`: Whether arrowing to a tab also selects it.
-   *
-   * Automatic is the default because showing a panel is usually cheap. Set this
-   * where it is not, so a reader arrowing past four tabs does not load four
-   * panels on the way.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -47722,9 +47722,9 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
-   * - `selected`: Whether this tab is the current one.
    * - `disabled`: Whether the tab can be chosen.
+   * - `selected`: Whether this tab is the current one.
+   * - `value`: Identifies the tab, and pairs it with the panel of the same value.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -47787,10 +47787,6 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `tone`: Which status the tag reports.
-   *
-   * `tone` is semantic color, which is what these are and what `helix-text`
-   * already calls them. `helix component`'s `axes` holds the vocabulary.
    * - `emphasis`: How much of the tone the tag wears.
    *
    * - `subtle` is the default: a wash of the tone with the label in it, for a
@@ -47803,6 +47799,10 @@ export type CustomElementsSolidJs = {
    * Independent of `tone` on purpose: an outlined danger tag and a solid danger
    * tag are both sensible, and one property welding color to fill can ask for
    * neither. That is the test the whole axis registry answers to.
+   * - `tone`: Which status the tag reports.
+   *
+   * `tone` is semantic color, which is what these are and what `helix-text`
+   * already calls them. `helix component`'s `axes` holds the vocabulary.
    * - `dismissible`: Whether it offers a control to take it away.
    * - `dismiss-label`/`dismissLabel`: Accessible name for that control.
    *
@@ -47909,9 +47909,6 @@ export type CustomElementsSolidJs = {
    * - `as`: Which element to render.
    *
    * Decides the outline and the semantics.
-   * - `variant`: Type treatment.
-   *
-   * Defaults to the one that matches `as`.
    * - `tone`: Color role. A separate axis from the type ramp, because color carries
    * state: folding it in would mean `caption-danger` and the rest of the cross
    * product.
@@ -47927,6 +47924,9 @@ export type CustomElementsSolidJs = {
    * nothing to be made of. `primary-subtle` is a tinted *ground* and not a
    * quiet ink. That is #141's to derive, and until it does, folding the two
    * halves apart would leave three of the four combinations unsayable.
+   * - `variant`: Type treatment.
+   *
+   * Defaults to the one that matches `as`.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -47984,8 +47984,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
@@ -47993,11 +47993,6 @@ export type CustomElementsSolidJs = {
    * Empty leaves the attribute off, which is the browser's default. Set it to
    * a token like `email` or `bday` to ask for autofill, or to `off` to refuse.
    * - `auto-grow`/`autoGrow`: Whether the box follows its own content rather than scrolling.
-   * - `placeholder`: Shown while the field is empty.
-   *
-   * Not a label: it goes when typing starts.
-   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
-   * - `rows`: How many lines the box is before anything is typed.
    * - `cols`: How many characters wide the box is, where the layout is not deciding.
    *
    * Optional and absent by default, which is the reflected-property rule: a
@@ -48013,15 +48008,20 @@ export type CustomElementsSolidJs = {
    * no form at all and forwarding the attribute would have looked right and
    * submitted nothing. `ElementInternals` takes a `FormData`, which is how one
    * element sends two entries, and that is what this does.
-   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with
-   * it.
+   * - `maxlength`/`maxLength`: Most characters the value may have.
    * - `minlength`/`minLength`: Fewest characters the value may have.
    *
    * Forwarded to the real `<textarea>` rather than checked here, which is what
    * makes the message the browser's and therefore the reader's own language.
    * No `pattern`: the platform does not give a textarea one, and inventing it
    * would be this library guessing where the point is to stop guessing.
-   * - `maxlength`/`maxLength`: Most characters the value may have.
+   * - `placeholder`: Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
+   * - `readonly`/`readOnly`: Whether the field refuses input while still submitting its value.
+   * - `rows`: How many lines the box is before anything is typed.
+   * - `wrap`: How the browser wraps the text, and whether the breaks are submitted with
+   * it.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -48216,14 +48216,50 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `autocomplete`: What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
    * lets autofill work at all.
+   * - `locale`: Language tag the times are written in.
+   *
+   * Absent uses the runtime's own.
+   * - `max`: Latest time that can be chosen, as `HH:mm`.
+   * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default, for the reason Date Input gives: how
+   * many fit depends on the width of the field and the length of what is in it,
+   * and this element knows neither.
+   * - `min`: Earliest time that can be chosen, as `HH:mm`.
+   * - `mode`: How many times can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value, which is what a
+   * form submits. `helix-time-picker` carries the longer note on the interaction and on
+   * why a wheel cannot do either.
+   * - `placeholder`: What the field says before a time is in it.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `step`: How far apart the offered times are, in minutes.
+   * - `time-style`/`timeStyle`: Whether the field writes the time out, or holds the value as it is.
+   *
+   * `local` is the reader's own convention from `Intl`, which is what a time is
+   * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
+   * swaps to the value while the caret is in it either way, so the rendering is
+   * never something this element would refuse to read back.
+   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
    * - `variant`: Whether the panel is one list of times or a column each.
    *
    * `list` offers whole times, which is what a product with slots or opening
@@ -48237,42 +48273,6 @@ export type CustomElementsSolidJs = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
-   * - `mode`: How many times can be held at once.
-   *
-   * Absent is one. `range` holds a start and an end, `multiple` holds any
-   * number, and both are carried as one comma-separated value, which is what a
-   * form submits. `helix-time-picker` carries the longer note on the interaction and on
-   * why a wheel cannot do either.
-   * - `max-tags`/`maxTags`: How many times are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default, for the reason Date Input gives: how
-   * many fit depends on the width of the field and the length of what is in it,
-   * and this element knows neither.
-   * - `step`: How far apart the offered times are, in minutes.
-   * - `min`: Earliest time that can be chosen, as `HH:mm`.
-   * - `max`: Latest time that can be chosen, as `HH:mm`.
-   * - `time-style`/`timeStyle`: Whether the field writes the time out, or holds the value as it is.
-   *
-   * `local` is the reader's own convention from `Intl`, which is what a time is
-   * for reading; `iso` is `HH:mm`, which is what it is for typing. The field
-   * swaps to the value while the caret is in it either way, so the rendering is
-   * never something this element would refuse to read back.
-   * - `locale`: Language tag the times are written in.
-   *
-   * Absent uses the runtime's own.
-   * - `placeholder`: What the field says before a time is in it.
-   * - `trigger-label`/`triggerLabel`: Accessible name for the control that opens the list.
-   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -48498,20 +48498,6 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `invalid`: Whether the current selection fails validation.
-   *
-   * A flag rather than a message, the same split Date Picker draws. A flat
-   * picker has no room of its own for a sentence: the field that wraps one owns
-   * the label, the hint and the feedback, and a second message inside the panel
-   * would be the same error said twice. What is left for the picker is the one
-   * thing the field cannot draw from outside, the mark on the answer itself.
-   * - `step`: How far apart the offered times are, in minutes.
-   *
-   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
-   * reader scrolls rather than hunts, and few enough that the list is a list.
-   * Anything under five is a thousand rows and wants a field instead.
-   * - `min`: Earliest time offered, as `HH:mm`.
-   * - `max`: Latest time offered, as `HH:mm`.
    * - `disable-times`/`disableTimes`: Times that cannot be chosen, comma separated, as `HH:mm`.
    *
    * The counterpart to Date Picker's `disable-dates`, and it exists for the same
@@ -48522,10 +48508,19 @@ export type CustomElementsSolidJs = {
    * A time not on the step is simply never offered, so it is not an error to
    * name one, and naming every time in the list is how the empty state is
    * reached honestly rather than by handing over an empty range.
+   * - `invalid`: Whether the current selection fails validation.
+   *
+   * A flag rather than a message, the same split Date Picker draws. A flat
+   * picker has no room of its own for a sentence: the field that wraps one owns
+   * the label, the hint and the feedback, and a second message inside the panel
+   * would be the same error said twice. What is left for the picker is the one
+   * thing the field cannot draw from outside, the mark on the answer itself.
+   * - `label`: Accessible name for the list, which has no visible one of its own.
    * - `locale`: Language tag the times are written in.
    *
    * Absent uses the runtime's own.
-   * - `label`: Accessible name for the list, which has no visible one of its own.
+   * - `max`: Latest time offered, as `HH:mm`.
+   * - `min`: Earliest time offered, as `HH:mm`.
    * - `mode`: How many times can be held at once.
    *
    * Absent is one. `range` holds a start and an end with everything between
@@ -48543,6 +48538,23 @@ export type CustomElementsSolidJs = {
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
    * whenever a mode is set.
+   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   * - `required`: Whether the form refuses to submit while nothing is chosen.
+   * - `step`: How far apart the offered times are, in minutes.
+   *
+   * Fifteen, which is four rows an hour and ninety-six in a day: enough that a
+   * reader scrolls rather than hunts, and few enough that the list is a list.
+   * Anything under five is a thousand rows and wants a field instead.
    * - `variant`: Whether the times are one list or a column each.
    *
    * `list` is the default and offers whole times, which is what a product with
@@ -48567,18 +48579,6 @@ export type CustomElementsSolidJs = {
    * not touch, and React reads that as a hydration mismatch. The absent
    * attribute *is* the list, which the stylesheet reads as the base rule, so
    * only the departure has to be named.
-   * - `readonly`/`readOnly`: Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
-   * - `required`: Whether the form refuses to submit while nothing is chosen.
    * - `disabled`: Whether the control is non-interactive.
    *
    * Reflected, because the styled tier selects on it, and mirrored to
@@ -49116,8 +49116,8 @@ export type CustomElementsSolidJs = {
    * asking it meant. Writing always applies; `<helix-input value="x">` is the
    * same statement in markup, and `default-value` is how markup seeds a value
    * a reset should return to.
-   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `feedback`: What is wrong, in the reader's words rather than the browser's.
+   * - `hint`: Help under the control, shown while there is nothing wrong.
    * - `label`: The accessible name, and the fallback for the `label` slot.
    * - `required`: Whether the form refuses to submit without it.
    * - `label-placement`/`labelPlacement`: Where the group's label sits, `start` putting it on the track's line.
@@ -49288,9 +49288,9 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: Identifies the item to the group.
-   * - `selected`: Whether this item is the current one.
    * - `disabled`: Whether the item can be chosen.
+   * - `selected`: Whether this item is the current one.
+   * - `value`: Identifies the item to the group.
    * - `defaultSelected`: Whether the markup declared this one chosen, which is what a reset returns to.
    *
    * `<option selected>` reflects to `defaultSelected` and `option.selected` is
@@ -49485,6 +49485,13 @@ export type CustomElementsSolidJs = {
    * The common case, and the fallback for the `content` slot: slot something
    * there and it replaces this. Both cannot show at once, which is the point
    * of using fallback content rather than rendering whichever is present.
+   * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
+   *
+   * Without one, sweeping across a row of controls flashes a tooltip for each
+   * of them, which is noise rather than help. Focus opens with no delay: a
+   * keyboard reader arriving on a control has already committed to it.
+   * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * - `disabled`: Whether the tooltip never shows.
    * - `for`: The id of the element this describes, in this tooltip's own tree.
    *
    * Set it and the tooltip stops wrapping: it renders no trigger, listens on
@@ -49502,9 +49509,6 @@ export type CustomElementsSolidJs = {
    * through as attributes. Both paths reach the same place through Lit, so
    * nothing is broken by it; a `[for]` selector would find nothing, which is
    * why this does not reflect and nothing styles on it.
-   * - `placement`: Preferred side.
-   *
-   * It moves if that side does not fit.
    * - `offset`: Space between the trigger and the point of the bubble, in pixels.
    *
    * **Measured from the point, which is what the arrow being back changed.**
@@ -49514,18 +49518,6 @@ export type CustomElementsSolidJs = {
    * given this plus however far the arrow actually protrudes, so eight means
    * eight from whatever is nearest, arrow or edge, and a consumer who changes
    * it changes the visible gap rather than a number the arrow then eats into.
-   * - `within`: The id of a box to keep the bubble inside, instead of the viewport.
-   *
-   * Resolved the way `for` is, so an id in the same tree, which is what lets a
-   * component name a box in its own shadow root. A chart does: its bubble is
-   * centered on a reading, and the first and last readings sit at the ends of
-   * the plot, so half the box hangs past the drawing and, measured on a chart
-   * in a 320px card, three pixels past the card itself.
-   *
-   * Clamping is on the cross axis only, which is what makes this safe to point
-   * at a box the bubble genuinely does not fit inside. See `within` on
-   * `FloatingController` for what happens if it is applied to the rest.
-   * - `disabled`: Whether the tooltip never shows.
    * - `persist`: Whether the bubble survives the trigger being used.
    *
    * **Activation takes a tooltip down, because a hint about what a control will
@@ -49540,12 +49532,20 @@ export type CustomElementsSolidJs = {
    * everywhere else. Escape, blur and pointer-leave still close it, because
    * those are a reader saying they are done rather than a control saying it
    * worked.
-   * - `delay`: How long the pointer must rest before the bubble appears, in milliseconds.
+   * - `placement`: Preferred side.
    *
-   * Without one, sweeping across a row of controls flashes a tooltip for each
-   * of them, which is noise rather than help. Focus opens with no delay: a
-   * keyboard reader arriving on a control has already committed to it.
-   * - `delay-out`/`delayOut`: How long the bubble stays after the pointer leaves, in milliseconds.
+   * It moves if that side does not fit.
+   * - `within`: The id of a box to keep the bubble inside, instead of the viewport.
+   *
+   * Resolved the way `for` is, so an id in the same tree, which is what lets a
+   * component name a box in its own shadow root. A chart does: its bubble is
+   * centered on a reading, and the first and last readings sit at the ends of
+   * the plot, so half the box hangs past the drawing and, measured on a chart
+   * in a 320px card, three pixels past the card itself.
+   *
+   * Clamping is on the cross axis only, which is what makes this safe to point
+   * at a box the bubble genuinely does not fit inside. See `within` on
+   * `FloatingController` for what happens if it is applied to the rest.
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
    * **Named `whenSettled` because `settled` was taken four times over.** Image
@@ -49641,7 +49641,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `open`: Whether the tour is running.
+   * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
    * - `index`: Which stop the reader is on.
    *
    * **Moved through `requestChange`, never by assignment from `move`.** That
@@ -49653,12 +49653,12 @@ export type CustomElementsSolidJs = {
    * `default-index` for markup that only seeds and a held state that is
    * `undefined` until somebody sets one.
    * - `default-index`/`defaultIndex`: Stop to start on, where nothing declared one.
-   * - `label`: Accessible name for the run, such as "Getting started".
-   * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
-   * - `back-label`/`backLabel`: Label for the control that goes back, handed to every stop.
-   * - `next-label`/`nextLabel`: Label for the control that goes on.
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `label`: Accessible name for the run, such as "Getting started".
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `open`: Whether the tour is running.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
+   * - `spotlight-padding`/`spotlightPadding`: Space left around the target when it is lit, in pixels.
    * - `stops`: The stops, in the order they were written. (property only) (readonly)
    * - `length`: How many stops there are. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -49737,8 +49737,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `for`: The id of the element this stop is about.
-   * - `placement`: Which side of the target the panel prefers.
+   * - `back-label`/`backLabel`: Label for the control that goes back.
    * - `current`: Whether this is the stop the reader is on.
    *
    * Written by the root rather than by a consumer, which is the one place this
@@ -49746,11 +49745,12 @@ export type CustomElementsSolidJs = {
    * reason that did not hold for the trail or the avatar group: a tour starts
    * closed, so there is no server state to get wrong. The server renders a
    * closed tour, a closed tour shows nothing, and nothing can disagree.
-   * - `last`: Whether this is the last stop, so the control says Done.
-   * - `first`: Whether this is the first stop, so there is nowhere back to.
-   * - `back-label`/`backLabel`: Label for the control that goes back.
-   * - `next-label`/`nextLabel`: Label for the control that goes on.
    * - `done-label`/`doneLabel`: Label for the control that goes on from the last stop.
+   * - `first`: Whether this is the first stop, so there is nowhere back to.
+   * - `for`: The id of the element this stop is about.
+   * - `last`: Whether this is the last stop, so the control says Done.
+   * - `next-label`/`nextLabel`: Label for the control that goes on.
+   * - `placement`: Which side of the target the panel prefers.
    * - `skip-label`/`skipLabel`: Label for the control that leaves the tour.
    * - `target`: The element this stop is about, or null where the id resolves to nothing. (property only) (readonly)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
@@ -49850,13 +49850,17 @@ export type CustomElementsSolidJs = {
    * last reader did rather than what the author wrote. `:state(open)` carries
    * the resolved state for stylesheets, which is what the mirror is for.
    * - `default-open`/`defaultOpen`: Initial open state for uncontrolled use, where nothing declared one.
-   * - `value`: Identifies the item to the consumer, carried in `helix-select`.
    * - `href`: Where this node goes, which makes its row a real link.
    *
    * Unset by default, and unreflected: a tree of choosable nodes is not a tree
    * of links, and an empty `href` written onto every row would be a link to the
    * current page on every item a consumer never asked to be one.
-   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
+   *
+   * Not reflected. The tree assigns this after it upgrades, so an attribute
+   * here would be a change to markup the consumer rendered and hydration would
+   * report it. The indent it drives is written onto the row instead, inside the
+   * shadow root, which is not part of the tree React hydrates.
    * - `rel`: What the link declares about where it goes.
    *
    * Set by the consumer rather than derived from `target`: `noreferrer` is a
@@ -49872,12 +49876,8 @@ export type CustomElementsSolidJs = {
    *
    * The stylesheet reads it from the row inside this shadow root, because the
    * row is not part of the tree React hydrates.
-   * - `level`: Depth from the root, set by the tree so indentation needs no CSS nesting.
-   *
-   * Not reflected. The tree assigns this after it upgrades, so an attribute
-   * here would be a change to markup the consumer rendered and hydration would
-   * report it. The indent it drives is written onto the row instead, inside the
-   * shadow root, which is not part of the tree React hydrates.
+   * - `target`: Where the link opens, for the rare row that leaves the site.
+   * - `value`: Identifies the item to the consumer, carried in `helix-select`.
    * - `focusable`: Whether this item holds the tree's single tab stop. (property only)
    * - `whenSettled`: Resolves a frame after the first update, when transitions are switched on.
    *
@@ -50004,13 +50004,13 @@ export type CustomElementsSolidJs = {
    * and the row's `end` slot already carries an auto margin of its own, so the
    * two split the free space and the chevron lands halfway along. Measured at
    * 70px short. That is the kind of thing a component should absorb once.
+   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `loading`: Whether the rows are still on their way.
    *
    * Reflected, because a stylesheet needs it: the rows that are already there
    * are dimmed rather than removed while a new set arrives, and only CSS can
    * say that without the component knowing what a row looks like.
    * - `loading-text`/`loadingText`: What is said while they are on their way.
-   * - `empty-text`/`emptyText`: What is said where there are none, and none are coming.
    * - `active`: Which item is current, by its `value`.
    *
    * Not `option.active`, which is the option the keyboard is on: that is a
@@ -50196,8 +50196,7 @@ export type CustomElementsSolidJs = {
    *
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
-   * - `value`: What identifies the entry, and what `active` is compared against.
-   * - `src`: The file this entry plays.
+   * - `disabled`: Whether the entry can be chosen.
    * - `poster`: What covers the picture before this entry plays, and the row's thumbnail.
    *
    * One property doing both, because they are the same picture: the frame that
@@ -50205,7 +50204,8 @@ export type CustomElementsSolidJs = {
    * fallback rather than something drawn beside it, which is this library's rule
    * for a content property, so a consumer with something better to show slots it
    * and the two can never both appear.
-   * - `disabled`: Whether the entry can be chosen.
+   * - `src`: The file this entry plays.
+   * - `value`: What identifies the entry, and what `active` is compared against.
    * - `current`: Whether the player is on this entry.
    *
    * Written by the playlist rather than by the entry, the way an option's
@@ -50494,10 +50494,18 @@ export type CustomElementsSolidJs = {
    * Component attributes and properties that can be applied to the element or by using JavaScript.
    *
    * - `separation`: Whether the bar floats on the picture or sits on its own ground.
-   * - `src`: Where the video is, for the common case of one file.
-   * - `poster`: A still shown before it plays, which the platform draws itself.
-   * - `label`: Accessible name, since a video is not described by its filename.
-   * - `loop`: Whether it starts again at the end.
+   * - `autoplay`: Whether it starts on its own, which a browser only allows while silent.
+   *
+   * Forwarded rather than acted on. Whether an unprompted play is permitted is
+   * the browser's policy and not this element's, and `play()` already swallows
+   * the refusal: what follows a refused autoplay is a paused player showing its
+   * start control, which is the correct thing to be looking at.
+   * - `controls`: Whether the browser draws the controls instead of this element.
+   *
+   * A fallback rather than a default. Two bars over one video is worse than
+   * either alone, so this one is not drawn at all when it is set.
+   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
+   * be read.
    * - `muted`/`defaultMuted`: Whether it *starts* silent, which is what an autoplaying video must do.
    *
    * **Named for the platform's split, which is real.** The `muted` content
@@ -50506,22 +50514,9 @@ export type CustomElementsSolidJs = {
    * `muted` bound to the attribute answers what the author wrote rather than
    * whether there is sound, which is a name matching the platform's while
    * meaning something else.
-   * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
-   * - `controls`: Whether the browser draws the controls instead of this element.
-   *
-   * A fallback rather than a default. Two bars over one video is worse than
-   * either alone, so this one is not drawn at all when it is set.
-   * - `preload`: How much to fetch before anything is asked for.
-   * - `autoplay`: Whether it starts on its own, which a browser only allows while silent.
-   *
-   * Forwarded rather than acted on. Whether an unprompted play is permitted is
-   * the browser's policy and not this element's, and `play()` already swallows
-   * the refusal: what follows a refused autoplay is a paused player showing its
-   * start control, which is the correct thing to be looking at.
-   * - `crossorigin`/`crossOrigin`: How the media is fetched across origins, which decides whether a track can
-   * be read.
    * - `disablepictureinpicture`/`disablePictureInPicture`: Whether the browser may offer picture in picture.
    * - `disableremoteplayback`/`disableRemotePlayback`: Whether the browser may offer playback on a remote device.
+   * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
    * - `extra-controls`/`extraControls`: Controls beyond the ones every player has, named in the order they appear.
    *
    * A list rather than a property apiece. A bar is a row with a budget, and a
@@ -50542,6 +50537,18 @@ export type CustomElementsSolidJs = {
    * ours to promise: the attribute is ignored cross-origin, so a file served
    * from somewhere else opens rather than saves, which is the browser's rule
    * and not something a player can work around.
+   * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
+   *
+   * A wait rather than leaving with the pointer, or a reader moving across the
+   * picture to reach a control watches the bar vanish under them. Zero turns
+   * the wait off and the bar goes immediately; a large number keeps it up for
+   * as long as anyone is likely to look.
+   *
+   * The wait is only ever about *idling*. A video that is paused keeps its bar
+   * regardless, because a reader who stopped it is deciding what to do next.
+   * - `label`: Accessible name, since a video is not described by its filename.
+   * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
+   * - `loop`: Whether it starts again at the end.
    * - `overflow-controls`/`overflowControls`: Controls that go behind one button instead of onto the bar, named the same
    * way.
    *
@@ -50557,6 +50564,13 @@ export type CustomElementsSolidJs = {
    * So the consumer says where the fold is, which they can, having already
    * named the controls in order. A name in both lists is drawn once, on the
    * bar: two of the same control is worse than either placement.
+   * - `pause-label`/`pauseLabel`: And while it would stop it.
+   * - `play-label`/`playLabel`: What the play control is called while it would start the video.
+   * - `playsinline`/`playsInline`: Whether it plays where it sits rather than taking over the screen.
+   * - `poster`: A still shown before it plays, which the platform draws itself.
+   * - `preload`: How much to fetch before anything is asked for.
+   * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
+   * - `src`: Where the video is, for the common case of one file.
    * - `start-control`/`startControl`: The big mark over the picture whenever it is not playing, or `none`.
    *
    * **On unless it is turned off, because a stopped video has nothing else.**
@@ -50572,20 +50586,6 @@ export type CustomElementsSolidJs = {
    * A value rather than a boolean, so the resting state is the attribute's
    * absence: a boolean defaulting to on would have to be spelled as its own
    * negation.
-   * - `speeds`: The speeds offered, slowest first, as multipliers of normal.
-   * - `idle-delay`/`idleDelay`: How long the bar waits after the pointer stops before it goes, in ms.
-   *
-   * A wait rather than leaving with the pointer, or a reader moving across the
-   * picture to reach a control watches the bar vanish under them. Zero turns
-   * the wait off and the bar goes immediately; a large number keeps it up for
-   * as long as anyone is likely to look.
-   *
-   * The wait is only ever about *idling*. A video that is paused keeps its bar
-   * regardless, because a reader who stopped it is deciding what to do next.
-   * - `play-label`/`playLabel`: What the play control is called while it would start the video.
-   * - `pause-label`/`pauseLabel`: And while it would stop it.
-   * - `loading-label`/`loadingLabel`: What a reader is told while the picture is waiting for more of itself.
-   * - `error-label`/`errorLabel`: And what they are told when it will not play at all.
    * - `currentSrc`: The media's own state, under the platform's own names.
    *
    * **Published because there is no other way in.** The `<video>` is inside

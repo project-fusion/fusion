@@ -213,28 +213,31 @@ const SKIP_SECONDS = 10
 @customElement('helix-headless-video')
 export class HelixHeadlessVideo extends HelixElement {
   /**
-   * Where the video is, for the common case of one file.
-   */
-  @property()
-  src = ''
-
-  /**
-   * A still shown before it plays, which the platform draws itself.
-   */
-  @property()
-  poster = ''
-
-  /**
-   * Accessible name, since a video is not described by its filename.
-   */
-  @property()
-  label = ''
-
-  /**
-   * Whether it starts again at the end.
+   * Whether it starts on its own, which a browser only allows while silent.
+   *
+   * Forwarded rather than acted on. Whether an unprompted play is permitted is
+   * the browser's policy and not this element's, and `play()` already swallows
+   * the refusal: what follows a refused autoplay is a paused player showing its
+   * start control, which is the correct thing to be looking at.
    */
   @property({ reflect: true, type: Boolean })
-  loop = false
+  autoplay = false
+
+  /**
+   * Whether the browser draws the controls instead of this element.
+   *
+   * A fallback rather than a default. Two bars over one video is worse than
+   * either alone, so this one is not drawn at all when it is set.
+   */
+  @property({ reflect: true, type: Boolean })
+  controls = false
+
+  /**
+   * How the media is fetched across origins, which decides whether a track can
+   * be read.
+   */
+  @property({ attribute: 'crossorigin' })
+  crossOrigin: 'anonymous' | 'use-credentials' | null = null
 
   /**
    * Whether it *starts* silent, which is what an autoplaying video must do.
@@ -250,45 +253,6 @@ export class HelixHeadlessVideo extends HelixElement {
   defaultMuted = false
 
   /**
-   * Whether it plays where it sits rather than taking over the screen.
-   */
-  @property({ attribute: 'playsinline', converter: onUnlessFalse })
-  playsInline = true
-
-  /**
-   * Whether the browser draws the controls instead of this element.
-   *
-   * A fallback rather than a default. Two bars over one video is worse than
-   * either alone, so this one is not drawn at all when it is set.
-   */
-  @property({ reflect: true, type: Boolean })
-  controls = false
-
-  /**
-   * How much to fetch before anything is asked for.
-   */
-  @property()
-  preload: 'auto' | 'metadata' | 'none' = 'metadata'
-
-  /**
-   * Whether it starts on its own, which a browser only allows while silent.
-   *
-   * Forwarded rather than acted on. Whether an unprompted play is permitted is
-   * the browser's policy and not this element's, and `play()` already swallows
-   * the refusal: what follows a refused autoplay is a paused player showing its
-   * start control, which is the correct thing to be looking at.
-   */
-  @property({ reflect: true, type: Boolean })
-  autoplay = false
-
-  /**
-   * How the media is fetched across origins, which decides whether a track can
-   * be read.
-   */
-  @property({ attribute: 'crossorigin' })
-  crossOrigin: 'anonymous' | 'use-credentials' | null = null
-
-  /**
    * Whether the browser may offer picture in picture.
    */
   @property({ attribute: 'disablepictureinpicture', reflect: true, type: Boolean })
@@ -299,6 +263,12 @@ export class HelixHeadlessVideo extends HelixElement {
    */
   @property({ attribute: 'disableremoteplayback', reflect: true, type: Boolean })
   disableRemotePlayback = false
+
+  /**
+   * And what they are told when it will not play at all.
+   */
+  @property({ attribute: 'error-label' })
+  errorLabel = 'This video could not be played'
 
   /**
    * Controls beyond the ones every player has, named in the order they appear.
@@ -326,6 +296,38 @@ export class HelixHeadlessVideo extends HelixElement {
   extraControls = ''
 
   /**
+   * How long the bar waits after the pointer stops before it goes, in ms.
+   *
+   * A wait rather than leaving with the pointer, or a reader moving across the
+   * picture to reach a control watches the bar vanish under them. Zero turns
+   * the wait off and the bar goes immediately; a large number keeps it up for
+   * as long as anyone is likely to look.
+   *
+   * The wait is only ever about *idling*. A video that is paused keeps its bar
+   * regardless, because a reader who stopped it is deciding what to do next.
+   */
+  @property({ attribute: 'idle-delay', type: Number })
+  idleDelay = 2500
+
+  /**
+   * Accessible name, since a video is not described by its filename.
+   */
+  @property()
+  label = ''
+
+  /**
+   * What a reader is told while the picture is waiting for more of itself.
+   */
+  @property({ attribute: 'loading-label' })
+  loadingLabel = 'Loading'
+
+  /**
+   * Whether it starts again at the end.
+   */
+  @property({ reflect: true, type: Boolean })
+  loop = false
+
+  /**
    * Controls that go behind one button instead of onto the bar, named the same
    * way.
    *
@@ -346,24 +348,16 @@ export class HelixHeadlessVideo extends HelixElement {
   overflowControls = ''
 
   /**
-   * The big mark over the picture whenever it is not playing, or `none`.
-   *
-   * **On unless it is turned off, because a stopped video has nothing else.**
-   * Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
-   * target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
-   * reader meets first is a still frame with some chrome along the bottom, and
-   * nothing in it says "press to watch".
-   *
-   * `none` is for the cases where that is wrong rather than right: a muted loop
-   * behind a hero, a grid of eight thumbnails, anything where the video is
-   * decoration rather than something to start.
-   *
-   * A value rather than a boolean, so the resting state is the attribute's
-   * absence: a boolean defaulting to on would have to be spelled as its own
-   * negation.
+   * And while it would stop it.
    */
-  @property({ attribute: 'start-control' })
-  startControl?: 'none'
+  @property({ attribute: 'pause-label' })
+  pauseLabel = 'Pause'
+
+  /**
+   * What the play control is called while it would start the video.
+   */
+  @property({ attribute: 'play-label' })
+  playLabel = 'Play'
 
   /**
    * Whether the file this points at is ours to hand over.
@@ -392,48 +386,54 @@ export class HelixHeadlessVideo extends HelixElement {
   }
 
   /**
+   * Whether it plays where it sits rather than taking over the screen.
+   */
+  @property({ attribute: 'playsinline', converter: onUnlessFalse })
+  playsInline = true
+
+  /**
+   * A still shown before it plays, which the platform draws itself.
+   */
+  @property()
+  poster = ''
+
+  /**
+   * How much to fetch before anything is asked for.
+   */
+  @property()
+  preload: 'auto' | 'metadata' | 'none' = 'metadata'
+
+  /**
    * The speeds offered, slowest first, as multipliers of normal.
    */
   @property({ attribute: 'speeds' })
   speeds = '0.5 1 1.5 2'
 
   /**
-   * How long the bar waits after the pointer stops before it goes, in ms.
+   * Where the video is, for the common case of one file.
+   */
+  @property()
+  src = ''
+
+  /**
+   * The big mark over the picture whenever it is not playing, or `none`.
    *
-   * A wait rather than leaving with the pointer, or a reader moving across the
-   * picture to reach a control watches the bar vanish under them. Zero turns
-   * the wait off and the bar goes immediately; a large number keeps it up for
-   * as long as anyone is likely to look.
+   * **On unless it is turned off, because a stopped video has nothing else.**
+   * Measured on the bar as it was: the play glyph is 16 by 16 in a 24 by 24
+   * target, which is 0.12% of a 528 by 396 picture and 0.33% at 320. What a
+   * reader meets first is a still frame with some chrome along the bottom, and
+   * nothing in it says "press to watch".
    *
-   * The wait is only ever about *idling*. A video that is paused keeps its bar
-   * regardless, because a reader who stopped it is deciding what to do next.
+   * `none` is for the cases where that is wrong rather than right: a muted loop
+   * behind a hero, a grid of eight thumbnails, anything where the video is
+   * decoration rather than something to start.
+   *
+   * A value rather than a boolean, so the resting state is the attribute's
+   * absence: a boolean defaulting to on would have to be spelled as its own
+   * negation.
    */
-  @property({ attribute: 'idle-delay', type: Number })
-  idleDelay = 2500
-
-  /**
-   * What the play control is called while it would start the video.
-   */
-  @property({ attribute: 'play-label' })
-  playLabel = 'Play'
-
-  /**
-   * And while it would stop it.
-   */
-  @property({ attribute: 'pause-label' })
-  pauseLabel = 'Pause'
-
-  /**
-   * What a reader is told while the picture is waiting for more of itself.
-   */
-  @property({ attribute: 'loading-label' })
-  loadingLabel = 'Loading'
-
-  /**
-   * And what they are told when it will not play at all.
-   */
-  @property({ attribute: 'error-label' })
-  errorLabel = 'This video could not be played'
+  @property({ attribute: 'start-control' })
+  startControl?: 'none'
 
   /**
    * Whether playback has stopped to wait for data.

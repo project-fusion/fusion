@@ -68,15 +68,19 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   })
 
   /**
-   * Which edge the drawer comes from.
+   * Which close requests the browser answers on its own.
    *
-   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
-   * beside `:host([placement="end"])` rather than as a value written here: a
-   * default assigned to the property would reflect onto every host and put a
-   * `placement="end"` into markup no consumer wrote.
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
    */
-  @property({ reflect: true })
-  placement?: 'start' | 'end' | 'top' | 'bottom'
+  @property({ attribute: 'closedby', reflect: true })
+  closedBy?: 'any' | 'closerequest' | 'none'
 
   /**
    * Accessible name for the panel.
@@ -101,19 +105,15 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   modal = true
 
   /**
-   * Which close requests the browser answers on its own.
+   * Which edge the drawer comes from.
    *
-   * `<dialog closedby>`, forwarded, and safe to forward because every path it
-   * opens still comes back through this element: a close request fires `cancel`
-   * first, `handleCancel` prevents it, and `requestOpen` decides. So
-   * `closedby="any"` gains light dismiss without giving up the refusal, which is
-   * the property this component exists to keep.
-   *
-   * Absent by default, which is the platform's `auto` and this library's rule
-   * that a resting value is an attribute's absence.
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    */
-  @property({ attribute: 'closedby', reflect: true })
-  closedBy?: 'any' | 'closerequest' | 'none'
+  @property({ reflect: true })
+  placement?: 'start' | 'end' | 'top' | 'bottom'
 
   /**
    * What the dialog closed with, the way `<dialog>` reports it.

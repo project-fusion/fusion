@@ -75,26 +75,6 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   autoGrow = false
 
   /**
-   * Shown while the field is empty.
-   *
-   * Not a label: it goes when typing starts.
-   */
-  @property()
-  placeholder = ''
-
-  /**
-   * Whether the field refuses input while still submitting its value.
-   */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
-
-  /**
-   * How many lines the box is before anything is typed.
-   */
-  @property({ type: Number })
-  rows = 3
-
-  /**
    * How many characters wide the box is, where the layout is not deciding.
    *
    * Optional and absent by default, which is the reflected-property rule: a
@@ -120,11 +100,35 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   dirName = ''
 
   /**
-   * How the browser wraps the text, and whether the breaks are submitted with
-   * it.
+   * Most characters the value may have.
+   */
+  @property({ attribute: 'maxlength', type: Number })
+  maxLength?: number
+
+  /**
+   * Fewest characters the value may have.
+   *
+   * Forwarded to the real `<textarea>` rather than checked here, which is what
+   * makes the message the browser's and therefore the reader's own language.
+   * No `pattern`: the platform does not give a textarea one, and inventing it
+   * would be this library guessing where the point is to stop guessing.
+   */
+  @property({ attribute: 'minlength', type: Number })
+  minLength?: number
+
+  /**
+   * Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    */
   @property()
-  wrap: 'hard' | 'off' | 'soft' = 'soft'
+  placeholder = ''
+
+  /**
+   * Whether the field refuses input while still submitting its value.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /** Focus is delegated to the control, so the host is never the target. */
   static override shadowRootOptions: ShadowRootInit = {
@@ -390,21 +394,17 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * Fewest characters the value may have.
-   *
-   * Forwarded to the real `<textarea>` rather than checked here, which is what
-   * makes the message the browser's and therefore the reader's own language.
-   * No `pattern`: the platform does not give a textarea one, and inventing it
-   * would be this library guessing where the point is to stop guessing.
+   * How many lines the box is before anything is typed.
    */
-  @property({ attribute: 'minlength', type: Number })
-  minLength?: number
+  @property({ type: Number })
+  rows = 3
 
   /**
-   * Most characters the value may have.
+   * How the browser wraps the text, and whether the breaks are submitted with
+   * it.
    */
-  @property({ attribute: 'maxlength', type: Number })
-  maxLength?: number
+  @property()
+  wrap: 'hard' | 'off' | 'soft' = 'soft'
 
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}

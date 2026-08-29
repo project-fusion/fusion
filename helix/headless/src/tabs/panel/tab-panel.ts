@@ -22,18 +22,6 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-tab-panel')
 export class HelixHeadlessTabPanel extends HelixElement {
   /**
-   * Pairs the panel with the tab of the same value.
-   */
-  @property()
-  value = ''
-
-  /**
-   * Whether this panel is the visible one.
-   */
-  @property({ type: Boolean })
-  selected = false
-
-  /**
    * The name of the panel, which is the text of the tab that opens it.
    *
    * Set by the root, which is the only thing that sees both. No attribute,
@@ -48,6 +36,18 @@ export class HelixHeadlessTabPanel extends HelixElement {
    */
   @property({ attribute: false })
   label = ''
+
+  /**
+   * Whether this panel is the visible one.
+   */
+  @property({ type: Boolean })
+  selected = false
+
+  /**
+   * Pairs the panel with the tab of the same value.
+   */
+  @property()
+  value = ''
 
   /**
    * Mirrors the chosen state where a stylesheet can select on it.

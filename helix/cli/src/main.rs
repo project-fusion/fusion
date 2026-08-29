@@ -49,6 +49,7 @@ fn main() {
         Noun::Component { verb } => match verb {
             Component::Audit(args) => component::run::audit(args, &from, cli.json, paint),
             Component::Check(args) => component::run::check(args, &from, cli.json, paint),
+            Component::Fix(args) => component::run::fix(args, &from, cli.json, paint),
         },
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),

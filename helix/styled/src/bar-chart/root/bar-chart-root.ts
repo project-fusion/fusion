@@ -47,6 +47,39 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   static override tier = 'helix-'
 
   /**
+   * How much ink the columns claim.
+   *
+   * The chart's treatment, which every series takes unless `outlined` or
+   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+   * of the series color with that edge on it, and absent is the filled column,
+   * per the rule that a reflected property takes no default.
+   *
+   * **It composes with `material` rather than competing with it.** Emphasis
+   * decides what is drawn and material decides how much of it comes through, so
+   * `glass` thins whatever emphasis put there: the fill on a solid column, the
+   * stroke on an outlined one. Without that the corner is inert, `glass` setting
+   * a fill opacity on a mark whose fill is `none`, and a combination that
+   * silently does nothing is the worst shape this can take.
+   */
+  @property({ reflect: true })
+  emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * Which series are glass rather than solid, by name.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `emphasis` is.** A
+   * chart-wide material puts every column in the same substance, which is right
+   * when the whole chart is joining the page's language and wrong the moment one
+   * series is a different kind of fact from the others. The two axes take the
+   * same shape because they answer the same question about the same thing: what
+   * is *this series* made of, and how much ink does *this series* claim.
+   */
+  @property()
+  glass?: string
+
+  /**
    * What the columns are made of.
    *
    * **A third axis on the chart, not on the bar.** A bar is a mark inside a
@@ -87,55 +120,6 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   material?: 'frosted' | 'glass'
 
   /**
-   * How a column's fill is distributed across it.
-   *
-   * `gradient` fades each column toward its base, into the wash the headless
-   * tier draws whether or not anything points at it.
-   *
-   * **A chart-domain axis and deliberately not a library one.** It lives on this
-   * family alone, and here it is a way of encoding data rather than a way of
-   * expressing a theme: promoted to the registry it would put an attribute on
-   * eighty-eight components that means nothing on eighty-seven. `wash` because
-   * that is what the tier below already calls it, in `--chart-bar-wash` and in
-   * the `bar-wash-start` and `bar-wash-end` stops.
-   */
-  @property({ reflect: true })
-  wash?: 'gradient'
-
-  /**
-   * Which series are glass rather than solid, by name.
-   *
-   * Matched the way `outlined` is, against the column headings the table gives.
-   *
-   * **Per series for the reason `emphasis` is.** A
-   * chart-wide material puts every column in the same substance, which is right
-   * when the whole chart is joining the page's language and wrong the moment one
-   * series is a different kind of fact from the others. The two axes take the
-   * same shape because they answer the same question about the same thing: what
-   * is *this series* made of, and how much ink does *this series* claim.
-   */
-  @property()
-  glass?: string
-
-  /**
-   * How much ink the columns claim.
-   *
-   * The chart's treatment, which every series takes unless `outlined` or
-   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-   * of the series color with that edge on it, and absent is the filled column,
-   * per the rule that a reflected property takes no default.
-   *
-   * **It composes with `material` rather than competing with it.** Emphasis
-   * decides what is drawn and material decides how much of it comes through, so
-   * `glass` thins whatever emphasis put there: the fill on a solid column, the
-   * stroke on an outlined one. Without that the corner is inert, `glass` setting
-   * a fill opacity on a mark whose fill is `none`, and a combination that
-   * silently does nothing is the worst shape this can take.
-   */
-  @property({ reflect: true })
-  emphasis?: 'outlined' | 'solid' | 'subtle'
-
-  /**
    * Which series are drawn as an outline rather than a fill, by name.
    *
    * Space separated and matched against the column headings the table gives,
@@ -162,6 +146,22 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    */
   @property()
   subtle?: string
+
+  /**
+   * How a column's fill is distributed across it.
+   *
+   * `gradient` fades each column toward its base, into the wash the headless
+   * tier draws whether or not anything points at it.
+   *
+   * **A chart-domain axis and deliberately not a library one.** It lives on this
+   * family alone, and here it is a way of encoding data rather than a way of
+   * expressing a theme: promoted to the registry it would put an attribute on
+   * eighty-eight components that means nothing on eighty-seven. `wash` because
+   * that is what the tier below already calls it, in `--chart-bar-wash` and in
+   * the `bar-wash-start` and `bar-wash-end` stops.
+   */
+  @property({ reflect: true })
+  wash?: 'gradient'
 
   /**
    * Marks each column with the treatments its series asked for.

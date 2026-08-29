@@ -54,23 +54,13 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
+              "name": "fieldLabel",
               "type": {
                 "text": "string"
               },
-              "default": "''",
-              "description": "The source being edited.",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "'html'",
-              "description": "Which source this pane holds, echoed in every change.",
-              "attribute": "name"
+              "default": "'Example source'",
+              "description": "Accessible name for the editable region.",
+              "attribute": "field-label"
             },
             {
               "kind": "field",
@@ -84,13 +74,13 @@
             },
             {
               "kind": "field",
-              "name": "fieldLabel",
+              "name": "name",
               "type": {
                 "text": "string"
               },
-              "default": "'Example source'",
-              "description": "Accessible name for the editable region.",
-              "attribute": "field-label"
+              "default": "'html'",
+              "description": "Which source this pane holds, echoed in every change.",
+              "attribute": "name"
             },
             {
               "kind": "field",
@@ -102,6 +92,16 @@
               "description": "Whether the text can be changed.\n\n`EditorState.readOnly` rather than removing the editor's focus or its\nkeymap: a reader still needs to select the text, scroll it, and put a\ncursor in it to read a long line. What it stops is the typing.",
               "attribute": "readonly",
               "reflects": true
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The source being edited.",
+              "attribute": "value"
             },
             {
               "kind": "field",
@@ -361,22 +361,13 @@
           ],
           "attributes": [
             {
-              "name": "value",
+              "name": "field-label",
               "type": {
                 "text": "string"
               },
-              "default": "''",
-              "description": "The source being edited.",
-              "fieldName": "value"
-            },
-            {
-              "name": "name",
-              "type": {
-                "text": "string"
-              },
-              "default": "'html'",
-              "description": "Which source this pane holds, echoed in every change.",
-              "fieldName": "name"
+              "default": "'Example source'",
+              "description": "Accessible name for the editable region.",
+              "fieldName": "fieldLabel"
             },
             {
               "name": "language",
@@ -388,13 +379,13 @@
               "fieldName": "language"
             },
             {
-              "name": "field-label",
+              "name": "name",
               "type": {
                 "text": "string"
               },
-              "default": "'Example source'",
-              "description": "Accessible name for the editable region.",
-              "fieldName": "fieldLabel"
+              "default": "'html'",
+              "description": "Which source this pane holds, echoed in every change.",
+              "fieldName": "name"
             },
             {
               "name": "readonly",
@@ -404,6 +395,15 @@
               "default": "false",
               "description": "Whether the text can be changed.\n\n`EditorState.readOnly` rather than removing the editor's focus or its\nkeymap: a reader still needs to select the text, scroll it, and put a\ncursor in it to read a long line. What it stops is the typing.",
               "fieldName": "readOnly"
+            },
+            {
+              "name": "value",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The source being edited.",
+              "fieldName": "value"
             }
           ],
           "superclass": {
@@ -680,16 +680,6 @@
             },
             {
               "kind": "field",
-              "name": "src",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The document that runs them.\n\nSame origin, and it must stay that way.",
-              "attribute": "src"
-            },
-            {
-              "kind": "field",
               "name": "label",
               "type": {
                 "text": "string"
@@ -697,6 +687,16 @@
               "default": "'Spec results'",
               "description": "Accessible name for the results.",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The document that runs them.\n\nSame origin, and it must stay that way.",
+              "attribute": "src"
             },
             {
               "kind": "field",
@@ -1034,15 +1034,6 @@
               "fieldName": "family"
             },
             {
-              "name": "src",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "The document that runs them.\n\nSame origin, and it must stay that way.",
-              "fieldName": "src"
-            },
-            {
               "name": "label",
               "type": {
                 "text": "string"
@@ -1050,6 +1041,15 @@
               "default": "'Spec results'",
               "description": "Accessible name for the results.",
               "fieldName": "label"
+            },
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "The document that runs them.\n\nSame origin, and it must stay that way.",
+              "fieldName": "src"
             }
           ],
           "superclass": {

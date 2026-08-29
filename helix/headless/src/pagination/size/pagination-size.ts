@@ -60,14 +60,10 @@ import '../../select/index.js'
 @customElement('helix-headless-pagination-size')
 export class HelixHeadlessPaginationSize extends HelixElement {
   /**
-   * The sizes offered, comma separated.
-   *
-   * A string rather than an array, so the whole control is expressible in
-   * markup and survives a server render. Anything that is not a positive number
-   * is dropped rather than rendered as an option that cannot mean anything.
+   * Size to start on, where nothing declared one.
    */
-  @property()
-  sizes = '10,25,50,100'
+  @property({ attribute: 'default-value', type: Number })
+  defaultValue = 0
 
   /**
    * The size in force.
@@ -88,12 +84,6 @@ export class HelixHeadlessPaginationSize extends HelixElement {
   }
 
   /**
-   * Size to start on, where nothing declared one.
-   */
-  @property({ attribute: 'default-value', type: Number })
-  defaultValue = 0
-
-  /**
    * The words beside the control.
    */
   @property()
@@ -106,6 +96,16 @@ export class HelixHeadlessPaginationSize extends HelixElement {
    */
   @property()
   locale = ''
+
+  /**
+   * The sizes offered, comma separated.
+   *
+   * A string rather than an array, so the whole control is expressible in
+   * markup and survives a server render. Anything that is not a positive number
+   * is dropped rather than rendered as an option that cannot mean anything.
+   */
+  @property()
+  sizes = '10,25,50,100'
 
   /** The size, whoever set it, and `undefined` until somebody has. */
   private valueState: number | undefined = undefined

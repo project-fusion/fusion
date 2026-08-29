@@ -163,24 +163,10 @@ const addMonths = (date: Date, months: number): Date => {
 @customElement('helix-headless-date-picker')
 export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormElement) {
   /**
-   * How many dates can be held at once.
+   * Month to open on, where nothing declared one.
    */
-  @property({ reflect: true })
-  mode?: 'range' | 'multiple'
-
-  /**
-   * How many months to show, side by side.
-   */
-  @property({ type: Number })
-  months = 1
-
-  /**
-   * Locale for month and day names.
-   *
-   * Absent uses the runtime's own.
-   */
-  @property()
-  locale = ''
+  @property({ attribute: 'default-month' })
+  defaultMonth = ''
 
   /**
    * Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
@@ -195,10 +181,22 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   disableDays = ''
 
   /**
+   * First column of the week, `0` for Sunday through `6` for Saturday.
+   */
+  @property({ attribute: 'first-day-of-week', type: Number })
+  firstDayOfWeek = 0
+
+  /**
    * Whether the current selection fails validation.
    */
   @property({ reflect: true, type: Boolean })
   invalid = false
+
+  /**
+   * Accessible name for the grid.
+   */
+  @property()
+  label = 'Date Picker'
 
   /**
    * The month on show, as `YYYY-MM`. Follows `value`, then the current month.
@@ -225,6 +223,47 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
+   * Locale for month and day names.
+   *
+   * Absent uses the runtime's own.
+   */
+  @property()
+  locale = ''
+
+  /**
+   * Latest selectable date, as `YYYY-MM-DD`.
+   */
+  @property()
+  max = ''
+
+  /**
+   * Earliest selectable date, as `YYYY-MM-DD`.
+   */
+  @property()
+  min = ''
+
+  /** The month on show, whoever set it, and `undefined` until somebody has. */
+  private monthState: string | undefined = undefined
+
+  /**
+   * How many dates can be held at once.
+   */
+  @property({ reflect: true })
+  mode?: 'range' | 'multiple'
+
+  /**
+   * How many months to show, side by side.
+   */
+  @property({ type: Number })
+  months = 1
+
+  /**
+   * Accessible name for the control that pages forward.
+   */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next month'
+
+  /**
    * Accessible name for the control that pages back.
    *
    * A property because a calendar rendering its own month names from `locale`
@@ -236,59 +275,20 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   previousLabel = 'Previous month'
 
   /**
-   * Accessible name for the control that pages forward.
-   */
-  @property({ attribute: 'next-label' })
-  nextLabel = 'Next month'
-
-  /**
-   * Month to open on, where nothing declared one.
-   */
-  @property({ attribute: 'default-month' })
-  defaultMonth = ''
-
-  /** The month on show, whoever set it, and `undefined` until somebody has. */
-  private monthState: string | undefined = undefined
-
-  /**
-   * Earliest selectable date, as `YYYY-MM-DD`.
-   */
-  @property()
-  min = ''
-
-  /**
-   * How far apart the selectable dates are, in days.
+   * Whether the control refuses changes while still submitting its value.
    *
-   * `<input type="date" step>`'s own unit, counted from `min` where there is
-   * one and from 1 January 1970 where there is not, which is the platform's own
-   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
-   * on a Monday, which `disable-dates` cannot express: it takes a list, and a
-   * year of Mondays is not a list anybody writes.
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
    *
-   * One is every date and needs no rule, which is why anything below one is
-   * treated as one rather than as an error: a step of zero would block every
-   * date including the one already chosen.
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    */
-  @property({ type: Number })
-  step = 1
-
-  /**
-   * Latest selectable date, as `YYYY-MM-DD`.
-   */
-  @property()
-  max = ''
-
-  /**
-   * Accessible name for the grid.
-   */
-  @property()
-  label = 'Date Picker'
-
-  /**
-   * First column of the week, `0` for Sunday through `6` for Saturday.
-   */
-  @property({ attribute: 'first-day-of-week', type: Number })
-  firstDayOfWeek = 0
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /**
    * The date the grid's tab stop is on.
@@ -533,20 +533,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * Whether the form refuses to submit while nothing is chosen.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ reflect: true, type: Boolean })
+  required = false
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -557,10 +547,20 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Whether the form refuses to submit while nothing is chosen.
+   * How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, counted from `min` where there is
+   * one and from 1 January 1970 where there is not, which is the platform's own
+   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+   * on a Monday, which `disable-dates` cannot express: it takes a list, and a
+   * year of Mondays is not a list anybody writes.
+   *
+   * One is every date and needs no rule, which is why anything below one is
+   * treated as one rather than as an error: a step of zero would block every
+   * date including the one already chosen.
    */
-  @property({ reflect: true, type: Boolean })
-  required = false
+  @property({ type: Number })
+  step = 1
 
   /**
    * Reports "required and empty", or clears it.

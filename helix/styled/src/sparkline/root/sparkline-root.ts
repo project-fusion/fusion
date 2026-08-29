@@ -77,21 +77,6 @@ export class HelixSparkline extends HelixHeadlessSparkline {
   static override styles: CSSResultGroup = [terminusStyles, styles]
 
   /**
-   * How heavy the line is drawn.
-   *
-   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
-   * in a table row among many; `thick` suits one standing on its own, where a
-   * hairline reads as an accident.
-   *
-   * Three steps rather than a number, because `--sparkline-width` is already
-   * the number and an attribute earns its place by being the thing a consumer
-   * reaches for without reading the stylesheet. The hook stays for anything the
-   * three do not cover.
-   */
-  @property({ reflect: true })
-  weight?: 'thick' | 'thin'
-
-  /**
    * The shape of the mark on the last reading.
    *
    * Absent is a dot, which is how a line is usually ended, and absent rather
@@ -116,6 +101,21 @@ export class HelixSparkline extends HelixHeadlessSparkline {
    */
   @property({ reflect: true })
   terminus?: 'none' | 'ring' | 'square' | 'triangle'
+
+  /**
+   * How heavy the line is drawn.
+   *
+   * Absent is the weight a sparkline is usually drawn at. `thin` suits one set
+   * in a table row among many; `thick` suits one standing on its own, where a
+   * hairline reads as an accident.
+   *
+   * Three steps rather than a number, because `--sparkline-width` is already
+   * the number and an attribute earns its place by being the thing a consumer
+   * reaches for without reading the stylesheet. The hook stays for anything the
+   * three do not cover.
+   */
+  @property({ reflect: true })
+  weight?: 'thick' | 'thin'
 }
 
 declare global {

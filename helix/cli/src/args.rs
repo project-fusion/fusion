@@ -176,6 +176,8 @@ pub enum Component {
     Audit(Rules),
     /// The CI shape of `audit`: same measurement, nothing printed on success.
     Check(Rules),
+    /// Run the rules that can write.
+    Fix(Rules),
 }
 
 /// What both component verbs take.

@@ -230,6 +230,17 @@ export class HelixHeadlessListbox extends MixinCollection(
   private filterState: string | undefined = undefined
 
   /**
+   * What is shown when a filter has hidden every option.
+   *
+   * From `MixinCollection`, which every collection in the library now shares,
+   * and re-declared here only to keep this list's own wording: "No matches" is
+   * about a filter, and the mixin's "Nothing to show" is about a list that was
+   * never given anything.
+   */
+  @property({ attribute: 'empty-text' })
+  override emptyText = 'No matches'
+
+  /**
    * Whether the list renders a field for narrowing itself.
    *
    * The field lives here rather than in whatever frames the list, because the
@@ -251,17 +262,6 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   @property({ reflect: true, type: Boolean })
   multiple = false
-
-  /**
-   * What is shown when a filter has hidden every option.
-   *
-   * From `MixinCollection`, which every collection in the library now shares,
-   * and re-declared here only to keep this list's own wording: "No matches" is
-   * about a filter, and the mixin's "Nothing to show" is about a list that was
-   * never given anything.
-   */
-  @property({ attribute: 'empty-text' })
-  override emptyText = 'No matches'
 
   /**
    * Which option the keyboard is on, which is not what is chosen.

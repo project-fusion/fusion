@@ -62,18 +62,18 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   })
 
   /**
-   * Value submitted when the box is checked.
-   */
-  @property()
-  value = 'on'
-
-  /**
    * Whether the box shows as neither checked nor unchecked.
    *
    * Presentation only. It never submits, and the first change resolves it.
    */
   @property({ reflect: true, type: Boolean })
   indeterminate = false
+
+  /**
+   * Value submitted when the box is checked.
+   */
+  @property()
+  value = 'on'
 
   /** Focus is delegated to the input, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {

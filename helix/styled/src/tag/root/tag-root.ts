@@ -32,15 +32,6 @@ import { styles } from './tag-root.css.js'
 @customElement('helix-tag')
 export class HelixTag extends HelixHeadlessTag {
   /**
-   * Which status the tag reports.
-   *
-   * `tone` is semantic color, which is what these are and what `helix-text`
-   * already calls them. `helix component`'s `axes` holds the vocabulary.
-   */
-  @property({ reflect: true })
-  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
-
-  /**
    * How much of the tone the tag wears.
    *
    * - `subtle` is the default: a wash of the tone with the label in it, for a
@@ -56,6 +47,15 @@ export class HelixTag extends HelixHeadlessTag {
    */
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * Which status the tag reports.
+   *
+   * `tone` is semantic color, which is what these are and what `helix-text`
+   * already calls them. `helix component`'s `axes` holds the vocabulary.
+   */
+  @property({ reflect: true })
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   static override styles: CSSResultGroup = styles
 }

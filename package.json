@@ -103,6 +103,7 @@
     "pixelmatch": "^7.2.0",
     "playwright": "^1.62.1",
     "pngjs": "^7.0.0",
+    "svgo": "^4.1.0",
     "turbo": "^2.3.0",
     "typescript": "^7.0.2"
   },

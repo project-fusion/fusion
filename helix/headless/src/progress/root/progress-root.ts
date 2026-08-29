@@ -50,12 +50,6 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-progress')
 export class HelixHeadlessProgress extends HelixElement {
   /**
-   * Accessible name for what is in progress.
-   */
-  @property()
-  label = 'Progress'
-
-  /**
    * Whether the work has a knowable end.
    *
    * On the headless tier rather than as a treatment, because it is
@@ -70,6 +64,12 @@ export class HelixHeadlessProgress extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   indeterminate = false
+
+  /**
+   * Accessible name for what is in progress.
+   */
+  @property()
+  label = 'Progress'
 
   /**
    * The total the work is measured against.

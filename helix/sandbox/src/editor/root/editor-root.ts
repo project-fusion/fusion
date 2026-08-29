@@ -59,16 +59,10 @@ export type EditorLanguage = keyof typeof LANGUAGES
 @customElement('helix-sandbox-editor')
 export class HelixSandboxEditor extends HelixElement {
   /**
-   * The source being edited.
+   * Accessible name for the editable region.
    */
-  @property()
-  value = ''
-
-  /**
-   * Which source this pane holds, echoed in every change.
-   */
-  @property()
-  name = 'html'
+  @property({ attribute: 'field-label' })
+  fieldLabel = 'Example source'
 
   /**
    * How to highlight it.
@@ -77,10 +71,10 @@ export class HelixSandboxEditor extends HelixElement {
   language: EditorLanguage = 'html'
 
   /**
-   * Accessible name for the editable region.
+   * Which source this pane holds, echoed in every change.
    */
-  @property({ attribute: 'field-label' })
-  fieldLabel = 'Example source'
+  @property()
+  name = 'html'
 
   /**
    * Whether the text can be changed.
@@ -91,6 +85,12 @@ export class HelixSandboxEditor extends HelixElement {
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * The source being edited.
+   */
+  @property()
+  value = ''
 
   private readonly readOnly$ = new Compartment()
 

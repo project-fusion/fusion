@@ -116,18 +116,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The whole result, in the order it arrived.
-   *
-   * A property and not an attribute: it is an array. Left alone this element
-   * filters, sorts and pages it; in `server` mode it is the page the consumer
-   * already fetched and none of the three is applied.
-   *
-   * **Read, never written.** Sorting produces a new array rather than reordering
-   * this one, because a consumer's array may be the same object their own state
-   * holds and reordering it under them is a mutation they did not ask for.
+   * Query to open with, where nothing declared one.
    */
-  @property({ attribute: false })
-  rows: readonly DataRow[] = []
+  @property({ attribute: 'default-filter' })
+  defaultFilter = ''
+
+  /**
+   * Page to open on, where nothing declared one.
+   */
+  @property({ attribute: 'default-page', type: Number })
+  defaultPage = 1
+
+  /**
+   * Page size to open with, where nothing declared one.
+   */
+  @property({ attribute: 'default-page-size', type: Number })
+  defaultPageSize = 0
+
+  /**
+   * Order to open on, where nothing declared one.
+   */
+  @property({ attribute: 'default-sort' })
+  defaultSort = ''
 
   /**
    * The field naming a row's stable identity.
@@ -141,36 +151,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property()
   key = ''
-
-  /**
-   * Whether this element does the work or asks the consumer to.
-   *
-   * `client` filters, sorts and pages `rows` itself. `server` applies none of
-   * them: `rows` is the page, `total` is the size of the whole result, and the
-   * three events are requests the consumer answers by fetching. Past some size
-   * the client cannot hold the data, so this is not an optimization, it is the
-   * only mode that works, and it is here from the start because adding it later
-   * inverts the data flow.
-   */
-  @property()
-  mode: 'client' | 'server' = 'client'
-
-  /**
-   * How many rows the whole result has, where this element cannot count them.
-   *
-   * Only read in `server` mode, where `rows` is one page and its length says
-   * nothing about the result. Ignored in `client` mode rather than trusted,
-   * because two sources for one count is the mistake, and here the array is the
-   * one that cannot be stale.
-   */
-  @property({ type: Number })
-  total = 0
-
-  /**
-   * Accessible name for the grid.
-   */
-  @property()
-  label = ''
 
   /**
    * The order, as `field:direction`.
@@ -191,10 +171,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Order to open on, where nothing declared one.
+   * Accessible name for the grid.
    */
-  @property({ attribute: 'default-sort' })
-  defaultSort = ''
+  @property()
+  label = ''
 
   /**
    * What the rows are narrowed to, as one query across every column.
@@ -215,10 +195,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Query to open with, where nothing declared one.
+   * Whether this element does the work or asks the consumer to.
+   *
+   * `client` filters, sorts and pages `rows` itself. `server` applies none of
+   * them: `rows` is the page, `total` is the size of the whole result, and the
+   * three events are requests the consumer answers by fetching. Past some size
+   * the client cannot hold the data, so this is not an optimization, it is the
+   * only mode that works, and it is here from the start because adding it later
+   * inverts the data flow.
    */
-  @property({ attribute: 'default-filter' })
-  defaultFilter = ''
+  @property()
+  mode: 'client' | 'server' = 'client'
 
   /**
    * The page on show, from 1.
@@ -240,10 +227,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Page to open on, where nothing declared one.
+   * The whole result, in the order it arrived.
+   *
+   * A property and not an attribute: it is an array. Left alone this element
+   * filters, sorts and pages it; in `server` mode it is the page the consumer
+   * already fetched and none of the three is applied.
+   *
+   * **Read, never written.** Sorting produces a new array rather than reordering
+   * this one, because a consumer's array may be the same object their own state
+   * holds and reordering it under them is a mutation they did not ask for.
    */
-  @property({ attribute: 'default-page', type: Number })
-  defaultPage = 1
+  @property({ attribute: false })
+  rows: readonly DataRow[] = []
 
   /**
    * How many rows a page holds. Zero is every row, which is what "no paging" means.
@@ -266,10 +261,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Page size to open with, where nothing declared one.
+   * How many rows the whole result has, where this element cannot count them.
+   *
+   * Only read in `server` mode, where `rows` is one page and its length says
+   * nothing about the result. Ignored in `client` mode rather than trusted,
+   * because two sources for one count is the mistake, and here the array is the
+   * one that cannot be stale.
    */
-  @property({ attribute: 'default-page-size', type: Number })
-  defaultPageSize = 0
+  @property({ type: Number })
+  total = 0
 
   /**
    * Whether to draw a pagination under the grid.

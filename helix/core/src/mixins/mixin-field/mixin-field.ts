@@ -167,16 +167,16 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
   // reads when resolving inherited members into dependent packages.
   class FieldElement extends Base {
     /**
-     * Help under the control, shown while there is nothing wrong.
-     */
-    @property()
-    hint = ''
-
-    /**
      * What is wrong, in the reader's words rather than the browser's.
      */
     @property()
     feedback = ''
+
+    /**
+     * Help under the control, shown while there is nothing wrong.
+     */
+    @property()
+    hint = ''
 
     /**
      * The accessible name, and the fallback for the `label` slot.

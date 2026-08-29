@@ -26,6 +26,12 @@ import { styles } from './loader-root.css.js'
 @customElement('helix-loader')
 export class HelixLoader extends HelixHeadlessLoader {
   /**
+   * Diameter relative to the surrounding text.
+   */
+  @property({ reflect: true })
+  size?: 'sm' | 'md' | 'lg'
+
+  /**
    * How the waiting is drawn.
    *
    * Unset is the turning arc, which is what most waits want.
@@ -38,12 +44,6 @@ export class HelixLoader extends HelixHeadlessLoader {
    */
   @property({ reflect: true })
   variant?: 'pulse'
-
-  /**
-   * Diameter relative to the surrounding text.
-   */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg'
 
   static override styles: CSSResultGroup = styles
 }

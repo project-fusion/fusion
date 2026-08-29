@@ -72,23 +72,6 @@ export class HelixText extends HelixElement {
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
 
   /**
-   * Type treatment.
-   *
-   * Defaults to the one that matches `as`.
-   */
-  @property({ reflect: true })
-  variant?:
-    | 'display'
-    | 'heading'
-    | 'subheading'
-    | 'title'
-    | 'body'
-    | 'body-strong'
-    | 'caption'
-    | 'label'
-    | 'code'
-
-  /**
    * Color role. A separate axis from the type ramp, because color carries
    * state: folding it in would mean `caption-danger` and the rest of the cross
    * product.
@@ -107,6 +90,23 @@ export class HelixText extends HelixElement {
    */
   @property({ reflect: true })
   tone?: 'muted' | 'subtle' | 'primary' | 'danger'
+
+  /**
+   * Type treatment.
+   *
+   * Defaults to the one that matches `as`.
+   */
+  @property({ reflect: true })
+  variant?:
+    | 'display'
+    | 'heading'
+    | 'subheading'
+    | 'title'
+    | 'body'
+    | 'body-strong'
+    | 'caption'
+    | 'label'
+    | 'code'
 
   protected override render(): unknown {
     /* `Object.hasOwn`, not a truthy index.

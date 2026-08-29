@@ -93,45 +93,6 @@ let showing: HelixHeadlessMegamenu | undefined
 @customElement('helix-headless-megamenu')
 export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   /**
-   * The section's name, which names the default trigger and the panel.
-   */
-  @property()
-  label = ''
-
-  /**
-   * Whether the panel is a card under the trigger or a band across the page.
-   *
-   * The resting one is the card, hanging off the trigger and as wide as it
-   * needs to be. `full` is the other shape navigations use: a band from edge to
-   * edge under the header, with its contents held to the page's own measure, so
-   * a set of destinations too wide to sit under one word gets the whole width
-   * to lay out in.
-   *
-   * It changes where the panel goes as well as how it looks, which is why this
-   * tier knows about it at all: a band spans the viewport, so there is nothing
-   * to measure it against and nothing to flip or shift to, and the placing pass
-   * is told not to run. Everything else the popover gives, the top layer and
-   * the dismissal, is exactly what such a band needs.
-   */
-  @property({ reflect: true })
-  variant?: 'full'
-
-  /**
-   * Whether hovering the trigger opens the panel, or only a press does.
-   *
-   * A press always works. This says whether a mouse also opens it by resting on
-   * the trigger, and it is the default because that is what a navigation bar
-   * does. `click` is for a trigger that does something else as well, or a panel
-   * heavy enough that opening it on the way past is rude.
-   */
-  /* Read, never written back. It has a default, and a reflected default puts an
-     attribute on the host that the consumer did not write, which the server
-     then ships: the SSR spec for this element checks exactly that. Nothing
-     selects on it, so there is nothing to reflect for. */
-  @property({ attribute: 'open-on' })
-  openOn: 'click' | 'hover' = 'hover'
-
-  /**
    * The width, in pixels, under which a card becomes a band. Zero never does.
    *
    * A card is a panel hung off one word, and there is no room to hang anything
@@ -150,6 +111,45 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    */
   @property({ attribute: 'full-below', type: Number })
   fullBelow = 640
+
+  /**
+   * The section's name, which names the default trigger and the panel.
+   */
+  @property()
+  label = ''
+
+  /**
+   * Whether hovering the trigger opens the panel, or only a press does.
+   *
+   * A press always works. This says whether a mouse also opens it by resting on
+   * the trigger, and it is the default because that is what a navigation bar
+   * does. `click` is for a trigger that does something else as well, or a panel
+   * heavy enough that opening it on the way past is rude.
+   */
+  /* Read, never written back. It has a default, and a reflected default puts an
+     attribute on the host that the consumer did not write, which the server
+     then ships: the SSR spec for this element checks exactly that. Nothing
+     selects on it, so there is nothing to reflect for. */
+  @property({ attribute: 'open-on' })
+  openOn: 'click' | 'hover' = 'hover'
+
+  /**
+   * Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `full` is the other shape navigations use: a band from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * It changes where the panel goes as well as how it looks, which is why this
+   * tier knows about it at all: a band spans the viewport, so there is nothing
+   * to measure it against and nothing to flip or shift to, and the placing pass
+   * is told not to run. Everything else the popover gives, the top layer and
+   * the dismissal, is exactly what such a band needs.
+   */
+  @property({ reflect: true })
+  variant?: 'full'
 
   @state()
   private narrow = false

@@ -36,26 +36,6 @@ export class HelixLegend extends HelixHeadlessLegend {
   static override styles: CSSResultGroup = [seriesStyles, styles]
 
   /**
-   * Where the legend sits and which way its entries run.
-   *
-   * Absent is a wrapping row, which is what sits under a chart. `start` and
-   * `end` stack the entries in a column, for a legend beside one.
-   *
-   * **This says which way the entries run and not where the element is**, which
-   * is the honest limit of a component that is a sibling of the chart rather
-   * than part of it. A legend cannot place itself relative to something it is
-   * not inside, so the consumer still puts it above, below or beside and this
-   * makes it lay out correctly once it is there.
-   *
-   * A `legend` slot on every chart is the obvious alternative and is worse: it
-   * makes the legend's position a fact about the chart, so two charts sharing
-   * one legend becomes impossible, and it puts a list inside a drawing that is
-   * `aria-hidden`.
-   */
-  @property({ reflect: true })
-  placement?: 'end' | 'start'
-
-  /**
    * How much ink the swatches claim.
    *
    * **The same axis as the chart's, with the same values, because a legend that
@@ -75,6 +55,14 @@ export class HelixLegend extends HelixHeadlessLegend {
    */
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * Which entries are glass rather than solid, by name.
+   *
+   * Matched as `outlined` is.
+   */
+  @property()
+  glass?: string
 
   /**
    * What the swatches are made of.
@@ -111,20 +99,32 @@ export class HelixLegend extends HelixHeadlessLegend {
   outlined?: string
 
   /**
+   * Where the legend sits and which way its entries run.
+   *
+   * Absent is a wrapping row, which is what sits under a chart. `start` and
+   * `end` stack the entries in a column, for a legend beside one.
+   *
+   * **This says which way the entries run and not where the element is**, which
+   * is the honest limit of a component that is a sibling of the chart rather
+   * than part of it. A legend cannot place itself relative to something it is
+   * not inside, so the consumer still puts it above, below or beside and this
+   * makes it lay out correctly once it is there.
+   *
+   * A `legend` slot on every chart is the obvious alternative and is worse: it
+   * makes the legend's position a fact about the chart, so two charts sharing
+   * one legend becomes impossible, and it puts a list inside a drawing that is
+   * `aria-hidden`.
+   */
+  @property({ reflect: true })
+  placement?: 'end' | 'start'
+
+  /**
    * Which entries are drawn as a wash of their color, by name.
    *
    * Matched as `outlined` is.
    */
   @property()
   subtle?: string
-
-  /**
-   * Which entries are glass rather than solid, by name.
-   *
-   * Matched as `outlined` is.
-   */
-  @property()
-  glass?: string
 
   /**
    * Marks each entry with the treatment its name was given.

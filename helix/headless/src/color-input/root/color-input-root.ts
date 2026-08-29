@@ -119,6 +119,12 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   })
 
   /**
+   * Whether the color carries an alpha channel.
+   */
+  @property({ reflect: true, type: Boolean })
+  alpha = false
+
+  /**
    * What the browser may autofill in the text field, as a platform token.
    *
    * **Defaults to `off`, which is not the platform's default and is the
@@ -128,32 +134,6 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
    */
   @property()
   autocomplete = 'off'
-
-  /**
-   * Whether the field is a text box with a swatch on it, or only the swatch.
-   *
-   * `swatch` is the native control's shape: a block of color that opens a
-   * picker, with no text beside it. It is what a toolbar wants, and a form that
-   * asks for a color among twenty other questions, where a hex in a box is
-   * eleven characters of noise next to the thing itself.
-   *
-   * It also settles where the value is stated. The default field *is* the input,
-   * so the panel is told `no-value` and would otherwise show a second one. A
-   * swatch states nothing, so the panel keeps its own row and the value is
-   * readable and typeable exactly once, in whichever of the two is present.
-   *
-   * The trade is real and is the reason this is not the default: a swatch cannot
-   * be read or pasted into without opening the panel, which is worse for a form
-   * where the color is the answer rather than a setting.
-   */
-  @property({ reflect: true })
-  variant?: 'swatch'
-
-  /**
-   * Whether the color carries an alpha channel.
-   */
-  @property({ reflect: true, type: Boolean })
-  alpha = false
 
   /**
    * The syntax the value is written in: `hex`, `rgb` or `hsl`.
@@ -192,6 +172,26 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
    */
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a color'
+
+  /**
+   * Whether the field is a text box with a swatch on it, or only the swatch.
+   *
+   * `swatch` is the native control's shape: a block of color that opens a
+   * picker, with no text beside it. It is what a toolbar wants, and a form that
+   * asks for a color among twenty other questions, where a hex in a box is
+   * eleven characters of noise next to the thing itself.
+   *
+   * It also settles where the value is stated. The default field *is* the input,
+   * so the panel is told `no-value` and would otherwise show a second one. A
+   * swatch states nothing, so the panel keeps its own row and the value is
+   * readable and typeable exactly once, in whichever of the two is present.
+   *
+   * The trade is real and is the reason this is not the default: a swatch cannot
+   * be read or pasted into without opening the panel, which is worse for a form
+   * where the color is the answer rather than a setting.
+   */
+  @property({ reflect: true })
+  variant?: 'swatch'
 
   /** The overlay, placed against the field for the reason Date Input gives. */
   protected readonly panel = new PopoverController(this, {

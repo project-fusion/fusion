@@ -144,24 +144,6 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   }
 
   /**
-   * Whether zero is forced into the range.
-   *
-   * Absent measures from the data's own extent, which is what a line is for.
-   * Set it where the distance from nothing is the point rather than the shape,
-   * and accept that a series which never approaches zero becomes a flat rule
-   * near the top of the box.
-   */
-  @property({ reflect: true, type: Boolean })
-  zero = false
-
-  /** The domain every series is drawn against, which the tooltip also needs. */
-  private range(series: Series[]): [number, number] {
-    const values = series.flatMap((one) => one.points.map((point) => point.value))
-    const [low, high] = extent(values.length > 0 ? values : [0])
-    return this.zero ? [Math.min(0, low), Math.max(0, high)] : [low, high]
-  }
-
-  /**
    * The shape of the mark on each series' last reading.
    *
    * Absent is a dot, and absent rather than defaulted because a reflecting
@@ -186,6 +168,24 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    */
   @property({ reflect: true })
   terminus?: 'none' | 'ring' | 'square' | 'triangle'
+
+  /** The domain every series is drawn against, which the tooltip also needs. */
+  private range(series: Series[]): [number, number] {
+    const values = series.flatMap((one) => one.points.map((point) => point.value))
+    const [low, high] = extent(values.length > 0 ? values : [0])
+    return this.zero ? [Math.min(0, low), Math.max(0, high)] : [low, high]
+  }
+
+  /**
+   * Whether zero is forced into the range.
+   *
+   * Absent measures from the data's own extent, which is what a line is for.
+   * Set it where the distance from nothing is the point rather than the shape,
+   * and accept that a series which never approaches zero becomes a flat rule
+   * near the top of the box.
+   */
+  @property({ reflect: true, type: Boolean })
+  zero = false
 
   /**
    * Where each series ends, as percentages of the drawing's own box.

@@ -94,32 +94,10 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   protected override readonly announcesInput = true
 
   /**
-   * Whether there are two thumbs and the value is a pair.
-   *
-   * The pair is one string, `"10,50"`, which is what a form submits and what
-   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
-   * the two, since a range has no single number.
+   * Whether each mark says which value it stands at.
    */
-  @property({ reflect: true, type: Boolean })
-  range = false
-
-  /**
-   * The largest value the reader can choose.
-   */
-  @property({ type: Number })
-  max = 100
-
-  /**
-   * The smallest value the reader can choose.
-   */
-  @property({ type: Number })
-  min = 0
-
-  /**
-   * Whether the chosen value is shown beside the track.
-   */
-  @property({ attribute: 'show-value', reflect: true, type: Boolean })
-  showValue = false
+  @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
+  markerLabels = false
 
   /**
    * How many marks to draw along the track, evenly spaced, ends included.
@@ -140,14 +118,47 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   markers = 0
 
   /**
-   * Whether each mark says which value it stands at.
+   * The largest value the reader can choose.
    */
-  @property({ attribute: 'marker-labels', reflect: true, type: Boolean })
-  markerLabels = false
-
-  /** How far one press of an arrow key moves it. */
   @property({ type: Number })
-  step = 1
+  max = 100
+
+  /**
+   * The smallest value the reader can choose.
+   */
+  @property({ type: Number })
+  min = 0
+
+  /**
+   * Which way the track runs, `vertical` standing it on end.
+   *
+   * For a level rather than a quantity: a fader, a channel, anything a reader
+   * pictures as high and low rather than as less and more. Absent is
+   * horizontal, which is what almost every slider in a form wants.
+   *
+   * **A vertical track has no length of its own**, the way a horizontal one
+   * takes the width of the row it is in. `--slider-length` is that number and
+   * defaults to nine rem, so one dropped into a layout is a usable height
+   * rather than a thumb sitting on nothing.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
+
+  /**
+   * Whether there are two thumbs and the value is a pair.
+   *
+   * The pair is one string, `"10,50"`, which is what a form submits and what
+   * `MixinControllerValue` already holds. `valueAsNumber` reads the lower of
+   * the two, since a range has no single number.
+   */
+  @property({ reflect: true, type: Boolean })
+  range = false
+
+  /**
+   * Whether the chosen value is shown beside the track.
+   */
+  @property({ attribute: 'show-value', reflect: true, type: Boolean })
+  showValue = false
 
   /**
    * How many characters the readout has to be able to hold, widest case.
@@ -365,20 +376,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     this.sync()
   }
 
-  /**
-   * Which way the track runs, `vertical` standing it on end.
-   *
-   * For a level rather than a quantity: a fader, a channel, anything a reader
-   * pictures as high and low rather than as less and more. Absent is
-   * horizontal, which is what almost every slider in a form wants.
-   *
-   * **A vertical track has no length of its own**, the way a horizontal one
-   * takes the width of the row it is in. `--slider-length` is that number and
-   * defaults to nine rem, so one dropped into a layout is a usable height
-   * rather than a thumb sitting on nothing.
-   */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
+  /** How far one press of an arrow key moves it. */
+  @property({ type: Number })
+  step = 1
 
   protected override render(): TemplateResult {
     /* The range's bounds are written before its value below, and that order is

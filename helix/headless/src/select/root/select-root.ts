@@ -87,6 +87,12 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   })
 
   /**
+   * What it says where there are none.
+   */
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No matches'
+
+  /**
    * Whether the list can be narrowed by typing.
    *
    * Passed to the listbox rather than acted on here, because the listbox owns
@@ -110,12 +116,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
-
-  /**
-   * What it says where there are none.
-   */
-  @property({ attribute: 'empty-text' })
-  emptyText = 'No matches'
 
   /**
    * Whether more than one option can be the answer.

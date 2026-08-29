@@ -21,12 +21,6 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-list')
 export class HelixHeadlessList extends HelixElement {
   /**
-   * Accessible name for the set.
-   */
-  @property()
-  label = ''
-
-  /**
    * What kind of list this is, which is a fact about the content.
    *
    * On the headless tier because it is meaning rather than decoration, the same
@@ -50,6 +44,12 @@ export class HelixHeadlessList extends HelixElement {
    */
   @property({ reflect: true })
   kind?: 'default' | 'description' | 'ordered' | 'unordered'
+
+  /**
+   * Accessible name for the set.
+   */
+  @property()
+  label = ''
 
   /**
    * Which markers an ordered list draws, in `<ol type>`'s own five values.

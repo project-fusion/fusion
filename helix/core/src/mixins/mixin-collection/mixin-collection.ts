@@ -61,6 +61,12 @@ export declare class CollectionElement {
 export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
   class Collection extends Base {
     /**
+     * What is said where there are none, and none are coming.
+     */
+    @property({ attribute: 'empty-text' })
+    emptyText = 'Nothing to show'
+
+    /**
      * Whether the rows are still on their way.
      *
      * Reflected, because a stylesheet needs it: the rows that are already there
@@ -75,12 +81,6 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
      */
     @property({ attribute: 'loading-text' })
     loadingText = 'Loading'
-
-    /**
-     * What is said where there are none, and none are coming.
-     */
-    @property({ attribute: 'empty-text' })
-    emptyText = 'Nothing to show'
 
     /**
      * Whether the rows have been looked at yet.

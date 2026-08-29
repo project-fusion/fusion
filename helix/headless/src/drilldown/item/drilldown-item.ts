@@ -44,10 +44,20 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   disabled = false
 
   /**
-   * Identifies the row to whatever is listening.
+   * Whether this row holds the region's tab stop. Written by the stack.
+   *
+   * A drill-down keeps one stop and moves within it on the arrows, so every
+   * other row is at `-1`. Leave it off every row, including the first, and
+   * nothing in the region is tab-reachable: the keyboard cannot get in without
+   * first clicking something with a pointer.
+   *
+   * No attribute, the same as `Button`'s: this is coordination between
+   * elements, and writing `tabindex` onto a host the consumer rendered is a
+   * change a React consumer's hydration reports and does not patch up. The stop
+   * lands inside this shadow root instead.
    */
-  @property()
-  value = ''
+  @property({ attribute: false })
+  focusable = false
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,
@@ -73,20 +83,10 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   showingPage = false
 
   /**
-   * Whether this row holds the region's tab stop. Written by the stack.
-   *
-   * A drill-down keeps one stop and moves within it on the arrows, so every
-   * other row is at `-1`. Leave it off every row, including the first, and
-   * nothing in the region is tab-reachable: the keyboard cannot get in without
-   * first clicking something with a pointer.
-   *
-   * No attribute, the same as `Button`'s: this is coordination between
-   * elements, and writing `tabindex` onto a host the consumer rendered is a
-   * change a React consumer's hydration reports and does not patch up. The stop
-   * lands inside this shadow root instead.
+   * Identifies the row to whatever is listening.
    */
-  @property({ attribute: false })
-  focusable = false
+  @property()
+  value = ''
 
   /** Moves focus onto the row itself. */
   focusItem(): void {

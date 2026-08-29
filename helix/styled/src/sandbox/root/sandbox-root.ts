@@ -99,10 +99,34 @@ const PANEL_MAX = 0.8
 @customElement('helix-sandbox')
 export class HelixSandbox extends HelixElement {
   /**
-   * Whether the panes sit side by side or stacked.
+   * Accessible name for the divider that moves both at once.
    */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
+  @property({ attribute: 'corner-label' })
+  cornerLabel = 'Resize panes and panel'
+
+  /**
+   * What a reset makes the panel, in pixels.
+   *
+   * The pair to `panel-size`.
+   */
+  @property({ attribute: 'default-panel-size', type: Number })
+  defaultPanelSize = DEFAULT_PANEL
+
+  /**
+   * Where a reset puts the divider, where nothing declared it.
+   *
+   * Separate from `split` for the reason `Splitter` keeps `default-position`
+   * separate from `position`. Resetting to whatever `split` held on the first
+   * render is the declared arrangement only where nobody owns the property: the
+   * workbench does, and restores it from the address bar and from storage, so the
+   * first value it holds is the reader's last session and a reset puts the
+   * sandbox back to the size it already was.
+   *
+   * Declared rather than captured, so it is a number a consumer states and can
+   * change, and it needs no first frame to be read on.
+   */
+  @property({ attribute: 'default-split', type: Number })
+  defaultSplit = DEFAULT_SPLIT
 
   /**
    * Which pane comes first, before the divider.
@@ -125,40 +149,10 @@ export class HelixSandbox extends HelixElement {
   lead: 'source' | 'preview' = 'source'
 
   /**
-   * Percentage of the sandbox given to the source pane.
+   * Whether the panes sit side by side or stacked.
    */
-  @property({ attribute: 'split', type: Number })
-  split = DEFAULT_SPLIT
-
-  /**
-   * Where a reset puts the divider, where nothing declared it.
-   *
-   * Separate from `split` for the reason `Splitter` keeps `default-position`
-   * separate from `position`. Resetting to whatever `split` held on the first
-   * render is the declared arrangement only where nobody owns the property: the
-   * workbench does, and restores it from the address bar and from storage, so the
-   * first value it holds is the reader's last session and a reset puts the
-   * sandbox back to the size it already was.
-   *
-   * Declared rather than captured, so it is a number a consumer states and can
-   * change, and it needs no first frame to be read on.
-   */
-  @property({ attribute: 'default-split', type: Number })
-  defaultSplit = DEFAULT_SPLIT
-
-  /**
-   * Height of the panel, in pixels.
-   */
-  @property({ attribute: 'panel-size', type: Number })
-  panelSize = DEFAULT_PANEL
-
-  /**
-   * What a reset makes the panel, in pixels.
-   *
-   * The pair to `panel-size`.
-   */
-  @property({ attribute: 'default-panel-size', type: Number })
-  defaultPanelSize = DEFAULT_PANEL
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * What the panel's height becomes when it is closed.
@@ -177,16 +171,22 @@ export class HelixSandbox extends HelixElement {
   panelLabel = 'Resize panel'
 
   /**
-   * Accessible name for the divider that moves both at once.
+   * Height of the panel, in pixels.
    */
-  @property({ attribute: 'corner-label' })
-  cornerLabel = 'Resize panes and panel'
+  @property({ attribute: 'panel-size', type: Number })
+  panelSize = DEFAULT_PANEL
 
   /**
    * Accessible name for the divider.
    */
   @property({ attribute: 'separator-label' })
   separatorLabel = 'Resize source pane'
+
+  /**
+   * Percentage of the sandbox given to the source pane.
+   */
+  @property({ attribute: 'split', type: Number })
+  split = DEFAULT_SPLIT
 
   /**
    * Whether anything is in the panel region.

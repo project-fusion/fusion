@@ -182,6 +182,51 @@ pub fn check(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
     Ok(verdict(&reports))
 }
 
+/// Runs the rules that can write, and says what they wrote.
+///
+/// **The same selection as `check`, filtered to what has a `fix`.** A rule with
+/// none is not an error to have asked for: `--only` names a subject, and the
+/// answer to "fix the tokens rule" is that there is nothing mechanical to apply.
+pub fn fix(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
+    let (selected, context) = prepare(args, from)?;
+    let mut wrote: Vec<(&str, String)> = Vec::new();
+    let mut ran = 0;
+    for rule in &selected {
+        let Some(apply) = rule.fix else {
+            continue;
+        };
+        ran += 1;
+        for file in apply(&context) {
+            wrote.push((rule.name, file));
+        }
+    }
+
+    if json {
+        println!(
+            "{:#}",
+            serde_json::json!({
+                "ran": ran,
+                "wrote": wrote.iter().map(|(rule, file)| serde_json::json!({
+                    "file": file,
+                    "rule": rule,
+                })).collect::<Vec<_>>(),
+            })
+        );
+        return Ok(Code::Ok);
+    }
+    if wrote.is_empty() {
+        let plural = if ran == 1 { "" } else { "s" };
+        println!("component: {ran} rule{plural} can write, and nothing needed it");
+    } else {
+        for (rule, file) in &wrote {
+            println!("  {}  {file}", paint.bold(rule));
+        }
+        let plural = if wrote.len() == 1 { "" } else { "s" };
+        println!("component: {} file{plural} written", wrote.len());
+    }
+    Ok(Code::Ok)
+}
+
 fn verdict(reports: &[(Rule, Report)]) -> Code {
     if reports.iter().all(|(_, report)| report.ok()) {
         Code::Ok

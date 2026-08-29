@@ -35,6 +35,17 @@ import { styles } from './icon-button-root.css.js'
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton) {
   /**
+   * Whether it is raised off the page it sits on.
+   *
+   * Separate from `shape`, because they are separate facts: a docked control is
+   * raised whatever its outline, and a circle inside a toolbar is not raised at
+   * all. Shadow rather than a border, since what is under a floating control is
+   * the page and a line drawn on the page is not the same as being above it.
+   */
+  @property({ reflect: true, type: Boolean })
+  raised = false
+
+  /**
    * The outline it is cut to, which is an axis of its own and not a value on one.
    *
    * `emphasis` says how filled it is and `tone` says what it means; neither of
@@ -52,17 +63,6 @@ export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton
    */
   @property({ reflect: true })
   shape?: 'circle'
-
-  /**
-   * Whether it is raised off the page it sits on.
-   *
-   * Separate from `shape`, because they are separate facts: a docked control is
-   * raised whatever its outline, and a circle inside a toolbar is not raised at
-   * all. Shadow rather than a border, since what is under a floating control is
-   * the page and a line drawn on the page is not the same as being above it.
-   */
-  @property({ reflect: true, type: Boolean })
-  raised = false
 
   static override styles: CSSResultGroup = styles
 }

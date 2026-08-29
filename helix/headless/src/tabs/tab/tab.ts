@@ -27,10 +27,10 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-tab')
 export class HelixHeadlessTab extends HelixElement {
   /**
-   * Identifies the tab, and pairs it with the panel of the same value.
+   * Whether the tab can be chosen.
    */
-  @property()
-  value = ''
+  @property({ reflect: true, type: Boolean })
+  disabled = false
 
   /**
    * Whether this tab is the current one.
@@ -39,10 +39,10 @@ export class HelixHeadlessTab extends HelixElement {
   selected = false
 
   /**
-   * Whether the tab can be chosen.
+   * Identifies the tab, and pairs it with the panel of the same value.
    */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
+  @property()
+  value = ''
 
   /** Moves focus to this tab, for the list's arrow keys. */
   focusItem(): void {

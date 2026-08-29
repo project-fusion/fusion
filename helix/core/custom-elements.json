@@ -5094,6 +5094,16 @@
           "members": [
             {
               "kind": "field",
+              "name": "emptyText",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "attribute": "empty-text"
+            },
+            {
+              "kind": "field",
               "name": "loading",
               "type": {
                 "text": "boolean"
@@ -5112,16 +5122,6 @@
               "default": "'Loading'",
               "description": "What is said while they are on their way.",
               "attribute": "loading-text"
-            },
-            {
-              "kind": "field",
-              "name": "emptyText",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Nothing to show'",
-              "description": "What is said where there are none, and none are coming.",
-              "attribute": "empty-text"
             },
             {
               "kind": "field",
@@ -5193,6 +5193,15 @@
           ],
           "attributes": [
             {
+              "name": "empty-text",
+              "type": {
+                "text": "string"
+              },
+              "default": "'Nothing to show'",
+              "description": "What is said where there are none, and none are coming.",
+              "fieldName": "emptyText"
+            },
+            {
               "name": "loading",
               "type": {
                 "text": "boolean"
@@ -5209,15 +5218,6 @@
               "default": "'Loading'",
               "description": "What is said while they are on their way.",
               "fieldName": "loadingText"
-            },
-            {
-              "name": "empty-text",
-              "type": {
-                "text": "string"
-              },
-              "default": "'Nothing to show'",
-              "description": "What is said where there are none, and none are coming.",
-              "fieldName": "emptyText"
             }
           ],
           "parameters": [
@@ -6420,16 +6420,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "hint",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help under the control, shown while there is nothing wrong.",
-              "attribute": "hint"
-            },
-            {
-              "kind": "field",
               "name": "feedback",
               "type": {
                 "text": "string"
@@ -6437,6 +6427,16 @@
               "default": "''",
               "description": "What is wrong, in the reader's words rather than the browser's.",
               "attribute": "feedback"
+            },
+            {
+              "kind": "field",
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "attribute": "hint"
             },
             {
               "kind": "field",
@@ -6589,15 +6589,6 @@
           ],
           "attributes": [
             {
-              "name": "hint",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "description": "Help under the control, shown while there is nothing wrong.",
-              "fieldName": "hint"
-            },
-            {
               "name": "feedback",
               "type": {
                 "text": "string"
@@ -6605,6 +6596,15 @@
               "default": "''",
               "description": "What is wrong, in the reader's words rather than the browser's.",
               "fieldName": "feedback"
+            },
+            {
+              "name": "hint",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "description": "Help under the control, shown while there is nothing wrong.",
+              "fieldName": "hint"
             },
             {
               "name": "label",

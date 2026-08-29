@@ -123,26 +123,16 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   autocomplete = ''
 
   /**
-   * Smallest value the reader may reach.
-   *
-   * Absent has no floor.
+   * Accessible name for the control that steps down.
    */
-  @property({ type: Number })
-  min?: number
+  @property({ attribute: 'decrement-label' })
+  decrementLabel = 'Decrease'
 
   /**
-   * Largest value the reader may reach.
-   *
-   * Absent has no ceiling.
+   * Accessible name for the control that steps up.
    */
-  @property({ type: Number })
-  max?: number
-
-  /**
-   * How far one step moves.
-   */
-  @property({ type: Number })
-  step = 1
+  @property({ attribute: 'increment-label' })
+  incrementLabel = 'Increase'
 
   /**
    * How far `PageUp` and `PageDown` move.
@@ -153,6 +143,22 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    */
   @property({ attribute: 'large-step', type: Number })
   largeStep?: number
+
+  /**
+   * Largest value the reader may reach.
+   *
+   * Absent has no ceiling.
+   */
+  @property({ type: Number })
+  max?: number
+
+  /**
+   * Smallest value the reader may reach.
+   *
+   * Absent has no floor.
+   */
+  @property({ type: Number })
+  min?: number
 
   /**
    * Shown while the field is empty.
@@ -182,16 +188,10 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   scrub = false
 
   /**
-   * Accessible name for the control that steps down.
+   * How far one step moves.
    */
-  @property({ attribute: 'decrement-label' })
-  decrementLabel = 'Decrease'
-
-  /**
-   * Accessible name for the control that steps up.
-   */
-  @property({ attribute: 'increment-label' })
-  incrementLabel = 'Increase'
+  @property({ type: Number })
+  step = 1
 
   /** Focus is delegated to the field, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {

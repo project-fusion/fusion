@@ -50,30 +50,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-chat-composer')
 export class HelixHeadlessChatComposer extends HelixElement {
   /**
-   * What the reader has written.
-   *
-   * Read it, or set it to seed a draft.
-   */
-  @property()
-  value = ''
-
-  /**
-   * Shown in an empty field.
-   */
-  @property()
-  placeholder = ''
-
-  /**
-   * What sends: pressing Enter, or only the control.
-   *
-   * `enter` is the messaging convention and makes Shift+Enter the line break.
-   * `button` is what a composer holding several paragraphs wants, where Enter
-   * has to mean a new line and nothing else.
-   */
-  @property({ attribute: 'submit-on' })
-  submitOn: 'button' | 'enter' = 'enter'
-
-  /**
    * Whether the composer refuses input, while a turn is in flight say.
    */
   @property({ reflect: true, type: Boolean })
@@ -86,10 +62,10 @@ export class HelixHeadlessChatComposer extends HelixElement {
   label = 'Message'
 
   /**
-   * Label for the control that sends.
+   * Shown in an empty field.
    */
-  @property({ attribute: 'send-label' })
-  sendLabel = 'Send'
+  @property()
+  placeholder = ''
 
   /**
    * How many rows the field opens at.
@@ -98,6 +74,30 @@ export class HelixHeadlessChatComposer extends HelixElement {
    */
   @property({ type: Number })
   rows = 1
+
+  /**
+   * Label for the control that sends.
+   */
+  @property({ attribute: 'send-label' })
+  sendLabel = 'Send'
+
+  /**
+   * What sends: pressing Enter, or only the control.
+   *
+   * `enter` is the messaging convention and makes Shift+Enter the line break.
+   * `button` is what a composer holding several paragraphs wants, where Enter
+   * has to mean a new line and nothing else.
+   */
+  @property({ attribute: 'submit-on' })
+  submitOn: 'button' | 'enter' = 'enter'
+
+  /**
+   * What the reader has written.
+   *
+   * Read it, or set it to seed a draft.
+   */
+  @property()
+  value = ''
 
   @state()
   private draft = ''

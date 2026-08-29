@@ -27,10 +27,10 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends HelixElement {
   /**
-   * Identifies the item to the group.
+   * Whether the item can be chosen.
    */
-  @property()
-  value = ''
+  @property({ reflect: true, type: Boolean })
+  disabled = false
 
   /**
    * Whether the markup declared this one chosen, which is what a reset returns to.
@@ -58,16 +58,22 @@ export class HelixHeadlessToggle extends HelixElement {
   private seeded = this.hasAttribute('selected')
 
   /**
+   * Whether this item holds the group's tab stop while nothing is chosen.
+   *
+   * The stop normally rides on the selection, and an unanswered group has no
+   * selection, so without this the keyboard cannot reach it. Written by the
+   * group, with no attribute: it is coordination between elements, and
+   * `tabindex` on a host the consumer rendered is the change a React consumer's
+   * hydration reports and does not patch up.
+   */
+  @property({ attribute: false })
+  focusable = false
+
+  /**
    * Whether this item is the current one.
    */
   @property({ type: Boolean })
   selected = false
-
-  /**
-   * Whether the item can be chosen.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
 
   /**
    * Moves focus to this item's own control.
@@ -89,16 +95,10 @@ export class HelixHeadlessToggle extends HelixElement {
   }
 
   /**
-   * Whether this item holds the group's tab stop while nothing is chosen.
-   *
-   * The stop normally rides on the selection, and an unanswered group has no
-   * selection, so without this the keyboard cannot reach it. Written by the
-   * group, with no attribute: it is coordination between elements, and
-   * `tabindex` on a host the consumer rendered is the change a React consumer's
-   * hydration reports and does not patch up.
+   * Identifies the item to the group.
    */
-  @property({ attribute: false })
-  focusable = false
+  @property()
+  value = ''
 
   /**
    * Mirrors the chosen state where a stylesheet can select on it.

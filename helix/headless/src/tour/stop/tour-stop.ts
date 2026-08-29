@@ -68,16 +68,10 @@ import '../../button/index.js'
 @customElement('helix-headless-tour-stop')
 export class HelixHeadlessTourStop extends HelixElement {
   /**
-   * The id of the element this stop is about.
+   * Label for the control that goes back.
    */
-  @property()
-  for = ''
-
-  /**
-   * Which side of the target the panel prefers.
-   */
-  @property()
-  placement: Placement = 'bottom'
+  @property({ attribute: 'back-label' })
+  backLabel = 'Back'
 
   /**
    * Whether this is the stop the reader is on.
@@ -92,10 +86,10 @@ export class HelixHeadlessTourStop extends HelixElement {
   current = false
 
   /**
-   * Whether this is the last stop, so the control says Done.
+   * Label for the control that goes on from the last stop.
    */
-  @property({ reflect: true, type: Boolean })
-  last = false
+  @property({ attribute: 'done-label' })
+  doneLabel = 'Done'
 
   /**
    * Whether this is the first stop, so there is nowhere back to.
@@ -104,10 +98,16 @@ export class HelixHeadlessTourStop extends HelixElement {
   first = false
 
   /**
-   * Label for the control that goes back.
+   * The id of the element this stop is about.
    */
-  @property({ attribute: 'back-label' })
-  backLabel = 'Back'
+  @property()
+  for = ''
+
+  /**
+   * Whether this is the last stop, so the control says Done.
+   */
+  @property({ reflect: true, type: Boolean })
+  last = false
 
   /**
    * Label for the control that goes on.
@@ -116,10 +116,10 @@ export class HelixHeadlessTourStop extends HelixElement {
   nextLabel = 'Next'
 
   /**
-   * Label for the control that goes on from the last stop.
+   * Which side of the target the panel prefers.
    */
-  @property({ attribute: 'done-label' })
-  doneLabel = 'Done'
+  @property()
+  placement: Placement = 'bottom'
 
   /**
    * Label for the control that leaves the tour.

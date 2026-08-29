@@ -110,6 +110,41 @@ import { fits, numbers, toneOf, words } from './buckets.js'
 @customElement('helix-headless-heatmap')
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /**
+   * Shown when the table has no readings in it.
+   */
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No readings'
+
+  /**
+   * Space between cells, in CSS pixels, for the same reason `min-cell` is a
+   * number.
+   */
+  @property({ type: Number })
+  gap = 2
+
+  /**
+   * The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
+   *
+   * **Set this only to overrule what the strip actually draws.** The arithmetic
+   * needs a width in pixels and the width is a length the stylesheet resolves,
+   * so a number written here that disagrees with the sheet is a promise the
+   * consumer has to keep by hand, and the one number a summary is told to trust
+   * is the one it gets wrong.
+   *
+   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
+   * enough on their own and these two are the estimate used until the first
+   * measurement lands. Writing the attribute pins the value and stops the
+   * measurement being consulted, which is what a container query or a transition
+   * on the cell size wants, where what is drawn this frame is not what the
+   * arithmetic should plan around.
+   *
+   * Zero turns the dropping off altogether, which is right for a strip in a
+   * container that cannot get narrow.
+   */
+  @property({ attribute: 'min-cell', type: Number })
+  minCell = 8
+
+  /**
    * How many rows the strip has.
    *
    * `1` is a status strip and `7` is a calendar week, which are the two readings
@@ -145,41 +180,6 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   @property()
   tones = ''
-
-  /**
-   * The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
-   *
-   * **Set this only to overrule what the strip actually draws.** The arithmetic
-   * needs a width in pixels and the width is a length the stylesheet resolves,
-   * so a number written here that disagrees with the sheet is a promise the
-   * consumer has to keep by hand, and the one number a summary is told to trust
-   * is the one it gets wrong.
-   *
-   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
-   * enough on their own and these two are the estimate used until the first
-   * measurement lands. Writing the attribute pins the value and stops the
-   * measurement being consulted, which is what a container query or a transition
-   * on the cell size wants, where what is drawn this frame is not what the
-   * arithmetic should plan around.
-   *
-   * Zero turns the dropping off altogether, which is right for a strip in a
-   * container that cannot get narrow.
-   */
-  @property({ attribute: 'min-cell', type: Number })
-  minCell = 8
-
-  /**
-   * Space between cells, in CSS pixels, for the same reason `min-cell` is a
-   * number.
-   */
-  @property({ type: Number })
-  gap = 2
-
-  /**
-   * Shown when the table has no readings in it.
-   */
-  @property({ attribute: 'empty-text' })
-  emptyText = 'No readings'
 
   /**
    * How many cells are actually drawn.

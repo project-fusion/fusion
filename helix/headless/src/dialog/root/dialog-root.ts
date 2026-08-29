@@ -67,10 +67,36 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   /**
+   * Which close requests the browser answers on its own.
+   *
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
+   */
+  @property({ attribute: 'closedby', reflect: true })
+  closedBy?: 'any' | 'closerequest' | 'none'
+
+  /**
    * Accessible name for the dialog.
    */
   @property()
   label = ''
+
+  /* Opened and closed from anywhere on the page, without a line of script:
+     `<helix-button commandfor="…" command="--show">`. See `CommandController`
+     for why this is the platform's invoker rather than a `data-` recipe. */
+  protected readonly commands = new CommandController(this, {
+    commands: {
+      '--close': () => this.close(),
+      '--show': () => this.show(),
+      '--toggle': () => this.toggleOpen(),
+    },
+  })
 
   /**
    * Whether Escape or a press on the backdrop can close it.
@@ -85,32 +111,6 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    */
   @property({ reflect: true, type: Boolean })
   persistent = false
-
-  /* Opened and closed from anywhere on the page, without a line of script:
-     `<helix-button commandfor="…" command="--show">`. See `CommandController`
-     for why this is the platform's invoker rather than a `data-` recipe. */
-  protected readonly commands = new CommandController(this, {
-    commands: {
-      '--close': () => this.close(),
-      '--show': () => this.show(),
-      '--toggle': () => this.toggleOpen(),
-    },
-  })
-
-  /**
-   * Which close requests the browser answers on its own.
-   *
-   * `<dialog closedby>`, forwarded, and safe to forward because every path it
-   * opens still comes back through this element: a close request fires `cancel`
-   * first, `handleCancel` prevents it, and `requestOpen` decides. So
-   * `closedby="any"` gains light dismiss without giving up the refusal, which is
-   * the property this component exists to keep.
-   *
-   * Absent by default, which is the platform's `auto` and this library's rule
-   * that a resting value is an attribute's absence.
-   */
-  @property({ attribute: 'closedby', reflect: true })
-  closedBy?: 'any' | 'closerequest' | 'none'
 
   /**
    * What the dialog closed with, the way `<dialog>` reports it.

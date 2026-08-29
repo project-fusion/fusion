@@ -133,10 +133,16 @@ const pathFor = (
 @customElement('helix-headless-qr-code')
 export class HelixHeadlessQrCode extends HelixElement {
   /**
-   * What the code encodes, which is usually a URL.
+   * How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
    */
-  @property()
-  value = ''
+  @property({ attribute: 'correction' })
+  correction?: QrCorrection
 
   /**
    * What the image is called.
@@ -164,16 +170,10 @@ export class HelixHeadlessQrCode extends HelixElement {
   shape: QrStyle = 'square'
 
   /**
-   * How much of the code can be lost and still read.
-   *
-   * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the center,
-   * chosen automatically when the slot is filled: it is the level that makes
-   * covering safe, and a consumer who fills the slot has said what they want
-   * without having to know that.
+   * What the code encodes, which is usually a URL.
    */
-  @property({ attribute: 'correction' })
-  correction?: QrCorrection
+  @property()
+  value = ''
 
   /** Whether anything is slotted into the middle. */
   private logo = false

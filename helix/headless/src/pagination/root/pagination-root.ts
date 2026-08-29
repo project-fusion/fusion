@@ -159,40 +159,30 @@ const fill = (
 @customElement('helix-headless-pagination')
 export class HelixHeadlessPagination extends HelixElement {
   /**
-   * How many pages there are in total.
-   *
-   * Clamped to at least one wherever it is read, so a result that has not
-   * loaded yet renders a single page rather than an empty control that then
-   * appears and pushes the layout down.
-   *
-   * Left unset where `total` and `page-size` are both given, since the two of
-   * them already say it. A fallback rather than an override: writing this wins,
-   * so there is never a question of which of two sources is current.
+   * How many pages to show at each end, whatever the current one is.
    */
   @property({ type: Number })
-  pages = 0
+  boundaries = 1
 
   /**
-   * How many items there are across every page.
+   * Where the numbers are replaced by a reading of the two.
    *
-   * What `pages` falls back to together with `page-size`. Unset is the common
-   * case, where a consumer knows the page total and not the item total.
+   * A different structure rather than a different look, which is why it is
+   * here: the run of pages is gone and a single status line stands in its
+   * place. This is the shape a narrow screen wants, and the only shape possible
+   * where the total is large enough that no window over it is useful.
    *
-   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
-   * to a reader, and takes its own.
+   * Not reflected, for the reason `ends` is not: it decides what renders, so
+   * nothing has to select on it.
    */
-  @property({ type: Number })
-  total = 0
+  @property({ type: Boolean })
+  compact = false
 
   /**
-   * How many items are on a page.
-   *
-   * Only arithmetic: this does not slice anything, because the component never
-   * sees the items. It is what turns `total` into a page count, and nothing
-   * else.
+   * Page to open on, where nothing declared one.
    */
-  @property({ attribute: 'page-size', type: Number })
-  pageSize = 0
+  @property({ attribute: 'default-page', type: Number })
+  defaultPage = 1
 
   /**
    * Whether to offer a jump to the first and last pages.
@@ -240,22 +230,16 @@ export class HelixHeadlessPagination extends HelixElement {
   }
 
   /**
-   * Page to open on, where nothing declared one.
+   * Accessible name for the control that jumps to the first page.
    */
-  @property({ attribute: 'default-page', type: Number })
-  defaultPage = 1
+  @property({ attribute: 'first-label' })
+  firstLabel = 'First page'
 
   /**
-   * How many pages to show either side of the current one.
+   * Accessible name for a gap, with `{page}` filled in as where it goes.
    */
-  @property({ type: Number })
-  siblings = 1
-
-  /**
-   * How many pages to show at each end, whatever the current one is.
-   */
-  @property({ type: Number })
-  boundaries = 1
+  @property({ attribute: 'gap-label' })
+  gapLabel = 'Skip to page {page}'
 
   /**
    * Address for a page, with `{page}` standing in for its number.
@@ -268,24 +252,16 @@ export class HelixHeadlessPagination extends HelixElement {
   href = ''
 
   /**
-   * Where the numbers are replaced by a reading of the two.
-   *
-   * A different structure rather than a different look, which is why it is
-   * here: the run of pages is gone and a single status line stands in its
-   * place. This is the shape a narrow screen wants, and the only shape possible
-   * where the total is large enough that no window over it is useful.
-   *
-   * Not reflected, for the reason `ends` is not: it decides what renders, so
-   * nothing has to select on it.
-   */
-  @property({ type: Boolean })
-  compact = false
-
-  /**
    * Accessible name for the navigation landmark.
    */
   @property()
   label = 'Pagination'
+
+  /**
+   * Accessible name for the control that jumps to the last page.
+   */
+  @property({ attribute: 'last-label' })
+  lastLabel = 'Last page'
 
   /**
    * Locale for the page numbers. Absent uses the runtime's own.
@@ -304,10 +280,52 @@ export class HelixHeadlessPagination extends HelixElement {
   locale = ''
 
   /**
+   * Accessible name for the control that moves forward.
+   */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next page'
+
+  /**
    * Accessible name for one page, with `{page}` and `{pages}` filled in.
    */
   @property({ attribute: 'page-label' })
   pageLabel = 'Page {page}'
+
+  /**
+   * How many pages there are in total.
+   *
+   * Clamped to at least one wherever it is read, so a result that has not
+   * loaded yet renders a single page rather than an empty control that then
+   * appears and pushes the layout down.
+   *
+   * Left unset where `total` and `page-size` are both given, since the two of
+   * them already say it. A fallback rather than an override: writing this wins,
+   * so there is never a question of which of two sources is current.
+   */
+  @property({ type: Number })
+  pages = 0
+
+  /**
+   * How many items are on a page.
+   *
+   * Only arithmetic: this does not slice anything, because the component never
+   * sees the items. It is what turns `total` into a page count, and nothing
+   * else.
+   */
+  @property({ attribute: 'page-size', type: Number })
+  pageSize = 0
+
+  /**
+   * Accessible name for the control that moves back.
+   */
+  @property({ attribute: 'previous-label' })
+  previousLabel = 'Previous page'
+
+  /**
+   * How many pages to show either side of the current one.
+   */
+  @property({ type: Number })
+  siblings = 1
 
   /**
    * The reading shown in `compact`, with `{page}` and `{pages}` filled in.
@@ -321,34 +339,16 @@ export class HelixHeadlessPagination extends HelixElement {
   statusLabel = '{page} of {pages}'
 
   /**
-   * Accessible name for the control that moves back.
+   * How many items there are across every page.
+   *
+   * What `pages` falls back to together with `page-size`. Unset is the common
+   * case, where a consumer knows the page total and not the item total.
+   *
+   * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
+   * to a reader, and takes its own.
    */
-  @property({ attribute: 'previous-label' })
-  previousLabel = 'Previous page'
-
-  /**
-   * Accessible name for the control that moves forward.
-   */
-  @property({ attribute: 'next-label' })
-  nextLabel = 'Next page'
-
-  /**
-   * Accessible name for the control that jumps to the first page.
-   */
-  @property({ attribute: 'first-label' })
-  firstLabel = 'First page'
-
-  /**
-   * Accessible name for the control that jumps to the last page.
-   */
-  @property({ attribute: 'last-label' })
-  lastLabel = 'Last page'
-
-  /**
-   * Accessible name for a gap, with `{page}` filled in as where it goes.
-   */
-  @property({ attribute: 'gap-label' })
-  gapLabel = 'Skip to page {page}'
+  @property({ type: Number })
+  total = 0
 
   /**
    * What the live region says, and nothing until the page has moved once.

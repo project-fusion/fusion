@@ -59,17 +59,13 @@ const CONFIRM = 1600
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   /**
-   * What goes on the clipboard.
+   * What it is called, and says, after one.
    *
-   * **Narrows `Button.value`, which is the submit value, and the two agree.**
-   * A copy button is `type="button"` and never submits, so the inherited
-   * meaning has nothing to act on; where a consumer changes the type, what it
-   * submits is what it copies, which is the reading anybody would expect of one
-   * property called `value`. Declared here rather than inherited because the
-   * clipboard is what this component is about and its own page should say so.
+   * `attribute` written out, because Lit lowercases a property name rather than
+   * dash-casing it, and `copiedlabel` is not what anyone would type.
    */
-  @property()
-  override value = ''
+  @property({ attribute: 'copied-label' })
+  copiedLabel = 'Copied'
 
   /**
    * What it is called, and says, before a press.
@@ -82,13 +78,17 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   override label = 'Copy'
 
   /**
-   * What it is called, and says, after one.
+   * What goes on the clipboard.
    *
-   * `attribute` written out, because Lit lowercases a property name rather than
-   * dash-casing it, and `copiedlabel` is not what anyone would type.
+   * **Narrows `Button.value`, which is the submit value, and the two agree.**
+   * A copy button is `type="button"` and never submits, so the inherited
+   * meaning has nothing to act on; where a consumer changes the type, what it
+   * submits is what it copies, which is the reading anybody would expect of one
+   * property called `value`. Declared here rather than inherited because the
+   * clipboard is what this component is about and its own page should say so.
    */
-  @property({ attribute: 'copied-label' })
-  copiedLabel = 'Copied'
+  @property()
+  override value = ''
 
   /**
    * The words for the state it is in, used twice on purpose.

@@ -56,16 +56,14 @@ export type HelixSandboxEditorHelixCaretElementEvent =
   HelixSandboxEditorElementEvent<HelixCaretEvent>;
 
 export type HelixSandboxEditorVueProps = {
-  /** The source being edited. */
-  value?: HelixSandboxEditor["value"];
-  /** Which source this pane holds, echoed in every change. */
-  name?: HelixSandboxEditor["name"];
-  /** How to highlight it. */
-  language?: HelixSandboxEditor["language"];
   /** Accessible name for the editable region. */
   "field-label"?: HelixSandboxEditor["fieldLabel"];
   /** Accessible name for the editable region. */
   fieldLabel?: HelixSandboxEditor["fieldLabel"];
+  /** How to highlight it. */
+  language?: HelixSandboxEditor["language"];
+  /** Which source this pane holds, echoed in every change. */
+  name?: HelixSandboxEditor["name"];
   /** Whether the text can be changed.
 
 `EditorState.readOnly` rather than removing the editor's focus or its
@@ -78,6 +76,8 @@ cursor in it to read a long line. What it stops is the typing. */
 keymap: a reader still needs to select the text, scroll it, and put a
 cursor in it to read a long line. What it stops is the typing. */
   readOnly?: HelixSandboxEditor["readOnly"];
+  /** The source being edited. */
+  value?: HelixSandboxEditor["value"];
 };
 
 export type HelixSandboxEditorVueEvents = {
@@ -92,12 +92,12 @@ export type HelixSandboxSpecsVueProps = {
 
 Changing it runs them. */
   family?: HelixSandboxSpecs["family"];
+  /** Accessible name for the results. */
+  label?: HelixSandboxSpecs["label"];
   /** The document that runs them.
 
 Same origin, and it must stay that way. */
   src?: HelixSandboxSpecs["src"];
-  /** Accessible name for the results. */
-  label?: HelixSandboxSpecs["label"];
 };
 
 export type HelixSandboxSpecsVueEvents = {};

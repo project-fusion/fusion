@@ -30,12 +30,6 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-divider')
 export class HelixHeadlessDivider extends HelixElement {
   /**
-   * Which way the rule runs.
-   */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
-
-  /**
    * Whether the rule is announced as a separator.
    *
    * Off by default, and out of the accessibility tree. Most rules on a page
@@ -51,6 +45,12 @@ export class HelixHeadlessDivider extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   announced = false
+
+  /**
+   * Which way the rule runs.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * Marks the middle region when nothing has been set into it.

@@ -127,18 +127,18 @@ export class HelixHeadlessNotification extends HelixElement {
   dismissible = false
 
   /**
+   * Accessible name for the dismiss control.
+   */
+  @property({ attribute: 'dismiss-label' })
+  dismissLabel = 'Dismiss'
+
+  /**
    * Locale for the timestamp.
    *
    * Empty is the runtime's own.
    */
   @property()
   locale = ''
-
-  /**
-   * Accessible name for the dismiss control.
-   */
-  @property({ attribute: 'dismiss-label' })
-  dismissLabel = 'Dismiss'
 
   /**
    * @internal Read by the list to identify its children across the light DOM,

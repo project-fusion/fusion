@@ -79,18 +79,18 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   href?: string
 
   /**
-   * Where the link opens, for the rare crumb that leaves the site.
-   */
-  @property()
-  target = ''
-
-  /**
    * What the link declares about where it goes.
    *
    * The consumer's decision.
    */
   @property()
   rel = ''
+
+  /**
+   * Where the link opens, for the rare crumb that leaves the site.
+   */
+  @property()
+  target = ''
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
