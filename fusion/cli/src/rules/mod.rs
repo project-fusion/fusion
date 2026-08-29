@@ -11,7 +11,9 @@ pub mod floors;
 pub mod modules;
 pub mod order;
 pub mod prerequisites;
+pub mod scoped;
 pub mod scripts;
+pub mod shaders;
 
 use std::path::PathBuf;
 
@@ -102,9 +104,23 @@ pub fn all() -> Vec<Rule> {
         Rule {
             fix: None,
             meta: false,
+            name: "scoped",
+            run: scoped::run,
+            summary: "no class a CSS module owns is still written as a bare string",
+        },
+        Rule {
+            fix: None,
+            meta: false,
             name: "scripts",
             run: scripts::run,
             summary: "every `bun run` in a manifest names a script that manifest declares",
+        },
+        Rule {
+            fix: None,
+            meta: false,
+            name: "shaders",
+            run: shaders::run,
+            summary: "GLSL written inside a template literal is still GLSL",
         },
     ]
 }
