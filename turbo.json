@@ -97,10 +97,40 @@
         "public/helix/docs/**"
       ]
     },
+
+    "content": {
+      "inputs": [
+        "insights/content/**",
+        "insights/src/pages.generated.ts",
+        "$TURBO_ROOT$/fusion/docs/scripts/build-content.mjs"
+      ],
+      "outputs": ["insights/src/sources.generated.ts"]
+    },
+
     "dev": {
       "cache": false,
       "persistent": true
     },
+
+    "docs": {
+      "inputs": [
+        "content/**",
+        "src/sections.ts",
+        "$TURBO_ROOT$/helix/styles/tokens.json",
+        "$TURBO_ROOT$/helix/styles/src/primitives.css",
+        "$TURBO_ROOT$/helix/docs/scripts/build-docs.mjs"
+      ],
+      "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
+    },
+
+    // **Four that cannot cache, each for its own reason, said rather than
+    // discovered.** `faces` fetches a font list over the network, so a cache hit
+    // would pin whatever Google answered the first time. `peers` installs four
+    // component libraries into a scratch directory and weighs them. `timings`
+    // measures `performance.now()`, which is not a function of its inputs.
+    // `wasm-check` derives seventeen themes through the tracked binary, which is
+    // the artifact it exists to distrust.
+    "faces": { "cache": false },
     "frame": {
       "dependsOn": ["^build"],
       "inputs": [
@@ -117,6 +147,31 @@
       "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/helix/icons/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts"]
     },
+    "peers": { "cache": false },
+
+    // Reads the manifest, so it waits for whoever writes one.
+    "reference": {
+      "dependsOn": ["^analyze"],
+      "inputs": [
+        "$TURBO_ROOT$/helix/styled/custom-elements.json",
+        "$TURBO_ROOT$/helix/docs/src/reference.ts",
+        "$TURBO_ROOT$/fusion/docs/scripts/build-reference.mjs"
+      ],
+      "outputs": ["references/component-reference.md"]
+    },
+    "routes": { "cache": false },
+    "samples": { "cache": false },
+
+    "specs": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_ROOT$/helix/headless/src/**/*.dom.spec.ts",
+        "$TURBO_ROOT$/helix/styled/src/**/*.dom.spec.ts",
+        "$TURBO_ROOT$/helix/testing/src/browser.ts",
+        "$TURBO_ROOT$/fusion/site/scripts/build-specs.mjs"
+      ],
+      "outputs": ["public/specs/**"]
+    },
     // Two generators, two outputs. `build-styles.mjs` writes the `.css.ts`
     // mirrors and `build-elements-css.mjs` writes `elements.css` at the package
     // root, and only the first was declared. Measured: delete `elements.css`
@@ -132,16 +187,64 @@
       ],
       "outputs": ["src/**/*.css.ts", "elements.css"]
     },
+
+    "styles-dist": {
+      "inputs": ["src/**", "$TURBO_ROOT$/helix/styles/scripts/build-styles-dist.mjs"],
+      "outputs": ["dist/**"]
+    },
     "test": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "tests/**"],
       "outputs": []
     },
+
+    // Renders React to markup, so it reads the pages it renders.
+    //
+    // **A wildcard segment where the route group is**, because a route group is
+    // written in parentheses and parentheses are alternation to a glob parser:
+    // the literal path fails to parse rather than matching nothing, which is the
+    // better of the two ways for that to go wrong.
+    "themed-page": {
+      "dependsOn": ["^build"],
+      "inputs": ["app/*/helix/theme/**", "$TURBO_ROOT$/fusion/site/scripts/build-themed-page.mjs"],
+      "outputs": ["app/*/helix/theme/themed-page-markup.generated.ts"]
+    },
+    "timings": { "cache": false },
+
+    // **The generators, one task each, and the reason is the cache rather than
+    // the spelling.** Each of these was a root alias reading `--filter <pkg>
+    // <script>`, which ran every time it was called; eight of them run in
+    // `verify`. Declared here they answer from cache when nothing they read has
+    // moved, and `turbo run <task> -- --check` passes the flag through and into
+    // the hash, so the generate and the compare are one task rather than two
+    // aliases.
+    //
+    // **An output not declared is one a cache hit does not restore**, which was
+    // invisible while these artifacts were tracked and is not any more. Every
+    // `outputs` below names everything its script writes.
+
+    // `src/tokens.ts` is the whole input: the layer is spelled there and this
+    // writes both the stylesheet block and the registry the docs read.
+    "token-layer": {
+      "inputs": ["src/tokens.ts", "$TURBO_ROOT$/helix/styles/scripts/build-token-layer.mjs"],
+      "outputs": ["src/tokens.css", "tokens.json"]
+    },
+
+    // **Three more that declare a task without caching it, which is a real
+    // answer rather than a gap.** `tokens` counts every read of every token
+    // across two whole domains, so its key changes on nearly every commit and a
+    // cache would cost a hash to miss. `routes` is the same shape one step over.
+    // `samples` writes back into the files it reads, so its own output changes
+    // the key it was stored under and the next run always misses. Declared
+    // anyway, because `turbo run` needs the declaration and because a task in
+    // the graph can be depended on.
+    "tokens": { "cache": false },
     "typecheck": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
-    }
+    },
+    "wasm-check": { "cache": false }
   },
   "ui": "stream"
 }

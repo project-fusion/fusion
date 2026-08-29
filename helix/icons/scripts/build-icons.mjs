@@ -27,13 +27,14 @@ import { optimize } from 'svgo'
  * inlined fragment, coordinates carrying more precision than a 256-unit box can
  * show.
  *
- * **Two of its defaults are wrong here and are turned off.** `removeViewBox`
- * would take the one attribute the component needs to scale by, and it is on by
- * default precisely because most callers keep the whole `<svg>` element where a
- * width and height suffice — this one keeps the inside and supplies its own box.
- * `cleanupIds` would rewrite `fusion.svg`'s gradient ids to single letters,
- * which is safe today for the reason below and would stop being safe the moment
- * two icons with minified ids met in one tree.
+ * **One of its defaults is wrong here and is turned off.** `cleanupIds` rewrites
+ * ids to single letters, which would take `fusion.svg`'s gradients with it: safe
+ * today for the reason below, and not the day two icons carrying `#a` meet in
+ * one tree. `removeViewBox` is the other one to watch and is *not* configured,
+ * because it left `preset-default` — turning it off explicitly is a warning on
+ * every run about a plugin that is not there, and the box survives without it.
+ * Asserted rather than assumed: every one of the 105 `viewBox` values is
+ * unchanged.
  *
  * `fusion.svg` defines gradients by id and is not skipped for it. Ids are
  * scoped to their *tree*, and a shadow root is a tree: `helix-icon` renders
@@ -74,12 +75,26 @@ const sourceFor = (slug) => {
     join(PHOSPHOR, 'fill', `${slug}.svg`),
     join(RAW, `${slug}.svg`),
   ]
-  for (const file of candidates) {
-    if (existsSync(file)) {
-      return readFileSync(file, 'utf8')
-    }
+
+  /* **Every match, not the first.** The list is a precedence and a precedence
+     only decides silently: a name that exists in two of the three resolves to
+     whichever sits higher, and the set builds, and the glyph on the page is not
+     the one somebody added. Nothing about it looks wrong afterwards. There is no
+     collision today — `raw/` holds product and technology marks, and Phosphor
+     draws neither — so this costs nothing until the day it is the only thing
+     that says which one was meant. */
+  const found = candidates.filter((file) => existsSync(file))
+  if (found.length > 1) {
+    throw new Error(
+      `icons: "${slug}" resolves to ${found.length} files, and the order between them is a ` +
+        `silent decision:\n  ${found.join('\n  ')}\n` +
+        'Rename one, or say in `icons.txt` which is meant.',
+    )
   }
-  throw new Error(`icons: no SVG for "${slug}" in @phosphor-icons/core or helix/icons/raw`)
+  if (found.length === 0) {
+    throw new Error(`icons: no SVG for "${slug}" in @phosphor-icons/core or helix/icons/raw`)
+  }
+  return readFileSync(found[0], 'utf8')
 }
 
 /* `removeViewBox` and `cleanupIds` off, for the reasons in the docblock. */
@@ -88,7 +103,7 @@ const SVGO = {
   plugins: [
     {
       name: 'preset-default',
-      params: { overrides: { cleanupIds: false, removeViewBox: false } },
+      params: { overrides: { cleanupIds: false } },
     },
   ],
 }
