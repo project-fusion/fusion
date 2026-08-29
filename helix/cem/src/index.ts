@@ -9,6 +9,7 @@ import { examples } from './plugins/examples.js'
 import { helixTier } from './plugins/helix-tier.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxNativeEvents } from './plugins/jsx-native-events.js'
+import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { metadata } from './plugins/metadata.js'
 import { reactEvents } from './plugins/react-events.js'
@@ -116,6 +117,11 @@ export const createHelixCemConfig = ({
           /* After everything that rewrites the JSX tag map, because it reuses
              the finished one. */
           ...(packageName ? [svelteTypes({ packageName })] : []),
+          /* Last of the generators, because it rewrites what two of them wrote.
+             `?: T` is not the same type as `?: T | undefined` under
+             `exactOptionalPropertyTypes`, and it is the one a consumer cannot
+             forward an optional prop into. */
+          jsxOptionalUndefined(),
         ]
       : []),
     ...plugins,
@@ -177,6 +183,7 @@ export {
   helixTier,
   jsxImports,
   jsxNativeEvents,
+  jsxOptionalUndefined,
   metadata,
   reactEvents,
   references,
