@@ -29,11 +29,15 @@
 
 pub mod attribute_names;
 pub mod floors;
+pub mod grounds;
+pub mod observers;
 pub mod reachable;
 pub mod reflected;
 pub mod run;
 pub mod separation;
+pub mod vocabulary;
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -56,6 +60,24 @@ pub struct Context {
 pub struct Settings {
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
+
+    /// Families that are the page's own furniture, each with why it is.
+    ///
+    /// **An allowlist without reasons becomes the place things go to stop being
+    /// questioned**, so this is a map rather than a list: a header bar and a
+    /// development shell paint the page's color because that is what they are,
+    /// and anything else claiming the exemption has to write the sentence.
+    #[serde(default)]
+    pub chrome: BTreeMap<String, String>,
+
+    /// Part names doing something the registry has no word for, each with what.
+    ///
+    /// **This names work rather than blocking on it**, and an entry nothing
+    /// renders any more is reported so it is deleted rather than kept. The
+    /// registered vocabulary ships with the rule because it is Helix's; what a
+    /// given library renders outside it is that library's own.
+    #[serde(default)]
+    pub unresolved: BTreeMap<String, String>,
 
     /// Whether to refuse a rule that counted nothing. Off unless asked for.
     ///
@@ -177,6 +199,16 @@ pub fn all() -> Vec<Rule> {
             summary: "every rule counted something",
         },
         Rule {
+            name: "grounds",
+            run: Runner::Source(grounds::run),
+            summary: "a component painting the page's color can be corrected",
+        },
+        Rule {
+            name: "observers",
+            run: Runner::Source(observers::run),
+            summary: "an observer torn down on disconnect is registered again on reconnect",
+        },
+        Rule {
             name: "reachable",
             run: Runner::Source(reachable::run),
             summary: "every attribute a stylesheet selects on the host reflects from a property",
@@ -190,6 +222,11 @@ pub fn all() -> Vec<Rule> {
             name: "separation",
             run: Runner::Source(separation::run),
             summary: "a surface hooks both its edge and its lift",
+        },
+        Rule {
+            name: "vocabulary",
+            run: Runner::Source(vocabulary::run),
+            summary: "one spelling for each role a part name can play",
         },
     ]
 }
