@@ -8,11 +8,11 @@
   "scripts": {
     "build": "bun run catalog && bun run frame && bun run specs && next build",
     "catalog": "bun scripts/build-catalog.mjs",
-    "dev": "bun run --filter @fusion.dev/helix-theme wasm && bun run catalog && bun run frame && bun run specs && next dev --port 3000",
+    "dev": "bun run --filter @fusion.dev/helix-theme wasm && bun run catalog && bun run frame && bun run specs && next dev",
     "faces": "bun scripts/build-faces.mjs",
     "frame": "bun scripts/build-frame.mjs",
     "specs": "bun scripts/build-specs.mjs",
-    "start": "next start --port 3000",
+    "start": "next start",
     "themed-page": "bun scripts/build-themed-page.mjs",
     "typecheck": "bun run catalog && bun run frame && bun run specs && tsc -p tsconfig.json --noEmit"
   },

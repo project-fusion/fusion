@@ -1,6 +1,7 @@
 {
   "configurations": [
     {
+      "autoPort": true,
       "name": "fusion",
       "port": 3000,
       "runtimeArgs": ["run", "--cwd", "fusion/site", "dev"],

@@ -21,8 +21,11 @@
 //! Keys only, never values. A script's value is a pipeline whose order is the
 //! whole meaning of it.
 
+use std::collections::HashSet;
 use std::fs;
+use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 
 use serde_json::{Map, Value};
 
@@ -133,6 +136,65 @@ fn order(manifest: &Value) -> Value {
     Value::Object(ordered)
 }
 
+/// What git ignores, out of a list of candidates.
+///
+/// **A hand-kept list of generated directories drifts from the place that
+/// actually decides**, and this rule shipped the drift: the walk skipped
+/// `.next` and Next 16 writes its dev server output to `.next-dev`, so a
+/// manifest nobody wrote and nobody commits failed the rule, but only while a
+/// dev server happened to be running. That is the worst shape for a guard —
+/// green on the machine that added the directory, red on the next person's.
+///
+/// `.gitignore` is the one file that has to be right for the repository to work
+/// at all, so it is the one to ask. One `git check-ignore` for the whole
+/// candidate list rather than one per file.
+///
+/// **The name list above stays, and is not the same thing.** It decides what to
+/// *descend into*, which is a question about cost and about safety: not walking
+/// `node_modules` is what keeps this fast, and not walking `.claude/worktrees`
+/// is what keeps it from rewriting manifests on somebody else's branch. This
+/// decides what to *judge*, which is a question about what the repository owns.
+///
+/// **A repository without git still works**, and reports every candidate: a
+/// failed command means no answer rather than an empty one, and a rule that
+/// silently judged nothing would be worse than one that judges a stray file.
+fn ignored(root: &Path, candidates: &[PathBuf]) -> HashSet<PathBuf> {
+    let mut ignored = HashSet::new();
+    if candidates.is_empty() {
+        return ignored;
+    }
+    let joined = candidates
+        .iter()
+        .map(|one| one.to_string_lossy().to_string())
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    let Ok(mut child) = Command::new("git")
+        .args(["check-ignore", "--stdin"])
+        .current_dir(root)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+    else {
+        return ignored;
+    };
+    if let Some(mut stdin) = child.stdin.take() {
+        /* The write is allowed to fail: git exits 1 when it matched nothing,
+        which closes the pipe, and that is a clean tree rather than an error. */
+        let _ = stdin.write_all(joined.as_bytes());
+    }
+    let Ok(output) = child.wait_with_output() else {
+        return ignored;
+    };
+    for line in String::from_utf8_lossy(&output.stdout).lines() {
+        if !line.is_empty() {
+            ignored.insert(PathBuf::from(line));
+        }
+    }
+    ignored
+}
+
 /// Every manifest under the root, skipping the directories that hold copies.
 fn found(root: &Path) -> Vec<PathBuf> {
     fn descend(directory: &Path, found: &mut Vec<PathBuf>) {
@@ -159,6 +221,8 @@ fn found(root: &Path) -> Vec<PathBuf> {
     }
     let mut all = Vec::new();
     descend(root, &mut all);
+    let ignored = ignored(root, &all);
+    all.retain(|one| !ignored.contains(one));
     all
 }
 
