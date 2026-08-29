@@ -230,3 +230,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* The subheading under the display line. Held off full strength the way every
+   other standfirst on the site is, and capped by the measure so it sets at a
+   readable line rather than running the width of the band. */
+.servicesHeroLede {
+  color: var(--helix-color-foreground-muted);
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+}

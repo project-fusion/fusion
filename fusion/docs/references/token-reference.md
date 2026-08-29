@@ -41,7 +41,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-well` | `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)` | `#0000000d` | `#ffffff0d` | 10 |
 | `--helix-color-overlay` | `light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )` | `#0b0b0b66` | `#0b0b0ba3` | 11 |
 | `--helix-color-foreground` | `light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))` | `#000000` | `#ffffff` | 194 |
-| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | `#636363` | `#a1a1a1` | 127 |
+| `--helix-color-foreground-muted` | `light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))` | `#636363` | `#a1a1a1` | 128 |
 | `--helix-color-foreground-subtle` | `light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))` | `#6c6c6c` | `#959595` | 90 |
 | `--helix-color-foreground-on-accent` | `var(--_helix-neutral-0)` | `#ffffff` | as light | 26 |
 | `--helix-color-surface-inverse` | `light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))` | `#121212` | `#f5f5f5` | 11 |
@@ -155,8 +155,8 @@ Font size.
 |---|---|---|
 | `--helix-text-xs` | `var(--_helix-size-12)` | 67 |
 | `--helix-text-sm` | `var(--_helix-size-13)` | 83 |
-| `--helix-text-md` | `var(--_helix-size-14)` | 31 |
-| `--helix-text-lg` | `var(--_helix-size-18)` | 23 |
+| `--helix-text-md` | `var(--_helix-size-14)` | 32 |
+| `--helix-text-lg` | `var(--_helix-size-18)` | 24 |
 | `--helix-text-xl` | `var(--_helix-size-24)` | 14 |
 | `--helix-text-2xl` | `var(--_helix-size-32)` | 9 |
 | `--helix-text-3xl` | `var(--_helix-size-44)` | 14 |

@@ -664,6 +664,23 @@
     display: none;
   }
 
+  /* **And the same in the other direction, which was missing.**
+   *
+   * The two faces share one grid cell, so the cell is as tall as the taller of
+   * them. Above this breakpoint the open state is a bar and both are one line,
+   * so nothing shows. Below it the open state is a sheet: measured at 390, the
+   * closed pill's button was 200x404 rather than 200x40, because the hidden
+   * sheet was still laying out in the cell it shares. `.fabFace` is
+   * `block-size: 100%`, so the label centered in 404px of button while the pill
+   * clipped to 40, and `Make it yours` was drawn outside its own pill. The
+   * control looked like an empty rounded rectangle on every phone.
+   *
+   * `opacity` alone cannot fix it, which is why the rule above exists at all: an
+   * invisible box still takes its space. */
+  .fab:not([data-open]) .fabTools {
+    display: none;
+  }
+
   /* Stated on the element rather than passed as `direction`, because the row is
      right on a pointer and this is the same markup. A document rule outranks the
      component's own `:host`, which is what makes one attribute serve both. */
