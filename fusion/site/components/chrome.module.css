@@ -247,6 +247,22 @@
   padding-block-start: var(--helix-space-xs);
 }
 
+/* **The glyph shrinks and the target does not.**
+ *
+ * At the full icon size these three read as loud as the wordmark above them,
+ * which is not what a set of profile links is for. `icon-tight` is the scale's
+ * own word for a step down and is what twenty-odd other reads already use, so
+ * this is a rung rather than a number invented in a footer.
+ *
+ * **`data-icon-link` keeps its box**, which is the point of doing this here
+ * rather than on the shared recipe: the recipe is also what the masthead's
+ * icons wear, and the 2rem square is a pointer target before it is a picture.
+ * Shrinking the box would take a third of the area off a link on the smallest
+ * screens, where these sit closest together. */
+.footerSocials helix-icon {
+  --icon-size: var(--helix-size-icon-tight);
+}
+
 /* **Narrow: tighten the gaps so the three groups stay one row.** Measured at
    375, `space-2xl` between them left Products and Company on the first line and
    stranded Legal alone on a second, which reads as a fourth thing rather than
