@@ -14,6 +14,7 @@
 //! rule added, and the set a caller wants is rarely the set anybody would have
 //! named.
 
+mod prose;
 mod rules;
 mod workspace;
 
@@ -53,12 +54,40 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Noun {
+    /// Hold the prose to what it describes.
+    ///
+    /// **A separate noun rather than more workspace rules**, because the subject
+    /// is different and a consumer asking one question should not pay for the
+    /// other: a workspace rule reads manifests and build output, and a prose
+    /// rule reads what people wrote. Nothing in either can answer the other's
+    /// question.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Prose {
+        #[command(subcommand)]
+        verb: Verb,
+    },
     /// Hold a workspace to what it says about itself.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Workspace {
         #[command(subcommand)]
         verb: Verb,
     },
+}
+
+impl Noun {
+    fn verb(&self) -> &Verb {
+        match self {
+            Self::Prose { verb } | Self::Workspace { verb } => verb,
+        }
+    }
+
+    /// The rules this noun holds, which is the whole of what makes it a noun.
+    fn rules(&self) -> Vec<rules::Rule> {
+        match self {
+            Self::Prose { .. } => prose::all(),
+            Self::Workspace { .. } => all(),
+        }
+    }
 }
 
 #[derive(Debug, Subcommand)]
@@ -92,10 +121,10 @@ impl Verb {
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
-    let Noun::Workspace { verb } = &cli.noun;
+    let verb = cli.noun.verb();
     let common = verb.common();
 
-    let known: Vec<&str> = all().iter().map(|rule| rule.name).collect();
+    let known: Vec<&str> = cli.noun.rules().iter().map(|rule| rule.name).collect();
     let unknown: Vec<&String> = common
         .only
         .iter()
@@ -125,7 +154,9 @@ fn main() -> ExitCode {
 
     let settings = Settings::read(&root);
     let context = Context { root, settings };
-    let selected: Vec<rules::Rule> = all()
+    let selected: Vec<rules::Rule> = cli
+        .noun
+        .rules()
         .into_iter()
         .filter(|rule| common.only.is_empty() || common.only.iter().any(|one| one == rule.name))
         .collect();

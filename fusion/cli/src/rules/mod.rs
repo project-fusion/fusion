@@ -21,6 +21,7 @@ pub mod scripts;
 pub mod shaders;
 pub mod shipped;
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -48,6 +49,26 @@ pub struct Settings {
     /// registering a custom element at module scope is a fault.
     pub hydrates: Vec<String>,
 
+    /// Paths this repository has lived at before. Add one when it moves again.
+    ///
+    /// **A list rather than an inference**, because which paths on the host are
+    /// ours cannot be inferred: a dependency's own repository is in this tree
+    /// and is nobody's mistake. A move is an event, so the name it moved from is
+    /// what catches whatever the move missed.
+    #[serde(default)]
+    pub former: Vec<String>,
+
+    /// British spellings and the American form each is written as.
+    ///
+    /// **Here rather than in the rule**, because the file it is in is the one
+    /// file whose British forms are the point of it, and a settings file the
+    /// walk already exempts costs nothing to be exempt from a sweep as well.
+    pub dialect: BTreeMap<String, String>,
+
+    /// Where the catalog's card art lives, what it draws, and what it counts.
+    #[serde(default)]
+    pub gallery: Gallery,
+
     /// The list of names an icon set actually has.
     pub icons: Option<String>,
 
@@ -57,6 +78,24 @@ pub struct Settings {
     /// Paths inside `hydrates` that are their own document, with nothing to
     /// hydrate, where registering at module scope is what an entry point is for.
     pub standalone: Vec<String>,
+}
+
+/// The three paths the gallery rule reads, which are one subject.
+///
+/// **Grouped rather than three loose keys**, because a manifest list that names
+/// a different set of packages than `families` comes from would compare two
+/// catalogs and report the difference as a fault.
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct Gallery {
+    /// The folder holding the hand-written card drawings and their stylesheet.
+    pub art: String,
+
+    /// The tier whose exporting folders the prose counts against.
+    pub families: String,
+
+    /// The manifests a family is derived from, which is how the page derives it.
+    pub manifests: Vec<String>,
 }
 
 impl Settings {
