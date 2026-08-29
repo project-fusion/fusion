@@ -28,12 +28,14 @@
 //! 80, the extra five clean.
 
 pub mod attribute_names;
+pub mod fallbacks;
 pub mod floors;
 pub mod grounds;
 pub mod observers;
 pub mod reachable;
 pub mod reflected;
 pub mod run;
+pub mod seams;
 pub mod separation;
 pub mod vocabulary;
 
@@ -61,6 +63,14 @@ pub struct Settings {
     /// Directories holding component source, relative to the root.
     pub tiers: Vec<String>,
 
+    /// The tier another one extends, if the layout has one.
+    ///
+    /// A rule about what a tier above can override has nothing to say where
+    /// there is no tier above, so this is optional and the seam rule reports
+    /// nothing without it.
+    #[serde(default)]
+    pub base: Option<String>,
+
     /// Families that are the page's own furniture, each with why it is.
     ///
     /// **An allowlist without reasons becomes the place things go to stop being
@@ -78,6 +88,18 @@ pub struct Settings {
     /// given library renders outside it is that library's own.
     #[serde(default)]
     pub unresolved: BTreeMap<String, String>,
+
+    /// Families a component may render inline, each with why no seam is owed.
+    ///
+    /// A leaf takes a name and draws it. There is no version of "render a
+    /// different one of these" that a consumer wants and their own element does
+    /// not already give them, so wrapping each use would be seams nobody opens.
+    #[serde(default)]
+    pub leaves: BTreeMap<String, String>,
+
+    /// The prefix on a custom element name, stripped to get the family's key.
+    #[serde(default, rename = "tagPrefix")]
+    pub tag_prefix: String,
 
     /// Whether to refuse a rule that counted nothing. Off unless asked for.
     ///
@@ -199,6 +221,11 @@ pub fn all() -> Vec<Rule> {
             summary: "every rule counted something",
         },
         Rule {
+            name: "fallbacks",
+            run: Runner::Source(fallbacks::run),
+            summary: "a slot's fallback markup sits behind a seam a tier can move",
+        },
+        Rule {
             name: "grounds",
             run: Runner::Source(grounds::run),
             summary: "a component painting the page's color can be corrected",
@@ -217,6 +244,11 @@ pub fn all() -> Vec<Rule> {
             name: "reflected",
             run: Runner::Source(reflected::run),
             summary: "no reflected property carries a default",
+        },
+        Rule {
+            name: "seams",
+            run: Runner::Source(seams::run),
+            summary: "a base component renders another family behind an overridable method",
         },
         Rule {
             name: "separation",
