@@ -48,6 +48,28 @@ fusion/site/public/media/sovereignty.webm
 # Generated icon set, built from raw/.
 helix/icons/src/generated.ts
 
+# **What `cem analyze` writes, which is machine-read and nothing else.** Four
+# files per tier, nine megabytes between them, and 331,308 added lines in the
+# fortnight before they were untracked. Nobody reads a manifest in a diff.
+#
+# **What committing them bought was a check, and the check survives them.**
+# `verify.yml` runs the generators and then `git diff --exit-code`, so a tracked
+# artifact that no longer matched its source failed there. Untracked, it cannot
+# fail that way because it cannot be stale: every consumer builds it. The
+# reviewable half moves to `fusion/docs/references/component-reference.md`,
+# which is derived from these, is committed, is sorted, and is 391K rather than
+# nine megabytes.
+#
+# **The cost is that `analyze` is now on the critical path of packing.** The
+# release workflows run it between `build` and the pack for that reason: `files`
+# names these, and a tarball missing a file its manifest promises is the failure
+# this trades for. `turbo.json` declares all four as outputs of `analyze`, which
+# is what makes a cache hit restore them rather than leave a gap.
+custom-elements.json
+jsx.d.ts
+svelte.d.ts
+vue.d.ts
+
 # Dev server output, kept apart from the cached `.next` build.
 .next-dev/
 
@@ -102,9 +124,11 @@ fusion/site/public/helix/docs/
 fusion/site/public/helix/*.md
 fusion/site/public/*.md
 fusion/site/public/insights/
-# **The wasm is tracked, and it is the only binary here that is.** Every other
-# generated artifact in this repository is committed and held to its generator by
-# a check: `custom-elements.json`, `tokens.css`, `jsx.d.ts`. This one was ignored
+# **The wasm is tracked, and it is the only binary here that is.** The generated
+# artifacts that stay committed are the ones somebody reads — the two reference
+# pages, the metrics table, `tokens.css` — and they are held to their generators
+# by `verify.yml` running them and then `git diff --exit-code`. This one was
+# ignored
 # instead, which put a Rust toolchain on the critical path of anything that
 # builds the site. CI could be given one. Vercel's build image cannot, and the
 # site reads `public/helix/theme.wasm` from disk at build time, so a deploy that

@@ -35,12 +35,20 @@ Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 | `bun run fix` | Fixes what it can: ordering, formatting, tokens |
 | `bun run regen` | Every generated file, in the one order that works |
 | `bun run build` | Compiles TS. Runs `styles` and `analyze` first |
-| `bun run analyze` | Regenerates custom-elements manifests |
+| `bun run analyze` | Writes the manifests and framework typings. Untracked, so a fresh clone needs it |
 | `cargo test --workspace` | Rust |
 
 **`verify` never writes.** It runs `biome ci`, not `biome check --write`. A step
 that edits your files cannot tell you whether they were correct. `fix` writes;
 `check` and `verify` judge.
+
+**A generated file is committed when somebody reads it, and not otherwise.** The
+two reference pages, the metrics table and `tokens.css` are committed, and
+`verify.yml` holds them to their generators by running those and then
+`git diff --exit-code`. What `cem analyze` writes is not: four files per tier,
+nine megabytes, and nobody reads a manifest in a diff. So a fresh clone has no
+manifests until `bun run analyze` has run, and every rule that reads one says so
+rather than reporting a clean tree it never looked at.
 
 **A name runs a leaf or everything under it, and never both.** `helix component`'s `tokens`
 is one guard, `check:css` is the twenty in that group, `check` is all 78. The

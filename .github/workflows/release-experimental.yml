@@ -120,6 +120,14 @@ jobs:
 
       - run: bun run build
 
+      # **`analyze` is on the critical path of packing, and only since the
+      # manifests stopped being tracked.** `files` names `custom-elements.json`
+      # and the three framework typings, and `build` does not produce them:
+      # turbo has `analyze` depending on `build`, not the other way round, so a
+      # build alone leaves them absent and the tarball ships without files its
+      # own manifest promises.
+      - run: bun run analyze
+
       # Against the tarballs, from outside the workspace, before anything is
       # published. A version can be deprecated but never taken back.
       - run: bun run smoke:template

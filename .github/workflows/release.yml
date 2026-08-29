@@ -200,6 +200,14 @@ jobs:
 
       - run: bun run build
 
+      # **`analyze` is on the critical path of packing, and only since the
+      # manifests stopped being tracked.** `files` names `custom-elements.json`
+      # and the three framework typings, and `build` does not produce them:
+      # turbo has `analyze` depending on `build`, not the other way round, so a
+      # build alone leaves them absent and the tarball ships without files its
+      # own manifest promises.
+      - run: bun run analyze
+
       - name: Publish to staging
         run: node fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next
 
