@@ -13,57 +13,51 @@ pub mod references;
 pub mod tag_order;
 pub mod repository;
 
-use crate::rules::Rule;
+use crate::rules::{floor, Rule, Runner};
 
 pub fn all() -> Vec<Rule> {
     vec![
+        floor(),
         Rule {
             fix: None,
-            meta: false,
             name: "art",
-            run: art::run,
+            run: Runner::Source(art::run),
             summary: "every family in the catalog has a gallery card, and the prose says how many",
         },
         Rule {
             fix: Some(dialect::fix),
-            meta: false,
             name: "dialect",
-            run: dialect::run,
+            run: Runner::Source(dialect::run),
             summary: "every word this repository writes is in American spelling",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "documented",
-            run: documented::run,
+            run: Runner::Source(documented::run),
             summary: "every API name the documentation uses is one that exists",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "orphans",
-            run: orphans::run,
+            run: Runner::Source(orphans::run),
             summary: "every doc block documents the thing under it",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "references",
-            run: references::run,
+            run: Runner::Source(references::run),
             summary: "every path and script a comment names is one that is there",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "repository",
-            run: repository::run,
+            run: Runner::Source(repository::run),
             summary: "every reference to this repository names the one place it lives",
         },
         Rule {
             fix: Some(tag_order::fix),
-            meta: false,
             name: "tag-order",
-            run: tag_order::run,
+            run: Runner::Source(tag_order::run),
             summary: "every class doc block carries its tags in one order, with every list sorted",
         },
     ]

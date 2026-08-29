@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Runs every other check and refuses a success line that counts nothing.
+ * Runs the checks no CLI floors, and refuses a success line that counts nothing.
  *
  * **A check that silently stops checking reads exactly like a check that
  * passes.** `check:prose:art` held the number words in the gallery prose against
@@ -24,6 +24,17 @@
  * `check:prose:art` would have survived this. The only real defense there is that
  * each check counts its assertions, which is a property of how each one is
  * written and not something another script can impose.
+ *
+ * **What it no longer runs is most of what it used to.** Every check that
+ * delegates to `fusion` or `helix` is floored in process by that CLI's own
+ * `floors` rule, which reads each rule's count rather than parsing an integer
+ * out of a sentence. Running those here as well would spawn the whole rule set
+ * a second time to learn what the first run already knew, which is the argument
+ * this file already makes about not running the group checks.
+ *
+ * So what is left is the generators: a `--check` that compares a committed file
+ * against a fresh derivation. Those are scripts rather than rules, they report
+ * a tally in prose, and this is the only thing reading it.
  *
  * Run with `bun run check:spec:floors` (also part of `bun run verify`).
  */
@@ -54,6 +65,11 @@ const checks = Object.keys(scripts)
      of the four already fails loudly on an empty corpus, because rendering
      nothing and comparing nothing is what they are, whereas a static check
      that walks an empty directory reports a confident zero. */
+  /* Floored in process by the CLI that runs them. A rule returns its count and
+     the `floors` rule beside it reads that count, so spawning the command here
+     to read the same number out of a sentence is the whole suite again for
+     nothing. */
+  .filter((name) => !/\b(?:fusion|helix) (?:workspace|component|prose|spec|theme)\b/.test(scripts[name]))
   .filter(
     (name) =>
       ![
@@ -80,10 +96,17 @@ for (const name of checks) {
     // The check itself failed, which is its own report to make and not this one's.
     continue
   }
+  /* **The runner's own last word is not the check's.** A script that delegates
+     with `--filter` has `@scope/name script: Exited with code 0` appended by
+     bun after the output it ran, and reading the last line then reads bun's
+     zero as the check's tally. Every one of the seven delegating checks
+     reported passing while counting nothing, which is this file's own failure
+     mode landing on this file. */
   const line = output
     .split('\n')
     .map((one) => one.trim())
     .filter(Boolean)
+    .filter((one) => !/^\S+ \S+: Exited with code \d+$/.test(one))
     .at(-1)
   if (!line) {
     continue

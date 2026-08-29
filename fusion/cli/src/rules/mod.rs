@@ -72,6 +72,9 @@ pub struct Settings {
     /// The list of names an icon set actually has.
     pub icons: Option<String>,
 
+    /// The paths the spec rules read, and what routes a suffix to a runner.
+    pub spec: Spec,
+
     /// The one npm scope every package in this repository is published under.
     pub scope: Option<String>,
 
@@ -96,6 +99,23 @@ pub struct Gallery {
 
     /// The manifests a family is derived from, which is how the page derives it.
     pub manifests: Vec<String>,
+}
+
+/// What the spec rules need to know about a workspace they do not assume.
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct Spec {
+    /// The route tree the specs document lives somewhere inside.
+    pub app: String,
+
+    /// The browser harness whose interface declares the matchers that exist.
+    pub harness: String,
+
+    /// The component that registers the library on the pages that want it.
+    pub registrar: String,
+
+    /// Each spec suffix, and the script that is supposed to run it.
+    pub runners: BTreeMap<String, String>,
 }
 
 impl Settings {
@@ -136,15 +156,55 @@ impl Report {
     }
 }
 
+/// What one rule counted, which is all a meta rule needs of it.
+pub struct Measured {
+    pub checked: usize,
+    pub name: &'static str,
+    pub unit: &'static str,
+}
+
+/// How a rule is run, which is also what says whether it is a meta rule.
+///
+/// **A runner rather than a flag beside one.** A boolean and a function pointer
+/// are two statements about the same fact, and the failure when they disagree is
+/// a meta rule handed a workspace or a source rule handed a list of counts.
+/// Naming the shape once makes that unrepresentable.
+pub enum Runner {
+    /// Reads what the source rules counted, and never the workspace.
+    Meta(fn(&[Measured]) -> Report),
+    /// Reads the workspace.
+    Source(fn(&Context) -> Report),
+}
+
 /// What a rule can do, beyond judging.
 pub struct Rule {
-    /// Runs the others, so it is never part of the set it runs.
-    pub meta: bool,
     pub name: &'static str,
     pub summary: &'static str,
     /// `None` for a rule that judges and cannot write, which is most of them.
     pub fix: Option<fn(&Context) -> Vec<String>>,
-    pub run: fn(&Context) -> Report,
+    pub run: Runner,
+}
+
+impl Rule {
+    /// Runs the others, so it is never part of the set it runs.
+    pub fn meta(&self) -> bool {
+        matches!(self.run, Runner::Meta(_))
+    }
+}
+
+/// The floor, which every noun carries and none of them declares twice.
+///
+/// **A function rather than a copy in each `all()`.** Three lists naming the
+/// same rule is three places for one of them to stop naming it, and a noun with
+/// no floor is a noun whose rules may quietly count nothing — which is the exact
+/// failure the rule exists to catch, one level up.
+pub fn floor() -> Rule {
+    Rule {
+        fix: None,
+        name: "floors",
+        run: Runner::Meta(floors::run),
+        summary: "every rule counted something",
+    }
 }
 
 /// Every rule, in the order they are listed and run.
@@ -152,100 +212,81 @@ pub fn all() -> Vec<Rule> {
     vec![
         Rule {
             fix: None,
-            meta: false,
             name: "barrels",
-            run: barrels::run,
+            run: Runner::Source(barrels::run),
             summary: "no barrel import of a package that cannot be tree-shaken",
         },
+        floor(),
         Rule {
             fix: None,
-            meta: true,
-            name: "floors",
-            run: floors::run,
-            summary: "every rule counted something",
-        },
-        Rule {
-            fix: None,
-            meta: false,
             name: "icons",
-            run: icons::run,
+            run: Runner::Source(icons::run),
             summary: "every icon named in markup is one the set actually has",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "modules",
-            run: modules::run,
+            run: Runner::Source(modules::run),
             summary: "no plain stylesheet selects a class only a CSS module declares",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "node",
-            run: node::run,
+            run: Runner::Source(node::run),
             summary: "the Node on this machine, and its types, satisfy the declared floor",
         },
         Rule {
             fix: Some(order::fix),
-            meta: false,
             name: "order",
-            run: order::run,
+            run: Runner::Source(order::run),
             summary: "every manifest has its keys in one order",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "prerequisites",
-            run: prerequisites::run,
+            run: Runner::Source(prerequisites::run),
             summary: "every typecheck builds what its build builds before compiling",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "publishable",
-            run: publishable::run,
+            run: Runner::Source(publishable::run),
             summary: "what may leave the repository, and what a package must be to do it",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "react-bridge",
-            run: react_bridge::run,
+            run: Runner::Source(react_bridge::run),
             summary: "the key the framework bridge reads still exists in the framework installed",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "registration",
-            run: registration::run,
+            run: Runner::Source(registration::run),
             summary: "an import that registers a custom element is deferred past hydration",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "scoped",
-            run: scoped::run,
+            run: Runner::Source(scoped::run),
             summary: "no class a CSS module owns is still written as a bare string",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "scripts",
-            run: scripts::run,
+            run: Runner::Source(scripts::run),
             summary: "every `bun run` in a manifest names a script that manifest declares",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "shaders",
-            run: shaders::run,
+            run: Runner::Source(shaders::run),
             summary: "GLSL written inside a template literal is still GLSL",
         },
         Rule {
             fix: None,
-            meta: false,
             name: "shipped",
-            run: shipped::run,
+            run: Runner::Source(shipped::run),
             summary: "nothing in `dist` outlives the source it was compiled from",
         },
     ]

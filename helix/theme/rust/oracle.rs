@@ -854,7 +854,7 @@ pub fn labels() -> Vec<&'static str> {
 
 /// Rebuilds the intent the oracle derived a theme from, by label.
 ///
-/// **Stated here and in `tooling/scripts/lib/theme-intents.mjs`, and it is the
+/// **Stated here and in `fusion/scripts/lib/theme-intents.mjs`, and it is the
 /// one duplication in this file**: the oracle stores what a theme *came out as*
 /// and not what went in, and a port asserted against outputs whose inputs it
 /// cannot reproduce is asserting nothing. The labels are the join.

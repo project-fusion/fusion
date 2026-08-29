@@ -28,7 +28,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const OUT = join(ROOT, 'tooling', 'eval', 'questions.json')
+const OUT = join(ROOT, 'fusion', 'scripts', 'eval', 'questions.json')
 
 /**
  * The family a declaration belongs to.
@@ -246,7 +246,7 @@ if (process.argv.includes('--check')) {
   const found = existsSync(OUT) ? readFileSync(OUT, 'utf8') : ''
   if (found !== wanted) {
     console.error(
-      'tooling/eval/questions.json is behind the artifacts it is generated from. Run `bun run gen:eval` and commit the result.',
+      'fusion/scripts/eval/questions.json is behind the artifacts it is generated from. Run `bun run gen:eval` and commit the result.',
     )
     process.exit(1)
   }

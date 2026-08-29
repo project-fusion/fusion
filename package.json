@@ -16,7 +16,7 @@
     "check:cli:workspace": "bun run fusion workspace audit",
     "check:css": "bun run check:css:contrast && bun run check:css:seeds && bun run check:css:wasm",
     "check:css:contrast": "node fusion/scripts/check-contrast.mjs",
-    "check:css:seeds": "node tooling/scripts/check-seeds.mjs",
+    "check:css:seeds": "bun run helix component check --only seeds",
     "check:css:wasm": "bun run --filter @fusion.dev/helix-theme wasm-check",
     "check:gen": "bun run check:gen:content && bun run check:gen:docs && bun run check:gen:element-events && bun run check:gen:eval && bun run check:gen:metrics && bun run check:gen:reference && bun run check:gen:routes && bun run check:gen:samples && bun run check:gen:themed-page && bun run check:gen:tokens-layer && bun run check:gen:tokens-reference",
     "check:gen:content": "bun run --filter @fusion.dev/docs content --check",
@@ -38,13 +38,13 @@
     "check:prose:references": "bun run fusion prose check --only references",
     "check:prose:repository": "bun run fusion prose check --only repository",
     "check:prose:tag-order": "bun run fusion prose check --only tag-order",
-    "check:spec": "bun run check:spec:diagnostics && bun run check:spec:floors && bun run check:spec:matchers && bun run check:spec:spec-hazards && bun run check:spec:spec-runners && bun run check:spec:specs-isolated && bun run check:spec:visual && bun run check:spec:visual-parity",
+    "check:spec": "bun run check:spec:diagnostics && bun run check:spec:floors && bun run check:spec:hazards && bun run check:spec:isolated && bun run check:spec:matchers && bun run check:spec:runners && bun run check:spec:visual && bun run check:spec:visual-parity",
     "check:spec:diagnostics": "bun fusion/scripts/check-diagnostics.mjs",
-    "check:spec:floors": "node tooling/scripts/check-floors.mjs",
-    "check:spec:matchers": "node tooling/scripts/check-matchers.mjs",
-    "check:spec:spec-hazards": "node tooling/scripts/check-spec-hazards.mjs",
-    "check:spec:spec-runners": "node tooling/scripts/check-spec-runners.mjs",
-    "check:spec:specs-isolated": "node tooling/scripts/check-specs-isolated.mjs",
+    "check:spec:floors": "node fusion/scripts/check-floors.mjs",
+    "check:spec:hazards": "bun run fusion spec check --only hazards",
+    "check:spec:isolated": "bun run fusion spec check --only isolated",
+    "check:spec:matchers": "bun run fusion spec check --only matchers",
+    "check:spec:runners": "bun run fusion spec check --only runners",
     "check:spec:visual": "node fusion/scripts/check-visual.mjs",
     "check:spec:visual-parity": "bun fusion/scripts/check-visual-parity.mjs",
     "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
@@ -94,7 +94,7 @@
     "test": "turbo run test",
     "trust": "node fusion/scripts/trust.mjs",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run check:cli && bun run check:gen:tokens-layer && bun run typecheck && bun run analyze && bun run check:prose:dialect && bun run check:prose:tag-order && bun run check:gen:docs && bun run check:gen:samples && bun run check:prose:documented && bun run check:gen:eval && bun run check:gen:content && bun run gen:catalog && bun run check:gen:routes && bun run check:gen:reference && bun run check:gen:tokens-reference && bun run check:gen:metrics && bun run check:css:seeds && bun run check:css:wasm && bun run check:prose:references && bun run check:prose:repository && bun run check:prose:orphans && bun run check:prose:art && bun run check:gen:themed-page && bun run check:gen:element-events && bun run check:spec:matchers && bun run check:spec:spec-hazards && bun run check:spec:spec-runners && bun run check:spec:specs-isolated && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
+    "verify": "biome ci . && bun run check:cli && bun run check:gen:tokens-layer && bun run typecheck && bun run analyze && bun run check:prose:dialect && bun run check:prose:tag-order && bun run check:gen:docs && bun run check:gen:samples && bun run check:prose:documented && bun run check:gen:eval && bun run check:gen:content && bun run gen:catalog && bun run check:gen:routes && bun run check:gen:reference && bun run check:gen:tokens-reference && bun run check:gen:metrics && bun run check:css:seeds && bun run check:css:wasm && bun run check:prose:references && bun run check:prose:repository && bun run check:prose:orphans && bun run check:prose:art && bun run check:gen:themed-page && bun run check:gen:element-events && bun run check:spec:matchers && bun run check:spec:hazards && bun run check:spec:runners && bun run check:spec:isolated && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
     "visual:update": "node fusion/scripts/check-visual.mjs --update",
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },
@@ -130,7 +130,6 @@
     "fusion/scripts",
     "fusion/site",
     "helix/*",
-    "helix/cli/npm",
-    "tooling/*"
+    "helix/cli/npm"
   ]
 }

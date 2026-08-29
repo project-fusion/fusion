@@ -132,26 +132,38 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing cli
 cortex/    core trace engram docs
-fusion/    docs site: what belongs to the company rather than to a product.
-           `insights` is the published writing, and two generated references
-           sit above it
-tooling/   CI and build scripts, and shrinking
+fusion/    cli docs scripts site: what belongs to the company rather than to a
+           product. `docs/insights` is the published writing, and two generated
+           references sit above it
 .local/    per-machine scratch, gitignored
 ```
 
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
-- **In `tooling/scripts`, flat is runnable and `lib/` is importable.** A hundred
-  files sit flat and every one is invoked by a script, a workflow, `turbo.json`
-  or the hook; six sit in `lib/` and nothing invokes any of them. So
-  `ls tooling/scripts` answers "what can I run" and the answer is exactly the
-  script names. A shebang is not the signal, which is worth saying because it
-  looks like one: several of the flat scripts do not carry one and are invoked
-  anyway.
+- **A check belongs to a CLI noun; a script belongs where its output belongs.**
+  Everything that judges the workspace is a rule under `fusion workspace`,
+  `fusion prose`, `fusion spec` or `helix component`, reached from the root by
+  one delegating script apiece. Everything that *writes* something lives in the
+  package that owns what it writes, declared in that package's own manifest, so
+  `helix/docs` builds the docs and `helix/styles` builds the token layer.
+
+  **What is left over is `fusion/scripts`, and it is small on purpose.** A
+  script goes there when it is genuinely cross-cutting and cannot be a rule: the
+  four that drive a browser, the two that build and run the eval corpus, and the
+  meta-check that floors the generators. Anything that could be a rule should be
+  one, because a rule returns a count that `floors` can read and a script returns
+  a sentence somebody has to parse.
+
+  **In `fusion/scripts`, flat is runnable and `lib/` is importable.** Every flat
+  file is invoked by a script, a workflow, `turbo.json` or the hook, and nothing
+  invokes anything in `lib/`, so `ls fusion/scripts` answers "what can I run" and
+  the answer is exactly the script names. A shebang is not the signal, which is
+  worth saying because it looks like one: several of the flat scripts do not
+  carry one and are invoked anyway.
 
   **Moving a module into `lib/` takes one thing beyond the import paths.**
   `workspace.mjs` and `theme-facts.mjs` derive the repository root from their own
-  directory, so a file one level deeper resolves the root to `tooling/` and every
+  directory, so a file one level deeper resolves it one level short and every
   check that reads a manifest fails at once.
 - **A folder inside a tier is a component family, except under `shared/`.**
   `helix/styled/src/shared/field` and `helix/styled/src/shared/chart` hold

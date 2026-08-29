@@ -103,7 +103,7 @@ const GLOBAL = [
   'helix/icons/',
   'helix/theme/',
   'helix/testing/',
-  'tooling/scripts/check-visual-parity.mjs',
+  'fusion/scripts/check-visual-parity.mjs',
   'fusion/site/scripts/build-frame.mjs',
 ]
 

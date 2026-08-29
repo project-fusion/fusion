@@ -6,7 +6,10 @@
     "app-header": "The bar across the top of the page, which is page chrome by definition.",
     "sandbox": "A development tool that owns its whole window, not a component put on a page."
   },
-  "documents": ["helix/styles/src", "fusion/site"],
+  "documents": [
+    "helix/styles/src",
+    "fusion/site"
+  ],
   "floors": true,
   "layer": [
     "helix/styles/src/primitives.css",
@@ -23,7 +26,12 @@
       "source": "helix/styled/src"
     }
   ],
-  "layouts": ["centered", "fullscreen", "hug", "padded"],
+  "layouts": [
+    "centered",
+    "fullscreen",
+    "hug",
+    "padded"
+  ],
   "leaves": {
     "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
   },
@@ -38,9 +46,32 @@
     "fusion/site",
     "fusion/docs"
   ],
-  "platform": "tooling/config/platform-fidelity.json",
-  "shared": ["chart"],
-  "tiers": ["helix/core/src", "helix/headless/src", "helix/sandbox/src", "helix/styled/src"],
+  "platform": "helix/cli/platform-fidelity.json",
+  "seeds": {
+    "pinned": [
+      "color-house-teal",
+      "color-primary"
+    ],
+    "planned": {
+      "accent": "#141: the engine derives an accent and emits its tokens, but the CSS ramp takes a seed rather than the solved steps, so seeding it would hand the stylesheet a second opinion on colors the engine already computed",
+      "accent-hue": "#141: same, and the relationship is the stylesheet's to apply",
+      "neutral-chroma": "#141: the engine takes the cast and derives from it directly",
+      "neutral-hue": "#141: same"
+    },
+    "sheets": [
+      "helix/styles/src/primitives.css",
+      "helix/styles/src/tokens.css"
+    ]
+  },
+  "shared": [
+    "chart"
+  ],
+  "tiers": [
+    "helix/core/src",
+    "helix/headless/src",
+    "helix/sandbox/src",
+    "helix/styled/src"
+  ],
   "unresolved": {
     "body": "Steps: a step's name and description together, which is a summary rather than a body."
   }

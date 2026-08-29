@@ -13,6 +13,7 @@
   "scripts": {
     "content": "bun scripts/build-content.mjs",
     "reference": "bun scripts/build-reference.mjs",
+    "routes": "bun scripts/check-routes.mjs",
     "tokens": "node scripts/build-tokens.mjs"
   },
   "devDependencies": {

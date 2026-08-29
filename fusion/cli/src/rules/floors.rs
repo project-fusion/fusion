@@ -25,27 +25,22 @@
 //! only defense is each rule counting its assertions, which is a property of how
 //! each is written and not something a sibling can impose.
 
-use crate::rules::{all, Context, Finding, Report};
+use crate::rules::{Finding, Measured, Report};
 
-pub fn run(context: &Context) -> Report {
-    let mut findings = Vec::new();
-    let mut checked = 0;
-    for rule in all().iter().filter(|rule| !rule.meta) {
-        checked += 1;
-        let report = (rule.run)(context);
-        if report.checked > 0 {
-            continue;
-        }
-        findings.push(Finding {
+pub fn run(measured: &[Measured]) -> Report {
+    let findings = measured
+        .iter()
+        .filter(|one| one.checked == 0)
+        .map(|one| Finding {
             detail: "The number a rule reports has to be what it tested. Zero means it looked at \
                      nothing, which reads identically to having found nothing wrong."
                 .to_owned(),
-            file: format!("rule: {}", rule.name),
-            message: format!("counted no {}", report.unit),
-        });
-    }
+            file: format!("rule: {}", one.name),
+            message: format!("counted no {}", one.unit),
+        })
+        .collect();
     Report {
-        checked,
+        checked: measured.len(),
         findings,
         unit: "rules",
     }

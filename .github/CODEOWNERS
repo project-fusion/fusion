@@ -47,4 +47,4 @@
 # The release path itself. A change here changes what is published and under
 # whose authority, so it is worth its own line even when the owner is the same.
 /.github/           @irontitan76
-/tooling/scripts/   @irontitan76
+/fusion/scripts/    @irontitan76

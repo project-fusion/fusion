@@ -555,7 +555,7 @@ that passes against code doing nothing.
 ## Visual axes are a registry, and `appearance` is refused
 
 **Five axes, fixed vocabularies, and a component takes a subset of one.** They
-are declared in `tooling/scripts/check-axes.mjs`, which is the registry:
+are declared in `helix/cli/src/component/axes.rs`, which is the registry:
 
 | Axis | Values | Families |
 |---|---|---|

@@ -93,6 +93,16 @@
   ],
   "icons": "helix/icons/icons.txt",
   "scope": "@fusion.dev/",
+  "spec": {
+    "app": "fusion/site/app",
+    "harness": "helix/testing/src/browser.ts",
+    "registrar": "fusion/site/components/helix-elements/helix-elements.tsx",
+    "runners": {
+      "dom.spec.ts": "test:dom",
+      "pure.spec.ts": "test:pure",
+      "ssr.spec.ts": "test:ssr"
+    }
+  },
   "standalone": [
     "fusion/site/preview"
   ]

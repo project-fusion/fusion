@@ -15,6 +15,7 @@
 //! named.
 
 mod prose;
+mod spec;
 mod rules;
 mod workspace;
 
@@ -66,6 +67,13 @@ enum Noun {
         #[command(subcommand)]
         verb: Verb,
     },
+    /// Hold the specs to being specs, rather than to what they test.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Spec {
+        #[command(subcommand)]
+        verb: Verb,
+    },
+
     /// Hold a workspace to what it says about itself.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Workspace {
@@ -77,7 +85,7 @@ enum Noun {
 impl Noun {
     fn verb(&self) -> &Verb {
         match self {
-            Self::Prose { verb } | Self::Workspace { verb } => verb,
+            Self::Prose { verb } | Self::Spec { verb } | Self::Workspace { verb } => verb,
         }
     }
 
@@ -85,6 +93,7 @@ impl Noun {
     fn rules(&self) -> Vec<rules::Rule> {
         match self {
             Self::Prose { .. } => prose::all(),
+            Self::Spec { .. } => spec::all(),
             Self::Workspace { .. } => all(),
         }
     }
@@ -205,6 +214,49 @@ fn fix(selected: &[rules::Rule], context: &Context, json: bool) -> ExitCode {
     ExitCode::SUCCESS
 }
 
+/// Runs the source rules once, then the meta rules over what they counted.
+///
+/// **Once, which is the point of the split.** The meta rule wants the numbers,
+/// not the workspace, and a version of it that re-ran its siblings to find them
+/// cost the whole set a second time on every audit.
+fn measure<'a>(
+    selected: &'a [rules::Rule],
+    context: &Context,
+) -> Vec<(&'a rules::Rule, rules::Report)> {
+    let (meta, source): (Vec<&rules::Rule>, Vec<&rules::Rule>) =
+        selected.iter().partition(|rule| rule.meta());
+
+    let mut reports: Vec<(&rules::Rule, rules::Report)> = source
+        .into_iter()
+        .map(|rule| {
+            let report = match rule.run {
+                rules::Runner::Source(run) => run(context),
+                rules::Runner::Meta(_) => unreachable!("partitioned above"),
+            };
+            (rule, report)
+        })
+        .collect();
+
+    let measured: Vec<rules::Measured> = reports
+        .iter()
+        .map(|(rule, report)| rules::Measured {
+            checked: report.checked,
+            name: rule.name,
+            unit: report.unit,
+        })
+        .collect();
+    for rule in meta {
+        let report = match rule.run {
+            rules::Runner::Meta(run) => run(&measured),
+            rules::Runner::Source(_) => unreachable!("partitioned above"),
+        };
+        reports.push((rule, report));
+    }
+
+    reports.sort_by_key(|(rule, _)| rule.name);
+    reports
+}
+
 fn report(
     selected: &[rules::Rule],
     context: &Context,
@@ -212,10 +264,7 @@ fn report(
     loud: bool,
     color: bool,
 ) -> ExitCode {
-    let reports: Vec<(&rules::Rule, rules::Report)> = selected
-        .iter()
-        .map(|rule| (rule, (rule.run)(context)))
-        .collect();
+    let reports = measure(selected, context);
     let failed: Vec<&(&rules::Rule, rules::Report)> =
         reports.iter().filter(|(_, report)| !report.ok()).collect();
 

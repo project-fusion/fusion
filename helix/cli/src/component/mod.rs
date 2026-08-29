@@ -59,6 +59,7 @@ pub mod reflected;
 pub mod reflected_defaults;
 pub mod run;
 pub mod seams;
+pub mod seeds;
 pub mod selectors;
 pub mod separation;
 pub mod ssr;
@@ -218,6 +219,35 @@ pub struct Settings {
     /// whole command turned off.
     #[serde(default)]
     pub floors: bool,
+
+    /// The two derivations of the palette, and where each of them is written.
+    pub seeds: Seeds,
+}
+
+/// Where each side of the palette is written, and what is knowingly missing.
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct Seeds {
+    /// Names a consumer pinned, which are emitted and are not the engine's.
+    ///
+    /// One intent adds a token of its own, which is the whole point of that
+    /// feature: a caller may name a token and have it verified beside the rest.
+    /// Left in the emitted set it reads as a name the engine invented, and this
+    /// rule would go looking for it in the token layer and ask for a declaration
+    /// nobody should write.
+    pub pinned: Vec<String>,
+
+    /// Seeds the stylesheet reads that the engine is not expected to emit yet,
+    /// and why.
+    ///
+    /// Each entry is a claim that a consumer writing CSS by hand is the intended
+    /// path today, which is exactly the kind of claim that should expire. The
+    /// rule reports an entry nothing reads and an entry the engine has started
+    /// emitting, so neither can outlive its reason quietly.
+    pub planned: BTreeMap<String, String>,
+
+    /// The stylesheets that read the seeds and declare the tokens.
+    pub sheets: Vec<String>,
 }
 
 impl Settings {
@@ -489,6 +519,11 @@ pub fn all() -> Vec<Rule> {
             name: "seams",
             run: Runner::Source(seams::run),
             summary: "a base component renders another family behind an overridable method",
+        },
+        Rule {
+            name: "seeds",
+            run: Runner::Source(seeds::run),
+            summary: "every name the theme engine emits is one the stylesheet reads",
         },
         Rule {
             name: "selectors",
