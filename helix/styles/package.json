@@ -23,7 +23,9 @@
   ],
   "sideEffects": true,
   "scripts": {
-    "build": "node scripts/build-styles-dist.mjs"
+    "build": "node scripts/build-styles-dist.mjs",
+    "styles-dist": "node scripts/build-styles-dist.mjs",
+    "token-layer": "bun scripts/build-token-layer.mjs"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "homepage": "https://fusion.dev",

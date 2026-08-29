@@ -33,9 +33,9 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { reference, referenceFamilies } from '../../helix/docs/src/reference.ts'
+import { reference, referenceFamilies } from '../../../helix/docs/src/reference.ts'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const MANIFEST = 'helix/styled/custom-elements.json'
 const OUTPUT = 'fusion/docs/component-reference.md'
 

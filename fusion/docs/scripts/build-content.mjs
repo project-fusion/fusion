@@ -17,9 +17,9 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { formatted } from './lib/formatted.mjs'
+import { formatted } from '../../../tooling/scripts/lib/formatted.mjs'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const CONTENT = join(ROOT, 'fusion/docs/insights/content')
 const OUT = join(ROOT, 'fusion/docs/insights/src/sources.generated.ts')
 const PAGES = join(ROOT, 'fusion/docs/insights/src/pages.generated.ts')

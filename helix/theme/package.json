@@ -26,7 +26,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "cargo test -p fusion-helix-theme --manifest-path ../../Cargo.toml",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "wasm": "node scripts/build-wasm.mjs"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "homepage": "https://fusion.dev",

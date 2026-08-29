@@ -31,6 +31,11 @@ import { execFileSync } from 'node:child_process'
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+/* From this file rather than from the working directory. Every path below is
+   repository-relative, which was true by accident while this lived at the root
+   of the tooling folder and is a fault now it lives inside a package: run from
+   anywhere but the root, it read nothing and wrote nothing. */
+const ROOT = join(import.meta.dirname, '../../..')
 const SOURCE = 'helix/styles/tokens.json'
 const OUTPUT = 'fusion/docs/token-reference.md'
 const ROOTS = ['fusion', 'helix']
@@ -139,7 +144,7 @@ const generated = (paths) => {
    not CSS only. */
 const reads = new Map()
 for (const root of ROOTS) {
-  const found = walk(root)
+  const found = walk(join(ROOT, root))
   const ignored = generated(found)
   for (const path of found) {
     if (ignored.has(path)) {
@@ -162,7 +167,7 @@ for (const root of ROOTS) {
   }
 }
 
-const registry = JSON.parse(readFileSync(SOURCE, 'utf8'))
+const registry = JSON.parse(readFileSync(join(ROOT, SOURCE), 'utf8'))
 const declared = registry.tokens.map((token) => [token.name, token.value])
 
 const grouped = new Map(CATEGORIES.map((one) => [one, []]))
@@ -237,7 +242,7 @@ const written = `${lines
   .join('\n')
   .replace(/\n{3,}/g, '\n\n')
   .trimEnd()}\n`
-const output = join(process.cwd(), OUTPUT)
+const output = join(ROOT, OUTPUT)
 
 if (process.argv.includes('--check')) {
   let existing = ''
