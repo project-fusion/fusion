@@ -17,10 +17,18 @@
  *
  * Hidden rather than only transparent when neither job is on, so an idle page
  * is not running a full-screen blur behind nothing. Discrete, so it flips at
- * the end of the fade rather than the start. */
+ * the end of the fade rather than the start.
+ *
+ * **`--site-glass`, which is what the landing bands are made of.** The bar had
+ * its own filter written out and its fill from `--helix-material-translucent`,
+ * so the masthead floating over a band was a different material from the band.
+ * Reaching for `--helix-material-backdrop` instead only moved the disagreement:
+ * the bands do not use it either, taking a heavier blur and a fill mixed from
+ * `surface`. `site.css` carries the recipe and everything on the page reads it
+ * from there. */
 .navGlass {
-  backdrop-filter: blur(var(--helix-material-blur-lg));
-  background-color: var(--helix-material-translucent);
+  backdrop-filter: var(--site-glass-backdrop);
+  background-color: var(--site-glass);
   block-size: var(--helix-size-header);
   inset-block-start: 0;
   inset-inline: 0;
@@ -342,17 +350,19 @@
  *
  * A trigger and the thing it summons reading as one material is what makes the
  * palette feel like it came out of the button rather than over it. The tokens
- * are the panel's, not a second set tuned by eye: `translucent` at the same 72%
- * and the same blur, so if the material ever moves both move together.
+ * are the site's glass, not a second set tuned by eye, so if the material ever
+ * moves both move together. That is not a promise this file could keep on its
+ * own and it did not: both sides wrote the filter out, so "the material" was a
+ * value typed twice and the landing bands moved without either of them.
  *
  * `--button-background-color` is `Button`'s own hook, so this is a fill the
  * component was built to take rather than a document rule reaching past it. The
  * blur has to be set directly, there being no hook for a filter and no reason
  * for one: it is a property of this surface rather than of buttons. */
 .siteFind {
-  backdrop-filter: blur(var(--helix-material-blur-lg));
+  backdrop-filter: var(--site-glass-backdrop);
 
-  --button-background-color: var(--helix-material-translucent);
+  --button-background-color: var(--site-glass);
 }
 
 .siteFind helix-kbd {
@@ -369,13 +379,15 @@
  * component invited: the four parts it forwards, and the two hooks it names. */
 /* **A lighter wash than a modal's, which is what makes the glass legible.**
  *
- * `Dialog` scrims at 64% black because a modal replaces the page. A palette is
- * summoned over a page the reader is still in, and at 64% the blur had a
- * near-uniform dark field to sample rather than the content: the material was
- * computed and invisible. Mixed down to 45% of the overlay token, the page is
- * still there to be blurred. The alpha is what matters and `overlay` alone did
- * not help: it is a lighter black at the same 0.64, so the field it gave the
- * blur was as solid as before.
+ * `Dialog` scrims for a modal, which replaces the page, and at that strength
+ * the blur had a near-uniform dark field to sample rather than the content: the
+ * material was computed and invisible. A palette is summoned over a page the
+ * reader is still in, so the scrim is mixed down until the page is still there
+ * to be blurred.
+ *
+ * **The alpha is what matters, and `overlay` alone did not help**: it is a
+ * lighter black at the same opacity, so the field it gave the blur was as solid
+ * as before. Which is why the fix is a mix rather than a different token.
  *
  * Set on this element and inherited down to the dialog inside it. The value
  * resolves here, where a token is in scope, which is the whole reason the hook
@@ -415,17 +427,27 @@
    * translucent fill over a blur, rather than an opacity invented here.
    *
    * **The panel's own alpha is only half of it.** What the blur samples is
-   * whatever the scrim leaves of the page, so a modal's 64% black would make
-   * this flat whatever is set here. `--dialog-scrim` above is the other half.
+   * whatever the scrim leaves of the page, so a modal's scrim would make this
+   * flat whatever is set here. `--dialog-scrim` above is the other half.
    *
    * The border is the material's own, not the brand's. A saturated hairline
    * reads as a focus ring on a panel that is not focused, and a palette that
    * always looks selected has nothing left to say when a row actually is. */
-  /* `translucent`, not `-strong`. At 88% the panel let 12% of the page through
-     and the blur had almost nothing to work on: the effect was in the computed
-     styles and invisible on the screen. 72% is more than twice as much. */
-  backdrop-filter: blur(var(--helix-material-blur-lg));
-  background-color: var(--helix-material-translucent);
+  /* `translucent`, not `-strong`. The strong fill left so little of the page
+     showing that the blur had almost nothing to work on: the effect was in the
+     computed styles and invisible on the screen.
+
+     Which token rather than which number, here and in the scrim above. The
+     alphas are `primitives.css`'s and they have moved; a figure copied into a
+     comment does not move with them, and the one that used to sit here had gone
+     stale without anybody noticing, which is the only kind of staleness a
+     comment has.
+
+     And the filter is `--helix-material-backdrop` rather than a blur written
+     out, so the palette is the same glass as the landing bands and the masthead
+     rather than a third one that happened to agree. */
+  backdrop-filter: var(--site-glass-backdrop);
+  background-color: var(--site-glass);
   border: var(--helix-border-thin) solid var(--helix-material-border);
   border-radius: var(--helix-radii-lg);
   /* The largest the scale has. A palette arrives over a page the reader was

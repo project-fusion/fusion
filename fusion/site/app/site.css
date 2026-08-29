@@ -15,6 +15,33 @@
  */
 
 :root {
+  /* **The one glass this site is made of, as a fill and a filter.**
+   *
+   * The landing bands, the closing card, the showcase's code block, the
+   * masthead and the command palette are all the same pane over the same page,
+   * and until this token existed each of them said so by carrying its own copy
+   * of the values. They drifted exactly as that arrangement predicts: the bands
+   * were written out as `blur(40px) saturate(1.5)` in four places and the
+   * chrome reached for `--helix-material-backdrop`, so the header floating over
+   * a band was a different material from the band, on the one page a reader
+   * sees both on at once.
+   *
+   * **Not `--helix-material-*`, and the difference is a decision rather than an
+   * oversight.** Those are the design system's answer for any consumer's glass.
+   * This site takes a heavier blur and mixes its fill from `surface` rather than
+   * from the neutral the material token uses, which is what makes a band read as
+   * part of the page rather than as a pane laid on it. A product may differ from
+   * the system it is built on; what it may not do is differ from itself.
+   *
+   * **The fill is re-declared inside a themed scope and the filter is not.**
+   * A `var()` inside a custom property resolves on the element the property is
+   * *declared* on, so a fill mixed from `surface` at `:root` carries the page's
+   * color scheme into a scope that forced its own. `primitives.css` records the
+   * same finding about `[data-helix-theme]`. The filter holds no `var()` and no
+   * scheme, so one declaration reaches everywhere. */
+  --site-glass: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  --site-glass-backdrop: blur(40px) saturate(1.5);
+
   /* The page runs edge to edge and the inset is what holds it off the sides.
      It scales with the viewport rather than stepping at a breakpoint, so the
      margin reads as deliberate at every width instead of only at three. */

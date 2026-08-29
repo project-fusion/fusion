@@ -430,14 +430,17 @@
  * another would pop, and the whole gesture is that this was always the same
  * object.
  *
- * **Real transparency, not a tinted panel.** 42% of the surface color, which is
- * low enough that the page reads through it and the blur has something to do.
- * `saturate` above 1 puts back the chroma that a heavy blur washes out, which is
- * the difference between glass and frosted plastic.
+ * **Real transparency, not a tinted panel**, and the site's own rather than a
+ * mix tuned here. The pill floats over the same page the bands sit on, so it is
+ * the same glass: low enough that the page reads through it and the blur has
+ * something to do, and `saturate` above 1 putting back the chroma a heavy blur
+ * washes out, which is the difference between glass and frosted plastic. Both
+ * of those are what `--site-glass` is; neither was a reason to state a second
+ * mix, which is all the old one turned out to be.
  */
 .fab {
-  backdrop-filter: blur(24px) saturate(1.8);
-  background: color-mix(in oklab, var(--helix-color-surface-overlay) 42%, transparent);
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
   /* **No stroke.** The shadow already separates the pill from whatever it is
      over, and a line around a translucent object reads as the edge of a sheet
      rather than the shape of a control. */
@@ -1101,25 +1104,27 @@
   letter-spacing: 0.04em;
 }
 
-/** The instrument face the gauge and the reading are drawn on. */
+/**
+ * The instrument face the gauge and the reading are drawn on.
+ *
+ * **The site's glass, and this is the one surface that had an argument against
+ * it.** The disc used to mix from `surface-overlay` in light and hold a much
+ * heavier fill than the bands do, on a measured finding: mixed from `surface`
+ * it read as a pale blue lens rather than as the white instrument face it is
+ * meant to be, because `surface` is `oklch(0.985)` in light where
+ * `surface-overlay` is white, and what showed through a light fill was the field
+ * behind it rather than the face. Dark never had the problem, a light-on-dark
+ * wash being plenty to separate the hub from its ground.
+ *
+ * *That finding is kept rather than deleted, because it is the thing to re-check
+ * if the disc ever looks wrong in light again, and because reversing this is
+ * then one edit made knowingly.* What overrode it is that a page cannot hold two
+ * answers to what its glass is made of, and the disc sits in a diagram
+ * surrounded by bands made of the other one.
+ */
 .diagramGlass {
-  backdrop-filter: blur(28px) saturate(1.7);
-  /* **Whiter in light, and the dark value untouched.**
-     `surface` is `oklch(0.985)` in light and at 24 percent it is barely there:
-     what showed through was the field behind it, so the disc read as a pale
-     blue lens rather than as the white instrument face it is meant to be. Dark
-     has the opposite problem and does not share it, a 24 percent light-on-dark
-     wash being plenty to separate the hub from its ground.
-
-     `surface-overlay` rather than `surface` on the light side, because it is
-     `lab(100 0 0)` there against `surface`'s 0.985: the point is white, so the
-     white token is the one to mix from. Held to 52 percent rather than taken
-     to opaque, because the blur behind it is the reason the hub reads as glass
-     and a solid disc would be a hole cut in the drawing. */
-  background: light-dark(
-    color-mix(in oklab, var(--helix-color-surface-overlay) 52%, transparent),
-    color-mix(in oklab, var(--helix-color-surface) 24%, transparent)
-  );
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
   block-size: 100%;
   border-radius: var(--helix-radii-full);
   inline-size: 100%;
@@ -1164,9 +1169,15 @@
 
 /* ── Glass, thinner ────────────────────────────────────────────────── */
 
-.fab {
-  background: color-mix(in oklab, var(--helix-color-surface-overlay) 26%, transparent);
-}
+/* **`.fab` had a second fill here and this is where it went.** The pill is
+   declared once, far above, and was declared again in this section with a
+   different base token and a different mix; same specificity, later in the file,
+   so this one won and the one anybody reads first did nothing. Nothing said so,
+   and the two disagreed for as long as they both existed.
+
+   That is the whole argument for `--site-glass`: a value stated twice is a value
+   that will differ, and the second statement is the one that is invisible. The
+   pill takes the token at its own rule now, and there is nothing to override. */
 
 /* The shared components carry their own fills, and those are opaque tokens
  * rather than mixes, so they need the same treatment where a draft uses them.
@@ -1181,6 +1192,10 @@
    ground itself: a two-layer background clips the fill to the padding box and
    the gradient to the border box, so the fill has to be a layer rather than a
    color. Two literals would drift the first time one of them moved. */
+/* Re-declared rather than inherited, because this scope may be forced to a
+   color scheme the page is not, and a `light-dark()` inside a custom property
+   resolves where the property is declared. Same recipe as `site.css`'s; the
+   point of restating it is that it resolves here. */
 .noRules {
   --site-glass: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
 }
@@ -1190,7 +1205,7 @@
   --card-background-color: var(--site-glass);
 
   background: var(--site-glass);
-  backdrop-filter: blur(40px) saturate(1.5);
+  backdrop-filter: var(--site-glass-backdrop);
 }
 
 /* ── The field takes the brand too ─────────────────────────────────── */
@@ -1218,8 +1233,8 @@
  * Measured identical across dark, light and the no-attribute case.
  */
 .noRules :global([data-closing][data-closing][data-closing]) {
-  backdrop-filter: blur(40px) saturate(1.5);
-  background: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
   border-color: transparent;
 }
 
@@ -1548,13 +1563,13 @@
  * different site. Written entirely in the properties `CodeBlock` publishes, so
  * nothing here reaches past the component.
  *
- * The same 30 percent and the same `blur(40px) saturate(1.5)` the cards use, so
- * the two are the same material rather than two attempts at one. The header
- * takes a lighter mix than the body, which is the one difference kept: it is
- * what makes the bar a bar rather than the block growing a title. */
+ * The site's glass, through the same two tokens the cards take, so the two are
+ * the same material rather than two attempts at one. The header takes a lighter
+ * mix than the body, which is the one difference kept: it is what makes the bar
+ * a bar rather than the block growing a title. */
 .noRules :global(helix-code-block) {
-  --code-block-backdrop: blur(40px) saturate(1.5);
-  --code-block-background-color: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+  --code-block-backdrop: var(--site-glass-backdrop);
+  --code-block-background-color: var(--site-glass);
   --code-block-border-color: transparent;
   --code-block-header-background-color: color-mix(
     in oklab,
