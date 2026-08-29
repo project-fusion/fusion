@@ -30,8 +30,10 @@
 pub mod attribute_names;
 pub mod cancelable;
 pub mod categories;
+pub mod composed;
 pub mod compositions;
 pub mod disabled;
+pub mod events;
 pub mod exportparts;
 pub mod fallbacks;
 pub mod floors;
@@ -277,9 +279,19 @@ pub fn all() -> Vec<Rule> {
             summary: "both layers give one answer about what a family is for",
         },
         Rule {
+            name: "composed",
+            run: Runner::Source(composed::run),
+            summary: "a component renders a tag it imports, and never names one literally",
+        },
+        Rule {
             name: "disabled",
             run: Runner::Source(disabled::run),
             summary: "a form control reads `:host(:disabled)` rather than the attribute",
+        },
+        Rule {
+            name: "events",
+            run: Runner::Source(events::run),
+            summary: "an event a component dispatches is one it declares",
         },
         Rule {
             name: "exportparts",

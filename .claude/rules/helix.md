@@ -242,7 +242,7 @@ So it warns, once per tag, and **only in a browser**. Lit's SSR shim provides
 from the render pass the guard was written for. A diagnostic that fires during a
 build is one somebody turns off.
 
-`bun run check:api:composed` enforces all three: no literal tag in a template with a
+`helix component --only composed` enforces all three: no literal tag in a template with a
 tier below it, `tier` overridden wherever a base template interpolates, and the
 family imported by both tiers.
 
@@ -1043,7 +1043,7 @@ and prefixed**:
 @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
 ```
 
-*`check:api:events` and `helix-convention-lint` both enforce
+*`helix component`'s `events` and `helix-convention-lint` both enforce
 `/^helix-[a-z][a-z0-9-]*$/`, which is what every shipped event answers to.*
 
 **The prefix is what stops a collision with a native name.** An event dispatched

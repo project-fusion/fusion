@@ -569,7 +569,7 @@ These are the difference between code that looks right and code that passes:
 
 | Rule | Check |
 |---|---|
-| A dispatched event must be declared | \`check:api:events\` |
+| A dispatched event must be declared | \`helix component --only events\` |
 | A documented part must be rendered | \`check:api:parts\` |
 | A documented CSS hook must be read | \`check:css:hooks\` |
 | A visual property draws from its axis | \`check:css:axes\` |

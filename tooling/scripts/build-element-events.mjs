@@ -8,7 +8,7 @@
  * make while writing a *correct* event.
  *
  * The manifest already knows. `@event` is declared per component and
- * `check:api:events` holds those declarations and the dispatches together in both
+ * `helix component`'s `events` holds those declarations and the dispatches together in both
  * directions, so a generated map is a third reading of a pair that is already
  * kept honest rather than a new claim.
  *
