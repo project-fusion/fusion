@@ -18,6 +18,9 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
+# The `modules` rule reads class selectors out of stylesheets and class
+# attributes out of markup, neither of which is a substring search.
+regex = { workspace = true }
 # Every rule reads manifests, and `--json` is a contract on every verb.
 serde = { workspace = true }
 # **`preserve_order`, and it is not optional here.** Without it `serde_json::Map`

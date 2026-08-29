@@ -8,6 +8,7 @@
 
 pub mod barrels;
 pub mod floors;
+pub mod modules;
 pub mod order;
 pub mod prerequisites;
 pub mod scripts;
@@ -76,6 +77,13 @@ pub fn all() -> Vec<Rule> {
             name: "floors",
             run: floors::run,
             summary: "every rule counted something",
+        },
+        Rule {
+            fix: None,
+            meta: false,
+            name: "modules",
+            run: modules::run,
+            summary: "no plain stylesheet selects a class only a CSS module declares",
         },
         Rule {
             fix: Some(order::fix),
