@@ -867,7 +867,7 @@ least styleable half.
   contract read from two ends.
 
 **A `::part()` written from outside is checked too, and nothing checked it
-before.** `check:css:selectors` reads `[part="x"]` inside a component's own sheet and
+before.** `helix component`'s `selectors` reads `[part="x"]` inside a component's own sheet and
 stops there, so a selector naming a part nothing publishes was unchecked in every
 example sheet, doc page and app file in the repository. `check:api:exportparts`
 covers it, and it had eight. `INDICATOR` in `build-headless-examples.mjs` names
