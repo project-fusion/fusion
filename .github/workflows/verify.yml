@@ -204,6 +204,19 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v2
       - run: bun run test
+      # **`check:cli` is here rather than in the shard pool**, because it is the
+      # only check that runs a binary: a shard has bun and node and no cargo, so
+      # the npm shim would build one from cold on whichever of the six drew it,
+      # while the other five paid for a toolchain they never used. Here the
+      # cache is warm and `rs:build` is the same compile `rs:check` and
+      # `rs:test` were going to do anyway.
+      #
+      # It reads source rather than `dist`, so it does not want the shard's
+      # `build` prerequisite. The one thing `dist` buys is naming the exact
+      # subpath in a barrel finding, and without it that advice degrades to
+      # `dependency/<part>` in words rather than silently.
+      - run: bun run rs:build
+      - run: bun run check:cli
       - run: bun run rs:check
       - run: bun run rs:test
 

@@ -3,19 +3,15 @@
  * Runs `verify`'s checks in shards, and reports all of a shard's failures.
  *
  * **The list is derived from `verify` rather than restated beside it.** A
- * workflow that names its own checks is a second source of truth, and this
- * repository has already paid for one of those: `.claude/rules/helix.md`
- * records a rule and its enforcement living in different files with nothing
- * holding them together. So this reads the `verify` script, splits it, and
- * refuses any step it does not recognize. Adding a check to `verify` puts it in
+ * workflow that names its own checks is a second source of truth. So this reads
+ * the `verify` script, splits it, and refuses any step it does not recognize. Adding a check to `verify` puts it in
  * CI with no second edit, and adding a step that is neither a check nor one of
  * the dedicated jobs stops the run rather than being skipped quietly.
  *
  * **Failures accumulate instead of short-circuiting**, which is the other half
  * and the reason this exists at all. `verify` is `a && b && c`, so it reports
- * one failure and stops: four separate CI runs went to finding four stale
- * artifacts on 25 Aug 2026, one per run, each about three minutes, because
- * every fix revealed the next one. A shard runs every check it owns.
+ * one failure and stops, and finding four stale artifacts costs four CI runs.
+ * A shard runs every check it owns.
  *
  * **Prerequisites run in every shard, because `verify`'s order is partly
  * semantic.** `analyze` sits at step 7 and `catalog` at 17, both generators,
@@ -45,6 +41,10 @@ const DEDICATED = new Set([
      serially and becomes the critical path for a workflow that split six ways
      to avoid exactly that. */
   'bun run check:spec:floors',
+  /* Needs a Rust toolchain, which a shard does not have and five of the six
+     would never use. It runs beside `rs:check` and `rs:test`, where the cargo
+     cache is already warm and the binaries it calls have just been built. */
+  'bun run check:cli',
   'bun run rs:check',
   'bun run rs:test',
   'bun run test',
@@ -57,11 +57,9 @@ const DEDICATED = new Set([
  * **`build` is here because `catalog` does not reach everything.** `catalog` is
  * a `fusion/site` task and turbo builds what that package depends on, which is not
  * the whole workspace: `@fusion.dev/helix-headless` is not one of its dependencies, and
- * `check:gen:metrics` measures `helix/headless/dist`. Shards without a full build
- * measured a dist nobody had produced, which passed on a machine where an
- * earlier build had left one and failed on a runner. That is the same fault
- * 273 fixed in three package scripts, arriving once more through turbo's graph
- * rather than through a missing script.
+ * `check:gen:metrics` measures `helix/headless/dist`. A shard without a full
+ * build measures a dist nobody produced, which passes on a machine where an
+ * earlier build left one and fails on a runner.
  *
  * All three are cached tasks, so with a warm remote cache they cost a restore.
  * Without one every shard pays the build, which is why the remote cache is a
