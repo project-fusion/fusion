@@ -104,6 +104,7 @@
     "fix:format": "biome check --write .",
     "fix:order": "node tooling/scripts/order-manifests.mjs",
     "fix:tag-order": "node tooling/scripts/check-tag-order.mjs --write",
+    "fusion": "node fusion/cli/npm/bin.mjs",
     "gen:catalog": "bun tooling/scripts/build-catalog.mjs",
     "gen:content": "bun tooling/scripts/build-content.mjs",
     "gen:docs": "node tooling/scripts/build-docs.mjs",
@@ -169,9 +170,10 @@
   "packageManager": "bun@1.1.43",
   "workspaces": [
     "cortex/docs",
+    "fusion/cli/npm",
     "fusion/docs/insights",
-    "helix/*",
     "fusion/site",
+    "helix/*",
     "tooling/*"
   ]
 }

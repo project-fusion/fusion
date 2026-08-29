@@ -1,0 +1,34 @@
+[package]
+name = "fusion-cli"
+description = "The Fusion command line: rules a workspace can be held to."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`. See the note in the root manifest.
+version = "0.0.0-dev"
+
+# **The binary drops the suffix**, per the naming rule: the crate is `fusion-cli`
+# and the command a reader types is `fusion`. The fusion domain takes no prefix
+# of its own, the way `@fusion.dev/insights` does not, because the scope is
+# already the company.
+[[bin]]
+name = "fusion"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+# Every rule reads manifests, and `--json` is a contract on every verb.
+serde = { workspace = true }
+# **`preserve_order`, and it is not optional here.** Without it `serde_json::Map`
+# is a `BTreeMap`, so every key comes back alphabetical whatever order it was
+# inserted in: the priority list is discarded and `exports` conditions come out
+# with `default` ahead of `types`, which is the precise fault the `order` rule
+# exists to prevent.
+serde_json = { workspace = true, features = ["preserve_order"] }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

@@ -4,6 +4,7 @@ members = [
 	"cortex/core",
 	"cortex/trace",
 	"cortex/engram",
+	"fusion/cli",
 	"helix/cli",
 	"helix/theme",
 ]

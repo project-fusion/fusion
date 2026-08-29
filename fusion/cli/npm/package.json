@@ -1,0 +1,22 @@
+{
+  "name": "@fusion.dev/cli",
+  "description": "The Fusion command line, for a workspace that reaches it through npm.",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "fusion/cli/npm",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "files": [
+    "bin.mjs"
+  ],
+  "bin": {
+    "fusion": "./bin.mjs"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
