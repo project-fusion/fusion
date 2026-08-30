@@ -1,0 +1,103 @@
+---
+author: Ross Sheppard
+date: 2026-08-25
+description: A platform team, a component library, eighteen months and a launch. Then adoption stalls, and nobody can name the quarter it died.
+kicker: Insights
+kind: Essay
+path: /insights/the-design-system-you-already-paid-for
+title: The design system you already paid for
+topic: Business
+---
+
+Almost every company past a few hundred engineers has built a design system.
+There was a platform team, a Figma library, a published component package, a
+governance forum, and eighteen months of work. It launched. There was a deck.
+
+Then, over the two years that followed, it stopped being the thing interfaces
+were actually built from, and nobody can name the quarter that happened. The
+package is still installed. The team is still funded, or was until the last
+reorganization. What is on screen is something else.
+
+## The number being reported is not adoption
+
+The reported number is coverage: how many components the system publishes,
+sometimes weighted by how many repositories install it. Coverage is a fact
+about the platform team's output. It says nothing about what a user sees.
+
+The number that matters is what share of a shipped interface is built out of
+the system without local overrides. That number is always lower, often by a
+lot, and the gap is not a reporting failure. The two measure different things,
+and only one of them is the asset the company thinks it bought.
+
+## Three parallel truths
+
+A mature system usually exists three times over. There is the Figma library,
+which the design organization maintains and treats as authoritative. There is
+the published package, which the platform team maintains and treats as
+authoritative. There is the code running in the products, which nobody
+maintains as a whole and which is the only one of the three that users
+encounter.
+
+Each is correct according to the group that owns it. None of them agree.
+Reconciling them is a project proposed every planning cycle and funded
+approximately never, because it has a large number attached and no
+user-visible outcome to defend it with.
+
+## The fork is a rational decision
+
+A product team is two weeks from a launch. The system's table component does
+not pin columns. The platform team's intake queue is six weeks deep and the
+request will be ranked against nine others.
+
+Copying the component into the product repository takes an afternoon. Every
+incentive in the organization points at the afternoon. The copy ships, the date
+is met, and the company now owns a component nobody is assigned to, that will
+not receive the accessibility fix landing upstream next month, and that no
+audit will find, because it looks exactly like the thing it was copied from.
+
+This is not a discipline problem, and treating it as one is why the usual
+remedy fails. A review board raises the cost of compliance without touching the
+cost of the fork. It widens the gap it was convened to close.
+
+## Then the system freezes
+
+The other half of the failure happens on the consumer side. An application
+needs a variant the system does not offer, so it writes a rule that reaches
+past the component's surface into its internals: a descendant selector, or a
+class name that was never promised to anyone.
+
+Multiply that by forty applications over three years. The system can no longer
+change, because any internal change breaks consumers in ways its own tests
+cannot see. Deprecations stop being issued. The major version stops being cut.
+The artifact built to make change cheap has become the reason change is
+expensive.
+
+The failure is invisible from outside. Install counts are high, the pipeline is
+green, and nothing is on fire.
+
+## The diagnosis is architectural, not organizational
+
+Every failure above has one shape. The property the system needed was held by a
+person noticing, and people stop noticing under deadline pressure. Where
+nothing structural holds a property, drift is not a risk to be managed. It is
+the resting state.
+
+That gives a short test worth applying before adopting a system or funding a
+rebuild of one:
+
+- When a color pair fails contrast, is that found by an audit or by the build?
+- When a consumer needs a variant, is there a supported surface to reach for,
+  or only internals?
+- When a team needs different pixels, is there anything to adopt short of a
+  copy?
+- Can the system state what share of the product is built out of it, or is that
+  a survey?
+
+A system whose answer to all four is *someone checks* is not a system. It is a
+library with a maintenance agreement, and the agreement is with a team whose
+priorities are set somewhere else.
+
+None of this was urgent while interface code was expensive to write, because
+drift accumulated at the speed a person could type. That stopped being true
+last year, and what it does to the arithmetic is the thing worth looking at
+next.

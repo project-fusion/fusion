@@ -1,0 +1,127 @@
+---
+author: Ross Sheppard
+date: 2026-07-28
+description: A large company does not have one brand or one framework, and a single styled component library serves exactly one of its surfaces. The rest fork.
+kicker: Insights
+kind: Essay
+path: /insights/why-helix-has-two-tiers
+title: Why Helix has two tiers
+topic: Design
+---
+
+An enterprise does not have one brand. It has a marketing site, six product
+surfaces on three different release cadences, an acquisition still running on
+whatever stack it was bought with, a partner portal somebody built in a hurry,
+and a brand refresh every three years that arrives as a PDF.
+
+A single styled component library serves exactly one of those well. Everything
+else either accepts pixels that are wrong for it, or forks. This is the
+structural reason component libraries fail inside large organizations, and it
+is upstream of every governance conversation about it.
+
+Helix is shaped around that fact rather than around the demo.
+
+## Two tiers, one vocabulary
+
+The headless tier is behavior with no opinion about appearance: state, focus
+management, keyboard interaction, the accessibility contract, the parts that
+are genuinely hard and genuinely universal. The styled tier is the same
+components with a derived visual system on top of them.
+
+They are not two products. They are one vocabulary with two levels of
+commitment. The same component names, the same parts, the same props, the same
+events, whichever tier a team is on.
+
+What that buys is not flexibility for its own sake. It is that the fork now has
+a supported destination. A team that needs different pixels drops a tier
+instead of copying a file, and the copy is what the previous essay describes as
+the thing nobody is assigned to and no audit finds. Dropping a tier keeps the
+team inside the vocabulary, keeps the accessibility work, and keeps the
+upgrade path. Copying a file gives up all three at once.
+
+For an enterprise this is the difference between one system with two adoption
+levels and two systems with a migration between them.
+
+## Tokens are derived, not authored
+
+Most systems ship a palette as a spreadsheet: eleven steps of gray, eleven of
+the brand, a handful of status colors, each of them a hex somebody picked and
+nobody can check. The file is authoritative because it is the file, not because
+anything about it is true.
+
+The problem is not that the values are wrong. It is that there is no procedure
+by which they could be found wrong. A contrast failure between two steps is
+discovered by a person running an audit, and the fix is another hex nobody can
+check. Accessibility becomes a review step, and review steps are what a
+deadline removes first.
+
+Helix takes one brand color and computes the rest in a perceptual space, so
+lightness means the same thing at every hue and the contrast between two steps
+is a consequence of how far apart they are rather than a coincidence somebody
+verified once. A component asks for a named foreground and gets a correct value
+in light mode, in dark mode, and against whatever brand the consumer set.
+
+The enterprise consequence is the one worth stating plainly: a rebrand becomes
+a value change rather than a project, and the accessibility posture survives it
+without a re-audit, because accessibility was never a property of the
+individual hexes. It was a property of the derivation.
+
+## Overrides land on a declared surface
+
+Every real adoption needs to change something. The question is only whether the
+change lands somewhere with a contract.
+
+A Helix component owns its surface and names the variables that tune it. A
+consumer sets those. A stylesheet reaching past them into internals is a
+finding the command line reports, not a clever workaround that ships and then
+freezes the system three years later.
+
+That is the whole mechanism that makes a version bump safe. The system can
+change its internals because no consumer was ever supposed to depend on them,
+and the difference between a system that can be upgraded and one that cannot is
+exactly whether that sentence is enforced or merely believed.
+
+## Web components, so the framework question stops mattering
+
+The four stacks in the paragraph at the top of this essay are the normal
+condition of a large company, not a symptom of poor planning. A React-only
+system asks that company to either standardize first, which is a multi-year
+program with no user-facing outcome, or to maintain a second system for
+everything else.
+
+Helix ships web components with framework wrappers over them. React, Vue,
+Svelte, Angular, and no bundler at all are adoption paths rather than ports.
+The acquisition on a different stack gets the same vocabulary on the day it is
+acquired.
+
+## One open tier, and what that costs us
+
+No pro components, no paywalled API surface, no enterprise build with three
+extra things in it. The economic argument for a paid tier is real and we are
+not pretending otherwise: it is how most component libraries fund themselves.
+
+The architectural argument against it is stronger. Under cheap generation a
+system's value is being the constraint that generated code converges on, and a
+paywalled component is a component that generation does not know about. Split
+the vocabulary and you have not added a revenue line with a small cost
+attached. You have damaged the property that made the system worth adopting,
+silently, in a way that reads as the system being mediocre.
+
+Payment lives in the engagement instead. We are paid for applying the system,
+which keeps making the system easier to apply aligned with revenue rather than
+opposed to it.
+
+## What the trade costs
+
+Derivation is worse than hand-picking at exactly one job, which is hitting a
+specific value a brand guideline names. If the book says the disabled state is
+this gray and no other, a derived system will argue with you.
+
+Web components cost some ergonomics against a shop that is genuinely
+React-and-nothing-else forever, and a few of them are real rather than
+imagined.
+
+We think both trades are correct for a design system and would be wrong for a
+brand identity or for a single-application component library, which are
+different artifacts with different jobs. Helix is Building, not shipped, and
+the stage labels on this site say so.
