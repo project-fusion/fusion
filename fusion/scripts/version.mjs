@@ -137,7 +137,51 @@ const raise = (version, level) => {
   return `${major}.${minor}.${patch + 1}`
 }
 
-const base = set ?? (bump === undefined ? allocated() : raise(allocated(), bump))
+/**
+ * Nothing crosses to `1.0.0` without saying so on the command line.
+ *
+ * **The first release chooses its own opening number, and one of the choices is
+ * `1.0.0`.** `allocated()` returns `0.0.0` while a domain has no tags, so a
+ * pull request labeled `<domain>:major` publishes 1.0.0 as its very first
+ * release. That is one label away at all times, the label is the only thing
+ * that decides it, and `release-intent` proposes `patch` rather than refusing
+ * anything above it.
+ *
+ * **And it cannot be taken back.** The `attempt` tag is pushed before anything
+ * is published, precisely so a number is never handed out twice, and npm will
+ * not accept a republish over a version that exists. A 1.0.0 allocated by
+ * accident on a Friday is the version this project shipped.
+ *
+ * So a major stays inside `0.` unless `--allow-major` is passed, which the
+ * workflow does not pass and a person has to type. Under semver's own reading
+ * of a zero major that is also the more correct arithmetic: while the major is
+ * 0 the API is unstable by declaration, and a breaking change raises the minor.
+ *
+ * `--set` is checked too. It exists to pin a release by hand and to return the
+ * manifests to `0.0.0-dev`, and neither wants a silent route past this.
+ */
+const ALLOW_MAJOR = flag('allow-major')
+
+const refuseMajor = (version, why) => {
+  if (parse(version)[0] < 1 || ALLOW_MAJOR) {
+    return version
+  }
+  fail(
+    `version: ${why} would allocate ${version}, and this project is in its 0. phase.\n\n` +
+      '  A number is tagged before it is published and npm refuses a republish, so\n' +
+      '  1.0.0 allocated by accident is the version this project shipped.\n\n' +
+      '  Pass `--allow-major` if 1.0 is the decision being made. While the major is\n' +
+      '  0 a breaking change raises the minor, which is what semver says about a\n' +
+      '  zero major and what `--bump minor` already does.',
+  )
+}
+
+const base =
+  set !== undefined
+    ? refuseMajor(set, '`--set`')
+    : bump === undefined
+      ? allocated()
+      : refuseMajor(raise(allocated(), bump), `\`--bump ${bump}\``)
 const version = pre === undefined ? base : `${base}-${pre}`
 
 if (flag('write')) {
