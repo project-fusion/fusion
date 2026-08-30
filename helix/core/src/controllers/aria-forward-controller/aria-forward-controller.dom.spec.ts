@@ -195,9 +195,11 @@ describe('a reference that arrives later', () => {
 })
 
 describe('every update rather than only the first', () => {
-  /* A component that re-renders its control, which `Button` does whenever
-     `href` swaps it between an anchor and a button, produces a new element with
-     none of this on it. */
+  /* A component that re-renders its control produces a new element with none of
+     this on it. Nothing in the library does that today: all fifteen consumers
+     resolve to one fixed part rendered once. It is the `target` contract that
+     permits it, and a controller in `core` is held to its contract rather than
+     to the fifteen callers it happens to have. */
   test('because a re-rendered control is a new element with none of this', () => {
     document.body.innerHTML = '<p id="tip">a tip</p><span aria-describedby="tip"></span>'
     const host = document.body.lastElementChild as HTMLElement
@@ -213,5 +215,31 @@ describe('every update rather than only the first', () => {
     expect(held(control, 'ariaDescribedByElements')).toBeNull()
     forward.hostUpdated()
     expect(held(control, 'ariaDescribedByElements')).toEqual(['tip'])
+  })
+
+  /* **And the record resets with it**, which is the other half and the half with
+     a writer in this library: `button-root.ts` renders `aria-expanded` onto its
+     own `[part="button"]`. Carried across a replacement, the record says this
+     controller put that attribute there, and the clearing branch takes off what
+     the component wrote. The reference branch above shares the record and not
+     the code path, so it does not cover this. */
+  test('and what the last control was told is not remembered against the next', () => {
+    document.body.innerHTML = '<span aria-expanded="true"></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    const root = host.attachShadow({ mode: 'open' })
+    let control = reflecting()
+    root.append(control)
+    const forward = new AriaForwardController(host as never, { target: () => control })
+    forward.hostUpdated()
+    expect(control.getAttribute('aria-expanded')).toBe('true')
+
+    host.removeAttribute('aria-expanded')
+    control.remove()
+    control = reflecting()
+    control.setAttribute('aria-expanded', 'false')
+    root.append(control)
+    forward.hostUpdated()
+    expect(control.getAttribute('aria-expanded')).toBe('false')
   })
 })
