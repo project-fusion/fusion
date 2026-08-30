@@ -70,8 +70,30 @@ const PREREQUISITES = ['bun run build', 'bun run analyze', 'turbo run catalog']
 const steps = readVerify()
 const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))
 
+/* **A generated-file check is a `turbo run` invocation now, and it is still a
+   check.** `verify` used to spell every one of them `bun run check:x`; the
+   script rename moved them to `turbo run x -- --check`, and the test below was
+   still the old spelling, so the first of them refused the whole listing.
+   `plan` then emitted nothing, the `checks` matrix expanded to zero jobs, and
+   the aggregator failed a run in which every job that existed had passed.
+   Measured on a pull request of nothing but pictures, where it read as the
+   pictures being wrong.
+
+   Two spellings because the corpus has two: most pass `-- --check` to a task
+   that also writes, and `wasm-check` is its own task and says so in the name.
+   Both are matched on the intent rather than on `turbo run` alone, which would
+   accept a generator and run it six times, silently, which is the failure this
+   refusal exists to prevent.
+
+   `bun run fusion <area> check` is the third, and it is a shard's work rather
+   than the Rust job's: `bin.mjs` resolves a built binary or builds one, and a
+   runner has cargo, which is how `check:prose` has been sharded all along
+   under the one spelling this test already accepted. */
+const CHECK =
+  /^turbo run [a-z-]+ -- --check$|^turbo run [a-z-]+-check$|^bun run fusion [a-z]+ check$/
+
 for (const step of checks) {
-  if (!step.startsWith('bun run check:')) {
+  if (!step.startsWith('bun run check:') && !CHECK.test(step)) {
     /* **Refused rather than run, and rather than ignored.** An unrecognized
        step is either a new generator that belongs in PREREQUISITES or a new
        kind of work that belongs in its own job. Guessing which would either
