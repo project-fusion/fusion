@@ -239,8 +239,16 @@
     // anyway, because `turbo run` needs the declaration and because a task in
     // the graph can be depended on.
     "tokens": { "cache": false },
+    // **`^analyze` and not only `^build`, because the typings are analyzer
+    // output.** `jsx.d.ts` is emitted by `analyze` and is gitignored, so on a
+    // clean checkout there is nothing on disk for the site's
+    // `import '@fusion.dev/helix-sandbox/jsx'` to contribute: every custom
+    // element written in JSX becomes an unknown `JSX.IntrinsicElements` member.
+    // It passed locally the whole time, because a developer who has ever run
+    // `analyze` has the file. Four errors across two site files, and the job
+    // that catches it runs `bun install` and `typecheck` and nothing between.
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^analyze"],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
