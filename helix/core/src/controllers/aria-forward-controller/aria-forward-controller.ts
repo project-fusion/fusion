@@ -91,6 +91,9 @@ export class AriaForwardController implements ReactiveController {
   /** Which state attributes this controller wrote, so only those are removed. */
   private readonly forwarded = new Set<string>()
 
+  /** The control the record above is about, so a replacement resets it. */
+  private recorded: HTMLElement | undefined
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
@@ -111,6 +114,21 @@ export class AriaForwardController implements ReactiveController {
     const target = this.target()
     if (!target) {
       return
+    }
+    /* **The record belongs to the element it was written about.** `forwarded`
+       says what this controller put on the control. Kept across a replacement,
+       it claims a value the new element never had, and the clearing branches
+       below then take off what the component wrote itself: the fault the record
+       exists to prevent, one element later.
+
+       **No component in this library replaces its control**, which is worth
+       saying because the comment here used to name one. All fifteen consumers
+       resolve to a single fixed part rendered once. `target` is a callback and
+       its contract permits a swap, so a controller in `core` is held to the
+       contract rather than to the fifteen callers it happens to have today. */
+    if (target !== this.recorded) {
+      this.forwarded.clear()
+      this.recorded = target
     }
     const root = this.host.getRootNode() as Document | ShadowRoot
     for (const [attribute, property] of RELATIONSHIPS) {
@@ -172,8 +190,7 @@ export class AriaForwardController implements ReactiveController {
 
   /* After the render that created the control, because there is nothing to
      forward to before it exists. Every update, not only the first: a component
-     that re-renders its control, which `Button` does whenever `href` changes it
-     between an anchor and a button, produces a new element with none of this. */
+     that re-renders its control produces a new element with none of this. */
   hostUpdated(): void {
     this.forward()
   }

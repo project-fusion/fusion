@@ -35,6 +35,17 @@ const CRATE = resolve(HERE, '..')
 const WORKSPACE = resolve(CRATE, '../..')
 const NAME = process.platform === 'win32' ? 'helix.exe' : 'helix'
 
+/**
+ * Set on the `PATH` probe below, so this shim can decline to be its own answer.
+ *
+ * A shim that starts with this set is being asked whether an installed binary
+ * exists, and it is not one. Exiting non-zero is that answer.
+ */
+const SELF = 'HELIX_NPM_SHIM_PROBE'
+if (process.env[SELF]) {
+  process.exit(70)
+}
+
 const target = process.env.CARGO_TARGET_DIR
   ? resolve(process.env.CARGO_TARGET_DIR)
   : join(WORKSPACE, 'target')
@@ -76,8 +87,27 @@ if (found && existsSync(found)) {
 
 /* `PATH`, which is what an installed binary looks like. `--version` rather than
    a bare run, because a bare run of a command line that requires a subcommand
-   exits 2 and would read as absent. */
-if (spawnSync(NAME, ['--version'], { stdio: 'ignore' }).status === 0) {
+   exits 2 and would read as absent.
+
+   **The probe has to be able to not find this file, and could not.** `bun run`
+   and `turbo` both put `node_modules/.bin` on `PATH`, and `helix` there is a
+   symlink to this shim, so `spawnSync('helix')` re-entered it, which probed
+   again. Every child was the parent of the next: measured 30 Aug 2026 at 4,880
+   processes accumulating around twenty-five a minute, until `posix_spawn`
+   returned `EAGAIN` and nothing on the machine could fork, which is a fork bomb
+   in a `--version` check.
+
+   `SELF` is what breaks it. The probe sets it, and a shim that starts with it
+   set refuses at the top rather than searching, so the probe reports absent and
+   the fall-through builds instead. Not a resolved-path comparison, which is the
+   other obvious fix and does not survive the symlink, a second checkout, or a
+   worktree with its own `node_modules`: this one is true wherever it runs. */
+if (
+  spawnSync(NAME, ['--version'], {
+    env: { ...process.env, [SELF]: '1' },
+    stdio: 'ignore',
+  }).status === 0
+) {
   run(NAME)
 }
 
