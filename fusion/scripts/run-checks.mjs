@@ -45,6 +45,16 @@ const DEDICATED = new Set([
      would never use. It runs beside `rs:check` and `rs:test`, where the cargo
      cache is already warm and the binaries it calls have just been built. */
   'bun run check:cli',
+  /* **The CLI's own subcommands, for the reason above and measured.** `bin.mjs`
+     resolves a built binary or builds one, so a shard without the cargo cache
+     compiles it, and six shards compiling Rust at once took the runner's
+     memory: shard 2 was `Killed` at exit 137 and shard 5 took a SIGTERM, both
+     inside a `fusion` subcommand, and shard 3 was canceled behind them. They
+     had never run before, `--list` having refused ahead of them, so this was
+     the first time six of them tried at once. */
+  'bun run check:css:seeds',
+  'bun run check:prose',
+  'bun run fusion spec check',
   'bun run rs:check',
   'bun run rs:test',
   'bun run test',
@@ -71,7 +81,7 @@ const steps = readVerify()
 const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))
 
 /* **A generated-file check is a `turbo run` invocation now, and it is still a
-   check.** `verify` used to spell every one of them `bun run check:x`; the
+   check.** `verify` used to spell every one of them as a `check:` script; the
    script rename moved them to `turbo run x -- --check`, and the test below was
    still the old spelling, so the first of them refused the whole listing.
    `plan` then emitted nothing, the `checks` matrix expanded to zero jobs, and
@@ -85,10 +95,9 @@ const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.inc
    accept a generator and run it six times, silently, which is the failure this
    refusal exists to prevent.
 
-   `bun run fusion <area> check` is the third, and it is a shard's work rather
-   than the Rust job's: `bin.mjs` resolves a built binary or builds one, and a
-   runner has cargo, which is how `check:prose` has been sharded all along
-   under the one spelling this test already accepted. */
+   `bun run fusion <area> check` is the third, and it is recognized here and
+   then claimed by DEDICATED: it is a check, and it is the Rust job's rather
+   than a shard's. */
 const CHECK =
   /^turbo run [a-z-]+ -- --check$|^turbo run [a-z-]+-check$|^bun run fusion [a-z]+ check$/
 
@@ -131,9 +140,24 @@ if (!Number.isInteger(shard) || !Number.isInteger(of) || of < 1) {
    the node rule reads one file, and nothing here knows which is which. */
 const mine = checks.filter((_, index) => index % of === shard)
 
+/* **`turbo` is a workspace binary and is not on a plain `PATH`.** `spawnSync`
+   without a shell gets the environment it is given, so `turbo run catalog`
+   returned ENOENT and the prerequisite loop reported the whole shard dead
+   before a single check ran. The pre-push hook prepends the same directory for
+   the same reason and says so; this file spawned eleven commands assuming a
+   PATH it never arranged. Invisible until now, because `--list` refused ahead
+   of it and no shard ever reached a `turbo` step. */
+const PATH = `${join(ROOT, 'node_modules', '.bin')}:${process.env.PATH ?? ''}`
+
 const run = (step) => {
   const [command, ...rest] = step.split(' ')
-  return spawnSync(command, rest, { cwd: ROOT, stdio: 'inherit' }).status === 0
+  return (
+    spawnSync(command, rest, {
+      cwd: ROOT,
+      env: { ...process.env, PATH },
+      stdio: 'inherit',
+    }).status === 0
+  )
 }
 
 for (const step of PREREQUISITES) {
