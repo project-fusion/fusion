@@ -176,17 +176,12 @@ export class HelixHeadlessScrollArea extends HelixElement {
        One state per edge rather than one holding tokens, because a custom state
        is a name and not a value: there is no `~=` to ask with. The four
        selectors are what the styled tier writes either way. */
-    if (this.scrolls) {
-      this.internals.states.add('scrolls')
-    } else {
-      this.internals.states.delete('scrolls')
-    }
+    /* Through `toggleState` for the feature test it carries. This is `updated`
+       rather than `willUpdate`, so the server never reaches it, but Safari
+       below 17.4 and Firefox below 126 do and have no `CustomStateSet`. */
+    this.toggleState('scrolls', this.scrolls)
     for (const edge of EDGES) {
-      if (this.more.includes(edge)) {
-        this.internals.states.add(`more-${edge}`)
-      } else {
-        this.internals.states.delete(`more-${edge}`)
-      }
+      this.toggleState(`more-${edge}`, this.more.includes(edge))
     }
   }
 

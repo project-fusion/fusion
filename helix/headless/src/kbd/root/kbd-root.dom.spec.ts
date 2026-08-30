@@ -131,6 +131,35 @@ describe('a key that binds', () => {
     expect({ heard, tookTheKey: event.defaultPrevented }).toEqual({ heard: '/', tookTheKey: true })
   })
 
+  /* **Dispatched from a real field, which is what the guard reads.** Every
+     other test here presses on `host.parentElement`, a bare element, so
+     `composedPath()[0]` is never a field and the guard is never reached: it
+     could be inverted and this file would not notice. `within="control"` is the
+     case that has to keep working, since that listener binds to the parent and
+     so only ever fires with focus already inside the control. */
+  const inField = async (attrs: string): Promise<{ heard: number; host: Kbd }> => {
+    const host = await kbd(attrs)
+    const field = document.createElement('input')
+    field.type = 'text'
+    ;(host.parentElement as HTMLElement).append(field)
+    let heard = 0
+    host.addEventListener('helix-shortcut', () => {
+      heard += 1
+    })
+    field.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: '/' }),
+    )
+    return { heard, host }
+  }
+
+  test('a bare printable chord scoped to the control still fires from inside it', async () => {
+    expect((await inField('keys="/" within="control"')).heard).toBe(1)
+  })
+
+  test('and the same chord bound to the document leaves the typing alone', async () => {
+    expect((await inField('keys="/" within="document"')).heard).toBe(0)
+  })
+
   test('a chord a reader did not press goes to whoever wanted it', async () => {
     // `mod+k` is not `shift+mod+k`. Modifiers are checked both ways round, so a
     // near miss is not a hit and the keystroke carries on.

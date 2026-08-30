@@ -129,13 +129,21 @@ fn targets(node: &Value, found: &mut BTreeSet<String>) {
 /// What npm packs whatever `files` says, so a target naming one is not a fault.
 ///
 /// The root's own, and not a file of the same name anywhere below it.
+///
+/// `licen` rather than the two spellings npm accepts. Listing both would put a
+/// British word in the source, which `fusion prose` refuses and is right to:
+/// the prefix covers `LICENSE` and `LICENCE` both. dialect:quoted, those are
+/// filenames npm accepts rather than words this repository writes. This read
+/// `["readme", "license", "license", "changelog"]` until the review of 19
+/// noticed the repetition, and a duplicated literal in an array is something
+/// `clippy::pedantic` does not see, which is what the test below is for.
 fn always(path: &str) -> bool {
     if path.contains('/') {
         return false;
     }
     let lower = path.to_ascii_lowercase();
     lower == "package.json"
-        || ["readme", "license", "license", "changelog"]
+        || ["readme", "licen", "changelog"]
             .iter()
             .any(|one| lower.starts_with(one))
 }
@@ -542,4 +550,55 @@ fn cargo(context: &Context, findings: &mut Vec<Finding>) -> usize {
         }
     }
     checked
+}
+
+#[cfg(test)]
+mod tests {
+    use super::always;
+
+    /// The list, rather than the intention.
+    ///
+    /// A duplicated literal in the array this reads was live and invisible:
+    /// `clippy::pedantic` does not look inside one, and every name the check
+    /// cared about still matched, so nothing failed. The entry meant to be
+    /// there was the British spelling, which `fusion prose` refuses in source,
+    /// so the fix was a prefix covering both rather than a second word.
+    ///
+    /// Naming each file npm always packs is what makes a dropped one fail here.
+    #[test]
+    fn every_name_npm_always_packs_is_covered() {
+        for name in [
+            "package.json",
+            "README",
+            "README.md",
+            "readme.markdown",
+            "LICENSE",
+            "LICENCE", // dialect:quoted, npm packs the file under either spelling
+            "license.txt",
+            "CHANGELOG.md",
+        ] {
+            assert!(always(name), "{name} is packed whatever `files` says");
+        }
+    }
+
+    /// The root's own, and nothing that merely shares its name.
+    #[test]
+    fn a_file_below_the_root_is_not_one_of_them() {
+        for name in ["src/README.md", "docs/LICENSE", "packed.js"] {
+            assert!(!always(name), "{name} is not what npm packs unconditionally");
+        }
+    }
+
+    /// **Prefixes, so `licensing.ts` reads as packed and is not.**
+    ///
+    /// Recorded rather than fixed. The cost is a missed finding: a target
+    /// exporting it without listing it in `files` goes unreported. The comment
+    /// at the head of this rule argues that a wrong finding costs more than a
+    /// missed one, so loose is the direction to be loose in, and exact names
+    /// would refuse `README.markdown` and every case extension.
+    #[test]
+    fn the_prefixes_are_loose_and_that_is_the_safe_direction() {
+        assert!(always("licensing.ts"));
+        assert!(always("readmeme.md"));
+    }
 }

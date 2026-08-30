@@ -234,11 +234,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
       ['sorted-ascending', this.sorted === 'ascending'],
       ['sorted-descending', this.sorted === 'descending'],
     ] as const) {
-      if (on) {
-        this.internals.states.add(name)
-      } else {
-        this.internals.states.delete(name)
-      }
+      /* Through `toggleState`, which carries the feature test, the way
+         `pagination-root.ts` does in this same hook. Safari below 17.4 and
+         Firefox below 126 have no `CustomStateSet`, and there
+         `internals.states.delete` is a `TypeError` thrown from `willUpdate`:
+         the column would fail to render rather than render without a caret. */
+      this.toggleState(name, on)
     }
   }
 

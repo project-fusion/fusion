@@ -232,8 +232,18 @@ export class HelixHeadlessKbd extends HelixElement {
        `composedPath()[0]` rather than `target`, which retargets to the host at
        document level and would need a list of every tag name that holds a field.
        The path's first entry is the real one, through open shadow roots and
-       through `delegatesFocus`. */
-    if (this.printable && typing(press.composedPath()[0])) {
+       through `delegatesFocus`.
+
+       **`document` only, because `control` has already answered the question.**
+       That binding listens on `this.parentElement`, so it fires only with focus
+       inside the control the badge sits in, and the guard would make a bare
+       printable chord unreachable there by construction: the two are mutually
+       exclusive. `.examples/events.html` is exactly that shape, a `keys="/"`
+       slotted into a `helix-input` telling the reader to put the cursor in the
+       field and press slash, and it would have shipped to the docs site doing
+       nothing. What is ambiguous is `/` competing with every field on the page,
+       which is the `document` case and the only one this refuses. */
+    if (this.within === 'document' && this.printable && typing(press.composedPath()[0])) {
       return
     }
     if (!this.matches_(press)) {
