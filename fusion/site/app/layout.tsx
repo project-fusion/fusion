@@ -9,6 +9,7 @@ import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { COLOR_MODE_KEY } from '@/utils/color-mode/color-mode'
 import { siteUrl } from '@/utils/metadata/metadata'
 import { SITE } from '@/utils/site/site'
+import { OWNED, SITE_THEME_KEY, THEME_VERSION } from '@/utils/site-theme/site-theme'
 
 /** The faces `fonts.css` declares, in the order the page asks for them. */
 const FACES = [
@@ -99,16 +100,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           />
         ))}
 
-        {/* **The color mode, applied before the first pixel.**
+        {/* **What the reader chose, applied before the first pixel.**
          *
-         * Restoring the stored choice in an effect is not early enough: an
-         * effect runs after the document has painted, and until then the page
-         * follows `prefers-color-scheme`, so a reader whose system is light and
-         * whose choice is dark gets a frame of the light theme. Everything on
-         * the page survives that; the aura does not. It reads
+         * Two things: the color mode, and the palette they derived on the
+         * landing page. One script, because they are one concern — appearance
+         * restored from storage — and because the second of two
+         * `beforeInteractive` scripts is not emitted, measured: only the first
+         * reached the document, so the palette silently never restored.
+         *
+         * Restoring either in an effect is not early enough: an effect runs
+         * after the document has painted, and until then the page follows
+         * `prefers-color-scheme` and the shipped palette. Everything on the
+         * page survives a frame of that; the aura does not. It reads
          * `--helix-color-background` once on mount to decide which half of its
-         * palette to draw, catches the light value, and renders a full-viewport
-         * field at light-mode brightness under chrome that is already dark.
+         * palette to draw, catches the wrong value, and renders a full-viewport
+         * field at light-mode brightness under chrome that is already dark. The
+         * palette has the same problem an order of magnitude wider: every color
+         * on the page changing one frame in.
          *
          * A blocking script in `head` is the only thing that runs early enough,
          * and `next/script` at `beforeInteractive` is how this framework writes
@@ -117,16 +125,28 @@ export default function RootLayout({ children }: { children: ReactNode }) {
          * `<script dangerouslySetInnerHTML>` does the same thing and is rightly
          * refused by `noDangerouslySetInnerHtml` while a supported form exists.
          *
-         * The key is interpolated rather than written out, so this and the
-         * preferences panel cannot drift onto different keys. It comes from a
-         * plain module rather than from `preferences.tsx`: that file is
+         * **The palette is restored, never derived.** The engine is wasm and
+         * loading it is asynchronous, so a script that computed the palette
+         * could not be the thing that runs first. What is stored is what the
+         * engine already produced, so this is a list of custom properties being
+         * written to the root: synchronous, and done in the same tick. The flag
+         * goes on last, being what the token layer keys its own declarations
+         * off; set first, the layer would resolve against properties that are
+         * not there yet.
+         *
+         * The keys are interpolated rather than written out, so this and the
+         * panels that write them cannot drift apart. Both come from plain
+         * modules rather than from `preferences.tsx`: that file is
          * `'use client'`, and a server component importing a non-component value
          * from a client module gets a reference proxy, so the constant arrives
-         * here as `undefined` and ships `getItem(undefined)`. Wrapped in
-         * `try`, because storage throws rather than returning null in a
-         * private window, and a theme is not worth a blank page. */}
-        <Script id="site-color-mode" strategy="beforeInteractive">
-          {`try{var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')document.documentElement.dataset.colorMode=m}catch(e){}`}
+         * here as `undefined` and ships `getItem(undefined)`. Wrapped in `try`,
+         * because storage throws rather than returning null in a private window,
+         * and an appearance is not worth a blank page. The version is checked
+         * for a narrower reason: a palette held from before a role was renamed
+         * would restore a page with a hole in it that the reader cannot see and
+         * cannot report. */}
+        <Script id="site-appearance" strategy="beforeInteractive">
+          {`try{var d=document.documentElement;var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')d.dataset.colorMode=m;var t=JSON.parse(localStorage.getItem(${JSON.stringify(SITE_THEME_KEY)})||'null');if(t&&t.version===${THEME_VERSION}&&t.tokens){var s=d.style,i;for(i=0;i<t.tokens.length;i++)s.setProperty(${JSON.stringify(OWNED)}+t.tokens[i].name,t.tokens[i].hex);for(i in t.seeds)s.setProperty(${JSON.stringify(OWNED)}+i,t.seeds[i]);d.dataset.helixTheme=''}}catch(e){}`}
         </Script>
       </head>
       <body>
