@@ -45,7 +45,7 @@
     "helix": "node helix/cli/npm/bin.mjs",
     "insight": "bun fusion/scripts/new-insight.mjs",
     "lint": "biome lint .",
-    "prepare": "git config core.hooksPath .githooks",
+    "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "probe:stuck": "bun fusion/scripts/probe-stuck-spec.mjs",
     "regen": "bun run fix && bun run analyze && bun run gen:element-events && turbo run reference && turbo run token-layer && turbo run tokens && bun run gen:metrics && turbo run routes && turbo run samples && turbo run docs && turbo run content && turbo run catalog && turbo run themed-page && bun run gen:eval",
     "rs:build": "cargo build --workspace",
