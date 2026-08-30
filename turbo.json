@@ -88,13 +88,31 @@
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/src/*/.examples/**",
+        "$TURBO_ROOT$/fusion/docs/insights/**",
         "$TURBO_ROOT$/fusion/site/scripts/build-catalog.mjs"
       ],
+      // **`public/insights` is an output and was not declared**, which is the
+      // same fault this file records two tasks down about `public/sandbox` and
+      // `public/specs`. `routes` asks whether every published path has a
+      // document under `public/insights`, so a cache hit restored a tree
+      // without them and the check reported six essays as having no document.
+      // The insights content is an input for the other half of it: six essays
+      // were added and the cache key did not move, so the task that writes
+      // those documents was never asked to run again.
+      //
+      // The set is `.gitignore`'s, which is the list of what this task
+      // generates and the only place it was written down: `public/*.md`,
+      // `public/helix/*.md`, `public/helix/components/`, `public/helix/docs/`
+      // and `public/insights/`. Declaring them one failure at a time found
+      // `insights` and then `helix/*.md` on the next run, because a `.md` is
+      // written per route and a route is as deep as its path.
       "outputs": [
         "content/catalog/catalog.generated.json",
         "public/*.md",
         "public/helix/components/**",
-        "public/helix/docs/**"
+        "public/helix/docs/**",
+        "public/helix/*.md",
+        "public/insights/**"
       ]
     },
 
@@ -239,8 +257,16 @@
     // anyway, because `turbo run` needs the declaration and because a task in
     // the graph can be depended on.
     "tokens": { "cache": false },
+    // **`^analyze` and not only `^build`, because the typings are analyzer
+    // output.** `jsx.d.ts` is emitted by `analyze` and is gitignored, so on a
+    // clean checkout there is nothing on disk for the site's
+    // `import '@fusion.dev/helix-sandbox/jsx'` to contribute: every custom
+    // element written in JSX becomes an unknown `JSX.IntrinsicElements` member.
+    // It passed locally the whole time, because a developer who has ever run
+    // `analyze` has the file. Four errors across two site files, and the job
+    // that catches it runs `bun install` and `typecheck` and nothing between.
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "^analyze"],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
