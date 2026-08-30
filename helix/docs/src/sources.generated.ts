@@ -2240,7 +2240,7 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 872,154 | 113 | 161,230 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
+| \`@fusion.dev/helix-core\` | 872,264 | 113 | 161,232 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
 | \`@fusion.dev/helix-headless\` | 9,626,448 | 422 | 735,736 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 63,952 | 11 | 20,403 | none |
 | \`@fusion.dev/helix-styles\` | 83,184 | 5 | 0 | none |
