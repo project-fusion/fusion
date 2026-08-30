@@ -184,7 +184,10 @@ jobs:
       # misses is one the shard builds itself, exactly as it does today.
       - run: bun run build
       - run: bun run analyze
-      - run: bun run catalog
+      # `turbo run catalog`, which is the spelling `run-checks.mjs` lists as a
+      # prerequisite. There is no root `catalog` script: the rename moved every
+      # generator behind `turbo`, and this job was written before it.
+      - run: turbo run catalog
 
   # **Ten shards rather than six, because `warm` changed what a shard costs.**
   # A shard was 31 seconds of setup, a build it paid alone, and its share of the
