@@ -122,8 +122,27 @@ const argument = (name) => {
   return index === -1 ? undefined : process.argv[index + 1]
 }
 
+/**
+ * How many shards the checks divide into, and why it lives here.
+ *
+ * **The count is a fact about the list, so it belongs with the list.** It was
+ * in two places and they disagreed: the workflow declared ten in a shell
+ * variable while this file defaulted to six, so `--list` and `--shard 0 --of 6`
+ * run by hand described a different sixth than CI ran a tenth of. Whichever was
+ * read last was the answer.
+ *
+ * `--count` is what the workflow reads, so the number leaves this file and
+ * arrives there rather than being written twice and compared by eye.
+ */
+const SHARDS = 10
+
+if (process.argv.includes('--count')) {
+  console.log(SHARDS)
+  process.exit(0)
+}
+
 if (process.argv.includes('--list')) {
-  const total = Number(argument('of') ?? 6)
+  const total = Number(argument('of') ?? SHARDS)
   console.log(JSON.stringify([...Array(total).keys()]))
   process.exit(0)
 }

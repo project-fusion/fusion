@@ -93,15 +93,15 @@ that exact failure under a name promising the opposite.
 of it.
 
 **`verify` is CI's job, not a local ritual.** `verify.yml` runs all of it on every
-push, sharded across `plan`, `checks`, `lint`, `types`, `tests` and four `browser`
-jobs, on a clean checkout, and it is better at every part of that than a laptop
-is.
+push, sharded across `plan`, `warm`, `checks`, `lint`, `types`, `tests` and six
+`browser` jobs, on a clean checkout, and it is better at every part of that than
+a laptop is.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
 a push. `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a
 red build that stays red until somebody runs `turbo run tokens` and
 pushes again, so `.githooks/pre-push` runs `biome ci`, `check:cli` and
-the twelve generated-file checks and nothing else: seconds against ten minutes.
+the twelve generated-file checks and nothing else: seconds against four minutes.
 It judges and never writes, because a hook that edits the tree during `git push`
 produces a push that does not contain the edits. `git push --no-verify` skips it.
 

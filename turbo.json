@@ -12,7 +12,7 @@
   //
   // `RUNNER_OS` and `RUNNER_ARCH` are set by GitHub Actions and unset on a
   // desk, so the two populations never share an entry. What matters is kept:
-  // every job in a run is Linux, so the six check shards and four browser
+  // every job in a run is Linux, so the check shards and the browser
   // shards still restore each other's build, which is where the saving was.
   // Nothing is lost but a laptop feeding a runner, which is the thing that
   // broke.
