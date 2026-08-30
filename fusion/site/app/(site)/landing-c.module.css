@@ -973,10 +973,48 @@
 .noRules :global([data-substrate]),
 .noRules :global(helix-card),
 .noRules :global([data-closing]) {
+  /* Named so the rule below can reach the cast without restating the geometry
+     it is cast with. */
+  --card-cast: rgb(0 0 0 / 0.55);
+
   border-color: transparent;
   box-shadow:
     0 1px 0 0 color-mix(in oklab, var(--helix-color-foreground) 6%, transparent) inset,
-    0 18px 40px -24px rgb(0 0 0 / 0.55);
+    0 18px 40px -24px var(--card-cast);
+}
+
+/**
+ * **The cast comes off a light phone.**
+ *
+ * Black at 55 per cent under a card is depth on a dark page, where it deepens a
+ * ground that is already dark. On a light one it is a gray smear, and at 390px
+ * the sections run the full width, so what it smears is a band the whole way
+ * across the screen directly under an edge that has no border. Photographed at
+ * the seam between two sections it reads as a printing fault rather than as one
+ * card sitting above another.
+ *
+ * There is nothing for it to do there either. The cast exists to separate a card
+ * from what is behind it, and full-bleed sections stacked edge to edge have no
+ * behind: the fill and the seam already say where one ends. The wide layout,
+ * where cards float inset with page showing around them, keeps it.
+ *
+ * **The color rather than the layer, so the geometry is written once.** Turning
+ * the whole shadow off would take the inset hairline with it, and restating the
+ * shadow with a different color would put the offsets in two places for the day
+ * somebody changes one of them.
+ *
+ * `light-dark()` rather than a `[data-color-mode]` selector: it resolves from
+ * the used `color-scheme`, so the reader who has chosen a mode and the reader
+ * who has chosen nothing and is on a light system are both answered by one
+ * declaration. The dark arm restates the literal because a custom property
+ * cannot refer to itself.
+ */
+@media (max-width: 40rem) {
+  .noRules :global([data-substrate]),
+  .noRules :global(helix-card),
+  .noRules :global([data-closing]) {
+    --card-cast: light-dark(transparent, rgb(0 0 0 / 0.55));
+  }
 }
 
 /**
