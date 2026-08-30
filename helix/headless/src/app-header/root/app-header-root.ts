@@ -13,15 +13,11 @@ import { property } from 'lit/decorators.js'
  * load starts at the top, which is what the server rendered, and a reload
  * part-way down corrects on hydration.
  *
- * **A custom state and not `data-scrolled`, which is what this used to be.**
- * The attribute was written onto the host by the element itself, so a server
- * sent the header without it and the element added it on upgrade. A framework
- * hydrating the page then found an attribute it had not rendered and reported
- * the tree as mismatched: intermittently, because it only happens when the
- * reader reloads far enough down the page to pass the threshold. Every
- * server-rendered consumer paid for that, and could only answer it by
- * suppressing hydration warnings on an element they did not write.
- *
+ * **A custom state and never `data-scrolled`.** An attribute the element writes
+ * onto its own host is one the server did not send, so a hydrating framework
+ * reports the tree as mismatched, intermittently: only when the reader reloads
+ * far enough down the page to pass the threshold. A consumer can answer that
+ * only by suppressing hydration warnings on an element they did not write.
  * `ElementInternals.states` is deliberately not in the DOM, so there is nothing
  * for a hydration pass to disagree with, and `:state(scrolled)` selects it. The
  * base class made the same move for `data-settled` and its note explains the
@@ -76,18 +72,15 @@ export class HelixHeadlessAppHeader extends HelixElement {
    *
    * `start` is the opt-out, for a header whose middle region trails the brand.
    *
-   * **Named for the region and not for what is usually in it.** It was
-   * `nav-align`, which reads as a property about `Navigation` and is not: the
-   * middle slot takes whatever a consumer puts there, a search field or a
-   * breadcrumb trail as readily as a nav, and a header that centered its search
-   * box would have been setting `nav-align` to do it. The part is called
-   * `content`, so the property is too.
+   * **Named for the region and not for what is usually in it.** The middle slot
+   * takes a search field or a breadcrumb trail as readily as a `Navigation`, so
+   * the property carries the part's name, `content`.
    */
   @property({ attribute: 'content-align', reflect: true })
   contentAlign?: 'start'
 
   /* Whether the bar currently believes the page has moved, kept alongside the
-     attribute so a scroll that changes nothing writes nothing. */
+     custom state so a scroll that changes nothing writes nothing. */
   private scrolled = false
 
   /**
@@ -98,8 +91,8 @@ export class HelixHeadlessAppHeader extends HelixElement {
    * quiet place: rubber-banding overshoots past it and comes back, scroll
    * anchoring nudges by a pixel when an image or a font lands, and a
    * `scroll-behavior: smooth` jump settles by oscillating around its target.
-   * Every one of those crossings toggled the attribute, and the fill and the
-   * blur are both transitioned, so each toggle started a fresh animation in the
+   * Every one of those crossings toggles the state, and the fill and the blur
+   * are both transitioned, so each toggle starts a fresh animation in the
    * opposite direction. What a reader sees is a bar that shimmers, and text
    * legible through it for as long as the fill is part way in.
    *

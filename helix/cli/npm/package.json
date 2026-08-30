@@ -1,0 +1,19 @@
+{
+  "name": "@fusion.dev/helix-cli",
+  "description": "The Helix command line, for a workspace that reaches it through npm.",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "helix/cli/npm",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "files": [
+    "bin.mjs"
+  ],
+  "bin": {
+    "helix": "./bin.mjs"
+  }
+}

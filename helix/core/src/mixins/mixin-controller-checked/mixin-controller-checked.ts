@@ -18,9 +18,9 @@ export declare class MixinControllerCheckedInterface {
   /**
    * Whether the control is checked.
    *
-   * Reading gives the real state, in either mode. Writing hands ownership to
-   * the consumer: from then on the control announces changes and applies none
-   * of them.
+   * Reading gives the real state. Writing always applies, and is a seed and a
+   * correction rather than a claim of ownership: a consumer who wants the
+   * decision refuses the `helix-before-toggle`.
    */
   checked: boolean
 
@@ -39,28 +39,26 @@ export declare class MixinControllerCheckedInterface {
   toggleChecked(): boolean
 
   /**
-   * Drops the uncontrolled state, so the control reads `defaultChecked` again.
+   * Drops the recorded state, so the control reads `defaultChecked` again.
    *
-   * A form reset has to return a control to what its markup declared. Clearing
-   * `checked` alone cannot do it: that only leaves controlled mode, and the
-   * uncontrolled value the element has been keeping is private to the mixin
-   * and would still be what `checked` reports.
+   * A form reset has to return a control to what its markup declared, and
+   * assigning `checked` cannot do it: any assignment records a state, and the
+   * recorded state is private to the mixin. This is the only way to clear it.
    */
   resetChecked(): void
 }
 
 /**
- * Grafts controlled and uncontrolled checked state onto a base class.
+ * Grafts checked state onto a base class.
  *
- * Which mode it is in is read once, at the first update, from whether anything
- * had set `checked` by then: markup, a hydrating server's attributes and a
- * framework's initial properties have all arrived, and nothing else has
- * happened yet. Set, and the consumer owns it and the element only announces.
- * Unset, and the element owns it and `defaultChecked` says where it starts.
+ * `checked` is a seed and a correction rather than a claim: the element applies
+ * its own changes from wherever markup started it, `defaultChecked` is what a
+ * reset returns to, and a consumer takes the decision by refusing the
+ * `helix-before-toggle`.
  *
- * Records `:state(checked)` whenever the element is checked, in either mode.
- * Styled tiers select on that rather than on `[checked]`, which is absent for
- * uncontrolled consumers.
+ * Records `:state(checked)` whenever the element is checked. Styled tiers
+ * select on that rather than on `[checked]`, which is absent until somebody
+ * writes it.
  */
 export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinControllerCheckedInterface deliberately. The
@@ -70,17 +68,12 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     /**
      * Whether the control is checked.
      *
-     * One property rather than two. Reading gives the real state whichever
-     * mode the control is in; writing hands ownership to the consumer, which
-     * is what the attribute in `<helix-checkbox checked>` does as well. The
-     * same shape all four of these mixins have, for the reason given on
-     * `MixinControllerOpen.open`.
+     * One property rather than two. Writing always applies;
+     * `<helix-checkbox checked>` is the same statement in markup.
      *
      * Not reflected: the attribute is the consumer's input and stays as they
      * wrote it, and `:state(checked)` carries the resolved state for
      * stylesheets.
-     *
-     *
      */
     @property({ type: Boolean })
     get checked(): boolean {
@@ -103,27 +96,22 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * The state, whoever set it, and `undefined` until somebody has.
      *
      * One field and not two. Writing always applies, the way a native control
-     * does when a script assigns to it. What the write does not do is change
-     * which mode the element is in.
+     * does when a script assigns to it.
      */
     private checkedState: boolean | undefined = undefined
 
     /**
      * Records the resolved state as the custom state `checked`.
      *
-     * **A state and not `data-checked`, which is what this wrote until 27 Aug
-     * 2026.** The attribute went on in `willUpdate`, so `<helix-checkbox
-     * default-checked>` came back from a consumer's server without it and
-     * gained it the moment the definition landed, which React lists as a
-     * hydration mismatch and does not patch up. `HelixElement.toggleState` says
-     * why the host is the wrong place to keep a component's own bookkeeping.
+     * **A custom state and never `data-checked`.** An attribute written here
+     * means `<helix-checkbox default-checked>` comes back from a consumer's
+     * server without it and gains it the moment the definition lands, which
+     * React lists as a hydration mismatch and does not patch up.
+     * `HelixElement.toggleState` says why the host is the wrong place to keep a
+     * component's own bookkeeping.
      *
-     * Still in `willUpdate`, which is where the resolved state is first known
-     * and is what a subclass rendering from it expects. The old note here said
-     * SSR calls `willUpdate` and not `connectedCallback`, so the attribute
-     * reached server output: true, and no longer a reason for anything, a
-     * custom state being a fact about a running element that a server has
-     * nothing to say about.
+     * In `willUpdate`, which is where the resolved state is first known and is
+     * what a subclass rendering from it expects.
      */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
@@ -134,10 +122,11 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * Requests a checked change, and reports whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the
-     * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing means the element updates itself, whether or not a consumer
-     * declared the property: a declared property is a seed and a correction,
-     * the way `<input value>` is, and a consumer who wants the change for
-     * themselves refuses it and assigns their own. See 294.
+     * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing
+     * means the element updates itself, whether or not a consumer declared the
+     * property: a declared property is a seed and a correction, the way
+     * `<input value>` is, and a consumer who wants the change for themselves
+     * refuses it and assigns their own.
      */
     requestChecked(next: boolean): boolean {
       if (this.checked === next) {
@@ -170,25 +159,23 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
     /**
      * Restores the control when the browser brings a form back.
      *
-     * Hand-written on the checkbox and nowhere else, so `Switch`, the mixin's
-     * only other consumer, had no restore at all: a reader who navigated away
-     * and came back to a restored form found their switch flipped off. The
-     * mixin owns `checked`, so the mixin owns putting it back.
+     * The mixin owns `checked`, so the mixin owns putting it back: written on
+     * one consumer and not the other, a reader who navigates away and comes
+     * back to a restored form finds that control flipped off.
      *
-     * Through `checked` rather than the private state, so a controlled consumer
-     * is asked the same way every other change asks.
+     * Through the public accessor rather than the private field, so a restore
+     * takes the same path a script assignment does.
      */
     formStateRestoreCallback(state: string | null): void {
       this.checked = state !== null
     }
 
     /**
-     * Drops the uncontrolled state, so the control reads `defaultChecked`
-     * again.
+     * Drops the recorded state, so the control reads `defaultChecked` again.
      *
-     * A form reset has to return a control to what its markup declared, and
-     * clearing `checked` alone only leaves controlled mode. The value the
-     * element has been keeping lives here, so this is where it is dropped.
+     * A form reset has to return a control to what its markup declared, and no
+     * assignment to `checked` can do that: any assignment records a state. The
+     * recorded state lives here, so this is where it is dropped.
      */
     resetChecked(): void {
       const previous = this.checked

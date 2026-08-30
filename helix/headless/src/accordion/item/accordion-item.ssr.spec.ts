@@ -36,11 +36,11 @@ describe('accordion server output', () => {
 
   test('a closed section is closed with no stylesheet at all', () => {
     /* The headless tier's whole claim. `inert` takes the region out of the
-       accessibility tree and off the tab order and leaves every pixel of it on
-       screen, so for a consumer who brings their own CSS it was two sections
-       permanently open under a trigger reporting `aria-expanded="false"`. The
-       collapse was living in the styled tier's `grid-template-rows`, which is
-       an animation that was hiding things as a side effect.
+       accessibility tree and off the tab order while leaving every pixel of it
+       on screen. Without it a consumer bringing their own CSS gets two sections
+       permanently open under a trigger reporting `aria-expanded="false"`: the
+       collapse lives in the styled tier's `grid-template-rows`, which hides
+       things as a side effect of an animation.
 
        Asserted on the part's own tag rather than on the markup, because the
        inlined stylesheet names both attributes and `toContain` would pass on a

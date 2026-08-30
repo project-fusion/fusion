@@ -1,0 +1,79 @@
+/* The centered fallback, and the delay that keeps it from flashing.
+ *
+ * `animation` rather than `transition`, because there is nothing to transition
+ * from: the element is painted once and never changes state. A forwards
+ * animation with a delay is the shape that says "invisible, then visible" for
+ * something that only ever arrives.
+ *
+ * `dvh` rather than `vh`, so the box is the space actually available on a phone
+ * with a retracting toolbar rather than the space there would be without one. */
+/**
+ * The mark, breathing rather than spinning.
+ *
+ * A spinner claims to know how long this takes and a dot claims nothing at all.
+ * A slow pulse on the site's own mark says the page is coming and whose it is,
+ * which is the whole of what a reader needs from a wait this short.
+ */
+.loadingMark {
+  animation: siteLoadingBreathe var(--helix-duration-slow) var(--helix-easing-standard) infinite
+    alternate;
+}
+
+@keyframes siteLoadingBreathe {
+  from {
+    opacity: 0.55;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* A mark that pulses is motion for its own sake once a reader has asked for
+   none, and the mark alone still says the same thing. */
+@media (prefers-reduced-motion: reduce) {
+  .loadingMark {
+    animation: none;
+  }
+}
+
+/**
+ * The fallback, held back past the loads that do not need announcing.
+ *
+ * At `--helix-duration-slow` alone, 320ms, a page that streams in around half a
+ * second cleared the delay, so the loader faded in and was gone again inside a
+ * few frames: a black wordmark appearing and vanishing on a white ground, which
+ * reads as a flash rather than as a wait.
+ *
+ * Derived from the token rather than typed as 640ms, so it still moves with the
+ * scale if the scale moves.
+ */
+.loading {
+  align-items: center;
+  animation: siteLoadingArrive var(--helix-duration-normal) var(--helix-easing-decelerate)
+    calc(var(--helix-duration-slow) * 2) both;
+  display: flex;
+  justify-content: center;
+  min-block-size: 60dvh;
+}
+
+@keyframes siteLoadingArrive {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* A reader who has asked for less motion still needs to know it is working, so
+   the loader stays and only its fade stops. `--helix-duration-instant` is the
+   scale's own zero, which is what the token layer emits for a theme asking for
+   no motion at all: the delay is kept, because a wait that is too short to be
+   worth reporting is too short whatever a reader thinks of animation. */
+@media (prefers-reduced-motion: reduce) {
+  .loading {
+    animation-duration: var(--helix-duration-instant);
+  }
+}

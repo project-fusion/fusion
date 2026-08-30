@@ -35,17 +35,16 @@ pub const STATUS_FLOOR: f64 = 0.55;
 /// Away from one role can be toward another, so the only honest search is to
 /// widen outward and take the first hue that clears everything.
 ///
-/// **A repair either works or it does not happen.** The first version kept
-/// whatever hue it had reached when the allowance ran out, which is the worst of
-/// both outcomes: with the shipped blue, `warning` walked the full forty degrees
-/// to 115, came to rest in the greens, and still collided. A warning that has
-/// stopped looking like a warning *and* is still indistinguishable is worse than
-/// one that only collides, and `collisions` is there to report the failure
-/// honestly.
+/// **A repair either works or it does not happen.** Keeping whatever hue the
+/// walk had reached when the allowance ran out is the worst of both outcomes:
+/// with the shipped blue, `warning` walks the full forty degrees to 115, comes
+/// to rest in the greens, and still collides. A warning that has stopped looking
+/// like a warning *and* is still indistinguishable is worse than one that only
+/// collides, and `collisions` is there to report the failure honestly.
 ///
 /// Its own function because the order inside it is a fidelity detail no output
 /// can show: `hue + step` is tried before `hue - step`, and that only decides
-/// anything when both clear at the same step, which none of the eleven themes
+/// anything when both clear at the same step, which no theme in the oracle
 /// happens to do. Taking a predicate is what makes it assertable at all.
 #[must_use]
 pub fn repair_hue(hue: f64, allowance: f64, clears: impl Fn(f64) -> bool) -> f64 {
@@ -142,11 +141,9 @@ pub fn statuses(
         };
 
         /* **Its own chroma, pulled toward the palette's loudness, never the
-        brand's outright.** Taking the brand's gave a gray danger on a muted
-        brand; ignoring the brand entirely gave the opposite, danger measuring six
-        times primary's chroma on the same palette, which is a red that shouts.
+        brand's outright**, for the reason the module header measures.
 
-        So the multiplier walks from 1 toward how loud this brand is against a
+        The multiplier walks from 1 toward how loud this brand is against a
         normal one, as far as `harmony` asks, and is clamped at both ends: never
         above the status's own chroma, that already being what its hue can hold,
         and never below the floor, a danger too quiet to read as danger being
@@ -162,10 +159,8 @@ pub fn statuses(
 
         let mut resolved_hue = hue;
         if allowance > 0.0 {
-            /* **Against the brand and against the statuses already settled.**
-            Deliberately not against the accent, which has not been decided yet:
-            the accent is the role that yields, so a status must not spend its
-            allowance getting out of the way of something about to move itself. */
+            /* **Against the brand and against the statuses already settled**,
+            and deliberately not against the accent, per this function's doc. */
             let decided: Vec<Oklch> = std::iter::once(primary_raw)
                 .chain(settled.iter().copied())
                 .collect();

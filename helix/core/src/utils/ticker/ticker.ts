@@ -6,12 +6,6 @@
  * reader leaves open in a background tab, where every wakeup is a wakeup the
  * browser cannot coalesce away and a laptop pays for.
  *
- * *Moved here from `Notifications.Item` on 27 Aug 2026, when the timestamp
- * became `helix-format-date` and two families needed the same timer.* It was
- * always page-wide, which is what the `globalThis` key below is for; living in
- * one family's folder only ever meant the second family would have written its
- * own and got a second timer, which is the exact failure that note describes.
- *
  * Each subscriber says when it next needs looking at, and this holds a single
  * timeout for the soonest of them. A subscriber that wakes early is harmless,
  * because it recomputes its own reading and re-subscribes with a fresh answer;

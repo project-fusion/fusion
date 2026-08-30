@@ -1,0 +1,299 @@
+/* Insights: the gallery's own hero and grid, and everything a post is made of.
+ *
+ * Scoped to the two routes that read it. What stayed global is the card itself,
+ * `.insightCard`, because a card is rendered on the landing
+ * page as well and its picture is painted by a component in `lib/`: a name two
+ * routes and a shared component all apply is a shared name, whatever directory
+ * it happens to be styled from.
+ */
+
+/* A step off the page, and the masthead is see-through so it takes the step too.
+ *
+ * `.pageHero` is the page's own color on both galleries, which is right on
+ * `/helix` because the lattice and its lit dots are what separate the band from
+ * what follows. Insights has neither, so without a color of its own the only
+ * thing marking the band is the filter bar's hairline, 448 pixels down.
+ *
+ * **One token in both modes.** `surface-sunken` is thirteen values off white
+ * across 448 pixels of a hero, which is a gray panel rather than a step;
+ * `surface` is five, and the band is a change in the paper rather than a block
+ * on it. Pairing two tokens through `light-dark()` to compensate for the
+ * neutral ramp's asymmetry is the thing 145 says should not spread, so one
+ * token and no compensation.
+ *
+ * The bar above it needs no rule at all. `/insights` is already in `onHero`, so
+ * the masthead is `transparent` at rest, and the hero's negative start margin
+ * already pulls up by the header *plus the hairline* for precisely this case. */
+.insightsHero {
+  background-color: var(--helix-color-surface);
+}
+
+/* ======================================================== insights ======= */
+
+/* Five across, stepping down as the window narrows.
+ *
+ * **Five is what the summary being two lines pays for.** Unclamped, a summary
+ * ran to whatever length the essay's own description happened to be, four and
+ * five sentences in places, so the tallest card in a row set the height of all
+ * of them. Clamped at two lines the card has a bounded shape, and a bounded
+ * shape is what makes the narrower column work.
+ *
+ * The steps fall where a sentence stops fitting rather than at a list of device
+ * widths. */
+.insightGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* Four steps down rather than three, because five across needs one more. Each
+   step widens the card by about a quarter; skipping one doubles it in a single
+   breakpoint, which is the jump these exist to avoid. */
+@media (width < 100rem) {
+  .insightGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (width < 88rem) {
+  .insightGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width < 70rem) {
+  .insightGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width < 44rem) {
+  .insightGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* A post is a centered column, and the column is the page's measure rather than
+   the shell's full width. */
+/* The chevron sits on the column, and the label sits after it.
+ *
+ * Aligning the *label* instead is the better-sounding argument: a reader
+ * aligns on words, not on icons, and with the chevron on the column the label
+ * starts 29 inside it, so the masthead has a title and a standfirst at one edge
+ * and the only other words at another. Measured at 24 against 53.
+ *
+ * It loses anyway, because the fix has to put the chevron somewhere and the
+ * only place left is outside. Pulling back far enough to land the label on the
+ * column drags the whole control 44 to the left, and the hover fill goes with
+ * it, since anything that hangs still has to sit inside the thing that lights
+ * up. That gives a wash reaching 44 one way and 16 the other, hanging off the
+ * side of a centered column with nothing under it. A resting misalignment of 29
+ * costs less than a moving one of 44: the first is a slightly indented label,
+ * the second is a shape that looks broken every time a pointer crosses it.
+ *
+ * So one control inset, the fill overhangs evenly, and the chevron holds the
+ * edge that the title and the standfirst hold. The label is inset by the icon
+ * and its gap, which is what a leading icon does to a label anywhere. */
+.insightTrail {
+  margin-inline-start: calc(var(--helix-space-control) * -1);
+}
+
+/* The avatar sized to sit inside the chip that carries it.
+ *
+ * `Avatar`'s own `sm` is 24, which is exactly the height of a tag at this
+ * density, so slotted as a prefix it filled the chip edge to edge and pushed it
+ * taller than the four beside it. Through the component's own hook, at the
+ * tag's text size, so the two move together if the ramp does.
+ *
+ * The 0.75 the prefix slot puts on everything it holds is left alone. It is
+ * there because a prefix is a category qualifying a label and should not
+ * outshout it, and that reasoning survives the thing being a face rather than a
+ * word: this is a byline, not a profile. */
+
+/* A row that is a link. Cards were tried here and are wrong at the foot of an
+   article: three boxes after a column of prose read as a different page
+   starting, where rows read as the same page continuing.
+ *
+ * **No rules between the rows.** A hairline above every row plus a fill on
+ * hover is two separators for one boundary: the wash says where a row begins
+ * and ends more exactly than a line between them does, and it says it on the
+ * row the reader is actually pointing at. The one divider that stays is the one
+ * above the whole section, which separates the list from the article rather
+ * than the rows from each other. That one is a real boundary and nothing else
+ * marks it.
+ *
+ * **Inset, and pulled back by the same amount.** The padding gives the wash
+ * room, so it reads as a row containing the text rather than a stripe behind
+ * it, and the negative margin puts the text back on the article's own measure,
+ * so nothing moves when the fill appears and the column of prose above still
+ * lines up with the titles below. Same construction the back step uses.
+ *
+ * The radius comes with the inset: a fill with corners is an object, and a fill
+ * that runs to both edges of the page is a band. These are objects. */
+.insightNext {
+  border-radius: var(--helix-radii-sm);
+  color: inherit;
+  display: block;
+  margin-inline: calc(var(--helix-space-md) * -1);
+  padding: var(--helix-space-md);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+}
+
+/* The arrow leans the way the row goes: a static glyph is a picture of a
+   direction rather than a sign of one, since nothing about it answers the
+   pointer. Four pixels is enough, and more is a row that feels like it is
+   trying to leave.
+ *
+ * `translate` rather than `transform`, so it composites on its own and cannot
+ * collide with a transform the icon might want later. Declared on the icon
+ * rather than the row, because only the arrow moves.
+ *
+ * The component sets no `translate` of its own, so this adds a property rather
+ * than overruling one. */
+.insightNext helix-icon {
+  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover helix-icon {
+  translate: var(--helix-space-2xs) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightNext helix-icon {
+    transition: none;
+  }
+
+  .insightNext:hover helix-icon {
+    translate: none;
+  }
+}
+
+/* The tags in the byline separate by fill, not by edge.
+ *
+ * Five chips in a row each drawing its own hairline is five more lines than the
+ * row needs: the fill already says where each one begins and ends, and the
+ * edges turn a set of facts into a set of boxes. Through `--tag-border-color`,
+ * which `Tag` publishes beside its fill and label hooks, so this is the
+ * component's own property rather than a document rule reaching past it.
+ *
+ * No `outlined` here, since an outlined chip with no outline is nothing at all.
+ * Every tag is `subtle` and the subject keeps `primary`, which is the one
+ * distinction the row makes with color. */
+.insightFiling helix-tag {
+  --tag-border-color: transparent;
+}
+
+/* Two of the five are links, and the chip is the whole target.
+ *
+ * `quiet` rather than no treatment at all, because a bare anchor draws an
+ * underline and that line propagates into the label the tag has slotted from
+ * this tree: the chip would come out underlined through its own shadow root.
+ * `quiet` is the variant that takes the decoration off, and its color never
+ * reaches the label, which `Tag` sets on its own host.
+ *
+ * `inline-flex` so the anchor is exactly the chip. Left inline it takes the
+ * line box's height instead, which puts a taller invisible target around a
+ * short chip and lands the row's `align: center` on the wrong box. */
+.insightFiling a {
+  display: inline-flex;
+}
+
+/* The read-through line, on the one strip of the page that never moves.
+ *
+ * Pinned to the masthead's own height at the masthead's own layer, so it rides
+ * the bottom edge of a sticky bar rather than floating somewhere under it. Two
+ * pixels: enough to see at the edge of vision while reading, not enough to be
+ * a second piece of chrome.
+ *
+ * `transform-origin` at the start edge, because the component scales it on X
+ * from 0 and a bar that grows from its middle is not a progress bar. Logical,
+ * so it fills the way the script reads.
+ *
+ * No transition. The value already tracks the scroll frame by frame, and easing
+ * a thing that is already following the pointer makes it lag behind the content
+ * it is reporting on. */
+.readingProgress {
+  background-color: var(--helix-color-primary);
+  block-size: 2px;
+  inset-block-start: var(--helix-size-header);
+  inset-inline: 0;
+  position: fixed;
+  transform-origin: 0 50%;
+  z-index: var(--helix-layer-sticky);
+}
+
+/* The arrow holds the end of the row rather than wrapping under it. Without a
+   floor of zero the text column refuses to shrink, so `justify: between` has
+   nothing to distribute and the icon drops to a line of its own. */
+.insightNextRow > helix-flex:first-child {
+  min-inline-size: 0;
+}
+
+/* The rays field behind the insights hero.
+ *
+ * **Rays rather than the lattice the gallery wears**, because the two pages
+ * should not be interchangeable: one is a set of drawings and this is a set of
+ * arguments, and light being cast is what an insight looks like.
+ *
+ * **Two things about it are unsettled.** The hero still carries the shared lattice underneath from
+ * `.pageHero::before`, so there are two textures where the page wants one; the
+ * dots are faint under the rays and it has not been decided whether they should
+ * be turned off here. And the frame cost of a WebGL context on a page that is
+ * otherwise text has not been measured: the 8.3ms figure on record is the
+ * landing page's field, not this one.
+ *
+ * Absolute against the band rather than fixed against the window, so it belongs
+ * to the hero and not to the page: the hero already establishes both the
+ * stacking context and the positioning.
+ *
+ * `base` under the content's `raised`, which is the pair `.pageHeroInner`
+ * already relies on. */
+.insightsAura {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* A ground for the masthead, and an edge for the band.
+ *
+ * **Two gradients rather than one, because they answer different things.** The
+ * linear one is the masthead's: `rays` puts its brightest light at the top
+ * center, which is exactly where the nav sits, and `Products` and `Services` are
+ * muted labels by design, so they lost against it while the current item kept
+ * its own filled pill. Two header heights of falloff, so the ground is gone
+ * before it reaches the eyebrow.
+ *
+ * The radial one is the vignette: it darkens the corners so the field ends
+ * rather than stopping at the filter bar's hairline, and it leaves the middle
+ * clear where the heading and the search are.
+ *
+ * Mixed from `--helix-color-background`, so this darkens on a dark page and
+ * lightens on a light one without a `light-dark()` pair, which is what the
+ * insights hero note above already says not to spread.
+ *
+ * `::after` rather than a rendered element: `::before` is the shared lattice,
+ * and a generated last child paints over an earlier sibling at the same layer,
+ * which is what puts this above the aura and under `.pageHeroInner`. */
+.insightsHero::after {
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--helix-color-background) 72%, transparent) 0,
+      color-mix(in srgb, var(--helix-color-background) 0%, transparent)
+        calc(var(--helix-size-header) * 2)
+    ),
+    radial-gradient(
+      ellipse 86% 72% at 50% 44%,
+      color-mix(in srgb, var(--helix-color-background) 0%, transparent) 0%,
+      color-mix(in srgb, var(--helix-color-background) 58%, transparent) 100%
+    );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}

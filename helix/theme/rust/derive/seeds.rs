@@ -2,7 +2,7 @@
 //!
 //! **This is what stops the two derivations disagreeing.** The stylesheet builds
 //! a ramp of its own from `--helix-seed-*`, including the twenty-four series
-//! colours a chart reads, and nothing in this engine reaches those. Emitting the
+//! colors a chart reads, and nothing in this engine reaches those. Emitting the
 //! tokens alone moved the buttons, the tags and the surfaces and left every
 //! chart on the page the original blue.
 
@@ -25,11 +25,11 @@ const LOUDEST_SERIES: f64 = 0.277;
 /// **The brand seed is the solved primary, not the color handed in**, and that
 /// is what makes the two derivations agree: the stylesheet builds its ramp from
 /// the seed, so seeding it with the raw input would leave the CSS primary and
-/// this engine's primary two different colours on the same page.
+/// this engine's primary two different colors on the same page.
 ///
 /// **The chroma policy has to reach the seed, or half the palette never hears
 /// about it.** This engine applies it to every color it solves, and the
-/// twenty-four series colours are not among those. Measured before it did:
+/// twenty-four series colors are not among those. Measured before it did:
 /// saturation at 20 per cent, and a bar still painted chroma 0.206.
 ///
 /// A `Vec` of pairs rather than a map, because the emitted order is the order
@@ -78,9 +78,10 @@ pub(crate) fn trimmed(value: f64, places: usize) -> String {
 /// `String(x)` for a float: JavaScript's shortest round-tripping form.
 ///
 /// Rust's `{}` for `f64` is also shortest-round-trip, so they agree on every
-/// value in this range except that JavaScript writes an integral float without a
-/// fraction, `1` where Rust writes `1`. They agree there too, which is worth
-/// checking rather than assuming: `format!("{}", 1.0_f64)` is `"1"`.
+/// value in this range, the integral case included: JavaScript writes an
+/// integral float without a fraction, and so does Rust, which is worth checking
+/// rather than assuming because `1.0` would be a different string in the emitted
+/// file. `format!("{}", 1.0_f64)` is `"1"`.
 fn number(value: f64) -> String {
     format!("{value}")
 }

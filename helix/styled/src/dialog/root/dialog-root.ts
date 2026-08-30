@@ -25,7 +25,7 @@ import { styles } from './dialog-root.css.js'
  *   theme says otherwise.
  * @cssproperty --dialog-icon-size - How big the mark above the title is.
  * @cssproperty --dialog-inline-size - Width of the panel.
- * @cssproperty --dialog-inset - Padding inside the panel.
+ * @cssproperty --dialog-padding - Padding inside the panel.
  * @cssproperty --dialog-rise - How far the panel rises as it opens. Follows
  *   `--helix-space-lg`.
  * @cssproperty --dialog-scrim - The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
@@ -37,35 +37,6 @@ import { styles } from './dialog-root.css.js'
  */
 @customElement('helix-dialog')
 export class HelixDialog extends HelixHeadlessDialog {
-  /**
-   * How wide the panel is allowed to be.
-   *
-   * Steps rather than a number, because a dialog's width is a fact about what is
-   * in it: a confirmation is narrow, a form is not, and picking pixels per
-   * dialog is how a product ends up with nine of them. `full` takes the viewport
-   * less the same inset every step already stops short by, so a takeover is one
-   * more rung and not a second property.
-   *
-   * Unset is `md`, read as `:host(:not([size]))` beside `:host([size="md"])`
-   * rather than assigned here, for the reason `Drawer.placement` gives: this
-   * reflects, and a default would put `size="md"` into markup no consumer wrote.
-   *
-   * **This was `appearance`, and it was the wrong word.** That word said how a
-   * thing *reads*, and here it said how wide the panel is, which its own
-   * description admitted in as many words. It turned out to be the first of
-   * many: `appearance` held four axes across 21 components and #158 retired it
-   * entirely, so this rename was that sweep arriving early at one component.
-   *
-   * `size` is right despite the rule that controls have no size, because that
-   * rule's own test is whether two of them sitting together could legitimately
-   * differ, and it is answering "a ragged row is unwritable". Two dialogs never
-   * sit together. One is on screen at a time, in the top layer, and it is the
-   * region rather than a control in one, which is the same reason `Avatar` and
-   * `Spinner` keep theirs.
-   */
-  @property({ reflect: true })
-  size?: 'sm' | 'md' | 'lg' | 'full'
-
   /**
    * Which way the panel's contents read.
    *
@@ -80,6 +51,30 @@ export class HelixDialog extends HelixHeadlessDialog {
    */
   @property({ reflect: true })
   align?: 'center' | 'start'
+
+  /**
+   * How wide the panel is allowed to be.
+   *
+   * Steps rather than a number, because a dialog's width is a fact about what is
+   * in it: a confirmation is narrow, a form is not, and picking pixels per
+   * dialog is how a product ends up with nine of them. `full` takes the viewport
+   * less the same inset every step already stops short by, so a takeover is one
+   * more rung and not a second property.
+   *
+   * Unset is `md`, read as `:host(:not([size]))` beside `:host([size="md"])`
+   * rather than assigned here, for the reason `Drawer.placement` gives: this
+   * reflects, and a default would put `size="md"` into markup no consumer wrote.
+   *
+   * `size` is right despite the rule that controls have no size, because that
+   * rule's own test is whether two of them sitting together could legitimately
+   * differ, and it is answering "a ragged row is unwritable". Two dialogs never
+   * sit together. One is on screen at a time, in the top layer, and it is the
+   * region rather than a control in one, which is the same reason `Avatar` and
+   * `Spinner` keep theirs. Not `appearance`, which says how a thing reads
+   * rather than how wide it is.
+   */
+  @property({ reflect: true })
+  size?: 'sm' | 'md' | 'lg' | 'full'
 
   static override styles: CSSResultGroup = styles
 }

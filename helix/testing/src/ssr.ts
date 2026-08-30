@@ -21,6 +21,24 @@ export const withoutStyles = (markup: string): string =>
   markup.replace(/<style>[\s\S]*?<\/style>/g, '')
 
 /**
+ * Only the inlined stylesheets, for the assertion that is about them.
+ *
+ * The counterpart to `withoutStyles`, and the reason it exists is the same one:
+ * a test asserting that declarative shadow DOM *carries* the sheet is asking
+ * about the styles rather than about the markup, and it was reaching for the
+ * whole document to do it. That reads identically to a structural assertion made
+ * against the raw string, which is the fault every other helper here exists to
+ * prevent, so the two could not be told apart by anything reading the test.
+ *
+ * Naming the subject separates them. `styles(markup)` cannot pass on a rendered
+ * attribute, the way the whole document can, and it is the stronger assertion
+ * besides: `toContain('--helix-color-surface')` on the whole document would be
+ * satisfied by a host attribute of that name.
+ */
+export const styles = (markup: string): string =>
+  [...markup.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((one) => one[1]).join('\n')
+
+/**
  * The host element's opening tag, for asserting on its attributes.
  *
  * Reflected properties land here rather than in the shadow root, so a test

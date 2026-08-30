@@ -32,9 +32,8 @@ describe('stat', () => {
 
 describe('stat direction', () => {
   test('a stat is a label over a number by default', async () => {
-    /* The words say what is coming and the number answers, which is how a figure
-       is read on a dashboard. The markup order never changes with it: a screen
-       reader hears the label first whichever way the pair is drawn. */
+    /* The markup order never changes with the visual one: a screen reader hears
+       the label first whichever way the pair is drawn. */
     /* Absent rather than `column`, and that is the point: a reflecting property
        with a default writes its attribute onto a host the consumer rendered,
        which React reports as a hydration mismatch. The stylesheet reads the
@@ -65,12 +64,12 @@ describe('stat direction', () => {
 
 if (hasLayout()) {
   describe('stat unit geometry', () => {
-    /* The unit read as a superscript, and `align-self: baseline` was already on
-       it, which is why nobody looked twice. Baseline alignment is relative: an
-       item aligns against the others in its baseline-sharing group, and one
-       item is not a group, so it fell back to start and sat at the top of the
-       number. `align-items: baseline` on the grid puts the value in the group
-       too, and both readings of the value need it.
+    /* `align-self: baseline` on the unit is not enough. Baseline alignment is
+       relative: an item aligns against the others in its baseline-sharing
+       group, and one item is not a group, so it falls back to start and sits at
+       the top of the number, reading as a superscript. `align-items: baseline`
+       on the grid puts the value in the group too, and both readings of the
+       value need it.
 
        Asserted as a distance rather than an equality, because the two are on a
        shared baseline and not a shared bottom edge: the smaller type has the

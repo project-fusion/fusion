@@ -18,12 +18,11 @@ const APPEARANCE_OPENERS = ['themed', 'a styled', 'styled', 'a themed']
  * Relaying is what makes a component behave like the control it wraps, and the
  * name has to be the native one for a consumer, and for React, to hear it.
  *
- * `close`, `cancel`, `toggle` and `beforetoggle` joined on 26 Aug 2026 with the
- * lifecycle work in 296. A `<dialog>` opened with `showModal()` and a panel
- * shown with `showPopover()` both have the browser firing these already, on an
- * element inside a shadow root, where they neither bubble nor compose and so
- * reach nobody. Relaying is the platform doing the work rather than an
- * invention.
+ * `close`, `cancel`, `toggle` and `beforetoggle` are here because the browser
+ * fires them already: a `<dialog>` opened with `showModal()` and a panel shown
+ * with `showPopover()` fire them on an element inside a shadow root, where they
+ * neither bubble nor compose and so reach nobody. Relaying is the platform
+ * doing the work rather than an invention.
  */
 const RELAYED_NATIVE = new Set([
   'beforetoggle',
@@ -47,12 +46,12 @@ const EM_DASH = /[—–]/
 /**
  * Enforces the documented Helix conventions against the manifest.
  *
- * These rules are written down in `CLAUDE.md`, which means they are followed
+ * These rules are written down in `AGENTS.md`, which means they are followed
  * exactly as often as someone remembers them. Checking them here turns prose
  * into a gate, and does it at the layer where the consequences actually land:
- * the manifest is what IDE tooltips, wrapper generators, and code-authoring
- * agents read, so an undocumented property is invisible tooling-wide, not just
- * untidy.
+ * the manifest is what IDE tooltips, the framework type generators, and
+ * code-authoring agents read, so an undocumented property is invisible
+ * tooling-wide, not just untidy.
  */
 export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
   const { failOn = 'error' } = options
@@ -172,8 +171,7 @@ export const conventionLint = (options: ConventionLintOptions = {}): Plugin => {
             'Event has no description. Events are public API.',
           )
           // The name decides the framework prop, because the manifest derives
-          // one from the other by stripping `helix-` and camel-casing. Two
-          // rules follow.
+          // one from the other by stripping `helix-` and camel-casing.
           //
           // Prefixed and lowercase, because an event from inside a shadow root
           // is retargeted to look like it came from the host: a bare `input`

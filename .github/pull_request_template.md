@@ -4,8 +4,7 @@
 
 ## Why
 
-<!-- The reasoning. If it closes a queue row, name it: "Closes #NNN". A row
-     number is the handle, and `docs/19-queue.md` is where the reasoning lives. -->
+<!-- The reasoning. If it closes an issue, name it: "Closes #NNN". -->
 
 ## How it was checked
 
@@ -15,7 +14,6 @@
 - [ ] `cargo test --workspace` passes (if Rust changed)
 - [ ] New or changed behavior has a spec
 - [ ] Visual baselines retaken with `bun run visual:update` on Linux (if pixels moved)
-- [ ] `docs/19-queue.md` updated (row closed, or a new one filed)
 
 ## Anything a reviewer should look at first
 

@@ -28,8 +28,7 @@ const tooltip = async (attrs = 'content="Regenerates the manifests"'): Promise<T
  * A bare `focusin` on the host is not the event a browser sends. `focusin`
  * bubbles *from* the element that took focus, and the tooltip reads the target to
  * ask whether the focus was one a reader chose, so dispatching it on the host
- * hands it an element that is not focused at all. That gap is what let a stale
- * focus hold survive a mouse press for as long as it did.
+ * hands it an element that is not focused at all.
  */
 const focusTrigger = async (tip: Tooltip): Promise<void> => {
   const trigger = tip.querySelector('button') as HTMLButtonElement
@@ -323,12 +322,10 @@ describe('tooltip for', () => {
   })
 
   test('and focus the reader did not choose takes no hold', async () => {
-    /* **A mouse press focuses the button it pressed.** An unconditional focus
-       hold meant that after any click the bubble was held up by a reader who had
-       not asked for it: the pointer leaving released the pointer hold, found a
-       focus hold still set, and left the tooltip on screen until something else
-       blurred the control. Invisible until `persist`, because activation used to
-       clear every hold on the way out.
+    /* **A mouse press focuses the button it pressed**, so an unconditional focus
+       hold leaves the bubble up after any click: the pointer leaving releases
+       the pointer hold, finds a focus hold still set, and the tooltip stays on
+       screen until something else blurs the control.
 
        `:focus-visible` is the test, and this asserts it through the one case a
        unit DOM can express: a `focusin` whose target is not focused at all. The

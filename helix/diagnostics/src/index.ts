@@ -75,10 +75,9 @@ export interface Options {
  *
  * **It returns coverage and findings together and offers no way to have one
  * without the other.** A collector that cannot read cross-origin sheets reports
- * the same empty array whether it read everything or nothing, and this
- * repository has already shipped one check that was structurally incapable of
- * failing and green for weeks because of it. An empty `findings` is only
- * meaningful beside the `coverage` that says what was looked at.
+ * the same empty array whether it read everything or nothing. An empty
+ * `findings` is only meaningful beside the `coverage` that says what was looked
+ * at.
  *
  * Cheap enough to call on a route change. There is no observer and no polling
  * loop: sheets that arrive later are found by calling it again.

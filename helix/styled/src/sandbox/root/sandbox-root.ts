@@ -18,14 +18,13 @@ import type { HelixSandboxTerminal } from '../terminal/sandbox-terminal.js'
 import { styles } from './sandbox-root.css.js'
 
 /** Where the divider sits, and how tall the panel is, before anyone moves them.
-    Named because the properties default to them and `applyPanel` falls back to
-    them, and two copies of a default drift. */
+    Named because the properties default to them and the getters that reset them
+    fall back to them, and two copies of a default drift. */
 const DEFAULT_SPLIT = 50
-/* One hundred and sixty, not one hundred and ninety-two. The panel is a console
-   a reader glances at, and at 192 it opened taking forty-two percent of the
-   sandbox: the thing being previewed had less room than the log of it. Its own
-   tab bar is forty-eight of that, so this leaves about five lines, which is what
-   a console is read in. Dragging it taller is one gesture and it is remembered. */
+/* One hundred and sixty, not one hundred and ninety-two. At 192 the panel opened
+   taking forty-two percent of the sandbox: the thing being previewed had less
+   room than the log of it. Its own tab bar is forty-eight of that, so this
+   leaves about five lines, which is what a console is read in. */
 const DEFAULT_PANEL = 160
 
 /** The most of the sandbox the panel may take, leaving the panes above it. */
@@ -48,12 +47,9 @@ const PANEL_MAX = 0.8
  * a React component into the preview.
  *
  * **The dividers are two nested `helix-splitter`s, not a grid this element
- * drags itself.** It had its own: a five row grid, a stylesheet written to on
- * every pointer move, three pointer handlers, a keyboard handler reading which
- * axes each divider was allowed to move, and a corner placed by hand into the
- * cell where two tracks met. All of it is the splitter's now, including the
- * corner, which arrives on its own wherever a nested splitter crosses the one it
- * is in.
+ * drags itself.** The pointer handling, the keyboard handling and the corner are
+ * all the splitter's, and the corner arrives on its own wherever a nested
+ * splitter crosses the one it is in.
  *
  * The panes are the inner splitter and the panel is the outer one, which is the
  * order that makes the panel span the full width: the outer divider runs edge to
@@ -103,10 +99,34 @@ const PANEL_MAX = 0.8
 @customElement('helix-sandbox')
 export class HelixSandbox extends HelixElement {
   /**
-   * Whether the panes sit side by side or stacked.
+   * Accessible name for the divider that moves both at once.
    */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
+  @property({ attribute: 'corner-label' })
+  cornerLabel = 'Resize panes and panel'
+
+  /**
+   * What a reset makes the panel, in pixels.
+   *
+   * The pair to `panel-size`.
+   */
+  @property({ attribute: 'default-panel-size', type: Number })
+  defaultPanelSize = DEFAULT_PANEL
+
+  /**
+   * Where a reset puts the divider, where nothing declared it.
+   *
+   * Separate from `split` for the reason `Splitter` keeps `default-position`
+   * separate from `position`. Resetting to whatever `split` held on the first
+   * render is the declared arrangement only where nobody owns the property: the
+   * workbench does, and restores it from the address bar and from storage, so the
+   * first value it holds is the reader's last session and a reset puts the
+   * sandbox back to the size it already was.
+   *
+   * Declared rather than captured, so it is a number a consumer states and can
+   * change, and it needs no first frame to be read on.
+   */
+  @property({ attribute: 'default-split', type: Number })
+  defaultSplit = DEFAULT_SPLIT
 
   /**
    * Which pane comes first, before the divider.
@@ -129,42 +149,10 @@ export class HelixSandbox extends HelixElement {
   lead: 'source' | 'preview' = 'source'
 
   /**
-   * Percentage of the sandbox given to the source pane.
+   * Whether the panes sit side by side or stacked.
    */
-  @property({ attribute: 'split', type: Number })
-  split = DEFAULT_SPLIT
-
-  /**
-   * Where a reset puts the divider, where nothing declared it.
-   *
-   * Separate from `split` for the reason `Splitter` keeps `default-position`
-   * separate from `position`, and the bug is worth recording because this
-   * element had it after that one was fixed. A double click reset to whatever
-   * `split` held on the first render, which is the declared arrangement only
-   * when nobody owns the property. The workbench owns it, restores it from the
-   * address bar and from storage, so the first value it ever held was the
-   * reader's last session: double clicking reset the sandbox to the size it
-   * already was, which is to say it did nothing at all.
-   *
-   * Declared rather than captured, so it is a number a consumer states and can
-   * change, and it needs no first frame to be read on.
-   */
-  @property({ attribute: 'default-split', type: Number })
-  defaultSplit = DEFAULT_SPLIT
-
-  /**
-   * Height of the panel, in pixels.
-   */
-  @property({ attribute: 'panel-size', type: Number })
-  panelSize = DEFAULT_PANEL
-
-  /**
-   * What a reset makes the panel, in pixels.
-   *
-   * The pair to `panel-size`.
-   */
-  @property({ attribute: 'default-panel-size', type: Number })
-  defaultPanelSize = DEFAULT_PANEL
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * What the panel's height becomes when it is closed.
@@ -183,16 +171,22 @@ export class HelixSandbox extends HelixElement {
   panelLabel = 'Resize panel'
 
   /**
-   * Accessible name for the divider that moves both at once.
+   * Height of the panel, in pixels.
    */
-  @property({ attribute: 'corner-label' })
-  cornerLabel = 'Resize panes and panel'
+  @property({ attribute: 'panel-size', type: Number })
+  panelSize = DEFAULT_PANEL
 
   /**
    * Accessible name for the divider.
    */
   @property({ attribute: 'separator-label' })
   separatorLabel = 'Resize source pane'
+
+  /**
+   * Percentage of the sandbox given to the source pane.
+   */
+  @property({ attribute: 'split', type: Number })
+  split = DEFAULT_SPLIT
 
   /**
    * Whether anything is in the panel region.
@@ -213,16 +207,14 @@ export class HelixSandbox extends HelixElement {
    * panel asked for at 192px quietly keeps whatever share of the old height that
    * was.
    *
-   * **Measured at render rather than cached from the observer**, which is the
-   * second design here. The first held the number the observer last reported and
-   * was correct only while the observer was firing, and a `ResizeObserver`
-   * callback is delivered from the rendering lifecycle: a background tab runs
-   * none, so the value went stale with nothing to say so. Reading the box at
-   * render leaves one source of truth, and the observer's only job is to say
-   * that a render is due.
+   * **Measured at render rather than cached from the observer.** A
+   * `ResizeObserver` callback is delivered from the rendering lifecycle and a
+   * background tab runs none, so a cached number goes stale with nothing to say
+   * so. Reading the box at render leaves one source of truth, and the observer's
+   * only job is to say that a render is due.
    *
-   * Cheap, because renders are rare. A drag no longer goes through this element
-   * at all: the splitter follows the pointer itself and announces once, when it
+   * Cheap, because renders are rare: a drag does not go through this element at
+   * all, the splitter following the pointer itself and announcing once, when it
    * settles.
    */
   private bodyHeight = 0
@@ -281,12 +273,11 @@ export class HelixSandbox extends HelixElement {
   /**
    * Whether a change came from inside this sandbox's source region.
    *
-   * Structural rather than a type check. It was `instanceof
-   * HelixSandboxSource`, which was right until there was a second kind of
-   * pane: the editor is `@fusion.dev/helix-sandbox/editor`, on its own path because it
-   * carries CodeMirror, and naming its class here would pull that back into
-   * this module for every consumer. Where the event came from is a question
-   * about the tree, and the tree can answer it.
+   * Structural rather than a type check. There is more than one kind of pane and
+   * the editor is `@fusion.dev/helix-sandbox/editor`, on its own path because it
+   * carries CodeMirror, so naming its class here would pull that back into this
+   * module for every consumer. Where the event came from is a question about the
+   * tree, and the tree can answer it.
    */
   private fromSource(target: EventTarget | null): boolean {
     if (!(target instanceof Node)) {
@@ -314,15 +305,10 @@ export class HelixSandbox extends HelixElement {
        than `event.target`, which is retargeted to the outermost host once the
        event has crossed a shadow boundary.
 
-       Named, not guessed. The rule was that `css` is the stylesheet and
-       anything else is markup, which was true while there were two panes and
-       wrong the moment there was a third: a pane showing the example as JSX
-       announced itself the same way, and the preview rendered the text of a
-       React component as though it were markup.
-
-       The name used to arrive in the detail, where it was one of four different
-       things that field carried. It is on the pane, which is where a name
-       belongs. */
+       Named, not guessed. Treating anything that is not `css` as markup holds
+       only while there are two panes: a pane showing the example as JSX
+       announces itself the same way, and the preview renders the text of a React
+       component as though it were markup. */
     const pane = event.composedPath()[0] as { name?: string }
     if (pane?.name !== 'css' && pane?.name !== 'html') {
       return
@@ -419,11 +405,9 @@ export class HelixSandbox extends HelixElement {
    * wrote to storage on its own would be deciding for all of them under a key
    * it chose.
    *
-   * **A verb each, where this was one `helix-before-resize` carrying which of the
-   * two had moved.** Both dividers are this element's, so `composedPath()[0]` is
-   * the same host for either and the name is the only thing that can separate
-   * them. It was the last caller of a field every request in the library carried
-   * for it. See 306.
+   * **A verb each, rather than one `helix-before-resize` naming which of the two
+   * moved.** Both dividers are this element's, so `composedPath()[0]` is the same
+   * host for either and the event name is the only thing that can separate them.
    */
   private splitSettled(): void {
     this.dispatchEvent(new HelixBeforeSplitEvent({ value: String(this.split) }))
@@ -445,7 +429,8 @@ export class HelixSandbox extends HelixElement {
    * `target` against `currentTarget`, because a source pane's own change bubbles
    * up through these same elements on its way to the host. Only a splitter
    * speaking for itself is one of ours, and only those are stopped: the sandbox
-   * announces `arrangement` and a consumer never sees the two inside it.
+   * announces `helix-before-split` and `helix-before-panel-resize` in their
+   * place, and a consumer never sees the two splitters inside it.
    */
   private readonly handlePanesChange = (event: Event): void => {
     if (event.target !== event.currentTarget) {
@@ -481,9 +466,8 @@ export class HelixSandbox extends HelixElement {
     /* And the body is watched again, because `disconnectedCallback` stopped
        watching it. The observer itself survives, being a field rather than
        something `firstUpdated` built, but a disconnected one reports nothing
-       until something calls `observe` again, and only `firstUpdated` did. So a
-       sandbox moved in the DOM came back with its panel sizes frozen.
-       `check:observers` holds this. */
+       until something calls `observe` again. Left to `firstUpdated` alone, a
+       sandbox moved in the DOM comes back with its panel sizes frozen. */
     if (this.hasUpdated) {
       this.watchBody()
     }

@@ -107,11 +107,10 @@ against the stylesheet's own URL with no bundler involved. Copy the whole
 four requests and both layers resolve.
 
 *This page listed `tokens.css` and `base.css` and no `primitives.css` until 24
-Aug 2026, which is the same omission `installation.mdx`, `introduction.mdx` and
-the agent page carried. `tokens.css` refers to a primitive 235 times and imports
-nothing, so a reader who followed this got all 178 semantic tokens declared and
-every one resolving to `rgba(0, 0, 0, 0)`. Linking `all.css` is the fix that
-cannot be got wrong again.*
+Aug 2026. `tokens.css` refers to a primitive 297 times and imports nothing, so a
+reader who followed that got all 185 semantic tokens declared and every color
+resolving to `rgba(0, 0, 0, 0)`. If your page looks unstyled in exactly that
+way, link `all.css` instead.*
 
 `elements.css` stays its own link, being `@fusion.dev/helix`'s rather than this
 package's, and it matters more here than anywhere: with no bundler the module

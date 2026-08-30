@@ -75,26 +75,6 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   autoGrow = false
 
   /**
-   * Shown while the field is empty.
-   *
-   * Not a label: it goes when typing starts.
-   */
-  @property()
-  placeholder = ''
-
-  /**
-   * Whether the field refuses input while still submitting its value.
-   */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
-
-  /**
-   * How many lines the box is before anything is typed.
-   */
-  @property({ type: Number })
-  rows = 3
-
-  /**
    * How many characters wide the box is, where the layout is not deciding.
    *
    * Optional and absent by default, which is the reflected-property rule: a
@@ -120,11 +100,35 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   dirName = ''
 
   /**
-   * How the browser wraps the text, and whether the breaks are submitted with
-   * it.
+   * Most characters the value may have.
+   */
+  @property({ attribute: 'maxlength', type: Number })
+  maxLength?: number
+
+  /**
+   * Fewest characters the value may have.
+   *
+   * Forwarded to the real `<textarea>` rather than checked here, which is what
+   * makes the message the browser's and therefore the reader's own language.
+   * No `pattern`: the platform does not give a textarea one, and inventing it
+   * would be this library guessing where the point is to stop guessing.
+   */
+  @property({ attribute: 'minlength', type: Number })
+  minLength?: number
+
+  /**
+   * Shown while the field is empty.
+   *
+   * Not a label: it goes when typing starts.
    */
   @property()
-  wrap: 'hard' | 'off' | 'soft' = 'soft'
+  placeholder = ''
+
+  /**
+   * Whether the field refuses input while still submitting its value.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /** Focus is delegated to the control, so the host is never the target. */
   static override shadowRootOptions: ShadowRootInit = {
@@ -151,9 +155,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     const next = control.value
     /* Through the mixin, which announces and then applies only if the value is
        the element's to move. The native control has already changed either way,
-       so wherever the answer does not follow it has to be put back: that is a
-       refusal, and it is equally a consumer who owns the value and has not
-       given a new one yet. Both are "what is on screen is not the answer". */
+       so wherever the answer does not follow it has to be put back. */
     this.requestValue(next)
     restoreValue(control, this.value)
     this.grow()
@@ -185,11 +187,10 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     /* Zero is not a height, it is the absence of a layout box.
      *
      * An element with `display: none` anywhere above it reports `scrollHeight`
-     * as zero, and this wrote that straight back as a fixed `block-size`. The
-     * field then had a real inline height of zero pixels and stayed there:
-     * every later call measured a control pinned to zero and measured zero
-     * again. A textarea inside a tab panel, an accordion, or anything else that
-     * renders shut and opens later came out as a hairline with the text hidden
+     * as zero. Written back as a fixed `block-size` it pins the field there,
+     * since every later call then measures a control at zero and measures zero
+     * again: a textarea inside a tab panel, an accordion, or anything else that
+     * renders shut and opens later comes out as a hairline with the text hidden
      * behind it. `tabs-root` refuses zero for the same reason.
      *
      * The reset to `auto` above has already been written by this point, which
@@ -205,11 +206,11 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   /**
    * Re-measures when the box changes rather than only when a property does.
    *
-   * The height was computed on Lit updates alone, and nothing about a container
-   * narrowing, a font swapping, or the field finally gaining a layout box is a
-   * property change here. A field that wrapped to three lines at one width kept
-   * a three-line height at half the width and clipped the rest behind
-   * `overflow: hidden`, with no way for a reader to reach it.
+   * Nothing about a container narrowing, a font swapping, or the field finally
+   * gaining a layout box is a property change here, so on Lit updates alone a
+   * field that wrapped to three lines at one width keeps that three-line height
+   * at half the width and clips the rest behind `overflow: hidden`, with no way
+   * for a reader to reach it.
    *
    * Observing the control also covers the zero case above from the other side:
    * a `ResizeObserver` fires when an element gains a box, so a field that was
@@ -240,11 +241,11 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    * The caret and the selection, under the platform's own names.
    *
    * **The whole reason this renders a real `<textarea>` is the caret**, and the
-   * caret was the one thing a consumer could not reach: the control is inside
-   * this shadow root, so `querySelector` does not find it and there was no way
-   * to ask where the selection is, let alone move it. A field that cannot be
-   * scripted at the caret cannot do an insert-at-cursor toolbar, which is the
-   * first thing anybody builds on a textarea.
+   * control is inside this shadow root, so `querySelector` does not find it and
+   * a consumer has no other way to ask where the selection is, let alone move
+   * it. A field that cannot be scripted at the caret cannot do an
+   * insert-at-cursor toolbar, which is the first thing anybody builds on a
+   * textarea.
    *
    * Written through to the control, and answering zero before there is one,
    * which is where an empty field's caret would be anyway.
@@ -328,11 +329,10 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   /* Rebuilt on reconnection, because nothing else does it.
    *
    * `firstUpdated` runs once for the life of the element and
-   * `disconnectedCallback` runs every time it moves, so a framework reordering
-   * a list left this permanently dead: the observer gone, nothing to rebuild
-   * it, and the component still rendering as though it were watching. Guarded
-   * on `hasUpdated`, because the first connection happens before the first
-   * render and there is nothing to watch yet. `check:observers` holds it. */
+   * `disconnectedCallback` runs every time it moves, so without this a
+   * framework reordering a list leaves the observer gone with nothing to
+   * rebuild it. Guarded on `hasUpdated`, because the first connection happens
+   * before the first render and there is nothing to watch yet. */
   override connectedCallback(): void {
     super.connectedCallback()
     if (this.hasUpdated) {
@@ -394,21 +394,17 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * Fewest characters the value may have.
-   *
-   * Forwarded to the real `<textarea>` rather than checked here, which is what
-   * makes the message the browser's and therefore the reader's own language.
-   * No `pattern`: the platform does not give a textarea one, and inventing it
-   * would be this library guessing where the point is to stop guessing.
+   * How many lines the box is before anything is typed.
    */
-  @property({ attribute: 'minlength', type: Number })
-  minLength?: number
+  @property({ type: Number })
+  rows = 3
 
   /**
-   * Most characters the value may have.
+   * How the browser wraps the text, and whether the breaks are submitted with
+   * it.
    */
-  @property({ attribute: 'maxlength', type: Number })
-  maxLength?: number
+  @property()
+  wrap: 'hard' | 'off' | 'soft' = 'soft'
 
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}

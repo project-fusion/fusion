@@ -1,7 +1,6 @@
 /* The host is the stack: a label, the track, and one line under it. The track
-   is what used to be here, and it had to move into an element of its own the
-   moment there was anything else to sit beside it, or the label would have been
-   a segment in the same row. */
+   is an element of its own rather than the host, because anything sitting
+   beside it would otherwise be a segment in the same row. */
 :host {
   display: inline-flex;
   flex-direction: column;
@@ -77,15 +76,14 @@
   flex-wrap: wrap;
 
   /* The control is the height of a control, and the segments are what is left
-     inside it. It was the other way round: the items took the full control
-     height and the track's padding and border were added outside them, so a
-     forty pixel item made a fifty pixel control that stood taller than every
-     button beside it.
+     inside it. The other way round, items taking the full control height with
+     the track's padding and border added outside them, a forty pixel item makes
+     a fifty pixel control that stands taller than every button beside it.
 
      **A floor rather than a height, and the row is named rather than inferred.**
-     This was `block-size` with the item at `100%`, which let the box model
-     subtract the padding and the border rather than arithmetic that has to be
-     kept in step with them. That trick cannot survive wrapping: `100%` of a
+     `block-size` with the item at `100%` lets the box model subtract the padding
+     and the border rather than arithmetic that has to be kept in step with them.
+     That trick cannot survive wrapping: `100%` of a
      two-row track is two rows, so every segment would grow to the full height of
      the group instead of filling its own line. The row is therefore derived
      once, per separation, the way `--_toggle-radius` beside it already is, and
@@ -98,11 +96,10 @@
 
   /* Inset even where nothing is drawn around it.
    *
-   * The framed separations get this from their own padding, and `plain` had
-   * none, so its items were the full forty and the control was the item: a
-   * selected tab's thumb ran edge to edge and the group read as one tall block
-   * rather than as a marker inside a strip. Measured, 40 against the framed
-   * 30.
+   * The framed separations get this from their own padding. With none, `plain`
+   * items are the full forty and the control is the item: a selected tab's thumb
+   * runs edge to edge and the group reads as one tall block rather than as a
+   * marker inside a strip. Measured, 40 against the framed 30.
    *
    * The padding is the same either way. What `plain` drops is the background
    * and the border, which is what makes it plain; the room the items sit in is
@@ -112,10 +109,9 @@
      marker is a pill lying *on* whatever surface the group was put on, so it
      has to be darker than it: that is `raised`. The grooved separations below
      take `overlay` instead, because a thumb in a groove has to be lighter than
-     the groove, and on a white page those are opposite directions. Reported as
-     a selected file tab that had gone too light, which is this case exactly:
-     the sandbox's tabs are `plain` and sit on a white toolbar, so a white thumb
-     on them is the shadow and nothing else. */
+     the groove, and on a white page those are opposite directions. The
+     sandbox's tabs are `plain` and sit on a white toolbar, where a white thumb
+     is the shadow and nothing else. */
   --_indicator-surface: var(--helix-color-surface-raised);
 }
 
@@ -165,17 +161,12 @@
  * every label carries an identical margin and the segments differ instead,
  * which is the thing nobody looks at.
  *
- * Still fills the track. `flex-grow: 1` is what does that, and it was doing it
- * before: the bunched-up row this replaced had no grow at all. The thumb now
- * changes width as it travels, which is why `inline-size` has always been in
- * its transition. */
+ * Still fills the track, which is `flex-grow: 1`'s job. The thumb changes width
+ * as it travels, which is why `inline-size` is in its transition. */
 ::slotted(helix-toggle) {
-  /* **The row, and this is what finally reads `--_toggle-height`.** The property
-     was written here and by nothing else, and consumed by nothing at all: the
-     item sized itself with a literal `block-size: 100%` in its own sheet. A
-     private property nobody reads is invisible to `check:hooks`, which exempts
-     `--_` names as a component talking to itself, and this was a component
-     talking to no one. Wrapping is what gave it something true to say. */
+  /* **The row, and this is the only reader of `--_toggle-height`.** Never a
+     literal `block-size: 100%` in the item's own sheet: it cannot survive
+     wrapping, for the reason the track's note above gives. */
   block-size: var(--_toggle-height);
   flex: 1 1 auto;
 }
@@ -193,10 +184,10 @@
      reason: the token is decided by what is behind the thumb, and `plain` has
      no track behind it. See `:host` above. */
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
-  block-size: var(--indicator-height, 0);
+  block-size: var(--indicator-block-size, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
   box-shadow: var(--helix-shadow-sm);
-  inline-size: var(--indicator-width, 0);
+  inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
   opacity: 0;
@@ -238,19 +229,18 @@
  *
  * `align-items: center` for the same reason the inline label uses it: the track
  * is a control with padding and a border, so anything beside it that is only
- * text would otherwise sit on a different optical line. */
-/* **`flex`, not `inline-flex`, and the track grows inside it.**
+ * text would otherwise sit on a different optical line.
  *
- * The row was added between the host and the track, and an inline-flex box
- * shrink wraps: a group stretched to its column, which is what a field in a
- * drawer is, had a full width host with a shrink wrapped row inside it and a
- * track that could no longer reach the edges. The track used to be the host's
- * own child and inherited the stretch for free.
+ * **`flex`, not `inline-flex`, and the track grows inside it.**
+ *
+ * This row sits between the host and the track, and an inline-flex box shrink
+ * wraps: a group stretched to its column, which is what a field in a drawer is,
+ * then has a full width host with a shrink wrapped row inside it and a track
+ * that cannot reach the edges.
  *
  * A block level row fills whatever the host has, and the track is told to take
- * what is left after the slots either side, so a group is exactly as wide as it
- * was before the row existed in both cases: shrink wrapped when the host is
- * auto, full width when something stretched it. */
+ * what is left after the slots either side, so a group is shrink wrapped when
+ * the host is auto and full width when something stretched it. */
 [part="row"] {
   align-items: center;
   display: flex;

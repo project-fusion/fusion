@@ -5,12 +5,12 @@ import { resolveActiveItem } from './resolve-active-item.js'
  * `items.find(match) ?? items[0]` written once instead of four times, and the
  * asymmetry in it is the whole reason it is a function.
  *
- * The match honours a disabled item and the fallback refuses one, which reads
+ * The match honors a disabled item and the fallback refuses one, which reads
  * like an inconsistency and is the point: naming a disabled item is a consumer's
  * decision and quietly moving off it would be the component overruling them,
  * while falling back *onto* one is the component choosing, and it should not
- * choose something out of play. All four hand-written copies took `items[0]`
- * either way, so a set opening on a disabled first item showed it as current.
+ * choose something out of play. Taking `items[0]` either way opens a set on a
+ * disabled first item and shows it as current.
  */
 const items = (...spec: (string | [string, 'disabled'])[]) =>
   spec.map((one) => (typeof one === 'string' ? { value: one } : { disabled: true, value: one[0] }))

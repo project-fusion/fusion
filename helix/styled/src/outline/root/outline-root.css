@@ -47,29 +47,25 @@
 
 /* The mark that travels.
  *
- * One element that moves, rather than a border appearing on each link in turn.
- * That is the tab strip's argument and it is the same argument: a border can
- * only be there or not, and something that moves says these are places in one
- * document rather than a column of separate states. Vertical, so it is the
- * block axis that is measured and animated where the strip animates the inline
- * one.
+ * One element that moves, rather than a border appearing on each link in turn:
+ * a border can only be there or not, and something that moves says these are
+ * places in one document rather than a column of separate states. Vertical, so
+ * it is the block axis that is measured and animated where the tab strip
+ * animates the inline one.
  *
  * Hidden until it has been measured, so it fades in where it belongs rather
  * than sliding down from the top of the list on first paint.
- */
-/* Three widths, and the middle one is the whole idea.
  *
- * At rest it is a hairline, thinner than the rail it sits in, because a mark
- * that is only saying "you are here" does not need to be a bar. Hovering the
- * list thickens it a step, which is the list acknowledging the pointer before
- * anything has been chosen. And while it is traveling it takes the full rail,
- * then settles back: a mark that swells as it leaves and thins as it lands
- * reads as a thing being carried, where one that keeps its width the whole way
- * reads as a rectangle being repositioned.
+ * Three widths, and the middle one is the whole idea. At rest it is a hairline,
+ * thinner than the rail it sits in, because a mark that is only saying "you are
+ * here" does not need to be a bar. Hovering the list thickens it a step. And
+ * while it is traveling it takes the full rail, then settles back: a mark that
+ * swells as it leaves and thins as it lands reads as a thing being carried,
+ * where one that keeps its width the whole way reads as a rectangle being
+ * repositioned.
  *
  * `data-moving` is written by `IndicatorController` for the length of the
- * travel, because CSS has no state for "a transition is running" and this
- * wanted one.
+ * travel, because CSS has no state for "a transition is running".
  *
  * The width lives in a custom property because two declarations depend on it:
  * the size and the inset that keeps it centered in the rail. Both are ordinary
@@ -82,7 +78,7 @@
   --_mark-width: var(--helix-border-thin);
 
   background-color: var(--helix-color-primary);
-  block-size: var(--indicator-height, 0);
+  block-size: var(--indicator-block-size, 0);
   border-radius: var(--helix-radii-full);
   inline-size: var(--_mark-width);
   inset-block-start: 0;
@@ -94,15 +90,12 @@
    *
    * `--helix-easing-spring` is a `linear()` of thirteen stops that carries past
    * the target and settles back over three diminishing bounces, which is a real
-   * spring rather than the single overshoot `emphasized` gives. It was declared
-   * in the token file and read by nothing at all, which the token reference
-   * turned up: a curve nobody uses is a curve nobody has judged, and a mark
-   * traveling a list is the thing it was drawn for.
+   * spring rather than the single overshoot `emphasized` gives.
    *
-   * Two durations, not one. The height used to move on the same curve at the
-   * same rate, so a mark going to a heading that wraps to two lines arrived
-   * already grown. Slower and decelerating, it stretches as it leaves and
-   * catches up after it lands, which is what gives the travel a direction. */
+   * Two durations, not one. On the same curve at the same rate, a mark going to
+   * a heading that wraps to two lines arrives already grown. Slower and
+   * decelerating, the height stretches as it leaves and catches up after it
+   * lands, which is what gives the travel a direction. */
   transition:
     translate var(--helix-duration-normal) var(--helix-easing-spring),
     block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
@@ -150,12 +143,11 @@
 
 /* The links, back here from the base layer.
  *
- * They lived in the document because `:where(a)` was unscoped and painted every
- * contents-page link brand blue and underlined, and a `::slotted()` rule loses
- * to a document rule whatever the specificity. Measured at the time:
- * `margin-inline-start` and `font-weight` came through from the shadow, `color`
- * and `text-decoration` did not. This component had asked for `foreground-muted`
- * since it was written and no outline had ever shown it.
+ * A `::slotted()` rule loses to a document rule whatever the specificity, and it
+ * loses per declaration: measured against the base layer's old unscoped
+ * `:where(a)`, `margin-inline-start` and `font-weight` came through from the
+ * shadow while `color` and `text-decoration` did not, so this component asked
+ * for `foreground-muted` and no outline ever showed it.
  *
  * Prose theming is behind `[data-prose]` now, so nothing contests these and the
  * component draws its own list again. */
@@ -194,7 +186,7 @@
 
 ::slotted(a[aria-current]) {
   color: var(--helix-color-foreground);
-  /* One step above the rest, which is what it was before the rest moved up. */
+  /* One step above the rest. */
   font-weight: var(--helix-weight-semibold);
 }
 
@@ -246,7 +238,7 @@
 /* Print: a table of contents, which is what paper invented.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

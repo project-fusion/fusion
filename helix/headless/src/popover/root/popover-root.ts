@@ -75,9 +75,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   @property()
   placement: Placement = 'bottom-start'
 
-  /* The panel, plus everything that has to happen around it: one controller
-     rather than the three this took at every call site, which is what let
-     `Select` quietly never reach the top layer at all.
+  /* The panel, plus everything that has to happen around it.
    *
    * Called `panel` rather than `popover`, because `HTMLElement.popover` is the
    * popover API's own IDL attribute and a field of that name shadows it with
@@ -85,15 +83,13 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * at runtime is break the API this is built on. */
   private readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
-    /* The host, not the panel. `display: contents` leaves it without a box, so
-       a press on the trigger is inside the host and outside the panel, and a
-       boundary of the panel alone would close on the very press that opened
-       it. */
-    /* The host *and* whatever invoked it. An outside press is measured against
-       this, and a `--toggle` button outside the host is part of the control by
-       any reading a reader would give it: pressing it while the panel is open
-       should close it once, not close it on `pointerdown` and reopen it on the
-       `click` that follows. */
+    /* The host *and* whatever invoked it, never the panel alone. An outside
+       press is measured against this, and the styled host is
+       `display: contents` with no box of its own, so a boundary of the panel
+       alone would close on the very press that opened it. A `--toggle` button
+       outside the host is part of the control by any reading a reader would
+       give it: pressing it while the panel is open should close it once, not
+       close it on `pointerdown` and reopen it on the `click` that follows. */
     boundary: (): (HTMLElement | undefined)[] => [this, this.invoker],
     offset: () => this.offset,
     onDismiss: () => this.hide(),
@@ -104,14 +100,13 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /**
    * The invoker that last opened the panel, when a command did.
    *
-   * The handlers discarded the `source` the controller hands them, which cost
-   * two things at once. The panel was positioned against the host, and the
-   * styled tier makes the host a boxless `display: contents` element, so a
-   * popover opened by a command outside it opened against the window origin.
-   * And the outside-press dismissal had no way to know the invoker was part of
-   * the control: the press fires on `pointerdown`, the command arrives on the
-   * `click` after it, so a `--toggle` button outside the host closed the panel
-   * and immediately reopened it, for ever.
+   * Kept because the `source` a command hands the handlers is needed twice
+   * over. It is the anchor: the styled host is a boxless `display: contents`
+   * element, so a popover opened by a command outside it would otherwise open
+   * against the window origin. And the outside-press dismissal has to know the
+   * invoker is part of the control, the press firing on `pointerdown` and the
+   * command arriving on the `click` after it, or a `--toggle` button outside
+   * the host closes the panel and immediately reopens it, for ever.
    */
   private invoker: HTMLElement | undefined
 
@@ -189,17 +184,14 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /**
    * Puts the panel where `open` says it should be, however it got there.
    *
-   * `show()` and `hide()` raised and lowered it, and nothing else did, so a
-   * panel opened by *declaring* `open` (or `default-open`, or a consumer
-   * assigning the property) rendered visible and was never in the top layer and
-   * never anchored. Every imperative path worked and every declarative one was
-   * quietly half-open: clipped by the first ancestor with `overflow`, and
-   * positioned wherever normal flow left it.
-   *
-   * Driving the controller from the resolved state rather than from the two
-   * methods is what makes the two paths the same path. The controller ignores a
-   * `show()` on something already raised, so this costs nothing when the
-   * methods did the work.
+   * Driven from the resolved state rather than from `show()` and `hide()`,
+   * which is what makes the imperative and the declarative paths one path. Left
+   * to the two methods, a panel opened by *declaring* `open` (or `default-open`,
+   * or a consumer assigning the property) renders visible while never reaching
+   * the top layer and never being anchored: clipped by the first ancestor with
+   * `overflow`, and positioned wherever normal flow left it. The controller
+   * ignores a `show()` on something already raised, so this costs nothing when
+   * the methods did the work.
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
@@ -213,25 +205,14 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     }
     /* Raised here rather than a microtask later, and `updated()` is what makes
        that safe: the render has already been written, so the panel is no longer
-       `display: none` and `showPopover` will not throw on it. The old
-       `show()` deferred to `updateComplete` precisely because it ran *before*
-       the render; from here there is nothing left to wait for. */
+       `display: none` and `showPopover` will not throw on it. Anything raising
+       it before the render has to wait for `updateComplete`; from here there is
+       nothing left to wait for. */
     if (this.open) {
       this.panel.show()
     } else {
       this.panel.hide()
     }
-  }
-
-  protected override willUpdate(changed: PropertyValues): void {
-    super.willUpdate(changed)
-    /* The name is the panel's, not the host's.
-     *
-     * `label` is documented as the panel's accessible name and was written to
-     * the host's internals, and the host carries no role at all: the name
-     * landed on a generic element while the panel it names rendered with none.
-     * A `dialog` role goes with it, because a name needs something to be the
-     * name of, and that is what a popover is. */
   }
 
   protected override render(): TemplateResult {

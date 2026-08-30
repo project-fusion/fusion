@@ -162,9 +162,9 @@ describe('the shape of the composer', () => {
   /**
    * The field spans the composer and the tools sit under it.
    *
-   * One row was the wrong shape: an attachment control, the field, a stop
-   * control and a send button all on one line meant every tool a consumer added
-   * took width from the thing being typed into.
+   * One row is the wrong shape: an attachment control, the field, a stop
+   * control and a send button on one line means every tool a consumer adds
+   * takes width from the thing being typed into.
    */
   test('the tools are under the field, not beside it', async () => {
     const element = await composer()

@@ -52,12 +52,6 @@ import { property, state } from 'lit/decorators.js'
 @customElement('helix-headless-image')
 export class HelixHeadlessImage extends HelixElement {
   /**
-   * Where the picture is.
-   */
-  @property()
-  src = ''
-
-  /**
    * What it shows, for a reader who cannot see it.
    *
    * Empty is a real answer and means decoration. Omitting the attribute is not
@@ -67,26 +61,21 @@ export class HelixHeadlessImage extends HelixElement {
   alt = ''
 
   /**
-   * Whether to wait until it is nearly on screen.
+   * How the picture is fetched across origins, which decides whether a canvas
+   * can read it.
+   */
+  @property({ attribute: 'crossorigin' })
+  crossOrigin: 'anonymous' | 'use-credentials' | null = null
+
+  /**
+   * Whether the browser may decode off the main thread.
    *
-   * `lazy` by default, which is the opposite of the platform's, because a
-   * picture worth putting in a component is usually below the fold and the one
-   * that is not is the exception worth writing down.
-   */
-  @property({ reflect: true })
-  loading?: 'eager' | 'lazy'
-
-  /**
-   * The candidate widths, passed through to the picture.
+   * `async` is the resting value and right for a picture in a page. `sync` is
+   * what a consumer reaches for when the picture is about to be composited with
+   * something else and a tear would show.
    */
   @property()
-  srcset = ''
-
-  /**
-   * How much of the line it will take, passed through to the picture.
-   */
-  @property()
-  sizes = ''
+  decoding: 'async' | 'auto' | 'sync' = 'async'
 
   /**
    * How urgently to fetch it, for the one picture that is the page.
@@ -101,30 +90,38 @@ export class HelixHeadlessImage extends HelixElement {
   fetchPriority: 'auto' | 'high' | 'low' = 'auto'
 
   /**
-   * Whether the browser may decode off the main thread.
+   * Whether to wait until it is nearly on screen.
    *
-   * **The template hardcoded `async` and a consumer could not reach it**, which
-   * is worse than the property being absent: the decision was taken on their
-   * behalf and nothing said so. `async` is still the resting value and still
-   * right for a picture in a page, and `sync` is what a consumer reaches for
-   * when the picture is about to be composited with something else and a tear
-   * would show.
+   * `lazy` by default, which is the opposite of the platform's, because a
+   * picture worth putting in a component is usually below the fold and the one
+   * that is not is the exception worth writing down.
    */
-  @property()
-  decoding: 'async' | 'auto' | 'sync' = 'async'
-
-  /**
-   * How the picture is fetched across origins, which decides whether a canvas
-   * can read it.
-   */
-  @property({ attribute: 'crossorigin' })
-  crossOrigin: 'anonymous' | 'use-credentials' | null = null
+  @property({ reflect: true })
+  loading?: 'eager' | 'lazy'
 
   /**
    * How much of the referring URL to send with the request.
    */
   @property({ attribute: 'referrerpolicy' })
   referrerPolicy = ''
+
+  /**
+   * How much of the line it will take, passed through to the picture.
+   */
+  @property()
+  sizes = ''
+
+  /**
+   * Where the picture is.
+   */
+  @property()
+  src = ''
+
+  /**
+   * The candidate widths, passed through to the picture.
+   */
+  @property()
+  srcset = ''
 
   /**
    * Whether the picture is on its way, here, or never coming.
@@ -136,14 +133,12 @@ export class HelixHeadlessImage extends HelixElement {
    * a consumer rendered: React reads the attribute appearing at upgrade as a
    * hydration mismatch, and a serialized `<helix-image status="loaded">` pasted
    * back declares that a picture has arrived which this element has never
-   * fetched. The `data-` name is the library's answer to both, being a
-   * different name a re-parse cannot mistake for a declaration, and it is what
-   * `data-closed` on `Toast.Item` already does, and `AppHeader` did until its
-   * own moved to `:state(scrolled)` for the hydration reason recorded there.
-   * A picture arrives after somebody fetched it, which puts this on the safe
-   * side of hydration: a fact that can be true on the *first* update mirrors to
-   * a custom state instead, which is what `:state(open)` and `:state(checked)`
-   * became on 27 Aug 2026 for exactly that reason.
+   * fetched. The `data-` name is the library's answer to both, being a name a
+   * re-parse cannot mistake for a declaration, and it is what `data-closed` on
+   * `Toast.Item` already does. A picture arrives after somebody fetched it,
+   * which puts this on the safe side of hydration: a fact that can be true on
+   * the *first* update mirrors to a custom state instead, which is what
+   * `:state(open)` and `:state(checked)` are.
    *
    * `loading` writes nothing, because it is where every image starts and the
    * resting state of a mirror is the attribute's absence.
@@ -161,22 +156,18 @@ export class HelixHeadlessImage extends HelixElement {
    * Says so under the platform's own name, because the platform's cannot escape.
    *
    * `load` and `error` on an `<img>` neither bubble nor compose, so the ones
-   * fired inside this shadow root reach nobody outside it. A consumer had a
-   * reflected attribute and a `MutationObserver` and nothing else. Re-emitting
-   * from the host is what `relayNativeEvent` is for, and it is what `Avatar`
-   * already did for the same pair on the same element.
+   * fired inside this shadow root reach nobody outside it. Re-emitting from the
+   * host is what `relayNativeEvent` is for, and it is what `Avatar` already does
+   * for the same pair on the same element.
    *
-   * **These were `helix-load` and `helix-error`, and the rename is the fix.**
-   * The argument for a prefix is a collision with a native name, and there was
-   * none to collide with here: the native events cannot reach a consumer at
-   * all. So the prefix bought nothing and cost the two spellings this library
-   * had for one idea, `Avatar` relaying `load` while `Image` invented one. See
-   * 294 and 295.
+   * **Unprefixed, unlike every other event here.** The prefix exists to stop a
+   * collision with a native name, and there is none to collide with: the native
+   * events cannot reach a consumer at all.
    *
-   * **Not bubbling, and that is not a small point.** The retired events were
-   * `bubbles: true, composed: true` deliberately, so a gallery could count its
-   * pictures with one listener. A bubbling relay of `load` reaches nothing in
-   * React: `load` is in react-dom's `nonDelegatedEvents`, so there is no root
+   * **Not bubbling, and that is not a small point.** A bubbling relay of `load`
+   * would be the tempting one, letting a gallery count its pictures with one
+   * listener, and it reaches nothing in React: `load` is in react-dom's
+   * `nonDelegatedEvents`, so there is no root
    * listener to catch it, and React attaches a direct one for `<img>` and never
    * for a custom element. `bindReactHandler` binds exactly the non-bubbling
    * ones, so matching the native propagation is what makes `onLoad` work at
@@ -218,8 +209,8 @@ export class HelixHeadlessImage extends HelixElement {
    * **It can only ever conclude success.** A picture that has not been attempted
    * looks exactly like one that failed: `complete` is true and `naturalWidth` is
    * zero for both, and a DOM that never fetches anything reports that for every
-   * image it has. Deciding `error` here called every picture broken the moment
-   * it rendered. Failure has an event of its own and that event is reliable, so
+   * image it has, so deciding `error` here calls every picture broken the moment
+   * it renders. Failure has an event of its own and that event is reliable, so
    * this is only here to catch the success that happened too early to hear.
    */
   private settle(): void {
@@ -266,12 +257,11 @@ export class HelixHeadlessImage extends HelixElement {
   /**
    * The picture's own state, under the platform's own names.
    *
-   * The `<img>` is inside this shadow root, so a consumer asking how big the
-   * picture turned out to be, or whether it is already there, had nowhere to
-   * ask: `querySelector` does not cross a shadow boundary. `status` answers a
-   * narrower question and answers it in this library's words, which is the
-   * right report for the three states this element draws and is not a
-   * substitute for the numbers.
+   * The `<img>` is inside this shadow root and `querySelector` does not cross a
+   * shadow boundary, so a consumer asking how big the picture turned out to be,
+   * or whether it is already there, has nowhere else to ask. `status` answers a
+   * narrower question in this library's words and is no substitute for the
+   * numbers.
    *
    * `naturalWidth` and `naturalHeight` are the case worth having: they are how
    * a consumer sizes a lightbox or works out an aspect ratio, and they exist

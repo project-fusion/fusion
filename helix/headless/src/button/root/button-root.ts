@@ -55,28 +55,78 @@ export class HelixHeadlessButton extends HelixFormElement {
   })
 
   /**
-   * What activating the button does to its form.
+   * What to send when the button is activated, and what to send it to.
+   *
+   * The platform's invoker attributes, forwarded onto the inner `<button>`
+   * rather than left on the host: only a real button is recognized as an
+   * invoker, so `commandfor` written on a custom element resolves nothing and
+   * the trigger silently does nothing at all. A wrapper has to hand them down,
+   * the same way `label` becomes `aria-label` in there.
+   *
+   * ```html
+   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
+   * ```
+   *
+   * `commandFor` spells its attribute out, because Lit lowercases a property
+   * name to derive one rather than dash-casing it, and what a consumer writes
+   * is the platform's `commandfor`.
+   *
+   * @reference https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command Invoker Commands
    */
   @property()
-  type: 'button' | 'submit' | 'reset' = 'button'
+  command = ''
 
   /**
-   * What this button submits under its own `name`, the way a native submitter does.
+   * The id of the element the command is sent to.
    *
-   * **Reported for exactly the submission this button starts and not otherwise.**
-   * A native submit button contributes `name=value` only when it is the one
-   * that submitted, and every other button on the form contributes nothing. A
-   * form-associated element reporting a value continuously would contribute on
-   * every submission whoever started it, which is a different feature wearing
-   * the same name, so `submit` below sets it, submits, and clears it inside one
-   * synchronous call.
-   *
-   * `CopyButton` has a `value` of its own meaning the text to put on the
-   * clipboard, which is not this and is why it is declared there rather than
-   * inherited.
+   * @reference https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor Invoker Commands
    */
-  @property()
-  value = ''
+  @property({ attribute: 'commandfor' })
+  commandFor = ''
+
+  /**
+   * Whether this button is a disclosure trigger, and whether its panel is open.
+   *
+   * **Set by whatever owns the panel, and a property rather than an attribute
+   * for the reason `Menu` already states about its items**: an attribute
+   * written onto a consumer's element after it upgrades is a hydration mismatch
+   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * hydrated with the definitions loaded either side of `hydrateRoot`:
+   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
+   * and React reported "some attributes of the server rendered HTML didn't
+   * match the client properties. This won't be patched up" in both orders;
+   * `Popover` and `Menu`, which write nothing, were clean in both.
+   *
+   * **A property crosses that gap because React never looks at one.** It diffs
+   * the attributes it rendered, and this one is `attribute: false`, so the state
+   * travels to the inner `<button>` and lands inside a shadow root React does
+   * not own and cannot compare. The consumer's own element is left exactly as
+   * they served it and the reader is still told what the control does.
+   *
+   * `undefined` renders nothing at all, so a button that is not a trigger
+   * carries no `aria-expanded`: the resting state is the attribute's absence,
+   * which is the rule every reflected property here follows.
+   *
+   * A consumer who wants to say this statically writes `aria-expanded` on the
+   * host instead, which `AriaForwardController` carries to the same place.
+   */
+  @property({ attribute: false })
+  expanded?: boolean
+
+  /**
+   * Whether the button holds its group's tab stop.
+   *
+   * A toolbar keeps one tab stop across its children, and the obvious way to do
+   * that is to write `tabindex` onto each of them. That is a change to markup
+   * the consumer rendered, so a React consumer's hydration reports it and does
+   * not patch it up. A parent sets this property instead, which writes nothing,
+   * and the stop lands on the inner control inside the shadow root.
+   *
+   * No attribute, because it is coordination between elements rather than
+   * anything a consumer sets.
+   */
+  @property({ attribute: false })
+  focusable = true
 
   /**
    * Where this button's submission goes, overriding the form's own.
@@ -131,36 +181,6 @@ export class HelixHeadlessButton extends HelixFormElement {
   @property()
   label = ''
 
-  /**
-   * What to send when the button is activated, and what to send it to.
-   *
-   * The platform's invoker attributes, forwarded onto the inner `<button>`
-   * rather than left on the host: only a real button is recognized as an
-   * invoker, so `commandfor` written on a custom element resolves nothing and
-   * the trigger silently does nothing at all. A wrapper has to hand them down,
-   * the same way `label` becomes `aria-label` in there.
-   *
-   * ```html
-   * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
-   * ```
-   *
-   * `commandFor` spells its attribute out, because Lit lowercases a property
-   * name to derive one rather than dash-casing it, and what a consumer writes
-   * is the platform's `commandfor`.
-   *
-   * @reference https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command Invoker Commands
-   */
-  @property()
-  command = ''
-
-  /**
-   * The id of the element the command is sent to.
-   *
-   * @reference https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor Invoker Commands
-   */
-  @property({ attribute: 'commandfor' })
-  commandFor = ''
-
   /** Moves focus to the inner control, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
     ...HelixFormElement.shadowRootOptions,
@@ -170,20 +190,18 @@ export class HelixHeadlessButton extends HelixFormElement {
   private readonly handleClick = (): void => {
     /* **Re-linked here, and this is the line that makes a trigger reliable.**
      *
-     * `linkCommand` used to run from `updated` alone, so the target was
-     * resolved once, whenever the button last rendered, and never again. A
-     * button whose properties do not change does not update again, so one whose
-     * target had not been inserted yet stayed wired to nothing for good.
-     * Measured: `commandForElement` read null with the target absent, null
-     * again after the target was inserted, and resolved the instant an
-     * unrelated property forced an update. Whether a trigger worked came down
-     * to insertion order, which is why it survived a full reload and not a
-     * client navigation, where the same markup arrives in pieces.
+     * From `updated` alone the target resolves once, whenever the button last
+     * rendered, and never again. A button whose properties do not change does
+     * not update again, so one whose target had not been inserted yet stays
+     * wired to nothing for good. Measured: `commandForElement` read null with
+     * the target absent, null again after the target was inserted, and resolved
+     * the instant an unrelated property forced an update. Whether a trigger
+     * works then comes down to insertion order, which is why it survives a full
+     * reload and not a client navigation, where the same markup arrives in
+     * pieces.
      *
-     * **The fallback path was the correct one all along**, which is the tell:
-     * `sendCommand` resolves through `commandTarget` at activation, so a
-     * browser *without* invokers ran this correctly and a browser with them did
-     * not.
+     * `sendCommand` resolves through `commandTarget` at activation, so a browser
+     * *without* invokers was never affected and one with them was.
      *
      * A click listener is early enough, and that is measured rather than read
      * off the specification: activation behavior runs after the click has
@@ -218,50 +236,28 @@ export class HelixHeadlessButton extends HelixFormElement {
   }
 
   /**
-   * Whether the button holds its group's tab stop.
-   *
-   * A toolbar keeps one tab stop across its children, and the obvious way to do
-   * that is to write `tabindex` onto each of them. That is a change to markup
-   * the consumer rendered, so a React consumer's hydration reports it and does
-   * not patch it up. A parent sets this property instead, which writes nothing,
-   * and the stop lands on the inner control inside the shadow root.
-   *
-   * No attribute, because it is coordination between elements rather than
-   * anything a consumer sets.
+   * What activating the button does to its form.
    */
-  @property({ attribute: false })
-  focusable = true
+  @property()
+  type: 'button' | 'submit' | 'reset' = 'button'
 
   /**
-   * Whether this button is a disclosure trigger, and whether its panel is open.
+   * What this button submits under its own `name`, the way a native submitter does.
    *
-   * **Set by whatever owns the panel, and a property rather than an attribute
-   * for the reason `Menu` already states about its items**: an attribute
-   * written onto a consumer's element after it upgrades is a hydration mismatch
-   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
-   * hydrated with the definitions loaded either side of `hydrateRoot`:
-   * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
-   * and React reported "some attributes of the server rendered HTML didn't
-   * match the client properties. This won't be patched up" in both orders;
-   * `Popover` and `Menu`, which write nothing, were clean in both.
+   * **Reported for exactly the submission this button starts and not otherwise.**
+   * A native submit button contributes `name=value` only when it is the one
+   * that submitted, and every other button on the form contributes nothing. A
+   * form-associated element reporting a value continuously would contribute on
+   * every submission whoever started it, which is a different feature wearing
+   * the same name, so `submit` below sets it, submits, and clears it inside one
+   * synchronous call.
    *
-   * **A property crosses that gap because React never looks at one.** It diffs
-   * the attributes it rendered, and this one is `attribute: false`, so the state
-   * travels to the inner `<button>` and lands inside a shadow root React does
-   * not own and cannot compare. The consumer's own element is left exactly as
-   * they served it, which is what `Popover`'s note asks for, and the reader is
-   * still told what the control does, which is what `SpeedDial`'s note asks
-   * for. See #322.
-   *
-   * `undefined` renders nothing at all, so a button that is not a trigger
-   * carries no `aria-expanded`: the resting state is the attribute's absence,
-   * which is the rule every reflected property here follows.
-   *
-   * A consumer who wants to say this statically writes `aria-expanded` on the
-   * host instead, which `AriaForwardController` carries to the same place.
+   * `CopyButton` has a `value` of its own meaning the text to put on the
+   * clipboard, which is not this and is why it is declared there rather than
+   * inherited.
    */
-  @property({ attribute: false })
-  expanded?: boolean
+  @property()
+  value = ''
 
   /**
    * Submits the form as this button, for the length of one call.
@@ -318,11 +314,11 @@ export class HelixHeadlessButton extends HelixFormElement {
   /**
    * The element this button's command is sent to, resolved.
    *
-   * The platform's own accessor, and this element had the resolution and kept
-   * it to itself: `linkCommand` writes the target onto the inner `<button>`,
-   * where a consumer cannot reach it, and `commandFor` answers with an id
-   * rather than an element. Writing assigns the inner control directly, which
-   * is what an invoker without an id in the same tree needs.
+   * The platform's own accessor, because the resolution is otherwise kept
+   * inside: `linkCommand` writes the target onto the inner `<button>`, where a
+   * consumer cannot reach it, and `commandFor` answers with an id rather than
+   * an element. Writing assigns the inner control directly, which is what an
+   * invoker without an id in the same tree needs.
    */
   get commandForElement(): Element | null {
     const button = this.renderRoot?.querySelector('button') as
@@ -352,13 +348,7 @@ export class HelixHeadlessButton extends HelixFormElement {
    *
    * `commandForElement` takes an element instead, and an element reference
    * resolves outward: a node in a shadow root may point at one in the document.
-   * The same asymmetry the listbox relies on for `aria-activedescendant`, and
-   * the second place in this library where the id form is the one that cannot
-   * work.
-   *
-   * The id is looked up in the host's own root rather than the document, so a
-   * button inside somebody else's shadow root finds a target in that same root
-   * and not a coincidence in the page.
+   * The same asymmetry the listbox relies on for `aria-activedescendant`.
    */
   private linkCommand(): void {
     const button = this.renderRoot?.querySelector('button')
@@ -384,12 +374,10 @@ export class HelixHeadlessButton extends HelixFormElement {
   /**
    * Sends the `command` event where the browser will not.
    *
-   * Invoker commands are recent, and where they are missing `linkCommand` set a
-   * property that does not exist and returned, so the button did nothing at all
-   * when clicked. Silently: the markup was right, the component was right, and
-   * every `command` in the library was inert at once with no error to find. A
-   * design system cannot ship an example that depends on a feature failing that
-   * quietly.
+   * Invoker commands are recent, and where they are missing `linkCommand` sets a
+   * property that does not exist and returns, so the button does nothing at all
+   * when clicked. Silently: the markup is right, the component is right, and
+   * every `command` in the library is inert at once with no error to find.
    *
    * Only where the platform is absent, so a browser that has invokers sends
    * exactly one event and this sends none. Doing both would open a dialog and

@@ -16,7 +16,7 @@ export interface SvelteTypesOptions {
 /**
  * Types Helix elements for a Svelte template, by reusing the JSX ones.
  *
- * Svelte is the last framework left unyped, and it needs almost nothing new.
+ * Svelte needs almost nothing new.
  * Its templates are not JSX, so a tag is declared by augmenting
  * `SvelteHTMLElements` from `svelte/elements` rather than `IntrinsicElements`,
  * but **the props are the same props**: Svelte 5 binds a handler as
@@ -25,16 +25,14 @@ export interface SvelteTypesOptions {
  *
  * So this writes an augmentation that imports those types rather than
  * regenerating them, which is a few hundred bytes instead of another 360 kB and
- * cannot drift from the JSX ones by construction. The controlled-property
- * unions ride along for free, because they are part of the tag entry it reuses.
+ * cannot drift from the JSX ones by construction.
  *
  * There is no maintained package for this. `custom-element-svelte-integration`
  * is the author's pre-toolkit one, last published January 2025, and the toolkit
  * has no Svelte generator. Ten lines that reuse a file we already emit is a
  * smaller thing to own than a stale dependency.
  *
- * Runs after the JSX generator and after `controlledProps`, since it reads the
- * finished tag map.
+ * Runs after the JSX generator, since it reads the finished tag map.
  */
 export const svelteTypes = ({
   fileName = 'jsx.d.ts',
@@ -53,8 +51,8 @@ export const svelteTypes = ({
     }
 
     /* The tag map the generator wrote, read back rather than rebuilt from the
-       manifest: it already carries the `Partial<>`, the base props and the
-       controlled unions, and reading it means those cannot disagree. */
+       manifest: it already carries the `Partial<>` and the base props, and
+       reading it means the two files cannot disagree. */
     const map = source.match(/export type CustomElements = \{([\s\S]*?)\n\};/)
     if (!map?.[1]) {
       return

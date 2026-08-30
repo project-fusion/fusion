@@ -68,7 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - id: shards
-        run: echo "shards=$(node tooling/scripts/run-checks.mjs --list --of 6)" >> "$GITHUB_OUTPUT"
+        run: echo "shards=$(node fusion/scripts/run-checks.mjs --list --of 6)" >> "$GITHUB_OUTPUT"
 
   checks:
     needs: plan
@@ -105,13 +105,42 @@ jobs:
       # machine that pushed.
       - run: bun install --frozen-lockfile
 
-      - run: node tooling/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of 6
+      - run: node fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of 6
 
       # `verify` is meant not to write, and `analyze` is the one step that can:
       # it regenerates the manifests. A tracked manifest that no longer matches
       # its source is a real fault and an invisible one, because everything
       # downstream reads the file rather than the code. This is what makes the
       # "never writes" rule checkable instead of stated.
+      - name: The tree is unchanged by verifying it
+        run: git diff --exit-code
+
+  # **Its own job because it runs every other check.** In the shard pool it made
+  # whichever shard drew it run the whole suite serially, so a six-way split had
+  # a single shard doing all of it and finished no sooner than that shard did.
+  #
+  # Same prerequisites as a shard, for the same reason: the checks it runs read
+  # what `build` and `analyze` write.
+  floors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.20.0'
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run build
+
+      - run: bun run check:spec:floors
+
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
 
@@ -175,6 +204,34 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v2
       - run: bun run test
+      # **`check:cli` is here rather than in the shard pool**, because it is the
+      # only check that runs a binary: a shard has bun and node and no cargo, so
+      # the npm shim would build one from cold on whichever of the six drew it,
+      # while the other five paid for a toolchain they never used. Here the
+      # cache is warm and `rs:build` is the same compile `rs:check` and
+      # `rs:test` were going to do anyway.
+      #
+      # It reads source rather than `dist`, so it does not want the shard's
+      # `build` prerequisite. The one thing `dist` buys is naming the exact
+      # subpath in a barrel finding, and without it that advice degrades to
+      # `dependency/<part>` in words rather than silently.
+      - run: bun run rs:build
+      - run: bun run check:cli
+      # Beside `check:cli` because they are the same binary. A shard that runs
+      # one compiles Rust to do it, and six doing that at once took the runner's
+      # memory: exit 137 on one shard, SIGTERM on another, a third canceled
+      # behind them. Here the cargo cache is warm and the binary already built.
+      #
+      # **The build is what `references` reads.** That rule asks whether a path a
+      # comment names is on disk, and several of them name generated files:
+      # `fusion/site/public/sandbox/frame.css` is written by the site build and
+      # is gitignored. A shard had it because the shards build first; this job
+      # did not, so moving the check here turned seven true references into
+      # findings. Cached, so it is a restore rather than a build.
+      - run: bun run build
+      - run: bun run check:css:seeds
+      - run: bun run check:prose
+      - run: bun run fusion spec check
       - run: bun run rs:check
       - run: bun run rs:test
 
@@ -214,7 +271,7 @@ jobs:
     # `playwright install`. It never once finished: three runs, three
     # `cancelled` conclusions, which report as neither pass nor fail and read  # dialect:quoted, GitHub spells this conclusion value so
     # in the summary as a job that simply did not object. That is the fault
-    # `check:floors` exists to catch, one level up, in the workflow rather than
+    # `check:spec:floors` exists to catch, one level up, in the workflow rather than
     # in the script.
     timeout-minutes: 45
     strategy:
@@ -227,16 +284,22 @@ jobs:
           # above them or the page, and only a laid-out document knows. Both
           # color modes, because the half not on screen is the half that fails.
           - task: contrast
-            run: bun run check:contrast
+            run: bun run check:css:contrast
+          # The token reference's hex column, against what the browser paints.
+          # The column is arithmetic in Node, because that file is committed and
+          # `verify` checks it in a job with no browser; this is the other half
+          # of that trade and it belongs here, where one is already installed.
+          - task: hexes
+            run: bun run check:css:hexes
           # The specs themselves.
           - task: specs
             run: bun run specs:browser
-          # Every example, rendered. `check:examples` reads them and can tell
+          # Every example, rendered. `helix component`'s `examples` reads them and can tell
           # you an attribute no component declares; only running one can tell
           # you it throws on upgrade, names an element registered nowhere, or
           # lays out to nothing.
           - task: smoke
-            run: bun run smoke
+            run: bun run smoke:examples
           # Every example in both tiers, pixel for pixel against a committed
           # baseline. This is the one fault class the rest of `verify` cannot
           # reach: everything else reads source or asserts a fact somebody
@@ -244,13 +307,13 @@ jobs:
           # anybody wrote down. Here rather than in `verify` because it wants a
           # browser and a baseline taken on this runner: the comparison never
           # crosses platforms, so on a contributor's Mac it says so and exits
-          # clean. See 148.
+          # clean.
           - task: visual
-            run: bun run check:visual
+            run: bun run check:spec:visual
           # Every example rendered twice, from its HTML and from its TSX, and
           # the two compared. Both are authored now, neither derived from the
           # other, which is the right arrangement and costs exactly one thing:
-          # nothing else notices them drifting. `check:examples-paired` holds
+          # nothing else notices them drifting. `helix component`'s `examples-paired` holds
           # the two files to each other; only a picture can hold the two
           # renders.
           #
@@ -269,7 +332,7 @@ jobs:
             # verdict: a subset that reports like a full pass is the failure
             # this whole check exists to prevent.
             run: >-
-              bun run check:visual-parity --changed
+              bun run check:spec:visual-parity --changed
               "${{ github.event_name == 'pull_request'
               && github.event.pull_request.base.sha
               || github.event.before }}"
@@ -281,7 +344,7 @@ jobs:
           # assumption, that CSSOM hands back what it reads, is asserted nowhere
           # else.
           - task: diagnostics
-            run: bun run check:diagnostics
+            run: bun run check:spec:diagnostics
     steps:
       # **Full history, because `parity` scopes itself by diffing against the
       # base and a depth-1 checkout has nothing to diff against.** The script
@@ -323,7 +386,7 @@ jobs:
         run: ${{ matrix.run }}
 
       # **The pictures, when it fails, because nothing else can show them.**
-      # `check:visual` marks the changed pixels into `preview.diff.png` beside
+      # `check:spec:visual` marks the changed pixels into `preview.diff.png` beside
       # each baseline and those files die with the runner, so a reviewer got a
       # pixel count and no way to see what moved. `if-no-files-found: ignore`
       # because only the visual shard ever writes one.
@@ -351,7 +414,7 @@ jobs:
   # **One context to require, because the job names are not stable enough to
   # require directly.** A branch protection rule matches a job name, and this
   # workflow's are `checks (0)` through `checks (5)` and
-  # `browser (smoke, bun run smoke)`: the shard count is an argument and the
+  # `browser (smoke, bun run smoke:examples)`: the shard count is an argument and the
   # matrix label carries the command, so renaming a script or changing `--of 6`
   # silently un-requires whatever was named. Naming this one job instead means
   # the rule keeps holding, and a job added to `needs` is covered without anyone
@@ -368,7 +431,7 @@ jobs:
   # what fails it.
   verify:
     if: always()
-    needs: [plan, checks, lint, types, tests, browser]
+    needs: [plan, checks, floors, lint, types, tests, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

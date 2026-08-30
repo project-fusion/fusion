@@ -1,6 +1,7 @@
 import type { Config } from '@custom-elements-manifest/analyzer'
 import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
 import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
+import { borrowedStyles } from './plugins/borrowed-styles.js'
 import { composition } from './plugins/composition.js'
 import { type ConventionLintOptions, conventionLint } from './plugins/convention-lint.js'
 import { declaredEvents } from './plugins/declared-events.js'
@@ -26,8 +27,6 @@ export interface HelixCemOptions {
    * everything else reads: `jsx.d.ts` by `@wc-toolkit/jsx-types` for the whole
    * JSX family, and `vue.d.ts` by `@wc-toolkit/vuejs-types` for Vue templates,
    * which are not JSX and augment a different interface.
-   *
-   * It was `jsxTypes` while JSX was all it emitted.
    */
   frameworkTypes?: boolean
 
@@ -76,6 +75,10 @@ export const createHelixCemConfig = ({
     // Must precede the linter: it validates declared events, not inferred ones.
     declaredEvents(),
     references(),
+    /* After the analyzer has filled every declaration's own `cssProperties`,
+       since it copies them across, and before `stableOrder` so what it appends
+       is ordered with everything else. */
+    borrowedStyles(),
     reactEvents(),
     ...(lint === false ? [] : [conventionLint(lint)]),
     // Before the JSX generator, which walks modules in order, so both the
@@ -145,6 +148,7 @@ export type {
   Documented,
   HelixAttribute,
   HelixContext,
+  HelixCssProperty,
   HelixDeclaration,
   HelixEvent,
   HelixManifest,
@@ -165,6 +169,7 @@ export {
 } from './types.js'
 export type { ConventionLintOptions }
 export {
+  borrowedStyles,
   composition,
   conventionLint,
   declaredEvents,

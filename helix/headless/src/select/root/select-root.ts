@@ -87,13 +87,16 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   })
 
   /**
+   * What it says where there are none.
+   */
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No matches'
+
+  /**
    * Whether the list can be narrowed by typing.
    *
    * Passed to the listbox rather than acted on here, because the listbox owns
-   * the filtering, the empty state and the keyboard. This property existed and
-   * was never read: it reflected, it type-checked, and nothing anywhere
-   * rendered a field. API that does nothing is worse than API that is missing,
-   * because a consumer sets it and believes it.
+   * the filtering, the empty state and the keyboard.
    */
   @property({ reflect: true, type: Boolean })
   filterable = false
@@ -113,12 +116,6 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
-
-  /**
-   * What it says where there are none.
-   */
-  @property({ attribute: 'empty-text' })
-  emptyText = 'No matches'
 
   /**
    * Whether more than one option can be the answer.
@@ -161,10 +158,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    *
    * The optional chain is the server. `renderRoot` is a property Lit's element
    * shim does not carry, and this getter is reached from `display`, which is
-   * read during `render`: without it the select threw on every server render
-   * and could not be served at all. Found by writing its SSR spec, which is
-   * the only thing that would have found it, because the client is where every
-   * other path runs and the client always has a root.
+   * read during `render`: without it the select throws on every server render
+   * and cannot be served at all.
    *
    * The other reads of `renderRoot` here are inside callbacks the controllers
    * invoke, and a controller only runs on a connected element, so they cannot
@@ -174,15 +169,14 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     return this.renderRoot?.querySelector<HelixHeadlessListbox>('[part="listbox"]') ?? null
   }
 
-  /* The surface floats *and is in the top layer*, which it was not.
+  /* The surface floats *and is in the top layer*.
    *
-   * It had a `FloatingController` and a `DismissController` and never called
-   * `showPopover`, so the panel was an ordinary positioned element and the
-   * first ancestor with `overflow: hidden` clipped it. A select inside a
-   * scrolling card was cut off where a menu in the same place was not, and the
-   * two are the same shape: floating panel, trigger, dismissal. That is what
+   * Without `showPopover` the panel is an ordinary positioned element and the
+   * first ancestor with `overflow: hidden` clips it, so a select inside a
+   * scrolling card is cut off where a menu in the same place is not. The two
+   * are the same shape (floating panel, trigger, dismissal), which is what
    * `PopoverController` is, and having one of them is what stops the third copy
-   * being subtly different again.
+   * being subtly different.
    *
    * Held off the trigger by the controller rather than by a margin on the
    * panel. A margin is inside the box the controller measures, so it would be
@@ -194,15 +188,12 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
      *
      * A control is not always one element: the button that opens this panel is
      * part of it, and a press on it is not a press outside. Scoped to the
-     * surface alone, `pointerdown` on the trigger closed the panel and the
-     * trigger's own `toggleOpen` reopened it on the `click` that followed, so
-     * the panel could never be closed by the button that opened it. Measured
-     * across all five popover-bearing components: Menu, Popover and Tooltip
-     * already named their invoker; this one and its three siblings did not, and
-     * all four stayed open on a second press where Menu closed.
+     * surface alone, `pointerdown` on the trigger closes the panel and the
+     * trigger's own `toggleOpen` reopens it on the `click` that follows, so
+     * the panel can never be closed by the button that opened it.
      *
-     * `DismissController` documents this exact failure and takes a list for it.
-     * The list was the fix; using it was the part that did not happen here. */
+     * `DismissController` documents this exact failure and takes a list for
+     * it. */
     boundary: (): readonly (Element | null | undefined)[] => [
       this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
       this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
@@ -244,8 +235,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
      *
      * The event carries the value being *proposed*, and it is dispatched before
      * it is applied, which is what makes it refusable. Reading the listbox here
-     * therefore read the value it still held: one choice behind, and on the
-     * first choice nothing at all.
+     * reads the value it still holds: one choice behind, and on the first
+     * choice nothing at all.
      *
      * And the listbox never applies it anyway. The select passes `.value` down,
      * which is a consumer declaring ownership, so the listbox inside the panel
@@ -253,13 +244,12 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
      * right arrangement, and it makes reading the listbox's own value the one
      * thing that can never work. */
     const next = (event as CustomEvent<{ value: string }>).detail.value
-    /* Nothing happens on a refusal, and everything did.
+    /* Nothing happens on a refusal.
      *
-     * The panel closed and a native `change` went out whether or not the change
-     * was taken, so a consumer calling `preventDefault()` on `helix-change`
-     * kept the old value, watched the select shut as though it had been chosen,
-     * and told the form it had moved. Refusing a change should leave the
-     * control exactly where it was. */
+     * Without this return the panel closes and a native `change` goes out
+     * whether or not the change was taken, so a consumer calling
+     * `preventDefault()` on `helix-change` keeps the old value, watches the
+     * select shut as though it had been chosen, and tells the form it moved. */
     if (!this.requestValue(next)) {
       event.stopPropagation()
       return
@@ -272,13 +262,11 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     }
     /* The listbox's request is stopped and this element's own has already gone
        out, from `requestValue` above: two elements announcing one choice is
-       what a consumer would have to deduplicate. The comment here used to say
-       the listbox's was "left to travel", which the line below it has always
-       contradicted.
+       what a consumer would have to deduplicate.
 
        And no `change` is dispatched here. `requestValue` announces `input` and
        `change` through the mixin, the way every other discrete control does, so
-       a second one from this line was a second `change` per choice: measured on
+       a second one from this line is a second `change` per choice: measured on
        the styled tier at three, one from the mixin, one from here, and one from
        the listbox before it was stopped. */
     event.stopPropagation()
@@ -313,24 +301,22 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
          costs nothing. */
       this.panel.show()
       /* Into the list, which is where the keyboard has to be for the arrows to
-         mean anything. It reached the listbox element and stopped there, that
-         element not being focusable, so focus stayed on the trigger and every
-         arrow press went to the page. The listbox delegates focus now, so this
-         lands on the list inside it.
+         mean anything. The listbox delegates focus, so this lands on the list
+         inside it rather than stopping at the listbox element, which is not
+         itself focusable.
        *
        * Only on the update that opened it. `updated` runs for any change while
        * the panel is up, a filter keystroke or a value arriving, and moving
-       * focus on each of those is a focus thief: harmless while the listbox was
-       * unfocusable, and a real one the moment it was made to work. */
+       * focus on each of those is a focus thief. */
       if (changed.has('open')) {
         this.listbox?.focus()
       }
     } else {
       this.panel.hide()
-      /* And the filter goes with it. A filterable select reopened still narrowed
-         with the old needle in its search box, and `hidden` still written on the
-         options it had ruled out, so the second use of the control started from
-         the first one's leftovers. Closing is where a search ends. */
+      /* And the filter goes with it. Without this a filterable select reopens
+         still narrowed by the old needle, with `hidden` still written on the
+         options it ruled out, so the second use of the control starts from the
+         first one's leftovers. Closing is where a search ends. */
       this.listbox?.requestFilter('')
     }
   }
@@ -412,9 +398,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         }
         <slot name="end"></slot>
         ${
-          /* The slot has a fallback, and had none: a select written without a
-             hand-slotted icon drew no mark at all saying it opens, and every
-             example in the family passes one, which is what hid it. A caret is
+          /* The slot has a fallback: without one a select written without a
+             hand-slotted icon draws no mark at all saying it opens. A caret is
              the mark, and slotting anything replaces it, which is this
              library's rule for a content property. */
           ''

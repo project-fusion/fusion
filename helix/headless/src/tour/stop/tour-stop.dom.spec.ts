@@ -27,10 +27,10 @@ const asked = async (host: Stop, name: string): Promise<string | undefined> => {
  * One stop, and the contract that is the stop's rather than the tour's.
  *
  * **The tour already proves the sequence**, which is which stop is current, what
- * a `next` advances to and what happens at the end: it is named 29 times in this
- * family's specs. What one stop owns alone is that it *asks* rather than moves,
- * and that is the assertion that cannot be made from the tour, where a stop that
- * moved the tour itself and one that asked it to look identical from outside.
+ * a `next` advances to and what happens at the end. What one stop owns alone is
+ * that it *asks* rather than moves, and that is the assertion that cannot be
+ * made from the tour, where a stop that moved the tour itself and one that
+ * asked it to look identical from outside.
  */
 describe('one tour stop', () => {
   /* A stop does not know what is after it, and a stop that reached up to its

@@ -58,58 +58,40 @@
   visibility: hidden;
 }
 
-/* A ring rather than a disc.
- *
- * A column of filled circles is a column of traffic lights: the color is the
- * loudest thing on the card and it is saying something small, which is what
- * kind of event this was. A ring in the tone with the mark drawn inside it in
- * the same color reads as an annotation on the line rather than a warning, and
- * an entry with nothing slotted still gets a dot, because a ring with nothing
- * in it is a hole. */
+/* A ring rather than a disc. A column of filled circles is a column of traffic
+ * lights: the color is the loudest thing on the card and it is saying something
+ * small, which is what kind of event this was. An entry with nothing slotted
+ * still gets a dot, because a ring with nothing in it is a hole. */
 [part="marker"] {
   --icon-size: var(--helix-size-icon-sm);
 
   align-items: center;
   align-self: start;
   aspect-ratio: 1;
-  /* Not raised, which it was.
+  /* No vertical lift, and one must not come back. A `translate: 0 -0.1em` is
+   * right for a bare dot, which centers on a line box and so reads low against
+   * the descender space the box carries. The mark is a glyph inside a box
+   * Phosphor already balanced, so the same lift is an error of exactly its own
+   * size: measured across four entries at a 14px title, the mark sat 1.4 pixels
+   * above the center of its own label on every row, which is `0.1em` to the
+   * pixel.
    *
-   * There was a `translate: 0 -0.1em` here, measured when the mark was a
-   * `<span>` this sheet drew a circle on: a bare dot centres on the line box,
-   * and a line box carries descender space whether or not the words have a
-   * descender in them, so the dot read low and was lifted.
+   * No `background-color` either. One was here to knock the rail out behind the
+   * mark, which the split rail already does: the connector is `grid-row: 1`,
+   * above the mark, and the rail below is offset by the mark's own size, so
+   * neither is ever drawn where the mark is. It masked nothing and painted the
+   * page's color onto a component that cannot know it is on a page: on a card it
+   * came out darker than the surface it sat on and read as a hole. A component
+   * must not paint the color of something it does not own. Transparent, the mark
+   * is correct on a card, a drawer, a toast and a photograph without being told
+   * which it is.
    *
-   * The mark is a glyph now, drawn inside a box Phosphor already balanced, and
-   * the lift became an error of exactly its own size. Measured across all four
-   * entries at a 14px title: the mark sat 1.4 pixels above the center of its
-   * own label, on every row, which is `0.1em` to the pixel.
-   */
-  /* Round, and it cuts nothing.
+   * No ring. A 16 pixel glyph inside a 20 pixel box with a 4 pixel radius is the
+   * shape of an app icon, and four stacked read as badges pinned to a cable
+   * rather than as a record.
    *
-   * There was a `background-color` here, the page's, and its note said it
-   * knocked the rail out behind the mark. That was true of a rail drawn
-   * continuously and stopped being true when the line was split: the connector
-   * is `grid-row: 1`, above the mark, and the rail is offset down by the mark's
-   * own size, so neither is ever drawn in the space the mark occupies. It was
-   * masking nothing and painting the page's color onto a component that cannot
-   * know it is on a page. On a card it came out darker than the surface it sat
-   * on, which is what it looked like: a hole rather than a mark.
-   *
-   * A component must not paint the color of something it does not own. The
-   * mark is transparent now and is correct on a card, a drawer, a toast and a
-   * photograph without being told which it is.
-   *
-   * There was a ring here too, a neutral one-pixel border on a rounded square, and
-   * it is what made the column read as a row of stickers rather than a record:
-   * a 16 pixel glyph inside a 20 pixel box with a 4 pixel radius is the shape
-   * of an app icon, and four of them stacked read as four badges pinned to a
-   * cable. Rendered beside three alternatives at the size it is actually drawn,
-   * the one that stopped looking cartoony is the one with no ring at all.
-   *
-   * What is left is the background, which knocks the rail out behind the mark
-   * so the line arrives and leaves rather than passing through. Round rather
-   * than square so the cut stays a cut if a consumer ever thickens the rail,
-   * and the hook stays for a record that wants its ring back. */
+   * The radius stays as a hook, round rather than square, for a record that
+   * gives its mark a ground of its own. */
   border-radius: var(--timeline-marker-radius, var(--helix-radii-full));
   color: var(--_timeline-tone, var(--helix-color-foreground-subtle));
   display: inline-flex;
@@ -124,10 +106,9 @@
    `:has()`, and the first version of this tried, matched nothing, and left every
    unmarked entry as an empty ring. */
 [part="dot"] {
-  /* Sized, and nothing else. It was a `<span>` this sheet drew a circle on, and
-     drawing a circle beside a component that already has one is how two marks
-     that should be identical end up nearly identical. It is `Steps`' own glyph
-     now, at the size the slotted marks beside it take. */
+  /* Sized, and nothing else: the glyph is `Steps`' own, at the size the slotted
+     marks beside it take. Drawing a circle here instead is how two marks that
+     should be identical end up nearly identical. */
   block-size: var(--helix-size-icon-sm);
   inline-size: var(--helix-size-icon-sm);
 }

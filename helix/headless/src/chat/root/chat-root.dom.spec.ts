@@ -132,12 +132,12 @@ describe('the pin', () => {
   })
 
   /**
-   * The way back goes back, which it did not.
+   * The way back goes back on its own.
    *
-   * The control is slotted so a consumer picks the words, and `resume()` was
-   * public for them to call: shipped that way it was a button this element
-   * positions, lifts, and shows and hides, doing nothing at all. A press in a
-   * region that exists for one purpose means that purpose.
+   * The control is slotted so a consumer picks the words, and `resume()` is
+   * public for them to call, but a press in a region that exists for one purpose
+   * means that purpose: without this the element positions, lifts, shows and
+   * hides a button that does nothing.
    */
   test('a press in the way back pins again', async () => {
     const element = await chat()
@@ -206,8 +206,8 @@ describe('the pin', () => {
   })
 
   /**
-   * `helix-change` names the property, which is what its detail is for: a
-   * listener switching on the name is switching on something with one meaning.
+   * `helix-before-pin` is Chat's own verb rather than a generic change, so a
+   * listener binding the name is binding something with one meaning.
    */
   test('a pin change is announced as a change to `pinned`', async () => {
     const element = await chat()

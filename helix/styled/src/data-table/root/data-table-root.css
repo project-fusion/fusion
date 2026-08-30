@@ -17,9 +17,7 @@
   /* The consumer's hook first, then what the columns worked out. The derived
      value is written inline on this element, and an inline declaration beats
      any stylesheet, so the public name has to be the outer one or a consumer
-     setting the documented hook is overruled by the component every render.
-     That exact fault shipped on `helix-table` and is fixed here by copying the
-     shape rather than the mistake. */
+     setting the documented hook is overruled by the component every render. */
   grid-template-columns: var(--data-table-columns, var(--data-table-template, minmax(0, 1fr)));
   inline-size: 100%;
   overflow-x: auto;
@@ -121,7 +119,7 @@
 
 /* Print: zebra striping is a fill printers drop unevenly, which is worse than
    none. `@media print` does not cross a shadow boundary, so a page cannot answer
-   this on a component's behalf and every family says it for itself. See 165. */
+   this on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     background-color: transparent;

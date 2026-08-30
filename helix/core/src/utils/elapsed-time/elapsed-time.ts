@@ -94,9 +94,7 @@ export const elapsedTime = (locale: string): ((from: Date, now: Date) => Relativ
     if (size < 60_000) {
       /* Floored like every other branch. At 59,999 milliseconds the remainder is
          one, and a caller handed a one is re-armed inside the callback that
-         fired it. `relativeTime` shipped without this floor on the same branch
-         and its own `Relative.next` claimed to have it; only the shared ticker's
-         own `Math.max(1000, ...)` was standing between that and a busy loop. */
+         fired it. */
       return { next: Math.max(1000, 60_000 - size), text: zero.format(0, 'second') }
     }
 

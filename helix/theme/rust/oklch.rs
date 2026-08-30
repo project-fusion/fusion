@@ -1,17 +1,16 @@
-//! OKLCH color math, ported from `src/oklch.ts`.
+//! OKLCH color math, ported from the TypeScript engine `oracle.json` records.
 //!
 //! Theme derivation depends on a perceptual color space. Equal numeric steps in
 //! sRGB are not equal perceptual steps, which makes both scale generation and
 //! contrast targeting unreliable. Everything here exists so that
 //! [`lightness_for_contrast`] can be correct.
 //!
-//! **This is a port rather than a second implementation, and the difference is
-//! the whole reason 142 calls it a move.** `fit_to_gamut` is a twenty step
-//! bisection and `lightness_for_contrast` searches too, so the iteration count,
-//! the bisection order and the float arithmetic are not details, they are the
-//! answer: two implementations that merely agree on intent disagree on output by
-//! construction. So the loops below are the TypeScript's loop bounds, in its
-//! order, and every constant is copied rather than rederived.
+//! **The arithmetic is fixed, not merely correct.** `fit_to_gamut` is a twenty
+//! step bisection and `lightness_for_contrast` searches too, so the iteration
+//! count, the bisection order and the float arithmetic are not details, they are
+//! the answer: two implementations that merely agree on intent disagree on
+//! output by construction. So the loops below are the TypeScript's loop bounds,
+//! in its order, and every constant is copied rather than rederived.
 //!
 //! `f64` throughout, because a JavaScript number is one and a port that reached
 //! for `f32` would differ in the last place at exactly the point a bisection is
@@ -25,7 +24,7 @@ pub struct Oklch {
     pub lightness: f64,
 }
 
-/// Linear-light sRGB, unclamped so out-of-gamut colours stay detectable.
+/// Linear-light sRGB, unclamped so out-of-gamut colors stay detectable.
 #[derive(Clone, Copy, Debug)]
 pub struct LinearRgb {
     pub b: f64,
@@ -171,7 +170,7 @@ fn ratio(la: f64, lb: f64) -> f64 {
     (lighter + 0.05) / (darker + 0.05)
 }
 
-/// WCAG contrast ratio between two colours, from 1 to 21.
+/// WCAG contrast ratio between two colors, from 1 to 21.
 #[must_use]
 pub fn contrast_ratio(a: Oklch, b: Oklch) -> f64 {
     ratio(relative_luminance(a), relative_luminance(b))
@@ -196,7 +195,7 @@ pub fn shipped_luminance(color: Oklch) -> f64 {
     0.2126 * quantise(rgb.r) + 0.7152 * quantise(rgb.g) + 0.0722 * quantise(rgb.b)
 }
 
-/// WCAG contrast ratio between two colours as they will be written to hex.
+/// WCAG contrast ratio between two colors as they will be written to hex.
 #[must_use]
 pub fn shipped_contrast_ratio(a: Oklch, b: Oklch) -> f64 {
     ratio(shipped_luminance(a), shipped_luminance(b))

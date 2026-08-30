@@ -1,8 +1,8 @@
 //! The JSON shape a JavaScript consumer sees.
 //!
 //! **Shared by the boundary and the bless, so the two cannot disagree.** The
-//! oracle records what a theme looks like from JavaScript and `check:wasm`
-//! compares the boundary against those records; if each built its own object
+//! oracle records what a theme looks like from JavaScript and the boundary is
+//! compared against those records; if each built its own object
 //! literal, a renamed field would move both at once and the comparison would go
 //! on passing.
 //!
@@ -19,7 +19,6 @@ use serde_json::{Map, Value};
 use crate::derive::report::Outcome;
 use crate::derive::theme::Theme;
 
-/// The whole theme, as JavaScript sees it.
 /// Every pair, as JavaScript sees it.
 pub fn pairings(theme: &Theme) -> Value {
     theme
@@ -108,13 +107,8 @@ pub fn report(theme: &Theme) -> Value {
 /// it is `undefined`; `serde_json` writes `null` for a `None`, which is a
 /// different document. It reads the same through `token.contrast ?? fallback`
 /// and differently through `'contrast' in token`, `Object.keys`, an equality
-/// check on the serialised form, and any schema that distinguishes optional from
+/// check on the serialized form, and any schema that distinguishes optional from
 /// nullable.
-///
-/// Found by the check that compares the two, on the first token of the first
-/// theme, which is the argument for that check existing: nothing in either
-/// language would have mentioned it, and the wrapper is a *replacement* for the
-/// engine whose shape it has to keep.
 fn optional(row: &mut Map<String, Value>, key: &str, value: Option<f64>) {
     if let Some(value) = value {
         row.insert(key.to_owned(), value.into());

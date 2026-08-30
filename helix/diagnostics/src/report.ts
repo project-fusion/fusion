@@ -5,7 +5,7 @@
  * **A bare pass is a lie this collector is structurally capable of telling.**
  * Cross-origin stylesheets throw on `.cssRules`, and a run that could not read
  * half its input reports the same empty array as a run that read all of it.
- * `check:dialect` shipped in exactly that condition for weeks: green, and
+ * `fusion prose`'s `dialect` shipped in exactly that condition for weeks: green, and
  * incapable of being anything else. So `Report` has no `findings` that can be
  * destructured away from the `coverage` that qualifies them, and the console
  * sink prints coverage first whether or not anything was found.
@@ -18,8 +18,8 @@ export interface Origin {
    *
    * **There is no line number and there cannot be one.** CSSOM exposes
    * `cssText` and an index within the sheet; the byte offset in the authored
-   * file is not in the object model at any level. `24-diagnostics.md` asks for a
-   * line, and this is the honest substitute: the text of the rule is what a
+   * file is not in the object model at any level. A line was asked for, and
+   * this is the honest substitute: the text of the rule is what a
    * reader searches for, and it survives minification and bundling in a way a
    * line number would not.
    */

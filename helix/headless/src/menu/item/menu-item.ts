@@ -35,18 +35,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart item - The row, which is an `<a>` where `href` is set.
- * @csspart mark - The trailing mark: a tick when checked, a caret when it opens.
+ * @csspart mark - The trailing mark: a tick when checked, a caret when it opens
  * a page. One column, because a row is never both.
  * @csspart start - The leading column, which is a slot and is always there.
  */
 @customElement('helix-headless-menu-item')
 export class HelixHeadlessMenuItem extends HelixElement {
-  /**
-   * What this row stands for, carried in the event when it is chosen.
-   */
-  @property()
-  value = ''
-
   /**
    * Whether the row is one of a set of choices.
    *
@@ -74,13 +68,23 @@ export class HelixHeadlessMenuItem extends HelixElement {
   disabled = false
 
   /**
+   * Whether the link saves the file rather than opening it.
+   *
+   * Only meaningful beside an `href`, and only for a file served from this
+   * origin: the attribute is ignored cross-origin, which is the browser's rule
+   * about who may name a file on somebody's disk rather than a gap here.
+   */
+  @property({ type: Boolean })
+  download = false
+
+  /**
    * Where the row goes, which makes it a real link.
    *
    * **The row itself becomes an `<a>`, and the role goes with it.** A
    * `menuitem` cannot contain a link: measured in Chromium, an anchor inside
    * one is exposed as a child and the row loses its accessible name entirely.
    * So the anchor *is* the row, carrying `menuitem` and the `tabindex` the menu
-   * roves, which is the same manoeuvre `Tree.Item` makes and the reason `href`
+   * roves, which is the same maneuver `Tree.Item` makes and the reason `href`
    * changes the markup rather than only adding an attribute.
    *
    * **`Option` cannot have this and the reason is worth knowing**, since a
@@ -97,28 +101,6 @@ export class HelixHeadlessMenuItem extends HelixElement {
   href = ''
 
   /**
-   * Where the link opens, for the rows that should leave the page.
-   */
-  @property()
-  target = ''
-
-  /**
-   * The relationship, which `target="_blank"` should always set.
-   */
-  @property()
-  rel = ''
-
-  /**
-   * Whether the link saves the file rather than opening it.
-   *
-   * Only meaningful beside an `href`, and only for a file served from this
-   * origin: the attribute is ignored cross-origin, which is the browser's rule
-   * about who may name a file on somebody's disk rather than a gap here.
-   */
-  @property({ type: Boolean })
-  download = false
-
-  /**
    * Whether this row is on the page currently showing.
    *
    * Set by the menu, and a property rather than an attribute for that reason.
@@ -127,6 +109,12 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   @property({ attribute: false })
   onPage = true
+
+  /**
+   * The relationship, which `target="_blank"` should always set.
+   */
+  @property()
+  rel = ''
 
   /**
    * Whether this row's submenu is the page showing.
@@ -141,6 +129,18 @@ export class HelixHeadlessMenuItem extends HelixElement {
   showingSubmenu = false
 
   /**
+   * Where the link opens, for the rows that should leave the page.
+   */
+  @property()
+  target = ''
+
+  /**
+   * What this row stands for, carried in the event when it is chosen.
+   */
+  @property()
+  value = ''
+
+  /**
    * @internal Read by a parent to identify its children across the light DOM,
    * which is cheaper than `instanceof` and is why this is public rather than
    * protected. Not a consumer's to read or set.
@@ -150,15 +150,8 @@ export class HelixHeadlessMenuItem extends HelixElement {
   /**
    * Whether anything was slotted into `submenu`.
    *
-   * Client only, and the `?? []` is what makes that true rather than merely
-   * documented. Lit's element shim carries attributes but not a tree, so
-   * `children` is undefined on the server, and this getter is read during
-   * `render`: spreading it threw, and a menu row could not be served at all.
-   * Found by writing this component's SSR spec, which is the only place it
-   * could have been found, because every other path runs in a browser.
-   *
-   * False on the server is also the right answer rather than a safe one: the
-   * server cannot know whether a submenu was slotted, and a row that served a
+   * False on the server, which is the right answer rather than a safe one: the
+   * server cannot know whether a submenu was slotted, and a row that served an
    * `aria-haspopup` it might not have would be a promise made to a screen
    * reader on the strength of a guess.
    */
@@ -169,20 +162,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
   /**
    * Whether anything is slotted into `submenu`. Read after first render.
    *
-   * State rather than a getter over `children`, which is what it was: read
-   * during `render()` with nothing to re-read it, a submenu arriving after the
-   * row's first render produced no caret and no `aria-haspopup` while selecting
-   * the row still drilled in. A framework filling a submenu on demand hit that
-   * every time. `Tree.Item` backs `branch` the same way for the same reason.
+   * State rather than a getter over `children`. A getter is read during
+   * `render()` with nothing to re-read it, so a submenu arriving after the
+   * row's first render produces no caret and no `aria-haspopup` while selecting
+   * the row still drills in, which is what a framework filling a submenu on
+   * demand hits every time. `Tree.Item` backs `branch` the same way for the
+   * same reason.
    *
    * Kept in step by `readSubmenu`, which is bound in the template rather than
-   * once at first render. See the note there: bound once, a single drill-in left
-   * it false for good.
-   *
-   * False on the server is the right answer rather than a safe one: the server
-   * cannot know whether a submenu was slotted, and a row that served an
-   * `aria-haspopup` it might not have would be a promise made to a screen
-   * reader on the strength of a guess.
+   * once at first render. See the note there.
    */
   @state()
   private submenu = false
@@ -195,16 +183,14 @@ export class HelixHeadlessMenuItem extends HelixElement {
   /**
    * Re-reads whether anything is in the submenu, from whichever slot is current.
    *
-   * **Bound in the template, and it has to be.** It was `addEventListener` on
-   * the slot found at `firstUpdated`, which is a different element from the one
-   * showing a moment later: this row renders a `slot[name="submenu"]` in two
-   * template branches, one for the row and one for the page it opens, and moving
-   * between them makes Lit build a new slot and throw the old one away. The
-   * listener stayed on the discarded slot, and the discarded slot fired
-   * `slotchange` on its way out with nothing assigned to it any more. So one
-   * drill-in set `submenu` false and nothing was left listening to set it back:
-   * every caret in the menu vanished and every row stopped opening. Reported
-   * from a recording of the sandbox's Environment menu.
+   * **Bound in the template, and it has to be.** This row renders a
+   * `slot[name="submenu"]` in two template branches, one for the row and one
+   * for the page it opens, and moving between them makes Lit build a new slot
+   * and throw the old one away. A listener added at `firstUpdated` stays on the
+   * discarded slot, which fires `slotchange` on its way out with nothing
+   * assigned to it any more: one drill-in sets `submenu` false and nothing is
+   * left listening to set it back, so every caret in the menu vanishes and
+   * every row stops opening.
    *
    * The live slot is asked rather than `event.target`, so it does not matter
    * which of the two fired or in what order.

@@ -2,13 +2,10 @@
  * The component catalog: manifests and example markup, as one shape a reader
  * can render.
  *
- * **Pure, and it lives here for the same reason `reference()` does.** This is
- * Helix knowledge, and it used to sit in a marketing app: once both an HTML
- * page and a `.md` route need it, leaving it there means one of them imports
- * across a domain boundary to get at it. Reading the manifests and the
- * `.examples/*.html` files off disk is the caller's job, because a content
- * package that touched the filesystem would trace itself into every consumer's
- * server bundle.
+ * **Pure, and it lives here for the same reason `reference()` does.** Reading
+ * the manifests and the `.examples/*.html` files off disk is the caller's job,
+ * because a content package that touched the filesystem would trace itself
+ * into every consumer's server bundle.
  *
  * Two sources and no third: the manifests describe the API, and the example
  * files hold the markup. Nothing about a component is written down here, which
@@ -18,21 +15,15 @@ import type { HelixDeclaration, HelixManifest, HelixMember } from '@fusion.dev/h
 import { displayName, startCase, tierOf } from './naming.js'
 import { place } from './reference.js'
 
-/* The headless twin's slug, and the suffix every other one carries. Named
-   because the sort and the label both ask, and a tier that has been renamed
-   once can be renamed again. */
 /**
- * The canonical example's slug, named once because three places knew it.
+ * The canonical example's slug, named once because three places ask for it.
  *
- * The tier pairing, the first-position pin and the label all had it written
- * out, and renaming `default` to `preview` broke each of them separately: the
- * pin because the old name sorted early by accident, the pairing because a twin
- * mirrors this one, the label because it reads from the name. A fact three
- * places hold is a fact that drifts, which the comment on the sort below
- * already records happening once when the tier was called `base`.
+ * The tier pairing, the first-position pin and the label all read it. A fact
+ * three places hold is a fact that drifts.
  */
 const CANONICAL = 'preview'
 
+/* The headless twin's slug, and the suffix every other one carries. */
 const HEADLESS = 'headless'
 const HEADLESS_SUFFIX = /\.headless$/
 
@@ -124,30 +115,24 @@ export interface Example {
   /**
    * The same example authored in TSX, which is a file and never a conversion.
    *
-   * **Both syntaxes are authored, neither derived.** The sandbox used to run
-   * the HTML through `htmlToJsx` when a reader asked for TSX, which is the
-   * mistake `build-headless-examples.mjs` made one axis over and this package
-   * already rejected once: a derived example is a function of its twin rather
-   * than a thing anybody wrote. It also did not work. Every example carrying a
-   * `<script>` converted to a JSX fragment with a `<script>` in it, which is a
-   * syntax error rather than a bad example, and three separate faults hit the
-   * script-free ones as well.
+   * **Both syntaxes are authored, neither derived.** A derived example is a
+   * function of its twin rather than a thing anybody wrote, and converting the
+   * HTML mechanically does not work: an example carrying a `<script>` becomes
+   * a JSX fragment with a `<script>` in it, which is a syntax error rather
+   * than a bad example.
    *
-   * `check:examples-paired` holds the two files to each other and
-   * `check:visual` holds the two pictures to each other.
+   * `helix component`'s `examples-paired` holds the two files to each other and
+   * `check:spec:visual-parity` holds the two pictures to each other.
    */
   tsx: string
   /**
    * Which tier the example shows, read from what it renders.
    *
-   * Off the markup rather than off the filename, the same test `check:tokens`
+   * Off the markup rather than off the filename, the same test `helix component`'s `tokens`
    * uses to know a headless example's stylesheet may write raw values: an
    * example is a headless one when it renders a `helix-headless-` element.
-   * When this was written the file was called `headless.html` and the name
-   * could have answered, which is why the comment argued against relying on
-   * it. Both tiers call theirs `preview.html` now, the package directory
-   * carrying the tier, so the name cannot answer and this is the only fact
-   * available. The word `base` was the tier's old name and is gone with it.
+   * Both tiers call theirs `preview.html`, the package directory carrying the
+   * tier, so the name cannot answer and this is the only fact available.
    */
   tier: 'headless' | 'styled'
 }
@@ -173,22 +158,21 @@ export interface Family {
  *
  * An example is up to two files, `<slug>.html` and an optional `<slug>.css`.
  * The HTML is the list: a stylesheet on its own is not an example, and
- * `check:examples` fails on one whose markup is missing rather than showing a
+ * `helix component`'s `examples` fails on one whose markup is missing rather than showing a
  * sandbox with a stylesheet and nothing to style.
  *
  * The pair is what the sandbox already shows, `index.html` beside `styles.css`,
  * so the second file is the one the reader is looking at rather than a build
- * step. It is also what replaced the `style` attributes these examples used to
- * carry: an inline style is unreachable from a stylesheet, cannot express a
- * hover or a media query, and teaches a reader to write the one thing the
- * library exists to avoid.
+ * step. Never an inline `style` attribute instead: it is unreachable from a
+ * stylesheet, cannot express a hover or a media query, and teaches a reader to
+ * write the one thing the library exists to avoid.
  */
 export interface ExampleSource {
   css: string
   /** Family folder the example was found in. */
   family: string
   html: string
-  /** File name without its extension: `default`, `base`, `cards.base`. */
+  /** File name without its extension: `preview`, `headless`, `cards.headless`. */
   slug: string
   /** The authored TSX beside the HTML, never a conversion of it. */
   tsx: string
@@ -202,8 +186,7 @@ export interface ExampleSource {
  * on the host that a React consumer's server markup never had. That makes the
  * declared type `'primary' | 'neutral' | undefined`, and the `undefined` is an
  * implementation detail of how the default is expressed rather than a value
- * anyone sets. The table reads better without it, and the attribute being
- * omissible is already what "attribute" means.
+ * anyone sets.
  */
 const withoutUndefined = (text: string): string =>
   text
@@ -231,9 +214,9 @@ const isPublic = (row: HelixMember): boolean =>
 /**
  * Properties, with the default each one falls back to.
  *
- * Fields rather than attributes, which is the change this page needed: an
- * attribute carries no default in the manifest, so the old table could say a
- * component took `appearance` and never what it did when you left it alone.
+ * Fields rather than attributes: an attribute carries no default in the
+ * manifest, so a table built from attributes can say a component takes a
+ * property and never what it does when you leave it alone.
  */
 const properties = (rows: HelixMember[] | undefined): PropertyDoc[] =>
   (rows ?? [])
@@ -243,12 +226,11 @@ const properties = (rows: HelixMember[] | undefined): PropertyDoc[] =>
        reads to decide a control participates in a form. Thirty-five rows across
        the library, none of them anything a consumer sets on a tag. */
     /* `@internal` needs nothing here: the analyzer drops a member carrying it
-       before the manifest is written, which was worth finding out before
-       building a plugin and a filter to do the same thing twice. */
+       before the manifest is written. */
     .filter((row) => row.kind === 'field' && isPublic(row) && row.static !== true)
     .map((row) => ({
       /* `undefined` is not a default, it is the absence of one, and the
-         analyzer records the initialiser verbatim. Printed, the column reads
+         analyzer records the initializer verbatim. Printed, the column reads
          "undefined" for every optional property, which is a table telling a
          reader a word rather than a value. Blank says the same thing and says
          it quietly. */
@@ -314,11 +296,9 @@ const ANNOTATION = /^[^\S\n]*<!--\s*@[\s\S]*?-->[^\S\n]*\n?/gm
  * The example's markup as a reader should receive it.
  *
  * `@summary` is metadata about the example rather than part of it: the cem
- * plugin lifts it into the manifest, the reference prints it as the
- * description, and it was *also* left sitting on line one of every example, so
- * the copy button handed back a comment describing the thing you had just
- * copied. Ninety-odd examples, each one telling a reader that a Helix component
- * needs a docs annotation above it.
+ * plugin lifts it into the manifest and the reference prints it as the
+ * description, so left in place it makes the copy button hand back a comment
+ * describing the thing you just copied.
  *
  * Stripped here rather than at the reader, because every consumer of the
  * catalog wants the same thing and a site that trimmed it in its own renderer
@@ -355,26 +335,18 @@ const examplesOf = (
   return (
     sources
       .filter((source) => source.family === slug)
-      /* `default` first, then alphabetical, with each headless twin directly
+      /* `preview` first, then alphabetical, with each headless twin directly
          behind the example it mirrors.
 
-         By slug, not by filename. This used to compare `compact-counts.html`
-         against `compact.html`, where `-` precedes `.` and so the longer name
-         sorted first, which is a list ordered by a file extension no reader
-         ever sees. The extension is not part of an example's identity:
-         `compact` and `compact-counts` are what the tabs say, and `compact`
-         comes first.
+         By slug, never by filename. Comparing `compact-counts.html` against
+         `compact.html` puts the longer name first, `-` preceding `.`, which is
+         a list ordered by a file extension no reader ever sees.
 
-         **Pairing on the mirrored name, because sorting on the raw slug only
-         ever worked by luck.** The twin used to be called `base`, and `base`
-         sorts before every family's other examples, so it landed under
-         `default` and looked deliberate. Renaming the tier to `headless` moved
-         it to the end of the list and broke two specs that had been reading
-         that accident as the rule. What the pairing is for is that the tabs
-         show the same list on both tiers, which is what `mirrored` below is
-         computing anyway: sort on it and the position is a consequence of the
-         relationship rather than of where the tier's name falls in the
-         alphabet. */
+         **Pair on the mirrored name, not on the raw slug.** Sorting on the raw
+         slug puts the twin wherever the tier's name happens to fall in the
+         alphabet, which is only ever right by luck. The tabs have to show the
+         same list on both tiers, and `mirrored` below is that relationship: sort
+         on it and the position follows from the pairing. */
       .sort((a, b) => {
         const pairOf = (slug: string) =>
           slug === HEADLESS ? CANONICAL : slug.replace(HEADLESS_SUFFIX, '')
@@ -388,10 +360,9 @@ const examplesOf = (
       })
       .map((source) => {
         /* Which styled example this one is the headless twin of. `headless` is
-         the twin of `preview`, and `<name>.headless` of `<name>`. Both names
-         have moved: the tier was `base` and the canonical example was
-         `default`, and this line is the one place that has to know the pairing
-         because a headless example is not named for itself. */
+         the twin of `preview`, and `<name>.headless` of `<name>`. This is the
+         one place that has to know the pairing, because a headless example is
+         not named for itself. */
         /* Read once and narrowed here rather than spread from the map
            directly: `get` answers `string | undefined`, and under
            `exactOptionalPropertyTypes` an optional property will not take the
@@ -404,11 +375,8 @@ const examplesOf = (
           css: source.css,
           description: described.get(source.slug) ?? '',
           html: withoutAnnotations(source.html),
-          /* **The label is the file's name, with no special case left.** The
-           canonical example was called `default` and read as "Preview", a
-           translation that existed only because the name did not say what the
-           file was: it is the component's headline, not a named variant sitting
-           beside the others. Renamed, `startCase` gives "Preview" on its own.
+          /* **The label is the file's name, with no special case.** `startCase`
+           gives "Preview" for the canonical example on its own.
 
            **A headless example takes the name of the one it mirrors**, so the two
            tiers show the same list rather than a list that changes its labels

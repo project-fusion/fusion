@@ -30,12 +30,9 @@ export interface DrilldownOptions {
  * with. What a reader gets instead is one panel, a title saying where they are,
  * and a way back.
  *
- * **Extracted from `Menu`, which had all of this and did not say so.** The menu
- * held a `page`, derived the rows on it, read a title off the row that opened
- * it, and reset on close; the sandbox's settings dropdown has been a drill-down
- * for as long as it has existed. None of that is about menus. Taking it out is
- * what lets a settings panel, a filter stack or a navigation tree have the same
- * behavior without one of them being a menu that is pretending.
+ * **None of this is about menus.** A settings panel, a filter stack or a
+ * navigation tree gets the same behavior without being a menu that is
+ * pretending.
  *
  * **The tree is the state.** A row's page is its own children, assigned to a
  * slot, so the controller holds one reference, the row currently drilled into,

@@ -1,10 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const markup = ssr(
-  html`<helix-time-picker locale="en-GB" max="09:30" min="09:00" value="09:15"></helix-time-picker>`,
+const markup = withoutStyles(
+  ssr(
+    html`<helix-time-picker locale="en-GB" max="09:30" min="09:00" value="09:15"></helix-time-picker>`,
+  ),
 )
 
 describe('time server output', () => {

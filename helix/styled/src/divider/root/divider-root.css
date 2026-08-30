@@ -32,9 +32,8 @@
 /* Nothing set in, so no region and no gap either side of it: the two halves meet
    and the divider is one continuous line. `:empty` cannot ask this, since the
    region always holds a `<slot>` however little is assigned, and
-   `:host(:has(...))` is invalid CSS dropped at parse time. `check:selectors`
-   caught that rule here, written by an author who had already read the note
-   saying so. The component answers it instead, as `Announcement` and `List` do.
+   `:host(:has(...))` is invalid CSS dropped at parse time. The component answers
+   it instead, as `Announcement` and `List` do.
 
    `display: none` rather than a zero size, because a flex gap is drawn beside
    an item of no width just the same. */
@@ -48,13 +47,19 @@
    pair under it for the rest, which is the shape `Drawer` uses for its own
    inset. */
 :host {
-  padding-inline-end: var(--divider-inset-end, var(--divider-inset, var(--helix-space-none)));
-  padding-inline-start: var(--divider-inset-start, var(--divider-inset, var(--helix-space-none)));
+  padding-inline-end: var(--divider-padding-end, var(--divider-padding, var(--helix-space-none)));
+  padding-inline-start: var(
+    --divider-padding-start,
+    var(--divider-padding, var(--helix-space-none))
+  );
 }
 
 :host([orientation="vertical"]) {
-  padding-block-end: var(--divider-inset-end, var(--divider-inset, var(--helix-space-none)));
-  padding-block-start: var(--divider-inset-start, var(--divider-inset, var(--helix-space-none)));
+  padding-block-end: var(--divider-padding-end, var(--divider-padding, var(--helix-space-none)));
+  padding-block-start: var(
+    --divider-padding-start,
+    var(--divider-padding, var(--helix-space-none))
+  );
   padding-inline: var(--helix-space-none);
 }
 
@@ -95,11 +100,10 @@
  * A horizontal divider has no equivalent: its length is the width it is given,
  * which a consumer sets on the box the way they would any other block.
  *
- * The site had this as `block-size` on the element, which is a document rule
- * against a shadow one and therefore not a fight the component can lose
- * gracefully: it wins outright, whatever the component says, and
- * `check:overruled` fails on it for that reason. A hook is the same effect
- * through the published door. */
+ * A hook rather than a `block-size` from the consumer's own stylesheet. A
+ * document rule beats a shadow one outright, whatever the component says, so
+ * setting the height from outside is not a fight the component can lose
+ * gracefully. This is the same effect through the published door. */
 :host([orientation="vertical"]) {
   block-size: var(--divider-length, auto);
 }
@@ -115,7 +119,7 @@
 /* Print: a rule, which prints.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

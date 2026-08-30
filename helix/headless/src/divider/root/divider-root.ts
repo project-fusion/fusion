@@ -30,12 +30,6 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-divider')
 export class HelixHeadlessDivider extends HelixElement {
   /**
-   * Which way the rule runs.
-   */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
-
-  /**
    * Whether the rule is announced as a separator.
    *
    * Off by default, and out of the accessibility tree. Most rules on a page
@@ -53,13 +47,18 @@ export class HelixHeadlessDivider extends HelixElement {
   announced = false
 
   /**
+   * Which way the rule runs.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
+
+  /**
    * Marks the middle region when nothing has been set into it.
    *
    * A divider with no content has to be one continuous line, and the space
    * either side of the content is what would break it. `:empty` cannot answer
    * this and neither can `:host(:has(...))`, which is invalid CSS dropped at
-   * parse time: `check:selectors` caught exactly that rule here, written in
-   * this file, by an author who had already read the note saying so.
+   * parse time.
    *
    * On the region inside the shadow root rather than on the host, because an
    * attribute written onto the host is a change to markup the consumer rendered.

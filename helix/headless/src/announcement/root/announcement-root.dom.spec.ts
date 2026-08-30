@@ -48,11 +48,11 @@ describe('announcement', () => {
     const announcement = await mount(
       '<helix-headless-announcement dismiss-label="Close notice" dismissible><span slot="icon">x</span></helix-headless-announcement>',
     )
-    /* The name is on the control that is actually focused, which is now the
-       control itself: this was a `helix-headless-icon-button` wrapping a button,
-       and the wrapper shipped no styles, so what rendered was the browser's own
-       bordered gray button inside a message bar. A plain `<button>` is what
-       every other in-shadow control in the library renders.
+    /* The name is on the control that is actually focused, which is the plain
+       `<button>` every other in-shadow control in the library renders. Nesting
+       a `helix-headless-icon-button` here instead puts the name on a wrapper
+       that ships no styles, so what renders is the browser's own bordered gray
+       button inside a message bar.
 
        Asserting the tag as well as the name, because the two failure modes are
        different and only one of them is visible: a name that never reaches the

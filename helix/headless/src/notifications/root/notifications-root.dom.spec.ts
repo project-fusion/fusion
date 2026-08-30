@@ -72,11 +72,11 @@ describe('the count', () => {
   })
 
   /**
-   * **The bug this replaced.** `@property({ reflect: true })` on a getter with
-   * no setter reflects once, because nothing puts a derived getter into
-   * `changedProperties` after the first update. Measured before the fix: the
-   * property answered 1 and the attribute still said 2, so a badge reading the
-   * attribute showed a count for an item the reader had just opened.
+   * `@property({ reflect: true })` on a getter with no setter reflects once,
+   * because nothing puts a derived getter into `changedProperties` after the
+   * first update: the property answers 1 while the attribute still says 2, so a
+   * badge reading the attribute shows a count for an item the reader has just
+   * opened.
    */
   test('the attribute follows too, rather than being right once', async () => {
     const element = await feed()
@@ -135,11 +135,10 @@ describe('marking everything read', () => {
   /**
    * A region nobody filled is not laid out, and the element is what says so.
    *
-   * The stylesheet asked this with `:not(:has(> slot:has(*)))` and could not:
-   * `:has()` may not be nested inside `:has()`, so the rule never parsed, and a
-   * slot's assigned nodes are not its DOM children, so the inner test was about
-   * fallback content rather than the fill. A feed with no footer drew its rule
-   * over nothing.
+   * A stylesheet cannot ask it: `:not(:has(> slot:has(*)))` never parses, since
+   * `:has()` may not be nested inside `:has()`, and a slot's assigned nodes are
+   * not its DOM children, so the inner test would be about fallback content
+   * rather than the fill.
    */
   test('an empty region is hidden, and a filled one is not', async () => {
     const element = await feed()
@@ -154,14 +153,13 @@ describe('marking everything read', () => {
   })
 
   /**
-   * The empty feed is the one state where the header is all there is, and it was
-   * the one state that lost it.
+   * The empty feed is the one state where the header is all there is.
    *
-   * `markEmpty` reads what is assigned and `assign` is what assigns it, and they
-   * ran in that order. A feed with items is saved by its own `slotchange`, which
-   * schedules a second update that asks again after the first assignment; a feed
-   * with no items schedules nothing, so the answer from before anything was
-   * assigned stood for the life of the element.
+   * `markEmpty` reads what is assigned and `assign` is what assigns it, in that
+   * order. A feed with items is saved by its own `slotchange`, which schedules a
+   * second update that asks again after the first assignment; a feed with no
+   * items schedules nothing, so an answer from before anything was assigned
+   * would stand for the life of the element.
    */
   test('a feed with a header and no items keeps its header', async () => {
     const element = await feed(`

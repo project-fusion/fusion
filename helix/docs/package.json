@@ -26,12 +26,16 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "docs": "node scripts/build-docs.mjs",
+    "peers": "bun scripts/build-peers.mjs",
     "test": "bun test src",
+    "timings": "bun scripts/build-timings.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
-    "@fusion.dev/helix-cem": "workspace:*"
+    "@fusion.dev/helix-cem": "workspace:*",
+    "@fusion.dev/scripts": "workspace:*"
   },
   "homepage": "https://fusion.dev",
   "keywords": [

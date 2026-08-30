@@ -9,14 +9,11 @@ beforeAll(async () => {
 /**
  * The readings in a path, as `[x, y]` pairs.
  *
- * **Anchor points, not every coordinate.** Four assertions here matched
- * `/[ML]x,y/`, which was every reading while the resting curve was straight and
- * is the first one alone now that it is smooth: a cubic segment carries two
- * control points before the reading it lands on, and `M` is the only command
- * left that the old pattern matches. Two of those assertions failed outright
- * and a third kept passing on a one-element array, which is the one worth
- * naming: `Math.max` of a single point is that point, so the scale assertion
- * agreed with itself about nothing.
+ * **Anchor points, not every coordinate.** A cubic segment carries two control
+ * points before the reading it lands on, so a pattern like `/[ML]x,y/` matches
+ * the first reading of a smooth curve and nothing else, and it fails silently:
+ * `Math.max` of a one-element array is that element, so a scale assertion built
+ * on it agrees with itself about nothing.
  *
  * The anchor is the last pair of whatever command drew the segment, which is
  * the same point whichever curve is in use.
@@ -175,9 +172,9 @@ describe('line chart', () => {
        the gridlines *between* the label columns, which are equal shares of the
        width. Measured in a browser before this: the first name centered at a
        twelfth of the width with its point at zero, every label off by half a
-       slot. Inset, all six centres landed on their vertices exactly.
+       slot. Inset, all six centers landed on their vertices exactly.
      *
-       Three readings, so the slots are a third each and the centres are at
+       Three readings, so the slots are a third each and the centers are at
        16.67, 50 and 83.33. */
     const host = await chart(SESSIONS, 'for="sessions"')
     const xs = anchors(d(lines(host)[0])).map(([x]) => x)
@@ -249,19 +246,14 @@ describe('line chart', () => {
     expect(part(host, 'plot')?.getAttribute('aria-hidden')).toBe('true')
   })
 
-  /* **The caption fallback is not asserted here any more, and the assertion went
-     with the behavior rather than ahead of it.** The plot carried
-     `title=${named}`, which on an element that is `aria-hidden="true"` is a
-     mouse tooltip and not an accessible name: nothing reading this page with
-     assistive technology ever heard it, and the table it was drawn from is the
-     readable form by design. The attribute was removed from every chart family
-     in one sweep and `title=${named}` now appears in no chart source at all;
-     these two specs were what the sweep left behind.
+  /* **No chart carries `title` on its plot.** On an element that is
+     `aria-hidden="true"` it is a mouse tooltip and not an accessible name, so
+     nothing reading the page with assistive technology hears it, and the table
+     it was drawn from is the readable form by design.
 
-     What the fallback itself does is still asserted, in
-     `mixin-chart-source.dom.spec.ts`: "is the table's own caption where the
-     consumer said nothing". That is the fact worth keeping, and it is kept
-     where the one implementation lives rather than in each family. */
+     What the caption fallback does is asserted in
+     `mixin-chart-source.dom.spec.ts`, where the one implementation lives rather
+     than in each family. */
 
   test('naming nothing draws nothing rather than throwing', async () => {
     const host = await chart(SESSIONS, '')

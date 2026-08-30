@@ -27,22 +27,19 @@ pub struct NeutralInks {
 /// `foreground` is solved at 1.6 times the target, `muted` at the target
 /// exactly, and `border` at a flat 1.4 against the page alone rather than
 /// against the ladder. Those are three bare lines with no comment above them,
-/// so what follows is a reading rather than a record, and is marked as one
-/// because a comment in this repository is usually the second.
+/// so what follows is a reading rather than a record.
 ///
-/// The reading: `muted` is the quietest thing that still has to be read, so it
-/// is the ink that answers to `contrastTarget`, and body text standing well
-/// clear of the floor is what leaves somewhere quieter to stand. That much is
-/// consistent with #124, which measured the readable range as holding one quiet
-/// step and not two, and is recorded in the model's `NOT_EMITTED`. `border` is
-/// neither text nor a control boundary, so no WCAG figure applies to it at all,
-/// which is presumably why 1.4 is a number rather than a citation: the three
-/// places this engine *does* cite one all say 3:1 under 1.4.11 and say so out
-/// loud.
+/// `muted` is the quietest thing that still has to be read, so it is the ink
+/// that answers to `contrastTarget`, and body text standing well clear of the
+/// floor is what leaves somewhere quieter to stand. That much is consistent
+/// with #124, which measured the readable range as holding one quiet step and
+/// not two, and is recorded in the model's `NOT_EMITTED`. `border` is neither
+/// text nor a control boundary, so no WCAG figure applies to it at all, which
+/// is presumably why 1.4 is a number rather than a citation: the three places
+/// this engine *does* cite one all say 3:1 under 1.4.11 and say so out loud.
 ///
-/// **What is worth checking before trusting any of that** is the one thing the
-/// port can check: the numbers themselves are asserted against the oracle, so a
-/// reader who disagrees with the reading can still rely on the behavior.
+/// The numbers themselves are asserted against the oracle, so a reader who
+/// disagrees with the reading can still rely on the behavior.
 ///
 /// `1.6` is not unique to `foreground`, which is a fact rather than a reading:
 /// the inverse pair uses the same multiplier, so whatever it is for, it is for

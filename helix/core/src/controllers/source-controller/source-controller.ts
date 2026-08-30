@@ -12,11 +12,8 @@ export interface SourceHost extends ReactiveControllerHost, HTMLElement {
 /**
  * Resolves the element a chart reads from, and follows it.
  *
- * **Three charts had written this out separately before it was one thing**, and
- * the drift had already started: two of them called the lookup `#table` and one
- * called it `#source`, for the same method with the same body. Every chart that
- * takes a `for` wants exactly this, and wants it to behave identically, so it is
- * a controller rather than a paragraph in each of them.
+ * Every chart that takes a `for` wants exactly this, and wants it to behave
+ * identically, so it is a controller rather than a paragraph in each of them.
  *
  * A controller and not a pure function, by the test the rules set: it reacts to
  * the host's lifecycle. It has to start watching when the host connects, stop

@@ -1,9 +1,9 @@
 //! The page's ladder: the five grounds a component actually names.
 //!
-//! **Only two of these used to be emitted**, and every component reading one of
-//! the other three kept the stock gray. A dropdown sits on `surface-overlay`, a
-//! recess on `surface-sunken`, a card that lifts on `surface-raised`, so a
-//! themed panel came out unthemed exactly where a popover opened.
+//! **All five are emitted, and a component reading one that is not keeps the
+//! stock gray.** A dropdown sits on `surface-overlay`, a recess on
+//! `surface-sunken`, a card that lifts on `surface-raised`, so emitting fewer
+//! leaves a themed panel unthemed exactly where a popover opens.
 
 use crate::derive::Cast;
 use crate::intent::{Mechanism, Scheme};
@@ -11,10 +11,8 @@ use crate::oklch::{fit_to_gamut, Oklch, GAMUT_STEPS};
 
 /// How far the ladder stands off the page, per separation mechanism.
 ///
-/// **`fill` and `space` were doing nothing before this.** Both emitted a zero
-/// edge and no lift, which made them identical to each other and left two of the
-/// four mechanisms as options a reader could pick with no effect. A mechanism
-/// nobody can see is not a choice.
+/// **`fill` and `space` both emit a zero edge and no lift**, so nothing about
+/// the edge can tell them apart, and a mechanism nobody can see is not a choice.
 ///
 /// What separates a surface, when it is neither an edge nor a lift, is how far
 /// its own color sits from the page. So the policy scales that distance: `fill`
@@ -83,14 +81,12 @@ impl Surfaces {
 
 /// Builds the ladder for a scheme.
 ///
-/// **The page is pure white and pure black, and it was neither.** `tokens.css`
-/// states the decision outright, that the page is `#ffffff` and `#000000` and is
-/// the one fixed point either mode has, and records rejecting the near-black it
-/// was briefly given to make room underneath for `sunken`. This engine shipped
-/// that rejected arrangement and worse: in light it had the page at 0.985 and
-/// `surface` at pure white, which is the two of them the wrong way round, so a
-/// themed page came out faintly gray with white cards on it where the stylesheet
-/// paints a white page with faintly gray cards.
+/// **The page is pure white and pure black.** `tokens.css` states the decision
+/// outright, that the page is `#ffffff` and `#000000` and is the one fixed point
+/// either mode has, and records rejecting the near-black that would make room
+/// underneath for `sunken`. `surface` is the faintly gray one: the two the wrong
+/// way round is a themed page coming out faintly gray with white cards on it
+/// where the stylesheet paints a white page with faintly gray cards.
 ///
 /// No cast on the page, for the reason the primitive gives: it is the one
 /// surface with nothing behind it to sit against, so the trace of brand hue that
@@ -98,10 +94,8 @@ impl Surfaces {
 /// color cast across the whole window.
 ///
 /// **Every rung is taken from the stylesheet's own ladder**, since the two are
-/// meant to agree for the brand that ships and every figure here was a little
-/// off: raised and overlay sat at 0.25 against `neutral-800`'s 0.29, and sunken
-/// at 0.11 against `neutral-950`'s 0.15. Small enough to look like rounding and
-/// large enough to be a different gray.
+/// meant to agree for the brand that ships. A rung a few hundredths off is small
+/// enough to look like rounding and large enough to be a different gray.
 ///
 /// Stated per scheme rather than stepped off `surface`, because a step has to
 /// know which way is away and the answer is not the same for all three. Raised
@@ -124,7 +118,7 @@ pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
             lightness: 1.0,
         }
     };
-    let surface_base_lightness = if dark { 0.21 } else { 0.985 };
+    let surface_base_lightness = if dark { 0.182 } else { 0.985 };
 
     /* The step away from the page, scaled by the separation policy. */
     let step =
@@ -136,7 +130,7 @@ pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
         `neutral-0`: a menu on a white page is white, which is what every desktop
         menu does. */
         raw_overlay: if dark {
-            step(0.29)
+            step(0.21)
         } else {
             Oklch {
                 chroma: 0.0,
@@ -144,7 +138,7 @@ pub fn surfaces(scheme: Scheme, neutral: Cast, rung: f64) -> Surfaces {
                 lightness: 1.0,
             }
         },
-        raw_raised: step(if dark { 0.29 } else { 0.97 }),
+        raw_raised: step(if dark { 0.21 } else { 0.97 }),
         raw_sunken: step(if dark { 0.15 } else { 0.96 }),
         /* Declared after the ladder, since `surface` is on it: it is the ground a
         card uses, so a fill-first theme has to move it too or the one surface the

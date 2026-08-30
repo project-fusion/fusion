@@ -5,7 +5,7 @@
    rather than a second page; a conversation is the case that wants both, because
    a transcript with no ceiling is one that never scrolls. */
 .fullscreen::part(dialog) {
-  --dialog-inset: var(--helix-space-none);
+  --dialog-padding: var(--helix-space-none);
   block-size: calc(100dvh - var(--helix-space-xl));
 }
 
@@ -18,7 +18,7 @@
    dialog's panel is a flex column and its default slot is `display: contents`,
    so the chat is a flex item of the panel: `flex: 1` is what makes the
    transcript the part that grows and leaves the composer against the bottom
-   edge. `--chat-max-height` is the other half, for a chat that is *not* being
+   edge. `--chat-max-block-size` is the other half, for a chat that is *not* being
    filled by its container, and setting it here instead put the composer under
    the last turn with seven hundred pixels of nothing below it. */
 .fullscreen-chat {

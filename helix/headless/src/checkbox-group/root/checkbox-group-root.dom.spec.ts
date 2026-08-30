@@ -48,21 +48,15 @@ describe('checkbox group', () => {
   })
 
   test('the shared name reaches the attribute, because that is what submits', async () => {
-    /* This asserted the opposite, that the name was pushed down as a property
-       and never written onto the markup, on the grounds that an attribute
-       written onto a box is a change a React consumer's hydration reports.
-       That reasoning is right about hydration and wrong about what it costs.
-
-       The platform builds a form's entry list from the `name` *content
+    /* The platform builds a form's entry list from the `name` *content
        attribute*. Measured against the shipped build: a checked, form-associated
        host named only by property contributed nothing at all to a `FormData`,
-       while an attribute-named one beside it did. So every box in every group
-       submitted nameless, and this spec was the reason nobody found it.
+       while an attribute-named one beside it did.
 
-       `name` reflects from `HelixFormElement` now, so setting the property is
-       what writes the attribute. The hydration cost is real and is the smaller
-       of the two: a warning in development against a form that silently drops
-       the answer in production. */
+       `name` reflects from `HelixFormElement`, so setting the property is what
+       writes the attribute. Pushing it down as a property alone spares a React
+       consumer a hydration warning and costs the answer: the smaller cost is the
+       warning. */
     const g = await group()
     expect(g.boxes.map((b) => b.name)).toEqual(['verticals', 'verticals', 'verticals'])
     expect((g.boxes[0] as HTMLElement).getAttribute('name')).toBe('verticals')
@@ -145,8 +139,8 @@ describe('checkbox group as a field', () => {
   })
 
   test('orientation lays out the boxes, not the field', async () => {
-    // On the host it laid out the label too, so a horizontal group put its own
-    // name in the row beside the first box.
+    // On the host it would lay out the label too, putting a horizontal group's
+    // own name in the row beside the first box.
     const host = await mount(
       '<helix-headless-checkbox-group label="L" orientation="horizontal"><helix-headless-checkbox value="a">A</helix-headless-checkbox></helix-headless-checkbox-group>',
     )

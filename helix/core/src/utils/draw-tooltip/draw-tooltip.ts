@@ -11,36 +11,23 @@ import type { Row } from '../read-series/read-series.js'
  * A mixin's members reach a subclass only through its declared interface, and an
  * interface cannot carry a protected one: TypeScript refuses to widen a class to
  * an interface across a protected member. Declaring it public would make a
- * render seam part of the published API and break the convention
- * `check:seams` holds, that a composed thing sits behind
- * `protected render…()`. So the markup is shared here, the way `drawIcon`
- * shares a glyph, and each chart keeps a one-line seam of its own.
- *
+ * render seam part of the published API and break the convention that a
+ * composed thing sits behind `protected render…()`. So the markup is shared
+ * here, the way `drawIcon` shares a glyph, and each chart keeps a one-line
+ * seam of its own.
  *
  * **The tooltip's tag is an argument, because this file is on the wrong tier to
- * know it.** It wrote `<helix-tooltip>` literally, which `helix/styled` registers
- * and `@fusion.dev/helix-headless` does not, so a consumer of the headless tier alone
- * got an inert unknown element where the reading should be: the chart correct,
- * the markup correct, and resting a pointer on a bar doing nothing. Nothing
- * here could catch it. `check:composed` holds a *component* to interpolating
- * its tag through `tier` and this is a free function with no class to read one
- * from, and both the sandbox frame and the docs site import the whole library,
- * so every environment a test runs in has the styled tag registered and the
- * element upgrades.
+ * know it.** A literal `<helix-tooltip>` is registered by `helix/styled` and not
+ * by `@fusion.dev/helix-headless`, so a consumer of the headless tier alone gets
+ * an inert unknown element where the reading should be. Nothing here catches it:
+ * the rule about interpolating a tag through `tier` holds a *component*, and
+ * this is a free function with no class to read one from, while the sandbox
+ * frame and the docs site both import the whole library, so every environment a
+ * test runs in has the styled tag registered.
  *
  * So the caller passes `this.tag('tooltip')` and each tier answers with its own
  * name, which is how every composed tag in the library already resolves. That
  * makes this `static-html` rather than `lit`, a tag being a `StaticValue`.
- * **It shows the table's text and not the chart's numbers.** `$128k` is what
- * the cell says and `128000` is what the drawing measured, and a tooltip
- * printing the second is the chart overruling the table about how its own
- * figure reads. Every cell of the row is here, including columns nothing was
- * plotted from, because a note or a status beside the figures is most of the
- * reason to want a tooltip at all.
- *
- * **Hidden from assistive technology, on purpose.** The table is the accessible
- * representation and the drawing is `aria-hidden`; a reader on a keyboard gets
- * the table, which they can reach, rather than a tooltip which they cannot.
  */
 /** Where a tooltip points, in the plot's own percentages, and which side it prefers. */
 export interface TooltipAt {

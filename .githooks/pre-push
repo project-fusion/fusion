@@ -4,11 +4,11 @@
 # **This is the one class CI cannot fix for you.** `verify.yml` runs everything
 # on every push, sharded, on a clean checkout, and it is better at all of it than
 # a laptop is: types, specs, browsers, Rust. What it cannot do is regenerate.
-# `docs/token-reference.md is behind helix/styles/tokens.json` is a red build that
-# stays red until somebody runs `bun run tokens` and pushes again, so catching it
+# `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a red build that
+# stays red until somebody runs `turbo run tokens` and pushes again, so catching it
 # here saves a round trip rather than duplicating a gate.
 #
-# **It judges and never writes.** `bun run check` rewrites files, and a hook that
+# **It judges and never writes.** `bun run fix` rewrites files, and a hook that
 # edits the tree during `git push` produces a push that does not contain the
 # edits, which is worse than the failure it was avoiding. So this reports and
 # names the command to run.
@@ -18,9 +18,9 @@
 # minutes is a hook people pass `--no-verify` to, which costs the checks that
 # were worth having.
 #
-# *Widened 27 Aug 2026.* A second class earns a place: a check that is fast and
-# whose failure is otherwise silent. `biome ci` was always that and was never
-# described, and `check:reachable` is the second. The bar is the one this file
+# A second class of check earns a place here: one that is fast and whose failure
+# is otherwise silent. `biome ci` was always that and was never
+# described, and `check:cli` is the second. The bar is the one this file
 # already sets, seconds rather than minutes, and the reason is the same one the
 # regeneration argument makes: the cheapest place to learn is before the push.
 #
@@ -28,9 +28,28 @@
 # runs on `bun install`. Skip once with `git push --no-verify`.
 set -e
 
+# **A runner installs this too, and none of it is a runner's job.** `prepare`
+# runs on every `bun install`, so `core.hooksPath` is set on CI as much as on a
+# laptop, and a workflow that pushes a branch gets this in front of it. On a
+# runner the checks are not merely redundant, they cannot pass: `check:cli` runs
+# the Rust binary, and a job that never builds it fails here with no useful
+# message.
+#
+# Measured 30 Aug 2026: `Visual baselines` retook every picture, committed them,
+# and died at this hook on the push, opening no pull request. `check:visual` had
+# then been red on `main` since 26 Aug for want of the baselines this workflow
+# exists to produce, and the reason was a developer aid running where the whole
+# of `verify` already runs.
+[ -n "$CI" ] && exit 0
+
+# `turbo` is a workspace binary, and `sh -c` below does not get the PATH bun
+# adds. Named once here rather than prefixed onto eleven commands.
+PATH="$PWD/node_modules/.bin:$PATH"
+export PATH
+
 printf 'pre-push: formatting and lint\n'
 bunx biome ci . >/dev/null 2>&1 || {
-  printf '\n  biome refuses this tree. Run `bun run check` and commit the result.\n\n'
+  printf '\n  biome refuses this tree. Run `bun run fix` and commit the result.\n\n'
   exit 1
 }
 
@@ -40,22 +59,29 @@ bunx biome ci . >/dev/null 2>&1 || {
 # unchanged by verifying it"* on three shards, which names nothing.
 #
 # `themed-page` was in neither for longer, and its failure is the worse shape:
-# `verify` runs `check:themed-page`, so CI went red naming the file, and `regen`
+# `verify` runs `turbo run themed-page -- --check`, so CI went red naming the file, and `regen`
 # did not write it, so the remedy this repository documents did not produce the
 # fix. A check in `verify` whose writer is not in `regen` is a red build with no
 # published way out of it.
 
 # **One check here is not about generated files, and it is worth saying why.**
-# `check:reachable` reads `:host([x])` selectors against whether `x` reflects,
-# which CI can do perfectly well and does. It is here because the fault it
-# catches is silent in every other way: the component works, the attribute is
-# correct, and a rule simply never matches for anybody who sets the property
-# instead of writing the attribute. Four had drifted before it existed, three of
-# them found by rendering pictures rather than by reading code, and the cost of
-# finding out on the far side of a push is an afternoon. It runs in about a
-# second, which is the bar anything joining this list has to clear.
-printf 'pre-push: reachable host rules\n'
-bun run check:reachable >/tmp/pre-push-$$.log 2>&1 || {
+# `check:cli` is the sixteen rules that moved into `helix` and `fusion`, and the
+# one that earned this line is `reachable`: it reads `:host([x])` selectors
+# against whether `x` reflects, which CI can do perfectly well and does. It is
+# here because the fault it catches is silent in every other way: the component
+# works, the attribute is correct, and a rule simply never matches for anybody
+# who sets the property instead of writing the attribute. Four had drifted before
+# it existed, three of them found by rendering pictures rather than by reading
+# code, and the cost of finding out on the far side of a push is an afternoon.
+#
+# **The other fifteen ride along because they are now free.** As a bun script
+# reading its own corpus, that one rule cost about a second, which was the bar
+# anything joining this list had to clear. As one Rust binary the whole set costs
+# 0.7s and the workspace set 1.0s, so the hook covers sixteen rules for less than
+# it used to spend on one. That is the argument for the port, arriving where it
+# is easiest to measure.
+printf 'pre-push: the rules that ship\n'
+bun run check:cli >/tmp/pre-push-$$.log 2>&1 || {
   printf '\n'
   grep -v '^\$' /tmp/pre-push-$$.log | tail -4 | sed 's/^/  /'
   printf '\n'
@@ -65,8 +91,24 @@ bun run check:reachable >/tmp/pre-push-$$.log 2>&1 || {
 rm -f /tmp/pre-push-$$.log
 
 printf 'pre-push: generated files\n'
-for task in reference element-events tokens-reference metrics docs samples routes content themed-page eval queue; do
-  bun run "check:$task" >/tmp/pre-push-$$.log 2>&1 || {
+# **Written out rather than assembled from a suffix.** This was a loop over
+# `gen:*` names calling `bun run "check:$task"`, and a name a shell builds at run
+# time is a name nothing can check: `fusion workspace`'s `scripts` rule reads
+# literal `bun run` calls, so when those aliases were deleted for the turbo tasks
+# they now name, every one of them still resolved here and failed on the push.
+for check in \
+  "turbo run reference -- --check" \
+  "turbo run tokens -- --check" \
+  "turbo run token-layer -- --check" \
+  "turbo run docs -- --check" \
+  "turbo run samples -- --check" \
+  "turbo run routes -- --check" \
+  "turbo run content -- --check" \
+  "turbo run themed-page -- --check" \
+  "bun run check:gen:element-events" \
+  "bun run check:gen:metrics" \
+  "bun run check:gen:eval"; do
+  sh -c "$check" >/tmp/pre-push-$$.log 2>&1 || {
     printf '\n'
     grep -v '^\$' /tmp/pre-push-$$.log | tail -3 | sed 's/^/  /'
     printf '\n'

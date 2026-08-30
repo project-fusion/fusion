@@ -5,8 +5,9 @@ import { eachComponent } from '../types.js'
  *
  * The analyzer records an event for every `dispatchEvent` call it can see. When
  * the call sits inside a generic helper, the name it records is the *parameter
- * identifier*, not an event name: `HelixElement.emit(name, detail)` yields a
- * phantom event called `name` on every element that inherits it.
+ * identifier*, not an event name: a dispatch through `emit(name, detail)` in a
+ * base class yields a phantom event called `name` on every element that
+ * inherits it. That is why `helix/core` ships no such helper.
  *
  * Helix requires every event to be declared with `@event` on the component that
  * exposes it, precisely because a dispatch inside a mixin or a base helper is

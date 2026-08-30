@@ -218,7 +218,7 @@ export class HelixHeadlessFormatDate extends HelixElement {
        ordinary reasons: built in `firstUpdated` alone this comes back
        permanently dead the first time a list is reordered. Guarded on
        `hasUpdated` because the first connection happens before there is anything
-       to watch. See `check:observers`. */
+       to watch. */
     if (this.hasUpdated) {
       this.watch()
     }

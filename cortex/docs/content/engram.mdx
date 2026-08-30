@@ -37,9 +37,9 @@ memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), None)
 
 ## Consolidation
 
-Episodes accumulate; a background pass distills them into semantic facts.
+Episodes accumulate and are distilled into semantic facts.
 `unconsolidated()` returns the episodes not yet folded into any fact, which is
-the input to that pass.
+the input to that pass. The pass itself is not built yet.
 
 [//]: # (rust:fusion-cortex-engram::Memory::unconsolidated)
 

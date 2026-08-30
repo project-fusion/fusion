@@ -54,6 +54,12 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
   /**
+   * When it was said, as anything `Date` parses.
+   */
+  @property()
+  at = ''
+
+  /**
    * Who said it.
    *
    * Free text rather than a two-value union, because a conversation is not
@@ -62,15 +68,39 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * `me` and `them` are the conventional values and the stylesheet knows them;
    * anything else is a name the consumer styles.
    */
-  /* **No initialiser, because a reflected default is an attribute.**
-     `check:reflected-defaults` permits an empty string on the stated grounds
-     that it "writes nothing", which is measurably untrue: Lit writes
-     `author=""`, and a consumer who server-renders this gets an attribute React
-     never sent. Undefined reflects nothing at all, which is what the resting
-     state should be. The stylesheet only ever selects `[author="me"]`, so
-     nothing downstream moves. */
+  /* **No initializer, because a reflected default is an attribute.** An empty
+     string does not write nothing: Lit writes `author=""`, and a consumer who
+     server-renders this gets an attribute React never sent. Undefined reflects
+     nothing at all, which is what the resting state should be. The stylesheet
+     only ever selects `[author="me"]`. */
   @property({ reflect: true })
   author?: string
+
+  /**
+   * Label for a message that did not send.
+   */
+  @property({ attribute: 'failed-label' })
+  failedLabel = 'Not sent'
+
+  /**
+   * Locale for the timestamp.
+   *
+   * Empty is the runtime's own.
+   */
+  @property()
+  locale = ''
+
+  /**
+   * Label for the control offered on a failed message.
+   */
+  @property({ attribute: 'retry-label' })
+  retryLabel = 'Try again'
+
+  /**
+   * What to call each state, for a reader who cannot see it.
+   */
+  @property({ attribute: 'sending-label' })
+  sendingLabel = 'Sending'
 
   /**
    * What has happened to it.
@@ -83,38 +113,6 @@ export class HelixHeadlessChatMessage extends HelixElement {
    */
   @property({ reflect: true })
   state?: 'failed' | 'sending' | 'sent' | 'streaming'
-
-  /**
-   * When it was said, as anything `Date` parses.
-   */
-  @property()
-  at = ''
-
-  /**
-   * Locale for the timestamp.
-   *
-   * Empty is the runtime's own.
-   */
-  @property()
-  locale = ''
-
-  /**
-   * What to call each state, for a reader who cannot see it.
-   */
-  @property({ attribute: 'sending-label' })
-  sendingLabel = 'Sending'
-
-  /**
-   * @internal
-   */
-  @property({ attribute: 'failed-label' })
-  failedLabel = 'Not sent'
-
-  /**
-   * Label for the control offered on a failed message.
-   */
-  @property({ attribute: 'retry-label' })
-  retryLabel = 'Try again'
 
   /**
    * @internal Read by the transcript to identify its children across the light
@@ -142,7 +140,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
     /* `article` rather than `listitem`, because the transcript is a `log` and a
        log's children are not list items: a turn is a self-contained thing a
        reader can be moved to, which is what an article is for.
-       
+
        `aria-busy` while it arrives is the whole of the streaming contract on
        this side: the live region above it holds its announcement until the flag
        clears, so the message is read once, whole, rather than per token. */
@@ -190,7 +188,6 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * sent, and a transcript that labels each one is a transcript of the word
    * "sent".
    */
-
   protected renderState(): TemplateResult | typeof nothing {
     if (this.state === 'sending') {
       return html`<span part="state">${this.sendingLabel}</span>`
@@ -244,13 +241,13 @@ export class HelixHeadlessChatMessage extends HelixElement {
   /**
    * The turn: who said it, what was said, what it was drawn from, and its line.
    *
-   * **`sources` and `actions` are inside the body rather than beside it**, and
-   * the second of those moved twice. `actions` was a third grid column, so a
-   * copy control on a fifteen-word turn sat at the container's trailing edge
-   * with a hundred and fifty pixels of nothing between it and the bubble it
-   * acted on, on both sides of the conversation. Moved into the body as a
-   * column of its own it was no better: a bubble spanning two auto tracks
-   * inflates both, so the controls landed under the middle of the turn.
+   * **`sources` and `actions` are inside the body rather than beside it.**
+   * `actions` as a third grid column puts a copy control on a fifteen-word turn
+   * at the container's trailing edge, a hundred and fifty pixels of nothing
+   * between it and the bubble it acts on, on both sides of the conversation. As
+   * a column of its own inside the body it is no better: a bubble spanning two
+   * auto tracks inflates both, so the controls land under the middle of the
+   * turn.
    *
    * So they are inside `meta`, which is the line under a turn rather than only
    * its timestamp, and that line is one flex row: time, state, controls, all

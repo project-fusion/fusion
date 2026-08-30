@@ -83,12 +83,15 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      # Trusted publishing needs npm 11.5.1+ on Node 22.14+, which is newer than
-      # the runner default.
+      # Trusted publishing needs npm 11.5.1+ on Node 22.14+.
       - uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
           registry-url: 'https://registry.npmjs.org'
+
+      # Node 22.20.0 ships npm 10.9.x, so the floor above is not what
+      # `setup-node` leaves behind. Same pin as `release.yml`, same reasoning.
+      - run: npm install -g npm@11.18.0
 
       - run: bun install --frozen-lockfile
 
@@ -101,7 +104,7 @@ jobs:
             level=$(gh api "repos/${{ github.repository }}/issues/$NUMBER/labels" \
               --jq ".[].name | select(startswith(\"$domain:\"))" | head -1 | cut -d: -f2)
             [ -n "$level" ] || continue
-            version=$(node tooling/scripts/version.mjs \
+            version=$(node fusion/scripts/version.mjs \
               --domain "$domain" --bump "$level" --pre "exp.$NUMBER.g$short" --write | tail -1)
             printf '%s %s\n' "$domain" "$version" >> /tmp/released
           done
@@ -117,16 +120,24 @@ jobs:
 
       - run: bun run build
 
+      # **`analyze` is on the critical path of packing, and only since the
+      # manifests stopped being tracked.** `files` names `custom-elements.json`
+      # and the three framework typings, and `build` does not produce them:
+      # turbo has `analyze` depending on `build`, not the other way round, so a
+      # build alone leaves them absent and the tarball ships without files its
+      # own manifest promises.
+      - run: bun run analyze
+
       # Against the tarballs, from outside the workspace, before anything is
       # published. A version can be deprecated but never taken back.
-      - run: bun run test:template
+      - run: bun run smoke:template
 
       - name: Publish under the pull request's own tag
         run: |
           set -euo pipefail
           [ -s /tmp/released ] || exit 0
           while read -r domain version; do
-            node tooling/scripts/publish.mjs --domain "$domain" --tag "pr-$NUMBER"
+            node fusion/scripts/publish.mjs --domain "$domain" --tag "pr-$NUMBER"
           done < /tmp/released
 
       - name: Say how to install it

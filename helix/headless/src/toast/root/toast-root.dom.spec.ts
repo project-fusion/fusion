@@ -18,17 +18,15 @@ type Item = HTMLElement & {
 /**
  * How long to wait on a 40ms clock before calling it stopped.
  *
- * **A fixed sleep of 250ms was six times the duration and still lost.** These
- * two failed on runners and nowhere else, and a margin chosen against a laptop
- * is not a margin: a loaded runner throttles timers, and the clock these assert
- * is also one hover or focus away from being held deliberately. Waiting on the
- * outcome rather than on a stopwatch costs nothing when it passes, which is
- * almost always, and stops guessing at a number that has already been wrong.
+ * **Not a fixed sleep: 250ms was six times the duration and still lost.** A
+ * loaded runner throttles timers, and the clock these assert is one hover or
+ * focus away from being held deliberately. Waiting on the outcome costs nothing
+ * when it passes, which is almost always.
  *
- * **Under the harness timeout, which 2000 was not.** `TIMEOUT` in
- * `@fusion.dev/helix-testing/browser` is 2000ms, so a poll of exactly that killed the
- * test before it could assert and printed `timed out after 2000ms` where the
- * diagnostic should have been. A budget has to leave room to report.
+ * **Under the harness timeout.** `TIMEOUT` in
+ * `@fusion.dev/helix-testing/browser` is 2000ms, so a poll of exactly that kills
+ * the test before it can assert and prints `timed out after 2000ms` where the
+ * diagnostic should be. A budget has to leave room to report.
  */
 const LATEST = 1200
 
@@ -44,12 +42,12 @@ const closes = async (found: Item): Promise<void> => {
 /**
  * The state, compared as a string so the failure carries it.
  *
- * **`expect(value, message)` drops the message under bun**, which cost a CI
- * round trip that reported `expected true to be false` and nothing else. What
- * is needed is whether the clock was stopped on purpose: a timer that did not
- * fire and a timer that was deliberately held are different faults, and the
- * pause on hover and focus is exactly what makes the second one possible.
- * Folding it into the compared value is the only form bun prints.
+ * **`expect(value, message)` drops the message under bun**, leaving
+ * `expected true to be false` and nothing else. What is needed is whether the
+ * clock was stopped on purpose: a timer that did not fire and a timer that was
+ * deliberately held are different faults, and the pause on hover and focus is
+ * what makes the second one possible. Folding it into the compared value is the
+ * only form bun prints.
  */
 const state = (found: Item): string =>
   `open=${found.open} paused=${found.hasAttribute('data-paused')}`
@@ -97,10 +95,10 @@ describe('toast item', () => {
   }
 
   test('it goes when asked, and takes itself out of no list at all', async () => {
-    /* Two halves, and they used to be one. The message hides itself, which is
-       what every other stateful thing here does when nothing has claimed it,
-       and it stays in the DOM, because the consumer owns the list and a node
-       removed under a framework would be put straight back. */
+    /* Two halves. The message hides itself, which is what every other stateful
+       thing here does when nothing has claimed it, and it stays in the DOM,
+       because the consumer owns the list and a node removed under a framework
+       would be put straight back. */
     const found = await item('dismissible')
     let seen = ''
     found.addEventListener('helix-dismiss', (event) => {
@@ -117,10 +115,9 @@ describe('toast item', () => {
   })
 
   test('a declared `open` is a seed, and dismissing closes it', async () => {
-    /* This component was once the exception, waiting to be told in every case,
-       so `duration` did nothing without consumer script. Then only a consumer
-       who declared `open` got that. Now nobody does: the element dismisses
-       itself and a consumer who wants the decision refuses it. See 294. */
+    /* The element dismisses itself, and a consumer who wants the decision
+       refuses it. Declaring `open` is a seed and not a claim of ownership, so
+       it does not turn that off. */
     const found = await item('dismissible open')
     let asked = false
     found.addEventListener('helix-dismiss', () => {

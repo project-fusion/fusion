@@ -24,11 +24,11 @@
      every row. Rows are `display: contents` so their cells land here. */
   /* The consumer's hook first, then what the columns worked out.
    *
-   * `--table-columns` is published as a CSS property and was also what the
-   * component wrote inline on the very element that reads it, and an inline
-   * declaration beats any stylesheet: a consumer setting the documented hook
-   * was overruled by the component every render. The derived track list has its
-   * own private name now, and the public one wins where it is set. */
+   * `--table-columns` is the published hook and the component must never write
+   * it inline on the element that reads it: an inline declaration beats any
+   * stylesheet, so a consumer setting the documented name would be overruled
+   * every render. The derived track list carries its own private name, and the
+   * public one wins where it is set. */
   grid-template-columns: var(--table-columns, var(--table-template, minmax(0, 1fr)));
   inline-size: 100%;
 }
@@ -70,7 +70,7 @@
 /* Print: zebra striping is a fill printers drop unevenly, which is worse than none.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     background-color: transparent;

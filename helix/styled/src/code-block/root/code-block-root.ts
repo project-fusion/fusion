@@ -18,10 +18,10 @@ import '../../copy-button/index.js'
  * @documentation https://helix.fusion.dev/components/code-block
  *
  * @cssproperty --code-block-backdrop - A filter over what shows through the block and its header, for a translucent ground.
- * @cssproperty --code-block-background - The ground behind the code, for a block that is not on the page.
+ * @cssproperty --code-block-background-color - The ground behind the code, for a block that is not on the page.
  * @cssproperty --code-block-border-color - The line around the block and its header.
- * @cssproperty --code-block-header-background - The ground behind the name, where it should not be `surface-raised`.
- * @cssproperty --code-block-radii - The corner on the header's top and the block's bottom, which are one shape.
+ * @cssproperty --code-block-header-background-color - The ground behind the name, where it should not be `surface-raised`.
+ * @cssproperty --code-block-radius - The corner on the header's top and the block's bottom, which are one shape.
  */
 @customElement('helix-code-block')
 export class HelixCodeBlock extends HelixHeadlessCodeBlock {

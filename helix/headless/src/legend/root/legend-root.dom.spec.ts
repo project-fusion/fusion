@@ -63,10 +63,10 @@ describe('chart legend', () => {
 
   test('the entries carry a palette index, which starts over after twenty-four', async () => {
     /* The palette is eight hues in three tones, so a legend past eight repeats
-       a hue in a different tone rather than repeating a color. This pinned
-       eight until the tokens went to twenty-four, at which point a chart of
-       twelve painted series nine and its legend painted series one: the two
-       disagreeing is the one thing the legend exists to prevent. */
+       a hue in a different tone rather than repeating a color. The wrap has to
+       match the token count: pinned at eight while the tokens hold twenty-four,
+       a chart of twelve paints series nine and its legend paints series one,
+       and the two disagreeing is the one thing the legend exists to prevent. */
     const names = Array.from({ length: 26 }, (_, index) => `S${index + 1}`)
     const wide = `<table id="wide"><thead><tr>${['x', ...names]
       .map((header) => `<th>${header}</th>`)
@@ -100,9 +100,9 @@ describe('chart legend', () => {
        read. */
     const host = await legend(TRAFFIC, 'for="traffic"')
     /* Built rather than parsed. `insertAdjacentHTML` is the shorter way to
-       write this and happy-dom drops a `<th>` handed to it on a `<tr>`, so the
-       first version of this test added nothing and then reported the component
-       for not noticing. */
+       write this and happy-dom drops a `<th>` handed to it on a `<tr>`, so a
+       test written that way adds nothing and then reports the component for not
+       noticing. */
     const header = document.createElement('th')
     header.textContent = 'Email'
     document.querySelector('#traffic thead tr')?.append(header)

@@ -59,7 +59,7 @@ const VIEW: Box = { bottom: 100, left: 0, right: 200, top: 0 }
 describe('an item already in view', () => {
   /* A scroll of zero still fires a `scroll` event and still cancels a smooth
      one already running, so the early return is behavior rather than an
-     optimisation. It is also the difference from `block: 'nearest'`, which
+     optimization. It is also the difference from `block: 'nearest'`, which
      nudges on every keypress and makes a long list feel like it is fighting
      the reader. */
   test('is not scrolled to, at all', () => {
@@ -124,12 +124,11 @@ describe('an item past an edge', () => {
 })
 
 describe('which box gets scrolled', () => {
-  /* This was `item.offsetParent`, which is the nearest *positioned* ancestor
-     and has nothing to do with overflow. The two coincide often enough to look
-     right, and come apart exactly where it matters: anything `position:
-     relative` in between was scrolled instead, which does not scroll, and
-     nothing was reported. `Tree` passes no scroller, so it had this on every
-     keypress. */
+  /* Never `offsetParent`, which is the nearest *positioned* ancestor and has
+     nothing to do with overflow. The two coincide often enough to look right
+     and come apart exactly where it matters: anything `position: relative` in
+     between would be scrolled instead, which does not scroll, and nothing would
+     be reported. */
   test('is the nearest ancestor that scrolls, not the nearest positioned one', () => {
     document.body.innerHTML =
       '<div id="outer" style="overflow-y:auto"><div id="between" style="position:relative"><span id="item"></span></div></div>'

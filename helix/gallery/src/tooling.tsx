@@ -4,10 +4,8 @@ import type { CSSProperties, ReactNode } from 'react'
  * Gallery art for the families that come from `@fusion.dev/helix-sandbox`.
  *
  * Their own file because the package is their own: the sandbox is deliberately
- * not the component library, and a reader who notices that `editor` and
- * `sandbox` sit apart here has noticed something true. Nobody reskins a dev
- * tool, so these two are also the only families with no headless tier to be
- * abstract about.
+ * not the component library. Nobody reskins a dev tool, so these two are also
+ * the only families with no headless tier to be abstract about.
  *
  * The system is documented at the top of `core.tsx`.
  */
@@ -71,9 +69,8 @@ export const toolingArt: Record<string, ReactNode> = {
       <rect className="artRule" height="120" width="1" x="160" y="40" />
       <rect className="artPage" height="120" width="111" x="161" y="40" />
       {/* Centered in the preview pane, not flush to its right edge. The pane
-          runs 161 to 272, so a control 80 wide sits at 176: it was at 192,
-          which put it hard against the frame and read as clipped rather than
-          as rendered. */}
+          runs 161 to 272, so a control 80 wide sits at 176. Hard against the
+          frame it reads as clipped rather than as rendered. */}
       <g className="artMotion artLift">
         <g className="artLiftShadow" filter="url(#helixArtShadow)">
           <rect className="artSolid" height="40" rx="4" width="80" x="176" y="80" />

@@ -15,12 +15,10 @@ import { property, state } from 'lit/decorators.js'
  * @summary A score out of a few marks, given or shown.
  *
  * @description
- * **Half marks decide the shape, so they are decided first.** Supporting them
- * means the value is not an integer and the targets are not the marks: five
- * stars at a half step is ten places to press, and a mark that is filled to the
- * middle. Everything else follows from that, which is why `step` is here rather
- * than added later, when the pointer handling would have to be rewritten around
- * it.
+ * **Half marks decide the shape.** Supporting them means the value is not an
+ * integer and the targets are not the marks: five stars at a half step is ten
+ * places to press, and a mark that is filled to the middle. The pointer handling
+ * and `step` are both built around that rather than added over it.
  *
  * **A partial mark is the whole mark, clipped.** Not a second glyph filled to
  * the middle: that needs a matching pair drawn for every mark anybody uses, and
@@ -28,7 +26,7 @@ import { property, state } from 'lit/decorators.js'
  * fill is the same marks over the same marks, cut off partway, so any mark works
  * and any fraction does.
  *
- * **Read-only is not this control greyed out, it is a different thing.** The
+ * **Read-only is not this control grayed out, it is a different thing.** The
  * commoner use is showing a score nobody is being asked for, a product's
  * average, and that is not a control at all: it takes no focus, answers no keys,
  * has no options to choose between, and reads as one thing rather than as five.
@@ -81,15 +79,13 @@ import { property, state } from 'lit/decorators.js'
 @customElement('helix-headless-rating')
 export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFormElement)) {
   /*
-   * Discrete, which is the default and is said here only because it was wrong.
-   *
-   * `Input`, `Slider`, `NumberInput`, `Textarea` and `PinInput` all announce
-   * input, and every one of them is edited continuously: a value passes through
-   * every keystroke or pixel on its way to the one meant. A rating does not. A
-   * press picks a score, an arrow picks the next one, and the drag deliberately
-   * asks for nothing until it is let go, so there is exactly one value and it
-   * is the chosen one. That is `helix-before-change`, the same as the radio group this
-   * announces itself as.
+   * Discrete. `Input`, `Slider`, `NumberInput`, `Textarea` and `PinInput` all
+   * announce input, and every one of them is edited continuously: a value passes
+   * through every keystroke or pixel on its way to the one meant. A rating does
+   * not. A press picks a score, an arrow picks the next one, and the drag
+   * deliberately asks for nothing until it is let go, so there is exactly one
+   * value and it is the chosen one. That is `helix-before-change`, the same as
+   * the radio group this announces itself as.
    */
   protected override readonly announcesInput = false
 
@@ -111,15 +107,6 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   min = 0
 
   /**
-   * The smallest part of a mark that can be chosen.
-   *
-   * `0.5` is the half star, and it is the reason the value is a number rather
-   * than an index: with halves, five marks are ten answers.
-   */
-  @property({ type: Number })
-  step = 1
-
-  /**
    * Whether this shows a score rather than asks for one.
    *
    * A readout is not a control that has been switched off. It takes no focus,
@@ -127,17 +114,6 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
-
-  /**
-   * How the score is read out, where "3.5 out of 5" is not what it should say.
-   *
-   * A rating out of five is one of the few places a screen reader gets a worse
-   * answer from the value than from a sentence: "3.5" alone is a number without
-   * a subject. This names the readout, where a control is named by its `label`
-   * and each of its options by the score that option is.
-   */
-  @property({ attribute: 'value-text' })
-  valueText = ''
 
   /**
    * Whether the score is written out beside the marks.
@@ -153,6 +129,26 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
+
+  /**
+   * The smallest part of a mark that can be chosen.
+   *
+   * `0.5` is the half star, and it is the reason the value is a number rather
+   * than an index: with halves, five marks are ten answers.
+   */
+  @property({ type: Number })
+  step = 1
+
+  /**
+   * How the score is read out, where "3.5 out of 5" is not what it should say.
+   *
+   * A rating out of five is one of the few places a screen reader gets a worse
+   * answer from the value than from a sentence: "3.5" alone is a number without
+   * a subject. This names the readout, where a control is named by its `label`
+   * and each of its options by the score that option is.
+   */
+  @property({ attribute: 'value-text' })
+  valueText = ''
 
   /**
    * The shape a consumer slotted, if they slotted one.
@@ -308,7 +304,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     try {
       ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
     } catch {
-      /* A synthesised pointer has no capture to take, and the drag works
+      /* A synthesized pointer has no capture to take, and the drag works
          without it right up until the pointer leaves the row. Worth having the
          gesture testable rather than making the specs drive a real device. */
     }
@@ -351,13 +347,10 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   /**
    * Reports the value, and whether the form may go without one.
    *
-   * **`required` was on the API page and did nothing.** The mixin brings it,
-   * so it printed on the reference page and read as supported, and nothing here
-   * ever called `setValidity`: a form holding an unrated required rating
-   * submitted, measured, with `:valid` true and the entry present but empty.
-   * This is the case `min` argues for in its own note, that "no rating" and
-   * "the worst rating" are different answers and a survey that requires one
-   * says so with `required`.
+   * **`required` arrives from the mixin, so it prints on the reference page
+   * whether or not anything here enforces it.** Without a `setValidity` call a
+   * form holding an unrated required rating submits, `:valid` true and the
+   * entry present but empty. `reportRequired` is what makes the property real.
    *
    * **Empty is `value === ''` rather than a score of zero**, because zero is a
    * rating a reader can deliberately give when `min` allows it, and refusing to
@@ -403,7 +396,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`, and the fifteen controls that already did this.
+    // `ColorInput.updated`.
     this.sync()
   }
 
@@ -425,9 +418,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
        rather than a count of the filled ones.
      
        Written out twice rather than through one helper taking the part name:
-       `check:selectors` reads the literals to know what this renders, and a
-       `part=${name}` binding is invisible to it. It called the stylesheet's
-       `[part="track"]` and `[part="fill"]` dead. */
+       a part is read from the source as a literal, and a `part=${name}`
+       binding is invisible. The stylesheet's `[part="track"]` and
+       `[part="fill"]` read as dead. */
     const marksIn = (layer: string): unknown =>
       Array.from({ length: count }, (_, index) => mark(layer, index))
 

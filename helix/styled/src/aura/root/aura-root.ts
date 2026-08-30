@@ -96,33 +96,10 @@ export class HelixAura extends HelixElement {
   static override styles: CSSResultGroup = [styles]
 
   /**
-   * Which form the light takes. Absent is `braid`.
-   *
-   * Reflected because the fallback gradient selects on it, and given no default
-   * for the same reason every axis here has none: a default on a reflected
-   * property writes the attribute onto every host anybody renders.
-   *
-   * **`variant` and not `shape`, which it was until 26 Aug 2026.** `shape` is
-   * an axis about geometry, `circle` against `square`, `arc` against `ring`,
-   * and it is registered as one now. Aurora, braid and caustics are not
-   * geometries; they are eleven names for a look, which is what `variant` is
-   * for by the rule the registry already states. Renamed rather than
-   * grandfathered because nothing is published yet: there is no `helix-v` tag,
-   * so this costs an edit today and a deprecation later. See 236.
+   * How soft the falloff is, `0` tight and `1` diffuse.
    */
-  @property({ reflect: true })
-  variant?:
-    | 'aurora'
-    | 'braid'
-    | 'caustics'
-    | 'flow'
-    | 'fracture'
-    | 'lattice'
-    | 'particles'
-    | 'rays'
-    | 'streaks'
-    | 'threads'
-    | 'waves'
+  @property({ type: Number })
+  bloom = 0.5
 
   /**
    * How far the settings wander on their own, `0` still and `1` restless.
@@ -142,13 +119,19 @@ export class HelixAura extends HelixElement {
   drift = 0
 
   /**
+   * Overall brightness, as a multiplier on the field.
+   */
+  @property({ type: Number })
+  gain = 1
+
+  /**
    * What the pointer does, where the shape's own answer is not wanted.
    *
    * Absent is `native`, which is each shape answering in the terms it is made
    * of: braid leans, rays are occluded, threads pinch, particles scatter. The
    * named options are generic, and are a deliberate step down in meaning. A
    * response made of the same material as the shape says something about that
-   * shape; a lamp following the cursor says the same nothing on all nine.
+   * shape; a lamp following the cursor says the same nothing on every one.
    *
    * They exist because a consumer may want the quieter, more conventional
    * answer, and because `none` is a real requirement. Not because any of them
@@ -156,16 +139,6 @@ export class HelixAura extends HelixElement {
    */
   @property()
   interaction?: 'light' | 'none' | 'ripple' | 'shadow'
-
-  /**
-   * How far the pointer reaches into the field, `0` upward.
-   *
-   * Multiplied into the presence the pointer already fades in and out with, so
-   * it scales the whole response rather than any one part of it, whichever
-   * interaction is in play.
-   */
-  @property({ type: Number })
-  reach = 1
 
   /**
    * Whether the pointer shifts and lifts the field.
@@ -179,16 +152,14 @@ export class HelixAura extends HelixElement {
   interactive = false
 
   /**
-   * How soft the falloff is, `0` tight and `1` diffuse.
+   * How far the pointer reaches into the field, `0` upward.
+   *
+   * Multiplied into the presence the pointer already fades in and out with, so
+   * it scales the whole response rather than any one part of it, whichever
+   * interaction is in play.
    */
   @property({ type: Number })
-  bloom = 0.5
-
-  /**
-   * Overall brightness, as a multiplier on the field.
-   */
-  @property({ type: Number })
-  gain = 1
+  reach = 1
 
   /**
    * Feature size, as a multiplier on the sampled coordinates.
@@ -201,12 +172,6 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Number })
   speed = 1
-
-  /**
-   * The field's rotation, in degrees.
-   */
-  @property({ type: Number })
-  tilt = 14
 
   /**
    * Where the axis crosses the top edge, as a fraction of the width.
@@ -225,14 +190,6 @@ export class HelixAura extends HelixElement {
    * the angle really is the point, which is what an aura in a square tile
    * wants.
    *
-   * **The fraction is measured across the whole width, and for a while it was
-   * not.** The first expression corrected for the aspect once in the wrong
-   * direction and never subtracted the center, so the value read as an offset
-   * from the middle that also moved with the box: on a 1440 by 1800 hero `0.5`
-   * put the axis at 81.3% of the width and `0` was the only value that reached
-   * the middle. The contract above is now solved against what the shader draws
-   * rather than asserted beside it.
-   *
    * Derived from the box the resize observer already keeps, so it costs no
    * layout read per frame, and the drift is applied to the result rather than
    * to the angle behind it: the field still wanders, around a bearing that
@@ -240,6 +197,12 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Number })
   terminus?: number
+
+  /**
+   * The field's rotation, in degrees.
+   */
+  @property({ type: Number })
+  tilt = 14
 
   /**
    * How much the members of a population differ from one another, `0` a set
@@ -258,6 +221,33 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Number })
   variance = 1
+
+  /**
+   * Which form the light takes. Absent is `braid`.
+   *
+   * Reflected because the fallback gradient selects on it, and given no default
+   * for the same reason every axis here has none: a default on a reflected
+   * property writes the attribute onto every host anybody renders.
+   *
+   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
+   * against `square`, `arc` against `ring`, and it is registered as one.
+   * Aurora, braid and caustics are not geometries; they are eleven names for a
+   * look, which is what `variant` is for by the rule the registry already
+   * states.
+   */
+  @property({ reflect: true })
+  variant?:
+    | 'aurora'
+    | 'braid'
+    | 'caustics'
+    | 'flow'
+    | 'fracture'
+    | 'lattice'
+    | 'particles'
+    | 'rays'
+    | 'streaks'
+    | 'threads'
+    | 'waves'
 
   /** Repaints when the palette moves, which no re-render would do on its own. */
   private readonly tokens = new TokenColorController(this, () => {
@@ -335,9 +325,12 @@ export class HelixAura extends HelixElement {
    */
   private readonly head = { x: 1, y: 1 }
 
-  /** Where the pointer is, and where the field has got to. The gap is weight. */
-  /* `presence`, not `reach`: the eased value is how far the pointer has faded
-     in, and `reach` is now the consumer's amplitude. The two multiply. */
+  /**
+   * Where the pointer is, and where the field has got to. The gap is weight.
+   *
+   * `presence`, not `reach`: the eased value is how far the pointer has faded
+   * in, and `reach` is the consumer's amplitude. The two multiply.
+   */
   private readonly target = { presence: 0, x: 0, y: 0 }
   private readonly eased = { presence: 0, x: 0, y: 0 }
 
@@ -347,12 +340,12 @@ export class HelixAura extends HelixElement {
   /**
    * The element's box, cached.
    *
-   * **Read per event, this was the ragged half.** `getBoundingClientRect` forces
-   * a synchronous layout, and a pointer emits events far faster than the
-   * display refreshes: a 1000Hz mouse flushed layout a thousand times a second
-   * to compute a number that only changes when the page reflows. Refreshed from
-   * the resize observer and from scroll, both of which are exactly when it can
-   * go stale, and never from the handler that reads it.
+   * **Never read per event.** `getBoundingClientRect` forces a synchronous
+   * layout, and a pointer emits events far faster than the display refreshes: a
+   * 1000Hz mouse flushed layout a thousand times a second to compute a number
+   * that only changes when the page reflows. Refreshed from the resize observer
+   * and from scroll, both of which are exactly when it can go stale, and never
+   * from the handler that reads it.
    */
   private box = { height: 1, left: 0, top: 0, width: 1 }
 
@@ -371,9 +364,8 @@ export class HelixAura extends HelixElement {
    * scales: it opens coarse and tightens, which reads as the background zooming
    * out on load rather than as a background.
    *
-   * Refusing the degenerate 0 by 0 box fixed the worst of it, a 2 by 2 drawing
-   * buffer smeared over the page, and left the ordinary case: a first real box
-   * that is simply not the last one.
+   * Refusing the degenerate 0 by 0 box leaves the ordinary case: a first real
+   * box that is simply not the last one.
    *
    * So the opening frame waits for the box to stop moving. Nothing paints until
    * a measurement has stood unchanged for one animation frame, which is the
@@ -409,16 +401,15 @@ export class HelixAura extends HelixElement {
 
   /* Everything the canvas needs, in one place both lifecycles can reach.
    *
-   * This was the body of `firstUpdated`, which runs once for the life of the
-   * element, while `disconnectedCallback` deletes the program, drops the
-   * context and disconnects both observers, and runs every time the element
-   * moves. So an aura reordered by a framework came back with `this.gl` null
-   * and nothing to rebuild it: a live component painting nothing, for the rest
-   * of the page's life, with no error anywhere.
+   * `firstUpdated` runs once for the life of the element, while
+   * `disconnectedCallback` deletes the program, drops the context and
+   * disconnects both observers, and runs every time the element moves. Setup
+   * that lives only in `firstUpdated` therefore leaves an aura reordered by a
+   * framework with `this.gl` null and nothing to rebuild it: a live component
+   * painting nothing, for the rest of the page's life, with no error anywhere.
    *
    * Guarded at the call site on `hasUpdated`, because the first connection
-   * happens before the first render and there is no canvas yet.
-   * `check:observers` holds the pairing. */
+   * happens before the first render and there is no canvas yet. */
   private start(): void {
     /* Client only, and by contract. There is no canvas on a server, so the
        shader is an enhancement over markup that already renders a gradient. */
@@ -451,7 +442,7 @@ export class HelixAura extends HelixElement {
     window.addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
 
     this.sized = new ResizeObserver(() => {
-      /* **A resize repaints unconditionally, where a resize used to ask.**
+      /* **A resize repaints unconditionally rather than asking.**
          `measure` clears the drawing buffer whenever it resizes it, because
          assigning `canvas.width` is a reset and not a hint. `paintOnce` declines
          while the loop holds a frame handle, which is right for a property
@@ -481,17 +472,16 @@ export class HelixAura extends HelixElement {
   /**
    * The context and the program, from whatever canvas can still give one.
    *
-   * **A canvas whose context was force-lost never yields a working one again**,
-   * and the release below used to assume the opposite: `getContext` hands back
-   * the very same dead object, which reports `isContextLost()` and answers
-   * `null` to every `getShaderParameter`. So `link` failed, `start` returned
-   * before installing a single observer, and the element sat connected and
-   * permanently blind, holding whatever buffer it last painted. Measured on the
-   * landing page, where one remove-and-reinsert was enough: the frozen frame
-   * was the 2x2 the first `measure` took before layout, stretched across two
-   * screens as a gray smear that reads as a broken gradient rather than as a
-   * dead component. The only sound in the console was `getShaderInfoLog`
-   * answering `null`, twice per element.
+   * **A canvas whose context was force-lost never yields a working one again.**
+   * `getContext` hands back the very same dead object, which reports
+   * `isContextLost()` and answers `null` to every `getShaderParameter`, so
+   * `link` fails, `start` returns before installing a single observer, and the
+   * element sits connected and permanently blind, holding whatever buffer it
+   * last painted. Measured on the landing page, where one remove-and-reinsert
+   * was enough: the frozen frame was the 2x2 the first `measure` took before
+   * layout, stretched across two screens as a gray smear that reads as a broken
+   * gradient rather than as a dead component. The only sound in the console was
+   * `getShaderInfoLog` answering `null`, twice per element.
    *
    * A spent canvas is therefore replaced rather than re-asked. `restoreContext`
    * is the other way and is not reachable from here: it needs the `webglcontextlost`
@@ -898,12 +888,10 @@ export class HelixAura extends HelixElement {
    * `/helix/aura`, where it is a toggle a reader chose. So the cap applies where
    * nothing is being followed and lifts where something is.
    *
-   * **Measured before it was capped, because the cost had changed.** 252 was
-   * filed against one field on the first two screens. It is three now, one per
-   * transparent run of the page, and with the frame limiter off they drew 2,654
-   * times in three seconds against 1,276 for one: the work scales with the count
-   * because each instance draws once per callback. Capping the two that nobody
-   * points at is most of that back.
+   * **The cost scales with the count.** Three fields run on the landing page,
+   * one per transparent run, and with the frame limiter off they drew 2,654
+   * times in three seconds against 1,276 for one: each instance draws once per
+   * callback. Capping the two that nobody points at is most of that back.
    */
   private static readonly CAPPED = 1000 / 30
 
@@ -928,36 +916,32 @@ export class HelixAura extends HelixElement {
        must never do. */
     this.elapsed += delta * Math.max(0, this.drifted(this.speed, 0.4, 0.043))
 
-    /* Two time constants, because position and presence are two different
-       jobs and one number was serving both badly.
-       
+    /* Two time constants, because position and presence are two different jobs
+       and one number serves both badly.
+
        **Position tracks.** A parallax that lags is not weighty, it is late: at
        85 milliseconds it took about two tenths of a second to close nine tenths
        of the gap, which is well inside what a reader perceives as the page
-       being slow rather than the field being heavy. 28 milliseconds puts it at
-       the edge of perception while still absorbing the jitter a raw pointer
-       carries, which is the only thing the easing was ever for.
-       
+       being slow rather than the field being heavy.
+
        **Presence does not.** `reach` is the effect fading in as the pointer
        arrives and out as it leaves, and that wants to be gradual: snapped on,
        the whole field flinches the instant a cursor crosses the edge.
-       
+
+       **The position constant scales with the gap, because one constant cannot
+       do both jobs.** A fixed 28 milliseconds leaves a moving pointer a
+       distance v * t behind it for as long as it keeps moving: about 56 pixels
+       at a 2000 pixel per second flick and twice that at twice the speed, which
+       is what reads as the field being unable to keep up. Lowering it for
+       everyone would give the jitter of a resting hand straight back to the
+       shader, which is the only thing the smoothing was ever there for. Jitter
+       is small and a flick is large, so the size of the gap is the signal that
+       tells them apart: at rest this eases over about 25 milliseconds, a gap of
+       one shape unit closes over nine, and two over five.
+
        Frame-rate independent, written as a time constant rather than a
        per-frame factor: a factor ties the feel to the refresh rate, so a 120Hz
        display would chase twice as eagerly as a 60Hz one. */
-    /* **The constant scales with the gap, because one constant cannot do both
-       jobs.** A fixed 28 milliseconds leaves a moving pointer a distance v * t
-       behind it for as long as it keeps moving: about 56 pixels at a 2000
-       pixel per second flick and twice that at twice the speed, which is what
-       reads as the field being unable to keep up. Lowering it for everyone
-       would give the jitter of a resting hand straight back to the shader,
-       which is the only thing the smoothing was ever there for.
-    
-       Jitter is small and a flick is large, so the size of the gap is the
-       signal that tells them apart. At rest this still eases over about 25
-       milliseconds; a gap of one shape unit closes over nine, and two over
-       five. Nothing to tune per shape and nothing to measure per frame beyond
-       a distance already implied by the two points. */
     const drift = Math.hypot(this.target.x - this.eased.x, this.target.y - this.eased.y)
     const follow = 1 - Math.exp(-delta / (0.028 / (1 + drift * 2.4)))
     if (!this.interactive) {
@@ -1007,13 +991,6 @@ export class HelixAura extends HelixElement {
     this.last = 0
   }
 
-  /*
-   * One axis, wandering around its set value.
-   *
-   * Two sines at an irrational ratio rather than one, so a single axis has no
-   * period of its own either. Bounded by construction: the weights sum to one,
-   * so the value never leaves `base` plus or minus `span`.
-   */
   /**
    * The angle actually drawn, which is `terminus` resolved against the box.
    *
@@ -1021,12 +998,9 @@ export class HelixAura extends HelixElement {
    * business knowing when: it is read once per frame from numbers already
    * there.
    *
-   * The solve is `tiltFor` in `aura-axis.ts` rather than an expression here,
-   * and that is the fix for how this went wrong twice. Both times the
-   * arithmetic sat inside this getter next to a sentence describing different
-   * arithmetic, and nothing in the repository could tell they disagreed. It is
-   * callable now, and `aura-root.dom.spec.ts` runs it against a model of the
-   * shader in both directions. See 155.
+   * The solve is `tiltFor` in `aura-axis.ts` rather than an expression here, so
+   * it is callable and `aura-root.dom.spec.ts` runs it against a model of the
+   * shader in both directions.
    */
   private get bearing(): number {
     if (this.terminus === undefined) {
@@ -1036,6 +1010,13 @@ export class HelixAura extends HelixElement {
     return tiltFor(this.terminus, width / Math.max(height, 1))
   }
 
+  /*
+   * One axis, wandering around its set value.
+   *
+   * Two sines at an irrational ratio rather than one, so a single axis has no
+   * period of its own either. Bounded by construction: the weights sum to one,
+   * so the value never leaves `base` plus or minus `span`.
+   */
   private drifted(base: number, span: number, seed: number): number {
     if (!this.drift) {
       return base
@@ -1070,19 +1051,19 @@ export class HelixAura extends HelixElement {
   /**
    * Keeps the head of the wake on the cursor, and commits it as it travels.
    *
-   * **The head used to be a committed mark, and that was both faults at once.**
-   * Marks are spaced by distance so eight slots cover a gesture rather than the
-   * last few milliseconds of one, but committing was also the only time the
-   * stroke grew: its leading end therefore sat up to a full gate behind the
-   * pointer, and caught up in jumps of exactly that size. Latent, and jagged,
-   * for one reason.
+   * **The head is provisional, never a committed mark**, and holding it in the
+   * ring is two faults at once. Marks are spaced by distance so eight slots
+   * cover a gesture rather than the last few milliseconds of one, but if
+   * committing is also the only time the stroke grows, its leading end sits up
+   * to a full gate behind the pointer and catches up in jumps of exactly that
+   * size. Latent, and jagged, for one reason.
    *
-   * So the slot at `trailNext` is provisional. It is rewritten every frame to
-   * wherever the field has actually eased to, which is where the cursor looks
-   * like it is, so the stroke always reaches the pointer. Crossing the gate does
-   * not move the head, it just stops the previous position from being
-   * overwritten, and a new provisional head starts from there. The wake grows
-   * continuously and is still only ever eight points.
+   * So the slot at `trailNext` is rewritten every frame to wherever the field
+   * has actually eased to, which is where the cursor looks like it is, so the
+   * stroke always reaches the pointer. Crossing the gate does not move the head,
+   * it just stops the previous position from being overwritten, and a new
+   * provisional head starts from there. The wake grows continuously and is still
+   * only ever eight points.
    *
    * Measured against `eased` rather than `target`, or the stroke would reach a
    * place the field has not arrived at yet and lead its own parallax.
@@ -1107,9 +1088,9 @@ export class HelixAura extends HelixElement {
     this.trail[at + 2] = 0
     this.trailNext = (this.trailNext + 1) % 8
 
-    /* Every other mark ages a slot's worth on each commit, on top of ageing
+    /* Every other mark ages a slot's worth on each commit, on top of aging
        with time.
-       
+
        Time alone is not enough, because what has to be spent by the moment the
        ring reuses a slot is a function of *distance traveled*, not of seconds:
        marks commit every gate length, so a brisk gesture laps the ring long

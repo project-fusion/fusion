@@ -3,11 +3,11 @@ import './element-events.generated.js'
 /**
  * Everything core exports, forwarded whole.
  *
- * Named individually before, and the list drifted every time a component used
- * something new: a value-change event, a placement type, a close event. Each
- * one compiled here and broke in the generated React package, which imports
- * the type a public property is declared with. Forwarding the module has
- * nothing to keep in step.
+ * Not a named list. The generated React package imports the type each public
+ * property is declared with, so anything a component newly reaches for (a
+ * value-change event, a placement type, a close event) compiles here and breaks
+ * there the moment the list misses it. Forwarding the module has nothing to
+ * keep in step.
  */
 
 export * from '@fusion.dev/helix-core'

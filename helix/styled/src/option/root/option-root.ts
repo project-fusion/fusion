@@ -19,9 +19,9 @@ import { styles } from './option-root.css.js'
  * @documentation https://helix.fusion.dev/components/option
  *
  * @cssproperty --option-active-color - Wash behind the option the keyboard is on.
- * @cssproperty --option-block-inset - Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list.
- * @cssproperty --option-inset - Space before the label, shared with a group heading.
- * @cssproperty --option-radii - Corner radius of the row. A listbox and a select flatten it.
+ * @cssproperty --option-block-padding - Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list.
+ * @cssproperty --option-padding - Space before the label, shared with a group heading.
+ * @cssproperty --option-radius - Corner radius of the row. A listbox and a select flatten it.
  */
 @customElement('helix-option')
 export class HelixOption extends HelixHeadlessOption {

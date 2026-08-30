@@ -1,15 +1,17 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const markup = ssr(html`<helix-date-input
+const markup = withoutStyles(
+  ssr(html`<helix-date-input
   hint="Any weekday"
   label="Starts"
   min="2026-01-01"
   name="starts"
   value="2026-08-18"
-></helix-date-input>`)
+></helix-date-input>`),
+)
 
 describe('input date server output', () => {
   test('the field and its input ship, before any script runs', () => {

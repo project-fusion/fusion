@@ -4,7 +4,7 @@ import { fits, numbers, toneOf, words } from './buckets.js'
 /**
  * The two calculations a picture cannot check.
  *
- * A threshold comparison off by one boundary colours a handful of cells wrong
+ * A threshold comparison off by one boundary colors a handful of cells wrong
  * out of ninety, and a fit calculation off by one drops a day. Neither shows in
  * a screenshot of a strip, which is exactly why they are here rather than left
  * to the visual baseline.

@@ -26,16 +26,11 @@ const OTHER_AGENT =
  *
  * **The element reads `navigator.userAgent` at render, and this file is run
  * twice on two different ones.** `.dom.spec.ts` is compiled into a browser spec
- * as well as run under happy-dom, so the same assertion was answered by
+ * as well as run under happy-dom, so an unstubbed assertion is answered by
  * happy-dom's non-Apple agent in `bun test` and by the host's real one in
- * Chromium. On Linux both agreed and the suite was green; on a contributor's
- * Mac the browser half rendered `⌘K` against an expectation of `Ctrl+K` and
- * `⇧↵` against `Shift+Enter`, so the library was correct and the suite said
- * otherwise.
- *
- * Stubbing it also fixes the half nobody noticed: whichever platform ran the
- * tests, only one of the two maps was ever exercised, and `mod` existing at all
- * is a claim about both.
+ * Chromium, and passes or fails by which machine ran it. Stubbing also fixes
+ * the half that is otherwise invisible: only one of the two maps is ever
+ * exercised, and `mod` existing at all is a claim about both.
  *
  * An own property shadows the prototype getter and `delete` uncovers it again,
  * which is the restore for a real browser. happy-dom defines it on the instance
@@ -56,12 +51,10 @@ const onPlatform = async <T>(agent: string, run: () => Promise<T>): Promise<T> =
 }
 
 /**
- * What the element draws, which was being typed by hand and was wrong.
- *
- * Both platforms are stated rather than inherited from whoever is running the
- * suite, which is what `onPlatform` is for. The half that was broken is the
- * non-Apple one: a literal `⌘K` in a template tells a reader on Windows to
- * press a key their keyboard does not have.
+ * What the element draws, on both platforms stated rather than inherited from
+ * whoever is running the suite, which is what `onPlatform` is for. A literal
+ * `⌘K` in a template tells a reader on Windows to press a key their keyboard
+ * does not have.
  */
 describe('a key drawn from a chord', () => {
   test('mod is the platform modifier, which is the whole reason to write a chord', async () => {

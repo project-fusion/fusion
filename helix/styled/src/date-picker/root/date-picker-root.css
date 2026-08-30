@@ -12,12 +12,12 @@
 
 /* Two months to a row, and the rest underneath.
  *
- * A flex row without `wrap` cannot do anything but overflow, and it did:
- * `months="3"` measured 872px wide in an 820px container, a 560px one and a
- * 320px one alike, always three across and always past the edge. Wrapping fixed
- * the overflow and left the layout at the mercy of whatever box it was in, so
- * three months were three across in a wide panel and two-and-one in a narrower
- * one, which is a calendar that changes shape as the page does.
+ * Not a flex row: without `wrap` it can do nothing but overflow, and `months="3"`
+ * measured 872px wide in an 820px container, a 560px one and a 320px one alike,
+ * always three across and always past the edge. Wrapping cures the overflow and
+ * leaves the layout at the mercy of whatever box it is in, so three months are
+ * three across in a wide panel and two-and-one in a narrower one, which is a
+ * calendar that changes shape as the page does.
  *
  * A grid with a stated column count instead. Two, because that is the pairing a
  * range wants, a start month beside an end month; three across is wider than
@@ -45,11 +45,11 @@
 
 /* Three columns, whether or not there is anything in the outer two.
  *
- * `space-between` on a flex row is what this was, and only the first month
- * carries a back arrow while only the last carries a forward one, so a run of
- * three put the first heading against its arrow, the second hard left and the
- * third against the other arrow. Measured across `months="3"`: three headings,
- * three different positions, none of them centered.
+ * Not `space-between` on a flex row: only the first month carries a back arrow
+ * while only the last carries a forward one, so a run of three puts the first
+ * heading against its arrow, the second hard left and the third against the
+ * other arrow. Measured across `months="3"`: three headings, three different
+ * positions, none of them centered.
  *
  * A grid places the heading in the middle column whether the arrows exist or
  * not, so every month in a row reads at the same height and the same offset,
@@ -106,7 +106,7 @@
  * `::slotted()` never matches fallback content and a `[part=]` rule never
  * reaches an assigned node, so the shadow-tree caret and a consumer's own mark
  * need one rule each or the swap changes the size of the control. The area
- * notes carry the measurement: `CopyButton` shipped two correctly coloured
+ * notes carry the measurement: `CopyButton` shipped two correctly colored
  * glyphs at 0x0 for exactly this. */
 [part="previous"] svg,
 [part="next"] svg,
@@ -140,8 +140,9 @@
 /* The cell is the whole track and the day is the shape centered in it. A range
    paints the cell, so it runs unbroken between days and stops at the ends of a
    row on its own, where a fill painted on the day has to be bridged across the
-   space between them and then clipped at the row's edge. */
-/* Wider than it is tall: the track carries the space between days across, and
+   space between them and then clipped at the row's edge.
+
+   Wider than it is tall: the track carries the space between days across, and
    the row is only as tall as a day needs. */
 [part="cell"] {
   align-items: center;
@@ -166,8 +167,6 @@
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Days either side of the month stay in place and stay selectable, so the
-   first and last weeks are whole rows rather than ragged ones. */
 /* Today, which is a fact about the calendar rather than about the answer.
  *
  * A ring rather than a fill, because a fill is what selection is: the two land
@@ -175,17 +174,15 @@
  * through the other.
  *
  * **The resting hairline, because today is a fact and not an interaction.**
- * This was `border-strong`, and it is the site the sweep that removed that
- * token missed: seventeen others moved to `border` or to `primary` and this one
- * kept naming a token that no longer exists, so the whole declaration was
- * invalid at computed-value time and the ring simply never drew. `main` was red
- * on it. Menu's note records the same choice for the same reason: `border-strong`
- * existed because `border` was invisible against a raised surface in dark mode,
- * and the ramp puts a step between them now. */
+ * Not `border-strong`, which no longer exists: it was there because `border`
+ * was invisible against a raised surface in dark mode, and the ramp puts a step
+ * between them now. Menu records the same choice. */
 [part="cell"][data-today] [part="day"] {
   box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
 }
 
+/* Days either side of the month stay in place and stay selectable, so the
+   first and last weeks are whole rows rather than ragged ones. */
 [part="cell"][data-outside] [part="day"] {
   color: var(--helix-color-foreground-subtle);
 }
@@ -198,11 +195,10 @@
 
 /* The band, on the cell, and only where there is a run to band.
  *
- * A lone selected date used to take it too, and a cell is wider than it is tall
- * — forty by thirty-six — so rounding both ends of one drew an oval around a
- * circular day. The mark for a single date is a ring on the day itself, which
- * is round because the day is square, and the gap between the two sizes is
- * exactly what the ring is. */
+ * A cell is wider than it is tall, forty by thirty-six, so rounding both ends
+ * of a lone selected one draws an oval around a circular day. The mark for a
+ * single date is a ring on the day itself, which is round because the day is
+ * square, and the gap between the two sizes is exactly what the ring is. */
 [part="cell"][aria-selected]:is([data-range-start], [data-range-middle], [data-range-end]) {
   background-color: var(
     --date-picker-range-color,
@@ -238,16 +234,15 @@
 }
 
 /* The ends of a range, and a single date, are the solid mark. The days between
-   them carry only the band. */
-/* Grays rather than the accent, the same call Time's range takes, and now by the
-   same pair of tokens.
+   them carry only the band. Grays rather than the accent, the same call Time's
+   range takes.
 
-   **`foreground-muted` is an ink, and this is a ground.** The 6.01 recorded here
-   was measured in light mode, where muted is a dark gray and white sits on it
-   comfortably. In dark it is a *light* gray, because an ink follows the page and
-   inverts with it, and white on it reads 2.58:1. A ground that must stay dark
-   while the page goes light is `surface-inverse`, which is what it says: the
-   opposite of the page, in either direction, carrying `foreground-inverse`. */
+   **`foreground-muted` is an ink, and this is a ground.** It measures 6.01
+   against white in light mode, where muted is a dark gray, and 2.58:1 in dark,
+   where an ink follows the page and inverts with it. A ground that must stay
+   dark while the page goes light is `surface-inverse`, which is what it says:
+   the opposite of the page, in either direction, carrying
+   `foreground-inverse`. */
 [part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
   background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
   color: var(--helix-color-foreground-inverse);
@@ -352,7 +347,7 @@
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

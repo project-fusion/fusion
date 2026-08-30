@@ -53,21 +53,19 @@ describe('carousel', () => {
 
   test('and writes nothing at all onto the slides themselves', async () => {
     /* The slides are the consumer's own elements, and on a React page they are
-       nodes React is in the middle of hydrating. Writing the ARIA onto them put
-       `role` and `aria-roledescription` on six anchors before React reached
-       them, which React reports as a mismatch and does not patch up. Deferring
-       the write was tried and is a race rather than an ordering; a pane the
-       component renders is neither.
+       nodes React is in the middle of hydrating. Writing `role` and
+       `aria-roledescription` onto them is a mismatch React reports and does not
+       patch up. Deferring the write is a race rather than an ordering; a pane
+       the component renders is neither.
 
-       And the role was wrong on its own terms: `role="group"` on an `<a href>`
-       replaces the link role rather than adding to it, so a slide that was a
-       link stopped being announced as one. Both faults are the same write, so
-       the assertion is that the write does not happen.
+       And the role is wrong on its own terms: `role="group"` on an `<a href>`
+       replaces the link role rather than adding to it, so a slide that is a
+       link stops being announced as one. Both faults are the same write, so the
+       assertion is that the write does not happen.
 
        This is `hydration.dom.spec.ts` one level down: that lane asks what an
-       element writes onto its *own* host, and says in its own comments that a
-       write a parent makes to its children is the case it cannot reach, having
-       no markup to mount. Here there is markup, so the question is askable. */
+       element writes onto its *own* host and has no markup to mount, so a write
+       a parent makes to its children is the case it cannot reach. */
     const cal = await carousel()
     await cal.updateComplete
     expect([...cal.children].map((slide) => slide.getAttributeNames())).toEqual([[], [], []])
@@ -75,9 +73,8 @@ describe('carousel', () => {
 
   test('a slide that names itself keeps its own name, and stays what it is', async () => {
     /* The pane carries the position and the slide carries itself, so a link is
-       still announced as a link inside a group that says where it sits. While
-       the role was written onto the slide, this anchor was a group and left the
-       links list entirely. */
+       still announced as a link inside a group that says where it sits. A role
+       written onto the slide takes this anchor out of the links list. */
     const cal = (await mount(
       '<helix-headless-carousel label="x"><a href="/d" aria-label="Fusion Design">D</a></helix-headless-carousel>',
     )) as Carousel
@@ -150,10 +147,9 @@ describe('carousel naming', () => {
   test('an emptied label leaves the host unnamed, not named with nothing', async () => {
     /* The distinction `hostAria` exists for. `ariaLabel = ''` is a name of no
        characters, which a screen reader announces as an unnamed control while
-       every check for "is it labeled" passes. This component assigned the
-       property straight through, so a consumer emptying it on purpose, which is
-       what you do when a wrapper already names the thing, got the broken half
-       of that rather than the honest one. */
+       every check for "is it labeled" passes. Assigning the property straight
+       through hands that broken half to a consumer who empties the label on
+       purpose, which is what you do when a wrapper already names the thing. */
     const host = (await mount(
       '<helix-headless-carousel label=""></helix-headless-carousel>',
     )) as Updatable & {
@@ -164,10 +160,9 @@ describe('carousel naming', () => {
 })
 
 describe('carousel selection can be refused', () => {
-  /* It announced after moving, so a listener refusing a slide change was
-     refusing a decision already taken and the carousel moved anyway. Every
-     other stateful component in the library announces first, through the same
-     helper, whose own documentation calls itself the one audited path for this. */
+  /* Announcing after moving would leave a listener refusing a decision already
+     taken. Every stateful component in the library announces first, through the
+     same helper. */
   const carousel = async (): Promise<
     HTMLElement & { goTo(index: number): void; index: number; updateComplete: Promise<boolean> }
   > => {
@@ -239,10 +234,8 @@ describe('carousel, controlled and uncontrolled', () => {
   }
 
   test('an index in the markup is a seed, and the carousel still moves', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Control is an action: the element always applies, and a consumer takes
+       the decision by refusing. */
     const host = await carousel('index="1"')
     host.goTo(2)
     await host.updateComplete
@@ -431,10 +424,8 @@ describe('carousel settling', () => {
   })
 
   test('a drag writes the index it settled on, declared or not', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Control is an action: the element always applies, and a consumer takes
+       the decision by refusing. */
     const { host, track } = await scrolling('index="0"')
     let asked = ''
     host.addEventListener('helix-select', (event) => {
@@ -452,7 +443,7 @@ describe('carousel indicators', () => {
   test('the run is the dots themselves, each one its own state', async () => {
     /* A single traveling mark was tried here and taken out again. The pill is
        three times a dot's width, so a mark that takes no room in the row has to
-       sit over its neighbours, and the pitch had to grow from 12 to 20 to make
+       sit over its neighbors, and the pitch had to grow from 12 to 20 to make
        space for it. The run stopped reading as a run. */
     const host = await carousel('default-index="1"')
     await host.updateComplete
@@ -472,9 +463,9 @@ describe('carousel indicators', () => {
 describe('carousel chrome placement', () => {
   /* Where a run lands, read against the row it is placed in rather than against
      the host. The host spans three grid rows, so a run centered in its own row
-     is well above the host's center, and measuring against the host called every
-     inline case "start" on the first pass. happy-dom lays nothing out, so this
-     asserts the properties the layout is made of instead. */
+     is well above the host's center and measuring against the host calls every
+     inline case "start". happy-dom lays nothing out, so this asserts the
+     properties the layout is made of instead. */
   const along = (host: HTMLElement, name: string): string =>
     (part(host, name) as HTMLElement).style.getPropertyValue(`--_carousel-${name}-along`)
 
@@ -504,8 +495,7 @@ describe('carousel chrome placement', () => {
 
 describe('carousel across several slides at once', () => {
   /* Six slides four across stop three times: 0 to 3, 1 to 4, 2 to 5. Everything
-     here is that one number, and every failure it replaced came from counting
-     slides instead. */
+     here is that one number, and counting slides instead is the fault. */
   const four = async (): Promise<HTMLElement> =>
     mount(`<helix-headless-carousel label="Reel" per-view="4">
       <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>

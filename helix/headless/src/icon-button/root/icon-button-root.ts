@@ -12,12 +12,10 @@ import { HelixHeadlessButton } from '../../button/root/button-root.js'
  * toolbar becomes unusable without sight. `label` is not optional in practice,
  * and having a component that says so is what makes it reviewable.
  *
- * **Registered, so it can be rendered and not only subclassed.** The styled
- * icon button extended `HelixHeadlessButton` directly, which left no
- * `helix-headless-icon-button` for anything to use: a headless consumer wanting an
- * icon button had a button and a naming convention. Anything in this tier that
- * needs one, such as an announcement's dismiss control, can now render it
- * without reaching into the styled tier for a tag that would never upgrade.
+ * **Registered, so it can be rendered and not only subclassed.** Anything in
+ * this tier needing an icon button, such as an announcement's dismiss control,
+ * renders `helix-headless-icon-button` rather than reaching into the styled tier
+ * for a tag that would never upgrade.
  *
  * Top-level rather than `Button.Icon`, because a namespace means composition
  * and an icon-only button is not part of a button. It is a button with

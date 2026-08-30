@@ -25,20 +25,18 @@
 
 /* Wrong, and the set says so, on the controls rather than around them.
  *
- * This drew a danger outline round the whole run, on the reasoning that "choose
- * at least one" is a complaint about the set and not about the third checkbox.
- * True, and it produced a full-width red rectangle for a message one line long,
- * which is a great deal louder than the error is. The controls are where every
- * other field in the library puts wrongness, and a reader scanning a form finds
- * it there.
+ * A danger outline round the whole run is the other reading, "choose at least
+ * one" being a complaint about the set rather than about the third checkbox. It
+ * is a full-width red rectangle for a message one line long, a great deal louder
+ * than the error is, and the controls are where every other field in the library
+ * puts wrongness.
  *
  * Through `--checkbox-border-color` rather than by writing `:state(invalid)`
- * onto the members, which was the objection to marking them and is a real one:
- * these are the consumer's elements and the group does not own what they say
- * about themselves. A custom property set here inherits through the slot into
- * each checkbox's own shadow root, which is the same crossing `data-density`
- * makes, and every rule that paints that edge already reads the hook, so a
- * pointer over one member does not rub the mark off it.
+ * onto the members: these are the consumer's elements and the group does not
+ * own what they say about themselves. A custom property set here inherits
+ * through the slot into each checkbox's own shadow root, the same crossing
+ * `data-density` makes, and every rule that paints that edge already reads the
+ * hook, so a pointer over one member does not rub the mark off it.
  *
  * Only the edge. The tick keeps its own ink: a box the reader ticked is not the
  * thing that is wrong, and a run of red ticks says the opposite. */
@@ -46,10 +44,12 @@
   --checkbox-border-color: var(--helix-color-danger);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and the state has to survive. A
+ * tick that is a fill prints as an empty box, which is a document saying the
+ * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

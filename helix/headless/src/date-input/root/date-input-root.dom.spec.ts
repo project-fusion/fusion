@@ -43,9 +43,8 @@ describe('input date', () => {
   })
 
   test('typing sets the value, so a reader who knows the date never uses the grid', async () => {
-    /* It used to assert the panel stayed shut, which stopped being true when
-       focus was made to open it: reaching the field opens the calendar now, and
-       the claim worth keeping is that a reader who types never has to touch it. */
+    /* Reaching the field opens the calendar, so what is asserted is not that
+       the panel stays shut but that a reader who types never has to touch it. */
     const host = await field()
     await type(host, '2026-08-18')
     expect(host.value).toBe('2026-08-18')
@@ -122,10 +121,9 @@ describe('input date', () => {
   })
 
   test('declaring `value` seeds it, and the field still moves', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Declaring the property is a seed and not a claim of ownership: control is
+       an action, so the element applies it and a consumer refuses to take the
+       decision. */
     const host = await field('value="2026-01-01"')
     let asked = ''
     host.addEventListener('helix-before-change', (event) => {
@@ -169,9 +167,9 @@ describe('input date opens on focus', () => {
   })
 
   test('but a hand-off from inside does not, or picking a date reopens it', async () => {
-    /* Choosing a day shuts the panel and puts the caret back in the field. The
-       first version of this opened on any focus at all, so the calendar came
-       straight back and the reader could not get out of it. */
+    /* Choosing a day shuts the panel and puts the caret back in the field, so
+       focus arriving from inside must not reopen it: opening on any focus at
+       all brings the calendar straight back and the reader cannot get out. */
     const host = await dateField()
     const control = part(host, 'control') as HTMLInputElement
     const trigger = part(host, 'trigger') as HTMLElement
@@ -505,12 +503,11 @@ describe('input date keeps the tag row readable', () => {
   })
 
   test('and the count sits with the tags it counts, before the field', async () => {
-    /* It sat after the field, on the reasoning that at the end it is a note
-       about the row. Rendered against the combobox it is not: pushed right the
-       count lands against the trigger with the whole width of the field between
-       it and the tags, so it reads as part of the trigger rather than as a fact
-       about the set. The caret still follows the set, the set now being the tags
-       and their count. */
+    /* Not after the field, where it reads as a note about the row: pushed right
+       the count lands against the trigger with the whole width of the field
+       between it and the tags, so it reads as part of the trigger rather than
+       as a fact about the set. The caret follows the set, which is the tags and
+       their count. */
     const host = await many('default-value="2026-08-04,2026-08-11,2026-08-18" max-tags="2"')
     const nodes = [...(part(host, 'field')?.children ?? [])]
     const at = (name: string) => nodes.findIndex((one) => one.getAttribute('part') === name)

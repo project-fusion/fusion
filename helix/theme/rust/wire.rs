@@ -108,13 +108,13 @@ impl<'de> Deserialize<'de> for StatusSeed {
 /// **A `Vec` rather than a map, because the order is the emitted order**, and it
 /// is the document's order: the TypeScript walks `Object.entries`, which is
 /// insertion order, and an override appended to the token list lands where its
-/// author put it. A `HashMap` would randomise that per run and a `BTreeMap`
+/// author put it. A `HashMap` would randomize that per run and a `BTreeMap`
 /// would sort it, and both would emit a different file from the same input.
 ///
 /// **Which is why this is a visitor rather than `Vec<(String, Color)>`.** Serde
-/// reads that shape from a JSON *array* of pairs, so the derived version parsed
-/// nothing a consumer would ever write and said "invalid type: map, expected a
-/// sequence" about a file that was correct. Found by writing one.
+/// reads that shape from a JSON *array* of pairs, so the derived version parses
+/// nothing a consumer would ever write and says "invalid type: map, expected a
+/// sequence" about a file that is correct.
 ///
 /// # Errors
 ///
@@ -130,7 +130,7 @@ pub fn tokens<'de, D: Deserializer<'de>>(
         type Value = Vec<(String, Color)>;
 
         fn expecting(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            out.write_str("an object of token names to colours")
+            out.write_str("an object of token names to colors")
         }
 
         fn visit_map<M: MapAccess<'de>>(self, mut entries: M) -> Result<Self::Value, M::Error> {

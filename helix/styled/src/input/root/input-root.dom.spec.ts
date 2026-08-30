@@ -299,7 +299,7 @@ if (hasLayout()) {
       /* Only a browser can answer this: it is entirely a question of which rule
          wins, and happy-dom resolves no cascade for `:focus-within`.
 
-         Both faults it covers are specificity. `[data-invalid]` unnamed by
+         Both faults it covers are specificity. `:state(invalid)` unnamed by
          hover is (0,3,0) against hover's (0,4,0), so pointing at a field with
          an error in it put the gray border back. And the focus rule owns the
          `outline`, so a focused error came out red inside blue, which is the
@@ -347,11 +347,8 @@ describe('input, controlled and uncontrolled', () => {
 
   test('a script may set an uncontrolled value without taking it over', async () => {
     /* What a native input does: `element.value = x` sets the value and the
-       field keeps working. It did not, because any write was read as the
-       consumer claiming ownership, so one line of script froze the field for
-       the rest of the page's life. Which mode an element is in is read once, at
-       the first update, from whether anything had declared one by then; a write
-       after that is just a write. */
+       field keeps working. A write claims nothing, so one line of script cannot
+       freeze the field for the rest of the page's life. */
     const host = (await mount('<helix-input label="Name"></helix-input>')) as HTMLElement & {
       updateComplete: Promise<boolean>
       value: string
@@ -367,10 +364,9 @@ describe('input, controlled and uncontrolled', () => {
   })
 
   test('a declared value is a seed, and typing still moves it', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Control is an action, not a mode: a declared `value` is a seed, the
+       element always applies, and a consumer takes the decision by refusing the
+       before event. */
     const host = (await mount(
       '<helix-input label="Name" value="mine"></helix-input>',
     )) as HTMLElement & { updateComplete: Promise<boolean>; value: string }
@@ -385,14 +381,11 @@ describe('input, controlled and uncontrolled', () => {
   })
 
   test('typing does not quietly hand the value to nobody', async () => {
-    /* Writing `value` is how a consumer says they own it, so a control that
-       wrote its own would declare itself controlled on the first keystroke and
-       ignore every request after that.
-
-       Two keystrokes does not see it, which is worth recording: the faulty
-       version overwrote its own claim each time, so the value tracked typing
-       either way and the spec passed on the bug. What a claimed value actually
-       breaks is the next request, so that is what this asks for. */
+    /* Two keystrokes does not see this, which is worth recording: the faulty
+       version overwrote its own write each time, so the value tracked typing
+       either way and the spec passed on the bug. What a control writing its own
+       `value` breaks is the next request from outside, so that is what this
+       asks for. */
     const host = (await mount('<helix-input label="Name"></helix-input>')) as HTMLElement & {
       requestValue(next: string): boolean
       updateComplete: Promise<boolean>
@@ -407,11 +400,9 @@ describe('input, controlled and uncontrolled', () => {
   })
 
   test('a refused change is undone, on the host and on the control alike', async () => {
-    /* Refusing is how a consumer takes the decision now, and the native control
-       has already moved by the time the refusal runs, so putting it back is a
-       separate act from not applying the change. This asserted the same two
-       things about a declared `value` until 26 Aug 2026, when declaring one was
-       the refusal. See 294. */
+    /* Refusing is how a consumer takes the decision, and the native control has
+       already moved by the time the refusal runs, so putting it back is a
+       separate act from not applying the change. */
     const host = (await mount(
       '<helix-input label="Name" value="fixed"></helix-input>',
     )) as HTMLElement & { value: string }

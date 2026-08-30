@@ -26,9 +26,7 @@ const menu = async (
   )) as Menu
 
 describe('moving through a menu with the keyboard', () => {
-  /* There were no specs for this at all, which is how a rewiring of it came to
-     be proposed on the strength of a suite that could not have noticed. The
-     arrow keys are a shared controller's business now, and these say what the
+  /* The arrow keys are a shared controller's business, and these say what the
      menu asks of it. */
   const opened = async (): Promise<{ host: Menu; rows: Item[] }> => {
     const host = await menu(
@@ -111,7 +109,7 @@ describe('moving through a menu with the keyboard', () => {
        too, nested inside the row that opens it, so the second element in
        document order is the child rather than the next row along: an assertion
        written against `rows[1]` is asking about the wrong element and reads a
-       correct submenu entry as a failure. It did. */
+       correct submenu entry as a failure. */
     const share = host.querySelector('helix-headless-menu-item[value="share"]') as Item
     const link = host.querySelector('helix-headless-menu-item[value="link"]') as Item
     await (share as unknown as { updateComplete: Promise<boolean> }).updateComplete
@@ -146,9 +144,8 @@ describe('a menu row that navigates', () => {
 
   /* A fragment, not a path. These specs also run in a real browser through
      `bun run specs:browser`, where pressing Space really does click the anchor
-     and a path really does navigate: it took the whole browser run down, with
-     no results and a message naming no family. A fragment proves the same
-     press and goes nowhere. */
+     and a path really does navigate, taking the whole browser run down. A
+     fragment proves the same press and goes nowhere. */
   test('the anchor is the row, carrying the role and the tab stop', async () => {
     /* Not an anchor inside the row. A `menuitem` cannot contain a link:
        measured in Chromium, the row loses its accessible name entirely and the
@@ -294,11 +291,8 @@ describe('menu submenus, coming and going', () => {
      once at first render is still on that slot and sets `hasSubmenu` false for
      good: every caret goes and every row stops opening.
    *
-     Written as a spec it passed against the broken build as readily as the
+     Written as a spec it passes against the broken build as readily as the
      fixed one, measured both ways, because happy-dom neither rebuilds the slot
-     nor fires the departing `slotchange`. It is checked in a browser instead:
-     with the listener bound once, the four rows of the sandbox's Environment
-     menu went from `hasSubmenu` true to false after a single drilldown and the
-     carets vanished; bound in the template, they survive that and a second
-     drilldown still opens. */
+     nor fires the departing `slotchange`. Bind the listener in the template,
+     and check the behavior in a browser. */
 })

@@ -144,8 +144,7 @@ describe('a handler prop attached to nothing', () => {
 
     /* `onhelix-open`, not `onhelix-before-open`: the warning echoes the prop it
        was given, and `on:helix-open` is a stand-in for any Solid-shaped name
-       rather than this library's event. A rename swept the expectation and not
-       the input, which is the one shape a global rename gets wrong. */
+       rather than this library's event. A rename must not sweep the input. */
     expect(warnings[0]).toContain("Solid's syntax")
     expect(warnings[0]).toContain('onhelix-open')
   })
@@ -179,12 +178,12 @@ describe('a handler prop attached to nothing', () => {
 })
 
 describe('a relayed native event', () => {
-  /* React recognises `onError` and `onLoad` as its own and attaches nothing to
+  /* React recognizes `onError` and `onLoad` as its own and attaches nothing to
      a custom element for either: the delegated listener at the root sees only
      what bubbles, and the non-delegated list it sets up for `<video>` and
      `<img>` is never set up for a custom element. Avatar relays `load` and
-     `error`, Video relays `ended`, `play` and `pause`, and all five were
-     silent. */
+     `error`, Video relays `ended`, `play` and `pause`, and none of the five
+     reaches React on its own. */
   test('reaches the prop React uses for it, when nothing else would', () => {
     let calls = 0
     const element = hydrated({
@@ -215,11 +214,10 @@ describe('a relayed native event', () => {
     expect(calls).toBe(0)
   })
 
-  /* The trio the comment beside `reactPropFor` named as fixed while `Video` kept
-     them broken: it relayed `play`, `pause` and `ended` with `bubbles: true`,
-     which is the one branch that refuses to bind, so all three were silent in
-     React. Both directions are asserted, because the fix is a propagation flag
-     and a test of only the working half would pass against the bug. */
+  /* `play`, `pause` and `ended` relayed with `bubbles: true` land in the one
+     branch that refuses to bind, so they reach nothing in React. Both
+     directions are asserted, because the fix is a propagation flag and a test
+     of only the working half would pass against the bug. */
   test.each([
     ['play', 'onPlay'],
     ['pause', 'onPause'],
@@ -313,17 +311,12 @@ describe('the settled mark', () => {
   })
 
   test('is a state and never an attribute, which is what hydration reads', async () => {
-    /* **The regression this exists for was reported three times as three bugs.**
-       The mark was `setAttribute('data-settled', '')` on the host, and the host
-       is the element React owns: a definition landing during module evaluation
-       has a frame to spend before React arrives, so the element wrote onto
-       itself and React then hydrated a DOM that had gained an attribute since
-       the server wrote it. Measured at the time across three routes: `/helix`
-       clean, `/helix/theme` one and `/helix/sandbox` three.
-
-       Three deferred imports were added to move that frame to the other side of
-       hydration. Each fixed a route and none fixed the cause, which is that
-       private bookkeeping was being kept where React reconciles. */
+    /* The host is the element React owns, so an attribute mark is a hydration
+       mismatch: a definition landing during module evaluation has a frame to
+       spend before React arrives, and the element writes onto itself before
+       React hydrates the DOM the server wrote. Deferring the import moves the
+       frame past hydration and fixes one route rather than the cause, which is
+       that private bookkeeping was being kept where React reconciles. */
     const element = mounted()
     await element.updateComplete
     await frame()

@@ -1,0 +1,724 @@
+/* The site's own furniture: the masthead's glass, the command palette, the
+ * wordmark and the footer.
+ *
+ * Colocated with the components that apply it. Every page renders these, which
+ * is an argument for loading it everywhere and not an argument for leaving the
+ * names global: a class the layout applies is still a class one component owns,
+ * and scoping it means nothing else can reach in and move it.
+ */
+
+/* The one glass. Sized by the app, which is the only place that knows both the
+ * bar's height and the panel's.
+ *
+ * `block-size` rather than a clip, because the sheet is a bare fixed box with
+ * no content to reflow: growing it is what the panel's reveal looks like from
+ * behind, and it lands on the panel's own bottom edge rather than approaching
+ * it. At rest it is exactly the bar.
+ *
+ * Hidden rather than only transparent when neither job is on, so an idle page
+ * is not running a full-screen blur behind nothing. Discrete, so it flips at
+ * the end of the fade rather than the start.
+ *
+ * **`--site-glass`, which is what the landing bands are made of.** The bar had
+ * its own filter written out and its fill from `--helix-material-translucent`,
+ * so the masthead floating over a band was a different material from the band.
+ * Reaching for `--helix-material-backdrop` instead only moved the disagreement:
+ * the bands do not use it either, taking a heavier blur and a fill mixed from
+ * `surface`. `site.css` carries the recipe and everything on the page reads it
+ * from there. */
+.navGlass {
+  backdrop-filter: var(--site-glass-backdrop);
+  background-color: var(--site-glass);
+  block-size: var(--helix-size-header);
+  inset-block-start: 0;
+  inset-inline: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition:
+    block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    visibility var(--helix-duration-normal) allow-discrete;
+  visibility: hidden;
+  z-index: var(--helix-layer-raised);
+}
+
+.navGlass[data-lit] {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navGlass {
+    transition: none;
+  }
+}
+
+/* The mark takes the brand.
+ *
+ * Its gradients are declared against `--logo-color-*` with gray literals as
+ * fallbacks, exactly so a theme can retint it without the SVG being touched.
+ * `primary` is the brand blue and follows the color mode on its own.
+ *
+ * Not the foreground: the mark is the one thing here that carries the brand
+ * without words, so it is the one thing that keeps the brand's color. The
+ * wordmark beside it is what takes the ink. */
+/**
+ * **The stops are computed from `primary`, not borrowed from hover and active.**
+ *
+ * Those two are interaction states, and the palette is free to move them
+ * whichever way suits the scheme: the shipped stylesheet takes them *darker*
+ * than primary, and a derived palette takes them *lighter*. Either is right for
+ * a button. Neither is a gradient ramp, and a mark built from them inherits
+ * whichever direction the palette happened to choose. On the derived one that
+ * gave three increasingly pale blues with almost no range between them, so the
+ * lockup washed out.
+ *
+ * Stating the offsets makes the ramp a property of the mark rather than a
+ * side effect of somebody else's hover state, and it keeps the same depth under
+ * any palette. `primary` stays the base, so the mark still follows the theme.
+ */
+.fusionLogo {
+  --logo-color-from: var(--helix-color-primary);
+  --logo-color-mid: oklch(from var(--helix-color-primary) calc(l - 0.09) c h);
+  --logo-color-to: oklch(from var(--helix-color-primary) calc(l - 0.17) c h);
+}
+
+/* ============================================================ footer ===== */
+
+/* The same inset as the masthead, for the same reason.
+ *
+ * Header and footer are the two pieces of chrome bracketing every page, and a
+ * reader sees their left edges as one line whether or not they are on screen
+ * together. Not `--site-inset`, which is a clamp opening to seven rem: at 1600
+ * that puts the wordmark at 48 and the copyright at 96.
+ *
+ * The content column keeps the clamp. That is the split: chrome sits at a fixed
+ * inset because it runs the width of the window, and a column of prose gets air
+ * beside it because it is a measure. */
+.siteFooter {
+  /* The chrome's inset, not the page's, which is what keeps the logo here on the
+     same line down the left edge as the wordmark in the header. One variable and
+     never `2xl` written in place: written in place the footer stays at 48 a side
+     while the header narrows to 16 below 48rem, and at 320 that leaves 224 for
+     three link groups needing 231, so Legal wraps alone onto a second row. */
+  --site-inset: var(--site-chrome-inset);
+
+  /* A rule, because the footer now holds links rather than one quiet line and
+     needs to read as its own region rather than as the end of the page. */
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-2xl);
+}
+
+/* Brand at the start, links at the end, and both wrap onto their own line when
+   the row runs out. `space-between` rather than a grid: the two halves are
+   different kinds of thing and neither wants a column the other is measured
+   against. */
+.footerInner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xl);
+  justify-content: space-between;
+}
+
+/**
+ * The lockup: a mark in its own column, and both lines of type in the other.
+ *
+ * **Not a row with a line beneath it**, which gives the block two left edges:
+ * the mark and the tagline start at the block's edge while the name begins past
+ * the mark, so a three-line lockup has a step in it and reads as two things
+ * stacked rather than one object.
+ *
+ * A grid puts the mark in a column of its own and gives the name and the
+ * tagline a shared edge, which is what a mark beside stacked type is: a marker
+ * for a block, not the first word of one line.
+ *
+ * **The indent is derived, not measured.** It is whatever the mark's column
+ * turns out to be plus the column gap, so a mark that changes size takes the
+ * tagline with it. A `padding-inline-start` on the tagline would be the same
+ * number written a second time, and wrong the day the first one moved.
+ *
+ * `start` rather than `center` down the block: the mark aligns to the cap of
+ * the name beside it rather than to the middle of a two-line stack it is not
+ * part of.
+ */
+.footerBrand {
+  align-items: start;
+  /* **Rows sized to their content, not to the space around them.** This is a
+     stretched item of the footer's own flex row, so it inherits the height of
+     the tallest column beside it, and a grid hands that surplus to its rows:
+     without this, two lines of type come out 66px apart. */
+  align-content: start;
+  column-gap: var(--helix-space-xs);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: var(--helix-space-2xs);
+}
+
+/* **Everything after the mark, not only the last thing.** `> :last-child` holds
+   only while the lockup is a mark, a name and a tagline; add a fourth child and
+   the tagline falls back to auto-placement and lands in the mark's column.
+   Stated as "every child after the first" it does not depend on how many there
+   are. */
+.footerBrand > * + * {
+  grid-column: 2;
+}
+
+/**
+ * The mark set to its glyph rather than to its box.
+ *
+ * **An icon is padded and a logo in a lockup is not.** `fusion.svg` draws into
+ * a 256 viewBox with the artwork spanning 42.5 to 213.9, which is 16.6 percent
+ * of clear space on each side. That is correct for an icon, where the padding
+ * is what makes a row of different drawings look like one row. It is wrong
+ * here, where the mark is the first character of a line and the line under it
+ * starts at the container's edge.
+ *
+ * Measured in the footer at a 1.25rem mark: the glyph began 3.3px right of
+ * "Developing" below it, and the 8px between mark and name read as 11.3. Small
+ * numbers, and between two lines that are supposed to start together they are
+ * the whole of what looks wrong.
+ *
+ * Negative on both sides, so one declaration does both halves: the start pulls
+ * the glyph out to the text's edge, and the end takes the same slack out from
+ * between the mark and the name so `gap` means what it says.
+ *
+ * No fallback on `--icon-size`. The footer sets it on the element, and a length
+ * written here to cover the case where it does not would be a raw space value
+ * that `helix component`'s `tokens` is right to refuse. Without one an unset size makes the
+ * `calc` invalid and the margin drops, which is the correct failure: the mark
+ * sits where an unadjusted mark sits.
+ *
+ * Here rather than in the icon, because the padding is a fact about the drawing
+ * and every other use of it wants that padding. A lockup is the exception and
+ * is the thing that should carry the correction. Tightening the viewBox instead
+ * would have fixed the alignment and made the mark non-square, which every
+ * consumer sizing it as an icon assumes it is.
+ */
+.footerBrand helix-icon {
+  margin-inline: calc(var(--icon-size) * -0.166);
+}
+
+.footerNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xl);
+}
+
+/**
+ * A column of links, floored so three of them read as a directory.
+ *
+ * **Flex items size to their content, and these three have nothing in common
+ * to size to.** Products holds two short names, Company five medium ones and
+ * Legal one long one, so the columns came out at three different widths with an
+ * identical gap between them: the eye reads the gap as the thing that varies
+ * and the block looks misaligned rather than ragged-by-design.
+ *
+ * A floor rather than equal thirds. `1fr` columns would divide the footer's
+ * whole remaining width and push Legal out to the far edge, which is a table of
+ * contents rather than a footer; a minimum makes the three regular while each
+ * still ends where its longest link does. `12ch` is measured on the widest of
+ * them, "Acceptable use", so the floor clears the content it has to hold.
+ *
+ * `min-inline-size` and not `inline-size`, so a group that outgrows the floor
+ * still grows, and the wrapping the parent relies on at narrow widths is
+ * untouched.
+ */
+.footerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 12ch;
+}
+
+/* **The heading is a heading, and the gap is what says so.** One `2xs` between
+   every line put `Products` the same distance from `Helix` as `Helix` is from
+   `Cortex`, so the column read as four peers of which the first happened to be
+   bold. A step more under the heading separates the name of the group from its
+   contents, which is the only distinction the column is making. */
+.footerGroup > :first-child {
+  padding-block-end: var(--helix-space-2xs);
+}
+
+/* Clear of the tagline by more than the brand's own row gap: the marks are a
+   different kind of thing from the two lines above them, and at the row gap they
+   read as a third line of the lockup. */
+.footerSocials {
+  padding-block-start: var(--helix-space-xs);
+}
+
+/* **The glyph shrinks and the target does not.**
+ *
+ * At the full icon size these three read as loud as the wordmark above them,
+ * which is not what a set of profile links is for. `icon-tight` is the scale's
+ * own word for a step down and is what twenty-odd other reads already use, so
+ * this is a rung rather than a number invented in a footer.
+ *
+ * **`data-icon-link` keeps its box**, which is the point of doing this here
+ * rather than on the shared recipe: the recipe is also what the masthead's
+ * icons wear, and the 2rem square is a pointer target before it is a picture.
+ * Shrinking the box would take a third of the area off a link on the smallest
+ * screens, where these sit closest together. */
+.footerSocials helix-icon {
+  --icon-size: var(--helix-size-icon-tight);
+}
+
+/* **Narrow: tighten the gaps so the three groups stay one row.** Measured at
+   375, `space-2xl` between them left Products and Company on the first line and
+   stranded Legal alone on a second, which reads as a fourth thing rather than
+   the third of three. The groups are 52, 55 and 76 wide, so a `space-lg` gap
+   fits all of them in the 279 the inset leaves.
+
+   A viewport query is honest here for the reason the responsiveness rule gives:
+   this is a consumer stylesheet laying out a page, not a component reading a
+   width it cannot know. 48rem is the breakpoint the rest of the site's chrome
+   already turns at. */
+@media (width < 48rem) {
+  .siteFooter {
+    padding-block: var(--helix-space-xl);
+  }
+
+  .footerInner {
+    gap: var(--helix-space-xl);
+  }
+
+  /* **The groups spread to both edges; nothing is centered.** Left-aligning
+     the nav as well left it ending 128 pixels short of the right edge at 375,
+     so a footer that had wrapped onto two lines looked like it had wrapped
+     rather than like a layout. Distributing the three groups across the full
+     width is what fixes that, and it is the only thing that needed to change.
+
+     The brand reads as the start of the block the way it does at every other
+     width, and a column of centered links would have a ragged left edge, which
+     is harder to scan and the same fault the underlines were. The columns get
+     distributed; their contents and the brand beside them do not. */
+  .footerNav {
+    gap: var(--helix-space-lg);
+    inline-size: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Quiet at rest and plainly a link on hover. A legal link is something a reader
+   finds when they go looking rather than something the page offers them. No
+   underline by default, because a column of underlined rows reads as a
+   document's table of contents rather than as navigation. */
+.siteFooterLink {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.siteFooterLink:hover,
+.siteFooterLink:focus-visible {
+  color: var(--helix-color-foreground);
+}
+
+/* ============================================================ chrome ===== */
+
+/* Mixed case, and large enough to be worth setting.
+ *
+ * **Never `text-transform: uppercase` here**, however much a wordmark is read
+ * as a shape rather than as letters: everything that identifies Funnel Display
+ * lives in its lowercase, the angled cut on the `F` and the wide round `u`. Set
+ * side by side in caps, Funnel Display and Geist are the same picture, which is
+ * what a report that "the display face is not being applied" turns out to be.
+ * It is applied, and there is nothing left of the face to see.
+ *
+ * Size is the other half. Below about twenty pixels the two faces are within a
+ * hair of each other whatever the case, so this sits just under the mark beside
+ * it: the smallest setting where the face is still identifiable, and a shade
+ * shorter than the mark so the two read as a lockup rather than as two things
+ * of equal weight.
+ *
+ * Not on a `Text` appearance, because there is no ramp step here and there
+ * should not be: this is a brand lockup rather than a size in the type scale,
+ * and a `heading` that happened to match would be coupled to it by accident. */
+.wordmark::part(text) {
+  /* Full strength, black on a white page and white on a black one.
+     The lockup sits inside `<a data-link="quiet">`, which paints navigation in
+     the muted foreground so that a column of rows does not shout, and the
+     wordmark was inheriting it: measured at oklch(0.5), a mid gray, in both
+     modes. Right for a nav row and wrong for the brand's own name, which is
+     the one piece of text on the page that is a thing rather than a label. */
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-display);
+  font-size: var(--site-text-wordmark);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+}
+
+/* ---------------------------------------------------------- palette ----- */
+
+/* **The search in the masthead, and the space between its two halves.**
+ *
+ * A button's `gap` is one number for everything it holds, which is right when
+ * the parts are a mark and a word. Here the last part is a *key*, and a key
+ * pressed to open the thing is not the next word in the label: at the button's
+ * own gap it read as "Search ⌘K" in one breath. The margin is on the key alone,
+ * so the magnifier stays tucked against the word it belongs to.
+ *
+ * `auto` rather than a length would push it to the far edge, which is what a
+ * toolbar does with a trailing control and is wrong for a button: the two would
+ * stop being one object as soon as the button was wider than its content. */
+/* **The same glass as the panel it opens.**
+ *
+ * A trigger and the thing it summons reading as one material is what makes the
+ * palette feel like it came out of the button rather than over it. The tokens
+ * are the site's glass, not a second set tuned by eye, so if the material ever
+ * moves both move together. That is not a promise this file could keep on its
+ * own and it did not: both sides wrote the filter out, so "the material" was a
+ * value typed twice and the landing bands moved without either of them.
+ *
+ * `--button-background-color` is `Button`'s own hook, so this is a fill the
+ * component was built to take rather than a document rule reaching past it. The
+ * blur has to be set directly, there being no hook for a filter and no reason
+ * for one: it is a property of this surface rather than of buttons. */
+.siteFind {
+  backdrop-filter: var(--site-glass-backdrop);
+
+  --button-background-color: var(--site-glass);
+}
+
+.siteFind helix-kbd {
+  margin-inline-start: var(--helix-space-sm);
+}
+
+/* **The palette, dressed as ours.**
+ *
+ * The component decides how a palette behaves and most of how it looks. What is
+ * left for the site is what the surface says about whose product it is.
+ *
+ * Through `::part()`, which is the published door into a component and the one
+ * mechanism a document rule may use on one. Everything here is a departure the
+ * component invited: the four parts it forwards, and the two hooks it names. */
+/* **A lighter wash than a modal's, which is what makes the glass legible.**
+ *
+ * `Dialog` scrims for a modal, which replaces the page, and at that strength
+ * the blur had a near-uniform dark field to sample rather than the content: the
+ * material was computed and invisible. A palette is summoned over a page the
+ * reader is still in, so the scrim is mixed down until the page is still there
+ * to be blurred.
+ *
+ * **The alpha is what matters, and `overlay` alone did not help**: it is a
+ * lighter black at the same opacity, so the field it gave the blur was as solid
+ * as before. Which is why the fix is a mix rather than a different token.
+ *
+ * Set on this element and inherited down to the dialog inside it. The value
+ * resolves here, where a token is in scope, which is the whole reason the hook
+ * can take one at all. */
+.siteCommand {
+  --dialog-scrim: color-mix(in oklab, var(--helix-color-overlay) 45%, transparent);
+}
+
+/**
+ * The panel and the bar are one sheet, so the panel stops drawing its own.
+ *
+ * **`.navGlass` already grows to the panel's bottom**, measured by the nav and
+ * set as a block size, so a single blurred surface covers the bar and whatever
+ * it opened. The panel kept its own edge inside that: a top border, two top
+ * corners, and a `0 4px 12px` shadow whose blur reaches back up over the bar.
+ * Three ways of drawing a line where the two meet, on a join that is supposed
+ * to have no line at all.
+ *
+ * The bottom corners and a downward shadow stay. That edge is real: it is where
+ * the sheet ends and the page it opened over begins.
+ */
+.navPanel::part(surface) {
+  border-block-start: 0;
+  border-start-end-radius: 0;
+  border-start-start-radius: 0;
+  /* Offset past its own blur, so nothing reaches back over the bar. */
+  box-shadow: 0 14px 28px -10px color-mix(in oklab, var(--helix-color-background) 70%, transparent);
+}
+
+.siteCommand::part(dialog) {
+  /* **Glass, which is what a palette is: the page is still there.**
+   *
+   * A palette does not replace the page the way a dialog does. It is summoned
+   * over whatever was being read and dismissed back to it, so a surface that
+   * lets the page through says what the thing is before any of the copy does.
+   * The tokens are the ones the design system already keeps for this, a
+   * translucent fill over a blur, rather than an opacity invented here.
+   *
+   * **The panel's own alpha is only half of it.** What the blur samples is
+   * whatever the scrim leaves of the page, so a modal's scrim would make this
+   * flat whatever is set here. `--dialog-scrim` above is the other half.
+   *
+   * The border is the material's own, not the brand's. A saturated hairline
+   * reads as a focus ring on a panel that is not focused, and a palette that
+   * always looks selected has nothing left to say when a row actually is. */
+  /* `translucent`, not `-strong`. The strong fill left so little of the page
+     showing that the blur had almost nothing to work on: the effect was in the
+     computed styles and invisible on the screen.
+
+     Which token rather than which number, here and in the scrim above. The
+     alphas are `primitives.css`'s and they have moved; a figure copied into a
+     comment does not move with them, and the one that used to sit here had gone
+     stale without anybody noticing, which is the only kind of staleness a
+     comment has.
+
+     And the filter is `--helix-material-backdrop` rather than a blur written
+     out, so the palette is the same glass as the landing bands and the masthead
+     rather than a third one that happened to agree. */
+  backdrop-filter: var(--site-glass-backdrop);
+  /* Dense, which is only a departure in light: over a pale page at the ordinary
+     coverage the reader's own paragraph went on being legible under the list. */
+  background-color: var(--site-glass-dense);
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-lg);
+  /* The largest the scale has. A palette arrives over a page the reader was
+     mid-way through rather than replacing it, so it has to sit clearly above
+     the thing it did not close. */
+  box-shadow: var(--helix-shadow-lg);
+}
+
+/* The mark in the search row takes the brand, which is the one place a small
+   amount of color reads as identity rather than as decoration: it is the thing
+   the eye lands on first and it is already the panel's subject. */
+.siteCommand::part(search) {
+  color: var(--helix-color-primary);
+}
+
+.siteCommand::part(search-field) {
+  /* The field carries the panel's voice. `display` is the face the masthead and
+     the section titles are set in, so a palette opening over them is the same
+     product rather than a control that happens to be on the page. */
+  font-family: var(--helix-font-display);
+}
+
+/* The row under the keyboard, which the component leaves to whoever knows what
+   the keys do. Ours holds the product's name, quietly, because a palette is the
+   one surface a reader opens from anywhere and may not remember whose it is. */
+.siteCommand::part(footer) {
+  /* **`sm`, not the `xs` the component sets, and the keys are why.** `Kbd`
+     draws its label at 0.75em of the text around it, which is right in prose
+     and compounds in a legend already at the smallest step: 12px of footer gave
+     a 9px glyph inside a 18px key, and an arrow at 9px in the mono face is a
+     smudge. One step up puts the label at 10.5px and the keys read. */
+  font-size: var(--helix-text-sm);
+  justify-content: space-between;
+}
+
+/* **The hints, spaced as groups.**
+ *
+ * A row of them, each holding its keys and the word for what they do. The gap
+ * between groups is the larger of the two so the grouping is visible before any
+ * of it is read: `sm` inside a hint, `lg` between hints. At one gap, three
+ * hints and six words read as one sentence needing commas.
+ *
+ * The keys keep their own `Kbd` margin against the word beside them, which the
+ * trigger in the masthead already sets, so a key and its label are one object
+ * in both places. */
+.siteCommandHints {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-lg);
+}
+
+.siteCommandHints span {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
+
+.siteCommandMark {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-display);
+  letter-spacing: var(--helix-tracking-wide);
+}
+
+/* The row the keyboard is on, in the brand's own subtle ground rather than the
+   neutral wash a select uses. A palette is driven by the arrow keys, so this is
+   the only thing on screen that says where the reader is. */
+.siteCommand {
+  --option-active-color: var(--helix-color-primary-subtle);
+  --option-radius: var(--helix-radii-sm);
+}
+
+/* The navigation drawer is a menu, not prose.
+ *
+ * **`data-link` is the prose recipe and must not be applied to these rows**:
+ * primary color, underlined, sized to sit inside a sentence. On a menu it gives
+ * eleven blue underlined phrases stacked down a panel.
+ *
+ * What a menu wants instead is a row: foreground color so the destination is
+ * the content rather than the fact that it is a link, no underline because
+ * position already says these are navigation, and a box tall enough to hit.
+ * 2.75rem is 44px, which is the smallest comfortable touch target and the one
+ * number in here that is not a token, tokens being about rhythm rather than
+ * about the size of a fingertip. */
+.navMenu {
+  display: grid;
+  gap: var(--helix-space-xl);
+  inline-size: 100%;
+}
+
+.navGroup {
+  display: grid;
+  gap: var(--helix-space-2xs);
+}
+
+/* The label sits over a column of rows that are inset by their own padding, so
+   it takes the same inset or it hangs off the left of everything it names. */
+.navGroupLabel {
+  padding-block-end: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+.navItem {
+  align-items: center;
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground);
+  display: flex;
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-sm);
+  /* The whole row is the link and the tag rides its end, so five verticals
+     line their stages up in a column instead of each one starting wherever its
+     own name happened to stop. */
+  justify-content: space-between;
+  min-block-size: 2.75rem;
+  padding-inline: var(--helix-space-sm);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast);
+}
+
+.navItem:hover {
+  background-color: var(--helix-color-surface-raised);
+}
+
+/* Where the reader already is, said once. The tone is the link color the rest
+   of the menu deliberately gave up, which is free to use here because exactly
+   one row can carry it. */
+.navItem[aria-current="page"] {
+  color: var(--helix-color-primary);
+}
+
+.navAction {
+  inline-size: 100%;
+  margin-block-start: var(--helix-space-xs);
+}
+
+/* ============================================== responsive chrome ===== */
+
+/**
+ * The breakpoint is CSS, not React state.
+ *
+ * **`narrow` starts false, so the server always shipped the wide header.** It
+ * only became the narrow one after `matchMedia` ran in an effect, which means
+ * every phone got a first paint with four nav words and a search field laid over
+ * each other in a 375 pixel bar, and then a second layout once JavaScript
+ * arrived. On a fast connection that is a flicker; on a slow one it is the
+ * header for as long as the bundle takes; and where hydration fails for any
+ * reason it is the header permanently.
+ *
+ * A media query knows the width at first paint and needs nothing to have loaded.
+ * Both sets render and CSS picks, so there is no moment where the wrong one is
+ * showing and no state to get out of step with the viewport.
+ *
+ * 48rem, which is the breakpoint the rest of this file already turns at.
+ */
+@media (width < 48rem) {
+  .wideOnly {
+    display: none;
+  }
+}
+
+@media (width >= 48rem) {
+  .narrowOnly {
+    display: none;
+  }
+}
+
+/**
+ * The two controls the bar drops on a narrow screen, as rows in the panel.
+ *
+ * Held off the navigation above them by a rule rather than a gap: they are a
+ * different kind of thing from a list of destinations, and a gap alone reads as
+ * the tree having ended untidily rather than as a second group starting.
+ */
+.navExtras {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  margin-block-start: var(--helix-space-md);
+  padding-block-start: var(--helix-space-md);
+}
+
+/* A row that matches the tree above it: same height, same inset, same quiet ink
+   until it is pointed at. `all: unset` on the button so the two are one shape
+   whichever element they are, and `box-sizing` back because unsetting takes it
+   with everything else. */
+.navExtra {
+  align-items: center;
+  all: unset;
+  block-size: var(--helix-size-control);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  gap: var(--helix-space-sm);
+  padding-inline: var(--helix-space-sm);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.navExtra:hover,
+.navExtra:focus-visible {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}
+
+/**
+ * **A glass panel on a phone in daylight has to admit less.**
+ *
+ * `--helix-material-translucent` is 30 percent, which is right for a pane over a
+ * dark page where the ink behind it is dim and the blur has room to work. In
+ * light mode the ground behind it is near-white and so is the fill, so what
+ * reads through is the page's own text at close to full strength, under the
+ * panel's own text. On a phone the panel covers most of the screen, so most of
+ * the screen is two documents at once.
+ *
+ * `translucent-strong` is the scale's own answer for a ground that admits less,
+ * and it is what `frosted` already uses. Only the light arm moves: dark was
+ * never the problem, and taking it up there would trade a material for a slab.
+ *
+ * Set through `--drawer-background-color`, which `Drawer` publishes for exactly
+ * this, so the component stays in charge of when its material applies.
+ */
+@media (max-width: 40rem) {
+  .siteDrawer {
+    --drawer-background-color: light-dark(
+      var(--helix-material-translucent-strong),
+      var(--site-glass)
+    );
+  }
+}
+
+/**
+ * **Nothing to press them with.**
+ *
+ * The chip on the search button and the four hints in the palette's footer are
+ * teaching: they exist so a reader with a keyboard finds out there is a faster
+ * way in than the button they just used. On a phone there is no faster way, and
+ * the row of hints is four groups of a key nobody can press and the word for
+ * what pressing it would do — a legend for a machine that is not there.
+ *
+ * The hotkeys are not touched. They are listened for on the document, and a
+ * phone with a keyboard attached still gets them; what goes is only the
+ * instruction, which is the part that was wrong on this width.
+ *
+ * **On a wrapper of ours rather than on the key itself.** `Kbd` sets `display`
+ * on its own host, and a document rule setting it again wins whatever the
+ * specificity — which is a component quietly overruled from outside, and
+ * `helix component`'s `overruled` rule says so. The span is ours to hide, and
+ * the component goes on deciding how a key lays itself out.
+ */
+@media (max-width: 40rem) {
+  .keysOnly,
+  .siteCommandHints {
+    display: none;
+  }
+}

@@ -1,4 +1,4 @@
-/* Three columns and two rows: the supporting text sits under the label rather
+/* Four columns and two rows: the supporting text sits under the label rather
    than under the leading icon, which a flex row cannot express without a
    wrapper around the middle. */
 :host {
@@ -18,20 +18,18 @@
      this grid, by the argument the leading mark makes below, so an empty first
      track adds nothing rather than adding a gap beside nothing. */
   grid-template-columns: auto auto 1fr auto;
-  padding: var(--list-item-inset, var(--helix-space-sm) var(--helix-space-md));
+  padding: var(--list-item-padding, var(--helix-space-sm) var(--helix-space-md));
 }
 
 /* The rail: the ordinal, at the start edge of the block rather than beside the
  * words.
  *
- * **`display: none` and not an empty box.** The cell was an empty `<span>` in
- * every row, on the argument that a zero-width grid item costs nothing. It is
- * free to *layout* and it is not free to the marker: an `outside` marker aligns
- * to the first line box inside the principal box, and an empty first grid item
- * is a box that alignment can see. Measured against the same tree without it,
- * every row's box and label sat at the identical pixel and 178 pixels of the
- * markers on a plain ordered list moved, which is a retaken baseline for a
- * feature that list is not using. Absent rather than empty is exactly free.
+ * **`display: none` and not an empty box.** A zero-width grid item is free to
+ * *layout* and not free to the marker: an `outside` marker aligns to the first
+ * line box inside the principal box, and an empty first grid item is a box that
+ * alignment can see. Measured against the same tree without it, every row's box
+ * and label sat at the identical pixel and 178 pixels of the markers on a plain
+ * ordered list moved. Absent rather than empty is exactly free.
  *
  * **A width and not a `min-width`.** Each row carries its own grid, so a track
  * that sizes to its content is a track that differs between rows: `I` and `III`
@@ -44,11 +42,10 @@
  * it belongs to the whole item; a number belongs to the line it numbers, and a
  * row with supporting text under the label wants the two aligned.
  *
- * **`align-self: start`, against the row's `align-items: center`.** Centering was
- * written here on the reasoning that it puts the number on the label's line,
- * which is true of a label that is one line and false of every other: a claim
- * that wraps to three lines got its number against the second, floating in the
- * middle of the block it was numbering. A number belongs on the *first* line of
+ * **`align-self: start`, against the row's `align-items: center`.** Centering
+ * puts the number on the label's line only while the label is one line: a claim
+ * that wraps to three lines gets its number against the second, floating in the
+ * middle of the block it is numbering. A number belongs on the *first* line of
  * what it numbers, at any length, and the label's line-height is inherited here
  * so the two baselines land together rather than the number sitting high on a
  * box of its own. */
@@ -62,7 +59,7 @@
   grid-row: 1;
   letter-spacing: var(--helix-tracking-wide);
   line-height: calc(var(--helix-text-sm) * var(--helix-leading-normal));
-  width: var(--list-rail-width, var(--helix-space-3xl));
+  inline-size: var(--list-rail-inline-size, var(--helix-space-3xl));
 }
 
 /* Written by the list, which is the only thing that knows the ordinal. An item
@@ -77,7 +74,7 @@
 /* `span 2`, not `1 / -1`. The row has a column template and no row template, so
    `-1` is the last *explicit* row line, of which there are none: the span
    collapsed to row one and a leading icon beside a two-line row sat against the
-   label rather than centered on both. The exact fault `Card` hit and wrote up.
+   label rather than centered on both.
 
    Two is the most this row ever has, a label and its supporting line, and a
    second implicit track is zero tall when there is only one, so the same rule
@@ -86,7 +83,7 @@
    nothing for it. A `column-gap` on the grid is drawn beside a zero-width
    column just the same: measured on an ordered list, the text sat 28px in
    where the row's own inset is 16, the extra twelve being a gap next to a
-   column holding nothing. Same fault the toast had, and the same fix. */
+   column holding nothing. */
 slot[name="start"]::slotted(*) {
   color: var(--helix-color-foreground-muted);
   grid-column: 2;
@@ -102,31 +99,25 @@ slot[name="start"]::slotted(*) {
  * generates no box and whatever is assigned to it becomes the grid item
  * directly. That is fine for an element and impossible for text: a bare run
  * between the tags becomes an *anonymous* grid item, and no selector can reach
- * an anonymous box, so `grid-column: 2` never applied to it and it auto-placed.
+ * an anonymous box, so `grid-column` never applies to it and it auto-places.
  *
  * Measured, `<helix-list-item>Bare text<span slot="supporting">Caption</span>`
- * with nothing in `start`: the label landed in column 1 at x=32 and the
- * supporting text, explicitly placed in column 2, sat beside it at x=102 on the
- * same line rather than under it. The identical row with the label wrapped in a
- * `<span>` stacked correctly at x=44 and x=44. It looked right in every example
- * only because every example has a leading icon, which fills column 1 and makes
+ * with nothing in `start`: the label landed in the first column at x=32 and the
+ * supporting text, explicitly placed, sat beside it at x=102 on the same line
+ * rather than under it. The identical row with the label wrapped in a `<span>`
+ * stacked correctly at x=44 and x=44, and the two heights disagreed as well,
+ * 65px bare against 63px wrapped. It looks right in every example only because
+ * every example has a leading icon, which fills a column and makes
  * auto-placement land on the right cell by accident.
  *
- * The two heights disagreed as well, 65px bare against 63px wrapped, since one
- * was a text run in an anonymous box and the other an element.
+ * Bare text is allowed here by design and must stay allowed: the rule below
+ * puts the inherited half of the typography on the slot so a text node picks it
+ * up through the flattened tree.
  *
- * This is not something to solve in the consumer's markup. `@slot - The label`
- * takes content, and the rule below this one exists *because* that content is
- * usually bare text: it puts the inherited half of the typography on the slot
- * so a text node picks it up through the flattened tree. A component whose two
- * label rules disagree about whether text is allowed is the fault, not the
- * markup that trips over it.
- *
- * The bare-slot rule in the area notes says a region with no behavior is a bare
- * `<slot>` and never a wrapped one, because an empty wrapper paints an inset
- * band. That is about a *wrapper element* the component renders. This adds no
- * element: the slot is the box, and an unfilled one is a zero-height cell in a
- * row whose height comes from its siblings. */
+ * The bare-slot rule in the area notes, that a region with no behavior is a
+ * bare `<slot>` and never a wrapped one, is about a *wrapper element* the
+ * component renders. This adds no element: the slot is the box, and an unfilled
+ * one is a zero-height cell in a row whose height comes from its siblings. */
 slot:not([name]) {
   color: var(--helix-color-foreground);
   display: block;

@@ -11,7 +11,7 @@ import { shellLanguage } from './shell.js'
  * them**, and the base JavaScript grammar reads both wrongly rather than
  * partially. Measured on a `tsx` fence highlighted as `js`: `<helix-input` came
  * out as the variable `helix`, the operator `-` and the variable `input`, which
- * is the parser doing arithmetic on a tag name and colouring the result
+ * is the parser doing arithmetic on a tag name and coloring the result
  * confidently. A grammar that does not know the dialect does not degrade, it
  * lies.
  *
@@ -20,7 +20,7 @@ import { shellLanguage } from './shell.js'
  * a fourth entry would be a distinction with no consequence.
  *
  * `sh` is the one grammar here that is not shipped as it comes: see `shell.ts`
- * for why a mode that knows sh perfectly colours nothing in `bun add`.
+ * for why a mode that knows sh perfectly colors nothing in `bun add`.
  */
 export type HighlightLanguage = 'css' | 'html' | 'js' | 'sh' | 'ts' | 'tsx'
 
@@ -49,19 +49,16 @@ const escapeHtml = (text: string): string =>
  * on a server with no DOM at all, which is what lets a static page ship
  * highlighted code with no client JavaScript spent on it.
  *
- * **Here rather than in `helix/styled`, and that is the whole point.** A code block
- * is a component and must not carry a parser: CodeMirror is about 4 MB
- * installed, and a `dependencies` entry is paid by every consumer whether or
- * not they import it. This package already carries those grammars for the
- * editor, so highlighting costs nothing new. `CodeBlock` renders a `<slot>`,
- * so the output of this drops straight into one and the component stays
- * dependency-free while its content is highlighted by the same grammars the
- * editor uses. A snippet on a reference page and the same snippet open in the
- * sandbox are then coloured by one source rather than two that agree by
- * coincidence.
+ * **Here rather than in `helix/styled`.** A code block must not carry a parser:
+ * CodeMirror is about 4 MB installed, and a `dependencies` entry is paid by
+ * every consumer whether or not they import it. This package already carries
+ * those grammars for the editor, and `CodeBlock` renders a `<slot>`, so the
+ * output of this drops straight into one. A snippet on a reference page and the
+ * same snippet open in the sandbox are then colored by one source rather than
+ * two that agree by coincidence.
  *
  * `classHighlighter` emits Lezer's own `tok-` class names. Mapping those to
- * colours is the consumer's, because the classes are stable and the palette is
+ * colors is the consumer's, because the classes are stable and the palette is
  * not: the site paints them from `--helix-color-syntax-*`.
  */
 export const highlight = (code: string, language: HighlightLanguage): string => {

@@ -1,5 +1,5 @@
 /* Starting where the label starts rather than under the leading mark, which is
    what a rule between rows is for. */
 .row-rule {
-  --divider-inset-start: 3.25rem;
+  --divider-padding-start: 3.25rem;
 }

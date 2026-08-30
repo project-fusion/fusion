@@ -19,11 +19,10 @@ import { property } from 'lit/decorators.js'
  * the page for everyone rather than only for the people who cannot see it.
  *
  * **It never creates or destroys anything.** The consumer renders items and
- * removes them; asking to go is a cancelable `helix-dismiss` from the item.
- * That is still exactly true of the region: an item that has gone hides itself
- * and stays in the tree, so a consumer whose state still lists it does not have
- * their framework fighting a node this component took away. What changed is
- * that the item no longer waits to be told before hiding, unless the consumer
+ * removes them; asking to go is a cancelable `helix-dismiss` from the item. An
+ * item that has gone hides itself and stays in the tree, so a consumer whose
+ * state still lists it does not have their framework fighting a node this
+ * component took away. It hides without waiting to be told, unless the consumer
  * declared `open` and said the state is theirs.
  * There is no `toast.show()`, because an imperative queue inside a component is
  * a second copy of the application's state that nothing can render from: an app
@@ -56,15 +55,12 @@ export class HelixHeadlessToast extends HelixElement {
    * toasts is a fact about the page: a stack whose members disagreed about
    * where they were would not be a stack.
    *
-   * **Optional, and bottom-end is the absence of it.** It reflected *and*
-   * defaulted, which is the pair that writes onto a host: every toast region
-   * anybody rendered gained a `placement="bottom-end"` nobody typed, and a
-   * React consumer's server markup does not have it. The styled sheet carries
-   * the resting arrangement in its own `:host` rule now and the selectors
-   * describe only the departures, which is what `orientation` has always done.
-   *
-   * The SSR spec could never have caught it: it passed a placement explicitly,
-   * so the attribute it asserted was one the consumer had written.
+   * **Optional, and bottom-end is the absence of it.** Reflecting *and*
+   * defaulting is the pair that writes onto a host: every toast region anybody
+   * rendered would gain a `placement="bottom-end"` nobody typed, which a React
+   * consumer's server markup does not have. The styled sheet carries the resting
+   * arrangement in its own `:host` rule and the selectors describe only the
+   * departures, which is what `orientation` does.
    */
   @property({ reflect: true })
   placement?:

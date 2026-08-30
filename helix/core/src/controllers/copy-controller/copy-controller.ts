@@ -71,10 +71,8 @@ const write = async (text: string): Promise<boolean> => {
  * case wrong.
  *
  * **There are two routes and both are tried**, because the modern one is gated
- * in more places than it looks: an insecure origin, an unfocused document, and a
- * Permissions Policy defaulting to `self`, which a sandboxed iframe is not. The
- * component using this reported as not working, and a control that does nothing
- * is indistinguishable from a broken one. See `write` above.
+ * in more places than it looks and a control that does nothing is
+ * indistinguishable from a broken one. See `write` above.
  *
  * **Where neither route is allowed, the failure is silence.** The confirmation
  * does not appear, which is the honest report: a message about a clipboard is
@@ -117,11 +115,11 @@ export class CopyController implements ReactiveController {
     }
     /* **The host may have gone while the clipboard was being written.** Writing
        is asynchronous, `hostDisconnected` runs the moment the element leaves,
-       and it clears a timer that does not exist yet: everything below this line
-       used to run afterwards regardless, starting a fresh timer on a detached
-       host and calling `requestUpdate` on it a second later. Checked here
-       rather than in `reset`, because the thing to skip is the whole
-       confirmation and not only its clock. */
+       and it clears a timer that does not exist yet, so without this the
+       confirmation starts a fresh timer on a detached host and calls
+       `requestUpdate` on it a second later. Checked here rather than in
+       `reset`, because the thing to skip is the whole confirmation and not only
+       its clock. */
     if (this.host instanceof HTMLElement && !this.host.isConnected) {
       return
     }

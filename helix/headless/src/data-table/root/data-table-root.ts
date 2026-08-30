@@ -39,12 +39,8 @@ import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.
  * </helix-data-table>
  * ```
  *
- * This is the resolution of a deferral rather than a new idea. `helix-table`
- * takes rows as markup and is the right component for a table of twelve things
- * a person wrote out; the repeated `page`, `page-size` and `total` attributes on
- * the three pagination elements are placeholders whose own comments name the fix
- * as "a data table composing a pagination inside itself", and `helix-table`
- * already carried `@aliases DataTable`: a name claimed and not kept.
+ * `helix-table` takes rows as markup and is the right component for a table of
+ * twelve things a person wrote out.
  *
  * **Sort and filter apply to the whole set, never the page.** Sorting the drawn
  * window is correct on the first screen and wrong on every other one, which is
@@ -64,10 +60,10 @@ import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.
  * `helix-table` where the content has to be in the served HTML and the result is
  * small enough to write out; use this where the result is large, and accept that
  * the first paint is a shell. The obvious workaround, a `columns` property
- * beside the markup columns, is deliberately not offered: this family has
- * already shipped one source of truth for columns splitting into two, nothing
- * checked that they agreed, and a table rendering one way on the server and
- * another in the browser is that failure with a hydration mismatch on top.
+ * beside the markup columns, is deliberately not offered: it splits one source
+ * of truth for the columns into two that nothing checks against each other, and
+ * a table rendering one way on the server and another in the browser is that
+ * failure with a hydration mismatch on top.
  *
  * **Every axis is controlled or uncontrolled, and that is what makes a server
  * mode fall out rather than be bolted on.** `sort`, `filter`, `page` and
@@ -120,18 +116,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The whole result, in the order it arrived.
-   *
-   * A property and not an attribute: it is an array. Left alone this element
-   * filters, sorts and pages it; in `server` mode it is the page the consumer
-   * already fetched and none of the three is applied.
-   *
-   * **Read, never written.** Sorting produces a new array rather than reordering
-   * this one, because a consumer's array may be the same object their own state
-   * holds and reordering it under them is a mutation they did not ask for.
+   * Query to open with, where nothing declared one.
    */
-  @property({ attribute: false })
-  rows: readonly DataRow[] = []
+  @property({ attribute: 'default-filter' })
+  defaultFilter = ''
+
+  /**
+   * Page to open on, where nothing declared one.
+   */
+  @property({ attribute: 'default-page', type: Number })
+  defaultPage = 1
+
+  /**
+   * Page size to open with, where nothing declared one.
+   */
+  @property({ attribute: 'default-page-size', type: Number })
+  defaultPageSize = 0
+
+  /**
+   * Order to open on, where nothing declared one.
+   */
+  @property({ attribute: 'default-sort' })
+  defaultSort = ''
 
   /**
    * The field naming a row's stable identity.
@@ -147,43 +153,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   key = ''
 
   /**
-   * Whether this element does the work or asks the consumer to.
-   *
-   * `client` filters, sorts and pages `rows` itself. `server` applies none of
-   * them: `rows` is the page, `total` is the size of the whole result, and the
-   * three events are requests the consumer answers by fetching. Past some size
-   * the client cannot hold the data, so this is not an optimization, it is the
-   * only mode that works, and it is here from the start because adding it later
-   * inverts the data flow.
-   */
-  @property()
-  mode: 'client' | 'server' = 'client'
-
-  /**
-   * How many rows the whole result has, where this element cannot count them.
-   *
-   * Only read in `server` mode, where `rows` is one page and its length says
-   * nothing about the result. Ignored in `client` mode rather than trusted,
-   * because two sources for one count is the mistake, and here the array is the
-   * one that cannot be stale.
-   */
-  @property({ type: Number })
-  total = 0
-
-  /**
-   * Accessible name for the grid.
-   */
-  @property()
-  label = ''
-
-  /**
    * The order, as `field:direction`.
    *
    * Set it and this element defers: a reader's click fires `helix-sort` and
    * changes nothing until a new value arrives. `default-sort` seeds an order this
    * element then owns.
-   *
-   *
    */
   @property()
   get sort(): string {
@@ -197,10 +171,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Order to open on, where nothing declared one.
+   * Accessible name for the grid.
    */
-  @property({ attribute: 'default-sort' })
-  defaultSort = ''
+  @property()
+  label = ''
 
   /**
    * What the rows are narrowed to, as one query across every column.
@@ -208,8 +182,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * One query rather than a predicate per column, which is what a reader means
    * by a search box above a table. It matches on each column's ordering value,
    * so search and sort cannot disagree about what a column holds.
-   *
-   *
    */
   @property()
   get filter(): string {
@@ -223,10 +195,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Query to open with, where nothing declared one.
+   * Whether this element does the work or asks the consumer to.
+   *
+   * `client` filters, sorts and pages `rows` itself. `server` applies none of
+   * them: `rows` is the page, `total` is the size of the whole result, and the
+   * three events are requests the consumer answers by fetching. Past some size
+   * the client cannot hold the data, so this is not an optimization, it is the
+   * only mode that works, and it is here from the start because adding it later
+   * inverts the data flow.
    */
-  @property({ attribute: 'default-filter' })
-  defaultFilter = ''
+  @property()
+  mode: 'client' | 'server' = 'client'
 
   /**
    * The page on show, from 1.
@@ -234,8 +213,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * Clamped on the way out, so what this reports is the page it drew: a
    * bookmarked link to page 99 of a result that has since shrunk reads back as
    * the last page rather than as 99.
-   *
-   *
    */
   @property({ type: Number })
   get page(): number {
@@ -250,10 +227,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Page to open on, where nothing declared one.
+   * The whole result, in the order it arrived.
+   *
+   * A property and not an attribute: it is an array. Left alone this element
+   * filters, sorts and pages it; in `server` mode it is the page the consumer
+   * already fetched and none of the three is applied.
+   *
+   * **Read, never written.** Sorting produces a new array rather than reordering
+   * this one, because a consumer's array may be the same object their own state
+   * holds and reordering it under them is a mutation they did not ask for.
    */
-  @property({ attribute: 'default-page', type: Number })
-  defaultPage = 1
+  @property({ attribute: false })
+  rows: readonly DataRow[] = []
 
   /**
    * How many rows a page holds. Zero is every row, which is what "no paging" means.
@@ -276,10 +261,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Page size to open with, where nothing declared one.
+   * How many rows the whole result has, where this element cannot count them.
+   *
+   * Only read in `server` mode, where `rows` is one page and its length says
+   * nothing about the result. Ignored in `client` mode rather than trusted,
+   * because two sources for one count is the mistake, and here the array is the
+   * one that cannot be stale.
    */
-  @property({ attribute: 'default-page-size', type: Number })
-  defaultPageSize = 0
+  @property({ type: Number })
+  total = 0
 
   /**
    * Whether to draw a pagination under the grid.
@@ -319,8 +309,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   get tableColumns(): HelixHeadlessTableColumn[] {
     /* `?? []` is the server. Lit's element shim carries attributes and not a
        tree, so `children` is undefined there, and this getter is read during
-       `render`: spreading it threw and took the whole SSR suite with it in this
-       family once already. */
+       `render`: spreading it throws and takes the whole SSR suite with it. */
     return [...(this.children ?? [])].filter(
       (child): child is HelixHeadlessTableColumn =>
         'isTableColumn' in child && child.isTableColumn === true,
@@ -341,6 +330,59 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * How many rows this draws before it is worth saying something, and why 2,000.
+   *
+   * Measured 28 Aug 2026 on a four-column grid, mounting and painting: 100 rows
+   * in 10.9ms, 500 in 30.2ms, 2,000 in 83.2ms and **5,000 rows as 20,000 cells
+   * in 186ms**. It is linear at roughly 37 microseconds a row, so the 100ms an
+   * interaction has to stay inside lands near 2,700 and this sits under it.
+   * Sorting stays cheap throughout, 23.7ms at five thousand, so the cost is the
+   * cells rather than the work over them.
+   */
+  private static readonly COMFORTABLE = 2_000
+
+  /** Said once per element, so a table that re-renders does not repeat it. */
+  private warnedAboutSize = false
+
+  /**
+   * Says so when a table is asked to draw more than it comfortably can.
+   *
+   * **The component renders every row it is given and defaults to doing so.**
+   * `defaultPageSize` is `0`, so `paginated` is false unless a consumer asks,
+   * which means the out-of-the-box arrangement is the unbounded one and nothing
+   * about it says that a result of any size will simply be drawn.
+   *
+   * **Windowing was refused**, which is worth recording because it is the
+   * obvious answer. This element already has two mechanisms: `paginated` with a
+   * `page-size`, and `mode="server"` where `rows` is one page, `total` is the
+   * whole result and `aria-rowcount` already reports the result rather than the
+   * window, which is the hard half of virtualization done correctly. A third
+   * would fight the first two, and virtualizing a grid means variable row
+   * heights, a sticky header and keeping `aria-rowindex` honest against a result
+   * the element is no longer holding. `VirtualizeController` exists for the case
+   * where the rows are a flat list and this is not that.
+   *
+   * Warned once per element, in a browser only: a warning during a server render
+   * is one nobody can act on and one that would print per request.
+   */
+  private warnIfCrowded(drawn: number): void {
+    if (
+      this.warnedAboutSize ||
+      drawn <= HelixHeadlessDataTable.COMFORTABLE ||
+      typeof window === 'undefined'
+    ) {
+      return
+    }
+    this.warnedAboutSize = true
+    console.warn(
+      `<${this.localName}> is drawing ${drawn} rows at once, which is past the ${HelixHeadlessDataTable.COMFORTABLE} ` +
+        'it stays responsive to: every row is rendered, so this costs roughly 37 microseconds each and ' +
+        'crosses an interaction budget around 2,700. Set `page-size` to paginate, or `mode="server"` ' +
+        'to hand it one page at a time with `total` describing the whole result.',
+    )
+  }
+
+  /**
    * The rows to draw, and the counts around them.
    *
    * In `server` mode this element applies nothing: `rows` is already the page,
@@ -353,12 +395,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       const total = Math.max(this.total, this.rows.length)
       return { matched: total, rows: [...this.rows], total }
     }
-    return ordered(this.rows, this.axes, {
+    const view = ordered(this.rows, this.axes, {
       page: this.page,
       query: this.filter,
       size: this.pageSize,
       spec: this.sort,
     })
+    this.warnIfCrowded(view.rows.length)
+    return view
   }
 
   /** How many pages the result makes, which is at least one even when empty. */
@@ -507,18 +551,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * Says on the toolbar and the footer whether anything is in them.
    *
-   * **The stylesheet used to ask, and could not.** It read
-   * `[part="toolbar"]:has(> slot:not(:has(*)))`, which is two faults at once:
-   * `:has()` may not be nested inside `:has()`, so the selector failed to parse
-   * and the whole rule was discarded; and `slot:not(:has(*))` is as true of a
-   * filled slot as of an empty one, because assigned nodes are not a slot's DOM
-   * children. Both verified in a browser. A table with no toolbar paid the gap
-   * above the grid for one that was not there.
+   * **A stylesheet cannot ask.** `[part="toolbar"]:has(> slot:not(:has(*)))` is
+   * two faults at once: `:has()` may not be nested inside `:has()`, so the
+   * selector fails to parse and the whole rule is discarded; and
+   * `slot:not(:has(*))` is as true of a filled slot as of an empty one, because
+   * assigned nodes are not a slot's DOM children. Both verified in a browser.
    */
   private markEmpty(): void {
     this.markRegion('toolbar', ['toolbar'])
     /* The footer is not empty while this element is drawing its own pagination
-       into it, which is the case the old selector spelled with a second `:not`. */
+       into it. */
     this.markRegion('footer', ['footer'], '[part="pagination"]')
   }
 
@@ -639,8 +681,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * node passes through the slot in the flattened tree, and does not work in
    * happy-dom, which does not implement that propagation: measured, the host
    * hears the click and the slot does not. A spec written against the slot fails
-   * in the suite while the component is correct, and the same trust in the
-   * flattened tree could as easily have gone the other way.
+   * in the suite while the component is correct.
    *
    * Added here rather than in the template because there is nothing in the
    * shadow tree to attach it to, and removed on disconnect because this element

@@ -8,11 +8,10 @@
    of document order and needs no `z-index`: nothing here is positioned, so
    painting follows the tree.
  *
- * `row-reverse` was the first attempt, for the familiar trick that puts the
- * *first* avatar on top. It also reverses the row, so the person written first
- * appears last, and a facepile whose reading order is the reverse of its markup
- * is a worse trade than which face is in front. Measured before it was
- * believed: the second avatar landed left of the first.
+ * Not `row-reverse`, which is the familiar trick for putting the *first* avatar
+ * on top. It also reverses the row, measured: the second avatar lands left of
+ * the first. A facepile whose reading order is the reverse of its markup is a
+ * worse trade than which face is in front.
  *
  * The ring goes on as a shadow rather than a border. `::slotted()` reaches the
  * avatar's host, which is where its size and radius already are, and a border
@@ -25,10 +24,9 @@
 
 /* The overlap, as a negative margin on everything after the first.
  *
- * Not a negative `gap`, which is what this was: `gap` is a `<length-percentage>`
- * that refuses negative values, so the declaration is invalid and dropped, and
- * the row came out merely adjacent with nothing to say why. The browser spec
- * caught it at one pixel of difference, `expected 40 to be less than 40`.
+ * Never a negative `gap`: it is a `<length-percentage>` that refuses negative
+ * values, so the declaration is invalid and dropped and the row comes out merely
+ * adjacent with nothing to say why.
  *
  * `::slotted()` takes a compound selector, and `:not(:first-child)` is one, so
  * the first avatar can keep its edge without the group writing an attribute
@@ -40,18 +38,17 @@
 /* Past `max`. Hidden rather than removed, so nothing re-renders when the limit
  * changes and the group can still count what it is not showing.
  *
- * In CSS, because this was JavaScript writing `data-overflow` onto each avatar
- * from `updated`. Measured in Chrome 148: append two avatars past `max` to a
- * settled group and read before yielding, and all five are `flex`; they fold to
- * three only on the next Lit update. So a framework rendering a list painted
- * the whole set for a frame, and the group wrote attributes onto elements it
- * does not own to do it.
+ * In CSS, and never in JavaScript writing `data-overflow` onto each avatar from
+ * `updated`. Measured in Chrome 148: append two avatars past `max` to a settled
+ * group and read before yielding, and all five are `flex`; they fold to three
+ * only on the next Lit update. So a framework rendering a list paints the whole
+ * set for a frame, and the group writes attributes onto elements it does not own
+ * to do it.
  *
- * The comment justifying that said `::slotted()` takes a compound selector "and
- * not `:nth-child()`", which is wrong: `:nth-child()` is a pseudo-class and a
- * compound selector may hold one, exactly as `:not(:first-child)` does in the
- * rule above. Measured before it was believed, `::slotted(*:nth-child(n + 4))`
- * hides the fourth onward and nothing else.
+ * `::slotted()` takes a compound selector and `:nth-child()` is a pseudo-class,
+ * so a compound selector may hold one exactly as `:not(:first-child)` does in
+ * the rule above. Measured: `::slotted(*:nth-child(n + 4))` hides the fourth
+ * onward and nothing else.
  *
  * One selector per value of `max`, because `An+B` takes a literal and there is
  * no reading a custom property into it, so this cannot be written once. Twelve,

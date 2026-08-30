@@ -5,14 +5,14 @@ import '../index.js'
 import '../../table/index.js'
 
 /**
- * The server output, which is where this family has been broken before.
+ * The server output.
  *
  * **Lit's element shim carries attributes and not a tree**, so `this.children`
  * is `undefined` on the server. `tableColumns` is read during `render`, and
- * spreading an undefined `children` threw and took the whole SSR suite down with
- * an unhandled error the last time this family was written. The `?? []` guarding
- * it is invisible in a DOM spec, because there `children` always exists, which
- * is the entire reason these specs run in a second process.
+ * spreading an undefined `children` throws and takes the whole SSR suite down
+ * with an unhandled error. The `?? []` guarding it is invisible in a DOM spec,
+ * because there `children` always exists, which is the entire reason these
+ * specs run in a second process.
  *
  * The rows are a property here rather than markup, so what a crawler gets is not
  * an accident of what the consumer typed: the table renders its cells from data
@@ -57,12 +57,12 @@ describe('data table server output', () => {
    *
    * That is the cost of "the schema is markup and the data is a property", and
    * it is a bigger version of a cost the design already accepted: a consumer
-   * hand-authoring HTML with no build step gets default cell rendering. Filed as
-   * a row rather than worked around here, because the obvious workaround is a
-   * `columns` property beside the markup columns, and this family has already
-   * shipped one source of truth for columns splitting into two: nothing checked
-   * that they agreed, and a table rendered one way on the server and another in
-   * the browser is that failure with a hydration mismatch on top.
+   * hand-authoring HTML with no build step gets default cell rendering. Filed
+   * rather than worked around here, because the obvious workaround is a
+   * `columns` property beside the markup columns, which splits one source of
+   * truth for columns into two that nothing checks agree: a table rendered one
+   * way on the server and another in the browser, with a hydration mismatch on
+   * top.
    *
    * Asserted rather than left implicit, so the day it is fixed this spec fails
    * and says what changed.

@@ -1,7 +1,7 @@
 /* A region rather than an overlay: it sits where it is put, so it brings a fill
    and a width and no shadow. Whatever frames it is the consumer's. */
 :host {
-  background-color: var(--drilldown-background, var(--helix-color-surface));
+  background-color: var(--drilldown-background-color, var(--helix-color-surface));
   block-size: fit-content;
   display: block;
   inline-size: var(--drilldown-inline-size, 100%);
@@ -16,13 +16,13 @@
 [part="header"] {
   align-items: center;
   /* A step above the rows rather than level with them. The header is the one
-     thing on the page that is not a row, and at the rows' own height it read as
-     the first of them with a different weight of text. `control-md` against the
-     rows' `control-sm` is eight pixels, which is enough to separate the bar
-     from the list without making it a banner.
+     thing on the page that is not a row, and at the rows' own height it reads as
+     the first of them with a different weight of text. `size-control` against
+     the rows' `size-control-tight` is eight pixels at the default density, which
+     is enough to separate the bar from the list without making it a banner.
 
-     Both are pinned to a step rather than reading the current one, so the gap
-     between them holds whatever density the panel is dropped into. */
+     Both follow the current control step, so the gap between them holds whatever
+     density the panel is dropped into. */
   block-size: var(--helix-size-control);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
@@ -97,9 +97,9 @@
   }
 }
 
-/* The instant swap, which is what this did before it moved. A reader who has
-   asked for less motion still gets the header and the title saying where they
-   are, which is the part that carries the meaning. */
+/* The instant swap. A reader who has asked for less motion still gets the header
+   and the title saying where they are, which is the part that carries the
+   meaning. */
 @media (prefers-reduced-motion: reduce) {
   :host([data-direction]) [part="page"] {
     animation: none;
@@ -107,8 +107,7 @@
 }
 
 /* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical. */
+   rule it answers loses on specificity and does nothing. */
 @media (prefers-reduced-motion: reduce) {
   :host([data-direction="forward"]) [part="page"] {
     animation: none;
@@ -163,7 +162,7 @@
 /* Print: a way into a hierarchy, which paper cannot descend.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     display: none;

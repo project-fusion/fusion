@@ -27,16 +27,14 @@
 
 /* With tags in it the field grows, and only then.
  *
- * On `:has([part="tags"])` rather than on a reflected `multiple`, which is the
- * more accurate question and needs no attribute on the host: a `multiple`
- * combobox with nothing chosen yet is a plain field and should look like one.
- * Tree's row asks the same question of its own shadow content.
+ * On `:has([part="tags"])` rather than on a reflected `multiple`, which needs no
+ * attribute on the host: a `multiple` combobox with nothing chosen yet is a
+ * plain field and should look like one.
  *
  * `block-size: auto` with a floor rather than the fixed height every other
- * field has, because the number of rows is the reader's and not the designer's:
- * six tags wrap to three lines and a field that kept one line would clip two of
- * them. The floor keeps a field with one tag the same height as a field with
- * none, so a form does not jump as the first choice is made.
+ * field has: six tags wrap to three lines and a field that kept one line would
+ * clip two of them. The floor keeps a field with one tag the same height as a
+ * field with none, so a form does not jump as the first choice is made.
  *
  * The block padding arrives with the wrapping. At a fixed height the tags are
  * centered by `align-items` and need none; once the box can grow, nothing is
@@ -53,10 +51,9 @@
 
 /* And it turns over as the panel opens, saying which way the panel is going.
  *
- * Both selectors, for the reason Select's block records at length and was fixed
- * for: the default caret is the slot's *fallback* content, `::slotted()` matches
- * assigned nodes only, and fallback content is never assigned. One half is the
- * fallback, the other the consumer's replacement.
+ * Both selectors: the default caret is the slot's *fallback* content,
+ * `::slotted()` matches assigned nodes only, and fallback content is never
+ * assigned. One half is the fallback, the other the consumer's replacement.
  *
  * A flip across the x-axis rather than a rotation: the two end in the same
  * place for a symmetric caret and take different routes, and a rotation spends
@@ -71,12 +68,11 @@
 
 /* And the caret comes out of the wrap.
  *
- * Measured with eight tags: it is the last flex item, so it wrapped with the
- * text field onto a third line and sat there alone against the right edge,
- * under a row of tags, which reads as a field that has broken rather than one
- * that has grown. It says the panel opens, which is true of the whole control
- * and not of whichever line it landed on, so it belongs at the field's end
- * rather than at the end of the content.
+ * Measured with eight tags: as the last flex item it wrapped with the text field
+ * onto a third line and sat there alone against the right edge, which reads as a
+ * field that has broken rather than one that has grown. It says the panel opens,
+ * which is true of the whole control and not of whichever line it landed on, so
+ * it belongs at the field's end rather than at the end of the content.
  *
  * Both selectors for the reason the flip rule gives: the default caret is the
  * slot's fallback content and `::slotted()` cannot match it. */
@@ -105,11 +101,10 @@
 
 /* Beside the tags it counts, not at the far end of the row.
  *
- * It is a fact about the set, and a summary separated from what it summarises
- * by a text field is one the reader has to work out. Pushed right it also sits
- * against the caret and reads as chrome, and the distance between the tags and
- * their own count then changes as the field is typed into, which is the clearest
- * sign it is in the wrong place. */
+ * A summary separated from what it summarizes by a text field is one the reader
+ * has to work out. Pushed right it also sits against the caret and reads as
+ * chrome, and the distance between the tags and their own count then changes as
+ * the field is typed into. */
 [part="rest"] {
   align-self: center;
   color: var(--helix-color-foreground-subtle);
@@ -205,22 +200,21 @@ slot[name="end"]::slotted(*) {
 }
 
 /* The panel, in the house shape every floating surface here takes. `border: none`
- * said rather than left out, for the reason Popover, Menu and Select all record:
- * the UA stylesheet gives `[popover]` `border: solid`, so dropping the
- * declaration leaves three pixels of medium gray rather than none at all.
+ * said rather than left out: the UA stylesheet gives `[popover]` `border: solid`,
+ * so dropping the declaration leaves three pixels of medium gray rather than none
+ * at all.
  *
  * The field's width, from the controller rather than from a percentage: the
  * panel is positioned `fixed`, so `100%` would be the viewport and not the
- * field. A list of the field's own options is a continuation of the field, and
- * one narrower or wider reads as a second control.
+ * field.
  *
  * `min-inline-size: max-content` is a floor rather than a cap, so an option
- * longer than the field widens the panel instead of wrapping. A dropdown is
- * read, and a name broken across two lines to fit a field it has no
- * relationship to is worse than a panel that sticks out. Select records both.
+ * longer than the field widens the panel instead of wrapping. A name broken
+ * across two lines to fit a field it has no relationship to is worse than a
+ * panel that sticks out.
  *
- * And never taller than the room under the field, for the same reason as the
- * width: the space is measured, not declared. */
+ * And never taller than the room under the field: the space is measured, not
+ * declared. */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
   border: var(--combobox-border-width, var(--helix-border-floating)) solid
@@ -228,10 +222,10 @@ slot[name="end"]::slotted(*) {
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--combobox-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
-  inline-size: var(--combobox-panel-size, var(--floating-anchor-width, 100%));
+  inline-size: var(--combobox-panel-size, var(--floating-anchor-inline-size, 100%));
   inset: auto;
   margin: var(--helix-space-none);
-  max-block-size: var(--floating-available-height, none);
+  max-block-size: var(--floating-available-block-size, none);
   min-inline-size: max-content;
   overflow: hidden;
   padding: var(--helix-space-none);
@@ -239,10 +233,9 @@ slot[name="end"]::slotted(*) {
 }
 
 /* The row offering to add what was typed, dressed as a row of the list rather
- * than as a button, because that is what it stands in for: it sits under the
- * options in the same panel and is chosen the same way. `all: unset` first,
- * since a `<button>` arrives with a background, a border and a font of its own,
- * every one of which would make it read as a control bolted under a list.
+ * than as a button: it sits under the options in the same panel and is chosen
+ * the same way. `all: unset` first, since a `<button>` arrives with a
+ * background, a border and a font of its own.
  *
  * Separated by a rule rather than by space alone. It is not one of the
  * consumer's options and pressing it does something none of them do, and a row
@@ -265,10 +258,9 @@ slot[name="end"]::slotted(*) {
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The same wash a hovered option takes, and for the reason that block records
-   at length: a step on the surface ladder painted the highlight in the panel's
-   own color and it vanished. The row is standing in for an option, so it
-   highlights like one. */
+/* The same wash a hovered option takes: a step on the surface ladder painted the
+   highlight in the panel's own color and it vanished. The row is standing in for
+   an option, so it highlights like one. */
 [part="create"]:hover {
   background-color: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
@@ -356,10 +348,12 @@ slot[name="end"]::slotted(*) {
   }
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and the state has to survive: a
+ * tick that is a fill prints as an empty box, which is a document saying the
+ * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

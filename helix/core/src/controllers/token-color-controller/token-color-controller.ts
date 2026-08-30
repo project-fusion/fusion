@@ -14,10 +14,8 @@ export type TokenColor = [number, number, number]
  * white. Parsing that with a regular expression for numbers reads the three
  * channels as 100, 0 and 0, which divided by 255 is a dark red.
  *
- * That is not hypothetical. It shipped, and `--helix-color-foreground` arrived
- * as a dark red that painted a warm streak down a shader for an afternoon. It
- * survived review because a warm cast on a saturated gradient is also what a
- * screenshot's chroma subsampling produces, so the picture agreed with the bug.
+ * A screenshot cannot catch that: a warm cast on a saturated gradient is also
+ * what chroma subsampling produces, so the picture agrees with the bug.
  *
  * The conversion is therefore the browser's own: fill a pixel and read it back.
  * That holds for `lab()`, `oklch()`, `color-mix()` and whatever a token is

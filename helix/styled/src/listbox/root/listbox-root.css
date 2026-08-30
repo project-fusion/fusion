@@ -16,7 +16,7 @@
   /* Square rows, for the reason the select's panel gives: they run the full
      width of this box, and a radius on a band that reaches both edges rounds
      against nothing. */
-  --option-radii: var(--helix-radii-none);
+  --option-radius: var(--helix-radii-none);
 
   /* `surface`, not `surface-sunken`, and the rows are what decides it. A row
      hovers and selects at `raised`, which on a white page is a step *darker*
@@ -124,8 +124,9 @@ slot[name="filter-icon"]::slotted(*) {
  *
  * A rule under it rather than a box around it, because it is part of the same
  * surface as the rows rather than a control sitting on one. The panel that
- * frames the list is already the frame. */
-/* A row now, holding the mark and the field. */
+ * frames the list is already the frame.
+ *
+ * A row, holding the mark and the field. */
 [part="search"] {
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
@@ -165,10 +166,11 @@ slot[name="filter-icon"]::slotted(*) {
   opacity: 0.5;
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: the list prints the options it holds, without the lift that says it is
+ * a live surface.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

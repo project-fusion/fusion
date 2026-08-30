@@ -44,10 +44,20 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   disabled = false
 
   /**
-   * Identifies the row to whatever is listening.
+   * Whether this row holds the region's tab stop. Written by the stack.
+   *
+   * A drill-down keeps one stop and moves within it on the arrows, so every
+   * other row is at `-1`. Leave it off every row, including the first, and
+   * nothing in the region is tab-reachable: the keyboard cannot get in without
+   * first clicking something with a pointer.
+   *
+   * No attribute, the same as `Button`'s: this is coordination between
+   * elements, and writing `tabindex` onto a host the consumer rendered is a
+   * change a React consumer's hydration reports and does not patch up. The stop
+   * lands inside this shadow root instead.
    */
-  @property()
-  value = ''
+  @property({ attribute: false })
+  focusable = false
 
   /**
    * @internal Read by a parent to identify its children across the light DOM,
@@ -73,20 +83,10 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   showingPage = false
 
   /**
-   * Whether this row holds the region's tab stop. Written by the stack.
-   *
-   * A drill-down keeps one stop and moves within it on the arrows, so every
-   * other row is at `-1`. Every row was, including the first, which left
-   * nothing in the region tab-reachable at all: the keyboard could not get in
-   * without first clicking something with a pointer.
-   *
-   * No attribute, the same as `Button`'s: this is coordination between
-   * elements, and writing `tabindex` onto a host the consumer rendered is a
-   * change a React consumer's hydration reports and does not patch up. The stop
-   * lands inside this shadow root instead.
+   * Identifies the row to whatever is listening.
    */
-  @property({ attribute: false })
-  focusable = false
+  @property()
+  value = ''
 
   /** Moves focus onto the row itself. */
   focusItem(): void {
@@ -110,16 +110,14 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     }
     /* A real `<button>`, and `role="menuitem"` on it.
      *
-     * It was a `<div role="button">` with a click handler and nothing else, so
-     * the row could not be activated from the keyboard at all: Enter and Space
-     * are behavior the platform gives a real button and gives nothing else,
-     * and neither was handled here. Same argument `Button` makes for rendering
-     * one rather than reproducing it.
+     * A `<div role="button">` with a click handler cannot be activated from the
+     * keyboard: Enter and Space are behavior the platform gives a real button
+     * and gives nothing else. Same argument `Button` makes for rendering one
+     * rather than reproducing it.
      *
      * `menuitem` because the stack says `role="menu"`, and a menu whose
-     * children are buttons is not a menu: the roles contradicted each other and
-     * a reader was told the count of items by one and the kind of them by the
-     * other.
+     * children are buttons is not a menu: a reader would be told the count of
+     * items by one role and the kind of them by the other.
      *
      * `aria-disabled` rather than `disabled`, so a row that cannot be chosen is
      * still reachable and still announces why. `select()` is what refuses. */

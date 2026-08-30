@@ -1,14 +1,16 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('virtual list server output', () => {
   test('ships the box and its name, which is what a server can know', () => {
-    const markup = ssr(
-      html`<helix-headless-virtual-list for="rows" label="Rows"
+    const markup = withoutStyles(
+      ssr(
+        html`<helix-headless-virtual-list for="rows" label="Rows"
         ><template><div data-field="name"></div></template></helix-headless-virtual-list
       >`,
+      ),
     )
     expect(hasPart(markup, 'viewport')).toBe(true)
     expect(hasPart(markup, 'before')).toBe(true)
@@ -23,10 +25,12 @@ describe('virtual list server output', () => {
        Asked of the host's attributes rather than of the whole document, for the
        reason `scroll-area` records: the stylesheet ships inside the output and
        names its own parts, so a substring check passes on a selector. */
-    const markup = ssr(
-      html`<helix-headless-virtual-list for="rows" label="Rows"
+    const markup = withoutStyles(
+      ssr(
+        html`<helix-headless-virtual-list for="rows" label="Rows"
         ><template><div data-field="name"></div></template></helix-headless-virtual-list
       >`,
+      ),
     )
     expect(markup).not.toContain('aria-posinset')
     expect(hostAttributes(markup, 'helix-headless-virtual-list')).not.toContain('data-rows')

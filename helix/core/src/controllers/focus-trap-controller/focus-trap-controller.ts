@@ -50,11 +50,9 @@ export class FocusTrapController implements ReactiveController {
      * `focusableElements` returns hosts: a `helix-button` delegates focus, so
      * the list holds the component and `deepActiveElement` returns the
      * `<button>` in its shadow root. They are never equal, and the container
-     * never `contains` the second, so this read `active === first` as false on
-     * the first element and "outside the trap" on every element. Measured
-     * against the two branches below, that made shift-Tab jump to the last item
-     * from anywhere and forward Tab never wrap at all, which is a trap that
-     * leaks in one direction and cannot be walked backwards in the other.
+     * never `contains` the second, so an identity check reads "outside the
+     * trap" on every element: against the two branches below, shift-Tab jumps
+     * to the last item from anywhere and forward Tab never wraps at all.
      *
      * An index also gives the outside-entirely case for free: -1 wraps to
      * whichever end the reader was heading for. */
@@ -79,12 +77,11 @@ export class FocusTrapController implements ReactiveController {
     /* After render, so the container has something to focus, and *held*, so a
        release before the frame runs can cancel it.
      *
-       Unheld, an overlay opened and closed inside one frame pulled focus into
-       itself a frame after it had gone: the reader is looking at the page, the
+       Unheld, an overlay opened and closed inside one frame pulls focus into
+       itself a frame after it has gone: the reader is looking at the page, the
        surface is not on it, and their next key goes somewhere they cannot see.
-       That is not a contrived sequence. A menu that closes on the same
-       activation that opened it does exactly this, and so does any consumer
-       toggling `open` twice in one task. */
+       A menu that closes on the same activation that opened it does exactly
+       this, and so does any consumer toggling `open` twice in one task. */
     this.frame = requestAnimationFrame(() => {
       this.frame = undefined
       const items = focusableElements(container)

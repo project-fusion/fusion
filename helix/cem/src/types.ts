@@ -61,16 +61,22 @@ export interface HelixAttribute extends Documented {
   inheritedFrom?: InheritedFrom
 }
 
+/**
+ * A published custom property, and the component it is answered on behalf of.
+ *
+ * `inheritedFrom` is set by `helix-borrowed-styles` for a hook a component
+ * answers because it borrowed another's stylesheet whole, which is a
+ * relationship the analyzer has no field for: not inheritance, not a mixin and
+ * not a part. The name still belongs to the lender, so recording it as the
+ * borrower's own would be a rename nobody performed.
+ */
+export interface HelixCssProperty extends Documented {
+  inheritedFrom?: InheritedFrom
+}
+
 export interface HelixMember extends Documented {
   /** Helix's own fields, namespaced the way the declaration's are. */
   helix?: {
-    /**
-     * Events that answer this property, where it is controlled.
-     *
-     * Set from `@controlled` by `helix-controlled`. Present only on a property
-     * a consumer can take ownership of by declaring it.
-     */
-    controlled?: string[]
     /**
      * Where the platform feature this is built on is specified.
      *
@@ -107,41 +113,21 @@ export interface HelixEvent extends Documented {
  * no category rather than failing, and a category of one is invisible until
  * someone counts.
  *
- * **This exists because the alternative was inferring it.** The gallery grouped
- * families by which of five art files their drawing happened to live in, and
- * those files are split for authoring convenience: one of them is named for the
- * ten components the drawing system was worked out on, which is a fact about
- * the order they were made in. Twenty-nine of sixty-five sat in a bucket that
- * did not describe them. A category is a fact about a component, so it belongs
- * on the component, in the manifest, beside `@status`.
+ * **Declared, never inferred.** A category is a fact about a component, so it
+ * belongs on the component, in the manifest, beside `@status`. Grouping the
+ * gallery by which art file a family's drawing happened to live in put
+ * twenty-nine of sixty-five in a bucket that did not describe them.
  *
- * **`content` is gone, and the count was always the argument.** It held 27 of 88
- * families and meant "none of the other seven", which is a drawer rather than a
- * category: a reader filtering by it was filtering by nothing. `charts` came out
- * on 23 Aug 2026, the six that draw being the clearest cluster and the one
- * another component can be wrong about, since a legend whose swatches disagree
- * with the chart they key is a visible fault. The remaining 21 came out on 24
- * Aug as `media` (7), `typography` (6), `data` (4) and `markers` (3), with
- * `carousel` going to `layout` because arranging children in a viewport is what
- * it does.
- *
- * **Retired rather than left holding the residue**, which is the part worth
- * saying. A category that survives a split as the name for whatever did not fit
- * is the same drawer with fewer things in it, and `content` was the worst
- * possible name for one: everything here is content. Nothing means "none of the
- * others" now, and the ceiling on any future drawer is that it has to be
+ * **No category may mean "none of the others".** `content` did, holding 27 of
+ * 88 families, so a reader filtering by it was filtering by nothing. A category
+ * that survives a split as the name for whatever did not fit is the same drawer
+ * with fewer things in it. The ceiling on any future one is that it has to be
  * nameable.
  *
- * **`markers` at 3 and `tooling` at 1 are deliberate.** A category earns its
- * name by what filtering on it returns, not by how many families it holds, and
- * three that annotate something else is a truer answer than three folded into a
- * word that covers the library.
- *
- * **The list and the type are one declaration, because they were two.** The
- * array lived in `metadata.ts` and the union was written out here, so adding a
- * category meant editing both. `charts` went into one of them and `analyze`
- * failed on a word that had just been made legal, which is the argument for
- * deriving one from the other rather than a story about a typo.
+ * **A small category is not a wrong one.** A category earns its name by what
+ * filtering on it returns, not by how many families it holds, and three that
+ * annotate something else is a truer answer than three folded into a word that
+ * covers the library.
  */
 export const CATEGORIES = [
   'actions',
@@ -168,9 +154,7 @@ export type Category = (typeof CATEGORIES)[number]
  * so.** The nine chart-adjacent families span three categories: `charts` holds
  * the six that draw, `feedback` holds `meter` and `progress`, and `overlays`
  * holds `tooltip`. So a rule keyed on category would never compare a meter
- * against a bar chart. And `content` carried 27 families before `charts` was
- * split out of it, so the same rule would have compared a bar chart against a
- * blockquote. Too coarse and too narrow in one measurement.
+ * against a bar chart.
  *
  * **Multi-valued, because the interesting members belong to two things at
  * once.** `tooltip` is genuinely an overlay and genuinely something a chart
@@ -180,7 +164,7 @@ export type Category = (typeof CATEGORIES)[number]
  * **What it is for** is the visual axes: a legend whose swatches are solid while
  * the bars it keys are outlined is a legend that does not match its own chart,
  * and that is a fault no check could see while the only grouping was purpose.
- * `check:axes` reads it. See 176.
+ * `helix component`'s `axes` reads it.
  *
  * Closed, the way `CATEGORIES` and the statuses are, so a typo lands a family
  * in a group of one rather than being trusted.
@@ -247,7 +231,7 @@ export interface HelixMetadata {
 
   /**
    * Composition family this component belongs to, from its directory.
-   * `Card.Root` and `Card.Header` share the group `Card`.
+   * `Tabs.Root` and `Tabs.Tab` share the group `Tabs`.
    */
   group?: string
 
@@ -257,10 +241,9 @@ export interface HelixMetadata {
   part?: string
 
   /**
-   * Which layer of the design system the declaration belongs to. The React
-   * wrapper generator wraps only `styled`. `core` holds element primitives and
-   * mixins, which are not components but must be analyzed so dependents can
-   * inherit from them.
+   * Which layer of the design system the declaration belongs to. `core` holds
+   * element primitives and mixins, which are not components but must be
+   * analyzed so dependents can inherit from them.
    */
   tier?: 'core' | 'headless' | 'styled'
 }
@@ -276,7 +259,7 @@ export interface HelixMetadata {
 export interface HelixDeclaration extends Documented {
   attributes?: HelixAttribute[]
   cssParts?: Documented[]
-  cssProperties?: Documented[]
+  cssProperties?: HelixCssProperty[]
   customElement?: boolean
   events?: HelixEvent[]
   helix?: HelixMetadata

@@ -53,10 +53,9 @@ describe('breadcrumbs fold, server rendered', () => {
     <helix-headless-breadcrumb current>C</helix-headless-breadcrumb>
   </helix-headless-breadcrumbs>`
 
-  /* The point of removing the measurement. The trail used to ship every crumb
-     visible and hide some after hydrating, because there is no width on a
-     server, so a folded trail painted wrong on every load. The fold is markup
-     now, so the served HTML is already the arrangement a reader sees. */
+  /* The fold is markup rather than a measurement, which is the point: a trail
+     that shipped every crumb visible and hid some after hydrating would paint
+     wrong on every load, there being no width on a server. */
   test('serves the fold itself, menu items and all', () => {
     const markup = withoutStyles(ssr(folded))
     expect(markup.match(/<helix-headless-breadcrumb[\s>]/g)?.length).toBe(3)

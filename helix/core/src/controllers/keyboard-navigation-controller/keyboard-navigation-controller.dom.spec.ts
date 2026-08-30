@@ -21,9 +21,8 @@ import {
  * the wrong axis and gets nothing concludes the set does not answer the
  * keyboard at all.
  *
- * Three families mix this in, and it exists because two of them had it
- * identically, down to the order of the branches. The third had diverged, which
- * is what `origin` and `selects` are.
+ * Three families mix this in, and `origin` and `selects` are where the third
+ * legitimately differs from the other two.
  */
 beforeAll(() => {
   registerDom()
@@ -126,11 +125,10 @@ describe('a set whose ends do not join up', () => {
     expect(asked).toEqual(['focus item-2', 'select item-2'])
   })
 
-  /* The same answer at the other end, which it did not give: forward clamps
-     with `Math.min` and backward did not clamp at all, so `items[-1]` was
-     undefined, nothing was focused or chosen, and the key had already been
-     swallowed by `preventDefault`. A reader holding Left on the first star of a
-     rating got silence where holding Right on the last one holds its ground. */
+  /* Both ends clamp. Backward without a clamp is `items[-1]`, so nothing is
+     focused or chosen and the key has already been swallowed by
+     `preventDefault`: a reader holding Left on the first star of a rating gets
+     silence where holding Right on the last one holds its ground. */
   test('and on the first, rather than swallowing the press and doing nothing', () => {
     const { asked, host } = set('Aaa', { wrap: false })
     press(host, 'ArrowUp')
@@ -153,17 +151,16 @@ describe('an item that cannot be reached', () => {
 })
 
 describe('a set with nothing chosen in it', () => {
-  /* Where a reader entering an unanswered set expects to arrive. The forward
-     half falls out of the arithmetic; the backward half did not. */
+  /* Where a reader entering an unanswered set expects to arrive. */
   test('moves forward onto the first item', () => {
     const { asked, host } = set('aaa')
     press(host, 'ArrowDown')
     expect(asked).toEqual(['focus item-0', 'select item-0'])
   })
 
-  /* `(-1 - 1 + length) % length` is `length - 2`, the *second* to last, so a
-     reader arrowing backwards into an unanswered group landed one short of the
-     end while the comment beside it said plainly that it lands on the end. */
+  /* The obvious arithmetic looks right and is one short: `(-1 - 1 + length) %
+     length` is `length - 2`, the *second* to last, so a reader arrowing
+     backwards into an unanswered group would land one before the end. */
   test('and backward onto the last, not the one before it', () => {
     const { asked, host } = set('aaa')
     press(host, 'ArrowUp')
@@ -205,7 +202,7 @@ describe('where a move starts from', () => {
 
   /* The listener is on the host, not on the items, and a host can hold more
      than the set: a tab panel is `tabindex="0"`, so an arrow pressed while
-     reading a panel used to move the tabs out from under the reader. */
+     reading a panel would otherwise move the tabs out from under the reader. */
   test('which is also the only reading that can tell a press on an item from one beside it', () => {
     const { asked, host } = set('Aaa', { origin: 'focus' })
     expect(press(host, 'ArrowDown', 'stranger')).toBe(false)

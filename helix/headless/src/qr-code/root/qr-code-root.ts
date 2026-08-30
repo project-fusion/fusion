@@ -23,10 +23,8 @@ const isFinder = (x: number, y: number, size: number): boolean => {
  * tree walks, and every one of them is a one-unit square.
  *
  * **`square` joins runs and the other styles cannot.** A row of eight square
- * modules is one `h8`, which is what keeps the node count down; a row of eight
- * *rounded* ones is eight shapes, because the corners are what is being drawn
- * and a joined run has no corners in the middle of it. So the cost of the other
- * styles is real and is paid only by the codes that ask for them.
+ * modules is one `h8`; a row of eight *rounded* ones is eight shapes, because
+ * the corners are what is being drawn and a joined run has none in the middle.
  *
  * `only` splits the drawing in two without walking the matrix twice: the finder
  * squares are structural, at three known corners, so a caller can ask for them
@@ -67,7 +65,7 @@ const pathFor = (
   }
 
   /* A circle for `dots` and a squircle for `rounded`, both drawn as arcs on a
-     one-unit square. The radius is a little under half so neighbouring dots do
+     one-unit square. The radius is a little under half so neighboring dots do
      not touch, which is what makes a dotted code read as dots rather than as a
      square one with soft edges. */
   const r = style === 'dots' ? 0.45 : 0.28
@@ -135,10 +133,16 @@ const pathFor = (
 @customElement('helix-headless-qr-code')
 export class HelixHeadlessQrCode extends HelixElement {
   /**
-   * What the code encodes, which is usually a URL.
+   * How much of the code can be lost and still read.
+   *
+   * `M` by default, which is the level almost every code in the world uses and
+   * costs about fifteen percent redundancy. `H` where a mark covers the center,
+   * chosen automatically when the slot is filled: it is the level that makes
+   * covering safe, and a consumer who fills the slot has said what they want
+   * without having to know that.
    */
-  @property()
-  value = ''
+  @property({ attribute: 'correction' })
+  correction?: QrCorrection
 
   /**
    * What the image is called.
@@ -159,23 +163,17 @@ export class HelixHeadlessQrCode extends HelixElement {
    * middle. That cost is paid only by a code that asks for them.
    *
    * A scanner reads contrast between cells, not their shape, so all three
-   * scan. `dots` sits a little under half a module so neighbours do not touch,
+   * scan. `dots` sits a little under half a module so neighbors do not touch,
    * which is what makes it read as dots rather than as a softened square code.
    */
   @property()
   shape: QrStyle = 'square'
 
   /**
-   * How much of the code can be lost and still read.
-   *
-   * `M` by default, which is the level almost every code in the world uses and
-   * costs about fifteen percent redundancy. `H` where a mark covers the center,
-   * chosen automatically when the slot is filled: it is the level that makes
-   * covering safe, and a consumer who fills the slot has said what they want
-   * without having to know that.
+   * What the code encodes, which is usually a URL.
    */
-  @property({ attribute: 'correction' })
-  correction?: QrCorrection
+  @property()
+  value = ''
 
   /** Whether anything is slotted into the middle. */
   private logo = false

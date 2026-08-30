@@ -18,10 +18,10 @@ const entry = async (
  * One entry, and the contract that is the entry's rather than the line's.
  *
  * **The timeline already proves the arrangement**, which is the order of entries
- * and the rail running behind them: it is named 41 times in this family's specs.
- * What one entry decides alone is whether the time it was given is a machine
- * readable stamp or a label, and where that time sits in the box, and neither is
- * visible from the timeline, because both shapes read identically.
+ * and the rail running behind them. What one entry decides alone is whether the
+ * time it was given is a machine readable stamp or a label, and where that time
+ * sits in the box, and neither is visible from the timeline, because both
+ * shapes read identically.
  */
 describe('one timeline entry', () => {
   /* A `<time>` with no `datetime` is a worse element than a `<span>`: it claims

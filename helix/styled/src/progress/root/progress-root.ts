@@ -35,17 +35,18 @@ export class HelixProgress extends HelixHeadlessProgress {
    * How much ink the bar claims.
    *
    * `subtle` is the bar as a wash of its own color: still legible, no longer
-   * the loudest thing in the region. The case is a background task: something uploading while the reader is doing something else has to be visible and must not compete with what they are actually looking at.
+   * the loudest thing in the region. The case is a background task, which has to
+   * be visible and must not compete with what the reader is actually looking at.
    *
-   * **One value and not the four, which is the judgment this axis asks for
-   * rather than a partial sweep.** `ghost` would leave a track with nothing in
+   * **One value and not the four.** `ghost` would leave a track with nothing in
    * it, which is not a quiet reading but an absent one. `outlined` is the
-   * interesting refusal: `BarChart` makes it work by keeping the area and fading
-   * it toward the page, so an outlined column still encodes its value, and the
-   * reason it earns the value there is that a chart has other series for the
-   * outlined one to be a *different kind of fact from* (a forecast, a target,
-   * a budget). A progress bar is alone in its region and has nothing to differ from, so an outline there costs legibility and buys no distinction. `solid` is the resting state and is written by not
-   * writing it, per the rule that a reflected property takes no default.
+   * interesting refusal: `BarChart` earns it by keeping the area and fading it
+   * toward the page, so an outlined column still encodes its value and stands as
+   * a *different kind of fact* from the series beside it (a forecast, a target,
+   * a budget). A progress bar is alone in its region and has nothing to differ
+   * from, so an outline there costs legibility and buys no distinction. `solid`
+   * is the resting state and is written by not writing it, per the rule that a
+   * reflected property takes no default.
    * @cssproperty --progress-size - Thickness of the bar.
    * @cssproperty --progress-track-color - Fill of the part that is not.
    */

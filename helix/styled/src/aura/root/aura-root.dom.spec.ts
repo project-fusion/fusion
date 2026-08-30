@@ -47,8 +47,8 @@ describe('aura', () => {
        `--helix-color-primary` undiluted, which is the top of the shader's range
        and far from its average: measured on a page at half opacity it sat at
        68.3 luma against a settled 20.8 in dark, and 174 against 231 in light.
-       Every hard reload flashed, brighter in one scheme and darker in the other,
-       and a screen recording is what finally named it.
+       Every hard reload flashed, brighter in one scheme and darker in the
+       other.
 
        Asserted against the sheet rather than a rendered pixel because happy-dom
        has no WebGL and no compositor: there is nothing here that could paint the
@@ -98,15 +98,15 @@ describe('aura', () => {
     expect(host.hasAttribute('interactive')).toBe(true)
   })
 
-  /* The reconnection, which was one-way and silent.
+  /* The reconnection, which fails one-way and silently.
    *
    * `disconnectedCallback` gives the context back through `WEBGL_lose_context`,
    * because a browser caps live contexts at about sixteen. What it cannot do is
    * assume the canvas recovers: `getContext` hands back the very same dead
-   * object, so `link` failed, `start` returned before installing one observer,
-   * and the element sat connected and permanently blind holding its last frame.
-   * On the landing page that frame was the 2x2 the first `measure` took before
-   * layout, stretched over two screens as a gray smear.
+   * object, so `link` fails, `start` returns before installing one observer,
+   * and the element sits connected and permanently blind holding its last
+   * frame. On the landing page that frame was the 2x2 the first `measure` took
+   * before layout, stretched over two screens as a gray smear.
    *
    * Both halves are asserted because they are two mechanisms. A move is a
    * removal and an insertion with nothing between them, so the release is
@@ -159,15 +159,15 @@ describe('aura', () => {
 /* The axis, asserted where it lands rather than at what angle.
  *
  * `terminus` exists so nobody has to reason about an angle, so a fixture on the
- * angle would guard the wrong number: it was the angle that was right-looking
- * and wrong twice while the docstring promised a position. These go through
- * `exitOf`, which models what `aura-shader.ts` does with the tilt, so what is
- * being checked is that the property keeps its promise about the picture.
+ * angle would guard the wrong number: an angle can be right-looking and wrong
+ * while the docstring promises a position. These go through `exitOf`, which
+ * models what `aura-shader.ts` does with the tilt, so what is being checked is
+ * that the property keeps its promise about the picture.
  *
  * In this file rather than a lane of its own because this is the lane that runs
  * twice. `bun test` runs it under happy-dom and `specs:browser` runs the same
- * file in a real browser, and `check:matchers` reads `.dom.spec.ts` for
- * matchers both of those have. Pure arithmetic needs neither environment and
+ * file in a real browser, and a `.dom.spec.ts` may only use matchers both of
+ * those have. Pure arithmetic needs neither environment and
  * loses nothing by being in the one that is already wired. */
 describe('aura axis', () => {
   /* The three the docstring names, at four boxes including the two the hero has

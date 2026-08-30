@@ -27,11 +27,10 @@ export class HelixBadge extends HelixHeadlessBadge {
   /**
    * What the mark means.
    *
-   * **The docstring said "how much attention the mark asks for", which is the
-   * emphasis question, and the values answer a different one.** `danger` and
-   * `neutral` are meanings: the stylesheet picks a fill by what the count *is*,
-   * not by how loudly it is drawn. Filed under `appearance` it read as a
-   * treatment, which is the confusion `check:axes` exists to stop.
+   * `danger` and `neutral` are meanings, not treatments: the stylesheet picks a
+   * fill by what the count *is*, not by how loudly it is drawn. Filed under
+   * `appearance` it would read as a treatment, which is the confusion the split
+   * exists to stop.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'neutral'

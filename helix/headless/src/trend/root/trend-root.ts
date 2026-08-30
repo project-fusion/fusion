@@ -35,12 +35,10 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * **`good` is absent by default, so an unjudged trend is gray.** Every
  * dashboard convention says up is green, and for churn, latency, error rate,
  * cost and bounce rate that convention is a lie told in the most legible color
- * on the page. A component that guesses is wrong roughly a third of the time
- * and silent about it; one that waits to be told is uninformative until it is,
- * which is the cheaper failure. State the metric's polarity once and the
- * component does the part that varies.
+ * on the page. State the metric's polarity once and the component does the part
+ * that varies.
  *
- * The direction is also written as a word, because a coloured arrow says
+ * The direction is also written as a word, because a colored arrow says
  * nothing to a reader who is not looking at it. `part="direction"` is what the
  * styled tier clips out of sight and leaves in the accessibility tree.
  *
@@ -100,13 +98,11 @@ export class HelixHeadlessTrend extends HelixElement {
     /* One interpolation rather than two, so the phrase is one text node.
        Lit SSR writes a `<!--lit-part-->` marker around every binding, and two
        bindings put a pair of comments between "Up" and ", worse" in the served
-       markup. No screen reader is confused by adjacent text nodes, but the
-       server output should read as the thing the DOM will hold, and a test
-       against it should be able to say so in one string. */
+       markup, which a spec then cannot assert in one string. */
     /* Written out rather than through `drawIcon`, because this one needs a
        `part` and a part behind an interpolation is one the manifest cannot see:
        the helper's `part=${…}` binding took `[part="icon"]` out of the
-       stylesheet's reach and `check:selectors` said so. */
+       stylesheet's reach. */
     return html`<svg
         aria-hidden="true"
         data-glyph

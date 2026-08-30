@@ -27,10 +27,9 @@ const CARETLESS = new Set(['button', 'checkbox', 'color', 'file', 'image', 'rese
  * Whether the press was already the business of whatever it landed on.
  *
  * A toolbar holds anything, and some of what it holds uses the arrow keys for
- * itself. The handler below found the control the press came from and moved the
- * toolbar regardless, so an input in a toolbar could not be edited: pressing
- * ArrowRight to move the caret moved the focus to the next control instead, and
- * `preventDefault` meant the caret never moved at all.
+ * itself. Moving the toolbar regardless makes an input in a toolbar
+ * uneditable: ArrowRight moves focus to the next control, and `preventDefault`
+ * means the caret never moves at all.
  *
  * `composedPath()[0]` rather than `event.target`, which is retargeted to the
  * control's host at the shadow boundary and cannot tell a text field inside a
@@ -102,12 +101,10 @@ export class HelixHeadlessToolbar extends HelixElement {
    * toolbar holds anything, including elements this package has never heard of.
    * Client only, there being no tree to walk on the server.
    *
-   * **It does not ask a child whether it is focusable, and the description said
-   * it did.** That would mean reading a `focusable` property off each one, which
-   * `focus` below does when moving the stop and this does not when choosing the
-   * set. The two are separable and only one of them was ever written: an element
-   * that is neither disabled nor hidden and still cannot take focus is counted
-   * here and skipped there.
+   * **It does not ask a child whether it is focusable.** Reading a `focusable`
+   * property is what `setTabStop` does when moving the stop, not what this does
+   * when choosing the set, so an element that is neither disabled nor hidden and
+   * still cannot take focus is counted here and skipped there.
    */
   private get controls(): HTMLElement[] {
     return [...this.children].filter((child): child is HTMLElement => {
@@ -171,10 +168,9 @@ export class HelixHeadlessToolbar extends HelixElement {
    * Gives the tab stop back to a control that still exists.
    *
    * `controls` excludes anything disabled or hidden, so disabling the control
-   * holding the stop dropped it out of the list while every other control was
-   * already at `-1`. The toolbar then had no tab stop at all and the keyboard
-   * could not reach it again, from a change as ordinary as a Save button
-   * disabling itself once the form is clean.
+   * holding the stop drops it out of the list while every other control is
+   * already at `-1`, leaving a toolbar the keyboard cannot reach at all. A Save
+   * button disabling itself once the form is clean is enough to do it.
    *
    * `foreign` stays false, the same as the first claim: a control this package
    * has never heard of that was never given `tabindex="-1"` is still in the

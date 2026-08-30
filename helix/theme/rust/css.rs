@@ -2,12 +2,10 @@
 //!
 //! **The seeds are emitted beside the tokens, and that is what stops the two
 //! derivations disagreeing.** `helix/styles` derives a ramp of its own from
-//! `--helix-seed-*`, including the twenty-four series colours a chart reads, and
-//! nothing in the engine reaches those. Emitting the tokens alone moved the
-//! buttons, the tags and the surfaces and left every chart on the page the
-//! original blue, which the marketing site worked around by writing the seed
-//! itself. `check:seeds` holds the two name sets to each other now, in both
-//! directions.
+//! `--helix-seed-*`, including the twenty-four series colors a chart reads, and
+//! nothing in the engine reaches those. Emit the tokens alone and the buttons,
+//! the tags and the surfaces move while every chart on the page stays the
+//! original blue. The two name sets are held to each other, in both directions.
 //!
 //! Everything below the tokens is emitted **only where it was asked for**. An
 //! omitted policy leaves the stylesheet's own defaults standing, which is not
@@ -23,7 +21,7 @@ const DURATIONS: [(&str, f64); 3] = [("fast", 120.0), ("normal", 200.0), ("slow"
 /// What each mechanism means for an edge.
 ///
 /// `fill` and `space` both come out as no edge and no lift, which is not a bug:
-/// the difference between them lives in the surface colours and in `density`.
+/// the difference between them lives in the surface colors and in `density`.
 fn edge(mechanism: Mechanism) -> &'static str {
     match mechanism {
         Mechanism::Border => "1px",
@@ -179,12 +177,10 @@ pub fn to_css(theme: &Theme, selector: &str) -> String {
 /// honest half of this: a consumer picks faces, where the size scale, the
 /// weights, the leading and the tracking are a system rather than a choice.
 ///
-/// **`font-sans`, which is the name the stylesheet reads.** This emitted
-/// `font-body` and nothing consumed it, so setting a body face changed the
-/// headings, which take `font-display`, and left every other word on the page
-/// alone. The intent field stays `body`, that being what a consumer means; the
-/// token is what the token layer calls it, which is the same direction the
-/// `foreground-on-accent` rename went.
+/// **The body face is emitted as `font-sans`, which is the name the stylesheet
+/// reads.** Nothing consumes `font-body`, so emitting that name sets a face no
+/// word on the page takes. The intent field stays `body`, that being what a
+/// consumer means; the token is what the token layer calls it.
 fn font_faces(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
     let font = &theme.intent.font;
     if font.body.is_some() || font.display.is_some() || font.mono.is_some() {
@@ -226,9 +222,9 @@ fn motion(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
         return;
     }
     /* The spring is a token rather than a literal, so it has to be written under
-    whatever namespace this theme is emitting. It was `var(--helix-easing-...)`
-    hardcoded, which is correct for exactly one namespace and silently dead for
-    any other, which is the gap `namespace` as an input exists to close. */
+    whatever namespace this theme is emitting. A hardcoded
+    `var(--helix-easing-...)` is correct for exactly one namespace and silently
+    dead for every other, which is the gap `namespace` as an input closes. */
     let curves = feel(character);
     for (role, value) in [
         ("standard", curves.standard),
@@ -325,8 +321,8 @@ fn material(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
         material reach different things. The color is what a translucent
         *surface* is filled with; the scalar is what every wash drawn at its own
         strength gets multiplied by, which is how a chart's area and a faded
-        group follow the same policy as a glass header. Emitting one and not the
-        other left the flat half of the language behind. */
+        group follow the same policy as a glass header. Emit one without the
+        other and the flat half of the language is left behind. */
         lines.push(format!(
             "  --{namespace}-material-opacity: {};",
             crate::derive::seeds::trimmed(opacity, 3)

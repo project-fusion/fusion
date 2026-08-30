@@ -63,10 +63,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   /**
    * Every item, in the order a reader moving down would meet them.
    *
-   * Selected by tag rather than by walking everything and filtering. `'*'` built
-   * an array of every descendant element in the tree, labels and icons and
-   * whatever a consumer slotted into a row included, and threw most of it away;
-   * on a tree of any size that is the array a single arrow press rebuilds.
+   * Selected by tag, never by `'*'` and a filter: this is the array a single
+   * arrow press rebuilds, and `'*'` makes it every descendant element in the
+   * tree, labels and icons and whatever a consumer slotted into a row included.
    *
    * The two tag names rather than `instanceof` on everything: a styled
    * `helix-tree-item` extends the base, so both names are needed, and the
@@ -93,9 +92,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     })
   }
 
-  /* Through the mixin, so a consumer can refuse the change. It was written
-     straight from the event, the same way Tabs did, which made `helix-before-activate`
-     an announcement nobody could answer. */
+  /* Through the mixin, so a consumer can refuse the change. Writing the value
+     straight from the event makes `helix-before-activate` an announcement
+     nobody can answer. */
   private readonly handleSelection = (event: Event): void => {
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
     this.syncItems()
@@ -111,16 +110,13 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   private syncItems(): void {
     const visible = this.visibleItems
     /* Through the mixin, which resolves an exact match and otherwise falls back
-       to the first item. The comment here used to add "which skips a disabled
-       one", and a tree item has no `disabled` property at all, so the claim was
-       about a check that could not be running. `Tree.Item` is the only
-       selectable row in the library without one, which is worth knowing and is
-       not this line's business to fix. */
+       to the first item. No disabled rows are skipped, because `Tree.Item` is
+       the only selectable row in the library with no `disabled` property. */
     const chosen = this.resolveActive(visible)
-    /* The keyboard keeps its place. The stop was bound to the selection on
-       every sync, so a branch opening or a child arriving threw the reader back
-       to the selected row from wherever they had arrowed to. It only moves when
-       the row holding it is no longer reachable. */
+    /* The keyboard keeps its place: the stop moves only when the row holding it
+       is no longer reachable. Bound to the selection instead, a branch opening
+       or a child arriving throws the reader back to the selected row from
+       wherever they had arrowed to. */
     const held = visible.find((item) => item.focusable)
     const stop = held ?? chosen
 
@@ -154,11 +150,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       entry.focusable = entry === item
     }
     item.focusItem()
-    /* And bring it into view, which arrow keys through a long tree did not do
-       at all: focus moved to an item below the fold and the tree stayed where
-       it was, so a reader navigating a sidebar of forty items was moving
-       something they could not see.
- 
+    /* And bring it into view, or focus lands below the fold and the tree stays
+       where it is.
+
        Not `scrollIntoView`, which scrolls every scrollable ancestor including
        the page. A reader who pressed Down in a sidebar did not ask the document
        to move. */
@@ -166,17 +160,16 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    /* The innermost item the press came from, which `find` could not give.
+    /* The innermost item the press came from, which `find` cannot give.
      *
      * `items` is every tree item in document order and a nested one is inside
-     * all of its ancestors, so `entry.contains(target)` matched the outermost
-     * ancestor first: every key pressed on a nested node moved the root of its
-     * branch instead. The deeper the node, the further the answer was wrong,
-     * and the shallow cases it was written against all looked right.
+     * all of its ancestors, so `entry.contains(target)` matches the outermost
+     * ancestor first and every key pressed on a nested node moves the root of
+     * its branch instead. The shallow cases all look right.
      *
      * `closestInstance` walks up by identity and crosses shadow roots on the
-     * way, which is the util that exists for exactly this. `closest('*')` was
-     * also a no-op: it returns the element it was called on. */
+     * way, which is the util that exists for exactly this. `closest('*')` is a
+     * no-op: it returns the element it was called on. */
     const current = closestInstance(event.target as Element | null, HelixHeadlessTreeItem)
     if (!current || !this.items.includes(current) || !KEYS.has(event.key)) {
       return
@@ -212,10 +205,10 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
         current.toggleOpen()
         this.syncItems()
       } else {
-        /* `activate`, not `select`. Enter announced the choice and stopped
-           there, so a tree used as navigation could be walked with the arrows
-           and never entered: the pointer had a link under it to press and the
-           keyboard had nothing. */
+        /* `activate`, not `select`. Announcing the choice and stopping there
+           leaves a tree used as navigation walkable with the arrows and never
+           enterable: the pointer has a link under it and the keyboard has
+           nothing. */
         current.activate()
       }
     }
@@ -226,12 +219,10 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   /**
    * A branch opened or closed, whoever did it.
    *
-   * The keyboard paths called `syncItems` by hand and the pointer path did not,
-   * so collapsing a branch by clicking its chevron left the tab stop on a row
-   * inside the subtree that had just been hidden: the tree kept its one stop
-   * and the stop was on something nobody could see or reach. Listening for the
-   * item's own open events covers every way a branch can move, including a
-   * consumer setting `open` directly.
+   * Listening for the item's own open events rather than calling `syncItems`
+   * from each keyboard path: that misses the pointer, and collapsing a branch
+   * by clicking its chevron then leaves the tree's one tab stop on a row inside
+   * the subtree just hidden. It also covers a consumer setting `open` directly.
    */
   private readonly handleBranch = (): void => {
     this.syncItems()
@@ -244,10 +235,10 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     this.addEventListener('helix-before-close', this.handleBranch)
     this.addEventListener('keydown', this.handleKeydown)
     /* Nested items arrive on a *branch's* slot, not on this element's, so the
-       root's `slotchange` never fires for them: a subtree rendered after first
-       paint got no `level`, no `selected` and no `focusable`, and sat at the
-       wrong indent with no way into it. A framework filling a branch on demand,
-       which is what a lazy tree is, hit this every time. */
+       root's `slotchange` never fires for them: without this, a subtree
+       rendered after first paint gets no `level`, no `selected` and no
+       `focusable`, and sits at the wrong indent with no way into it. A
+       framework filling a branch on demand is exactly that case. */
     this.watcher = new MutationObserver(() => this.syncItems())
     this.watcher.observe(this, { childList: true, subtree: true })
   }

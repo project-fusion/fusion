@@ -16,11 +16,10 @@
    translucent ground composites whatever is behind it, so a glass card's
    contrast stops being the card's. Over a saturated blue this same pair measured
    3.83:1: the body ink is `foreground-muted`, and the ground it was solved
-   against had become a pale blue. `check:contrast` caught it in this file, which
-   is the right place for a material to be caught teaching its own rule. A
-   neutral near the page's own lightness composites to something the ink was
-   solved for; glass carries whatever ground it is given, and giving it one that
-   keeps the ink legible is the consumer's half of the bargain. */
+   against had become a pale blue. A neutral near the page's own lightness
+   composites to something the ink was solved for; glass carries whatever ground
+   it is given, and giving it one that keeps the ink legible is the consumer's
+   half of the bargain. */
 .band {
   background-color: var(--helix-color-surface-sunken);
   background-image:

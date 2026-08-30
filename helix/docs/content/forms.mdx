@@ -94,7 +94,7 @@ Submitting an empty form blocks and points at the control. `checkValidity()`,
 `reportValidity()` and `:invalid` behave.
 
 **`feedback` overrides the message.** Left empty, the browser's own is shown,
-which is localised and familiar; set, it says what you want in the words your
+which is localized and familiar; set, it says what you want in the words your
 product uses:
 
 ```html
@@ -123,12 +123,10 @@ deliberately reports no value of its own.
 </fieldset>
 ```
 
-That works, and it did not always. The platform tells a form-associated element
-through `formDisabledCallback`, which nothing implemented, so a control inside a
-disabled fieldset stayed fully typeable and announced itself as enabled.
-Measured: a `helix-input` in one accepted text, reported `disabled` as false,
-and carried no `aria-disabled`, while the form's entry list correctly left it
-out. Interactive and unsubmittable is the worst of both.
+That works. The platform tells a form-associated element it has been disabled by
+an ancestor through `formDisabledCallback`, and every Helix control implements
+it, so a control inside a disabled fieldset refuses input and announces itself
+as off rather than staying typeable and unsubmittable.
 
 **For your own CSS this means one rule.** Style disabled controls with
 `:disabled`, never `[disabled]`:

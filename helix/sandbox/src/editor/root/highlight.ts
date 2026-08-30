@@ -10,8 +10,8 @@ import { tags } from '@lezer/highlight'
  * `light-dark()` like every other color in the system, so the editor follows
  * the page rather than declaring its own mode.
  *
- * The palette is GitHub's, which is what the sandbox this replaces used, and
- * what most engineers already read without having to learn it.
+ * The palette is GitHub's, which most engineers already read without having to
+ * learn it.
  *
  * A tag not named here inherits the editor's foreground. That is deliberate:
  * punctuation, operators and separators are structure a reader skims past, and

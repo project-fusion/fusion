@@ -1,15 +1,11 @@
 /*
  * The three layers this package owns, in the order they have to be in.
  *
- * **This exists because the order was got wrong in the documentation, three
- * times, and the failure was silent.** `installation.mdx`, `introduction.mdx`
- * and the agent page all listed `tokens.css` and `base.css` without
- * `primitives.css`, under a line reading "each one needs what is above it".
- * `tokens.css` refers to a primitive 235 times and imports nothing, so a
- * consumer who followed the steps got all 177 semantic tokens declared and
- * every one of them resolving to `rgba(0, 0, 0, 0)`. It also disabled theming
- * outright, every public `--helix-seed-*` knob being read in `primitives.css`
- * and nowhere else.
+ * **Getting the order wrong is silent.** `tokens.css` refers to a primitive 235
+ * times and imports nothing, so importing it without `primitives.css` declares
+ * all 177 semantic tokens and resolves every one of them to `rgba(0, 0, 0, 0)`.
+ * It also disables theming outright, every public `--helix-seed-*` knob being
+ * read in `primitives.css` and nowhere else.
  *
  * A list of three that must be written in order is a list somebody will write
  * two of. One entry point cannot be, which is the whole reason to have it.
@@ -17,8 +13,7 @@
  * **It stops at this package's own boundary.** `elements.css` belongs to
  * `@fusion.dev/helix` and stays a second import: a bare specifier in an
  * `@import` is resolved by the bundler rather than by CSS, so a cross-package
- * one works in most toolchains and silently does not in the rest, which is the
- * class of failure this file was written to end rather than to move.
+ * one works in most toolchains and silently does not in the rest.
  *
  * The individual files keep their exports. Anyone substituting a layer, a
  * consumer bringing their own reset or their own primitives, imports the two

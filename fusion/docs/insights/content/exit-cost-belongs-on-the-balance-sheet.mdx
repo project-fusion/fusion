@@ -1,0 +1,109 @@
+---
+author: Ross Sheppard
+date: 2026-06-30
+description: Procurement prices the entry and ignores the exit. The exit is usually the larger number, and it is why the renewal was never a negotiation.
+kicker: Insights
+kind: Essay
+path: /insights/exit-cost-belongs-on-the-balance-sheet
+title: Exit cost belongs on the balance sheet
+topic: Business
+---
+
+A three-year total cost model for enterprise software has a line for licenses,
+a line for implementation, a line for training and a line for support. It has
+no line for what it costs to stop.
+
+That number exists. It is usually larger than the licenses, it grows every
+quarter without being reviewed, and it is the reason the renewal conversation
+was never a negotiation. Both sides knew it. Only one side had it written down.
+
+## Nobody buys lock-in
+
+This is the part worth being careful about, because the vendor is usually not
+the villain of the story and treating them as one produces the wrong control.
+
+A company buys a convenience. Then a second convenience that assumes the first.
+Then an integration, because the integration is obviously correct and takes a
+week. Four years later the export button produces a file that nothing else can
+read, and no individual step in that sequence was unreasonable. Each was
+approved by someone competent, on the merits, at the time.
+
+The cost accrued between the decisions rather than in them, which is why no
+governance process catches it. Governance reviews decisions.
+
+## Three mechanisms, worth naming separately
+
+**Format.** The data is exportable, and the export is a shape only the vendor's
+software consumes. This is the mechanism people expect, and it is the mildest
+of the three, because a determined engineering team can usually parse anything.
+
+**Behavior.** The organization's processes have taken the shape of the tool.
+The approval flow exists because the tool has approvals. The team is organized
+around the tool's object model. Leaving is not a migration, it is a
+reorganization, and it is priced accordingly by everyone who would have to live
+through it.
+
+**Position.** The tool sits between the company and other things. It holds the
+identity, or the routing, or the integration surface everything else was
+plumbed into. The migration is not one project. It is forty, run concurrently,
+by teams whose roadmaps were committed elsewhere.
+
+Format is the one that gets asked about in procurement. The other two are the
+ones that actually hold.
+
+## Why intelligence makes this sharper
+
+The per-seat charge for artificial intelligence is being added, in most cases,
+to software the company already licensed, already deployed and already built
+its processes around. The switching cost was paid years ago, by someone who has
+since left.
+
+Repricing against a base that cannot leave is not a hypothetical risk. It is
+the observed behavior of the market over the last two years, applied by
+companies with entirely conventional obligations to their shareholders. It
+would be strange if they did anything else.
+
+The relevant question for a buyer is therefore not whether a vendor intends to
+do this. It is what happens if they do.
+
+## Contracts are the wrong instrument
+
+The usual response is a better contract: price protection, an exit clause, a
+data portability commitment, an escrow arrangement. These are worth having and
+they do not solve the problem, because a contract prices a risk rather than
+removing one. The clause is enforceable against a company that still exists,
+still cares, and has not been acquired by someone who does not.
+
+The control that works is architectural. Buy things whose failure mode is that
+you keep running. Then the exit clause is a formality rather than the only
+thing standing between the company and a very bad quarter.
+
+## The one-question test
+
+For any system under evaluation: *what happens to us if this vendor shuts down
+tomorrow?*
+
+If the answer is that operations degrade and something has to be replaced on a
+schedule, that is a tool, and tools are fine. If the answer is that the company
+loses the thing, that is a dependency, and it should be priced, minuted and
+reviewed as one, whatever the sales process called it.
+
+We hold ourselves to the same question, in the inverted form, and it is written
+down as a rule rather than a value because values lose to quarterly pressure
+and rules do not:
+
+> No Fusion product may create a dependency its user cannot exit. The user
+> holds their own keys, data and hardware. Fusion may operate a control plane,
+> never a chokepoint.
+
+What that forecloses for us is worth stating rather than presenting as free
+principle. It rules out lock-in, the data moat and usage rent, which are not
+marginal business models. They are most of the good ones in software. What is
+left is services now, a hosted control plane later sold as convenience, and
+hardware margin eventually, which is the one model fully native to sovereignty,
+because you sell it and they own it.
+
+The line between a control plane and a chokepoint is exactly the test above. If
+ours goes dark and your system keeps running on your hardware with your keys,
+it was a control plane. If it goes dark and you are stopped, it was never the
+thing we said it was.

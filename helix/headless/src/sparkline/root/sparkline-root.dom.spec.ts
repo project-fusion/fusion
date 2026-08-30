@@ -14,13 +14,12 @@ const path = (host: HTMLElement): string | null => part(host, 'line')?.getAttrib
 /**
  * The `y` of each reading in the drawing, in the view box's own units.
  *
- * **Anchor points, not every coordinate in the path.** This split on `[ML]` and
- * read the y of each pair, which was the whole path while the resting curve was
- * straight and is a third of it now that it is smooth: a cubic segment carries
- * two control points before the reading it lands on, and counting those makes a
- * series of three look like a series of seven. The anchor is the last pair of
- * whatever command drew the segment, which is the same point in both shapes and
- * is the only one that is a reading rather than a means of getting to it.
+ * **Anchor points, not every coordinate in the path.** A cubic segment carries
+ * two control points before the reading it lands on, so reading the y of every
+ * pair makes a series of three look like a series of seven. The anchor is the
+ * last pair of whatever command drew the segment, which is the same point in
+ * every shape and is the only one that is a reading rather than a means of
+ * getting to it.
  */
 const heights = (host: HTMLElement): number[] =>
   [...(path(host) ?? '').matchAll(/([MLC])([^MLCHVZ]*)/g)].map((command) => {
@@ -77,13 +76,10 @@ describe('sparkline', () => {
   })
 
   test('absent is an area, `line` is the bare stroke, and a bar is neither', async () => {
-    /* What is drawn varies by plot, which is why this is a headless property
-       and why the region is no longer drawn under everything and hidden.
-     *
-     * Absent draws the region, which is the departure the class doc argues for:
-     * at the size a sparkline is drawn, a hairline in a wide box is mostly box.
-     * This test asserted the opposite until the default moved, and read as a
-     * failing suite rather than as a stale assertion. */
+    /* What is drawn varies by plot, which is why this is a headless property.
+       Absent draws the region, which is the departure the class doc argues for:
+       at the size a sparkline is drawn, a hairline in a wide box is mostly
+       box. */
     const bare = await spark('plot="line" values="1 5 9"')
     expect(part(bare, 'line')).not.toBeNull()
     expect(part(bare, 'area')).toBeNull()
@@ -118,13 +114,13 @@ describe('sparkline', () => {
     const heights = columns.map((one) => Number(one.getAttribute('height')))
     expect(heights[0]).toBeGreaterThan(0)
     /* The proportion rather than the pixels, which is the property being
-       claimed: a column five times the value is five times the length. Asserted
-       as an equality first, and `32/9` and `Math.abs(floor - y(value))` differ
-       in the last bit of a double. */
+       claimed: a column five times the value is five times the length. Not an
+       equality: `32/9` and `Math.abs(floor - y(value))` differ in the last bit
+       of a double. */
     const tallest = heights[2] as number
     expect(Math.abs((heights[0] as number) / tallest - 1 / 9)).toBeLessThan(1e-6)
     expect(Math.abs((heights[1] as number) / tallest - 5 / 9)).toBeLessThan(1e-6)
-    // Inset inside its slot, so neighbours do not touch.
+    // Inset inside its slot, so neighbors do not touch.
     expect(Number(columns[0]?.getAttribute('width'))).toBeLessThan(100 / 3)
   })
 
@@ -176,8 +172,8 @@ describe('sparkline', () => {
     /* All three start on the first reading and finish on the last. The step
        path says so in its own idiom: `H` carries only an x, because the y was
        already set by the `V` before it, so it ends `V0H100` where the other two
-       end `100,0`. Asserting one spelling for all three is what the first
-       version of this did, and it reported a path that was correct. */
+       end `100,0`. One spelling asserted across all three reports a correct
+       path as a failure. */
     for (const drawn of [resting, straight, smooth, stepped]) {
       expect(drawn.startsWith('M0,32')).toBe(true)
     }

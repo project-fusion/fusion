@@ -48,7 +48,7 @@ const parts = (selector: string): Array<{ names: string[]; tag: string }> => {
  *
  * **This is the check a static tool cannot make, and skipping it is a three
  * percent false-positive rate.** Measured on this repository: `landing.module.css`
- * sets `--icon-button-radii` and `--icon-button-size` on `helix-copy-button`,
+ * sets `--icon-button-radius` and `--icon-button-size` on `helix-copy-button`,
  * which answers neither, and both work, because a copy button *renders* an icon
  * button and custom properties inherit through a shadow boundary. A rule that
  * reads the manifest alone calls those two dead. Six findings out of 197
@@ -227,7 +227,7 @@ export const analyze = (
  * later can improve on: by the time a page can be scanned, the losing class is
  * unreachable and all that is left is an identity mismatch to infer from. So
  * this reads `duplicateRegistrations()` rather than re-deriving it, which is
- * `CLAUDE.md`'s rule about where a fix lives applied to a detector.
+ * `AGENTS.md`'s rule about where a fix lives applied to a detector.
  *
  * The identity check stays as a fallback, for the copy that never went through
  * Helix's own decorator: a fork, a hand-written `customElements.define`, or a

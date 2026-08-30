@@ -70,14 +70,11 @@ export class HelixLineChart extends HelixHeadlessLineChart {
    * carries the reading, which is the trade `BarChart` makes on a column. `solid`
    * takes the wash to full strength and the fill carries it instead.
    *
-   * **This refused `outlined` until 25 Aug 2026, and `area` was the reason
-   * given**: on a column `outlined` is the edge without the loud fill, the line
-   * chart's version of that is the line without its wash, and `area` already says
-   * exactly that. `area` is unchanged and still says it. What the argument
-   * conflated is existence with weight: `area` decides whether a wash is drawn,
-   * which is structural and belongs to the tier below, and emphasis decides which
-   * of the two marks is carrying the reading. Both ends need a wash present and
-   * neither can summon one.
+   * **`outlined` is not `area` said twice**, which is the confusion to hold off:
+   * `area` decides whether a wash is drawn at all, which is structural and
+   * belongs to the tier below, and emphasis decides which of the two marks is
+   * carrying the reading. Both ends of emphasis need a wash present and neither
+   * can summon one.
    *
    * `ghost` would be a chart with no lines.
    */
@@ -104,7 +101,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
    *
    * **`transparent` is where this one stops.** A mark with no ink is not a
    * material choice, it is an absent series, and a chart says that by not
-   * having the datum rather than by painting it invisibly. See 270.
+   * having the datum rather than by painting it invisibly.
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'

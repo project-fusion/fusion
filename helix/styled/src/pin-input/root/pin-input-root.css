@@ -67,17 +67,14 @@
 
 /* Flush with its ground, which is what `transparent` says and no color can.
  *
- * This named `surface` while the resting fill named `surface-sunken`, so the
- * pair was two absolute steps and only the resting one was corrected by 154.
- * Absolute was wrong here for the same reason and one rung further: on a card,
- * `surface` *is* the card, so read-only was flush by coincidence; on a raised
- * panel it came out lighter than the thing it sat on, which is a field rising
- * out of the surface it belongs to.
+ * Never an absolute step here. On a card, `surface` *is* the card, so read-only
+ * would be flush by coincidence; on a raised panel it comes out lighter than the
+ * thing it sits on, which is a field rising out of the surface it belongs to.
  *
- * The resting field is a recess now, a percentage of the foreground over
- * whatever is behind it. So read-only is the absence of that recess rather than
- * a second color: no fill, the ground showing through, distinct from the
- * resting state on every ground and needing no token to stay that way. */
+ * The resting field is a recess, a percentage of the foreground over whatever is
+ * behind it, so read-only is the absence of that recess rather than a second
+ * color: no fill, the ground showing through, distinct from the resting state on
+ * every ground and needing no token to stay that way. */
 :host([readonly]) [part="cell"] {
   background-color: transparent;
 }
@@ -102,10 +99,13 @@
   color: var(--helix-color-foreground-subtle);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and the boxes holding it have to
+ * survive. A printer that drops the cell fills and borders leaves a run of
+ * characters with nothing separating them, which is the one thing the row of
+ * boxes exists to say.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

@@ -39,7 +39,8 @@ buggy writer can produce.
 Given a trace, re-run it against a different model or prompt version and diff
 the result. This is how you regression-test a system whose outputs are not
 deterministic: you hold the inputs fixed and compare, rather than asserting on
-text.
+text. The graph holds the inputs a replay needs; the runner that re-executes
+them is not built.
 
 ## Cascading deletion
 

@@ -24,28 +24,20 @@ export interface IndicatorOptions {
 /**
  * Measures the marked child and writes the geometry onto a traveling mark.
  *
- * **Four components had written this and the copies had diverged.** `Navigation`,
- * `Tabs`, `Toggle.Group` and `Outline` each measured an active child and wrote
- * a position onto an indicator, and two of them had bugs the others did not.
- * `Outline`'s own comment counted the repetition rather than resolving it, and
- * the audit found the same shape independently in all four.
- *
- * What the copies disagreed about, and what this settles:
+ * Serves `Navigation`, `Tabs`, `Toggle.Group` and `Outline`. The two things
+ * hand-written copies of this get wrong:
  *
  * **The inline axis is signed.** In a right-to-left document the distance is
  * measured from the surface's right edge and applied as a negative translation,
  * because the mark travels from the inline start and the inline start is on the
- * right. `Navigation` measured from the physical left and applied it from the
- * inline-start edge with an unsigned offset, so its marker went the wrong way
- * in RTL. That is the bug this extraction exists to stop repeating.
+ * right. Measuring from the physical left and applying an unsigned offset from
+ * the inline-start edge sends the mark the wrong way in RTL.
  *
  * **The border has to come off both axes.** `getBoundingClientRect` gives the
  * border box and the containing block is the padding box, so a surface with a
- * border of its own puts the mark one border-width out. `Tabs` and
- * `Toggle.Group` each did this arithmetic separately, `Outline` did the block
- * half with `clientTop`, and `Navigation` did neither. `clientLeft` and `clientTop`
- * are the border widths, already resolved, which is why they are used here
- * rather than parsing `borderLeftWidth`.
+ * border of its own puts the mark one border-width out. `clientLeft` and
+ * `clientTop` are the border widths, already resolved, which is why they are
+ * used here rather than parsing `borderLeftWidth`.
  *
  * **Nothing is written until there is something to measure.** A zero-width box
  * is a component whose children have not upgraded yet, and writing zeroes would
@@ -57,15 +49,13 @@ export interface IndicatorOptions {
  * is its own business, which is how one controller serves a bar under a tab, a
  * pill filling it, and a rule down the side of a contents page.
  *
- * **Declared here because this is what writes them.** They carry a measurement
- * no stylesheet can take, they are read by whoever draws the mark, and `core`
- * ships no CSS, so there is no reader inside this package and nothing about
- * them is private. `check:hooks` pairs a `@cssproperty` with a rule that reads
- * one, in both directions, and the underscore these used to carry was what
- * exempted them from it.
+ * **Declared here because this is what writes them.** `core` ships no CSS, so
+ * every reader is outside this package and none of these is private.
+ * the `hooks` rule pairs a documented hook with a rule that reads one, in both
+ * directions.
  *
- * @cssproperty --indicator-height - How tall the active item is, in pixels.
- * @cssproperty --indicator-width - How wide the active item is, in pixels.
+ * @cssproperty --indicator-block-size - How tall the active item is, in pixels.
+ * @cssproperty --indicator-inline-size - How wide the active item is, in pixels.
  * @cssproperty --indicator-x - Where the active item starts, along the inline axis.
  * @cssproperty --indicator-y - Where the active item starts, along the block axis.
  */
@@ -114,14 +104,12 @@ export class IndicatorController implements ReactiveController {
   /**
    * The listener currently waiting, so the next move can take it off first.
    *
-   * **Without this, a move inside a second orphans a listener.** Each placement
-   * built a fresh `settle` closure and then called `clearTimeout` on the timer
-   * belonging to the *previous* one, which is the only thing that would have
-   * removed it: the event itself never arrives under reduced motion, where
-   * there is no transition to end. So a reader changing tabs quickly, or any
-   * reader at all with motion reduced, left one dead listener per selection on
-   * an element that lives as long as the page. The people who asked for less
-   * work were the ones accumulating it.
+   * **Without this, a move inside a second orphans a listener.** Clearing the
+   * timer is not enough on its own: the `transitionend` that would remove the
+   * listener never arrives under reduced motion, where there is no transition
+   * to end, so a reader changing tabs quickly, or any reader at all with motion
+   * reduced, leaves one dead listener per selection on an element that lives as
+   * long as the page.
    */
   private waiting: { on: HTMLElement; settle: (event?: TransitionEvent) => void } | undefined
 
@@ -185,8 +173,8 @@ export class IndicatorController implements ReactiveController {
 
     indicator.style.setProperty('--indicator-x', x)
     indicator.style.setProperty('--indicator-y', y)
-    indicator.style.setProperty('--indicator-width', `${box.width}px`)
-    indicator.style.setProperty('--indicator-height', `${box.height}px`)
+    indicator.style.setProperty('--indicator-inline-size', `${box.width}px`)
+    indicator.style.setProperty('--indicator-block-size', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
 
     if (!moved) {

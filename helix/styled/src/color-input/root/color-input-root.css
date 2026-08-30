@@ -24,11 +24,11 @@
 /* Stripped rather than replaced, so the caret, the selection and the keyboard a
    phone chooses are all the platform's.
 
-   The field's own face, not mono. Mono was here on the argument that a color is
-   a code, which is true of the syntax and not of the field: nobody scans a
-   column of colors for alignment, and one field in a form set in a different
-   typeface reads as a mistake in the form. The syntax toggle in the panel keeps
-   mono, where it is genuinely a token rather than a word. */
+   The field's own face, not mono. A color is a code in the syntax and not in
+   the field: nobody scans a column of colors for alignment, and one field in a
+   form set in a different typeface reads as a mistake in the form. The syntax
+   toggle in the panel keeps mono, where it is genuinely a token rather than a
+   word. */
 [part="control"] {
   all: unset;
   box-sizing: border-box;
@@ -136,8 +136,8 @@
 /* Square corners on the picker's own square, since the panel is doing the
    rounding now, and the room the picker needs under it. */
 [part="picker"] {
-  --color-picker-grid-radii: var(--helix-radii-none);
-  --color-picker-inset: var(--helix-space-sm);
+  --color-picker-grid-radius: var(--helix-radii-none);
+  --color-picker-padding: var(--helix-space-sm);
 
   display: block;
 }
@@ -233,21 +233,17 @@
 :host([variant="swatch"]) [part="preview"] {
   block-size: 100%;
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--color-input-swatch-radii, var(--helix-radii-sm));
+  border-radius: var(--color-input-swatch-radius, var(--helix-radii-sm));
   inline-size: 100%;
 }
 
 /* Wrong, and the field says so.
  *
  * The same four selectors Input carries, and for the reason it records at
- * length: the focus rule owns the `outline` and nothing here was changing its
- * color, so a focused field with an error came out as a red border inside a
- * blue ring. Hover is named for the same reason from the other side. The border
- * and the ring are one edge, so when one turns they both do.
- *
- * This was missing on every field added after Input, which is what a sweep of
- * all sixteen form controls turned up: `:state(invalid)` reached the host and
- * only the message underneath answered it. */
+ * length: the focus rule owns the `outline`, so a field that does not change
+ * its color here shows an error as a red border inside a blue ring. Hover is
+ * named for the same reason from the other side. The border and the ring are
+ * one edge, so when one turns they both do. */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],
@@ -265,10 +261,12 @@ slot[name="end"]::slotted(*) {
   flex: 0 0 auto;
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and here the value *is* a fill.
+ * `print-color-adjust: exact` is what keeps a browser from dropping it, which
+ * would print an empty swatch for a color that was chosen.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

@@ -22,8 +22,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * component renders a pane per slide carrying `role="group"`,
  * `aria-roledescription="slide"` and a name reading its position in the set,
  * and assigns the slide into it: a screen-reader user hears where they are, and
- * a slide that is itself a link is still a link, which it was not while the role
- * was being written on top of it. See `assign`.
+ * a slide that is itself a link is still a link. See `assign`.
  *
  * **Rotation stops on focus and on hover, and once stopped it stays stopped.**
  * The APG is explicit: rotation must not resume unless the reader asks for it,
@@ -72,10 +71,10 @@ export class HelixHeadlessCarousel extends HelixElement {
   }
 
   /**
-   * Accessible name for the carousel.
+   * Whether the carousel advances on its own.
    */
-  @property()
-  label = 'Carousel'
+  @property({ type: Boolean })
+  autoplay = false
 
   /**
    * The slide in view, counted from zero.
@@ -91,8 +90,6 @@ export class HelixHeadlessCarousel extends HelixElement {
    * extracted, because a slide is addressed by position and every one of those
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
-   *
-   *
    */
   @property({ type: Number })
   get index(): number {
@@ -104,23 +101,6 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.indexState = next
     this.requestUpdate('index', previous)
   }
-
-  /**
-   * Which way the track runs.
-   *
-   * Behavior rather than presentation, which is why it is here: the scroll
-   * position and the nearest-slide arithmetic are both single-axis, and a
-   * styled-tier attribute cannot change which one they read. Two sites branch
-   * on it, `scrollTo` and the drag settle, and nothing else in the component
-   * knows about the axis at all.
-   *
-   * A vertical track needs a height, which a horizontal one does not: width
-   * comes from the page and height does not, so the styled tier gives it
-   * `--carousel-block-size` and a consumer sets that to whatever the slides
-   * want.
-   */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
 
   /**
    * Whether the previous and next controls are shown.
@@ -156,8 +136,20 @@ export class HelixHeadlessCarousel extends HelixElement {
   @property({ attribute: 'default-index', type: Number })
   defaultIndex = 0
 
+  /**
+   * How long each slide is held, in milliseconds.
+   */
+  @property({ type: Number })
+  interval = 5000
+
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
+
+  /**
+   * Accessible name for the carousel.
+   */
+  @property()
+  label = 'Carousel'
 
   /**
    * Whether moving past either end wraps to the other.
@@ -166,16 +158,21 @@ export class HelixHeadlessCarousel extends HelixElement {
   loop = false
 
   /**
-   * Whether the carousel advances on its own.
+   * Which way the track runs.
+   *
+   * Behavior rather than presentation, which is why it is here: the scroll
+   * position and the nearest-slide arithmetic are both single-axis, and a
+   * styled-tier attribute cannot change which one they read. Two sites branch
+   * on it, `scrollTo` and the drag settle, and nothing else in the component
+   * knows about the axis at all.
+   *
+   * A vertical track needs a height, which a horizontal one does not: width
+   * comes from the page and height does not, so the styled tier gives it
+   * `--carousel-block-size` and a consumer sets that to whatever the slides
+   * want.
    */
-  @property({ type: Boolean })
-  autoplay = false
-
-  /**
-   * How long each slide is held, in milliseconds.
-   */
-  @property({ type: Number })
-  interval = 5000
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
 
   /**
    * Whether rotation is running.
@@ -191,14 +188,13 @@ export class HelixHeadlessCarousel extends HelixElement {
    * How many slides are shown across the track at once. Absent shows one.
    *
    * **Here rather than on the styled tier, because it decides how many places
-   * the track can stop.** It was declared above as a width, which is what it
-   * looks like from the stylesheet: one rule per value setting a custom
-   * property, and the slides divide the track by it. But a carousel showing
-   * four of six slides has three positions, not six, and everything that counts
-   * positions is in this file. Left up there, `goTo` clamped to the last
-   * *slide*, so three of the six indicators pointed at a scroll offset the
-   * track had already reached and could not pass: pressing next walked the dots
-   * to the end while the slides stopped moving a third of the way through.
+   * the track can stop.** From the stylesheet it looks like a width, one rule
+   * per value setting a custom property that the slides divide the track by.
+   * But a carousel showing four of six slides has three positions, not six, and
+   * everything that counts positions is in this file. Declared up there, `goTo`
+   * clamps to the last *slide*, so three of the six indicators point at an
+   * offset the track has already reached: pressing next walks the dots to the
+   * end while the slides stop moving a third of the way through.
    *
    * No default, because it reflects. A reflected property with a value writes
    * its attribute on upgrade, and the host then carries something a consumer's
@@ -235,19 +231,15 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   /** The slides, in light-DOM order. Empty on the server, which has no tree. */
   get slides(): HTMLElement[] {
-    /* `?? []` is the server, and the comment above it was already right and
-       still did not save it: this said "client only" while `render` read it to
-       count the indicators, so every carousel SSR spec died on an unhandled
-       spread of `undefined`. Third time in this library, after the menu item
-       and the table, and the only one of the three the note was written on.
-       Knowing where a getter must not be reached is not the same as it not
-       being reached, which is what the guard is for.
+    /* `?? []` is the server, and a note saying "client only" is not a guard:
+       `render` reads this to count the indicators, so an unhandled spread of
+       `undefined` kills every carousel SSR pass.
 
        Empty is also the honest answer rather than damage control. The
        indicators are one per position and a position is counted from the
-       children, which the server cannot see, so they
-       arrive with the upgrade. Nothing moves when they do: the tags are hidden
-       until they are defined. */
+       children, which the server cannot see, so they arrive with the upgrade.
+       Nothing moves when they do: the tags are hidden until they are
+       defined. */
     return [...(this.children ?? [])].filter(
       (child): child is HTMLElement => child instanceof HTMLElement,
     )
@@ -360,12 +352,6 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (!slide || !track) {
       return
     }
-    /* The preference is read here, because this is where the motion is.
-     *
-     * `scroll-behavior: auto` in a reduce block does nothing: it restates the
-     * initial value, and the scroll that actually animates is this call, which
-     * names `smooth` outright and overrides the property either way. A reader
-     * who asked not to be moved was moved. */
     const vertical = this.orientation === 'vertical'
     const target = this.edgeOf(slide, track, this.bleed(track))
 
@@ -385,8 +371,7 @@ export class HelixHeadlessCarousel extends HelixElement {
      *
      * `scroll-behavior: auto` in a reduce block does nothing: it restates the
      * initial value, and the scroll that actually animates is this call, which
-     * names `smooth` outright and overrides the property either way. A reader
-     * who asked not to be moved was moved. */
+     * names `smooth` outright and overrides the property either way. */
     const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
     /* The scroll about to run is ours, so the `scrollend` it produces is not a
        reader saying where they went. See `handleScroll`. */
@@ -437,12 +422,11 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * Owns the timer, from the state rather than from the call site.
    *
-   * `start()` and `stop()` each held the interval and `connectedCallback`
-   * started one, which the rules forbid: a DOM move re-ran connect and restarted
-   * rotation the reader had stopped, and the server, which never runs connect at
-   * all, rendered the control saying the opposite of what it would do. The
-   * state is what is declared and the timer follows it, which also means one
-   * place clears it.
+   * Never hold the interval in `start()` and `stop()` and start one from
+   * `connectedCallback`: a DOM move re-runs connect and restarts rotation the
+   * reader stopped, and the server, which never runs connect at all, renders
+   * the control saying the opposite of what it will do. The state is what is
+   * declared and the timer follows it, which also means one place clears it.
    */
   private runTimer(): void {
     clearInterval(this.timer)
@@ -487,9 +471,8 @@ export class HelixHeadlessCarousel extends HelixElement {
    *
    * **`scrollend` is the only honest place to commit an index and much too late
    * to show one.** It fires once momentum has fully settled, which on iOS is
-   * most of a second after the finger has left the glass, so the dots sat on
-   * the old slide for the whole of the coast and then jumped. Reported exactly
-   * that way, as the delay on the indicator being too great.
+   * most of a second after the finger has left the glass, so the dots sit on
+   * the old slide for the whole of the coast and then jump.
    *
    * So showing and committing are separated. This moves the marker and nothing
    * else: no state is written and no event is dispatched, because neither is
@@ -523,13 +506,13 @@ export class HelixHeadlessCarousel extends HelixElement {
    * Reads where a reader's drag settled, and only a reader's.
    *
    * **The scroll we issued ourselves ends with a `scrollend` too, and taking it
-   * as a reading is what makes the dots jump back.** This ran on every one, so
-   * the index a reader had just chosen was overwritten by whichever slide
-   * happened to be nearest the leading edge at the moment the animation
-   * finished. Any disagreement there is enough: a snap settling a pixel short of
-   * a midpoint, a target clamped by the scroller's own maximum, a fractional
-   * layout, or a smooth scroll cut off by the next click. The component asked
-   * for slide four, the pixels said three, and the pixels won.
+   * as a reading is what makes the dots jump back.** Run on every one, the
+   * index a reader just chose is overwritten by whichever slide happened to be
+   * nearest the leading edge when the animation finished. Any disagreement
+   * there is enough: a snap settling a pixel short of a midpoint, a target
+   * clamped by the scroller's own maximum, a fractional layout, or a smooth
+   * scroll cut off by the next click. The component asked for slide four, the
+   * pixels said three, and the pixels won.
    *
    * Which is the wrong precedence in one direction only. A drag is the reader
    * moving the track and the index has to follow it; a click is the reader
@@ -554,7 +537,7 @@ export class HelixHeadlessCarousel extends HelixElement {
        to refuse, and `preventDefault()` could not un-drag it. This is the case
        the controlled-change helper's own documentation distinguishes, a native
        control that has already moved, and putting it on that path would offer a
-       refusal that cannot be honoured. */
+       refusal that cannot be honored. */
     if (nearest === this.index) {
       return
     }
@@ -647,24 +630,20 @@ export class HelixHeadlessCarousel extends HelixElement {
     super.updated(changed)
     /* The track follows `index`, whoever moved it.
      *
-     * This was called from inside `goTo`'s apply callback, which returns early
-     * in controlled mode, so a controlled carousel announced where it would go,
-     * the consumer assigned `index`, and the track never moved: the dots
-     * updated and the slides sat still. Every other path in was equally
-     * stranded, a plain `carousel.index = 2` included, apply being the only
-     * caller. Here it is one place and it covers all of them. */
+     * Not from inside `goTo`'s apply callback: that returns early in controlled
+     * mode, so the dots update and the slides sit still, and it is not the only
+     * path in either, a plain `carousel.index = 2` reaching no apply at all. */
     if (changed.has('index')) {
       this.scrollToIndex()
     }
     this.runTimer()
     /* Back inside the set when the set shrinks.
      *
-     * Nothing re-clamped `index`, and the indicators carry a roving tab stop
-     * keyed on it, so a carousel whose slides were removed under it was left
-     * with no tab stop, no current dot and a focus restore pointing at nothing.
-     * In `updated` rather than `willUpdate` because `slides` is empty on the
-     * server, and through `goTo` so a controlled consumer is told rather than
-     * overwritten. */
+     * The indicators carry a roving tab stop keyed on `index`, so a carousel
+     * whose slides are removed under it is left with no tab stop, no current
+     * dot and a focus restore pointing at nothing. In `updated` rather than
+     * `willUpdate` because `slides` is empty on the server, and through `goTo`
+     * so a controlled consumer is told rather than overwritten. */
     const count = this.slides.length
     if (count > 0 && this.index > count - 1) {
       this.goTo(count - 1)
@@ -678,31 +657,25 @@ export class HelixHeadlessCarousel extends HelixElement {
    * **The panes carry the ARIA and the consumer's element carries none**, which
    * is the whole reason this is a manual assignment rather than a plain slot.
    * The APG wants each slide to be a `group` with `aria-roledescription="slide"`
-   * and a name saying where it sits in the run, and this used to be four
-   * `setAttribute` calls onto the elements a consumer wrote. Two things were
-   * wrong with that, and only one of them was about frameworks.
+   * and a name saying where it sits in the run, and writing those onto the
+   * elements a consumer wrote fails twice, only one of them about frameworks.
    *
    * **A React consumer's slides are nodes React is in the middle of hydrating.**
-   * The attributes landed before React reached them, so React found a DOM it had
-   * not rendered and reported a mismatch it says it will not patch up. It means
-   * it: the ARIA survived and the announcement was correct, so nothing looked
-   * wrong and the console was the only tell. Deferring the write was tried
-   * first, and a frame is a race rather than an ordering: measured in Chromium
-   * on the landing page, a tab opened in the foreground still reported the
-   * mismatch, and a tab opened hidden did not, only because `requestAnimationFrame`
-   * had not run there yet. `Chat` reached this same conclusion for the same
-   * reason and its comment on `shadowRootOptions` says so.
+   * Attributes landing before React reaches them are a DOM it did not render,
+   * which it reports as a mismatch and will not patch up: the ARIA survives and
+   * the announcement is correct, so the console is the only tell. Deferring the
+   * write does not help, a frame being a race rather than an ordering: measured
+   * in Chromium on the landing page, a tab opened in the foreground still
+   * reported the mismatch and a tab opened hidden did not, only because
+   * `requestAnimationFrame` had not run there yet. `Chat`'s comment on
+   * `shadowRootOptions` reaches the same conclusion.
    *
    * **And `role="group"` on a consumer's `<a href>` is not additive.** It
    * replaces the implicit link role, so six insight cards on the landing page
-   * announced as groups and left the links list entirely. Every slide that is
-   * itself a control had this, and no amount of deferring the write would have
-   * helped, because the write was the bug. A pane around the slide is what the
-   * pattern actually asks for: a group holding a link, rather than a link
-   * relabeled as a group.
-   *
-   * So nothing is written onto a consumer's element at all now, and the
-   * mismatch is gone by construction rather than by timing.
+   * announced as groups and left the links list entirely. No amount of
+   * deferring helps, because the write is the bug. A pane around the slide is
+   * what the pattern actually asks for: a group holding a link, rather than a
+   * link relabeled as a group.
    */
   private assign(): void {
     const panes = this.renderRoot?.querySelectorAll?.<HTMLSlotElement>('[part="slide"] slot')
@@ -795,16 +768,14 @@ export class HelixHeadlessCarousel extends HelixElement {
               ${
                 /* Plain buttons, not a half-built tablist.
                  *
-                 * They were `role="tab"` inside `role="tablist"` with no
-                 * `aria-controls`, while the slides were `role="group"` rather
-                 * than tabpanels: the APG has two carousel patterns and this
-                 * was the announcement of one over the structure of the other,
-                 * so a reader was told to expect panels that do not exist.
-                 *
-                 * The basic pattern is what this is: buttons that move the
-                 * carousel, with the current one marked. `aria-current` is the
-                 * right word for "the one you are on" where nothing is being
-                 * selected. */
+                 * `role="tab"` in a `role="tablist"` promises tabpanels, and
+                 * the slides are `role="group"`: the APG has two carousel
+                 * patterns and taking the announcement of one over the
+                 * structure of the other tells a reader to expect panels that
+                 * do not exist. This is the basic pattern, buttons that move
+                 * the carousel with the current one marked, and `aria-current`
+                 * is the right word for "the one you are on" where nothing is
+                 * being selected. */
                 ''
               }
               ${Array.from({ length: this.positions }).map(

@@ -38,20 +38,46 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    * **The styled tier, so the tooltip this renders is the styled one.**
    *
    * `tag()` builds a child's tag name from this prefix, and the base declares
-   * `helix-headless-`. Every other styled component that renders a child
-   * overrides it; the three charts that draw a tooltip did not, so a
-   * `helix-bar-chart` on a page put a `helix-headless-tooltip` in its shadow
-   * root: the behavior with none of the surface. What showed was the browser's
-   * own popover defaults, a white 1.5px border, square corners, `0.25em` of
-   * padding and the page's font size, which is why the reading bubble looked
-   * like no other tooltip on the site.
-   *
-   * Measured before the fix: the chart's bubble computed
-   * `border: 1.5px solid rgb(255, 255, 255)`, `border-radius: 0px`,
-   * `padding: 3.5px`, `font-size: 14px`. The masthead's, a `helix-tooltip`,
-   * had the component's own `none`, `radii-sm`, `2xs xs` and `text-xs`.
+   * `helix-headless-`. Without this override the chart puts a
+   * `helix-headless-tooltip` in its shadow root: the behavior with none of the
+   * surface, so the reading bubble falls back to the browser's popover defaults,
+   * a white 1.5px border, square corners, `0.25em` of padding and the page's
+   * font size, and looks like no other tooltip on the site.
    */
   static override tier = 'helix-'
+
+  /**
+   * How much ink the columns claim.
+   *
+   * The chart's treatment, which every series takes unless `outlined` or
+   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+   * of the series color with that edge on it, and absent is the filled column,
+   * per the rule that a reflected property takes no default.
+   *
+   * **It composes with `material` rather than competing with it.** Emphasis
+   * decides what is drawn and material decides how much of it comes through, so
+   * `glass` thins whatever emphasis put there: the fill on a solid column, the
+   * stroke on an outlined one. Without that the corner is inert, `glass` setting
+   * a fill opacity on a mark whose fill is `none`, and a combination that
+   * silently does nothing is the worst shape this can take.
+   */
+  @property({ reflect: true })
+  emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * Which series are glass rather than solid, by name.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `emphasis` is.** A
+   * chart-wide material puts every column in the same substance, which is right
+   * when the whole chart is joining the page's language and wrong the moment one
+   * series is a different kind of fact from the others. The two axes take the
+   * same shape because they answer the same question about the same thing: what
+   * is *this series* made of, and how much ink does *this series* claim.
+   */
+  @property()
+  glass?: string
 
   /**
    * What the columns are made of.
@@ -64,11 +90,10 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    * chart in the same language as a glass header rather than leaving it the one
    * opaque slab on the page.
    *
-   * **`gradient` was here and is `wash` now, which is #156.** The two set
+   * **`gradient` belongs to `wash` and never here (#156).** The two set
    * different properties, `fill-opacity` against `fill`, and a chart forced into
    * both renders as a translucent gradient that is distinct from either: one
-   * enum was holding two independent things, which is the mistake `Card`'s own
-   * doc warns about arriving on the component that borrowed the word.
+   * enum holding two independent things.
    *
    * Absent is solid, per the rule that a reflected property takes no default,
    * so the stylesheet describes only the departure. The strength is the
@@ -89,60 +114,10 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    *
    * **`transparent` is where this one stops.** A mark with no ink is not a
    * material choice, it is an absent series, and a chart says that by not
-   * having the datum rather than by painting it invisibly. See 270.
+   * having the datum rather than by painting it invisibly.
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
-
-  /**
-   * How a column's fill is distributed across it.
-   *
-   * `gradient` fades each column toward its base, into the wash the headless
-   * tier draws whether or not anything points at it.
-   *
-   * **A chart-domain axis and deliberately not a library one.** It lives on this
-   * family alone, and here it is a way of encoding data rather than a way of
-   * expressing a theme: promoted to the registry it would put an attribute on
-   * eighty-eight components that means nothing on eighty-seven. `wash` because
-   * that is what the tier below already calls it, in `--chart-bar-wash` and in
-   * the `bar-wash-start` and `bar-wash-end` stops.
-   */
-  @property({ reflect: true })
-  wash?: 'gradient'
-
-  /**
-   * Which series are glass rather than solid, by name.
-   *
-   * Matched the way `outlined` is, against the column headings the table gives.
-   *
-   * **Per series for the reason `emphasis` is, arrived at one axis later.** A
-   * chart-wide material puts every column in the same substance, which is right
-   * when the whole chart is joining the page's language and wrong the moment one
-   * series is a different kind of fact from the others. The two axes take the
-   * same shape because they answer the same question about the same thing: what
-   * is *this series* made of, and how much ink does *this series* claim.
-   */
-  @property()
-  glass?: string
-
-  /**
-   * How much ink the columns claim.
-   *
-   * The chart's treatment, which every series takes unless `outlined` or
-   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
-   * of the series color with that edge on it, and absent is the filled column,
-   * per the rule that a reflected property takes no default.
-   *
-   * **It composes with `material` rather than competing with it.** Emphasis
-   * decides what is drawn and material decides how much of it comes through, so
-   * `glass` thins whatever emphasis put there: the fill on a solid column, the
-   * stroke on an outlined one. That corner was inert when the two were first
-   * put side by side, `glass` setting a fill opacity on a mark whose fill is
-   * `none`, and a combination that silently does nothing is the trap
-   * `--card-backdrop` was for the one commit it shipped alone.
-   */
-  @property({ reflect: true })
-  emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
    * Which series are drawn as an outline rather than a fill, by name.
@@ -171,6 +146,22 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    */
   @property()
   subtle?: string
+
+  /**
+   * How a column's fill is distributed across it.
+   *
+   * `gradient` fades each column toward its base, into the wash the headless
+   * tier draws whether or not anything points at it.
+   *
+   * **A chart-domain axis and deliberately not a library one.** It lives on this
+   * family alone, and here it is a way of encoding data rather than a way of
+   * expressing a theme: promoted to the registry it would put an attribute on
+   * eighty-eight components that means nothing on eighty-seven. `wash` because
+   * that is what the tier below already calls it, in `--chart-bar-wash` and in
+   * the `bar-wash-start` and `bar-wash-end` stops.
+   */
+  @property({ reflect: true })
+  wash?: 'gradient'
 
   /**
    * Marks each column with the treatments its series asked for.

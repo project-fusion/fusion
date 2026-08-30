@@ -12,7 +12,7 @@ describe('option server output', () => {
 
   test('the host carries only what the consumer wrote', () => {
     // `role="option"` and `aria-selected` go through internals, which write no
-    // attribute, so the host is the consumer"s markup and hydration agrees.
+    // attribute, so the host is the consumer's markup and hydration agrees.
     expect(
       hostAttributes(
         ssr(html`<helix-headless-option value="ross">Ross</helix-headless-option>`),

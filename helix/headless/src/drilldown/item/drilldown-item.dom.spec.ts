@@ -17,11 +17,10 @@ const row = async (attributes = 'value="a"'): Promise<Row> =>
  * One row, and the contract that is the row's rather than the stack's.
  *
  * **The drilldown already proves the navigation**, which is a row opening a page
- * and the trail back out of it: it is named 20 times in this family's specs.
- * What the row owns alone is what element it is and how it refuses, and both
- * were wrong at once in a way the stack could not show: it was a
- * `<div role="button">` with a click handler, so it worked under a pointer and
- * could not be activated from a keyboard at all.
+ * and the trail back out of it. What the row owns alone is what element it is
+ * and how it refuses, and neither is visible from the stack: a
+ * `<div role="button">` with a click handler works under a pointer and cannot
+ * be activated from a keyboard at all, and the stack passes either way.
  */
 describe('one drilldown row', () => {
   /* A real `<button>`, because Enter and Space are behavior the platform gives
@@ -34,8 +33,8 @@ describe('one drilldown row', () => {
   })
 
   /* `menuitem` because the stack says `role="menu"`. A menu whose children are
-     buttons is not a menu: the two roles contradicted each other, and a reader
-     was told the count of items by one and the kind of them by the other. */
+     buttons is not a menu: the two roles contradict each other, and a reader is
+     told the count of items by one and the kind of them by the other. */
   test('answers to the role its container declares, not to the tag it renders', async () => {
     expect(part(await row(), 'item')?.getAttribute('role')).toBe('menuitem')
   })

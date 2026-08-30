@@ -69,7 +69,7 @@
    in a sentence is as wide as its answer. The trigger stops spacing its two
    halves apart, so the mark sits against the value rather than at the far end of
    a width nothing is using. And the step comes down, because a control drawn
-   without a frame beside 32 pixel neighbours is 40 pixels of empty air.
+   without a frame beside 32 pixel neighbors is 40 pixels of empty air.
 
    The label is unaffected and deliberately so: a field with no visible label
    sets `aria-label` and gets a clipped one, which is a separate question from
@@ -98,11 +98,11 @@
 }
 
 /* One line, cut rather than wrapped, so a long answer does not make the closed
-   control taller than the fields beside it. */
-/* The value takes the room, so the trigger reads the same with a leading icon
-   as without one.
+   control taller than the fields beside it.
 
-   The trigger is `justify-content: space-between` over two children, which puts
+   The value takes the room, so the trigger reads the same with a leading icon
+   as without one. The trigger is `justify-content: space-between` over two
+   children, which puts
    the value at the start and the indicator at the end. A third child, which is
    what slotting into `start` adds, would have spread all three and left the
    value floating in the middle of its own control. Growing the value pins the
@@ -123,7 +123,7 @@
      a row inset from its container, where the corners have space to sit in; on
      a band that reaches both edges it rounds against nothing and reads as a
      rectangle with the corners nibbled. */
-  --option-radii: var(--helix-radii-none);
+  --option-radius: var(--helix-radii-none);
 
   background-color: var(--helix-color-surface-overlay);
   /* No border. A panel over the page is told apart by its shadow and by the
@@ -131,7 +131,7 @@
      well reads as a box drawn around something already separate. The shadow is
      `lg` here rather than `sm` for that reason: it is carrying the separation
      on its own. */
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--select-shadow, var(--helix-shadow-floating));
   /* The trigger's width, with the content as the floor.
    *
@@ -143,11 +143,11 @@
    * longer than the field widens the panel instead of wrapping or being cut.
    * A dropdown is read, and a name broken across two lines to fit a field it
    * has no relationship to is worse than a panel that sticks out. */
-  inline-size: var(--floating-anchor-width, 100%);
+  inline-size: var(--floating-anchor-inline-size, 100%);
   min-inline-size: max-content;
   /* Never taller than the room under the trigger, for the same reason as the
      width: the space is measured, not declared. */
-  max-block-size: var(--floating-available-height, none);
+  max-block-size: var(--floating-available-block-size, none);
   /* Block only. The rows run the full width of the panel and bring their own
      inline padding, so a hovered or selected row is a band across the panel
      rather than a pill inset from its edges: the highlight lines up with the
@@ -158,17 +158,17 @@
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
      `border: solid`, so dropping the declaration leaves a three-pixel medium
      border rather than none at all. The same line the menu's surface carries,
-     and now for the same reason: this is a popover.
+     for the same reason: this is a popover.
 
      `inset` and `margin` for the same reason. The UA centers a popover in the
      window and gives it a margin, and the positioning this panel gets from the
      controller is applied on top of both, so neither can merely be overridden
      by something more specific: they have to be cleared.
 
-     No `z-index` any more, and no `position` either. Both were this panel's way
-     of trying to get above the page from inside it, and neither works against
-     an ancestor with `overflow: hidden`, which is what was actually clipping
-     it. The top layer is above everything by construction. */
+     No `z-index` and no `position`. Both are a panel's way of trying to get
+     above the page from inside it, and neither works against an ancestor with
+     `overflow: hidden`, which is what does the clipping. The top layer is above
+     everything by construction. */
   border: var(--select-border-width, var(--helix-border-floating)) solid
     var(--select-border-color, var(--helix-color-border));
   inset: auto;
@@ -176,10 +176,11 @@
 }
 
 /* Shown and placed are two different moments, and this waits for the second.
-   The controller positions asynchronously, so a panel revealed by the render
-   sits at its stylesheet's position for one frame first. Opacity rather than
-   `visibility`, so the panel still has a box for the controller to measure. */
-/* And it travels, a little, out of the edge it opened against.
+ * The controller positions asynchronously, so a panel revealed by the render
+ * sits at its stylesheet's position for one frame first. Opacity rather than
+ * `visibility`, so the panel still has a box for the controller to measure.
+ *
+ * And it travels, a little, out of the edge it opened against.
  *
  * On `transform`, never on `translate`: the floating controller writes the
  * panel's position onto `translate`, and a keyframe animating that property took
@@ -250,10 +251,8 @@
 
 /* The indicator turns over as the panel opens.
  *
- * Nothing rotated it before, which is why nothing transitioned: the slot was
- * rendered and left alone, so a caret pointing down stayed pointing down with
- * the list open under it. The mark says which way the panel is going, and a
- * mark that never moves says nothing at all.
+ * The mark says which way the panel is going, and a mark that never moves says
+ * nothing at all.
  *
  * A flip across the x-axis rather than a rotation. The two end in the same
  * place for a symmetric caret and take different routes to get there: a
@@ -265,10 +264,10 @@
  * Both selectors, and that is the point. The default caret is the indicator
  * slot's *fallback* content, and `::slotted()` matches assigned nodes only:
  * fallback content is never assigned to the slot it sits in, so a rule written
- * for `::slotted` alone reached the one mark a consumer supplied and missed the
- * one almost every consumer gets. Measured after the fact: the default caret's
- * computed `scale` read `none` open and shut. `[part="indicator"]` is the
- * fallback, the `::slotted` half is the replacement.
+ * for `::slotted` alone reaches the one mark a consumer supplied and misses the
+ * one almost every consumer gets. Measured: the default caret's computed `scale`
+ * read `none` open and shut. `[part="indicator"]` is the fallback, the
+ * `::slotted` half is the replacement.
  *
  * `scale` rather than `transform: scaleY`, so a consumer who wants to translate
  * or rotate the mark can do that without the two fighting over one property.
@@ -308,12 +307,11 @@
 [part="listbox"]::part(items) {
   background-color: transparent;
   border: none;
-  /* And no radius, which is the one this block kept and should not have. The
-     list scrolls, so it clips what is inside it: a four pixel radius on the
-     scroller rounds the first row's top corners and the last row's bottom ones,
-     which reads as the option having a radius when the option has none. That is
-     what it was reported as, and looking at the option was looking at the wrong
-     element. The panel's own radius is the frame; this is inside it. */
+  /* And no radius. The list scrolls, so it clips what is inside it: a four pixel
+     radius on the scroller rounds the first row's top corners and the last
+     row's bottom ones, which reads as the option having a radius when the
+     option has none, and looking at the option is looking at the wrong element.
+     The panel's own radius is the frame; this is inside it. */
   border-radius: var(--helix-radii-none);
   max-block-size: var(--select-surface-max-block-size, 14rem);
   padding: var(--helix-space-none);
@@ -324,8 +322,7 @@
 }
 
 /* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical. */
+   rule it answers loses on specificity and does nothing. */
 @media (prefers-reduced-motion: reduce) {
   [part="trigger"] {
     transition: none;
@@ -343,10 +340,12 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and the state has to survive. A
+ * tick that is a fill prints as an empty box, which is a document saying the
+ * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

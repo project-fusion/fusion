@@ -36,9 +36,9 @@ describe('rating server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    /* `variant` reflected and defaulted to `marks`, so the server stamped
-       `variant="marks"` onto every rating anybody rendered and React, which
-       holds no such prop, reported a hydration mismatch for each one. */
+    /* `variant` must not reflect while it defaults: `variant="marks"` on every
+       rating served is an attribute React holds no prop for, and so a hydration
+       mismatch for each one. */
     expect(hostAttributes(ssr(given), 'helix-headless-rating')).toEqual(['label', 'value'])
   })
 })

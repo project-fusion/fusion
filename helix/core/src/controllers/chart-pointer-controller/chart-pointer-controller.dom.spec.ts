@@ -118,12 +118,11 @@ describe('a pointer moving across a chart', () => {
 })
 
 describe('a chart whose categories run down the box', () => {
-  /* This was `tracks = true` and every reading was resolved from x whatever the
-     chart was doing. A horizontal bar chart runs its categories down, so moving
-     the pointer from the first row to the last never changed the answer:
-     measured on four rows, all four reported the third, which is the slot the
-     middle of the box falls in. It looked like a tooltip that would not follow
-     and was a tooltip reading the wrong axis. */
+  /* A horizontal bar chart runs its categories down the box, so resolving every
+     reading from x reports the slot the middle of the box falls in however far
+     the pointer moves: measured on four rows, all four reported the third. That
+     reads as a tooltip that will not follow, and is a tooltip reading the wrong
+     axis. */
   test('is read down the box, not across it', () => {
     const one = scene(4)
     one.point.axis = 'block'

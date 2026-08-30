@@ -4,16 +4,14 @@ import { mount, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 /**
  * One change, one pair of native announcements, however many elements are inside.
  *
- * **294 moved every consumer onto `onChange` and left the composed controls
- * announcing twice.** A `<helix-select>` renders a `<helix-listbox>`, and after
- * that change both of them announced: the listbox dispatched `input` and
- * `change` from its own host, `input` is composed by specification, and the
- * pair crossed the select's shadow boundary to arrive beside the select's own.
+ * **A composed control announces twice unless it stops its child.** A
+ * `<helix-select>` renders a `<helix-listbox>`: the listbox dispatches `input`
+ * and `change` from its own host, `input` is composed by specification, and the
+ * pair crosses the select's shadow boundary to arrive beside the select's own.
  * Measured on the styled tier before the fix, one choice made on the inner
  * listbox produced `input` twice and `change` three times. The prefixed request
- * never had this, because every one of those components already stopped the
- * child's `helix-before-change` and spoke for itself; the natives arrived
- * without the equivalent.
+ * never had this, every one of those components already stopping the child's
+ * `helix-before-change` and speaking for itself.
  *
  * Across families rather than in each family's own file, because what is being
  * asserted is a property of the composition and the bug was invisible from
@@ -30,13 +28,12 @@ beforeAll(async () => {
    * `hydration.dom.spec.ts` collects its tag list by patching
    * `customElements.define` and importing the barrel, so whichever file
    * evaluates the barrel first is the one that sees the registrations: a second
-   * import is a module-cache hit and defines nothing. Importing it here left
-   * that spec with an empty list and a `mounted` count of zero, which it
-   * reports as a floor failure rather than as the collision it is.
+   * import is a module-cache hit and defines nothing. Importing it here leaves
+   * that spec with an empty list and a `mounted` count of zero, which it reports
+   * as a floor failure rather than as the collision it is.
    *
-   * Naming the families is the right shape for this file anyway. It is a
-   * cross-family spec, not an every-family one, and what it needs is the six
-   * that compose plus the group and the controls they contain. */
+   * Naming the families is the right shape for this file anyway: it is a
+   * cross-family spec, not an every-family one. */
   await Promise.all([
     import('./chat/index.js'),
     import('./checkbox/index.js'),
@@ -118,14 +115,12 @@ describe('a control that renders another control', () => {
 })
 
 describe('a palette, which is the case that announces nothing', () => {
-  /* `Command` renders a listbox and is deliberately not a value control: its own
-     comment says the listbox's word is "the right word for a control that holds
-     a value and the wrong one for a palette, nothing here changed, a command
-     ran". So the correct native count here is zero, and what it had was one, the
-     listbox's `input` crossing the boundary and describing a value the palette
-     does not have. It is the same leak as the five above and the opposite
-     expectation, which is why it is asserted separately rather than folded into
-     the table. */
+  /* `Command` renders a listbox and is deliberately not a value control: a
+     command ran, nothing changed value. So the correct native count here is
+     zero, and the leak to guard against is the listbox's `input` crossing the
+     boundary and describing a value the palette does not have. Same leak as the
+     five above and the opposite expectation, which is why it is asserted
+     separately rather than folded into the table. */
   test('command relays no native, because nothing changed', async () => {
     const host = (await mount(
       `<helix-headless-command label="L">${OPTIONS}</helix-headless-command>`,
@@ -150,10 +145,9 @@ describe('a palette, which is the case that announces nothing', () => {
 describe('a group whose members are controls in their own right', () => {
   /* Checkbox Group is the one where this is not obvious. Each box is
      form-associated and submits itself, so each announces, and the group has a
-     value of its own and announces too: before this, one click produced the
-     group's `change` and the box's `input` and `change`, all three at a
-     consumer listening on the group, two of them describing one box rather than
-     the set. Radio Group and Toggle Group never had it, their members being
+     value of its own and announces too: unstopped, one click puts three events
+     at a consumer listening on the group, two of them describing one box rather
+     than the set. Radio Group and Toggle Group never had it, their members being
      option-shaped and announcing nothing. */
   test('the group is the single voice for the set', async () => {
     const host = (await mount(
@@ -208,12 +202,11 @@ describe('a control that renders a native control', () => {
   /* **`input` is composed by specification, so the inner control's own event
      leaves the shadow root.** Every form control here renders a real `<input>`
      or `<textarea>` and announces `input` from the host beside it, so one
-     keystroke reached a consumer twice and one of the two carried the value from
+     keystroke reaches a consumer twice and one of the two carries the value from
      before the change. Measured in Chrome 148 on `<helix-checkbox>`: `input`
      from the inner control with `checked` still false, then
-     `helix-before-toggle`, then `input` from the host with it true.
-     `handleChange` had stopped the inner one since it was written and
-     `handleInput` never did, so the pair was half applied. */
+     `helix-before-toggle`, then `input` from the host with it true. Stopping the
+     inner `change` and not the inner `input` is half the pair. */
   const NATIVE: Array<[string, string, 'bare' | 'check' | 'text']> = [
     ['helix-headless-input', `<helix-headless-input label="L"></helix-headless-input>`, 'text'],
     [
@@ -233,12 +226,10 @@ describe('a control that renders a native control', () => {
       'check',
     ],
     ['helix-headless-switch', `<helix-headless-switch label="L"></helix-headless-switch>`, 'check'],
-    /* The two the first sweep missed, because it started from the seven that
-       announce through `MixinControllerValue` rather than from every family that
-       renders a native control. File Input declared `input` and sent none, so
-       the only one a consumer received was the inner `<input type="file">`'s;
-       Color Picker stopped its hue and alpha rails since they were written and
-       left the two area axes inline, moving the color and stopping nothing. */
+    /* The two that announce through no value mixin, so a sweep starting from
+       `MixinControllerValue` does not reach them. File Input declares `input`
+       and the escape is the inner `<input type="file">`'s; Color Picker stops
+       its hue and alpha rails and its two area axes are inline. */
     [
       'helix-headless-file-input',
       `<helix-headless-file-input label="L"></helix-headless-file-input>`,
@@ -335,15 +326,11 @@ describe('the native pair a control sends', () => {
 })
 
 describe('no family lets an inner native control speak in its name', () => {
-  /* **The population is the shape, which is the whole lesson of 308.** That row
-     was found through one mechanism, a rail forwarding without stopping, and
-     fixed in the seven families that mechanism reached. Sweeping instead by what
-     a family *renders* found two more, File Input and Color Picker. Sweeping by
-     that shape and meaning it found a third, Video, whose scrubber and volume
-     rail are `<input type="range">` in a component that declares no `input` at
-     all: both passes before this one had read "renders a native control" as
-     "is a form control", and a media component with two rails in its chrome is
-     neither a form control nor exempt from the mechanism.
+  /* **The population is what a family renders, not whether it is a form
+     control.** Read the narrower way this misses Video, whose scrubber and
+     volume rail are `<input type="range">` in a component that declares no
+     `input` at all: a media component with two rails in its chrome is neither a
+     form control nor exempt from the leak.
 
      So every family that renders an `<input>`, `<textarea>` or `<select>` is
      listed here, and the assertion is the one thing true of all of them however
@@ -400,12 +387,11 @@ describe('no family lets an inner native control speak in its name', () => {
     for (const child of host.querySelectorAll('*')) {
       await settle(child as HTMLElement)
     }
-    /* Down through every shadow root, not just this element's own. Six of these
-       render their native control inside a child's: Chat's composer, the two
-       groups' members, the two pickers' field, Pagination's size select. That is
-       exactly where a composed `input` starts its journey, so a query that
-       stopped at the host's own root would report those six clean by never
-       looking at them. */
+    /* Down through every shadow root, not just this element's own. Several of
+       these render their native control inside a child's: Chat's composer, a
+       group's members, the pickers' field. That is exactly where a composed
+       `input` starts its journey, so a query stopping at the host's own root
+       would report them clean by never looking at them. */
     const inners: HTMLInputElement[] = []
     const dig = (root: ParentNode): void => {
       for (const node of root.querySelectorAll('*')) {

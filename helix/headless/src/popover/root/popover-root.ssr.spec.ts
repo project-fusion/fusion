@@ -28,7 +28,7 @@ describe('popover server output', () => {
   })
 
   test('an open popover serves back what was typed and nothing else', () => {
-    // `data-open` was here until the open state moved to `ElementInternals`.
+    // The open state lives in `ElementInternals`, so it writes no attribute.
     expect(
       hostAttributes(
         ssr(html`<helix-headless-popover open>x</helix-headless-popover>`),

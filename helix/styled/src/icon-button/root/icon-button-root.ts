@@ -10,7 +10,7 @@ import { styles } from './icon-button-root.css.js'
  *
  * @description
  * Top-level rather than `Button.Icon`, because a namespace means composition:
- * `Card.Header` is part of a card, and an icon-only button is not part of a
+ * `Tabs.Tab` is part of a tab set, and an icon-only button is not part of a
  * button. It is a button with different content and a different shape, which
  * makes it its own component.
  *
@@ -28,12 +28,23 @@ import { styles } from './icon-button-root.css.js'
  *
  * @csspart button - The inner button or anchor.
  *
- * @cssproperty --icon-button-radii - Corner radius of the control, which a group flattens through `--button-radii-start` and `--button-radii-end`.
+ * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.
  * @cssproperty --icon-button-shadow - What it casts, where it is raised off the page.
  * @cssproperty --icon-button-size - Edge length of the control.
  */
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton) {
+  /**
+   * Whether it is raised off the page it sits on.
+   *
+   * Separate from `shape`, because they are separate facts: a docked control is
+   * raised whatever its outline, and a circle inside a toolbar is not raised at
+   * all. Shadow rather than a border, since what is under a floating control is
+   * the page and a line drawn on the page is not the same as being above it.
+   */
+  @property({ reflect: true, type: Boolean })
+  raised = false
+
   /**
    * The outline it is cut to, which is an axis of its own and not a value on one.
    *
@@ -52,17 +63,6 @@ export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton
    */
   @property({ reflect: true })
   shape?: 'circle'
-
-  /**
-   * Whether it is raised off the page it sits on.
-   *
-   * Separate from `shape`, because they are separate facts: a docked control is
-   * raised whatever its outline, and a circle inside a toolbar is not raised at
-   * all. Shadow rather than a border, since what is under a floating control is
-   * the page and a line drawn on the page is not the same as being above it.
-   */
-  @property({ reflect: true, type: Boolean })
-  raised = false
 
   static override styles: CSSResultGroup = styles
 }

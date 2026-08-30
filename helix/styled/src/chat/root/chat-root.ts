@@ -36,7 +36,7 @@ import '../message/chat-message.js'
  * @csspart log - The transcript, which is the thing that scrolls.
  *
  * @cssproperty --chat-gap - Space between turns.
- * @cssproperty --chat-max-height - How tall the conversation may get before the transcript scrolls.
+ * @cssproperty --chat-max-block-size - How tall the conversation may get before the transcript scrolls.
  * @cssproperty --chat-padding-inline - Space either side of every region.
  * @cssproperty --chat-resume-border-color - The edge around the way back.
  * @cssproperty --chat-resume-border-width - How thick that edge is, for a surface over content.

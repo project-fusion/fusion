@@ -42,10 +42,10 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * the value itself, for the reason Date Input gives about its dates: half-typed
  * input does not survive a round trip through a formatter.
  *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * The custom property below is written by this component and never set by a
+ * consumer: it carries a value this element resolved and CSS cannot, which is
+ * what lets a stylesheet on this tier paint the swatch without parsing anything
+ * itself.
  *
  * @since 0.1.0
  * @status experimental
@@ -119,53 +119,32 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   })
 
   /**
-   * What the browser may autofill in the text field, as a platform token.
-   *
-   * **Defaults to `off`, which is not the platform's default and is the
-   * point.** The field filters a list rather than collecting a value, so a
-   * browser offering to fill it with a saved address is competing for the same
-   * keystrokes as the listbox. A consumer who wants autofill can still ask.
-   */
-  @property()
-  autocomplete = 'off'
-
-  /**
-   * Whether the field is a text box with a swatch on it, or only the swatch.
-   *
-   * `swatch` is the native control's shape: a block of color that opens a
-   * picker, with no text beside it. It is what a toolbar wants, and a form that
-   * asks for a color among twenty other questions, where a hex in a box is
-   * eleven characters of noise next to the thing itself.
-   *
-   * It also settles where the value is stated. The default field *is* the input,
-   * so the panel is told `no-value` and would otherwise show a second one. A
-   * swatch states nothing, so the panel keeps its own row and the value is
-   * readable and typeable exactly once, in whichever of the two is present.
-   *
-   * The trade is real and is the reason this is not the default: a swatch cannot
-   * be read or pasted into without opening the panel, which is worse for a form
-   * where the color is the answer rather than a setting.
-   */
-  @property({ reflect: true })
-  variant?: 'swatch'
-
-  /**
    * Whether the color carries an alpha channel.
    */
   @property({ reflect: true, type: Boolean })
   alpha = false
 
   /**
+   * What the browser may autofill in the text field, as a platform token.
+   *
+   * **Defaults to `off`, which is not the platform's default and is the
+   * point.** The field holds a color, so a browser offering to fill it with a
+   * saved address is competing for the same keystrokes as the picker. A
+   * consumer who wants autofill can still ask.
+   */
+  @property()
+  autocomplete = 'off'
+
+  /**
    * The syntax the value is written in: `hex`, `rgb` or `hsl`.
    *
-   * **Undefaulted, because it reflects.** The two together are what stamp an
-   * attribute onto every host anybody renders, including the ones nobody
-   * configured: the server wrote `format="hex"` on every color input on the
-   * page, and React, holding no such prop, reported a hydration mismatch for
-   * each one. That is the fault `Tree.chevronPlacement` had and the reason the
-   * area rules say a reflected property takes no default. Hex is still what an
-   * unset one writes; the difference is that the resting arrangement is the
-   * attribute's absence rather than a value spelled out.
+   * **Undefaulted, because it reflects.** The two together stamp an attribute
+   * onto every host anybody renders, including the ones nobody configured: the
+   * server writes `format="hex"` on every color input on the page, and React,
+   * holding no such prop, reports a hydration mismatch for each one.
+   * `helix component`'s `reflected-defaults` holds it. Hex is still what an unset one
+   * writes; the resting arrangement is the attribute's absence rather than a
+   * value spelled out.
    */
   @property({ reflect: true })
   format?: ColorFormat
@@ -194,6 +173,26 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a color'
 
+  /**
+   * Whether the field is a text box with a swatch on it, or only the swatch.
+   *
+   * `swatch` is the native control's shape: a block of color that opens a
+   * picker, with no text beside it. It is what a toolbar wants, and a form that
+   * asks for a color among twenty other questions, where a hex in a box is
+   * eleven characters of noise next to the thing itself.
+   *
+   * It also settles where the value is stated. The default field *is* the input,
+   * so the panel is told `no-value` and would otherwise show a second one. A
+   * swatch states nothing, so the panel keeps its own row and the value is
+   * readable and typeable exactly once, in whichever of the two is present.
+   *
+   * The trade is real and is the reason this is not the default: a swatch cannot
+   * be read or pasted into without opening the panel, which is worse for a form
+   * where the color is the answer rather than a setting.
+   */
+  @property({ reflect: true })
+  variant?: 'swatch'
+
   /** The overlay, placed against the field for the reason Date Input gives. */
   protected readonly panel = new PopoverController(this, {
     anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
@@ -201,15 +200,12 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
      *
      * A control is not always one element: the button that opens this panel is
      * part of it, and a press on it is not a press outside. Scoped to the
-     * surface alone, `pointerdown` on the trigger closed the panel and the
-     * trigger's own `toggleOpen` reopened it on the `click` that followed, so
-     * the panel could never be closed by the button that opened it. Measured
-     * across all five popover-bearing components: Menu, Popover and Tooltip
-     * already named their invoker; this one and its three siblings did not, and
-     * all four stayed open on a second press where Menu closed.
+     * surface alone, `pointerdown` on the trigger closes the panel and the
+     * trigger's own `toggleOpen` reopens it on the `click` that follows, so the
+     * panel can never be closed by the button that opened it.
      *
-     * `DismissController` documents this exact failure and takes a list for it.
-     * The list was the fix; using it was the part that did not happen here. */
+     * `DismissController` documents this exact failure and takes a list for
+     * it. */
     boundary: (): readonly (Element | null | undefined)[] => [
       this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
       this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
@@ -368,10 +364,8 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
        `value` is an accessor over `valueState ?? defaultValue`, so a consumer
        moving `default-value` on an untouched control moves what the form
        submits without ever putting `value` in the changed map, and the reported
-       entry went stale. Native `<input>` updates in exactly that case, which is
-       the behavior the mixin's own notes take as the reference. Fifteen of the
-       twenty controls here already reported unconditionally; this is one of the
-       five that did not. */
+       entry goes stale. Native `<input>` updates in exactly that case, which is
+       the behavior the mixin's own notes take as the reference. */
     this.sync()
     if (changed.has('value') && parseColor(this.value)) {
       this.settled = this.value
@@ -403,9 +397,9 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
    * editable field for the same value, which is two places to type with no
    * answer to which one is authoritative or which has the caret.
    *
-   * The other way round was considered, this element dropping its own field and
-   * letting the panel's be the only one. It is worse for a form: the value could
-   * not be read at a glance or pasted without opening a panel.
+   * Not the other way round, this element dropping its own field and letting the
+   * panel's be the only one: the value could then not be read at a glance or
+   * pasted without opening a panel.
    */
   /**
    * The picker the field opens, behind a seam the styled tier can move.
@@ -453,8 +447,8 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
         <!-- The same pair Input carries, in the same places: leading content
              before the text, trailing content after it and before the trigger.
              A label wanting to sit inside the field rather than over it goes
-             here, which is what the toggle group's own label-placement does and
-             what this had no way to express. Backticks stay out of this
+             here, which is what the toggle group's own label-placement does.
+             Backticks stay out of this
              comment: it is inside a tagged template, so one would end the
              literal and the error lands on a line further down. -->
         <slot name="start"></slot>

@@ -15,11 +15,10 @@ const row = async (attributes = ''): Promise<HTMLElement> =>
  * One menu row, and the contract that is the row's rather than the menu's.
  *
  * **The menu already proves the coordination**, which is roving focus, typeahead
- * and which row a chosen value came from: it is named 48 times in this family's
- * specs. What the row decides alone is which *element* it is, and that decision
- * is invisible from the menu, because a menu made of anchors and a menu made of
- * divs behave identically until a reader reaches one with a screen reader or a
- * middle click.
+ * and which row a chosen value came from. What the row decides alone is which
+ * *element* it is, and that decision is invisible from the menu, because a menu
+ * made of anchors and a menu made of divs behave identically until a reader
+ * reaches one with a screen reader or a middle click.
  */
 describe('one menu row', () => {
   /* The anchor is the row rather than something inside it. A `menuitem`

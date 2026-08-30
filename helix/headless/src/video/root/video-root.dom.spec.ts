@@ -106,9 +106,9 @@ describe('the mark that starts it', () => {
        to press. Measured in a browser: `paused` true, `playing` true, and no
        `pause` anywhere in the event log.
 
-       `paused` is defined here rather than played for real, because it is the
-       platform's half of the exchange and a spec cannot make a browser decode a
-       file. What is under test is which events this element listens to. */
+       `paused` is defined here rather than played for real: a spec cannot make
+       a browser decode a file, and what is under test is which events this
+       element listens to. */
     const host = await player()
     const video = host.shadowRoot?.querySelector('video') as HTMLVideoElement
     const paused = (value: boolean) => {
@@ -152,8 +152,8 @@ describe('the mark that starts it', () => {
 
   test('it goes while playing and comes back on pause', async () => {
     /* Whenever it is not playing, which is what the mark means: press this to
-       play. It said that only before the first play, which made it mean two
-       different things at two moments that are the same state. */
+       play. Drawn only before the first play, it would mean two different
+       things at two moments that are the same state. */
     const host = await player()
     const video = part(host, 'video') as HTMLVideoElement
     expect(part(host, 'start')).not.toBeNull()
@@ -178,7 +178,7 @@ describe('the mark that starts it', () => {
 
 describe('the download control', () => {
   test('claims nothing it cannot do, and does not take the page with it', async () => {
-    /* `download` is honoured for a same-origin file and ignored for any other,
+    /* `download` is honored for a same-origin file and ignored for any other,
        whatever headers come back. Measured on a cross-origin clip: the press
        navigated the whole page to the mp4, which reads as the player
        disappearing. An attribute the browser will ignore is a lie in the
@@ -199,8 +199,7 @@ describe('the download control', () => {
        happy-dom serves every document from `about:blank`, whose origin is the
        string `null`, so a relative path resolves to nothing there while
        resolving perfectly in the browser run. An assertion about the
-       environment passes in one and fails in the other, which is what the first
-       version of this did. */
+       environment passes in one and fails in the other. */
     const ours = await player(
       '<helix-headless-video extra-controls="download" label="A clip" src="blob:whatever"></helix-headless-video>',
     )
@@ -457,10 +456,9 @@ if (hasLayout()) {
 
       const video = part(host, 'video') as HTMLVideoElement
       /* The state as well as the event. The element reads `video.paused` rather
-         than trusting that a `play` event means playing, which is right and is
-         what this spec did not do: dispatching alone leaves `paused` true in a
-         real engine, so the flag never moved and the spec only passed against a
-         shim whose `paused` was not backed by anything. */
+         than trusting that a `play` event means playing, so dispatching alone
+         leaves `paused` true in a real engine and the flag never moves: a spec
+         that only dispatches passes against a shim and nothing else. */
       const pausedAs = (value: boolean) => {
         Object.defineProperty(video, 'paused', { configurable: true, value })
       }

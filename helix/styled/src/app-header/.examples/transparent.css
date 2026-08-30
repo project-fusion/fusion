@@ -1,12 +1,12 @@
-/* The bar needs something behind it before the two appearances differ at all,
-   and bare, they did not: a 72% white pane over a white page is an opaque white
-   pane. Neither example scrolled either, so neither ever drew its separating
-   rule. Three things fix it, and `opaque.css` is the same file so that flipping
-   between the two examples changes one attribute and nothing else.
+/* The bar needs something behind it before the two appearances differ at all: a
+   72% white pane over a white page is an opaque white pane, and a page with
+   nothing to scroll never draws the bar's separating rule. `opaque.css` is the
+   same file, so flipping between the two examples changes one attribute and
+   nothing else.
 
    The scroller is the frame's own document, which is the one the component
-   listens to: the custom state `scrolled` is set from `window.scrollY`, so a bar inside an
-   overflowing div would never lift. */
+   listens to: the custom state `scrolled` is set from `window.scrollY`, so a bar
+   inside an overflowing div would never lift. */
 .page {
   display: flex;
   flex-direction: column;
@@ -20,9 +20,8 @@
 
    Pulled up by the height of the bar and padded back down by it, so the band
    starts *behind* the banner rather than below it. Without that, the two
-   appearances are the same picture until the reader scrolls, which is the
-   thing that made these two examples indistinguishable in the first place. It
-   is also what a page with a glass header actually does with its hero. */
+   appearances are the same picture until the reader scrolls. It is also what a
+   page with a glass header actually does with its hero. */
 .band {
   align-content: center;
   margin-block-start: calc(var(--helix-size-header) * -1);
@@ -70,21 +69,17 @@
 
    **`surface-inverse` cannot say "dark".** It says "the opposite of the page",
    which is neutral-900 in light mode and neutral-100 in dark, so in dark mode
-   this hero came out near-white with white text on it and a light-inked bar
-   floating over the top: the example inverted along with the page it was meant
+   this hero comes out near-white with white text on it and a light-inked bar
+   floating over the top: the example inverting along with the page it is meant
    to stand against.
 
-   A dark scheme on the band is the answer, and it failed the first time for a
-   reason that looked like the opposite: `color-scheme: dark` was declared while
-   the background still read `surface-inverse`, so the scheme flipped the very
-   token being used to make it dark and the band went light gray. The two
-   halves belong together. `data-color-mode="dark"` sets the scheme on this
-   subtree, and a plain `surface` under it is neutral-900 in either mode, which
-   is what light mode was already getting.
+   **And `color-scheme: dark` over `surface-inverse` goes light gray**, the
+   scheme flipping the very token being used to make it dark. The two halves
+   belong together: `data-color-mode="dark"` sets the scheme on this subtree, and
+   a plain `surface` under it is neutral-900 in either mode.
 
-   Nothing else in the file moves, because `foreground-on-accent` is
-   neutral-0 with no second arm: the heading and the rules of the grid were
-   white before this and are white after it. */
+   Nothing else in the file moves, because `foreground-on-accent` is neutral-0
+   with no second arm. */
 .band {
   background-color: var(--helix-color-surface);
 }

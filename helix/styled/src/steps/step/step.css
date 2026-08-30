@@ -55,11 +55,9 @@
   display: none;
 }
 
-/* The mark, which is an icon and not a box.
- *
- * A ring drawn round a check is a second shape saying what the check already
- * says, and a row of them reads as a row of buttons rather than as a rule with
- * marks on it. `numeric` puts a digit here instead, and it gets no box either.
+/* The mark, which is an icon and not a box. A ring drawn round a check is a
+ * second shape saying what the check already says, and `numeric` puts a digit
+ * here instead and gets no box either.
  *
  * The square it occupies is not always the glyph's own size. Down a column the
  * mark shares a row with a dense button, and a twenty pixel glyph aligned to
@@ -115,12 +113,9 @@ slot[name="marker"]::slotted(*) {
   --icon-size: var(--_steps-m, var(--helix-size-icon));
 }
 
-/* A hue only where the shape already carries the meaning.
- *
- * Green on a check is confirming: the check is the shape for "finished", so the
- * color agrees with something a reader can already read. The accent on the
- * target is the same bargain, and the two together let the sequence be read at
- * a glance, everything ahead of the reader staying quiet.
+/* A hue only where the shape already carries the meaning: the check is the
+ * shape for "finished" and the target for "here", so the color agrees with
+ * something a reader can already read.
  *
  * Under `numeric` both go back to ink, because a digit carries no meaning of
  * its own for a color to agree with: a green 2 would be hue used as the whole
@@ -152,13 +147,12 @@ slot[name="marker"]::slotted(*) {
   z-index: 1;
 }
 
-/* The name, which is a `helix-button` rather than a `<button>` reset here.
- *
- * What is left to say is only what a step needs that a button has no view on:
- * how tall it is, and that its text is the step's size rather than a control's.
- * The hover wash, the focus ring, the disabled treatment and the pressed state
- * all arrive with it, and so does `--button-background-color`, which is why
- * there is no hover hook of this component's own.
+/* The name, which is a `helix-button` rather than a `<button>` reset here. What
+ * is left to say is only what a step needs that a button has no view on: how
+ * tall it is, and that its text is the step's size rather than a control's. The
+ * hover wash, the focus ring, the disabled treatment, the pressed state and
+ * `--button-background-color` all arrive with it, which is why there is no
+ * hover hook of this component's own.
  *
  * Dense, said in the properties density is made of rather than with a
  * `data-density` attribute. That attribute is matched by a rule in the base
@@ -183,9 +177,7 @@ slot[name="marker"]::slotted(*) {
   --button-foreground-color: var(--helix-color-foreground);
 }
 
-/* The same inset the name takes as padding, so the two start on one line. The
-   name is a button and carries its own; the description is text and would
-   otherwise begin a dozen pixels to the left of the word above it. */
+/* The same inset the name takes as padding, so the two start on one line. */
 [part="description"] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
@@ -199,16 +191,15 @@ slot[name="marker"]::slotted(*) {
 }
 
 /* What the stage holds, open on the current step and only down a column. A row
-   has no room under a step for a form, and stretching one to fit would set
-   every step's height by the tallest.
+ * has no room under a step for a form, and stretching one to fit would set
+ * every step's height by the tallest. Under both, in the name's own column, so
+ * a stage's content lines up with the name rather than with the mark beside it.
  *
  * `grid-template-rows` from `0fr` to `1fr` rather than a height, because the
  * height is the content's and nothing here knows it: animating `max-height` to
  * a guess either clips the content or spends the difference easing nothing.
  * The inner element needs `min-block-size: 0` or a grid item refuses to go
  * below its own content and the row never closes. */
-/* Under both, in the name's own column, so a stage's content lines up with the
-   name rather than with the mark beside it. */
 [part="content"] {
   display: var(--_steps-content, none);
   grid-column: var(--_steps-body-column, 1);

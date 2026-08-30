@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,7 +8,7 @@ describe('button server output', () => {
     // `delegatesFocus` is a shadow root option, so it only reaches the browser
     // if it serializes onto the declarative template. If it did not, the button
     // would be unfocusable until hydration.
-    const markup = ssr(html`<helix-button>Go</helix-button>`)
+    const markup = withoutStyles(ssr(html`<helix-button>Go</helix-button>`))
     expect(markup).toContain('shadowrootdelegatesfocus')
     expect(hasPart(markup, 'button')).toBe(true)
     expect(withoutStyles(markup)).toMatch(/<button\s+part="button"/)
@@ -32,8 +32,8 @@ describe('button server output', () => {
     // recipe so one declaration serves this control and a consumer's own
     // anchor. What ships in the shadow root is what a document rule cannot
     // reach, which is why the focus ring is the thing to assert on here.
-    const markup = ssr(html`<helix-button emphasis="solid" tone="primary">Go</helix-button>`)
-    expect(markup).toContain('shadowrootmode="open"')
-    expect(markup).toContain('--helix-color-focus-ring')
+    const served = ssr(html`<helix-button emphasis="solid" tone="primary">Go</helix-button>`)
+    expect(withoutStyles(served)).toContain('shadowrootmode="open"')
+    expect(styles(served)).toContain('--helix-color-focus-ring')
   })
 })

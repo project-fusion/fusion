@@ -1,16 +1,7 @@
-/* The three nodes `MixinField` renders, styled once.
- *
- * This was copied by hand into ten stylesheets, each opening with a comment
- * saying it was the same block everywhere. It was not, and the drift was not
- * theoretical: three bugs came out of it in one afternoon, all on the switch.
- * The label carried `display: block` and a bottom padding that belong to a
- * label sitting *above* a control, which put a beside-label's ink two pixels
- * high; and the hint's indent, which the checkbox has always had, had never
- * been copied across, so a hint sat at the host's own edge while its label
- * started a track further along.
- *
- * Each of those was found by looking at the switch. None of them could have
- * been found by looking at this block, because there was no this block.
+/* The three nodes `MixinField` renders, styled once, and never copied into a
+ * component's own sheet: a hand-copied version of this block drifts silently,
+ * and the drift shows up as a stacked label's padding on a beside-label or a
+ * hint indented to the host's edge rather than to its label.
  *
  * A component composes what it needs:
  *
@@ -25,11 +16,10 @@
  * renders these nodes, because `helix/headless` extends that mixin and must
  * never carry CSS. `helix/styled` is the first tier that may. */
 
-/* Every placeholder in every field, which is where this belongs: the rule was
- * copied identically into six stylesheets, and the seventh field written would
- * have made it seven. `listbox` names `search-field` rather than `control`, so
- * the subject is left off entirely: a bare `::placeholder` is `*::placeholder`,
- * and every placeholder in the component is exactly what is meant.
+/* Every placeholder in every field, which is where this belongs. `listbox` names
+ * `search-field` rather than `control`, so the subject is left off entirely: a
+ * bare `::placeholder` is `*::placeholder`, and every placeholder in the
+ * component is exactly what is meant.
  *
  * `medium` rather than regular. A placeholder is not filler, it is the one piece
  * of instruction a field carries before anything is typed, and at
@@ -123,7 +113,7 @@
 /* Print: the shared field parts, so every control inherits the same answer.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

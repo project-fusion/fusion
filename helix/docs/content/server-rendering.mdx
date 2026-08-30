@@ -39,7 +39,7 @@ has a tree.
 **Anything that inspects the tree runs in `firstUpdated` or later**, and is
 therefore a client-side enhancement by definition.
 
-## Never initialise state in `connectedCallback`
+## Never initialize state in `connectedCallback`
 
 SSR does not call it. Derive from properties, or seed in `willUpdate`, which SSR
 does call.

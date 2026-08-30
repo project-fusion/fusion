@@ -58,18 +58,17 @@ describe('the states', () => {
     expect(mark?.getAttribute('aria-label')).toBe('Error')
   })
 
-  /**
-   * Retry is `helix-send` again, from the message rather than the composer. A
-   * listener telling them apart has `event.target`, which the DOM already
-   * distinguishes without a second event name.
-   */
-
   test('no other state takes a mark, since none of them has to be found', async () => {
     expect(part(await message('state="sending"'), 'mark')).toBeNull()
     expect(part(await message('state="sent"'), 'mark')).toBeNull()
     expect(part(await message('state="streaming"'), 'mark')).toBeNull()
   })
 
+  /**
+   * Retry is `helix-send` again, from the message rather than the composer. A
+   * listener telling them apart has `event.target`, which the DOM already
+   * distinguishes without a second event name.
+   */
   test('retry offers the turn again, and names itself as the source', async () => {
     const element = await message('state="failed"')
     const seen: Array<{ target: string; value: string }> = []

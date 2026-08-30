@@ -24,9 +24,9 @@ describe('a drawer told whether to be modal', () => {
 
   test('and is not when the attribute says false', async () => {
     /* The whole point. Lit's boolean converter answers `value !== null`, so
-       this read as true for being present, and a consumer who wrote the obvious
-       thing got the opposite of what they asked for with nothing to say so. A
-       tour cannot point inside a modal, which is where it was found. */
+       `modal="false"` reads as true for being present: a consumer who writes
+       the obvious thing gets the opposite of what they asked for, with nothing
+       to say so. */
     expect((await drawer('modal="false"')).modal).toBe(false)
   })
 

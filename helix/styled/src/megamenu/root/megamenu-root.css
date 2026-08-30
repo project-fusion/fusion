@@ -60,25 +60,24 @@
  * markup, and it is styled by the `data-megamenu-*` recipes in the base layer
  * rather than from here, for the reason `Outline` records against exactly this
  * mistake: a `::slotted()` rule loses to any document rule whatever its
- * specificity, so a rule here naming the anchors would have lost to the base
- * layer's own and the panel would have gone on drawing prose links in a box.
- * Which is what it did. */
+ * specificity, so a rule here naming the anchors loses to the base layer's own
+ * and the panel goes on drawing prose links in a box. */
 [part="surface"] {
   /* The page's own ground, not a raised surface. White in the light and black in
      the dark: a navigation panel is the site continuing, and `surface-overlay`
      put a gray card in front of a black page as though the nav were a dialog.
-     
+
      Both are hooks so a consumer can make the panel glass, which is not an
      appearance: `full` already occupies that axis with a layout, and a band
      can be material or not independently of being a band. Two things that can
      be true at once are two axes, so this is a custom property and not a
      second value on `appearance`.
-     
+
      Declared rather than absent, so turning the filter on cannot change what
      the panel is composited against: `none` is the initial value and costs
      nothing. */
   backdrop-filter: var(--megamenu-backdrop, none);
-  background-color: var(--megamenu-background, var(--helix-color-background));
+  background-color: var(--megamenu-background-color, var(--helix-color-background));
   /* A hairline in the dark, and nothing in the light.
    *
    * A shadow is a light-mode device. It works by darkening what is behind it,
@@ -98,7 +97,12 @@
    * around the panel instead of no box at all. */
   border: var(--megamenu-border-width, var(--helix-border-thin)) solid
     light-dark(transparent, var(--helix-color-border));
-  border-radius: var(--helix-radii-md);
+  /* The house corner, and being the largest panel in the library is not a
+     reason to take a different one. A radius is read against the corner beside
+     it rather than against the area behind it, so a wide panel at `md` next to
+     a menu at `sm` reads as two systems rather than as one panel that happens
+     to be bigger. Every floating panel is `sm`. */
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--megamenu-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   /* The panel expands downward rather than appearing, and the clip is what does
@@ -106,28 +110,27 @@
      top to bottom, so nothing inside moves, reflows or scales. A height
      animation would squash the columns on the way open and a scale would
      stretch the type.
-   
+
      Negative on three sides, which is not padding for its own sake: `clip-path`
      clips the shadow too, and a card's shadow spills outside the box on every
      side. Only the bottom is a real edge, and it is the one that travels. The
      top is clipped at zero, so the shadow's upward spill goes: the card hangs
      below its trigger and that spill lands on the bar, which is the same reason
      the band below clips it.
-   
+
      The corners survive. An `inset()` with no `round` clips to a rectangle, and
      the outside of a rounded corner is already transparent, so the radius is
      still the element's to draw.
-   
-     **The overshoot is one space step, and it used to be `100vmax`, which is
-     what made the reveal look like a snap.** The clip travels from `100%` of
-     the panel's height to the overshoot, and the panel is fully revealed the
-     moment the bottom inset reaches zero. At `-100vmax` on a 267 pixel band
-     that is 267 of 1547 pixels of travel: the reveal finished in the first 17%
-     of the duration and the remaining 83% moved a clip edge that was already
-     past the shadow. Lengthening the duration only lengthened the part nobody
-     can see. One step clears the shadow and nothing more, so nearly all of the
-     travel is the part that shows.
-   
+
+     **The overshoot is one space step, and must not be `100vmax`, which reads
+     as a snap.** The clip travels from `100%` of the panel's height to the
+     overshoot, and the panel is fully revealed the moment the bottom inset
+     reaches zero. At `-100vmax` on a 267 pixel band that is 267 of 1547 pixels
+     of travel: the reveal finishes in the first 17% of the duration and the
+     remaining 83% moves a clip edge already past the shadow, so lengthening the
+     duration only lengthens the part nobody can see. One step clears the shadow
+     and nothing more, so nearly all of the travel is the part that shows.
+
      **Collapsed is the resting value and open is the departure, keyed on
      `:popover-open`.** Written the other way round, with the closed value on
      `[hidden]`, the panel opened in one jump: `hidden` is removed by the
@@ -136,7 +139,7 @@
      started was canceled a frame later when `showPopover` ran. Measured: a
      transition existed on the frame the panel opened and was gone twenty
      milliseconds later with the clip already at rest.
-   
+
      Keyed here, the only change that carries the clip is the one that puts the
      panel in the top layer, which is a single recalc that `@starting-style` can
      supply a before-value for. The exit was never affected, because closing is
@@ -168,14 +171,14 @@
   padding: var(--helix-space-md);
   /* `display` and `overlay` ride along with `allow-discrete`, or only the
      opening animates.
-   
+
      Both are discrete properties and both flip the instant the panel closes:
      `display` because the closed panel is `display: none`, and `overlay`
      because leaving the top layer is what actually removes a popover from the
      screen. Transitioned discretely they hold their open value until the clip
      has finished traveling, which is what gives the panel an exit at all.
      Without them it vanishes on the frame it is told to.
-   
+
      `decelerate` opening: the panel arrives and settles rather than braking
      into place, which is the shape of something being pulled down. */
   transition:
@@ -218,8 +221,8 @@
  * Placed here rather than by the controller, which is told not to measure: a
  * band spans the viewport, so there is nothing to place it against.
  *
- * **Both edges rather than a width**, which is the whole of the overflow bug
- * that was here. `100vw` is the viewport including the scrollbar's gutter, and
+ * **Both edges rather than a width**, or the band overflows.
+ * `100vw` is the viewport including the scrollbar's gutter, and
  * `100dvw` is the same measurement taken when retractable browser chrome is out
  * of the way: the `d` is about phone toolbars, not scrollbars, so swapping one
  * for the other fixed nothing. A band that wide on a page with a classic
@@ -239,7 +242,7 @@
      the bar goes glass the band has to as well, or the seam between them is the
      one thing this rule exists to prevent. */
   backdrop-filter: var(--megamenu-backdrop, none);
-  background-color: var(--megamenu-background, var(--helix-color-background));
+  background-color: var(--megamenu-background-color, var(--helix-color-background));
   /* No edge at all. The bottom hairline was there to say where the band ends,
      which the shadow underneath it already says, and a line under a band that
      is meant to read as the header continuing downward turns the whole thing
@@ -361,7 +364,7 @@
   }
 
   /* The clip goes and the discrete pair stay.
-   
+
      Answered here rather than left to the base layer's global cap, because `*`
      does not cross a shadow boundary. Dropping the whole declaration would take
      `display` and `overlay` with it, and those are not motion: without them the
@@ -378,12 +381,14 @@
 
 /* Not printed, being chrome.
  *
- * It is how a reader moves around a document rather than any of the document: a printed page has no elsewhere to go to, so a bar of destinations is ink spent on navigation that cannot happen.
+ * It is how a reader moves around a document rather than any of the document: a
+ * printed page has no elsewhere to go to, so a bar of destinations is ink spent
+ * on navigation that cannot happen.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. */
 @media print {
   :host {
     display: none;

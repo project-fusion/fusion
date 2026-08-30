@@ -60,9 +60,9 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    * Accessible name for the region.
    */
   @property()
-  /* Not "Menu", which is what it was: this component's own description is built
-     around not being one, and a default accessible name is the one place that
-     claim reaches a reader. */
+  /* Not "Menu". This component's own description is built around not being one,
+     and a default accessible name is the one place that claim reaches a
+     reader. */
   label = 'Navigation'
 
   /**
@@ -79,12 +79,11 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    * reader went deeper or came back. Without it a slide has to pick one
    * direction and be wrong half the time.
    *
-   * **Undefined until a move has happened**, which is what "the last move" means
-   * before there has been one. It defaulted to `forward` and was written on the
-   * first update, which cost two things: an attribute on the host that a
-   * consumer's server never sent, reported as a hydration mismatch, and a first
-   * page that animated itself in on load, since an animation is not a transition
-   * and the settle guard does not suppress it.
+   * **Undefined until a move has happened**, and never defaulted. A value
+   * written on the first update puts an attribute on the host that a consumer's
+   * server never sent, reported as a hydration mismatch, and animates the first
+   * page in on load: an animation is not a transition, so the settle guard does
+   * not suppress it.
    */
   @state()
   private direction?: 'back' | 'forward'
@@ -104,10 +103,9 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   /**
    * Puts the region's one tab stop on the first row of the page showing.
    *
-   * Every row rendered at `-1`, so nothing in the region was tab-reachable and
-   * the keyboard could not get in at all without a pointer first. One row holds
-   * the stop and the arrows move within, which is the roving pattern the
-   * toolbar uses and the one a `menu` wants.
+   * One row holds the stop and the arrows move within, which is the roving
+   * pattern the toolbar uses and the one a `menu` wants. Every row at `-1` is
+   * a region the keyboard cannot get into at all without a pointer first.
    *
    * Called after every update, because the set changes with the page: drilling
    * in replaces the rows outright, and the stop has to land on rows that are

@@ -4,16 +4,15 @@ const warned = new WeakSet<Element>()
 /**
  * Tells a slotted trigger that it opens something, and whether it is open.
  *
- * **Two components answered this by writing `aria-expanded` onto the consumer's
- * element, and that is a hydration mismatch.** `Megamenu` and `SpeedDial` both
- * did, each with a note saying why: a consumer who has to mirror `open` back
- * onto their own trigger is a consumer who will forget, and the failure is
- * silent to everyone who can see the screen. Both notes are right about the
- * gap. `Popover` refused to write anything, from the day it was written, on the
- * grounds that a component decorating a consumer's markup after upgrading is
- * one whose output a React consumer's hydration disagrees with.
+ * **Writing `aria-expanded` onto the consumer's element is a hydration
+ * mismatch, so it is not written.** The gap that answer was reaching for is
+ * real: a consumer who has to mirror `open` back onto their own trigger is a
+ * consumer who will forget, and the failure is silent to everyone who can see
+ * the screen. It is still the wrong answer, because a component decorating a
+ * consumer's markup after upgrading is one whose output a React consumer's
+ * hydration disagrees with.
  *
- * **Popover was right, measured 28 Aug 2026 against React 19.2.8.** Four
+ * **Measured 28 Aug 2026 against React 19.2.8.** Four
  * families were server-rendered as React emits them and hydrated with the
  * element definitions loaded either side of `hydrateRoot`:
  *
@@ -31,14 +30,12 @@ const warned = new WeakSet<Element>()
  * and rebuilding it, which is what the carousel's own note records blinding an
  * `<helix-aura>` two sections away.
  *
- * **A property crosses the gap that an attribute cannot, and this library
- * already knew it.** `Menu` tells its items by property "rather than an
- * attribute for that reason", in those words. React diffs the attributes it
- * rendered and never looks at a property, so the state reaches the trigger,
- * lands as `aria-expanded` inside *that element's* shadow root, and the
- * consumer's markup is exactly what they served. Both positions get what they
- * were protecting: nothing is written onto the consumer's element, and the
- * reader is still told what the control does.
+ * **A property crosses the gap that an attribute cannot.** React diffs the
+ * attributes it rendered and never looks at a property, so the state reaches
+ * the trigger, lands as `aria-expanded` inside *that element's* shadow root,
+ * and the consumer's markup is exactly what they served. Both positions get
+ * what they were protecting: nothing is written onto the consumer's element,
+ * and the reader is still told what the control does.
  *
  * **Set before upgrade is safe**, which is what lets this run without waiting
  * for a definition: `ReactiveElement` captures an instance property assigned
@@ -49,7 +46,7 @@ const warned = new WeakSet<Element>()
  * `<button slot="trigger">` has no shadow root to keep the state out of the
  * markup and no property to take it, and a consumer cannot mirror it themselves
  * because the open state belongs to the component. Saying so once is the same
- * answer `Tooltip` gives about the link it will not write for them. See #322.
+ * answer `Tooltip` gives about the link it will not write for them.
  */
 export const tellDisclosure = (trigger: Element | null | undefined, open: boolean): void => {
   if (!trigger) {

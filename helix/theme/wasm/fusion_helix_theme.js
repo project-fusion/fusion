@@ -10,9 +10,6 @@
  * intent-in-CSS-out function would have it deriving twice for one keystroke.
  * The result carries `css` keyed by selector, empty when none were asked for.
  *
- * For reference, the TypeScript engine this replaces took 39ms for the
- * derivation alone, so the builder does less work than it did rather than more.
- *
  * `selectors` is a JSON array, keeping the boundary uniformly JSON in and JSON
  * out rather than mixing in a bound array type for one argument.
  *
@@ -50,11 +47,10 @@ export function derive(intent, selectors) {
 /**
  * Reads a hex color into its OKLCH components, as JSON.
  *
- * **Throws where the TypeScript returned `NaN`**, which is a deliberate change
- * and the same one `resolve` makes for a brand: `Number.parseInt` of something
- * that is not hex gives `NaN`, every comparison against which is false, so a
- * color that could not be read traveled onward looking like a color. A
- * caller passing the value of a color input never sees this.
+ * **Throws rather than returning a `NaN` triple**, which is the decision
+ * `resolve` makes for a brand: every comparison against `NaN` is false, so a
+ * color that could not be read travels onward looking like a color. A caller
+ * passing the value of a color input never sees this.
  *
  * # Errors
  *

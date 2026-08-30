@@ -28,10 +28,22 @@ import { styles } from './grid-root.css.js'
 @customElement('helix-grid')
 export class HelixGrid extends HelixElement {
   /**
+   * Alignment of each cell within its row.
+   */
+  @property({ reflect: true })
+  align?: 'start' | 'center' | 'end' | 'stretch'
+
+  /**
    * Fixed number of equal columns.
    */
   @property({ reflect: true, type: Number })
   columns?: number
+
+  /**
+   * Space between cells, named on the space scale.
+   */
+  @property({ reflect: true })
+  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
 
   /**
    * Minimum column width, filling as many as fit.
@@ -41,18 +53,6 @@ export class HelixGrid extends HelixElement {
    */
   @property()
   min = ''
-
-  /**
-   * Space between cells, named on the space scale.
-   */
-  @property({ reflect: true })
-  gap?: 'none' | '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
-
-  /**
-   * Alignment of each cell within its row.
-   */
-  @property({ reflect: true })
-  align?: 'start' | 'center' | 'end' | 'stretch'
 
   /**
    * Writes the track list into the shadow root's own stylesheet.
@@ -106,10 +106,9 @@ export class HelixGrid extends HelixElement {
         : ''
   }
 
-  /* `updated` alone, where there was a `firstUpdated` beside it doing the same
-     thing. Lit puts every initial property into the first `changed`, so a grid
-     with a `min` ran `applyTemplate` twice on every mount, and one without it
-     ran it once to write the empty string an empty `<style>` already held. */
+  /* `updated` alone, and never a `firstUpdated` beside it. Lit puts every
+     initial property into the first `changed`, so the pair runs
+     `applyTemplate` twice on every mount of a grid with a `min`. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (changed.has('min')) {

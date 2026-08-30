@@ -1,15 +1,13 @@
-/* The item is a four-column grid: media, body, actions, dismiss. A grid rather
-   than flex, because the media column has to line up down the feed whether or
-   not every item has one, and a flex row collapses the empty ones so every line
-   of text starts somewhere different.
+/* The item is a three-column grid: media, body, trailing. A grid rather than
+   flex, because the media column has to line up down the feed whether or not
+   every item has one, and a flex row collapses the empty ones so every line of
+   text starts somewhere different.
 
-   **The grid did not achieve that on its own, which is the part that was
-   wrong.** Each item is its own grid, so nothing about one row's tracks reaches
-   the row below it: a feed where some items had an avatar and some did not drew
-   its text at two different left edges, exactly the fault the comment above
-   claimed a grid prevents. The feed is what can see across its rows, so the root
-   publishes whether anything in it has media and every item holds the column
-   open by that much. */
+   The grid cannot do that on its own. Each item is its own grid, so nothing
+   about one row's tracks reaches the row below it: a feed where some items have
+   an avatar and some do not draws its text at two different left edges. The feed
+   is what can see across its rows, so the root publishes whether anything in it
+   has media and every item holds the column open by that much. */
 :host {
   /* One line of body text, which is what the body is set in and what the unread
      mark is drawn to, so the mark cannot drift off the line it belongs to.
@@ -20,10 +18,7 @@
   /* The row reflows on how much room the row was given, which is a fact about
      this box and about nothing else: a feed in a 320 pixel side panel is narrow
      inside a 1400 pixel window, and a `@media` rule would hand it the wide
-     branch. See the responsiveness rules, which name this mechanism for exactly
-     this category and record that nothing had used it yet. This is the first
-     `@container` rule in the library; the two families that already declare
-     `container-type` still query nothing. */
+     branch. */
   container-type: inline-size;
 
   display: block;
@@ -53,17 +48,15 @@
    striped list nobody can read. The mark is on the inline start edge, which is
    where the eye already is.
 
-   **It was `box-shadow: inset`, and that spelling made it read as an artifact
-   rather than as a mark.** An inset shadow paints inside the padding box, which
-   stops short of the rule under the row, so two unread items in a row drew one
-   line broken by a hairline every 67 pixels; and it ran the whole height of the
-   item, so the mark grew with the length of the notification and said something
-   about the text rather than about the state. Measured on a three line item, 106
-   pixels of accent against 67 for the row above it, for the same fact.
-
-   A pseudo element of a fixed height, on the first line and inset from the edge,
-   is the same fact at the same size every time, and does not touch the border it
-   used to be mistaken for.
+   Not `box-shadow: inset`, which is the obvious spelling and reads as an
+   artifact rather than as a mark. An inset shadow paints inside the padding box,
+   which stops short of the rule under the row, so two unread items in a row draw
+   one line broken by a hairline every 67 pixels; and it runs the whole height of
+   the item, so the mark grows with the length of the notification and says
+   something about the text rather than about the state: 106 pixels of accent on
+   a three line item against 67 for the row above it, for the same fact. A pseudo
+   element of a fixed height, on the first line and inset from the edge, is the
+   same fact at the same size every time.
 
    **Every dimension of it is a hook, because the shape is a preference and the
    fact is not.** A bar down the leading edge is one reading of "unread" and a dot
@@ -101,14 +94,12 @@
    nothing in the media slot is that space and nothing else, which is what puts
    every line of text down the feed on the same edge.
 
-   **`[part="media"]:not(:has(*)) { display: none }` was here and could never
-   match.** The box's child is the `<slot>`, not what a consumer assigned to it,
-   so `:has(*)` is true of an empty one and true of a filled one alike: valid
-   CSS, no error, and a rule that had never once applied. It is the same wall the
-   root hit and wrote up in `markEmpty`, which is where `slotFilled` came from.
-   Nothing asks the question now, because the reservation answers it feed-wide
-   and an item has no reason to care whether it is the one holding the column
-   open. */
+   **Never `[part="media"]:not(:has(*)) { display: none }`.** The box's child is
+   the `<slot>`, not what a consumer assigned to it, so `:has(*)` is true of an
+   empty one and true of a filled one alike: valid CSS, no error, and a rule that
+   can never apply. Nothing asks the question now, because the reservation
+   answers it feed-wide and an item has no reason to care whether it is the one
+   holding the column open. */
 [part="media"] {
   display: grid;
   place-items: center start;
@@ -121,9 +112,7 @@
 
 /* The label is the thing that happened and the caption qualifies it, so they are
    two lines rather than one sentence: a feed is scanned, and a reader deciding
-   whether a row is theirs is reading the first few words of the first line. The
-   caption takes the timestamp's old place under the body, the timestamp having
-   moved to the trailing column. */
+   whether a row is theirs is reading the first few words of the first line. */
 [part="label"] {
   color: var(--notifications-color, var(--helix-color-foreground-muted));
   font-family: var(--helix-font-sans);
@@ -135,8 +124,7 @@
    for the one it does not have. A `<slot>` is `display: contents` in the UA
    stylesheet and an unassigned one generates no box at all: no grid row, no gap.
    A wrapper generates both either way, and there is no way to ask in CSS whether
-   a slot was filled, which is the wall this file already hit once on the media
-   box and the root hit on its header.
+   a slot was filled.
 
    The cost is the rule the library already accepts for this: the region has no
    `part`, and what a consumer slotted is styled through `::slotted()`. The label
@@ -162,17 +150,6 @@ slot[name="caption"]::slotted(*) {
   font-weight: var(--helix-weight-medium);
 }
 
-/* The timestamp is the quietest thing in the row and is never the reason
-   somebody looked, so it takes the smallest size and the subtlest ink.
-
-   **`foreground-subtle` is lighter than `foreground-muted`, and this had them
-   the wrong way round.** The two are 0.53 and 0.50 in oklch, so the timestamp,
-   the thing the line above calls the quietest in the row, was drawn darker than
-   the content it belongs to: on a read item the ink went `subtle` for the content
-   and `muted` for the time, and a row whose least important element is its
-   darkest has no hierarchy left to read. Three pounds now, and they descend:
-   `foreground` for unread content, `foreground-muted` for read content,
-   `foreground-subtle` for the time in either. */
 /* One column, holding two things in one place.
  *
  * The time and the controls are the same cell of a one-cell grid, so they
@@ -214,18 +191,15 @@ slot[name="caption"]::slotted(*) {
    **Named by what it is not, and that is not a stylistic choice.** The other
    child of this column is the format-date element, whose tag is
    `helix-format-date` here and `helix-headless-format-date` a tier down, so
-   neither tag can be written. `[part="time"]` cannot either, and
-   `check:selectors` is what said so: the part belongs to the child and arrives
-   through `exportparts`, so a rule in this sheet naming it matches nothing at
-   all. Valid CSS, no error, and a timestamp drawn at the inherited size.
+   neither tag can be written. `[part="time"]` cannot either: the part belongs to
+   the child and arrives through `exportparts`, so a rule in this sheet naming it
+   matches nothing at all. Valid CSS, no error, and a timestamp drawn at the
+   inherited size.
 
-   **`foreground-subtle` is lighter than `foreground-muted`, and this had them
-   the wrong way round.** The two are 0.53 and 0.50 in oklch, so the timestamp,
-   the thing the line above calls the quietest in the row, was drawn darker than
-   the content it belongs to: on a read item the ink went `subtle` for the label
-   and `muted` for the time, and a row whose least important element is its
-   darkest has no hierarchy left to read. Three pounds now, and they descend:
-   `foreground` for an unread label, `foreground-muted` for a read one,
+   **`foreground-subtle` is lighter than `foreground-muted`**, 0.53 against 0.50
+   in oklch, so the two are easily swapped and the swap draws the quietest thing
+   in the row darker than the content it belongs to. Three pounds, and they
+   descend: `foreground` for an unread label, `foreground-muted` for a read one,
    `foreground-subtle` for the time in either. */
 [part="trailing"] > :not([part="controls"]) {
   color: var(--helix-color-foreground-subtle);
@@ -296,34 +270,31 @@ slot[name="caption"]::slotted(*) {
 
    **Both trailing boxes are centered on the row**, which is what puts them on an
    axis with each other and on the row's own. `align-items: start` hangs a box
-   from the top of the content, so a 32 pixel button in a 20 pixel line sat with
+   from the top of the content, so a 32 pixel button in a 20 pixel line sits with
    its label between the first line of text and the timestamp, aligned to
-   neither, while the dismiss beside it sat at the top: two controls in one row
+   neither, while the dismiss beside it sits at the top: two controls in one row
    on two different centers.
 
-   Centered on the row rather than on its first line, which was the first answer
-   to that. They act on the whole notification and not on the sentence at the top
-   of it, and the row a feed is made of is two lines, the notification and when it
-   happened: hung off the first of the two they sit high in a box whose other half
-   is empty. The cost is a long notification, where the middle of five lines is a
-   way from the text the control belongs to; the row that is actually common is
-   what decides it. */
+   Centered on the row rather than on its first line, because they act on the
+   whole notification and not on the sentence at the top of it, and the row a
+   feed is made of is two lines, the notification and when it happened. The cost
+   is a long notification, where the middle of five lines is a way from the text
+   the control belongs to; the row that is actually common is what decides it. */
 [part="actions"] {
   align-items: center;
   display: flex;
   gap: var(--helix-space-2xs);
 }
 
-/* A square the size of the row's controls, not a glyph with padding around it.
-   It measured 15 by 22, which is under any target anybody recommends and under
-   half the area of the button sitting next to it; the mark inside it is centered
+/* A square the size of the row's controls, not a glyph with padding around it,
+   which measured 15 by 22: under any target anybody recommends and under half
+   the area of the button sitting next to it. The mark inside it is centered
    rather than laid out, so a consumer replacing it with an icon gets the same
-   box. The negative block-start margin is what centers that box on the first
-   line, the trailing boxes being one line tall by the rule above.
+   box.
 
    No `font-size` and no `line-height`, which is what a text glyph needed. The
-   mark is an `<svg>` now and takes the icon step from `glyph.css`, which the
-   root has already set to `sm` along with the rest of the row's density.
+   mark is an `<svg>` and takes the icon step from `glyph.css`, which the root
+   has already set to `sm` along with the rest of the row's density.
 
    It is quiet until the row is pointed at, and that is the trailing column's
    doing rather than this rule's: the whole column swaps, so a cross appears
@@ -371,7 +342,7 @@ slot[name="caption"]::slotted(*) {
 
 /* Print: the dismiss control is not a thing on paper, and the unread mark is a
    fill printers drop unevenly. `@media print` does not cross a shadow boundary,
-   so every family says it for itself. See 165. */
+   so every family says it for itself. */
 @media print {
   [part="dismiss"] {
     display: none;

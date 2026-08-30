@@ -140,8 +140,8 @@ describe('input file', () => {
     // A cross says "dismiss this", which is what a tag does. This is not that.
     const host = await field()
     await choose(host, 'one.txt')
-    // The glyph is an inlined `<svg>` from a named import now, not an element
-    // with a name: `helix-headless-icon` indexed the whole set at runtime.
+    // The glyph is an inlined `<svg>` from a named import, not an element with
+    // a name: `helix-headless-icon` indexed the whole set at runtime.
     expect(part(host, 'remove')?.querySelector('svg')?.innerHTML).toContain(
       trash.content.slice(0, 40),
     )

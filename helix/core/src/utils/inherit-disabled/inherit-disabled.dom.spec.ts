@@ -7,8 +7,8 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  * **The remembering is the whole of it.** Writing `disabled = false` on release
  * would enable a member the consumer had disabled themselves, so the first time
  * a group disables one it records what that member already was, and hands that
- * back rather than a guess. A group that was never disabled writes to its
- * members at all.
+ * back rather than a guess. A group that was never disabled writes nothing to
+ * its members at all.
  */
 type Item = HTMLElement & { disabled: boolean }
 

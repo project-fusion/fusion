@@ -39,9 +39,9 @@ if (hasLayout()) {
          Only a browser can answer it: `slotchange` is what decides, and it does
          not fire without a real slot assignment. */
       /* Both in one mount, because `mount` replaces the body: measured
-         separately, the first was detached by the time it was read, and a
-         detached element reports zero for everything. Which the spec caught,
-         by asking the box to be wider than nothing before comparing it. */
+         separately, the first is detached by the time it is read, and a
+         detached element reports zero for everything. The width-over-zero
+         assertion below is what catches that. */
       const bare = (await mount(
         '<helix-checkbox></helix-checkbox><helix-checkbox label="Accept"></helix-checkbox>',
       )) as HTMLElement
@@ -61,19 +61,18 @@ if (hasLayout()) {
     })
 
     test('slotted words keep the room, with no property set', async () => {
-      // The case gating on the property would have broken: a checkbox named by
-      // its own content, which is how every checkbox was written before `label`.
+      // Gating on the `label` property breaks the checkbox named by its own
+      // slotted content, which is how most of them are written.
       const host = await mount('<helix-checkbox>Accept</helix-checkbox>')
       expect(hasState(host, 'has-label')).toBe(true)
       expect(getComputedStyle(part(host, 'label') as HTMLElement).display).not.toBe('none')
     })
 
     test('an invalid box is wrong at its own edge, not ringed outside it', async () => {
-      /* It was a ring, offset outside the box, and the picture was a red square
-         with a rounded gray box sitting inside it: a box inside a box rather
-         than a box that is wrong. A ring is right where a component has no edge
-         of its own to color, which stopped being true when this stopped
-         letting the browser paint it. */
+      /* An offset ring around this box draws a red square with a rounded gray
+         box inside it: a box inside a box rather than a box that is wrong. A
+         ring is for a component with no edge of its own to color, and this one
+         has an edge. */
       const host = (await mount(
         '<helix-checkbox label="Accept" name="t" required></helix-checkbox>',
       )) as Updatable

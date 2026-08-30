@@ -19,11 +19,9 @@
  * name rather than passing quietly, so a spec reaching for one is a visible
  * failure and not a green tick.
  *
- * The count that used to be here said five and the list had grown to fifteen,
- * which is the shape of thing `check:matchers` exists to notice: it reads the
- * specs and this file against each other, so the list moves whenever a spec
- * reaches for something new, and a number written beside it is stale by the
- * next one.
+ * `fusion spec`'s `matchers` reads the specs and this file against each other, so the
+ * list moves whenever a spec reaches for something new and a count written
+ * beside it is stale by the next one.
  */
 
 /**
@@ -90,9 +88,8 @@ const register = (name: string, body: () => unknown): void => {
  * A skip here is an absence. `SpecResult` has no skipped state, so a test that
  * is skipped is one that was never registered, which is exactly what the
  * `if (hasLayout())` guard already produced and reports the same way: it is not
- * in the run. Giving the runner a third outcome is a bigger change than making
- * the two harnesses agree on their API, and it is the change worth having next
- * if a skip should ever be visible rather than merely absent.
+ * in the run. Making a skip visible rather than merely absent needs a third
+ * outcome on the runner.
  *
  * `only` is deliberately absent. It does not mean "register this", it means
  * "and drop the rest", and a shim that accepted it while running everything
@@ -130,12 +127,11 @@ export const beforeAll = (body: () => unknown): void => {
 /**
  * Runs after every test in the block it was declared in, passed or failed.
  *
- * **The rules require one and this harness did not have it**, which is a gap of
- * exactly the shape `check:matchers` exists to police from the other side: a
- * spec importing `afterEach` compiled under happy-dom, where it comes from
- * `bun:test`, and failed to bundle for the browser, where `build-specs.mjs`
- * points `bun:test` at this file. The error names the missing export rather than
- * the spec's own line, so it reads as a harness fault and is one.
+ * **Every name `bun:test` exports has to exist here too**, which is what
+ * `fusion spec`'s `matchers` polices: `build-specs.mjs` points `bun:test` at this file
+ * for the browser, so a spec importing something this module lacks compiles
+ * under happy-dom and fails to bundle here. The error names the missing export
+ * rather than the spec's own line, so it reads as a harness fault and is one.
  *
  * After the test rather than before the next one, and in a `finally`, because
  * what it is for is putting a global back: a spec that shadows
@@ -185,9 +181,7 @@ const show = (value: unknown): string => {
  *
  * **Sets and Maps are named, because the object branch below silently passes
  * them.** `Object.keys(new Set([1, 2, 3]))` is `[]`, so two sets of anything
- * compared equal and every assertion about one asserted nothing. Caught by a
- * spec that both `toEqual`d one set and `not.toEqual`d a different one and had
- * the second fail, which is a pair of results no real comparison can produce.
+ * compared equal and every assertion about one asserted nothing.
  *
  * Membership by identity for a set, which is what `has` does: the specs here
  * hold strings. A set of objects would need pairing every member against every
@@ -278,10 +272,9 @@ const build = (actual: unknown, negated: boolean): Matchers => {
     toBeFalsy: () => check(!actual, 'to be falsy'),
     toBeGreaterThan: (expected) => check(number > expected, `to be greater than ${expected}`),
     toBeGreaterThanOrEqual: (expected) => check(number >= expected, `to be at least ${expected}`),
-    /* The class is named in the message, because the failure this replaces said
-       nothing: `toBeInstanceOf` was missing, so under happy-dom the spec passed
-       and in a real engine it was a `TypeError` on an undefined method, reported
-       as a failed assertion about a comparison that never happened. */
+    /* The class is named in the message. A matcher missing from this object is a
+       `TypeError` on an undefined method, reported as a failed assertion about a
+       comparison that never happened, which says nothing at all. */
     toBeInstanceOf: (expected) =>
       check(actual instanceof expected, `to be an instance of ${expected.name}`),
     toBeLessThan: (expected) => check(number < expected, `to be less than ${expected}`),
@@ -306,7 +299,7 @@ const build = (actual: unknown, negated: boolean): Matchers => {
        for the wrong reason, and `undefined` in the expectation passes against a
        key that is present and undefined. A reader asking whether a point carries
        no `tone` at all is asking about the shape.
-    
+
        Dot paths, because `bun:test` takes them, and a spec that means one thing
        here and another there is the one thing this harness must never be. */
     toHaveProperty: (path, ...rest) => {
@@ -578,10 +571,6 @@ export const role = (host: HTMLElement): string | null =>
  * `getAttribute('aria-label')` reports nothing on an element that is correctly
  * named. An author's own `aria-label` still wins, which is the platform's
  * precedence and why the attribute is checked first.
- *
- * Added while writing the first spec for `Option.Group`, whose whole job is to
- * name a run of options: without this the assertion that it does so had nothing
- * to read.
  */
 export const label = (host: HTMLElement): string | null =>
   host.getAttribute('aria-label') ??
@@ -616,8 +605,7 @@ export const part = (host: HTMLElement, name: string): Element | null =>
  * `await host.updateComplete` reads the state from before the last update
  * landed, and an unbounded loop hangs the whole run when a component never
  * settles. Written twice because the two harnesses share no code, which is the
- * arrangement `check:matchers` already exists to police from the other side.
- * See 299.
+ * arrangement `fusion spec`'s `matchers` already exists to police from the other side.
  */
 export const settle = async (host: Updatable, turns = 40): Promise<void> => {
   let taken = 0
@@ -670,8 +658,8 @@ export const hasLayout = (): boolean => true
  * running. Six hundred milliseconds later, `display: none` and zero by zero.
  *
  * The same function in both harnesses, and it has to be: a name exported from
- * one and not the other does not fail a spec, it fails the bundle, which is how
- * this one announced itself. Waits on the animations rather than on a duration,
+ * one and not the other does not fail a spec, it fails the bundle. Waits on the
+ * animations rather than on a duration,
  * a timeout being a number kept beside a token and either flaky or slow
  * depending on which way it is wrong.
  */
@@ -701,14 +689,11 @@ export const settled = async (element: Element | null): Promise<void> => {
  *
  * **Waits on the element's own `settled` promise**, rather than on a frame count,
  * so it is right whether the component settles in one frame or the runner is
- * busy. It used to watch `[data-settled]` with a `MutationObserver`, which is
- * not available any more and should not be: the flag is an
- * `ElementInternals.states` entry now, deliberately outside the DOM, because on
- * the host it was an attribute React had not rendered and hydration said so.
- * A promise is the better signal in any case, being what this wanted rather
- * than a mutation it had to interpret. `settled()` is the
- * other half and is not this: that one waits for animations to *finish*, where
- * this one waits for them to become possible at all.
+ * busy. There is no attribute to watch instead: the flag is an
+ * `ElementInternals.states` entry, deliberately outside the DOM, because on the
+ * host it was an attribute React had not rendered and hydration said so.
+ * `settled()` is the other half and is not this: that one waits for animations
+ * to *finish*, where this one waits for them to become possible at all.
  */
 export const readyToMove = async (element: Element | null): Promise<void> => {
   const settled = (element as (Element & { whenSettled?: Promise<void> }) | null)?.whenSettled
@@ -723,7 +708,7 @@ export const readyToMove = async (element: Element | null): Promise<void> => {
        having painted by then and happy-dom having nothing to wait for.
 
        `Promise.resolve` is idempotent, so whichever arrives first wins and the
-       loser is a no-op. Nothing to tear down now that there is no observer. */
+       loser is a no-op. */
     setTimeout(resolve, 50)
   })
 }

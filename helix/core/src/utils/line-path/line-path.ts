@@ -20,7 +20,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  *
  * Two rules do it. A tangent at a turning point is flat, so the curve arrives
  * and leaves level rather than carrying on past the peak; and where a tangent
- * is steep enough relative to its neighbours to bulge anyway, the pair is
+ * is steep enough relative to its neighbors to bulge anyway, the pair is
  * scaled back until it cannot.
  */
 const tangents = (xs: readonly number[], ys: readonly number[]): number[] => {

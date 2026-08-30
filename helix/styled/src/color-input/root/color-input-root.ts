@@ -1,10 +1,10 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessColorInput } from '@fusion.dev/helix-headless/color-input'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect import, because the tier below renders `<helix-slider>` and a
-   custom element registers on import. Inherited from the base along with the
+/* Side-effect import, because the tier below renders `<helix-color-picker>` and
+   a custom element registers on import. Inherited from the base along with the
    template, which is why it has to be restated here: this file has no
-   `<helix-slider>` in it to remind anyone. `check:composed` enforces it. */
+   `<helix-color-picker>` in it to remind anyone. */
 import '../../color-picker/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
@@ -45,7 +45,7 @@ import { styles } from './color-input-root.css.js'
  * @cssproperty --color-input-shadow - Lift under the panel. Follows
  *   `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it
  *   keeps a lift by default.
- * @cssproperty --color-input-swatch-radii - Corner radius of that block.
+ * @cssproperty --color-input-swatch-radius - Corner radius of that block.
  * @cssproperty --color-input-swatch-size - Edge length of the block in `appearance="swatch"`.
  */
 @customElement('helix-color-input')

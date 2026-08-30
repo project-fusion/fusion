@@ -34,11 +34,10 @@
   block-size: var(--meter-size, var(--helix-size-meter));
   /* The house radius, not the pill `Progress` wears, and the ticks are why.
    *
-   * `radii-full` on an eight pixel bar resolves to a four pixel pill, so
-   * `Progress` has rendered at exactly `radii-sm` since the day it was written
-   * and nothing noticed. The token only starts to matter at twelve, and at
-   * twelve `full` makes this the roundest container in a library whose house
-   * value is four and is on nearly everything.
+   * `radii-full` on an eight pixel bar resolves to a four pixel pill, so it is
+   * indistinguishable from `radii-sm` at that height. The token only starts to
+   * matter at twelve, and at twelve `full` makes this the roundest container in
+   * a library whose house value is four and is on nearly everything.
    *
    * The ticks settle it. They cut the fill into segments, so a pill-ended bar
    * comes out as a run whose outer ends are round and whose inner ends are
@@ -224,19 +223,18 @@
  *
  * The bar's indicator carries `scale: var(--meter-fraction, 0) 1`, which is how
  * a bar fills. `--meter-fraction` is never written in these shapes, so the
- * fallback won and the circle was scaled to zero width: present, measurable,
- * correctly stroked, and one pixel wide. Everything read back right, which is
- * what made it hard to see. Progress carries the same line for the same reason,
- * which is where the answer came from. */
+ * fallback wins and the circle is scaled to zero width: present, measurable,
+ * correctly stroked, and one pixel wide. Everything reads back right, which is
+ * what makes it hard to see. Progress carries the same line for the same
+ * reason. */
 :host([shape="arc"]) [part="indicator"],
 :host([shape="ring"]) [part="indicator"] {
   scale: none;
   stroke: var(--_meter-hue);
 
-  /* The ring's unbanded ink, which is muted rather than the bar's primary and
-     has been since it was written. Named here rather than left in the `stroke`
-     declaration so `emphasis` has one property to quieten, whichever shape and
-     whichever band chose the color. */
+  /* The ring's unbanded ink, muted rather than the bar's primary. Named here
+     rather than left in the `stroke` declaration so `emphasis` has one property
+     to quieten, whichever shape and whichever band chose the color. */
   --_meter-hue: var(--helix-color-foreground-muted);
   stroke-dasharray: var(--meter-along) 100;
   stroke-linecap: round;
@@ -251,9 +249,8 @@
 
    `--meter-tick-color` is the same hook the bar's tick takes, so the two shapes
    answer to one property rather than one of them being correctable and the
-   other not. It was a bare `--helix-color-background` until 21 Aug 2026, which
-   made the arc the only shape whose marks could not be told what the meter had
-   been put on. */
+   other not: a bare `--helix-color-background` here leaves the round shapes
+   unable to be told what the meter was put on. */
 :host([shape="arc"]) [part="tick"],
 :host([shape="ring"]) [part="tick"] {
   /* The bar's tick is a positioned span; on a circle none of that applies and
@@ -304,7 +301,7 @@
 /* Print: the bar is the reading.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

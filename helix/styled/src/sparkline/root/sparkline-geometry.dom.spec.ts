@@ -14,13 +14,12 @@ const path = (host: HTMLElement): string | null => part(host, 'line')?.getAttrib
 /**
  * The `y` of each reading in the drawing, in the view box's own units.
  *
- * **Anchor points, not every coordinate in the path.** This split on `[ML]` and
- * read the y of each pair, which was the whole path while the resting curve was
- * straight and is a third of it now that it is smooth: a cubic segment carries
- * two control points before the reading it lands on, and counting those makes a
- * series of three look like a series of seven. The anchor is the last pair of
- * whatever command drew the segment, which is the same point in both shapes and
- * is the only one that is a reading rather than a means of getting to it.
+ * **Anchor points, not every coordinate in the path.** The resting curve is
+ * smooth, so a cubic segment carries two control points before the reading it
+ * lands on, and counting every pair makes a series of three look like a series
+ * of seven. The anchor is the last pair of whatever command drew the segment,
+ * which is the same point in a straight path and a curved one and is the only
+ * one that is a reading rather than a means of getting to it.
  */
 const _heights = (host: HTMLElement): number[] =>
   [...(path(host) ?? '').matchAll(/([MLC])([^MLCHVZ]*)/g)].map((command) => {
@@ -59,9 +58,8 @@ if (hasLayout()) {
 
          Both mounted together, because `mount` replaces the body and reading
          the first one's computed style after mounting the second reads a
-         detached element, where every computed value is the empty string. The
-         first version of this test did exactly that and reported the component
-         for a stroke it had never lost. */
+         detached element, where every computed value is the empty string. That
+         reads as a component that lost its stroke. */
       await mount(`<div>
         <helix-sparkline id="bare" plot="line" values="1 9 3"></helix-sparkline>
         <helix-sparkline id="washed" plot="area" values="1 9 3"></helix-sparkline>
@@ -74,14 +72,13 @@ if (hasLayout()) {
         ),
       )
 
-      /* A line plot draws no region at all now, rather than one kept invisible.
-         **`plot="line"` written out, because absent is not it.** This mounted a
-         sparkline with no `plot` and called it the line case, and absent is
+      /* A line plot draws no region at all, rather than one kept invisible.
+         **`plot="line"` written out, because absent is not it.** Absent is
          `area` here, deliberately and for the reason the class doc gives: at
          the size a sparkline is drawn, a hairline in a wide box is mostly box.
-         So the assertion was made against the one element that must fail it,
-         and the case it names was never tested. It failed only in a real
-         engine, where this block runs. */
+         A sparkline with no `plot` is therefore the one element that must fail
+         this assertion, and it fails only in a real engine, where this block
+         runs. */
       expect(part(plain, 'area')).toBeNull()
       const stops = [...(washed.shadowRoot?.querySelectorAll('stop') ?? [])]
       const opacities = stops.map((stop) => Number(getComputedStyle(stop).stopOpacity))

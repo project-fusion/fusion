@@ -29,8 +29,7 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 ## Why two axes
 
 **The library had four axes and one word for all of them.** Counted across both
-tiers, `appearance` held 21 declarations describing at least four different
-questions: where a surface ends (`outlined` against `plain` on a Card), how much
+tiers, `appearance` described at least four different questions: where a surface ends (`outlined` against `plain` on a Card), how much
 ink a control claims (`ghost` against `solid` on a Button), which widget gets
 rendered (`segmented` against `underlined` on Tabs), and in one case a plain
 misfiled tone.
@@ -45,10 +44,9 @@ and a component reintroducing it fails the build.
 
 ## Two axes, not one
 
-This is the test, and the library found it before the registry existed.
-`megamenu-root.css` reads: a consumer can make the panel glass, which is not an
-appearance, because `full` already occupies that axis with a layout. A panel can
-be glass *and* outlined. Two axes.
+This is the test. `Megamenu` is the worked example: a consumer can make the panel
+glass, which is not an appearance, because `full` already occupies that axis with
+a layout. A panel can be glass *and* outlined. Two axes.
 
 If you are adding a property and cannot decide which axis it belongs to, that is
 usually the answer: it is two properties.
@@ -66,7 +64,7 @@ choice between two widgets, which is structural wherever it is made, so it lives
 on either tier.
 
 **What it may not be is a place to put something that is on an axis.** That is
-the failure mode `appearance` demonstrated for 21 components.
+the failure mode `appearance` demonstrated.
 
 ## `tone` is the one axis both tiers carry
 

@@ -14,7 +14,7 @@ import { styles } from './date-picker-root.css.js'
  * difference is the space between days, which belongs to the track rather than
  * to a `gap`, so a range can paint across the whole track and stay continuous.
  *
- * Days from the neighbouring months stay in place and stay selectable, marked
+ * Days from the neighboring months stay in place and stay selectable, marked
  * quieter rather than hidden, so the first and last weeks are whole and the
  * grid reads as a continuous run of dates.
  *

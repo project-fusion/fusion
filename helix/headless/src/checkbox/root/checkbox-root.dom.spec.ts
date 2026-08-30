@@ -45,11 +45,9 @@ describe('checkbox', () => {
     expect(control(box).checked).toBe(false)
   })
 
-  /* The reason `helix-toggle` exists. Reported through `helix-change` it was
-     `String(checked)`, so a consumer received the string "false", which is
-     truthy, and our own checkbox group decoded it with `detail.value === 'true'`.
-     A test asserting the value would have passed on the bug; this asserts the
-     type. */
+  /* The reason `helix-toggle` exists: reported through `helix-change` the
+     payload was `String(checked)`, and the string "false" is truthy. A test
+     asserting the value passes on that bug, so this asserts the type. */
   test('announces a boolean, and not a word that reads like one', async () => {
     const box = await checkbox()
     let seen: unknown = 'unset'
@@ -65,10 +63,8 @@ describe('checkbox', () => {
   })
 
   test('a box whose markup declared `checked` still moves, the property being a seed', async () => {
-    /* This asserted the opposite until 26 Aug 2026, when setting `checked`
-       entered a controlled mode and the consumer owned the state from then on.
-       Control is an action now: the element applies, and a consumer takes the
-       decision by refusing it. See 294. */
+    /* Control is an action: the element applies, and a consumer takes the
+       decision by refusing it. */
     const box = await checkbox('checked')
     control(box).click()
     await box.updateComplete

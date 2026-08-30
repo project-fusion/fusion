@@ -7,10 +7,8 @@ import { property } from 'lit/decorators.js'
  *
  * Apple keyboards label their modifiers with glyphs and print no separator
  * between them, so `⌘K` is the whole of it. Everywhere else the words are the
- * label and the plus is part of the convention rather than prose. That is the
- * one separator this component is willing to supply: the class docstring says
- * a separator between keys is prose because it is "then" in a sequence and
- * "plus" in a simultaneous press, and `keys` is only ever the second of those.
+ * label and the plus is part of the convention rather than prose, which is why
+ * it is the one separator this component supplies.
  */
 const APPLE: Record<string, string> = {
   alt: '⌥',
@@ -84,13 +82,6 @@ const onApple = (): boolean =>
  *   shortcut should work while that control has focus and stop existing when
  *   the control does.
  * - `document` listens on the document, for a chord that works from anywhere.
- *
- * *Corrected 25 Aug 2026: this said `scope`, `self` and `global` until then,
- * naming a property that has never existed under that name. The rename is
- * explained on the property itself, twenty lines below, and this paragraph
- * above it went on teaching the old one. A reader who trusted the class doc
- * wrote an attribute that binds nothing, which is also what an unset `within`
- * does, so nothing about the mistake looked like one.*
  *
  * **A hidden `kbd` is a dead shortcut, and that is the point rather than a
  * trap.** Binding here ties the key to its own advertisement, so a hint that is

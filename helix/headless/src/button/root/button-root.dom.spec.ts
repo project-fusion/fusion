@@ -8,15 +8,6 @@ beforeAll(async () => {
 
 const control = (host: HTMLElement): Element | null => part(host, 'button')
 
-/* **The `variant` shorthand had two tests here and they are gone with it.**
-   `c2dd5df8` folded the four presets back into the `emphasis` and `tone` pair
-   they were short for, and the CSS mapping went with them, but the tests stayed.
-   What they asserted by then was that `getAttribute('variant')` returns what the
-   markup wrote, on a tier that declares neither `variant` nor `emphasis`: the
-   DOM storing an attribute, with nothing about Button involved. Two tests that
-   passed whatever the component did, under a name describing an API that no
-   longer existed. */
-
 describe('button control', () => {
   test('is always a button, never an anchor', async () => {
     // A router renders its own anchor and cannot render it inside this shadow
@@ -88,12 +79,12 @@ describe('button form participation', () => {
 describe('button invokers', () => {
   /* **A target that arrives after the button rendered still gets the command.**
    *
-   * `linkCommand` ran from `updated` alone, so the target was resolved once and
-   * never again, and a button whose properties do not change does not update
-   * again: one rendered before its target existed stayed wired to nothing
-   * permanently. Measured before the fix, `commandForElement` read null with the
-   * target absent, null again after it was inserted, and resolved only when an
-   * unrelated property forced an update.
+   * Linking the command from `updated` alone resolves the target once and never
+   * again, and a button whose properties do not change does not update again: one
+   * rendered before its target existed stays wired to nothing permanently.
+   * Measured that way, `commandForElement` read null with the target absent, null
+   * again after it was inserted, and resolved only when an unrelated property
+   * forced an update.
    *
    * **The environment decides which half of the component this exercises**, and
    * both halves are worth having. Under happy-dom there are no invokers, so this

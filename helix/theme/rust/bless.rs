@@ -1,18 +1,13 @@
 //! Regenerating the oracle from the engine.
 //!
-//! **What this file is, and what it stopped being.** `oracle.json` was the
-//! TypeScript engine's answers, frozen so the Rust port could be held to them.
-//! That engine is deleted: the port passed, and keeping two implementations of a
-//! search is the thing 142 was filed to prevent. So the oracle is a snapshot
-//! now, and this is what writes it.
-//!
-//! **That is a real loss and it is worth naming rather than glossing.** Until
-//! today those tests proved agreement with an implementation written
-//! independently; from here they prove that nothing has changed since somebody
-//! last looked. Regression detection rather than correctness. The committed file
-//! still holds the numbers the TypeScript produced, so the assertions keep their
-//! provenance until the day a bless overwrites them, and a bless is a reviewable
-//! diff rather than a green tick.
+//! **The oracle is a snapshot, not a second implementation.** `oracle.json` was
+//! the TypeScript engine's answers, frozen so the Rust port could be held to
+//! them; that engine is deleted, keeping two implementations of a search being
+//! what (142) was filed to prevent. So these tests prove that nothing has
+//! changed since somebody last looked, which is regression detection rather than
+//! correctness. The committed file still holds the numbers the TypeScript
+//! produced, so the assertions keep their provenance until the day a bless
+//! overwrites them, and a bless is a reviewable diff rather than a green tick.
 //!
 //! **Which is why it is deliberately awkward to run.** An env var and an ignored
 //! test, so it cannot happen as a side effect of `cargo test`. A snapshot tool
@@ -226,20 +221,20 @@ fn bless() {
     let path = concat!(env!("CARGO_MANIFEST_DIR"), "/rust/oracle.json");
     let written = format!(
         "{}\n",
-        serde_json::to_string_pretty(&oracle()).expect("the oracle serialises")
+        serde_json::to_string_pretty(&oracle()).expect("the oracle serializes")
     );
     std::fs::write(path, written).expect("the oracle is writable");
     println!("blessed {path}");
 }
 
-/// The distance table, and the lab triples that localise a disagreement in it.
+/// The distance table, and the lab triples that localize a disagreement in it.
 fn distances(colors: &[Oklch]) -> Value {
     /* `perceptual_distance`, whose `hypot` of three is not the square root of the
     sum of the squares: a naive port differs on 37 per cent of inputs. It feeds a
     threshold the status hue search branches on, so a flipped comparison is a
     different palette rather than a last-place difference.
 
-    The lab triples as well as the distance, so a disagreement can be localised:
+    The lab triples as well as the distance, so a disagreement can be localized:
     `hypot` fed the same three numbers, or `cos` and `sin` an ulp out upstream of
     it. Two very different answers. */
     let mut distances = Vec::new();

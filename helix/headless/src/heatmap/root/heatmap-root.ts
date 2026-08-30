@@ -13,19 +13,19 @@ import '../../tooltip/index.js'
 import { fits, numbers, toneOf, words } from './buckets.js'
 
 /**
- * @summary A strip of cells coloured by how each one went: uptime, contributions, activity.
+ * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
  *
  * @description
  * **One family covers both readings, and the split people expect does not
- * exist.** It was filed as two on the argument that a contribution graph needs a
- * continuous ramp where uptime needs a category. GitHub's contribution graph is
- * five discrete levels rather than a gradient, so a cell that takes a tone
- * covers both: `rows="1"` is a status strip, `rows="7"` is a contribution graph,
- * and heatmap is the name of that.
+ * exist.** The argument for two is that a contribution graph needs a continuous
+ * ramp where uptime needs a category. GitHub's contribution graph is five
+ * discrete levels rather than a gradient, so a cell that takes a tone covers
+ * both: `rows="1"` is a status strip, `rows="7"` is a contribution graph, and
+ * heatmap is the name of that.
  *
  * **What it cannot be is a bar chart with flat values**, and the data model is
  * what closes that rather than taste: chart color is per *series* everywhere
- * else here, `--chart-series-1` through `-15`, so ninety differently coloured
+ * else here, `--chart-series-1` through `-15`, so ninety differently colored
  * cells would be ninety series.
  *
  * The data is a real `<table>` named by `for`, the same convention every chart
@@ -45,13 +45,12 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * so what a name is worth is the answering tier's to say: `helix/styled` points
  * the semantic names at the theme's status colors and the numbered ones at a
  * ramp, and a consumer on `headless` declares the same names as whatever they
- * like. It read `var(--helix-color-${tone})` until 27 Aug 2026, which is the
- * dependency the tiers exist to prevent and which failed loudly rather than
- * quietly: off-tier that property is not undefined, it is *invalid*, so
- * `background-color: var(--heatmap-tone, …)` declined its own fallback and every
- * cell came out transparent. The headless baseline was a blank page under a row
- * of footer text. `shared/chart/series.css` records Bar Chart having had the
- * same fault for the same reason.
+ * like. Reaching for `var(--helix-color-${tone})` here is the dependency the
+ * tiers exist to prevent, and it fails loudly rather than quietly: off-tier that
+ * property is not undefined, it is *invalid*, so
+ * `background-color: var(--heatmap-tone, …)` declines its own fallback and every
+ * cell comes out transparent, leaving a blank page under a row of footer text.
+ * `shared/chart/series.css` records the same fault in Bar Chart.
  *
  * **On a narrow container it draws fewer cells rather than thinner ones.**
  * Ninety cells in 320 pixels is three and a half pixels each, which is a smear
@@ -89,10 +88,11 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
+ * @cssproperty --heatmap-cell-inline-size - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
- * @cssproperty --heatmap-cell-width - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
+ * @cssproperty --heatmap-rows - How many rows the strip lays out. Written by the component from the data, read by the tier that draws it.
  * @cssproperty --heatmap-tone - The tone of the cell this is set on. Written by the component, read by the sheet that paints.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
@@ -109,6 +109,41 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  */
 @customElement('helix-headless-heatmap')
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
+  /**
+   * Shown when the table has no readings in it.
+   */
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No readings'
+
+  /**
+   * Space between cells, in CSS pixels, for the same reason `min-cell` is a
+   * number.
+   */
+  @property({ type: Number })
+  gap = 2
+
+  /**
+   * The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
+   *
+   * **Set this only to overrule what the strip actually draws.** The arithmetic
+   * needs a width in pixels and the width is a length the stylesheet resolves,
+   * so a number written here that disagrees with the sheet is a promise the
+   * consumer has to keep by hand, and the one number a summary is told to trust
+   * is the one it gets wrong.
+   *
+   * The strip measures itself, so `--heatmap-cell-inline-size` and `--heatmap-gap` are
+   * enough on their own and these two are the estimate used until the first
+   * measurement lands. Writing the attribute pins the value and stops the
+   * measurement being consulted, which is what a container query or a transition
+   * on the cell size wants, where what is drawn this frame is not what the
+   * arithmetic should plan around.
+   *
+   * Zero turns the dropping off altogether, which is right for a strip in a
+   * container that cannot get narrow.
+   */
+  @property({ attribute: 'min-cell', type: Number })
+  minCell = 8
+
   /**
    * How many rows the strip has.
    *
@@ -139,49 +174,12 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * **`"1"` through `"5"` are a ramp and everything else is a category**, which
    * is the distinction a heatmap lives or dies on: magnitude has to be one hue
    * getting louder, because a reader compares two cells by weight and cannot
-   * compare two hues at all. This shipped demonstrating the opposite,
-   * `tones="surface info accent success primary"` for a commit count, and five
-   * unrelated hues for five amounts is confetti with no order in it.
+   * compare two hues at all. `tones="surface info accent success primary"` for a
+   * commit count is five unrelated hues for five amounts, which is confetti with
+   * no order in it.
    */
   @property()
   tones = ''
-
-  /**
-   * The smallest a cell may get before the strip draws fewer of them, in CSS pixels.
-   *
-   * **Set this only to overrule what the strip actually draws.** The arithmetic
-   * needs a width in pixels and the width is a length the stylesheet resolves,
-   * so for as long as this was the only answer it was a promise the consumer had
-   * to keep by hand: it sat at 8 against a sheet drawing 12, the arithmetic
-   * believed a cell cost 10 pixels where it cost 16, and a ninety day strip ran
-   * 940 pixels wide out of a 592 pixel box while `visible` reported 59. The one
-   * number a summary is told to trust was the number that was wrong.
-   *
-   * The strip is measured now, so `--heatmap-cell-width` and `--heatmap-gap` are
-   * enough on their own and these two are the estimate used until the first
-   * measurement lands. Writing the attribute pins the value and stops the
-   * measurement being consulted, which is what a container query or a transition
-   * on the cell size wants, where what is drawn this frame is not what the
-   * arithmetic should plan around.
-   *
-   * Zero turns the dropping off altogether, which is right for a strip in a
-   * container that cannot get narrow.
-   */
-  @property({ attribute: 'min-cell', type: Number })
-  minCell = 8
-
-  /**
-   * Space between cells, in CSS pixels, for the same reason `min-cell` is a
-   * number.
-   */
-  @property({ type: Number })
-  gap = 2
-
-  /**
-   * Shown when the table has no readings in it.
-   */
-  @property({ attribute: 'empty-text' })
-  emptyText = 'No readings'
 
   /**
    * How many cells are actually drawn.
@@ -221,7 +219,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * the cascade can resolve: it may be a `rem` against a root font size, a
    * percentage of a container, or whatever a container query chose this frame.
    * Every one of those is invisible to a number typed into an attribute, and
-   * each of `--heatmap-cell-width`, `--heatmap-cell-height` and `--heatmap-gap`
+   * each of `--heatmap-cell-inline-size`, `--heatmap-cell-height` and `--heatmap-gap`
    * added one more way for the two to drift apart silently.
    *
    * Reading it back is not styling and does not breach the tier: this asks what
@@ -371,13 +369,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /**
    * Says on the footer whether any of its three slots holds anything.
    *
-   * **The stylesheet used to ask, and could not.** It read
-   * `[part="footer"]:not(:has(slot:has(*)))`, which is two faults at once:
-   * `:has()` may not be nested inside `:has()`, so the selector failed to parse
-   * and the rule was discarded whole; and a slot's assigned nodes are not its
-   * DOM children, so `slot:has(*)` reports fallback content rather than the
-   * fill, and would have been false either way. Both verified in a browser. A
-   * heatmap with no legend and no summary still reserved the row for one.
+   * **A stylesheet cannot ask.** `[part="footer"]:not(:has(slot:has(*)))` is two
+   * faults at once: `:has()` may not be nested inside `:has()`, so the selector
+   * fails to parse and the rule is discarded whole; and a slot's assigned nodes
+   * are not its DOM children, so `slot:has(*)` reports fallback content rather
+   * than the fill, and is false either way. Both verified in a browser.
    */
   private markEmpty(): void {
     this.markRegion('footer', ['start', 'summary', 'end'])
@@ -409,16 +405,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     /* Written here rather than reflected, and announced only on a change: a
        consumer recomputing a summary from this is doing work, and an event per
        resize frame is work per frame.
-       
-       The attribute is set after the first render rather than during it, so a
-       hydrating consumer's markup and the server's output agree: neither has it,
-       and it appears once the element has measured something. */
-    /* **Nothing measured yet is the absence of the attribute.** The comment
-       above claimed writing here made the server's output and a hydrating
-       consumer's markup agree, and it does the reverse: `updated` runs in the
-       same microtask checkpoint as `firstUpdated`, before React need have
-       reached the node, so `visible="0"` was an attribute no server sent. That
-       is the fault `data-settled` was found for four times. */
+
+       **Nothing measured yet is the absence of the attribute.** `updated` runs
+       in the same microtask checkpoint as `firstUpdated`, before React need have
+       reached the node, so writing `visible="0"` here is an attribute no server
+       sent. That is the fault `data-settled` was found for. */
     const showing = this.visible
     const written = showing > 0 ? String(showing) : null
     if (this.getAttribute('visible') !== written) {
@@ -442,7 +433,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     return html`<div
         part="strip"
         id="helix-chart-plot"
-        style="--_heatmap-rows: ${this.rowCount}"
+        style="--heatmap-rows: ${this.rowCount}"
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
       >
@@ -482,15 +473,13 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /**
    * The bubble over the cell a pointer is resting on.
    *
-   * **One tooltip that moves, which is what every other chart here does and is
-   * the thing the `title` attribute was kept to avoid.** The note this replaces
-   * read that ninety `helix-tooltip` elements was the cost of a real one, and
-   * that was never the shape: Bar Chart, Line Chart and Donut Chart each render
-   * a single anchor against an invisible mark and move the mark, so the count is
-   * one however many readings there are. `drawTooltip` is their shared markup
-   * and this is the fourth caller.
+   * **One tooltip that moves, which is what every other chart here does.** Bar
+   * Chart, Line Chart and Donut Chart each render a single anchor against an
+   * invisible mark and move the mark, so the count is one however many readings
+   * there are, rather than one element per cell. `drawTooltip` is their shared
+   * markup and this is the fourth caller.
    *
-   * What it buys over the native one is the row rather than the reading.
+   * What it buys over a native `title` is the row rather than the reading.
    * `sourceRows` carries every column of the table including the ones nothing
    * was plotted from, so a cell reads "11 Jun 2026 / Uptime 81.2% / Note Partial
    * outage" where `title` could only ever say the two values this component

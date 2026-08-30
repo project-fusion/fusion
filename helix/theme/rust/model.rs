@@ -76,10 +76,10 @@ pub const TINTS: [&str; 2] = ["color-primary-subtle", "color-accent-subtle"];
 
 /// Filled grounds, every one of which carries `foreground-on-accent`.
 ///
-/// **The hover states are grounds too, and they were the gap.** A filled button
-/// under a pointer is a different color with the same text on it, and the ink
-/// was solved against the resting fill alone. Six families times two states is
-/// twelve grounds, of which exactly one was being checked.
+/// **The hover states are grounds too.** A filled button under a pointer is a
+/// different color with the same text on it, so an ink solved against the
+/// resting fill alone leaves the hovered half unmeasured. Six families times two
+/// states is twelve grounds.
 pub const FILLS: [&str; 12] = [
     "color-accent-surface",
     "color-accent-surface-hover",
@@ -138,8 +138,7 @@ pub static GROUNDS: LazyLock<Vec<Ground>> = LazyLock::new(|| {
     grounds.push(unbounded("color-surface-media"));
     /* The scrim itself, which `Video` paints its own controls over. Translucent
     by definition, so what is behind it is the video: unbounded for the same
-    reason as the surface above, and found by `check:pairings` reporting a pair
-    the model had never heard of. */
+    reason as the surface above. */
     grounds.push(unbounded("color-overlay"));
     /* A field's fill is a percentage of the foreground mixed toward transparent,
     so what is behind it is whatever the control was dropped onto: a page, a

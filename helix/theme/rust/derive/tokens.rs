@@ -70,10 +70,9 @@ pub fn derive_tokens(resolved: &Resolved) -> Derived {
 /// What the color phases produced, before any of it is named.
 ///
 /// Split from the assembly because the two answer different questions: this is
-/// "which colours does this intent imply", and [`assemble`] is "what does the
+/// "which colors does this intent imply", and [`assemble`] is "what does the
 /// emitted file call them, and in what order". A change to one is almost never a
-/// change to the other, and holding both in one function is what let the
-/// 615-line original hide each behind the other.
+/// change to the other.
 struct Phases {
     accent: Emphasis,
     accent_origin: Origin,
@@ -133,7 +132,7 @@ impl Phases {
     }
 }
 
-/// Names the colours, in the order the emitted file carries them.
+/// Names the colors, in the order the emitted file carries them.
 fn assemble(
     resolved: &Resolved,
     ctx: &Deriving,
@@ -171,12 +170,10 @@ fn assemble(
         plain("color-surface-sunken", ctx.surfaces.raw_sunken),
         token("color-primary", primary.raw, Origin::Derived, ground),
         /* **`foreground-on-accent`, which is the name the stylesheet reads.**
-        This emitted `color-primary-foreground` and nothing consumed it: every
-        component putting text on the brand asks for
-        `--helix-color-foreground-on-accent`, so the engine and the token layer
-        were naming the same color differently and a themed page kept the stock
-        one. The token layer has 135 names and this has a handful, so the handful
-        moved. */
+        Every component putting text on the brand asks for
+        `--helix-color-foreground-on-accent`, so an engine naming that color
+        anything else leaves a themed page on the stock one. The token layer has
+        135 names and this has a handful, so the handful moved. */
         against("color-foreground-on-accent", *on_accent, primary.filled),
         plain("color-primary-hover", primary.hover),
         plain("color-primary-active", primary.active),
@@ -203,11 +200,10 @@ fn assemble(
         ));
     }
 
-    /* **The grounds the model says exist, which the engine never emitted.** A
-    filled danger button, a hovered filled anything, the inverse pair a toast
-    uses and the ring a keyboard depends on: each was a ground or an ink the
-    stylesheet had and the engine did not, so a themed page kept the stock one
-    exactly where it mattered most. */
+    /* **The grounds the model says exist.** A filled danger button, a hovered
+    filled anything, the inverse pair a toast uses and the ring a keyboard
+    depends on: a ground or an ink the stylesheet has and the engine does not is
+    a themed page keeping the stock color exactly where it matters most. */
     tokens.push(plain(
         "color-primary-surface-hover",
         hover_of(primary.filled),

@@ -15,16 +15,16 @@ const pascal = (value: string): string =>
  * group and the part:
  *
  *   src/card/root/card-root.ts       -> Card.Root
- *   src/card/header/card-header.ts   -> Card.Header
+ *   src/tree/item/tree-item.ts       -> Tree.Item
  *   src/scroll-area/root/…           -> ScrollArea.Root
  *
  * Deriving this from the tag name instead is ambiguous in exactly the cases
- * that matter: `helix-scroll-area` is one component, `helix-card-header` is
- * part of another, and nothing in either name distinguishes them. Folders
- * already encode the author's intent, so they are the honest source.
+ * that matter: `helix-scroll-area` is one component, `helix-tree-item` is part
+ * of another, and nothing in either name distinguishes them. Folders already
+ * encode the author's intent, so they are the honest source.
  *
  * Recording it in the manifest rather than recomputing it in each generator
- * means the React wrappers, the docs site, and anything else agree on what
+ * means the docs site and anything else reading the manifest agree on what
  * belongs together, and a regrouping shows up as a manifest diff.
  */
 export const composition = (): Plugin => ({

@@ -1,6 +1,5 @@
 /* Both charts the same height, so the comparison is about the shape rather than
-   the box. Both are the resting height; this only says so out loud, since a
-   reader looking for the difference should not have to rule that out first. */
+   the box. */
 helix-line-chart {
   --line-chart-block-size: 9em;
 }

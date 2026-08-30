@@ -1,14 +1,13 @@
 /* **A column, so a block given a height spends it on the code.**
  *
- * `display: block` left the header and the frame at their content heights and
+ * `display: block` leaves the header and the frame at their content heights and
  * the rest of the host empty: stretched into a 118px row beside a card, the
- * snippet drew 82px of itself and 36px of nothing, which reads as a box that
- * failed to fill rather than as a short snippet. The frame takes the remainder,
- * so a longer snippet and a stretched one both put their space in the same
- * place, under the code.
+ * snippet draws 82px of itself and 36px of nothing. The frame takes the
+ * remainder, so a longer snippet and a stretched one both put their space in
+ * the same place, under the code.
  *
  * Free when nothing imposes a height: a flex column with no outside constraint
- * is exactly as tall as its content, which is what it was before. */
+ * is exactly as tall as its content. */
 :host {
   display: flex;
   flex-direction: column;
@@ -23,46 +22,38 @@
    it had an empty strip above it. */
 [part="header"] {
   align-items: center;
-  /* **A hook, because the header is half the surface.** `--code-block-background`
-     tuned the block and left the bar above it on `surface-raised`, so a consumer
-     putting the element on anything other than the page got a translucent body
-     under an opaque strip: two materials in one object. The bar defaults to what
-     it always was, so a block that says nothing looks unchanged. */
+  /* **A hook, because the header is half the surface.** With only
+     `--code-block-background-color`, a consumer putting the element on anything
+     other than the page gets a translucent body under an opaque strip: two
+     materials in one object. */
   backdrop-filter: var(--code-block-backdrop, none);
-  background-color: var(--code-block-header-background, var(--helix-color-surface-raised));
+  background-color: var(--code-block-header-background-color, var(--helix-color-surface-raised));
   border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
   border-end-end-radius: var(--helix-radii-none);
   border-end-start-radius: var(--helix-radii-none);
   /* **The corner is a hook, because half of it is on the other part.** This
      element's radius is stated in three places, the header's two top corners and
-     the block's `border-radius`, so a consumer wanting a different corner had to
-     reach past the component in all three or get a bar and a body that disagreed.
-     `Card` publishes `--card-radii` for the same reason and this had no
-     equivalent.
+     the block's `border-radius`, so a consumer wanting a different corner would
+     otherwise have to reach past the component in all three or get a bar and a
+     body that disagreed. `Card` publishes `--card-radius` for the same reason.
 
-     **And the default is `lg`, which is what `Card` already shipped.** The two
-     are peer surfaces, a panel of content with an edge, and they disagreed:
-     `Card` resolves `var(--card-radii, var(--helix-radii-lg))` and this resolved
-     `sm`, so a code block beside a card wore a corner half its size. Both steps
-     scale with `--_helix-seed-radii`, so this was never a component ignoring the
-     theme's radius; it was following it one step down from everything it sits
-     next to. */
-  border-start-end-radius: var(--code-block-radii, var(--helix-radii-lg));
-  border-start-start-radius: var(--code-block-radii, var(--helix-radii-lg));
+     **The default is `lg` because that is what `Card` resolves.** The two are
+     peer surfaces, a panel of content with an edge, and at `sm` a code block
+     beside a card wore a corner half its size. */
+  border-start-end-radius: var(--code-block-radius, var(--helix-radii-lg));
+  border-start-start-radius: var(--code-block-radius, var(--helix-radii-lg));
   display: flex;
-  /* `2xs` around a line of `xs` text made a 24px strip, which is a bar that has
-     been squeezed rather than one that is deliberately tight. The inline
-     padding matches the block's own, so the name sits over the first character
-     of the code rather than a few pixels off it. */
+  /* `2xs` around a line of `xs` text is a 24px strip, which reads as squeezed
+     rather than deliberately tight. The inline padding matches the block's own,
+     so the name sits over the first character of the code. */
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-md);
 }
 
-/* **The name is a name, not code.** It was set in the mono face, which put
-   "Install Helix" in the same type as the command under it and made a title
-   read as the snippet's first line. The block below is the only thing here
-   that is code. Medium rather than regular, because at `xs` and muted a
-   regular weight has nothing left to be a heading with. */
+/* **The name is a name, not code**, so it is not in the mono face: the block
+   below is the only thing here that is code. Medium rather than regular,
+   because at `xs` and muted a regular weight has nothing left to be a heading
+   with. */
 [part="label"] {
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
@@ -98,34 +89,32 @@
  * likely to be read. */
 [part="block"] {
   /* The page's own ground, not a sunken panel. `surface-sunken` is a step away
-     from the background, so a block of code read as a well cut into the page
+     from the background, so a block of code reads as a well cut into the page
      when what it is is the page with a line around it. On a dark theme that
      step is the difference between black and not-quite.
 
-     Which is an argument about a block of code *on a page*, and a block of code
+     That is an argument about a block of code *on a page*, and a block of code
      inside a card or a drawer is a slab of the page's color sitting on
-     something else. `--code-block-background` is how that is said, and the
+     something else. `--code-block-background-color` is how that is said, and the
      reasoning above is why the page stays the default rather than becoming a
-     `transparent` that would take the border's meaning with it. */
-  /* **`backdrop-filter` beside the fill, because a translucent ground on its own
+     `transparent` that would take the border's meaning with it.
+
+     **`backdrop-filter` beside the fill, because a translucent ground on its own
      is a tint rather than a material.** `Card` publishes `--card-backdrop` for
-     exactly this and this element published nothing, so a consumer could make
-     the block see-through and had no way to blur what showed through it. `none`
-     by default, which costs a compositor nothing. */
+     exactly this. `none` by default, which costs a compositor nothing. */
   backdrop-filter: var(--code-block-backdrop, none);
-  background-color: var(--code-block-background, var(--helix-color-background));
+  background-color: var(--code-block-background-color, var(--helix-color-background));
   border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
-  border-radius: var(--code-block-radii, var(--helix-radii-lg));
+  border-radius: var(--code-block-radius, var(--helix-radii-lg));
   margin: var(--helix-space-none);
   overflow-x: auto;
   padding-block: var(--helix-space-sm);
   padding-inline: var(--helix-space-md);
 }
 
-/* **The gutter is only reserved when something is standing in it.** The end
-   padding held a control's width unconditionally, so a block with `no-copy`
-   paid 40px of empty margin for a button that was never rendered, and a short
-   line sat oddly far from a border it was nowhere near. */
+/* **The gutter is only reserved when something is standing in it.** Held
+   unconditionally, the end padding costs a block with `no-copy` 40px of empty
+   margin for a button that was never rendered. */
 :host(:not([no-copy])) [part="block"] {
   padding-inline-end: calc(var(--helix-size-control) + var(--helix-space-sm));
 }
@@ -148,7 +137,7 @@
 /* Print: a fill that is a slab of gray on paper; the border frames it instead.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     background-color: transparent;

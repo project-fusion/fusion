@@ -1,6 +1,6 @@
 /**
  * Every page this package documents, derived from the frontmatter of each MDX
- * file by `bun run docs`. Do not edit: `bun run check:docs` fails when this
+ * file by `turbo run docs`. Do not edit: `turbo run docs -- --check` fails when this
  * file and the content disagree, and the content is the source.
  */
 import type { DocPage } from './registry.js'
@@ -25,6 +25,12 @@ export const docPages: DocPage[] = [
     section: 'Getting started',
     slug: 'browser-support',
     title: 'Browser support',
+  },
+  {
+    description: 'Using the headless tier as the foundation for a design system of your own.',
+    section: 'Essentials',
+    slug: 'building-on-the-headless-tier',
+    title: 'Building on the headless tier',
   },
   {
     description: 'The data channel nobody expects, and why it is a real table.',
@@ -77,7 +83,7 @@ export const docPages: DocPage[] = [
     title: 'Forms and validation',
   },
   {
-    description: '103 glyphs, one geometry, and how to draw one that is not in the set.',
+    description: '105 glyphs, one geometry, and how to draw one that is not in the set.',
     section: 'Foundations',
     slug: 'iconography',
     title: 'Iconography',

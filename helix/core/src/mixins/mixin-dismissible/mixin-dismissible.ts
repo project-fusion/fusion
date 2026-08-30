@@ -25,25 +25,20 @@ export declare class DismissibleElement {
 /**
  * Grafts `dismissible`, its label, and the event that says so.
  *
- * Three surfaces had written this: `Announcement`, `Tag` and `Toast.Item`, each
- * with the same two properties, the same event, and the same expression for the
- * label. They had not diverged, which is the argument for extracting rather than
- * against it, because the fourth would have.
- *
- * **The label reads the default slot, not the whole element**, and that is a bug
- * fix rather than a move. Every copy said `this.textContent`, which is every
- * light-DOM descendant including the ones assigned elsewhere. On `Announcement`
- * and `Tag` that is the same thing, because they have one slot. On `Toast.Item`
- * it swept in the actions: a message reading "Could not reach the server" with a
- * `Retry` button announced itself as "Could not reach the server Retry", and the
- * consumer removing it from their list got that string to match on.
+ * **The label reads the default slot, never `this.textContent`**, which is
+ * every light-DOM descendant including the ones assigned elsewhere. On
+ * `Announcement` and `Tag` the two are the same thing, because they have one
+ * slot. On `Toast.Item` the second sweeps in the actions: a message reading
+ * "Could not reach the server" with a `Retry` button announces itself as "Could
+ * not reach the server Retry", and the consumer removing it from their list
+ * gets that string to match on.
  *
  * **`dismissEvent()` is separate from `dismiss()` for the one that needs it.**
  * `Announcement` and `Tag` dispatch and are done: they own no state, so a
  * refusal is the whole of the consumer's answer. `Toast.Item` holds an `open`
- * it may or may not own, so its event has to go through the controlled-change
- * path with an `apply` beside it. Giving it the event rather than the method
- * lets it keep the contract and skip the default.
+ * and applies the change itself, so its event goes through `requestChange` with
+ * an `apply` beside it. Giving it the event rather than the method lets it keep
+ * the contract and skip the default.
  */
 export const MixinDismissible = <T extends Constructor<LitElement>>(Base: T) => {
   class Dismissible extends Base {

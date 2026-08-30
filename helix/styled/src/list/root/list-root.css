@@ -17,29 +17,26 @@
  * tree, so the implicit `list-item` counter is shared between them and the
  * numbering needs nothing written by script and nothing counted on the server.
  *
- * **`outside`, with a gutter of our own for it to hang into.** It was `inside`,
- * on the argument that an outside marker hangs into the page. It does, and the
- * answer to that is to give it somewhere rather than to move it: an *inside*
- * marker is laid out as the first inline box within the principal box, and the
- * next thing in that box is `[part="row"]`, which is a block-level grid. A block
- * after an inline breaks the line, so every marker got a line of its own and
- * every row started underneath it. Measured before this: the item was 68px tall
+ * **`outside`, with a gutter of our own for it to hang into.** Never `inside`:
+ * an *inside* marker is laid out as the first inline box within the principal
+ * box, and the next thing in that box is `[part="row"]`, which is a block-level
+ * grid. A block after an inline breaks the line, so every marker gets a line of
+ * its own and every row starts underneath it. Measured: the item was 68px tall
  * where the row is 45, and the row's top sat 23px below the item's.
  *
- * The two options were "hangs into the page" and "breaks the line", and the file
- * picked the second without saying that the first had a fix. The fix is a
- * `padding-inline-start` on the list, so the marker hangs into the component
- * instead, which is what a `<ul>` has always done.
+ * An outside marker does hang into the page, and the answer is the
+ * `padding-inline-start` below rather than moving it, so it hangs into the
+ * component instead, which is what a `<ul>` has always done.
  */
 :host([kind="ordered"]),
 :host([kind="unordered"]) {
   /* Wide enough for a two-digit marker and no wider.
    *
-   * `space-xl` first, which is 32px for a glyph about fourteen across, then
-   * `lg` at 24, and it still read as a column of numbers beside a separate
-   * column of words: with `outside`, the gap a reader sees is the gutter less
-   * the marker, so a single digit was carrying most of the 24 as empty space.
-   * `md` puts the words next to the numbers and still fits `10.`, which is the
+   * With `outside`, the gap a reader sees is the gutter less the marker, so a
+   * wider rung spends the difference as empty space and the list reads as a
+   * column of numbers beside a separate column of words: at `lg`, 24px against
+   * a glyph about fourteen across, a single digit carried most of it. `md`
+   * puts the words next to the numbers and still fits `10.`, which is the
    * widest marker a list of this kind usually reaches. */
   padding-inline-start: var(--list-marker-gutter, var(--helix-space-md));
 }
@@ -90,11 +87,10 @@
 
 /* The rail: the same numbering, at the start edge of the block.
  *
- * A marker hangs *beside the words*. That is what a marker is, and for a list of
- * short rows it is right. It is not right for a numbered argument, where each
- * item is a claim with prose under it and the numbers want to read as a column
- * down the left of the page with the text starting at one measure, the way a
- * numbered specification is set.
+ * A marker hangs beside the words, which is right for short rows and wrong for
+ * a numbered argument, where each item is a claim with prose under it and the
+ * numbers want to read as a column down the left of the page with the text
+ * starting at one measure, the way a numbered specification is set.
  *
  * **The native marker cannot be moved there.** `outside` places the marker just
  * clear of the row's content box, so widening the gutter moves the *text* right
@@ -128,7 +124,7 @@
 :host([marker="rail"]) ::slotted(*) {
   --list-item-rail-content: counter(list-rail, var(--list-rail-style, decimal-leading-zero));
   /* The two things a row cannot work out for itself: that there is a rail at all,
-     and what number this row is. Its width it reads from `--list-rail-width`
+     and what number this row is. Its width it reads from `--list-rail-inline-size`
      directly, which a consumer sets on the list and every row inherits. */
   --list-item-rail-display: block;
   counter-increment: list-rail;
@@ -153,7 +149,7 @@
 /* Print: a list.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

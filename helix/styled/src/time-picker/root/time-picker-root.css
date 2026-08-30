@@ -10,7 +10,7 @@
  * count, because what a panel has is room, and a count would need recomputing
  * every time the density moved. */
 [part="list"] {
-  --listbox-max-block-size: var(--time-picker-list-height, 16rem);
+  --listbox-max-block-size: var(--time-picker-list-block-size, 16rem);
 
   display: block;
 }
@@ -46,21 +46,15 @@
  * does not sit on the accent, and this is the one place in this component where
  * a row stops being a row on the panel. */
 :host([mode="range"]) [part="option"]:state(selected)::part(item) {
-  /* **The inverse pair, because the muted one was measured in light only.**
-     This was `foreground-muted` carrying `foreground-on-accent`, on the
-     reasoning that `foreground` was a slab of near-black in a list of gray rows
-     and the muted step measured 6.01. That figure is a light-mode figure:
-     `foreground-muted` flips to a *light* gray in dark, and a pale ink on it
-     measured 2.96:1, under AA.
+  /* **The inverse pair, and never `foreground-muted` carrying
+     `foreground-on-accent`.** That pairing measures 6.01 in light and 2.96:1 in
+     dark, under AA: `foreground-muted` flips to a *light* gray there, and the
+     ink on it is pale.
 
      `surface-inverse` is the token for a slab that is the opposite of the page
      whichever page it is, and `foreground-inverse` is the ink solved against
-     it: 7.20:1 in both schemes. It keeps what the old pairing was reaching for,
-     a fill that is not the accent and not black, without depending on which way
-     round the scheme happens to be.
-
-     Found by `check:pairings`, which reported this as a pair the model did not
-     declare and therefore one nothing measured. */
+     it: 7.20:1 in both schemes. It is still a fill that is neither the accent
+     nor black, without depending on which way round the scheme happens to be. */
   background-color: var(--helix-color-surface-inverse);
   color: var(--helix-color-foreground-inverse);
 }
@@ -79,7 +73,7 @@
  *
  * `light-dark()` wraps the two mixes rather than the two percentages. Not a
  * style choice: it returns a color, so a percentage inside it is invalid and the
- * whole declaration is dropped. Option records the same, having found out. */
+ * whole declaration is dropped. Option records the same. */
 [part="option"][data-between]::part(item) {
   background-color: var(
     --time-picker-range-color,
@@ -130,19 +124,20 @@
 
 /* Shorter than the single list, which is a different job: a list is read down
    and a dial is read around its middle, so it wants enough rows to show the
-   neighbours and not so many that the center stops being a center. */
-/* Each column is at least as wide as its own widest row, and they share what is
-   left equally. `flex-basis: 0` with a zero floor was the first version and it
-   collapsed them: inside a panel sized to its content there is no content to
-   size to, because every column had offered to be nothing. Measured, `AM` came
-   out as one letter and an ellipsis. */
+   neighbors and not so many that the center stops being a center.
+
+   Each column is at least as wide as its own widest row, and they share what is
+   left equally. `flex-basis: 0` with a zero floor collapses them: inside a panel
+   sized to its content there is no content to size to, because every column has
+   offered to be nothing. Measured, `AM` came out as one letter and an
+   ellipsis. */
 [part="column"] {
   /* The row is stated once and read three times: by the row itself, by the block
      padding that lets the first and last reach the middle, and by the height,
      which is five of them. Written separately they drift, and the drift shows up
      as a wheel resting a few pixels off center. */
   --_time-row: var(--time-picker-row-size, var(--helix-size-control));
-  --listbox-max-block-size: var(--time-picker-wheel-height, calc(var(--_time-row) * 5));
+  --listbox-max-block-size: var(--time-picker-wheel-block-size, calc(var(--_time-row) * 5));
 
   flex: 1 1 auto;
   min-inline-size: max-content;
@@ -203,12 +198,9 @@
    otherwise exactly as wide as its widest row, and three columns of bare digits
    sit against each other with nothing between them.
 
-   Which is what the padding is now entirely for. There were rules between the
-   columns as well, and between them and this inset it was two separations doing
-   one job: three numbers side by side are already three numbers, and ruling them
-   apart makes a table out of what is meant to read as one control. Gone, and the
-   inset comes down a step with them, since it was sized to hold digits off a
-   line that is no longer there. */
+   The inset is the whole of that separation. No rules between the columns as
+   well: three numbers side by side are already three numbers, and ruling them
+   apart makes a table out of what is meant to read as one control. */
 [part="column"] [part="option"]::part(item) {
   min-block-size: var(--_time-row);
   min-inline-size: var(--_time-row);
@@ -217,9 +209,8 @@
      and below make the row forty-eight while `--_time-row` still says forty, and
      that number is read three times: by this rule, by the column height that is
      five of them, and by the block padding that lets the first and last rows
-     reach the middle. The comment on `--_time-row` warns about exactly this
-     drift; measured with the padding left in, the row was 48 and a column of
-     "five" held 4.17. */
+     reach the middle. Measured with the padding left in, the row was 48 and a
+     column of "five" held 4.17. */
   padding-block: var(--helix-space-none);
   padding-inline: var(--helix-space-sm);
 }
@@ -317,10 +308,12 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and the state has to survive. A
+ * tick that is a fill prints as an empty box, which is a document saying the
+ * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

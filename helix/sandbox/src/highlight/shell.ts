@@ -6,11 +6,11 @@ import { tags } from '@lezer/highlight'
 /*
  * Shell, with the command named.
  *
- * **The stock mode colours nothing in the commands this documentation actually
+ * **The stock mode colors nothing in the commands this documentation actually
  * contains.** It knows sh: builtins, keywords, redirects, quoting, comments.
  * Every shell fence here is `bun add @fusion.dev/helix`, and to that mode `bun` is
- * an ordinary word, so all three blocks came out entirely gray. A highlighter
- * that returns the input unchanged is not highlighting.
+ * an ordinary word, so every fence comes out entirely gray. A highlighter that
+ * returns the input unchanged is not highlighting.
  *
  * So this delegates first and only relabels what the mode declined to classify.
  * A bare word in command position, which is the start of a line or whatever
@@ -35,10 +35,10 @@ import { tags } from '@lezer/highlight'
  * Whether a token hands command position to whatever follows it.
  *
  * One character at a time, because that is how the mode emits them: measured,
- * `cd site && bun run dev` comes back as `cd`, `site`, `&`, `&`, `bun`, and a
- * pattern written for the `&&` a reader sees never matches anything. It cost
- * the first version of this: `bun` after a `&&` stayed gray while the same word
- * at the start of a line was a command.
+ * `cd site && bun run dev` comes back as `cd`, `site`, `&`, `&`, `bun`, so a
+ * pattern written for the `&&` a reader sees never matches anything and `bun`
+ * after a `&&` stays gray while the same word at the start of a line is a
+ * command.
  */
 const OPENS = /^[|&;({!]+$/
 

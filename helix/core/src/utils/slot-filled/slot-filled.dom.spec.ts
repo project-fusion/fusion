@@ -10,8 +10,7 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  *
  * It matters because an empty wrapper is not free. A region that generates a box
  * is a flex or grid item whether or not it holds anything, so it takes the
- * container's gap: an announcement with no actions paid the row gap twice and a
- * blockquote with no attribution reserved a space under every quote.
+ * container's gap.
  */
 let slotFilled: (slot: HTMLSlotElement | null | undefined) => boolean
 
@@ -60,15 +59,12 @@ describe('what counts as filled', () => {
 })
 
 /* **The fallback case is deliberately not asserted here, and that is a fact
-   about the harness rather than about the function.**
-   `flatten` is the whole point of the `true` in `assignedNodes({ flatten: true })`:
-   this asks "will anything render", where the tooltip's emptiness test asks "did
-   the consumer provide anything", so a slot showing its fallback is filled.
-   happy-dom returns nothing from a flattened `assignedNodes` where a browser
-   returns the fallback, which `helix/testing/src/browser.ts` records in its own
-   header as one of the gaps that makes the browser the stronger environment. An
-   assertion here would be measuring happy-dom, and one written to pass under it
-   would assert the opposite of what ships.
+   about the harness rather than about the function.** happy-dom returns nothing
+   from a flattened `assignedNodes` where a browser returns the fallback, which
+   `helix/testing/src/browser.ts` records in its own header as one of the gaps
+   that makes the browser the stronger environment. An assertion here would be
+   measuring happy-dom, and one written to pass under it would assert the
+   opposite of what ships.
    `helix/core` has no browser lane: `build-specs.mjs` bundles families out of
    `helix/headless` and `helix/styled`. Covering this properly means a component
    spec in one of those, which is where the behavior is consumed anyway. */

@@ -1,15 +1,23 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, hostTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  hostTag,
+  ssr,
+  styles,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('app header server output', () => {
-  const markup = ssr(html`
+  const served = ssr(html`
     <helix-app-header>
       <span slot="start">Fusion</span>
       <a href="/work">Work</a>
     </helix-app-header>
   `)
+  const markup = withoutStyles(served)
 
   test('renders without reaching for a window it does not have', () => {
     // The scroll listener is attached on connect, which the server never calls,
@@ -33,6 +41,6 @@ describe('app header server output', () => {
 
   test('declarative shadow DOM carries the material', () => {
     expect(markup).toContain('shadowrootmode="open"')
-    expect(markup).toContain('--helix-material-translucent')
+    expect(styles(served)).toContain('--helix-material-translucent')
   })
 })

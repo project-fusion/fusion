@@ -44,21 +44,18 @@ on purpose and are not softened as the company matures.
 
 ## Documents
 
-The strategy is not in this repository. The numbered plan (thesis, planning documents) lives in the internal repository, because this one is public.
-
-What is here is the writing meant to be read: `docs/insights/` is the published
-essays, `docs/19-queue.md` is the work queue, and the two generated references
-beside them are `component-reference.md` and `token-reference.md`.
+`fusion/docs/insights/` is the published essays, and `fusion/docs/references/`
+holds the two generated ones, `component-reference.md` and `token-reference.md`.
 
 ## Packages
 
 | Domain | Packages |
 |---|---|
-| **Helix** (`@fusion.dev/helix-*`) | `styles` `core` `headless` `web` `react` `icons` `theme` `cem` `docs` |
-| **Cortex** (crates, `@fusion.dev/cortex-*`) | `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram` `docs` |
+| **Helix** (`@fusion.dev/helix-*`) | `turbo run styles` `core` `headless` `icons` `theme` `docs` `diagnostics`, and `@fusion.dev/helix` for the styled tier. `cem` `gallery` `sandbox` `testing` are build tooling and do not publish |
+| **Cortex** | the crates `fusion-cortex-core` `fusion-cortex-trace` `fusion-cortex-engram`, which do not publish yet, and `@fusion.dev/cortex-docs` |
 
 Versions are **lockstep within a domain**, independent across domains. See
-[`CLAUDE.md`](CLAUDE.md).
+[`AGENTS.md`](AGENTS.md).
 
 ## Stack
 
@@ -73,5 +70,5 @@ bun install && bun run verify
 ## Conventions
 
 - `.local/` is gitignored and per-machine. Scratch, artifacts, screenshots.
-- `docs/` is tracked. Strategy lives with the code.
+- `fusion/docs/` is tracked. Strategy lives with the code.
 - **No em dashes** in code, docs, or copy.

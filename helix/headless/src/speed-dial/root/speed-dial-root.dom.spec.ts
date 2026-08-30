@@ -34,8 +34,8 @@ const press = (host: Dial, key: string) => {
 }
 
 /* Focus retargets to the host, so from the document `activeElement` is the
-   action itself. `Menu.Item` records the same, and the shadow-root reading it
-   replaced is one happy-dom does not survive. */
+   action itself. `Menu.Item` records the same. Reading it through the shadow
+   root instead is what happy-dom does not survive. */
 const focused = (one: Action) => one.ownerDocument.activeElement
 
 describe('a speed dial', () => {
@@ -54,12 +54,11 @@ describe('a speed dial', () => {
        is state only the dial holds. Left to them it goes unsaid, and the failure
        is silent to everyone who can see the screen.
 
-       **A property, not an attribute, and the attribute is what this asserted
-       until 28 Aug 2026.** Writing onto the consumer's element is a hydration
-       mismatch React reports and does not patch up, measured against 19.2.8 on
-       this family and `Megamenu`. A property never reaches the markup, so React
-       has nothing to compare, and a Helix trigger renders `aria-expanded`
-       inside its own shadow root. See `tellDisclosure` and #322. */
+       **A property, not an attribute.** Writing onto the consumer's element is a
+       hydration mismatch React reports and does not patch up, measured against
+       19.2.8 on this family and `Megamenu`. A property never reaches the markup,
+       so React has nothing to compare, and a Helix trigger renders
+       `aria-expanded` inside its own shadow root. See `tellDisclosure` and #322. */
     const host = (await mount(
       `<helix-headless-speed-dial label="Actions">
         <helix-headless-button slot="trigger">Open</helix-headless-button>

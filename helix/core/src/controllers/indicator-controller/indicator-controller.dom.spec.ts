@@ -5,12 +5,9 @@ import { IndicatorController } from './indicator-controller.js'
 /**
  * Measuring the marked child and writing the geometry onto a traveling mark.
  *
- * **Four components had written this and the copies had diverged.**
- * `Navigation`, `Tabs`, `Toggle.Group` and `Outline` each measured an active
- * child and wrote a position onto an indicator, and two of them had bugs the
- * others did not. What they disagreed about is what these specs are: the sign
- * of the inline axis in a right-to-left document, and whether the surface's own
- * border comes off the measurement.
+ * What these specs are about is the two things separate copies of this
+ * arithmetic disagreed on: the sign of the inline axis in a right-to-left
+ * document, and whether the surface's own border comes off the measurement.
  *
  * The boxes are supplied. happy-dom answers `0 0 0 0` to every
  * `getBoundingClientRect`, and the arithmetic between two rectangles is the
@@ -89,7 +86,7 @@ const scene = (
 
 const at = (indicator: HTMLElement): Record<string, string> =>
   Object.fromEntries(
-    ['height', 'width', 'x', 'y'].map((name) => [
+    ['block-size', 'inline-size', 'x', 'y'].map((name) => [
       name,
       indicator.style.getPropertyValue(`--indicator-${name}`),
     ]),
@@ -99,15 +96,19 @@ describe('the geometry of the marked child', () => {
   test('is written as the four properties whoever draws the mark reads', () => {
     const one = scene()
     one.place()
-    expect(at(one.indicator)).toEqual({ height: '30px', width: '60px', x: '40px', y: '0px' })
+    expect(at(one.indicator)).toEqual({
+      'block-size': '30px',
+      'inline-size': '60px',
+      x: '40px',
+      y: '0px',
+    })
   })
 
   /* `getBoundingClientRect` gives the border box and the containing block is
      the *padding* box, so a surface with a border of its own puts the mark one
-     border-width out. `Tabs` and `Toggle.Group` each did this arithmetic
-     separately, `Outline` did the block half only, and `Navigation` did
-     neither. `clientLeft` and `clientTop` are the resolved widths, which is why
-     they are read rather than `borderLeftWidth` parsed. */
+     border-width out, on both axes rather than one. `clientLeft` and
+     `clientTop` are the resolved widths, which is why they are read rather
+     than `borderLeftWidth` parsed. */
   test('with the surface’s own border off both axes, not one', () => {
     const one = scene({ active: box(40, 10, 60, 30), border: 2, own: box(0, 0, 300, 40) })
     one.place()
@@ -116,11 +117,11 @@ describe('the geometry of the marked child', () => {
 })
 
 describe('a right-to-left document', () => {
-  /* The bug this extraction exists to stop repeating. The mark travels from the
-     inline start and the inline start is on the right, so the distance is
-     measured from the surface's right edge and applied as a negative
-     translation. `Navigation` measured from the physical left and applied it
-     from the inline-start edge unsigned, so its marker went the wrong way. */
+  /* The mark travels from the inline start and the inline start is on the
+     right, so the distance is measured from the surface's right edge and
+     applied as a negative translation. Measuring from the physical left and
+     applying it from the inline-start edge unsigned sends the mark the wrong
+     way. */
   test('measures from the right edge and travels the other way', () => {
     const one = scene({ active: box(40, 0, 60, 30), own: box(0, 0, 300, 30), rtl: true })
     one.place()
@@ -243,13 +244,11 @@ describe('a mark on its way somewhere', () => {
 })
 
 describe('a second move before the first has settled', () => {
-  /* Each placement built a fresh `settle` closure and then cleared the timer
-     belonging to the *previous* one, which was the only thing that would have
-     removed its listener: the event itself never arrives under reduced motion,
-     where there is no transition to end. So a reader changing tabs quickly, or
-     any reader at all with motion reduced, left one dead listener per selection
-     on an element that lives as long as the page. The people who asked for less
-     work were the ones accumulating it. */
+  /* A placement must take the previous listener off itself rather than leave it
+     to the previous placement's timer: under reduced motion there is no
+     transition to end, so the event never arrives, and a reader changing tabs
+     quickly leaves one dead listener per selection on an element that lives as
+     long as the page. */
   test('takes the first listener off before adding its own', () => {
     const one = scene()
     let held = 0
