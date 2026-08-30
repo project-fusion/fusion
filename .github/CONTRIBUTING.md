@@ -54,9 +54,15 @@ the cause is deeper, the fix still goes deeper.
 
 ## Adding a Helix component
 
-There is a skill for it: `.claude/skills/adding-helix-components`. A component
+There is a skill for it: `.agents/skills/adding-helix-components`. A component
 is not one file. It is both tiers, tokens, specs on every part, manifest
 metadata and an example, and `helix component --only stable` knows the difference.
+
+The skill lives under `.agents/` because its content is agent-facing and only
+the directory is one vendor's. `.claude/skills/<name>` is a symlink into it, so
+Claude Code finds it where it looks and there is still exactly one copy to edit.
+A second tool that reads a different directory gets a second symlink, never a
+second file.
 
 ## Commits
 

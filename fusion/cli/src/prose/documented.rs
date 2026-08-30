@@ -249,11 +249,18 @@ fn survey(root: &Path) -> Api {
 /// Everything in this repository that tells somebody what the API is.
 ///
 /// **The published pages and the files that instruct an agent, which is the same
-/// problem twice.** The rules and the skills beside them are read by a machine
-/// that then writes code, and they drift harder than the documentation does.
+/// problem twice.** The rules in `.claude/rules` and the skills in
+/// `.agents/skills` are read by a machine that then writes code, and they drift
+/// harder than the documentation does.
 ///
 /// A page that is wrong misleads a reader who can push back. A rule that is
 /// wrong is read by something that cannot, and it is read first.
+///
+/// **The skills are read where they live, not through the pointer.**
+/// `.claude/skills/<name>` is a symlink into `.agents/skills/<name>`, because a
+/// skill is agent-facing content and only the directory it sits in is one
+/// vendor's. Scanning both would find the same `SKILL.md` twice and report every
+/// fault in it twice, under a path that is not where anybody would fix it.
 fn pages(root: &Path) -> Vec<PathBuf> {
     let mut found = Vec::new();
     let ordered = |directory: PathBuf| {
@@ -282,7 +289,7 @@ fn pages(root: &Path) -> Vec<PathBuf> {
             found.push(page);
         }
     }
-    for skill in ordered(root.join(".claude/skills")) {
+    for skill in ordered(root.join(".agents/skills")) {
         let card = skill.join("SKILL.md");
         if card.is_file() {
             found.push(card);
