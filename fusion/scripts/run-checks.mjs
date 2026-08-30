@@ -45,6 +45,15 @@ const DEDICATED = new Set([
      would never use. It runs beside `rs:check` and `rs:test`, where the cargo
      cache is already warm and the binaries it calls have just been built. */
   'bun run check:cli',
+  /* **The CLI's own subcommands, for the reason above and measured.** `bin.mjs`
+     resolves a built binary or builds one, so a shard without the cargo cache
+     compiles it, and six shards compiling Rust at once took the runner's
+     memory: shard 2 was `Killed` at exit 137 and shard 5 took a SIGTERM, both
+     inside a `fusion` subcommand, and shard 3 was cancelled behind them. They
+     had never run before, `--list` having refused ahead of them, so this was
+     the first time six of them tried at once. */
+  'bun run check:prose',
+  'bun run fusion spec check',
   'bun run rs:check',
   'bun run rs:test',
   'bun run test',
@@ -85,10 +94,9 @@ const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.inc
    accept a generator and run it six times, silently, which is the failure this
    refusal exists to prevent.
 
-   `bun run fusion <area> check` is the third, and it is a shard's work rather
-   than the Rust job's: `bin.mjs` resolves a built binary or builds one, and a
-   runner has cargo, which is how `check:prose` has been sharded all along
-   under the one spelling this test already accepted. */
+   `bun run fusion <area> check` is the third, and it is recognized here and
+   then claimed by DEDICATED: it is a check, and it is the Rust job's rather
+   than a shard's. */
 const CHECK =
   /^turbo run [a-z-]+ -- --check$|^turbo run [a-z-]+-check$|^bun run fusion [a-z]+ check$/
 

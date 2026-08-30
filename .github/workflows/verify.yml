@@ -217,6 +217,12 @@ jobs:
       # `dependency/<part>` in words rather than silently.
       - run: bun run rs:build
       - run: bun run check:cli
+      # Beside `check:cli` because they are the same binary. A shard that runs
+      # one compiles Rust to do it, and six doing that at once took the runner's
+      # memory: exit 137 on one shard, SIGTERM on another, a third cancelled
+      # behind them. Here the cargo cache is warm and the binary already built.
+      - run: bun run check:prose
+      - run: bun run fusion spec check
       - run: bun run rs:check
       - run: bun run rs:test
 
