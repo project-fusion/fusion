@@ -217,6 +217,21 @@ jobs:
       # `dependency/<part>` in words rather than silently.
       - run: bun run rs:build
       - run: bun run check:cli
+      # Beside `check:cli` because they are the same binary. A shard that runs
+      # one compiles Rust to do it, and six doing that at once took the runner's
+      # memory: exit 137 on one shard, SIGTERM on another, a third canceled
+      # behind them. Here the cargo cache is warm and the binary already built.
+      #
+      # **The build is what `references` reads.** That rule asks whether a path a
+      # comment names is on disk, and several of them name generated files:
+      # `fusion/site/public/sandbox/frame.css` is written by the site build and
+      # is gitignored. A shard had it because the shards build first; this job
+      # did not, so moving the check here turned seven true references into
+      # findings. Cached, so it is a restore rather than a build.
+      - run: bun run build
+      - run: bun run check:css:seeds
+      - run: bun run check:prose
+      - run: bun run fusion spec check
       - run: bun run rs:check
       - run: bun run rs:test
 

@@ -68,6 +68,18 @@ export const generatedPages: SitePage[] = [
 export const generatedEssays: SiteEssay[] = [
   {
     author: 'Ross Sheppard',
+    date: '2026-08-25',
+    description:
+      'A platform team, a component library, eighteen months and a launch. Then adoption stalls, and nobody can name the quarter it died.',
+    kind: 'Essay',
+    minutes: 4,
+    path: '/insights/the-design-system-you-already-paid-for',
+    slug: 'the-design-system-you-already-paid-for',
+    title: 'The design system you already paid for',
+    topic: 'Business',
+  },
+  {
+    author: 'Ross Sheppard',
     date: '2026-08-18',
     description:
       'No pro components and no paywalled API surface. The architectural reason is stronger than the economic one.',
@@ -82,6 +94,18 @@ export const generatedEssays: SiteEssay[] = [
     author: 'Ross Sheppard',
     date: '2026-08-11',
     description:
+      'Writing a component stopped being the expensive part. Converging on one way to write it is now the whole problem, and a design system is the only artifact that solves it.',
+    kind: 'Essay',
+    minutes: 3,
+    path: '/insights/generated-code-needs-somewhere-to-land',
+    slug: 'generated-code-needs-somewhere-to-land',
+    title: 'Generated code needs somewhere to land',
+    topic: 'Intelligence',
+  },
+  {
+    author: 'Ross Sheppard',
+    date: '2026-08-11',
+    description:
       'A spreadsheet of hexes is a set of decisions nobody can check. Deriving the palette makes contrast a property of the system rather than a review step.',
     kind: 'Essay',
     minutes: 2,
@@ -89,6 +113,30 @@ export const generatedEssays: SiteEssay[] = [
     slug: 'a-palette-from-one-brand-color',
     title: 'A palette from one brand color',
     topic: 'Design',
+  },
+  {
+    author: 'Ross Sheppard',
+    date: '2026-07-28',
+    description:
+      'A large company does not have one brand or one framework, and a single styled component library serves exactly one of its surfaces. The rest fork.',
+    kind: 'Essay',
+    minutes: 5,
+    path: '/insights/why-helix-has-two-tiers',
+    slug: 'why-helix-has-two-tiers',
+    title: 'Why Helix has two tiers',
+    topic: 'Design',
+  },
+  {
+    author: 'Ross Sheppard',
+    date: '2026-07-14',
+    description:
+      "The model is rented and repriced every quarter. What accumulates value is the context around it, and that currently lives in somebody else's account.",
+    kind: 'Essay',
+    minutes: 3,
+    path: '/insights/what-your-company-knows',
+    slug: 'what-your-company-knows',
+    title: 'What your company knows, and who holds it',
+    topic: 'Engineering',
   },
   {
     author: 'Ross Sheppard',
@@ -112,6 +160,30 @@ export const generatedEssays: SiteEssay[] = [
     path: '/insights/the-sovereignty-constraint',
     slug: 'the-sovereignty-constraint',
     title: 'The Sovereignty Constraint',
+    topic: 'Sovereignty',
+  },
+  {
+    author: 'Ross Sheppard',
+    date: '2026-06-30',
+    description:
+      'Procurement prices the entry and ignores the exit. The exit is usually the larger number, and it is why the renewal was never a negotiation.',
+    kind: 'Essay',
+    minutes: 4,
+    path: '/insights/exit-cost-belongs-on-the-balance-sheet',
+    slug: 'exit-cost-belongs-on-the-balance-sheet',
+    title: 'Exit cost belongs on the balance sheet',
+    topic: 'Business',
+  },
+  {
+    author: 'Ross Sheppard',
+    date: '2026-06-16',
+    description:
+      'Cheap intelligence and cheap energy are arriving together. Neither halving matters alone, and together they are why we build substrates before products.',
+    kind: 'Essay',
+    minutes: 4,
+    path: '/insights/why-we-started-at-the-bottom',
+    slug: 'why-we-started-at-the-bottom',
+    title: 'Why we started at the bottom',
     topic: 'Sovereignty',
   },
   {
