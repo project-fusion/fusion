@@ -28,6 +28,20 @@
 # runs on `bun install`. Skip once with `git push --no-verify`.
 set -e
 
+# **A runner installs this too, and none of it is a runner's job.** `prepare`
+# runs on every `bun install`, so `core.hooksPath` is set on CI as much as on a
+# laptop, and a workflow that pushes a branch gets this in front of it. On a
+# runner the checks are not merely redundant, they cannot pass: `check:cli` runs
+# the Rust binary, and a job that never builds it fails here with no useful
+# message.
+#
+# Measured 30 Aug 2026: `Visual baselines` retook every picture, committed them,
+# and died at this hook on the push, opening no pull request. `check:visual` had
+# then been red on `main` since 26 Aug for want of the baselines this workflow
+# exists to produce, and the reason was a developer aid running where the whole
+# of `verify` already runs.
+[ -n "$CI" ] && exit 0
+
 # `turbo` is a workspace binary, and `sh -c` below does not get the PATH bun
 # adds. Named once here rather than prefixed onto eleven commands.
 PATH="$PWD/node_modules/.bin:$PATH"
