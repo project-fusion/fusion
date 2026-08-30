@@ -107,7 +107,10 @@ produces a push that does not contain the edits. `git push --no-verify` skips it
 
 Installed by `git config core.hooksPath .githooks`, which the `prepare` script
 runs on `bun install`. No hook manager: husky and lefthook would each be a
-dependency whose job is that one line.
+dependency whose job is that one line. The script asks whether it is in a
+repository first, because `bun install` also runs where there is none — a
+`vercel deploy` uploads files rather than cloning, and `git config` there exits
+128 and takes the install down with it.
 
 **The generated-file list in the hook is kept in step with `regen` by hand**, and
 the loop in `.githooks/pre-push` is the authority. If prose anywhere counts it and

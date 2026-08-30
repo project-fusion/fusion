@@ -1,0 +1,81 @@
+---
+author: Ross Sheppard
+date: 2026-07-14
+description: The model is rented and repriced every quarter. What accumulates value is the context around it, and that currently lives in somebody else's account.
+kicker: Insights
+kind: Essay
+path: /insights/what-your-company-knows
+title: What your company knows, and who holds it
+topic: Engineering
+---
+
+The enterprise purchase so far has been seats. A per-seat assistant, deployed
+across a division, reading a context window and forgetting it. The line item is
+legible, the pilot is easy to approve, and the thing being bought is the model.
+
+The model is the part that is commoditizing. Capability is converging across
+vendors, prices fall every few months, and any advantage in the weights is
+rented for as long as the contract runs. Nobody is going to hold a durable
+position there, including the companies currently selling it.
+
+What accumulates is everything around the model: the corrections, the retrieved
+documents, the decisions and the reasons for them, the accumulated institutional
+knowledge of why a system is the way it is. That is the asset. In most
+organizations it is currently being deposited into a vendor's account, under
+their retention policy, in their schema.
+
+## Two consequences that read the same in a boardroom
+
+**Concentration.** The operational knowledge of the company comes to sit in a
+system it does not run, priced by someone else, on a roadmap it does not
+control. This is the same exposure as any critical vendor dependency, except
+that it is being accrued without a decision, one convenient integration at a
+time, and it does not appear on the risk register because nobody bought it.
+
+**Audit.** When a decision was made partly by a model, and the decision was
+material, the question is on what basis. Regulators are converging on that
+question across jurisdictions and the answer has to be producible after the
+fact.
+
+A chat log is not an answer. It records what was said and not what was read.
+Reconstructing the basis of a decision from a transcript requires knowing which
+version of which document was in front of the model, which retrieval returned
+it, which prior correction was still in effect, and who made that correction
+when. None of that is in the transcript, and in most deployments none of it is
+anywhere.
+
+## Provenance is the half nobody sells
+
+Memory is the part that gets attention, because it is the part a demo shows.
+Provenance is harder and it is the part that makes memory usable in a regulated
+setting.
+
+Provenance means every claim the system holds carries a lineage: where it came
+from, at what version, through which step, corrected by whom. Not a citation
+appended to an answer after the fact, which is a presentation detail, but a
+recorded edge that existed before the answer did and survives the model being
+replaced.
+
+The test is whether you can ask, eighteen months later, why the system believed
+a thing, and get a chain rather than a paragraph. Almost nothing in production
+today can answer that, and the reason is that provenance has to be designed in
+at the substrate rather than added at the surface.
+
+## Which is why Cortex is a substrate
+
+Cortex is memory and provenance, run where you put it. What a system knows, and
+where it learned it, held as records you hold, with a lineage on every claim.
+Engram is the memory, Trace is the provenance, and Recall is the question of
+what to put in front of a model and why that. Engram and Trace are Building,
+Recall is Declared, and those labels mean what this site says they mean.
+
+The reason to build it as a substrate rather than as a product is the same
+reason the design system had to be a constraint rather than a library. An
+application built on rented memory is not sovereign whatever its own
+architecture says, because the property has to be true all the way down or it
+is not true. A well-worded dependency is still a dependency.
+
+The practical version of that, for a company evaluating any of this: the model
+is replaceable and should be treated as replaceable. What must not be
+replaceable, and must not be somebody else's, is the record of what your
+organization has learned.

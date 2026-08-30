@@ -19,10 +19,23 @@
 /fusion/docs/*.md
 
 # Build output and scratch, rebuilt on Vercel anyway.
+#
+# **`.next-dev` is named separately, and `**/.next/` does not cover it.** The
+# site builds development into its own directory so that a turbo task writing
+# `.next` cannot pull the floor out from under a running `next dev` — the reason
+# is in `next.config.ts` — and that directory is the largest thing in the
+# repository by an order of magnitude: measured at 23GB across 9,903 files,
+# because a dev server's output accumulates rather than replacing itself.
+#
+# Git never sees it, `.gitignore` having excluded it since it was introduced, so
+# the omission here was invisible until a deploy tried to upload it. What that
+# looks like is `Upload aborted` three times over and then the CLI killed
+# outright, which reads as a network fault and is not one.
 .claude/
 .local/
 target/
 **/.next/
+**/.next-dev/
 **/.turbo/
 **/dist/
 **/node_modules/
