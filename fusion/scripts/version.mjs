@@ -142,7 +142,7 @@ const raise = (version, level) => {
  *
  * **The first release chooses its own opening number, and one of the choices is
  * `1.0.0`.** `allocated()` returns `0.0.0` while a domain has no tags, so a
- * pull request labelled `<domain>:major` publishes 1.0.0 as its very first
+ * pull request labeled `<domain>:major` publishes 1.0.0 as its very first
  * release. That is one label away at all times, the label is the only thing
  * that decides it, and `release-intent` proposes `patch` rather than refusing
  * anything above it.
