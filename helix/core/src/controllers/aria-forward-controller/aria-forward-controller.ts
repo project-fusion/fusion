@@ -91,6 +91,9 @@ export class AriaForwardController implements ReactiveController {
   /** Which state attributes this controller wrote, so only those are removed. */
   private readonly forwarded = new Set<string>()
 
+  /** The control the record above is about, so a replacement resets it. */
+  private recorded: HTMLElement | undefined
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
@@ -111,6 +114,18 @@ export class AriaForwardController implements ReactiveController {
     const target = this.target()
     if (!target) {
       return
+    }
+    /* **The record belongs to the element it was written about.** `forwarded`
+       says what this controller put on the control, and a component that
+       re-renders its control produces a new element carrying none of it:
+       `Button` does exactly that whenever `href` swaps an anchor for a button.
+       Kept across the swap, the record claims a value the new element never
+       had, and the clearing branch below then removes an attribute the
+       component wrote itself, which is the fault this whole record exists to
+       prevent, one element later. */
+    if (target !== this.recorded) {
+      this.forwarded.clear()
+      this.recorded = target
     }
     const root = this.host.getRootNode() as Document | ShadowRoot
     for (const [attribute, property] of RELATIONSHIPS) {

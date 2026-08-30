@@ -123,6 +123,31 @@ describe('an id that resolves to nothing', () => {
      element-reference property removes the content attribute rather than merely
      clearing the property, so forwarding nothing described the hint to nobody on
      every form control this reaches. */
+  /* **A replaced control is a new element and the record is about the old one.**
+     `Button` re-renders its control whenever `href` swaps an anchor for a
+     button. Carried across that, the record claims a reference the new element
+     never had, and the clearing branch takes off an attribute the component
+     wrote itself: the exact fault the record exists to prevent, one element
+     later. */
+  test('and a control that was replaced does not inherit the record of the one it replaced', () => {
+    let control = reflecting()
+    const host = document.body.appendChild(document.createElement('span'))
+    document.body.insertAdjacentHTML('afterbegin', '<p id="tip">a tip</p>')
+    Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
+    host.attachShadow({ mode: 'open' }).append(control)
+    host.setAttribute('aria-describedby', 'tip')
+    const forward = new AriaForwardController(host as never, { target: () => control })
+    forward.forward()
+    expect(held(control, 'ariaDescribedByElements')).toEqual(['tip'])
+
+    host.removeAttribute('aria-describedby')
+    const replaced = reflecting()
+    ;(replaced as unknown as Record<string, unknown>).ariaDescribedByElements = [document.body]
+    control = replaced
+    forward.forward()
+    expect(held(replaced, 'ariaDescribedByElements')).toEqual([''])
+  })
+
   test('and a control the host said nothing about keeps what it wrote itself', () => {
     const { control, forward } = scene('')
     ;(control as unknown as Record<string, unknown>).ariaDescribedByElements = [document.body]
