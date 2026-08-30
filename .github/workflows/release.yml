@@ -248,12 +248,31 @@ jobs:
       # Cortex work. That is the thing per-domain lockstep exists to prevent,
       # and it is why the range is walked here instead.
       #
-      # **No transformation, because the subjects are already the notes.**
+      # **One line per pull request, and the number is on the merge commit.**
       # `release-intent.yml` puts the machine-readable part in a label so the
-      # titles can stay prose, and this is where that pays: `git log` of a
-      # squashed history is one finished sentence per pull request, each ending
-      # in the `(#N)` GitHub links. Conventional Commits would have bought a
-      # parser here and cost the sentences.
+      # titles can stay prose, and this is where that pays: the notes are
+      # finished sentences rather than a parsed grammar. Conventional Commits
+      # would have bought a parser here and cost the sentences.
+      #
+      # **This said the subjects already were the notes, and measured they are
+      # not.** That reasoning assumed a squashed history, where each subject
+      # ends in the `(#N)` GitHub links. Six of 1,910 subjects carry one and all
+      # six are bot pull requests: every human one this repository has merged is
+      # a merge commit. So `--no-merges` dropped the one commit carrying the
+      # number and listed the branch's intermediate commits in its place, which
+      # for #20 was ten lines, three of them fixes to fixes inside the branch.
+      #
+      # `--first-parent` is one line per merge. The number is in the merge
+      # subject and the pull request title is the merge body, which is GitHub's
+      # own format, so the two are recombined below into the line the paragraph
+      # above promises. A commit pushed straight to `main` has no body and keeps
+      # its subject, which is what it is.
+      #
+      # **The setting is the real invariant and it is not in this tree.** Flip
+      # the repository to squash-only and every subject carries its own number;
+      # flip it back and this reconstruction is what holds the notes together.
+      # Worth a guard reading `gh api repos/{owner}/{repo}` for the merge
+      # settings, which is not written here because it wants its own argument.
       - name: Record the release
         if: vars.PUBLISHING == 'on'
         run: |
@@ -272,11 +291,38 @@ jobs:
           # reads and close enough to GitHub's size limit to fail on its own
           # one day. Naming the count says what is not listed, where a `head -n`
           # would have read as a complete list that happened to be short.
+          # A merge commit's subject carries the number and its body is the
+          # pull request title, so the two become one line. Anything else keeps
+          # its subject.
+          notes() {
+            git log --first-parent --format='%H' "$@" | while read -r commit; do
+              subject=$(git log -1 --format='%s' "$commit")
+              case "$subject" in
+                'Merge pull request #'*)
+                  number=${subject#Merge pull request #}
+                  number=${number%% *}
+                  title=$(git log -1 --format='%b' "$commit" | sed -n '/./{p;q;}')
+                  printf -- '- %s (#%s)\n' "${title:-$subject}" "$number"
+                  ;;
+                *) printf -- '- %s\n' "$subject" ;;
+              esac
+            done
+          }
+
           if [ -n "$prev" ]; then
-            git log --no-merges --format='- %s' "$prev..${{ github.sha }}" -- "$domain/" > notes.md
+            notes "$prev..${{ github.sha }}" -- "$domain/" > notes.md
           else
-            count=$(git log --no-merges --oneline "${{ github.sha }}" -- "$domain/" | wc -l | tr -d ' ')
-            printf 'First release. %s commits under `%s/` to here.\n' "$count" "$domain" > notes.md
+            # **Written only when there is something to count.** Stating a
+            # count of zero left a non-empty file, so the guard below could not
+            # see it, the release body read `0 commits` as though that were a
+            # result, and `${prev:-the first commit}` was unreachable because
+            # the only way to an empty file went through the other branch.
+            count=$(git log --first-parent --oneline "${{ github.sha }}" -- "$domain/" | wc -l | tr -d ' ')
+            if [ "$count" -gt 0 ]; then
+              printf 'First release. %s commits under `%s/` to here.\n' "$count" "$domain" > notes.md
+            else
+              : > notes.md
+            fi
           fi
 
           # **Empty notes warn and do not fail.** This step is last because the
