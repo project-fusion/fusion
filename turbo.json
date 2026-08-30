@@ -88,13 +88,23 @@
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/src/*/.examples/**",
+        "$TURBO_ROOT$/fusion/docs/insights/**",
         "$TURBO_ROOT$/fusion/site/scripts/build-catalog.mjs"
       ],
+      // **`public/insights` is an output and was not declared**, which is the
+      // same fault this file records two tasks down about `public/sandbox` and
+      // `public/specs`. `routes` asks whether every published path has a
+      // document under `public/insights`, so a cache hit restored a tree
+      // without them and the check reported six essays as having no document.
+      // The insights content is an input for the other half of it: six essays
+      // were added and the cache key did not move, so the task that writes
+      // those documents was never asked to run again.
       "outputs": [
         "content/catalog/catalog.generated.json",
         "public/*.md",
         "public/helix/components/**",
-        "public/helix/docs/**"
+        "public/helix/docs/**",
+        "public/insights/**"
       ]
     },
 
