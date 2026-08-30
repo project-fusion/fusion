@@ -117,6 +117,68 @@ applies to what is stored. Saying so now is cheaper than discovering it later.
 Anything here, or a report of abuse, goes to the address on the
 [contact](/contact) page.
 `,
+  announcements: `---
+description: Helix is the first thing Fusion ships, and this is what it is.
+kicker: Announcements
+lede: Helix is first. It is a design system that ships as custom elements, and it is close.
+path: /announcements
+title: Helix is what comes first
+---
+
+Fusion is five layers, and the top one is the only one anybody can use today.
+So that is the one being finished first: the interface layer, shipped as a
+design system rather than as a framework, because a design system is the part
+of an interface that a company can actually own.
+
+## What it is
+
+Every component is a custom element. Not a React component with a wrapper
+generated for other frameworks, and not a set of primitives a team assembles
+into components themselves. The element is the artifact, and React, Vue and
+Svelte consume the same one.
+
+It arrives in two tiers. The headless tier is behavior with no stylesheet at
+all: state, focus, keyboard, form participation, the accessibility contract.
+The styled tier is those components with a derived visual system on top. A team
+that needs different pixels drops a tier rather than copying a file, which is
+the difference between a fork with a supported destination and a fork nobody is
+assigned to.
+
+## What you get out of it
+
+One brand color goes in and a full palette comes out, and the engine refuses a
+palette it cannot make readable. Contrast stops being an audit somebody
+schedules and becomes a property of the derivation.
+
+Every tag, property and event is in one manifest at a URL, and every page
+answers as Markdown. That was built for agents before it was fashionable to say
+so: the document a model reads is the document a person reads, and there is no
+second, worse copy of the API written for either of them.
+
+It is MIT, in your repository, and it runs whether or not we are still
+involved. That is the whole of the exit test and it is not a marketing line: if
+the answer were no, it would not be a Fusion product.
+
+## What we do around it
+
+Three offers, in the order they usually happen. An audit, two weeks at a fixed
+price, to find out what is worth building at all. A design system sprint, which
+is Helix applied to your product and shipped into your repository rather than
+drawn in a design tool. And a build, for work whose shape is still moving,
+which is most of the work worth doing.
+
+[What each one involves](/services) is written out, including what you keep at
+the end of it.
+
+## What comes after
+
+Cortex, which is the layer under this one: memory and provenance, so what a
+company knows is an asset it holds rather than something rented back to it a
+quarter at a time. It is real work with nothing shipped, and it will appear here
+when that stops being true.
+
+Nothing on this page is a forecast.
+`,
   'helix-ships-as-one-open-tier': `---
 author: Ross Sheppard
 date: 2026-08-18
@@ -295,20 +357,22 @@ Questions, or a request to remove something, go to the address on the
 `,
   services: `---
 appends: services
-description: What we take on, and what it costs.
+description: The interface and intelligence work we take on now, and what you have at the end of it.
 kicker: Services
-lede: 'Everything else on this site is being built. This is the work we take on now: interface and intelligence work the substrates make faster to do well. Three offers, in the order they usually happen. Most start with the audit, which is two weeks at a fixed price, and the rest is scoped from what it finds.'
+lede: Most start with the audit, which is two weeks at a fixed price, and the rest is scoped from what it finds.
 path: /services
-title: The part of this you can buy today
+title: The work we take on now
 ---
 
-## You are not acquiring a dependency
+## What you have at the end
 
-Your repository, your license, your infrastructure. Handover is a condition of
-the work rather than a phase at the end of it, and the architecture decisions
-are written down with their trade-offs rather than just made. If an engagement
-would leave you unable to continue without us on a retainer, it is not one we
-will take.
+Working software in your repository, under your license, running whether or not
+we are still involved. The architecture decisions are written down with their
+trade-offs, so the next person to touch it can see why it is shaped the way it
+is rather than guessing.
+
+Handover is part of the work rather than a phase bolted on at the end of it. You
+get the code, the reasoning and the ability to keep going.
 
 ## Start with the audit
 

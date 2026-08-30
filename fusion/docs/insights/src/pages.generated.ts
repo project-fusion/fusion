@@ -16,6 +16,14 @@ export const generatedPages: SitePage[] = [
     title: 'What you may run here',
   },
   {
+    description: 'Helix is the first thing Fusion ships, and this is what it is.',
+    kicker: 'Announcements',
+    lede: 'Helix is first. It is a design system that ships as custom elements, and it is close.',
+    path: '/announcements',
+    slug: 'announcements',
+    title: 'Helix is what comes first',
+  },
+  {
     description:
       'Three preference keys, no cookies, no analytics, and nothing that identifies you.',
     kicker: 'Privacy',
@@ -25,12 +33,13 @@ export const generatedPages: SitePage[] = [
   },
   {
     appends: 'services',
-    description: 'What we take on, and what it costs.',
+    description:
+      'The interface and intelligence work we take on now, and what you have at the end of it.',
     kicker: 'Services',
-    lede: 'Everything else on this site is being built. This is the work we take on now: interface and intelligence work the substrates make faster to do well. Three offers, in the order they usually happen. Most start with the audit, which is two weeks at a fixed price, and the rest is scoped from what it finds.',
+    lede: 'Most start with the audit, which is two weeks at a fixed price, and the rest is scoped from what it finds.',
     path: '/services',
     slug: 'services',
-    title: 'The part of this you can buy today',
+    title: 'The work we take on now',
   },
   {
     description: 'What we offer, what we do not, and the one clause the sandbox makes specific.',
