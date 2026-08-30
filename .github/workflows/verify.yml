@@ -184,10 +184,16 @@ jobs:
       # misses is one the shard builds itself, exactly as it does today.
       - run: bun run build
       - run: bun run analyze
-      # `turbo run catalog`, which is the spelling `run-checks.mjs` lists as a
-      # prerequisite. There is no root `catalog` script: the rename moved every
-      # generator behind `turbo`, and this job was written before it.
-      - run: turbo run catalog
+      # `bunx`, because `turbo` is a workspace binary and a `run:` step does not
+      # get the PATH `bun run` arranges: bare `turbo` here is exit 127, which is
+      # the same fault `run-checks.mjs` carries a comment about after spawning
+      # it eleven times without one. `bunx biome` below is the existing shape.
+      #
+      # And `turbo run catalog` rather than `bun run catalog`, which is not a
+      # script: the rename moved every generator behind `turbo`, and this job
+      # was written before it. It is the spelling `run-checks.mjs` already lists
+      # as one of its three prerequisites.
+      - run: bunx turbo run catalog
 
   # **Ten shards rather than six, because `warm` changed what a shard costs.**
   # A shard was 31 seconds of setup, a build it paid alone, and its share of the
