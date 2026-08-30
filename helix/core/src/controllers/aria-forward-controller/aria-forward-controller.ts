@@ -116,13 +116,16 @@ export class AriaForwardController implements ReactiveController {
       return
     }
     /* **The record belongs to the element it was written about.** `forwarded`
-       says what this controller put on the control, and a component that
-       re-renders its control produces a new element carrying none of it:
-       `Button` does exactly that whenever `href` swaps an anchor for a button.
-       Kept across the swap, the record claims a value the new element never
-       had, and the clearing branch below then removes an attribute the
-       component wrote itself, which is the fault this whole record exists to
-       prevent, one element later. */
+       says what this controller put on the control. Kept across a replacement,
+       it claims a value the new element never had, and the clearing branches
+       below then take off what the component wrote itself: the fault the record
+       exists to prevent, one element later.
+
+       **No component in this library replaces its control**, which is worth
+       saying because the comment here used to name one. All fifteen consumers
+       resolve to a single fixed part rendered once. `target` is a callback and
+       its contract permits a swap, so a controller in `core` is held to the
+       contract rather than to the fifteen callers it happens to have today. */
     if (target !== this.recorded) {
       this.forwarded.clear()
       this.recorded = target
@@ -187,8 +190,7 @@ export class AriaForwardController implements ReactiveController {
 
   /* After the render that created the control, because there is nothing to
      forward to before it exists. Every update, not only the first: a component
-     that re-renders its control, which `Button` does whenever `href` changes it
-     between an anchor and a button, produces a new element with none of this. */
+     that re-renders its control produces a new element with none of this. */
   hostUpdated(): void {
     this.forward()
   }

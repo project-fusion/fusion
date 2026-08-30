@@ -123,31 +123,6 @@ describe('an id that resolves to nothing', () => {
      element-reference property removes the content attribute rather than merely
      clearing the property, so forwarding nothing described the hint to nobody on
      every form control this reaches. */
-  /* **A replaced control is a new element and the record is about the old one.**
-     `Button` re-renders its control whenever `href` swaps an anchor for a
-     button. Carried across that, the record claims a reference the new element
-     never had, and the clearing branch takes off an attribute the component
-     wrote itself: the exact fault the record exists to prevent, one element
-     later. */
-  test('and a control that was replaced does not inherit the record of the one it replaced', () => {
-    let control = reflecting()
-    const host = document.body.appendChild(document.createElement('span'))
-    document.body.insertAdjacentHTML('afterbegin', '<p id="tip">a tip</p>')
-    Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
-    host.attachShadow({ mode: 'open' }).append(control)
-    host.setAttribute('aria-describedby', 'tip')
-    const forward = new AriaForwardController(host as never, { target: () => control })
-    forward.forward()
-    expect(held(control, 'ariaDescribedByElements')).toEqual(['tip'])
-
-    host.removeAttribute('aria-describedby')
-    const replaced = reflecting()
-    ;(replaced as unknown as Record<string, unknown>).ariaDescribedByElements = [document.body]
-    control = replaced
-    forward.forward()
-    expect(held(replaced, 'ariaDescribedByElements')).toEqual([''])
-  })
-
   test('and a control the host said nothing about keeps what it wrote itself', () => {
     const { control, forward } = scene('')
     ;(control as unknown as Record<string, unknown>).ariaDescribedByElements = [document.body]
@@ -220,9 +195,11 @@ describe('a reference that arrives later', () => {
 })
 
 describe('every update rather than only the first', () => {
-  /* A component that re-renders its control, which `Button` does whenever
-     `href` swaps it between an anchor and a button, produces a new element with
-     none of this on it. */
+  /* A component that re-renders its control produces a new element with none of
+     this on it. Nothing in the library does that today: all fifteen consumers
+     resolve to one fixed part rendered once. It is the `target` contract that
+     permits it, and a controller in `core` is held to its contract rather than
+     to the fifteen callers it happens to have. */
   test('because a re-rendered control is a new element with none of this', () => {
     document.body.innerHTML = '<p id="tip">a tip</p><span aria-describedby="tip"></span>'
     const host = document.body.lastElementChild as HTMLElement
@@ -238,5 +215,31 @@ describe('every update rather than only the first', () => {
     expect(held(control, 'ariaDescribedByElements')).toBeNull()
     forward.hostUpdated()
     expect(held(control, 'ariaDescribedByElements')).toEqual(['tip'])
+  })
+
+  /* **And the record resets with it**, which is the other half and the half with
+     a writer in this library: `button-root.ts` renders `aria-expanded` onto its
+     own `[part="button"]`. Carried across a replacement, the record says this
+     controller put that attribute there, and the clearing branch takes off what
+     the component wrote. The reference branch above shares the record and not
+     the code path, so it does not cover this. */
+  test('and what the last control was told is not remembered against the next', () => {
+    document.body.innerHTML = '<span aria-expanded="true"></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    const root = host.attachShadow({ mode: 'open' })
+    let control = reflecting()
+    root.append(control)
+    const forward = new AriaForwardController(host as never, { target: () => control })
+    forward.hostUpdated()
+    expect(control.getAttribute('aria-expanded')).toBe('true')
+
+    host.removeAttribute('aria-expanded')
+    control.remove()
+    control = reflecting()
+    control.setAttribute('aria-expanded', 'false')
+    root.append(control)
+    forward.hostUpdated()
+    expect(control.getAttribute('aria-expanded')).toBe('false')
   })
 })
