@@ -15,5 +15,8 @@
   ],
   "bin": {
     "helix": "./bin.mjs"
+  },
+  "scripts": {
+    "test": "bun test"
   }
 }

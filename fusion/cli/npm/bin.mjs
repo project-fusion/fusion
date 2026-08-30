@@ -21,8 +21,8 @@
  * which of the four possible causes they have.
  */
 import { spawnSync } from 'node:child_process'
-import { existsSync, statSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { existsSync, realpathSync, statSync } from 'node:fs'
+import { delimiter, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -55,6 +55,58 @@ const built = () =>
 /** Whether cargo is on the path, asked once and cheaply. */
 const hasCargo = () => spawnSync('cargo', ['--version'], { stdio: 'ignore' }).status === 0
 
+/** This file, resolved, which is what the `PATH` entry has to not be. */
+const SELF = realpathSync(fileURLToPath(import.meta.url))
+
+/**
+ * The first `fusion` on `PATH`, resolved through its symlinks, or undefined.
+ *
+ * **Walked rather than spawned, because the spawn is the bug.** Probing with
+ * `spawnSync('fusion', ['--version'])` asks `PATH` to answer, and under
+ * `bun run` the first answer is `node_modules/.bin/fusion`, which is a symlink
+ * to this file: the probe ran this shim, which had no built binary either, so
+ * it probed `PATH` again. Nothing returns and nothing errors, because every
+ * level is waiting on the level below it. Measured on a checkout with no
+ * `target/`: 4,871 node processes before the machine stopped forking.
+ *
+ * `built()` answering first is why this was never seen. Any tree that has run
+ * `cargo build` once takes the branch above and never reaches here, so the
+ * trap is set for a fresh clone, which is what CI and a new contributor both
+ * are.
+ */
+const onPath = () => {
+  const extensions = process.platform === 'win32' ? ['', '.exe', '.cmd', '.bat'] : ['']
+  for (const directory of (process.env.PATH ?? '').split(delimiter)) {
+    if (directory === '') {
+      continue
+    }
+    for (const extension of extensions) {
+      const candidate = join(directory, NAME + extension)
+      if (!existsSync(candidate)) {
+        continue
+      }
+      /* Through the symlink, so `node_modules/.bin/fusion` is recognized as
+         this file rather than as an installed binary that happens to share a
+         name. A path that cannot be resolved is not one to hand to `spawn`. */
+      let real
+      try {
+        real = realpathSync(candidate)
+      } catch {
+        continue
+      }
+      /* Skipped and not given up on: an entry earlier in `PATH` being this file
+         says nothing about a real one later in it, and returning here would
+         make an installed binary invisible whenever a checkout was in front of
+         it. */
+      if (real === SELF) {
+        continue
+      }
+      return real
+    }
+  }
+  return undefined
+}
+
 const run = (binary) => {
   const { status, error } = spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' })
   if (error) {
@@ -69,11 +121,11 @@ if (found && existsSync(found)) {
   run(found)
 }
 
-/* `PATH`, which is what an installed binary looks like. `--version` rather than
-   a bare run, because a bare run of a command line that requires a subcommand
-   exits 2 and would read as absent. */
-if (spawnSync(NAME, ['--version'], { stdio: 'ignore' }).status === 0) {
-  run(NAME)
+/* `PATH`, which is what an installed binary looks like. Resolved rather than
+   probed: see `onPath`, where the probe this used to do is what recursed. */
+const installed = onPath()
+if (installed) {
+  run(installed)
 }
 
 if (!hasCargo()) {

@@ -16,6 +16,9 @@
   "bin": {
     "fusion": "./bin.mjs"
   },
+  "scripts": {
+    "test": "bun test"
+  },
   "publishConfig": {
     "access": "restricted"
   }
