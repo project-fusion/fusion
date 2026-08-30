@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import type { ApiTier } from '@/hooks/use-api-tier/use-api-tier'
+import { forgetSiteTheme, readSiteTheme } from '@/utils/site-theme/site-theme'
 import chrome from '../chrome.module.css'
 
 /* Re-exported, because the preview's theme toolbar writes the same preference
@@ -126,6 +127,20 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
     window.localStorage.setItem(STORAGE_KEY, next)
   }
 
+  /**
+   * Whether there is a theme to offer to forget.
+   *
+   * Read when the drawer opens rather than once on mount: the reader can derive
+   * a palette on the landing page with this drawer closed and open it a moment
+   * later, and a flag read at mount would say there was nothing to reset.
+   */
+  const [themed, setThemed] = useState(false)
+  useEffect(() => {
+    if (open) {
+      setThemed(readSiteTheme() !== null)
+    }
+  }, [open])
+
   const chooseTier = (next: ApiTier) => {
     setTier(next)
     applyTier(next)
@@ -179,6 +194,34 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           <helix-toggle value="headless">Headless</helix-toggle>
           <helix-toggle value="styled">Styled</helix-toggle>
         </helix-toggle-group>
+
+        {/* **Only when there is one, because a reset with nothing to reset is a
+            control that reports the feature rather than offering it.** A reader
+            who has never touched the theme controls should not have to work out
+            what "site theme" means here to conclude it does not concern them.
+
+            **One control for both ways in.** The masthead's preferences button
+            and the mobile menu's Preferences row open this same drawer, so this
+            is the reset in the toolbar and the reset in the mobile menu; a
+            second one in the menu itself would be a second copy of the same
+            state to keep true. */}
+        {themed && (
+          <helix-flex direction="column" gap="2xs">
+            <helix-text variant="label">Site theme</helix-text>
+            <helix-text tone="muted" variant="caption">
+              Every page is wearing the palette you derived.
+            </helix-text>
+            <helix-button
+              emphasis="outlined"
+              onClick={() => {
+                forgetSiteTheme()
+                setThemed(false)
+              }}
+            >
+              Reset to the default palette
+            </helix-button>
+          </helix-flex>
+        )}
       </helix-flex>
     </helix-drawer>
   )
