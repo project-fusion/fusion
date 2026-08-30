@@ -73,6 +73,18 @@ jobs:
       # anyone who can open one against this repository could spend the
       # workspace's budget. The workspace carries a limit for the same reason,
       # `continue-on-error` meaning an overrun here fails invisibly.
+      # **The findings go on the lines they are about, not in one comment.**
+      # A summary makes the reader carry a file and a line number back to the
+      # diff for every finding, and the ones that get skipped are the ones that
+      # read as prose rather than as a defect. Anchored, a finding is next to
+      # the code and GitHub resolves it when the line changes, which a comment
+      # cannot do: the reviews on 16, 17 and 19 each carried findings that were
+      # still open days later with nothing marking them.
+      #
+      # **The sticky comment stays** and holds what has no line: progress while
+      # the job runs, the count when it finishes, and the one line that says
+      # nothing survived, which is the common case and wants somewhere to go
+      # that is not five inline comments saying nothing is wrong.
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_federation_rule_id: fdrl_01QpMYFZydwuKsUrQ2YFZtjV
@@ -118,15 +130,43 @@ jobs:
             caught by an existing `check:*` script? Drop everything that does not
             survive. Default to dropping.
 
-            Then post. At most five findings, most serious first. Every one must
-            name a file and line, and give either the rule it breaks or the
-            concrete way it fails: inputs, state, and what goes wrong. No
-            summary of the pull request, no praise, no restating the diff.
+            Then post, as one review with each finding on the line it is
+            about. At most five, most serious first. Every one must give either
+            the rule it breaks or the concrete way it fails: inputs, state, and
+            what goes wrong. No summary of the pull request, no praise, no
+            restating the diff.
+
+            Post it with one call, so the findings arrive together rather than
+            as five notifications:
+
+            gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
+              --method POST --input review.json
+
+            where review.json is {"event": "COMMENT", "body": ..., "comments":
+            [{"path": ..., "line": ..., "side": "RIGHT", "body": ...}]}.
+
+            `line` is the line number in the file as this branch has it, and it
+            has to be a line the diff touches: the API refuses a comment anchored
+            outside it, and refuses the whole review with it, so one bad anchor
+            loses the other four. Check each against the diff before you send,
+            and for a finding whose subject is a line this branch did not touch,
+            which the stale-prose ones often are, put it in the review `body`
+            and say there which file and line it is about. Use `start_line` with
+            `line` where a finding is genuinely about a range.
+
+            The `body` is for what has no single line: the finding that spans
+            files, the check you are proposing, and nothing else. It is not a
+            summary of the review.
 
             If a finding could have been caught deterministically, say so and
             propose the `check:*` script that would catch it, including the
             invariant in one sentence. That is worth more than the finding.
 
-            If nothing survives pass two, reply with exactly one line saying so.
-            Silence is the correct output most of the time and is not a failure
-            to be useful.
+            Your own final message is not the review. Say how many findings you
+            posted and stop: it lands in the sticky comment above the diff, and
+            repeating there what is already on the lines is the summary this
+            asks you to stop writing.
+
+            If nothing survives pass two, post no review and reply with exactly
+            one line saying so. Silence is the correct output most of the time
+            and is not a failure to be useful.
