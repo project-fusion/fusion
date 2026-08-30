@@ -53,9 +53,9 @@ export interface ThemeEngine {
   /**
    * Reads a hex color into its OKLCH components.
    *
-   * @throws when the string is not a hex color. **The TypeScript engine
-   * returned a `NaN` triple**, which every comparison is false against, so a
-   * color that could not be read traveled onward looking like one.
+   * @throws when the string is not a hex color. Returning a `NaN` triple
+   * instead is worse: every comparison against it is false, so a color that
+   * could not be read travels onward looking like one.
    */
   hexToOklch(hex: string): Oklch
 }

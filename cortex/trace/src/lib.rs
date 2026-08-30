@@ -60,9 +60,10 @@ impl Node {
 
 /// An in-memory provenance graph.
 ///
-/// The storage-backed implementations (`SQLite` and `Postgres`) hold the same shape
-/// behind a trait; this one is the reference used by tests and by the local
-/// tier before a store is attached.
+/// The only implementation today, and the reference for the storage-backed ones
+/// to come. `SQLite` and `Postgres` must both match it behind a trait: an
+/// abstraction with one implementation is a guess, and `SQLite` assumptions
+/// otherwise leak into the domain model.
 #[derive(Clone, Debug, Default)]
 pub struct Graph {
     /// Reverse index: node -> nodes that derive from it. Maintained on insert
@@ -113,10 +114,9 @@ impl Graph {
     ///
     /// This is the query the product rests on. "Why did the system say that?"
     ///
-    /// Breadth-first is load-bearing rather than incidental. The answer is read
-    /// by a person asking why an output happened, and its first entries should
-    /// be the immediate causes. A depth-first walk surfaces one arbitrary
-    /// ancestor chain to its root before mentioning the sibling that mattered.
+    /// Breadth-first is load-bearing: the first entries must be the immediate
+    /// causes. A depth-first walk surfaces one arbitrary ancestor chain to its
+    /// root before mentioning the sibling that mattered.
     ///
     /// ```
     /// use fusion_cortex_trace::{Graph, Node, NodeKind};
@@ -155,9 +155,6 @@ impl Graph {
     /// Returns the ids removed. Deleting a memory must also remove the
     /// summaries, embeddings, and outputs computed from it, or "delete" is a
     /// promise the system cannot keep.
-    ///
-    /// The setup here is hidden because the point is the cascade rather than the
-    /// graph: rustdoc runs every line and shows only the ones a reader needs.
     ///
     /// ```
     /// # use fusion_cortex_trace::{Graph, Node, NodeKind};

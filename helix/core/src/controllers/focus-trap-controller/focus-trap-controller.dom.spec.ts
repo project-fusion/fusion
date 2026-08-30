@@ -10,13 +10,12 @@ import { FocusTrapController } from './focus-trap-controller.js'
  * release matters as much: without it, closing a drawer drops them at the top
  * of the document.
  *
- * **The bug worth holding on to is the one about hosts.** `focusableElements`
- * returns hosts, so a `helix-button` delegating focus is what the list holds
- * while `deepActiveElement` returns the `<button>` in its shadow root. Those are
- * never equal and the container never `contains` the second, so an identity
- * check read "outside the trap" on every element: shift-Tab jumped to the last
- * item from anywhere and forward Tab never wrapped at all. A trap that leaks in
- * one direction and cannot be walked backwards in the other.
+ * **The trap is hosts.** `focusableElements` returns hosts, so a `helix-button`
+ * delegating focus is what the list holds while `deepActiveElement` returns the
+ * `<button>` in its shadow root. Those are never equal and the container never
+ * `contains` the second, so an identity check reads "outside the trap" on every
+ * element: shift-Tab jumps to the last item from anywhere and forward Tab never
+ * wraps at all.
  */
 beforeAll(() => {
   registerDom()
@@ -26,10 +25,10 @@ beforeAll(() => {
 const host = () => ({ addController: () => {} }) as never
 
 /* Released whatever the test did, because `activate` puts a capturing listener
-   on the *document* and a test that fails before its own `deactivate` would
-   leave it there, trapping every test after it against a container that is no
-   longer on the page. That happened while writing this: one real failure
-   produced a second, and the second said nothing about the code. */
+   on the *document* and a test that fails before its own `deactivate` leaves it
+   there, trapping every test after it against a container that is no longer on
+   the page: one real failure then produces a second that says nothing about the
+   code. */
 let live: FocusTrapController | undefined
 afterEach(() => {
   live?.deactivate()
@@ -108,9 +107,9 @@ describe('focus that is outside the trap entirely', () => {
 })
 
 describe('a container holding an element that delegates focus', () => {
-  /* The regression above, as the thing that produced it: the list holds the
-     host and the active element is the control in its shadow root, so an
-     identity check sees every element as outside. */
+  /* The case the JSDoc above is about: the list holds the host and the active
+     element is the control in its shadow root, so an identity check sees every
+     element as outside. */
   test('knows the host holds focus even though the shadow control has it', () => {
     const { container, trap } = scene('<div id="a"></div><button id="b">b</button>')
     const delegating = document.getElementById('a') as HTMLElement

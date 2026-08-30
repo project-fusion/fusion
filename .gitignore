@@ -42,25 +42,47 @@ sandbox/ui/dist/
 .env*
 
 # Generated vision film. Recapture with `bun tooling/scripts/capture-scale-film.mjs`.
-site/ui/public/media/sovereignty.jpg
-site/ui/public/media/sovereignty.webm
+fusion/site/public/media/sovereignty.jpg
+fusion/site/public/media/sovereignty.webm
 
 # Generated icon set, built from raw/.
 helix/icons/src/generated.ts
 
+# **What `cem analyze` writes, which is machine-read and nothing else.** Four
+# files per tier, nine megabytes between them, and 331,308 added lines in the
+# fortnight before they were untracked. Nobody reads a manifest in a diff.
+#
+# **What committing them bought was a check, and the check survives them.**
+# `verify.yml` runs the generators and then `git diff --exit-code`, so a tracked
+# artifact that no longer matched its source failed there. Untracked, it cannot
+# fail that way because it cannot be stale: every consumer builds it. The
+# reviewable half moves to `fusion/docs/references/component-reference.md`,
+# which is derived from these, is committed, is sorted, and is 391K rather than
+# nine megabytes.
+#
+# **The cost is that `analyze` is now on the critical path of packing.** The
+# release workflows run it between `build` and the pack for that reason: `files`
+# names these, and a tarball missing a file its manifest promises is the failure
+# this trades for. `turbo.json` declares all four as outputs of `analyze`, which
+# is what makes a cache hit restore them rather than leave a gap.
+custom-elements.json
+jsx.d.ts
+svelte.d.ts
+vue.d.ts
+
 # Dev server output, kept apart from the cached `.next` build.
 .next-dev/
 
-# Spec bundles for the sandbox, built from the spec files by `bun run specs`.
+# Spec bundles for the sandbox, built from the spec files by `turbo run specs`.
 # Event probes, written by the `specs` step of `bun run dev`. Generated like
 # `public/specs` beside it, and ignored for the same reason: `biome ci` lints
 # what it can see, and a generated page failing lint fails the push.
-site/ui/public/probe-events/
+fusion/site/public/probe-events/
 
-site/ui/public/specs
+fusion/site/public/specs
 
-# The sandbox preview document, built from source by `bun run frame`.
-site/ui/public/sandbox
+# The sandbox preview document, built from source by `turbo run frame`.
+fusion/site/public/sandbox
 
 # Scratch pages written by hand to look at a composition in a real browser, and
 # served by the dev server because the sandbox preview cannot be: the in-app
@@ -71,9 +93,9 @@ site/ui/public/sandbox
 # see, and a scratch page failing format fails the push, which is what happened
 # when a `git add -A` swept one up mid-session. The commit that added this entry
 # read that as the parity harness's build and said so; it is not, and
-# `check:visual-parity` builds to `.local/parity`, as that commit's own message
+# `check:spec:visual-parity` builds to `.local/parity`, as that commit's own message
 # conceded it had not established.
-site/ui/public/check
+fusion/site/public/check
 
 # Worktrees an agent made for isolation. A second checkout of this repo, so
 # tracking it would track everything twice and linting it collides with this
@@ -81,13 +103,13 @@ site/ui/public/check
 .claude/worktrees/
 
 # Measurement scratch: pages written to probe layout and paint, never shipped.
-site/ui/public/.probe/
+fusion/site/public/.probe/
 
 # The visual lab: pages generated from a component's own source so a drawing can
 # be measured with real fonts and real tokens. Served by the dev server, which is
 # why it sits under public, and regenerated on demand, which is why it is never
 # committed.
-site/ui/public/_lab/
+fusion/site/public/_lab/
 
 # The artifact a failed visual comparison leaves behind, marked with the pixels
 # that moved. What belongs in the history is the baseline a reviewer approved,
@@ -95,23 +117,25 @@ site/ui/public/_lab/
 *.diff.png
 *.parity.png
 
-# Derived from the manifests and the example files by `bun run catalog`.
-site/ui/content/catalog/catalog.generated.json
-site/ui/public/helix/components/
-site/ui/public/helix/docs/
-site/ui/public/helix/*.md
-site/ui/public/*.md
-site/ui/public/insights/
-# **The wasm is tracked, and it is the only binary here that is.** Every other
-# generated artifact in this repository is committed and held to its generator by
-# a check: `custom-elements.json`, `tokens.css`, `jsx.d.ts`. This one was ignored
+# Derived from the manifests and the example files by `turbo run catalog`.
+fusion/site/content/catalog/catalog.generated.json
+fusion/site/public/helix/components/
+fusion/site/public/helix/docs/
+fusion/site/public/helix/*.md
+fusion/site/public/*.md
+fusion/site/public/insights/
+# **The wasm is tracked, and it is the only binary here that is.** The generated
+# artifacts that stay committed are the ones somebody reads — the two reference
+# pages, the metrics table, `tokens.css` — and they are held to their generators
+# by `verify.yml` running them and then `git diff --exit-code`. This one was
+# ignored
 # instead, which put a Rust toolchain on the critical path of anything that
 # builds the site. CI could be given one. Vercel's build image cannot, and the
 # site reads `public/helix/theme.wasm` from disk at build time, so a deploy that
 # has to compile Rust first is a deploy that fails on a platform we do not
 # control. Tracked, it is 419K that nothing has to rebuild.
 #
-# `check:wasm` is what keeps it honest, and it reads this artifact rather than
+# `turbo run wasm-check` is what keeps it honest, and it reads this artifact rather than
 # building a fresh one first, so the file measured is the file that ships. It
 # derives all seventeen themes through the tracked binary and holds them to
 # `oracle.json`, which carries them as the TypeScript derives them. `cargo test`

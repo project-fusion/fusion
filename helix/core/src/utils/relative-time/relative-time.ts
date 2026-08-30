@@ -77,12 +77,11 @@ export const relativeTime = (locale: string): ((from: Date, now: Date) => Relati
        nothing: nobody acts differently at seven seconds than at four. */
     const size = Math.abs(elapsed)
     if (size < 60_000) {
-      /* Floored, which `Relative.next` has always said this is and this branch
-         alone was not: at 59,999 milliseconds the remainder is one, so a caller
-         is re-armed inside the callback that fired it. Nothing had noticed
-         because both readers go through the shared ticker, whose own
-         `Math.max(1000, ...)` was absorbing it; a caller scheduling for itself
-         would have had the busy loop the type promised it would not. */
+      /* Floored, as `Relative.next` says every branch is: at 59,999
+         milliseconds the remainder is one, so a caller scheduling for itself is
+         re-armed inside the callback that fired it. The shared ticker's own
+         `Math.max(1000, ...)` hides this from the two readers that go through
+         it. */
       return { next: Math.max(1000, 60_000 - size), text: found.format(0, 'second') }
     }
 

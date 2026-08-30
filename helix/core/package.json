@@ -27,8 +27,8 @@
   "scripts": {
     "analyze": "cem analyze --config custom-elements-manifest.config.ts",
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "bun test src"
+    "test": "bun test src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {

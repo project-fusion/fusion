@@ -5,12 +5,11 @@ import { PopoverController } from './popover-controller.js'
 /**
  * A surface that floats against something, in the top layer, until dismissed.
  *
- * Three things always travel together and were written out longhand three
- * times: the popover API, a `FloatingController` and a `DismissController`.
- * Each is small, which is exactly why the copies drifted rather than being
- * noticed. `Select` never called `showPopover` at all, so its list was an
- * ordinary positioned panel that any ancestor with `overflow: hidden` clipped,
- * while a menu two folders away in the same position was not.
+ * Three things always travel together: the popover API, a `FloatingController`
+ * and a `DismissController`. Each is small, which is exactly why copies of them
+ * drift without being noticed. `Select` never called `showPopover` at all, so
+ * its list was an ordinary positioned panel that any ancestor with
+ * `overflow: hidden` clipped, while a menu in the same position was not.
  *
  * **happy-dom implements neither `showPopover` nor `hidePopover`**, which makes
  * the degraded path the one that runs by default here: a browser without the
@@ -57,9 +56,7 @@ const scene = (
       showPopover: () => made.asked.push('show'),
     })
   }
-  /* Recorded so the order can be asserted: measuring an element that is still
-     `display: none` gives zeroes, so a surface positioned before it is shown
-     lands at the origin and slides into place on the next frame. */
+  /* Recorded so the order the two halves run in can be asserted. */
   const real = anchor.getBoundingClientRect.bind(anchor)
   anchor.getBoundingClientRect = () => {
     made.asked.push('measure')
@@ -135,8 +132,7 @@ describe('a surface that is not one', () => {
 
 describe('a browser without the popover API', () => {
   /* Feature-detected rather than assumed: a browser without it should still get
-     a positioned panel, which is what every one of these was before the API
-     existed. Worse, because it can be clipped, and not broken. */
+     a positioned panel, worse because it can be clipped and not broken. */
   test('still gets a positioned panel that dismisses', () => {
     const one = scene({ api: false, attribute: false })
     one.popover.show()

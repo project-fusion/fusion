@@ -16,19 +16,18 @@ const column = async (attributes = ''): Promise<Column> =>
 /**
  * One column, and the contract that is the column's rather than the table's.
  *
- * **The table already proves that the tracks add up**, which is what the column
- * replaced a `columns` string to fix: the column is named 14 times in this
- * family's specs. What the column owns alone is the track it contributes when
- * nobody said, and that default is not a detail: it decides whether a table with
- * more content than room destroys its values or scrolls.
+ * **The table already proves that the tracks add up.** What the column owns
+ * alone is the track it contributes when nobody said, and that default is not a
+ * detail: it decides whether a table with more content than room destroys its
+ * values or scrolls.
  */
 describe('one table column', () => {
-  /* The floor is `max-content` and was `0`. A zero floor lets a track shrink
-     under its own content, which at 375 squeezed three columns to 75px and
-     wrapped `eu-central-1` across lines. `min-content` was not enough, a hyphen
-     being a wrap opportunity, so the value still broke. The table scrolls its own
-     box now, so a column asks for its longest cell and the overflow has somewhere
-     to go. */
+  /* The floor is `max-content`, and neither smaller value works. A zero floor
+     lets a track shrink under its own content, which at 375 squeezed three
+     columns to 75px and wrapped `eu-central-1` across lines; `min-content` still
+     breaks the value, a hyphen being a wrap opportunity. The table scrolls its
+     own box, so a column asks for its longest cell and the overflow has
+     somewhere to go. */
   test('grows to fit its longest cell rather than shrinking under it', async () => {
     expect((await column()).track).toBe('minmax(max-content, 1fr)')
   })

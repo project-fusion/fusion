@@ -7,14 +7,14 @@ import { DismissController } from './dismiss-controller.js'
  *
  * Both, because they are different intentions with the same meaning: Escape is
  * the keyboard's way out and clicking away is the pointer's, and an overlay
- * honouring only one is one half its readers cannot dismiss.
+ * honoring only one is one half its readers cannot dismiss.
  *
  * **The case worth the most here is two overlays open at once.** Every one of
  * them listens on `document`, so they are siblings on a single node and the
  * only ordering is registration, which is the order they *opened* rather than
  * the order they are nested in. `stopPropagation` stops an event reaching
- * ancestors and does nothing between siblings, so one Escape ran all of them
- * under a comment claiming the innermost was the one the reader meant.
+ * ancestors and does nothing between siblings, so without a depth to compare
+ * one Escape closes every open overlay rather than the innermost.
  */
 beforeAll(() => {
   registerDom()
@@ -246,6 +246,37 @@ describe('a press inside a frame', () => {
     one.dismiss.activate()
     focused(null)
     await blur()
+    expect(one.asked).toBe(0)
+  })
+
+  /* **Focus is not the only signal, because in WebKit there is no focus to
+     read.** A press in a frame moves focus into it in Chromium; in WebKit it
+     moves nothing and blurs nothing, so an overlay watching only for that can
+     never be dismissed by pressing what is inside the frame. Where the frame is
+     same-origin its document can be listened to directly, which is what these
+     two cover. */
+  test('is heard from inside a same-origin frame, with no focus moving at all', () => {
+    document.body.innerHTML = ''
+    const one = overlay()
+    const frame = document.createElement('iframe')
+    document.body.append(frame)
+    one.dismiss.activate()
+    const inner = frame.contentDocument as Document
+    pointerAt(inner.body ?? inner)
+    expect(one.asked).toBe(1)
+  })
+
+  /* Released with the overlay, or the frame goes on answering for a menu that
+     closed and dismisses whatever opened after it. */
+  test('and not after the overlay has closed', () => {
+    document.body.innerHTML = ''
+    const one = overlay()
+    const frame = document.createElement('iframe')
+    document.body.append(frame)
+    one.dismiss.activate()
+    const inner = frame.contentDocument as Document
+    one.dismiss.deactivate()
+    pointerAt(inner.body ?? inner)
     expect(one.asked).toBe(0)
   })
 

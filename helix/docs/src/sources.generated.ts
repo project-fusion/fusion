@@ -1,6 +1,6 @@
 /**
- * Every page's MDX, inlined by `bun run docs`. Do not edit: the files in
- * `content/` are the source, and `bun run check:docs` fails when this module
+ * Every page's MDX, inlined by `turbo run docs`. Do not edit: the files in
+ * `content/` are the source, and `turbo run docs -- --check` fails when this module
  * and they disagree.
  */
 export const docSources: Record<string, string> = {
@@ -213,11 +213,11 @@ report we want, and it is not one we would have caught.
 | Custom elements and shadow DOM | Everything |
 | \`ElementInternals\` | Form participation, and ARIA that has to cross a shadow boundary |
 | Popover API | Every overlay: menu, tooltip, select, combobox, dialog |
-| \`light-dark()\` | 761 declarations, 135 of them in the token layer |
+| \`light-dark()\` | 156 declarations in the shipped stylesheets, 71 of them in the token layer |
 | \`oklch()\` | Every color in the system |
 | \`:has()\` | 11 rules, mostly relational styling of slotted content |
 | \`@starting-style\` | Entry transitions on overlays |
-| \`:state()\` | Every boolean state the library publishes: \`open\`, \`checked\`, \`selected\`, \`invalid\`, \`read\`, \`has-label\`, \`settled\`, \`empty\` |
+| \`:state()\` | Every boolean state the library publishes: \`open\`, \`checked\`, \`selected\`, \`invalid\`, \`read\`, \`has-label\`, \`settled\`, \`empty\`, \`controls\` |
 | \`CSS.highlights\` | Filter-match highlighting, in \`Command\` and \`Combobox\` |
 
 Positioning is \`@floating-ui/dom\` rather than CSS anchor positioning, which is a
@@ -266,6 +266,150 @@ If you need to support something older, the honest answer is the base layer:
 \`@fusion.dev/helix-styles\` is plain CSS with no JavaScript, and a page built from its
 recipes works considerably further back than the components do.
 See [Without a bundler](./without-a-bundler).
+`,
+  'building-on-the-headless-tier': `---
+description: Using the headless tier as the foundation for a design system of your own.
+section: Essentials
+title: Building on the headless tier
+---
+
+# Building on the headless tier
+
+The headless tier is a set of components with no stylesheet: structure, ARIA,
+keyboard behavior, state and form participation, and nothing about how any of it
+looks. That makes it usable as a foundation rather than as a library you consume
+whole. Your tags, your stylesheets, our accessibility.
+
+This is a different thing from theming Helix. Theming keeps our components and
+changes their tokens. This keeps our behavior and replaces the presentation
+layer outright, under names of your own.
+
+## One line does it
+
+Every headless component renders its children by interpolating a tag rather than
+naming one, and the prefix comes from a static on the class:
+
+\`\`\`ts
+import { HelixHeadlessCombobox } from '@fusion.dev/helix-headless/combobox'
+
+export class AcmeCombobox extends HelixHeadlessCombobox {
+  static override tier = 'acme-'
+}
+
+customElements.define('acme-combobox', AcmeCombobox)
+\`\`\`
+
+That is the whole mechanism, and it is the same one the styled tier uses: it
+writes \`static override tier = 'helix-'\` and nothing else. The static appears 116
+times in the headless manifest, so it is discoverable rather than folklore.
+
+## The render graph is the part that will catch you
+
+**A component that renders another gives you two things to register, and only
+one of them is obvious.** Twenty-two of the 88 headless families interpolate
+another family's tag, across 89 call sites and seventeen distinct children.
+
+Register \`acme-combobox\` without also registering \`acme-listbox\` and the panel
+renders a tag nobody defined. That is not an error and not a warning: an
+unregistered custom element is an inert, unstyled inline box, so what you see is
+a combobox that appears not to open.
+
+| Family | Renders |
+|---|---|
+| \`bar-chart\`, \`donut-chart\`, \`heatmap\`, \`line-chart\` | \`tooltip\` |
+| \`code-block\` | \`copy-button\` |
+| \`color-input\` | \`color-picker\` |
+| \`color-picker\` | \`button\`, \`button-group\`, \`slider\` |
+| \`combobox\` | \`listbox\`, \`tag\` |
+| \`command\` | \`dialog\`, \`listbox\` |
+| \`copy-button\` | \`tooltip\` |
+| \`data-table\` | \`pagination\` |
+| \`date-input\` | \`date-picker\`, \`tag\` |
+| \`file-input\` | \`tag\` |
+| \`notifications\` | \`format-date\` |
+| \`pagination\` | \`option\`, \`select\` |
+| \`select\` | \`listbox\` |
+| \`steps\`, \`tour\` | \`button\` |
+| \`time-input\` | \`tag\`, \`time-picker\` |
+| \`time-picker\` | \`listbox\`, \`option\` |
+| \`video\`, \`video-playlist\` | \`menu\`, \`menu-item\` |
+
+The safe rule is to subclass and register a family together with everything it
+renders, transitively: \`command\` reaches \`dialog\` and \`listbox\`, and \`listbox\`
+reaches \`option\`.
+
+**This table is maintained by hand today and should not be.** The graph is
+already computed inside this repository, by the check that stops us shipping the
+same fault, and it is thrown away afterward rather than written to the manifest.
+Until it is published, treat the table above as the version that can go stale.
+
+## What you have to supply yourself
+
+**A \`:not(:defined)\` guard.** \`@fusion.dev/helix\` ships an \`elements.css\` that
+hides each of its tags until the definition lands, so a page does not show a run
+of unstyled text and then snap. The headless package ships no such file, and
+nothing can generate one for tags you have not named yet. Write the rule for
+your own elements:
+
+\`\`\`css
+acme-combobox:not(:defined),
+acme-listbox:not(:defined) {
+  visibility: hidden;
+}
+\`\`\`
+
+Visibility rather than \`display\`, so the page does not reflow when the
+definitions arrive.
+
+**Your own typings.** The generated \`jsx.d.ts\`, \`vue.d.ts\` and \`svelte.d.ts\`
+carry our tag names. For yours, merge each element into the tag map:
+
+\`\`\`ts
+declare global {
+  interface HTMLElementTagNameMap {
+    'acme-combobox': AcmeCombobox
+  }
+}
+\`\`\`
+
+Per element, by hand. There is no generated version of this for consumer names.
+
+## What you get without asking
+
+**Tree-shaking is honest.** \`@fusion.dev/helix-headless\` declares
+\`sideEffects: ["./dist/**/*.js"]\`, which is true rather than convenient: the
+modules register elements on import, so a bundler that believed otherwise would
+drop a registration and leave you debugging a tag that does not upgrade.
+
+**A styling surface that is documented.** Every part carries an \`@csspart\`, so
+\`::part()\` is a published door rather than a shadow tree you have to guess at.
+That is what makes replacing the presentation layer tractable: you are writing
+against named parts, not against our internals.
+
+**Composition stays ours.** Focus management, typeahead, the roving tab stop,
+form participation and validity all live below the tier you are replacing, so
+they keep working under your names.
+
+## What is not promised yet
+
+\`tier\` is an implementation detail that happens to be visible in the manifest.
+Using it the way this page describes turns it into API with a stability contract
+attached, and that contract is not written. Treat this as a supported pattern
+that is not yet a versioned promise, and pin your Helix version.
+
+## How this differs from white-labeling
+
+Two different customers get confused for each other here. This page is for the
+one building a design system on top of ours and content for our tags to sit
+beside theirs. The other wants Helix shipped under their name with ours absent,
+which is a different and more expensive mechanism: rewriting the tag literals at
+build time, a second distribution to publish, and an artifact per customer.
+Nothing on this page needs any of that.
+
+The sovereignty question answers itself in this direction. You hold the
+presentation layer, the tags and the build. If Fusion stopped tomorrow you would
+keep a working design system and lose upstream fixes to the behavior underneath
+it.
 `,
   charting: `---
 description: The data channel nobody expects, and why it is a real table.
@@ -321,18 +465,14 @@ Hide the table visually if it should not be seen, and the data is still there:
 The caption becomes the chart's accessible name unless you set \`label\`, which is
 usually the right words and is already written.
 
-## Series colours
+## Series colors
 
 Twenty-four \`--helix-color-series-*\` tokens, in order. A chart with three series
 uses the first three. They are ordered to stay distinguishable in that order
 rather than to look good as a full set of twenty-four.
 
-The palette wraps, and where it wraps is one number in one place. It used to be
-four: four families held the same \`const PALETTE = 24\` and the legend held a
-fifth, so when the palette went from eight to twenty-four one of them was missed
-and drew every ninth series in the first color while the legend beside it named
-the ninth correctly. A number two files have to agree on is a number that will
-stop agreeing.
+The palette wraps, and where it wraps is one number in one place, so a chart and
+the legend beside it can never disagree about which color a series is.
 
 **A chart's mark carries its own series color as a custom property**, because a
 chart knows which series a bar belongs to and CSS cannot count it. That is what
@@ -345,7 +485,7 @@ lets you restyle a series from outside without knowing the drawing order.
 <helix-bar-chart for="revenue"></helix-bar-chart>
 \`\`\`
 
-The legend reads the same table, so the names and the colours cannot disagree
+The legend reads the same table, so the names and the colors cannot disagree
 with the chart's. Pointing them at two different tables is the only way to make
 them disagree, and it is not something to do by accident.
 
@@ -381,13 +521,9 @@ https://fusion.dev/helix/custom-elements.json
 @fusion.dev/helix/custom-elements.json
 \`\`\`
 
-A URL and a package path, the same file either way. **The URL exists because this
-page's own argument required it**: an agent that found the library through
-\`llms.txt\` has this site and no checkout, and a specifier is reachable from a
-\`node_modules\` and from nowhere else. It was only the specifier until 24 Aug 2026,
-and the specifier did not resolve either: \`exports\` carried a \`./*\` pattern
-pointing at \`./dist/*/index.js\`, so the path two pages recommended was one
-\`require.resolve\` refused.
+A URL and a package path, the same file either way. **Both exist because a
+specifier is reachable from a \`node_modules\` and from nowhere else**, and an
+agent that found the library through \`llms.txt\` has this site and no checkout.
 
 Every element, every property with its literal type union, every event with its
 class, every slot, every part, every custom property. It is what the framework
@@ -425,13 +561,13 @@ These are the difference between code that looks right and code that passes:
 
 | Rule | Check |
 |---|---|
-| A dispatched event must be declared | \`check:events\` |
-| A documented part must be rendered | \`check:parts\` |
-| A documented CSS hook must be read | \`check:hooks\` |
-| A visual property draws from its axis | \`check:axes\` |
-| A form control styles with \`:disabled\` | \`check:disabled\` |
-| A component that animates answers reduced motion | \`check:motion\` |
-| No component reads a primitive token | \`check:tokens\` |
+| A dispatched event must be declared | \`helix component --only events\` |
+| A documented part must be rendered | \`helix component\`'s \`parts\` |
+| A documented CSS hook must be read | \`helix component --only hooks\` |
+| A visual property draws from its axis | \`helix component\`'s \`axes\` |
+| A form control styles with \`:disabled\` | \`helix component --only disabled\` |
+| A component that animates answers reduced motion | \`helix component --only motion\` |
+| No component reads a primitive token | \`helix component\`'s \`tokens\` |
 
 If you are generating Helix code, the first two are the ones that produce
 working-looking output that is wrong.
@@ -449,8 +585,7 @@ existing.
 
 Start there rather than crawling: one request, and it names every page on the
 site plus the two machine-readable surfaces above. No count here, because a
-number typed into prose is a number that goes stale, which the read of these pages
-on 24 Aug 2026 found five of.
+number typed into prose is a number that goes stale.
 
 ## From a component's page
 
@@ -490,12 +625,9 @@ of a binary you installed, talking to a client you chose, with no network in it.
 page into one file is out of date the moment anything changes, where the links
 in \`llms.txt\` are individually cacheable and individually current.
 
-This page used to offer one anyway, a repository path to a generated document
-holding every family at once, which contradicted the paragraph above it and was
-not a thing a consumer could open: an agent reading the published package has
-this site and no checkout. What it was for is covered better by the two surfaces
-already here. \`llms.txt\` is the index, one request, and each family's \`.md\` is
-the document. Fetch the families you are using.
+What such a file would be for is covered better by the two surfaces already
+here. \`llms.txt\` is the index, one request, and each family's \`.md\` is the
+document. Fetch the families you are using.
 
 **A search index.** The site has one for humans; there is nothing an agent can
 query yet, and \`llms.txt\` plus the documents it names is a smaller thing to read
@@ -509,7 +641,7 @@ title: Color
 
 # Color
 
-Seventy-four of the library's 177 tokens are color, which is most of what a
+Seventy-four of the library's 185 tokens are color, which is most of what a
 theme is. They are roles rather than values: nothing in Helix is named after
 what it looks like, because a name like \`--brand-blue-500\` stops being true the
 moment anybody rethemes.
@@ -584,7 +716,7 @@ pairing a reader has to be able to read.
 /* Yours to read. */
 color: var(--helix-color-foreground-muted);
 
-/* Not yours to read, and \`check:tokens\` fails the build on it. */
+/* Not yours to read, and the \`tokens\` rule fails the build on it. */
 color: var(--_helix-neutral-500);
 \`\`\`
 
@@ -616,9 +748,9 @@ stylesheet, no \`.dark\` class to toggle, and nothing to remember to update twic
 
 Every token is written once, with both halves in a \`light-dark()\`. Which half
 resolves is decided by \`color-scheme\` and nothing else, so the mode is a single
-inherited property and no token is restated to honor it. That is 761
-declarations across the library, 135 of them in the token layer, expressing two
-modes without a second copy of anything.
+inherited property and no token is restated to honor it. That is 156
+declarations across the shipped stylesheets, 71 of them in the token layer,
+expressing two modes without a second copy of anything.
 
 ## Setting the mode
 
@@ -668,7 +800,7 @@ told.
 
 ## What this means for your own CSS
 
-Write \`light-dark()\` for your own colours and set nothing else:
+Write \`light-dark()\` for your own colors and set nothing else:
 
 \`\`\`css
 .callout {
@@ -926,8 +1058,8 @@ Eight tokens describing translucency rather than color:
 | \`--helix-material-blur-sm\` | \`8px\` | The lightest backdrop blur. |
 | \`--helix-material-blur-md\` | \`16px\` | The backdrop blur a modal takes. |
 | \`--helix-material-blur-lg\` | \`32px\` | The heaviest backdrop blur. |
-| \`--helix-material-translucent\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 30%, transparent)\` | The translucent ground, for a surface that admits what is behind it. |
-| \`--helix-material-translucent-strong\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.21 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 88%, transparent)\` | The heavier translucent ground, for one that admits less. |
+| \`--helix-material-translucent\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 30%, transparent)\` | The translucent ground, for a surface that admits what is behind it. |
+| \`--helix-material-translucent-strong\` | \`color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 88%, transparent)\` | The heavier translucent ground, for one that admits less. |
 | \`--helix-material-border\` | \`light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent), color-mix(in oklab, oklch(1 0 0) 12%, transparent))\` | The edge a translucent surface needs to have any at all. |
 
 [//]: # (/tokens)
@@ -1053,7 +1185,7 @@ dispatch, so an event you can listen for is an event that is documented.
 | \`helix-navigate\` | A component is about to navigate |
 | \`helix-copy\` | Something was copied |
 | \`helix-caret\` | The cursor moved in a text control |
-| \`helix-load\`, \`helix-error\`, \`helix-complete\` | Media and async lifecycle |
+| \`helix-complete\` | A control that fills up has filled |
 | \`helix-create\` | A new item was made from a query |
 | \`helix-console\` | The sandbox relaying a log |
 | \`helix-tour-ask\`, \`helix-sample-start\`, \`helix-sample-end\` | Tour and color sampling |
@@ -1170,7 +1302,7 @@ Submitting an empty form blocks and points at the control. \`checkValidity()\`,
 \`reportValidity()\` and \`:invalid\` behave.
 
 **\`feedback\` overrides the message.** Left empty, the browser's own is shown,
-which is localised and familiar; set, it says what you want in the words your
+which is localized and familiar; set, it says what you want in the words your
 product uses:
 
 \`\`\`html
@@ -1199,12 +1331,10 @@ deliberately reports no value of its own.
 </fieldset>
 \`\`\`
 
-That works, and it did not always. The platform tells a form-associated element
-through \`formDisabledCallback\`, which nothing implemented, so a control inside a
-disabled fieldset stayed fully typeable and announced itself as enabled.
-Measured: a \`helix-input\` in one accepted text, reported \`disabled\` as false,
-and carried no \`aria-disabled\`, while the form's entry list correctly left it
-out. Interactive and unsubmittable is the worst of both.
+That works. The platform tells a form-associated element it has been disabled by
+an ancestor through \`formDisabledCallback\`, and every Helix control implements
+it, so a control inside a disabled fieldset refuses input and announces itself
+as off rather than staying typeable and unsubmittable.
 
 **For your own CSS this means one rule.** Style disabled controls with
 \`:disabled\`, never \`[disabled]\`:
@@ -1246,7 +1376,7 @@ returns to, which is usually what a seed in a form means:
 See [State and control](./state-and-control).
 `,
   iconography: `---
-description: 103 glyphs, one geometry, and how to draw one that is not in the set.
+description: 105 glyphs, one geometry, and how to draw one that is not in the set.
 section: Foundations
 title: Iconography
 ---
@@ -1257,10 +1387,12 @@ title: Iconography
 <helix-icon name="trash"></helix-icon>
 \`\`\`
 
-103 glyphs, from Phosphor, drawn on a 256 box at stroke-width 16. That is
+105 glyphs, from Phosphor, drawn on a 256 box at Phosphor's bold weight. That is
 Phosphor's own geometry and it is kept rather than rescaled: normalizing to a 24
 box would change the optical weight of every glyph and stop the set matching
-anything upstream.
+anything upstream. Bold rather than regular, because Phosphor's regular is a
+hairline beside the medium weight this library sets its text in, and an icon
+that reads lighter than the words next to it is the opposite of a mark.
 
 ## Size and color come from the context
 
@@ -1310,21 +1442,22 @@ failure rather than an empty box.
 
 ## Adding one
 
-Drop the SVG into \`helix/icons/raw\` and run \`bun run icons\`. The set is
-generated from those files, so adding a glyph is adding a file rather than
-hand-transcribing a path into a TypeScript object.
+Add the name to \`helix/icons/icons.txt\` and run \`turbo run icons\`. Phosphor names
+resolve from \`@phosphor-icons/core\` at build time, so adding a glyph is adding a
+line rather than hand-transcribing a path into a TypeScript object.
 
-Keep to the same geometry: 256 box, stroke-width 16, no fill. A glyph drawn at a
-different weight is visible immediately when it sits beside one that was not.
+A mark Phosphor does not draw goes into \`helix/icons/raw\` as an SVG under the
+same name, and is read from there when the package has no match. Keep it to the
+same geometry, a 256 box at the bold weight: a glyph drawn at a different weight
+is visible immediately when it sits beside one that was not.
 
 ## Icons this set does not have
 
 Product marks. Helix and Cortex have marks and they live in the icon package,
 but a mark is not an icon: it identifies a product and does not mean an action.
-Three earlier attempts at product marks were removed for being pictograms of a
-metaphor standing beside a parent that is a geometric monogram, and the rule
-that replaced them is that **a mark is one rounded body with material removed**.
-If you are reaching for the icon set to draw a logo, that is the wrong drawer.
+**A mark is one rounded body with material removed**, never a pictogram of a
+metaphor, because the parent it stands beside is a geometric monogram. If you
+are reaching for the icon set to draw a logo, that is the wrong drawer.
 `,
   installation: `---
 description: What to install, the order the stylesheets go in, and how to check it worked.
@@ -1352,8 +1485,7 @@ import '@fusion.dev/helix/helix.css'
 
 One import, and it is four files in the order they have to be in:
 \`primitives.css\`, \`tokens.css\`, \`base.css\`, \`elements.css\`. The order is
-load-bearing and the failure is silent, which these instructions demonstrated
-for longer than anyone would like, so it is stated once inside the package
+load-bearing and the failure is silent, so it is stated once inside the package
 rather than by every consumer.
 
 It resolves \`@fusion.dev/helix-styles\` through this package's own dependency, so
@@ -1369,13 +1501,12 @@ own ramp imports the two they want and skips the bundle.
 - **\`primitives.css\`** is the raw ramp the semantic layer is derived from, and
   it is where the seven \`--helix-seed-*\` knobs are read. Nothing in your own
   code should name a primitive, and leaving the file out is not a way to
-  enforce that: \`tokens.css\` refers to one 235 times, so without it every
+  enforce that: \`tokens.css\` refers to one 297 times, so without it every
   semantic token resolves to nothing at all. Measured on a page missing it,
   \`--helix-color-background\` computes to \`rgba(0, 0, 0, 0)\`, and so does every
   other color. It is also the file [theming](theming.mdx) depends on, since a
-  \`--helix-seed-brand\` nobody reads moves nothing. **This is the one that was
-  missing from this page**, which is why the bundle exists.
-- **\`tokens.css\`** declares the semantic layer, 177 custom properties in 15
+  \`--helix-seed-brand\` nobody reads moves nothing.
+- **\`tokens.css\`** declares the semantic layer, 185 custom properties in 15
   categories, plus \`color-scheme: light dark\` on \`:root\`. Everything below reads
   from it, and it reads primitives.
 - **\`base.css\`** is the element reset, the type scale on bare \`h1\` through
@@ -1592,7 +1723,7 @@ analysis time rather than left to review.
 bun add @fusion.dev/helix @fusion.dev/helix-styles
 \`\`\`
 
-Three imports at your app root, in this order, then the elements are usable
+Two imports at your app root, in this order, then the elements are usable
 anywhere:
 
 \`\`\`ts
@@ -1735,7 +1866,7 @@ title: Metrics
 
 # Metrics
 
-*Generated by \`bun run metrics\` from the built packages. Do not edit: every
+*Generated by \`bun run gen:metrics\` from the built packages. Do not edit: every
 number here is measured, and an edited one is a number nothing produced.*
 
 Bundle size, and what a component costs in time. The two are kept apart on
@@ -1775,7 +1906,7 @@ nobody ever downloads this floor on its own.
 
 | | Raw | Gzip | Brotli |
 |---|---|---|---|
-| Lit and \`@fusion.dev/helix-core\` | 132,935 | 44,397 | 37,891 |
+| Lit and \`@fusion.dev/helix-core\` | 132,556 | 43,973 | 37,477 |
 
 ## Whole packages
 
@@ -1786,11 +1917,11 @@ repository does that. The per-component tables are what a page pays.
 
 | Package | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 132,489 | 43,947 | 37,794 | Element base class, mixins, decorators, floating positioning. |
-| \`@fusion.dev/helix-headless\` | 515,427 | 130,669 | 102,456 | Every headless family, which is what the barrel means. |
-| \`@fusion.dev/helix-icons\` | 46,295 | 14,855 | 12,542 | The whole glyph set. |
-| \`@fusion.dev/helix-theme\` | 3,288 | 1,570 | 1,353 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@fusion.dev/helix\` | 963,466 | 217,845 | 160,111 | Every styled family. |
+| \`@fusion.dev/helix-core\` | 132,110 | 43,511 | 37,337 | Element base class, mixins, decorators, floating positioning. |
+| \`@fusion.dev/helix-headless\` | 515,292 | 130,487 | 102,147 | Every headless family, which is what the barrel means. |
+| \`@fusion.dev/helix-icons\` | 45,300 | 14,268 | 11,940 | The whole glyph set. |
+| \`@fusion.dev/helix-theme\` | 3,288 | 1,571 | 1,355 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
+| \`@fusion.dev/helix\` | 958,543 | 216,018 | 158,296 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1803,25 +1934,25 @@ is the whole cost of adopting the base layer on its own.
 
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| \`base.css\` | 23,050 | 3,528 | 3,024 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
-| \`elements.css\` | 8,336 | 1,905 | 1,614 | The components' own layer, generated from every family's stylesheet. |
+| \`base.css\` | 23,052 | 3,527 | 3,024 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
+| \`elements.css\` | 8,290 | 1,875 | 1,600 | The components' own layer, generated from every family's stylesheet. |
 | \`all.css\` | 179 | 142 | 110 | The three above in one import, in the order they have to be in. |
-| \`primitives.css\` | 6,274 | 1,233 | 1,055 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
-| \`tokens.css\` | 19,583 | 2,412 | 2,014 | The 179 semantic tokens. Nothing paints without this. |
+| \`primitives.css\` | 6,275 | 1,234 | 1,062 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
+| \`tokens.css\` | 19,989 | 2,467 | 2,073 | The 185 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
-**Most of a first component is the runtime under it.** The median styled family is 13,976 bytes gzipped alone and adds 2,474 to a page that already has Helix on it, so 82 percent of the first one is shared and 18 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
+**Most of a first component is the runtime under it.** The median styled family is 13,974 bytes gzipped alone and adds 2,482 to a page that already has Helix on it, so 82 percent of the first one is shared and 18 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`code\` at 9,057 gzipped alone, the dearest \`data-table\` at 49,141, over 93 components. Every family at once is 217,845.
+Across the tier: the cheapest is \`code\` at 9,057 gzipped alone, the dearest \`data-table\` at 49,032, over 93 components. Every family at once is 216,018.
 
-**No family imports a barrel, and \`check:barrels\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs 130,669 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
+**No family imports a barrel, and the \`barrels\` rule in \`fusion workspace\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs 130,487 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
-The headless tier never had the problem, and it is the control: \`@fusion.dev/helix-core\` is \`sideEffects: false\`, and a headless family is a median of 16,083 bytes gzipped alone.
+The headless tier never had the problem, and it is the control: \`@fusion.dev/helix-core\` is \`sideEffects: false\`, and a headless family is a median of 16,143 bytes gzipped alone.
 
 ## Against other systems
 
-Four other libraries of custom elements, pinned and measured on 2026-08-24 by \`bun run metrics:peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run metrics\`**, so the column that could go stale against this repository is the one that cannot.
+Four other libraries of custom elements, pinned and measured on 2026-08-24 by \`turbo run peers\`, which installs them into \`.local\` and bundles them through the harness that produced everything above. **Helix's own rows are measured on every run of \`bun run gen:metrics\`**, so the column that could go stale against this repository is the one that cannot.
 
 **Every system here is built on Lit**, so the runtime under the comparison is the same library in every column and what is left is the components. A React component library is not in the table, because comparing a custom element with a React component measures the framework.
 
@@ -1829,43 +1960,43 @@ Four other libraries of custom elements, pinned and measured on 2026-08-24 by \`
 
 | Component | System | Raw | Gzip | Brotli |
 |---|---|---|---|---|
-| \`button\` | **Helix** | 37,316 | 11,513 | 10,182 |
+| \`button\` | **Helix** | 37,482 | 11,570 | 10,201 |
 | | Carbon | 133,058 | 20,959 | 17,685 |
 | | Material Web | 47,060 | 14,173 | 12,591 |
 | | Shoelace | 62,628 | 18,287 | 15,805 |
 | | Spectrum | 98,792 | 22,045 | 18,674 |
-| \`checkbox\` | **Helix** | 40,872 | 12,578 | 11,068 |
+| \`checkbox\` | **Helix** | 41,026 | 12,625 | 11,135 |
 | | Carbon | 60,255 | 15,609 | 13,550 |
 | | Material Web | 43,785 | 13,556 | 12,015 |
 | | Shoelace | 47,614 | 15,177 | 13,301 |
 | | Spectrum | 62,492 | 15,437 | 13,481 |
-| \`dialog\` | **Helix** | 34,634 | 11,191 | 9,871 |
+| \`dialog\` | **Helix** | 34,636 | 11,185 | 9,860 |
 | | Carbon | 510,866 | 67,390 | 39,189 |
 | | Material Web | 34,238 | 11,510 | 10,229 |
 | | Shoelace | 52,754 | 17,698 | 15,554 |
 | | Spectrum | 155,708 | 31,899 | 26,262 |
-| \`radio\` | **Helix** | 43,716 | 12,868 | 11,346 |
+| \`radio\` | **Helix** | 43,716 | 12,869 | 11,341 |
 | | Carbon | 63,055 | 16,887 | 14,605 |
 | | Material Web | 41,044 | 13,234 | 11,757 |
 | | Shoelace | 34,865 | 12,027 | 10,559 |
 | | Spectrum | 38,685 | 10,660 | 9,370 |
-| \`switch\` | **Helix** | 38,537 | 12,142 | 10,666 |
+| \`switch\` | **Helix** | 38,701 | 12,193 | 10,729 |
 | | Carbon | 69,423 | 17,127 | 14,764 |
 | | Material Web | 50,155 | 14,577 | 12,935 |
 | | Shoelace | 37,833 | 11,814 | 10,568 |
 | | Spectrum | 62,322 | 15,059 | 13,321 |
-| \`tabs\` | **Helix** | 40,414 | 12,371 | 10,894 |
+| \`tabs\` | **Helix** | 40,442 | 12,375 | 10,921 |
 | | Carbon | 578,766 | 73,537 | 43,235 |
 | | Material Web | 38,883 | 12,820 | 11,368 |
 | | Shoelace | 54,573 | 17,140 | 15,068 |
 | | Spectrum | 64,875 | 18,298 | 16,283 |
-| \`tooltip\` | **Helix** | 59,426 | 20,247 | 17,917 |
+| \`tooltip\` | **Helix** | 59,878 | 20,379 | 18,010 |
 | | Carbon | 189,382 | 30,354 | 22,273 |
 | | Material Web | | not shipped | |
 | | Shoelace | 57,412 | 20,220 | 17,933 |
 | | Spectrum | 136,599 | 40,552 | 35,286 |
 
-**Where Helix loses**, which is the half of a comparison table worth reading: \`radio\`, \`switch\`, \`tooltip\`. The largest gap is radio against Spectrum, by 2,208 bytes gzipped. 4 of 28 peer measurements come in under ours.
+**Where Helix loses**, which is the half of a comparison table worth reading: \`radio\`, \`switch\`, \`tooltip\`. The largest gap is radio against Spectrum, by 2,209 bytes gzipped. 4 of 28 peer measurements come in under ours.
 
 - **Carbon** \`@carbon/web-components@2.61.0\`. Its dialog is Modal, its radio is Radio Button, and its switch is Toggle.
 - **Material Web** \`@material/web@2.5.0\`. Ships no tooltip. Its button is measured as the filled one, there being no single button element.
@@ -1876,7 +2007,7 @@ Every specifier measured is in [\`peers.json\`](https://github.com/project-fusio
 
 ## What it costs in time
 
-Measured on 2026-08-26 by \`bun run metrics:timing\`, which drives a real browser against the built packages. The median of 9 runs each, on one machine.
+Measured on 2026-08-26 by \`turbo run timings\`, which drives a real browser against the built packages. The median of 9 runs each, on one machine.
 
 **These never join the comparison above, and that is not a hedge.** Bytes are a fact about a package and can be held against anybody else's. A timing is a fact about a page, a machine and a day, so a column of somebody else's milliseconds would be comparing two laptops rather than two libraries.
 
@@ -1910,94 +2041,94 @@ Structure, accessibility, state and form participation. No presentation, and no 
 
 | Family | Alone raw | Alone gzip | Alone brotli | Added raw | Added gzip | Added brotli |
 |---|---|---|---|---|---|---|
-| \`accordion\` | 76,223 | 25,761 | 21,340 | 3,227 | 1,221 | 780 |
-| \`announcement\` | 74,254 | 25,126 | 20,904 | 1,374 | 682 | 350 |
-| \`app-header\` | 27,483 | 9,331 | 8,226 | 1,306 | 610 | 251 |
-| \`avatar\` | 28,859 | 9,794 | 8,643 | 2,644 | 1,069 | 661 |
-| \`badge\` | 26,919 | 9,246 | 8,148 | 1,120 | 568 | 251 |
-| \`bar-chart\` | 70,690 | 24,230 | 21,377 | 12,138 | 4,122 | 3,078 |
-| \`blockquote\` | 26,839 | 9,232 | 8,140 | 917 | 522 | 257 |
-| \`breadcrumbs\` | 73,875 | 24,790 | 20,711 | 1,955 | 726 | 416 |
-| \`button\` | 31,158 | 10,389 | 9,175 | 3,167 | 1,124 | 809 |
-| \`button-group\` | 26,832 | 9,170 | 8,068 | 661 | 405 | 204 |
-| \`callout\` | 73,005 | 24,653 | 20,548 | 912 | 523 | 271 |
-| \`card\` | 26,866 | 9,186 | 8,102 | 694 | 419 | 145 |
-| \`carousel\` | 79,754 | 26,720 | 22,285 | 7,686 | 2,448 | 1,698 |
-| \`chat\` | 83,713 | 27,957 | 23,221 | 9,449 | 2,828 | 2,160 |
-| \`checkbox\` | 34,492 | 11,126 | 9,843 | 2,252 | 1,008 | 520 |
-| \`checkbox-group\` | 37,392 | 11,749 | 10,393 | 4,655 | 1,632 | 1,028 |
-| \`code\` | 25,451 | 8,754 | 7,715 | 451 | 292 | 197 |
-| \`code-block\` | 111,316 | 37,526 | 31,754 | 12,439 | 3,554 | 2,674 |
-| \`color-input\` | 129,278 | 42,297 | 35,772 | 26,102 | 7,166 | 5,864 |
-| \`color-picker\` | 99,094 | 32,311 | 26,815 | 19,492 | 5,690 | 4,680 |
-| \`combobox\` | 125,336 | 40,785 | 34,496 | 20,361 | 5,532 | 4,277 |
-| \`command\` | 99,183 | 31,859 | 26,261 | 17,134 | 4,871 | 3,810 |
-| \`copy-button\` | 109,996 | 37,255 | 31,541 | 11,120 | 3,301 | 2,388 |
-| \`data-table\` | 141,056 | 44,986 | 37,900 | 36,583 | 9,523 | 7,674 |
-| \`date-input\` | 122,117 | 40,160 | 33,977 | 19,388 | 5,390 | 4,251 |
-| \`date-picker\` | 84,476 | 28,217 | 23,393 | 9,805 | 3,185 | 2,411 |
-| \`dialog\` | 30,301 | 10,183 | 8,978 | 2,534 | 1,082 | 606 |
-| \`divider\` | 27,036 | 9,308 | 8,172 | 1,115 | 596 | 374 |
-| \`donut-chart\` | 66,600 | 22,813 | 20,141 | 9,398 | 3,290 | 2,406 |
-| \`drawer\` | 29,268 | 9,876 | 8,699 | 1,792 | 796 | 496 |
-| \`drilldown\` | 79,507 | 26,788 | 22,064 | 5,059 | 1,765 | 1,150 |
-| \`empty\` | 26,988 | 9,226 | 8,147 | 816 | 472 | 227 |
-| \`file-input\` | 84,086 | 28,154 | 23,166 | 6,219 | 2,205 | 1,516 |
-| \`format-date\` | 30,257 | 10,284 | 9,103 | 2,805 | 972 | 658 |
-| \`heatmap\` | 68,065 | 23,095 | 20,375 | 10,692 | 3,537 | 2,601 |
-| \`icon\` | 72,411 | 24,410 | 20,339 | 850 | 485 | 281 |
-| \`icon-button\` | 31,557 | 10,419 | 9,198 | 3,566 | 1,152 | 762 |
-| \`image\` | 28,816 | 9,694 | 8,539 | 2,969 | 1,059 | 717 |
-| \`input\` | 83,600 | 27,860 | 22,929 | 4,944 | 1,773 | 1,280 |
-| \`kbd\` | 28,236 | 9,743 | 8,582 | 2,427 | 1,131 | 745 |
-| \`legend\` | 29,187 | 10,066 | 8,845 | 1,097 | 600 | 402 |
-| \`line-chart\` | 68,716 | 23,629 | 20,932 | 10,165 | 3,524 | 2,515 |
-| \`list\` | 27,887 | 9,356 | 8,240 | 1,727 | 587 | 364 |
-| \`listbox\` | 91,239 | 30,089 | 24,864 | 10,677 | 3,397 | 2,462 |
-| \`loader\` | 27,072 | 9,293 | 8,182 | 900 | 503 | 230 |
-| \`megamenu\` | 55,170 | 19,330 | 17,098 | 4,934 | 1,742 | 1,198 |
-| \`menu\` | 108,420 | 36,763 | 31,238 | 8,105 | 2,391 | 1,692 |
-| \`meter\` | 29,964 | 10,078 | 8,894 | 3,800 | 1,271 | 889 |
-| \`navigation\` | 28,821 | 9,809 | 8,637 | 1,582 | 720 | 413 |
-| \`notifications\` | 83,706 | 28,017 | 23,156 | 8,640 | 2,592 | 1,834 |
-| \`number-input\` | 85,670 | 28,393 | 23,470 | 7,100 | 2,321 | 1,630 |
-| \`option\` | 28,849 | 9,632 | 8,502 | 2,680 | 894 | 534 |
-| \`outline\` | 31,827 | 10,808 | 9,530 | 4,539 | 1,772 | 1,204 |
-| \`pagination\` | 130,371 | 41,801 | 35,282 | 26,097 | 6,593 | 5,264 |
-| \`pin-input\` | 37,269 | 11,920 | 10,550 | 5,023 | 1,828 | 1,199 |
-| \`popover\` | 52,501 | 18,609 | 16,445 | 2,019 | 872 | 576 |
-| \`progress\` | 28,113 | 9,563 | 8,430 | 1,949 | 787 | 493 |
-| \`qr-code\` | 38,587 | 13,556 | 11,956 | 12,807 | 4,961 | 4,104 |
-| \`quote\` | 26,355 | 9,041 | 7,964 | 552 | 402 | 161 |
-| \`radio\` | 35,977 | 11,448 | 10,083 | 3,138 | 1,166 | 667 |
-| \`rating\` | 38,033 | 12,237 | 10,822 | 5,617 | 2,029 | 1,433 |
-| \`scroll-area\` | 28,463 | 9,741 | 8,560 | 2,610 | 1,105 | 650 |
-| \`select\` | 119,534 | 39,509 | 33,331 | 15,389 | 4,432 | 3,306 |
-| \`skeleton\` | 25,544 | 8,786 | 7,725 | 544 | 354 | 219 |
-| \`slider\` | 37,742 | 12,019 | 10,633 | 5,250 | 1,817 | 1,254 |
-| \`sparkline\` | 31,645 | 11,086 | 9,794 | 2,530 | 1,084 | 876 |
-| \`speed-dial\` | 100,981 | 34,764 | 29,582 | 3,821 | 1,299 | 843 |
-| \`splitter\` | 36,329 | 11,666 | 10,300 | 10,165 | 2,926 | 2,353 |
-| \`stat\` | 27,320 | 9,222 | 8,136 | 1,150 | 458 | 202 |
-| \`steps\` | 81,596 | 27,126 | 22,419 | 6,303 | 1,862 | 1,305 |
-| \`switch\` | 34,160 | 11,058 | 9,766 | 1,798 | 858 | 539 |
-| \`table\` | 31,609 | 10,196 | 9,008 | 4,118 | 1,225 | 837 |
-| \`tabs\` | 33,925 | 11,030 | 9,733 | 4,469 | 1,302 | 806 |
-| \`tag\` | 73,289 | 24,733 | 20,562 | 897 | 492 | 199 |
-| \`textarea\` | 36,847 | 11,696 | 10,315 | 4,115 | 1,416 | 931 |
-| \`time-input\` | 134,174 | 43,284 | 36,557 | 28,643 | 7,663 | 6,155 |
-| \`time-picker\` | 99,260 | 32,521 | 26,869 | 18,154 | 5,510 | 4,230 |
-| \`timeline\` | 73,821 | 24,751 | 20,746 | 1,896 | 685 | 417 |
-| \`toast\` | 77,019 | 25,851 | 21,418 | 4,007 | 1,279 | 984 |
-| \`toggle\` | 38,199 | 12,100 | 10,665 | 3,928 | 1,327 | 971 |
-| \`toolbar\` | 28,734 | 9,827 | 8,655 | 2,932 | 1,258 | 812 |
-| \`tooltip\` | 55,861 | 19,439 | 17,172 | 5,867 | 2,057 | 1,347 |
-| \`tour\` | 61,076 | 20,606 | 18,249 | 10,277 | 2,947 | 2,200 |
-| \`tree\` | 83,288 | 27,803 | 22,913 | 7,069 | 2,379 | 1,585 |
-| \`trend\` | 72,614 | 24,511 | 20,430 | 1,056 | 561 | 324 |
-| \`video\` | 131,870 | 42,504 | 36,162 | 31,304 | 7,764 | 6,557 |
-| \`video-playlist\` | 115,869 | 38,434 | 32,628 | 14,151 | 3,704 | 2,912 |
-| \`virtual-list\` | 29,714 | 10,244 | 9,021 | 2,089 | 965 | 596 |
+| \`accordion\` | 75,228 | 25,133 | 20,668 | 3,227 | 1,258 | 733 |
+| \`announcement\` | 73,259 | 24,505 | 20,223 | 1,374 | 720 | 301 |
+| \`app-header\` | 27,483 | 9,331 | 8,226 | 1,306 | 629 | 194 |
+| \`avatar\` | 28,859 | 9,794 | 8,642 | 2,644 | 1,103 | 603 |
+| \`badge\` | 26,919 | 9,246 | 8,163 | 1,120 | 571 | 248 |
+| \`bar-chart\` | 71,142 | 24,352 | 21,496 | 12,138 | 4,105 | 2,974 |
+| \`blockquote\` | 26,839 | 9,232 | 8,140 | 917 | 513 | 191 |
+| \`breadcrumbs\` | 72,880 | 24,160 | 20,072 | 1,955 | 760 | 306 |
+| \`button\` | 31,312 | 10,445 | 9,216 | 3,167 | 1,168 | 650 |
+| \`button-group\` | 26,832 | 9,170 | 8,068 | 661 | 393 | 147 |
+| \`callout\` | 72,010 | 24,021 | 20,015 | 912 | 523 | 252 |
+| \`card\` | 26,866 | 9,186 | 8,102 | 694 | 403 | 141 |
+| \`carousel\` | 78,759 | 26,085 | 21,622 | 7,686 | 2,448 | 1,659 |
+| \`chat\` | 82,718 | 27,339 | 22,539 | 9,449 | 2,829 | 1,957 |
+| \`checkbox\` | 34,646 | 11,172 | 9,831 | 2,252 | 1,039 | 458 |
+| \`checkbox-group\` | 37,546 | 11,793 | 10,407 | 4,655 | 1,634 | 906 |
+| \`code\` | 25,451 | 8,754 | 7,715 | 451 | 274 | 25 |
+| \`code-block\` | 110,927 | 37,085 | 31,314 | 12,439 | 3,559 | 2,590 |
+| \`color-input\` | 128,853 | 41,841 | 35,289 | 26,066 | 7,175 | 5,794 |
+| \`color-picker\` | 98,253 | 31,760 | 26,202 | 19,492 | 5,724 | 4,529 |
+| \`combobox\` | 124,913 | 40,338 | 33,989 | 20,327 | 5,530 | 4,182 |
+| \`command\` | 98,342 | 31,303 | 25,740 | 17,134 | 4,880 | 3,678 |
+| \`copy-button\` | 109,607 | 36,818 | 31,061 | 11,120 | 3,307 | 2,258 |
+| \`data-table\` | 141,269 | 44,867 | 37,748 | 37,185 | 9,843 | 7,854 |
+| \`date-input\` | 121,728 | 39,735 | 33,589 | 19,388 | 5,395 | 4,274 |
+| \`date-picker\` | 83,481 | 27,583 | 22,761 | 9,805 | 3,172 | 2,309 |
+| \`dialog\` | 30,301 | 10,177 | 8,981 | 2,534 | 1,112 | 570 |
+| \`divider\` | 27,036 | 9,307 | 8,174 | 1,115 | 601 | 194 |
+| \`donut-chart\` | 67,052 | 22,933 | 20,246 | 9,398 | 3,294 | 2,329 |
+| \`drawer\` | 29,268 | 9,874 | 8,685 | 1,792 | 828 | 479 |
+| \`drilldown\` | 78,512 | 26,159 | 21,481 | 5,059 | 1,746 | 1,107 |
+| \`empty\` | 26,988 | 9,226 | 8,147 | 816 | 465 | 191 |
+| \`file-input\` | 83,243 | 27,585 | 22,684 | 6,217 | 2,196 | 1,475 |
+| \`format-date\` | 30,257 | 10,284 | 9,103 | 2,805 | 1,000 | 552 |
+| \`heatmap\` | 68,516 | 23,210 | 20,528 | 10,691 | 3,540 | 2,509 |
+| \`icon\` | 71,416 | 23,777 | 19,718 | 850 | 468 | 137 |
+| \`icon-button\` | 31,711 | 10,475 | 9,230 | 3,566 | 1,194 | 801 |
+| \`image\` | 28,816 | 9,691 | 8,518 | 2,969 | 1,090 | 640 |
+| \`input\` | 82,612 | 27,223 | 22,328 | 4,797 | 1,689 | 1,183 |
+| \`kbd\` | 28,236 | 9,743 | 8,582 | 2,427 | 1,166 | 676 |
+| \`legend\` | 29,187 | 10,066 | 8,845 | 1,097 | 611 | 220 |
+| \`line-chart\` | 69,168 | 23,752 | 20,985 | 10,165 | 3,530 | 2,418 |
+| \`list\` | 27,887 | 9,360 | 8,245 | 1,727 | 597 | 276 |
+| \`listbox\` | 90,398 | 29,545 | 24,215 | 10,677 | 3,428 | 2,362 |
+| \`loader\` | 27,072 | 9,293 | 8,182 | 900 | 498 | 156 |
+| \`megamenu\` | 55,622 | 19,463 | 17,195 | 4,934 | 1,737 | 1,094 |
+| \`menu\` | 107,877 | 36,309 | 30,731 | 8,105 | 2,395 | 1,726 |
+| \`meter\` | 29,964 | 10,079 | 8,879 | 3,800 | 1,301 | 867 |
+| \`navigation\` | 28,831 | 9,815 | 8,680 | 1,582 | 748 | 264 |
+| \`notifications\` | 82,711 | 27,403 | 22,568 | 8,640 | 2,595 | 1,700 |
+| \`number-input\` | 84,829 | 27,821 | 22,797 | 7,100 | 2,321 | 1,519 |
+| \`option\` | 28,849 | 9,639 | 8,506 | 2,680 | 935 | 487 |
+| \`outline\` | 31,837 | 10,811 | 9,517 | 4,539 | 1,767 | 1,041 |
+| \`pagination\` | 129,982 | 41,361 | 34,926 | 26,097 | 6,601 | 5,128 |
+| \`pin-input\` | 37,535 | 12,009 | 10,627 | 5,135 | 1,847 | 1,254 |
+| \`popover\` | 52,919 | 18,732 | 16,527 | 1,985 | 885 | 450 |
+| \`progress\` | 28,113 | 9,566 | 8,450 | 1,949 | 825 | 492 |
+| \`qr-code\` | 38,587 | 13,554 | 11,997 | 12,807 | 4,980 | 4,087 |
+| \`quote\` | 26,355 | 9,041 | 7,964 | 552 | 378 | 66 |
+| \`radio\` | 35,977 | 11,448 | 10,088 | 3,138 | 1,196 | 620 |
+| \`rating\` | 38,033 | 12,238 | 10,784 | 5,617 | 2,027 | 1,355 |
+| \`scroll-area\` | 28,463 | 9,741 | 8,560 | 2,610 | 1,132 | 617 |
+| \`select\` | 119,145 | 39,075 | 32,883 | 15,389 | 4,445 | 3,316 |
+| \`skeleton\` | 25,544 | 8,786 | 7,725 | 544 | 331 | 85 |
+| \`slider\` | 37,896 | 12,065 | 10,659 | 5,250 | 1,808 | 1,319 |
+| \`sparkline\` | 31,645 | 11,088 | 9,794 | 2,530 | 1,123 | 728 |
+| \`speed-dial\` | 100,438 | 34,310 | 29,025 | 3,821 | 1,329 | 732 |
+| \`splitter\` | 36,329 | 11,667 | 10,338 | 10,165 | 2,935 | 2,281 |
+| \`stat\` | 27,320 | 9,222 | 8,136 | 1,150 | 444 | 197 |
+| \`steps\` | 80,755 | 26,561 | 21,920 | 6,303 | 1,844 | 1,255 |
+| \`switch\` | 34,314 | 11,106 | 9,826 | 1,798 | 892 | 347 |
+| \`table\` | 31,609 | 10,201 | 9,002 | 4,118 | 1,267 | 738 |
+| \`tabs\` | 33,935 | 11,035 | 9,722 | 4,469 | 1,332 | 749 |
+| \`tag\` | 72,294 | 24,114 | 19,900 | 897 | 485 | 174 |
+| \`textarea\` | 37,001 | 11,743 | 10,362 | 4,115 | 1,456 | 849 |
+| \`time-input\` | 133,785 | 42,852 | 36,209 | 28,643 | 7,682 | 6,089 |
+| \`time-picker\` | 98,419 | 31,952 | 26,374 | 18,154 | 5,527 | 4,260 |
+| \`timeline\` | 72,826 | 24,117 | 20,017 | 1,896 | 707 | 432 |
+| \`toast\` | 76,024 | 25,222 | 20,781 | 4,007 | 1,307 | 816 |
+| \`toggle\` | 38,209 | 12,101 | 10,670 | 3,928 | 1,359 | 769 |
+| \`toolbar\` | 28,734 | 9,827 | 8,655 | 2,932 | 1,282 | 758 |
+| \`tooltip\` | 56,313 | 19,569 | 17,314 | 5,867 | 2,069 | 1,275 |
+| \`tour\` | 61,682 | 20,788 | 18,404 | 10,277 | 2,947 | 2,071 |
+| \`tree\` | 82,278 | 27,177 | 22,318 | 7,054 | 2,358 | 1,571 |
+| \`trend\` | 71,619 | 23,876 | 19,860 | 1,056 | 557 | 256 |
+| \`video\` | 131,126 | 41,992 | 35,658 | 31,103 | 7,748 | 6,398 |
+| \`video-playlist\` | 115,326 | 37,967 | 32,090 | 14,151 | 3,708 | 2,842 |
+| \`virtual-list\` | 29,714 | 10,244 | 9,021 | 2,089 | 997 | 547 |
 
 ### Styled tier
 
@@ -2005,99 +2136,99 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 
 | Family | Alone raw | Alone gzip | Alone brotli | Added raw | Added gzip | Added brotli |
 |---|---|---|---|---|---|---|
-| \`accordion\` | 79,517 | 26,569 | 21,937 | 6,509 | 2,049 | 1,398 |
-| \`announcement\` | 78,022 | 26,038 | 21,534 | 5,126 | 1,535 | 1,163 |
-| \`app-header\` | 30,778 | 10,123 | 8,920 | 4,584 | 1,375 | 1,009 |
-| \`aura\` | 93,124 | 32,615 | 28,199 | 66,161 | 23,229 | 20,116 |
-| \`avatar\` | 32,433 | 10,538 | 9,282 | 6,205 | 1,797 | 1,333 |
-| \`badge\` | 29,550 | 9,942 | 8,737 | 3,734 | 1,210 | 876 |
-| \`bar-chart\` | 86,443 | 26,997 | 23,803 | 27,871 | 6,945 | 5,399 |
-| \`blockquote\` | 28,015 | 9,529 | 8,383 | 2,077 | 792 | 520 |
-| \`breadcrumbs\` | 77,346 | 25,597 | 21,315 | 5,414 | 1,492 | 1,100 |
-| \`button\` | 37,316 | 11,513 | 10,182 | 9,307 | 2,274 | 1,782 |
-| \`button-group\` | 28,498 | 9,540 | 8,403 | 2,310 | 779 | 512 |
-| \`callout\` | 75,022 | 25,222 | 21,051 | 2,913 | 1,037 | 710 |
-| \`card\` | 30,061 | 9,999 | 8,797 | 3,877 | 1,197 | 894 |
-| \`carousel\` | 88,795 | 28,265 | 23,685 | 16,716 | 3,981 | 3,175 |
-| \`chat\` | 95,366 | 30,097 | 25,083 | 21,091 | 4,947 | 3,890 |
-| \`checkbox\` | 40,872 | 12,578 | 11,068 | 8,616 | 2,460 | 1,889 |
-| \`checkbox-group\` | 39,639 | 12,321 | 10,884 | 6,888 | 2,215 | 1,459 |
-| \`code\` | 26,476 | 9,057 | 7,994 | 1,459 | 597 | 400 |
-| \`code-block\` | 124,475 | 39,735 | 33,641 | 25,579 | 5,675 | 4,609 |
-| \`color-input\` | 161,077 | 47,161 | 40,020 | 57,881 | 11,996 | 10,064 |
-| \`color-picker\` | 125,609 | 36,554 | 30,508 | 46,001 | 9,893 | 8,333 |
-| \`combobox\` | 139,004 | 43,269 | 36,520 | 34,008 | 7,938 | 6,411 |
-| \`command\` | 109,425 | 33,871 | 28,093 | 27,361 | 6,833 | 5,474 |
-| \`copy-button\` | 120,612 | 39,128 | 33,112 | 21,718 | 5,081 | 3,942 |
-| \`data-table\` | 168,931 | 49,141 | 41,584 | 64,439 | 13,725 | 11,276 |
-| \`date-input\` | 137,045 | 43,023 | 36,415 | 34,294 | 8,187 | 6,825 |
-| \`date-picker\` | 90,171 | 29,433 | 24,478 | 15,482 | 4,357 | 3,445 |
-| \`dialog\` | 34,634 | 11,191 | 9,871 | 6,852 | 2,117 | 1,611 |
-| \`divider\` | 29,161 | 9,814 | 8,607 | 3,223 | 1,066 | 809 |
-| \`donut-chart\` | 78,617 | 24,828 | 21,910 | 21,398 | 5,367 | 4,165 |
-| \`drawer\` | 33,206 | 10,776 | 9,495 | 5,712 | 1,686 | 1,238 |
-| \`drilldown\` | 83,859 | 27,759 | 22,977 | 9,398 | 2,737 | 2,026 |
-| \`empty\` | 28,293 | 9,603 | 8,453 | 2,105 | 830 | 563 |
-| \`file-input\` | 94,827 | 30,332 | 25,146 | 16,953 | 4,366 | 3,385 |
-| \`flex\` | 27,799 | 9,391 | 8,289 | 1,986 | 697 | 452 |
-| \`format-date\` | 30,905 | 10,420 | 9,233 | 3,435 | 1,134 | 734 |
-| \`grid\` | 28,326 | 9,563 | 8,437 | 2,511 | 870 | 673 |
-| \`heatmap\` | 71,852 | 23,941 | 21,191 | 14,461 | 4,403 | 3,277 |
-| \`icon\` | 73,106 | 24,587 | 20,429 | 1,528 | 626 | 365 |
-| \`icon-button\` | 37,646 | 11,450 | 10,103 | 9,641 | 2,203 | 1,724 |
-| \`image\` | 30,646 | 10,202 | 8,977 | 4,781 | 1,555 | 1,158 |
-| \`input\` | 89,818 | 29,243 | 24,183 | 11,157 | 3,137 | 2,350 |
-| \`kbd\` | 29,648 | 10,205 | 8,982 | 3,824 | 1,584 | 1,129 |
-| \`legend\` | 34,022 | 11,144 | 9,798 | 5,924 | 1,706 | 1,283 |
-| \`line-chart\` | 81,216 | 25,769 | 22,779 | 22,646 | 5,721 | 4,384 |
-| \`list\` | 31,926 | 10,291 | 9,064 | 5,756 | 1,528 | 1,189 |
-| \`listbox\` | 95,297 | 31,053 | 25,672 | 14,722 | 4,351 | 3,240 |
-| \`loader\` | 30,078 | 10,033 | 8,831 | 3,891 | 1,192 | 924 |
-| \`megamenu\` | 59,580 | 20,378 | 18,027 | 9,329 | 2,802 | 2,135 |
-| \`menu\` | 114,695 | 38,185 | 32,440 | 14,362 | 3,750 | 2,956 |
-| \`meter\` | 35,602 | 11,267 | 9,972 | 9,420 | 2,474 | 2,087 |
-| \`navigation\` | 30,339 | 10,243 | 8,997 | 3,084 | 1,128 | 736 |
-| \`notifications\` | 91,350 | 29,584 | 24,500 | 16,271 | 4,148 | 3,205 |
-| \`number-input\` | 90,634 | 29,544 | 24,415 | 12,050 | 3,440 | 2,635 |
-| \`option\` | 32,109 | 10,544 | 9,313 | 5,928 | 1,787 | 1,292 |
-| \`outline\` | 35,810 | 11,611 | 10,251 | 8,505 | 2,591 | 1,879 |
-| \`pagination\` | 148,244 | 44,851 | 37,891 | 43,952 | 9,540 | 7,808 |
-| \`pin-input\` | 40,491 | 12,748 | 11,254 | 8,228 | 2,674 | 1,937 |
-| \`popover\` | 55,111 | 19,249 | 16,985 | 4,611 | 1,506 | 1,108 |
-| \`progress\` | 33,246 | 10,757 | 9,521 | 7,064 | 1,970 | 1,588 |
-| \`qr-code\` | 40,236 | 13,976 | 12,295 | 14,439 | 5,392 | 4,483 |
-| \`quote\` | 27,030 | 9,207 | 8,088 | 1,211 | 570 | 308 |
-| \`radio\` | 43,716 | 12,868 | 11,346 | 10,869 | 2,612 | 1,977 |
-| \`rating\` | 41,008 | 13,168 | 11,593 | 8,574 | 2,950 | 2,146 |
-| \`sandbox\` | 61,195 | 16,813 | 14,912 | 34,733 | 8,030 | 6,618 |
-| \`scroll-area\` | 31,437 | 10,374 | 9,095 | 5,567 | 1,761 | 1,219 |
-| \`select\` | 131,843 | 41,806 | 35,281 | 27,677 | 6,677 | 5,332 |
-| \`skeleton\` | 28,062 | 9,544 | 8,416 | 2,242 | 860 | 584 |
-| \`slider\` | 47,681 | 13,817 | 12,251 | 15,172 | 3,609 | 2,889 |
-| \`sparkline\` | 35,412 | 12,013 | 10,609 | 6,285 | 2,017 | 1,699 |
-| \`speed-dial\` | 108,514 | 36,259 | 30,743 | 11,332 | 2,750 | 2,098 |
-| \`splitter\` | 42,741 | 12,722 | 11,288 | 16,559 | 3,996 | 3,295 |
-| \`stat\` | 29,954 | 9,789 | 8,646 | 3,774 | 1,039 | 741 |
-| \`steps\` | 95,120 | 29,535 | 24,500 | 19,815 | 4,266 | 3,542 |
-| \`switch\` | 38,537 | 12,142 | 10,666 | 6,160 | 1,930 | 1,407 |
-| \`table\` | 34,938 | 10,790 | 9,513 | 7,436 | 1,842 | 1,358 |
-| \`tabs\` | 40,414 | 12,371 | 10,894 | 10,947 | 2,670 | 2,062 |
-| \`tag\` | 76,482 | 25,615 | 21,390 | 4,075 | 1,284 | 1,029 |
-| \`text\` | 29,734 | 9,670 | 8,508 | 3,922 | 993 | 644 |
-| \`textarea\` | 40,278 | 12,528 | 11,028 | 7,529 | 2,285 | 1,670 |
-| \`time-input\` | 154,109 | 46,673 | 39,455 | 48,559 | 10,988 | 9,068 |
-| \`time-picker\` | 110,603 | 34,668 | 28,834 | 29,492 | 7,641 | 6,058 |
-| \`timeline\` | 77,087 | 25,507 | 21,266 | 5,151 | 1,393 | 1,056 |
-| \`toast\` | 84,295 | 27,463 | 22,803 | 11,270 | 2,901 | 2,412 |
-| \`toggle\` | 43,368 | 13,291 | 11,736 | 9,089 | 2,560 | 1,917 |
-| \`toolbar\` | 29,632 | 10,054 | 8,841 | 3,813 | 1,495 | 986 |
-| \`tooltip\` | 59,426 | 20,247 | 17,917 | 9,414 | 2,863 | 2,026 |
-| \`tour\` | 71,102 | 22,310 | 19,791 | 20,284 | 4,650 | 3,667 |
-| \`tree\` | 88,512 | 29,043 | 24,005 | 12,281 | 3,610 | 2,722 |
-| \`trend\` | 75,648 | 25,206 | 21,009 | 4,083 | 1,215 | 904 |
-| \`video\` | 149,476 | 45,698 | 38,927 | 48,889 | 10,892 | 9,194 |
-| \`video-playlist\` | 128,636 | 40,739 | 34,545 | 26,899 | 5,924 | 4,774 |
-| \`virtual-list\` | 30,546 | 10,470 | 9,192 | 2,904 | 1,181 | 847 |
+| \`accordion\` | 78,523 | 25,936 | 21,490 | 6,510 | 2,036 | 1,412 |
+| \`announcement\` | 77,027 | 25,412 | 20,969 | 5,126 | 1,543 | 1,140 |
+| \`app-header\` | 30,814 | 10,122 | 8,910 | 4,620 | 1,398 | 891 |
+| \`aura\` | 87,842 | 30,863 | 26,680 | 60,879 | 21,479 | 18,469 |
+| \`avatar\` | 32,433 | 10,538 | 9,281 | 6,205 | 1,768 | 1,276 |
+| \`badge\` | 29,550 | 9,942 | 8,727 | 3,734 | 1,237 | 815 |
+| \`bar-chart\` | 86,895 | 27,118 | 23,853 | 27,871 | 6,930 | 5,317 |
+| \`blockquote\` | 28,015 | 9,529 | 8,383 | 2,077 | 827 | 441 |
+| \`breadcrumbs\` | 76,351 | 24,968 | 20,707 | 5,414 | 1,513 | 1,105 |
+| \`button\` | 37,482 | 11,570 | 10,201 | 9,319 | 2,288 | 1,679 |
+| \`button-group\` | 28,508 | 9,543 | 8,424 | 2,320 | 813 | 479 |
+| \`callout\` | 74,028 | 24,592 | 20,468 | 2,914 | 1,068 | 696 |
+| \`card\` | 30,101 | 10,012 | 8,842 | 3,917 | 1,233 | 836 |
+| \`carousel\` | 87,800 | 27,620 | 23,073 | 16,716 | 3,990 | 3,107 |
+| \`chat\` | 94,397 | 29,468 | 24,409 | 21,117 | 4,947 | 3,968 |
+| \`checkbox\` | 41,026 | 12,625 | 11,135 | 8,616 | 2,459 | 1,797 |
+| \`checkbox-group\` | 39,793 | 12,366 | 10,895 | 6,888 | 2,213 | 1,352 |
+| \`code\` | 26,484 | 9,057 | 7,975 | 1,467 | 601 | 314 |
+| \`code-block\` | 124,111 | 39,279 | 33,201 | 25,604 | 5,662 | 4,439 |
+| \`color-input\` | 160,688 | 46,706 | 39,636 | 57,881 | 11,984 | 9,991 |
+| \`color-picker\` | 124,800 | 35,970 | 30,047 | 46,033 | 9,912 | 8,292 |
+| \`combobox\` | 138,593 | 42,816 | 36,131 | 33,986 | 7,937 | 6,387 |
+| \`command\` | 108,595 | 33,301 | 27,505 | 27,372 | 6,846 | 5,396 |
+| \`copy-button\` | 120,233 | 38,682 | 32,612 | 21,728 | 5,073 | 3,882 |
+| \`data-table\` | 169,163 | 49,032 | 41,356 | 65,060 | 14,030 | 11,412 |
+| \`date-input\` | 136,657 | 42,576 | 36,026 | 34,295 | 8,183 | 6,695 |
+| \`date-picker\` | 89,176 | 28,793 | 23,853 | 15,482 | 4,360 | 3,339 |
+| \`dialog\` | 34,636 | 11,185 | 9,860 | 6,854 | 2,111 | 1,508 |
+| \`divider\` | 29,181 | 9,820 | 8,610 | 3,243 | 1,106 | 713 |
+| \`donut-chart\` | 79,069 | 24,953 | 22,035 | 21,398 | 5,375 | 3,997 |
+| \`drawer\` | 33,215 | 10,780 | 9,478 | 5,721 | 1,689 | 1,187 |
+| \`drilldown\` | 82,870 | 27,128 | 22,329 | 9,404 | 2,730 | 1,913 |
+| \`empty\` | 28,295 | 9,601 | 8,463 | 2,107 | 858 | 547 |
+| \`file-input\` | 93,987 | 29,742 | 24,531 | 16,954 | 4,352 | 3,270 |
+| \`flex\` | 27,799 | 9,392 | 8,240 | 1,986 | 721 | 429 |
+| \`format-date\` | 30,905 | 10,420 | 9,233 | 3,435 | 1,165 | 693 |
+| \`grid\` | 28,326 | 9,564 | 8,449 | 2,511 | 907 | 506 |
+| \`heatmap\` | 72,308 | 24,064 | 21,296 | 14,465 | 4,416 | 3,235 |
+| \`icon\` | 72,111 | 23,953 | 19,878 | 1,528 | 644 | 266 |
+| \`icon-button\` | 37,810 | 11,506 | 10,162 | 9,651 | 2,214 | 1,603 |
+| \`image\` | 30,646 | 10,200 | 8,952 | 4,781 | 1,568 | 989 |
+| \`input\` | 88,830 | 28,594 | 23,534 | 11,010 | 3,063 | 2,210 |
+| \`kbd\` | 29,648 | 10,205 | 8,982 | 3,824 | 1,590 | 1,119 |
+| \`legend\` | 34,022 | 11,148 | 9,812 | 5,924 | 1,706 | 1,141 |
+| \`line-chart\` | 81,668 | 25,893 | 22,859 | 22,646 | 5,726 | 4,222 |
+| \`list\` | 31,940 | 10,292 | 9,050 | 5,770 | 1,548 | 1,137 |
+| \`listbox\` | 94,457 | 30,493 | 24,990 | 14,723 | 4,373 | 3,171 |
+| \`loader\` | 30,078 | 10,033 | 8,830 | 3,891 | 1,224 | 803 |
+| \`megamenu\` | 60,045 | 20,507 | 18,139 | 9,342 | 2,798 | 2,064 |
+| \`menu\` | 114,156 | 37,712 | 31,915 | 14,366 | 3,747 | 2,800 |
+| \`meter\` | 35,602 | 11,268 | 9,952 | 9,420 | 2,482 | 1,870 |
+| \`navigation\` | 30,359 | 10,243 | 9,007 | 3,094 | 1,155 | 677 |
+| \`notifications\` | 90,359 | 28,963 | 23,962 | 16,275 | 4,151 | 3,189 |
+| \`number-input\` | 89,793 | 28,967 | 23,771 | 12,050 | 3,438 | 2,568 |
+| \`option\` | 32,116 | 10,548 | 9,315 | 5,935 | 1,774 | 1,271 |
+| \`outline\` | 35,824 | 11,614 | 10,256 | 8,509 | 2,594 | 1,820 |
+| \`pagination\` | 147,874 | 44,398 | 37,438 | 43,971 | 9,542 | 7,737 |
+| \`pin-input\` | 40,757 | 12,834 | 11,310 | 8,340 | 2,701 | 1,878 |
+| \`popover\` | 55,537 | 19,366 | 17,110 | 4,585 | 1,500 | 1,048 |
+| \`progress\` | 33,246 | 10,760 | 9,523 | 7,064 | 1,931 | 1,489 |
+| \`qr-code\` | 40,238 | 13,974 | 12,313 | 14,441 | 5,416 | 4,379 |
+| \`quote\` | 27,030 | 9,207 | 8,088 | 1,211 | 564 | 255 |
+| \`radio\` | 43,716 | 12,869 | 11,341 | 10,869 | 2,618 | 1,937 |
+| \`rating\` | 41,008 | 13,169 | 11,612 | 8,574 | 2,953 | 2,116 |
+| \`sandbox\` | 61,318 | 16,830 | 14,932 | 34,856 | 8,082 | 6,550 |
+| \`scroll-area\` | 31,437 | 10,374 | 9,095 | 5,567 | 1,754 | 1,175 |
+| \`select\` | 131,473 | 41,361 | 34,869 | 27,696 | 6,650 | 5,258 |
+| \`skeleton\` | 28,062 | 9,544 | 8,416 | 2,242 | 890 | 523 |
+| \`slider\` | 47,836 | 13,862 | 12,294 | 15,173 | 3,605 | 2,804 |
+| \`sparkline\` | 35,412 | 12,015 | 10,603 | 6,285 | 2,015 | 1,584 |
+| \`speed-dial\` | 107,971 | 35,793 | 30,262 | 11,332 | 2,753 | 1,961 |
+| \`splitter\` | 42,741 | 12,723 | 11,294 | 16,559 | 4,001 | 3,136 |
+| \`stat\` | 29,954 | 9,789 | 8,646 | 3,774 | 1,068 | 685 |
+| \`steps\` | 94,291 | 28,969 | 23,919 | 19,827 | 4,285 | 3,327 |
+| \`switch\` | 38,701 | 12,193 | 10,729 | 6,170 | 1,934 | 1,326 |
+| \`table\` | 34,938 | 10,794 | 9,499 | 7,436 | 1,829 | 1,268 |
+| \`tabs\` | 40,442 | 12,375 | 10,921 | 10,965 | 2,680 | 2,005 |
+| \`tag\` | 75,488 | 24,993 | 20,644 | 4,076 | 1,308 | 982 |
+| \`text\` | 29,734 | 9,670 | 8,508 | 3,922 | 1,022 | 703 |
+| \`textarea\` | 40,432 | 12,574 | 11,039 | 7,529 | 2,294 | 1,616 |
+| \`time-input\` | 153,743 | 46,249 | 39,022 | 48,582 | 11,002 | 8,970 |
+| \`time-picker\` | 109,778 | 34,070 | 28,194 | 29,508 | 7,641 | 6,089 |
+| \`timeline\` | 76,092 | 24,877 | 20,659 | 5,151 | 1,420 | 993 |
+| \`toast\` | 83,304 | 26,828 | 22,198 | 11,274 | 2,910 | 2,205 |
+| \`toggle\` | 43,388 | 13,285 | 11,687 | 9,099 | 2,559 | 1,842 |
+| \`toolbar\` | 29,632 | 10,054 | 8,841 | 3,813 | 1,497 | 838 |
+| \`tooltip\` | 59,878 | 20,379 | 18,010 | 9,414 | 2,874 | 1,913 |
+| \`tour\` | 71,720 | 22,488 | 19,908 | 20,296 | 4,643 | 3,514 |
+| \`tree\` | 87,502 | 28,416 | 23,336 | 12,266 | 3,603 | 2,679 |
+| \`trend\` | 74,653 | 24,566 | 20,420 | 4,083 | 1,237 | 845 |
+| \`video\` | 148,735 | 45,183 | 38,440 | 48,691 | 10,872 | 9,193 |
+| \`video-playlist\` | 128,097 | 40,252 | 34,083 | 26,903 | 5,918 | 4,669 |
+| \`virtual-list\` | 30,546 | 10,470 | 9,192 | 2,904 | 1,209 | 738 |
 
 ## What lands in \`node_modules\`
 
@@ -2109,12 +2240,12 @@ column is what was removed rather than part of what remains.
 
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
-| \`@fusion.dev/helix-core\` | 907,191 | 113 | 160,112 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
-| \`@fusion.dev/helix-headless\` | 10,062,025 | 422 | 736,824 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
-| \`@fusion.dev/helix-icons\` | 65,119 | 11 | 20,405 | none |
-| \`@fusion.dev/helix-styles\` | 81,955 | 5 | 0 | none |
-| \`@fusion.dev/helix-theme\` | 465,772 | 8 | 4,793 | none |
-| \`@fusion.dev/helix\` | 9,990,486 | 717 | 287,546 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix-core\` | 872,264 | 113 | 161,232 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
+| \`@fusion.dev/helix-headless\` | 9,626,448 | 422 | 735,736 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
+| \`@fusion.dev/helix-icons\` | 63,952 | 11 | 20,403 | none |
+| \`@fusion.dev/helix-styles\` | 83,184 | 5 | 0 | none |
+| \`@fusion.dev/helix-theme\` | 463,476 | 8 | 4,764 | none |
+| \`@fusion.dev/helix\` | 9,589,407 | 717 | 287,529 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
@@ -2122,8 +2253,8 @@ Named rather than left out, because a metrics page is read for what it does
 not say as much as for what it does.
 
 - **No whole-library comparison, and no fifth component.** The comparison above is five components against four systems. Widening it means naming the equivalent element in each system by hand, which is where a comparison table starts arguing, so each addition is a deliberate one rather than a sweep.
-- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running \`bun run metrics:peers\`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.
-- **No load or rendering timings.** First paint, time to upgrade, and the cost of hydrating a server-rendered tree. These need a browser harness rather than a bundler, and they never join a cross-system table.
+- **The peer numbers are pinned, so they age.** They are dated in the section above and refreshed by running \`turbo run peers\`. Nothing fails when they are old, because nothing in this repository changes when somebody else releases, and a check that fired on the calendar would be noise.
+- **No first paint.** The timings above are facts about a component: time to upgrade, first render, hydration. First paint is a fact about a whole page, so it belongs to whatever renders one rather than to the library it renders.
 - **No per-component stylesheet bytes.** There are none to report: a family's CSS is compiled into its JavaScript, so it is already inside every number above. \`elements.css\` is the light-DOM layer and is in the stylesheet table.
 `,
   motion: `---
@@ -2252,17 +2383,18 @@ should end up passing that string through.
 element.addEventListener('helix-before-change', (event) => console.log(event.detail))
 \`\`\`
 
-**A declared \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership.**
-The element announces the change and applies none of it, and waits to be told.
-Use \`default-value\`, \`default-open\` and their siblings for a control that owns
-its own state. This is the rule most likely to look like a bug, and
+**A declared \`value\`, \`open\`, \`checked\` or \`active\` is a seed.** The element
+starts there and goes on managing itself, exactly as \`<input value="Ada">\` does.
+To take one decision, listen for the matching \`helix-before-*\` event and call
+\`preventDefault()\`; to own the state outright, refuse and assign your own.
+\`default-value\`, \`default-open\` and their siblings are what a reset returns to.
 [State and control](./state-and-control) is the page about it.
 
 ## What each one needs
 
 | Framework | Notes |
 |---|---|
-| Solid | Sets properties on custom elements by default. Use \`prop:\` to force one and \`attr:\` to force the other. \`on:helix-change\` binds the literal name |
+| Solid | Sets properties on custom elements by default. Use \`prop:\` to force one and \`attr:\` to force the other. \`on:helix-before-change\` binds the literal name |
 | Qwik | Works as JSX. Bind with \`document:on…\` or a ref, since a plain \`on*\` prop is normalized |
 | Lit | \`.prop=\`, \`?bool=\` and \`@helix-before-change=\` are already the right three channels |
 | Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
@@ -2411,12 +2543,14 @@ Three doors are open, and they are in the order you should try them.
 
 \`\`\`css
 :root {
-  --helix-radii-md: 2px;
+  --helix-seed-radii: 2px;
 }
 \`\`\`
 
 If every card, dialog and button should be squarer, that is a token change and
-you are done. Tokens cross shadow boundaries on their own, because custom
+you are done. The seed rather than \`--helix-radii-md\`, because the four rungs
+are derived from it: \`md\` on its own is one step of four, and the buttons and
+dialogs are on a different one. See [Shape and borders](./shape-and-borders). Tokens cross shadow boundaries on their own, because custom
 properties inherit, so one declaration reaches every component at once.
 
 Reach for this first. Most requests that arrive as "can I restyle the button"
@@ -2442,13 +2576,10 @@ semantic token, so leaving it alone gets you the themed value, and setting it
 changes that component and nothing else.
 
 **They are API, not tokens**, and the distinction is enforced. A hook is named
-after the component (\`--card-padding\`, \`--drawer-radii\`) and a token is named
+after the component (\`--card-padding\`, \`--drawer-radius\`) and a token is named
 \`--helix-*\`. Every documented hook is held to a rule that actually reads it, in
 both directions: declared and never read is a promise with nothing behind it,
-and read and never declared is a working feature nobody is told about. Three of
-\`Button\`'s four hooks were inert for a refactor's worth of time while the
-reference went on listing them, which is how that check came
-to exist.
+and read and never declared is a working feature nobody is told about.
 
 Each component's page lists its hooks under Custom properties.
 
@@ -2471,10 +2602,8 @@ internal structure.
 
 **A published part is a promise**, held both ways:
 a documented part that nothing renders, and a rendered part nobody was told
-about. The second is the worse of the two, because a \`::part()\` that resolves to
-nothing is valid CSS that matches nothing and reports nothing. \`Breadcrumbs\`
-published a \`nav\` part the family does not render; \`Checkbox\` renders the
-\`field\` part the whole styled appearance is built on and never declared it.
+about. The first is the worse of the two for you, because a \`::part()\` that
+resolves to nothing is valid CSS that matches nothing and reports nothing.
 
 Each component's page lists its parts.
 
@@ -2499,12 +2628,11 @@ its arrow is \`tooltip-arrow\`.
 \`Command\` forwarded the listbox's \`search-field\` under a name it also rendered
 itself, so \`::part(search-field)\` matched two elements at once.
 
-This is checked in both directions. \`check:parts\` holds a published part and a
-rendered one to each other, and \`check:exportparts\` holds a composition to
+This is checked in both directions. \`helix component\`'s \`parts\` holds a published part and a
+rendered one to each other, and \`helix component\`'s \`exportparts\` holds a composition to
 forwarding everything its child publishes, under one prefix, colliding with
-nothing. Before it existed, 148 published child parts were unreachable: all
-sixteen of the color picker's from inside a color input, all thirteen of the
-date picker's from inside a date input.
+nothing. So every part the color picker publishes is reachable from inside a
+color input, and every part the date picker publishes from inside a date input.
 
 If you still find a part you cannot reach, that is worth reporting rather than
 working around: the missing part is the bug.
@@ -2866,9 +2994,9 @@ amount of JavaScript reproduces:
 - right-click offers Copy Link Address
 - a crawler follows it
 
-Before \`href\` existed, the docs sidebar put a \`<Link>\` inside each row. The
-anchor was 57px of a 240px row, so five sixths of every row did nothing, and
-Enter did nothing at all: the tree announced a selection and no anchor heard it.
+A \`<Link>\` inside each row buys none of it. In the docs sidebar the anchor was
+57px of a 240px row, so five sixths of every row did nothing, and Enter did
+nothing at all: the tree announced a selection and no anchor heard it.
 
 ## \`href\` and a framework's \`<Link>\`
 
@@ -3027,7 +3155,7 @@ host is the only element the listbox can point at.
 same browser, the accessibility tree for \`<div role="option"><a href>Open
 settings</a></div>\` inside a listbox is an option with *no accessible name*, and
 the link exposed as a child of it. The sibling option with plain text is named
-correctly. So the manoeuvre that works for \`treeitem\` and \`menuitem\`, moving the
+correctly. So the maneuver that works for \`treeitem\` and \`menuitem\`, moving the
 role onto the anchor, is exactly the one thing that cannot be done here.
 
 Two constraints pointing opposite ways, and no arrangement satisfies both.
@@ -3157,7 +3285,7 @@ has a tree.
 **Anything that inspects the tree runs in \`firstUpdated\` or later**, and is
 therefore a client-side enhancement by definition.
 
-## Never initialise state in \`connectedCallback\`
+## Never initialize state in \`connectedCallback\`
 
 SSR does not call it. Derive from properties, or seed in \`willUpdate\`, which SSR
 does call.
@@ -3247,17 +3375,29 @@ square: a percentage radius on a wide element gives an ellipse, and a pill is
 what you wanted.
 
 Rounding is the fastest single change to how a system feels, and it is one
-token:
+token, but it is the **seed** rather than one of the four above:
 
 \`\`\`css
 :root {
-  --helix-radii-md: 2px;
+  --helix-seed-radii: 2px;
 }
 \`\`\`
 
-That makes every card, dialog, input and button squarer at once. The theme
+That makes every card, dialog, input and button squarer at once, because \`sm\`,
+\`md\` and \`lg\` are all derived from it: they become 1px, 2px and 3px. The theme
 engine takes a \`radius\` intent input for exactly this reason. See [Deriving a
 theme](./theming).
+
+**Setting \`--helix-radii-md\` instead moves only what reads \`md\`**, which is
+neither the buttons, the inputs and the dialogs (\`sm\`) nor the cards (\`lg\`).
+The four rungs are siblings derived from the seed, not a chain, so overriding
+one is how you change a single step on purpose rather than how you reshape a
+system.
+
+**Every floating panel takes \`sm\`.** A dialog, a drawer, a menu, a popover, a
+tooltip, a toast, and the panel any field opens under itself: all the same
+corner, whatever the panel's size. A radius is read against the corner beside it
+rather than against the area behind it.
 
 **A shape that is round rather than softened does not use these.** An avatar, a
 loader and a radio are circles because of what they are, so they say \`50%\`
@@ -3281,11 +3421,10 @@ belong to [Surfaces and separation](./surfaces-and-separation): they are what a
 theme sets to zero to go shadow-first, or to a width to go border-first.
 
 This distinction is why a component's border width sits behind a per-component
-hook rather than being written inline. Of 68 border declarations reaching for
-\`--helix-color-border\` before this was fixed, eight put the *color* behind a
-hook and none put the width behind one, so a border could be recoloured and
-never removed, and the floating surfaces wrote \`border: none\` outright so one
-could never be added either.
+hook rather than being written inline. A width written inline can be recolored
+by a theme and never removed, and a hardcoded \`border: none\` can never have one
+added back, so a surface themes perfectly in one direction and not at all in the
+other.
 
 ## Corner radius on a group
 
@@ -3439,7 +3578,7 @@ Use them for gap, padding and margin:
 
 ## Size
 
-Thirty-four tokens, and almost all of them name a specific thing:
+Forty-one tokens, and almost all of them name a specific thing:
 \`--helix-size-control\`, \`--helix-size-checkbox\`, \`--helix-size-switch\`,
 \`--helix-size-avatar\`, \`--helix-size-icon\`, \`--helix-size-tag\`,
 \`--helix-size-header\`, \`--helix-size-progress\`, \`--helix-size-meter\`.
@@ -3501,11 +3640,11 @@ That works. Type in it and the value moves. Assign to it later and the value
 moves to what you assigned. There is no mode to be in and nothing to wire before
 the control responds.
 
-*This page said the opposite until 26 Aug 2026, and the sample above was printed
-as plain text with an instruction not to paste it. Writing a property was a
-claim of ownership, so the element announced its changes and applied none of
-them until it was told, and that markup produced a field that ignored every
-keystroke with nothing logged and nothing visibly wrong.*
+*This page said the opposite until 26 Aug 2026: writing a property was a claim
+of ownership, so the element announced its changes and applied none of them
+until it was told. The mode is deleted. If you were refusing a change by
+withholding a state update rather than by calling \`preventDefault()\`, that is
+the one thing that has to be rewritten.*
 
 ## Taking a decision
 
@@ -3752,9 +3891,9 @@ because Svelte was already right about custom elements.
 \`bind:\` does not work on a Helix control, because there is no two-way binding
 convention a custom element can opt into. Read the value off the event.
 
-And a declared \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership:
-the element announces and waits rather than applying the change itself. Use
-\`default-value\` and its siblings when you want the element to own its own state.
+And a declared \`value\`, \`open\`, \`checked\` or \`active\` is a seed: the element
+starts there and goes on applying its own changes. To refuse one, cancel the
+matching \`helix-before-*\` event; withholding a state update refuses nothing.
 See [State and control](./state-and-control).
 `,
   'theme-builder': `---
@@ -3814,7 +3953,7 @@ export const theme = { brand: '#2563eb', chroma: { ceiling: 0.1 }, radius: 2 }
 
 **Keep the intent, not the tokens.** The tokens are the output of a solver, and
 the solver improves: a theme stored as its inputs picks up a better derivation,
-and a theme stored as 176 literal values is frozen at the version that produced
+and a theme stored as literal values is frozen at the version that produced
 it. The tokens are for pasting into a system that cannot run the engine.
 
 ## What it does not do
@@ -3889,7 +4028,7 @@ console.log(toCss(theme))
 \`\`\`
 
 The emitted block carries the seeds as well as the tokens, so the halves the
-engine does not compute, the twenty-four series colours a chart reads, the
+engine does not compute, the twenty-four series colors a chart reads, the
 spacing scale and the corner radii, re-derive from the same values the solver
 used. That is what stops the two paths disagreeing on the same page.
 
@@ -3953,7 +4092,7 @@ direction never reverses.
 | \`@fusion.dev/helix-styles\` | Tokens and the base layer. Pure CSS | nothing |
 | \`@fusion.dev/helix-core\` | Element base class, mixins, decorators | Lit |
 | \`@fusion.dev/helix-headless\` | Structure, accessibility, state, form participation | \`core\` |
-| \`@fusion.dev/helix\` | Presentation: tokens, parts, and the visual axes | \`headless\`, \`styles\` |
+| \`@fusion.dev/helix\` | Presentation: tokens, parts, and the visual axes | \`headless\`, \`turbo run styles\` |
 
 \`@fusion.dev/helix-theme\` and \`@fusion.dev/helix-icons\` ship beside the stack rather than in it:
 neither is a tier, and neither is needed to render a component. **There is no
@@ -3963,7 +4102,7 @@ the bridge that repairs React's hydration of custom events is in
 
 ## Why the split
 
-**\`headless\` must never depend on \`styles\`.**
+**\`headless\` must never depend on \`turbo run styles\`.**
 
 That single constraint is what makes the headless tier independently
 consumable. Consume it and bring your own
@@ -4032,7 +4171,7 @@ to a system token, so overriding it restyles one component without touching
 
 \`\`\`css
 helix-accordion {
-  --accordion-radii: 1rem;
+  --accordion-radius: 1rem;
 }
 \`\`\`
 
@@ -4140,10 +4279,10 @@ be lifted into: a raised surface goes *down* the ramp, not up.
   groove.
 
 **\`raised\` and \`overlay\` are the pair worth learning.** They land on the same
-step in dark mode, which is why one token tried to do both jobs for a while. In
-light they want opposite fills: a hovered row must be darker than a white page,
-and a thumb must be lighter than the groove it sits in. If something looks
-almost right in dark and wrong in light, this is usually why.
+step in dark mode, so one token looks like it would do both jobs. In light they
+want opposite fills: a hovered row must be darker than a white page, and a thumb
+must be lighter than the groove it sits in. If something looks almost right in
+dark and wrong in light, this is usually why.
 
 ## Per-component hooks
 
@@ -4353,37 +4492,37 @@ request and names every document plus these two surfaces.
 
 These are in order of how often they look like a library bug and are not.
 
-### 1. A declared \`value\` hands you the control
+### 1. Refusing a change by not answering
 
-\`\`\`text
-<!-- Ignores every keystroke. Nothing is logged. Nothing looks wrong. -->
-<helix-input label="Name" value="Ada"></helix-input>
-\`\`\`
-
-Do not paste it. Plain text rather than a live example, the same way
-[State and control](./state-and-control) shows this one: a reader copies what is
-in front of them, and these are the two pages that have to show the mistake in
-order to name it.
-
-**Writing \`value\`, \`open\`, \`checked\` or \`active\` is a claim of ownership.** From
-then on the element announces changes and applies none of them, waiting to be
-told. Which mode it is in is read once, at its first update.
-
-Seed with the \`default-\` twin, or answer the event:
+**Writing \`value\`, \`open\`, \`checked\` or \`active\` is a seed and a correction.**
+The element starts there and goes on applying its own changes, exactly as
+\`<input value="Ada">\` does, so this works and needs no handler beside it:
 
 \`\`\`html
 <helix-input
-  default-value="Ada"
   label="Name"
+  value="Ada"
 ></helix-input>
 \`\`\`
 
+The trap is on the other side. React force-restores a native \`<input>\` whose
+state did not move and does not do this for a custom element, so a handler that
+declines to call \`setState\` leaves the element holding the new value. Refusal is
+\`preventDefault()\` on the matching \`helix-before-*\` event:
+
 \`\`\`tsx
-<helix-input label="Name" onChange={(e) => setName(e.currentTarget.value)} value={name} />
+<helix-input
+  label="Name"
+  onhelix-before-change={(event) => {
+    event.preventDefault()
+    setName(clean(event.detail.value))
+  }}
+  value={name}
+/>
 \`\`\`
 
-In TypeScript this is a compile error rather than a surprise. Everywhere else the
-element warns on its second unanswered request.
+\`default-value\` and its twins are what a reset returns to. See
+[State and control](./state-and-control).
 
 ### 2. The event name is the event's own
 
@@ -4425,10 +4564,11 @@ The tell for a missing layer is which. A flash before hydration is
 \`elements.css\`; bare headings are \`base.css\`. **No color anywhere means the
 ramp or the semantic layer, and the two are told apart by what is in the
 stylesheet rather than by what is on screen**: without \`tokens.css\` nothing
-declares \`--helix-color-*\` at all, while without \`primitives.css\` all 177 are
-declared and every one resolves to \`rgba(0, 0, 0, 0)\`, since \`tokens.css\` refers
-to a primitive 235 times and to nothing else. The second is the one that looks
-like a working install, and it is the reason \`all.css\` exists.
+declares \`--helix-color-*\` at all, while without \`primitives.css\` all 185
+semantic tokens are declared and every color resolves to \`rgba(0, 0, 0, 0)\`,
+since \`tokens.css\` refers to a primitive 297 times and to nothing else. The
+second is the one that looks like a working install, and it is the reason
+\`all.css\` exists.
 
 ## Choosing a family
 
@@ -4450,9 +4590,11 @@ Two distinctions worth knowing before searching:
 
 Three doors, in the order to try them.
 
-1. **A token.** \`--helix-radii-md: 2px\` at \`:root\` reaches every component,
+1. **A token.** \`--helix-seed-radii: 2px\` at \`:root\` reaches every component,
    because custom properties inherit. Most "can I restyle the button" is really
-   "our brand has less rounding".
+   "our brand has less rounding". The seed and not \`--helix-radii-md\`: the four
+   radii are siblings derived from it, so \`md\` alone moves neither the buttons
+   nor the cards.
 2. **A per-component hook.** \`--card-padding\` on \`helix-card\`. Named after the
    component, documented on its page, defaults to a semantic token.
 3. **A part.** \`helix-select::part(trigger)\`. The most powerful and the one that
@@ -4494,7 +4636,7 @@ for the API.
 
 | Tool | Where it goes |
 |---|---|
-| Claude Code | \`CLAUDE.md\`, or a skill in \`.claude/skills/\` |
+| Claude Code | \`AGENTS.md\` or \`CLAUDE.md\`, or a skill in \`.claude/skills/\` |
 | Cursor | \`.cursor/rules/\` |
 | GitHub Copilot | \`.github/copilot-instructions.md\` |
 | Anything else | Whatever it reads. The line is the same |
@@ -4600,8 +4742,6 @@ inspecting it.
 - \`onHelixOpen\` binds an event called \`HelixOpen\`, which nobody dispatches. ❌
 
 The number of hyphens does not matter, measured in Chrome against React 19.2.8.
-An earlier version of this page said two were a hard stop; that was the
-hydration bug above, read as a fact about names.
 
 ## Register once, in a client component
 
@@ -4765,8 +4905,7 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 ## Why two axes
 
 **The library had four axes and one word for all of them.** Counted across both
-tiers, \`appearance\` held 21 declarations describing at least four different
-questions: where a surface ends (\`outlined\` against \`plain\` on a Card), how much
+tiers, \`appearance\` described at least four different questions: where a surface ends (\`outlined\` against \`plain\` on a Card), how much
 ink a control claims (\`ghost\` against \`solid\` on a Button), which widget gets
 rendered (\`segmented\` against \`underlined\` on Tabs), and in one case a plain
 misfiled tone.
@@ -4781,10 +4920,9 @@ and a component reintroducing it fails the build.
 
 ## Two axes, not one
 
-This is the test, and the library found it before the registry existed.
-\`megamenu-root.css\` reads: a consumer can make the panel glass, which is not an
-appearance, because \`full\` already occupies that axis with a layout. A panel can
-be glass *and* outlined. Two axes.
+This is the test. \`Megamenu\` is the worked example: a consumer can make the panel
+glass, which is not an appearance, because \`full\` already occupies that axis with
+a layout. A panel can be glass *and* outlined. Two axes.
 
 If you are adding a property and cannot decide which axis it belongs to, that is
 usually the answer: it is two properties.
@@ -4802,7 +4940,7 @@ choice between two widgets, which is structural wherever it is made, so it lives
 on either tier.
 
 **What it may not be is a place to put something that is on an axis.** That is
-the failure mode \`appearance\` demonstrated for 21 components.
+the failure mode \`appearance\` demonstrated.
 
 ## \`tone\` is the one axis both tiers carry
 
@@ -5000,11 +5138,10 @@ against the stylesheet's own URL with no bundler involved. Copy the whole
 four requests and both layers resolve.
 
 *This page listed \`tokens.css\` and \`base.css\` and no \`primitives.css\` until 24
-Aug 2026, which is the same omission \`installation.mdx\`, \`introduction.mdx\` and
-the agent page carried. \`tokens.css\` refers to a primitive 235 times and imports
-nothing, so a reader who followed this got all 178 semantic tokens declared and
-every one resolving to \`rgba(0, 0, 0, 0)\`. Linking \`all.css\` is the fix that
-cannot be got wrong again.*
+Aug 2026. \`tokens.css\` refers to a primitive 297 times and imports nothing, so a
+reader who followed that got all 185 semantic tokens declared and every color
+resolving to \`rgba(0, 0, 0, 0)\`. If your page looks unstyled in exactly that
+way, link \`all.css\` instead.*
 
 \`elements.css\` stays its own link, being \`@fusion.dev/helix\`'s rather than this
 package's, and it matters more here than anywhere: with no bundler the module

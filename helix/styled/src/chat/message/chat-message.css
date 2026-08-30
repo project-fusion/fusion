@@ -1,22 +1,18 @@
 /* Two columns: the avatar, and everything else. A grid rather than a flex row so
    the avatar column can be sized and named independently of what is beside it.
 
-   **`actions` was a third column and is not one now.** It sits on the line under
-   the turn, inside `meta`, because a column of its own put it at the container's
-   trailing edge, a hundred and fifty pixels from a short bubble; and moved into
-   the body as a track it landed under the *middle* of the turn, because `content`
-   spans the body and a spanning grid item inflates every track it spans.
-   Measured at 36rem: bubble at 58, copy control at 232.
+   **`actions` is not a third column.** It sits on the line under the turn,
+   inside `meta`: a column of its own put it at the container's trailing edge, a
+   hundred and fifty pixels from a short bubble; and moved into the body as a
+   track it landed under the *middle* of the turn, because `content` spans the
+   body and a spanning grid item inflates every track it spans. Measured at
+   36rem: bubble at 58, copy control at 232.
 
-   **It does not reserve an avatar column across the transcript, and the note
-   here used to claim it did.** Each turn is its own grid, so no turn can know
-   what its neighbors slotted, and the column that was supposedly reserved was
-   only ever a `column-gap` every turn paid whether it had an avatar or not. A
-   transcript where every turn has one lines up, and so does a transcript where
-   none does, which is the ordinary case both ways: an assistant avatars every
-   one of its turns and a support thread avatars none. A transcript that avatars
-   only the first turn of each run staggers, and that is a grouping feature this
-   component does not have. */
+   **It does not reserve an avatar column across the transcript.** Each turn is
+   its own grid, so no turn can know what its neighbors slotted. A transcript
+   where every turn has an avatar lines up, and so does one where none does. A
+   transcript that avatars only the first turn of each run staggers, and that is
+   a grouping feature this component does not have. */
 :host {
   display: block;
 }
@@ -27,13 +23,12 @@
   grid-template-columns: auto minmax(0, 1fr);
 }
 
-/* **The space beside an avatar belongs to the avatar, not to the column.** This
-   was `column-gap: var(--helix-space-sm)`, which a grid pays between two tracks
-   whether or not either has anything in it, and most turns in most transcripts
-   have neither an avatar nor an action row. Measured on a chat in a popover: the
-   header, the status line and the composer all align to the log's own padding at
-   x 36, and every turn sat at 48, indented past all three by two phantom tracks
-   nothing was in.
+/* **The space beside an avatar belongs to the avatar, not to the column.** A
+   `column-gap` is paid between two tracks whether or not either has anything in
+   it, and most turns in most transcripts have neither an avatar nor an action
+   row. Measured on a chat in a popover: the header, the status line and the
+   composer all align to the log's own padding at x 36, and every turn sat at 48,
+   indented past all three by two phantom tracks nothing was in.
 
    `::slotted()` is what makes the space conditional without anything having to
    detect emptiness: a rule that matches an assigned node cannot apply when there
@@ -75,9 +70,8 @@
   display: none;
 }
 
-/* **What was here was dead, and it is worth saying how rather than deleting it
-   quietly.** The rule read `[part="avatar"]:not(:has(*))`, meaning "hide the
-   avatar box when it holds nothing". It never fired: the box holds
+/* **Do not hide the avatar box when nothing is slotted; both spellings are
+   dead.** `[part="avatar"]:not(:has(*))` never fires: the box holds
    `<slot name="avatar">`, which is an element child, so `:has(*)` is true
    whether or not anybody slotted an avatar. The sibling idiom used elsewhere in
    the library, `:not(:has(> slot:has(*)))`, is worse than wrong: `:has()` may
@@ -85,10 +79,9 @@
    rule is dropped. Both were verified in a browser, the second through
    `insertRule` throwing a `SyntaxError`.
 
-   Nothing replaces it, because nothing needs to. An empty box in an `auto` track
-   is zero wide, and the space beside it now belongs to the slotted content
-   above, so a turn with no avatar is laid out as though the column were not
-   there. Emptiness stopped being a thing this stylesheet has to detect. */
+   Nothing needs to replace it. An empty box in an `auto` track is zero wide, and
+   the space beside it belongs to the slotted content above, so a turn with no
+   avatar is laid out as though the column were not there. */
 
 /* The body: what was said, what it was drawn from, and the line under both. */
 [part="body"] {
@@ -162,11 +155,11 @@
      it, for `Announcement`'s reason: a container that sets the control size and
      stops there draws `md` glyphs inside `sm` boxes.
 
-     **A notch inside `sm`, which is the same 28 the send control takes**, and
-     for the same reason: these sit under a line of 12 pixel text rather than in
-     a row of their own, and at the full small step they were still the tallest
-     thing on the line. Derived from the step rather than written as a number, so
-     a consumer at another density gets the same relationship. */
+     **A notch inside `sm`, which is the same 28 the send control takes**: these
+     sit under a line of 12 pixel text rather than in a row of their own, and at
+     the full small step they were still the tallest thing on the line. Derived
+     from the step rather than written as a number, so a consumer at another
+     density gets the same relationship. */
   /* The fixed step, not the relative one, and it has to be: this declares
      `--helix-size-control` itself, and `-tight` is defined in terms of that
      property, so the relative form would be a circular reference and the
@@ -186,9 +179,9 @@
 
 /* **What the turn was drawn from, set as a footnote.** Under the bubble rather
    than in it, because a citation is about the answer rather than part of what
-   was said. Set quietly, because it was not: a row of outlined tags at the
-   control step was the second loudest thing in a transcript and read as a set of
-   filters rather than as a reference.
+   was said. Set quietly: a row of outlined tags at the control step was the
+   second loudest thing in a transcript and read as a set of filters rather than
+   as a reference.
 
    So the row declares the type and the density once and whatever is slotted
    takes them: `text-xs` and the muted ink a footnote has everywhere else in this
@@ -197,15 +190,13 @@
    control. A consumer who wants otherwise sets it on their own element and wins,
    which is what inherited properties are for.
 
-   **It does not stack the marks itself, and it briefly tried to.** There was a
-   rule here reading `::slotted(helix-avatar + helix-avatar)`, meant to overlap a
-   run of source avatars the way a facepile does. It was dead twice over.
-   `::slotted()` takes a compound selector and a `+` is a combinator, which
-   `Avatar.Group`'s own stylesheet says out loud where it explains why
-   `:not(:first-child)` is allowed there; and the avatars in that example were
-   inside a consumer's own wrapper, so they were never assigned to this slot to
-   be matched in the first place. Nothing in a shadow root can reach a slotted
-   element's children.
+   **It does not stack the marks itself, and it cannot.** A rule reading
+   `::slotted(helix-avatar + helix-avatar)` is dead twice over: `::slotted()`
+   takes a compound selector and a `+` is a combinator, which `Avatar.Group`'s
+   own stylesheet says out loud where it explains why `:not(:first-child)` is
+   allowed there; and avatars inside a consumer's own wrapper are never assigned
+   to this slot to be matched in the first place, nothing in a shadow root being
+   able to reach a slotted element's children.
 
    The library already has the thing: `helix-avatar-group` overlaps its members,
    rings each one against the ground, folds past `max` and counts the rest. A
@@ -257,7 +248,7 @@
    1.38 light against 1.35 dark on the page. */
 [part="content"] {
   background-color: var(
-    --chat-message-background,
+    --chat-message-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
   );
   border-radius: var(--helix-radii-md);
@@ -269,25 +260,21 @@
   padding-inline: var(--helix-space-sm);
 }
 
-/* **The brand, and this rule has been wrong twice.** It was `accent-subtle`, the
-   only rule in the library reaching for an accent nobody asked for: the accent
-   is derived as the brand's complement, `--helix-seed-accent-hue: 180` off a
-   blue seed, so a reader who had themed nothing was asked why their chat was
-   orange. `primary-subtle` fixed the hue and kept the fault underneath it, which
-   was being an absolute color at all. Both are recorded here because the second
-   was a considered fix for the first and still failed.
+/* **The brand, as a wash and not as an absolute color.** Do not reach for
+   `accent-subtle`: the accent is derived as the brand's complement,
+   `--helix-seed-accent-hue: 180` off a blue seed, so a reader who had themed
+   nothing was asked why their chat was orange. `primary-subtle` fixes the hue
+   and keeps the fault underneath it. It is L 0.28 and `surface-overlay` is
+   L 0.29, so an own turn inside a popover measured 1.04 against the panel behind
+   it: legible by hue alone, and gone entirely in grayscale or to a reader who
+   cannot separate blue from gray. That is the same collision `Option` records
+   between `surface-raised` and `surface-overlay`, one rung further down.
 
    The same wash at the brand's hue, and 28% because that is where it weighs the
    same as the one above: 1.43 to 1.54 against every ground in both modes, where
    the neutral wash is 1.35 to 1.57. The two turns are the same object with a
-   different tint, which is what keeps the transcript one rhythm rather than two.
-
-   **`primary-subtle` was the last thing here and it failed the way an absolute
-   color does.** It is L 0.28 and `surface-overlay` is L 0.29, so an own turn
-   inside a popover measured 1.04 against the panel behind it: legible by hue
-   alone, and gone entirely in grayscale or to a reader who cannot separate blue
-   from gray. That is the same collision `Option` records between `surface-raised`
-   and `surface-overlay`, one rung further down. */
+   different tint, which is what keeps the transcript one rhythm rather than
+   two. */
 /* **`plain` takes the ground away and leaves the words.** Not the padding: the
    inline padding goes, because there is no box left for it to be inside, and the
    block padding stays so a run of plain turns keeps the rhythm a bubble gave it. */
@@ -298,7 +285,7 @@
 
 :host([author="me"]) [part="content"] {
   background-color: var(
-    --chat-message-background-me,
+    --chat-message-background-color-me,
     color-mix(in oklab, var(--helix-color-primary) 28%, transparent)
   );
 }
@@ -345,12 +332,12 @@
    with `aria-busy`. One element and three background layers, each moved in turn,
    which is the only way to stagger three dots without three boxes to stagger.
 
-   **The first version animated `background-size` and was inert.** A
+   **Do not animate `background-size` here; it is inert.** A
    `circle closest-side` gradient takes its radius from the *smaller* half of its
    layer box, and the layers are wider than they are tall: growing the height
-   from 30% to 60% left the width untouched, so the closest side never changed
-   and the dot never changed with it. The animation ran, the computed value moved
-   every frame, and nothing on screen did. Measured in a browser mid-cycle:
+   from 30% to 60% leaves the width untouched, so the closest side never changes
+   and the dot never changes with it. The animation runs, the computed value
+   moves every frame, and nothing on screen does. Measured in a browser mid-cycle:
    `background-size: 20% 30%, 20% 59.7%, 20% 30.3%` against three dots the same
    size.
 
@@ -423,14 +410,14 @@
    to be found rather than noticed. `sending` is quieter than a settled turn, and
    `streaming` is drawn only while it has nothing to show: once the text is
    arriving the text is the signal, and decorating it competes with it. */
-/* **The bubble is not marked, and it was.** A failed turn drew a `danger` edge,
-   on the argument that an invalid field turns its own border rather than relying
-   on the note under it. A field is the right analogy for the mechanism and the
+/* **The bubble is not marked.** Do not draw a `danger` edge on a failed turn, on
+   the argument that an invalid field turns its own border rather than relying on
+   the note under it. A field is the right analogy for the mechanism and the
    wrong one for the object: a field is a control the reader is being told to fix
    and a turn is something they already said, so ringing it in red reads as an
    accusation about the words rather than a report about the delivery. It also
-   could not survive `separation="plain"`, where there is no box to ring and the
-   rule came out as a hairline tight around bare prose.
+   cannot survive `separation="plain"`, where there is no box to ring and the
+   rule comes out as a hairline tight around bare prose.
 
    The mark and the words on the line below are what a failure says. That is
    `field`'s own fallback for a control whose border a theme has removed, and it
@@ -464,16 +451,12 @@
   opacity: 0.6;
 }
 
-/* **The red says what happened; the control says what to do about it.** This
-   inherited the danger color from the line it sits on, so "Not sent" and "Try
-   again" were the same red at the same weight and the only thing separating them
-   was an underline, which made the action read as a broken link rather than as a
-   control. Three treatments were drawn and compared: danger with no underline is
-   more red text and offers nothing to click; the primary color puts a second
-   loud color on a small line and lands it beside a bubble already wearing it;
-   the ordinary foreground with an underline leaves exactly one red thing on the
-   line, which is the state, and one thing that reads as a control, which is the
-   way out.
+/* **The red says what happened; the control says what to do about it.** Left to
+   inherit the danger color from the line it sits on, "Not sent" and "Try again"
+   are the same red at the same weight with only an underline between them, which
+   makes the action read as a broken link rather than as a control. The ordinary
+   foreground with an underline leaves exactly one red thing on the line, which
+   is the state, and one thing that reads as a control, which is the way out.
 
    It was also a bare 12 pixel word, about 55 by 15, under the 24 by 24 a pointer
    target is meant to clear. It takes its padding and radius from the shape the

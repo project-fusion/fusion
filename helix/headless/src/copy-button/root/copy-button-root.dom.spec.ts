@@ -29,12 +29,10 @@ const clipboard = (behavior: 'accept' | 'refuse') => {
 
 /* A press, and everything it sets off.
  *
- * **Not a fixed number of microtask ticks**, which is what these did and what
- * broke the day the write moved into `CopyController`: the controller is one
- * `await` deeper than the hand-rolled write it replaced, so a single
- * `await Promise.resolve()` no longer reached the end of it and two specs
- * failed on an implementation detail rather than on behavior. A press is done
- * when the element has settled, and a task boundary reaches past any number of
+ * **Not a fixed number of microtask ticks.** Counting them ties the spec to how
+ * many `await`s deep the write happens, so a single `await Promise.resolve()`
+ * stops reaching the end of it the moment that changes. A press is done when the
+ * element has settled, and a task boundary reaches past any number of
  * promises. */
 const press = async (el: Awaited<ReturnType<typeof mount>>): Promise<void> => {
   const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
@@ -69,14 +67,10 @@ describe('copy button', () => {
   /* The one that matters. A refused clipboard is the common case on an insecure
      origin, and a button that confirms anyway is lying about the one thing it
      exists to report.
-   *
-     **Both routes refused, which "the platform refuses" now means.** This
-     rejected `writeText` alone and called that the platform, which was true
-     while the button had only that one route. In a real browser the fallback
-     then succeeds, because `document.execCommand('copy')` works there, and the
-     button confirmed: the spec failed in Chromium and passed under happy-dom,
-     which has no `execCommand` at all. The second route is the fix, so the test
-     has to refuse it too. */
+
+     **Both routes have to be refused.** Rejecting `writeText` alone passes under
+     happy-dom, which has no `execCommand` at all, and fails in Chromium, where
+     `document.execCommand('copy')` succeeds and the button confirms. */
   test('says nothing when the platform refuses', async () => {
     clipboard('refuse')
     ;(document as unknown as Record<string, unknown>).execCommand = () => false
@@ -123,17 +117,13 @@ describe('what it says and shows', () => {
 })
 
 /**
- * The route the button did not have, in the place it matters most.
+ * The fallback route, in the place it matters most.
  *
- * It reached straight for `navigator.clipboard.writeText` and stopped there, so
- * in a sandboxed iframe without `allow-same-origin` it was inert: the guard on
- * the API existing does not help, because in that sandbox the object exists and
- * the write rejects. That is the sandbox every example on the docs site runs
- * in, which made a copy button that does nothing the most likely one a reader
- * would ever press.
- *
- * `CopyController` has always had both routes. This is a second, thinner
- * implementation of it going away rather than a new feature.
+ * `navigator.clipboard.writeText` alone is inert in a sandboxed iframe without
+ * `allow-same-origin`, and guarding on the API existing does not help: in that
+ * sandbox the object exists and the write rejects. That is the sandbox every
+ * example on the docs site runs in, so it is the copy button a reader is most
+ * likely to press.
  */
 describe('a context that refuses the modern clipboard', () => {
   const legacy = (answers: boolean) => {

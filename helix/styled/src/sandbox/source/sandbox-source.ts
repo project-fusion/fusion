@@ -34,16 +34,16 @@ import { styles } from './sandbox-source.css.js'
  *
  * @csspart source - The editable region.
  *
- * @cssproperty --sandbox-source-background - Fill behind the source.
+ * @cssproperty --sandbox-source-background-color - Fill behind the source.
  * @cssproperty --sandbox-source-min-block-size - Minimum height of the pane.
  */
 @customElement('helix-sandbox-source')
 export class HelixSandboxSource extends HelixElement {
   /**
-   * The source being edited.
+   * Accessible name for the editable region.
    */
-  @property()
-  value = ''
+  @property({ attribute: 'field-label' })
+  fieldLabel = 'Example source'
 
   /**
    * Which source this pane holds, echoed in every `helix-before-edit`.
@@ -57,16 +57,16 @@ export class HelixSandboxSource extends HelixElement {
   name = 'html'
 
   /**
-   * Accessible name for the editable region.
-   */
-  @property({ attribute: 'field-label' })
-  fieldLabel = 'Example source'
-
-  /**
    * Whether Tab indents rather than moving focus.
    */
   @property({ attribute: 'tab-indents', converter: onUnlessFalse })
   tabIndents = true
+
+  /**
+   * The source being edited.
+   */
+  @property()
+  value = ''
 
   /** Set by Escape, so the next Tab leaves the field. */
   private escaped = false
@@ -74,19 +74,14 @@ export class HelixSandboxSource extends HelixElement {
   /**
    * Reports where the cursor is, for a status bar to read.
    *
-   * **The shipped shell could not fill its own readout before this.**
-   * `SandboxRoot` binds a `helix-caret` listener and writes `line` and `column`
-   * onto every slotted status bar, and `SandboxStatusBar` renders a `caret` part
-   * as soon as it has both, and both of those ship from `@fusion.dev/helix`. The one
-   * pane that reported a position was `SandboxEditor`, which is in
-   * `@fusion.dev/helix-sandbox` and is `private` while Helix is pre-release. So a
-   * consumer taking the published shell and this pane got a status bar that
-   * could never show a position, and the only fix available to them was a
-   * package they cannot install.
-   *
-   * That is the gap rather than a dead event: the editor has dispatched this
-   * since it was written, and `check:events` has always seen it. What was
-   * missing was the half of the pair that ships.
+   * **This pane has to send it, not only `SandboxEditor`.** `SandboxRoot` binds
+   * a `helix-caret` listener and writes `line` and `column` onto every slotted
+   * status bar, and `SandboxStatusBar` renders a `caret` part as soon as it has
+   * both; all of that ships from `@fusion.dev/helix`, while the editor is in
+   * `@fusion.dev/helix-sandbox` and is `private` while Helix is pre-release. A
+   * consumer taking the published shell and this pane would otherwise get a
+   * status bar that can never show a position, fixable only with a package they
+   * cannot install.
    *
    * The textarea is the only thing that knows, so this is where it belongs.
    * One-based on both axes, which is what an editor shows and what the detail's
@@ -107,12 +102,11 @@ export class HelixSandboxSource extends HelixElement {
   /**
    * Announces the edit, then applies it if nobody refused.
    *
-   * **This was the other way round, so `helix-before-edit` was a `before` event
-   * that had already happened.** The value was assigned and the request
-   * dispatched after it, which means `preventDefault()` was accepted and
-   * ignored: a consumer refusing an edit kept the old value in their handler and
-   * the pane held the new one. Every other `before` event in this library is
-   * announced first and applied only if the request stands, and this is that.
+   * **Never the other way round.** Assigning the value and dispatching the
+   * request after it accepts `preventDefault()` and ignores it: a consumer
+   * refusing an edit keeps the old value in their handler while the pane holds
+   * the new one, and `helix-before-edit` becomes a `before` event that has
+   * already happened.
    *
    * `restoreValue` because the textarea has already taken the character
    * whichever way it goes, so a refusal has to put the text back, and it does so
@@ -125,10 +119,8 @@ export class HelixSandboxSource extends HelixElement {
   }
 
   /**
-   * The one place an edit is taken, so a refusal cannot be forgotten at one of them.
-   *
-   * Two paths reach it, a keystroke and the tab that indents, and the second had
-   * the same fault as the first with its own copy of the code.
+   * The one place an edit is taken, so a refusal cannot be forgotten at one of
+   * them. Two paths reach it, a keystroke and the tab that indents.
    */
   private edit(field: HTMLTextAreaElement, next: string): void {
     const request = new HelixBeforeEditEvent({ value: next })

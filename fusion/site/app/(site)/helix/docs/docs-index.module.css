@@ -1,0 +1,96 @@
+/* The guides index. One route applies these and no other.
+ */
+
+/* ======================================================== index ========== */
+
+/* **A row per page, with its description, which is the whole reason this page
+   exists.** The sidebar beside it already lists every section and every title,
+   so an index showing the same names in boxes is a second copy of the
+   navigation with a border around it: 3,838px of page for 42 links and not one
+   word a reader could not already see. The description is in the frontmatter of
+   every page and is rendered nowhere else.
+ */
+.section {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  /* **More below the last row than above the next heading**, which is not
+     symmetry for its own sake: the rule belongs to the section that follows it,
+     so it should sit nearer the heading it introduces than the rows it closes
+     off. With no end padding a row's hover rectangle lands exactly on the
+     rule. */
+  padding-block-end: var(--helix-space-2xl);
+  padding-block-start: var(--helix-space-lg);
+}
+
+/* The last section has no rule under it, so its end padding is the footer's
+   business rather than a gap before nothing. */
+.section:last-of-type {
+  padding-block-end: var(--helix-space-none);
+}
+
+/* Two columns where there is room, one where there is not, and the section
+   heading spans both: a heading in a column is a heading for that column. */
+.pages {
+  column-gap: var(--helix-space-xl);
+  display: grid;
+  /* **18rem, measured against the column this actually gets.** The docs shell
+     gives the content 768px beside its sidebar and the grid 672 inside that, so
+     a 20rem floor needed 640 plus a `2xl` gap of 48 and came to 688: four pixels
+     over, and the whole page fell to one column and got taller than the boxes it
+     replaced. Two tracks at 18rem and an `xl` gap fit with room, and the floor is
+     still wide enough that a description wraps at most twice. */
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  row-gap: var(--helix-space-md);
+}
+
+/* **The whole row is the target, not the words.** A title that is a link and a
+   description that is not makes the description dead space next to something
+   pressable, which is the same complaint `Tree.Item` fixed by rendering its own
+   anchor: five sixths of every row did nothing. */
+.page {
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  /* **No negative inline margin, which is what a hover that bleeds into the
+     gutter would need.** It looked right on a wide screen and pushed the page
+     six pixels past the viewport at 390, where the column is already flush with
+     the edge: measured, a scroll width of 396 against 390. The highlight aligns
+     to the text instead, which costs a little generosity and cannot overflow. */
+  padding-block: var(--helix-space-sm);
+  padding-inline: var(--helix-space-xs);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.page:hover {
+  background-color: var(--helix-color-surface);
+}
+
+/* No underline on the title, because the row is the affordance and a link
+   underline inside a pressable row is the second marker for one thing. The
+   `data-link` recipe is deliberately not used here for the same reason. */
+.title {
+  color: var(--helix-color-foreground);
+  display: block;
+}
+
+.summary {
+  color: var(--helix-color-foreground-muted);
+  display: block;
+  margin-block-start: var(--helix-space-2xs);
+}
+
+/* The standfirst, at the size the product pages set for one.
+ *
+ * Carried here rather than imported from `vertical-page.module.css`: that module
+ * also holds the marketing band inset, and taking one class from it means
+ * wearing the other. See the note on `docsMain` in the page.
+ */
+.lede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  max-inline-size: 68ch;
+}
+
+/* `main` is not a flex container, so the space between the standfirst and the
+   first section has to be said rather than left to a gap. */
+.head {
+  margin-block-end: var(--helix-space-2xl);
+}

@@ -16,8 +16,7 @@
  * In a column flex container the inline axis is the cross axis, where items
  * stretch to the container rather than the container sizing to them. So the
  * field is as wide as the host whatever the host is, and the host is still as
- * wide as its content wants to be. A block box behaved this way all along,
- * which is why none of this existed before there was anything to stack. */
+ * wide as its content wants to be. */
 :host {
   display: flex;
   flex-direction: column;
@@ -45,17 +44,6 @@
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* On the box, because `delegatesFocus` puts focus on the input inside it and a
- * ring around that would sit within the frame rather than around it.
- *
- * One edge, too, not two rings with a gap down the middle.
- *
- * The border turns accent and the ring is drawn against it rather than offset
- * from it, so the two read as a single thicker edge. Offset, they were a blue
- * line, a dark gap, and a second blue line: the field looked double-struck
- * rather than focused. The offset is right where a ring surrounds something
- * that is not itself changing color, which is most controls, and wrong here
- * because the border is doing the same job at the same moment. */
 /* `:host(:disabled)`, not `:host([disabled])`.
  *
  * The pseudo-class matches on the element's own attribute *and* on an ancestor
@@ -68,7 +56,18 @@
   border-color: var(--helix-color-primary);
 }
 
-/* Named with `:hover` as well, which is the whole reason this reads right.
+/* On the box, because `delegatesFocus` puts focus on the input inside it and a
+   ring around that would sit within the frame rather than around it.
+
+   One edge, not two rings with a gap down the middle. The border turns accent
+   and the ring is drawn against it rather than offset from it, so the two read
+   as a single thicker edge. Offset, they are a blue line, a dark gap, and a
+   second blue line, and the field looks double-struck rather than focused. The
+   offset is right where a ring surrounds something that is not itself changing
+   color, which is most controls, and wrong here because the border is doing the
+   same job at the same moment.
+
+   Named with `:hover` as well, which is the whole reason this reads right.
    Hover is a more specific selector than focus here, four to three, so a
    focused field under the pointer took the hover border back: a gray edge
    inside a blue ring, which is the two-ring look this was meant to end. Being
@@ -146,19 +145,15 @@ slot[name="end"]::slotted(*) {
   opacity: 0.5;
 }
 
-/* Flush with its ground, which is what `transparent` says and no color can.
+/* Flush with its ground, which is what `transparent` says and no absolute color
+ * can: on a card, `surface` *is* the card, so read-only would be flush by
+ * coincidence; on a raised panel it comes out lighter than the thing it sits
+ * on, a field rising out of the surface it belongs to.
  *
- * This named `surface` while the resting fill named `surface-sunken`, so the
- * pair was two absolute steps and only the resting one was corrected by 154.
- * Absolute was wrong here for the same reason and one rung further: on a card,
- * `surface` *is* the card, so read-only was flush by coincidence; on a raised
- * panel it came out lighter than the thing it sat on, which is a field rising
- * out of the surface it belongs to.
- *
- * The resting field is a recess now, a percentage of the foreground over
- * whatever is behind it. So read-only is the absence of that recess rather than
- * a second color: no fill, the ground showing through, distinct from the
- * resting state on every ground and needing no token to stay that way. */
+ * The resting field is a recess, a percentage of the foreground over whatever
+ * is behind it, so read-only is the absence of that recess rather than a second
+ * color: no fill, the ground showing through, distinct from the resting state
+ * on every ground and needing no token to stay that way. */
 :host([readonly]) [part="field"] {
   background-color: transparent;
 }
@@ -217,10 +212,11 @@ slot[name="end"]::slotted(*) {
   }
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and a state carried by a fill has
+ * to survive, or the paper says the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

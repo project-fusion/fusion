@@ -11,13 +11,13 @@
 [part="tab"] {
   align-items: center;
   background-color: var(--_tab-surface, transparent);
-  /* The height a control is. A tab was as tall as its own text plus whatever
-     padding the appearance asked for, which came out at 31px next to a 40px
-     button and made a toolbar look assembled from parts.
+  /* The height a control is. Left to its own text plus whatever padding the
+     variant asks for, a tab comes out at 31px beside a 40px button and a toolbar
+     looks assembled from parts.
 
-     Through a variable, because an appearance that puts a frame around the row
-     has to hand the tab a share of the frame rather than the whole control
-     height. `segmented` does exactly that. */
+     Through a variable, because a variant that puts a frame around the row has
+     to hand the tab a share of the frame rather than the whole control height.
+     `segmented` does exactly that. */
   block-size: var(--_tab-height, var(--helix-size-control));
   border: none;
   /* Transparent always. The mark that says which tab is current is one
@@ -42,11 +42,11 @@
 
 /* A wash under the pointer, not a color change alone.
  *
- * Hover only darkened the label, which is the quietest answer a control can
- * give and is invisible on a tab that is already at full foreground: the
- * selected tab, and every tab in the sandbox's own chrome, answered the pointer
- * with nothing at all. The same five percent wash the nav bar uses, so a row of
- * tabs and a row of navigation behave alike.
+ * Darkening the label is the quietest answer a control can give and is invisible
+ * on a tab already at full foreground: the selected tab, and every tab in the
+ * sandbox's own chrome, would answer the pointer with nothing at all. The same
+ * five percent wash the nav bar uses, so a row of tabs and a row of navigation
+ * behave alike.
  *
  * Under the selected rule below, so a selected tab keeps its own surface: it is
  * already the one you are on and does not need telling twice. */

@@ -70,12 +70,10 @@ if (hasLayout()) {
     })
 
     test('names the sideways edges too, and draws them', async () => {
-      /* Measured on all four from the start, and drawn on two until a row that
-         ran past its box needed the other pair. The host has two
-         pseudo-elements and four edges want four, so the sideways ones hang off
-         a part of their own and are placed with logical properties, which is
-         what makes inline-start the right-hand edge for a reader who reads that
-         way. */
+      /* The host has two pseudo-elements and four edges want four, so the
+         sideways ones hang off a part of their own and are placed with logical
+         properties, which is what makes inline-start the right-hand edge for a
+         reader who reads that way. */
       const host = (await mount(
         `<helix-scroll-area label="Row" style="display:block;inline-size:120px"><div style="display:flex"><span style="flex:0 0 200px">a</span><span style="flex:0 0 200px">b</span></div></helix-scroll-area>`,
       )) as Area

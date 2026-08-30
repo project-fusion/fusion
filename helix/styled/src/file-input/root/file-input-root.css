@@ -1,6 +1,11 @@
 /* The field is the drop target, so it is a box with room in it rather than a
    line. A file control is not a text field: nothing is typed into it, its height
-   is not a line of text, and the thing a reader aims at is the whole area. */
+   is not a line of text, and the thing a reader aims at is the whole area.
+
+   Dashed, and that is the one piece of ornament here worth defending: a solid
+   border says "a box", and a dashed one is the convention for a box you may put
+   something into. It is the only affordance a drop target has before anything is
+   dragged, because a cursor cannot say it in advance. */
 [part="field"] {
   align-items: center;
   position: relative;
@@ -10,16 +15,11 @@
   display: flex;
   gap: var(--helix-space-xs);
   justify-content: center;
-  padding: var(--file-input-inset, var(--helix-space-md));
+  padding: var(--file-input-padding, var(--helix-space-md));
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
-
-/* Dashed, and that is the one piece of ornament here worth defending: a solid
-   border says "a box", and a dashed one is the convention for a box you may put
-   something into. It is the only affordance a drop target has before anything is
-   dragged, because a cursor cannot say it in advance. */
 
 /* The input is kept, not replaced. It has to be in the layout and reachable,
    because it holds the label, the name, the validity and the focus, so it is
@@ -38,10 +38,10 @@
 
 /* The field is what the input is measured against, not the host.
  *
- * Positioned on the host it covered the host: the label above the box and the
- * hint below it were both under an invisible file input, so pressing either one
- * opened a picker, and the box a reader actually aims at was not the box that
- * answered. Measured, the control and the field were different sizes. */
+ * Positioned on the host it covers the host: the label above the box and the
+ * hint below it both end up under an invisible file input, so pressing either
+ * one opens a picker, and the box a reader aims at is not the box that answers.
+ * Measured, the control and the field came out different sizes. */
 :host {
   display: block;
 }
@@ -104,13 +104,13 @@
  * control, and a bar holding three things reads as a row of a table with no
  * header. A bordered card on the page's own ground separates them from each
  * other and from the drop field above, which is the one thing a tinted bar
- * could not do, being the same tint as the field. */
-/* A card arrives rather than appearing.
+ * could not do, being the same tint as the field.
  *
- * Three files chosen at once were three cards at full strength in one frame,
- * under a field that had not changed, so the only thing telling a reader
- * anything had happened was that the page was suddenly taller. A short scale and
- * fade says "these are new" without asking anyone to wait for it.
+ * A card arrives rather than appearing. Three files chosen at once are three
+ * cards at full strength in one frame, under a field that has not changed, so
+ * the only thing telling a reader anything happened is that the page is
+ * suddenly taller. A short scale and fade says "these are new" without asking
+ * anyone to wait for it.
  *
  * `@starting-style` is what makes it possible at all: a transition needs a value
  * to come *from*, and an element inserted this frame has no previous value, so
@@ -167,7 +167,7 @@
 /* The name and its readings on one line where they fit, and stacked where they
  * do not.
  *
- * A column always was two lines for every file, including `raw.bin` at one byte,
+ * A column always is two lines for every file, including `raw.bin` at one byte,
  * which is a lot of card for very little. A row always cannot work either: a
  * file name is often long, and the name is the thing being identified.
  *
@@ -197,11 +197,11 @@
 
 /* The size and the kind, as two small tags under the name.
  *
- * They were one line of muted text with a middle dot between them, which reads
- * as a sentence about the file. They are not a sentence, they are two readings
- * of it, and a tag is what this system already uses for a short fact with an
- * edge around it. Two of them also survive a narrow card: text wraps mid-reading
- * and tags wrap between readings.
+ * One line of muted text with a middle dot between them reads as a sentence
+ * about the file. They are not a sentence, they are two readings of it, and a
+ * tag is what this system already uses for a short fact with an edge around it.
+ * Two of them also survive a narrow card: text wraps mid-reading and tags wrap
+ * between readings.
  *
  * `size-tag-sm` set here rather than a density on the host, because density is a
  * decision about a region and these are small because they are secondary to the
@@ -232,13 +232,12 @@
   overflow-wrap: anywhere;
 }
 
-/* A trash can rather than a cross, and from the icon set rather than drawn.
+/* A trash can rather than a cross, and from the icon set rather than drawn as a
+ * stencil here.
  *
- * It was a stencil in a mask here, on the argument that a file field should cost
- * no icon dependency. The argument held until the mark was wrong: a cross says
- * "dismiss this", which is what a tag's control does, and taking a file out of a
- * set that is about to be uploaded is a delete. The set has a trash can and the
- * component now uses it, the same way the color picker uses its eyedropper.
+ * A cross says "dismiss this", which is what a tag's control does, and taking a
+ * file out of a set that is about to be uploaded is a delete. The set has a
+ * trash can, the same way the color picker takes its eyedropper from it.
  *
  * `danger` on hover only. A row of red bins is a list that looks like a warning,
  * where the same mark in the muted foreground is a control that is available. */
@@ -295,7 +294,7 @@
   }
 
   /* The card still has to arrive, so the starting style goes rather than the
-     card: without this it is inserted at 0.96 and stays there, which is a
+     card: without this it is inserted at 0.9 and stays there, which is a
      shrunken card rather than a still one. */
   [part="file"] {
     opacity: 1;
@@ -323,13 +322,9 @@
  *
  * The same four selectors Input carries, and for the reason it records at
  * length: the focus rule owns the `outline` and nothing here was changing its
- * color, so a focused field with an error came out as a red border inside a
+ * color, so a focused field with an error comes out as a red border inside a
  * blue ring. Hover is named for the same reason from the other side. The border
- * and the ring are one edge, so when one turns they both do.
- *
- * This was missing on every field added after Input, which is what a sweep of
- * all sixteen form controls turned up: `:state(invalid)` reached the host and
- * only the message underneath answered it. */
+ * and the ring are one edge, so when one turns they both do. */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],
@@ -338,10 +333,12 @@
   outline-color: var(--helix-color-danger);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
+/* Print: a control prints the value it holds, and the state has to survive: a
+ * state drawn as a fill prints as an empty box, which is a document saying the
+ * opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

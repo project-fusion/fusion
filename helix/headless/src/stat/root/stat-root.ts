@@ -11,11 +11,6 @@ import { property } from 'lit/decorators.js'
  * lands on the number either way, because the number is the loud thing; a
  * reader hearing it needs to know what it counts before hearing how many.
  *
- * This paragraph said the opposite, value first and label after, on a render
- * that has always emitted the label slot first: the description was published
- * to two tiers and shipped into the generated types, and the component was
- * right and the sentence was wrong.
- *
  * Both are bare slots. An element whose only job is to assign itself a slot on
  * connect gives its own host an attribute after upgrade, which a React
  * consumer's server markup never had.
@@ -52,8 +47,8 @@ export class HelixHeadlessStat extends HelixElement {
    * the host the moment the element upgrades, and the host is markup the
    * consumer rendered: React compares what it rendered against what is there and
    * reports a hydration mismatch. The absent attribute is the column, which the
-   * stylesheet reads as the base case. The existing server spec caught this,
-   * being the one that asserts the host carries nothing nobody wrote.
+   * stylesheet reads as the base case, and the server spec asserts the host
+   * carries nothing nobody wrote.
    */
   @property({ reflect: true })
   direction?: 'column-reverse' | 'row' | 'row-reverse'

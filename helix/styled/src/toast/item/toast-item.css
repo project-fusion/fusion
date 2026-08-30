@@ -18,15 +18,14 @@
     margin-block-start var(--helix-duration-normal) var(--helix-easing-standard),
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     translate var(--helix-duration-normal) var(--helix-easing-standard);
-  /* Dense by nature, and it never said so. A toast is a compact region the same
-     way the app header, the toolbar and the announcement are, and every one of
-     those declares this on its own host. Without it a slotted `Retry` came out
-     at the full 40px beside a 32px dismiss, so the two controls in one row were
-     different heights: measured, three center lines at 654, 660 and 664. */
-  /* The icon step with it. A container that is dense by nature declares the
-     control size and stopped there, so an icon in the message drew at the `md` step
-     inside `sm` controls: 20 pixels in a 32 pixel row, which is what the
-     shipped examples render. `Menu` is the only one that already did both. */
+  /* Dense by nature. A toast is a compact region the same way the app header,
+     the toolbar and the announcement are, and every one of those declares this
+     on its own host. Without it a slotted `Retry` comes out at the full 40px
+     beside a 32px dismiss, so the two controls in one row are different heights:
+     measured, three center lines at 654, 660 and 664. */
+  /* The icon step with it. A container that declares the control size and stops
+     there draws an icon in the message at the `md` step inside `sm` controls: 20
+     pixels in a 32 pixel row. */
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
   /* The height of one line of the message, which is what everything in the row
@@ -44,22 +43,15 @@
      corner and out of flow. What goes where is the grid below; this is how the
      things sharing the first row sit on it.
    *
-   * The paragraph that stood here described a wrapping flex, where a short
-   * message left room and the action sat beside it. That is what this was, and
-   * the note under `display` records why it stopped being that, thirty lines
-   * later in the same comment: an action belongs under the words rather than
-   * beside them. Two accounts of one row, and the browser suite believed the
-   * older one, having never run.
-   *
    * Aligned to the top, and then each thing on the first row nudged onto the
    * *first line* of the message rather than onto the top of its own box.
    *
-   * `center` was right for a one-line message and wrong for every other: the
-   * mark and the dismiss floated to the middle of a four-line paragraph, when
+   * `center` is right for a one-line message and wrong for every other: the
+   * mark and the dismiss float to the middle of a four-line paragraph, when
    * a mark belongs beside the words it qualifies and a close belongs in the
-   * corner. Plain `start` is wrong too, and that is what the earlier note here
-   * was reacting to: three boxes of 16px, 21px and 32px sharing a top edge have
-   * their centers 8px apart, so a one-line message came out visibly staggered.
+   * corner. Plain `start` is wrong too: three boxes of 16px, 21px and 32px
+   * sharing a top edge have their centers 8px apart, so a one-line message
+   * comes out visibly staggered.
    *
    * Both are fixed by aligning to the line box instead of to the box top. The
    * offsets are derived, not guessed: the line is the font size times the line
@@ -70,13 +62,13 @@
   /* Two columns, the mark and everything it qualifies, and the actions in the
      second of them on a row of their own.
    *
-   * It was a wrapping flex, which put the actions beside the message when both
-   * fit on one line and under the *mark* when they did not. Both readings were
-   * wrong for the same reason: an action is a thing to do about the message, so
-   * it belongs under the words rather than beside them or under the icon. And
-   * inline, the action was the tallest thing on the line, so a one-line toast
-   * had its text and its mark centered against a 32px control instead of sitting
-   * on their own line.
+   * Not a wrapping flex, which put the actions beside the message when both fit
+   * on one line and under the *mark* when they did not. Both readings are wrong
+   * for the same reason: an action is a thing to do about the message, so it
+   * belongs under the words rather than beside them or under the icon. And
+   * inline, the action is the tallest thing on the line, so a one-line toast has
+   * its text and its mark centered against a 32px control instead of sitting on
+   * their own line.
    *
    * Column one is `auto`, so with no mark it is zero wide and the message
    * starts at the inset. The gap that would otherwise still be drawn beside an
@@ -94,7 +86,7 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
-  padding: var(--toast-item-inset, var(--helix-space-sm));
+  padding: var(--toast-item-padding, var(--helix-space-sm));
   /* Room for the close, which is out of flow. Reserved here rather than by a
      grid column, because a column is only as tall as it needs to be and this
      one was 32px tall next to a 21px line: a one-line message paid eleven
@@ -119,12 +111,11 @@
 
 /* The severity mark.
  *
- * It was a bar down the leading edge, and before that a bar drawn as a border
- * that the corner radius bent. Both were the same mistake in different shapes:
- * a colored line says *something* is different about this message and never
- * says what, so a reader who cannot tell green from red is told nothing at all.
- * The icon carries an `aria-label`, so the severity is in the accessibility
- * tree rather than only in the paint.
+ * A glyph and not a colored bar down the leading edge: a colored line says
+ * *something* is different about this message and never says what, so a reader
+ * who cannot tell green from red is told nothing at all. The icon carries an
+ * `aria-label`, so the severity is in the accessibility tree rather than only in
+ * the paint.
  *
  * The same four glyphs `Callout` uses. A reader meets these marks in a passage
  * and in a message, and a vocabulary that changed shape between the two would
@@ -210,17 +201,17 @@ slot[name="icon"]::slotted(*) {
      `border-box` every shadow root is given comes from a rule this one
      outranks. Restored at each site because there is nowhere later to put it.
    *
-   * The first-line offset has to be restored here for the same reason, and was
-   * not: written in an earlier rule it was wiped by this one, and the close sat
-   * 5.5px below the mark and the action it is meant to line up with. Measured,
-   * which is the only way that shows. */
+   * The first-line offset has to be restored here for the same reason: written
+   * in an earlier rule it is wiped by this one, and the close sits 5.5px below
+   * the mark and the action it is meant to line up with. Measured, which is the
+   * only way that shows. */
   box-sizing: border-box;
   /* In the corner and out of the flow, so it cannot set the height of the row
      the message is on. Placed against the first line the same way it was, which
      is what keeps it level with the mark. */
   position: absolute;
   inset-block-start: calc(
-    var(--toast-item-inset, var(--helix-space-sm)) +
+    var(--toast-item-padding, var(--helix-space-sm)) +
     (var(--_toast-line) - var(--helix-size-control-tight)) /
     2
   );
@@ -297,20 +288,6 @@ slot[name="icon"]::slotted(*) {
   }
 }
 
-/* Kept, and this was hidden for a reason that turned out not to be true.
- *
- * The note here said the base layer's reduced-motion rule would cap this at
- * 0.01ms and leave a bar claiming no time remained. It does not: that rule is
- * `*, *::before, *::after` in the document, and `*` does not cross a shadow
- * boundary. Measured under `prefers-reduced-motion: reduce`, this element kept
- * its full eight seconds while a light-DOM element beside it came back at
- * 1e-05s. So the bar was being hidden to avoid a failure that could not happen.
- *
- * It stays visible, because it is the only thing saying how long is left and a
- * 2px rule traveling once over the message's own lifetime is closer to a clock
- * than to an animation. What the preference is about is motion that surprises,
- * and this is the message's duration drawn at the speed of the message. */
-
 /* It arrives rather than appearing. A message that is simply there is one a
    reader has to notice on their own. */
 @media (prefers-reduced-motion: no-preference) {
@@ -331,28 +308,21 @@ slot[name="icon"]::slotted(*) {
   }
 }
 
-/* Gone when it has gone.
+/* Gone, and it takes its own space with it.
  *
- * On the host, because a message is an item in a stack and leaving an empty box
- * behind would hold its gap open. `display: none` takes it out of the
- * accessibility tree with it, which is right: a dismissed message is not
- * something to be read, and the region is `aria-relevant="additions"` so
- * nothing is announced on the way out either.
+ * `display: none` is instant, so the messages under it jump up. Collapsing the
+ * row and the margin together means the stack closes at the speed the message
+ * leaves at, and the ones below travel rather than teleport.
+ *
+ * It leaves towards the edge it arrived from, which is the same property the
+ * region sets for the entrance. `visibility: hidden` is what takes it out of the
+ * accessibility tree once the height is gone, where `display: none` would have
+ * ended the transition before it started. The region is
+ * `aria-relevant="additions"`, so nothing is announced on the way out either.
  *
  * Here rather than in the headless tier, which has no CSS: what the state means
  * is the component's, how it is drawn is this tier's. A headless consumer reads
  * `data-closed` and decides for themselves. */
-/* Gone, and it takes its own space with it.
- *
- * `display: none` was instant, so the messages under it jumped up. Collapsing
- * the row and the margin together means the stack closes at the speed the
- * message leaves at, and the ones below travel rather than teleport.
- *
- * It leaves towards the edge it arrived from, which is the same property the
- * region sets for the entrance. Still in the tree and still not focusable:
- * `visibility: hidden` is what takes it out of the accessibility tree once the
- * height is gone, where `display: none` would have ended the transition before
- * it started. */
 :host([data-closed]) [part="item"] {
   /* The last thing holding the box open. Padding is inside the border box and
      survives a zero height, so it has to collapse with the row. */
@@ -392,16 +362,8 @@ slot[name="icon"]::slotted(*) {
     visibility var(--helix-duration-normal) step-end;
 }
 
-/* Two answers in one file, which is why the check asks whether the question was
-   answered rather than how.
- *
- * The arrival goes: a message that slides in is the kind of movement the
- * preference is about, and it still appears.
- *
- * The timer stays. It is the only thing saying how long is left, and a 2px rule
- * crossing once over the message's own lifetime is nearer a clock than an
- * animation. It was hidden here once, on the belief that the base layer would
- * cap it to nothing; measured, the base layer never reached it at all. */
+/* The arrival goes: a message that slides in is the kind of movement the
+   preference is about, and it still appears. */
 @media (prefers-reduced-motion: reduce) {
   [part="item"] {
     animation: none;
@@ -422,7 +384,12 @@ slot[name="icon"]::slotted(*) {
  * It is the only thing telling a reader how long is left, and a 2px rule
  * crossing once over the message's own lifetime is nearer a clock than an
  * animation. Restated rather than left out, because left out is
- * indistinguishable from forgotten. */
+ * indistinguishable from forgotten.
+ *
+ * The base layer does not cap it either: its `*, *::before, *::after` rule is in
+ * the document, and `*` does not cross a shadow boundary. Measured under
+ * `prefers-reduced-motion: reduce`, this element kept its full eight seconds
+ * while a light-DOM element beside it came back at 1e-05s. */
 @media (prefers-reduced-motion: reduce) {
   :host,
   :host([data-closed]),

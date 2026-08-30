@@ -9,8 +9,7 @@ const acknowledge = async (): Promise<boolean> => Promise.resolve(true)
  * **Refusing the event is how a page owns the state.** `read` is a boolean
  * attribute, so its presence means true and there is no way to write "the page
  * owns this and it is currently false" as markup: `read="false"` is a present
- * attribute and therefore true, which is the trap `helix-toggle` carries the
- * same warning about.
+ * attribute and therefore true.
  *
  * So the page refuses instead. `preventDefault` stops the item applying
  * anything, the request goes to the server, and the property is written only

@@ -23,5 +23,5 @@
   --slider-track-size: var(--helix-space-md);
   --slider-thumb-size: var(--helix-space-lg);
   --slider-thumb-length: var(--helix-space-xs);
-  --slider-thumb-radii: var(--helix-radii-sm);
+  --slider-thumb-radius: var(--helix-radii-sm);
 }

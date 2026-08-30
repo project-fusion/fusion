@@ -1,13 +1,14 @@
 //! Memory.
 //!
-//! Storage is not memory. A table of everything that ever happened is the raw
-//! material memory operates on, not memory itself. What makes this a memory
-//! system is **consolidation**: episodic records accumulate, and a background
-//! pass distills them into semantic facts that supersede and decay.
+//! Storage is not memory: a table of everything that ever happened is the raw
+//! material it operates on. What makes this a memory system is
+//! **consolidation**: episodic records accumulate and are distilled into
+//! semantic facts that supersede and decay. `unconsolidated()` identifies the
+//! episodes waiting for that, and the pass that consumes them is not built.
 //!
 //! v0 ships episodic and semantic. Procedural memory (distilling repeated
 //! successful action sequences into reusable procedure) is deferred to v1
-//! because it is a research problem and the first two already differentiate.
+//! because it is a research problem.
 //!
 //! ```
 //! use fusion_cortex_core::Id;
@@ -83,13 +84,9 @@ impl Fact {
 
     /// Confidence after exponential decay over `days` with the given half-life.
     ///
-    /// Forgetting is an operation, not an omission. A memory system that never
-    /// lowers its confidence in stale claims is a memory system that confidently
-    /// tells you things that stopped being true.
     /// Elapsed time is clamped at zero: a negative age would *raise* confidence
-    /// above what was recorded, which is not decay running backwards, it is a
-    /// clock skew or an unset timestamp producing a fact the system believes
-    /// more than anything it was ever told.
+    /// above what was recorded, which is clock skew or an unset timestamp
+    /// manufacturing belief rather than decay running backwards.
     ///
     /// ```
     /// # use fusion_cortex_engram::Fact;
@@ -108,9 +105,10 @@ impl Fact {
     }
 }
 
-/// The in-memory reference store. `SQLite` and `Postgres` implementations hold the
-/// same shape behind a trait and are held in lockstep by a shared conformance
-/// suite, which is what keeps the storage abstraction honest.
+/// The in-memory reference store, and the shape the `SQLite` and `Postgres`
+/// backends must match behind a trait. Both are required from the start: an
+/// abstraction with one implementation is a guess, and `SQLite` assumptions
+/// otherwise leak into the domain model.
 #[derive(Clone, Debug, Default)]
 pub struct Memory {
     episodes: Vec<Episode>,

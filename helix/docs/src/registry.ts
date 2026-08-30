@@ -15,7 +15,7 @@
  * mechanism npm already provides and the only one that cannot drift.
  *
  * **Nothing about a page is written here.** `pages.generated.ts` is derived
- * from each file's frontmatter by `bun run docs`, because the frontmatter is
+ * from each file's frontmatter by `turbo run docs`, because the frontmatter is
  * what a `.md` consumer receives and a second copy would be a second source of
  * truth. This module is the types and the reading of them; `sections.ts` is the
  * spine that frontmatter has nowhere to live.
@@ -35,7 +35,7 @@ export interface DocPage {
   order?: number
   /**
    * Slug of the page this one sits under, for the one level of nesting that
-   * exists. Installation and its per-framework pages are the case.
+   * exists. Installation and Coding agents are the cases.
    */
   parent?: string
   /**
@@ -88,7 +88,7 @@ const byTitle = (a: DocPage, b: DocPage): number =>
  * The pages of one section, in the order a sidebar renders them.
  *
  * **Alphabetical, except a section that is a path, and except one pinned entry
- * page where a section has one.** The exemption is the same one `CLAUDE.md`
+ * page where a section has one.** The exemption is the same one `AGENTS.md`
  * grants positional arguments and middleware chains, that ordering is skipped
  * where order is semantic. Written down so a section is not silently reordered
  * by whoever next notices it is not alphabetical.
@@ -106,7 +106,7 @@ const ordered = (pages: DocPage[], section: DocSection): DocPage[] => {
  * The whole sidebar: every declared section, its pages in render order, and
  * each page's children beneath it.
  *
- * A section with no pages cannot appear, because `bun run check:docs` refuses
+ * A section with no pages cannot appear, because `turbo run docs -- --check` refuses
  * to generate one. Children are alphabetical, because nesting exists for the
  * per-framework installation pages and a reader picking their framework out of
  * a list is looking one up rather than reading a sequence, and then the

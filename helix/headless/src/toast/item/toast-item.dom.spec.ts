@@ -17,12 +17,10 @@ const message = async (attributes = ''): Promise<Item> =>
  * One message, and the contract that is the message's rather than the region's.
  *
  * **The toast region already proves the arrangement**, which is where messages
- * stack, how many are held and the order they leave in: it is named 39 times in
- * this family's specs. What one message owns alone is that it goes when it is
- * asked to, and every assertion here is about a message with no region around
- * it, because the region answering for it is exactly the bug this contract was
- * written after: the item waited to be told in every case, so its own dismiss
- * control looked broken to anyone who pressed it.
+ * stack, how many are held and the order they leave in. What one message owns
+ * alone is that it goes when it is asked to, so every assertion here is about a
+ * message with no region around it: an item that waits to be told is one whose
+ * own dismiss control looks broken to anyone who presses it.
  */
 describe('one toast message', () => {
   /* Undeclared, the message is its own. It says it is going and then goes, the
@@ -43,10 +41,9 @@ describe('one toast message', () => {
     expect(host.open).toBe(false)
   })
 
-  /* Asserted the opposite until 26 Aug 2026, when declaring `open` was a claim
-     of ownership and the element announced without closing. Control is an
-     action now: it applies, and a consumer refuses to take the decision.
-     See 294. */
+  /* Declaring `open` seeds the state and does not claim ownership of it.
+     Control is an action: it applies, and a consumer refuses to take the
+     decision. */
   test('announces and closes, where the markup only seeded it', async () => {
     const host = await message('dismissible open')
     let heard = 0

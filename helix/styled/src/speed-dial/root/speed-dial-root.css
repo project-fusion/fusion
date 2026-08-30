@@ -7,9 +7,8 @@
 /* A column, and in the top layer, so a dial floating over a page is over the
    page rather than over whatever its own stacking context contains.
  *
- * No surface of its own. Every action carries its own mark and its own chip,
- * and a panel behind them would be a second box round a set of boxes: what a
- * dial is, is the actions, spread out from the button that holds them. */
+ * No surface of its own: every action carries its own mark and its own chip,
+ * and a panel behind them would be a second box round a set of boxes. */
 [part="actions"] {
   background-color: transparent;
   border: none;
@@ -40,12 +39,8 @@
   display: none;
 }
 
-/* The actions arrive from the button, one after another.
- *
- * **Motion here says where they came from**, which is the one thing a fan can
- * say that a list cannot: three controls appearing at once beside a button is
- * three controls, and three climbing out of it is a button that opened. The
- * trigger is left alone, and the note in the example says why.
+/* The actions arrive from the button, one after another. Motion here says where
+ * they came from, which is the one thing a fan can say that a list cannot.
  *
  * `data-placed` rather than `@starting-style`, which `Tooltip` records at
  * length: the controller places the panel a microtask after it first renders,
@@ -64,11 +59,10 @@
   --_dial-from: calc(var(--helix-space-md) * -1);
 }
 
-/* Scoped to the actions' own slot, and it has to be said: `::slotted(*)` on its
-   own matches everything this element has slotted into it, and one of those is
-   the trigger. Unscoped, the button was hidden with the actions and never let
-   back in, because what lets them in is a rule about the panel: a dial that
-   opened onto three actions and no button to close them with. */
+/* Scoped to the actions' own slot. `::slotted(*)` on its own matches everything
+   this element has slotted into it, and one of those is the trigger: unscoped,
+   the button is hidden with the actions and never let back in, because what
+   lets them back in is a rule about the panel. */
 [part="actions"] ::slotted(*) {
   opacity: 0;
   scale: 0.8;
@@ -98,7 +92,7 @@
    and a `motion` character moves every duration in the library by its pace: with
    the delays written out, `gentle` slowed each action and left the gaps between
    them where they were, so the fan came apart at one pace and arrived at
-   another. The only file in the library where that was true. */
+   another. */
 [part="actions"] {
   --_speed-dial-stagger: calc(var(--helix-duration-fast) / 3);
 }
@@ -150,11 +144,10 @@
   /* The lift under the pointer arrives at once instead of easing in. Nothing is
      displaced by it, so unlike the actions above there is no resting state to
      write back: the hover shadow still applies, it just applies immediately.
-     Same shape as Card's answer to the same rule.
 
      Named as its own selector rather than folded into the one above. A reduce
      rule written looser than the rule it answers loses on specificity and does
-     nothing, which is the trap this file's other comment already records. */
+     nothing. */
   [part="trigger"] {
     transition: none;
   }
@@ -163,16 +156,14 @@
 /* The trigger this component draws when a consumer slots none.
  *
  * `::slotted()` matches assigned nodes and fallback content is not assigned, so
- * every rule that styles a slotted trigger reaches nothing here. The button was
- * left with the browser's own: measured at 16x6 with a gray fill and a 2px
- * border, against 40x40 for the `helix-icon-button` the example slots. A
- * floating action button rendering as a gray nub, and only for the consumer who
- * wrote the least markup.
+ * every rule that styles a slotted trigger reaches nothing here. Left to the
+ * browser's own, the button measured 16x6 with a gray fill and a 2px border,
+ * against 40x40 for the `helix-icon-button` the example slots: a floating
+ * action button rendering as a gray nub, and only for the consumer who wrote
+ * the least markup. Valid CSS, matching nothing, no error and no warning.
  *
  * Same shape and the same tokens the slotted path resolves to, so a trigger a
- * consumer passes and one drawn here come out as the same control. This is the
- * `CopyButton` failure again, which is why it is written out again: valid CSS,
- * matching nothing, no error and no warning. */
+ * consumer passes and one drawn here come out as the same control. */
 [part="trigger"] {
   all: unset;
   --icon-size: var(--helix-size-icon);
@@ -183,9 +174,7 @@
      it comes out light by construction, and a fill made of it cannot carry the
      pale ink this trigger puts on it: measured, `foreground-on-accent` over
      `primary` is 2.96:1 in dark against 4.50:1 over `primary-surface`.
-     `primary-surface` exists for exactly this and its own comment says so.
-     Found by `check:pairings`, which reported the pair as one no model declared
-     and therefore one nothing measured. */
+     `primary-surface` exists for exactly this and its own comment says so. */
   background-color: var(--helix-color-primary-surface);
   block-size: var(--helix-size-control);
   border-radius: var(--helix-radii-full);
@@ -214,14 +203,13 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Not printed, being a control.
- *
- * Paper cannot be pressed. A button prints its chrome and its label, and the chrome is the half that says press me, which on a page is an instruction to do the one thing that is not available.
+/* Not printed, being a control. Paper cannot be pressed, and a button's chrome
+ * on a page is an instruction to do the one thing that is not available.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. */
 @media print {
   :host {
     display: none;

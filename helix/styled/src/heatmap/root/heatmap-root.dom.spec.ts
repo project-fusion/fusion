@@ -47,13 +47,13 @@ describe('the styled heatmap', () => {
   })
 
   /**
-   * **The seam, asserted from the side that would not have noticed.** The base
-   * tier wrote `var(--helix-color-success)` onto a cell until 27 Aug 2026, which
-   * is correct here and names nothing at all one tier down, and the failure is
-   * not an undefined property: it is an *invalid* one, so
+   * **The seam, asserted from the side that would not have noticed.** A
+   * `var(--helix-color-success)` written onto a cell by the base tier is correct
+   * here and names nothing at all one tier down, and the failure is not an
+   * undefined property: it is an *invalid* one, so
    * `background-color: var(--heatmap-tone, …)` declines its own fallback and the
-   * cell paints transparent. A styled page looked perfect throughout, which is
-   * why nothing caught it. What the cell may carry is a `--heatmap-*` name.
+   * cell paints transparent. A styled page looks perfect throughout, which is
+   * why nothing else catches it. What the cell may carry is a `--heatmap-*` name.
    */
   test('a cell names a heatmap hook and never a token', async () => {
     const element = await strip()

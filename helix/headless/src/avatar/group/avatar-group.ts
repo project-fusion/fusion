@@ -32,15 +32,13 @@ export const FOLDS_UP_TO = 12
  * gets; the group's own name is what everyone else gets, and "Seven people" is
  * more useful than seven names read in a row.
  *
- * **And hidden by the stylesheet, not by this class.** It wrote `data-overflow`
- * onto each avatar from `updated`, which is one update too late and one element
- * too far out: Lit renders on a microtask, so an avatar appended past the limit
- * was laid out and painted before anything ran to hide it, and the group was
- * writing attributes onto markup a consumer owns to do it. Measured in Chrome
- * 148, appending two past `max="3"` and reading before yielding: five `flex`,
- * folding to three on the next update. The styled tier now does it with
- * `:host([max="N"]) ::slotted(:nth-child(n + N+1))`, which is right at the
- * first style resolution and writes nothing.
+ * **And hidden by the stylesheet, not by this class.** Hiding from `updated` is
+ * one update too late and one element too far out: Lit renders on a microtask,
+ * so an avatar appended past the limit is laid out and painted before anything
+ * runs to hide it, and marking each one means writing attributes onto markup a
+ * consumer owns. The styled tier's
+ * `:host([max="N"]) ::slotted(:nth-child(n + N+1))` is right at the first style
+ * resolution and writes nothing.
  *
  * **The fold is finite, and the count agrees with it.** `An+B` takes a literal,
  * so there is one selector per value of `max` and the range stops at twelve.
@@ -82,16 +80,9 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
    * styled tier hides past the limit with `:host([max="N"]) ::slotted(:nth-child(n + N+1))`,
    * so the attribute *is* the mechanism: a `max` that reaches this property and
    * never reaches the host matches no rule, and every avatar is drawn beside a
-   * count that says two of them are hidden. That is the failure this repository
-   * already writes down as "reflect only what CSS selects on", and it went
-   * unnoticed because the examples set `max` in markup, where the author had
-   * written the attribute themselves.
-   *
-   * It is the path a script takes that was broken, and React takes it for
-   * everyone: React assigns a matching property rather than an attribute, so
-   * `<helix-avatar-group max={4}>` folded nothing at all. Measured against the
-   * markup twin, the fifth and sixth avatars rendered at full size where the
-   * markup version had them at 0x0.
+   * count claiming some are hidden. Markup is the safe path and hides the fault;
+   * a script is the broken one, and React takes it for everyone, assigning a
+   * matching property rather than an attribute.
    *
    * **Optional rather than defaulted, per the rule that a reflected property
    * takes no default**: `max = 0` would stamp `max="0"` onto every host that
@@ -103,9 +94,7 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
   /** The avatars, in light-DOM order. Empty on the server, which has no tree. */
   get avatars(): HTMLElement[] {
     /* `?? []` is the server: Lit's element shim carries attributes and not a
-       tree, so `children` is undefined there and spreading it throws. The same
-       fault the menu item, the table and the carousel each had in turn, which
-       is why it is written before it can happen again. */
+       tree, so `children` is undefined there and spreading it throws. */
     return [...(this.children ?? [])].filter(
       (child): child is HTMLElement => child instanceof HTMLElement,
     )
@@ -135,11 +124,10 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    /* Nothing hides anything here any more: the stylesheet does it, from `max`
-       on the host, so the arrangement is right at the first style resolution
-       rather than one update later. What is left is saying so when a `max` is
-       set that no rule can match, because showing everyone is a defensible
-       answer and showing everyone beside a "+5" is not. */
+    /* Nothing hides anything here: the stylesheet does it, from `max` on the
+       host. What is left is saying so when a `max` is set that no rule can
+       match, because showing everyone is a defensible answer and showing
+       everyone beside a "+5" is not. */
     const limit = this.max ?? 0
     if (limit > FOLDS_UP_TO && this.avatars.length > limit && !this.warned) {
       this.warned = true

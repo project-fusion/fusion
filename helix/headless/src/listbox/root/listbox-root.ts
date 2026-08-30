@@ -55,11 +55,9 @@ const HIGHLIGHT = 'helix-filter-match'
 /**
  * Whether this environment can paint a highlight at all.
  *
- * Asked before the ranges are built rather than after. Walking every shown
- * option's text nodes to hand the result to an API that is not there is work
- * with no output, and it is not free: a server, a test environment and an older
- * browser all take that path, and the DOM implementations they use are not the
- * one this was measured against.
+ * Asked before the ranges are built rather than after: a server, a test
+ * environment and an older browser all take that path, and walking every shown
+ * option's text nodes for an API that is not there is work with no output.
  */
 const paintable = (): boolean =>
   typeof CSS !== 'undefined' && 'highlights' in CSS && typeof Highlight !== 'undefined'
@@ -137,25 +135,14 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * chooses, because a reader passing over four options on the way to the fifth
  * did not mean to pick all five.
  *
- * **This does not use `KeyboardNavigationController`, and the reason given here
- * was the wrong one.** It said the controller moves and chooses in one act by
- * design, so half of this component needed that and half the opposite. The
- * controller does not work that way: it takes `origin: 'focus' | 'selection'`,
- * and `focus` exists precisely so a reader can arrow without choosing, which is
- * what `Tabs` uses in `manual` mode. `focusItem()` and `select()` are separate
- * members of `NavigableItem`. The incompatibility named above is one the
- * controller had already solved.
- *
- * The real one is where focus lives. `NavigableItem.focusItem()` moves DOM
- * focus to the item, because the controller's model is a roving tab stop. A
- * filterable list cannot do that: focus has to stay in the field or typing
- * stops, so what moves is a virtual cursor and `aria-activedescendant` is what
- * says where it is. Those two disagree about the one thing neither can
- * abstract, and no flag reconciles them.
- *
- * Worth keeping the distinction sharp, because the old wording invites the
- * wrong fix: someone reading it would add `origin` to the controller, find it
- * already there, and conclude this component could adopt it.
+ * **This does not use `KeyboardNavigationController`, and the reason is where
+ * focus lives rather than whether moving chooses.** The controller already
+ * separates those, taking `origin: 'focus' | 'selection'`. What it cannot do is
+ * leave focus alone: `NavigableItem.focusItem()` moves DOM focus to the item,
+ * its model being a roving tab stop. A filterable list cannot have that, focus
+ * having to stay in the field or typing stops, so what moves is a virtual
+ * cursor and `aria-activedescendant` is what says where it is. No flag
+ * reconciles the two.
  *
  * **Filtering hides rather than removes.** An option the filter has hidden is
  * still the consumer's element in the consumer's order, so a filter that clears
@@ -221,8 +208,6 @@ export class HelixHeadlessListbox extends MixinCollection(
    * the list is still the consumer's own elements in their own order. Reading
    * gives what is being filtered on; writing declares it theirs, and
    * `default-filter` seeds one the list owns.
-   *
-   *
    */
   @property()
   get filter(): string {
@@ -245,14 +230,23 @@ export class HelixHeadlessListbox extends MixinCollection(
   private filterState: string | undefined = undefined
 
   /**
+   * What is shown when a filter has hidden every option.
+   *
+   * From `MixinCollection`, which every collection in the library now shares,
+   * and re-declared here only to keep this list's own wording: "No matches" is
+   * about a filter, and the mixin's "Nothing to show" is about a list that was
+   * never given anything.
+   */
+  @property({ attribute: 'empty-text' })
+  override emptyText = 'No matches'
+
+  /**
    * Whether the list renders a field for narrowing itself.
    *
    * The field lives here rather than in whatever frames the list, because the
    * filtering already does: `filter`, the empty state and the keyboard are all
-   * this component's. A select that drew its own search box above a listbox
-   * would be writing the same field again, and so would a combobox, and so
-   * would a command palette, which is the fault the three-family split exists
-   * to prevent.
+   * this component's. A select, a combobox and a command palette drawing their
+   * own search boxes would be three copies of one field.
    */
   @property({ attribute: 'filterable', reflect: true, type: Boolean })
   filterable = false
@@ -268,17 +262,6 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   @property({ reflect: true, type: Boolean })
   multiple = false
-
-  /**
-   * What is shown when a filter has hidden every option.
-   *
-   * From `MixinCollection`, which every collection in the library now shares,
-   * and re-declared here only to keep this list's own wording: "No matches" is
-   * about a filter, and the mixin's "Nothing to show" is about a list that was
-   * never given anything.
-   */
-  @property({ attribute: 'empty-text' })
-  override emptyText = 'No matches'
 
   /**
    * Which option the keyboard is on, which is not what is chosen.
@@ -301,10 +284,9 @@ export class HelixHeadlessListbox extends MixinCollection(
    *
    * Counting during render reads the hiding from the *previous* pass, because
    * hiding happens in `updated` against options that are the consumer's
-   * elements rather than this component's markup. So a filter matching nothing
-   * rendered the full list, hid every option, and left an empty box with no
-   * message in it: the count was right one pass too late. Written to state
-   * instead, which schedules the one further render that shows it.
+   * elements rather than this component's markup, so a filter matching nothing
+   * leaves an empty box with no message in it. Written to state instead, which
+   * schedules the one further render that shows it.
    */
   @state()
   private hasMatches = true
@@ -322,9 +304,8 @@ export class HelixHeadlessListbox extends MixinCollection(
   private counted = false
 
   /* Stated once, and the group never thinks about it again. See the
-     controller: the cascade was four hand calls from four different
-     methods, so which paths reached it differed by component and a fifth
-     group would have got none at all. */
+     controller: cascading by hand from each method that changes the set
+     leaves the paths that reached it differing by component. */
   protected readonly cascade = new DisabledCascadeController(this, {
     items: () => this.options,
   })
@@ -374,17 +355,11 @@ export class HelixHeadlessListbox extends MixinCollection(
   /**
    * Walks the tree, and walks *through* a slot when it meets one.
    *
-   * Descendants rather than children, because a group puts a level between the
-   * list and its options and the keyboard has to move through a grouped list
-   * exactly as it moves through a flat one.
-   *
    * Through a slot because that is how this gets composed. `Select` renders a
    * listbox in its own shadow root with a slot inside it, so the options are
    * the *select's* light DOM and the listbox's only child is the slot: a plain
    * `querySelectorAll` finds the slot and no options at all, and the whole
-   * component comes up empty. Found the first time the two were put together,
-   * which is the argument for building the pieces separately rather than
-   * discovering it inside a finished Select.
+   * component comes up empty.
    */
   private collect(nodes: Iterable<Element>): HelixHeadlessOption[] {
     const found: HelixHeadlessOption[] = []
@@ -446,10 +421,9 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (joined === this.value) {
       return
     }
-    /* Through the mixin rather than hand-rolled. It did the same two steps in
-       the same order, and doing them here meant the control could not be
-       owned: writing `value` is how a consumer says it is theirs, so a listbox
-       writing its own would take ownership away from them on every change. */
+    /* Through the mixin rather than hand-rolled: writing `value` is how a
+       consumer says it is theirs, so a listbox writing its own would take
+       ownership away from them on every change. */
     this.requestValue(joined)
   }
 
@@ -524,9 +498,8 @@ export class HelixHeadlessListbox extends MixinCollection(
    *
    * A combobox keeps focus in its text field, because that is the whole of what
    * a combobox is, and still has to move this list with the arrows. Without
-   * this it would have to reimplement the moving, the wrapping, the skipping of
-   * disabled options and the seeding from the current value, and the second
-   * copy would drift from this one the first time either changed.
+   * this it would reimplement the moving, the wrapping, the skipping of
+   * disabled options and the seeding from the current value.
    *
    * Public and taking the event rather than a direction, so a caller forwards
    * what it received and this decides what the key means. `preventDefault` is
@@ -555,8 +528,8 @@ export class HelixHeadlessListbox extends MixinCollection(
    * A method rather than something this does on its own, because a listbox
    * opening on its answer usually wants it merely *visible* and the browser
    * already manages that: centering is what a caller wants when the list is being
-   * read as a dial rather than scanned as a list, which is what Time Picker's wheels
-   * does with three of these.
+   * read as a dial rather than scanned as a list, which is what Time Picker's
+   * wheels do with three of these.
    *
    * A delta from the two boxes rather than `offsetTop`. An option is a slotted
    * light DOM child, so its `offsetParent` is whatever is positioned above it,
@@ -684,30 +657,6 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
   }
 
-  /*
-   * Points the focused list at the option the keyboard is on.
-   *
-   * **The gap this closes.** Focus stays on `[part="items"]` while a highlight
-   * moves between options, which is the half of the ARIA listbox pattern we
-   * had. The other half is saying *which* option, and nothing did: a screen
-   * reader heard the list and its selection and never heard the item being
-   * moved over. Neither `aria-activedescendant` nor a roving `tabindex` was
-   * wired, and the pattern requires one of the two.
-   *
-   * **An element reference and not an id, because an IDREF cannot do this.**
-   * The options are the consumer's light DOM and the element that takes focus
-   * is in this shadow root, so `aria-activedescendant="whatever"` resolves
-   * against the shadow tree, finds nothing, and is dropped in silence. Element
-   * references are the platform's answer to exactly that, and they resolve
-   * outward: a shadow-tree element may point at a light-DOM one, which is the
-   * direction this needs.
-   *
-   * Feature-tested rather than assumed, for the reason `hostAria` gives:
-   * assigning to a property an engine does not implement is a no-op rather than
-   * an error, so the guard is what makes the absence visible to anyone reading
-   * this. Where it is missing the list still works and still announces its
-   * selection; what is lost is the running commentary as the keys move.
-   */
   /**
    * Where the reader is, and failing that where the answer is.
    *
@@ -717,17 +666,29 @@ export class HelixHeadlessListbox extends MixinCollection(
    * Seeding from the value means the first press moves from what the reader can
    * see is selected.
    *
-   * **The keyboard knew this and the announcement did not.** `linkActive` asked
-   * for `activeValue` alone, so a list that had been given a value and not yet
-   * arrowed through pointed `aria-activedescendant` at nothing: a screen reader
-   * was told the list and its selection, and nothing about where the cursor
-   * was, until a key moved it. Both read this now, so the thing announced and
-   * the thing the arrows move from cannot disagree.
+   * Read by `linkActive` as well as by the keys, so the option announced and
+   * the option the arrows move from cannot disagree: asking for `activeValue`
+   * alone points `aria-activedescendant` at nothing until a key has moved it.
    */
   private get currentValue(): string {
     return this.activeValue || (this.value.split(',')[0] ?? '')
   }
 
+  /*
+   * Points the focused list at the option the keyboard is on.
+   *
+   * **An element reference and not an id, because an IDREF cannot do this.**
+   * The options are the consumer's light DOM and the element that takes focus
+   * is in this shadow root, so `aria-activedescendant="whatever"` resolves
+   * against the shadow tree, finds nothing, and is dropped in silence. Element
+   * references resolve outward: a shadow-tree element may point at a light-DOM
+   * one, which is the direction this needs.
+   *
+   * Feature-tested rather than assumed, for the reason `hostAria` gives:
+   * assigning to a property an engine does not implement is a no-op rather than
+   * an error. Where it is missing the list still works and still announces its
+   * selection; what is lost is the running commentary as the keys move.
+   */
   private linkActive(): void {
     /* Whichever element the reader is actually in. `aria-activedescendant` is
        read from the focused element, so pointing the list at the active option
@@ -760,8 +721,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    *
    * `helix-filter` and not `helix-change`, because nothing about the value
    * changes: the options are hidden rather than removed, and telling a consumer
-   * their answer moved when it did not is worse than telling them nothing. It
-   * told them nothing before this.
+   * their answer moved when it did not is worse than telling them nothing.
    */
   private readonly handleFilter = (event: Event): void => {
     // Stopped for the reason `Input.handleInput` gives: the inner control's own
@@ -826,15 +786,12 @@ export class HelixHeadlessListbox extends MixinCollection(
        arrows move the highlight and Enter takes it, which is what Enter already
        does by bubbling to the host handler.
 
-       **What was here instead moved focus to `[part="items"]` and re-dispatched
-       the key.** Both halves of that were wrong, and measured on a bare
-       `<helix-listbox filterable>` one Down produced: two `helix-change` events,
-       `a` then `b`, and a highlight on the *second* option. Focus on the list
-       meant moving chose, so a single press committed a value the reader was
-       arrowing past; and the original press went on bubbling to the same host
-       handler the re-dispatch had already reached, so every key was handled
-       twice and the list advanced two rows for one press. In `Command` that
-       reads as a palette that navigates away the moment a reader presses Down.
+       **Never move focus to `[part="items"]` and re-dispatch the key instead.**
+       Both halves fail: focus on the list means moving chooses, so a single
+       press commits a value the reader was arrowing past, and the original
+       press goes on bubbling to the same host handler the re-dispatch already
+       reached. Measured on a bare `<helix-listbox filterable>`, one Down
+       produced two `helix-change` events and a highlight two rows down.
 
        `stopPropagation` is what closes the second half: the field handled the
        key, so it must not arrive at the host as well. The move keys are the
@@ -907,9 +864,9 @@ export class HelixHeadlessListbox extends MixinCollection(
         id="items"
         aria-busy=${this.loading ? 'true' : nothing}
         ${
-          /* `isDisabled`, matching the filter input above it. The two lines
-             disagreed, so a listbox in a disabled fieldset kept its tab stop
-             and took arrow keys while its own filter was correctly out. */
+          /* `isDisabled`, matching the filter input above it: on `disabled`
+             alone, a listbox in a disabled fieldset keeps its tab stop and
+             takes arrow keys while its own filter is correctly out. */
           ''
         }
         tabindex=${this.isDisabled ? -1 : 0}

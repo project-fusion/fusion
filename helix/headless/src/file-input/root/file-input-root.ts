@@ -22,7 +22,7 @@ import '../../tag/index.js'
  * a thing.
  *
  * `Intl.NumberFormat` for the number rather than `toFixed`, so a decimal comma
- * lands where a decimal comma belongs. The unit is not localised with it: `MB`
+ * lands where a decimal comma belongs. The unit is not localized with it: `MB`
  * is written the same way in the places this ships, and `Intl`'s own byte units
  * carry no scale to pick from.
  */
@@ -67,10 +67,9 @@ const kind = (file: File): string => {
  * **A real `<input type="file">`, kept and made invisible rather than
  * replaced.** It is the only way to open a file picker: the dialog is a
  * privileged action a script cannot start on its own, and it opens for a click
- * on the input or on a `<label>` pointing at it. Every version of this component
- * that draws its own button ends up calling `.click()` on a hidden input
- * anyway, and then has two things a screen reader can find where there is one
- * control.
+ * on the input or on a `<label>` pointing at it. A component that draws its own
+ * button ends up calling `.click()` on a hidden input anyway, and then has two
+ * things a screen reader can find where there is one control.
  *
  * So the input stays, holds the label, the name, the validity and the focus,
  * and the visible trigger is a `<label for>` rather than a button. A label is
@@ -83,10 +82,10 @@ const kind = (file: File): string => {
  *
  * **Files are not a value a consumer can hand back.** Every other control here
  * takes the controlled and uncontrolled pair, and this one does not: a `FileList`
- * cannot be constructed from markup, and a consumer writing `value` on a file
- * input is the one thing browsers refuse outright, because a page that could
- * name a file could read it. So this element owns what was chosen, announces it,
- * and offers `clear()` for the one change a consumer can legitimately ask for.
+ * cannot be constructed from markup, and browsers refuse a consumer writing
+ * `value` on a file input outright, because a page that could name a file could
+ * read it. So this element owns what was chosen, announces it, and offers
+ * `clear()` for the one change a consumer can legitimately ask for.
  *
  * **The list under it is the control's own, not decoration.** A file input with
  * files chosen reports "3 files" and nothing else, which is unusable for
@@ -113,7 +112,6 @@ const kind = (file: File): string => {
  * @csspart field - The box that is pressed and dropped on.
  * @csspart file - One chosen file.
  * @csspart hint - Help under the field, while nothing is wrong.
- * @csspart icon - A glyph this component draws.
  * @csspart kind - What kind of file it is.
  * @csspart kind-dismiss - The remove button, when `dismissible`.
  * @csspart kind-dismiss-mark - The glyph on the dismiss control, where none is slotted.
@@ -147,22 +145,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   accept = ''
 
   /**
-   * Whether more than one file can be chosen.
-   */
-  @property({ reflect: true, type: Boolean })
-  multiple = false
-
-  /**
    * Which camera or microphone a mobile picker should offer, if any.
    */
   @property()
   capture?: 'environment' | 'user'
-
-  /**
-   * What the trigger reads, where nothing is slotted into it.
-   */
-  @property({ attribute: 'trigger-label' })
-  triggerLabel = 'Choose files'
 
   /**
    * Language tag the sizes are written in.
@@ -173,10 +159,22 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   locale = ''
 
   /**
+   * Whether more than one file can be chosen.
+   */
+  @property({ reflect: true, type: Boolean })
+  multiple = false
+
+  /**
    * What the control removing one file is called, per file.
    */
   @property({ attribute: 'remove-label' })
   removeLabel = 'Remove'
+
+  /**
+   * What the trigger reads, where nothing is slotted into it.
+   */
+  @property({ attribute: 'trigger-label' })
+  triggerLabel = 'Choose files'
 
   /**
    * Whether something is being dragged over the field.
@@ -271,12 +269,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        bind and what a native file input sends when the chosen files move: both,
        in that order, the way every other control here does.
 
-       `input` was declared and never sent until 27 Aug 2026. The only one a
-       consumer received was the inner `<input type="file">`'s own, composed out
-       of this shadow root, so the documented event did not exist and an
-       undocumented one arrived in its place. Found by sweeping every family
-       that renders a native control rather than every family the first pass
-       named. See 308. */
+       Without the explicit `input`, the only one a consumer receives is the
+       inner `<input type="file">`'s own, composed out of this shadow root, so
+       the documented event does not exist and an undocumented one arrives in
+       its place. */
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
     this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
@@ -304,12 +300,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        Kept, as a decision rather than an omission. A phantom entry naming a file
        that does not exist is a thing every server reading this form has to know
        to discard, and the reason the platform sends one is compatibility with
-       form encodings that predate `FormData` rather than anything a reader wants.
-       `check:platform-fidelity` excuses `value` on this family already, for the
-       neighbouring reason that the native one is `C:\fakepath\name`; this is
-       the same component declining to reproduce a lie, one level down. Recorded
-       here because a divergence nobody wrote down is indistinguishable from one
-       nobody noticed. */
+       form encodings that predate `FormData`. `value` is excused on this family
+       already, for the neighboring reason that the native one is
+       `C:\fakepath\name`; this is the same component declining to reproduce a
+       lie, one level down. */
     this.internals.setFormValue(data)
     const control = this.control
     if (!control) {
@@ -399,22 +393,15 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
   /*
    * The hint goes under the field, and the list after both.
    *
-   * It was under the list, on the reading that the field and its files are one
-   * block and the hint describes the block. Three things say otherwise.
-   *
    * A hint is instruction for the next action rather than a note about the
    * result: "up to 10MB each" is a rule for what may be added, and a rule read
-   * after the outcome is a rule read too late.
+   * after the outcome is a rule read too late. Its position also has to be
+   * stable, and under the list it travels down the page as files are added, a
+   * card's height at a time. Every other field here puts it immediately under
+   * the control.
    *
-   * Its position has to be stable, and this is the one that decides it. Under
-   * the list the hint travels down the page as files are added, a card's height
-   * at a time, so the one piece of guidance the control carries is never twice
-   * in the same place. Every other field here puts it immediately under the
-   * control, and a reader who has learned where to look should not have to
-   * relearn it for this one.
-   *
-   * And feedback stands in place of the hint rather than beside it, so wherever
-   * the hint is, an error is. An error about a file that was refused belongs
+   * Feedback stands in place of the hint rather than beside it, so wherever the
+   * hint is, an error is. An error about a file that was refused belongs
    * against the control that refused it, not below a list of the ones that were
    * not.
    */
@@ -426,15 +413,13 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * element saying two things and two methods would be two places to keep in
    * step. Both parts are written out rather than passed in, and that is not
    * style: a part name behind an interpolation is a part the manifest cannot
-   * see, so `check:selectors` reported the stylesheet as matching nothing the
-   * moment this took the name as an argument.
+   * see, so a stylesheet targeting it matches nothing.
    *
    * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
-   * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * wrap this one, or leave it out without reimplementing the whole template.
+   * The tag is interpolated rather than written, so `tier` resolves it: this
+   * renders the headless element, and a styled subclass that sets `tier`
+   * renders the styled one from the same template.
    */
   protected renderMeta(file: File): TemplateResult {
     return html`<${this.tag('tag')} part="size"
@@ -474,7 +459,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
       </div>
       <!-- The hint sits under the field and the list goes last, which is the
            one ordering decision this component makes differently from the way it
-           reads. Reasoning below the template. -->
+           reads. Reasoning above renderMeta. -->
       ${this.renderHint()}${this.renderFeedback()}
       ${
         files.length === 0

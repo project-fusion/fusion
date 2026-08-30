@@ -27,10 +27,9 @@ describe('deepContains', () => {
   })
 
   test('finds a node inside a shadow root, which is the whole reason it exists', () => {
-    /* The failure this replaces: `container.contains(deepActiveElement())`.
-       `deepActiveElement` returns the `<button>` in a control's shadow root and
-       `contains` walks `parentNode`, which is null at a shadow boundary, so the
-       answer was false for every focused control in every dialog. */
+    /* `contains` walks `parentNode`, which is null at a shadow boundary, so
+       `container.contains(deepActiveElement())` answers false for every focused
+       control in every dialog. */
     const box = document.createElement('div')
     const { host, inner } = control()
     box.append(host)
@@ -68,13 +67,12 @@ describe('deepContains', () => {
 /**
  * What the reader can reach with Tab, and the order they reach it in.
  *
- * The order is the contract this had written down and was not keeping. Two
- * lists concatenated, every native element and then every delegating host, is
- * not document order, and it is invisible in a set that is all one kind, which
- * is what every example and every spec had. `FocusTrapController` reads the
- * ends of this list as the boundaries it wraps at, so a surface whose last
- * control was a plain `<button>` had a last that was not last and leaked focus
- * out of the dialog on forward Tab.
+ * Document order is the contract. Two lists concatenated, every native element
+ * and then every delegating host, is not document order, and the difference is
+ * invisible in a set that is all one kind. `FocusTrapController` reads the ends
+ * of this list as the boundaries it wraps at, so a surface whose last control
+ * is a plain `<button>` has a last that is not last and leaks focus out of the
+ * dialog on forward Tab.
  *
  * **`delegatesFocus` is declared rather than requested.** happy-dom accepts the
  * option to `attachShadow` and reports the flag as false, so a delegating host
@@ -109,9 +107,8 @@ describe('focusableElements', () => {
     expect(ids(root)).toBe('one')
   })
 
-  /* The fault. Mixed content in document order `a b c d` came back `b d a c`,
-     natives first and hosts after, under a doc comment promising document
-     order. */
+  /* Two queries concatenated put natives first and hosts after: `a b c d` in
+     the markup comes back `b d a c`. */
   test('in document order, natives and hosts interleaved as they are written', () => {
     document.body.innerHTML = '<div id="t"></div>'
     const root = document.getElementById('t') as HTMLElement

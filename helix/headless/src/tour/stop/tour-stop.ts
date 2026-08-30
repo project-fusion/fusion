@@ -31,9 +31,8 @@ import '../../button/index.js'
  *
  * What it does not own is the heading, the paragraph, the picture and the
  * layout. Slot a `helix-card`, or a heading and a line of prose, or anything
- * else. This was written the other way first, with `title` and `body` parts and
- * a fixed arrangement, which is a component deciding what a tour is allowed to
- * say.
+ * else. Fixed `title` and `body` parts would be a component deciding what a
+ * tour is allowed to say.
  *
  * **The buttons are slot fallback, so the common case costs nothing and the
  * uncommon one is possible.** Write nothing and get Back, Next and Skip already
@@ -69,16 +68,10 @@ import '../../button/index.js'
 @customElement('helix-headless-tour-stop')
 export class HelixHeadlessTourStop extends HelixElement {
   /**
-   * The id of the element this stop is about.
+   * Label for the control that goes back.
    */
-  @property()
-  for = ''
-
-  /**
-   * Which side of the target the panel prefers.
-   */
-  @property()
-  placement: Placement = 'bottom'
+  @property({ attribute: 'back-label' })
+  backLabel = 'Back'
 
   /**
    * Whether this is the stop the reader is on.
@@ -93,10 +86,10 @@ export class HelixHeadlessTourStop extends HelixElement {
   current = false
 
   /**
-   * Whether this is the last stop, so the control says Done.
+   * Label for the control that goes on from the last stop.
    */
-  @property({ reflect: true, type: Boolean })
-  last = false
+  @property({ attribute: 'done-label' })
+  doneLabel = 'Done'
 
   /**
    * Whether this is the first stop, so there is nowhere back to.
@@ -105,10 +98,16 @@ export class HelixHeadlessTourStop extends HelixElement {
   first = false
 
   /**
-   * Label for the control that goes back.
+   * The id of the element this stop is about.
    */
-  @property({ attribute: 'back-label' })
-  backLabel = 'Back'
+  @property()
+  for = ''
+
+  /**
+   * Whether this is the last stop, so the control says Done.
+   */
+  @property({ reflect: true, type: Boolean })
+  last = false
 
   /**
    * Label for the control that goes on.
@@ -117,10 +116,10 @@ export class HelixHeadlessTourStop extends HelixElement {
   nextLabel = 'Next'
 
   /**
-   * Label for the control that goes on from the last stop.
+   * Which side of the target the panel prefers.
    */
-  @property({ attribute: 'done-label' })
-  doneLabel = 'Done'
+  @property()
+  placement: Placement = 'bottom'
 
   /**
    * Label for the control that leaves the tour.
@@ -214,14 +213,12 @@ export class HelixHeadlessTourStop extends HelixElement {
   protected override render(): TemplateResult {
     return html`<div part="bubble" popover="manual" ?hidden=${!this.current}>
       ${
-        /* The one surface in this library that draws one, and the reason is
-           worth stating because everything else here deliberately does not.
-           An arrow says which thing a panel is describing, and a menu or a
-           select does not need one: it hangs off its trigger and adjacency says
-           it. A tour panel is anchored to something it did not open, on a page
-           full of other things, and it may be flipped to the far side of its
-           target by collision. Fusion's own taste is to leave arrows off, which
-           is a fact about the house style rather than about the system. */
+        /* The one surface in this library that draws an arrow, and every other
+           one deliberately does not. A menu or a select hangs off its trigger
+           and adjacency says what it belongs to; a tour panel is anchored to
+           something it did not open, on a page full of other things, and
+           collision may flip it to the far side of its target. Leaving arrows
+           off elsewhere is house style rather than a fact about the system. */
         ''
       }
       <div part="arrow" aria-hidden="true"></div>

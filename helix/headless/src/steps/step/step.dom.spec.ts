@@ -14,11 +14,10 @@ const step = async (attributes = ''): Promise<Step> =>
 /**
  * One stage, and the contract that is the step's own rather than the run's.
  *
- * **What the parent already proves is not repeated here**, which is 198's whole
- * recommendation: `Steps` exercises walking a run, which is the only arrangement
- * that means anything for coordination. What is left over is what a single step
- * answers for on its own, and every assertion below is about this element in
- * isolation.
+ * **What the parent already proves is not repeated here.** `Steps` exercises
+ * walking a run, which is the only arrangement that means anything for
+ * coordination. What is left over is what a single step answers for on its own,
+ * and every assertion below is about this element in isolation.
  */
 describe('one step', () => {
   /* `complete` and `current` are separate and both may be false, which is the

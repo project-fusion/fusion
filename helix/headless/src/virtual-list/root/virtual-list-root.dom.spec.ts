@@ -17,11 +17,9 @@ import {
  * standing alone is a box with no height that does not scroll. `scrollTop` is
  * then always zero and `clientHeight` is whatever was just drawn.
  *
- * This spec did not do it, and that is the whole of why the family could not be
- * run in a browser: measuring moved what was being measured, the two settled
- * into a 378/379 oscillation, and the loop runs on microtasks so no timer could
- * interrupt it. The headless example next door has carried these two rules since it
- * was written, which is where the shape of this came from.
+ * Without those two rules the family cannot run in a browser at all: measuring
+ * moves what is being measured, the two settle into a 378/379 oscillation, and
+ * the loop runs on microtasks so no timer can interrupt it.
  *
  * `::part()` because it is the published door into a shadow root, and a
  * document rule beats a shadow one, so nothing here is fighting the component.

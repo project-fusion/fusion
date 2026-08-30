@@ -17,11 +17,10 @@ const cell = async (attributes = ''): Promise<Cell> =>
  * One cell, and the contract that is the cell's rather than the table's.
  *
  * **The table already proves the arrangement**, which is the tracks lining up
- * and the columns deciding them: the cell is named 24 times in this family's
- * specs. What the cell owns alone is that it is a cell *to anything reading the
- * page*, and that assertion has nowhere else to live: a grid of divs looks
- * exactly like a table until a screen reader is pointed at it, and the table's
- * own specs read the layout rather than the semantics.
+ * and the columns deciding them. What the cell owns alone is that it is a cell
+ * *to anything reading the page*, and that assertion has nowhere else to live:
+ * a grid of divs looks exactly like a table until a screen reader is pointed at
+ * it, and the table's own specs read the layout rather than the semantics.
  */
 describe('one table cell', () => {
   /* The role is on the host, not inside the shadow root, because the cell has to

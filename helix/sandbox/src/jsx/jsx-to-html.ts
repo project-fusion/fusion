@@ -1,14 +1,12 @@
 /**
  * Reads a JSX example back as the markup it stands for.
  *
- * It exists so the file on screen is the file that runs, and it is the only
- * converter left: `htmlToJsx` is deleted, both syntaxes being authored files
- * now rather than one derived from the other. What is converted here is a
- * reader's live edit in the TSX pane, which has no authored twin. A preview renders markup into a document; it does not run React,
+ * What is converted is a reader's live edit in the TSX pane, which has no
+ * authored twin: both syntaxes are authored files rather than one derived from
+ * the other. A preview renders markup into a document and does not run React,
  * and putting a compiler in there to make it look as though it did would ship a
- * megabyte to answer a question nobody asked. Converting is honest and small:
- * the JSX in a sandbox is Helix elements with attributes, which is the same
- * tree said differently.
+ * megabyte to answer a question nobody asked. The JSX in a sandbox is Helix
+ * elements with attributes, which is the same tree said differently.
  *
  * **It converts markup, not programs.** An expression, a prop holding a value
  * rather than a literal, a component of the consumer's own: none of those have
@@ -20,7 +18,7 @@
 /** A tag that closes itself in HTML, where every other tag needs a pair. */
 const VOID = new Set([
   'area',
-  'headless',
+  'base',
   'br',
   'col',
   'embed',

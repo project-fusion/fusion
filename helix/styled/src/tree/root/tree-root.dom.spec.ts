@@ -55,9 +55,9 @@ describe('tree', () => {
 
 describe('tree selection can be refused', () => {
   test('a listener that refuses keeps the selection where it was', async () => {
-    /* It could not be refused before: the value was written straight from the
-       item's event, so `helix-change` was an announcement nobody could answer.
-       Tabs had the same hole and both are closed by the same mixin. */
+    /* The value is never written straight from the item's event, which would
+       make the announcement one nobody can answer. Tabs shares the mixin that
+       closes this. */
     const host = (await mount(markup)) as Updatable & { value: string }
     await host.updateComplete
     const started = host.active
@@ -81,16 +81,12 @@ describe('tree selection can be refused', () => {
 
 if (hasLayout()) {
   describe('a link inside a branch row', () => {
-    /* Browser-only, and why is the point of it.
-     *
-     * The first version sat with the other tree tests and passed against a
-     * component that was broken: happy-dom does not carry a click on slotted
-     * light-DOM content up to the shadow element holding the slot, so the row
-     * handler never ran and nothing was asserted. In Chrome it runs, and the
-     * branch collapsed on the way out of the link.
-     *
-     * A spec that cannot see the fault it names is worse than none, because it
-     * reads as coverage. */
+    /* Browser-only, and why is the point of it. happy-dom does not carry a
+     * click on slotted light-DOM content up to the shadow element holding the
+     * slot, so under it the row handler never runs and this passes against a
+     * broken component. In Chrome it runs, and the branch collapses on the way
+     * out of the link. A spec that cannot see the fault it names is worse than
+     * none, because it reads as coverage. */
     test('goes where it points and leaves the branch as it was', async () => {
       const tree = (await mount(
         `<helix-tree label="R">
@@ -158,11 +154,10 @@ if (hasLayout()) {
     })
 
     test('and a leaf beside a branch shares its column', async () => {
-      /* This used to be a trade, and the spec here pinned it as one: lining a
-         leaf up with the branch next to it and lining a child up with its
-         parent could not both be had, because a branch's label was one gutter
-         into its own row and a leaf's was not. A leaf reserves nothing it does
-         not have now, so both are true at once and the trade is gone. */
+      /* Both alignments at once, which is only possible because a leaf reserves
+         nothing it does not have: give it a gutter it never uses and lining a
+         leaf up with the branch beside it and lining a child up with its parent
+         become a trade. */
       for (const attrs of ['', 'chevron-placement="end"']) {
         const items = await laidOut(attrs)
         expect(labelX(named(items, 'cortex'))).toBe(labelX(named(items, 'helix')))
@@ -172,8 +167,8 @@ if (hasLayout()) {
     test('moving the chevron moves the whole tree, and nothing within it', async () => {
       /* The chevron on the left is a column before the first level, so taking it
          away shifts every row by that one column and leaves every relationship
-         inside the tree where it was. It used to be the parent alone that moved,
-         which is what made a leaf and a branch disagree.
+         inside the tree where it was. Never the parent alone, which is what
+         makes a leaf and a branch disagree.
 
          Each tree is measured before the next is mounted. `mount` writes the
          body, so holding on to the first one's elements and reading them after
@@ -372,10 +367,10 @@ describe('a tree item that is a link', () => {
 })
 
 describe('a branch opening is announced, and can be owned', () => {
-  /* It was a bare `this.expanded = !this.expanded`: no event, so a consumer
-     could not know a branch had opened, and no mode, so they could not hold it
-     either. `AccordionItem` has been on `MixinControllerOpen` all along, and a
-     branch showing its children is the same state a disclosure holds. */
+  /* Never a bare `this.open = !this.open`: with no event a consumer cannot know
+     a branch opened, and cannot refuse it either. A branch showing its children
+     is the same state a disclosure holds, so this is `MixinControllerOpen`, the
+     same as `AccordionItem`. */
   const branch = async (
     attrs = 'default-open',
   ): Promise<
@@ -418,10 +413,9 @@ describe('a branch opening is announced, and can be owned', () => {
   })
 
   test('open in the markup is a seed, and the branch still closes', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Declaring the property is not a claim of ownership. Control is an action:
+       the element applies, and a consumer refuses to take the decision.
+ */
     const item = await branch('open')
     item.toggleOpen()
     await item.updateComplete
@@ -445,20 +439,18 @@ describe('a branch opening is announced, and can be owned', () => {
     expect(item.open).toBe(false)
   })
 
-  /* The documentation nav, which is where this was reported twice.
-   *
-   * `active` on the tree *is* controlled, answered by navigating, and the
-   * branch below it is seeded with `default-open` and owns itself. Those are
-   * two different properties on two different elements and the suspicion in
-   * #119 was that the first was reaching the second: a branch that would not
-   * close after a client route change, and did after a refresh.
+  /* The documentation nav. `active` on the tree is answered by navigating,
+   * while the branch below it is seeded with `default-open` and owns itself:
+   * two different properties on two different elements, and #119 suspected the
+   * first of reaching the second, a branch that would not close after a client
+   * route change and did after a refresh.
    *
    * It does not reproduce, measured six ways on the running site, and the
-   * reason it cannot is worth pinning rather than leaving to a paragraph.
-   * `MixinControllerOpen` decides ownership from whether anything set `open`
-   * by the first update, and nothing here ever sets `open`: the nav writes
-   * `default-open`, which is a different property with a different name. A
-   * tree's `active` moving cannot make an item's `open` controlled. */
+   * reason it cannot is worth pinning. `MixinControllerOpen` decides ownership
+   * from whether anything set `open` by the first update, and nothing here ever
+   * sets `open`: the nav writes `default-open`, a different property with a
+   * different name. A tree's `active` moving cannot make an item's `open`
+   * controlled. */
   test('a controlled `active` on the tree leaves a seeded branch its own', async () => {
     const tree = (await mount(
       `<helix-tree active="b" label="R">

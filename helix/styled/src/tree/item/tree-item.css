@@ -1,10 +1,10 @@
 :host {
   /* The chevron, and the gutter a leaf reserves for one, from a single number.
      The two have to agree or a leaf's label sits off the line its siblings do,
-     and until this they agreed by both saying `--helix-size-icon` in different
-     rules. `icon-sm` because a chevron is a marker rather than content: at the
-     current step it read as the loudest thing in a row whose text is 14px, and
-     a tree is a list of names with a hint of structure beside them. */
+     so neither may name a size of its own. `icon-tight` because a chevron is a
+     marker rather than content: at the current step it reads as the loudest
+     thing in a row whose text is 14px, and a tree is a list of names with a hint
+     of structure beside them. */
   --_tree-chevron: var(--tree-chevron-size, var(--helix-size-icon-tight));
   display: block;
 }
@@ -24,25 +24,21 @@
    property the item writes onto this row, so every depth works rather than the
    handful an enumerated rule set covers. */
 [part="row"] {
-  /* **`center`, and the row's height no longer comes from its tallest child.**
-   *
-   * This was `stretch` so a slotted link could fill the row rather than sit at
-   * its own height with bands above and below belonging to the row, which
-   * selects rather than navigates. The half that was missing is that a child
-   * taller than the line then set the row: the sandbox rail puts a 24px docs
-   * link in `end`, so its 88 family rows came out 40 against 34 for every
-   * example row under them, which is the opposite of what `min-block-size`
-   * below says it is for.
+  /* **`center`, never `stretch`: the row's height must not come from its tallest
+   * child.** Under `stretch` a child taller than the line sets the row, so the
+   * sandbox rail's 24px docs link in `end` made its family rows 40 against 34
+   * for every example row under them, which is the opposite of what
+   * `min-block-size` below is for.
    *
    * So the line decides the height and a taller control centers against it and
    * overflows into the padding the row already owns. Measured in the rail: rows
    * 34 throughout, the docs link still 24 square, and the padding it grows into
    * is inside the row rather than beyond it.
    *
-   * The old complaint survives for a control *shorter* than the line, which now
-   * keeps its own height instead of filling the row. That is the better failure
-   * of the two: a small target is the consumer's to size, and a row that
-   * disagrees with every other row is nobody's. */
+   * The cost is a control *shorter* than the line, which keeps its own height
+   * instead of filling the row. That is the better failure of the two: a small
+   * target is the consumer's to size, and a row that disagrees with every other
+   * row is nobody's. */
   align-items: center;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
@@ -50,15 +46,12 @@
   display: flex;
   font-size: var(--_tree-text, var(--helix-text-sm));
   gap: var(--helix-space-2xs);
-  /* A row you can hit, rather than one sized to the height of its own text. A
-     tree is a list you scan and point at, and four pixels above and below a
-     twelve pixel label made a target under twenty tall: two steps up puts it at
-     a size a pointer finds without care and a finger can reach at all. The
-     minimum is what holds a row with no icon in it to the same height as one
-     that has. */
-  /* One line plus the padding, floored at the target size. `block-size` rather
-     than `min-block-size` alone, because a minimum only holds a row up: it is
-     what let the docs link push one past every other. */
+  /* One line plus the padding, floored at the target size: a row you can hit,
+     rather than one sized to the height of its own text. Four pixels above and
+     below a twelve pixel label makes a target under twenty tall, and the floor
+     also holds a row with no icon in it to the same height as one that has.
+     `block-size` rather than `min-block-size` alone, because a minimum only
+     holds a row up: it is what let the docs link push one past every other. */
   block-size: max(
     var(--tree-row-size, var(--helix-size-control-tight)),
     calc(1lh + var(--helix-space-xs) * 2)
@@ -91,17 +84,16 @@
  * **Only where there is a chevron on that side.** With `chevron-placement="end"`
  * nothing pushes a branch's label, so a branch and a leaf both start at the
  * row's own inset and already share a column: reserving a gutter there is space
- * held for a mark that is at the other end of the row. Written unconditionally
- * it put every child of the documentation sidebar two gutters in, which is what
- * surfaced it. The tree zeroes `--_tree-reserve` when it moves its chevrons.
+ * held for a mark that is at the other end of the row, and puts every child of a
+ * sidebar two gutters in. The tree zeroes `--_tree-reserve` when it moves its
+ * chevrons.
  *
- * **Siblings line up, and children indent.** The rule above aligned each child
- * with its *parent* instead, by letting a branch's chevron be the indent: real,
- * and it costs the alignment a reader actually looks for. A top-level branch put
- * its label at 28 and a top-level leaf beside it at 8, so two items at the same
- * depth started in different columns and the tree read as though the leaf were
- * shallower than its sibling. Measured on `Item One` and `Item Four`, which is
- * what surfaced it.
+ * **Siblings line up, and children indent.** Letting a branch's chevron be the
+ * indent aligns each child with its *parent* instead, and costs the alignment a
+ * reader actually looks for: a top-level branch puts its label at 28 and a
+ * top-level leaf beside it at 8, so two items at the same depth start in
+ * different columns and the tree reads as though the leaf were shallower than
+ * its sibling.
  *
  * The two cannot both hold with one gutter: aligning a child under its parent
  * and aligning siblings with each other are different columns. Siblings win,
@@ -122,7 +114,7 @@
 }
 
 /* A parent reads as a parent, and a leaf as a leaf.
- 
+
    Both keyed on whether the row drew a chevron, rather than on an attribute:
    being a branch is detected from what was slotted, so reflecting it would put
    an attribute on the host that the consumer never wrote and that appears only
@@ -132,12 +124,12 @@
   font-weight: var(--helix-weight-medium);
 }
 
-/* And a leaf is only a step behind it. Leaves inherited the page's regular
-   weight, so a child sat noticeably lighter than the branch above it and the
-   deeper the tree the fainter it read, as though depth meant less important.
-   It does not: a leaf is usually the thing being looked for. The chevron is
-   what marks a branch, so the two rows can be closer in weight than they were
-   without becoming the same. */
+/* And a leaf carries the same weight, not a lighter one. Left to inherit the
+   page's regular weight it sat noticeably lighter than the branch above it, and
+   the deeper the tree the fainter it read, as though depth meant less important.
+   It does not: a leaf is usually the thing being looked for. The chevron is what
+   marks a branch, so the two rows can share a weight without reading as the same
+   kind of row. */
 [part="row"]:not(:has([part="toggle"])) {
   font-weight: var(--helix-weight-medium);
 }
@@ -162,19 +154,17 @@ slot[name="children"]::slotted(*) {
    a heavier label is a wider one, and a row that resizes as it is chosen is a
    list that twitches. The surface says it.
 
-   **A different surface from hover, which it was not.** Both painted
-   `surface-raised` over the same foreground, so a pointer traveling down the
-   tree made every row it crossed look chosen and the row that actually was
-   became impossible to find. `sunken` is a step further from the page in light
-   and in dark alike, which reads as settled where `raised` reads as answering
-   the pointer: the row you are on is in, the row under the pointer is lifting.
+   **A different surface from hover.** Sharing `surface-raised` makes every row a
+   pointer travels across look chosen and the row that actually is impossible to
+   find. `sunken` is a step further from the page in light and in dark alike,
+   which reads as settled where `raised` reads as answering the pointer: the row
+   you are on is in, the row under the pointer is lifting.
 
-   On the row, not on the host. The item stopped reflecting `selected` onto the
-   consumer's markup, and mirroring it to `data-selected` on the host instead
-   was the same fault wearing a different name: React reported the mismatch and
-   said it would not patch it up. The row is inside this shadow root and is not
-   part of the tree React hydrates, which is where `level` already puts its
-   indent for the same reason. */
+   On the row, not on the host. Reflecting `selected`, or mirroring it to
+   `data-selected` on the host, writes into the markup React hydrates and it
+   reports the mismatch and will not patch it up. The row is inside this shadow
+   root and out of that tree, which is where `level` already puts its indent for
+   the same reason. */
 :host(:state(selected)) [part="row"] {
   background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
@@ -196,14 +186,13 @@ slot[name="children"]::slotted(*) {
    underlined rows reads as prose that has been marked up rather than as a list
    to move around in.
 
-   **The decoration only, because `color: inherit` was overshooting.** It took
-   the anchor out of the link color and out of the row color with it, so the
-   anchor inherited the page's foreground while every non-link row beside it
-   kept `foreground-muted`. Two rows in one tree then read at two brightnesses
-   for no reason a reader could see: reported as branches looking muted against
-   their leaves, which was really links looking lit against everything else.
-   Dropping the declaration lets `[part="row"]` apply to an anchor as it does to
-   a div, and an author rule beats the UA's `a:link` without being told to. */
+   **The decoration only. `color: inherit` overshoots**: it takes the anchor out
+   of the link color and out of the row color with it, so the anchor inherits the
+   page's foreground while every non-link row beside it keeps `foreground-muted`,
+   and two rows in one tree read at two brightnesses for no reason a reader can
+   see. With no declaration at all, `[part="row"]` applies to an anchor as it
+   does to a div, and an author rule beats the UA's `a:link` without being told
+   to. */
 a[part="row"] {
   text-decoration: none;
 }
@@ -228,11 +217,11 @@ a[part="row"] {
   transform: rotate(0deg);
 }
 
-/* The label takes the room, which the comment below has claimed since it was
-   written and no rule made true: the marks were told not to grow and nothing
-   was told to. It cost nothing while a label was text, and everything once one
-   held a link. A row 240px wide had a 57px anchor in it, so three quarters of
-   every navigation row looked clickable and was not. */
+/* The label takes the room, and something has to be told to: marks told not to
+   grow leave the label at its content width. It costs nothing while a label is
+   text and everything once one holds a link. Measured before this, a row 240px
+   wide had a 57px anchor in it, so three quarters of every navigation row looked
+   clickable and was not. */
 [part="label"] {
   /* Full height, not just the height of the words. The row has a
      `min-block-size` for the sake of a touch target, so a label sized to its
@@ -260,22 +249,6 @@ a[part="row"] {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* And it reaches out over the row's padding, so the row is the target rather
-   than the row minus its edges.
- *
- * The label fills the space between the padding; the padding belonged to the
- * row, so a press on the last pixels of a navigation row hit the row's click
- * handler, which selects and does not navigate. That reads as a link needing
- * two clicks: the first selects, the second lands on the text.
- *
- * Pulled out by the padding and given the same padding back, so the boundary
- * moves and the text does not. No condition on the row, because there is no way
- * to write one: `:has()` cannot contain `::slotted()`, that being a
- * pseudo-element, and from inside a shadow root `:has(a)` cannot see slotted
- * content at all. It needs no condition anyway. The selector only matches where
- * an anchor was actually slotted, which is the same question a condition would
- * have asked. */
 
 /* The label takes the room, so a mark at either side keeps its size and the
    name is what gives way when the rail is narrow. */
@@ -342,8 +315,7 @@ slot[name="start"]::slotted(*) {
 }
 
 /* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. `check:motion`
-   compares them, which is what turned this from invisible into mechanical. */
+   rule it answers loses on specificity and does nothing. */
 @media (prefers-reduced-motion: reduce) {
   [part="row"] {
     transition: none;
@@ -358,12 +330,13 @@ slot[name="start"]::slotted(*) {
  *
  * `order` moves the paint and not the DOM, which is correct here and would not
  * be for anything focusable: the toggle is `aria-hidden` and the row itself is
- * the control, so reading order is untouched. `margin-inline-start: auto` is
- * what actually pushes it to the far end; without it `order` alone only puts it
- * after the label, hard against the text. */
+ * the control, so reading order is untouched. `order` alone only puts it after
+ * the label, hard against the text; what pushes it to the far end is the auto
+ * margin on `slot[name="end"]`, which the chevron rides behind at a higher
+ * order. */
 [part="toggle"] {
-  /* The chevron is a mark, not a region: it keeps its own size against a row
-     that now stretches its children. */
+  /* The chevron is a mark, not a region: its own size, on the row's center,
+     whatever the row does with its other children. */
   align-self: center;
   margin-inline-start: var(--tree-chevron-gap, var(--helix-space-none));
   order: var(--tree-chevron-order, 0);

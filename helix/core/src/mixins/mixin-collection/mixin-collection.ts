@@ -42,9 +42,7 @@ export declare class CollectionElement {
  * **Empty and loading are different answers and a reader can tell them apart.**
  * "No results" under a spinner is a lie for as long as the request is in
  * flight, and a blank box is not an answer at all: a reader cannot know whether
- * a list is empty, still arriving, or broken. Six components each rendered rows
- * and none of them said either thing, so every consumer wrote their own and
- * wrote it differently.
+ * a list is empty, still arriving, or broken.
  *
  * **`aria-busy` on the collection, not on the message.** A reader with a screen
  * reader is told the region is changing and then told once, politely, what it
@@ -56,16 +54,18 @@ export declare class CollectionElement {
  * which question it is answering, and this is the point in a component's life
  * when a consumer is most likely to be looking at stale content.
  *
- * Listbox had `empty-text` and nothing else, and Combobox forwarded it. Both
- * keep the name, so nothing a consumer wrote has moved.
- *
- *
  * **`empty` and `loading` are documented on each of the five families that
  * apply this, rather than here.** See `MixinField` for why a class-level tag on
  * a mixin reaches no manifest.
  */
 export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
   class Collection extends Base {
+    /**
+     * What is said where there are none, and none are coming.
+     */
+    @property({ attribute: 'empty-text' })
+    emptyText = 'Nothing to show'
+
     /**
      * Whether the rows are still on their way.
      *
@@ -83,12 +83,6 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
     loadingText = 'Loading'
 
     /**
-     * What is said where there are none, and none are coming.
-     */
-    @property({ attribute: 'empty-text' })
-    emptyText = 'Nothing to show'
-
-    /**
      * Whether the rows have been looked at yet.
      */
     @state()
@@ -97,14 +91,13 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
     /**
      * How many there were, the last time anyone looked.
      *
-     * **Not `rows`, and the rename is the whole point of this comment.**
-     * TypeScript's `private` is a compile-time claim and the runtime field is
-     * whatever it is named, so a subclass declaring `@property() rows` for the
-     * data a consumer hands it would share one field with this counter: the
-     * slot count would overwrite the consumer's array on every `updated`, and
-     * `hasRows` would read the array's length as a slot count. Nothing would
-     * throw. `helix-data-table` takes exactly that property, which is what
-     * found this before it happened.
+     * **Never name this `rows`.** TypeScript's `private` is a compile-time
+     * claim and the runtime field is whatever it is named, so a subclass
+     * declaring `@property() rows` for the data a consumer hands it would share
+     * one field with this counter: the slot count would overwrite the
+     * consumer's array on every `updated`, and `hasRows` would read the array's
+     * length as a slot count. Nothing would throw. `helix-data-table` takes
+     * exactly that property.
      */
     @state()
     private slotRows = 0
@@ -116,7 +109,7 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
      * count. `slotchange` never fires there, so `counted` is false exactly when
      * the answer is unknown, and an unknown answer is not "empty": a list that
      * shipped "Nothing to show" over markup about to have rows in it is the one
-     * thing an empty state must never do. Listbox's spec caught precisely that.
+     * thing an empty state must never do.
      */
     protected countRows(event: Event): void {
       this.slotCounted = true

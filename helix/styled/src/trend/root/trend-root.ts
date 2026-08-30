@@ -18,13 +18,10 @@ import { styles } from './trend-root.css.js'
  * reads and the judgment is a gloss on it.
  *
  * **No visual axis applies here, and that is the answer rather than a gap.**
- * This family carries `@groups charts`, so `check:axes` reports it beside eight
- * that do declare one. Each of the three was asked and each refuses for a reason
- * about what this is rather than about the axis. `emphasis` is how much ink a
- * mark claims, and there is no mark: an arrow glyph and two runs of text, whose
- * weight is `Text`'s business and whose size is the region's. `material` is what
- * reads through a surface, and a 13px glyph has nothing behind it. `wash` is a
- * gradient across an area, and there is no area.
+ * `emphasis` is how much ink a mark claims, and there is no mark: an arrow glyph
+ * and two runs of text, whose weight is `Text`'s business and whose size is the
+ * region's. `material` is what reads through a surface, and a 13px glyph has
+ * nothing behind it. `wash` is a gradient across an area, and there is no area.
  *
  * The meaning axis is here and is *derived*, which is the more interesting half:
  * `direction` and `good` together resolve to success, danger or muted, so a

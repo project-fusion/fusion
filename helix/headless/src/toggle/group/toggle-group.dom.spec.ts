@@ -83,7 +83,7 @@ describe('toggle group in a form', () => {
      `innerHTML` on an element that was not in the document at the time, even
      though `parentElement` is the form: measured, `closest` returned null while
      the parent read `FORM`. Every spec here that finds its form does it this
-     way, which is why the button's passed and the first draft of this did not. */
+     way. */
   const inForm = async (extra = ''): Promise<{ form: HTMLFormElement; group: Updatable }> => {
     document.body.innerHTML = `<form>
         <helix-headless-toggle-group name="mode" label="Mode" ${extra}>
@@ -148,8 +148,7 @@ describe('toggle group in a form', () => {
  * These run in the sandbox's Specs panel, against the same file `bun test`
  * runs, which is the only place the answers mean anything.
  *
- * The fault they hold is a real one and was invisible for three attempts: the
- * offsets were measured from the group's border box, with
+ * The fault they hold: offsets measured from the group's border box, with
  * `getBoundingClientRect`, and applied from its padding box, which is where an
  * absolutely positioned element is placed. A border's width late on both axes,
  * which in a forty pixel track holding a thirty pixel thumb is six above it and

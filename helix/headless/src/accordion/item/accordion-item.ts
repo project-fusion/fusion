@@ -30,10 +30,11 @@ const TRIGGER_ID = 'trigger'
  * Carries its own open state, which is why it is an element rather than a slot.
  * Used alone, outside an accordion, it is a disclosure.
  *
- * Content stays mounted when closed and is hidden by the styled tier's CSS, so
- * it can animate and so the text is present in server-rendered HTML. Closed
- * content is `inert`, keeping it out of the tab order and the accessibility
- * tree without removing it from the box tree.
+ * Content stays mounted when closed, so it can animate and so the text is
+ * present in server-rendered HTML. Closed content carries both `hidden` and
+ * `inert`: the first collapses it with no stylesheet in play, the second keeps
+ * it out of the tab order and the accessibility tree once the styled tier's
+ * `display` has overridden the first.
  *
  * @since 0.1.0
  * @status experimental
@@ -44,7 +45,7 @@ const TRIGGER_ID = 'trigger'
  * @slot summary - The always-visible trigger content.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the section closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the section opens. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart chevron - The open and close indicator.
@@ -164,8 +165,8 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
     if (next && (mode !== undefined || (this.name !== undefined && this.name !== ''))) {
       for (const peer of this.peers) {
         if (peer !== this && peer.open) {
-          // A peer in controlled mode will only notify: its consumer owns the
-          // value and may decline, which can legitimately leave two open.
+          // A peer whose consumer refuses the request stays open, which can
+          // legitimately leave two open.
           peer.requestOpen(false)
         }
       }
@@ -187,22 +188,19 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * The item, with `hidden` doing the collapsing.
    *
    * **A closed section has to be closed with no stylesheet at all**, which is
-   * the whole claim `headless` makes. `inert` alone was not that: it takes the
+   * the whole claim `headless` makes. `inert` alone is not that: it takes the
    * region out of the accessibility tree and off the tab order and leaves every
-   * pixel of it on the screen, so a consumer taking this tier got two sections
-   * of text permanently open with a trigger underneath saying
-   * `aria-expanded="false"`. Worse than merely unstyled: a sighted reader saw
-   * content a screen reader was told is not there.
-   *
-   * The collapse was living in the styled tier's `grid-template-rows: 0fr`,
-   * which is an animation and was doing the hiding as a side effect. So the
-   * state was in a stylesheet, and only one of the two tiers had it.
+   * pixel of it on the screen, so a consumer taking this tier gets sections of
+   * text permanently open under a trigger saying `aria-expanded="false"`, and a
+   * sighted reader sees content a screen reader is told is not there. Leaving
+   * the collapse to the styled tier's `grid-template-rows: 0fr` puts the state
+   * in a stylesheet, where only one of the two tiers has it.
    *
    * **`hidden` costs the styled tier nothing**, which is what makes this the
    * cheap fix rather than a trade. The UA sheet hides `[hidden]` from the UA
    * origin, and `accordion-item.css` already sets `display: grid` on this part
    * unconditionally, so the author rule wins and the 0fr transition runs
-   * exactly as before. Measured both tiers after the change.
+   * exactly as before. Measured on both tiers.
    *
    * **Not `hidden="until-found"`**, which would be the better accordion and is
    * a different piece of work. It hides through `content-visibility` rather

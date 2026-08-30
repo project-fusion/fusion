@@ -16,19 +16,12 @@ const input = async (extra = ''): Promise<Input> =>
   (await mount(`<helix-headless-input label="Name" ${extra}></helix-headless-input>`)) as Input
 
 /**
- * What a declared `value` means, which is the opposite of what it meant.
+ * What a declared `value` means.
  *
- * **This file held nine cases and all nine are gone**, 26 Aug 2026. They
- * asserted an audit: a control whose consumer declared `value` announced,
- * applied nothing, and warned on its second unanswered request if nobody was
- * listening. The audit existed because a declared property was a claim of
- * ownership rather than the seed it looks like, so `value="Ada"` quietly
- * stopped the control responding and six of our own examples fell into it.
- *
- * Control is an action now. The element always applies, `value="Ada"` is the
- * native seed it resembles, and a consumer who wants the change for themselves
- * refuses it. There is no mode to be silently in, so there is nothing to audit
- * and no warning to test. See 294.
+ * Control is an action. The element always applies, `value="Ada"` is the native
+ * seed it resembles, and a consumer who wants the change for themselves refuses
+ * it. There is no mode to be silently in, so there is nothing to audit and no
+ * warning to test.
  */
 describe('a control whose markup declared a value', () => {
   test('still moves, the property being a seed rather than a claim', async () => {

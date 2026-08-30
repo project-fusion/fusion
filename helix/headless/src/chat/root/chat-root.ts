@@ -15,7 +15,7 @@ import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
  *
  * Named once because two things read the list: the manual assignment that puts
  * a child in the region its `slot` names, and the emptiness each region is
- * hidden on. They went out of step the first time they were written twice.
+ * hidden on. Written out twice they go out of step.
  */
 const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
 
@@ -41,8 +41,8 @@ const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
  * a reader who is reading.**
  *
  * The element owns it, because it is the only party that knows a message arrived
- * and where the viewport was when it did. `pinned` is a controlled property like
- * any other, so a consumer who wants to own it can.
+ * and where the viewport was when it did. `pinned` announces before it moves, so
+ * a consumer who wants to own it refuses the request and assigns their own.
  *
  * **The live region announces on completion, not on arrival.** The transcript is
  * `role="log"` with `aria-live="polite"`, and a streaming message carries
@@ -95,29 +95,24 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Whether to open pinned, where nothing declared it.
+   */
+  @property({ attribute: 'default-pinned', type: Boolean })
+  defaultPinned = true
+
+  /**
    * Accessible name for the conversation.
    */
   @property()
   label = ''
 
   /**
-   * How near the bottom still counts as being at it, in pixels.
-   *
-   * A hook rather than a constant, because the right number depends on how tall
-   * a turn is: a transcript of one-line replies wants a smaller threshold than
-   * one of paragraphs, and a reader who has scrolled up by half a message has
-   * not left.
-   */
-  @property({ type: Number })
-  threshold = 48
-
-  /**
    * Whether the transcript follows new turns to the bottom.
    *
-   * Set it and this element defers: the reader's scrolling fires `helix-change`
-   * and moves nothing until a new value arrives. `default-pinned` seeds a state
-   * this element then owns, and it defaults to pinned because a conversation
-   * opens at its most recent turn.
+   * The reader's scrolling asks first: `helix-before-pin` is cancelable, so a
+   * consumer refusing it takes the decision and assigns their own value.
+   * `default-pinned` seeds the state this element then owns, and it defaults to
+   * pinned because a conversation opens at its most recent turn.
    *
    * **Not reflected, and the default is why.** A reflected property that
    * defaults to true writes its attribute on upgrade whether or not the
@@ -128,8 +123,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * that is a part inside the shadow tree where a stylesheet can already reach
    * it. Measured rather than assumed: `label, pinned` after upgrade against
    * `label` from the server.
-   *
-   *
    */
   @property({ type: Boolean })
   get pinned(): boolean {
@@ -143,10 +136,15 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Whether to open pinned, where nothing declared it.
+   * How near the bottom still counts as being at it, in pixels.
+   *
+   * A hook rather than a constant, because the right number depends on how tall
+   * a turn is: a transcript of one-line replies wants a smaller threshold than
+   * one of paragraphs, and a reader who has scrolled up by half a message has
+   * not left.
    */
-  @property({ attribute: 'default-pinned', type: Boolean })
-  defaultPinned = true
+  @property({ type: Number })
+  threshold = 48
 
   @state()
   private pinnedState: boolean | undefined = undefined
@@ -274,18 +272,12 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /**
    * A press anywhere in the way back takes the reader back.
    *
-   * **The affordance was inert, in the component and in every example.** The
-   * control is slotted so the consumer picks the words, and `resume()` was
-   * public "because the control offering it is the consumer's and needs
-   * something to call". True, and it left a button this element positions, lifts
-   * and shows and hides doing nothing at all until somebody wired it, which none
-   * of the five examples did: the one control whose whole job is to undo a
-   * scroll shipped as decoration.
-   *
-   * The region exists for exactly one purpose, so a press inside it has exactly
-   * one meaning and this element is entitled to act on it. `resume()` stays
-   * public for the other callers it was always for: a keyboard shortcut, or a
-   * consumer's own control somewhere else on the page.
+   * The control is slotted so the consumer picks the words, which on its own
+   * leaves a button this element positions, lifts, shows and hides doing nothing
+   * until somebody wires it. The region exists for exactly one purpose, so a
+   * press inside it has exactly one meaning and this element is entitled to act
+   * on it. `resume()` stays public for the other callers: a keyboard shortcut,
+   * or a consumer's own control somewhere else on the page.
    */
   private readonly handleResume = (): void => {
     this.resume()
@@ -340,20 +332,15 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /**
    * The reader's own scrolling, which is the only thing that unpins.
    *
-   * **Bound to the transcript in the template, and it has to be.** This was a
-   * capture listener on the host, on the reasoning that `scroll` does not bubble
-   * so the capture phase is the only phase that reaches it. Not bubbling is not
-   * the problem: `scroll` is not *composed*, and a non-composed event's
-   * propagation path stops at the shadow root and never includes the host, in
-   * any phase. So the listener never ran once, the pin never released, and a
-   * reader who scrolled up to re-read was pulled back to the bottom by the next
-   * turn to arrive, which this element's own description calls the most
-   * got-wrong thing in the category.
+   * **Bound to the transcript in the template, and it has to be.** A listener on
+   * the host never runs, in any phase, and capture does not rescue it: `scroll`
+   * is not *composed*, so its propagation path stops at the shadow root and
+   * never includes the host. Not bubbling is the red herring.
    *
    * Measured by dispatching both shapes at the transcript: with
    * `composed: false`, which is what the platform sends, the host saw zero and
    * `pinned` stayed true; with `composed: true` the host saw one and `pinned`
-   * went false. Bound here, the phase and the bubbling never come up.
+   * went false.
    *
    * **The scroll this element does itself must not unpin it**, which is the
    * subtle half: `scrollTop = scrollHeight` fires the same event a reader's

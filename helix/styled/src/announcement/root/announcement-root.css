@@ -1,9 +1,9 @@
 :host {
-  /* A compact strip, said once, so its actions need not each be told. */
-  /* The icon step with it. A container that is dense by nature declares the
-     control size and stopped there, so an icon in the announcement drew at the `md` step
-     inside `sm` controls: 20 pixels in a 32 pixel row, which is what the
-     shipped examples render. `Menu` is the only one that already did both. */
+  /* A compact strip, said once, so its actions need not each be told.
+
+     The icon step comes down with it. A container that is dense by nature and
+     declares only the control size leaves its icons at the `md` step inside
+     `sm` controls: measured, 20 pixels in a 32 pixel row. */
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
 
@@ -46,26 +46,26 @@
   --_announcement-color: var(--helix-color-danger);
 }
 
-/* The tone colors the band rather than the text, which has to stay
-   readable at body size across the full width.
- 
-   **More of the color in dark mode, and that is not a preference.** The mix is
-   against the page, and the page is near-black there: eighteen percent of a hue
-   into black is very nearly black, so every tone came out as the same dark band
-   and the row of them read as one. The same eighteen percent into white is a
-   clear tint. Two numbers for two grounds.
- 
-   `light-dark()` wraps each whole mix rather than the percentages inside them,
-   which is not a style choice: it returns a color, so a percentage inside it is
-   invalid and the declaration is dropped. Option's highlight records the same
-   trap, found the same way.
+/* The tone colors the band rather than the text, which has to stay readable at
+ * body size across the full width.
  *
- * **Opaque, and mixed against the page rather than into it.** These were
- * `color-mix(... , transparent)`, so the band was a translucent film: whatever
- * sat behind it came through, and two announcements over different content were
- * two different colors. Mixed with `--helix-color-background` instead, the
- * result is a real color that renders the same wherever it is, and it still
- * follows the theme because both halves are tokens.
+ * **More of the color in dark mode, and that is not a preference.** The mix is
+ * against the page, and the page is near-black there: eighteen percent of a hue
+ * into black is very nearly black, so every tone comes out as the same dark
+ * band and the row of them reads as one. The same eighteen percent into white
+ * is a clear tint. Two numbers for two grounds.
+ *
+ * `light-dark()` wraps each whole mix rather than the percentages inside them,
+ * which is not a style choice: it returns a color, so a percentage inside it is
+ * invalid and the declaration is dropped. Option's highlight records the same
+ * trap.
+ *
+ * **Opaque, and mixed against the page rather than into it.** Never
+ * `color-mix(..., transparent)`: the band is then a translucent film, whatever
+ * sits behind it comes through, and two announcements over different content
+ * are two different colors. Mixed with `--helix-color-background` the result is
+ * a real color that renders the same wherever it is, and it still follows the
+ * theme because both halves are tokens.
  *
  * The gradient is a small tilt of the same color, lighter at the start of the
  * inline axis, so a band the width of a page has some direction to it rather
@@ -180,9 +180,9 @@
 }
 
 /* A well under the pointer, the same one the toast's control gets. Mixed from
-   the foreground, because the band's own fill *is* `surface-sunken` on an
-   unsevered announcement: the well was the identical color to what it sat on
-   and there was no well at all. */
+   the foreground rather than from the surface ladder, because the band's own
+   fill *is* `surface-sunken` on an untoned announcement: a well taken from the
+   ladder is the identical color to what it sits on, which is no well at all. */
 [part="dismiss"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
@@ -218,7 +218,7 @@
 /* Print: a line across the page, and its fill is the part a printer fights.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     background-color: transparent;

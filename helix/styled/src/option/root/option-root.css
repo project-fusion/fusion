@@ -15,53 +15,40 @@
      inset or full-bleed and only a row with space around it has corners worth
      rounding. A listbox on its own insets its rows and keeps the radius; the
      select's panel runs them edge to edge and sets this to none. */
-  border-radius: var(--option-radii, var(--helix-radii-sm));
+  border-radius: var(--option-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: flex;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   gap: var(--helix-space-xs);
-  /* A stated height rather than one that falls out of the padding, so every
-     row in a list is the same height whatever is slotted into it: a row with an
-     icon in it was taller than the one above it, and a list whose rows differ by
-     two pixels reads as a list nobody measured.
+  /* A stated size rather than one that falls out of the padding, so every row in
+     a list is the same height whatever is slotted into it: a row with an icon in
+     it is otherwise taller than the one above it, and a list whose rows differ
+     by two pixels reads as a list nobody measured.
 
-     **`control-sm` is a fixed step of the ramp, and this comment used to claim
-     the opposite.** *Corrected 28 Aug 2026.* It read "it is the token that moves
-     with density rather than a number that does not", and the density rules
-     redeclare the unsuffixed `--helix-size-control`; the `-sm`, `-md` and `-lg`
-     tokens are the scale and never move. Measured across the three regions, an
-     option row is 32px in every one of them while a button beside it is 32, 40
-     and 48.
+     **A floor, not a fixed height.** The `start` slot is documented for an
+     avatar, and an avatar at its default size is taller than a dense row: fixed,
+     it overflows into the rows above and below.
 
-     Left pinned rather than swept, because whether a row in a floating panel
-     *should* follow the region's density is a real question and this file cannot
-     answer it alone: twenty stylesheets across seventeen families read a fixed
-     step, and eleven more are dense by nature and redeclare the current step on
-     their own host, which is the mechanism that works. See #321. */
-  /* A floor, not a fixed height. The `start` slot is documented for an avatar,
-     and an avatar at its default size is taller than a dense row: fixed, it
-     overflowed into the rows above and below. */
+     `control-tight` is derived from the unsuffixed `--helix-size-control`, so a
+     row in a floating panel does follow the region's density. Whether it should
+     is the open question. */
   min-block-size: var(--helix-size-control-tight);
   box-sizing: border-box;
   /* Through a hook, for the reason the inline inset above is: a panel that
      wants roomier rows says one thing and the group headings move with them.
      `Command` is that panel, being a page of rows read at speed rather than a
      select's short list. */
-  padding-block: var(--option-block-inset, var(--helix-space-2xs));
-  /* Twelve, matching the drilldown's rows and the select's own trigger. A row
-     that reaches both edges of its panel needs its words held further in than
-     one that sits inside a padded box: the inset is doing the work the box used
-     to. */
-  /* The trigger's inset, which the comment claimed and the number did not: the
-     trigger insets by `xs` and this by `sm`, so the chosen answer shifted
-     sideways between the closed control and the row it came from. */
-  /* Through a hook, because the heading above a group reads the same one and
-     the comment below records what happens when two stylesheets each name the
-     inset themselves. A panel that wants its rows on some other column, as the
-     command palette does, now moves both by saying one thing. */
-  padding-inline: var(--option-inset, var(--helix-space-xs));
+  padding-block: var(--option-block-padding, var(--helix-space-2xs));
+  /* `xs`, which is the select's own trigger inset: a row and the closed control
+     it came from have to hold their words on the same column, or the chosen
+     answer shifts sideways when the panel opens.
+
+     Through a hook, because the heading above a group reads the same one. A
+     panel that wants its rows on some other column, as the command palette
+     does, moves both by saying one thing. */
+  padding-inline: var(--option-padding, var(--helix-space-xs));
   /* A picker, not prose. Its three sibling chooseable rows all say this;
      without it, dragging across a list selects the labels. */
   user-select: none;
@@ -88,7 +75,7 @@
 /* The caption, quieter than the words above it and on one line for the reason
    the label gives: a list whose rows are different heights is a list the
    keyboard moves through unevenly, and a caption that wraps to two lines makes
-   one row twice its neighbours. */
+   one row twice its neighbors. */
 [part="description"] {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
@@ -107,21 +94,16 @@
   white-space: nowrap;
 }
 
-/* Where the keyboard is, which is not the same as what is chosen. A list that
-   draws the two the same way leaves a reader arrowing through it unable to tell
-   what they have picked from what they are looking at, which is the whole
-   difference between a listbox and a menu. */
-/* The chosen option, which nothing anywhere drew.
+/* The chosen option, which is not the same fact as where the keyboard is. A
+ * list that draws the two the same way leaves a reader arrowing through it
+ * unable to tell what they have picked from what they are looking at, which is
+ * the whole difference between a listbox and a menu.
  *
- * `selected` reflects and no rule in the repo selected on it, so a listbox
- * announced its answer and never showed it: every row looked the same and the
- * only way to know what was chosen was to listen. The one visible state was the
- * keyboard cursor below, which is a different thing entirely.
- *
- * A tick rather than a fill. The cursor already owns the row's background, so a
- * second background would either fight it or be hidden under it whenever the two
- * land on the same row, which for a listbox opening on its own answer is
- * immediately and always. A mark beside the label is legible under both.
+ * A tick rather than a fill. The cursor below already owns the row's
+ * background, so a second background would either fight it or be hidden under
+ * it whenever the two land on the same row, which for a listbox opening on its
+ * own answer is immediately and always. A mark beside the label is legible
+ * under both.
  */
 :host(:state(selected)) [part="item"]::after {
   content: "";
@@ -140,10 +122,10 @@
 :host(:not([disabled])) [part="item"]:hover {
   /* A wash of the foreground rather than a step on the surface ladder.
    *
-   * It was `surface-raised`, which in dark mode is the same neutral as
-   * `surface-overlay` — and `surface-overlay` is what the select's panel is
-   * made of. So a hovered option was painted exactly the color it sat on and
-   * the highlight vanished, in the one place options are used most.
+   * Never `surface-raised`: in dark mode it is the same neutral as
+   * `surface-overlay`, which is what the select's panel is made of, so a hovered
+   * option is painted exactly the color it sits on and the highlight vanishes,
+   * in the one place options are used most.
    *
    * A translucent wash cannot have that problem: it is a step away from
    * whatever is underneath it, on a panel, in a standalone listbox, or on
@@ -153,7 +135,7 @@
    * `light-dark()` wraps the two mixes rather than the two percentages, which
    * is not a style choice: it returns a color, so a percentage inside it is
    * invalid, the whole declaration is dropped, and the highlight comes out
-   * fully transparent. Which is what happened on the first attempt. */
+   * fully transparent. */
   background-color: var(
     --option-active-color,
     light-dark(
@@ -171,7 +153,7 @@
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

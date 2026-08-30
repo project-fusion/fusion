@@ -16,7 +16,7 @@
 
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  max-block-size: var(--notifications-max-height, none);
+  max-block-size: var(--notifications-max-block-size, none);
 }
 
 /* Something in the feed has media, so every item holds the column open by this
@@ -47,14 +47,12 @@
 /* Empty, the regions take no space: a consumer with no header should not pay for
    the rule under one.
 
-   **The element says so, because `:has` cannot.** This asked in CSS, with
-   `:not(:has(> slot:has(*)))`, and the note here claimed that was the point.
-   Both halves of it were wrong. `:has()` may not be nested inside `:has()`, so
-   the selector never parsed and the rule was discarded whole; and a slot's
-   assigned nodes are not its DOM children, so `slot:has(*)` asks about fallback
-   content rather than about the fill. `slotFilled` is the library's answer to
-   this question and `data-empty` is how it reaches a stylesheet. See
-   `notifications-root.ts`. */
+   **The element says so, because `:has` cannot.** `:not(:has(> slot:has(*)))`
+   fails twice over: `:has()` may not be nested inside `:has()`, so the selector
+   never parses and the rule is discarded whole, and a slot's assigned nodes are
+   not its DOM children, so `slot:has(*)` asks about fallback content rather than
+   about the fill. `slotFilled` is the library's answer and `data-empty` is how
+   it reaches a stylesheet. See `notifications-root.ts`. */
 [part="header"][data-empty],
 [part="footer"][data-empty] {
   display: none;

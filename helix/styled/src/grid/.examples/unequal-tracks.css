@@ -4,9 +4,9 @@
    works out for itself.
    
    The two lengths are written out rather than held in properties of their own.
-   A consumer would name them, and this file is scanned by `check:hooks`, which
-   cannot tell a consumer's `--site-rail` from a Helix hook nobody documented and
-   is right to ask about the second. */
+   A consumer would name them, and a reader cannot tell a consumer's
+   `--site-rail` from a Helix hook nobody documented, and is right to ask about
+   the second. */
 .page {
   --grid-columns: 7rem minmax(0, 32rem);
 

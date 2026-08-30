@@ -30,7 +30,7 @@ import '../notification/notification.js'
  * @csspart list - The list itself.
  * @csspart mark-all - The control that marks everything read.
  *
- * @cssproperty --notifications-max-height - How tall the feed may get before the list scrolls.
+ * @cssproperty --notifications-max-block-size - How tall the feed may get before the list scrolls.
  * @cssproperty --notifications-media-column - The gutter every item holds open where something in the feed has media.
  * @cssproperty --notifications-padding-inline - Space either side of the header and footer.
  * @cssproperty --notifications-rule - The hairline between items and around the regions.

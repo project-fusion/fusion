@@ -28,7 +28,7 @@ export interface Located {
  * Every custom property a tag's own shadow styles read, by tag.
  *
  * **This is what the manifest cannot tell you.** `helix-copy-button` declares no
- * hooks at all and answers `--icon-button-size` and `--icon-button-radii`,
+ * hooks at all and answers `--icon-button-size` and `--icon-button-radius`,
  * because its class sets `styles = [HelixIconButton.styles, styles].flat()`:
  * it borrows another component's stylesheet outright. That is not inheritance,
  * not a mixin and not a part, so no manifest field describes it and `cem` records

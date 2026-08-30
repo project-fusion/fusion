@@ -14,9 +14,8 @@ if (hasLayout()) {
     test('draws neither the arc nor the ring', async () => {
       /* The turning rim is what this component is named for and it is wrong
          around a wordmark: a logo with something orbiting it reads as chrome
-         bolted to the brand. The ring was carrying the motion whenever nothing
-         was slotted, which left two things moving, and the outer one is the
-         chrome this appearance exists to remove. */
+         bolted to the brand. Leave the ring in and two things move, the outer
+         one being the chrome this appearance exists to remove. */
       const host = await pulse()
       expect(globalThis.getComputedStyle(part(host, 'indicator') as Element).display).toBe('none')
       expect(globalThis.getComputedStyle(part(host, 'track') as Element).display).toBe('none')

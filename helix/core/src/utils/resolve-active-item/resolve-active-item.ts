@@ -17,9 +17,9 @@ export interface ActivatableItem {
  * The fallback skips disabled items and the match does not. A consumer who
  * names a disabled item meant it, and quietly moving to another would be the
  * component overruling them; but falling back *onto* a disabled item is the
- * component choosing, and it should not choose something out of play. Every
- * hand-written copy took `items[0]` either way, so a set opening on a disabled
- * first item showed it as current.
+ * component choosing, and it should not choose something out of play. Taking
+ * `items[0]` either way opens a set on a disabled first item and shows it as
+ * current.
  *
  * A plain function rather than only a method on `MixinControllerActive`,
  * because the components that need it are split across two mixins: a set whose

@@ -1,11 +1,11 @@
 //! The filled grounds, and the one ink that has to stand on all of them.
 //!
 //! **`foreground-on-accent` is a single token and there are ten grounds wearing
-//! it.** It was solved against `primary-surface` alone, so a hovered button and
-//! all four status fills carried an ink nothing had measured against them. One
-//! name has to mean one color, so it clears the worst of them or `pairings`
-//! reports that it could not, rather than the name quietly meaning something
-//! different per family.
+//! it.** Solving it against `primary-surface` alone leaves a hovered button and
+//! all four status fills carrying an ink nothing measured against them. One name
+//! has to mean one color, so it clears the worst of them or `pairings` reports
+//! that it could not, rather than the name quietly meaning something different
+//! per family.
 
 use crate::derive::emphasis::emphasis;
 use crate::derive::solve::solve_against;
@@ -25,11 +25,10 @@ pub struct Fill {
 ///
 /// An ink's hover steps toward the ink, which is lighter on a dark page; a fill
 /// already carries light text by construction, so lightening it in dark mode
-/// takes contrast away from the very text it exists to hold. The first version
-/// stepped toward the ink for consistency and the enumeration caught it at once:
-/// six filled grounds fell to 3.67:1 against their own label. The stylesheet had
-/// it right the whole time, `primary-surface` being the 600 and its hover the
-/// 700.
+/// takes contrast away from the very text it exists to hold: stepping toward the
+/// ink for consistency drops six filled grounds to 3.67:1 against their own
+/// label. The stylesheet has it right, `primary-surface` being the 600 and its
+/// hover the 700.
 #[must_use]
 pub fn hover_of(fill: Oklch) -> Oklch {
     Oklch {
@@ -42,8 +41,7 @@ pub fn hover_of(fill: Oklch) -> Oklch {
 ///
 /// A `Vec` rather than a map, because the order is load-bearing twice over: it
 /// decides which candidate `on_accent` keeps on a tie, and it decides the order
-/// the surface tokens are emitted in. The TypeScript's `Map` preserves insertion
-/// order and is being relied on for exactly that.
+/// the surface tokens are emitted in.
 #[must_use]
 pub fn status_fills(statuses: &[StatusColor], ctx: &Deriving) -> Vec<(&'static str, Fill)> {
     statuses
@@ -53,11 +51,9 @@ pub fn status_fills(statuses: &[StatusColor], ctx: &Deriving) -> Vec<(&'static s
             (
                 status.name,
                 Fill {
-                    /* Both halves are the resting fill, and `hover` is written
-                    by nobody: every consumer takes `rest` and applies `hover_of`
-                    itself. Kept because the TypeScript keeps it and a port is
-                    not the place to decide a field is dead. Noted for the sweep
-                    that removes it from both. */
+                    /* Both halves are the resting fill, and `hover` is read by
+                    nobody: every consumer takes `rest` and applies `hover_of`
+                    itself. */
                     hover: steps.filled,
                     rest: steps.filled,
                 },
@@ -89,11 +85,9 @@ pub fn filled_grounds(
 
 /// The ink that stands on all of them, at chroma 0.
 ///
-/// This is [`solve_against`] exactly, which is worth saying rather than
-/// rewriting: the TypeScript spells the map-and-reduce out a second time here,
-/// and the two copies are the same algorithm over a different ground list. The
-/// solver already takes its grounds as a parameter, so the difference is an
-/// argument.
+/// This is [`solve_against`] over a different ground list, and not a second copy
+/// of the map-and-reduce: the solver takes its grounds as a parameter, so the
+/// difference is an argument.
 ///
 /// Chroma 0 because it is white or black. An on-accent ink carrying brand hue
 /// reads as a tint of the fill it sits on rather than as text.

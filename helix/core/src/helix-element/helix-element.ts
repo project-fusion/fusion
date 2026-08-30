@@ -21,9 +21,8 @@ const BOX_SIZING = css`
  *
  * The UA stylesheet's `[hidden] { display: none }` is user-agent origin, so any
  * author declaration beats it, and a component whose `:host` sets a `display`
- * is doing exactly that. `<helix-grid hidden>` stayed visible; so did
- * `<helix-empty hidden>`, `<helix-flex hidden>` and fifty-four others. The
- * audit found three of them and the real count was fifty-seven, because every
+ * is doing exactly that. Fifty-seven components stayed visible while hidden,
+ * `<helix-grid>`, `<helix-empty>` and `<helix-flex>` among them, because every
  * component that lays itself out has the same fault and nothing connects them.
  *
  * Here rather than in each sheet, for the reason `box-sizing` is here: it is a
@@ -31,14 +30,13 @@ const BOX_SIZING = css`
  * forget the fifty-eighth.
  *
  * **The selector is (0,3,0) on purpose, and the obvious (0,2,0) is not enough.**
- * A bare `:host([hidden])` beats a bare `:host`, which is what the first version
- * of this rule assumed and it was wrong: six components set their `display` from
- * an attribute selector at the *same* (0,2,0) and win on source order because
- * they are injected after this. Measured, all five still rendered while hidden:
- * `flex[inline]` at `inline-flex`, `divider[orientation="vertical"]` at
- * `inline-block`, and `text[as]`, `checkbox[appearance="card"]` and
- * `radio[appearance="card"]` at `block`. The `:not()` lifts it a step and it
- * wins from first position, so the rule can stay prepended.
+ * A bare `:host([hidden])` beats a bare `:host`, but it only ties with the
+ * `:host([attr])` rules a component uses to set its own `display`, and those win
+ * on source order because they are injected after this. Measured, elements
+ * styled that way still rendered while hidden: `flex[inline]` at `inline-flex`,
+ * `divider[orientation="vertical"]` at `inline-block`, `text[as]` at `block`.
+ * The `:not()` lifts it a step and it wins from first position, so the rule can
+ * stay prepended.
  *
  * **And the `:not()` is load-bearing beyond specificity.** `hidden="until-found"`
  * is how the platform lets find-in-page reveal collapsed content: the browser
@@ -63,30 +61,25 @@ const HIDDEN = css`
  * so.** `overflow` is what creates a scrollport: without it `scrollTop` is
  * permanently zero and every scroll API on the element is inert. So a component
  * that reads `scrollTop` and cannot declare `overflow` is one whose behavior
- * lives in somebody else's stylesheet, and six of them do exactly that.
+ * lives in somebody else's stylesheet.
  *
  * Measured before deciding: `helix-headless-scroll-area`, the component whose
  * entire purpose is scrolling, computes `overflow-y: visible` on its viewport
- * with `scrollHeight` equal to `clientHeight`. Standing alone it is a div. The
- * virtual list was worse, because it *acts* on the reading: #174 is the day it
- * pegged a renderer measuring a box that could not scroll.
+ * with `scrollHeight` equal to `clientHeight`. Standing alone it is a div, and
+ * the virtual list is worse because it *acts* on the reading.
  *
- * **It goes here rather than in a stylesheet, because this is where the other
- * three already are.** `BOX_SIZING`, `HIDDEN` and `SETTLED` are token-free
- * structural rules `core` ships into every shadow root, and `HIDDEN` is the
- * exact same category: the rules argue `hidden` is base-tier state because the
- * platform acts on it, and the way the headless tier makes the platform act is a
- * CSS rule shipped from here. "The headless tier has no CSS" has never meant
- * `core` has none; it means `helix/headless` must not depend on
+ * **It goes here rather than in a stylesheet**, beside `BOX_SIZING`, `HIDDEN`
+ * and `SETTLED`, which are the token-free structural rules `core` ships into
+ * every shadow root. "The headless tier has no CSS" has never meant `core` has
+ * none; it means `helix/headless` must not depend on
  * `@fusion.dev/helix-styles`, and a rule with no token in it does not.
  *
  * **And a rule rather than an inline style, which was the first idea and is
  * wrong.** An inline `style` on a rendered part outranks every author rule
  * short of `!important`, so a consumer wanting `overflow: hidden` on that part
- * would have to fight it, and this repository's own notes say what that is: it
- * moves the fight onto consumers, who then need `!important` of their own. A
- * shadow rule loses to a document rule, so `::part(viewport) { overflow: … }`
- * from a consumer simply wins, which is the right way round.
+ * would have to fight it and would need `!important` of their own. A shadow rule
+ * loses to a document rule, so `::part(viewport) { overflow: … }` from a
+ * consumer simply wins, which is the right way round.
  *
  * Both axes, and nothing else. Which *kind* of scrolling, how much room,
  * `overscroll-behavior`, `scroll-snap`, a gutter, a scrollbar treatment: those
@@ -94,14 +87,13 @@ const HIDDEN = css`
  * styled sheet is prepended-after so it overrides at equal specificity anyway.
  *
  * **A component marks a box whose scroll state it reads, and no other**, which
- * is narrower than "every box that ends up scrolling" and is the line that took
- * a measurement to find. `Megamenu`'s panel scrolls, and only because the
- * styled tier gives it a `max-block-size`: that is a decision, the `overflow`
- * that serves it belongs with it, and the headless tier never asks the panel
- * where it is scrolled to. Marking it anyway moved a heading four pixels,
- * because `overflow` establishes a block formatting context and margins that
- * had been collapsing stopped. A mechanism with a layout consequence is one to
- * apply exactly where it is needed.
+ * is narrower than "every box that ends up scrolling". `Megamenu`'s panel
+ * scrolls, and only because the styled tier gives it a `max-block-size`: that is
+ * a decision, the `overflow` that serves it belongs with it, and the headless
+ * tier never asks the panel where it is scrolled to. Marking it anyway moved a
+ * heading four pixels, because `overflow` establishes a block formatting context
+ * and margins that had been collapsing stopped. A mechanism with a layout
+ * consequence is one to apply exactly where it is needed.
  *
  * Three qualify: `ScrollArea`, `VirtualList` and `Carousel`, each of which
  * reads `scrollTop` or `scrollLeft` and acts on the answer.
@@ -153,20 +145,13 @@ const SCROLLER = css`
  * resolved with transitions off, so enabling them changes nothing and there is
  * nothing left to animate.
  *
- * **`:state()` and not an attribute, and that was a bug for three routes before
- * it was a preference.** This was `[data-settled]`, written onto the host with
- * `setAttribute`, and the host is the element React owns. A definition that
- * lands during module evaluation has a frame to spend before React arrives, so
- * the element wrote its own bookkeeping onto itself and React then hydrated a
- * DOM that had gained an attribute since the server wrote it. Measured across
- * three routes at the time: `/helix` clean, `/helix/theme` one diff and
- * `/helix/sandbox` three, every one of them a `data-settled=""` no server sent.
- *
- * It was worked around three times, in `use-sandbox-editor.ts`, in the sandbox
- * barrel and again on the reference pages, each deferring a registration so the
- * frame fell the other side of hydration. Every one of those is a fix for the
- * timing rather than for the cause: the cause is that a component's private
- * bookkeeping was being kept somewhere React reconciles.
+ * **`:state()` and never an attribute.** The host is the element React owns, and
+ * a definition that lands during module evaluation has a frame to spend before
+ * React arrives, so an element writing `[data-settled]` onto its own host leaves
+ * React hydrating a DOM that gained an attribute since the server wrote it.
+ * Deferring a registration so the frame falls the other side of hydration is a
+ * fix for the timing rather than for the cause, which is that a component's
+ * private bookkeeping was being kept somewhere React reconciles.
  *
  * A custom state is not in the DOM. It carries the fact to this stylesheet and
  * nothing to the markup, so a server's output and a hydrated client's agree by
@@ -195,25 +180,25 @@ const REACT_PROPS = '__reactProps$'
  * would be a scan per keystroke. Re-scanned whenever the cached key comes back
  * empty, so a second React root with a suffix of its own still resolves.
  *
- * **A miss must not erase it, and it did.** The re-scan wrote its own result
- * back unconditionally, so any dispatch from a node React does not own found
- * nothing and set the key to `undefined`, and the next React-owned node paid
- * for a full scan again. Most elements in this library are rendered by Lit
- * inside a shadow root and are exactly that kind of node, so on a real page the
- * cache was being cleared constantly by the components least able to benefit
- * from it. Measured, 20,000 dispatches: 5.3ms with a warm cache against 20.3ms
- * alternating one owned node with one that is not, which is roughly twice the
- * per-dispatch cost for the half that should have been free.
+ * **A miss must not erase it.** A re-scan that writes its own result back
+ * unconditionally sets the key to `undefined` on every dispatch from a node
+ * React does not own, and the next React-owned node pays for a full scan again.
+ * Most elements in this library are rendered by Lit inside a shadow root and are
+ * exactly that kind of node, so the cache is cleared constantly by the
+ * components least able to benefit from it. Measured, 20,000 dispatches: 5.3ms
+ * with a warm cache against 20.3ms alternating one owned node with one that is
+ * not, roughly twice the per-dispatch cost for the half that should have been
+ * free.
  *
- * So a miss now leaves the cache alone and only a *different* key replaces it,
- * which keeps the second-React-root case the note above is about.
+ * So a miss leaves the cache alone and only a *different* key replaces it, which
+ * keeps the second-React-root case the note above is about.
  *
  * **What is left is a scan per dispatch on a page with no React at all**, since
  * there is no key to find and no honest way to conclude one will never appear:
  * a root can mount at any time, and memoizing "this node is not React's" would
  * silently disable the binding for any element that dispatches before React
  * commits, which is the exact failure this whole mechanism exists to repair.
- * It is around half a microsecond and it is filed rather than hidden. See #320.
+ * It is around half a microsecond and it is filed rather than hidden.
  */
 let reactPropsKey: string | undefined
 
@@ -254,9 +239,9 @@ const REMOVED = new Set(['onActiveChange', 'onCheckedChange', 'onOpenChange', 'o
  * do reject a wrong *value* on a normal attribute. Measured with `tsc`.
  *
  * That leaves runtime as the only place a typo can be caught, and React's props
- * bag as the only place to look, which the binding above already reads. Once
- * per element, like the controlled-change audit, and for the same reason: a
- * warning that repeats on every keystroke is one a consumer silences.
+ * bag as the only place to look, which the binding above already reads. Once per
+ * element, because a warning that repeats on every keystroke is one a consumer
+ * silences.
  *
  * `on:helix-open` gets its own message because it is not a mistake so much as
  * the wrong dialect. It is what the Solid types offer, correctly, and React
@@ -300,7 +285,7 @@ const auditReactProps = (host: EventTarget, props: Record<string, unknown>): voi
        bubbling, but React binds an `on` prop by reading it as the element itself
        dispatches: one merely passing through never calls this host's own
        `dispatchEvent`, so the prop is recorded and never wired.
-    
+
        Silent when nothing registered the tag, which is a component from outside
        this library or a package built before the map existed. */
     const mine = host instanceof Element ? eventsForTag(host.localName) : undefined
@@ -373,7 +358,7 @@ const REACT_WIRES = new Set(['scroll', 'scrollend'])
  * React binds a hyphenated prop directly on the element, so our own events are
  * reached by name and are safe to bind again: same type, same callback, same
  * capture flag is a no-op by specification. A native name is different. React
- * recognises `onChange` and `onLoad` as its own registration names and attaches
+ * recognizes `onChange` and `onLoad` as its own registration names and attaches
  * nothing to the element for either; it relies on a delegated listener at the
  * root, which sees an event only if it **bubbles**, and on a non-delegated list
  * it sets up for `<video>`, `<audio>` and `<img>` and never for a custom
@@ -384,8 +369,7 @@ const REACT_WIRES = new Set(['scroll', 'scrollend'])
  * it and the consumer's handler runs twice. A non-bubbling relay arrives
  * nowhere, and is the bug this exists to close: `<helix-avatar>` relays `load`
  * and `error`, `<helix-video>` relays `ended`, `play` and `pause`, all of them
- * declared public API, all of them silent in React until now. An avatar
- * fallback is a shipped feature that did nothing.
+ * declared public API and all of them otherwise silent in React.
  *
  * The name is React's own casing, `onError` rather than `onerror`, because that
  * is what a consumer writes and therefore what is in the props bag. Every
@@ -444,9 +428,8 @@ const bindReactHandler = (host: EventTarget, event: Event): void => {
  * the element; the second is what keeps this to the properties that are actually
  * broken, rather than re-applying a string that is already correct. Three
  * qualify today, `rows` on the data table and `cell` and `compare` on a table
- * column, and the other ten `attribute: false` properties in the library are
- * booleans and strings a parent writes at runtime, which no consumer passes and
- * this never touches.
+ * column; the remaining `attribute: false` properties are booleans and strings a
+ * parent writes at runtime, which no consumer passes and this never touches.
  *
  * **`null` is the one place this does not reproduce a client mount, and it is
  * deliberate.** `typeof null` is `'object'`, and React assigns a null prop on a
@@ -511,13 +494,11 @@ export class HelixElement extends LitElement {
    * `helix-pagination-size` composes `helix-select`. One template says
    * `${this.tag('select')}` and each tier answers with its own name.
    *
-   * It was the public tag in both tiers, on the argument that each imports its
-   * own element under that name. That works and costs three things: the name
-   * means two different things depending on what a consumer imported, the
-   * headless tier composes an element it does not ship, and the composition
-   * cannot be tested there at all, because there is no `helix-select` on that
-   * tier to test it against. Thirty-nine specs had to be moved back to
-   * `helix/styled` for exactly that reason.
+   * **The public tag may not be the composed one, in either tier.** Using it
+   * costs three things: the name means two different things depending on what a
+   * consumer imported, the headless tier composes an element it does not ship,
+   * and the composition cannot be tested there at all, because there is no
+   * `helix-select` on that tier to test it against.
    *
    * **A prefix rather than an override per composition**, which was the first
    * plan and does not compile. An override re-renders the fragment from the
@@ -566,19 +547,15 @@ export class HelixElement extends LitElement {
    * fact to a stylesheet through `:state()` and leaves the markup alone, so the
    * server's output and the client's agree by construction.
    *
-   * `SETTLED` carries the long version of that argument and was the first to
-   * move. `checked`, `open`, `invalid` and `has-label` followed it on 27 Aug
-   * 2026, after the same fault was reported once more from the landing page's
-   * showcase: a `default-checked` switch, a `default-checked` checkbox and a
-   * `default-open` accordion item, each writing its own resolved state onto
-   * itself before React reached the node.
+   * `SETTLED` carries the long version of that argument; `checked`, `open`,
+   * `invalid` and `has-label` are recorded the same way, each of them a state a
+   * `default-*` attribute resolves before React reaches the node.
    *
-   * **The deferral that had been holding it is not a fix and could not be.**
-   * The site imports the definitions from an effect so the upgrades fall the
-   * other side of hydration, which works only while hydration is one pass:
-   * anything that splits it, a streamed segment or a suspended boundary, puts
-   * an upgrade back inside the window. Timing cannot be the guarantee when the
-   * fact is kept somewhere React reconciles.
+   * **Deferring the definitions is not a fix and could not be.** Importing them
+   * from an effect so the upgrades fall the other side of hydration works only
+   * while hydration is one pass: anything that splits it, a streamed segment or
+   * a suspended boundary, puts an upgrade back inside the window. Timing cannot
+   * be the guarantee when the fact is kept somewhere React reconciles.
    *
    * Feature-tested rather than assumed, the way `hostAria` tests element
    * references. An engine without `CustomStateSet` records nothing and keeps
@@ -611,8 +588,7 @@ export class HelixElement extends LitElement {
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`
-   * in `@fusion.dev/helix-testing` was written around and the reason two checkbox specs
-   * were misread as a token fault for days.
+   * in `@fusion.dev/helix-testing` is written around.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
    * server, a hidden tab, and happy-dom. Callers that must not hang race it
@@ -721,9 +697,9 @@ export class HelixElement extends LitElement {
    * suppressing transitions.
    *
    * A frame later, not now: see `SETTLED` for why `firstUpdated` itself is too
-   * early. SSR never calls this, which is correct, because the attribute
-   * describes something that happened in a browser and the server has no frame
-   * to wait for.
+   * early. SSR never calls this, which is correct, because the state describes
+   * something that happened in a browser and the server has no frame to wait
+   * for.
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
@@ -741,10 +717,10 @@ export class HelixElement extends LitElement {
       this.toggleState('settled', true)
       this.resolveSettled()
       /* **Audited here as well as at dispatch, and this is the half that catches
-         the real mistake.** The audit ran only from inside `dispatchEvent`, so an
-         element holding a handler prop and sending nothing was never looked at.
-         A prop on the wrong element is exactly the case where that element has no
-         reason to dispatch, so the check could not reach the thing it is for.
+         the real mistake.** From inside `dispatchEvent` alone, an element holding
+         a handler prop and sending nothing is never looked at, and a prop on the
+         wrong element is exactly the case where that element has no reason to
+         dispatch.
 
          A frame late, alongside the settled state, because React has to have
          committed its props for there to be anything to read. Once per element

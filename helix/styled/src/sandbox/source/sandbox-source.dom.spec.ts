@@ -21,13 +21,12 @@ const press = (field: HTMLTextAreaElement, key: string): KeyboardEvent => {
  * The source pane, and the contract that is the pane's rather than the
  * sandbox's.
  *
- * **The sandbox already proves the routing**, which is a change reaching the
- * preview and each pane keeping its own name: the source is named 29 times in
- * this family's specs. What this pane owns alone is the keyboard, and it owns a
- * genuine conflict: an editor where Tab indents is a keyboard trap, and an
- * editor where Tab moves focus cannot indent. The way out is Escape, and it is
- * invisible from the sandbox because both halves of it look like a field that
- * received a keystroke.
+ * **The sandbox already proves the routing**, a change reaching the preview and
+ * each pane keeping its own name. What this pane owns alone is the keyboard, and
+ * it owns a genuine conflict: an editor where Tab indents is a keyboard trap,
+ * and an editor where Tab moves focus cannot indent. The way out is Escape, and
+ * it is invisible from the sandbox because both halves of it look like a field
+ * that received a keystroke.
  */
 describe('the source pane', () => {
   /* Tab indents, which is the whole reason this is a pane and not an input. */
@@ -109,9 +108,9 @@ describe('the source pane', () => {
  *
  * Worth its own block because this pane is the half of the readout that *ships*.
  * The root's listener and the status bar's `caret` part are both in
- * `@fusion.dev/helix`, and the only pane that reported a position was the editor in
- * the private `@fusion.dev/helix-sandbox`, so a consumer with the published shell had a
- * status bar that could never fill.
+ * `@fusion.dev/helix`, so a pane here that reports nothing leaves a consumer with
+ * a status bar that can never fill, whatever the private
+ * `@fusion.dev/helix-sandbox` editor does.
  */
 describe('the source pane reporting its cursor', () => {
   const caret = async (value: string, at: number): Promise<{ column: number; line: number }> => {

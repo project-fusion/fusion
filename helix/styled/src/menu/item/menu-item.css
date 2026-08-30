@@ -25,20 +25,16 @@
      their own against the surface they sit on. */
   font-weight: var(--helix-weight-medium);
   gap: var(--helix-space-xs);
-  /* The label, then one trailing column for the mark. A row is never both a
-     choice and a way into a page, so one column serves both and the marks line
-     up down the side they are read from. */
   /* A column each side of the label, and both are there on every row whether or
      not anything fills them. Sized rather than auto, so a menu where one row has
      an icon and three do not still reads as one column of labels: `auto` would
-     collapse the empty ones and step every other label left. The mark's column
-     already worked this way and the note under it says why. */
-  /* The leading column takes a hook, the trailing one does not, and the
+     collapse the empty ones and step every other label left.
+
+     The leading column takes a hook and the trailing one does not, and the
      asymmetry is the point. What goes in `start` is whatever the consumer put
      there, and it is not always a mark: a still from a video, an avatar, a
      favicon. What goes in the mark column is a tick or a caret this component
-     draws, at icon size, always. So one of them is a decision a consumer can
-     have and the other is not. */
+     draws, at icon size, always. */
   grid-template-columns:
     var(--menu-item-start, var(--helix-size-icon))
     minmax(0, 1fr)
@@ -102,12 +98,10 @@
 /* The mark is monotone, and checked is a step in strength rather than a change
  * of hue.
  *
- * It was `--helix-color-primary`, which is the one color on a menu that means
- * "this is the action" and was here meaning "this is on". A row of settings with
- * three things enabled came out with three brand-colored ticks down the side,
- * reading as three recommendations. Nothing else in a dropdown does this:
- * `Option`'s tick is `currentColor`, so a listbox's answer has always been drawn
- * in the row's own ink.
+ * Never `--helix-color-primary`, which on a menu means "this is the action" and
+ * here would mean "this is on": a row of settings with three things enabled
+ * comes out with three brand-colored ticks reading as three recommendations.
+ * `Option`'s tick is `currentColor` for the same reason.
  *
  * The color only has to be legible, not comparative: an unchecked row renders
  * an empty `<span part="mark">` as a spacer rather than a gray tick, so the

@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * Gallery art for navigation and the overlays. The system is documented at the
  * top of `core.tsx`.
  *
- * Two conventions belong to this group and stop meaning anything if another
+ * Three conventions belong to this group and stop meaning anything if another
  * file borrows them:
  *
  * - **A full-bleed `overlay` wash is a scrim, and only Drawer draws one.** It
@@ -12,16 +12,15 @@ import type { CSSProperties, ReactNode } from 'react'
  *   separates a modal from a panel that happens to be on top. It is the real
  *   `--helix-color-overlay` token, so a drawing of a dimmed page is dimmed by
  *   exactly what dims a page.
- * - **A masthead's top corners are an arc of four, not a chord of eleven.** All
- *   four paths here that cap a page at the top were written `a4 4 0 0 1 8-8`,
- *   which asks for a radius-4 arc across a chord of 11.3. SVG cannot draw that,
- *   and rather than fail it scales both radii up until the arc fits, so every
- *   one of those corners rendered as a semicircle bulging out past the frame.
- *   The corner is `a4 4 0 0 1 4-4` off a start point four units back.
+ * - **A masthead's top corners are an arc of four, not a chord of eleven.**
+ *   `a4 4 0 0 1 8-8` asks for a radius-4 arc across a chord of 11.3. SVG cannot
+ *   draw that, and rather than fail it scales both radii up until the arc fits,
+ *   so the corner renders as a semicircle bulging out past the frame. Write
+ *   `a4 4 0 0 1 4-4` off a start point four units back.
  * - **Draw what a panel overlays only when the panel has no silhouette without
  *   it.** Drawer does: it is *attached* to an edge, and a drawer detached from
  *   the edge it came in from is just a tall card, so the page is the subject as
- *   much as the panel is. Dialog does not, and drawing one for it cost two
+ *   much as the panel is. Dialog does not, and drawing one for it costs two
  *   thirds of the frame to say something a shadow already says. This is the
  *   rule that most wants over-applying: a relationship is easy to draw and it
  *   is almost never the component.
@@ -30,13 +29,12 @@ export const overlaysArt: Record<string, ReactNode> = {
   /**
    * The band, its message and the way out of it.
    *
-   * Drawn over a masthead and a page once, because an announcement is a thing
-   * that sits *above* chrome. That is true, and it made the card mostly a
-   * picture of the chrome: the band was a fifth of the frame and the other four
-   * fifths were App Header's drawing. The relationship belongs in the prose.
+   * No masthead and no page under it. An announcement does sit *above* chrome,
+   * and drawing that makes the card mostly a picture of App Header: the band
+   * takes a fifth of the frame and the relationship belongs in the prose.
    *
-   * It still unfurls from its own top edge rather than fading, which is the one
-   * thing an announcement does that a static notice does not.
+   * It unfurls from its own top edge rather than fading, which is the one thing
+   * an announcement does that a static notice does not.
    */
   announcement: (
     <>
@@ -61,30 +59,22 @@ export const overlaysArt: Record<string, ReactNode> = {
   /**
    * Fifty-six pixels tall, which is `--helix-size-header`, spanning the page.
    *
-   * The bar and nothing else. A page under it, twice: first as an empty gray
-   * field, then with content, on the reasoning that what makes fifty-six pixels
-   * read as *header* is something beginning where it ends. That is true of a
-   * page and it is not true of a card. What the card has to say is "a bar of
-   * this height, holding a mark, some nav and an action", and the page under it
-   * was the biggest thing in the frame while contributing none of that.
+   * The bar and nothing else. A page under it is the biggest thing in the frame
+   * while contributing none of what the card has to say, which is "a bar of
+   * this height, holding a mark, some nav and an action".
    *
-   * **The bar is static and its contents are not**, which is a narrower claim
-   * than the one that used to be here. That claim was that the whole card had
-   * to hold still, and it came from the right instinct answered too broadly:
-   * the thing that must not move is the masthead, because a header that drifts
-   * on its own page is a picture of a bug. It had exactly that once, the
-   * trailing action lifting off the bar. What a mark, two links and an action
-   * do instead is arrive in the order they are laid out in, which says nothing
-   * about the bar going anywhere.
+   * **The bar is static and its contents are not.** A masthead that drifts on
+   * its own page is a picture of a bug, so nothing may lift the bar itself. A
+   * mark, two links and an action arriving in the order they are laid out in
+   * says nothing about the bar going anywhere.
    */
   'app-header': (
     <>
       {/* A rule under it rather than an outline around it, which is what a
-          masthead actually has. The four sides were only ever there because the
-          bar's `surface` fill sits one and a half percent off the page and
-          could not hold a silhouette on its own. One edge does the same job
-          honestly: a header is defined by where it *ends*, and the mark, the
-          nav and the action say where it begins.
+          masthead actually has: a header is defined by where it *ends*, and the
+          mark, the nav and the action say where it begins. The bar's `surface`
+          fill sits one and a half percent off the page and cannot hold a
+          silhouette on its own, which is what tempts the four sides.
 
           `artRule` rather than `artEdge` because it is a rule. Rules in this
           gallery are filled rects at one unit, so they never half-render at a
@@ -209,7 +199,6 @@ export const overlaysArt: Record<string, ReactNode> = {
    * nothing, and the second is the state worth drawing: it is what the reader
    * is looking at by the time the component has done its job.
    */
-
   command: (
     <>
       <g className="artMotion artOpen">
@@ -257,14 +246,12 @@ export const overlaysArt: Record<string, ReactNode> = {
   /**
    * The window: a title, a line of it, and the two ways out.
    *
-   * The page and its scrim are gone. They were here on the rule below, that an
-   * overlay is only convincing if you draw what it overlays, and for Dialog
-   * that rule was buying a relationship at the cost of the subject: two thirds
-   * of the frame was a page, dimmed almost to flat, with the actual dialog
-   * small in the middle of it. Drawer keeps the page because Drawer is
-   * *attached* to an edge and has no silhouette without one. A dialog is
-   * centered and floating, and floating is a shadow, which needs nothing behind
-   * it to read.
+   * No page and no scrim. Drawing what an overlay overlays buys a relationship
+   * at the cost of the subject here: the page takes two thirds of the frame,
+   * dimmed almost to flat, with the dialog small in the middle of it. Drawer
+   * keeps its page because Drawer is *attached* to an edge and has no
+   * silhouette without one. A dialog is centered and floating, and floating is
+   * a shadow, which needs nothing behind it to read.
    */
   dialog: (
     <>
@@ -298,12 +285,12 @@ export const overlaysArt: Record<string, ReactNode> = {
         {/* Flush to the page edge, and traveling exactly the distance that
             clears it.
          *
-         * The panel stopped at 272 against a page ending at 276, leaving a four
-         * unit sliver of page down its outer side: a drawer that is not touching
-         * the edge it came in from is a tall card. It also started 120 out when
-         * 96 clears the clip, so a quarter of the run happened off-screen and it
-         * entered the frame already at speed, then decelerated into place. That
-         * is what read as overshoot. The easing never overshot: it is
+         * A panel stopping short of the page leaves a sliver of page down its
+         * outer side, and a drawer not touching the edge it came in from is a
+         * tall card. Travel is 100, just past the 96 that clears the clip:
+         * further out and part of the run happens off-screen, so the panel
+         * enters the frame already at speed and decelerates into place, which
+         * reads as overshoot. The easing cannot overshoot. It is
          * `cubic-bezier(0.22, 1, 0.36, 1)`, whose control points are both at
          * y=1, so the curve is monotonic and cannot exceed its end value.
          *
@@ -328,8 +315,7 @@ export const overlaysArt: Record<string, ReactNode> = {
    *
    * Two layers, not three. The idea is *the level you are on and the level
    * behind it*, and two is what that takes: a third only proves the stack can
-   * keep going, which is a claim about the API rather than about the component,
-   * and it cost a third of the frame to make.
+   * keep going, which is a claim about the API rather than about the component.
    */
   drilldown: (
     <>
@@ -513,16 +499,15 @@ export const overlaysArt: Record<string, ReactNode> = {
    * `border-inline-start` that the current one colors in. So the marker sits
    * *on* the rule rather than beside it.
    */
-
   outline: (
     <>
       <rect className="artRule" height="112" width="1" x="64" y="44" />
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="88" x="80" y="48" />
       <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="64" x="96" y="76" />
       {/* The one marker in the set that travels down rather than across, which
-          is the axis the component reads on. It was written with `--art-to: 0`
-          once, which parses, animates, and moves nothing: the card was the only
-          one in the gallery that claimed an archetype and then sat still. */}
+          is the axis the component reads on. `--art-to: 0` on its own parses,
+          animates, and moves nothing, so the block axis has to be named:
+          `--art-to-block` is what carries this one. */}
       <rect
         className="artSolid artMotion artTravel"
         height="16"
@@ -588,6 +573,7 @@ export const overlaysArt: Record<string, ReactNode> = {
     </>
   ),
 
+  /** A panel that opens against a trigger and holds anything. */
   popover: (
     <>
       <rect className="artSunken" height="40" rx="4" width="64" x="56" y="36" />
@@ -631,19 +617,16 @@ export const overlaysArt: Record<string, ReactNode> = {
       {/* The control itself, filled and larger: the one thing on the card that
        * is not a shadow of the others.
        *
-       * **`artSolid`, which it did not carry.** The class was `artOn`, which is
-       * a motion name and paints nothing, so the disc fell through to the SVG
-       * default fill and was drawing in literal black. In light mode that is
-       * within a hair of `surface-inverse` and nobody could see it; in dark mode
-       * `surface-inverse` is near white, so the card's one filled control was a
-       * black disc on a black page with a white plus hanging in the middle of
-       * it. The plus already said which token this wanted, being
-       * `artStrokeOnSolid`.
+       * **`artSolid`, never `artOn`.** `artOn` is a motion name and paints
+       * nothing, so a disc carrying it falls through to the SVG default fill
+       * and draws in literal black. In light mode that is within a hair of
+       * `surface-inverse` and nobody can see it; in dark mode `surface-inverse`
+       * is near white, so the card's one filled control becomes a black disc on
+       * a black page with a white plus hanging in the middle of it.
        *
-       * **And it holds still.** The whole drawing used to lift, actions and
-       * control together, which is a speed dial floating off the page: the one
-       * thing a dial's button does is stay exactly where a thumb left it, and
-       * anchoring it is what makes the fan above it read as a fan. */}
+       * **And it holds still.** The one thing a dial's button does is stay
+       * exactly where a thumb left it, and anchoring it is what makes the fan
+       * above it read as a fan. */}
       <circle className="artSolid" cx="212" cy="152" r="16" />
       {/* The plus turns into its own close, which is the whole of what pressing
           this control does to the glyph on it. 45 degrees rather than the
@@ -748,9 +731,9 @@ export const overlaysArt: Record<string, ReactNode> = {
           style={{ '--art-i': control.i } as CSSProperties}
         >
           <rect className="artSunken" height="40" rx="4" width={control.w} x={control.x} y="80" />
-          {/* Kept. These are the one case in the set where the fill really is
-              not enough: a 40 unit sunken square on the page is a ghost at card
-              size, and four ghosts beside a rule is Flex with a divider. */}
+          {/* The one case in the set where the fill really is not enough: a 40
+              unit sunken square on the page is a ghost at card size, and four
+              ghosts beside a rule is Flex with a divider. */}
           <rect
             className="artEdge"
             height="39"
@@ -772,12 +755,11 @@ export const overlaysArt: Record<string, ReactNode> = {
       <rect className="artEdge" height="23" rx="4" width="23" x="100.5" y="112.5" />
       {/* It scales up out of the target and carries no arrow.
        *
-       * The arrow was a tail pointing at the square below, which is a thing
-       * the component can draw and is not what makes a tooltip legible here:
-       * at card size it read as a notch in the panel's underside. What says
-       * "this belongs to that" is the scale origin. Growing from `center
-       * bottom`, directly above the target, is the same gesture the real
-       * component performs, and it needs no second mark to explain it.
+       * An arrow is a thing the component can draw and at card size it reads as
+       * a notch in the panel's underside. What says "this belongs to that" is
+       * the scale origin: growing from `center bottom`, directly above the
+       * target, is the same gesture the real component performs and needs no
+       * second mark to explain it.
        *
        * Shift zeroed, scale raised. The shared swell drifts five units down,
        * which on a panel anchored to something reads as it coming loose. */}
@@ -799,7 +781,6 @@ export const overlaysArt: Record<string, ReactNode> = {
     </>
   ),
 
-  /* A panel that opens against a trigger and holds anything. */
   /**
    * The thing being pointed at, lit, and the panel that says why.
    *

@@ -1,8 +1,8 @@
-/* The bar needs something behind it before the two appearances differ at all,
-   and bare, they did not: a 72% white pane over a white page is an opaque white
-   pane. Neither example scrolled either, so neither ever drew its separating
-   rule. Three things fix it, and `opaque.css` is the same file so that flipping
-   between the two examples changes one attribute and nothing else.
+/* The bar needs something behind it and something to scroll before the two
+   appearances differ at all: a 72% white pane over a white page is an opaque
+   white pane, and a page that never scrolls never draws its separating rule.
+   `opaque.css` is the same file, so flipping between the two examples changes
+   one attribute and nothing else.
 
    The scroller is the frame's own document, which is the one the component
    listens to: the custom state `scrolled` is set from `window.scrollY`, so a bar inside an
@@ -19,10 +19,9 @@
    reason, so its strokes pass under the bar rather than beside it.
 
    Pulled up by the height of the bar and padded back down by it, so the band
-   starts *behind* the banner rather than below it. Without that, the two
-   appearances are the same picture until the reader scrolls, which is the
-   thing that made these two examples indistinguishable in the first place. It
-   is also what a page with a glass header actually does with its hero. */
+   starts *behind* the banner rather than below it. Without that the two
+   appearances are the same picture until the reader scrolls. It is also what a
+   page with a glass header actually does with its hero. */
 .band {
   align-content: center;
   margin-block-start: calc(var(--helix-size-header) * -1);

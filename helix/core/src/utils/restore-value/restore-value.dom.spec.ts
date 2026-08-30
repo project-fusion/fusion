@@ -10,11 +10,11 @@ import { holdCaret, restoreValue } from './restore-value.js'
  * does it too: measured, caret at 3 in `abcdef`, assign `abcXdef`, caret at 7.
  * So these specs exercise the actual failure rather than a description of it.
  *
- * What it cost before: a React consumer holding the value in state commits
- * after the event, so a controlled field was put back to the old text while
- * they decided, Lit then assigned a genuinely different string, and the caret
- * went to the end after every single keystroke. Typing in the middle of a word
- * was impossible.
+ * The case it exists for: a React consumer holding the value in state commits
+ * after the event, so a controlled field is put back to the old text while they
+ * decide, Lit then assigns a genuinely different string, and without this the
+ * caret goes to the end after every single keystroke, making it impossible to
+ * type in the middle of a word.
  */
 beforeAll(() => {
   registerDom()
@@ -84,7 +84,7 @@ describe('putting a value back', () => {
 
 describe('a value that is already what it should be', () => {
   /* The assignment itself is what moves the caret, so the early return is
-     behavior rather than an optimisation. */
+     behavior rather than an optimization. */
   test('is left alone, caret included', () => {
     const control = field('same', 2)
     restoreValue(control, 'same')

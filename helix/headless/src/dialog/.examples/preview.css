@@ -5,22 +5,19 @@
  * platform's and the component's. None of that is below. What is below is the
  * surface: a modal that looks like nothing still traps focus correctly.
  *
- * Deliberately skeletal, for the reason the checkbox's sheet gives: this is a
- * diagram of what has to be styled, not a theme to copy.
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy.
  *
  * **The triggers are `helix-headless-button` and not a bare `<button>`**, which is
  * the one thing here that is not about appearance. `command` and `commandfor`
  * are Chrome 135, Firefox 137 and Safari 18.4, and before those a bare button
  * carrying them is simply inert: no error, no warning, the markup right and the
- * control dead. `HelixHeadlessButton` already sends the event itself where the
- * platform will not, which is why the styled twin of this example worked in a
- * browser where this one did nothing at all. An example that only runs on
- * last-year's browsers teaches a consumer to ship one.
+ * control dead. `HelixHeadlessButton` sends the event itself where the platform
+ * will not. An example that only runs on last-year's browsers teaches a
+ * consumer to ship one.
  *
- * **`::backdrop` inherits from its originating element**, which is worth
- * knowing because it did not always: the working group changed it, Chromium
- * shipped it, and a note in this repository claimed otherwise for years. So a
- * custom property set on the dialog reaches the backdrop. */
+ * **`::backdrop` inherits from its originating element**, so a custom property
+ * set on the dialog reaches the backdrop. */
 
 helix-headless-dialog::part(dialog) {
   border: 1px solid;

@@ -34,9 +34,9 @@ import { styles } from './drawer-root.css.js'
  * @cssproperty --drawer-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.
- * @cssproperty --drawer-inset - Padding inside the panel.
- * @cssproperty --drawer-inset-block-start - Padding above the content, which clears the close control.
- * @cssproperty --drawer-radii - Corner radius on the edges that face the page.
+ * @cssproperty --drawer-padding - Padding inside the panel.
+ * @cssproperty --drawer-padding-block-start - Padding above the content, which clears the close control.
+ * @cssproperty --drawer-radius - Corner radius on the edges that face the page.
  * @cssproperty --drawer-scrim - The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
  * @cssproperty --drawer-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
  *   floating surface sits over content nobody can predict, so it keeps a lift by default.
@@ -52,16 +52,12 @@ export class HelixDrawer extends HelixHeadlessDrawer {
    * translucent ground with no filter is a tint, so a consumer says what it
    * wants rather than assembling it out of two hooks.
    *
-   * A drawer is the case where the pair earns the most, because there is already
-   * something behind it worth seeing: the page it covers, under its own scrim.
-   *
    * Absent is opaque, per the rule that a reflected property takes no default,
    * so the stylesheet only describes the departure.
    *
-   * **`transparent` is where this one stops, and that is the statement 270
-   * asks for rather than an omission.** A panel that floats over arbitrary page
-   * content is only readable because it has a ground; dropping it does not make
-   * a lighter drawer, it makes an unreadable one. `frosted` and `glass` are the
+   * **No `transparent`, deliberately.** A panel floating over arbitrary page
+   * content is only readable because it has a ground; dropping it makes an
+   * unreadable drawer rather than a lighter one. `frosted` and `glass` are the
    * two honest points here.
    */
   @property({ reflect: true })

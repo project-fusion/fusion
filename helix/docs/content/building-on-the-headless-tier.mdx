@@ -1,0 +1,143 @@
+---
+description: Using the headless tier as the foundation for a design system of your own.
+section: Essentials
+title: Building on the headless tier
+---
+
+# Building on the headless tier
+
+The headless tier is a set of components with no stylesheet: structure, ARIA,
+keyboard behavior, state and form participation, and nothing about how any of it
+looks. That makes it usable as a foundation rather than as a library you consume
+whole. Your tags, your stylesheets, our accessibility.
+
+This is a different thing from theming Helix. Theming keeps our components and
+changes their tokens. This keeps our behavior and replaces the presentation
+layer outright, under names of your own.
+
+## One line does it
+
+Every headless component renders its children by interpolating a tag rather than
+naming one, and the prefix comes from a static on the class:
+
+```ts
+import { HelixHeadlessCombobox } from '@fusion.dev/helix-headless/combobox'
+
+export class AcmeCombobox extends HelixHeadlessCombobox {
+  static override tier = 'acme-'
+}
+
+customElements.define('acme-combobox', AcmeCombobox)
+```
+
+That is the whole mechanism, and it is the same one the styled tier uses: it
+writes `static override tier = 'helix-'` and nothing else. The static appears 116
+times in the headless manifest, so it is discoverable rather than folklore.
+
+## The render graph is the part that will catch you
+
+**A component that renders another gives you two things to register, and only
+one of them is obvious.** Twenty-two of the 88 headless families interpolate
+another family's tag, across 89 call sites and seventeen distinct children.
+
+Register `acme-combobox` without also registering `acme-listbox` and the panel
+renders a tag nobody defined. That is not an error and not a warning: an
+unregistered custom element is an inert, unstyled inline box, so what you see is
+a combobox that appears not to open.
+
+| Family | Renders |
+|---|---|
+| `bar-chart`, `donut-chart`, `heatmap`, `line-chart` | `tooltip` |
+| `code-block` | `copy-button` |
+| `color-input` | `color-picker` |
+| `color-picker` | `button`, `button-group`, `slider` |
+| `combobox` | `listbox`, `tag` |
+| `command` | `dialog`, `listbox` |
+| `copy-button` | `tooltip` |
+| `data-table` | `pagination` |
+| `date-input` | `date-picker`, `tag` |
+| `file-input` | `tag` |
+| `notifications` | `format-date` |
+| `pagination` | `option`, `select` |
+| `select` | `listbox` |
+| `steps`, `tour` | `button` |
+| `time-input` | `tag`, `time-picker` |
+| `time-picker` | `listbox`, `option` |
+| `video`, `video-playlist` | `menu`, `menu-item` |
+
+The safe rule is to subclass and register a family together with everything it
+renders, transitively: `command` reaches `dialog` and `listbox`, and `listbox`
+reaches `option`.
+
+**This table is maintained by hand today and should not be.** The graph is
+already computed inside this repository, by the check that stops us shipping the
+same fault, and it is thrown away afterward rather than written to the manifest.
+Until it is published, treat the table above as the version that can go stale.
+
+## What you have to supply yourself
+
+**A `:not(:defined)` guard.** `@fusion.dev/helix` ships an `elements.css` that
+hides each of its tags until the definition lands, so a page does not show a run
+of unstyled text and then snap. The headless package ships no such file, and
+nothing can generate one for tags you have not named yet. Write the rule for
+your own elements:
+
+```css
+acme-combobox:not(:defined),
+acme-listbox:not(:defined) {
+  visibility: hidden;
+}
+```
+
+Visibility rather than `display`, so the page does not reflow when the
+definitions arrive.
+
+**Your own typings.** The generated `jsx.d.ts`, `vue.d.ts` and `svelte.d.ts`
+carry our tag names. For yours, merge each element into the tag map:
+
+```ts
+declare global {
+  interface HTMLElementTagNameMap {
+    'acme-combobox': AcmeCombobox
+  }
+}
+```
+
+Per element, by hand. There is no generated version of this for consumer names.
+
+## What you get without asking
+
+**Tree-shaking is honest.** `@fusion.dev/helix-headless` declares
+`sideEffects: ["./dist/**/*.js"]`, which is true rather than convenient: the
+modules register elements on import, so a bundler that believed otherwise would
+drop a registration and leave you debugging a tag that does not upgrade.
+
+**A styling surface that is documented.** Every part carries an `@csspart`, so
+`::part()` is a published door rather than a shadow tree you have to guess at.
+That is what makes replacing the presentation layer tractable: you are writing
+against named parts, not against our internals.
+
+**Composition stays ours.** Focus management, typeahead, the roving tab stop,
+form participation and validity all live below the tier you are replacing, so
+they keep working under your names.
+
+## What is not promised yet
+
+`tier` is an implementation detail that happens to be visible in the manifest.
+Using it the way this page describes turns it into API with a stability contract
+attached, and that contract is not written. Treat this as a supported pattern
+that is not yet a versioned promise, and pin your Helix version.
+
+## How this differs from white-labeling
+
+Two different customers get confused for each other here. This page is for the
+one building a design system on top of ours and content for our tags to sit
+beside theirs. The other wants Helix shipped under their name with ours absent,
+which is a different and more expensive mechanism: rewriting the tag literals at
+build time, a second distribution to publish, and an artifact per customer.
+Nothing on this page needs any of that.
+
+The sovereignty question answers itself in this direction. You hold the
+presentation layer, the tags and the build. If Fusion stopped tomorrow you would
+keep a working design system and lose upstream fixes to the behavior underneath
+it.

@@ -11,10 +11,7 @@
  *
  * That is reachable outside a test: a pointer released between the event being
  * queued and the handler running is gone by the time this is called, and a
- * synthetic `pointerdown` has no active pointer at all. The browser spec run
- * reported four of those as uncaught page errors, and three splitter specs had
- * each stubbed the method to get past it, which is the shape of a workaround
- * that has been in place long enough to read as setup.
+ * synthetic `pointerdown` has no active pointer at all.
  *
  * Returns whether it took, for the callers that then ask `hasPointerCapture`
  * before believing a move belongs to them.

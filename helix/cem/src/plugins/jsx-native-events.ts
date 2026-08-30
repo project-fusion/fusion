@@ -26,14 +26,14 @@ export interface JsxNativeEventsOptions {
  * `Event`, so `currentTarget` is `EventTarget` or null. The prefixed events
  * have no such problem, being emitted per element with a typed detail. So the
  * ergonomic half of 294 cost a consumer a cast and the advanced half did not,
- * which is exactly backwards. See 300.
+ * which is exactly backwards.
  *
  * `@wc-toolkit/jsx-types` cannot do better and is not wrong to: it emits one
  * shared bag because it has no idea which element a handler will be written on.
  * The manifest does, and `BaseProps<T>` beside it already names the element,
  * which is what makes this a rewrite rather than a table to keep.
  *
- * **Generic rather than per-component, which was the first shape tried.**
+ * **Generic rather than per-component.**
  * Emitting an override for each native event a component declares needs the
  * declarations read, kept in step, and intersected with the shared bag, and an
  * intersection of two handler types is an overload rather than a replacement:

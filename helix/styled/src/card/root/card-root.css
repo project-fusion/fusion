@@ -4,13 +4,9 @@
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
-  /* `sm`, the same 4px the controls take. A card is a container and the reflex
-     is to round it more than the things inside it, but at `md` the corner was
-     twice a button's and the card read as the softest object on a page full of
-     square-ish controls. Matching them makes the card recede, which is what a
-     container should do. `--card-radii` is still there for a consumer who
-     wants the older, rounder box. */
-  border-radius: var(--card-radii, var(--helix-radii-lg));
+  /* `lg`: a container corner rather than the `sm` the controls inside it take.
+     `--card-radius` is the hook for a squarer box. */
+  border-radius: var(--card-radius, var(--helix-radii-lg));
   /* A hook rather than a value, so something outside can lift the card without
      reaching into the shadow root. `elevated` sets it below, and the
      `data-card` recipe sets it on hover: one property, so a card cannot end up
@@ -35,10 +31,10 @@
    *
    * **A hook rather than a bare value, because the other answer is real.** A row
    * of cards whose footers should sit at one height wants `space-between`, which
-   * is what the site's insight cards ask for. Written as a plain declaration here
-   * that would be a document rule overruling a shadow one, which is dead in a way
-   * nothing reports: `check:overruled` catches exactly that and did. A custom
-   * property is the door this library already publishes for a single knob. */
+   * is what the site's insight cards ask for. Asking for it from outside means a
+   * document rule overruling a shadow one, which is dead in a way nothing
+   * reports. A custom property is the door this library already publishes for a
+   * single knob. */
   align-content: var(--card-align, start);
   display: grid;
   gap: var(--helix-space-sm);
@@ -55,8 +51,8 @@
   /* One inset for every region, so they narrow together.
    *
    * `--helix-space-control` rather than `--helix-space-md`, which is the same
-   * value at rest and follows `data-density` on any ancestor. It was a `dense`
-   * boolean here, and measured, a card read 16px of inset in a `sm` region and
+   * value at rest and follows `data-density` on any ancestor. With a `dense`
+   * boolean here instead, a card measured 16px of inset in a `sm` region and
    * 16px in an `lg` one: the region said how tight it was and the card was the
    * one component that did not listen. Saying it twice is the fault the size
    * rule exists to prevent, and the second channel was also the deaf one. */
@@ -67,16 +63,39 @@
   --_card-media: var(--card-media-size, 12rem);
 }
 
+/* **A lift in the light, and a hairline in the dark, because a shadow is a
+   light-mode device.**
+
+   It works by darkening what is behind it, and in the dark what is behind it is
+   already close to the darkest value the theme has. Measured on the insights
+   gallery, which is where this was found: a card on the page's own black had a
+   `shadow-md` of `oklab(0.15 0 0 / 0.1)` painted onto `lab(0 0 0)`, a shadow
+   *darker than its ground*, and no border to fall back on. The separation the
+   variant is named for was not faint, it was absent, and the card was told
+   apart only by the words inside it.
+
+   `megamenu-root.css` reached the same finding from its own side and drew the
+   same conclusion in a hand-written rule: the edge a shadow draws in the light
+   is drawn by a line in the dark. This is that, for the one variant whose whole
+   policy is the lift.
+
+   **The shadow stays in both modes** rather than being swapped out. It is not
+   doing nothing in dark, it is doing very little, and a card that keeps it is
+   one declaration rather than two; what changes is that the line is there when
+   the lift cannot carry the separation alone.
+
+   `light-dark()` rather than a media query, so it follows a theme a consumer
+   sets rather than only the one the system reports. */
 :host([separation="elevated"]) {
-  border-color: transparent;
+  border-color: light-dark(transparent, var(--helix-color-border));
 
   --card-shadow: var(--helix-shadow-md);
 }
 
 /* Told apart by its own color and nothing else, which is the fourth mechanism
-   `ThemeIntent.separation` has always carried and no component could ask for.
-   The ground stays, both the edge and the lift go: `plain` below clears the
-   ground as well, so between them there was no way to say "a surface, quietly".
+   `ThemeIntent.separation` carries and no component could ask for. The ground
+   stays, both the edge and the lift go: `plain` below clears the ground as
+   well, so without this there is no way to say "a surface, quietly".
 
    Nothing here states a color. The base already fills with
    `--helix-color-surface`, one rung off the page, and a theme whose policy is
@@ -144,12 +163,12 @@ slot[name="footer"]::slotted(*) {
 
 /* Sideways is the same stack with the media taken out of flow beside it.
  *
- * It was a second grid column, and that cannot work here, for two reasons that
- * compound. The regions are bare slots, so `::slotted(*)` is the only way to
- * place them and it reaches elements only: a body written as text between the
- * tags is an anonymous item that auto-places wherever it likes. And `grid-row:
- * 1 / -1` spans to the last *explicit* line, of which a grid with no row
- * template has none, so the media covered one row rather than all of them.
+ * Never a second grid column, for two reasons that compound. The regions are
+ * bare slots, so `::slotted(*)` is the only way to place them and it reaches
+ * elements only: a body written as text between the tags is an anonymous item
+ * that auto-places wherever it likes. And `grid-row: 1 / -1` spans to the last
+ * *explicit* line, of which a grid with no row template has none, so the media
+ * covers one row rather than all of them.
  *
  * Measured on the component's own example: the body landed in column one, row
  * two, which then sized that column to four hundred and two pixels around a
@@ -219,7 +238,7 @@ slot[name="footer"]::slotted(*) {
 /* Print: the lift is a shadow, which printers drop into a gray smear; the edge carries it.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     background-color: transparent;

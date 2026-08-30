@@ -17,11 +17,11 @@ const panel = async (attributes = ''): Promise<Panel> =>
  * One panel, and the contract that is the panel's rather than the tabs'.
  *
  * **The root already proves the pairing**, which is that selecting a tab reveals
- * the panel of the same value: it is named 27 times in this family's specs. What
- * the panel owns alone is how it carries its own name, and that is worth its own
- * spec because the obvious markup is wrong in a way nothing reports: it named
- * `tab-${value}`, an id inside the *tab's* shadow root, and an IDREF resolves
- * only in the tree it is written in, so the panel had no accessible name at all.
+ * the panel of the same value. What the panel owns alone is how it carries its
+ * own name, and that is worth its own spec because the obvious markup is wrong
+ * in a way nothing reports: `aria-labelledby="tab-${value}"` names an id inside
+ * the *tab's* shadow root, and an IDREF resolves only in the tree it is written
+ * in, so the panel ends up with no accessible name at all.
  */
 describe('one tab panel', () => {
   /* A name rather than a reference, because a name is the one form that crosses

@@ -55,25 +55,11 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   /**
    * Which color the band wears.
    *
-   * **This was `severity` and it was claiming more than it did.** Severity is a
-   * judgment about the message, and elsewhere in this library it carries one:
-   * `Callout` reads `TONE_MARKS` for an icon and a label, so `tone="danger"`
-   * puts a mark beside the text and names it to a screen reader. Here it did
-   * none of that. It set a color, the live region stayed polite either way, and
-   * nothing about the announcement's semantics moved. A property that only
-   * changes the paint should say so.
-   *
-   * `tone` is the word this library already uses for exactly that, and `Tag`
-   * made the identical rename for the identical reason: the word it left was a
-   * treatment, `tone` is semantic color. The set matches `Tag`'s so the two
-   * agree, with `neutral` as the resting value and `primary` for a band that is
-   * about the product rather than about a state.
-   *
-   * `neutral` is what an unset announcement already looked like, said out loud
-   * so a consumer can put a band back to it from markup, and `surface` is the
-   * one value that is not a color: it lifts the band onto the surface step
-   * instead of the sunken one, for a strip carrying something that is not a
-   * state at all.
+   * Paint only: unlike `Callout`, no value here draws a mark, changes the label,
+   * or moves the live region off polite. The set matches `Tag`'s. `neutral` is
+   * the resting value, said out loud so a consumer can put a band back to it
+   * from markup, and `surface` is the one value that is not a color: it lifts
+   * the band onto the surface step instead of the sunken one.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning'
@@ -123,12 +109,8 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
    * layer, and a fallback with only the first is one a tier can restyle and
    * cannot change.
    *
-   * **Named for what it draws, which it was not.** It was `renderIcon`, with a
-   * description of "the mark for the announcement's tone", and it draws the `x`
-   * glyph inside the dismiss button and has never drawn a tone. The name is
-   * `renderIcon` on `Toast` and `Callout` too, and on both of those it takes a
-   * severity and draws exactly the tone mark this claimed to: the prose came
-   * from a sibling that meant it. An announcement has no tone mark at all.
+   * Not `renderIcon`, which is what `Toast` and `Callout` call the method that
+   * draws a tone mark. An announcement has no tone mark at all.
    */
   protected renderDismissIcon(): TemplateResult {
     return html`<slot name="icon">
@@ -143,20 +125,11 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
       <div part="actions"><slot name="actions"></slot></div>
       ${
         /* A plain `<button>`, the way `Menu` renders its way back and every
-           other in-shadow control in the library.
-
-           It was `helix-headless-icon-button`, which is the headless tier and
-           therefore ships no CSS at all, so the `<button>` inside it kept the
-           browser's own border and gray fill and the dismiss control read as a
-           form button dropped into a message bar. The styled tier could not
-           reach it: `[part="dismiss"]` selects the host and stops at its shadow
-           boundary, and its rules were already written for a plain button,
-           `all: unset` and all, which is the clue that this element was never
-           meant to be here.
-
-           Nesting a component inside a component's shadow root also makes the
-           parent depend on the child being registered, invisibly, and this was
-           the only place in the library doing it. */
+           other in-shadow control in the library. Never a nested component
+           here: `[part="dismiss"]` would select the host and stop at its shadow
+           boundary, so the styled tier could not reach the inner control at
+           all, and the parent would depend invisibly on the child being
+           registered. */
         this.dismissible
           ? html`<button
               part="dismiss"

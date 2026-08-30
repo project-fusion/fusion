@@ -55,7 +55,7 @@ export interface FloatingOptions {
   /**
    * Whether to cap the floating element to the space available.
    *
-   * On by default, written as `--floating-available-height` and
+   * On by default, written as `--floating-available-block-size` and
    * `--floating-available-width` rather than as a height. A list decides for
    * itself whether to scroll or to shrink; a controller that sets the height
    * has decided that for every element it places.
@@ -104,14 +104,13 @@ export interface FloatingOptions {
  * **The custom properties are declared here because this is what writes them.**
  * Each carries a measurement taken against the viewport that no stylesheet can
  * take for itself, and `core` ships no CSS, so there is no reader inside this
- * package and none of them is private. `check:hooks` pairs a `@cssproperty`
- * with a rule that reads one, in both directions, and the underscore these used
- * to carry was what exempted them from it.
+ * package and none of them is private. the `hooks` rule pairs a documented
+ * hook with a rule that reads one, in both directions.
  *
- * @cssproperty --floating-anchor-width - How wide the anchor is, for a panel that matches it.
+ * @cssproperty --floating-anchor-inline-size - How wide the anchor is, for a panel that matches it.
  * @cssproperty --floating-arrow-x - Where the pointer meets the anchor, along the inline axis.
  * @cssproperty --floating-arrow-y - Where the pointer meets the anchor, along the block axis.
- * @cssproperty --floating-available-height - How much room is left below, for a panel that scrolls.
+ * @cssproperty --floating-available-block-size - How much room is left below, for a panel that scrolls.
  */
 export class FloatingController implements ReactiveController {
   private readonly options: FloatingOptions
@@ -121,11 +120,11 @@ export class FloatingController implements ReactiveController {
    * Which run of placements the results coming back belong to.
    *
    * `computePosition` is async, so a measurement started before `stop()` still
-   * resolves after it and wrote its result onto a surface that had just been
-   * taken down: the inline `position` and `translate` went back on, and so did
-   * `data-placed`, which is the attribute five families gate visibility on.
-   * Opening and closing inside one task is all it takes, since the write lands
-   * a microtask later.
+   * resolves after it and would write its result onto a surface that had just
+   * been taken down: the inline `position` and `translate` back on, and with
+   * them `data-placed`, which is the attribute five families gate visibility
+   * on. Opening and closing inside one task is all it takes, since the write
+   * lands a microtask later.
    *
    * A counter rather than an `AbortController`, because there is nothing to
    * abort: the work is already done by the time the answer arrives and the only
@@ -192,15 +191,14 @@ export class FloatingController implements ReactiveController {
         size({
           /* The height and not the width, which is asymmetric on purpose. A
              panel that runs out of room grows a scrollbar downwards and every
-             rule reading this asks for a `max-block-size`; nothing in the
-             library has ever asked for the inline twin, so writing it was a
-             `setProperty` on every reposition of every floating element for
-             nobody. `check:hooks` is what says so out loud: declared and never
+             rule reading this asks for a `max-block-size`; nothing asks for the
+             inline twin, so writing it would be a `setProperty` on every
+             reposition of every floating element for nobody. Declared and never
              read is a promise on the API page with nothing behind it. It comes
              back the day a rule wants it, together with that rule. */
           apply: ({ availableHeight, elements, rects }) => {
             elements.floating.style.setProperty(
-              '--floating-available-height',
+              '--floating-available-block-size',
               `${Math.round(availableHeight)}px`,
             )
             /* The anchor's width, which a panel that has to match the control
@@ -211,7 +209,7 @@ export class FloatingController implements ReactiveController {
                edge. It looked like a positioning fault and was a percentage
                resolving against something the CSS could not see. */
             elements.floating.style.setProperty(
-              '--floating-anchor-width',
+              '--floating-anchor-inline-size',
               `${Math.round(rects.reference.width)}px`,
             )
           },
@@ -259,29 +257,17 @@ export class FloatingController implements ReactiveController {
          *
          * `computePosition` returns a position in the viewport and this element
          * is `position: fixed`, so the two agree and the translate is the answer
-         * unmodified.
+         * unmodified. **Never subtract an ancestor's origin from it.**
          *
-         * **A correction used to sit here and it was answering the wrong
-         * question.** A chart's bubble was landing hundreds of pixels from its
-         * anchor, which looked like an ancestor stealing the containing block:
-         * `transform`, `filter` and `backdrop-filter` all do that to a `fixed`
-         * descendant, and the page's cards are glass. Measured, the bubble with
-         * a zeroed translate sat at (799, 439) rather than the origin, which
-         * seemed to confirm it.
-         *
-         * It was not that. 799 is `(1728 - 130) / 2` and 439 is near
-         * `(1003 - 73) / 2`: the bubble was centered in the viewport, which is
-         * what the UA stylesheet does to a `popover` through `inset: 0` and
-         * `margin: auto`. The chart was rendering the *headless* tooltip, which
-         * ships no styles to overrule that; `Tooltip` sets `margin: 0` and the
-         * controller writes the insets, so a styled one was never centered and
-         * never needed correcting. Fixing the tier fixed the position, and the
-         * correction then subtracted a real ancestor's origin from an already
-         * correct number and threw every tooltip on the page off by it.
-         *
-         * Recorded because the evidence for the wrong answer was a measurement,
-         * not a guess, and the number that disproved it was arithmetic on the
-         * viewport. */
+         * A surface landing hundreds of pixels from its anchor looks like an
+         * ancestor stealing the containing block, which `transform`, `filter`
+         * and `backdrop-filter` all do to a `fixed` descendant. Check the tier
+         * first: the UA stylesheet centers a `popover` through `inset: 0` and
+         * `margin: auto`, and the headless tooltip ships no styles to overrule
+         * it, so it sits mid-viewport with a zeroed translate while `Tooltip`,
+         * which sets `margin: 0`, never does. A correction added for that
+         * subtracts a real ancestor's origin from an already correct number and
+         * throws every tooltip on the page off by it. */
         translate: `${Math.round(x)}px ${Math.round(y)}px`,
       })
 
@@ -295,9 +281,8 @@ export class FloatingController implements ReactiveController {
          the first open, and looked correct on every open after, because the
          inline styles from last time were still on it.
 
-         A panel that wants to fade in on placement selects on this. Nothing has
-         to: `data-placement` has been written here all along and this is its
-         pair, so a component that ignores both is exactly as it was. */
+         A panel that wants to fade in on placement selects on this. Nothing
+         has to. */
       floating.setAttribute('data-placed', '')
 
       const point = middlewareData.arrow

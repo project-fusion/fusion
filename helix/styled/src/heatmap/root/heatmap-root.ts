@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles } from './heatmap-root.css.js'
 
 /**
- * @summary A strip of cells coloured by how each one went: uptime, contributions, activity.
+ * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
  *
  * @description
  * One grid, filled down the column and then across, which is what a calendar
@@ -43,9 +43,9 @@ import { styles } from './heatmap-root.css.js'
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --heatmap-cell-height - How tall a cell is. A row of a tall thin cell is what a status page draws.
+ * @cssproperty --heatmap-cell-inline-size - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-cell-radius - How far a cell's corners are rounded.
  * @cssproperty --heatmap-cell-size - The size a cell wants on both axes, where neither is given its own.
- * @cssproperty --heatmap-cell-width - How wide a cell is. The strip fits as many as the container allows.
  * @cssproperty --heatmap-gap - Space between cells. Zero is a continuous field rather than a grid of tiles.
  * @cssproperty --heatmap-tone-1 - The quietest step of the magnitude ramp, reached by `tones="1 …"`.
  * @cssproperty --heatmap-tone-2 - The second step of the magnitude ramp.
@@ -69,18 +69,17 @@ export class HelixHeatmap extends HelixHeadlessHeatmap {
   /**
    * The first guess at what this sheet draws, before it has been measured.
    *
-   * **Not a contract any more, and it was a bad one.** `fits()` works against a
-   * measured width and a cell size it has to be told, and being told by hand
-   * meant these sat at the base tier's 8 and 2 against a sheet drawing 12 and 4:
-   * the arithmetic believed a cell cost 10 pixels where it cost 16, so a ninety
-   * day strip drew 940 pixels of cells into a 592 pixel box at 640 and 540 into
-   * 342 at 390, overflowing the document both times while `visible` reported 59
-   * and 34. The number a summary is told to trust was the number that was wrong.
+   * **Not a contract.** `fits()` reads the strip back rather than being told a
+   * cell size by hand, so nothing has to be kept in step and
+   * `--heatmap-cell-inline-size` on its own is enough. Told by hand, these sat
+   * at the base tier's 8 and 2 against a sheet drawing 12 and 4, and the
+   * arithmetic believed a cell cost 10 pixels where it cost 16: a ninety day
+   * strip drew 940 pixels of cells into a 592 pixel box while `visible`
+   * reported 59.
    *
-   * The strip is read back now, so nothing has to be kept in step and
-   * `--heatmap-cell-width` on its own is enough. These two remain because a
-   * measurement arrives one frame after the first paint, and a first paint from
-   * numbers that match the sheet is one that does not move.
+   * These two remain because a measurement arrives one frame after the first
+   * paint, and a first paint from numbers that match the sheet is one that does
+   * not move.
    */
   override gap = 4
 

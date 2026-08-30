@@ -34,9 +34,9 @@ amount of JavaScript reproduces:
 - right-click offers Copy Link Address
 - a crawler follows it
 
-Before `href` existed, the docs sidebar put a `<Link>` inside each row. The
-anchor was 57px of a 240px row, so five sixths of every row did nothing, and
-Enter did nothing at all: the tree announced a selection and no anchor heard it.
+A `<Link>` inside each row buys none of it. In the docs sidebar the anchor was
+57px of a 240px row, so five sixths of every row did nothing, and Enter did
+nothing at all: the tree announced a selection and no anchor heard it.
 
 ## `href` and a framework's `<Link>`
 
@@ -195,7 +195,7 @@ host is the only element the listbox can point at.
 same browser, the accessibility tree for `<div role="option"><a href>Open
 settings</a></div>` inside a listbox is an option with *no accessible name*, and
 the link exposed as a child of it. The sibling option with plain text is named
-correctly. So the manoeuvre that works for `treeitem` and `menuitem`, moving the
+correctly. So the maneuver that works for `treeitem` and `menuitem`, moving the
 role onto the anchor, is exactly the one thing that cannot be done here.
 
 Two constraints pointing opposite ways, and no arrangement satisfies both.

@@ -28,12 +28,12 @@ fn binary() -> PathBuf {
 }
 
 fn run(directory: &Path, args: &[&str]) -> Output {
-    coloured(directory, args, false)
+    colored(directory, args, false)
 }
 
 /// **The same command with color forced on**, which is the only way one class of
 /// bug is visible. See [`the_matrix_stays_aligned_when_it_is_coloured`].
-fn coloured(directory: &Path, args: &[&str], paint: bool) -> Output {
+fn colored(directory: &Path, args: &[&str], paint: bool) -> Output {
     let mut command = Command::new(binary());
     command.args(args).current_dir(directory);
     if paint {
@@ -297,10 +297,10 @@ fn an_explicit_path_wins_over_the_search() {
     assert_eq!(code(&explicit), 1, "the explicit path was ignored");
 }
 
-/// **A coloured column is padded before it is coloured, never after.**
+/// **A colored column is padded before it is colored, never after.**
 ///
 /// A terminal counts an escape sequence as characters, so a width format applied
-/// to an already-coloured one-character glyph sees a string of twelve and adds
+/// to an already-colored one-character glyph sees a string of twelve and adds
 /// nothing, while the same format on an uncoloured one adds a space. The matrix
 /// was straight with `NO_COLOR` set and ragged by exactly one character without
 /// it, which is a bug that survives every run in CI: CI is not a terminal.
@@ -310,10 +310,10 @@ fn an_explicit_path_wins_over_the_search() {
 #[test]
 fn the_matrix_stays_aligned_when_it_is_coloured() {
     let sandbox = Sandbox::new("aligned", Some(FAILING));
-    let output = coloured(&sandbox.0, &["theme", "audit"], true);
+    let output = colored(&sandbox.0, &["theme", "audit"], true);
     assert_eq!(code(&output), 1);
 
-    /* **The output has to actually be coloured, or this test is about the other
+    /* **The output has to actually be colored, or this test is about the other
     branch.** Without the check, breaking the thing that turns color on makes
     the assertions below run against plain text, where the alignment has never
     been in question: the test would go on passing while covering nothing.
@@ -321,7 +321,7 @@ fn the_matrix_stays_aligned_when_it_is_coloured() {
     let printed = out(&output);
     assert!(
         printed.contains('\u{1b}'),
-        "nothing was coloured, so the alignment below is about the plain branch"
+        "nothing was colored, so the alignment below is about the plain branch"
     );
 
     let rows: Vec<String> = printed

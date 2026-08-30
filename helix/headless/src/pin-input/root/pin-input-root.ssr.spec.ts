@@ -34,10 +34,9 @@ describe('input pin server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    /* This is what caught `type` reflecting for nothing: it wrote
-       `type="numeric"` onto every pin ever rendered, an attribute no consumer's
-       markup had, which is the fault `Input`'s own `type` had. Reflection exists
-       so a selector can reach a value, and no rule selects on this one. */
+    /* `type` must not reflect: it would write `type="numeric"` onto every pin,
+       an attribute no consumer's markup has. Reflection exists so a selector
+       can reach a value, and no rule selects on this one. */
     expect(hostAttributes(ssr(code), 'helix-headless-pin-input')).toEqual(['label', 'length'])
   })
 })

@@ -56,18 +56,15 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   /**
    * The entries, in the order the consumer wrote them.
    *
-   * **Found by tag and filtered on the property, never on `[value]`.** The
-   * prefilter used to be an attribute selector, which is redundant beside the
-   * tag match and is the half that broke: React assigns a matching property
-   * rather than an attribute, so a playlist written in JSX carried no `value`
-   * attribute anywhere and `querySelectorAll('[value]')` returned nothing. Every
-   * entry vanished from the list, the active one included, and the component
-   * threw no error because an empty playlist is a legal playlist.
+   * **Found by tag and filtered on the property, never on `[value]`.** React
+   * assigns a matching property rather than an attribute, so a playlist written
+   * in JSX carries no `value` attribute anywhere and `querySelectorAll('[value]')`
+   * returns nothing: every entry vanishes from the list, the active one
+   * included, and nothing throws, an empty playlist being a legal playlist.
    *
-   * Reading `one.value` answers the same question and answers it the same way
-   * whether the consumer wrote markup or set a property, which is the only form
-   * that works for both. Found by rendering the React twin of this family's
-   * examples beside the markup ones.
+   * Reading `one.value` answers the same question the same way whether the
+   * consumer wrote markup or set a property, which is the only form that works
+   * for both.
    */
   private get items(): HelixHeadlessVideoPlaylistItem[] {
     return [
@@ -77,14 +74,6 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     ].filter((one) => one.value !== '')
   }
 
-  /*
-   * The player, whichever tag the consumer slotted.
-   *
-   * Asked of the slot rather than matched by tag name: the headless tier's
-   * player is `helix-headless-video` and the styled tier's is `helix-video`, and a
-   * consumer bringing a third under either name should still be driven. What is
-   * needed of it is `src`, which is the whole of the contract.
-   */
   /**
    * Whether the entry changed because somebody moved through the playlist.
    *
@@ -101,6 +90,14 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    */
   private chased = false
 
+  /**
+   * The player, whichever tag the consumer slotted.
+   *
+   * Asked of the slot rather than matched by tag name: the headless tier's
+   * player is `helix-headless-video` and the styled tier's is `helix-video`, and
+   * a consumer bringing a third under either name should still be driven. What
+   * is needed of it is `src`, which is the whole of the contract.
+   */
   private get player():
     | (HTMLElement & {
         label: string
@@ -139,12 +136,11 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     /* Stopped and not relayed. The entry says it was chosen, this element says
        what is playing, and a consumer hearing both would hear one press twice
        under two names.
-     *
-     * `stopImmediatePropagation`, not `stopPropagation`. The consumer's listener
-     * is on this same element, and stopping propagation only keeps an event off
-     * the *next* node: every listener already bound here still runs, so the
-     * entry's selection reached them anyway. Command carries the longer note,
-     * and the spec below is what caught this one. */
+
+       `stopImmediatePropagation`, not `stopPropagation`. The consumer's listener
+       is on this same element, and stopping propagation only keeps an event off
+       the *next* node: every listener already bound here still runs, so the
+       entry's selection reaches them anyway. Command carries the longer note. */
     event.stopImmediatePropagation()
     this.chased = true
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)

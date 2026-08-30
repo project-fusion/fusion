@@ -16,11 +16,10 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @summary A short code, one character to a box.
  *
  * @description
- * **One `<input>` per cell, rather than one input drawn as cells.** Both are
- * built in the wild and the trade is real: a single field autofills perfectly
- * and needs a drawn caret nobody can style well, and separate fields give every
- * box a real focus ring, a real caret and a real tab stop for free. This takes
- * the second, and then closes autofill's gap rather than living with it, below.
+ * **One `<input>` per cell, rather than one input drawn as cells.** A single
+ * field autofills perfectly and needs a drawn caret nobody can style well;
+ * separate fields give every box a real focus ring, a real caret and a real tab
+ * stop for free. Autofill's gap is closed below rather than lived with.
  *
  * **Anything longer than one character is treated as a paste, wherever it
  * lands.** That covers the obvious case and two that are not: a browser
@@ -80,10 +79,42 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   autocomplete = 'one-time-code'
 
   /**
+   * Accessible name for one box, with `{index}` and `{length}` filled in.
+   */
+  @property({ attribute: 'cell-label' })
+  cellLabel = 'Character {index} of {length}'
+
+  /**
    * How many characters the code has.
    */
   @property({ type: Number })
   length = 6
+
+  /**
+   * Whether the characters are hidden, the way a password is.
+   */
+  @property({ reflect: true, type: Boolean })
+  mask = false
+
+  /**
+   * What an empty box shows, usually a single dot.
+   *
+   * The platform's own placeholder, on each cell, rather than a character
+   * drawn behind the field: it clears the moment anything is typed, it is
+   * already excluded from the accessible value, and it works the same under
+   * `mask`, where the cell is a password input and a hand-drawn glyph would
+   * have to know that.
+   *
+   * Empty by default, because a row of boxes already reads as a row of boxes.
+   */
+  @property()
+  placeholder = ''
+
+  /**
+   * Whether the boxes refuse input while still submitting their value.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /**
    * What a box accepts, which decides the keyboard a phone offers.
@@ -101,49 +132,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * other end is going to reject. A consumer whose codes really do carry
    * marked letters wants `text`, which judges nothing.
    *
-   * **Not reflected**, and it was until this component's own server spec caught
-   * it: nothing selects on it, so all reflection did was write `type="numeric"`
-   * onto every `<helix-pin-input>` ever rendered, an attribute no consumer's
-   * markup had. That is the fault `Input`'s own `type` had and the reason the
-   * area rules carry the sentence "reflect only what CSS selects on". The real
-   * inputs take it as a binding, which is what makes the keyboard follow.
+   * **Not reflected**: nothing selects on it, so reflecting only writes
+   * `type="numeric"` onto every `<helix-pin-input>` ever rendered, an attribute
+   * no consumer's markup had. The area rules carry the sentence "reflect only
+   * what CSS selects on". The real inputs take it as a binding, which is what
+   * makes the keyboard follow.
    */
   @property()
   type: PinType = 'numeric'
-
-  /**
-   * Whether the characters are hidden, the way a password is.
-   */
-  @property({ reflect: true, type: Boolean })
-  mask = false
-
-  /**
-   * What an empty box shows, usually a single dot.
-   *
-   * The platform's own placeholder, on each cell, rather than a character
-   * drawn behind the field: it clears the moment anything is typed, it is
-   * already excluded from the accessible value, and it works the same under
-   * `mask`, where the cell is a password input and a hand-drawn glyph would
-   * have to know that.
-   *
-   * Empty by default, because a row of boxes already reads as a row of boxes
-   * and a dot in each is a choice about how much the field should announce
-   * itself before anybody has touched it.
-   */
-  @property()
-  placeholder = ''
-
-  /**
-   * Whether the boxes refuse input while still submitting their value.
-   */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
-
-  /**
-   * Accessible name for one box, with `{index}` and `{length}` filled in.
-   */
-  @property({ attribute: 'cell-label' })
-  cellLabel = 'Character {index} of {length}'
 
   /** Focus is delegated, so the host is never the focus target. */
   static override shadowRootOptions: ShadowRootInit = {
@@ -192,16 +188,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     }
     /* **A code has no holes in it**, so a character cannot land past the end of
        what is already there. Clamped rather than allowed, because the value is
-       one compact string and a gap in the middle of it does not exist: writing
-       four characters into box three of an empty field produced "4321" and
-       showed it in boxes one to four, so the boxes and the value disagreed about
-       where the reader had typed.
-    
-       Clamping is what makes them agree, and it reads correctly in both
-       directions. Pasting a whole code while the caret happens to sit in box
-       three fills from the start, which is what a reader pasting a code means.
-       Pasting two characters into box three of a field with two already in it
-       fills from box three, because that is where the end was. */
+       one compact string and a gap in the middle of it does not exist: unclamped,
+       the boxes and the value disagree about where the reader typed.
+
+       It reads correctly in both directions. Pasting a whole code while the
+       caret happens to sit in box three fills from the start, which is what a
+       reader pasting a code means. Pasting two characters into box three of a
+       field with two already in it fills from box three, because that is where
+       the end was. */
     const start = Math.min(from, this.value.length)
     const characters = this.characters
     for (let at = 0; at < cleaned.length && start + at < this.count; at += 1) {
@@ -219,8 +213,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         /* And a native `change`, because a filled code is this control's
            commit. There is no inner control to relay one from: six boxes each
            fire their own, and none of them means the code is entered. */
-        this.committed = next
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+        this.commit()
       }
     })
   }
@@ -252,15 +245,14 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     if (at === -1) {
       return
     }
-    /* **An emptied box is a deletion, and this used to be unreachable.** A
-       Backspace in a *filled* box is the browser's own: the keydown handler
-       leaves it alone, the character goes, and `input` arrives carrying "". That
-       fell through to `write`, which returns early on empty, and then `paint`
-       put the character straight back. Pressing Backspace on a full code changed
-       nothing at all, twice in a row, measured with real keystrokes rather than
-       dispatched events, which is why every spec and the whole state audit
-       passed over it.
-    
+    /* **An emptied box is a deletion, and without this branch it is
+       unreachable.** A Backspace in a *filled* box is the browser's own: the
+       keydown handler leaves it alone, the character goes, and `input` arrives
+       carrying "". That falls through to `write`, which returns early on empty,
+       and then `paint` puts the character straight back. Only real keystrokes
+       reproduce it: dispatched events do not, which is why the specs pass over
+       it.
+
        The rest collapse left, which is what the model already requires and what
        a single text field does: "123456" with the 2 deleted is "13456", not a
        hole. Focus stays where the reader was, so the box under the caret now
@@ -329,26 +321,35 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * The code as it stood at the last commit, so a blur that changed nothing
+   * The code as it stood when focus arrived, so a visit that changed nothing
    * says nothing.
    *
-   * **The last commit, and not the value the reader arrived on**, which is what
-   * the platform compares against. Taking that reading means recognizing the
-   * arrival, and this component moves focus itself on every character, so the
-   * `focus` it would be reading is mostly one it caused: telling those apart
-   * rests entirely on `relatedTarget`, on an event the element dispatched to
-   * itself. The last commit rests on nothing, and it is the value the event
-   * would carry anyway.
+   * **Baselined on arrival, not at the last commit**, which is the platform's
+   * reading. What the two do to a real browser, measured in Chromium against a
+   * native `<input>` with real keystrokes:
    *
-   * They agree everywhere a reader is involved, including the case the platform
-   * is careful about: typing a character and deleting it again leaves the code
-   * where it was, so neither reading commits. They part only when a script
-   * assigns while the field is unfocused, where this commits on the way out and
-   * the platform does not, having taken its baseline after the assignment.
-   * Announcing a value a consumer set themselves is the safe half of that trade.
+   * | | native | last commit | on arrival |
+   * |---|---|---|---|
+   * | types, leaves | `change` | `change` | `change` |
+   * | script assigns unfocused, visit with no edit | silent | **`change`** | silent |
+   * | script assigns unfocused, then edits | `change` | `change` | `change` |
+   * | types a character and deletes it | silent | silent | silent |
+   *
+   * One row differed and it is the one that matters: a consumer who assigns
+   * `value` and then has a reader tab through the row was told the reader had
+   * entered a code. `change` on a field means "the reader had a go at this",
+   * `MixinField` treats it as exactly that, and announcing a value the consumer
+   * set themselves is a false positive rather than the safe half of a trade.
+   *
+   * **The narrower divergence that is left** is a script assigning while the row
+   * is focused, where the platform stays silent because no user edit happened
+   * and this commits on the way out. Closing it needs a dirty flag set from real
+   * cell input rather than a baseline, which is more machinery than the case has
+   * earned: a consumer writing to a field the reader is inside is already in a
+   * fight with them.
    *
    * Seeded in `firstUpdated`, a code in the markup being committed by whoever
-   * wrote it.
+   * wrote it, and re-taken on every arrival from outside the row.
    */
   private committed = ''
 
@@ -358,28 +359,73 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   }
 
   /**
-   * Commits when focus leaves the row, which is the moment every other field in
-   * the library has and this one did not.
+   * Whether focus is currently somewhere inside the row.
+   *
+   * **The arrival is a transition, not a `relatedTarget` reading**, which is
+   * what the exit still does. `relatedTarget` does not work on the way in for
+   * two reasons and the second decides it. Every character moves focus to the
+   * next box, so an unguarded `focusin` re-baselines on each keystroke and the
+   * row can never report anything: measured, the three commit specs went silent
+   * at once. And `focusin` carries `relatedTarget` in a browser and not in
+   * happy-dom, so a guard written on it holds in production and not in the
+   * specs, which is the worse half. This flag needs neither: entering is
+   * `focusin` while it is `false`, and nothing else is.
+   */
+  private within = false
+
+  /**
+   * Takes the baseline when focus arrives from outside the row.
+   *
+   * The value at arrival is what the platform compares against, and the table
+   * on `committed` is why.
+   */
+  private readonly handleFocusIn = (): void => {
+    if (this.within) {
+      return
+    }
+    this.within = true
+    this.committed = this.value
+  }
+
+  /**
+   * Commits when focus leaves the row.
    *
    * `change` is one of the two events `MixinField` reads as "the reader has had
-   * a go at this", so a code that was never completed was never `touched` and
-   * its own `tooShort` message could not show: two boxes of four filled and
-   * tabbed away from was answered with nothing at all. `Input` gets this for
-   * free by relaying its control's own `change`; here the cells each fire one,
-   * none of them means the code is entered, and neither does any single one of
-   * them mean the reader has left.
+   * a go at this", so without this a code that was never completed is never
+   * `touched` and its own `tooShort` message cannot show: two boxes of four
+   * filled and tabbed away from is answered with nothing at all. `Input` gets
+   * this for free by relaying its control's own `change`; here the cells each
+   * fire one, none of them means the code is entered, and neither does any
+   * single one of them mean the reader has left.
    *
    * **Focus leaving the row, and not a cell.** Every character moves focus to
    * the next box, so a per-cell blur would commit on every keystroke, which is
    * the fault this exists to fix pointed the other way.
-   *
-   * `composed: false`, like the completion above and like the native event this
-   * stands in for. It is dispatched on the host, so a consumer hears it.
    */
   private readonly handleFocusOut = (event: FocusEvent): void => {
     if (this.cells.includes(event.relatedTarget as HTMLInputElement)) {
       return
     }
+    this.within = false
+    this.commit()
+  }
+
+  /**
+   * Announces the code as entered, from whichever moment reached it first.
+   *
+   * **One writer, because the fact has two moments and only one meaning.** A
+   * filled code and a row being left are both "the reader is done with this".
+   * Dispatching from either site directly is how a moment gets added that fires
+   * without baselining.
+   *
+   * Silent when nothing moved since the baseline, which is what makes it safe
+   * to call from both: completing a code that is already the committed one, or
+   * leaving a row nobody edited, says nothing.
+   *
+   * `composed: false`, like the native event this stands in for. It is
+   * dispatched on the host, so a consumer hears it.
+   */
+  private commit(): void {
     if (this.value === this.committed) {
       return
     }
@@ -387,7 +433,32 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
   }
 
-  /** Reports the code and a verdict on it. */
+  /**
+   * Reports the code and a verdict on it.
+   *
+   * **A half-entered code is invalid whether or not it is required, and that is
+   * the platform's answer rather than ours.** `required` guards `valueMissing`
+   * and nothing guards `tooShort`, so an optional code is refused for being half
+   * filled. Measured in Chromium against a native `<input minlength="4">` with
+   * real keystrokes, which is the feature this is the same shape as:
+   *
+   * | | optional | required |
+   * |---|---|---|
+   * | typed `12` | `tooShort`, invalid | `tooShort`, invalid |
+   * | left empty | valid | `valueMissing` |
+   * | typed `1234` | valid | valid |
+   *
+   * So `required` decides whether *nothing* is acceptable, and the length rule
+   * applies to anything that is not nothing. That is the right split for a code
+   * as well: two of four characters is not an optional code omitted, it is a
+   * code got wrong, and submitting it would send a fragment. The gate on the
+   * message is `touched` rather than `required`, which is what stops a reader
+   * being told off before they have had a go.
+   *
+   * `execCommand('insertText')` is not enough to measure this: `tooShort`
+   * applies only to a value the user edited, and the first run of the probe
+   * reported every case valid because nothing had set that flag.
+   */
   private sync(): void {
     this.internals.setFormValue(this.value)
     const first = this.cells[0]
@@ -449,6 +520,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         part="field"
         role="group"
         aria-describedby=${this.describedBy ?? nothing}
+        @focusin=${this.handleFocusIn}
         @focusout=${this.handleFocusOut}
       >
         ${characters.map(

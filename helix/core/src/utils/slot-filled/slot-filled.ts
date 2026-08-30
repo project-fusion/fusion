@@ -10,10 +10,8 @@
  * The answer matters because an empty wrapper is not free. A region that
  * generates a box is a flex item or a grid item whether or not it holds
  * anything, so it takes the container's gap: an announcement with no actions
- * paid the row gap twice, a switch with no label took one for a label that was
- * not there, and a blockquote with no attribution reserved a full space below
- * every quote. `display: none` is the only fix, because only a box that is not
- * generated has no gap beside it.
+ * pays the row gap twice. `display: none` is the only fix, because only a box
+ * that is not generated has no gap beside it.
  *
  * Text or an element, because neither alone is the test. An element on its own
  * counts a whitespace-only span as content; text on its own counts an icon as

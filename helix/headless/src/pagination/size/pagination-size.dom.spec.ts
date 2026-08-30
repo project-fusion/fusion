@@ -29,8 +29,8 @@ const choose = (_host: HTMLElement, value: string): CustomEvent =>
 
 describe('pagination size', () => {
   test('is the library’s select, not a native one', async () => {
-    /* It was native first, on the argument that the platform's menu is a wheel
-       on a phone. What that leaves out is a library with two dropdowns that are
+    /* Native is the tempting answer, the platform's menu being a wheel on a
+       phone. What it leaves out is a library with two dropdowns that are
        identical closed and different open, met in the same footer. */
     const it = await mount('<helix-headless-pagination-size></helix-headless-pagination-size>')
     expect(control(it).tagName).toBe('HELIX-HEADLESS-SELECT')
@@ -80,10 +80,9 @@ describe('pagination size', () => {
   })
 
   test('the select’s own event does not escape as this one’s', async () => {
-    /* `Select`'s `helix-change` bubbles and is composed, so a consumer would
-       have heard two per change. The count is what catches it: both would now
-       arrive under one name carrying one value, where the escaped one used to be
-       told by `Select`'s idea of what a property is called. */
+    /* `Select`'s own event bubbles and is composed, so unstopped a consumer
+       hears two per change. The count is what catches it: both arrive under
+       one name carrying one value. */
     const it = (await mount(
       '<helix-headless-pagination-size default-value="10" sizes="10,25"></helix-headless-pagination-size>',
     )) as Size
@@ -127,10 +126,9 @@ describe('pagination size', () => {
   })
 
   test('declaring `value` seeds it, and the element still moves', async () => {
-    /* Asserted the opposite until 26 Aug 2026, when declaring the property was a
-       claim of ownership and the element announced without moving. Control is
-       an action now: it applies, and a consumer refuses to take the decision.
-       See 294. */
+    /* Control is an action, not a mode: declaring `value` seeds rather than
+       claiming ownership, so the element applies and a consumer refuses the
+       before event to take the decision. */
     const it = (await mount(
       '<helix-headless-pagination-size sizes="10,25" value="10"></helix-headless-pagination-size>',
     )) as Size

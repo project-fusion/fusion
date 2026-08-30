@@ -21,6 +21,7 @@ path = "src/main.rs"
 # `@fusion.dev/helix-theme`.
 fusion-helix-theme = { path = "../theme", features = ["serde"] }
 clap = { version = "4", features = ["derive"] }
+regex = { workspace = true }
 # **Only the CLI takes this.** `fusion-helix-theme` computes and does not draw, and a
 # library that pulled a terminal backend in would carry it into the WASM build.
 ratatui = { workspace = true }

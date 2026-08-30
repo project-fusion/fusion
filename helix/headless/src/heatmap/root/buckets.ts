@@ -3,7 +3,7 @@
  *
  * Kept apart from the element because both answers are arithmetic and both are
  * easy to get subtly wrong in ways a picture hides: a threshold comparison off
- * by one boundary colours a handful of cells wrong out of ninety, and a fit
+ * by one boundary colors a handful of cells wrong out of ninety, and a fit
  * calculation off by one drops a day silently. Neither is visible in a
  * screenshot of a strip.
  */
@@ -20,7 +20,7 @@ export interface Reading {
  * **The cell's own tone wins**, and that ordering is the whole reason both
  * exist. A status page already knows a day was degraded; making it encode that
  * as a number so a component can decode it again is work for nothing, and the
- * encoding would have to agree with the thresholds or the colours would drift
+ * encoding would have to agree with the thresholds or the colors would drift
  * from the truth. A contribution graph has only counts and wants the buckets.
  *
  * Thresholds are read as lower bounds, in the order given, and the last one that
@@ -77,13 +77,13 @@ export const words = (source: string): string[] =>
  * cannot show, which is why the element reflects the number and announces it.
  *
  * **What crosses the width is a column, and `rows` is how many cells are in
- * one.** This counted cells until 27 Aug 2026, which is the same number only
- * while `rows` is 1. At `rows="7"` a ten week graph came out at fifty-nine
+ * one.** Counting cells is the same number only while `rows` is 1. Divide by
+ * the wrong thing at `rows="7"` and a ten week graph comes back as fifty-nine
  * readings in a 592px box: eleven days dropped to fit a strip that wanted 156
- * pixels, and the fifty-nine were not a multiple of seven, so every column after
- * the cut was offset by a day and the day-of-week rows stopped meaning anything.
- * A calendar heatmap that silently rotates its own weekdays is worse than one
- * that drops a week, and both came from dividing by the wrong thing.
+ * pixels, and fifty-nine is not a multiple of seven, so every column after the
+ * cut is offset by a day and the day-of-week rows stop meaning anything. A
+ * calendar heatmap that silently rotates its own weekdays is worse than one
+ * that drops a week.
  *
  * The count is therefore always a whole number of columns, which is what keeps
  * the tail slice aligned.

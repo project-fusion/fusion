@@ -7,10 +7,8 @@ import { capturePointer } from './capture-pointer.js'
  * **Stubbed rather than run against a real element, because the throw is the
  * subject.** `setPointerCapture` rejects a pointer id that names nothing
  * active, and there is no way to ask a browser for that state on purpose: a
- * synthetic `pointerdown` simply has no active pointer, which is how four
- * browser specs came to report uncaught page errors and three splitter specs
- * came to stub this method as though it were setup. Controlling the refusal is
- * the only way to assert that the drag continues past it.
+ * synthetic `pointerdown` simply has no active pointer. Controlling the refusal
+ * is the only way to assert that the drag continues past it.
  */
 const target = (behavior: 'takes' | 'refuses') => {
   const calls: number[] = []

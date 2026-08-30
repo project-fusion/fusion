@@ -21,22 +21,19 @@ const RELATIONSHIPS = [
  * wherever it is written, so the whole of the work is putting it on the node the
  * accessibility tree actually exposes.
  *
- * **The case that asked for it was a disclosure with a slotted trigger.**
- * `Megamenu` and `SpeedDial` write `aria-expanded` onto whatever a consumer
- * slots, and where that is a `<helix-button>` the attribute landed on a host the
- * tree reports as `generic`: measured through Chrome's own tree, a button named
- * "Mega" with no expanded state at all, on a component whose comment says the
- * write exists so a screen reader is not "told the control was a plain button
- * forever". A plain `<button slot="trigger">` never had the problem, because
- * there the host *is* the focusable node.
+ * **A state written on a host reaches nobody.** `Megamenu` and `SpeedDial` write
+ * `aria-expanded` onto whatever a consumer slots, and where that is a
+ * `<helix-button>` it lands on a host the tree reports as `generic`: measured
+ * through Chrome's own tree, a button named "Mega" with no expanded state at
+ * all. A plain `<button slot="trigger">` never had the problem, because there
+ * the host *is* the focusable node.
  *
- * **Only what this controller put there is ever taken away, and getting that
- * wrong broke three components.** The first version removed any of these from
- * the control whenever the host lacked it, which reads as the obvious way to
+ * **Only what this controller put there is ever taken away.** Removing any of
+ * these from the control whenever the host lacks it reads as the obvious way to
  * keep the two in step and quietly deletes what the component renders for
  * itself: `Combobox` writes `aria-controls="listbox"` onto its own input and
- * `Select` writes `aria-expanded` onto its own trigger, and both were wiped on
- * every update by a controller carrying nothing. Their own specs caught it.
+ * `Select` writes `aria-expanded` onto its own trigger, and a controller
+ * carrying nothing would wipe both on every update.
  *
  * So the record below holds what was forwarded last time, and a host that stops
  * carrying one removes exactly that and nothing else. A control's own attribute
@@ -94,6 +91,9 @@ export class AriaForwardController implements ReactiveController {
   /** Which state attributes this controller wrote, so only those are removed. */
   private readonly forwarded = new Set<string>()
 
+  /** The control the record above is about, so a replacement resets it. */
+  private recorded: HTMLElement | undefined
+
   constructor(host: ReactiveControllerHost & HTMLElement, options: AriaForwardOptions) {
     this.host = host
     this.target = options.target
@@ -115,6 +115,21 @@ export class AriaForwardController implements ReactiveController {
     if (!target) {
       return
     }
+    /* **The record belongs to the element it was written about.** `forwarded`
+       says what this controller put on the control. Kept across a replacement,
+       it claims a value the new element never had, and the clearing branches
+       below then take off what the component wrote itself: the fault the record
+       exists to prevent, one element later.
+
+       **No component in this library replaces its control**, which is worth
+       saying because the comment here used to name one. All fifteen consumers
+       resolve to a single fixed part rendered once. `target` is a callback and
+       its contract permits a swap, so a controller in `core` is held to the
+       contract rather than to the fifteen callers it happens to have today. */
+    if (target !== this.recorded) {
+      this.forwarded.clear()
+      this.recorded = target
+    }
     const root = this.host.getRootNode() as Document | ShadowRoot
     for (const [attribute, property] of RELATIONSHIPS) {
       if (!(property in target)) {
@@ -127,8 +142,24 @@ export class AriaForwardController implements ReactiveController {
       const elements = ids
         .map((id) => root.getElementById?.(id) ?? null)
         .filter((element): element is HTMLElement => element !== null)
-      ;(target as unknown as Record<string, Element[] | null>)[property] =
-        elements.length > 0 ? elements : null
+      const reflect = target as unknown as Record<string, Element[] | null>
+      if (elements.length > 0) {
+        reflect[property] = elements
+        this.forwarded.add(attribute)
+        continue
+      }
+      /* Only if this controller is what put it there, which is the same rule
+         the states below keep and for a worse reason. `MixinField` writes
+         `aria-describedby` on the control for its own hint, and assigning null
+         here removes the content attribute, so forwarding nothing wiped the
+         component's own description on all eighteen form controls. Invisible to
+         every DOM spec: happy-dom implements no ARIA element reflection, so the
+         `property in target` guard above skips this whole branch and the suite
+         is green against code that clears a description in every browser. */
+      if (this.forwarded.has(attribute)) {
+        reflect[property] = null
+        this.forwarded.delete(attribute)
+      }
     }
     for (const attribute of STATES) {
       const value = this.host.getAttribute(attribute)
@@ -159,8 +190,7 @@ export class AriaForwardController implements ReactiveController {
 
   /* After the render that created the control, because there is nothing to
      forward to before it exists. Every update, not only the first: a component
-     that re-renders its control, which `Button` does whenever `href` changes it
-     between an anchor and a button, produces a new element with none of this. */
+     that re-renders its control produces a new element with none of this. */
   hostUpdated(): void {
     this.forward()
   }

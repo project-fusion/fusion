@@ -1,10 +1,10 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessColorPicker } from '@fusion.dev/helix-headless/color-picker'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect import, because the tier below renders `<helix-slider>` and a
+/* Side-effect imports, because the tier below renders each of these tags and a
    custom element registers on import. Inherited from the base along with the
-   template, which is why it has to be restated here: this file has no
-   `<helix-slider>` in it to remind anyone. `check:composed` enforces it. */
+   template, which is why they have to be restated here: this file has none of
+   the tags in it to remind anyone. */
 import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../icon/index.js'
@@ -44,9 +44,9 @@ import { styles } from './color-picker-root.css.js'
  * @aliases Color, ColorArea, Swatch picker
  * @documentation https://helix.fusion.dev/components/color-picker
  *
- * @cssproperty --color-picker-grid-radii - Corner radius of the square.
+ * @cssproperty --color-picker-grid-radius - Corner radius of the square.
  * @cssproperty --color-picker-grid-ratio - Aspect ratio of the square.
- * @cssproperty --color-picker-inset - Inset of the rows under the square, and the bottom.
+ * @cssproperty --color-picker-padding - Inset of the rows under the square, and the bottom.
  * @cssproperty --color-picker-sample-size - Edge length of the chip that copies the value.
  * @cssproperty --color-picker-swatch-size - Edge length of one preset.
  */

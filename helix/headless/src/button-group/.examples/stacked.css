@@ -19,15 +19,15 @@ helix-headless-button-group[orientation="vertical"] > *:not(:first-child) {
 
 /* Squared everywhere the shape continues, rounded only where it ends. */
 helix-headless-button-group[orientation="vertical"] > * {
-  --button-radii: 0;
+  --button-radius: 0;
 }
 
 helix-headless-button-group[orientation="vertical"] > *:first-child {
-  --button-radii-start-start: 3px;
-  --button-radii-start-end: 3px;
+  --button-radius-start-start: 3px;
+  --button-radius-start-end: 3px;
 }
 
 helix-headless-button-group[orientation="vertical"] > *:last-child {
-  --button-radii-end-start: 3px;
-  --button-radii-end-end: 3px;
+  --button-radius-end-start: 3px;
+  --button-radius-end-end: 3px;
 }

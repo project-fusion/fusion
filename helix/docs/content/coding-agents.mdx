@@ -18,13 +18,9 @@ https://fusion.dev/helix/custom-elements.json
 @fusion.dev/helix/custom-elements.json
 ```
 
-A URL and a package path, the same file either way. **The URL exists because this
-page's own argument required it**: an agent that found the library through
-`llms.txt` has this site and no checkout, and a specifier is reachable from a
-`node_modules` and from nowhere else. It was only the specifier until 24 Aug 2026,
-and the specifier did not resolve either: `exports` carried a `./*` pattern
-pointing at `./dist/*/index.js`, so the path two pages recommended was one
-`require.resolve` refused.
+A URL and a package path, the same file either way. **Both exist because a
+specifier is reachable from a `node_modules` and from nowhere else**, and an
+agent that found the library through `llms.txt` has this site and no checkout.
 
 Every element, every property with its literal type union, every event with its
 class, every slot, every part, every custom property. It is what the framework
@@ -62,13 +58,13 @@ These are the difference between code that looks right and code that passes:
 
 | Rule | Check |
 |---|---|
-| A dispatched event must be declared | `check:events` |
-| A documented part must be rendered | `check:parts` |
-| A documented CSS hook must be read | `check:hooks` |
-| A visual property draws from its axis | `check:axes` |
-| A form control styles with `:disabled` | `check:disabled` |
-| A component that animates answers reduced motion | `check:motion` |
-| No component reads a primitive token | `check:tokens` |
+| A dispatched event must be declared | `helix component --only events` |
+| A documented part must be rendered | `helix component`'s `parts` |
+| A documented CSS hook must be read | `helix component --only hooks` |
+| A visual property draws from its axis | `helix component`'s `axes` |
+| A form control styles with `:disabled` | `helix component --only disabled` |
+| A component that animates answers reduced motion | `helix component --only motion` |
+| No component reads a primitive token | `helix component`'s `tokens` |
 
 If you are generating Helix code, the first two are the ones that produce
 working-looking output that is wrong.
@@ -86,8 +82,7 @@ existing.
 
 Start there rather than crawling: one request, and it names every page on the
 site plus the two machine-readable surfaces above. No count here, because a
-number typed into prose is a number that goes stale, which the read of these pages
-on 24 Aug 2026 found five of.
+number typed into prose is a number that goes stale.
 
 ## From a component's page
 
@@ -127,12 +122,9 @@ of a binary you installed, talking to a client you chose, with no network in it.
 page into one file is out of date the moment anything changes, where the links
 in `llms.txt` are individually cacheable and individually current.
 
-This page used to offer one anyway, a repository path to a generated document
-holding every family at once, which contradicted the paragraph above it and was
-not a thing a consumer could open: an agent reading the published package has
-this site and no checkout. What it was for is covered better by the two surfaces
-already here. `llms.txt` is the index, one request, and each family's `.md` is
-the document. Fetch the families you are using.
+What such a file would be for is covered better by the two surfaces already
+here. `llms.txt` is the index, one request, and each family's `.md` is the
+document. Fetch the families you are using.
 
 **A search index.** The site has one for humans; there is nothing an agent can
 query yet, and `llms.txt` plus the documents it names is a smaller thing to read

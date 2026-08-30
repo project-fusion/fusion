@@ -107,10 +107,10 @@ if (hasLayout()) {
     })
 
     test('the reading line moves down with offset, which is what chrome needs', async () => {
-      /* The direction is worth stating, because it reads backwards at first and
-         this spec asserted the opposite before it was run. `offset` is where the
-         top of the *readable* area is, so a larger one means a heading counts as
-         reached while it is still further down the window. That is exactly what
+      /* The direction is worth stating, because it reads backwards at first.
+         `offset` is where the top of the *readable* area is, so a larger one
+         means a heading counts as reached while it is still further down the
+         window. That is exactly what
          a sticky masthead wants: a heading sliding under 64px of chrome has
          arrived, and waiting for it to reach y=0 leaves the previous section
          marked while its own heading is out of sight.
@@ -136,8 +136,8 @@ if (hasLayout()) {
     test('the mark travels to the section being read, and is sized to it', async () => {
       /* A border on each link can only appear and disappear. This is one
          element that moves, so it has to be measured, and a measurement is
-         something only a browser has. `check:selectors` cannot catch an
-         indicator that renders and never places: the selector matches, the
+         something only a browser has. No static rule catches an indicator
+         that renders and never places: the selector matches, the
          element is there, and it sits at the top of the list forever. */
       const nav = await build()
       const mark = part(nav, 'indicator') as HTMLElement
@@ -152,9 +152,9 @@ if (hasLayout()) {
       await settle()
       expect(marked(nav)).toBe('#two')
       expect(mark.style.getPropertyValue('--indicator-y')).not.toBe(first)
-      expect(Number.parseFloat(mark.style.getPropertyValue('--indicator-height'))).toBeGreaterThan(
-        0,
-      )
+      expect(
+        Number.parseFloat(mark.style.getPropertyValue('--indicator-block-size')),
+      ).toBeGreaterThan(0)
     })
 
     test('the end of the page marks the last section, reachable or not', async () => {

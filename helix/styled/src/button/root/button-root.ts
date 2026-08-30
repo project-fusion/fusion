@@ -13,9 +13,9 @@ import { styles } from './button-root.css.js'
  * real button are indistinguishable to a reader. There are no sizes: a control
  * takes its height from the region it is in, through `data-density`, which is
  * the one size axis in the library and the reason a row of controls cannot come
- * out ragged. The focus
- * ring is declared here rather than inherited, because the base layer's
- * `:focus-visible` rule is a light-DOM rule and stops at the shadow boundary.
+ * out ragged. The focus ring is declared here rather than inherited, because the
+ * base layer's `:focus-visible` rule is a light-DOM rule and stops at the shadow
+ * boundary.
  *
  * @since 0.1.0
  * @status stable
@@ -34,13 +34,13 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-gap - Space between the label and whatever flanks it.
  * @cssproperty --button-inline-size - Width taken by `width="standard"`.
  * @cssproperty --button-padding-inline - Inline padding, for a container whose rhythm is not the control default.
- * @cssproperty --button-radii - Corner radius of the control.
- * @cssproperty --button-radii-end - Trailing corners, which a group flattens.
- * @cssproperty --button-radii-end-end - The bottom trailing corner, for a group stacking down.
- * @cssproperty --button-radii-end-start - The bottom leading corner, for a group stacking down.
- * @cssproperty --button-radii-start - Leading corners, which a group flattens.
- * @cssproperty --button-radii-start-end - The top trailing corner, for a group stacking down.
- * @cssproperty --button-radii-start-start - The top leading corner, for a group stacking down.
+ * @cssproperty --button-radius - Corner radius of the control.
+ * @cssproperty --button-radius-end - Trailing corners, which a group flattens.
+ * @cssproperty --button-radius-end-end - The bottom trailing corner, for a group stacking down.
+ * @cssproperty --button-radius-end-start - The bottom leading corner, for a group stacking down.
+ * @cssproperty --button-radius-start - Leading corners, which a group flattens.
+ * @cssproperty --button-radius-start-end - The top trailing corner, for a group stacking down.
+ * @cssproperty --button-radius-start-start - The top leading corner, for a group stacking down.
  * @cssproperty --button-size - Height of the control, for a container whose row is not one of the density steps.
  */
 @customElement('helix-button')
@@ -55,24 +55,17 @@ export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {
    * - `full` fills the container, for a single action at the foot of a form or
    *   a card, and on a phone where a control is a target before it is a label.
    *
-   * **This was `fill`, and the name had to disclaim itself.** The paragraph here
-   * opened "Width and not weight", which is a sentence a name should not need:
-   * `emphasis` on this same element is documented as "How filled it is drawn",
-   * so a button carried a property called `fill` beside a property about being
-   * filled, meaning different things. `separation="filled"` and
-   * `ThemeIntent.separation`'s `fill` mechanism both mean a surface's own
-   * color, and every chart in the library writes `fill` for paint, which left
-   * this the only use of the word meaning geometry.
+   * **Not `fill`, and not `size`.** `fill` means a surface's own color
+   * everywhere else in the library, in `separation="filled"`, in
+   * `ThemeIntent.separation`'s `fill` mechanism and in every chart, so it cannot
+   * also mean geometry beside an `emphasis` documented as "How filled it is
+   * drawn". `size` fails the rule's own test, which is whether two of them
+   * sitting together could legitimately differ: two buttons can, because this is
+   * a width *policy* rather than a scale, and `standard` exists precisely to
+   * stop a row being ragged.
    *
-   * `Dialog` had already made the same move for the same reason, its
-   * `appearance` becoming `size` for saying how wide a panel is, "which its own
-   * description admitted in as many words". `size` is not available here,
-   * because that rule's test is whether two of them sitting together could
-   * legitimately differ, and two buttons do: this is a width *policy* rather
-   * than a scale, and `standard` exists precisely to stop a row being ragged.
-   *
-   * Width and not weight, still. `emphasis` says how much a button matters and
-   * this says how much room it takes, and the three are independent: a `ghost
+   * Width and not weight. `emphasis` says how much a button matters and this
+   * says how much room it takes, and the three are independent: a `ghost
    * standard` Cancel beside a `solid primary standard` Save is exactly the
    * pairing a dialog wants.
    *
@@ -83,11 +76,9 @@ export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {
    * <a data-button="solid" data-button-width="standard" data-button-tone="primary" href="/save">Save</a>
    * ```
    *
-   * Both are one declaration in the base layer. They were not, and that was a
-   * real gap rather than a missing convenience: this class promises a link
-   * styled as a button and a real button are indistinguishable, and a dialog's
-   * button row is built on `standard`, so the one place the promise mattered
-   * most was the one place it did not hold.
+   * Both are one declaration in the base layer, and both are needed: this class
+   * promises a link styled as a button and a real button are indistinguishable,
+   * and a dialog's button row is built on `standard`.
    */
   @property({ reflect: true })
   width?: 'auto' | 'full' | 'standard'

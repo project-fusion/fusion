@@ -11,9 +11,8 @@
      and belongs close to it. Padding rather than a larger gap, which would move
      both.
 
-     This is the declaration that leaked. It was in the block every control
-     copied, so a beside-label got four pixels of padding under its text, its
-     box came out four pixels taller than its ink, and centering the box put the
-     ink two pixels high. Here it can only reach a control that asked for it. */
+     Here rather than in the block every control copies, or a beside-label takes
+     four pixels of padding under its text: its box comes out four pixels taller
+     than its ink, and centering the box puts the ink two pixels high. */
   padding-block-end: var(--helix-space-2xs);
 }

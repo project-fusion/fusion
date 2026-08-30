@@ -1,10 +1,5 @@
 body:
   - attributes:
-      value:
-        Before filing, check `docs/19-queue.md`. It is the outstanding work,
-        with the reasoning, and it is a file rather than an issue list.
-    type: markdown
-  - attributes:
       description: What you did, what you expected, and what happened instead.
       placeholder:
         Set `shape="pill"` on `helix-button` and the corners stayed square.

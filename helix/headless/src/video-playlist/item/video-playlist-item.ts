@@ -44,16 +44,20 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-video-playlist-item')
 export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   /**
-   * What identifies the entry, and what `active` is compared against.
+   * Whether the player is on this entry.
+   *
+   * Written by the playlist rather than by the entry, the way an option's
+   * selection is: an entry that made itself current would be a second answer to
+   * which one is playing.
    */
-  @property()
-  value = ''
+  @property({ attribute: false })
+  current = false
 
   /**
-   * The file this entry plays.
+   * Whether the entry can be chosen.
    */
-  @property()
-  src = ''
+  @property({ reflect: true, type: Boolean })
+  disabled = false
 
   /**
    * What covers the picture before this entry plays, and the row's thumbnail.
@@ -68,28 +72,24 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   poster = ''
 
   /**
-   * Whether the entry can be chosen.
+   * The file this entry plays.
    */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
+  @property()
+  src = ''
 
   /**
-   * Whether the player is on this entry.
-   *
-   * Written by the playlist rather than by the entry, the way an option's
-   * selection is: an entry that made itself current would be a second answer to
-   * which one is playing.
+   * What identifies the entry, and what `active` is compared against.
    */
-  @property({ attribute: false })
-  current = false
+  @property()
+  value = ''
 
   /**
    * The entry's name, which is the words and not everything in it.
    *
-   * `textContent` was what this used, and it takes the whole subtree: a row with
-   * a duration in `meta` reported "His Girl Friday0:06", and that string went to
-   * the player and on to the lock screen. Only the nodes the consumer left
-   * unslotted are the name; anything named is a column beside it.
+   * `textContent` takes the whole subtree: a row with a duration in `meta`
+   * reads as "His Girl Friday0:06", and that string reaches the player and the
+   * lock screen. Only the nodes the consumer left unslotted are the name;
+   * anything named is a column beside it.
    *
    * Light DOM rather than `assignedNodes`, so it answers on the server too,
    * where there is no slot to ask. `Option.text` reads its own the same way.

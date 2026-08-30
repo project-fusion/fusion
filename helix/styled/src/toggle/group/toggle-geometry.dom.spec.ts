@@ -28,12 +28,12 @@ if (hasLayout()) {
  
        Ended rather than waited out. A sleep long enough to be safe went over the
        runner's two second budget, and one short enough to fit would pass only on
-       a fast machine. Awaiting `finished` was worse in a way worth writing down:
-       a transition in a document the browser is not painting is started and then
-       never advanced, so the promise never settles and both specs hung. That is
-       every backgrounded tab, not a quirk of one. `finish()` puts the transition
-       at its end state synchronously and asks nothing of the timeline, so this
-       reads the same geometry whether or not anyone is looking at it. */
+       a fast machine. Awaiting `finished` is worse: a transition in a document
+       the browser is not painting is started and then never advanced, so the
+       promise never settles and the spec hangs. That is every backgrounded tab,
+       not a quirk of one. `finish()` puts the transition at its end state
+       synchronously and asks nothing of the timeline, so this reads the same
+       geometry whether or not anyone is looking at it. */
     const settle = async (group: Updatable): Promise<void> => {
       await group.updateComplete
       for (const moving of (part(group, 'indicator') as HTMLElement).getAnimations()) {
@@ -55,10 +55,8 @@ if (hasLayout()) {
         const target = segment.getBoundingClientRect()
 
         /* Before anything is compared, because every one of these compares two
-           measurements and zero equals zero. An unlaid-out runner would pass all
-           four while measuring nothing at all, which it did: this suite was
-           green against a known misplacement until the frame was moved
-           somewhere it gets laid out. */
+           measurements and zero equals zero. An unlaid-out runner passes all four
+           while measuring nothing at all, green against a known misplacement. */
         expect(target.width).toBeGreaterThan(0)
         expect(marker.width).toBeGreaterThan(0)
 
@@ -77,10 +75,9 @@ if (hasLayout()) {
       group.value = 'system'
       await settle(group)
 
-      /* The track, not the host. The host is the whole stack now, a label and a
-         hint included, so its box has not been the groove's box since the field
-         parts landed. Measured against the host this asserted the inset from
-         the top of a label, which is not a fact about anything. */
+      /* The track, not the host. The host is the whole stack, a label and a hint
+         included, so its box is not the groove's: measured against the host this
+         would assert the inset from the top of a label. */
       const track = (part(group, 'track') as HTMLElement).getBoundingClientRect()
       expect(track.width).toBeGreaterThan(0)
       const marker = (part(group, 'indicator') as HTMLElement).getBoundingClientRect()

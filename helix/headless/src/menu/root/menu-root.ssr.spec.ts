@@ -18,10 +18,9 @@ describe('menu server output', () => {
   })
 
   test('an open menu serves back what was typed and nothing else', () => {
-    /* Sorted by the helper, so this is a set rather than an order. `data-open`
-       was the third member until the open state moved to
-       `ElementInternals.states`, which no server writes and no hydration
-       reconciles. */
+    /* Sorted by the helper, so this is a set rather than an order. The open
+       state lives in `ElementInternals.states`, which no server writes and no
+       hydration reconciles. */
     expect(
       hostAttributes(
         ssr(html`<helix-headless-menu label="A" open></helix-headless-menu>`),

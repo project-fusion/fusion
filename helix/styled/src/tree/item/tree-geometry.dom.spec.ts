@@ -36,18 +36,13 @@ const labelLeft = (item: HTMLElement): number =>
  */
 const geometry = hasLayout() ? test : (): void => {}
 
-/**
- * Geometry, which is the half of this component that kept breaking.
- *
- * Every one of these was a real bug found by measuring in a browser, and not one
- * of them was reachable from `bun test`: a leaf that started 20px left of the
- * branch beside it, a link 57px wide inside a 240px row, and a chevron that
- * came to rest halfway along because two auto margins split the free space.
- * They are guarded rather than deleted so the same file is honest in both
- * harnesses.
- */
+/* Each of these guards a bug only a browser could find: a leaf that started 20px
+   left of the branch beside it, a link 57px wide inside a 240px row, and a
+   chevron that came to rest halfway along because two auto margins split the
+   free space. Guarded rather than deleted, so the file is honest under `bun
+   test` too.
 
-/* Where a row's label sits and how much of it a slotted link covers, both of
+   Where a row's label sits and how much of it a slotted link covers, both of
    which this tier's stylesheet decides. On the headless tier there is no gutter to
    indent by, so parent and child measure the same left edge, and the row has no
    padding or gap to read: `parseFloat('')` is `NaN` and the comparison against
@@ -94,9 +89,7 @@ describe('tree item geometry', () => {
        of the row rather than written as a number, because the number is not one
        thing: 28 of leading inset where a chevron column is reserved, 8 of
        trailing, and 4 of gap that the empty `end` slot spends by being a flex
-       item at all. That came to 40 against a hardcoded 32, and the hardcoded
-       figure is the part that was wrong: the link already covers every pixel
-       the row does not keep for itself. */
+       item at all. Any figure hardcoded here is wrong at the next row shape. */
     const style = getComputedStyle(row)
     const inset =
       Number.parseFloat(style.paddingInlineStart) +

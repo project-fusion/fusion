@@ -42,21 +42,21 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 @customElement('helix-headless-icon')
 export class HelixHeadlessIcon extends HelixElement {
   /**
-   * Name of the icon in the Helix set.
-   */
-  @property()
-  name = ''
-
-  /**
    * Accessible name, for an icon that is not decorative.
    */
   @property()
   label = ''
 
+  /**
+   * Name of the icon in the Helix set.
+   */
+  @property()
+  name = ''
+
   protected override render(): TemplateResult | typeof nothing {
-    /* Own keys only. This was a truthiness check on a plain-object index, so an
-       inherited `Object.prototype` key passed it and the component went on to
-       render a sized, empty `<svg viewBox="">` rather than nothing at all. */
+    /* Own keys only. A truthiness check on a plain-object index lets an
+       inherited `Object.prototype` key through, and the component renders a
+       sized, empty `<svg viewBox="">` rather than nothing at all. */
     const icon = Object.hasOwn(icons, this.name) ? icons[this.name] : undefined
     if (!icon) {
       return nothing

@@ -6,11 +6,10 @@
  * `part="terminus"` positioned by its own two custom properties, and gets the
  * shapes with it.
  *
- * **It was here for weeks before the second chart existed**, which made every
- * `--chart-terminus-*` hook a shared name read by one family: the condition
- * `check:hooks` calls a family hook that has drifted, while its own `SHARED`
- * exemption was what allowed it. `check:hooks` asks the question now, so a sheet
- * in this folder has to have the second reader the folder exists for.
+ * A sheet in this folder has to have the second reader the folder exists for.
+ * With one, every `--chart-terminus-*` hook is a shared name read by a single
+ * family, which is the drift a family hook is watched for and which the `SHARED`
+ * exemption would let through.
  *
  * An element rather than a shape inside the drawing, and that is not a
  * preference. A chart that fills its box uses `preserveAspectRatio="none"`,
@@ -53,22 +52,20 @@
  * middle, so the mark reads as a ring rather than as a blot on the content.
  *
  * **Larger than the dot, and that is what makes it a ring at all.** At the same
- * 5px with a 2px border on every side, the hole left in the middle is one pixel:
- * the mark rendered as a slightly soft dot, which is what it was reported as.
- * A ring needs its hole to be the thing you see, so it is drawn at 1.6 times
- * the mark size, leaving a hole a little wider than the stroke around it.
+ * 5px with a 2px border on every side, the hole left in the middle is one pixel
+ * and the mark renders as a slightly soft dot. A ring needs its hole to be the
+ * thing you see, so it is drawn at 1.6 times the mark size, leaving a hole a
+ * little wider than the stroke around it.
  *
  * Bigger also because a hollow mark reads smaller than a filled one of the same
  * size, so matching the dot's diameter would make the ring look like the
  * quieter of the two when it is meant to be the same weight of statement.
  *
- * **The hole is a hole, and the chart is what makes it one.** It was filled
- * with `--helix-color-surface` until 21 Aug 2026, because a line ends *at* its
- * last reading, which is the ring's center, so a transparent middle showed the
- * stroke running into it and the mark read as a target. Filling it hid the
- * stroke and hid everything else with it: measured on a purple card, the ring
- * came out a disc of the page's color, which is the same mistake `Timeline`'s
- * marker was making and the reason both are in one queue row.
+ * **The hole is a hole, and the chart is what makes it one.** A line ends *at*
+ * its last reading, which is the ring's center, so a transparent middle shows
+ * the stroke running into it and the mark reads as a target. Never fill it with
+ * a surface color: measured on a purple card, that hides the stroke and
+ * everything else with it, and the ring comes out a disc of the page's color.
  *
  * Color cannot fix it, because no element can ask what is painted behind it.
  * Geometry can: the drawing has this exact disc taken out of it, so the stroke

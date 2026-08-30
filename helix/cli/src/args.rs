@@ -29,12 +29,15 @@ pub struct Cli {
     #[command(subcommand)]
     pub noun: Noun,
 
+    /* **Available on every verb, always**, which is the contract rather than a
+    convenience: a command that has a human form and no JSON form is one a
+    script has to parse prose out of, and prose is the thing this repository
+    reserves the right to improve. The reasoning stays here and out of the help
+    text, which is a reader's and carries no markup. */
     /// Emit machine-readable JSON on stdout.
     ///
-    /// **Available on every verb, always**, which is the contract rather than a
-    /// convenience: a command that has a human form and no JSON form is one a
-    /// script has to parse prose out of, and prose is the thing this repository
-    /// reserves the right to improve.
+    /// Available on every verb, in a shape a script can read without parsing
+    /// sentences.
     #[arg(long, global = true)]
     pub json: bool,
 
@@ -49,13 +52,26 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum Noun {
+    /* **A noun with no verb, and that is the shape rather than an omission.**
+    Every other noun here does several things to one subject; this does one
+    thing and the client asks for the rest over the protocol. A `helix mcp
+    serve` would be a word a reader types to no effect. */
     /// Serve the derivation to an agent, over stdio, as an MCP server.
     ///
-    /// **A noun with no verb, and that is the shape rather than an omission.**
-    /// Every other noun here does several things to one subject; this does one
-    /// thing and the client asks for the rest over the protocol. A `helix mcp
-    /// serve` would be a word a reader types to no effect.
+    /// Takes no verb: the client asks for what it wants over the protocol.
     Mcp,
+
+    /* **The design system saying whether you extended it correctly**, rather
+    than a linter to be configured into usefulness. */
+    /// Hold components to the conventions Helix is built on.
+    ///
+    /// Reads the tiers named by a `helix` key in `fusion.rules.json`, or by
+    /// `helix.rules.json` where that product is not in use.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Component {
+        #[command(subcommand)]
+        verb: Component,
+    },
 
     /// Derive, verify and inspect a theme.
     #[command(subcommand_required = true, arg_required_else_help = true)]
@@ -71,14 +87,13 @@ pub enum Theme {
     Init(Init),
     /// Emit the theme as CSS.
     Build(Build),
+    /* **The one verb that is a report rather than an artifact**, and both of
+    its forms read one report, so neither is the authoritative one. */
     /// Report every pair the theme was checked against.
     ///
-    /// **The one verb that is a report rather than an artifact.** It exits 1 when
-    /// a pair fails, so it is usable as a gate, and prints the whole matrix
-    /// either way, so it is usable as an answer.
-    ///
-    /// On a terminal it opens a screen; anywhere else it prints the table. Both
-    /// read one report, so neither is the authoritative one.
+    /// Exits 1 when a pair fails, so it works as a gate, and prints the whole
+    /// matrix either way, so it works as an answer. On a terminal it opens a
+    /// screen; anywhere else it prints the table.
     Audit(Audit),
     /// Fail if the theme has violations, and print nothing when it does not.
     ///
@@ -107,13 +122,13 @@ pub struct Audit {
     #[command(flatten)]
     pub common: Common,
 
+    /* **Not the CI flag**: without a tty the table is already what prints, so a
+    pipeline needs nothing, and a flag that had to be remembered there would be
+    one nobody remembered. */
     /// Print the table instead of opening the screen.
     ///
-    /// **The screen is what a terminal gets and this is how to refuse it**, for
-    /// the reader who wants to scroll their own scrollback, copy a row, or diff
-    /// two runs. It is not the CI flag: without a tty the table is already what
-    /// prints, so a pipeline needs nothing, and a flag that had to be remembered
-    /// there would be one nobody remembered.
+    /// For scrolling your own scrollback, copying a row, or diffing two runs.
+    /// Not needed in a pipeline, where the table already prints.
     #[arg(long)]
     pub plain: bool,
 }
@@ -131,13 +146,14 @@ pub struct Build {
     #[arg(long, default_value = ":root", value_name = "SELECTOR")]
     pub selector: String,
 
+    /* **The default is to refuse**, which is the whole argument for a tool that
+    derives rather than generates: writing a failing palette with a warning
+    above it produces a file that outlives the warning. */
     /// Emit the block even when a pair fails its target.
     ///
-    /// **The default is to refuse**, which is the whole argument for a tool that
-    /// derives rather than generates: a palette that does not meet the contrast
-    /// it claims is the failure this engine exists to prevent, and writing it
-    /// anyway with a warning above it produces a file that outlives the warning.
-    /// The flag exists because a builder iterating wants to see what they have.
+    /// Refused by default: a palette that does not meet the contrast it claims
+    /// is the failure this engine exists to prevent. Use it while iterating, to
+    /// see what you have.
     #[arg(long)]
     pub force: bool,
 }
@@ -155,4 +171,44 @@ pub struct Init {
     /// Overwrite an existing file.
     #[arg(long)]
     pub force: bool,
+}
+
+/// What can be asked of the component rules.
+#[derive(Debug, Subcommand)]
+pub enum Component {
+    /// Report every rule and what it found, and exit 1 on a finding.
+    Audit(ComponentAudit),
+    /// The CI shape of `audit`: same measurement, nothing printed on success.
+    Check(Rules),
+    /// Run the rules that can write.
+    Fix(Rules),
+}
+
+/// What `component audit` takes, which is the rules plus how to show them.
+#[derive(Args, Debug)]
+pub struct ComponentAudit {
+    #[command(flatten)]
+    pub rules: Rules,
+
+    /* **Not the CI flag**: without a tty the report already prints, so a
+    pipeline needs nothing, and a flag that had to be remembered there would be
+    one nobody remembered. */
+    /// Print the report instead of opening the screen.
+    ///
+    /// For scrolling your own scrollback, copying a line, or diffing two runs.
+    /// Not needed in a pipeline, where the report already prints.
+    #[arg(long)]
+    pub plain: bool,
+}
+
+/// What the component verbs take.
+#[derive(Args, Debug)]
+pub struct Rules {
+    /// Run just these rules.
+    #[arg(long, value_delimiter = ',')]
+    pub only: Vec<String>,
+
+    /// The workspace to read. Defaults to the current directory.
+    #[arg(long)]
+    pub root: Option<PathBuf>,
 }

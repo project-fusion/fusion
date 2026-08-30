@@ -36,7 +36,7 @@ export function Example() {
 
              `--slider-length` is a custom property, so it inherits: set on the group
              it reaches every slider inside and they cannot disagree. Set on one
-             child, that child is taller than its neighbours, the tracks still share a
+             child, that child is taller than its neighbors, the tracks still share a
              foot, and its label floats above theirs, which is a ragged row of names
              that no amount of aligning the row fixes. The hook is the fix, put where
              a length actually belongs. */}

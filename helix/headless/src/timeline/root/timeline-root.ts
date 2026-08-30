@@ -23,13 +23,11 @@ import { property } from 'lit/decorators.js'
  * reason `Steps` gives: the entries are the consumer's elements in the light
  * DOM, so a list element here would be a list whose items are somewhere else.
  *
- * **It runs down the page and has no horizontal form.** There was one, and it
- * was removed rather than tuned: laid along a line there is no room for the
- * time or the sentence that are the whole reason to reach for a timeline, so
- * what survives is a mark and a short label, and that is a stepper. `Steps` is
- * already horizontal by default and already draws it, so the horizontal version
- * of this was a second component rendering the same picture from thinner data.
- * A run of stages along a page is `Steps`.
+ * **It runs down the page and has no horizontal form.** Laid along a line there
+ * is no room for the time or the sentence that are the whole reason to reach for
+ * a timeline, so what survives is a mark and a short label, and that is a
+ * stepper. `Steps` is already horizontal by default and already draws it. A run
+ * of stages along a page is `Steps`.
  *
  * @since 0.1.0
  * @status stable

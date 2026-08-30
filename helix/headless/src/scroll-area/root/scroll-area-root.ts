@@ -67,17 +67,14 @@ export class HelixHeadlessScrollArea extends HelixElement {
   /**
    * The box that actually scrolls, for anything that needs to move it.
    *
-   * **Public because the alternative is silence.** Bringing a row into view
-   * means telling a scroll utility which box to scroll, and the scrolling box
-   * here is inside a shadow root: a consumer holding a reference to this
-   * element holds the host, which does not scroll, and `scrollBy` on it is a
-   * no-op that reports nothing. That is exactly how `scrollItemIntoView`'s
-   * `offsetParent` default fails, and the sandbox sidebar spent an afternoon
-   * scrolled to zero because of it.
+   * **Public because the alternative is silence.** The scrolling box is inside
+   * this shadow root: a consumer holding a reference to this element holds the
+   * host, which does not scroll, and `scrollBy` on it is a no-op that reports
+   * nothing. That is how `scrollItemIntoView`'s `offsetParent` default fails
+   * here.
    *
    * The element rather than a method of our own, because the utilities that
-   * want it already take one, and `Tree`, `Combobox` and anything windowing a
-   * long list all want the same thing from it.
+   * want it already take one.
    */
   get scroller(): HTMLElement | null {
     return this.renderRoot?.querySelector('[part="viewport"]') ?? null
@@ -121,20 +118,14 @@ export class HelixHeadlessScrollArea extends HelixElement {
        and the content changing size is a data change, and a fade that only
        answered one of them was wrong every time a list was filtered. */
     this.watcher = new ResizeObserver(this.measure)
-    /* And what it watches, which was registered only in `firstUpdated`.
-     *
-     * The observer was already rebuilt here, so this looked like the one
-     * component that had the lifecycle right, and it was half right. A fresh
-     * observer watches nothing until something calls `observe`, and only
-     * `firstUpdated` did, which runs once for the life of the element. So a
-     * scroll area moved in the DOM came back with a new observer registered on
-     * no targets: the fades stopped answering a resize or a filtered list, and
-     * the component went on rendering.
+    /* And what it watches, which rebuilding the observer does not restore. A
+     * fresh observer watches nothing until something calls `observe`, so a
+     * scroll area moved in the DOM comes back registered on no targets: the
+     * fades stop answering a resize or a filtered list, and the component goes
+     * on rendering.
      *
      * Guarded on `hasUpdated`, because the first connection happens before the
-     * first render and there is no scroller to find yet. `check:observers`
-     * holds it, and had to be tightened to see it: asking for `new` *or*
-     * `observe` passed this on the half that was fine. */
+     * first render and there is no scroller to find yet. */
     if (this.hasUpdated) {
       this.watchContent()
     }

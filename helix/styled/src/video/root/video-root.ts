@@ -49,19 +49,14 @@ export class HelixVideo extends HelixHeadlessVideo {
   /**
    * How the control bar sits on the picture.
    *
-   * **Classified by what it does rather than by what its values were called.**
-   * These were `solid` and `plain` under `appearance`, and `solid` reads like a
-   * fill weight, which is how this came to be listed as emphasis when the axes
-   * were first sorted. It is not: all three states say what the bar sits on,
-   * which is where it separates from the picture.
+   * `separation` and not `emphasis`: all three states say what the bar sits on,
+   * which is where it separates from the picture, rather than how loud it is.
    *
    * Absent is the default and is what a player looks like, and what the
    * platform's own controls do: they float on a gradient that fades up into the
    * picture, dark enough to read them against a bright frame and gone entirely
    * a little higher up. The picture runs edge to edge behind them. It has no
-   * name because it is the resting treatment, and `shadow` was never a declared
-   * value even while an example wrote it: the attribute matched no selector and
-   * fell through to this rule, which is why it appeared to work.
+   * name because it is the resting treatment.
    *
    * `filled` gives the controls a bar of their own, which is what a video
    * embedded in a document usually wants, where the player is a component on a

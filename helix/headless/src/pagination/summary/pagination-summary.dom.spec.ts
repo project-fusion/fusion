@@ -42,10 +42,8 @@ describe('pagination summary', () => {
 
 describe('pagination summary out of range', () => {
   test('a page past the end reads as the last one, not as a backwards range', async () => {
-    /* Only the end was clamped, so page 99 of a ten-page result produced a start
-       past the total and an end pinned to it: "2,451-248 of 248". A count is the
-       one number in a footer a reader cannot check against anything else on
-       screen, so a wrong one is the worst kind here. */
+    /* Clamping only the end leaves the start past the total: page 99 of a
+       ten-page result reads "2,451-248 of 248". */
     const it = await mount(
       '<helix-headless-pagination-summary page="99" page-size="25" total="248"></helix-headless-pagination-summary>',
     )

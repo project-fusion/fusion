@@ -64,7 +64,7 @@ describe('a collection that is empty or still arriving', () => {
     expect((part(host, 'loading') as HTMLElement).getAttribute('role')).toBe('status')
   })
 
-  test('both messages are the consumer"s words', async () => {
+  test("both messages are the consumer's words", async () => {
     const empty = (await mount(
       '<helix-headless-table empty-text="No invoices yet" label="Invoices"></helix-headless-table>',
     )) as Collection

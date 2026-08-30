@@ -8,7 +8,7 @@ import { styles } from './tag-root.css.js'
  * @summary Labels content with a short piece of metadata.
  *
  * @description
- * Five tones. The fill is a tint of the status color, mixed with
+ * Seven tones. The fill is a tint of the status color, mixed with
  * `color-mix` rather than held as a token per status, so a theme that changes
  * the status colors gets the tints with them.
  *
@@ -27,26 +27,10 @@ import { styles } from './tag-root.css.js'
  * @cssproperty --tag-background-color - Fill behind the tag.
  * @cssproperty --tag-border-color - Color of the edge, for a chip that separates by fill alone.
  * @cssproperty --tag-foreground-color - Label color.
- * @cssproperty --tag-radii - Corner radius of the tag.
+ * @cssproperty --tag-radius - Corner radius of the tag.
  */
 @customElement('helix-tag')
 export class HelixTag extends HelixHeadlessTag {
-  /**
-   * Which status the tag reports.
-   *
-   * This was called `appearance`, and it never was one. `tone` is semantic
-   * color, which is what these are and what `helix-text` already calls them.
-   * One axis was wearing the other's name, and the axis it should have held did
-   * not exist.
-   *
-   * **Written before there was a registry, and it turned out to be the first
-   * instance of a general fault rather than a local one.** `appearance` was not
-   * a treatment either: it held four different questions across 21 components,
-   * and this file found one of them the hard way. The rest is `check:axes`.
-   */
-  @property({ reflect: true })
-  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
-
   /**
    * How much of the tone the tag wears.
    *
@@ -58,13 +42,20 @@ export class HelixTag extends HelixHeadlessTag {
    *   each of them turns a list into a mosaic.
    *
    * Independent of `tone` on purpose: an outlined danger tag and a solid danger
-   * tag are both sensible, and until these were two properties you could ask
-   * for neither, because color and fill were welded together. Which is the same
-   * test the whole axis registry answers to, arrived at here first and one
-   * component at a time.
+   * tag are both sensible, and one property welding color to fill can ask for
+   * neither. That is the test the whole axis registry answers to.
    */
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * Which status the tag reports.
+   *
+   * `tone` is semantic color, which is what these are and what `helix-text`
+   * already calls them. `helix component`'s `axes` holds the vocabulary.
+   */
+  @property({ reflect: true })
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   static override styles: CSSResultGroup = styles
 }

@@ -49,24 +49,6 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-pagination-summary')
 export class HelixHeadlessPaginationSummary extends HelixElement {
   /**
-   * The page on show, one-based.
-   */
-  @property({ type: Number })
-  page = 1
-
-  /**
-   * How many items are on a page.
-   */
-  @property({ attribute: 'page-size', type: Number })
-  pageSize = 0
-
-  /**
-   * How many items there are across every page.
-   */
-  @property({ type: Number })
-  total = 0
-
-  /**
    * The reading, with `{from}`, `{to}` and `{total}` filled in.
    *
    * A template rather than a prefix and a suffix, because word order is not
@@ -91,6 +73,24 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
    */
   @property()
   locale = ''
+
+  /**
+   * The page on show, one-based.
+   */
+  @property({ type: Number })
+  page = 1
+
+  /**
+   * How many items are on a page.
+   */
+  @property({ attribute: 'page-size', type: Number })
+  pageSize = 0
+
+  /**
+   * How many items there are across every page.
+   */
+  @property({ type: Number })
+  total = 0
 
   /** Held across every component asking for the same locale. */
   private get numbers(): (value: number) => string {

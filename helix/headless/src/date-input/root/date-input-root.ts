@@ -132,89 +132,11 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    * What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all. This used to be hardcoded `off`, so a reader
-   * could never have a birthday or a postal code filled in for them and a
-   * consumer had no way to ask for it. See 295.
+   * lets autofill work at all: hardcoding `off` here means a birthday or a
+   * postal code can never be filled in for a reader.
    */
   @property()
   autocomplete = ''
-
-  /**
-   * How many dates can be held at once.
-   *
-   * Absent is one. `range` holds a start and an end, `multiple` holds any
-   * number, and both are carried as one comma-separated value: a form field
-   * submits a string, and two fields for one question is a different control.
-   */
-  @property({ reflect: true })
-  mode?: 'range' | 'multiple'
-
-  /**
-   * How many months the calendar shows, side by side.
-   *
-   * Worth more than one mainly for a range, where picking a start in March and
-   * an end in April otherwise means paging between them and losing sight of the
-   * first. The panel is sized by its content, so this widens it.
-   */
-  @property({ type: Number })
-  months = 1
-
-  /**
-   * How many dates are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default: a cap that guesses is worse than no
-   * cap, because the number that fits depends on the width of the field and the
-   * length of what is in it, neither of which this element knows. What a cap is
-   * genuinely for is a field in a row or a table cell, where a set of twelve
-   * dates would push everything below it down a line at a time.
-   *
-   * The remainder is counted rather than hidden. "3 more" is a fact a reader can
-   * act on, where a row that silently stops is a field that appears to have lost
-   * what was put in it, and the count is what tells them there is more to see.
-   */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
-
-  /**
-   * Earliest date that can be chosen, as `YYYY-MM-DD`.
-   */
-  @property()
-  min = ''
-
-  /**
-   * How far apart the selectable dates are, in days.
-   *
-   * `<input type="date" step>`'s own unit, handed to the calendar this renders
-   * so the field and the grid agree about which dates exist. Counted from `min`
-   * where there is one and from 1 January 1970 where there is not, which is the
-   * platform's base.
-   */
-  @property({ type: Number })
-  step = 1
-
-  /**
-   * Latest date that can be chosen, as `YYYY-MM-DD`.
-   */
-  @property()
-  max = ''
-
-  /**
-   * Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
-   */
-  @property({ attribute: 'disable-dates' })
-  disableDates = ''
-
-  /**
-   * Days of the week that cannot be chosen, `0` for Sunday through `6`.
-   */
-  @property({ attribute: 'disable-days' })
-  disableDays = ''
-
-  /**
-   * First column of the week in the calendar, `0` for Sunday through `6`.
-   */
-  @property({ attribute: 'first-day-of-week', type: Number })
-  firstDayOfWeek = 0
 
   /**
    * How a date is written in the field: `short` through `full`, or ISO.
@@ -244,10 +166,76 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   dateStyle: 'full' | 'iso' | 'long' | 'medium' | 'short' = 'long'
 
   /**
+   * Dates that cannot be chosen, as a comma-separated `YYYY-MM-DD` list.
+   */
+  @property({ attribute: 'disable-dates' })
+  disableDates = ''
+
+  /**
+   * Days of the week that cannot be chosen, `0` for Sunday through `6`.
+   */
+  @property({ attribute: 'disable-days' })
+  disableDays = ''
+
+  /**
+   * First column of the week in the calendar, `0` for Sunday through `6`.
+   */
+  @property({ attribute: 'first-day-of-week', type: Number })
+  firstDayOfWeek = 0
+
+  /**
    * Language tag the calendar names its months and days in.
    */
   @property()
   locale = ''
+
+  /**
+   * Latest date that can be chosen, as `YYYY-MM-DD`.
+   */
+  @property()
+  max = ''
+
+  /**
+   * How many dates are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default: a cap that guesses is worse than no
+   * cap, because the number that fits depends on the width of the field and the
+   * length of what is in it, neither of which this element knows. What a cap is
+   * genuinely for is a field in a row or a table cell, where a set of twelve
+   * dates would push everything below it down a line at a time.
+   *
+   * The remainder is counted rather than hidden. `+3` is a fact a reader can
+   * act on, where a row that silently stops is a field that appears to have lost
+   * what was put in it, and the count is what tells them there is more to see.
+   */
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
+
+  /**
+   * Earliest date that can be chosen, as `YYYY-MM-DD`.
+   */
+  @property()
+  min = ''
+
+  /**
+   * How many dates can be held at once.
+   *
+   * Absent is one. `range` holds a start and an end, `multiple` holds any
+   * number, and both are carried as one comma-separated value: a form field
+   * submits a string, and two fields for one question is a different control.
+   */
+  @property({ reflect: true })
+  mode?: 'range' | 'multiple'
+
+  /**
+   * How many months the calendar shows, side by side.
+   *
+   * Worth more than one mainly for a range, where picking a start in March and
+   * an end in April otherwise means paging between them and losing sight of the
+   * first. The panel is sized by its content, so this widens it.
+   */
+  @property({ type: Number })
+  months = 1
 
   /**
    * What the field says before a date is in it.
@@ -256,10 +244,31 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   placeholder = 'YYYY-MM-DD'
 
   /**
-   * Accessible name for the control that opens the calendar.
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
    */
-  @property({ attribute: 'trigger-label' })
-  triggerLabel = 'Choose a date'
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
+   * How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, handed to the calendar this renders
+   * so the field and the grid agree about which dates exist. Counted from `min`
+   * where there is one and from 1 January 1970 where there is not, which is the
+   * platform's base.
+   */
+  @property({ type: Number })
+  step = 1
 
   /**
    * The overlay, placed against the field rather than the trigger.
@@ -275,15 +284,10 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
      *
      * A control is not always one element: the button that opens this panel is
      * part of it, and a press on it is not a press outside. Scoped to the
-     * surface alone, `pointerdown` on the trigger closed the panel and the
-     * trigger's own `toggleOpen` reopened it on the `click` that followed, so
-     * the panel could never be closed by the button that opened it. Measured
-     * across all five popover-bearing components: Menu, Popover and Tooltip
-     * already named their invoker; this one and its three siblings did not, and
-     * all four stayed open on a second press where Menu closed.
-     *
-     * `DismissController` documents this exact failure and takes a list for it.
-     * The list was the fix; using it was the part that did not happen here. */
+     * surface alone, `pointerdown` on the trigger closes the panel and the
+     * trigger's own `toggleOpen` reopens it on the `click` that follows, so the
+     * panel can never be closed by the button that opened it.
+     * `DismissController` documents this failure and takes a list for it. */
     boundary: (): readonly (Element | null | undefined)[] => [
       this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
       this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
@@ -318,18 +322,6 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     return held.length > 0 && held.every(isIso) ? held.join(',') : ''
   }
 
-  /*
-   * What the field shows, which is the value in every mode but one.
-   *
-   * A range reads `2026-08-04 – 2026-08-11`, because two dates separated by a
-   * comma is a list and a range is a span: the comma says "and these", the dash
-   * says "through". It is the one place this component shows something other
-   * than the value it holds, and it is safe because the dash reads back: `dates`
-   * takes a spaced dash as a separator, so what is shown is what can be typed.
-   *
-   * `multiple` shows nothing here at all. Its dates are tags beside the input
-   * and the input is a draft, which is the next thing down.
-   */
   /** One date, written the way `dateStyle` asks for. */
   private written(date: string): string {
     if (this.dateStyle === 'iso' || !isIso(date)) {
@@ -347,6 +339,18 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
         }).format(at)
   }
 
+  /*
+   * What the field shows, which is the value in every mode but one.
+   *
+   * A range reads `2026-08-04 – 2026-08-11`, because two dates separated by a
+   * comma is a list and a range is a span: the comma says "and these", the dash
+   * says "through". It is the one place this component shows something other
+   * than the value it holds, and it is safe because the dash reads back: `dates`
+   * takes a spaced dash as a separator, so what is shown is what can be typed.
+   *
+   * `multiple` shows nothing here at all. Its dates are tags beside the input
+   * and the input is a draft.
+   */
   private get display(): string {
     if (this.mode === 'multiple') {
       return this.draft
@@ -522,20 +526,10 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   }
 
   /**
-   * Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * Accessible name for the control that opens the calendar.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ attribute: 'trigger-label' })
+  triggerLabel = 'Choose a date'
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -554,7 +548,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`, and the fifteen controls that already did this.
+    // `ColorInput.updated`.
     this.sync()
     /* Driven from here rather than from the toggle, because `open` is a property
        a consumer may set directly and the panel has to follow either way. The
@@ -574,27 +568,6 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     }
   }
 
-  /*
-   * Focusing the field opens the calendar.
-   *
-   * A reader who reaches this control is choosing a date, and making them find
-   * the trigger afterwards is a second action for something they have already
-   * asked for. Typing still works with it up, because the calendar follows the
-   * field rather than the other way round.
-   *
-   * **Only where focus arrived from outside this element**, which is the whole
-   * of the difficulty. Picking a date shuts the panel and puts the caret back in
-   * the field, and the first version of this reopened it on the way: the reader
-   * chose a date and the calendar came straight back, which the existing spec
-   * caught. `relatedTarget` is where focus came from, so a hand-off from the
-   * calendar or the trigger is left alone and only a genuine arrival opens
-   * anything.
-   *
-   * On the input rather than on the field, too. Focus does not bubble, so a
-   * listener here covers the text and not the trigger, which is what keeps
-   * pressing the trigger from opening the panel on focus and then shutting it
-   * again on the click.
-   */
   /**
    * Puts the caret back in the field without the field reopening the calendar.
    *
@@ -611,9 +584,8 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    * outside this element and reads as an arrival. Every step is ordinary browser
    * behavior and none of it can be exercised here: `focus()` dispatches no
    * event in an unfocused document, which is what both the test runtime and the
-   * available browser pane are. A spec was written for it and passed with the
-   * guard removed, so it was covering nothing and has been taken out rather than
-   * left to look like proof.
+   * available browser pane are. A spec for this passes with the guard removed,
+   * so there is no spec: it would cover nothing while looking like proof.
    *
    * A flag rather than a better guess, because this element is the one moving
    * the focus and is the only thing that can know so. Cleared synchronously,
@@ -631,13 +603,33 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     this.editing = false
   }
 
+  /*
+   * Focusing the field opens the calendar.
+   *
+   * A reader who reaches this control is choosing a date, and making them find
+   * the trigger afterwards is a second action for something they have already
+   * asked for. Typing still works with it up, because the calendar follows the
+   * field rather than the other way round.
+   *
+   * **Only where focus arrived from outside this element**, which is the whole
+   * of the difficulty: picking a date shuts the panel and puts the caret back in
+   * the field, so an unguarded version reopens the calendar the reader just
+   * answered. `relatedTarget` is where focus came from, so a hand-off from the
+   * calendar or the trigger is left alone and only a genuine arrival opens
+   * anything.
+   *
+   * On the input rather than on the field, too. Focus does not bubble, so a
+   * listener here covers the text and not the trigger, which is what keeps
+   * pressing the trigger from opening the panel on focus and then shutting it
+   * again on the click.
+   */
   private readonly handleFocus = (event: FocusEvent): void => {
-    /* Not while the caret is being handed back. Picking a date returns focus
-       to the field, and treating that as editing put the field into the shape it
-       takes for typing: a reader chose "10:00 PM" from a list and the field
-       answered "22:00". Focus is a good enough signal for editing everywhere
-       except the one moment this element moved the focus itself, and it already
-       knows when that is. */
+    /* Not while the caret is being handed back. Picking a date returns focus to
+       the field, and treating that as editing puts the field into the shape it
+       takes for typing: a reader picks 4 August 2026 from the calendar and the
+       field answers `2026-08-04`. Focus is a good enough signal for editing
+       everywhere except the one moment this element moved the focus itself, and
+       it already knows when that is. */
     this.editing = !this.returning
     const from = event.relatedTarget
     if (this.open || this.isDisabled || this.returning) {
@@ -657,12 +649,11 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   /**
    * The calendar the field opens, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
+   * A method rather than a fragment inline, so a tier above can replace, wrap
+   * or omit it without reimplementing the whole template. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * headless element, and a styled subclass that sets `tier` renders the styled
+   * one from the same template.
    */
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('date-picker')}
@@ -691,12 +682,11 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   /**
    * One chosen date, as a tag, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
+   * A method rather than a fragment inline, so a tier above can replace, wrap
+   * or omit it without reimplementing the whole template. The tag is
    * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * headless element, and a styled subclass that sets `tier` renders the styled
+   * one from the same template.
    */
   protected renderTag(date: string): TemplateResult {
     return html`<${this.tag('tag')}
@@ -719,15 +709,14 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding.
    *
-   * **A named import rather than `<helix-icon>`, and that is a reversal.** The
-   * element looked like the tidier of the two and loses on three counts.
+   * **A named import rather than `<helix-icon>`**, which loses on three counts.
    * `helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and
    * no bundler can shake a runtime lookup, so every consumer of any component
    * that renders one ships all 50kB of path data; a named import ships one
    * path. The import is checked when the package compiles, where a `name`
-   * string is checked only when `check:icons` runs. And `helix-icon` is not
+   * string is checked only by a later name lookup. And `helix-icon` is not
    * registered on the headless tier at all, which registers `helix-headless-icon`,
-   * so a headless consumer got an inert unknown element and no mark whatsoever.
+   * so a headless consumer gets an inert unknown element and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger"><svg aria-hidden="true" fill="currentColor" part="trigger-icon" viewBox=${calendarBlank.viewBox}>

@@ -27,10 +27,10 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends HelixElement {
   /**
-   * Identifies the item to the group.
+   * Whether the item can be chosen.
    */
-  @property()
-  value = ''
+  @property({ reflect: true, type: Boolean })
+  disabled = false
 
   /**
    * Whether the markup declared this one chosen, which is what a reset returns to.
@@ -41,11 +41,10 @@ export class HelixHeadlessToggle extends HelixElement {
    * the markup said at upgrade, before anything could overwrite it: read the
    * attribute later and the listbox's own writes answer instead.
    *
-   * **The deeper half is 302 and is not this.** State reflecting under the
-   * declaration's name is the fault `TreeItem` already avoids by mirroring to
-   * `data-selected`, and four families here still write `selected` back into a
-   * consumer's markup. Splitting them means moving what every stylesheet selects
-   * on, which is a change of its own rather than a property being added.
+   * **The deeper half is not this.** State reflecting under the declaration's
+   * name is the fault `TreeItem` avoids by mirroring to `data-selected`.
+   * Splitting them means moving what every stylesheet selects on, which is a
+   * change of its own rather than a property being added.
    */
   get defaultSelected(): boolean {
     return this.seeded
@@ -59,16 +58,22 @@ export class HelixHeadlessToggle extends HelixElement {
   private seeded = this.hasAttribute('selected')
 
   /**
+   * Whether this item holds the group's tab stop while nothing is chosen.
+   *
+   * The stop normally rides on the selection, and an unanswered group has no
+   * selection, so without this the keyboard cannot reach it. Written by the
+   * group, with no attribute: it is coordination between elements, and
+   * `tabindex` on a host the consumer rendered is the change a React consumer's
+   * hydration reports and does not patch up.
+   */
+  @property({ attribute: false })
+  focusable = false
+
+  /**
    * Whether this item is the current one.
    */
   @property({ type: Boolean })
   selected = false
-
-  /**
-   * Whether the item can be chosen.
-   */
-  @property({ reflect: true, type: Boolean })
-  disabled = false
 
   /**
    * Moves focus to this item's own control.
@@ -90,31 +95,25 @@ export class HelixHeadlessToggle extends HelixElement {
   }
 
   /**
-   * Whether this item holds the group's tab stop while nothing is chosen.
-   *
-   * The stop normally rides on the selection, and an unanswered group has no
-   * selection, so it had no stop and the keyboard could not reach it. Written
-   * by the group, with no attribute: it is coordination between elements, and
-   * `tabindex` on a host the consumer rendered is the change a React consumer's
-   * hydration reports and does not patch up.
+   * Identifies the item to the group.
    */
-  @property({ attribute: false })
-  focusable = false
+  @property()
+  value = ''
 
   /**
    * Mirrors the chosen state where a stylesheet can select on it.
    *
-   * **A custom state and not the `selected` attribute it used to reflect.** The
-   * parent writes this: a listbox choosing a row, a tab strip moving the tab, a
-   * radio group answering for its set. Reflected, that put the element's own
-   * bookkeeping onto markup a consumer wrote and a consumer's server never sent,
-   * which React reconciles and reports as a mismatch, and which a serialized
-   * element pasted back declares as a choice nobody made. `ElementInternals`
-   * holds it instead, where it is not in the DOM at all.
+   * **A custom state rather than the `selected` attribute.** The parent writes
+   * this: a listbox choosing a row, a tab strip moving the tab, a radio group
+   * answering for its set. Reflected, that puts the element's own bookkeeping
+   * onto markup a consumer wrote and a consumer's server never sent, which
+   * React reconciles and reports as a mismatch, and which a serialized element
+   * pasted back declares as a choice nobody made. `ElementInternals` holds it
+   * instead, where it is not in the DOM at all.
    *
    * Reading `selected` is unaffected and so is writing it: the attribute still
    * seeds the property, which is what `<helix-toggle selected>` in a consumer's
-   * markup means. What stops is the write back. See 302 and 304.
+   * markup means. There is no write back.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)

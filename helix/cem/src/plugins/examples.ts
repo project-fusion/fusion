@@ -14,11 +14,9 @@ import { eachComponent } from '../types.js'
  * docs table would tell a reader that the Form example is about a swallowed
  * submit.
  *
- * `@summary` rather than `@description`, because it is the same one-line job
- * the tag already does on every component class, and a second word for it would
- * be a second convention to remember. The docs column is headed Description
- * because that is what a reader of a table expects to see; the file says
- * `@summary` because that is what this codebase calls a single line.
+ * `@summary` rather than `@description`, because that is already this codebase's
+ * word for a single line. The docs column is headed Description because that is
+ * what a reader of a table expects to see.
  */
 const SUMMARY = /<!--\s*@summary\s+([\s\S]*?)\s*-->/
 
@@ -33,13 +31,9 @@ const SUMMARY = /<!--\s*@summary\s+([\s\S]*?)\s*-->/
  * viewport edge wants `fullscreen`, and one being shown in page context wants
  * `padded`.
  *
- * Absent on almost every example, which is the shape to keep. An annotation on
- * all ninety is a table of defaults maintained by hand; an annotation on the
- * six that differ is six facts.
- *
- * Read here rather than at the site, for the same reason the summary is: the
- * manifest is where a component says what it has, and a second reader parsing
- * the same comment would be a second convention to keep in step.
+ * Annotate only the exceptions. An annotation on every example is a table of
+ * defaults maintained by hand; an annotation on the ones that differ is a
+ * handful of facts.
  */
 const LAYOUT = /<!--\s*@layout\s+([a-z]+)\s*-->/
 
@@ -69,23 +63,20 @@ const oneLine = (value: string): string => value.replace(/\s+/g, ' ').trim()
 /**
  * Attaches a family's examples to its root declaration.
  *
- * The examples were already on disk and already read, by the docs site, which
- * walked `helix/styled/src/<family>/.examples` itself. That worked and put the
- * knowledge in the wrong place: the site is a consumer of this library, and it
- * was reaching past the published interface into the library's source tree to
- * find out what a component ships. Anything else wanting the same list, another
- * site, an editor plugin, a generated README, would have had to reach in the
- * same way and agree with the site by coincidence.
- *
  * The manifest is where a component says what it has, so this is where the
- * examples belong. What lands here is the list and the prose: slug and
- * description. **Not the markup.** The HTML and CSS are the payload the sandbox
- * loads, they are large, and putting them in the manifest would grow a file
- * every consumer parses in order to serve one that few of them render.
+ * examples belong. A site walking `helix/styled/src/<family>/.examples` itself
+ * is a consumer reaching past the published interface into the library's source
+ * tree, and anything else wanting the same list would have to reach in the same
+ * way and agree by coincidence.
+ *
+ * What lands here is the list and the prose: slug and description. **Not the
+ * markup.** The HTML and CSS are the payload the sandbox loads, they are large,
+ * and putting them in the manifest would grow a file every consumer parses in
+ * order to serve one that few of them render.
  *
  * On the root, because an example is the family's, not any one element's.
- * `Card.Root` carries the examples that show `Card.Header` alongside it, and
- * there is no sense in which the header has examples of its own.
+ * `Tabs.Root` carries the examples that show `Tabs.Tab` alongside it, and there
+ * is no sense in which a tab has examples of its own.
  */
 export const examples = (): Plugin => ({
   name: 'helix-examples',
@@ -108,12 +99,10 @@ export const examples = (): Plugin => ({
         continue
       }
 
-      /* `default` first, then alphabetical. The canonical example is the
-         family's headline rather than a variant sitting among the others, and
-         a reader arriving at the list should meet it first. The order is fixed
-         here rather than left to the directory, because `readdirSync` is
-         filesystem order and would differ between a developer's machine and
-         CI, which is a manifest that changes without anything changing. */
+      /* `preview` first, then alphabetical. The order is fixed here rather than
+         left to the directory, because `readdirSync` is filesystem order and
+         would differ between a developer's machine and CI, which is a manifest
+         that changes without anything changing. */
       const found = readdirSync(dir)
         .filter((file) => file.endsWith('.html'))
         .sort((a, b) => (a === 'preview.html' ? -1 : b === 'preview.html' ? 1 : a.localeCompare(b)))

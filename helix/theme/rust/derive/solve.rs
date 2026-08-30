@@ -1,14 +1,11 @@
 //! Solving one ink against every ground it lands on.
 //!
-//! **This is the phase that turned out to be pure**, which the closure hid. In
-//! the TypeScript `solveAgainst` sits inside `deriveTheme` and reads like the
-//! rest of it, but it captures nothing: grounds, sample and target are all
-//! arguments. `solveForAll` is the one that captures, and all it captures is the
-//! surface list, so it is that list applied rather than a different solver.
+//! **This phase is pure**: grounds, sample and target are all arguments, so it
+//! can be tested without deriving anything. `solve_for_all` is this solver
+//! applied to the surface list rather than a different one.
 //!
-//! Worth separating for that reason alone. Everything downstream calls one of
-//! these two, so a mistake here is a mistake in every color the theme emits,
-//! and a pure function is one that can be tested without deriving anything.
+//! Everything downstream calls one of the two, so a mistake here is a mistake in
+//! every color the theme emits.
 
 use crate::derive::Cast;
 use crate::oklch::{
@@ -19,9 +16,9 @@ use crate::oklch::{
 /// Solves one ink against every ground it lands on, keeping whichever candidate
 /// has the best worst case.
 ///
-/// **Grounds are a parameter because the model says which ones**, and that is
-/// the whole correction: a hardcoded surface list solved `primary` against the
-/// page and left it failing on the tinted badge it also sits in.
+/// **Grounds are a parameter because the model says which ones.** A hardcoded
+/// surface list solves `primary` against the page and leaves it failing on the
+/// tinted badge it also sits in.
 ///
 /// One candidate per ground, then the one whose *weakest* pairing is strongest.
 /// Not the average and not the first that passes: a token is one color standing
@@ -33,13 +30,11 @@ use crate::oklch::{
 /// color that cannot be rendered and then measures against the same
 /// unrenderable color: self-consistent, and wrong by however far the fit moves.
 /// `solve_for_all` satisfies this by construction, `Surfaces::solved_against`
-/// returning fitted values, which is why it went unstated until `on_accent`
-/// arrived with a ground list of its own.
+/// returning fitted values; a caller with a ground list of its own has to fit it.
 ///
 /// # Panics
 ///
-/// If handed no grounds. The TypeScript's `reduce` throws on an empty array for
-/// the same reason, and no caller has one: the model supplies them.
+/// If handed no grounds. No caller has one: the model supplies them.
 #[must_use]
 pub fn solve_against(grounds: &[Oklch], sample: Cast, target: f64) -> Oklch {
     assert!(
@@ -73,9 +68,9 @@ pub fn solve_against(grounds: &[Oklch], sample: Cast, target: f64) -> Oklch {
         })
         .collect();
 
-    /* Strictly greater, so a tie keeps the earlier candidate. That is what
-    `reduce` does with no initial value, and it is why the order of the grounds
-    is part of the answer rather than an implementation detail. */
+    /* Strictly greater, so a tie keeps the earlier candidate, which is why the
+    order of the grounds is part of the answer rather than an implementation
+    detail. */
     let mut best = candidates[0];
     for candidate in &candidates[1..] {
         if worst_case(*candidate) > worst_case(best) {

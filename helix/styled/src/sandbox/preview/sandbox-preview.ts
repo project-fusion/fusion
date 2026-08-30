@@ -41,13 +41,31 @@ export interface PreviewConsole {
   type: 'helix-preview-console'
 }
 
+/**
+ * A press inside the frame, which is the one event the page cannot see for
+ * itself.
+ *
+ * Carries nothing. What the page needs to know is that a reader pressed
+ * something here, not where: every overlay outside is dismissed by the fact of
+ * the press, and coordinates in the frame's viewport would not mean anything in
+ * the page's anyway.
+ */
+export interface PreviewPress {
+  type: 'helix-preview-press'
+}
+
 /** How tall the frame says its content is, in CSS pixels. */
 export interface PreviewSize {
   size: number
   type: 'helix-preview-size'
 }
 
-export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender | PreviewSize
+export type PreviewMessage =
+  | PreviewConsole
+  | PreviewPress
+  | PreviewReady
+  | PreviewRender
+  | PreviewSize
 
 /**
  * @summary Renders sandbox source in a frame of its own.
@@ -70,31 +88,24 @@ export type PreviewMessage = PreviewConsole | PreviewReady | PreviewRender | Pre
  * consumer's document rather than something guessed at here.
  *
  * **The source is not trusted, and the frame is what makes that safe.**
- * `fullscreen` is granted for the same reason and found the same way: a video
- * in the preview offered a fullscreen button that did nothing at all, because
- * the policy default is `self`, this frame is not `self`, and a denied request
- * rejects a promise nobody was watching. Two capabilities now, both explicit,
- * both starred.
- *
- * `allow="clipboard-write *"` is granted explicitly, and the star matters: the
- * policy defaults to `self` and this frame has an opaque origin, so it is not
- * `self` and the default denies it. A component inside the preview that copies
- * to the clipboard is otherwise a control that silently does nothing, which is
- * how this was found. Nothing else is granted, and a copy still needs the
- * reader's own gesture.
- *
  * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
  * an opaque origin: script in an example cannot reach this page, its storage,
  * its cookies, or the editor the source was typed into. Without it they could,
  * measured, through an `onerror` handler on an image that fails to load, which
- * `innerHTML` does not strip the way it refuses a `<script>` tag.
- *
- * That is what lets a sandbox hold markup a reader pasted from somewhere, or
- * one day arrived in a shared link, rather than only what its owner typed.
+ * `innerHTML` does not strip the way it refuses a `<script>` tag. That is what
+ * lets a sandbox hold markup a reader pasted from somewhere, or one day arrived
+ * in a shared link, rather than only what its owner typed.
  *
  * `allow-forms` is granted because examples have forms in them and a submit
  * that silently does nothing is a worse lie than one that navigates a frame
  * nobody is looking at. Top-level navigation, popups and modals are not.
+ *
+ * **`allow="clipboard-write *; fullscreen *"`, and the stars matter.** Both
+ * policies default to `self`, and a frame on an opaque origin is not `self`, so
+ * the default denies both: a component that copies to the clipboard and a video
+ * offering a fullscreen button each become a control that silently does nothing,
+ * a denied request rejecting a promise nobody was watching. Nothing else is
+ * granted, and a copy still needs the reader's own gesture.
  *
  * @since 0.1.0
  * @status experimental
@@ -121,34 +132,10 @@ export class HelixSandboxPreview extends HelixElement {
    * It matters more than a background: `light-dark()` is compiled to a shim
    * keyed on this attribute, and of the 56 tokens that differ by scheme the
    * theme engine emits 19. The other 37 would stay light in a dark preview,
-   * including every one of the 24 series colours a chart reads.
+   * including every one of the 24 series colors a chart reads.
    */
   @property({ attribute: 'color-mode' })
   colorMode?: 'dark' | 'light'
-
-  /**
-   * Document the frame loads, which brings the styles and the elements.
-   */
-  @property()
-  src = ''
-
-  /**
-   * Markup to render.
-   */
-  @property()
-  source = ''
-
-  /**
-   * Stylesheet applied inside the frame, alongside the markup.
-   */
-  @property()
-  styles = ''
-
-  /**
-   * Accessible name for the frame.
-   */
-  @property()
-  label = 'Preview'
 
   /**
    * Writing direction inside the frame.
@@ -157,10 +144,34 @@ export class HelixSandboxPreview extends HelixElement {
   direction?: 'rtl'
 
   /**
+   * Accessible name for the frame.
+   */
+  @property()
+  label = 'Preview'
+
+  /**
    * How the example is placed in the frame.
    */
   @property({ reflect: true })
   layout?: 'padded' | 'centered' | 'fullscreen' | 'hug'
+
+  /**
+   * Markup to render.
+   */
+  @property()
+  source = ''
+
+  /**
+   * Document the frame loads, which brings the styles and the elements.
+   */
+  @property()
+  src = ''
+
+  /**
+   * Stylesheet applied inside the frame, alongside the markup.
+   */
+  @property()
+  styles = ''
 
   /** Whether the frame has said it is listening. */
   private ready = false
@@ -172,14 +183,14 @@ export class HelixSandboxPreview extends HelixElement {
   /**
    * The frame's document has finished loading, so its listener exists.
    *
-   * **The announcement is one shot and the parent can miss it.** The frame
-   * posts `helix-preview-ready` at the end of its own module evaluation and
-   * never repeats it, and `handleMessage` drops anything whose `source` is not
+   * **The announcement is one shot and the parent can miss it.** The frame posts
+   * `helix-preview-ready` at the end of its own module evaluation and never
+   * repeats it, and `handleMessage` drops anything whose `source` is not
    * `this.frame?.contentWindow`. That getter reads the render root, so it is
-   * null until this element has rendered once. A frame that loads before that
-   * render commits therefore announces into a guard that refuses it, `ready`
-   * stays false, and `send` returns early forever: the source is set, the
-   * markup is correct, and the preview is blank with nothing logged.
+   * null until this element has rendered once: a frame that loads before that
+   * render commits announces into a guard that refuses it, `ready` stays false,
+   * and `send` returns early forever, leaving the source set, the markup
+   * correct, and the preview blank with nothing logged.
    *
    * **It is a race, so it hides in the one place nobody looks.** The frame is
    * only fast enough to win when its document and its bundle are already in the
@@ -227,6 +238,29 @@ export class HelixSandboxPreview extends HelixElement {
     if (event.data?.type === 'helix-preview-console') {
       this.dispatchEvent(new HelixConsoleEvent({ level: event.data.level, text: event.data.text }))
     }
+    /* **A press in the frame, put back into the page as a press.**
+     *
+     * The frame is on an opaque origin, which is the point of it, and a
+     * consequence is that a press inside is invisible outside: the event does
+     * not cross the boundary, the document cannot listen to a document it may
+     * not touch, and in WebKit the press moves no focus and blurs no window
+     * either, so there is nothing at all to infer it from. Measured: with the
+     * sandbox's settings menu open, pressing the component it configures left
+     * the menu standing over it, and the only way out was Escape or the trigger.
+     *
+     * So the frame reports it and this element re-states it where the page can
+     * hear it. A real `pointerdown` rather than a name of our own, because
+     * every light-dismiss in the library — and every one a consumer wrote —
+     * already listens for exactly that, and what happened *was* a press. It
+     * carries no coordinates for the reason the message does not: this element
+     * is where it happened, as far as the page is concerned.
+     *
+     * `composed` so it leaves whatever shadow root this element sits in, which
+     * is how those listeners find it in the path.
+     */
+    if (event.data?.type === 'helix-preview-press') {
+      this.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    }
     /* Relayed rather than acted on. What the frame measured is a fact about the
        example; how much room to give it is a decision, and it belongs to
        whatever laid this element out. A preview that resized itself would be
@@ -255,12 +289,11 @@ export class HelixSandboxPreview extends HelixElement {
   /**
    * Sends once the typing stops, replacing anything already waiting.
    *
-   * A frame was tried first and is the wrong unit. Keystrokes arrive fifty to a
-   * hundred and fifty milliseconds apart, so each one lands in a frame of its
-   * own and coalescing by frame coalesces nothing: the example was still being
-   * rebuilt per character. The delay has to be longer than the gap between
-   * keystrokes to catch a burst, and short enough to read as immediate when the
-   * typing stops.
+   * A frame is the wrong unit. Keystrokes arrive fifty to a hundred and fifty
+   * milliseconds apart, so each one lands in a frame of its own and coalescing
+   * by frame coalesces nothing, leaving the example rebuilt per character. The
+   * delay has to be longer than the gap between keystrokes to catch a burst, and
+   * short enough to read as immediate when the typing stops.
    */
   private scheduleSend(): void {
     clearTimeout(this.pending)
@@ -332,12 +365,10 @@ export class HelixSandboxPreview extends HelixElement {
      *
      * The frame renders by assigning `innerHTML`, which throws away the example
      * and builds it again, and every custom element in it disconnects and
-     * upgrades a second time. Sent on each update, that happened once per
-     * keystroke: an example of any size was being torn down and rebuilt for
-     * every character, and the work grows with the example while the typing
-     * does not.
+     * upgrades a second time. Sent on each update that is once per keystroke,
+     * and the work grows with the example while the typing does not.
      *
-     * A frame is short enough to feel immediate and long enough that a burst of
+     * `SETTLE` is short enough to feel immediate and long enough that a burst of
      * keystrokes is one render. Layout, direction and the color mode go
      * straight out: they arrive one at a time from a menu, there is nothing to
      * coalesce, and a delay there is a delay a reader can see. */

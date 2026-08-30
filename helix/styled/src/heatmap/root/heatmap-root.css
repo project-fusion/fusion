@@ -19,10 +19,9 @@
      time into a row. One `--heatmap-cell-size` could say either and not both.
 
      Each axis falls back to the shared hook, so `--heatmap-cell-size` still sets
-     both and existing markup is untouched, and the private is what the rules
-     read: a consumer moving one hook moves every rule that draws with it, and
-     the fallback chain is written twice rather than five times. */
-  --_heatmap-cell-width: var(--heatmap-cell-width, var(--heatmap-cell-size, 0.75rem));
+     both, and the rules read the private names, so the fallback chain is written
+     once per axis rather than at every use. */
+  --_heatmap-cell-width: var(--heatmap-cell-inline-size, var(--heatmap-cell-size, 0.75rem));
   --_heatmap-cell-height: var(--heatmap-cell-height, var(--heatmap-cell-size, 0.75rem));
 
   /* **What a tone name is worth, which the tier below cannot say.**
@@ -93,7 +92,7 @@
   gap: var(--heatmap-gap, var(--helix-space-2xs));
   grid-auto-columns: var(--_heatmap-cell-width);
   grid-auto-flow: column;
-  grid-template-rows: repeat(var(--_heatmap-rows, 1), var(--_heatmap-cell-height));
+  grid-template-rows: repeat(var(--heatmap-rows, 1), var(--_heatmap-cell-height));
   justify-content: start;
   /* The tooltip's mark is placed against this box. */
   position: relative;
@@ -237,7 +236,7 @@
    page a printer will render unevenly. Keeping the fills but adding a hairline
    is what makes the cells countable on paper whatever the fills come out like.
    `@media print` does not cross a shadow boundary, so every family says it for
-   itself. See 165. */
+   itself. */
 @media print {
   [part="cell"] {
     outline: var(--helix-border-thin) solid var(--helix-color-border);

@@ -18,19 +18,18 @@ const item = async (attributes = ''): Promise<Item> =>
  * accordion's.
  *
  * **The accordion already proves the coordination**, which is `single` closing
- * the peers and one section staying open: it is named 29 times in this family's
- * specs. What one section owns alone is that being closed is a fact in its
- * markup rather than a height its stylesheet chose, and that is exactly the
- * thing an accordion-level spec cannot see: from up there a section collapsed by
- * `grid-template-rows: 0fr` and one that is genuinely closed look the same, and
- * for a while ours was the first.
+ * the peers and one section staying open. What one section owns alone is that
+ * being closed is a fact in its markup rather than a height its stylesheet
+ * chose, and that is exactly the thing an accordion-level spec cannot see: from
+ * up there a section collapsed by `grid-template-rows: 0fr` and one that is
+ * genuinely closed look the same.
  */
 describe('one accordion section', () => {
-  /* Delete every stylesheet and a closed section is still closed. `hidden` takes
-     it off the screen, `inert` takes it out of the tab order and the
-     accessibility tree, and the trigger says which it is. Before this was true
-     the region was `inert` and nothing else: unreachable, unannounced, and every
-     pixel still painted. */
+  /* Delete every stylesheet and a closed section is still closed. All three are
+     required: `hidden` takes it off the screen, `inert` takes it out of the tab
+     order and the accessibility tree, and the trigger says which it is. `inert`
+     alone leaves the region unreachable, unannounced, and every pixel still
+     painted. */
   test('is closed in its markup, not in a stylesheet', async () => {
     const host = await item()
     const content = part(host, 'content')

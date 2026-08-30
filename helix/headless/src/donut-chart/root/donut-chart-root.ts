@@ -33,12 +33,10 @@ const GAP = 9999
  * How much of the radius the ring takes, by name.
  *
  * **The outer edge is fixed and the radius follows the thickness**, which is
- * what makes `none` a pie and makes clipping impossible. The stroke sits astride
- * its own radius, so a ring drawn at a fixed `r` grows outward as well as
- * inward: measured against a 100 box, the old fixed `r=40` had an unstated
- * ceiling at a thickness of 20, and anything past it crossed the view box and
- * was cut with nothing to say so. Closing the hole that way would have needed a
- * thickness of 80, spanning `r=0` to `r=80` in a box whose half is 50.
+ * what makes `none` a pie. The stroke sits astride its own radius, so a ring
+ * drawn at a fixed `r` grows outward as well as inward: against a 100 box, a
+ * fixed `r=40` has an unstated ceiling at a thickness of 20, and anything past
+ * it crosses the view box and is cut with nothing to say so.
  *
  * Derived instead, `r = EDGE - thickness / 2`, the outer edge lands on `EDGE`
  * for every value and the inner edge is `EDGE - thickness`. A pie is where the
@@ -70,7 +68,7 @@ const THICKNESS: Record<string, number> = {
  *
  * **It refuses negative values rather than drawing them.** A share of a whole
  * cannot be less than nothing, and an arc for a negative number either runs
- * backwards over its neighbours or is silently dropped. Those rows are skipped
+ * backwards over its neighbors or is silently dropped. Those rows are skipped
  * and the total is of what is left, which is the only reading that stays true.
  *
  * **The shape is drawn with a dashed stroke, not with arc commands.** One
@@ -116,7 +114,6 @@ const THICKNESS: Record<string, number> = {
  */
 @customElement('helix-headless-donut-chart')
 export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
-  /* The slices, in table order, with anything negative dropped. */
   /**
    * The pointer is not mapped across this one.
    *
@@ -127,11 +124,10 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * reading for opposite sides of the chart. So the slices say which one they
    * are and this only holds the answer.
    *
-   * Set here rather than in a constructor, and that is not a style choice. The
-   * analyzer reads `this.pointer.axis = 'none'` in a constructor body as a
-   * declaration of a public field called `axis`, and failed the build with
-   * `HelixHeadlessDonutChart.tracks has no description` for a member that does not
-   * exist on this class at all.
+   * Set here rather than in a constructor, and it must not move there: the
+   * analyzer reads `this.pointer.axis = 'none'` in a constructor body as the
+   * declaration of a public field, and fails the build demanding a description
+   * for a member this class does not have.
    */
   override connectedCallback(): void {
     super.connectedCallback()
@@ -151,11 +147,11 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * measured from anything but zero is, which is why this is a value here and
    * the bar chart's baseline is not a property at all.
    *
-   * **Geometry rather than a CSS hook, and it had to move.** This was
-   * `--donut-chart-thickness`, and the dash arithmetic needs the circumference,
-   * which needs the radius: reading a custom property means `getComputedStyle`,
-   * which is client-only, so a server would have drawn a different ring than
-   * the client. A plot's proportions are markup for the same reason `curve` is.
+   * **Geometry rather than a CSS hook.** The dash arithmetic needs the
+   * circumference, which needs the radius, and reading a custom property means
+   * `getComputedStyle`, which is client-only: a server would draw a different
+   * ring than the client. A plot's proportions are markup for the same reason
+   * `curve` is.
    */
   @property({ reflect: true })
   hole?: 'large' | 'none' | 'small'
@@ -173,11 +169,10 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * the band is, this is angular and says how far round it goes. A `half`
    * `none` is a semi-pie and is a real thing to want.
    *
-   * **Not a gauge**, and the distinction is worth stating because this row was
-   * first filed as one. A gauge is one value against a range, which is a
-   * different data shape entirely and is `Meter`, whose `round` example already
-   * draws the reading as a ring. This divides a whole into parts and then
-   * declines to use the bottom half of the circle.
+   * **Not a gauge.** A gauge is one value against a range, which is a different
+   * data shape entirely and is `Meter`, whose `round` example already draws the
+   * reading as a ring. This divides a whole into parts and then declines to use
+   * the bottom half of the circle.
    *
    * Reflected, because the stylesheet has three things to say about it: the
    * rotation that puts the first slice at nine o'clock, the aspect ratio of a
@@ -237,16 +232,10 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    */
   protected renderPlot(shares: { fraction: number; start: number }[]): TemplateResult {
     /* The thickness is declared here, on the box that holds both the ring and
-       the middle, and not on the slices.
-     *
-     * It was on each `<circle>`, and `[part="center"]` read it to size the hole
-     * it fills. A custom property inherits down and never sideways, so the
-     * middle, being a sibling, always got the fallback: the hole was sized as if
-     * every ring were the resting thickness. At `hole="large"` that made the
-     * middle smaller than the actual hole and the total fitted with room to
-     * spare, and at the default the two matched exactly and the total overflowed
-     * onto the slices. One reads as fine and the other as a bug, from one
-     * mistake. */
+       the middle, and never on the slices. A custom property inherits down and
+       never sideways, so `[part="center"]` is a sibling of the circles and would
+       only ever read the fallback, sizing the hole as if every ring were the
+       resting thickness. */
     return html`<div
       aria-hidden="true"
       id="helix-chart-plot"
@@ -330,15 +319,14 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * path is here for every donut and is `fill: none; stroke: none` until
    * something asks for it.
    *
-   * **Not a replacement for the dash, which was the first plan.** The dash
-   * carries three jobs and only one of them is the shape: a share growing is a
-   * `stroke-dasharray` interpolating with no reflow, and `@starting-style` on
-   * that same property is the whole reason the ring sweeps in rather than
-   * appearing. A `d` cannot do either. CSS interpolates one only between paths
-   * of identical command structure, and the large-arc flag flips the moment a
-   * slice crosses a half turn, so a growing slice would pop partway through the
-   * transition it was meant to smooth. Both animations stay on the dash and this
-   * path follows it.
+   * **Not a replacement for the dash.** The dash carries three jobs and only
+   * one of them is the shape: a share growing is a `stroke-dasharray`
+   * interpolating with no reflow, and `@starting-style` on that same property is
+   * the whole reason the ring sweeps in rather than appearing. A `d` cannot do
+   * either. CSS interpolates one only between paths of identical command
+   * structure, and the large-arc flag flips the moment a slice crosses a half
+   * turn, so a growing slice would pop partway through the transition it was
+   * meant to smooth. Both animations stay on the dash and this path follows it.
    *
    * The turn to twelve o'clock is arithmetic here rather than the rotation the
    * stylesheet gives the circles. That rule uses `transform-box: fill-box`, so
@@ -386,16 +374,14 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
        Ids are scoped to the shadow root, so an index is enough to keep them
        apart, and two donuts on a page cannot collide. */
     /* **`fill="none"` as an attribute, not a rule, because this tier has
-         no rules.** An SVG path fills black by default and the styled tier
-         says `fill: none` in its own stylesheet, so the shape was invisible
-         there and four black slices covering the ring everywhere else. Caught
-         by retaking the visual baselines: the headless donut lost two of its
-         four greys to a closed shape nobody had told to stop filling.
+         no rules.** An SVG path fills black by default, and the styled tier's
+         own `fill: none` covers only that tier: everywhere else these closed
+         shapes paint over the ring.
 
          A presentation attribute loses to any CSS rule, so the styled tier
          still decides and a consumer can still fill this if they want one.
-         What it cannot do any more is fill by accident on the tier whose
-         whole premise is that it ships no CSS. */
+         What it cannot do is fill by accident on the tier whose whole premise
+         is that it ships no CSS. */
     const clip = `helix-donut-edge-${index}`
     return svg`<clipPath id=${clip}><path d=${shape} /></clipPath>
     <path
@@ -422,24 +408,23 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     if (!share) {
       return drawTooltip(this.sourceRows, at, this.tag('tooltip'))
     }
-    /* **Outside the ring, on the slice's own bearing.** Centered in the hole was
-       the first version: harmless over a donut, since the hole is empty, and it
-       covers the data on a pie, and in neither case does it say *which* slice it
-       means. Out here it does, and one rule serves both.
-     *
-     * The mid-angle, less a quarter turn because the ring is rotated to start
-     * at twelve o'clock and this arithmetic starts at three. The point is the
-     * outer edge, and the box is pushed a little further along the same bearing
-     * so its arrow rests on the ring rather than in it. */
+    /* **Outside the ring, on the slice's own bearing**, rather than centered in
+       the hole: centered covers the data on a pie, and in neither shape does it
+       say *which* slice it means. Out here one rule serves both.
+
+       The mid-angle, less a quarter turn because the ring is rotated to start
+       at twelve o'clock and this arithmetic starts at three. The point is the
+       outer edge, and the box is pushed a little further along the same bearing
+       so its arrow rests on the ring rather than in it. */
     const angle = (share.start + share.fraction / 2) * 2 * Math.PI - Math.PI / 2
     const edge = EDGE
     const x = CENTER + Math.cos(angle) * edge
     const y = CENTER + Math.sin(angle) * edge
     return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
       /* The preferred side from the bearing's dominant axis, and
-         `FloatingController` moves it if that side does not fit. Four fixed
-         sides could not express a bearing at all, which is what made the arrow
-         miss the ring; a preference plus flipping can. */
+         `FloatingController` moves it if that side does not fit. A fixed side
+         cannot express a bearing, so the arrow misses the ring; a preference
+         plus flipping can. */
       placement:
         Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))
           ? Math.cos(angle) > 0

@@ -9,11 +9,11 @@
  * to copy: `@fusion.dev/helix` is the theme, and a second one growing inside an
  * example would be a design system nobody decided on.
  *
- * **The input is the box, and a first draft of this got that backwards.** It
- * painted `box` and left the input alone, so the browser drew its own control
- * beside the frame and what a reader saw was the UA checkbox, blue tick and
- * all, with the rules below doing nothing visible. `appearance: none` on the
- * real input is the whole technique, and it is what the styled tier does too.
+ * **The input is the box.** Paint `box` and leave the input alone and the
+ * browser draws its own control beside the frame: what a reader sees is the UA
+ * checkbox, blue tick and all, with the rules below doing nothing visible.
+ * `appearance: none` on the real input is the whole technique, and it is what
+ * the styled tier does too.
  *
  * Parts are the interface. `::part()` is the published door into a shadow root,
  * so nothing here depends on the component's internal structure. */

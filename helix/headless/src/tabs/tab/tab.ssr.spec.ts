@@ -3,8 +3,7 @@ import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ss
 import { html } from 'lit'
 import '../index.js'
 
-/* The two questions a server spec can answer for any part, and the two that
-   have each caught a real fault here.
+/* The two questions a server spec answers for any part.
 
    **That it renders at all**, which is what fails when a component reaches for
    the DOM to draw itself: `querySelector` is undefined on the server and any
@@ -14,23 +13,20 @@ import '../index.js'
    **That the host carries no attribute of its own beyond a `data-` mirror.** An
    element writing its own bookkeeping onto itself is markup the server never
    sent, which React reports as a hydration mismatch and a copy-paste re-parses
-   as a declaration. `Tree.chevronPlacement`, `Toast.placement` and
-   `Image.status` were each caught that way.
+   as a declaration.
 
-   `data-` names were the exception and are nearly none of them now. A boolean
-   state that is true only because a reader acted still mirrors to one, since
-   the write falls long after hydration and a pasted `data-closed` is inert:
-   `Toast.Item` is the case, and a first version of this asserted no attributes
-   at all and reported it for doing exactly the sanctioned thing. A state that
-   can be true on the first update mirrors to nothing at all. `checked`, `open`,
-   `invalid` and `has-label` moved to `ElementInternals.states` on 27 Aug 2026,
-   which is not in the DOM, so the server's output and the client's cannot
-   disagree about them and there is nothing here to assert.
+   The `data-` exception is narrow. A boolean state that is true only because a
+   reader acted still mirrors to one, since the write falls long after hydration
+   and a pasted `data-closed` is inert: `Toast.Item` is the case. A state that
+   can be true on the first update mirrors to nothing at all, and `checked`,
+   `open`, `invalid` and `has-label` live in `ElementInternals.states`, which is
+   not in the DOM, so the server's output and the client's cannot disagree about
+   them and there is nothing here to assert.
 
-   What it deliberately does not assert is the part's own markup. That is the
+   It deliberately does not assert the part's own markup. That is the
    component's business and belongs in a spec written about it, not in one
-   generated across twenty-five of them: an assertion nobody chose is an
-   assertion nobody maintains. */
+   generated across every part: an assertion nobody chose is an assertion nobody
+   maintains. */
 describe('tabs tab server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(withoutStyles(ssr(html`<helix-headless-tab></helix-headless-tab>`))).toContain(

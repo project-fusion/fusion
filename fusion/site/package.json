@@ -1,0 +1,39 @@
+{
+  "name": "@fusion.dev/site",
+  "description": "fusion.dev: the landing page, the verticals, and the tools under them.",
+  "version": "0.0.0-dev",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "bun run catalog && bun run frame && bun run specs && next build",
+    "catalog": "bun scripts/build-catalog.mjs",
+    "dev": "bun run --filter @fusion.dev/helix-theme wasm && bun run catalog && bun run frame && bun run specs && next dev",
+    "faces": "bun scripts/build-faces.mjs",
+    "frame": "bun scripts/build-frame.mjs",
+    "specs": "bun scripts/build-specs.mjs",
+    "start": "next start",
+    "themed-page": "bun scripts/build-themed-page.mjs",
+    "typecheck": "bun run catalog && bun run frame && bun run specs && tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@fusion.dev/insights": "workspace:*",
+    "@fusion.dev/helix-docs": "workspace:*",
+    "@fusion.dev/helix-gallery": "workspace:*",
+    "@fusion.dev/helix-sandbox": "workspace:*",
+    "@fusion.dev/helix-styles": "workspace:*",
+    "@fusion.dev/helix-theme": "workspace:*",
+    "@fusion.dev/helix": "workspace:*",
+    "next": "^16.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@fusion.dev/scripts": "workspace:*",
+    "@mdx-js/mdx": "^3.1.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1"
+  }
+}

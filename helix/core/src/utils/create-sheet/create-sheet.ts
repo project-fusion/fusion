@@ -5,7 +5,7 @@ import { type CSSResult, unsafeCSS } from 'lit'
  *
  * Component styles live in real `.css` files rather than `css` tagged
  * templates, so they get CSS tooling: syntax highlighting, formatters, the
- * token linter, and a diff that reads as CSS. `bun run styles` compiles each
+ * token linter, and a diff that reads as CSS. `turbo run styles` compiles each
  * one into a sibling `.css.ts` that calls this.
  *
  * The `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a

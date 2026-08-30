@@ -75,13 +75,8 @@ export interface PopoverOptions {
 /**
  * A surface that floats against something, in the top layer, until dismissed.
  *
- * Three things always travel together and were written out longhand three
- * times: the popover API, a `FloatingController` and a `DismissController`.
- * Individually each is small, which is exactly why the copies drifted rather
- * than being noticed. **`Select` never called `showPopover` at all**, so its
- * list was an ordinary positioned panel and any ancestor with `overflow:
- * hidden` clipped it, while a menu two folders away in the same position did
- * not. That is not a difference anyone chose.
+ * Bundles the three things that always travel together: the popover API, a
+ * `FloatingController` and a `DismissController`.
  *
  * **The top layer is the whole point.** A floating panel has to escape every
  * clipping ancestor between it and the page, and `position: fixed` does not do
@@ -169,8 +164,7 @@ export class PopoverController implements ReactiveController {
          element with no `popover` attribute throws `NotSupportedError`, from
          inside the promise the host called this in, so it surfaces as an
          unhandled rejection naming a method rather than as the thing that is
-         actually wrong. Which is how `Select` looked for as long as it was
-         broken: no error at all, just a panel that could be clipped. */
+         actually wrong. */
       if (!surface.hasAttribute('popover')) {
         throw new Error(
           'PopoverController: the surface needs a `popover` attribute to reach the top layer',

@@ -25,14 +25,14 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * `Menu` is built from the same pieces. What is not shared is what actually
  * differs: a dial has no submenus, no headers, no checkable rows and no long
  * list to type ahead through, and shipping it as an appearance of `Menu` would
- * have meant defining what a dial with a submenu in it does.
+ * mean defining what a dial with a submenu in it does.
  *
  * **The trigger is a control the consumer slots**, and the floating action
  * button is the usual one: `helix-icon-button` with `shape="circle"` and
- * `raised`. There is no `helix-fab` here, and the reason is worth stating,
- * because a component would have re-declared `emphasis`, `tone`, `label` and
- * a size around a control that already has all four. A round raised button is a
- * shape, and where it sits is `data-dock` in the base layer.
+ * `raised`. There is no `helix-fab`, because it would re-declare `emphasis`,
+ * `tone`, `label` and a size around a control that already has all four. A
+ * round raised button is a shape, and where it sits is `data-dock` in the base
+ * layer.
  *
  * **Nothing is reserved from the keyboard.** A menu that drills has to keep the
  * horizontal pair for going in and coming back; a dial goes nowhere, so all four
@@ -54,7 +54,6 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart actions - The region the actions are drawn in.
- * @csspart icon - A glyph this component draws.
  * @csspart trigger - The default trigger, where none was slotted.
  */
 @customElement('helix-headless-speed-dial')
@@ -66,6 +65,12 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   label = 'Actions'
 
   /**
+   * Space between the trigger and the actions, in pixels.
+   */
+  @property({ type: Number })
+  offset = 12
+
+  /**
    * Which way the actions fan out. They move if that side does not fit.
    *
    * Up by default, because the control this hangs off is usually docked to the
@@ -73,12 +78,6 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    */
   @property()
   placement: Placement = 'top-end'
-
-  /**
-   * Space between the trigger and the actions, in pixels.
-   */
-  @property({ type: Number })
-  offset = 12
 
   /* Nothing reserved: see the note above. `selects` is false because arriving at
      Delete must not delete, which is the difference between a set of commands
@@ -167,18 +166,16 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * who will forget, and the failure is silent to everyone who can see the
    * screen.
    *
-   * **Every word of that survives; the mechanism does not.** This wrote
-   * `aria-expanded` and `aria-haspopup` onto the consumer's element with
-   * `setAttribute`, and measured against React 19.2.8 that is a hydration
-   * mismatch React reports and does not patch up. `tellDisclosure` carries the
-   * argument and the measurement: the state travels as a property now, into the
-   * trigger's own shadow root, where React neither looks nor compares.
+   * **Never `setAttribute`.** Writing `aria-expanded` onto the consumer's
+   * element is a hydration mismatch React reports and does not patch up,
+   * measured against React 19.2.8. `tellDisclosure` carries the argument and the
+   * measurement: the state travels as a property, into the trigger's own shadow
+   * root, where React neither looks nor compares.
    *
-   * `aria-haspopup` goes with it rather than being written separately. It is a
-   * constant, so it could stay an attribute without changing on every open, and
-   * an attribute the consumer's server never sent is a mismatch whether or not
-   * it moves afterwards: that was measured too, both load orders. A trigger that
-   * says it is expanded is already saying it has something to expand.
+   * `aria-haspopup` goes with it rather than being written separately. An
+   * attribute the consumer's server never sent is a mismatch whether or not it
+   * moves afterwards, measured in both load orders, and a trigger that says it
+   * is expanded is already saying it has something to expand.
    */
   private announce(): void {
     const trigger = this.trigger
@@ -204,14 +201,11 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
       this.updateComplete.then(() => {
         if (this.open) {
           /* The first action that can *take* focus, not the first action. A
-             dial whose first item is disabled opened onto a row that refuses
-             focus, so the reader landed nowhere and their first arrow key
-             started from nothing.
-
-             `KeyboardNavigationController` has always filtered disabled items,
-             which is why the arrows were fine and this was not: the audit read
-             the fault into `items` and it was only ever here, at the one place
-             that reaches past the controller and indexes the list itself. */
+             dial whose first item is disabled otherwise opens onto a row that
+             refuses focus, so the reader lands nowhere and their first arrow
+             key starts from nothing. `KeyboardNavigationController` filters
+             disabled items itself; this is the one place that reaches past it
+             and indexes the list. */
           this.items.find((one) => !one.disabled)?.focusItem()
         }
       })
@@ -226,10 +220,9 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    * **This is the case the tier rule blocks and a render method unblocks.** A
    * bare `<button>` is what the headless tier can write: it must not reach for
    * `helix-button`, which lives a tier above and would make `headless` depend
-   * on `web`. So the base draws the plain control and a tier that has buttons
-   * of its own overrides this to use one, which is the whole shape #76 exists
-   * for. Written inline the only way to change it was to reimplement the
-   * template, panel and all.
+   * on `styled`. So the base draws the plain control and a tier that has buttons
+   * of its own overrides this to use one. Written inline, the only way
+   * to change it would be to reimplement the template, panel and all.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}>
@@ -241,10 +234,9 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
         aria-label=${this.label}
       >
         ${
-          /* A glyph, because the fallback was an empty `<button>`: a consumer
-             who slots no trigger got a control with nothing in it, and a
-             floating action button whose whole job is to be found. `plus` is
-             what a speed dial opens with everywhere it exists. */
+          /* A glyph, so a consumer who slots no trigger does not get an empty
+             control for a button whose whole job is to be found. `plus` is what
+             a speed dial opens with everywhere it exists. */
           ''
         }
         ${drawIcon(plus)}

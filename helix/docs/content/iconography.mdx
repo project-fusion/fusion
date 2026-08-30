@@ -1,5 +1,5 @@
 ---
-description: 103 glyphs, one geometry, and how to draw one that is not in the set.
+description: 105 glyphs, one geometry, and how to draw one that is not in the set.
 section: Foundations
 title: Iconography
 ---
@@ -10,10 +10,12 @@ title: Iconography
 <helix-icon name="trash"></helix-icon>
 ```
 
-103 glyphs, from Phosphor, drawn on a 256 box at stroke-width 16. That is
+105 glyphs, from Phosphor, drawn on a 256 box at Phosphor's bold weight. That is
 Phosphor's own geometry and it is kept rather than rescaled: normalizing to a 24
 box would change the optical weight of every glyph and stop the set matching
-anything upstream.
+anything upstream. Bold rather than regular, because Phosphor's regular is a
+hairline beside the medium weight this library sets its text in, and an icon
+that reads lighter than the words next to it is the opposite of a mark.
 
 ## Size and color come from the context
 
@@ -63,18 +65,19 @@ failure rather than an empty box.
 
 ## Adding one
 
-Drop the SVG into `helix/icons/raw` and run `bun run icons`. The set is
-generated from those files, so adding a glyph is adding a file rather than
-hand-transcribing a path into a TypeScript object.
+Add the name to `helix/icons/icons.txt` and run `turbo run icons`. Phosphor names
+resolve from `@phosphor-icons/core` at build time, so adding a glyph is adding a
+line rather than hand-transcribing a path into a TypeScript object.
 
-Keep to the same geometry: 256 box, stroke-width 16, no fill. A glyph drawn at a
-different weight is visible immediately when it sits beside one that was not.
+A mark Phosphor does not draw goes into `helix/icons/raw` as an SVG under the
+same name, and is read from there when the package has no match. Keep it to the
+same geometry, a 256 box at the bold weight: a glyph drawn at a different weight
+is visible immediately when it sits beside one that was not.
 
 ## Icons this set does not have
 
 Product marks. Helix and Cortex have marks and they live in the icon package,
 but a mark is not an icon: it identifies a product and does not mean an action.
-Three earlier attempts at product marks were removed for being pictograms of a
-metaphor standing beside a parent that is a geometric monogram, and the rule
-that replaced them is that **a mark is one rounded body with material removed**.
-If you are reaching for the icon set to draw a logo, that is the wrong drawer.
+**A mark is one rounded body with material removed**, never a pictogram of a
+metaphor, because the parent it stands beside is a geometric monogram. If you
+are reaching for the icon set to draw a logo, that is the wrong drawer.

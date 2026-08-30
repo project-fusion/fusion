@@ -1,12 +1,14 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostTag, ssr } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-const markup = ssr(html`<helix-steps label="Checkout">
+const markup = withoutStyles(
+  ssr(html`<helix-steps label="Checkout">
   <helix-step complete>Details</helix-step>
   <helix-step current>Payment</helix-step>
-</helix-steps>`)
+</helix-steps>`),
+)
 
 describe('steps server output', () => {
   test('the marker and the body ship before any script runs', () => {

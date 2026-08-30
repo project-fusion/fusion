@@ -27,14 +27,12 @@ slot[hidden] {
   color: var(--helix-color-success);
 }
 
-/* And it stays loud under the pointer, which it did not.
+/* And it stays loud under the pointer, which needs this second rule.
  *
  * `IconButton`'s hover is `:host(:not(:disabled)) [part="button"]:hover`, which
- * is (0,4,0), against (0,2,0) here: the hover won on specificity whatever the
- * order of the sheets, so the check mark went back to the hover ink the moment
- * a reader looked at it. They are still on the button they just pressed, which
- * is the one moment the answer matters, and the answer is the more important of
- * the two. */
+ * is (0,4,0), against (0,2,0) for the plain `[data-copied]` rule above: the
+ * hover wins on specificity whatever the order of the sheets, so the check mark
+ * goes back to the hover ink at the one moment a reader is looking at it. */
 :host(:not(:disabled)) [part="button"][data-copied]:hover {
   color: var(--helix-color-success);
 }
@@ -57,12 +55,13 @@ slot > svg {
 
 /* Not printed, being a control.
  *
- * Paper cannot be pressed. A button prints its chrome and its label, and the chrome is the half that says press me, which on a page is an instruction to do the one thing that is not available.
+ * A printed button is chrome saying press me on a page where pressing is the one
+ * thing not available.
  *
  * Here rather than in a consumer's stylesheet, and that is the whole reason
  * every component needs its own: `@media print` does not cross a shadow
  * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. See 165. */
+ * this on a component's behalf. */
 @media print {
   :host {
     display: none;

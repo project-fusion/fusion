@@ -21,8 +21,8 @@
  *
  * Not `DataRow`: `@fusion.dev/helix-core` already exports one, for a cell read out of a
  * chart series, and the headless barrel re-exports both. Two different `DataRow`s
- * reaching a consumer through one package is the kind of ambiguity TypeScript
- * refuses outright, which is how this was caught.
+ * reaching a consumer through one package is an ambiguity TypeScript refuses
+ * outright.
  */
 export type DataRow = Readonly<Record<string, unknown>>
 
@@ -183,9 +183,7 @@ const text = (value: unknown): string => {
  * **`sign` is applied in here rather than to the result**, and that is why it is
  * a parameter rather than the caller's multiplication. Written the obvious way,
  * as `sign * compare(a, b)`, the constant this returns for a hole flips with the
- * direction and the holes lead a descending sort: the comment above it claimed
- * otherwise for as long as it took the spec to be written, which is the argument
- * for writing the spec.
+ * direction and the holes lead a descending sort.
  */
 const compare = (left: unknown, right: unknown, sign: number): number => {
   const leftMissing = left === null || left === undefined || left === ''

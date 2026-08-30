@@ -74,15 +74,13 @@
  * component in a different state, not a different component, and a reader
  * should not have to work out that they are looking at the same control.
  *
- * **The segment is never anchored to either end, which is the correction.** It
- * used to grow from the inline start: forty per cent of every cycle was a bar
+ * **The segment is never anchored to either end.** A fill that reaches the end
+ * reads as finished and a fill that starts at the start reads as a measurement,
+ * and the state that must never say "this much is done" would then say it twice
+ * a second: anchored to the inline start, forty per cent of every cycle is a bar
  * fixed to the left edge getting wider, which is a determinate bar filling.
  * Frozen at eight points of one cycle and laid out as a strip, the first half
- * read 0, 15, 55, 60 per cent and stalled there before traveling, so the state
- * that must never say "this much is done" said it twice a second. The file's own
- * note two lines down had the right rule and applied it to one end only: a fill
- * that reaches the end reads as finished, and a fill that starts at the start
- * reads as a measurement.
+ * read 0, 15, 55, 60 per cent and stalled there before traveling.
  *
  * So it enters from before the track and leaves past the end of it, and the only
  * frames where it touches an edge are the ones where it is half off the screen.
@@ -104,15 +102,14 @@
    the slowest duration token, so a theme that slows its motion slows this
    with it.
 
-   **On the host, and that is not tidying.** It was declared on the indicator,
-   which is the only element that read it while the bar was the only shape.
-   Custom properties inherit downward and the ring's `<svg>` is the indicator's
-   *parent*, so the rotation written against it resolved `var(--_progress-cycle)`
-   to nothing, the `animation` shorthand failed to parse, and `animation-name`
-   fell back to `none`. The indeterminate ring never turned: it was a static arc
-   parked on the groove, which is a value, which is the one thing an
-   indeterminate state must never look like. Measured, after being written twice:
-   `animationName` came back `none` on the element the rule names. */
+   **On the host, and that is not tidying.** Custom properties inherit downward
+   and the ring's `<svg>` is the indicator's *parent*, so declared on the
+   indicator the rotation written against the `<svg>` resolves
+   `var(--_progress-cycle)` to nothing, the `animation` shorthand fails to parse,
+   and `animation-name` falls back to `none`. The indeterminate ring then never
+   turns: a static arc parked on the groove, which is a value, which is the one
+   thing an indeterminate state must never look like. Measured: `animationName`
+   came back `none` on the element the rule names. */
 :host([indeterminate]) {
   --_progress-cycle: calc(var(--helix-duration-slow) * 5);
 }
@@ -184,7 +181,7 @@
  *
  * After the rule it overrides, not folded into the reduced-motion block further
  * up: the selectors are identical, so source order is the whole of the cascade
- * and a block written earlier loses. Measured wrong first time. */
+ * and a block written earlier loses. */
 @media (prefers-reduced-motion: reduce) {
   :host([indeterminate]) [part="indicator"] {
     animation: none;
@@ -203,15 +200,15 @@
  * The loader's shape carrying the bar's value, which is what was asked for and
  * what a conic gradient could not give.
  *
- * The gradient version is worth recording because it failed on one thing: a
- * gradient has hard radial edges and no notion of a cap, so the rounded end the
- * loader has had to be drawn as a disc at each end of the arc, and those discs
- * sat proud of the band and were wider than the arc itself at small values. An
- * SVG stroke has `stroke-linecap: round` and needs none of it.
+ * Not a conic gradient, which fails on one thing: a gradient has hard radial
+ * edges and no notion of a cap, so the rounded end the loader has has to be
+ * drawn as a disc at each end of the arc, and those discs sit proud of the band
+ * and are wider than the arc itself at small values. An SVG stroke has
+ * `stroke-linecap: round` and needs none of it.
  *
- * That moved `shape` to the headless tier, where markup belongs. See the note
- * there: the value, the ARIA and the form participation are untouched, and the
- * only thing that changes is which shape carries the fraction.
+ * `shape` therefore lives on the headless tier, where markup belongs. See the
+ * note there: the value, the ARIA and the form participation are untouched, and
+ * the only thing that changes is which shape carries the fraction.
  */
 :host([shape="ring"]) {
   display: inline-grid;
@@ -277,13 +274,13 @@
 
 /* Running: the arc draws the circle in and takes it away again.
  *
- * A fixed third of the ring turning was `Loader` exactly, and that is what was
- * wrong with it. A loader says "something is happening" and has no circle to
- * fill; a progress ring's whole subject is a circle being filled, and its
- * indeterminate state should be that same act with the amount unknown rather
- * than a different component wearing its geometry. So the arc grows to most of
- * the way round and shrinks again, and the ring reads as filling even though
- * nothing here is a proportion.
+ * Not a fixed third of the ring turning, which is `Loader` exactly. A loader
+ * says "something is happening" and has no circle to fill; a progress ring's
+ * whole subject is a circle being filled, and its indeterminate state should be
+ * that same act with the amount unknown rather than a different component
+ * wearing its geometry. So the arc grows to most of the way round and shrinks
+ * again, and the ring reads as filling even though nothing here is a
+ * proportion.
  *
  * **Two motions, and the sweep is the one that carries it.** `stroke-dasharray`
  * grows the arc while `stroke-dashoffset` moves its tail, so head and tail each
@@ -293,17 +290,17 @@
  *
  * **The dash cycle ends one full lap along**, offset `-100` against a
  * `pathLength` of 100, so the last frame is the first frame and the loop has no
- * seam to hide. Written to land short of a lap first, and it ticked once per
- * cycle where the two frames failed to meet.
+ * seam to hide. Landing short of a lap ticks once per cycle, where the two
+ * frames fail to meet.
  *
  * The two periods are 10:7, so they line up only every seventh turn and the
  * pair never settles into a single beat. Same argument as the spinner's swell.
  *
- * The floor is 10 rather than the 3 it was written at, which is a measurement
- * rather than a preference: the stroke is 8px on a 64px ring whose path is about
- * 176px long, so three per cent of it is 5px, shorter than the stroke is thick.
- * With round caps the two ends merge and the shortest frames rendered as a dot
- * sitting on the groove. Ten per cent is 18px, which still reads as an arc.
+ * The floor is 10 rather than 3, and that is a measurement rather than a
+ * preference: the stroke is 8px on a 64px ring whose path is about 176px long,
+ * so three per cent of it is 5px, shorter than the stroke is thick. With round
+ * caps the two ends merge and the shortest frames render as a dot sitting on the
+ * groove. Ten per cent is 18px, which still reads as an arc.
  */
 :host([shape="ring"][indeterminate]) [part="track"] {
   animation: helix-progress-ring var(--_progress-cycle) linear infinite;
@@ -367,7 +364,7 @@
 /* Print: the same.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;

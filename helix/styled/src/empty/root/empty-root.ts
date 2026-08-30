@@ -17,7 +17,7 @@ import { styles } from './empty-root.css.js'
  * @aliases Placeholder, NoResults, Blank
  * @documentation https://helix.fusion.dev/components/empty
  *
- * @cssproperty --empty-inset - Space around the whole block.
+ * @cssproperty --empty-padding - Space around the whole block.
  */
 @customElement('helix-empty')
 export class HelixEmpty extends HelixHeadlessEmpty {

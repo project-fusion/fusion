@@ -73,11 +73,11 @@ if (hasLayout()) {
   describe('qr code with a mark in the middle', () => {
     test('it is ink on paper, and stays that way in a dark page', async () => {
       /* A code drawn light on dark is refused by a good half of the scanners in
-         the world. The first version stated both colours, which is right, and
-         stated them with tokens that turn over with the mode, which undid it: on
-         a dark page the ground went dark and the modules went light. The media
-         pair is the only one here that does not turn over, so a code uses it
-         inverted, and this asserts the direction rather than the values. */
+         the world. Stating both colors is right; stating them with tokens that
+         turn over with the mode undoes it, the ground going dark and the modules
+         light on a dark page. The media pair is the only one here that does not
+         turn over, so a code uses it inverted, and this asserts the direction
+         rather than the values. */
       const host = await code('<helix-qr-code value="hello"></helix-qr-code>')
       const cs = getComputedStyle(host)
       const lightness = (value: string): number =>

@@ -67,43 +67,6 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   /**
-   * Accessible name for the dialog.
-   */
-  @property()
-  label = ''
-
-  /**
-   * Whether Escape can close it.
-   *
-   * Off for a dialog that must be answered. It does not disable the close
-   * control a consumer slots in: refusing to be dismissed is not the same as
-   * refusing to be closed, and a dialog with no way out at all is a trap.
-   *
-   * Escape *and* a press on the backdrop, which it now genuinely means. The
-   * sentence said both for a long time while nothing listened for a backdrop
-   * press, so it promised a behavior a consumer would have written their
-   * markup around; the fix then was to narrow the sentence, and the fix now is
-   * to build the half that was missing.
-   *
-   * A persistent dialog does not ignore that press. It answers it: see
-   * `refuse`, which is the only way a dialog that will not be dismissed can say
-   * so at the moment a reader asks.
-   */
-  @property({ reflect: true, type: Boolean })
-  persistent = false
-
-  /* Opened and closed from anywhere on the page, without a line of script:
-     `<helix-button commandfor="…" command="--show">`. See `CommandController`
-     for why this is the platform's invoker rather than a `data-` recipe. */
-  protected readonly commands = new CommandController(this, {
-    commands: {
-      '--close': () => this.close(),
-      '--show': () => this.show(),
-      '--toggle': () => this.toggleOpen(),
-    },
-  })
-
-  /**
    * Which close requests the browser answers on its own.
    *
    * `<dialog closedby>`, forwarded, and safe to forward because every path it
@@ -119,13 +82,44 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   closedBy?: 'any' | 'closerequest' | 'none'
 
   /**
+   * Accessible name for the dialog.
+   */
+  @property()
+  label = ''
+
+  /* Opened and closed from anywhere on the page, without a line of script:
+     `<helix-button commandfor="…" command="--show">`. See `CommandController`
+     for why this is the platform's invoker rather than a `data-` recipe. */
+  protected readonly commands = new CommandController(this, {
+    commands: {
+      '--close': () => this.close(),
+      '--show': () => this.show(),
+      '--toggle': () => this.toggleOpen(),
+    },
+  })
+
+  /**
+   * Whether Escape or a press on the backdrop can close it.
+   *
+   * Off for a dialog that must be answered. It does not disable the close
+   * control a consumer slots in: refusing to be dismissed is not the same as
+   * refusing to be closed, and a dialog with no way out at all is a trap.
+   *
+   * A persistent dialog does not ignore that press. It answers it: see
+   * `refuse`, which is the only way a dialog that will not be dismissed can say
+   * so at the moment a reader asks.
+   */
+  @property({ reflect: true, type: Boolean })
+  persistent = false
+
+  /**
    * What the dialog closed with, the way `<dialog>` reports it.
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
    * boundary**, which is where this one is: the platform's contract is
-   * `close(value)` then read `returnValue`, and a consumer could do neither
-   * because `querySelector` does not reach the element. A confirmation asking
-   * which button was pressed is the ordinary case and had no answer.
+   * `close(value)` then read `returnValue`, and `querySelector` does not reach
+   * the element to do either. A confirmation asking which button was pressed is
+   * the ordinary case.
    *
    * Held here as well as on the element, so a value set before the first render
    * survives to it and a consumer reading one back gets what they wrote.
@@ -211,7 +205,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
 
        `cancel` is deliberately not relayed. `handleCancel` prevents it so that
        Escape is a request rather than an act, so the native one never completes:
-       relaying it would announce a dismissal that was refused. See 296. */
+       relaying it would announce a dismissal that was refused. */
     this.relayNativeEvent(event)
   }
 
@@ -266,7 +260,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    *
    * **The target alone is not enough here, where it is for `Drawer`.** A modal
    * `<dialog>` attributes backdrop clicks to itself, which is the usual trick,
-   * and this panel also carries `--dialog-inset` of padding: a press in that
+   * and this panel also carries `--dialog-padding` of padding: a press in that
    * padding has the same target as a press on the backdrop, so the trick alone
    * closes a dialog when a reader clicks just inside its own edge. The drawer
    * escapes that because its panel is flush against the window and its content

@@ -73,32 +73,16 @@
 /* Butt caps, not round.
  *
  * A round cap adds half the stroke width to each end of every slice, so the
- * arcs overlap their neighbours and the last one laps the first. On a ring of
+ * arcs overlap their neighbors and the last one laps the first. On a ring of
  * many small shares that reads as slices in the wrong order. */
 [part="segment"] {
   stroke-linecap: butt;
   /* From the markup, which is where the radius is decided, so the two cannot
      disagree. Left out entirely the stroke falls to the SVG default of 1 and
-     every slice is a hairline, which is what happened when the old hook was
-     removed without putting anything in its place. */
+     every slice is a hairline. */
   stroke-width: var(--donut-chart-stroke);
 }
 
-/* The middle is the hole, and it is computed rather than guessed.
- *
- * It was the whole grid cell at first, which is the size of the *chart*, so a
- * total slotted into it was wider than the hole and painted across the ring on
- * both sides. Seen rather than reasoned about: `10,000` at the default type
- * scale spilled over four slices.
- *
- * The ring is drawn at r=40 in a 100 box with the stroke astride it, so the
- * hole's diameter is `2 * (40 - thickness / 2)`, which is `80 - thickness`.
- * Written out that way it follows the hook, so a thinner ring gives its middle
- * more room without anybody adjusting a second number.
- *
- * Overflow is left visible on purpose. Clipping a total that does not fit would
- * hide the problem rather than show it, and a consumer who wants a bigger hole
- * has the thickness hook. */
 /* The hole tells its contents how big it is, twice, because one number cannot
    say it to everything.
  *
@@ -108,11 +92,11 @@
  *
  * **`--stat-value-size` is what a `Stat` comes out at**, and it has to be said
  * separately because a `Stat` multiplies what it inherits by a little over
- * three. One base tuned to that multiplier was the previous version, and it
- * sized a `Stat` correctly and everything else at a third of what it should be:
- * measured, plain text at 14px in a 179px hole, which reads as type that does
- * not scale at all. A component naming another component's hook is explicit
- * where a magic base is not, and `Stat` is what the examples put here.
+ * three. A single base tuned to that multiplier sizes a `Stat` correctly and
+ * everything else at a third of what it should be: measured, plain text at 14px
+ * in a 179px hole, which reads as type that does not scale at all. A component
+ * naming another component's hook is explicit where a magic base is not, and
+ * `Stat` is what the examples put here.
  *
  * The two are different numbers because they are different jobs: a total is the
  * figure a reader looks at, and plain text in a hole is more often a word beside
@@ -124,14 +108,14 @@
 }
 
 [part="center"] {
-  /* Centered in the plot, which it now sits inside rather than beside.
+  /* Centered in the plot, which it sits inside rather than beside.
    *
    * **`pointer-events: none`, and the slices stop responding without it.**
-   * `inset: 0` with `margin: auto` centres a box and also stretches it: with no
+   * `inset: 0` with `margin: auto` centers a box and also stretches it: with no
    * block size of its own it filled the plot's height, so a transparent column
    * lay over the middle of the ring and took every `pointerenter` the slices
-   * were listening for. The tooltip simply stopped appearing, and nothing about
-   * the drawing looked different, which is how it got shipped.
+   * were listening for. The tooltip simply stopped appearing, with nothing about
+   * the drawing looking different.
    *
    * Placed from the middle rather than stretched between the edges, so the box
    * is the size of the hole and no larger, and transparent to the pointer
@@ -147,18 +131,21 @@
      than against the page. The hole is a proportion of the chart and the type
      ramp is not, so absolute type fits at exactly one chart size: measured, a
      `Stat` reading `10,000` painted across four slices at anything but the one
-     the default was tuned to. `cqi` is a hundredth of this box's width, and the
-     figure below is the *base* the slotted content is set from, not the size it
-     comes out at. `Stat` draws its value at a little over three times the size
-     it inherits, so 15cqi produced a number four times the width of the ring
-     with the slices behind it. Eight is the base that puts a six figure total
-     across about a quarter of the hole.
+     the default was tuned to.
    *
-   * The size is on the slot and not here, which is not a detail: an element
-   * cannot size itself in its own container's units, that being circular, so
-   * `cqi` written on the container resolves against whatever container is
-   * further up, or the viewport. Both earlier attempts did that and produced a
-   * total four times the width of the ring. */
+   * **The sizes are on the slot and not here, which is not a detail.** An
+   * element cannot size itself in its own container's units, that being
+   * circular, so `cqi` written on the container resolves against whatever
+   * container is further up, or the viewport, and the total comes out four times
+   * the width of the ring.
+   *
+   * The width is the hole's own, computed rather than guessed. The ring is drawn
+   * at r=40 in a 100 box with the stroke astride it, so the hole's diameter is
+   * `2 * (40 - thickness / 2)`, which is `80 - thickness`. Written out that way
+   * it follows the hook, so a thinner ring gives its middle more room without
+   * anybody adjusting a second number. Overflow stays visible: clipping a total
+   * that does not fit hides the problem rather than showing it, and a consumer
+   * who wants a bigger hole has the thickness hook. */
   container-type: inline-size;
   display: grid;
   inline-size: calc(100% * (80 - var(--donut-chart-stroke, 16)) / 100);
@@ -166,27 +153,24 @@
   text-align: center;
 }
 
-/* Index to color, the same twenty-four the legend maps. An attribute cannot
-   select a token, so it is one rule per slice, taken as a stroke because the
-   ring is a stroke. */
 /* One rule, not twenty-four. The headless tier knows which series a mark
    belongs to and writes `--chart-series` onto it, pointing at one of the
    twenty-four hooks `chart/series.css` defines, so the index reaches CSS
    without an attribute selector having to carry it.
 
-   It was twenty-four rules keyed on `[data-series]`, which worked from in here
-   and could not be reached from outside: `::part()` takes no attribute
-   selector, so a consumer looking at `data-series="2"` written on the part had
-   no selector able to use it. Measured, `::part(bar)[data-series="2"]` is
-   dropped at parse time. `data-series` stays, because it is what a spec asserts
-   and what a document rule reaching in through the light DOM would still use. */
+   Twenty-four rules keyed on `[data-series]` work from in here and cannot be
+   reached from outside: `::part()` takes no attribute selector, so a consumer
+   looking at `data-series="2"` written on the part has no selector able to use
+   it. Measured, `::part(bar)[data-series="2"]` is dropped at parse time.
+   `data-series` stays, because it is what a spec asserts and what a document
+   rule reaching in through the light DOM would still use. */
 [part="segment"] {
   stroke: var(--chart-series);
 }
 /* The mark the bubble is anchored to, and the bubble's own content.
  *
- * The mark is invisible and zero-sized: it exists so `Tooltip` has an element to
- * point `for` at, since a reading is a position and not a thing. Placement,
+ * The mark is invisible: it exists so `Tooltip` has an element to point `for`
+ * at, since a reading is a position and not a thing. Placement,
  * flipping, the arrow and the top layer are all `Tooltip`'s, which is the whole
  * reason a chart no longer draws its own. */
 /* **A pixel rather than nothing, because a rect of no area is not trackable.**
@@ -345,9 +329,9 @@
   background-color: var(--helix-color-series-24);
 }
 
-/* The slice under the pointer, thickened rather than recoloured.
+/* The slice under the pointer, thickened rather than recolored.
  *
- * Recolouring would break the agreement with a legend beside it. Growing the
+ * Recoloring would break the agreement with a legend beside it. Growing the
  * stroke keeps the color and still says which one is being asked about, and it
  * grows outward and inward equally because the stroke sits astride its own
  * radius, so the hole does not move.
@@ -358,7 +342,7 @@
 
 /* **Under `outlined` the slice fills in instead of growing.**
  *
- * Two reasons, and the second is the one that forces it. Recolouring is what the
+ * Two reasons, and the second is the one that forces it. Recoloring is what the
  * rule above refuses, because a slice already in the series' color has nothing
  * to gain and a legend beside it to disagree with. An outlined slice is not in
  * that color: it is faded toward the track, so filling it in on hover *restores*
@@ -394,16 +378,6 @@
   }
 }
 
-/* Centered in the hole rather than pinned to the top.
- *
- * The shared rule places a tooltip at the block start, which is right for a
- * chart laid out left to right: there is nothing above the plot and the box
- * sits clear of it. A ring has its own middle and that is where a reader is
- * already looking, so pinning it to the top put it over the twelve o'clock
- * slices instead. It covers whatever is slotted into the hole, which is the
- * intent: a total is replaced by the figure being asked about, and comes back
- * when the pointer leaves. */
-
 /* **A chart must never animate through a value it does not have**, which is why
  * none of this uses `emphasized`.
  *
@@ -414,10 +388,10 @@
  * a number the data does not contain. A bar that reads 15 momentarily drawn at
  * 16.8 is showing something untrue, briefly, to look nice.
  *
- * On the donut it was visible rather than theoretical. Four slices partition one
+ * On the donut it is visible rather than theoretical. Four slices partition one
  * circumference, so their shares must sum to it at every frame; each overshooting
- * independently, with the offsets overshooting too, made the arcs slide past one
- * another and snap back. Reported as ragged and jittery, and that is what it was.
+ * independently, with the offsets overshooting too, makes the arcs slide past one
+ * another and snap back.
  *
  * `decelerate` is `cubic-bezier(0, 0, 0, 1)`, monotonic, so every frame is a
  * value between where the reading was and where it is. */
@@ -532,7 +506,7 @@
 /* Print: the same, and a donut with no fill is a ring of nothing.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;
@@ -540,18 +514,14 @@
   }
 }
 
-/* **Emphasis, and it takes three values now.** *Rewritten 25 Aug 2026, and the
-   note it replaces refused `outlined` outright.* That note was right about the
-   mark and wrong about the conclusion. A slice is a stroke on a ring, the edge
-   *is* the mark, and there is genuinely nothing within it to fade, so it read
-   that as `outlined` requiring slices to be filled paths instead of arcs, and
-   called that changing what a donut is to satisfy a word.
+/* **Emphasis takes three values.** A slice is a stroke on a ring and the edge
+   *is* the mark, with nothing within it to fade, which reads at first as
+   `outlined` requiring slices to be filled paths instead of arcs.
 
-   The step it missed is that both shapes can be present. The arc still draws the
-   slice and still carries the animation; a closed path traces the same wedge
-   beside it, `part="segment-edge"`, and is `stroke: none` until something asks.
-   The donut is unchanged and a second geometry sits next to it. `renderEdge` on
-   the tier below carries why the dash could not simply be swapped: it is doing
+   Both shapes can be present. The arc still draws the slice and still carries
+   the animation; a closed path traces the same wedge beside it,
+   `part="segment-edge"`, and is `stroke: none` until something asks. `renderEdge`
+   on the tier below carries why the dash cannot simply be swapped: it is doing
    the value transition and the arrival sweep as well as the shape, and a `d`
    interpolates only between paths of one command structure, which a slice
    crossing a half turn is not.
@@ -560,9 +530,8 @@
    that a resting value lands on the base. `ghost` stays refused: on a ring it is
    a chart with no slices.
 
-   `subtle` is real and needs no new geometry: the ring is still a ring and stops
-   being the loudest thing in the region, which is what a donut beside the number
-   it is explaining should be. Mixed toward the track rather than faded toward
+   `subtle` needs no new geometry: the ring is still a ring and stops being the
+   loudest thing in the region. Mixed toward the track rather than faded toward
    transparent, since a slice sits on the track and a translucent one would take
    its color from whatever the track is. */
 :host([emphasis="subtle"]) [part="segment"] {

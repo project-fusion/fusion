@@ -45,17 +45,16 @@ describe('video playlist menu', () => {
   })
 
   test('the player renders a bar with a slot for it to land in', async () => {
-    /* Every other assertion here reads the menu's own shadow root, and all of
-       them passed while the menu was assigned to no slot at all: the example
-       and this file both set `controls` on the video, which means the
-       *browser* draws the bar and Helix's own is not rendered, so there was no
-       `controls` slot to land in. Structure without placement is a component
-       that renders correctly into nowhere, and a screenshot is what found it.
+    /* Every other assertion here reads the menu's own shadow root and passes
+       while the menu is assigned to no slot at all. Set `controls` on the video
+       and the *browser* draws the bar, Helix's own is not rendered, and there is
+       no `controls` slot to land in: a component that renders correctly into
+       nowhere.
      *
      * Asserted through the player's slots rather than `menu.assignedSlot`,
      * which happy-dom does not implement and reports as `undefined` whatever
-     * the truth. That is not a weaker test of this bug: with `controls` set
-     * there is no bar, so there is no `controls` slot, and this fails. */
+     * the truth. That is not the weaker test: with `controls` set there is no
+     * bar, so there is no `controls` slot, and this fails. */
     const { playlist } = await mountMenu()
     const player = playlist.querySelector('helix-headless-video')
     const slots = [...(player?.shadowRoot?.querySelectorAll('slot') ?? [])].map((one) => one.name)
@@ -105,12 +104,11 @@ describe('video playlist menu', () => {
     expect(playlist.active).toBe('two')
   })
 
-  test('never assigns active, so the playlist does not latch controlled', async () => {
+  test('requests rather than assigning, so a consumer can refuse the move', async () => {
     const { menu, playlist } = await mountMenu()
-    /* The trap this component was built around. Writing `playlist.active`
-       would look like the shorter path and would settle the element into
-       controlled mode, after which it waits for a consumer nobody wrote. If
-       the menu had done that, a second selection would not move it. */
+    /* The trap this component was built around. Writing `playlist.active` is
+       the shorter path and skips `helix-before-activate`, so a consumer gets
+       no chance to refuse the move. The menu requests instead. */
     menu.dispatchEvent(
       new CustomEvent('helix-select', { bubbles: true, composed: true, detail: { value: 'two' } }),
     )

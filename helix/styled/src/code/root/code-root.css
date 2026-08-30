@@ -25,28 +25,21 @@
    *
    * The same trade the ghost button's hover already makes for the same reason,
    * and unlike a button this one is inline in a sentence, where a surface token
-   * is answering a question about planes that a run of text does not have.
-   *
-   * **The spacing was the suspected cause and was not.** The chip carries 4px
-   * either side against a 3.5px word space, so the gap next to a word is the
-   * ordinary space between any two words; next to punctuation the padding is
-   * already slightly too much, which is why `(` before a chip reads detached. A
-   * margin would have doubled that and made the punctuation worse. */
+   * is answering a question about planes that a run of text does not have. */
   background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   border-radius: var(--helix-radii-sm);
-  /* The prose's own ink, pulled back towards it, and not a syntax color.
+  /* The prose's own ink, pulled back towards it, and never a syntax color.
    *
-   * It was `syntax-name`, which is blue: a fragment of code inside a sentence
-   * is one word of that sentence, and a coloured word in running text reads as
-   * a link. Nothing here is being highlighted either, so borrowing a
-   * highlighter color was saying a thing that is not true. The fill and the
-   * face already say it is code, so the ink only has to be read.
+   * A fragment of code inside a sentence is one word of that sentence, and a
+   * colored word in running text reads as a link. Nothing here is highlighted
+   * either. The fill and the face already say it is code, so the ink only has
+   * to be read.
    *
-   * **It was `foreground-muted` alone and that was too far back.** Measured
-   * against the chip it sits on, 5.27 in light and 7.42 in dark, where the
-   * prose beside it runs at 21. Quieter than its sentence is right; a third of
-   * it is a word the reader has to lean into, and the two modes disagreeing by
-   * two points meant the light one was the worse of them.
+   * **`foreground-muted` alone is too far back.** Measured against the chip it
+   * sits on, 5.27 in light and 7.42 in dark, where the prose beside it runs at
+   * 21: quieter than its sentence is right, a third of it is a word the reader
+   * has to lean into, and the two modes disagreeing by two points made the
+   * light one the worse of them.
    *
    * The ramp has nothing between `muted` and the full ink, so this is the two
    * of them mixed: 30% measures 9.98 light and 10.20 dark, which is the same
@@ -59,25 +52,22 @@
   font-family: var(--helix-font-mono);
   /* **A ratio of the text it sits in, not a rung of the scale.**
    *
-   * This was `var(--helix-text-sm)`, a fixed 13px, on the reasoning that a ratio
-   * was the better default and was unavailable because `check:tokens` refuses a
-   * raw value inside a fallback too. The first half was right and the second was
-   * wrong, and the cost was paid in every heading: measured on the metrics page,
-   * `## What lands in node_modules` set the heading at 32px and the chip at 13,
-   * a ratio of 0.41, so a fragment of code in a heading rendered at body size
-   * and sat on the line like a footnote.
+   * A fixed rung is paid for in every heading: at `var(--helix-text-sm)`, a
+   * fixed 13px, `## What lands in node_modules` on the metrics page set the
+   * heading at 32px and the chip at 13, a ratio of 0.41, so a fragment of code
+   * in a heading rendered at body size and sat on the line like a footnote.
    *
-   * `Stat` had already found the idiom and this did not look. Dividing one rung
-   * by another yields a number, and multiplying `1em` by it yields the inherited
-   * size scaled by that number. The value names two tokens, so the check is
-   * satisfied by the thing it was actually asking for, and the ratio still moves
-   * when a theme moves the scale.
+   * Dividing one rung by another yields a number, and multiplying `1em` by it
+   * yields the inherited size scaled by that number. The value names two
+   * tokens, so `helix component`'s `tokens` is satisfied by the thing it was asking for,
+   * and the ratio still moves when a theme moves the scale. A raw value inside
+   * a fallback is refused, which is what rules out writing the number.
    *
    * The rungs are the ones this already used: `sm` over `md` is 13 over 14, so
-   * body text is unchanged to the pixel and only the cases that were broken
-   * move. That step exists because a monospace face at the same nominal size
-   * reads larger than the prose around it, which is a fact about the face rather
-   * than about any one size, and is exactly why it belongs in a ratio. */
+   * body text is unchanged to the pixel and only the broken cases move. That
+   * step exists because a monospace face at the same nominal size reads larger
+   * than the prose around it, which is a fact about the face rather than about
+   * any one size, and is exactly why it belongs in a ratio. */
   font-size: var(--code-size, calc(var(--helix-text-sm) / var(--helix-text-md) * 1em));
   padding-block: var(--helix-space-none);
   /* Half a step, and the punctuation is why.
@@ -104,9 +94,9 @@
 /* Print: the same, inline.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
-  :host {
+  [part="code"] {
     background-color: transparent;
     box-shadow: none;
   }

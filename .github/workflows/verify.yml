@@ -41,7 +41,7 @@ permissions:
 # **Turborepo's remote cache, and it is what makes the split affordable.** Every
 # task here declares `dependsOn: ^build`, so each job would otherwise rebuild
 # the workspace from cold: `bun run build` alone measured 76 seconds. Shared,
-# the build becomes a restore and the six shards stop paying for it six times.
+# the build becomes a restore and the shards stop paying for it once each.
 #
 # Absent the token turbo falls back to its local cache and everything still
 # runs, so this is inert until the secret exists rather than broken without it.
@@ -75,21 +75,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      # **The count is emitted as well as used, because it was never in one
-      # place.** The comment above said the shard count lives in one place and
-      # the matrix is built from it, and it was written where the matrix is
-      # built. `checks` passes `--of` a second time, so raising this to 10 and
-      # not that one gives a matrix of ten shards each dividing the checks by
-      # six: shards 6 through 9 run nothing, and every check they would have
-      # owned is skipped by a run that reports ten green jobs. That is the exact
-      # fault the comment claims is impossible, so the count now leaves here as
-      # an output and `checks` reads it.
+      # **The count comes from the sharder, because it is a fact about the
+      # list.** It was written here and defaulted separately in
+      # `run-checks.mjs`, and the two disagreed: a matrix of ten shards each
+      # dividing the checks into a different number leaves the tail running
+      # nothing, and every check they would have owned is skipped by a run
+      # reporting ten green jobs. Read from `--count` and passed to `checks` as
+      # an output, there is one number and nothing to keep in step.
       - id: shards
         run: |
           set -euo pipefail
-          of=10
+          of=$(node fusion/scripts/run-checks.mjs --count)
           echo "of=$of" >> "$GITHUB_OUTPUT"
-          echo "shards=$(node tooling/scripts/run-checks.mjs --list --of "$of")" >> "$GITHUB_OUTPUT"
+          echo "shards=$(node fusion/scripts/run-checks.mjs --list --of "$of")" >> "$GITHUB_OUTPUT"
 
       # **Which jobs this diff can possibly fail.** The browser matrix is six
       # jobs that each want a build, a browser and three minutes, and a change
@@ -228,7 +226,7 @@ jobs:
       # machine that pushed.
       - run: bun install --frozen-lockfile
 
-      - run: node tooling/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of ${{ needs.plan.outputs.of }}
+      - run: node fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of ${{ needs.plan.outputs.of }}
 
       # `verify` is meant not to write, and `analyze` is the one step that can:
       # it regenerates the manifests. A tracked manifest that no longer matches
@@ -238,8 +236,37 @@ jobs:
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
 
+  # **Its own job because it runs every other check.** In the shard pool it made
+  # whichever shard drew it run the whole suite serially, so a six-way split had
+  # a single shard doing all of it and finished no sooner than that shard did.
+  #
+  # Same prerequisites as a shard, for the same reason: the checks it runs read
+  # what `build` and `analyze` write.
+  floors:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.20.0'
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run build
+
+      - run: bun run check:spec:floors
+
+      - name: The tree is unchanged by verifying it
+        run: git diff --exit-code
+
   # Its own job because it reads every file regardless of who owns it, so
-  # sharding it would mean six passes over the same tree.
+  # sharding it would mean a pass over the same tree per shard.
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -298,6 +325,34 @@ jobs:
           components: clippy
       - uses: Swatinem/rust-cache@v2
       - run: bun run test
+      # **`check:cli` is here rather than in the shard pool**, because it is the
+      # only check that runs a binary: a shard has bun and node and no cargo, so
+      # the npm shim would build one from cold on whichever of the six drew it,
+      # while the other five paid for a toolchain they never used. Here the
+      # cache is warm and `rs:build` is the same compile `rs:check` and
+      # `rs:test` were going to do anyway.
+      #
+      # It reads source rather than `dist`, so it does not want the shard's
+      # `build` prerequisite. The one thing `dist` buys is naming the exact
+      # subpath in a barrel finding, and without it that advice degrades to
+      # `dependency/<part>` in words rather than silently.
+      - run: bun run rs:build
+      - run: bun run check:cli
+      # Beside `check:cli` because they are the same binary. A shard that runs
+      # one compiles Rust to do it, and six doing that at once took the runner's
+      # memory: exit 137 on one shard, SIGTERM on another, a third canceled
+      # behind them. Here the cargo cache is warm and the binary already built.
+      #
+      # **The build is what `references` reads.** That rule asks whether a path a
+      # comment names is on disk, and several of them name generated files:
+      # `fusion/site/public/sandbox/frame.css` is written by the site build and
+      # is gitignored. A shard had it because the shards build first; this job
+      # did not, so moving the check here turned seven true references into
+      # findings. Cached, so it is a restore rather than a build.
+      - run: bun run build
+      - run: bun run check:css:seeds
+      - run: bun run check:prose
+      - run: bun run fusion spec check
       - run: bun run rs:check
       - run: bun run rs:test
 
@@ -343,7 +398,19 @@ jobs:
     # run where this never reported, which is the property that lets the
     # required check stay exactly as it is.
     needs: [plan, warm]
-    if: needs.plan.outputs.browser == 'true'
+    # **`!= 'false'`, so the unknown case runs rather than skips.** `scope`
+    # states the required direction: a path nobody thought about lands outside
+    # the list and runs, which is the direction this has to fail in. `== 'true'`
+    # is the opposite. Rename the step, rename the output, or take a path out of
+    # that shell block that never writes `browser=`, and the expression reads
+    # empty: `plan` succeeds, six browser jobs report skipped, the gate below
+    # counts skipped as neither failure nor cancellation, and a pull request
+    # touching `helix/styled/src` merges with contrast, specs, smoke, visual,
+    # parity and diagnostics never having run. Nothing in the run says so.
+    #
+    # A failed or skipped `plan` still skips this through `needs`, and `plan`'s
+    # own failure is what the gate catches, so the safe case is unchanged.
+    if: needs.plan.outputs.browser != 'false'
     runs-on: ubuntu-latest
     # Forty-five because `parity` needs it and the others are billed for what
     # they use rather than for the ceiling. Measured 28 Aug 2026: the check
@@ -352,7 +419,7 @@ jobs:
     # `playwright install`. It never once finished: three runs, three
     # `cancelled` conclusions, which report as neither pass nor fail and read  # dialect:quoted, GitHub spells this conclusion value so
     # in the summary as a job that simply did not object. That is the fault
-    # `check:floors` exists to catch, one level up, in the workflow rather than
+    # `check:spec:floors` exists to catch, one level up, in the workflow rather than
     # in the script.
     timeout-minutes: 45
     strategy:
@@ -365,16 +432,22 @@ jobs:
           # above them or the page, and only a laid-out document knows. Both
           # color modes, because the half not on screen is the half that fails.
           - task: contrast
-            run: bun run check:contrast
+            run: bun run check:css:contrast
+          # The token reference's hex column, against what the browser paints.
+          # The column is arithmetic in Node, because that file is committed and
+          # `verify` checks it in a job with no browser; this is the other half
+          # of that trade and it belongs here, where one is already installed.
+          - task: hexes
+            run: bun run check:css:hexes
           # The specs themselves.
           - task: specs
             run: bun run specs:browser
-          # Every example, rendered. `check:examples` reads them and can tell
+          # Every example, rendered. `helix component`'s `examples` reads them and can tell
           # you an attribute no component declares; only running one can tell
           # you it throws on upgrade, names an element registered nowhere, or
           # lays out to nothing.
           - task: smoke
-            run: bun run smoke
+            run: bun run smoke:examples
           # Every example in both tiers, pixel for pixel against a committed
           # baseline. This is the one fault class the rest of `verify` cannot
           # reach: everything else reads source or asserts a fact somebody
@@ -382,13 +455,13 @@ jobs:
           # anybody wrote down. Here rather than in `verify` because it wants a
           # browser and a baseline taken on this runner: the comparison never
           # crosses platforms, so on a contributor's Mac it says so and exits
-          # clean. See 148.
+          # clean.
           - task: visual
-            run: bun run check:visual
+            run: bun run check:spec:visual
           # Every example rendered twice, from its HTML and from its TSX, and
           # the two compared. Both are authored now, neither derived from the
           # other, which is the right arrangement and costs exactly one thing:
-          # nothing else notices them drifting. `check:examples-paired` holds
+          # nothing else notices them drifting. `helix component`'s `examples-paired` holds
           # the two files to each other; only a picture can hold the two
           # renders.
           #
@@ -407,7 +480,7 @@ jobs:
             # verdict: a subset that reports like a full pass is the failure
             # this whole check exists to prevent.
             run: >-
-              bun run check:visual-parity --changed
+              bun run check:spec:visual-parity --changed
               "${{ github.event_name == 'pull_request'
               && github.event.pull_request.base.sha
               || github.event.before }}"
@@ -419,7 +492,7 @@ jobs:
           # assumption, that CSSOM hands back what it reads, is asserted nowhere
           # else.
           - task: diagnostics
-            run: bun run check:diagnostics
+            run: bun run check:spec:diagnostics
     steps:
       # **Full history, because `parity` scopes itself by diffing against the
       # base and a depth-1 checkout has nothing to diff against.** The script
@@ -461,7 +534,7 @@ jobs:
         run: ${{ matrix.run }}
 
       # **The pictures, when it fails, because nothing else can show them.**
-      # `check:visual` marks the changed pixels into `preview.diff.png` beside
+      # `check:spec:visual` marks the changed pixels into `preview.diff.png` beside
       # each baseline and those files die with the runner, so a reviewer got a
       # pixel count and no way to see what moved. `if-no-files-found: ignore`
       # because only the visual shard ever writes one.
@@ -488,9 +561,9 @@ jobs:
 
   # **One context to require, because the job names are not stable enough to
   # require directly.** A branch protection rule matches a job name, and this
-  # workflow's are `checks (0)` through `checks (5)` and
-  # `browser (smoke, bun run smoke)`: the shard count is an argument and the
-  # matrix label carries the command, so renaming a script or changing `--of 6`
+  # workflow's are `checks (0)` through `checks (9)` and
+  # `browser (smoke, bun run smoke:examples)`: the shard count is an argument and the
+  # matrix label carries the command, so renaming a script or changing the count
   # silently un-requires whatever was named. Naming this one job instead means
   # the rule keeps holding, and a job added to `needs` is covered without anyone
   # touching the branch settings.
@@ -512,7 +585,7 @@ jobs:
   # result rather than on the skip.
   verify:
     if: always()
-    needs: [plan, warm, checks, lint, types, tests, browser]
+    needs: [plan, warm, checks, floors, lint, types, tests, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

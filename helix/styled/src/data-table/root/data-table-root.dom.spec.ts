@@ -10,8 +10,7 @@ import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
  * itself: that a `helix-data-table` is still a grid after the subclass, and that
  * it renders through the *styled* pagination rather than the headless one.
  *
- * That second one is the whole of `check:composed`'s subject and the reason
- * `tier` exists: a template naming a literal tag renders the wrong tier's
+ * That second one is the reason `tier` exists: a template naming a literal tag renders the wrong tier's
  * element, and the wrong tier's element is unstyled rather than absent, so
  * nothing throws and the table just looks broken in one corner.
  */

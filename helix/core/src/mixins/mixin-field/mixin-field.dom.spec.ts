@@ -4,8 +4,8 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
 /**
  * The label, hint, feedback and validity contract every form control inherits.
  *
- * 467 lines mixed into every field in the library, and the parts worth asking
- * about directly are the three that no single component's spec covers, because
+ * Mixed into every field in the library, and the parts worth asking about
+ * directly are the three that no single component's spec covers, because
  * each component only ever exercises its own path through them: which message
  * wins, which description a control points at, and when a corrected field stops
  * showing the error it had.

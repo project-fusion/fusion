@@ -51,11 +51,9 @@ const toIso = (date: Date): string => date.toISOString().slice(0, 10)
  *
  * **`toISOString` converts to UTC first, which makes "today" a different day
  * for most of the planet.** Anywhere west of UTC, from late afternoon onward,
- * `toIso(new Date())` names tomorrow: the mark landed on the wrong cell and the
- * server and the client disagreed about which one, since the two run in
- * different zones. The parts are read locally instead and pasted together,
- * which is the only way to get a calendar date out of a `Date` without a
- * conversion happening on the way.
+ * `toIso(new Date())` names tomorrow. The parts are read locally instead and
+ * pasted together, which is the only way to get a calendar date out of a `Date`
+ * without a conversion happening on the way.
  */
 const localToday = (): string => {
   const now = new Date()
@@ -118,8 +116,7 @@ const addMonths = (date: Date, months: number): Date => {
  * Left unset, month and day names come from the runtime's own locale, and a
  * server and a browser need not agree on what that is.
  *
- * `helix-before-change` was `helix-select`, and it moved when the calendar became
- * form control. A control whose value changes dispatches `helix-before-change` here:
+ * A control whose value changes dispatches `helix-before-change`:
  * `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a
  * calendar submitting a date is the same kind of thing. `helix-select` stays
  * what it is elsewhere, which is a row or an item being chosen in something
@@ -166,24 +163,10 @@ const addMonths = (date: Date, months: number): Date => {
 @customElement('helix-headless-date-picker')
 export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormElement) {
   /**
-   * How many dates can be held at once.
+   * Month to open on, where nothing declared one.
    */
-  @property({ reflect: true })
-  mode?: 'range' | 'multiple'
-
-  /**
-   * How many months to show, side by side.
-   */
-  @property({ type: Number })
-  months = 1
-
-  /**
-   * Locale for month and day names.
-   *
-   * Absent uses the runtime's own.
-   */
-  @property()
-  locale = ''
+  @property({ attribute: 'default-month' })
+  defaultMonth = ''
 
   /**
    * Dates that cannot be chosen, comma separated, as `YYYY-MM-DD`.
@@ -198,31 +181,38 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   disableDays = ''
 
   /**
+   * First column of the week, `0` for Sunday through `6` for Saturday.
+   */
+  @property({ attribute: 'first-day-of-week', type: Number })
+  firstDayOfWeek = 0
+
+  /**
    * Whether the current selection fails validation.
    */
   @property({ reflect: true, type: Boolean })
   invalid = false
 
   /**
+   * Accessible name for the grid.
+   */
+  @property()
+  label = 'Date Picker'
+
+  /**
    * The month on show, as `YYYY-MM`. Follows `value`, then the current month.
    *
    * Separate from `value` on purpose, so paging selects nothing and a consumer
-   * can drive the view. It said that and could not do it: the calendar wrote
-   * this when the reader paged, so a consumer holding it was overwritten and
-   * never told. Reading gives the month on show; writing declares it theirs,
-   * and `default-month` seeds one the calendar owns.
-   *
-   *
+   * can drive the view. Reading gives the month on show; writing sets it, and
+   * `default-month` seeds one the calendar keeps until somebody does.
    */
   @property()
   get month(): string {
     /* What is on show, which is what the tag says it gives.
      *
-     * It returned `''` while a month was plainly on display, because nothing had
-     * declared one, and `show()` compares against it before moving: the guard
-     * was dead, so the first arrow key wrote `monthState` and from then on the
-     * grid stopped following `value`. A calendar whose consumer moved the value
-     * showed the month the reader had last paged to instead. */
+     * `show()` compares the requested month against this before moving, so a
+     * getter returning `''` while a month is on display leaves that guard dead:
+     * the first arrow key writes `monthState` and from then on the grid stops
+     * following `value`. */
     return this.monthState ?? (this.defaultMonth || toIso(this.derivedMonth).slice(0, 7))
   }
 
@@ -233,53 +223,12 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Accessible name for the control that pages back.
+   * Locale for month and day names.
    *
-   * A property because this is the one component in the library that takes a
-   * `locale`, and it carried two hardcoded English names with no way to change
-   * them: a calendar rendering its own month names in Japanese still announced
-   * its controls in English. `attribute:` spelled out, since Lit lowercases a
-   * camelCase name rather than dash-casing it.
-   */
-  @property({ attribute: 'previous-label' })
-  previousLabel = 'Previous month'
-
-  /**
-   * Accessible name for the control that pages forward.
-   */
-  @property({ attribute: 'next-label' })
-  nextLabel = 'Next month'
-
-  /**
-   * Month to open on, where nothing declared one.
-   */
-  @property({ attribute: 'default-month' })
-  defaultMonth = ''
-
-  /** The month on show, whoever set it, and `undefined` until somebody has. */
-  private monthState: string | undefined = undefined
-
-  /**
-   * Earliest selectable date, as `YYYY-MM-DD`.
+   * Absent uses the runtime's own.
    */
   @property()
-  min = ''
-
-  /**
-   * How far apart the selectable dates are, in days.
-   *
-   * `<input type="date" step>`'s own unit, counted from `min` where there is
-   * one and from 1 January 1970 where there is not, which is the platform's own
-   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
-   * on a Monday, and there was no way to say that: `disable-dates` takes a list
-   * and a year of Mondays is not a list anybody writes.
-   *
-   * One is every date and needs no rule, which is why anything below one is
-   * treated as one rather than as an error: a step of zero would block every
-   * date including the one already chosen.
-   */
-  @property({ type: Number })
-  step = 1
+  locale = ''
 
   /**
    * Latest selectable date, as `YYYY-MM-DD`.
@@ -288,16 +237,58 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   max = ''
 
   /**
-   * Accessible name for the grid.
+   * Earliest selectable date, as `YYYY-MM-DD`.
    */
   @property()
-  label = 'Date Picker'
+  min = ''
+
+  /** The month on show, whoever set it, and `undefined` until somebody has. */
+  private monthState: string | undefined = undefined
 
   /**
-   * First column of the week, `0` for Sunday through `6` for Saturday.
+   * How many dates can be held at once.
    */
-  @property({ attribute: 'first-day-of-week', type: Number })
-  firstDayOfWeek = 0
+  @property({ reflect: true })
+  mode?: 'range' | 'multiple'
+
+  /**
+   * How many months to show, side by side.
+   */
+  @property({ type: Number })
+  months = 1
+
+  /**
+   * Accessible name for the control that pages forward.
+   */
+  @property({ attribute: 'next-label' })
+  nextLabel = 'Next month'
+
+  /**
+   * Accessible name for the control that pages back.
+   *
+   * A property because a calendar rendering its own month names from `locale`
+   * would otherwise still announce its controls in English. `attribute:`
+   * spelled out, since Lit lowercases a camelCase name rather than dash-casing
+   * it.
+   */
+  @property({ attribute: 'previous-label' })
+  previousLabel = 'Previous month'
+
+  /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /**
    * The date the grid's tab stop is on.
@@ -344,7 +335,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    *
    * Split out from `shown` so `month` can report what is on display without the
    * two calling each other: `month` reading `shown` and `shown` reading `month`
-   * is a stack overflow, and the specs found it immediately.
+   * is a stack overflow.
    */
   private get derivedMonth(): Date {
     const from = toUtc(this.selected[0] ?? '') ?? new Date()
@@ -386,11 +377,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   /**
    * Whether a date is barred, by bound, by weekday, or by name.
    *
-   * `barred`, not `disabled`: the calendar is a form control now, and
-   * `HelixFormElement.disabled` is a boolean about the whole control. A method
-   * and a flag cannot share a name, and of the two it is the method that should
-   * move, because "disabled" on a control means one thing everywhere else in
-   * the library.
+   * `barred`, not `disabled`: `HelixFormElement.disabled` is a boolean about the
+   * whole control, and a method and a flag cannot share a name. "Disabled" on a
+   * control means one thing everywhere else in the library, so the method is the
+   * one that moves.
    */
   private barred(date: Date): boolean {
     const iso = toIso(date)
@@ -422,8 +412,8 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    *
    * `helix-navigate` and not `helix-change`: paging chooses nothing, and a
    * consumer driving the view has to hear that it moved without being told the
-   * answer did. In controlled mode nothing moves and the consumer decides,
-   * which is the point of them holding it.
+   * answer did. Refusing the event is how they take the decision, and nothing
+   * moves.
    */
   private show(date: Date): void {
     if (this.disabled) {
@@ -461,10 +451,8 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * clicking a chosen date takes it out.
    */
   private select(date: Date): void {
-    /* `disabled` meant nothing here beyond dropping the value at submit time:
-       days still took a click, the keyboard still moved through the grid, and
-       nothing said the control was off. Refused at the source rather than at
-       each cell, so every path in is covered by one check. */
+    /* Refused at the source rather than at each cell, so every path in is
+       covered by one check. */
     if (this.disabled) {
       return
     }
@@ -488,11 +476,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
        chosen. The selection is the part that can be refused. */
     this.focused = iso
 
-    /* Announced before it is written, which it was not: this set `value` and
-       then dispatched, so a listener calling `preventDefault()` was refusing a
-       date that had already been chosen. `requestChange` is the one
-       audited path its own documentation claims for every stateful change in
-       the system, and this was not on it. */
+    /* Announced before it is written, so a listener calling `preventDefault()`
+       refuses a date that has not been chosen yet. `requestChange` is the one
+       path every stateful change in the library goes through. */
     this.requestValue(next.join(','))
   }
 
@@ -502,11 +488,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     }
     /* Grid keys, from the grid.
      *
-     * The listener is on the host and the host holds the previous and next
-     * buttons as well, so Enter and Space pressed on one of those were read as
-     * "choose the focused day" and then `preventDefault()`ed: the button's own
-     * activation was canceled and the month never moved. Every arrow was taken
-     * from them too. */
+     * The listener is on the host, which holds the previous and next buttons as
+     * well, so without this check Enter and Space pressed on one of those read
+     * as "choose the focused day" and are then `preventDefault()`ed: the
+     * button's own activation is canceled and the month never moves. */
     const path = event.composedPath()
     const grid = this.renderRoot?.querySelector('[part="grid"]')
     if (!grid || !path.includes(grid)) {
@@ -548,20 +533,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * Whether the form refuses to submit while nothing is chosen.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ reflect: true, type: Boolean })
+  required = false
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -572,10 +547,20 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Whether the form refuses to submit while nothing is chosen.
+   * How far apart the selectable dates are, in days.
+   *
+   * `<input type="date" step>`'s own unit, counted from `min` where there is
+   * one and from 1 January 1970 where there is not, which is the platform's own
+   * base. A booking calendar that only takes Mondays is `step="7"` with a `min`
+   * on a Monday, which `disable-dates` cannot express: it takes a list, and a
+   * year of Mondays is not a list anybody writes.
+   *
+   * One is every date and needs no rule, which is why anything below one is
+   * treated as one rather than as an error: a step of zero would block every
+   * date including the one already chosen.
    */
-  @property({ reflect: true, type: Boolean })
-  required = false
+  @property({ type: Number })
+  step = 1
 
   /**
    * Reports "required and empty", or clears it.
@@ -593,12 +578,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       this.internals.setValidity({ valueMissing: true }, 'Choose a date.', anchor)
       return
     }
-    /* **A value the calendar cannot read is bad input, and it used to be
-       valid.** The grid draws only what it can parse, so `value="not-a-date"`
-       selected nothing, said nothing, reported `:valid`, and handed the string
-       to the form: measured, a form carrying `dp=not-a-date` that submitted
-       without complaint. `DateInput` had this right all along, because it
-       relays the validity of an inner control it can ask.
+    /* **A value the calendar cannot read is bad input.** The grid draws only
+       what it can parse, so `value="not-a-date"` would otherwise select
+       nothing, report `:valid` and hand the string to the form.
 
        `asDate` rather than the shape alone, which is the half `DateInput`'s own
        regex still misses: `2026-02-30` matches `YYYY-MM-DD` and is not a day,
@@ -678,10 +660,10 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   /**
    * How many months are shown, clamped once.
    *
-   * `months` was clamped at the call site and read raw where the last month is
-   * identified, so a zero, a negative or a non-numeric value rendered nothing
-   * and took the forward control with it: `index === this.months - 1` is never
-   * true for `NaN`. One getter both read.
+   * One getter for both readers. Clamping at the call site while the last month
+   * is identified from the raw `months` renders nothing for a zero, a negative
+   * or a non-numeric value, and takes the forward control with it, since
+   * `index === this.months - 1` is never true for `NaN`.
    */
   private get monthCount(): number {
     return Math.max(1, Math.floor(this.months) || 1)
@@ -690,12 +672,11 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
   /**
    * The three date formatters, built once per locale rather than per render.
    *
-   * `Intl.DateTimeFormat` is expensive to construct and these depend on nothing
-   * but `locale`, and they were built inside the per-month render: three
-   * constructions for every month on show, on every update, so a two-month
-   * calendar rebuilt six of them each time an arrow key moved the anchor.
-   * Measured elsewhere at about a quarter of a millisecond apiece, which is not
-   * a crisis and is pure waste.
+   * `Intl.DateTimeFormat` costs about a quarter of a millisecond to construct
+   * and these depend on nothing but `locale`, so building them inside the
+   * per-month render is three constructions for every month on show, on every
+   * update: a two-month calendar rebuilds six each time an arrow key moves the
+   * anchor.
    *
    * Keyed on the locale so a change to it is picked up, which a plain lazy
    * field would not do.
@@ -761,10 +742,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     const { full, heading, weekday } = this.formats
     const weeks = this.weeksOf(month)
     const anchor = toIso(this.anchor)
-    /* Today, which nothing marked at all: not in the accessibility tree, where
-       `aria-current="date"` is the word for it, and not on the cell either, so a
-       consumer could not add the mark from CSS. Computed once per month rather
-       than per cell. */
+    /* Today, marked with `aria-current="date"` in the accessibility tree and on
+       the cell, so a consumer can add a mark from CSS. Computed once per month
+       rather than per cell. */
     const today = localToday()
     const range = this.range
 
@@ -819,17 +799,13 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
               const iso = toIso(date)
               const disabled = this.barred(date)
               const selected = this.isSelected(iso)
-              /* A day from a neighbouring month is filler, so the grid is a
+              /* A day from a neighboring month is filler, so the grid is a
                  rectangle, and nothing else. It takes no click and shows no
-                 selection.
-                 It used to take both, and at `months="2"` that put the same
-                 date on the page twice: September the 5th is a trailing cell in
-                 August's grid and a real cell in September's, so choosing the
-                 end of a range drew the dark terminus in both, and the band ran
-                 through August's last row and then again through September's
-                 first. Two cells cannot be the answer to one question. The band
-                 now stops at the last day the grid owns and picks up in the
-                 next, which is where those dates actually are. */
+                 selection: at `months="2"` the same date is a trailing cell in
+                 one grid and a real cell in the next, so marking both puts one
+                 answer on the page twice and runs the range band through two
+                 rows. The band stops at the last day the grid owns and picks up
+                 in the next, which is where those dates actually are. */
               const outside = !sameMonth(date, month)
               // The cell is the column track and the day is the shape centered
               // in it. A range paints the track, so it runs continuously

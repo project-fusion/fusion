@@ -81,8 +81,8 @@ const shimTableSections = (): void => {
  * through `ElementInternals.states` has no other channel for it: the whole
  * point of a custom state is that it reaches a stylesheet and never the DOM, so
  * there is no attribute a spec could read instead. Feature-tested by its users
- * (`'states' in internals`), so leaving it out did not break anything; it made
- * the behavior untestable outside a browser, which is how it went in.
+ * (`'states' in internals`), so leaving it out breaks nothing and merely makes
+ * the behavior untestable outside a browser.
  *
  * `setValidity` is modeled too, for the same reason `setFormValue` is: a
  * control reads its own verdict back to decide whether to show a message, so a
@@ -131,11 +131,10 @@ const shimElementInternals = (): void => {
       /* Declared, not merely assignable: a component that guards on
          `'ariaDescribedByElements' in internals` skips the link entirely when
          the slot is absent, which is the browser's own feature test.
- 
-         Both of them, and the second was missing. `hostAria` feature-tests each
-         one separately, so a shim carrying only the description silently
-         dropped every name written by reference, and the groups' own specs read
-         that as the component failing to name itself. */
+
+         Both of them. `hostAria` feature-tests each one separately, so a shim
+         carrying only the description silently drops every name written by
+         reference, which reads as the component failing to name itself. */
       ariaDescribedByElements: null,
       ariaLabel: null,
       ariaLabelledByElements: null,
@@ -211,10 +210,6 @@ export const role = (host: HTMLElement): string | null =>
  * `getAttribute('aria-label')` reports nothing on an element that is correctly
  * named. An author's own `aria-label` still wins, which is the platform's
  * precedence and why the attribute is checked first.
- *
- * Added while writing the first spec for `Option.Group`, whose whole job is to
- * name a run of options: without this the assertion that it does so had nothing
- * to read.
  */
 export const label = (host: HTMLElement): string | null =>
   host.getAttribute('aria-label') ??
@@ -228,8 +223,7 @@ export const label = (host: HTMLElement): string | null =>
  * a stylesheet selects on with `:state()` is kept in `ElementInternals` and
  * writes no attribute, so `hasAttribute('data-open')` reports nothing on an
  * element that is correctly open. It is the reading half of
- * `HelixElement.toggleState`, and every spec that used to ask the host for a
- * `data-` mirror asks this instead.
+ * `HelixElement.toggleState`.
  *
  * A `Set` in happy-dom, per `registerDom`'s shim, and a real `CustomStateSet` in
  * a browser. `has` is the whole of the interface either way; whether a rule
@@ -266,7 +260,7 @@ export const slotted = (host: HTMLElement, name?: string): Element[] => {
  * runner's own `--timeout` does not save the reader either, because a file's
  * output is buffered until the file ends, so the whole suite reports nothing
  * about which test it was. Bounded, the same component fails one test in the
- * ordinary way and names itself. See 299.
+ * ordinary way and names itself.
  *
  * Forty is far past anything real. The most any component in this library takes
  * is three, and a number chosen against a laptop would be the wrong kind of
@@ -334,14 +328,11 @@ export const settled = async (element: Element | null): Promise<void> => {
  *
  * **Waits on the element's own `settled` promise**, rather than on a frame count,
  * so it is right whether the component settles in one frame or the runner is
- * busy. It used to watch `[data-settled]` with a `MutationObserver`, which is
- * not available any more and should not be: the flag is an
- * `ElementInternals.states` entry now, deliberately outside the DOM, because on
- * the host it was an attribute React had not rendered and hydration said so.
- * A promise is the better signal in any case, being what this wanted rather
- * than a mutation it had to interpret. `settled()` is the
- * other half and is not this: that one waits for animations to *finish*, where
- * this one waits for them to become possible at all.
+ * busy. There is no attribute to watch instead: the flag is an
+ * `ElementInternals.states` entry, deliberately outside the DOM, because on the
+ * host it was an attribute React had not rendered and hydration said so.
+ * `settled()` is the other half and is not this: that one waits for animations
+ * to *finish*, where this one waits for them to become possible at all.
  */
 export const readyToMove = async (element: Element | null): Promise<void> => {
   const settled = (element as (Element & { whenSettled?: Promise<void> }) | null)?.whenSettled
@@ -356,7 +347,7 @@ export const readyToMove = async (element: Element | null): Promise<void> => {
        having painted by then and happy-dom having nothing to wait for.
 
        `Promise.resolve` is idempotent, so whichever arrives first wins and the
-       loser is a no-op. Nothing to tear down now that there is no observer. */
+       loser is a no-op. */
     setTimeout(resolve, 50)
   })
 }

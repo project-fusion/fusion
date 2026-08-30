@@ -25,17 +25,29 @@ square: a percentage radius on a wide element gives an ellipse, and a pill is
 what you wanted.
 
 Rounding is the fastest single change to how a system feels, and it is one
-token:
+token, but it is the **seed** rather than one of the four above:
 
 ```css
 :root {
-  --helix-radii-md: 2px;
+  --helix-seed-radii: 2px;
 }
 ```
 
-That makes every card, dialog, input and button squarer at once. The theme
+That makes every card, dialog, input and button squarer at once, because `sm`,
+`md` and `lg` are all derived from it: they become 1px, 2px and 3px. The theme
 engine takes a `radius` intent input for exactly this reason. See [Deriving a
 theme](./theming).
+
+**Setting `--helix-radii-md` instead moves only what reads `md`**, which is
+neither the buttons, the inputs and the dialogs (`sm`) nor the cards (`lg`).
+The four rungs are siblings derived from the seed, not a chain, so overriding
+one is how you change a single step on purpose rather than how you reshape a
+system.
+
+**Every floating panel takes `sm`.** A dialog, a drawer, a menu, a popover, a
+tooltip, a toast, and the panel any field opens under itself: all the same
+corner, whatever the panel's size. A radius is read against the corner beside it
+rather than against the area behind it.
 
 **A shape that is round rather than softened does not use these.** An avatar, a
 loader and a radio are circles because of what they are, so they say `50%`
@@ -59,11 +71,10 @@ belong to [Surfaces and separation](./surfaces-and-separation): they are what a
 theme sets to zero to go shadow-first, or to a width to go border-first.
 
 This distinction is why a component's border width sits behind a per-component
-hook rather than being written inline. Of 68 border declarations reaching for
-`--helix-color-border` before this was fixed, eight put the *color* behind a
-hook and none put the width behind one, so a border could be recoloured and
-never removed, and the floating surfaces wrote `border: none` outright so one
-could never be added either.
+hook rather than being written inline. A width written inline can be recolored
+by a theme and never removed, and a hardcoded `border: none` can never have one
+added back, so a surface themes perfectly in one direction and not at all in the
+other.
 
 ## Corner radius on a group
 

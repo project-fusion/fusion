@@ -1,18 +1,15 @@
-//! The intent inputs and the shapes they resolve to, ported from `src/intent.ts`.
+//! The intent inputs and the shapes they resolve to.
 //!
-//! Split out of the derivation when the schema stopped being five scalars: the
-//! derivation is one function and the vocabulary it takes is a language, and a
-//! reader arriving to find out what they may write should not have to read a
-//! solver to find out.
+//! Separate from the derivation because the vocabulary a consumer writes is a
+//! language, and a reader arriving to find out what they may write should not
+//! have to read a solver to find out.
 //!
-//! **The reasoning stays in one place while there are two files.** `intent.ts`
-//! carries two hundred lines of it, a paragraph per field saying what was
-//! measured and what was refused, and copying that here would make two
-//! statements of one argument that drift the first time either is edited, which
-//! is the failure this whole port exists to avoid. So each field below carries
-//! the contract, the shape and the default; the argument for it stays in the
-//! TypeScript and moves here when that file goes. Where a field's *meaning* is
-//! not recoverable from its type, that much is written out.
+//! **The argument for each field lives in `src/types.ts` and not here.** That is
+//! the consumer-facing declaration and it carries a paragraph per field saying
+//! what was measured and what was refused; copying it here would make two
+//! statements of one argument that drift the first time either is edited. So
+//! each field below carries the contract, the shape and the default, plus its
+//! *meaning* where that is not recoverable from its type.
 //!
 //! Almost all of this is declaration. The runtime is two constant tables and one
 //! conversion, and those are what the oracle asserts.
@@ -47,7 +44,7 @@ impl std::fmt::Display for Color {
 ///
 /// Written as a relationship rather than a second color because a literal
 /// drifts out of relation the moment anybody rethemes, which is the failure of
-/// every palette with two hardcoded colours in it.
+/// every palette with two hardcoded colors in it.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[cfg_attr(
     feature = "serde",
@@ -411,7 +408,7 @@ impl Status {
     }
 }
 
-/// The four statuses, in the order the TypeScript declares them.
+/// The four statuses, in the declared order the derivation walks.
 pub const STATUS_NAMES: [&str; 4] = ["danger", "info", "success", "warning"];
 
 /// The hue each status carries, in degrees, taken from what already ships.
@@ -425,11 +422,11 @@ pub const STATUS_HUE: [f64; 4] = [27.0, 245.0, 155.0, 75.0];
 /// status sits at, which is the same fact `tokens.css` records for the series
 /// ramp, where one number for eight hues had three of them silently clipped.
 ///
-/// They exist at all because the engine was taking the *brand's* chroma for
-/// every status. A brand at 0.035 gave a danger at 0.035, a near-gray error; a
-/// magenta brand at 0.257 asked amber for a chroma its hue cannot hold and got
-/// 0.115 back after clipping, a muddy beige. A status's saturation is part of
-/// what it means and is not the brand's to set.
+/// **Never the *brand's* chroma, which is what these replace.** A brand at 0.035
+/// gives a danger at 0.035, a near-gray error; a magenta brand at 0.257 asks
+/// amber for a chroma its hue cannot hold and gets 0.115 back after clipping, a
+/// muddy beige. A status's saturation is part of what it means and is not the
+/// brand's to set.
 pub const STATUS_CHROMA: [f64; 4] = [0.21, 0.16, 0.15, 0.185];
 
 /// The hue and chroma a status carries, by name.
@@ -441,9 +438,9 @@ pub fn status_seed(name: &str) -> Option<(f64, f64)> {
 
 /// Accepts a hex string or an OKLCH triple and always returns the triple.
 ///
-/// `None` where the TypeScript returned a triple of `NaN`, for the reason
-/// [`hex_to_oklch`] gives: a port is the moment to stop carrying that quietly
-/// into a palette.
+/// `None` rather than a triple of `NaN`, for the reason [`hex_to_oklch`] gives:
+/// a `NaN` compares false against everything and travels into a palette looking
+/// like a color.
 #[must_use]
 pub fn to_oklch(color: &Color) -> Option<Oklch> {
     match color {

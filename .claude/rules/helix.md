@@ -15,7 +15,7 @@ styled     the styled tier. Extends headless, references tokens
 react      generated wrappers over styled and headless
 ```
 
-**`headless` must never depend on `styles`.** That constraint is what makes the
+**`headless` must never depend on `turbo run styles`.** That constraint is what makes the
 headless tier independently consumable. If styling leaks downward, we have
 shipped one package in five files.
 
@@ -31,7 +31,7 @@ rule shipped from here.
 So the test for whether a rule may live in `core` is not "is it CSS" but "does
 it name a token". A mechanism does not: `overflow: auto` is what creates a
 scrollport, and without it `scrollTop` is permanently zero and every scroll API
-on the element is inert. A decision does: a colour, a spacing, a duration, a
+on the element is inert. A decision does: a color, a spacing, a duration, a
 height, an `overscroll-behavior`, a scrollbar treatment. Those stay in
 `helix/styled`.
 
@@ -107,11 +107,6 @@ interpret does not exist on that tier.** `hidden`, `inert`, `popover`, a real
 already acts on them. `:state(open)` is a selector target the styled tier layers
 on top, and it can never be the mechanism.
 
-*Amended 27 Aug 2026, when the hook stopped being an attribute.* This said
-`data-open` throughout, which was right about the layering and wrong about where
-the hook lives; see the rule on mirrors below. Nothing else in this section
-changes: a hook, wherever it is kept, is still not the mechanism.
-
 Twenty-four families already work this way and it was never written down, which
 is how the accordion became the outlier nobody noticed. Its content region
 carried `inert` and nothing else, so a closed section was out of the
@@ -151,7 +146,7 @@ kind.
 
 **The line is a fact against a decision.** A fraction, a position, an index, a
 level, a measured ratio, a count: the component computed it and nothing else
-can. A colour, a spacing, a duration, an easing: those are the styled tier's,
+can. A color, a spacing, a duration, an easing: those are the styled tier's,
 and a base component reaching for `--helix-*` to write one would be the
 dependency the tier split exists to prevent.
 
@@ -167,7 +162,7 @@ marking them told the one consumer who has to read them that they may not. All
 41 lost the sigil and gained an `@cssproperty`: 32 on the headless components
 that write them, 9 on the two controllers in `core`.
 
-**`check:hooks` was what the underscore had been evading**, which is the part
+**the `hooks` rule was what the underscore had been evading**, which is the part
 worth remembering. It pairs an `@cssproperty` with a rule that reads one, in
 both directions, and exempts `--_` names as a component talking to itself. Strip
 the sigil and every undeclared one fails immediately. The convention was not
@@ -247,7 +242,7 @@ So it warns, once per tag, and **only in a browser**. Lit's SSR shim provides
 from the render pass the guard was written for. A diagnostic that fires during a
 build is one somebody turns off.
 
-`bun run check:composed` enforces all three: no literal tag in a template with a
+`helix component --only composed` enforces all three: no literal tag in a template with a
 tier below it, `tier` overridden wherever a base template interpolates, and the
 family imported by both tiers.
 
@@ -331,7 +326,7 @@ Two things follow for the component:
   host, from the same assignment. A handler on the host simply never runs, and
   the attribute it was going to write stays absent, which is indistinguishable
   from the case it was meant to detect. That is what sank the first attempt at
-  `data-labelled`, and every one of the thirty listeners in the library already
+  `data-labelled`, and every one of the thirty listeners in the library already <!-- dialect:quoted -->
   does it the right way, `DisabledCascadeController` saying so in a comment.
 
   **And it does not fire when nothing is assigned**, which is a feature here:
@@ -350,8 +345,8 @@ itself.
 
 Measured on `CopyButton`, which extends `IconButton` and supplies a clipboard
 and a check as slot fallbacks: both glyphs rendered, both inherited the right
-colour, and both came out 0x0, because the only rule sizing an icon was
-`IconButton`'s `::slotted()` one. A correctly sized, correctly coloured button
+color, and both came out 0x0, because the only rule sizing an icon was
+`IconButton`'s `::slotted()` one. A correctly sized, correctly colored button
 containing nothing.
 
 This is the same class of failure as `:host(:has())` above and as a `[part=]`
@@ -378,11 +373,12 @@ crumb, `code-block.noCopy` dropped the button and kept the 40px it stood in, and
 `breadcrumb.href`'s own docblock gave the reason as "nothing selects on it" while
 `breadcrumb.css` selected on it.
 
-`check:reachable` holds it now, and the three checks on this one rule are worth
-naming together because each sees a different half: `check:reachable` asks
-whether a selected-on property reflects, `check:reflected` bans a default on one
-that does, and `check:reflected-defaults` bans a default that writes an
-attribute. Three of the four above were found by `check:visual-parity` rendering
+`helix component`'s `reachable` holds it now, and the three checks on this one rule
+are worth naming together because each sees a different half: `reachable` asks
+whether a selected-on property reflects, `reflected` bans a default on one that
+does, and `reflected-defaults` bans a default that writes an
+attribute. All three are rules in `helix component`, which is why they are spelled
+without a `check:` prefix. Three of the four above were found by `check:spec:visual-parity` rendering
 a React twin, not by reading, which is the argument for all of them.
 
 **And a reflected property takes no default.** The two together are what write
@@ -453,19 +449,15 @@ The line that is actually drawn, and it is not "value is special":
   names which child is active. Option's `data-active` is a boolean its listbox
   writes, so it is the first rule rather than an exception to the second.
 
-*Rewritten 27 Aug 2026, and the first bullet said `data-open` and `data-checked`
-until it was.* The mirror was an attribute, and an attribute is in the DOM: an
-element writes it on the first update, so `<helix-checkbox default-checked>`
-served by a consumer's server grew `data-checked` the moment the definition
-landed and React reported a hydration mismatch it will not patch up. Measured on
-the landing page's showcase, which listed a switch, a checkbox and an accordion
-item at once.
+**A mirror must never be an attribute.** An attribute is in the DOM: an element
+writes it on the first update, so `<helix-checkbox default-checked>` served by a
+consumer's server grows `data-checked` the moment the definition lands, and
+React reports a hydration mismatch it will not patch up. Measured on the landing
+page's showcase, which listed a switch, a checkbox and an accordion item at once.
 
-**The reasoning that was there was sound and stopped one step short.** A
-different name so a paste cannot be re-read as a declaration is exactly right;
-it is just that the same argument goes on to the DOM itself. Nothing a component
-knows about itself belongs anywhere a framework reconciles, which is what
-`data-settled` was found for four times and `data-checked` a fifth.
+A different name, so a paste cannot be re-read as a declaration, is half of it.
+The other half is that nothing a component knows about itself belongs anywhere a
+framework reconciles.
 
 **Which side the write falls on is what decides between the two answers.** A
 fact that can be true on the first update mirrors to a custom state, because
@@ -513,7 +505,7 @@ and `MixinControllerActive` all run on it, so a mode would fork the event
 vocabulary across ninety-two families by prop presence: which event a consumer
 binds would depend on whether they passed a property, and an HTML consumer would
 have no ergonomic spelling for the controlled half at all, a prefixed event
-having no inline handler attribute. See 294.
+having no inline handler attribute.
 
 **Shared test scaffolding lives in `@fusion.dev/helix-testing`**, one module per
 environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
@@ -563,7 +555,7 @@ that passes against code doing nothing.
 ## Visual axes are a registry, and `appearance` is refused
 
 **Five axes, fixed vocabularies, and a component takes a subset of one.** They
-are declared in `tooling/scripts/check-axes.mjs`, which is the registry:
+are declared in `helix/cli/src/component/axes.rs`, which is the registry:
 
 | Axis | Values | Families |
 |---|---|---|
@@ -583,24 +575,15 @@ that *is* on an axis.
 and no box to size. `tone` is the exception and a principled one: it says what a
 thing means, and meaning survives having no stylesheet.
 
-*Rewritten 24 Aug 2026, and the section this replaces described an API the build
-refuses.* It read "Appearance is the treatment, tone is the meaning" and
-prescribed `appearance` with `solid`/`outlined`/`subtle`/`ghost` plus
-`elevated`/`plain`/`card`, naming `outlined` on Button and `ghost` on IconButton
-as the resting values. Button has no such property, `check:axes` fails outright
-on the word, and `UNSWEPT` is empty. The consumer documentation was already
-correct in `visual-axes.mdx`, so this file was the only place still teaching it,
-which is the worse half: it is the file that shapes the next change.
+**`appearance` is not a property and must not be reintroduced.** `helix component`'s `axes`
+fails outright on the word, and `visual-axes.mdx` is the page that explains why
+it went.
 
-**That is the third time a rule here has outlived its decision**, after the
-event-naming one that survived four days of work against it and the
-`helix/react` section that described a package which never existed. The pattern
-is the same each time: a rule and its enforcement live in different files and
-nothing holds them together. Where a check owns a vocabulary, quote the check
-and name it, so the next reader can go and see.
+**Where a check owns a vocabulary, quote the check and name it**, so the next
+reader can go and see. A rule and its enforcement living in different files with
+nothing holding them together is how a rule outlives its decision.
 
-**What the old section was right about, and what survives it.** The test is
-still *can two of these values be true at once?* If yes they are two axes,
+The test is *can two of these values be true at once?* If yes they are two axes,
 whatever the count of combinations looks like. That is what split Button's old
 `primary`/`secondary`/`tertiary`/`danger` into a rank and a meaning, and it is
 what `megamenu-root.css` derived from the inside before there was a registry to
@@ -614,7 +597,7 @@ Written out, those values select nothing and land on the base rule.
 `:host(:not(:disabled)) [part="button"]:hover` is four class-equivalents and an
 emphasis rule is three, so an emphasis without a hover of its own loses its fill
 the moment a pointer touches it. Measured on the old `danger`, which had no hover
-rule and turned neutral grey under the pointer in every build since it was
+rule and turned neutral gray under the pointer in every build since it was
 written. `button-root.css` carries the count beside the rules it explains.
 
 ## Size and density
@@ -665,7 +648,7 @@ typography, and it follows the text around it.
 
 **A `[part=]` selector for a part nothing renders fails silently.** It is valid
 CSS that matches nothing, so there is no error, no warning, and no clue beyond
-the feature quietly not happening. `bun run check:selectors` catches it, and it
+the feature quietly not happening. `helix component --only selectors` catches it, and it
 found two: Card's `orientation="horizontal"` had done nothing since the refactor
 that moved its container onto the host, and the Accordion had no border, no
 corner radius, and a dead `appearance="plain"` for the same reason.
@@ -705,7 +688,7 @@ Fifteen categories, every token in exactly one: `color` `space` `radii` `font`
 `text` `weight` `leading` `tracking` `border` `shadow` `material` `duration`
 `easing` `size` `layer`.
 
-`bun run check:tokens` enforces three rules: no raw values where a token exists,
+`helix component --only tokens` enforces three rules: no raw values where a token exists,
 no primitive access from outside `helix/styles`, and **no references to tokens
 that do not exist**. The third earns its keep: a renamed token resolves to
 nothing and the property silently falls back to a browser default, so the code
@@ -714,11 +697,39 @@ looks correct and the component is quietly unstyled.
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
 
+**Every panel that floats over the page takes `--helix-radii-sm`, and
+`helix component`'s `corners` holds it.** A radius is read against the corner
+beside it rather than against the area behind it, so a menu at 4px next to a
+dropdown at 8px reads as two design languages and a reader has no way to know
+the second is a larger panel rather than a different kind of thing. Neither a
+panel's size nor what it holds is a reason to round differently. `radii-none`
+passes, being the vocabulary used to say "square" out loud; a different rung or
+a raw length does not.
+
+**A floating panel names itself**, so the rule keeps no list: it is any part
+whose stylesheet reaches for `--helix-shadow-floating`, which is already the
+separation policy for a surface over content, so the set is whatever reaches
+for it and `helix component audit` prints how many that is.
+
+**The check is keyed on the part rather than on the rule**, because a panel
+routinely sets its corner in one rule and its lift in another: Drawer rounds
+`[part="panel"]` and lifts `:host(:state(open)) [part="panel"]`, so a rule-local
+reading checks neither half.
+
+**Three had drifted when this was written, and the third is why prose was not
+enough.** Select's panel took `md` from the commit that created the file,
+against its own trigger's `sm`. Megamenu took `md` with a size argument
+available and never written down. Tour's bubble took `md` under a comment
+reading "which is `Popover`'s panel by another name and is deliberately the same
+shape" — and Popover is `sm`. The convention was recorded, in the right file,
+directly above the declaration that broke it, and it held for exactly as long as
+nobody had to act on it.
+
 **`helix/styles` authors in `src` and ships `dist`, and the comment is the
 difference.** The package exported `./src/*.css` until 24 Aug 2026, so every
 consumer downloaded the reasoning: `tokens.css` is 71 percent comment,
 `primitives.css` 82, `base.css` 75, and the set was 60,944 bytes gzipped against
-8,219 of declarations. `bun run styles:dist` strips comments into `dist` and
+8,219 of declarations. `turbo run styles-dist` strips comments into `dist` and
 `exports` points there, so a consumer writing `@fusion.dev/helix-styles/tokens.css` is
 unaffected and gets a quarter of the bytes.
 
@@ -742,7 +753,7 @@ that shares an implementation with the thing it checks agrees with itself.
 Reaching the two sides by two methods is what gives it teeth.
 
 **A hook is named after the family that owns it, and owned by one family.**
-`check:hooks` holds both. A consumer predicts `--card-padding` from
+`helix component`'s `hooks` holds both. A consumer predicts `--card-padding` from
 `<helix-card>` and predicts nothing from a name that does not follow, and a
 custom property naming no declaration is inert with no error: the same silence
 as a `::part()` that resolves to nothing. Six were unguessable.
@@ -818,28 +829,23 @@ a document rule using one is the mechanism rather than a collision. And a rule
 undoing the *reset* stays: `helix-card > [slot="media"]` lifts the image clamp,
 which is global by necessity.
 
-`bun run check:overruled` enforces it, per declaration. It was written against
+`helix component --only overruled` enforces it, per declaration. It was written against
 the two failures above and fails on both when they are put back.
 
-**Apps use components, not native elements.** *Reversed 13 Aug 2026, and
-narrowed 18 Aug 2026: the base layer styles `h1`–`h6` and `:where(a)` only under
-`[data-prose]` now, for the reason in the section above.* Prose the design system
-never renders (markdown, a CMS) still has to look right, and says so on its
-container. But an app written
+**Apps use components, not native elements.** The base layer styles `h1` to
+`h6` and `:where(a)` only under `[data-prose]`, for the reason in the section
+above: prose the design system never renders (markdown, a CMS) still has to look
+right, and says so on its container. But an app written
 against Helix reaches for `Text`, `Flex` and `Grid` rather than raw tags, so
 dropping a component in works without the app knowing which token to apply.
 
-*Corrected 28 Aug 2026, and it named two components that do not exist.* It read
-`Heading`, `Text`, `Link`, `Flex`, and `Grid`. There is no `Heading`: `Text`
-absorbed it, and `as="h2"` picks the element while `variant` picks the ramp,
-which is the separation the paragraph below describes under the other name.
-There is no `Link` either, a link being the `[data-link]` recipe in the base
-layer, which exists precisely because the *outer* tree styles a slotted anchor
-and a component cannot. Both were found by reading this file against the tag
-list, which is the fourth time a rule here has outlived its decision.
+**There is no `Heading` and no `Link`.** `Text` absorbed the first: `as="h2"`
+picks the element while `variant` picks the ramp, which is the separation the
+paragraph below describes under the other name. A link is the `[data-link]`
+recipe in the base layer, which exists precisely because the *outer* tree styles
+a slotted anchor and a component cannot.
 
-The earlier rule said a component is only built when it has behavior. That was
-right about what *earns* an element and wrong about what an app should *write*:
+**Behavior is what earns an element, not what decides an app should write one.**
 `Flex` has no behavior and still removes every hand-rolled layout div.
 
 `Text` keeps `as` and `variant` separate, which is the risk that killed the
@@ -854,7 +860,7 @@ Layout components are presentation with no structure or a11y of their own, so
 they ship in `helix/styled` with **no headless tier**. The tier split exists to
 keep behavior separate from styling, and there is no behavior to separate.
 
-Styles are authored in sibling `.css` files. `bun run styles` compiles each into
+Styles are authored in sibling `.css` files. `turbo run styles` compiles each into
 a generated `.css.ts` calling `createSheet`. Generated files are gitignored;
 never edit one.
 
@@ -863,7 +869,7 @@ never edit one.
 **A component that renders another has to publish what it rendered.**
 `::part()` reaches one shadow boundary and stops, so a composition hides its
 child's entire part surface unless it forwards it. Measured before
-`check:exportparts` existed: thirty-seven sites across nineteen families
+`helix component`'s `exportparts` existed: thirty-seven sites across nineteen families
 composed another element, eight forwarded anything at all, and 148 published
 child parts were unreachable. `color-input` hid all sixteen of `color-picker`'s
 and `date-input` all thirteen of `date-picker`'s, which are the components a
@@ -883,15 +889,15 @@ least styleable half.
   predate the rule were both written this way, which is the usual sign of the
   right one, and what keeps the collapse safe is that the parent may not then
   render the role itself.
-- **A forwarded part still needs its `@csspart`**, and `check:parts` is what
+- **A forwarded part still needs its `@csspart`**, and `helix component`'s `parts` is what
   asks: it counts an `exportparts` name as rendered, so a forward without a
-  declaration fails there rather than in `check:exportparts`. The two are one
+  declaration fails there rather than in `helix component`'s `exportparts`. The two are one
   contract read from two ends.
 
 **A `::part()` written from outside is checked too, and nothing checked it
-before.** `check:selectors` reads `[part="x"]` inside a component's own sheet and
+before.** `helix component`'s `selectors` reads `[part="x"]` inside a component's own sheet and
 stops there, so a selector naming a part nothing publishes was unchecked in every
-example sheet, doc page and app file in the repository. `check:exportparts`
+example sheet, doc page and app file in the repository. `helix component`'s `exportparts`
 covers it, and it had eight. `INDICATOR` in `build-headless-examples.mjs` names
 the box its indicator is positioned against, and three of its four families were
 given a part they do not render, so the `position: relative` never landed and
@@ -903,7 +909,7 @@ twice in a file whose own comment says splitter has a `separator` and no
 `helix-dialog::part(panel)` on an element publishing `dialog`.
 
 **A `[part=]` written in TypeScript is checked like one written in CSS**, and
-only `check:selectors` reads stylesheets, so a rename verified against CSS alone
+only `selectors` reads stylesheets, so a rename verified against CSS alone
 is verified against half the callers. A stale `querySelector('[part="x"]')`
 returns `null`, so what breaks is behavior rather than appearance and an optional
 chain swallows it. Ninety-seven lookups exist. Only a lookup on the component's
@@ -915,14 +921,14 @@ host applies it and owning no parts of its own.
 **And a `[part="x"]` inside a selector string is not a render.** Harvesting
 `part="x"` without excluding the bracket let a lookup satisfy itself, so the very
 selector under test counted as evidence the part exists. Live across 53 files and
-five checks, including `check:parts`, whose whole purpose it defeats. It was
+five checks, including `helix component`'s `parts`, whose whole purpose it defeats. It was
 holding one real failure green: `command` documented `search-field` after that
 name stopped being forwarded, and a `querySelector('[part="search-field"]')` two
 hundred lines away was the only thing making it look rendered. Same shape as this
 file's older note about a JSDoc that quotes markup, and worth assuming of any new
 check that reads a template.
 
-**`check:parts` resolves the whole render chain in both directions**, and read
+**`helix component`'s `parts` resolves the whole render chain in both directions**, and read
 the class's own markup in one of them until 24 Aug 2026. One direction inherited
 and the other did not, which leaves exactly one gap and it is the expensive one:
 a part rendered by a *base* that nobody in the chain documents is invisible to
@@ -936,24 +942,24 @@ the ten pairs were published to nobody.
 the mixin does not work.** The analyzer reads `@csspart` off a custom element
 class, so a class-level tag on a mixin reaches the manifest as nothing at all,
 on the mixin's JSDoc and on its inner class alike. Measured both ways, and the
-inner-class version is the dangerous one: `check:parts` resolves docs through
+inner-class version is the dangerous one: `helix component`'s `parts` resolves docs through
 `extends` itself, so it goes green while every API page stays exactly as wrong
 as before. Members are the opposite and do inherit, which is what the note above
 about the inner class is about, and the two cases look identical from the source.
 
 **Publishing a part obliges every component that composes it.** These two checks
-are one contract, so documenting the mixin parts made `check:exportparts` fail on
+are one contract, so documenting the mixin parts made `helix component`'s `exportparts` fail on
 fourteen compositions that had been forwarding a complete surface the day before.
 That is the contract working rather than a regression, and it is the reason the
 forwarding is generated rather than typed.
 
 **Words that name a position draw from a registry; words that name a thing do
-not.** `check:vocabulary` holds the first set to one spelling each: `box`,
+not.** `helix component`'s `vocabulary` holds the first set to one spelling each: `box`,
 `container`, `content`, `panel`, `surface`, `viewport`. A `thumb`, a `terminus`,
 a `swatch` is that component's own word and no registry should have an opinion
 about it.
 
-This is `check:axes` one stage later. That check exists because `appearance` had
+This is `helix component`'s `axes` one stage later. That check exists because `appearance` had
 become one word for four questions; this one exists because the reverse happened
 to parts, nine words meaning "the box in the middle" across 204 names. `drawer`
 used both `panel` and `content`; `accordion` used both `content` and
@@ -970,7 +976,7 @@ accessor reading it, one file over, is called `surface`. The third, `wrapper` to
 `content` both, and they are different boxes: `content` is what the stage holds
 while it is open, `body` is the step's name and its description together.
 Renaming it would have merged two things. It sits in `UNRESOLVED` naming what it
-turns out to be, the way `check:axes` names work rather than blocking on it.
+turns out to be, the way `axes` names work rather than blocking on it.
 
 
 ## The manifest
@@ -999,7 +1005,7 @@ turns out to be, the way `check:axes` names work rather than blocking on it.
   every archived page point at today's source, which is the one thing a
   versioned reference must not do. What is durable is where a directory sits in
   the repository; what is not is which commit anyone wants to read.
-  `site/ui/lib/source.ts` is the only file a version selector has to touch.
+  `fusion/site/lib/source.ts` is the only file a version selector has to touch.
 
 - **Do not import `custom-elements-manifest/schema`.** The analyzer bundles its
   own copy and two copies produce types `exactOptionalPropertyTypes` will not
@@ -1018,12 +1024,8 @@ exception and is a rule about the question rather than about the tag. It answers
 what a component is for, and `Tabs.Tab` has no answer to that separate from
 `Tabs`: giving it one puts a part in the gallery beside its own root.
 
-*Corrected 27 Aug 2026, and the tag name was the half that mattered.* This said
-`@alias`, which the metadata plugin does not read, and omitted `@category`,
-which fails the build. The plugin's own header carried the same wrong name two
-lines above the right one. Nothing shipped wrong because the corpus was written
-against the code rather than against this file, which is luck: 216 blocks say
-`@aliases` and the two documents that name the tag both said `@alias`.
+**The tag is `@aliases`.** `@alias` is not read by the metadata plugin, and
+`@category` is required: omitting it fails the build.
 
 Only `@summary` is native CEM; the rest reach the manifest through
 `helix-metadata`. A `@status experimental` that lives only in a comment cannot
@@ -1051,13 +1053,13 @@ custom properties are what they write CSS against, and the two pairs are worth
 not interleaving.
 
 **Sorting is not tidiness, because the reference page is generated from this
-order.** `bun run reference` writes the tags out as it finds them, so an
+order.** `turbo run reference` writes the tags out as it finds them, so an
 unsorted block is a published API table with a part missing from where a reader
 looks. `Video` declares 48 parts and had its `captions-menu-*` family in three
 separate runs with the whole `overflow-*` set between them. No line of it was
 wrong, and no reader who did not already know the answer could have found one.
 
-`bun run tag-order` rewrites, `check:tag-order` judges, and `verify` runs it.
+`bun run fix:tag-order` rewrites, `fusion prose`'s `tag-order` judges, and `verify` runs it.
 Only blocks carrying `@summary` are touched: a member's JSDoc uses `@internal`,
 `@param` and `@reference`, whose order is the order of the thing they describe.
 
@@ -1068,13 +1070,8 @@ and prefixed**:
 @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
 ```
 
-*Corrected 17 Aug 2026. This section described PascalCase names (`OpenChange`)
-for one day and the code has never carried them since. `8d5ca07` made that
-change at 00:35 and rewrote this file; `0e75074` reversed it at 23:07 the same
-day and did not, so the rule outlived the decision by four days of work against
-it. `check:events` and `helix-convention-lint` both enforce
-`/^helix-[a-z][a-z0-9-]*$/`, which is what the sixty-six shipped events answer
-to.*
+*`helix component`'s `events` and `helix-convention-lint` both enforce
+`/^helix-[a-z][a-z0-9-]*$/`, which is what every shipped event answers to.*
 
 **The prefix is what stops a collision with a native name.** An event dispatched
 inside a shadow root is retargeted to look like it came from the host, so a bare
@@ -1122,12 +1119,7 @@ class in `helix/core/src/events/events.ts` that carries its own name and augment
 dispatch through one cannot be named by the analyzer.
 
 **Every state change is announced twice, and the two are for different
-people.** *Rewritten 26 Aug 2026; this described one event under two names.* It
-said a continuous control announces `helix-input` and a discrete one
-`helix-change`, which was one mechanism with `announcesInput` choosing a name:
-the name said *phase* and the flag meant *granularity*, so a consumer reading
-"change" as "the reader is done" wired a request to `onhelix-change` and got one
-per character.
+people.**
 
 The request is `helix-before-change`, or `helix-before-toggle` where the state
 is a boolean, or `helix-before-open` and `helix-before-close` where it is an
@@ -1144,32 +1136,23 @@ are continuous, Input, Textarea, Number Input, Pin Input and Slider, and the
 rest send `input` and `change` together the way a native `<select>` does.
 
 **The eleven families that sent a generic `helix-change` have verbs of their
-own.** *Rewritten 27 Aug 2026, and this said they still wanted them.* They are
-not form controls, so no native word applied, and one word was doing for them
+own.** They are not form controls, so no native word applied, and one word was doing for them
 what one word for four questions did for `appearance`. What they took: Chat
 `helix-before-pin`, Outline, Steps, Tabs, Tour, Tree and Video Playlist
 `helix-before-activate`, Splitter `helix-before-resize` and
 `helix-before-collapse`, Sandbox `helix-before-split` and
 `helix-before-panel-resize` for its two dividers and `helix-before-edit` for a
 source pane. Pagination Size kept `helix-before-change`, being the one of the
-eleven that really is a value control. See 294, and 306 for the field the
-sandbox's pair was the last caller of.
+eleven that really is a value control.
 
-**`@controlled` is deleted, and so is everything that read it.** *Rewritten 26
-Aug 2026, and this section described a tag, two analyzer plugins and a check
-that no longer exist.* It read: a controlled property declares itself with
-`@controlled` naming the events that answer it, declaring `value` is a claim of
-ownership so the element announces and applies nothing until told,
-`check:controlled` holds the tag and the call together in both directions, and
-the generated JSX types refuse the property without a handler.
-
-None of that is true. A declared property is a seed and a correction, the
+**`@controlled` is deleted, and so is everything that read it.** A declared
+property is a seed and a correction, the
 element always applies, and a consumer takes one decision by refusing the before
 event. With no mode to be silently in there is nothing for a tag to declare,
 nothing for the generated constraint to require, and nothing for a check to
 hold. `helix-controlled`, `helix-controlled-props`, `check:controlled` and its
-fixture were removed together. See 294, and the longer version of the argument
-under the reflected-property rules above.
+fixture were removed together. The longer version of the argument is under the
+reflected-property rules above.
 
 **What survives is the finding underneath it**, which was never about ownership:
 which properties are stateful cannot be inferred from `inheritedFrom`. Eight are
@@ -1193,13 +1176,11 @@ consumer would guess simply does nothing.
 React, and no React package: there is not one.
 
 **Bind Helix events with `onhelix-*`, and the element repairs the rest.**
-*Reversed 19 Aug 2026, which is the day it was written.* This read "bind with
-`addEventListener`, not a prop", because those props do not survive hydration:
-React records them, attaches no listener, and the handler never runs until React
-commits an update for some other reason. Nothing is logged and the element goes
-on doing its own job, which is why it passes every casual check. Before it was
-found, the sandbox's example tree and file tabs were dead on every fresh page
-load.
+**Do not reach for `addEventListener` instead.** The props alone do not survive
+hydration: React records them, attaches no listener, and the handler never runs
+until React commits an update for some other reason. Nothing is logged and the
+element goes on doing its own job, which is why it passes every casual check.
+What repairs it is the element itself, below.
 
 The handler is on the node the whole time, under a key React stashes there, so
 `HelixElement.dispatchEvent` reads it and binds it immediately before
@@ -1215,12 +1196,11 @@ dead weight and should go.
 
 *Re-checked 27 Aug 2026: the issue is still open, last touched 17 Aug, and PR
 #35474 is still the proposed fix, still unmerged and last touched 27 June.* Which version this was measured against is not left to prose:
-`check:react-bridge` reads the number out of this file and fails if the
+`check:pkg:react-bridge` reads the number out of this file and fails if the
 installed `react-dom` has moved past it, because a probe is a claim about one
 release's internals and nothing in `verify` reads a comment.
 
-**Object and function *properties* had the same bug and are fixed now.**
-*Rewritten 26 Aug 2026, and this said the fix was deliberately unbuilt.* React
+**Object and function *properties* had the same bug and are fixed now.** React
 skips everything it would have to apply imperatively while hydrating; strings,
 numbers and booleans survive only because the server wrote them as attributes. An
 object or a function survives by no route at all, and both halves of React agree
@@ -1241,7 +1221,7 @@ class default is standing, and assigning it would reproduce only a crash.
 **It was built when the first component needed one, which is exactly what the
 note it replaces asked for.** `helix-data-table` declares `rows` and
 `helix-table-column` declares `cell` and `compare`, so `rows={rows}` in JSX was a
-correctly labelled, permanently empty grid. The other ten `attribute: false`
+correctly labeled, permanently empty grid. The other ten `attribute: false`
 properties in the library are booleans and strings a parent writes at runtime,
 and this never touches them.
 
@@ -1264,7 +1244,7 @@ share their name with their property.**
 
 There is nothing to fix in the component. The value the consumer wrote is a
 string and JSX is where it has to stop being one, so an example, a page or an
-app writes `value={42}` and `modal={false}`. `check:visual-parity` is what holds
+app writes `value={42}` and `modal={false}`. `check:spec:visual-parity` is what holds
 it: it renders every example from its HTML and from its TSX and compares the two
 pictures, which is the only way a converter that quietly did not run shows up.
 
@@ -1273,9 +1253,9 @@ nothing at all.** That is the older rule below about reflection, met from this
 direction: React writes the property and no attribute appears, so `:host([max])`,
 `:host(:not([href]))` and `:host(:not([no-copy]))` match the wrong way round and
 the component works while looking wrong. Four had drifted, three of them found by
-rendering pictures rather than by reading. `check:reachable` reads every
-host-attribute selector against whether its property reflects, and it is the
-third check on that one rule: `check:reflected` and `check:reflected-defaults`
+rendering pictures rather than by reading. `helix component`'s `reachable` reads
+every host-attribute selector against whether its property reflects, and it is the
+third check on that one rule: `reflected` and `reflected-defaults`
 both ask about properties that already reflect, and neither notices one that
 should and does not.
 
@@ -1297,7 +1277,7 @@ React's own events are unaffected **where they bubble**: `onClick` on a
 `<helix-button>` goes through the synthetic system, which hydration does set up.
 
 **A relayed native event that does not bubble reaches nothing, and the element
-binds that one too.** React recognises `onError` and `onLoad` as its own names
+binds that one too.** React recognizes `onError` and `onLoad` as its own names
 and attaches nothing to a custom element for either: its delegated listener sits
 at the root and sees only what bubbles, and the non-delegated list it wires for
 `<video>`, `<audio>` and `<img>` is never wired for a custom element. Avatar
@@ -1354,7 +1334,7 @@ definition lands. Consumers are on the App Router; asking them to mark every
 page `'use client'` to use a button would not be a design system.
 
 **Import `@fusion.dev/helix/elements.css` beside the base layer.** It is generated
-from the element sources by `tooling/scripts/build-elements-css.mjs` and hides
+from the element sources by `fusion/scripts/build-elements-css.mjs` and hides
 each tag with `:not(:defined)` until it upgrades, using `visibility` so the page
 does not reflow. Without it a card arrives as a run of unstyled text and then
 snaps into a card. CSS cannot select "any custom element", and a bare
@@ -1395,22 +1375,12 @@ several commits. The assertion that means something is
 
 ## Framework typings, and the names they carry
 
-**There are no wrappers and there is no `helix/react`.** *Corrected 24 Aug 2026,
-and the section this replaces described a package that does not exist.* It said
-wrappers were generated by `bun run generate` in `helix/react`, and neither the
-directory nor the script is in the repository: the typings are emitted by cem
-plugins during `bun run analyze`, `jsx.d.ts` by `@wc-toolkit/jsx-types` with
-`jsxReactRef` and `jsxImports` on top of it, and `vue.d.ts` and `svelte.d.ts`
-beside them. Consumers write `<helix-card>` directly, which the section below on
-using the elements has said the whole time.
+**There are no wrappers and there is no `helix/react`.** The typings are emitted
+by cem plugins during `bun run analyze`: `jsx.d.ts` by `@wc-toolkit/jsx-types`
+with `jsxReactRef` and `jsxImports` on top of it, and `vue.d.ts` and
+`svelte.d.ts` beside them. Consumers write `<helix-card>` directly.
 
-The rule outlived the decision the same way the event-naming one did, and with
-the same cost: `tiers.mdx` carried an `@fusion.dev/helix-react` row in its package table
-while `introduction.mdx` two pages earlier said there is no React package, and
-`DisclosureRoot` was cited here as a naming example for a family that has never
-existed. Found by reading the documentation end to end.
-
-What survived is the naming, which was never about wrappers:
+The naming, which was never about wrappers:
 
 - **Namespaces mean composition, never variation.** `Tabs.Root` contains
   `Tabs.Tab`. An icon-only button is not a part of Button, so `IconButton` is
@@ -1429,13 +1399,13 @@ What survived is the naming, which was never about wrappers:
   **`CodeBlock` holds no parser, and that is the interesting half.** Syntax
   highlighting is `@fusion.dev/helix-sandbox/highlight`, a Lezer parse and a tree walk
   with no editor mounted and no DOM required, so it runs during a build and a
-  static page ships coloured markup with no JavaScript spent on it. Those
+  static page ships colored markup with no JavaScript spent on it. Those
   grammars are already in that package for the editor, so nothing new is
   installed; putting them in `helix/styled` would put CodeMirror in every
   consumer's `dependencies`, which is about 4 MB paid at install time whatever
   anyone imports. `CodeBlock` renders a `<slot>`, so highlighted markup drops
   straight in and the component stays free of it. A snippet on a reference page
-  and the same snippet in the sandbox are then coloured by one grammar rather
+  and the same snippet in the sandbox are then colored by one grammar rather
   than two that agree by coincidence.
 - **A group is a part when it is the control, and a family when it arranges
   them.** The test is whether the group reports a form value.
@@ -1451,12 +1421,9 @@ What survived is the naming, which was never about wrappers:
   group at all. Both are their own families, because their members are complete
   controls that the family does not need the group to explain.
 
-  *Corrected 15 Aug 2026.* This read "groups are parts where homogeneous", which
-  is a fact about the members rather than about the group, and by it both
-  `Checkbox Group` and `Button Group` were violations. Neither is: the code was
-  following the better rule and the rule was the thing that had drifted. A set of
-  checkboxes and a set of radios are equally homogeneous and are not the same
-  kind of thing, which is what "homogeneous" could not see.
+  A set of checkboxes and a set of radios are equally homogeneous and are not the
+  same kind of thing, which is why "homogeneous" is not the test: that is a fact
+  about the members rather than about the group.
 
   A container holding mixed content is a family for the older reason as well:
   `Toolbar` holds buttons, dropdowns and inputs, and is about none of them.
@@ -1519,7 +1486,7 @@ result worth keeping. Category one stays unbuilt because almost nothing asks for
 it: three families declare `container-type`, Donut Chart, Table and Video, and
 no `@container` rule exists yet. That is a measurement rather than a plan.
 
-**`check:visual` renders every family at two widths**, 640 and 390, on both
+**`check:spec:visual` renders every family at two widths**, 640 and 390, on both
 tiers, so a change to the narrow rendering is visible. That is the half of this
 that stays fixed without anybody remembering to look. A baseline is what makes a
 change visible, not a claim that what it pictures is good.
@@ -1528,7 +1495,7 @@ change visible, not a claim that what it pictures is good.
 ## The sandbox
 
 `@fusion.dev/helix` ships the sandbox shell and `@fusion.dev/helix-sandbox` the editor and
-the spec runner; `site/ui` is the Next site that renders them. Both dev and
+the spec runner; `fusion/site` is the Next site that renders them. Both dev and
 production work the same way as the marketing site, with element registration in
 one client component.
 
@@ -1545,7 +1512,7 @@ one client component.
   the thing *is* rather than what it weighs.
 
   So `Sandbox` is a component, under `@category tooling`, single tier. It earns
-  that by the same test as everything else: behaviour, state and API. Pane-size
+  that by the same test as everything else: behavior, state and API. Pane-size
   memory across a content change, panel collapse, `hasPanel` so an omitted panel
   paints no band, and separator labels. Single tier because the headless and
   styled split exists so a consumer can bring their own presentation, and nobody
@@ -1601,9 +1568,9 @@ one client component.
 Two copies of the library are on that page and they are not the same build.
 
 The sandbox's own chrome (the tabs, the tree, the toolbar) comes through Next's
-module graph from `helix/styled/dist`, so `bun run dev:watch` rebuilds it and HMR
+module graph from `helix/styled/dist`, so `bun run watch` rebuilds it and HMR
 shows it immediately. **The preview does not.** It runs `frame.js`, an 873 kB
-classic-script IIFE built by `bun run frame` and served from `public/`, which is
+classic-script IIFE built by `turbo run frame` and served from `public/`, which is
 the only shape that can carry the library into a sandboxed document (see below).
 It was 400 kB before the sandbox shell moved into `@fusion.dev/helix`, which the
 frame imports whole: the shell now rides in every preview, which is what lets an
@@ -1616,7 +1583,7 @@ reach a tab that is already open.
 - **`frame` is a turbo task**, `dependsOn: ["^build"]`, and `dev:watch` watches
   it rather than `build`. Because of that dependency, watching the frame
   rebuilds every library it carries as well, so the command does more and says
-  less: `turbo watch frame --filter=@fusion.dev/site-ui`. Turbo does not accept
+  less: `turbo watch frame --filter=@fusion.dev/site`. Turbo does not accept
   `--filter=pkg#task`, which is what makes the obvious version of this fail.
 - **The preview reloads itself.** HMR never re-creates the iframe, so the bundle
   it executed at page load is the one still running, forever. The workbench
@@ -1630,7 +1597,7 @@ reach a tab that is already open.
   `no-store` from `next.config.ts`, and the assets it names stay immutable.
 
 **If you are ever verifying a fix without `dev:watch` running, it is
-`bun run frame` and a page reload.** Not a hot reload, and not the chrome
+`turbo run frame` and a page reload.** Not a hot reload, and not the chrome
 looking right.
 
 ### The preview runs untrusted code
@@ -1646,7 +1613,7 @@ security boundary and everything about it follows from that.
   opaque origin, and from there every module import and `fetch` back to the site
   is cross-origin without CORS headers, so a framework route's chunks never load
   and the document never comes alive. A classic `<script src>` is not
-  CORS-checked and does run, which is why `bun run frame` emits one IIFE with
+  CORS-checked and does run, which is why `turbo run frame` emits one IIFE with
   the component library inside it and a plain HTML file beside it.
 - **Messages are identified by window, not by origin.** An opaque origin arrives
   as the string `"null"`, which any other sandboxed frame on the page also
@@ -1673,9 +1640,7 @@ Two page kinds, kept apart on purpose:
 
 - **`/components/<family>` is the whole component**: what it is, how to import
   it, the headline example running, the API, and the list of every other
-  example. *Reversed 19 Aug 2026.* This read "the API, read from the manifest
-  and nothing else. No examples: a reference page that starts collecting
-  pictures stops being complete." What the split actually produced was two
+  example. **Do not split the API off from the examples.** Doing so produced two
   pages a reader had to hold in their head at once, the tables here and the
   pictures elsewhere, and no page that answered "what is this and how do I use
   it" without a navigation in the middle of the answer. Completeness was never
@@ -1686,7 +1651,7 @@ Two page kinds, kept apart on purpose:
   headline one is *seen*.
 
 **Which tier a reference page documents is a preference, not a route.**
-`Base`/`Styled` lives in the preferences drawer beside colour mode, keyed
+`Base`/`Styled` lives in the preferences drawer beside color mode, keyed
 `fusion-api-tier`, and styled is the default because it is the tier almost
 everyone consumes and because it is a superset: styled extends base, so its
 tables already contain every member base would show.
@@ -1697,7 +1662,7 @@ reference pages are static and server-rendered, and the server cannot read it,
 so filtering in React would mean the server rendering one tier while the client
 wants the other: a hydration mismatch on every component page. Marking both and
 letting CSS choose costs a little HTML and cannot disagree with itself, which is
-the same trade colour mode already makes.
+the same trade color mode already makes.
 
 `display: none`, never a clip. The hidden tier has to leave the accessibility
 tree as well as the page, or a reader being read the styled API gets the headless one
@@ -1724,8 +1689,8 @@ browser lowercases it to something no component reads.
 
 `htmlToJsx` is deleted. `jsxToHtml` survives for one job, converting a reader's
 live edit in the TSX pane, which by definition has no authored twin.
-`check:examples-paired` holds the two files to each other and
-`check:visual-parity` holds the two pictures to each other.
+`helix component`'s `examples-paired` holds the two files to each other and
+`check:spec:visual-parity` holds the two pictures to each other.
 
 **An example shows the component. It never explains it.** Slot content is
 whatever a real page would hold, which usually means a label and lorem, and the
@@ -1757,7 +1722,7 @@ the published interface into the library's source tree to find out what a
 component ships. The markup stays on disk: it is the sandbox's payload, it is
 large, and every consumer parses this manifest whether or not it renders one.
 
-A family with an `index.ts` and no `.examples` fails `check:examples`. That is
+A family with an `index.ts` and no `.examples` fails `helix component`'s `examples`. That is
 what makes a directory a family, the same question the package's `exports` map
 asks, which is why `field/` is exempt and why moving the sandbox into
 `helix/styled` obliged it to ship an example.

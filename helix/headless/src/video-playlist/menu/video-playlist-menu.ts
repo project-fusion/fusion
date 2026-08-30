@@ -45,9 +45,9 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  *
  * **Choosing dispatches `helix-select`, the same event an entry dispatches.**
  * It never writes `active` on the playlist, which looks like the shorter path
- * and would latch the controlled contract: a playlist assigned `active` once
- * goes quiet and waits for a consumer who was never there. Announcing is what
- * an entry does, the playlist already listens for it, and a consumer refusing a
+ * and skips the cancelable request: an assignment applies the change with no
+ * `helix-before-activate` for anyone to refuse. Announcing is what an entry
+ * does, the playlist already listens for it, and a consumer refusing a
  * selection gets `preventDefault()` on one event rather than two paths that
  * behave differently.
  *
@@ -65,7 +65,6 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  * @csspart entry-item - The row, which is an `<a>` where `href` is set.
  * @csspart entry-mark - The trailing mark: a tick when checked, a caret when it opens
  * @csspart entry-start - The leading column, which is a slot and is always there.
- * @csspart icon - The glyph on the trigger.
  * @csspart menu - The menu that holds the entries.
  * @csspart menu-back - The control that returns from a submenu.
  * @csspart menu-back-mark - The glyph on the back control of a submenu.
@@ -115,17 +114,14 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
 
   /* Resolved once, on the client, and never during a render.
    *
-   * `render` reached for this through `closestInstance` at first, which walks
-   * `parentNode` and steps across a `ShadowRoot` by following its `host`. That
-   * names `ShadowRoot`, which the server has no global for, so every SSR of
-   * this element threw `ReferenceError: Can't find variable: ShadowRoot` from
-   * inside Lit's own result collector, three frames from anything recognisable.
-   *
-   * Which is the tree-inspection rule arriving as a crash rather than as a
-   * wrong answer: a component that walks the tree to render cannot render on a
-   * server, and the server has no tree to walk anyway. Held here instead, set
-   * after the first update, and `undefined` on the server, where an empty menu
-   * is the honest output. */
+   * `closestInstance` walks `parentNode` and steps across a `ShadowRoot` by
+   * following its `host`, and the server has no `ShadowRoot` global, so
+   * reaching for it inside `render` throws
+   * `ReferenceError: Can't find variable: ShadowRoot` from inside Lit's own
+   * result collector. A component that walks the tree to render cannot render
+   * on a server, and the server has no tree to walk anyway. Set after the first
+   * update, and `undefined` on the server, where an empty menu is the honest
+   * output. */
   #playlist: HelixHeadlessVideoPlaylist | undefined
 
   /** The playlist this menu belongs to, found upward through the slots. */
@@ -151,10 +147,8 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    * **Which entry is current** is `active`, a property with no attribute, so
    * there is nothing to observe: events travel up from the playlist and this
    * element is below it, and mirroring `active` to a `data-` name is ruled out
-   * on its own merits, `active` being a payload rather than a boolean fact.
-   * Mirroring it was written and reverted here: it put `data-active` onto every
-   * host, which `tree-root.ssr.spec.ts` caught, and the rule it broke was the
-   * one that stops a copied host coming back frozen.
+   * on its own merits, `active` being a payload rather than a boolean fact. A
+   * `data-active` on every host is what `tree-root.ssr.spec.ts` fails on.
    *
    * So it is re-read at the moment it is looked at. `helix-before-open` comes from the
    * menu in this element's own shadow root, which is the one direction events
@@ -177,10 +171,9 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    *
    * The entries are the playlist's light DOM rather than this element's, so
    * nothing about them schedules an update here: an entry added, removed, or
-   * made current changes a tree this element only looks at. A bumped field is
-   * the usual way to say "render again", and here it is a field nothing reads,
-   * which the linter is right to call out. Asking directly says the same thing
-   * with nothing to explain. */
+   * made current changes a tree this element only looks at. A bumped `@state`
+   * field is the usual way to say "render again", and here it would be a field
+   * nothing reads, which the linter is right to call out. */
   private readonly reread = (): void => {
     this.requestUpdate()
   }
@@ -220,16 +213,14 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
           }}
         >
           ${
-            /* The still, where there is one, for the reason the list beside the
-               player shows one: a reader picks an episode by recognising it
-               faster than by reading its title, and this menu opens over the
-               picture where reading is hardest.
+            /* The still, where there is one: a reader picks an episode by
+               recognizing it faster than by reading its title, and this menu
+               opens over the picture where reading is hardest.
              *
              * In `start`, which is free: `Menu.Item` renders its tick *after*
              * the label as `part="mark"`, so the leading column has nothing to
              * collide with. `alt=""`, because the name is in the same row and a
-             * still repeating it is the same thing said twice, which is what
-             * `Video.Playlist.Item` already decided about its own thumbnail.
+             * still repeating it is the same thing said twice.
              *
              * Omitted rather than empty where there is no poster, an `<img>`
              * with no `src` being a broken-image glyph in every engine. */

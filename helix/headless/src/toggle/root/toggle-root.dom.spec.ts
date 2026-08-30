@@ -22,9 +22,7 @@ const toggle = async (attributes = 'value="a"'): Promise<Toggle> =>
  *
  * **The group already proves the coordination**, which is one selection at a
  * time, arrow keys moving between members and the value the group reports to a
- * form. What is left is what one option owns, and this is the last part in the
- * library that had a server spec and no DOM spec: the inverse of the fifteen
- * around it, where the *group* was covered and the member was not.
+ * form. What is left is what one option owns on its own.
  */
 describe('one toggle', () => {
   /* `aria-checked` is written in both states rather than omitted when false,

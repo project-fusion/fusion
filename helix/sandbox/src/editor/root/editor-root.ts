@@ -32,12 +32,9 @@ export type EditorLanguage = keyof typeof LANGUAGES
  * @summary An editable pane of source, with highlighting and line numbers.
  *
  * @description
- * CodeMirror, not a `<textarea>`. The textarea it replaces was the right call
- * while a sandbox only had to hold text: undo, selection, spellcheck
- * suppression, mobile keyboards, and screen-reader support all came from the
- * platform. What it could not do is highlight what it holds, number its lines,
- * or say where the cursor is, and a status bar reading line and column has to
- * ask something.
+ * CodeMirror, not a `<textarea>`. A textarea cannot highlight what it holds,
+ * number its lines, or say where the cursor is, and a status bar reading line
+ * and column has to ask something.
  *
  * **On its own path.** This is `@fusion.dev/helix-sandbox/editor` rather than part of
  * the barrel, because CodeMirror is around 110 KB over the wire where the rest
@@ -62,16 +59,10 @@ export type EditorLanguage = keyof typeof LANGUAGES
 @customElement('helix-sandbox-editor')
 export class HelixSandboxEditor extends HelixElement {
   /**
-   * The source being edited.
+   * Accessible name for the editable region.
    */
-  @property()
-  value = ''
-
-  /**
-   * Which source this pane holds, echoed in every change.
-   */
-  @property()
-  name = 'html'
+  @property({ attribute: 'field-label' })
+  fieldLabel = 'Example source'
 
   /**
    * How to highlight it.
@@ -80,10 +71,10 @@ export class HelixSandboxEditor extends HelixElement {
   language: EditorLanguage = 'html'
 
   /**
-   * Accessible name for the editable region.
+   * Which source this pane holds, echoed in every change.
    */
-  @property({ attribute: 'field-label' })
-  fieldLabel = 'Example source'
+  @property()
+  name = 'html'
 
   /**
    * Whether the text can be changed.
@@ -94,6 +85,12 @@ export class HelixSandboxEditor extends HelixElement {
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
+
+  /**
+   * The source being edited.
+   */
+  @property()
+  value = ''
 
   private readonly readOnly$ = new Compartment()
 
@@ -233,12 +230,10 @@ export class HelixSandboxEditor extends HelixElement {
 
     // Only when it differs, or an edit would be dispatched back into the
     // document that produced it and the cursor would jump to the end.
-    /* A value set from outside replaces the document, and the caret stays where
-       it was rather than going to the top. A replacement carries no selection
-       of its own, so CodeMirror falls back to the start: every such write moved
-       the cursor to character zero, which is unusable if anything is echoing
-       what was typed back into the element. Clamped, because the new text can
-       be shorter than the old position. */
+    /* A replacement carries no selection of its own, so CodeMirror falls back
+       to the start and the caret lands on character zero, which is unusable if
+       anything is echoing what was typed back into the element. Clamped,
+       because the new text can be shorter than the old position. */
     if (changed.has('value') && this.value !== view.state.doc.toString()) {
       const head = view.state.selection.main.head
       view.dispatch({

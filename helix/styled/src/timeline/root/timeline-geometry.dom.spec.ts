@@ -83,11 +83,11 @@ describe('a timeline, as the stylesheet draws it', () => {
         </helix-timeline-item>
         <helix-timeline-item><span slot="time">C</span>One line</helix-timeline-item>`)
       const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
-      const centres = entries.map((one) => {
+      const centers = entries.map((one) => {
         const box = (part(one, 'marker') as HTMLElement).getBoundingClientRect()
         return Math.round(box.left + box.width / 2)
       })
-      expect(new Set(centres).size).toBe(1)
+      expect(new Set(centers).size).toBe(1)
     })
   }
 })

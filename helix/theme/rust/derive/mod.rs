@@ -1,31 +1,13 @@
 //! The derivation, ported from `src/derive.ts` and taken apart on the way.
 //!
-//! **The TypeScript is one 615-line function and this is not, which is the
-//! whole reason to port it into modules rather than a file.** The phases were
-//! always there: the chroma policy, the surface ladder, the solvers, the
-//! emphasis roles, the statuses and their repair, the fills, the audit. They
-//! were closures inside one scope, so what separated them was a blank line and a
-//! comment, and what they captured was whatever happened to be in scope.
-//!
-//! Splitting them makes the capture explicit, which is the part worth having: a
-//! phase that takes what it needs as arguments can be read, moved and tested on
-//! its own, where a closure over sixteen bindings can only be read in place.
-//! `solve_against` turns out to be pure and `emphasis` turns out to need six
-//! things, and neither of those was visible before.
-//!
-//! **The TypeScript is not being reorganised to match.** It is scheduled for
-//! deletion by this port, so restructuring it would churn the import surface of
-//! 82 specs to improve a file that is going, and the modularity has to live in
-//! the crate either way.
+//! **Do not reorganize the TypeScript to match.** It is deleted by this port,
+//! so restructuring it would churn the import surface of 82 specs to improve a
+//! file that is going, and the modularity has to live in the crate either way.
 //!
 //! Each phase is asserted against the oracle by the tokens it produces. That
 //! works because the artifact is 37 uniquely named tokens rather than one
 //! opaque blob: a disagreement names itself, so `color-primary` differing points
 //! at the emphasis phase without anybody bisecting a search by hand.
-//!
-//! What is here so far is what every phase needs: the token shape, the origin a
-//! reader tells a decision from a computation by, and the two things the audit
-//! turns on. The phases follow.
 
 pub mod accent;
 pub mod emphasis;
@@ -121,9 +103,9 @@ pub const COLLISION_DISTANCE: f64 = 0.08;
 /// OKLCH as the three `OKLab` axes it is the polar form of.
 ///
 /// Its own function rather than a closure, so the oracle's isolation test uses
-/// *this* and not a copy of it. It was a copy for one commit, which left the
-/// test that separates a disagreement in the trigonometry from one in the
-/// algorithm unable to see a disagreement introduced in the trigonometry.
+/// *this* and not a copy of it. A copy leaves that test, which separates a
+/// disagreement in the trigonometry from one in the algorithm, unable to see a
+/// disagreement introduced in the trigonometry.
 pub(crate) fn to_lab(color: Oklch) -> [f64; 3] {
     let rad = color.hue * std::f64::consts::PI / 180.0;
     [
@@ -175,17 +157,8 @@ fn hypot3(x: f64, y: f64, z: f64) -> f64 {
 
 /// What every phase after the ladder needs, named rather than captured.
 ///
-/// **This is the closure's capture list, written down.** In the TypeScript
-/// `emphasis` reaches for six things that happen to be in scope: the chroma
-/// policy, the scheme, the surface base lightness, the fitted surface list, the
-/// contrast target, and `solveAgainst`. Nothing says so, because a closure does
-/// not have to.
-///
-/// Five of the six are values and are the fields below, `surfaces` carrying two
-/// of them. The sixth is not here at all: `solveAgainst` was in that list only
-/// because a closure captures whatever is in scope, and it turned out to take
-/// everything it needs as arguments, so it is a free function. Writing the
-/// capture down is what made that visible.
+/// `solve_against` is not a field: it takes everything it needs as arguments,
+/// so it is a free function rather than something a phase is handed.
 #[derive(Clone, Copy, Debug)]
 pub struct Deriving {
     pub contrast_target: f64,

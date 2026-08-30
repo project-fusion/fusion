@@ -14,16 +14,16 @@
  * Named by role rather than numbered, because a number implies a scale somebody
  * maintains and this is seven values in one file. Underscored, because they are
  * declared and read in that same file and never leave it, which is the one case
- * the sigil is for: `check:hooks` pairs a public name with an `@cssproperty`
- * and would otherwise ask this example to publish its own palette. Written through
+ * the sigil is for: an unprefixed name reads as a hook this example
+ * publishes, and a diagram of what to style publishes none. Written through
  * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets
  * a sheet that inverts rather than a pale card on a dark page: the headless tier
  * has no theming and this is the cheapest honest substitute.
  *
  * A part with no rule below is one the platform already renders acceptably. A
- * wrong rule is worse than none: the first checkbox sheet painted a box and left
- * the input at `appearance: auto`, so the browser drew its own control and
- * nothing written for it was ever visible. */
+ * wrong rule is worse than none: a sheet that paints a box while leaving the
+ * input at `appearance: auto` gets the browser's own control drawn instead, and
+ * nothing written for it is ever visible. */
 
 :root {
   color-scheme: light dark;
@@ -99,10 +99,10 @@ helix-headless-rating::part(option):focus-visible {
 /* The mark ships with no glyph, deliberately, so the example draws one.
    A square rotated forty-five degrees is a diamond and needs no asset.
    
-   display is the load-bearing line and was the missing one. A mark is an inline
-   box, and width and height do not apply to those, so a rule giving it three
-   quarters of a rem left ten marks at zero by zero with their fill set and
-   nothing on screen at all. */
+   `display` is the load-bearing line. A mark is an inline box, and width and
+   height do not apply to those, so a rule giving it three quarters of a rem
+   leaves every mark at zero by zero with its fill set and nothing on screen at
+   all. */
 helix-headless-rating::part(mark) {
   background-color: currentColor;
   block-size: 0.75rem;
@@ -115,10 +115,9 @@ helix-headless-rating::part(mark) {
    
    Both track and fill hold every mark, and the fill is a clip of the whole row
    rather than a subset of it, so they have to be stacked and not laid side by
-   side. Left to the name-matching, marks became a row, track became a progress
-   groove painted over the marks it is made of, and fill was a block: the
-   component rendered as half a rem of flat gray, and with the groove removed it
-   rendered as nothing.
+   side. Laid out by what their names suggest, track becomes a progress groove
+   painted over the marks it is made of and the component renders as a bar of
+   flat gray.
    
    The width of the clip is the component's own arithmetic, published as
    --rating-full, --rating-part and --rating-steps on the container so a sheet
@@ -128,7 +127,7 @@ helix-headless-rating::part(marks) {
   position: relative;
 }
 
-/* Coloured through currentColor, because a consumer cannot reach inside.
+/* Colored through currentColor, because a consumer cannot reach inside.
    
    A filled mark is a mark inside the fill layer, and ::part(fill) [part="mark"]
    selects nothing: ::part() reaches the part and no further, so descendants of a

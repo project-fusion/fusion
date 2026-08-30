@@ -1,0 +1,221 @@
+/**
+ * The theme builder.
+ *
+ * Beside the tool rather than in `site.css`, which is the shared sheet every
+ * page of the marketing site draws on. A tool's chrome is not site chrome, and
+ * a file two people are editing at once is a conflict waiting for whichever of
+ * them commits second.
+ *
+ * The shell, the header and the splitter body are the sandbox's, by class:
+ * `sandboxShell`, `workbenchHeader` and `workbenchBody`. Only what goes inside
+ * the panes is this file's.
+ */
+
+/* The form. Its own scroller, because the pane is a fixed height and a theme
+   has more knobs than a short window has room for. */
+.themeControls {
+  block-size: 100%;
+  overflow-y: auto;
+  padding: var(--helix-space-lg);
+}
+
+/* What the brand became.
+ *
+ * **A caption under the field, not a callout.** A callout carries a severity
+ * and an icon and interrupts; this reports a normal consequence of the value
+ * just typed. As a callout it read as a warning about something that is not
+ * wrong, and in a quarter-width pane its icon and inset wrapped the sentence
+ * four times. */
+.themeShift {
+  display: grid;
+  gap: var(--helix-space-xs);
+  margin-block-start: calc(var(--helix-space-xs) * -1);
+}
+
+/* The pair reads left to right as one statement, so it gets its own line and a
+   size worth looking at rather than being squeezed beside the words. */
+.themeShiftPair {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-xs);
+}
+
+/* Drawn rather than set as an icon: an arrow glyph at this size is a
+   component, a focusable-looking mark and a name in the accessibility tree,
+   for something that is punctuation between two swatches. */
+.themeShiftArrow {
+  background-color: var(--helix-color-foreground-muted);
+  /* The box the clip-path draws inside, so it needs the arrowhead's height and
+     not the shaft's: at `--helix-border-thin` the polygon had one pixel to put
+     a head in and the whole mark disappeared. The shaft's thinness is the 40 to
+     60 percent band in the polygon instead. */
+  block-size: var(--helix-space-sm);
+  clip-path: polygon(0 40%, 62% 40%, 62% 0, 100% 50%, 62% 100%, 62% 60%, 0 60%);
+  inline-size: var(--helix-space-md);
+}
+
+.themeSwatch {
+  block-size: var(--helix-size-control-sm);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-control-sm);
+}
+
+/* The two swatches beside the brand: what was asked for, and what the solver
+   produced from it. */
+.themeSwatch {
+  block-size: var(--helix-size-icon-md);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: block;
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-md);
+}
+
+/* Do not route the two colored slider tracks from here. A rule selecting on a
+   `label` attribute only matches markup a server wrote: after a client-side
+   navigation React assigns `label` as a property, Lit does not reflect it, and
+   the selector matches nothing. They set `--slider-track-image` inline. */
+
+/* The stage is `helix-sandbox` and nothing else: the component owns the split,
+   the panel, the toolbar row and the separators. */
+.themeStage {
+  block-size: 100%;
+  display: grid;
+  min-inline-size: 0;
+}
+
+/* The artifact fills its pane the way the workbench's editor fills its own:
+   no inset and no box, because a source pane is not a figure on a page. */
+helix-sandbox-editor {
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+/* The findings, inside whichever tab is showing. The tabs own the panel's
+   height; each pane scrolls on its own so switching tabs does not move the
+   scroll position of the one you left. */
+.themeFindings {
+  block-size: 100%;
+  overflow-y: auto;
+  padding: var(--helix-space-md);
+}
+
+/* **It transitions in, because it appears in response to something the reader
+   just did.** A notice that arrives with no motion reads as having always
+   been there, and the thing it is reporting, that the brand moved, is a
+   consequence of the color they typed a moment ago.
+
+   Keyed on the direction in the markup, so switching from lightened to darkened
+   remounts and plays again rather than silently swapping a word. */
+.themeShift {
+  animation: themeShiftIn var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+@keyframes themeShiftIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--helix-space-2xs) * -1));
+  }
+}
+
+/* The base layer caps duration for a reader who asked not to be moved, and a
+   keyframe animation is not a transition, so it needs saying here. */
+@media (prefers-reduced-motion: reduce) {
+  .themeShift {
+    animation: none;
+  }
+}
+
+/* The audit counts, which are buttons wearing a tag.
+ *
+ * A bare reset rather than `all: unset`, which takes `box-sizing` with it and
+ * would need restoring in the same rule. Four properties is the whole of what a
+ * button brings that is unwanted here: the tag inside supplies every pixel a
+ * reader sees.
+ *
+ * The focus ring is the reason this is a button at all, so it is stated rather
+ * than left to the reset: `:focus-visible` only, because a pointer opening a
+ * panel does not need a ring left behind on the tag it came from. */
+.themeJump {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: block;
+  padding: 0;
+}
+
+.themeJump:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-border-thick) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-space-2xs);
+}
+
+/* The two-letter sample beside a face's name.
+ *
+ * Subtle on purpose: the name is what a reader is scanning and the sample is
+ * what they check once they have found it, so it sits back a step in the ink
+ * ramp and does not compete for the row. Centered in the column's fixed width,
+ * so each face sits on one vertical. */
+.themeFaceSample {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-lg);
+  inline-size: 3ch;
+  line-height: var(--helix-leading-tight);
+  text-align: center;
+}
+
+/* The specimen column at the end of a face's row, holding either the sample or
+ * its stand-in.
+ *
+ * A fixed inline size, because the whole column has to line up: `Ag` in
+ * Playfair Display is wider than in Inter, and a ragged edge down a thousand
+ * rows reads as a list that is broken rather than as type that varies. Both
+ * children are laid on top of each other in the same box, so the swap when a
+ * face lands moves nothing beside it.
+ *
+ * Not scaled down to the option's text. A sample smaller than the name it
+ * describes cannot show a terminal or a bowl, which is the only thing it is
+ * here for, so it takes a step up rather than down. */
+.themeFace {
+  align-items: center;
+  block-size: var(--helix-text-xl);
+  display: grid;
+  flex: 0 0 auto;
+  inline-size: 3ch;
+  /* Ranged right, so the column's own edge is the one that lines up. At the end
+     of a row it is the right edge a reader reads down, not the left. */
+  justify-items: end;
+}
+
+.themeFace > * {
+  grid-area: 1 / 1;
+}
+
+.themeFaceSample {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-lg);
+  line-height: var(--helix-leading-tight);
+}
+
+/* **Which of the two is showing is decided by the face, not by a guess.**
+ * `useFacePreviews` writes `data-face-ready` when `document.fonts.load` has
+ * actually resolved, so until then the sample is hidden and its stand-in is
+ * not. `display=swap` would otherwise render `Ag` in the fallback under a row
+ * naming something else, which is worse than blank: blank is forgiven and wrong
+ * is believed. */
+.themeFaceSample:not([data-face-ready]) {
+  visibility: hidden;
+}
+
+.themeFaceWaiting {
+  --skeleton-size: var(--helix-text-md);
+
+  inline-size: 100%;
+}
+
+.themeFaceSample[data-face-ready] + .themeFaceWaiting {
+  display: none;
+}

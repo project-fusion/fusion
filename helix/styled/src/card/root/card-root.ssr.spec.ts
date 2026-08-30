@@ -1,15 +1,16 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('card server output', () => {
-  const markup = ssr(html`
+  const served = ssr(html`
     <helix-card aria-labelledby="t">
       <h2 id="t" slot="header">Report</h2>
       Body
     </helix-card>
   `)
+  const markup = withoutStyles(served)
 
   test('renders without touching a DOM it does not have', () => {
     expect(markup).toContain('<helix-card')
@@ -17,7 +18,7 @@ describe('card server output', () => {
 
   test('declarative shadow DOM carries the styles', () => {
     expect(markup).toContain('shadowrootmode="open"')
-    expect(markup).toContain('--helix-color-surface')
+    expect(styles(served)).toContain('--helix-color-surface')
   })
 
   test('every region is present in the shadow root', () => {

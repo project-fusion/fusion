@@ -16,11 +16,10 @@
  * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets a
  * sheet that inverts rather than a pale card on a dark page.
  *
- * **This file is why the family had a baseline at all.** Heatmap was one of four
- * of eighty-seven with no `preview.css`, and its picture was a blank page under a
- * row of footer text: ninety cells, no size and no fill, so every one of them
- * laid out as an empty inline box. A `<span>` with nothing in it is the one shape
- * a missing sheet makes completely invisible rather than merely wrong.
+ * **A cell is an empty `<span>`, which a missing sheet makes completely
+ * invisible rather than merely wrong**: with no size and no fill every cell
+ * lays out as an empty inline box, and the strip is a blank page under a row of
+ * footer text.
  */
 
 :root {
@@ -40,9 +39,8 @@
    working: five steps that differ by weight, and three categories that differ by
    nothing else, since a diagram cannot mean "danger".
 
-   Written without the call spelled out, because `check:hooks` reads a stylesheet
-   whole: prose quoting the substitution counts as a reader, and this file is the
-   one place that answers rather than asks. */
+   The call is not spelled out here, because a stylesheet is read whole and
+   prose quoting the substitution counts as a reader. */
 /* One column of the strip's own width, so the two labels under it bracket the
    picture rather than the box: a thirty day strip 300 pixels across sat in a
    592 pixel host, and "Today" floated 290 pixels past the last cell it was
@@ -78,7 +76,7 @@ helix-headless-heatmap::part(strip) {
   gap: 2px;
   grid-auto-columns: 8px;
   grid-auto-flow: column;
-  grid-template-rows: repeat(var(--_heatmap-rows, 1), 8px);
+  grid-template-rows: repeat(var(--heatmap-rows, 1), 8px);
   justify-content: start;
   /* The mark the tooltip hangs off is placed against this box. */
   position: relative;

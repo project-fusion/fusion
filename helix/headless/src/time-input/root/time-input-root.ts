@@ -121,30 +121,40 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    * What the browser may autofill here, as one of the platform's own tokens.
    *
    * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all. This used to be hardcoded `off`, so a reader
-   * could never have a birthday or a postal code filled in for them and a
-   * consumer had no way to ask for it. See 295.
+   * lets autofill work at all.
    */
   @property()
   autocomplete = ''
 
   /**
-   * Whether the panel is one list of times or a column each.
+   * Language tag the times are written in.
    *
-   * `list` offers whole times, which is what a product with slots or opening
-   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
-   * the locale uses one, which is the only way to reach `23:45` without
-   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
-   *
-   * **Optional rather than defaulted, which is not a style preference.** A
-   * reflecting property with a default writes its attribute onto every host the
-   * moment the element upgrades, including the ones a consumer rendered and did
-   * not touch, and React reads that as a hydration mismatch. The absent
-   * attribute *is* the list, which the stylesheet reads as the base rule, so
-   * only the departure has to be named.
+   * Absent uses the runtime's own.
    */
-  @property({ reflect: true })
-  variant?: 'list' | 'wheels'
+  @property()
+  locale = ''
+
+  /**
+   * Latest time that can be chosen, as `HH:mm`.
+   */
+  @property()
+  max = '23:59'
+
+  /**
+   * How many times are shown as tags before the rest are counted, in `multiple`.
+   *
+   * `0` is all of them, and is the default, for the reason Date Input gives: how
+   * many fit depends on the width of the field and the length of what is in it,
+   * and this element knows neither.
+   */
+  @property({ attribute: 'max-tags', type: Number })
+  maxTags = 0
+
+  /**
+   * Earliest time that can be chosen, as `HH:mm`.
+   */
+  @property()
+  min = '00:00'
 
   /**
    * How many times can be held at once.
@@ -158,32 +168,32 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   mode?: 'multiple' | 'range'
 
   /**
-   * How many times are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default, for the reason Date Input gives: how
-   * many fit depends on the width of the field and the length of what is in it,
-   * and this element knows neither.
+   * What the field says before a time is in it.
    */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
+  @property()
+  placeholder = 'HH:mm'
+
+  /**
+   * Whether the control refuses changes while still submitting its value.
+   *
+   * **Enforced by refusing every request in one place**, which is the seam this
+   * component already has: `requestValue` is what every path here comes through,
+   * and gating it once is what stops the next call site from being written
+   * without the check.
+   *
+   * Not `disabled`, which is the confusion worth naming: a disabled control
+   * submits nothing and leaves the tab order, and a read-only one submits its
+   * value and stays reachable, which is what a form showing a value somebody
+   * else set needs.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
 
   /**
    * How far apart the offered times are, in minutes.
    */
   @property({ type: Number })
   step = 15
-
-  /**
-   * Earliest time that can be chosen, as `HH:mm`.
-   */
-  @property()
-  min = '00:00'
-
-  /**
-   * Latest time that can be chosen, as `HH:mm`.
-   */
-  @property()
-  max = '23:59'
 
   /**
    * Whether the field writes the time out, or holds the value as it is.
@@ -195,20 +205,6 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    */
   @property({ attribute: 'time-style' })
   timeStyle: 'iso' | 'local' = 'local'
-
-  /**
-   * Language tag the times are written in.
-   *
-   * Absent uses the runtime's own.
-   */
-  @property()
-  locale = ''
-
-  /**
-   * What the field says before a time is in it.
-   */
-  @property()
-  placeholder = 'HH:mm'
 
   /**
    * Accessible name for the control that opens the list.
@@ -231,13 +227,8 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
      * part of it, and a press on it is not a press outside. Scoped to the
      * surface alone, `pointerdown` on the trigger closed the panel and the
      * trigger's own `toggleOpen` reopened it on the `click` that followed, so
-     * the panel could never be closed by the button that opened it. Measured
-     * across all five popover-bearing components: Menu, Popover and Tooltip
-     * already named their invoker; this one and its three siblings did not, and
-     * all four stayed open on a second press where Menu closed.
-     *
-     * `DismissController` documents this exact failure and takes a list for it.
-     * The list was the fix; using it was the part that did not happen here. */
+     * the panel could never be closed by the button that opened it.
+     * `DismissController` documents this failure and takes a list for it. */
     boundary: (): readonly (Element | null | undefined)[] => [
       this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
       this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
@@ -392,10 +383,9 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    * the focus and it is the only thing that can know so. Cleared synchronously,
    * since `focus()` dispatches before it returns.
    *
-   * Reasoned rather than measured, and Date Input carries the long version of
-   * why: `focus()` dispatches no event in an unfocused document, which is what
-   * both the test runtime and the browser pane here are, so the path cannot be
-   * exercised from either.
+   * The path cannot be exercised from a spec: `focus()` dispatches no event in
+   * an unfocused document, which is what both the test runtime and the browser
+   * pane here are.
    */
   private returning = false
 
@@ -482,20 +472,22 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   }
 
   /**
-   * Whether the control refuses changes while still submitting its value.
+   * Whether the panel is one list of times or a column each.
    *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
+   * `list` offers whole times, which is what a product with slots or opening
+   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
+   * the locale uses one, which is the only way to reach `23:45` without
+   * scrolling most of a day. `helix-time-picker` carries the longer note on the trade.
    *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
+   * **Optional rather than defaulted, which is not a style preference.** A
+   * reflecting property with a default writes its attribute onto every host the
+   * moment the element upgrades, including the ones a consumer rendered and did
+   * not touch, and React reads that as a hydration mismatch. The absent
+   * attribute *is* the list, which the stylesheet reads as the base rule, so
+   * only the departure has to be named.
    */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
+  @property({ reflect: true })
+  variant?: 'list' | 'wheels'
 
   /** Refuses every change while read-only. See `readOnly`. */
   override requestValue(next: string): boolean {
@@ -514,7 +506,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`, and the fifteen controls that already did this.
+    // `ColorInput.updated`.
     this.sync()
     /* Driven from here rather than from the toggle, because `open` is a property
        a consumer may set directly and the panel has to follow either way. The
@@ -545,12 +537,9 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   /**
    * The clock the field opens, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
-   * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * A method rather than an inline fragment, so a tier above can replace or
+   * wrap it without reimplementing the template. The tag is interpolated rather
+   * than written, so `tier` resolves it to this tier's own element.
    */
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('time-picker')}
@@ -586,12 +575,9 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   /**
    * One chosen time, as a tag, behind a seam the styled tier can move.
    *
-   * A method rather than a fragment inline, so a tier above can render its own,
-   * wrap this one, pass it a property the base does not know about, or leave it
-   * out, without reimplementing the whole template to do any of them. The tag is
-   * interpolated rather than written, so `tier` resolves it: this renders the
-   * headless element, and a styled subclass that sets `tier` renders the styled one
-   * from the same template.
+   * A method rather than an inline fragment, so a tier above can replace or
+   * wrap it without reimplementing the template. The tag is interpolated rather
+   * than written, so `tier` resolves it to this tier's own element.
    */
   protected renderTag(at: string): TemplateResult {
     return html`<${this.tag('tag')}
@@ -614,15 +600,14 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    * Slot fallback, so a consumer replaces it by slotting; and a method, so the
    * tier above replaces it by overriding.
    *
-   * **A named import rather than `<helix-icon>`, and that is a reversal.** The
-   * element looked like the tidier of the two and loses on three counts.
+   * **A named import rather than `<helix-icon>`**, on three counts.
    * `helix-icon` indexes the whole icon map at runtime, `icons[this.name]`, and
    * no bundler can shake a runtime lookup, so every consumer of any component
    * that renders one ships all 50kB of path data; a named import ships one
    * path. The import is checked when the package compiles, where a `name`
-   * string is checked only when `check:icons` runs. And `helix-icon` is not
+   * string is checked only by a later name lookup. And `helix-icon` is not
    * registered on the headless tier at all, which registers `helix-headless-icon`,
-   * so a headless consumer got an inert unknown element and no mark whatsoever.
+   * so a headless consumer gets an inert unknown element and no mark whatsoever.
    */
   protected renderTrigger(): TemplateResult {
     return html`<slot name="trigger"><svg aria-hidden="true" fill="currentColor" part="trigger-icon" viewBox=${clock.viewBox}>

@@ -20,7 +20,7 @@ impl Paint {
     /// **Three ways off and one way on**, which is the right asymmetry: a stray
     /// escape sequence in a log file is a real cost and a missing color is not.
     ///
-    /// `NO_COLOR` is honoured by its own rule, which is presence rather than
+    /// `NO_COLOR` is honored by its own rule, which is presence rather than
     /// value: the specification says any non-empty value, and tools that test it
     /// for "1" break for everybody who set it to "true".
     #[must_use]
@@ -32,7 +32,7 @@ impl Paint {
             return Self(false);
         }
         /* **A way to force it on, and it exists for one reason.** The alignment
-        of a coloured column cannot be checked from a pipe, because a pipe is not
+        of a colored column cannot be checked from a pipe, because a pipe is not
         a terminal and the branch never runs; the bug it protects against is
         therefore invisible to every test and to all of CI. Named as an
         environment variable rather than a flag because it is not a thing to
@@ -86,13 +86,13 @@ impl Paint {
 ///
 /// **Padded here, to the width of the widest**, and that is not cosmetic. A
 /// terminal counts an escape sequence as characters, so `{:>2}` applied to an
-/// already-coloured `x` sees a string of twelve and adds nothing, while the same
-/// format applied to an uncoloured one adds a space. The column was therefore
+/// already-colored `x` sees a string of twelve and adds nothing, while the same
+/// format applied to an uncolored one adds a space. The column was therefore
 /// straight with `NO_COLOR` set and ragged by exactly one character without it,
 /// which is the shape of bug that survives every run in CI, CI not being a
 /// terminal.
 ///
-/// The rule is general: pad before colouring, never after. Anything formatting to
+/// The rule is general: pad before coloring, never after. Anything formatting to
 /// a width has to be looking at the text.
 #[must_use]
 pub fn glyph(outcome: fusion_helix_theme::derive::report::Outcome) -> &'static str {

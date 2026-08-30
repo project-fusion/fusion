@@ -23,13 +23,11 @@ type Row = Record<string, string>
  * emits it, React re-emits it as a child rather than applying it, and it is one
  * node whatever the row count.
  *
- * **The same shape the charts already use**, `for="<id>"` pointing at markup the
- * consumer wrote, and the difference is what is at the other end. A chart names
- * a `<table>`, which is the accessible version of the picture and which a reader
- * with no JavaScript still gets. Ten thousand rows cannot be that: the table
- * would be the cost this exists to avoid. So the accessible version here is the
- * rendered window plus `aria-setsize` and `aria-posinset`, which is what says
- * "four thousand of ten thousand" rather than "four of twenty".
+ * **The accessible version is not a `<table>`**, the way it is for the charts
+ * that share this `for="<id>"` shape: ten thousand rows in one is the cost this
+ * exists to avoid. It is the rendered window plus `aria-setsize` and
+ * `aria-posinset`, which is what says "four thousand of ten thousand" rather
+ * than "four of twenty".
  *
  * **Rows are light DOM, deliberately.** They are cloned from the consumer's
  * template and appended to the host, so a document rule reaches them, the base
@@ -103,10 +101,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
   @state()
   private rows: Row[] = []
 
-  /* No `overscan` property. The controller's four is a statement about a frame
-     of fast scrolling at a 32 pixel row, which is a fact about the platform
-     rather than a preference, and a knob here would be one more thing to get
-     wrong for no case anybody has. */
+  /* No `overscan` property. The controller's four is a frame of fast scrolling
+     at a 32 pixel row, which is a fact about the platform rather than a
+     preference. */
   private readonly virtualize = new VirtualizeController(this, {
     container: () => this.renderRoot.querySelector<HTMLElement>('[part="viewport"]'),
     count: () => this.rows.length,
@@ -156,11 +153,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /**
    * Puts the windowed rows into the light DOM, and takes the rest out.
    *
-   * Cleared and re-cloned rather than reconciled, which is the simple thing and
-   * is measured rather than assumed to be enough: a window is twenty-odd rows
-   * and cloning that many is well under a frame. A reconciler here would be
-   * carrying keys and identity for a set nothing selects into, and is the kind
-   * of optimisation to add against a measurement rather than ahead of one.
+   * Cleared and re-cloned rather than reconciled: a window is twenty-odd rows
+   * and cloning that many is well under a frame. A reconciler here would carry
+   * keys and identity for a set nothing selects into.
    */
   private place(): void {
     const template = this.querySelector('template')

@@ -84,9 +84,6 @@
   white-space: nowrap;
 }
 
-/* Index to color, the same twenty-four the legend maps. An attribute cannot
-   select a token, so it is one rule per series, and the line takes it as a
-   stroke where the bar chart takes it as a fill. */
 /* One rule, not twenty-four. The headless tier knows which series a mark
    belongs to and writes `--chart-series` onto it, pointing at one of the
    twenty-four hooks `chart/series.css` defines, so the index reaches CSS
@@ -133,24 +130,21 @@
 }
 /* The mark the bubble is anchored to, and the bubble's own content.
  *
- * The mark is invisible and zero-sized: it exists so `Tooltip` has an element to
- * point `for` at, since a reading is a position and not a thing. Placement,
- * flipping, the arrow and the top layer are all `Tooltip`'s, which is the whole
- * reason a chart no longer draws its own. */
+ * The mark is invisible: it exists so `Tooltip` has an element to point `for`
+ * at, since a reading is a position and not a thing. Placement, flipping, the
+ * arrow and the top layer are all `Tooltip`'s, which is the whole reason a chart
+ * no longer draws its own. */
 /* **A pixel rather than nothing, because a rect of no area is not trackable.**
-   This is the point the bubble hangs off, so it was written with no size at
-   all, and that is the one thing an anchor may not be. `Tooltip` names the
-   failure in its own source: an element that draws nothing is what "took the
-   bubble to the corner of the window", and the descent that guards against it
-   runs only on the slotted path. Reached through `for`, as a chart reaches it,
-   the element is taken as given.
+   `autoUpdate` tracks a reference by observing it, and the move observer derives
+   its root margin from the reference's own rect. A 0 by 0 rect makes that margin
+   degenerate, so the updates that should follow a scroll or a resize do not
+   necessarily fire, and the bubble keeps whatever position it was last given:
+   `Tooltip` names this in its own source as what "took the bubble to the corner
+   of the window". Its descent guard runs only on the slotted path, and reached
+   through `for`, as a chart reaches it, the element is taken as given.
 
-   `autoUpdate` tracks a reference by observing it, and the move observer
-   derives its root margin from the reference's own rect. A 0 by 0 rect makes
-   that margin degenerate, so the updates that should follow a scroll or a
-   resize do not necessarily fire, and the bubble keeps whatever position it was
-   last given. One pixel is enough to be observable and is still nothing to
-   look at: no fill, no border, and out of the pointer's way. */
+   One pixel is enough to be observable and is still nothing to look at: no fill,
+   no border, and out of the pointer's way. */
 [part="mark"] {
   block-size: 1px;
   inline-size: 1px;
@@ -336,12 +330,12 @@
  * yet.
  *
  * **The dash is here and not on the element, and it is a flat number rather
- * than a normalized one.** `pathLength="100"` was the first version, so that one
- * dash value could cover every path whatever its real length. Written as a
- * static attribute in a Lit template it is parsed as HTML, which lowercases
- * attribute names, and SVG's are case-sensitive: it arrived as `pathlength`,
- * meant nothing, and left `stroke-dasharray="100"` as a hundred *user units* on
- * a path some three hundred long. Every line rendered as four dashes with gaps
+ * than a normalized one.** `pathLength="100"` is the tempting version, one dash
+ * value covering every path whatever its real length. Written as a static
+ * attribute in a Lit template it is parsed as HTML, which lowercases attribute
+ * names, and SVG's are case-sensitive: it arrives as `pathlength`, means
+ * nothing, and leaves `stroke-dasharray="100"` as a hundred *user units* on a
+ * path some three hundred long. Every line rendered as four dashes with gaps
  * between them, which looked like a chart with missing data.
  *
  * A thousand is longer than any path can be in a hundred-unit box, so the dash
@@ -420,7 +414,7 @@
 /* Print: the same.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. See 165. */
+ * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
     box-shadow: none;
@@ -428,17 +422,14 @@
   }
 }
 
-/* **Emphasis, and it takes three values now.** *Rewritten 25 Aug 2026.* The note
-   here read "only `subtle`, because the other two are already spoken for", on the
-   grounds that `outlined` means the line without its wash and `area` already says
-   that. That is still true of `area` and `area` is unchanged: it stays the
-   boolean that decides whether a wash is drawn at all, on the tier below, because
-   whether a shape exists is structural and a stylesheet cannot conjure one.
+/* **Emphasis, and it takes three values.** `area` stays the boolean that decides
+   whether a wash is drawn at all, on the tier below, because whether a shape
+   exists is structural and a stylesheet cannot conjure one.
 
-   What the note conflated is existence with weight. `area` says whether there is
-   a wash; emphasis says which of the two marks is carrying the reading. Both ends
-   need a wash to be present and neither can summon one, so this axis does not
-   duplicate `area` and cannot replace it.
+   **Do not fold this axis into `area`.** That conflates existence with weight.
+   `area` says whether there is a wash; emphasis says which of the two marks is
+   carrying the reading. Both ends need a wash to be present and neither can
+   summon one.
 
    `outlined` fades the wash further and leaves the line at full weight, so the
    boundary is the mark, which is the same trade `BarChart` makes on a column.
@@ -490,11 +481,10 @@
    over a glass theme would round to nothing. The line has no such scaling and is
    the mark, so it is the one this axis has anything to say about.
 
-   **No `wash` on this family, and the reason was already in this file.** The area
-   note above says a gradient is `Sparkline`'s because it holds one series; a line
-   chart may hold several, and gradients stacked over one another read as a third
-   color wherever they cross rather than as two series that overlap. That is a
-   measured refusal written before the axis existed, and it still holds. */
+   **No `wash` on this family**, for the reason the area note above gives: a
+   gradient is `Sparkline`'s because it holds one series, and a line chart may
+   hold several, where gradients stacked over one another read as a third color
+   wherever they cross rather than as two series that overlap. */
 :host([material="glass"]) [part="line"] {
   stroke-opacity: calc(0.62 * var(--helix-material-opacity));
 }

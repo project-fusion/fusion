@@ -106,12 +106,10 @@ if (hasLayout()) {
       expect(b.left).toBeLessThan(a.right)
     })
 
-    /* The fold, asserted as boxes rather than as an attribute.
-     *
-     * It used to be `data-overflow`, written from `updated`, and a spec reading
-     * that attribute passed while the avatars were on screen for a frame: state
-     * can be right and paint wrong, which is the whole reason to ask for a box.
-     * `display` here rather than a rect, because `none` is the question. */
+    /* The fold, asserted as boxes rather than as an attribute: state can be
+     * right and paint wrong, so a spec reading a mirrored attribute passes
+     * while the avatars are on screen. `display` rather than a rect, because
+     * `none` is the question. */
     const shown = (host: Group): string[] =>
       host.avatars.filter((a) => getComputedStyle(a).display !== 'none').map((a) => a.title || '')
 
@@ -195,11 +193,11 @@ describe('the fold and the count agree about how far they go', () => {
  *
  * **This is the shape of bug a spec suite cannot see by accident.** Every
  * example writes `max` in markup, where the author put the attribute there
- * themselves, so the fold worked everywhere anybody looked. Set as a property,
- * which is what a script does and what React does for a matching prop name,
- * `max` reached the element and never reached the host: no attribute, no rule,
- * no fold, and every avatar drawn beside a count claiming some were hidden.
- * Found by rendering the React twin of `avatar/group` beside the markup one.
+ * themselves, so the fold works everywhere anybody looks. Set as a property,
+ * which is what a script does and what React does for a matching prop name, an
+ * unreflected `max` reaches the element and never the host: no attribute, no
+ * rule, no fold, and every avatar drawn beside a count claiming some were
+ * hidden.
  */
 describe('max reaches the host, because the fold is a rule and not code', () => {
   test('a property write reflects, which is the only way the stylesheet hears it', async () => {

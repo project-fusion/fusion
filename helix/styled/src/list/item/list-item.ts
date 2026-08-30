@@ -18,7 +18,7 @@ import { styles } from './list-item.css.js'
  *
  * @csspart rail - The cell a railed list draws its number in.
  *
- * @cssproperty --list-item-inset - Padding inside the row.
+ * @cssproperty --list-item-padding - Padding inside the row.
  * @cssproperty --list-item-rail-content - What the rail cell shows. Written by the list.
  * @cssproperty --list-item-rail-display - Whether there is a rail at all. Written by the list.
  * @cssproperty --list-item-term-weight - Weight of a description list's term.

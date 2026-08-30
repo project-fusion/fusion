@@ -28,9 +28,8 @@ describe('the styled feed', () => {
 
   test('unread is a custom state, which is how a stylesheet knows', async () => {
     /* And not an attribute on the item, which is what `:host(:not([read]))`
-       selected on until the state moved into `ElementInternals`. The host is
-       the consumer's markup and an item served `default-read` may not grow
-       anything it was not sent. */
+       would need. The host is the consumer's markup, and an item served
+       `default-read` may not grow anything it was not sent. */
     const element = await mount(markup)
     const items = element.querySelectorAll('helix-notification')
     expect(hasState(items[0] as Element, 'read')).toBe(false)

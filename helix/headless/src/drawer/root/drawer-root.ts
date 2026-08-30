@@ -12,8 +12,9 @@ import { property } from 'lit/decorators.js'
  * @summary A panel that slides in from an edge.
  *
  * @description
- * Takes `MixinControllerOpen`, so `open`, `defaultOpen`, and `OpenChange` behave exactly
- * as they do on an accordion item, and a consumer already knows the API.
+ * Takes `MixinControllerOpen`, so `open`, `defaultOpen` and the
+ * `helix-before-open` and `helix-before-close` requests behave exactly as they
+ * do on an accordion item, and a consumer already knows the API.
  *
  * Modal by default, which is three things together and not one: focus is
  * trapped inside, Escape and an outside press close it, and the page behind is
@@ -22,16 +23,10 @@ import { property } from 'lit/decorators.js'
  *
  * Content stays mounted when closed, so it is in the server's markup and can
  * animate. A closed `<dialog>` is already out of the tab order and out of the
- * accessibility tree, so nothing here writes `inert`.
- *
- * **This described a hand-written `inert` until 21 Aug 2026, and had done since
- * the panel became a `<dialog>`.** The rewrite took the `role`, the
- * `aria-modal`, the scrim and the `inert` with it, because the element brings
- * all four, and the comments at the two call sites say so. The class doc did
- * not, and `drawer-root.ssr.spec.ts` has asserted the panel carries no `inert`
- * the whole time: a spec three files away existing to contradict the prose is
- * the same shape as `Stat`'s `detail` slot, which is what `check:references`
- * was written after and is the half it cannot see.
+ * accessibility tree, so nothing here writes `inert`. The `role`, the
+ * `aria-modal` and the scrim come from the element too, and
+ * `drawer-root.ssr.spec.ts` asserts the panel carries no hand-written `inert`
+ * and no hand-written `role`.
  *
  * Opened declaratively with the platform's invoker attributes:
  *
@@ -51,7 +46,7 @@ import { property } from 'lit/decorators.js'
  *
  * @event {Event} close - Relayed, because the platform's own does not escape.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes, and cancelable.
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart content - The scrolling content region.
@@ -73,15 +68,19 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   })
 
   /**
-   * Which edge the drawer comes from.
+   * Which close requests the browser answers on its own.
    *
-   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
-   * beside `:host([placement="end"])` rather than as a value written here: a
-   * default assigned to the property would reflect onto every host and put a
-   * `placement="end"` into markup no consumer wrote.
+   * `<dialog closedby>`, forwarded, and safe to forward because every path it
+   * opens still comes back through this element: a close request fires `cancel`
+   * first, `handleCancel` prevents it, and `requestOpen` decides. So
+   * `closedby="any"` gains light dismiss without giving up the refusal, which is
+   * the property this component exists to keep.
+   *
+   * Absent by default, which is the platform's `auto` and this library's rule
+   * that a resting value is an attribute's absence.
    */
-  @property({ reflect: true })
-  placement?: 'start' | 'end' | 'top' | 'bottom'
+  @property({ attribute: 'closedby', reflect: true })
+  closedBy?: 'any' | 'closerequest' | 'none'
 
   /**
    * Accessible name for the panel.
@@ -106,19 +105,15 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
   modal = true
 
   /**
-   * Which close requests the browser answers on its own.
+   * Which edge the drawer comes from.
    *
-   * `<dialog closedby>`, forwarded, and safe to forward because every path it
-   * opens still comes back through this element: a close request fires `cancel`
-   * first, `handleCancel` prevents it, and `requestOpen` decides. So
-   * `closedby="any"` gains light dismiss without giving up the refusal, which is
-   * the property this component exists to keep.
-   *
-   * Absent by default, which is the platform's `auto` and this library's rule
-   * that a resting value is an attribute's absence.
+   * Unset is `end`, which the styled tier reads as `:host(:not([placement]))`
+   * beside `:host([placement="end"])` rather than as a value written here: a
+   * default assigned to the property would reflect onto every host and put a
+   * `placement="end"` into markup no consumer wrote.
    */
-  @property({ attribute: 'closedby', reflect: true })
-  closedBy?: 'any' | 'closerequest' | 'none'
+  @property({ reflect: true })
+  placement?: 'start' | 'end' | 'top' | 'bottom'
 
   /**
    * What the dialog closed with, the way `<dialog>` reports it.
@@ -181,7 +176,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
 
        `cancel` is deliberately not relayed. `handleCancel` prevents it so that
        Escape is a request rather than an act, so the native one never completes:
-       relaying it would announce a dismissal that was refused. See 296. */
+       relaying it would announce a dismissal that was refused. */
     this.relayNativeEvent(event)
   }
 
@@ -204,10 +199,8 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
        throws and `close()` on a shut one fires a second `close` event.
      *
      * `showModal` when modal and `show` when not, which is the whole of what
-     * `modal` means now: both put the panel in the top layer, and only the
-     * first brings a backdrop, a focus trap and `inert` behind it. This was a
-     * hand-built `position: fixed` panel with a scrim div, a focus trap and a
-     * dismisser, none of which the platform needed telling. */
+     * `modal` means: both put the panel in the top layer, and only the first
+     * brings a backdrop, a focus trap and `inert` behind it. */
     const panel = this.panel
     if (!panel) {
       return

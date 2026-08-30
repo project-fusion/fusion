@@ -16,7 +16,7 @@ let definitions: { ctor: CustomElementConstructor; tag: string }[] = []
  * React consumer reports that as a hydration mismatch and does not patch it up.
  *
  * **This is a mount rather than a read of the source, because the source cannot
- * be read for it.** `check:reflected-defaults` guards one route to the fault,
+ * be read for it.** One route to the fault is guarded statically,
  * Lit reflecting a property whose default is non-empty, and there are others it
  * cannot see: a `setAttribute` in `updated`, a `toggleAttribute`, a `dataset`
  * write. Every one of those produces the identical symptom from a place a
@@ -33,18 +33,12 @@ let definitions: { ctor: CustomElementConstructor; tag: string }[] = []
  * in response to a reader or a measurement, is after hydration and is fine.
  *
  * `data-settled` on `HelixElement` was this fault, found four separate times as
- * four route-specific bugs and patched three times by deferring a registration
- * before anybody looked at the cause. It is an `ElementInternals.states` entry
- * now, which is not in the DOM at all. This spec is what stops the next one
- * being found the same way.
+ * four route-specific bugs before anybody looked at the cause. It is an
+ * `ElementInternals.states` entry now, which is not in the DOM at all.
  *
- * **It was found the same way once more, on 27 Aug 2026**, and the gap was that
- * a bare mount asks only the resting state. `data-checked`, `data-open` and
- * `data-has-label` were written on the element a consumer had configured, so
- * the landing page reported a mismatch on a `default-checked` switch, a
- * `default-checked` checkbox and a `default-open` accordion item while every
- * one of them passed here. The second test below is that hole closed: it types
- * what a server would have sent and asks for the host back unchanged.
+ * **A bare mount asks only the resting state**, so the second test below types
+ * the `default-*` and `label` attributes a consumer would have sent and asks for
+ * the host back unchanged.
  */
 beforeAll(async () => {
   registerDom()
@@ -52,15 +46,13 @@ beforeAll(async () => {
   /* Read back from the registration the barrel performs, so the list is every
      tag this package really defines rather than a list here that goes stale the
      day one is added.
-     *
-     * **This patched `customElements.define` around the import until 27 Aug
-     * 2026, and that answers correctly only for the first importer.** A second
-     * import is a module-cache hit and defines nothing, so any spec that touched
-     * a component before this file ran silently shrank the list: it happened the
-     * day a cross-family spec was added above this one alphabetically, and what
-     * it reported was a floor count, 164 against 250, which names nothing about
-     * the cause. `declaredTags` reads what the generated registration left and
-     * gives the same answer whoever imported first. */
+
+     **Never patch `customElements.define` around the import instead.** That
+     answers correctly only for the first importer: a second import is a
+     module-cache hit and defines nothing, so any spec touching a component
+     before this file runs silently shrinks the list to a floor count, which
+     names nothing about the cause. `definedTags` reads what the generated
+     registration left and gives the same answer whoever imported first. */
   await import('./index.js')
   const { definedTags } = await import('@fusion.dev/helix-core')
   definitions = definedTags().flatMap((tag) => {
@@ -73,18 +65,17 @@ beforeAll(async () => {
 /**
  * The attributes a consumer could type on this element, one at a time.
  *
- * **A bare mount asks the resting case and only the resting case**, which is
- * the half that was already guarded and the half that was already right. What
- * it cannot see is the element a consumer asked for something: `data-checked`
- * was written only on a box that was checked, so every one of these tags passed
- * the test below while the showcase on the landing page reported three of them.
+ * **A bare mount asks the resting case and only the resting case.** What it
+ * cannot see is the element a consumer asked for something: `data-checked` was
+ * written only on a box that was checked, so every one of these tags passed the
+ * test below while the showcase on the landing page reported three of them.
  *
  * Read off Lit's own `elementProperties` rather than listed here, so an element
  * that gains one is covered the day it does. Booleans, because a value would
  * have to be invented and a wrong one is a different test, and `label` beside
  * them for the one state that comes from a slot rather than a property:
- * `Checkbox` asks `assignedNodes` and used to write `data-has-label` on the
- * answer, which no server could ever have sent.
+ * `Checkbox` asks `assignedNodes`, and a `data-has-label` written on the answer
+ * is an attribute no server could ever have sent.
  *
  * One at a time rather than all at once, so a failure names the attribute that
  * caused it and no two of them can combine into a case a consumer would not
@@ -152,7 +143,7 @@ test('no element writes to its own host when a consumer asks for a state', async
      what says so for every family at once rather than for the three that
      happened to be on a page somebody loaded.
 
-     **What it still cannot see is a write a parent makes**, which is 302: a
+     **What it still cannot see is a write a parent makes**, which is (302): a
      listbox choosing a row puts `selected` onto the row, and no mount of one
      element alone produces that. Every solo case is covered here. */
   const offenders: string[] = []

@@ -10,8 +10,7 @@
  * `--helix-color-primary` resolves to without every component knowing which
  * step of which ramp it happened to be.
  *
- * `bun run check:tokens` fails the build on any component reaching past this
- * line.
+ * A component reaching past this line fails the build.
  *
  * Colors are authored in OKLCH: equal numeric steps in sRGB are not equal
  * perceptual steps, which makes both ramp generation and contrast math
@@ -39,63 +38,43 @@
    *
    * **The public names are the ones without the underscore, and that is not
    * cosmetic.** The convention here is that a single leading underscore means
-   * `helix/styles` only, and `check:tokens` enforces it from the outside. These
+   * `helix/styles` only, and it is enforced from the outside. These
    * three are the *entry point to theming*: they are the only color inputs the
    * whole palette derives from, primary and its steps solve off the brand, the
    * twenty-four series are hue rotations of it, and the neutrals take the cast.
    * A consumer who wants a different palette has nothing else to write.
    *
-   * They were private, and the marketing site wrote to them anyway, because the
-   * series ramp has no other input. A rule everybody has to break is a rule
-   * that is wrong rather than a codebase that is undisciplined. So the private
-   * names stay, still the only thing the ramps below read, and each falls back
-   * through a public one a consumer may set.
+   * The private names are still the only thing the ramps below read, and each
+   * falls back through a public one a consumer may set. Written this way round
+   * so nothing already writing the private name breaks.
    *
-   * Written this way round rather than renaming, so nothing that already writes
-   * the private name breaks while the public name becomes the thing to write.
-   *
-   * **What is still missing is a vocabulary for a *relationship*.** One seed
-   * says what the brand is and cannot say "an accent complementary to it", "a
-   * second brand seeded independently", or "a status set that leans toward the
-   * brand rather than ignoring it". Those want a second input and a way to name
-   * how it relates to the first, and they are a design question rather than a
-   * rename. #110 carries it. */
+   * **A relationship has no general vocabulary yet.** The accent below is one,
+   * a rotation off the brand; a status set that leans toward the brand rather
+   * than ignoring it is not, and wants a second input and a way to name how it
+   * relates to the first. */
   /* **The default lightness is the engine's answer, not a hand-picked one.**
      At 0.58 this seed is `#2275e8`, which reads 4.395:1 on white and 4.395:1
      under the on-accent ink: under AA on both sides of the one pair the palette
-     uses most, and shipped that way because nothing measured it. Handed the same
-     color as a brand, `deriveTheme` solves the role down to 0.539 and clears it
-     at 5.229:1 and 4.923:1.
+     uses most. Handed the same color as a brand, `deriveTheme` solves the role
+     down to 0.539 and clears it at 5.229:1 and 4.923:1.
 
      So the number here is that answer rather than a second opinion. A default
      palette is a theme like any other, and the two derivations disagreeing about
      one input is the bug this whole family of checks exists to catch. */
   --_helix-seed-brand: var(--helix-seed-brand, oklch(0.539 0.19 258));
-  /* Zero, and the ramp is gray.
-     
-     The idea was that a gray with a trace of the brand in it belongs to the
-     palette in a way a dead gray does not, and the trace kept being visible: at
-     0.008 the dark backgrounds read navy, and halving it to 0.004 moved the
-     complaint from "too blue" to "still blue" rather than answering it. Chroma
-     in OKLCH is perceptually even but *saturation* is chroma against lightness,
-     so a fixed figure is a rising tint as the surface darkens, and a dark
-     interface is mostly large flat surfaces. The brand carries the hue; the
-     grays hold everything else up. */
   /* The second color, said as a relationship rather than as a color.
    *
-   * **This is what one seed could not express.** A brand says what the product
-   * is; an accent says "and this other thing, which is not that". Written as an
-   * independent color it drifts out of relation the moment somebody rethemes,
-   * which is the whole failure of a palette with two literals in it. Written as
-   * a rotation off the brand it stays in relation by construction: retheme the
-   * brand and the accent follows it round the wheel.
+   * A brand says what the product is; an accent says "and this other thing,
+   * which is not that". Written as an independent color it drifts out of
+   * relation the moment somebody rethemes. Written as a rotation off the brand
+   * it stays in relation by construction: retheme the brand and the accent
+   * follows it round the wheel.
    *
    * `--helix-seed-accent-hue` is the angle, and 180 is the complement, which is
    * the relationship a second color usually means. 30 or so is analogous and
    * reads as a shade of the same idea; 120 is a triad. A consumer who wants a
    * genuinely independent second brand sets `--helix-seed-accent` outright and
-   * this whole derivation stands aside, which is the case the row also asked
-   * for and is one line rather than a second system.
+   * this whole derivation stands aside.
    *
    * Lightness and chroma come from the brand unchanged, so the accent is as
    * loud as the brand is and no louder. That is deliberate: an accent brighter
@@ -109,9 +88,8 @@
 
   /* How saturated this palette is, as a fraction of what it would otherwise be.
    *
-   * **Feel is chroma, and it had no input at all.** Monotone, muted, restrained
-   * and vivid are all chroma statements and none of them is a hue, so a brand
-   * could move anywhere around the wheel and not one of those was sayable.
+   * Monotone, muted, restrained and vivid are all chroma statements and none of
+   * them is a hue, so none was sayable through the brand seed alone.
    *
    * **It reaches the two halves of the palette by different routes, which is
    * worth knowing before changing either.** The brand ramp copies `c` from the
@@ -121,10 +99,18 @@
    * hold, measured against sRGB rather than chosen. Those ceilings are still
    * the ceilings; this says how much of one to use.
    *
-   * Which is why the series ignored the brand entirely until #141: they take
-   * its hue and state the other two components as literals, so a deliberately
-   * monotone brand still painted twenty-four vivid charts. */
+   * Without it the series take only the brand's hue and state the other two
+   * components as literals, so a deliberately monotone brand paints twenty-four
+   * vivid charts. */
   --_helix-seed-chroma-scale: var(--helix-seed-chroma-scale, 1);
+  /* Zero, and the ramp is gray.
+
+     A gray with a trace of the brand in it reads as tinted rather than as part
+     of the palette: chroma in OKLCH is perceptually even but *saturation* is
+     chroma against lightness, so a fixed figure is a rising tint as the surface
+     darkens, and a dark interface is mostly large flat surfaces. Measured, 0.008
+     read navy on the dark backgrounds and 0.004 still read blue. The brand
+     carries the hue; the grays hold everything else up. */
   --_helix-seed-neutral-chroma: var(--helix-seed-neutral-chroma, 0);
   --_helix-seed-neutral-hue: var(--helix-seed-neutral-hue, 258);
 
@@ -137,16 +123,14 @@
    * the raw file so the tokens do resolve, measured, but a parse error that is
    * survivable today is a parse error. One line per step and it goes. */
   --_helix-neutral-cast: var(--_helix-seed-neutral-chroma) var(--_helix-seed-neutral-hue);
-  /* The two intent inputs that are not colours, public for the same reason the
+  /* The two intent inputs that are not colors, public for the same reason the
    * four above are: they are what a consumer writes to move the whole spacing
    * scale and every corner in the library, and there is nothing else to write.
    *
-   * **They were private with no public name at all**, which is the half of #110
-   * that was never looked at, and the engine had been emitting into the gap.
-   * `toCss` wrote `--helix-seed-density` and `--helix-seed-radius`, so a theme
-   * derived by `@fusion.dev/helix-theme` and applied to a page moved its colours and
-   * left its density and its corners exactly where they were: two of the five
-   * `ThemeIntent` knobs inert, with a spec asserting one of the dead names.
+   * **Without a public name these two are inert**, whatever the engine emits: a
+   * theme derived by `@fusion.dev/helix-theme` moves its colors and leaves the
+   * density and the corners where they were, two of the five `ThemeIntent`
+   * knobs doing nothing.
    *
    * `radii` rather than `radius`, matching the private name it falls back to
    * and the token category it feeds. The engine's own field stays `radius`,
@@ -164,56 +148,39 @@
   --_helix-neutral-1000: oklch(0 0 0);
   --_helix-neutral-50: oklch(0.985 var(--_helix-neutral-cast));
   --_helix-neutral-100: oklch(0.97 var(--_helix-neutral-cast));
-  /* 0.94, not 0.91. The light end of this ramp is where every surface lives,
-     and it was accelerating through the range they need: .015 from white to 50,
-     .025 to 100, then .05 to 200. That last step is twice the one before it and
-     it is the one `surface-sunken` sits on, so every control filled with it came
-     out as a gray slab on a white page. Reported on the checkbox, the input, the
-     textarea, the segmented control and a selected tab, which is five symptoms
-     of one number.
- 
-     Only `surface-sunken` reads this step in light, so moving it moves that and
-     nothing else. Below here the ramp can accelerate as much as it likes: 300
-     onwards are borders and text, where the eye wants the gaps to open up. */
-  /* 0.96, with 100 lifted to 0.97 above it. `surface-sunken` reads this step
-     and was reported heavy three times running; each time it moved on its own,
-     and by 0.95 it was one hundredth from `raised` and the two were the same
-     color to any eye.
+  /* 0.96, and it moves with 100 at 0.97 above it, never on its own. Only
+     `surface-sunken` reads this step in light, so it looks free to move, and it
+     is not: lifting only this one puts a field's fill lighter than a hovered
+     row, which inverts what the names mean, and at 0.95 it is one hundredth
+     from `raised` and the same color to any eye. The ladder is what has to stay
+     ordered: surface 0.985, raised 0.97, sunken 0.96, each a step nearer the
+     page than the last and none of them collapsed into its neighbor.
 
-     So the pair moves together. Lifting only this one would have put a field's
-     fill lighter than a hovered row, which inverts what the names mean, and
-     lifting only that one would not have answered the report. The ladder is
-     what has to stay ordered: surface 0.985, raised 0.97, sunken 0.96, each a
-     step nearer the page than the last and none of them collapsed into its
-     neighbor. */
+     Below here the ramp can accelerate as much as it likes: 300 onwards are
+     borders and text, where the eye wants the gaps to open up. */
   --_helix-neutral-200: oklch(0.96 var(--_helix-neutral-cast));
-  /* 0.91, was 0.88, was 0.84. This rung and 700 below it are read by exactly
-     one token, `--helix-color-border`, so moving them moves every resting
-     border in the library and nothing else: a card, a field, a table rule, a
-     key, an accordion seam, twenty-eight components in all. That is why the
-     change is here rather than twenty-eight times over.
+  /* This rung and 700 below it are read by exactly one token,
+     `--helix-color-border`, so moving them moves every resting border in the
+     library and nothing else: a card, a field, a table rule, a key, an accordion
+     seam, twenty-eight components in all. That is why a resting border is tuned
+     here rather than twenty-eight times over.
 
-     The old pairs drew a hairline that was doing more work than a hairline
-     should. Measured against the surfaces they sit on: a light page is 1.0 and
-     a light surface 0.985, so 0.84 was a sixteen percent step and 0.88 a
-     twelve, where a resting edge wants to be the quietest mark in the frame.
-     0.91 is nine.
+     Measured against the surfaces it sits on, a light page being 1.0 and a light
+     surface 0.985, 0.91 is a nine percent step, where a resting edge wants to be
+     the quietest mark in the frame. `border-strong` was removed when interaction
+     moved to the brand, so this is the only resting hairline in the library and
+     quieting it quiets all of it.
 
      **The two ends do not move together, and that is not an oversight.** The
-     light ramp has open space below white; the dark one does not. See 700.
-
-     There is no longer a second neutral line color to widen the gap against.
-     `border-strong` was removed when interaction moved to the brand, so this is
-     the only resting hairline in the library and quieting it quiets all of it.
+     light ramp has open space below white; the dark one does not.
 
      **This is decoration, not an affordance, and it is worth being clear which.**
      At 0.91 on white the line is about 1.3:1, nowhere near the 3:1 that
-     WCAG 1.4.11 asks of anything required to identify a control. It was already
-     under it at 0.88 and at 0.84, so this does not cross a line, it moves
-     further from one. What keeps a field identifiable is that a field is also
-     filled: `surface-sunken` at 0.96 against a 1.0 page. If the border ever
-     becomes the sole boundary of a control, that control reaches for
-     `--helix-color-primary`, not for a darker default here. */
+     WCAG 1.4.11 asks of anything required to identify a control. What keeps a
+     field identifiable is that a field is also filled: `surface-sunken` at 0.96
+     against a 1.0 page. If the border ever becomes the sole boundary of a
+     control, that control reaches for `--helix-color-primary`, not for a darker
+     default here. */
   --_helix-neutral-300: oklch(0.91 var(--_helix-neutral-cast));
   --_helix-neutral-400: oklch(0.71 var(--_helix-neutral-cast));
   /* The two half steps, and they exist because 4.5:1 puts a hard ceiling on how
@@ -222,9 +189,17 @@
    * Light grounds run 0.96 to 1.0, so any ink above about 0.53 is under 4.5 on
    * one of them: 500 at 0.6 measured 3.53 on `surface-sunken`, 3.62 raised,
    * 3.78 on surface and 3.95 on the page, and it was carrying inactive tab
-   * labels, the pagination summary and an input's own text. Dark is the mirror,
-   * `surface-raised` at 0.29 being the worst ground and 0.67 the floor: 500
-   * measured 3.59 there.
+   * labels, the pagination summary and an input's own text. Dark was the
+   * mirror, `surface-raised` being the worst ground and 0.67 the floor: at the
+   * 0.29 that rung then held, 500 measured 3.59 on it.
+   *
+   * **The dark half of that argument has since been paid off by the ladder
+   * rather than by the ink.** `surface-raised` now sits at 0.21, and 500
+   * measures 4.50 against it: the worst dark ground clears AA with no half step
+   * involved. 450 stays because it is what `foreground-subtle` points at in
+   * dark and because moving an ink is a decision about the ink, not a
+   * consequence of a surface moving under it. What was necessity there is now
+   * margin, and the light half below is untouched and still necessity.
    *
    * 0.53 and 0.67 are those thresholds with nothing to spare, measured rather
    * than picked, and they clear every ground in their own mode at 4.69 and 4.73.
@@ -239,54 +214,68 @@
   --_helix-neutral-500: oklch(0.6 var(--_helix-neutral-cast));
   --_helix-neutral-550: oklch(0.53 var(--_helix-neutral-cast));
   --_helix-neutral-600: oklch(0.5 var(--_helix-neutral-cast));
-  /* 0.33, and it barely moves while 300 moves three times as far, because this
-     end of the ramp has a floor and that end does not.
+  /* 0.33, and it cannot come much lower, because this end of the ramp has a
+     floor and the light end does not.
 
      Quieter in dark means nearer the surface it sits on, not nearer white, so a
-     receding border has to come *down*. It cannot come far. Dark runs
-     sunken 0.15, surface 0.21, raised 0.29, and a border has to stay visible on
-     all three, so `surface-raised` is a hard floor four hundredths below where
-     this now sits. Tabs, Icon Button, Toggle Group and the card appearances of
-     Radio and Checkbox all fill with raised *and* draw a border, so a value
-     under about 0.32 does not read as a quieter line on those five, it reads as
-     no line at all. 0.30 was tried and is exactly that: one hundredth off
-     raised, invisible.
+     receding border has to come *down*. It cannot come far. Dark now runs
+     sunken 0.15, surface 0.182, raised 0.21, and a border has to stay visible on
+     all three, so `surface-raised` is the floor. Tabs, Icon Button, Toggle Group
+     and the card appearances of Radio and Checkbox all fill with raised *and*
+     draw a border, so a rung within a hundredth or two of it does not read as a
+     quieter line on those five, it reads as no line at all.
+
+     **Nothing reads this rung today, and the sentence above is why it is kept.**
+     `--helix-color-border` mixes 800 with 900 in dark and 300 with 200 in light,
+     so 700 describes a job rather than holding one. It is the only rung left
+     between the inks and the surfaces, which is where a dark border has to come
+     from if the mix of two surface rungs stops separating from them. After the
+     ladder moved that mix measures 1.019:1 on `surface-raised`, against 1.083
+     before, so the question is now open rather than hypothetical.
 
      Light has no such floor. White is 1.0 with nothing above it competing, so
-     300 could take the whole reduction and did. The asymmetry is the ramps
-     being asymmetric, not the border meaning two different things. */
-  /* **These four are not moving, and the asymmetry that argued they should is
-     mostly an artifact of which metric was used to see it.**
+     300 takes the whole reduction. The asymmetry is the ramps being asymmetric,
+     not the border meaning two different things. */
+  /* **Two of these four moved, and none of it was the metrics asking.**
    *
-   * The complaint was that the surface ramp separates four to fourteen times
-   * harder in dark than in light, measured as OKLab lightness against the page.
-   * That number is real and it is one of four, and they do not agree. Measured
-   * in Chromium as painted sRGB, then converted, for `surface` against the page:
+   * 800 came down from 0.29 to 0.21 and 900 from 0.21 to 0.182, which paints
+   * dark `surface` #121212 and both `surface-raised` and `surface-overlay`
+   * #181818. That was a palette decision and was taken in those terms: the
+   * ladder was asked for particular grays and these are the rungs that render
+   * them. What follows is the separate question of whether the *measurements*
+   * ever argued for moving them, and the answer there is still no.
    *
-   *   OKLab L      light 0.0152  dark 0.2100   dark separates 13.8x more
-   *   sRGB code    light 0.0200  dark 0.0950   dark separates  4.8x more
-   *   WCAG excess  light 0.045   dark 0.185    dark separates  4.2x more
-   *   linear Y     light 0.0449  dark 0.0093   LIGHT separates 4.8x more
+   * The surface ramp separates several times harder in dark than in light,
+   * measured as OKLab lightness against the page. That number is real and it is
+   * one of four, and they do not agree. Measured in Chromium as painted sRGB,
+   * then converted, for `surface` against the page, at the rungs now shipping:
+   *
+   *   OKLab L      light 0.0150  dark 0.1820   dark separates 12.1x more
+   *   sRGB code    light 0.0196  dark 0.0706   dark separates  3.6x more
+   *   WCAG excess  light 0.0438  dark 0.1210   dark separates  2.8x more
+   *   linear Y     light 0.0440  dark 0.0060   LIGHT separates 7.3x more
    *
    * The last line is the one that matters most and it reverses the finding.
    * Linear luminance is what the display emits and what every contrast formula
    * is built on, and by it the light ramp separates its surfaces *more* than the
    * dark one does. `surface-sunken` behaves the same way: light 0.053 against
-   * dark 0.043 in sRGB, and light ahead by 1.9x on WCAG, where OKLab L alone
-   * says dark is 3.7x ahead.
+   * dark 0.043 in sRGB, and light ahead by 1.8x on WCAG, where OKLab L alone
+   * says dark is 3.7x ahead. Those two are unchanged: 950 did not move.
    *
-   * A fault whose magnitude runs from 0.2x to 14x and whose *sign* depends on
+   * A fault whose magnitude runs from 0.1x to 12x and whose *sign* depends on
    * the metric is not a measured fault. OKLab L is perceptually uniform for
    * judging one lightness against another and is not a model of discriminating
    * two large emissive areas near the ends of the range, which is what a surface
-   * on a page is. The original filing rejected the WCAG ratio for understating
-   * dark, which is true, and did not check that OKLab L overstates it.
+   * on a page is. The WCAG ratio understates dark, and OKLab L overstates it.
    *
-   * Moving these would also drag three unrelated roles with them, which is the
-   * second reason. `neutral-900` is dark `surface` *and* light
-   * `surface-inverse` *and* the dark translucent material; `neutral-950` is dark
-   * `surface-sunken` *and* the modal scrim in both modes. There is no rung to
-   * move that moves only a surface.
+   * Moving these drags unrelated roles with them, which is the cost that was
+   * paid rather than avoided. `neutral-900` is dark `surface` *and* light
+   * `surface-inverse` *and* the dark translucent material, so a light tooltip
+   * went to #121212 with the dark page it was named after, and the glass panels
+   * darkened by the same amount. `neutral-950` is dark `surface-sunken` *and*
+   * the modal scrim in both modes, and stayed. There is no rung to move that
+   * moves only a surface, so a request phrased about one surface is always a
+   * request about three or four.
    *
    * **What is left, and it is one thing rather than a ramp.**
    * `surface-overlay` in light is `neutral-0`, the page color exactly, so its
@@ -298,19 +287,25 @@
    * and it buys about seven thousandths of sRGB. That trade is a palette
    * decision and not a contrast one, which is where this now rests. */
   --_helix-neutral-700: oklch(0.33 var(--_helix-neutral-cast));
-  --_helix-neutral-800: oklch(0.29 var(--_helix-neutral-cast));
-  --_helix-neutral-900: oklch(0.21 var(--_helix-neutral-cast));
+  --_helix-neutral-800: oklch(0.21 var(--_helix-neutral-cast));
+  /* 0.182 and not 0.18, which is the same gray to read and not the same gray
+     to paint. The band that lands on #121212 runs 0.180 to 0.185, so 0.18 is
+     its lower edge and a thousandth of drift anywhere upstream paints #111111
+     instead. 0.182 sits in the middle of the band with two thousandths either
+     side, which is the difference between a value that renders the gray it was
+     chosen for and one that renders it on this machine. */
+  --_helix-neutral-900: oklch(0.182 var(--_helix-neutral-cast));
   --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
 
   /* ------------------------------------------------------ series ------ */
-  /* Eight colours for eight things that are not each other.
+  /* Eight colors for eight things that are not each other.
    *
    * Hue rotates off the brand seed, so a theme that moves its brand moves these
-   * with it. **Lightness does not.** The first attempt offset it from the seed,
-   * `calc(l + 0.14)` on every other step, and measured against a light
-   * background two of the eight came out at 1.04 and 1.00 contrast: the same
-   * color as the paper. A hue rotation changes how light a color *looks* at a
-   * fixed L, and yellow at 0.72 on white is nothing at all.
+   * with it. **Lightness must not.** Offsetting it from the seed with
+   * `calc(l + 0.14)` on every other step puts two of the eight at 1.04 and 1.00
+   * contrast against a light background: the same color as the paper. A hue
+   * rotation changes how light a color *looks* at a fixed L, and yellow at 0.72
+   * on white is nothing at all.
    *
    * So lightness is stated per mode and held in a band that clears 3:1 against
    * the surface it is drawn on, and the alternation that keeps adjacent pairs
@@ -321,20 +316,14 @@
    * hue are two some readers cannot tell apart. Every other step also moves in
    * lightness, so an adjacent pair differs on two axes and survives losing one.
    *
-   * **Eight slots 45 degrees apart, visited three at a time.** The argument for
-   * uneven spacing was that even spacing puts series two only 45 degrees from
-   * series one, and it was answered in the wrong place: the fix is the order
-   * the slots are taken in, not the spacing between them. Stepping three slots
+   * **Eight slots 45 degrees apart, visited three at a time.** Even spacing puts
+   * adjacent *slots* only 45 degrees apart, and the answer to that is the order
+   * the slots are taken in rather than the spacing between them: stepping three
    * each time visits all eight and leaves consecutive series 135 degrees apart,
    * so one, two and three sit 135, 90 and 135 from each other, which is what
-   * most charts use.
-   *
-   * The uneven rotations this replaced were 0, 150, 65, 275, 205, 30, 110 and
-   * 320, which put four of the eight between 205 and 320 with gaps of 30, and
-   * the set read as three blues and a purple. Measured in OKLab against the
-   * even cut: the closest dark pair goes from 0.107 to 0.133, the worst
-   * deuteranopia pair from 0.045 to 0.054, and the smallest hue gap from 30
-   * degrees to 45. */
+   * most charts use. Hand-picked uneven rotations cluster instead. Measured in
+   * OKLab, the even cut holds the closest dark pair at 0.133, the worst
+   * deuteranopia pair at 0.054 and the smallest hue gap at 45 degrees. */
   --_helix-series-hue-1: 0;
   --_helix-series-hue-2: 135;
   --_helix-series-hue-3: 270;
@@ -348,29 +337,32 @@
   --_helix-brand-500: var(--_helix-seed-brand);
   --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);
   --_helix-brand-700: oklch(from var(--_helix-seed-brand) calc(l - 0.1) c h);
-  /* **`0.13`, and the tenth of a step is the difference between passing and
-     not.** This rung is `--helix-color-primary` in dark mode, and at `+ 0.12`
-     it measured 4.431:1 against `surface-raised` and `surface-overlay`, the two
-     lightest grounds a dark page has. Under AA, on the pair a dark theme uses
-     most, and shipped that way because nothing looked: `check:contrast` reads
-     what the examples render and no example puts primary text on either of
-     them, which is the same blind spot that hid the engine's own rounding.
-     Measured in a browser by walking the lightness: 0.664 gives 4.48 and 0.669
-     gives 4.572, so the step is 0.13 and the margin is real rather than a
-     rounding away.
+  /* **`0.13`, and it was once the difference between passing and not.** This
+     rung is `--helix-color-primary` in dark mode, and against the 0.29 that
+     `surface-raised` and `surface-overlay` then held, `+ 0.12` measured 4.431:1
+     on the two lightest grounds a dark page has: under AA, on the pair a dark
+     theme uses most. No example puts primary text on either of them, so nothing
+     that reads what the examples render could see it. Measured in a browser by
+     walking the lightness: 0.664 gave 4.48 and 0.669 gave 4.572, so the step
+     became 0.13 and the margin was real rather than a rounding away.
+
+     **Those two grounds have since come down to 0.21, and the margin is now
+     large.** `+ 0.12` measures 5.556:1 there and `+ 0.13` measures 5.733:1, so
+     the rung no longer sits against a threshold. It stays at 0.13 because a
+     shipped color is not re-picked for having got easier, and because the
+     hundredth is what the light side's `- 0.05` and `- 0.10` are measured
+     against below.
 
      Exact for the seed that ships and approximate for any other, which is what
      `tokens.css` already says about this whole path. A theme that wants the
      guarantee rather than the approximation takes `deriveTheme`. */
   --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.13) c h);
-  /* **The dark side of the ramp, and the reason it did not exist.**
-     600 and 700 step down from the seed for a light page, where pressing a
-     control should sink it into the ground. A dark page needs the mirror of
-     that, and there was nothing above 400 to point at, so
-     `color-primary-hover` and `color-primary-active` were left without a
-     `light-dark()` while every sibling had one: on a dark page, primary sat at
-     400 and its own hover jumped two rungs *down* to 600, so a button got
-     darker against a dark ground the moment a pointer touched it.
+  /* **The dark side of the ramp.** 600 and 700 step down from the seed for a
+     light page, where pressing a control should sink it into the ground. A dark
+     page needs the mirror of that: without these, `color-primary-hover` and
+     `color-primary-active` have nothing above 400 to point at, primary sits at
+     400 and its own hover jumps two rungs *down* to 600, so a button gets darker
+     against a dark ground the moment a pointer touches it.
 
      `+ 0.18` and `+ 0.23` mirror the `- 0.05` and `- 0.10` the light side
      takes, measured from 400 rather than from the seed, so the two directions
@@ -393,32 +385,15 @@
   /* ------------------------------------------------------- status ------ */
   --_helix-info-500: oklch(0.58 0.16 245);
   --_helix-success-500: oklch(0.58 0.15 155);
-  /* Deeper and more chromatic than it was, which is a contrast fix rather than
-     a taste one. At `l 0.72` it measured 2.54:1 as a border on the page and
-     2.32:1 as an icon on a callout's own tint, both under the 3:1 a non-text
-     mark needs, and it was the only severity that failed. The hue is unmoved at
-     75, so it is the same amber: lightness carries the contrast and the extra
-     chroma keeps it from reading as brown on the way down. Measured after:
-     3.31 on the tint, 3.74 as a border, 3.74 on a light toast. */
-  /* Brightened to `l 0.70`, deliberately, and the note it replaces is worth
-     keeping in view: this was taken down to 0.62 to clear the 3:1 a non-text
-     mark needs, measured on a callout's own ten percent tint. At 0.70 that
-     surface measures about 2.7:1, so a warning mark on a tinted background no
-     longer clears it. Chosen anyway: amber at 0.62 read as brown against the
-     other severities, and a warning that nobody registers as one is its own
-     failure. Where the ratio has to hold, `--callout-background-color` and the
-     per-component hooks take a darker value. */
+  /* `l 0.70`, and it does not clear the 3:1 a non-text mark needs: on a
+     callout's own ten percent tint it measures about 2.7:1. Chosen anyway, and
+     deliberately. Amber deep enough to clear that, around 0.62, reads as brown
+     against the other severities, and a warning nobody registers as one is its
+     own failure. Where the ratio has to hold, `--callout-background-color` and
+     the per-component hooks take a darker value. */
   --_helix-warning-500: oklch(0.7 0.185 75);
   --_helix-danger-500: oklch(0.57 0.21 27);
-  /* The dark arms, derived rather than picked, the same `l + 0.12` the brand
-     ramp uses. A severity had exactly one value each, which is what a color
-     with no dark arm looks like: measured against an inverted surface, the
-     danger mark came out at 2.85:1, under the 3:1 a non-text mark needs. */
-  /* `info` was left out of this pass and two component comments said otherwise.
-     Three severities lightened in dark mode and the fourth, which is Callout's
-     default, stayed at its light value: the one severity a reader meets most
-     often was the one that did not follow the mode. */
-  /* And red gets a light arm of its own, one step down and a little out of the
+  /* Red gets a light arm of its own, one step down and a little out of the
      chroma.
    *
    * `500` is tuned for a dark surface, where a red has to stay bright to read
@@ -431,37 +406,34 @@
      strictly more of it.
    *
    * Only danger. Info, success and warning are not competing for attention the
-     same way, and warning has its own note above about being deepened for
-     contrast rather than for tone. */
+     same way. */
   --_helix-danger-600: oklch(from var(--_helix-danger-500) calc(l - 0.07) calc(c - 0.04) h);
 
   /* And the other three, because a 500 is not dark enough to be text.
    *
    * Measured against the three light surface tokens: `success` at 500 is
    * 3.58:1, `info` 3.80 and `warning` 2.63, all under the 4.5 that body text
-   * needs, and none of them had a 600 to fall back to. So a semantic token
-   * built on them could be a fill or a mark and could not be a word, and
-   * nothing anywhere said so: `Trend` found it by trying to color a number.
+   * needs, so a semantic token built on a 500 can be a fill or a mark and
+   * cannot be a word.
    *
-   * **The steps differ per hue, and that is the honest part.** A 600 is defined
-   * by the contrast it has to reach rather than by a fixed lightness drop,
-   * because the same drop buys different contrast at different hues: `-0.07`
-   * takes danger to 5.56, info to 5.09 and success to 4.87, and leaves warning
-   * at 3.21. Yellow starts at 0.7 rather than 0.58 and has the least room, so
-   * it takes `-0.18` to reach 5.02. Matching the numbers would have been tidier
-   * and would have shipped one severity that still could not be read. */
+   * **The steps differ per hue, and that is deliberate.** A 600 is defined by
+   * the contrast it has to reach rather than by a fixed lightness drop, because
+   * the same drop buys different contrast at different hues: `-0.07` takes
+   * danger to 5.56, info to 5.09 and success to 4.87, and leaves warning at
+   * 3.21. Yellow starts at 0.7 rather than 0.58 and has the least room, so it
+   * takes `-0.18` to reach 5.02. Matching the numbers would be tidier and would
+   * ship one severity that still could not be read. */
   --_helix-info-600: oklch(from var(--_helix-info-500) calc(l - 0.07) calc(c - 0.04) h);
   --_helix-success-600: oklch(from var(--_helix-success-500) calc(l - 0.07) calc(c - 0.04) h);
-  /* **`c - 0.075`, not `c - 0.02`, because the smaller step was outside sRGB.**
-     It asked for chroma 0.165 at lightness 0.52 on hue 75 and the browser
-     painted 0.110, so the file said one thing and the screen showed another
-     with nothing anywhere saying so. The same fault the series ramp records
-     hitting, found from the other side: `@fusion.dev/helix-theme` solves this hue for
-     itself, reports `chromaReduced`, and came out *more* saturated than the
-     token it was being compared against.
-     
-     Measured by fitting to gamut and reading the chroma back. Nothing on screen
-     moves, since 0.110 is what was already being painted. */
+  /* **`c - 0.075`, not `c - 0.02`, because the smaller step is outside sRGB.**
+     It asks for chroma 0.165 at lightness 0.52 on hue 75 and the browser paints
+     0.110, so the file says one thing and the screen shows another with nothing
+     anywhere reporting it. The same fault the series ramp records hitting, seen
+     from the other side: `@fusion.dev/helix-theme` solves this hue for itself
+     and reports `chromaReduced`.
+
+     Measured by fitting to gamut and reading the chroma back: 0.110 is what was
+     already being painted, so nothing on screen moves. */
   --_helix-warning-600: oklch(from var(--_helix-warning-500) calc(l - 0.18) calc(c - 0.075) h);
 
   /* The 700s, one step past the 600s on the same curve each of them took.
@@ -475,12 +447,17 @@
   --_helix-success-700: oklch(from var(--_helix-success-500) calc(l - 0.14) calc(c - 0.06) h);
   --_helix-warning-700: oklch(from var(--_helix-warning-500) calc(l - 0.26) calc(c - 0.03) h);
 
+  /* The dark arms, derived rather than picked, the same `l + 0.12` the brand
+     ramp uses. Without one a severity holds a single value in both modes, and
+     against an inverted surface the danger mark measures 2.85:1, under the 3:1
+     a non-text mark needs. */
   --_helix-info-400: oklch(from var(--_helix-info-500) calc(l + 0.12) c h);
   --_helix-success-400: oklch(from var(--_helix-success-500) calc(l + 0.12) c h);
-  /* Back to the shared `+ 0.12` now the light arm carries the brightness: from
-     0.70 that lands the dark arm at 0.82, measured at 9.62:1 on the sandbox's
-     own background and 7.99:1 on a dark callout tint. Further clips, red pinned
-     at 255 while green climbs, which moves the hue rather than the brightness. */
+  /* The shared `+ 0.12` is enough here because the light arm already carries the
+     brightness: from 0.70 that lands the dark arm at 0.82, measured at 9.62:1 on
+     the sandbox's own background and 7.99:1 on a dark callout tint. Further
+     clips, red pinned at 255 while green climbs, which moves the hue rather than
+     the brightness. */
   --_helix-warning-400: oklch(from var(--_helix-warning-500) calc(l + 0.12) c h);
   --_helix-danger-400: oklch(from var(--_helix-danger-500) calc(l + 0.12) c h);
 
@@ -490,18 +467,14 @@
      string from a keyword because of where the hue sits, and rotating the whole
      palette with the brand color would make every theme a new language to
      learn. These are GitHub's, which is the set most engineers already read
-     without thinking about it, and the pair below is light then dark. */
-  /* GitHub's palette, with the light half lifted to an even lightness.
-   *
-   * Theirs runs from 0.31 to 0.55 in OKLCH lightness, and the bottom of that is
-   * where the complaint came from: a string at #0a3069 is near enough black
-   * that it reads as uncolored text rather than as a dark blue, and a tag at
-   * #116329 is not far behind. Every one of them was in fact being colored;
-   * several were just too dark to look it.
-   *
-   * The hue and the chroma are theirs and only the lightness is set, so the
-   * palette is still the one most engineers already read. Comments stay the
-   * quietest of the set, which is the one place dark is doing a job. */
+     without thinking about it, and each pair below is light then dark.
+
+     **The light half is lifted to an even lightness.** GitHub's runs from 0.31
+     to 0.55 in OKLCH, and the bottom of that reads as uncolored text rather than
+     as color: a string at #0a3069 is near enough black, and a tag at #116329 is
+     not far behind. Only the lightness is set, the hue and the chroma being
+     theirs, so it is still the palette most engineers already read. Comments
+     stay the quietest of the set, which is the one place dark is doing a job. */
   --_helix-syntax-comment-light: oklch(from #6e7781 0.58 c h);
   --_helix-syntax-comment-dark: #8b949e;
   --_helix-syntax-keyword-light: oklch(from #cf222e 0.58 c h);

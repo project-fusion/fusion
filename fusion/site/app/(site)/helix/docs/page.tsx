@@ -1,0 +1,82 @@
+import { navigation } from '@fusion.dev/helix-docs'
+import Link from 'next/link'
+import { pageMetadata } from '@/utils/metadata/metadata'
+import shell from '../components/(reference)/docs.module.css'
+import styles from './docs-index.module.css'
+
+/**
+ * The guides index, which is a page rather than a redirect to the first page of
+ * the first section.
+ *
+ * A landing page in front of a table of contents is a click between a reader
+ * and what they asked for, which held while `/helix` was the component gallery
+ * and the documentation had no product page to be part of. `/helix` is the
+ * overview, so this is one section of a product rather than the whole of it,
+ * and a reader arriving from the masthead's Docs row has asked what the
+ * documentation covers.
+ *
+ * The sections come from `navigation()`, which is the same call the sidebar
+ * makes. Nothing about the shape of the documentation is written here: a
+ * section added to `@fusion.dev/helix-docs` appears without this file being touched,
+ * which is the property the registry exists to have.
+ */
+export const metadata = pageMetadata({
+  description: 'Install it, theme it, and the ideas underneath.',
+  path: '/helix/docs',
+  title: 'Docs',
+})
+
+export default function DocsIndex() {
+  return (
+    /* **`docsMain`, not the vertical product shell.**
+       `vertical-page.module.css` carries `padding-block: var(--site-band)`, the
+       marketing band inset that `/helix` and `/cortex` need because they have no
+       chrome above them. Inside the docs layout, which already pads 48px below
+       the header, the two stack: the index's title sits at 249 where every page
+       it links to starts at 134, and 108px below its own sidebar. An index that
+       does not line up with its siblings reads as a different kind of page. */
+    <main className={shell.docsMain}>
+      <helix-flex class={styles.head} direction="column" gap="sm">
+        <helix-flex align="center" data-density="sm" gap="xs">
+          <helix-tag>Helix</helix-tag>
+        </helix-flex>
+        <helix-text as="h1">Docs</helix-text>
+        <helix-text as="p" class={styles.lede} tone="muted">
+          Install it, theme it, and the ideas underneath. Every family's own API lives on its page
+          under Components; these are the guides that cross families.
+        </helix-text>
+      </helix-flex>
+
+      {/* **Descriptions, which is what the sidebar cannot show.** Every page
+          carries a one-line summary in its frontmatter, and without them the
+          index is the navigation again in boxes: the same six sections and the
+          same forty-two titles a reader already has two inches to the left, at
+          3,838px of page. A card per section adds a border and an inset and no
+          information.
+
+          The sections flow rather than sitting in a grid of equal-height cards,
+          because they have six, seven, ten and eleven pages: any row of two
+          leaves one of them padded to the other's height, which is the void this
+          page opened with and is a shape the content will keep producing. */}
+      {navigation().map((section) => (
+        <helix-flex class={styles.section} direction="column" gap="md" key={section.title}>
+          <helix-text as="h2" variant="subheading">
+            {section.title}
+          </helix-text>
+          <div className={styles.pages}>
+            {section.pages.map((page) => (
+              <Link className={styles.page} href={`/helix/docs/${page.slug}`} key={page.slug}>
+                <helix-text class={styles.title} variant="body-strong">
+                  {page.title}
+                </helix-text>
+                <helix-text as="span" class={styles.summary} variant="caption">
+                  {page.description}
+                </helix-text>
+              </Link>
+            ))}
+          </div>
+        </helix-flex>
+      ))}
+    </main>
+  )
+}

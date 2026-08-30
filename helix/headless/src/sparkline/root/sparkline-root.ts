@@ -44,13 +44,12 @@ const readValues = (input: string): number[] =>
  * **No label means decorative, and that is a choice rather than an oversight.**
  * A sparkline beside a stat that already says "Sessions, 1,102" has nothing of
  * its own to announce, and an unnamed `role="img"` announces "graphic" and
- * stops. So an unlabelled sparkline is `aria-hidden`, and a labeled one is an
+ * stops. So an unlabeled sparkline is `aria-hidden`, and a labeled one is an
  * image named by its sentence.
  *
- * It goes *beside* a `Stat` rather than inside one. The plan this was built
- * from called for a `trend` slot on `Stat`; the spec already on `Stat` says the
- * opposite, that a change beside a figure is a second fact, and the spec is
- * right. `Trend` composes the same way.
+ * It goes *beside* a `Stat` rather than inside one: a change beside a figure is
+ * a second fact, which is what `Stat`'s own spec says. `Trend` composes the same
+ * way.
  *
  * The properties below are written by this component and read by whoever draws
  * it. A consumer sets none of them: they carry a number this element computed
@@ -77,52 +76,17 @@ const readValues = (input: string): number[] =>
 @customElement('helix-headless-sparkline')
 export class HelixHeadlessSparkline extends HelixElement {
   /**
-   * What the readings are drawn as.
-   *
-   * Absent is a line, `area` is a line with the region beneath it washed, and
-   * `bar` is a column per reading.
-   *
-   * **A bar plot measures from zero and the other two measure from the data's
-   * own range**, which is the one way the plots are not interchangeable. A line
-   * says where the readings sit relative to each other, so a scale over their
-   * extent uses the whole box and claims nothing about absolute size. A bar's
-   * length *is* the value, so any baseline but zero makes the lengths
-   * proportional to nothing.
-   *
-   * **Which is a reason to prefer a line for readings in a narrow band far from
-   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
-   * seven columns of nearly the same height, and that is the true picture: they
-   * *are* nearly the same. The same readings as a line fill the box and show
-   * the movement, because a line is only ever claiming a shape.
-   *
-   * **Absent is `area`**, which is the departure from the rule that a resting
-   * arrangement is the plainest thing. At the size a sparkline is actually
-   * drawn, a hairline in a wide box is mostly box: the wash under it is what
-   * gives the shape a body and lets a reader see it at a glance rather than
-   * hunting for it, which is the entire job. `line` is the bare stroke for
-   * anywhere the fill would be noise, several of them in one box for instance.
-   *
-   * This tier rather than the one above: a plot type is geometry and geometry
-   * is markup, the same reason `curve` lives here.
-   */
-  @property({ reflect: true })
-  plot?: 'area' | 'bar' | 'line'
-
-  /**
    * How the line gets from one reading to the next.
    *
-   * **`smooth` is the resting curve.** *Changed 21 Aug 2026, reversing the
-   * argument this comment used to make.* It read that joining the readings
-   * claims nothing in between and is the default for that reason, which is true
-   * and is why `straight` still exists: a straight segment asserts nothing about
-   * the values between two readings, and a curve invents them.
-   *
-   * What settles it the other way is that the invention is bounded. The
-   * interpolation is monotone cubic, so it never leaves the band the data sets
-   * and never introduces a peak or a trough the series does not have. Within
-   * that bound the smoothed line is the easier one to follow across a long
-   * series, which is what the drawing is for. `straight` becomes the claim a
-   * consumer makes deliberately rather than the one they get by saying nothing.
+   * **`smooth` is the resting curve.** A straight segment asserts nothing about
+   * the values between two readings and a curve invents them, which is why
+   * `straight` exists. What settles the default the other way is that the
+   * invention is bounded: the interpolation is monotone cubic, so it never
+   * leaves the band the data sets and never introduces a peak or a trough the
+   * series does not have. Within that bound the smoothed line is the easier one
+   * to follow across a long series, which is what the drawing is for. `straight`
+   * becomes the claim a consumer makes deliberately rather than the one they get
+   * by saying nothing.
    *
    * **The property stays optional and the default lives in the render.** A
    * reflecting property with a default writes its attribute onto every host
@@ -161,6 +125,38 @@ export class HelixHeadlessSparkline extends HelixElement {
   label = ''
 
   /**
+   * What the readings are drawn as.
+   *
+   * Absent is a line, `area` is a line with the region beneath it washed, and
+   * `bar` is a column per reading.
+   *
+   * **A bar plot measures from zero and the other two measure from the data's
+   * own range**, which is the one way the plots are not interchangeable. A line
+   * says where the readings sit relative to each other, so a scale over their
+   * extent uses the whole box and claims nothing about absolute size. A bar's
+   * length *is* the value, so any baseline but zero makes the lengths
+   * proportional to nothing.
+   *
+   * **Which is a reason to prefer a line for readings in a narrow band far from
+   * zero.** Seven values between 1,102 and 1,408 drawn as columns from zero are
+   * seven columns of nearly the same height, and that is the true picture: they
+   * *are* nearly the same. The same readings as a line fill the box and show
+   * the movement, because a line is only ever claiming a shape.
+   *
+   * **Absent is `area`**, which is the departure from the rule that a resting
+   * arrangement is the plainest thing. At the size a sparkline is actually
+   * drawn, a hairline in a wide box is mostly box: the wash under it is what
+   * gives the shape a body and lets a reader see it at a glance rather than
+   * hunting for it, which is the entire job. `line` is the bare stroke for
+   * anywhere the fill would be noise, several of them in one box for instance.
+   *
+   * This tier rather than the one above: a plot type is geometry and geometry
+   * is markup, the same reason `curve` lives here.
+   */
+  @property({ reflect: true })
+  plot?: 'area' | 'bar' | 'line'
+
+  /**
    * The numbers, separated by whitespace or by commas.
    *
    * Both separators, so `values="1240 1318"` and an array assigned to the
@@ -172,8 +168,7 @@ export class HelixHeadlessSparkline extends HelixElement {
   values = ''
 
   /* One controller rather than the resolve-and-watch each chart had written
-     out for itself. Three copies had already drifted into two names for the
-     same lookup. */
+     out for itself. */
   protected readonly source = new SourceController(this)
 
   protected override willUpdate(changed: PropertyValues<this>): void {
@@ -197,22 +192,16 @@ export class HelixHeadlessSparkline extends HelixElement {
        so the empty case is stated here rather than left to look like a bug. */
     const x = linear([0, Math.max(points.length - 1, 1)], [0, BOX.width])
     /* **A bar measures from zero and a line measures from its own range**, and
-       that is a correctness difference rather than a preference.
-     *
-     * A line is a shape: what it says is where the readings sit relative to
-     * each other, so running the scale over the data's own extent uses the
-     * whole box and claims nothing about absolute size. A bar says something
-     * else. Its *length* is the value, so a baseline anywhere but zero makes
-     * the lengths proportional to nothing, which is the oldest misleading chart
-     * there is.
-     *
-     * Drawn over the data's extent, the smallest reading landed exactly on the
-     * floor and its column had no height at all: seven readings between 1,102
-     * and 1,408 came out as six columns and a gap, which looks like missing
-     * data and is really a scale saying the minimum is nothing.
-     *
-     * The zero is included at both ends, so a series that goes negative gets a
-     * baseline inside the box and its columns hang below it. */
+       that is a correctness difference rather than a preference. A bar's
+       *length* is the value, so a baseline anywhere but zero makes the lengths
+       proportional to nothing. Drawn over the data's extent, the smallest
+       reading lands exactly on the floor and its column has no height at all:
+       seven readings between 1,102 and 1,408 come out as six columns and a gap,
+       which looks like missing data and is really a scale saying the minimum is
+       nothing.
+
+       The zero is included at both ends, so a series that goes negative gets a
+       baseline inside the box and its columns hang below it. */
     const [low, high] = extent(points.length > 0 ? points : [0])
     const y =
       this.plot === 'bar'
@@ -225,10 +214,9 @@ export class HelixHeadlessSparkline extends HelixElement {
        the wash goes. Its own path rather than a fill on the line, because a
        closed path strokes its closing edges too: filling the line itself would
        draw a rule along the bottom of the box and up both sides.
-     *
-     * The floor is the smallest reading and not a true zero, because the scale
-     * runs over the data's own extent. That is the part a consumer would get
-     * wrong writing this themselves, and it is why the shape is built here. */
+
+       The floor is the smallest reading and not a true zero, because the scale
+       runs over the data's own extent. */
     /* Asked negatively, because absent *is* an area here and the class doc
        above says why. This is the one property in the family where the resting
        arrangement is not the plainest thing, so the test has to answer true for
@@ -238,7 +226,7 @@ export class HelixHeadlessSparkline extends HelixElement {
         ? `${path}L${BOX.width},${BOX.height}L0,${BOX.height}Z`
         : ''
 
-    /* One column per reading, inset so neighbours do not touch.
+    /* One column per reading, inset so neighbors do not touch.
      *
      * A rect rather than a thick stroked line, because a bar has two ends and a
      * stroke has a cap: `stroke-linecap` would round or square both ends of
@@ -292,7 +280,7 @@ export class HelixHeadlessSparkline extends HelixElement {
       >
         ${
           /* The ramp the area is poured with, drawn here because a gradient is
-             an element and elements are this tier's business, and coloured
+             an element and elements are this tier's business, and colored
              above because a color is not. Measured rather than assumed: a
              fragment id inside a shadow root resolves within that root, so two
              sparklines on a page carrying the same id stay independent, and CSS

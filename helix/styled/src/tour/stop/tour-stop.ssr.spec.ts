@@ -17,20 +17,17 @@ import '../index.js'
    as a declaration. `Tree.chevronPlacement`, `Toast.placement` and
    `Image.status` were each caught that way.
 
-   `data-` names were the exception and are nearly none of them now. A boolean
-   state that is true only because a reader acted still mirrors to one, since
-   the write falls long after hydration and a pasted `data-closed` is inert:
-   `Toast.Item` is the case, and a first version of this asserted no attributes
-   at all and reported it for doing exactly the sanctioned thing. A state that
-   can be true on the first update mirrors to nothing at all. `checked`, `open`,
-   `invalid` and `has-label` moved to `ElementInternals.states` on 27 Aug 2026,
-   which is not in the DOM, so the server's output and the client's cannot
-   disagree about them and there is nothing here to assert.
+   A boolean state that is true only because a reader acted still mirrors to a
+   `data-` name, since the write falls long after hydration and a pasted
+   `data-closed` is inert: `Toast.Item` is the case, which is why this asserts a
+   `data-` exemption rather than no attributes at all. A state that can be true
+   on the first update mirrors to nothing: `checked`, `open`, `invalid` and
+   `has-label` live in `ElementInternals.states`, which is not in the DOM, so
+   server and client cannot disagree about them.
 
-   What it deliberately does not assert is the part's own markup. That is the
-   component's business and belongs in a spec written about it, not in one
-   generated across twenty-five of them: an assertion nobody chose is an
-   assertion nobody maintains. */
+   It deliberately does not assert the part's own markup. That belongs in a spec
+   written about the component: an assertion nobody chose is an assertion nobody
+   maintains. */
 describe('tour stop server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(withoutStyles(ssr(html`<helix-tour-stop></helix-tour-stop>`))).toContain(

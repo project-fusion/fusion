@@ -115,11 +115,10 @@ describe('combobox', () => {
   })
 
   test('the first Down opens the panel and lands on the first option', async () => {
-    /* Both halves were wrong before, and both were the listbox's. Moving chose
-       as it went, so one Down committed an option and shut the panel; and
-       clearing the filter on close had already parked the highlight on the
-       first option, so the Down that was meant to arrive at it started from it
-       and reached the second. */
+    /* Two ways this goes wrong, both the listbox's: moving that chooses as it
+       goes commits an option on the first Down and shuts the panel, and a
+       highlight parked on the first option by the close makes the Down meant to
+       arrive at it start from it and reach the second. */
     const host = await combobox()
     expect(options(host).some((option) => option.active)).toBe(false)
 
@@ -150,11 +149,9 @@ describe('combobox', () => {
     const host = await combobox()
     /* Counted and identified separately, and the identity compared with `toBe`.
        A deep equality against an array holding a DOM node walks the node, and a
-       rendered element is a graph with cycles in it: this assertion was
-       `toEqual([host])` until 26 Aug 2026, and when it started failing it did
-       not fail, it exhausted the machine's memory and took the runner with it.
-       `Command` had already learned this and said so; the lesson was in a
-       comment and not in a check. See 297. */
+       rendered element is a graph with cycles in it: `toEqual([host])` does not
+       fail when it starts failing, it exhausts the machine's memory and takes
+       the runner with it. */
     const heard: EventTarget[] = []
     host.addEventListener('helix-before-change', (event) => heard.push(event.target as EventTarget))
     await type(host, 'go')
@@ -264,8 +261,9 @@ describe('combobox holding several', () => {
   })
 
   test('a refused choice leaves the control exactly where it was', async () => {
-    /* Everything used to happen anyway: the filter cleared and the panel shut
-       as though the option had been taken. Select was fixed for the same. */
+    /* A refusal has to leave the filter and the panel alone: clearing either is
+       the control acting as though the option had been taken. Select carries the
+       same rule. */
     const host = await many()
     host.addEventListener('helix-before-change', (event) => event.preventDefault())
     await type(host, 'ru')
@@ -439,9 +437,9 @@ describe('combobox that finishes the word', () => {
   })
 
   test('the completion goes when the panel does', async () => {
-    /* Only the listbox's copy of the filter was cleared on close, so `typed`
-       survived a dismissal: the field looked empty because a closed field shows
-       the chosen words instead, and reopening put the old search back with the
+    /* Both copies of the filter clear on close. With only the listbox's cleared,
+       `typed` survives a dismissal invisibly, since a closed field shows the
+       chosen words instead, and reopening puts the old search back with the
        whole list behind it. */
     const host = await suggesting()
     await type(host, 'ru')
@@ -518,7 +516,7 @@ if (hasLayout()) {
       for (let attempt = 0; attempt < 50 && !surface.hasAttribute('data-placed'); attempt += 1) {
         await new Promise((resolve) => requestAnimationFrame(resolve))
       }
-      expect(surface.style.getPropertyValue('--floating-anchor-width')).toMatch(/^\d+px$/)
+      expect(surface.style.getPropertyValue('--floating-anchor-inline-size')).toMatch(/^\d+px$/)
     })
   })
 }

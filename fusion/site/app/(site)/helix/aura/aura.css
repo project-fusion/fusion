@@ -1,0 +1,179 @@
+/* The bench. Scoped to this route: a background is the one decision on a page
+   that everything else has to stay legible against, and this one is provisional. */
+
+.auraStage {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-block-size: 100svh;
+  overflow: clip;
+  background: var(--helix-color-background);
+}
+
+.auraCanvasFrame {
+  position: absolute;
+  inset: 0;
+}
+
+.shapeCanvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+/* The floor the words stand on. One color at three alphas, mixed in sRGB, so
+   the hue cannot drift: a bare `transparent` is transparent *black* and drags
+   every stop before it toward black rather than toward nothing.
+   
+   `pointer-events: none`, or it eats the pointer the aura underneath is
+   listening for. Measured: hovering the field, the element received zero
+   `pointermove` events and `elementFromPoint` answered `shapeScrim` every
+   time. The component had already been given the hit test back for exactly
+   this feature, and a decorative wash one layer up took it away again. */
+.auraScrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--helix-color-background) 100%, transparent) 0%,
+    color-mix(in srgb, var(--helix-color-background) 70%, transparent) 40%,
+    color-mix(in srgb, var(--helix-color-background) 0%, transparent) 72%
+  );
+}
+
+/* Positioned, and that is the whole of the stacking. Three `z-index` values
+   would want three layer tokens and the scale has two that fit; positioned
+   elements with no `z-index` stack in tree order, which is already correct. */
+.auraShell {
+  position: relative;
+}
+
+/* One bar, fixed to the bottom, holding every control.
+ *
+ * Fixed rather than in the flow, because the field runs the height of the
+ * viewport and controls placed under it are controls a reader has to scroll away
+ * from the thing they are adjusting to reach.
+ *
+ * `sticky` layer, so it sits over the aura and under the masthead, and its own
+ * material so the field reads through it: an opaque strip across the bottom of a
+ * background is a strip taken out of the background. */
+.auraBar {
+  backdrop-filter: blur(var(--helix-material-blur-md));
+  background-color: var(--helix-material-translucent);
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding-block: var(--helix-space-md);
+  padding-inline: var(--helix-space-2xl);
+  position: fixed;
+  z-index: var(--helix-layer-sticky);
+}
+
+/* Room under the field for the bar, so the last of the light is not sitting
+   behind it. */
+.auraStage {
+  padding-block-end: calc(var(--helix-size-header) + var(--helix-space-2xl));
+}
+
+/* Flat on the bar rather than behind a trigger. A grid that wraps by itself,
+   so the eight find their own number of rows at whatever width there is. */
+.auraKnobs {
+  inline-size: 100%;
+}
+
+/* The handle row: shape and pointer on one line, the collapse control at the
+   end of it. */
+.auraHandle {
+  inline-size: 100%;
+}
+
+/* Sized to its content, not to the row. A toggle group is a block by default,
+   so without this the shape group takes the whole width and pushes pointer onto
+   a line of its own. */
+.auraShapes {
+  inline-size: auto;
+}
+
+/* The chevron points at what pressing it does: down to shut, up to open. */
+.auraCollapse {
+  flex: none;
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.auraBar[data-open] .auraCollapse {
+  rotate: 180deg;
+}
+
+/* **`grid-template-rows` from 0fr to 1fr, because nothing here has measured a
+   height.** A panel whose contents wrap at eight different widths has no number
+   to animate to, and `max-inline-size` guesses would either clip the sliders or
+   leave the transition finishing against empty space.
+
+   `visibility` rides the same transition so a shut panel leaves the tab order
+   rather than staying reachable underneath, and `transition-behavior` is what
+   lets a discrete property take part at all: without it the controls become
+   focusable the instant the collapse starts. */
+.auraPanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard),
+    visibility var(--helix-duration-normal);
+  transition-behavior: allow-discrete;
+  visibility: hidden;
+}
+
+.auraBar[data-open] .auraPanel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+/* The grid child has to be able to go to nothing, which it cannot do while its
+   own content sets a floor.
+
+   **The padding has to travel too, and `min-block-size` does not cover it.**
+   That property bounds the content box; padding renders underneath it whatever
+   the track is sized to, so a shut panel measured 16 pixels rather than 0 and
+   left a band of material with nothing in it. Transitioned on the same clock as
+   the rows, so it closes with them rather than snapping. */
+.auraPanelInner {
+  min-block-size: 0;
+  overflow: hidden;
+  padding-block-start: 0;
+  transition: padding-block-start var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.auraBar[data-open] .auraPanelInner {
+  padding-block-start: var(--helix-space-md);
+}
+
+/* No footer under a full-bleed field. The page is the component running at
+   size with a drawer over it, and a copyright line below that is a strip of
+   page furniture stapled to the bottom of a picture. Written here rather than
+   by moving the route out of the group, because everything else the layout
+   gives this page is wanted.
+ *
+ * **`[data-site-footer]`, never `.siteFooter`.** That is the *source* name of a
+ * rule in `chrome.module.css`, and a CSS module rewrites its class names, so the
+ * element carries `chrome-module__sKhELq__siteFooter` and the only thing that
+ * can select it is `styles.siteFooter` from inside the module. From a plain
+ * stylesheet the source name matches nothing.
+ *
+ * That is the same failure as a `[part=]` selector for a part nothing renders,
+ * and it is worse here because the module boundary makes it invisible: the rule
+ * reads correctly, the name is spelled correctly, and there is no error, no
+ * warning and no clue beyond the feature not happening. Any rule reaching a
+ * module-styled element from outside its module needs a hook the bundler cannot
+ * rename, so the layout marks the element and this asks for the mark. */
+:root:has(.auraStage) [data-site-footer] {
+  display: none;
+}
+
+/* Held to the right whether or not the row wrapped. `justify-content: between`
+   only distributes within a line, so once the switch and the reset drop to a
+   line of their own they are that line's only item and it puts them at its
+   start. An auto inline margin pushes them over in both cases. */
+.auraActions {
+  margin-inline-start: auto;
+}

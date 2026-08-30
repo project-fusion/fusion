@@ -52,18 +52,14 @@ Hide the table visually if it should not be seen, and the data is still there:
 The caption becomes the chart's accessible name unless you set `label`, which is
 usually the right words and is already written.
 
-## Series colours
+## Series colors
 
 Twenty-four `--helix-color-series-*` tokens, in order. A chart with three series
 uses the first three. They are ordered to stay distinguishable in that order
 rather than to look good as a full set of twenty-four.
 
-The palette wraps, and where it wraps is one number in one place. It used to be
-four: four families held the same `const PALETTE = 24` and the legend held a
-fifth, so when the palette went from eight to twenty-four one of them was missed
-and drew every ninth series in the first color while the legend beside it named
-the ninth correctly. A number two files have to agree on is a number that will
-stop agreeing.
+The palette wraps, and where it wraps is one number in one place, so a chart and
+the legend beside it can never disagree about which color a series is.
 
 **A chart's mark carries its own series color as a custom property**, because a
 chart knows which series a bar belongs to and CSS cannot count it. That is what
@@ -76,7 +72,7 @@ lets you restyle a series from outside without knowing the drawing order.
 <helix-bar-chart for="revenue"></helix-bar-chart>
 ```
 
-The legend reads the same table, so the names and the colours cannot disagree
+The legend reads the same table, so the names and the colors cannot disagree
 with the chart's. Pointing them at two different tables is the only way to make
 them disagree, and it is not something to do by accident.
 
