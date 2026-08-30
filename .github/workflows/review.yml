@@ -73,6 +73,18 @@ jobs:
       # anyone who can open one against this repository could spend the
       # workspace's budget. The workspace carries a limit for the same reason,
       # `continue-on-error` meaning an overrun here fails invisibly.
+      # **The findings go on the lines they are about, not in one comment.**
+      # A summary makes the reader carry a file and a line number back to the
+      # diff for every finding, and the ones that get skipped are the ones that
+      # read as prose rather than as a defect. Anchored, a finding is next to
+      # the code and GitHub resolves it when the line changes, which a comment
+      # cannot do: the reviews on 16, 17 and 19 each carried findings that were
+      # still open days later with nothing marking them.
+      #
+      # **The sticky comment stays** and holds what has no line: progress while
+      # the job runs, the count when it finishes, and the one line that says
+      # nothing survived, which is the common case and wants somewhere to go
+      # that is not five inline comments saying nothing is wrong.
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_federation_rule_id: fdrl_01QpMYFZydwuKsUrQ2YFZtjV
@@ -90,25 +102,41 @@ jobs:
 
             Work in two passes.
 
-            Pass one, find. Look for problems, and weight your attention toward
-            what a script cannot see, because twenty-odd `check:*` scripts
-            already run on this diff and there is no value in you repeating
-            them. In particular:
+            Pass one, find. The `check:*` scripts and the `helix component` and
+            `fusion prose` rules already run on this diff, so repeating them is
+            worth nothing. Look for what they cannot see, in this order:
 
-            - A fix applied at the consumer level when the cause is deeper.
-              AGENTS.md calls this out: a patch at the consumer masks an
-              architectural gap, and the fix goes where the cause is.
-            - A raw value where a semantic token exists, or a token invented
-              rather than used.
-            - A stage label softened. Active ships with users, Building is real
-              work with nothing shipped, Declared is committed direction with no
-              work started. These are honest by policy.
-            - Prose that no longer matches the code it describes. This repo's
-              comments carry measurements and incidents; a comment asserting
-              something the diff just made false is a real defect here.
-            - A claim stated rather than measured, where measuring was possible.
-            - Anything that would only fail on a consumer's machine: packaging,
-              exports, registration, a dependency on something unpublished.
+            - **A defect.** Wrong result, throw, race, leak, or a path that
+              claims to act and does nothing. Name the input or state that
+              reaches it. A guard that makes a documented case unreachable is
+              this, and so is behavior the diff changed with no test over it.
+            - **A break for somebody downstream.** Packaging, exports,
+              registration, hydration, an API a consumer already calls, a
+              dependency on something unpublished. These fail on a machine that
+              is not ours, which is why no local run catches them.
+            - **The standard, refused.** ARIA and the accessibility tree, form
+              participation, focus, keyboard, the DOM's own event semantics.
+              A component library is judged here and browsers are the authority,
+              so cite the spec or the engine behavior rather than a preference.
+            - **Cost paid on every render.** Work in a hot path, a listener or
+              observer never released, an await serializing what could overlap,
+              bytes a consumer cannot shake. Say what it costs, measured or
+              measurable.
+            - **The platform's answer, hand-rolled.** Something the DOM, the
+              language, or an imported dependency already does correctly, where
+              the difference is a bug the platform does not have.
+            - **Two spellings of one idea.** A raw value where a token exists, a
+              token invented rather than used, a name against the family's
+              vocabulary, a lifecycle hook its siblings do not use. Consistency
+              is what lets a reader predict the next file.
+            - **A fix at the consumer when the cause is deeper.** AGENTS.md:
+              a patch at the consumer masks an architectural gap.
+            - **Prose the diff made false.** Comments here carry measurements
+              and incidents, so a stale one is a defect rather than untidiness.
+              A claim stated where measuring was possible is the same fault
+              caught earlier. A softened stage label is this too: Active ships
+              with users, Building is real work with nothing shipped, Declared
+              is direction with no work started.
 
             Pass two, refute. For each candidate, argue against yourself as hard
             as you can. Is it actually wrong, or merely different from how you
@@ -118,15 +146,40 @@ jobs:
             caught by an existing `check:*` script? Drop everything that does not
             survive. Default to dropping.
 
-            Then post. At most five findings, most serious first. Every one must
-            name a file and line, and give either the rule it breaks or the
-            concrete way it fails: inputs, state, and what goes wrong. No
-            summary of the pull request, no praise, no restating the diff.
+            Then post, as one review with each finding on the line it is
+            about. At most five, most serious first. Every one must give either
+            the rule it breaks or the concrete way it fails: inputs, state, and
+            what goes wrong. No summary of the pull request, no praise, no
+            restating the diff.
+
+            One call, so they arrive together rather than as five
+            notifications:
+
+            gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews \
+              --method POST --input review.json
+
+            with {"event": "COMMENT", "body": ..., "comments": [{"path": ...,
+            "line": ..., "side": "RIGHT", "body": ...}]}, and `start_line` where
+            a finding is about a range.
+
+            **`line` has to be a line the diff touches.** The API refuses an
+            anchor outside it and refuses the whole review with it, so one bad
+            anchor loses the other four: check each before sending. A finding
+            about an untouched line goes in `body` naming its file and line,
+            which is where the stale-prose ones usually belong.
+
+            `body` is for what has no single line and nothing else. It is not a
+            summary of the review.
 
             If a finding could have been caught deterministically, say so and
             propose the `check:*` script that would catch it, including the
             invariant in one sentence. That is worth more than the finding.
 
-            If nothing survives pass two, reply with exactly one line saying so.
-            Silence is the correct output most of the time and is not a failure
-            to be useful.
+            Your own final message is not the review. Say how many findings you
+            posted and stop: it lands in the sticky comment above the diff, and
+            repeating there what is already on the lines is the summary this
+            asks you to stop writing.
+
+            If nothing survives pass two, post no review and reply with exactly
+            one line saying so. Silence is the correct output most of the time
+            and is not a failure to be useful.
