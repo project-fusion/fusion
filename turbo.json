@@ -99,11 +99,19 @@
       // The insights content is an input for the other half of it: six essays
       // were added and the cache key did not move, so the task that writes
       // those documents was never asked to run again.
+      //
+      // The set is `.gitignore`'s, which is the list of what this task
+      // generates and the only place it was written down: `public/*.md`,
+      // `public/helix/*.md`, `public/helix/components/`, `public/helix/docs/`
+      // and `public/insights/`. Declaring them one failure at a time found
+      // `insights` and then `helix/*.md` on the next run, because a `.md` is
+      // written per route and a route is as deep as its path.
       "outputs": [
         "content/catalog/catalog.generated.json",
         "public/*.md",
         "public/helix/components/**",
         "public/helix/docs/**",
+        "public/helix/*.md",
         "public/insights/**"
       ]
     },
