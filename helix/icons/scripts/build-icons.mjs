@@ -33,8 +33,9 @@ import { optimize } from 'svgo'
  * one tree. `removeViewBox` is the other one to watch and is *not* configured,
  * because it left `preset-default` — turning it off explicitly is a warning on
  * every run about a plugin that is not there, and the box survives without it.
- * Asserted rather than assumed: every one of the 105 `viewBox` values is
- * unchanged.
+ * Asserted rather than assumed: every `viewBox` value is unchanged. The count
+ * that was here went stale the first time an icon was added, which is what
+ * AGENTS.md means by a number in a comment being a second source of truth.
  *
  * `fusion.svg` defines gradients by id and is not skipped for it. Ids are
  * scoped to their *tree*, and a shadow root is a tree: `helix-icon` renders

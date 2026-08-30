@@ -3,6 +3,36 @@ import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
+ * Whether a node is something a reader types into.
+ *
+ * The input types are the ones that take text. A checkbox and a range are
+ * `<input>` and are not typing, so a chord still reaches them.
+ */
+const typing = (node: EventTarget | undefined): boolean => {
+  if (node instanceof HTMLTextAreaElement) {
+    return true
+  }
+  if (node instanceof HTMLElement && node.isContentEditable) {
+    return true
+  }
+  return node instanceof HTMLInputElement && !UNTYPED.has(node.type)
+}
+
+/** `<input>` types that hold no text, so a bare chord is not competing with one. */
+const UNTYPED = new Set([
+  'button',
+  'checkbox',
+  'color',
+  'file',
+  'hidden',
+  'image',
+  'radio',
+  'range',
+  'reset',
+  'submit',
+])
+
+/**
  * How each name in a chord is drawn, per platform.
  *
  * Apple keyboards label their modifiers with glyphs and print no separator
@@ -189,6 +219,33 @@ export class HelixHeadlessKbd extends HelixElement {
     if (press.isComposing) {
       return
     }
+    /* Neither is a bare character typed into a field, which is the same fault
+       the IME guard above already refuses: the reader meant the key to reach
+       what they are writing in.
+
+       Only a bare printable chord. `mod+k` is a shortcut a reader expects to
+       work from inside a search field, and `escape` is how they leave it, so a
+       guard over every chord would break the two conventions this is for. It is
+       `/` and `?` that are ambiguous, being both the most conventional
+       shortcuts on the web and characters somebody types.
+
+       `composedPath()[0]` rather than `target`, which retargets to the host at
+       document level and would need a list of every tag name that holds a field.
+       The path's first entry is the real one, through open shadow roots and
+       through `delegatesFocus`.
+
+       **`document` only, because `control` has already answered the question.**
+       That binding listens on `this.parentElement`, so it fires only with focus
+       inside the control the badge sits in, and the guard would make a bare
+       printable chord unreachable there by construction: the two are mutually
+       exclusive. `.examples/events.html` is exactly that shape, a `keys="/"`
+       slotted into a `helix-input` telling the reader to put the cursor in the
+       field and press slash, and it would have shipped to the docs site doing
+       nothing. What is ambiguous is `/` competing with every field on the page,
+       which is the `document` case and the only one this refuses. */
+    if (this.within === 'document' && this.printable && typing(press.composedPath()[0])) {
+      return
+    }
     if (!this.matches_(press)) {
       return
     }
@@ -199,6 +256,21 @@ export class HelixHeadlessKbd extends HelixElement {
     if (!shortcut.defaultPrevented) {
       press.preventDefault()
     }
+  }
+
+  /**
+   * Whether this chord is one bare character, and so indistinguishable from
+   * typing.
+   *
+   * A single part means no modifier, and one code point means a character
+   * rather than a name: `/` and `?` are printable, `escape` and `enter` are not.
+   */
+  private get printable(): boolean {
+    const parts = this.keys
+      .split('+')
+      .map((part) => part.trim())
+      .filter((part) => part !== '')
+    return parts.length === 1 && [...(parts[0] ?? '')].length === 1
   }
 
   /** Whether a press is this chord, modifiers and all. */

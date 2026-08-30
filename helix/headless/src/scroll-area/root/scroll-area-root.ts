@@ -12,12 +12,12 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * **The whole component is one fact a stylesheet cannot work out for itself:
  * which edges have content past them.** A fade at the bottom of a list is easy
  * to draw and impossible to decide, because CSS has no reading of scroll
- * position. So this measures and says, in `data-more`, and the styled tier
- * draws whatever it likes on the edges named.
+ * position. So this measures and says, in a custom state per edge, and the
+ * styled tier draws whatever it likes on the edges named.
  *
- * **Tokens rather than four attributes**, so a stylesheet asks
- * `[data-more~="block-end"]` the way it would ask about a class. Four booleans
- * say the same thing in four selectors and read worse at every use.
+ * **States rather than attributes**, so an element that upgrades after a
+ * framework rendered its markup does not hand that framework markup it did not
+ * write. A stylesheet asks `:host(:state(more-block-end))`.
  *
  * **A scrolling region takes the keyboard when it scrolls, and not before.**
  * A box a reader can only reach with a pointer is a box some readers cannot
@@ -160,12 +160,28 @@ export class HelixHeadlessScrollArea extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
     /* On the host rather than the viewport, so a consumer can style from the
-       outside without reaching through a part. */
-    this.toggleAttribute('data-scrolls', this.scrolls)
-    if (this.more.length > 0) {
-      this.setAttribute('data-more', this.more.join(' '))
-    } else {
-      this.removeAttribute('data-more')
+       outside without reaching through a part.
+
+       **Custom states and never attributes, which is what keeps hydration
+       clean.** These are a reading of a laid-out box, so they are written on
+       upgrade, and upgrade happens before a framework hydrates the subtree
+       around it. Written as attributes they are markup on the host that the
+       framework did not render: React reported a hydration mismatch naming
+       `data-scrolls` and `data-more` on every load of a page holding one.
+       `states` is not in the DOM at all, so this element may upgrade whenever it
+       likes and a framework finds the markup it rendered. That is the rule the
+       rest of the library already keeps, `app-header`'s `scrolled` being the
+       clearest statement of it.
+
+       One state per edge rather than one holding tokens, because a custom state
+       is a name and not a value: there is no `~=` to ask with. The four
+       selectors are what the styled tier writes either way. */
+    /* Through `toggleState` for the feature test it carries. This is `updated`
+       rather than `willUpdate`, so the server never reaches it, but Safari
+       below 17.4 and Firefox below 126 do and have no `CustomStateSet`. */
+    this.toggleState('scrolls', this.scrolls)
+    for (const edge of EDGES) {
+      this.toggleState(`more-${edge}`, this.more.includes(edge))
     }
   }
 

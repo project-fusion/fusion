@@ -1,6 +1,6 @@
 import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /**
  * How a column is read out of a row, once the row is data rather than markup.
@@ -171,6 +171,15 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   readonly isTableColumn = true
 
+  /**
+   * @internal Which way this column is currently ordered, written by the table
+   * that owns the sort. Not a consumer's to set: the sort lives on the table,
+   * and a column that disagreed with it would announce an order the rows are
+   * not in.
+   */
+  @state()
+  sorted: 'ascending' | 'descending' | undefined = undefined
+
   /** The track this column contributes, resolved. */
   get track(): string {
     return this.width || 'minmax(max-content, 1fr)'
@@ -201,7 +210,37 @@ export class HelixHeadlessTableColumn extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* **`aria-sort` is not decoration.** A `columnheader` a reader can reorder
+       by has to say which way it is ordered and which headers are orderable at
+       all, or the whole affordance exists only for a reader who can see the rows
+       move. `none` on the sortable ones that are not currently the sort is the
+       part that carries the second half: it is what tells a screen reader this
+       column can be sorted, where an absent attribute says nothing.
+
+       Off the internals rather than the attribute, for the same reason the role
+       is: it is this element's own semantics rather than markup a consumer
+       wrote, and an attribute here is one more thing hydration can disagree
+       about. */
     hostAria(this.internals, { role: 'columnheader' })
+    /* Set here rather than through `hostAria`, which carries the four semantics
+       every family needs and not this one. */
+    this.internals.ariaSort = this.canSort ? (this.sorted ?? 'none') : null
+    /* And the same fact as a custom state, because ARIA is not a style hook.
+       Whoever draws this column draws the caret, and had nothing to draw it
+       from: no state and no part told the sorted column from the rest, so the
+       only way to it was listening for `helix-sort` and reading the order back a
+       microtask later, which is a lot of machinery for one glyph. */
+    for (const [name, on] of [
+      ['sorted-ascending', this.sorted === 'ascending'],
+      ['sorted-descending', this.sorted === 'descending'],
+    ] as const) {
+      /* Through `toggleState`, which carries the feature test, the way
+         `pagination-root.ts` does in this same hook. Safari below 17.4 and
+         Firefox below 126 have no `CustomStateSet`, and there
+         `internals.states.delete` is a `TypeError` thrown from `willUpdate`:
+         the column would fail to render rather than render without a caret. */
+      this.toggleState(name, on)
+    }
   }
 
   protected override render(): TemplateResult {

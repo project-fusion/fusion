@@ -16,6 +16,7 @@ arrows-out-line-vertical
 bell
 book-open-text
 briefcase
+building
 calendar-blank
 caret-double-left
 caret-double-right
@@ -52,6 +53,7 @@ fusion
 gauge
 gear
 github-logo
+globe
 helix
 house
 html5
@@ -70,6 +72,7 @@ moon
 notebook
 palette
 pause
+phone
 picture-in-picture
 play
 plus

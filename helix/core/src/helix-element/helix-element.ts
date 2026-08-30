@@ -559,9 +559,15 @@ export class HelixElement extends LitElement {
    *
    * Feature-tested rather than assumed, the way `hostAria` tests element
    * references. An engine without `CustomStateSet` records nothing and keeps
-   * whatever the resting rule draws, which is the safe direction to fail, and
-   * Lit's server shim is one of them: a custom state is a fact about a running
-   * element, and a server has nothing to say about it.
+   * whatever the resting rule draws, which is the safe direction to fail.
+   *
+   * **Lit's server shim is no longer one of them**, and this said it was.
+   * `@lit-labs/ssr-dom-shim@1.6.0` sets `this.states = new Set()` in its
+   * `ElementInternals` constructor, so the guard passes on the server and a
+   * custom state is recorded where nothing reads it, which is harmless. The
+   * engines the test is for are browsers: Safari below 17.4 and Firefox below
+   * 126. There the write is a `TypeError`, so a component that bypasses this
+   * fails to render rather than rendering without whatever the state draws.
    */
   protected toggleState(name: string, on: boolean): void {
     if ('states' in this.internals) {

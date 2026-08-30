@@ -38,7 +38,10 @@ import '../../table/index.js'
  * @cssproperty --data-table-heading-color - Ink in a heading.
  * @cssproperty --data-table-padding-block - Space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - Space either side of a cell's content.
- * @cssproperty --data-table-rule - The hairline between rows.
+ * @cssproperty --data-table-rule-color - Color of the hairline between rows. A color
+ * and not a border: it lands in the color slot of a shorthand, so a whole border
+ * written into it produces invalid CSS and drops the rule. Drawn on the cells rather
+ * than the row, which is `display: contents` and measures `0px`.
  * @cssproperty --data-table-text - Type size, headings and cells alike.
  */
 @customElement('helix-data-table')

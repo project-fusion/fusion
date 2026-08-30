@@ -111,11 +111,7 @@ export class HelixHeadlessAppHeader extends HelixElement {
     /* The state is what CSS selects; the event is what anything outside this
        element can hear. Both, because neither covers the other: a state cannot
        be observed and an event cannot be styled. */
-    if (next) {
-      this.internals.states.add('scrolled')
-    } else {
-      this.internals.states.delete('scrolled')
-    }
+    this.toggleState('scrolled', next)
     this.dispatchEvent(new HelixScrolledEvent({ scrolled: next }))
   }
 

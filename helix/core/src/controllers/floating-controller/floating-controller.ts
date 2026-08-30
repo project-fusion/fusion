@@ -13,6 +13,53 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
 export type { Placement }
 
+/**
+ * The panel's largest corner radius, which is how far its arrow has to stay
+ * from either end.
+ *
+ * **Without it the arrow is correctly aimed and looks wrong.** Floating UI
+ * centers the arrow on the anchor, and on a small trigger that center is inside
+ * the panel's own corner: the arrow's base meets the curve instead of a straight
+ * run and its outer flank is cut by it. Measured against a 4px radius and an 8px
+ * arrow, a 14px trigger put the arrow's near flank 1.5px from the panel's edge
+ * and a 20px trigger put it at 4.3px, so anything narrower than the arrow plus
+ * two radii is broken by construction. An icon beside a heading is the ordinary
+ * way to be under that.
+ *
+ * `padding` is what Floating UI's `arrow` middleware takes for exactly this, and
+ * its own guidance for a rounded surface is the border radius.
+ *
+ * **Measured rather than named**, so a family that rounds itself differently is
+ * right without telling this controller. Reading a token here would put a value
+ * from `helix/styles` into a tier that must not name one, and would still be
+ * wrong for any component that overrides its own radius. The four corners rather
+ * than one, because they can differ and the arrow travels along two of them; the
+ * largest clears all of them.
+ *
+ * A percentage is refused rather than guessed at: it resolves against the box,
+ * which is the thing being positioned.
+ */
+const corner = (floating: HTMLElement): number => {
+  const style = getComputedStyle(floating)
+  const corners = [
+    style.borderTopLeftRadius,
+    style.borderTopRightRadius,
+    style.borderBottomRightRadius,
+    style.borderBottomLeftRadius,
+  ]
+  let largest = 0
+  for (const each of corners) {
+    if (!each.endsWith('px')) {
+      continue
+    }
+    const value = Number.parseFloat(each)
+    if (Number.isFinite(value) && value > largest) {
+      largest = value
+    }
+  }
+  return largest
+}
+
 export interface FloatingOptions {
   /** The element being pointed at. */
   anchor: () => HTMLElement | null | undefined
@@ -218,7 +265,7 @@ export class FloatingController implements ReactiveController {
       )
     }
     if (pointer) {
-      middleware.push(arrow({ element: pointer }))
+      middleware.push(arrow({ element: pointer, padding: corner(floating) }))
     }
 
     computePosition(anchor, floating, {

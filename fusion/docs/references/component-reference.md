@@ -1318,6 +1318,8 @@ around it at the same nominal size. `--code-size` overrides it.
 
 | Property | From | Description |
 | --- | --- | --- |
+| `--code-background-color` | - | Fill behind the fragment. Defaults to a 6% wash of the ink, which composites the same against a light page and a dark one. |
+| `--code-foreground-color` | - | The fragment's ink. Defaults to the prose's own, pulled back towards `foreground-muted`. |
 | `--code-padding` | - | Space either side of the fragment. Defaults to half of `space-2xs`, which is what keeps a bracket beside the chip rather than a space away from it. |
 | `--code-size` | - | The fragment's size. Defaults to `text-sm`. |
 
@@ -1989,7 +1991,7 @@ limitation and worth repeating where a consumer chooses between the two: use
 | `--data-table-heading-color` | - | Ink in a heading. |
 | `--data-table-padding-block` | - | Space above and below a cell's content. |
 | `--data-table-padding-inline` | - | Space either side of a cell's content. |
-| `--data-table-rule` | - | The hairline between rows. |
+| `--data-table-rule-color` | - | Color of the hairline between rows. A color and not a border: it lands in the color slot of a shorthand, so a whole border written into it produces invalid CSS and drops the rule. Drawn on the cells rather than the row, which is `display: contents` and measures `0px`. |
 | `--data-table-text` | - | Type size, headings and cells alike. |
 | `--data-table-template` | `HelixHeadlessDataTable` | The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set. |
 
