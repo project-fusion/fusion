@@ -426,7 +426,16 @@ const built = await Bun.build({
   outdir: join(BUILT, 'out'),
   plugins: [stubStylesheets],
   root: BUILT,
-  splitting: true,
+  /* **Off, because a scoped run builds a different set and splits it
+     differently.** With splitting on, the CJS interop helper lands in a shared
+     chunk that the page never fetches, so React renders nothing and the report
+     is `TypeError: __commonJS is not a function` against an example that is
+     fine. Which examples fail is a function of what was built: CI scoped to one
+     commit reported `pin-input` and `file-input`, the same scope run here
+     reported `donut-chart`, and the unscoped run of all 610 reports none, which
+     is why this survived until `--changed` had a wide diff to work on.
+     Self-contained bundles cost bytes this check never ships. */
+  splitting: false,
   target: 'browser',
 })
 

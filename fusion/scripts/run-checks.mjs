@@ -49,9 +49,10 @@ const DEDICATED = new Set([
      resolves a built binary or builds one, so a shard without the cargo cache
      compiles it, and six shards compiling Rust at once took the runner's
      memory: shard 2 was `Killed` at exit 137 and shard 5 took a SIGTERM, both
-     inside a `fusion` subcommand, and shard 3 was cancelled behind them. They
+     inside a `fusion` subcommand, and shard 3 was canceled behind them. They
      had never run before, `--list` having refused ahead of them, so this was
      the first time six of them tried at once. */
+  'bun run check:css:seeds',
   'bun run check:prose',
   'bun run fusion spec check',
   'bun run rs:check',
