@@ -85,12 +85,6 @@
   font-size: var(--helix-text-xl);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="cell"] {
-    transition: none;
-  }
-}
-
 /* Quieter than a typed character, and it has to be said here because a cell is
    an `<input>` and the UA gives its placeholder a color of its own. Subtle
    rather than muted: this is a hint at the shape of the field, sitting under

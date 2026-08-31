@@ -6,6 +6,21 @@
 //! be named. The one construct that crosses the boundary from outside is
 //! `::part()`, which is why a document sheet is read too, and only for those.
 //!
+//! **A tokenized transition is the exception, and it is the token layer that
+//! makes it one.** `base.css` sets `--helix-duration-*` to `0.01ms` under the
+//! preference, and a custom property inherits where a selector does not:
+//! measured across four components, a shadow child went from its authored
+//! duration to `1e-05s` when the tokens moved and back when they were restored.
+//! So a transition written with one of those tokens is already answered
+//! everywhere it can appear, and requiring the component to restate it is
+//! requiring 57 copies of a sentence the layer says once.
+//!
+//! **An animation is not the exception**, because the tokens do not reach it in
+//! the same way: durations there are not all tokenized, `video` spinning at
+//! `0.8s`, and seven sheets animate `infinite`, where a 0.01ms cycle is not a
+//! stopped animation but one running flat out. Those still answer for
+//! themselves, and so does a transition whose duration is written as a literal.
+//!
 //! **A reduce rule has to repeat the selector.** Naming a looser one loses on
 //! specificity and does nothing, so the two are compared as normalized selector
 //! text rather than by whether some reduce block exists in the file.
@@ -57,6 +72,70 @@ static ONLY_NONE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^\s*(animation|transition)[^:]*:\s*none\s*;?\s*$")
         .expect("a literal pattern compiles")
 });
+
+/// A `transition` whose every duration is a token the layer moves.
+///
+/// Read as "mentions a duration token and no literal time", rather than by
+/// parsing the shorthand: a single literal anywhere in the list is enough to
+/// leave part of the transition running, and that is exactly the case that has
+/// to keep answering for itself.
+static ANSWERED_BY_THE_LAYER: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^\s*transition(-duration)?\s*:").expect("a literal pattern compiles")
+});
+
+static DURATION_TOKEN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"var\(\s*--helix-duration-").expect("a literal pattern compiles")
+});
+
+static LITERAL_TIME: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"[0-9](\.[0-9]+)?m?s\b").expect("a literal pattern compiles"));
+
+/// A rule body as declarations rather than as lines.
+///
+/// A `transition` shorthand routinely spans four lines, one property per line,
+/// so reading this line by line sees `transition:` alone and none of the
+/// durations under it. Splitting on `;` is safe here because the values that
+/// carry one, a `url()` or a quoted string, do not appear in a timing
+/// declaration.
+fn declarations(body: &str) -> Vec<&str> {
+    body.split(';').collect()
+}
+
+/// A file's own private properties, so a token one indirection away still reads
+/// as a token.
+///
+/// `carousel` writes `--_carousel-indicator-motion: var(--helix-duration-slow)
+/// var(--helix-easing-emphasized)` and then transitions through it, which is a
+/// tokenized transition spelled once instead of twice. One level, because that
+/// is the shape that exists here and a full resolver is a CSS engine.
+static PRIVATE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(--_[a-z0-9-]+)\s*:\s*([^;{}]+)").expect("a literal pattern compiles")
+});
+
+fn expand(line: &str, privates: &BTreeMap<String, String>) -> String {
+    let mut out = line.to_owned();
+    for (name, value) in privates {
+        if out.contains(name.as_str()) {
+            out = out.replace(&format!("var({name})"), value);
+        }
+    }
+    out
+}
+
+/// Whether one declaration still needs the component to answer the preference.
+fn unanswered_line(line: &str, privates: &BTreeMap<String, String>) -> bool {
+    if !MOVES.is_match(line) || ONLY_NONE.is_match(line) {
+        return false;
+    }
+    let resolved = expand(line, privates);
+    if ANSWERED_BY_THE_LAYER.is_match(line)
+        && DURATION_TOKEN.is_match(&resolved)
+        && !LITERAL_TIME.is_match(&resolved)
+    {
+        return false;
+    }
+    true
+}
 
 static REDUCE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"@media[^{]*prefers-reduced-motion:\s*reduce").expect("a literal pattern compiles")
@@ -159,14 +238,18 @@ pub fn run(context: &Context) -> Report {
                 .flat_map(|rule| parts(&rule.selector))
                 .collect();
 
+            let privates: BTreeMap<String, String> = PRIVATE
+                .captures_iter(&css)
+                .map(|one| (one[1].to_owned(), one[2].trim().to_owned()))
+                .collect();
+
             for rule in &parsed {
                 if rule.reduced {
                     continue;
                 }
-                let moves = rule
-                    .body
-                    .lines()
-                    .any(|line| MOVES.is_match(line) && !ONLY_NONE.is_match(line));
+                let moves = declarations(&rule.body)
+                    .into_iter()
+                    .any(|one| unanswered_line(one, &privates));
                 if !moves {
                     continue;
                 }

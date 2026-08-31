@@ -204,14 +204,6 @@ slot[name="end"]::slotted(*) {
   color: var(--helix-color-foreground);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="field"],
-  [part="clear"],
-  [part="reveal"] {
-    transition: none;
-  }
-}
-
 /* Print: a control prints the value it holds, and a state carried by a fill has
  * to survive, or the paper says the opposite of the truth.
  *

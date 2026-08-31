@@ -106,12 +106,6 @@
     scale var(--helix-duration-fast) var(--helix-easing-accelerate);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"] {
-    transition: none;
-  }
-}
-
 /* The alarming one, which is the exception rather than the default. A badge is
    usually a count of things waiting, and a count is news rather than a warning:
    red on everything that has unread anything is a page that is always
@@ -123,14 +117,6 @@
 :host([tone="neutral"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-surface-raised));
   color: var(--helix-color-foreground);
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"][data-blank] {
-    transition: none;
-  }
 }
 
 /* Print: a count.

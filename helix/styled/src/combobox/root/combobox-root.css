@@ -184,13 +184,6 @@
   scale: 1 -1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"],
-  ::slotted([slot="indicator"]) {
-    transition: none;
-  }
-}
-
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
   --icon-size: var(--helix-size-icon);

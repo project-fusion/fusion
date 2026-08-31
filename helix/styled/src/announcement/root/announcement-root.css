@@ -198,16 +198,6 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* A color crossfade is not motion in the sense the preference is about, but the
-   base layer caps every transition in the document for the same reader, and a
-   component that kept fading while the page around it stopped would be the odd
-   one out. The rule cannot reach in here, so it is restated. */
-@media (prefers-reduced-motion: reduce) {
-  [part="dismiss"] {
-    transition: none;
-  }
-}
-
 /* Nothing in it, so no box and no gap beside it. See `slotFilled`: there is no
    selector that can ask this, and only a box that is not generated costs
    nothing in a flex row. */

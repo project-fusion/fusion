@@ -64,12 +64,6 @@
   transform: scaleY(-1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="chevron"] {
-    transition: none;
-  }
-}
-
 /* No fill on hover. An accordion row runs the width of its container, so a
    background under it is a band across the page rather than a hint at a target.
    The chevron answers instead, coming up to full strength from the subtle it
@@ -130,18 +124,4 @@
   line-height: var(--helix-leading-normal);
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   padding-block-start: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="content"] {
-    transition: none;
-  }
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  [part="trigger"] {
-    transition: none;
-  }
 }

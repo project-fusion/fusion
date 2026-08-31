@@ -180,16 +180,6 @@ slot[name="start"]::slotted(*) {
   justify-content: flex-start;
 }
 
-/* A color crossfade is not motion in the sense the preference is about, but the
-   base layer caps every transition in the document for the same reader, and a
-   component that kept fading while the page around it stopped would be the odd
-   one out. The rule cannot reach in here, so it is restated. */
-@media (prefers-reduced-motion: reduce) {
-  :host {
-    transition: none;
-  }
-}
-
 /* Print: a bar of destinations, and a printed page has no elsewhere to go.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

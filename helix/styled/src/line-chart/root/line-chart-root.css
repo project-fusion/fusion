@@ -367,13 +367,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="line"],
-  [part="area"] {
-    transition: none;
-  }
-}
-
 /* A crosshair over the drawing, because the drawing reads a position.
  *
  * `pointer` would be wrong and is the tempting one: it promises a click, and a

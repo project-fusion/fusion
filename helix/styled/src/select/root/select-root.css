@@ -284,13 +284,6 @@
   scale: 1 -1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"],
-  ::slotted([slot="indicator"]) {
-    transition: none;
-  }
-}
-
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and every
    author declaration above outranks it whatever its specificity. Restated here,
    the same way Tooltip, Menu and Popover restate theirs, and the same rule
@@ -319,14 +312,6 @@
 
 [part="listbox"]::part(items):focus-visible {
   outline: none;
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  [part="trigger"] {
-    transition: none;
-  }
 }
 
 /* The fallback caret, sized. An `<svg>` with no dimensions fills the box it is

@@ -204,13 +204,6 @@
   background-color: var(--helix-color-danger);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="mark"],
-  [part="control"] {
-    transition: none;
-  }
-}
-
 /* Nothing to read, so nothing to space away from the box.
  *
  * `:state(has-label)` rather than a selector, because there is no selector for
@@ -306,14 +299,6 @@
     (var(--helix-text-sm) * var(--helix-leading-tight) - var(--_checkbox-size)) /
     2
   );
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  :host([variant="card"]) [part="field"] {
-    transition: none;
-  }
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a

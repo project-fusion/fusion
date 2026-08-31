@@ -421,13 +421,6 @@
   transition: r var(--helix-duration-normal) var(--helix-easing-decelerate);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="segment"],
-  [part="track"] {
-    transition: none;
-  }
-}
-
 /* On the slices rather than the plot, which is the difference between a ring
    and a chart with axes: a line answers anywhere along its width, so the whole
    drawing is the target, while a ring answers only where a slice is and the

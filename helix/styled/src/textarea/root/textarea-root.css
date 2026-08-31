@@ -93,12 +93,6 @@
   background-color: transparent;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="field"] {
-    transition: none;
-  }
-}
-
 /* Print: a control prints the value it holds, and the field's fill has to
  * survive with it, or the words print with nothing around them saying they were
  * typed into anything.

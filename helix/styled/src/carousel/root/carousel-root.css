@@ -578,16 +578,6 @@
   order: 1;
 }
 
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"],
-  :host([indicator-placement="inline-start"]) [part="indicator"],
-  :host([indicator-placement="inline-end"]) [part="indicator"] {
-    transition: none;
-  }
-}
-
 /* A caret is physical and the thing it points at is not.
  *
  * The row itself already flips, because it is laid out on the inline axis and
