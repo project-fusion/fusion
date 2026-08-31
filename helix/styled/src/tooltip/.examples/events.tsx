@@ -31,14 +31,17 @@ export function Example() {
 
   return (
     <helix-flex direction="column" gap="md">
+      <helix-button aria-describedby="events-deploy-tip" id="events-deploy">
+        Deploy
+      </helix-button>
       <helix-tooltip
         content="Deploys the current branch"
+        for="events-deploy"
+        id="events-deploy-tip"
         onhelix-before-close={closing}
         onhelix-before-open={opening}
         onToggle={moved}
-      >
-        <helix-button>Deploy</helix-button>
-      </helix-tooltip>
+      ></helix-tooltip>
 
       <helix-list divided label="What arrived">
         {heard.map((one, at) => (

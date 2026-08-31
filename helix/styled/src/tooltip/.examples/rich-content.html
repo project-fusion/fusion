@@ -1,6 +1,13 @@
 <!-- @summary More than a line, for a tooltip that has something to explain. -->
-<helix-tooltip placement="top">
-  <helix-button>Button</helix-button>
+<helix-button
+  aria-describedby="rich-content-tip"
+  id="rich-content-trigger"
+>Button</helix-button>
+<helix-tooltip
+  for="rich-content-trigger"
+  id="rich-content-tip"
+  placement="top"
+>
   <span slot="content">
     Lorem ipsum dolor
     <helix-kbd>Cmd</helix-kbd>

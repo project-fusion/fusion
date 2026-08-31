@@ -3,12 +3,15 @@
   direction="column"
   gap="md"
 >
+  <helix-button
+    aria-describedby="hint"
+    id="events-deploy"
+  >Deploy</helix-button>
   <helix-tooltip
     content="Deploys the current branch"
+    for="events-deploy"
     id="hint"
-  >
-    <helix-button>Deploy</helix-button>
-  </helix-tooltip>
+  ></helix-tooltip>
 
 
   <helix-list

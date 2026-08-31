@@ -23,6 +23,8 @@ import { styles } from './listbox-root.css.js'
  * @aliases Options, Select list
  * @documentation https://helix.fusion.dev/components/listbox
  *
+ * @cssproperty --listbox-background-color - The panel's fill. `transparent` where the list is already inside one.
+ * @cssproperty --listbox-border - The panel's border, as a shorthand. `none` where the list is already inside one.
  * @cssproperty --listbox-max-block-size - How tall it gets before it scrolls.
  */
 @customElement('helix-listbox')

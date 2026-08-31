@@ -28,8 +28,18 @@
      that: it is a surface with rows on it, and what it has to do is sit far
      enough from its own rows for them to read. On `surface` the hover is darker
      in light and lighter in dark, which is the right direction in both. */
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  /* Through hooks, because two components already write them.
+
+     `combobox-root.css` and `command-root.css` each set
+     `--listbox-background-color: transparent` in a rule whose comment says a
+     nested list must not fill the panel a second time, and neither write did
+     anything: this hardcoded the fill, so the `border: none` half of each rule
+     landed and the fill half was inert, drawing the shape twice. `Select`
+     reaches the part directly and gets it right, which is a different door and
+     stays valid; three consumers wanting the flattening is what makes this a
+     hook rather than a deletion. */
+  background-color: var(--listbox-background-color, var(--helix-color-surface));
+  border: var(--listbox-border, var(--helix-border-thin) solid var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
   display: flex;
   flex-direction: column;
