@@ -35,9 +35,11 @@
  *   - Two-factor on "authorization only": every call below runs unattended.
  *   - On "authorization and writes": each one wants a one-time password, and a
  *     passkey account has no code to type. npm offers a browser challenge
- *     instead, which this file cannot present, because the `execFileSync` below
- *     pipes stdio and nothing reaches the terminal. It fails once per
- *     registration and reports 403 for none of them.
+ *     instead. The first call pipes stdio, which is what keeps npm's own error
+ *     legible, and a challenge cannot appear through a pipe: so an `EOTP` is
+ *     retried once with the streams inherited, which prints the URL and waits.
+ *     That makes it answerable rather than fatal, at two registrations per
+ *     package. "Authorization only" still makes the run unattended.
  *
  * The package does have to exist, and npm/cli#8544 asks for that to change and
  * is still open. It is simply not what a 403 tells you.
@@ -133,7 +135,27 @@ for (const name of packages) {
     try {
       execFileSync('npm', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
       console.log(`  ${name} <- ${file} (${environment})`)
-    } catch (error) {
+    } catch (first) {
+      /* **A one-time password is answerable, so it is asked again with a
+         terminal.** The call above pipes stdio to keep npm's own message, which
+         is what makes a 403 legible; piped, npm's browser challenge has nowhere
+         to appear and the registration fails for a reason the operator could
+         have satisfied. So an `EOTP` is retried once with the streams inherited:
+         the URL prints, the browser answers it, and this continues.
+
+         Only on `EOTP`. Retrying a 403 interactively asks a person to watch a
+         permission error arrive a second time. */
+      if (/EOTP|one-time password/i.test(String(first.stderr ?? first.message))) {
+        try {
+          console.log(`  ${name} <- ${file} (${environment}): npm wants a one-time password`)
+          execFileSync('npm', args, { stdio: 'inherit' })
+          console.log(`  ${name} <- ${file} (${environment})`)
+          continue
+        } catch {
+          /* Fall through and report it the way anything else is reported. */
+        }
+      }
+      const error = first
       failed += 1
       /* npm's own message, rather than "Command failed". Getting this wrong is
          how a registry error becomes an afternoon. */
@@ -177,13 +199,15 @@ if (failed > 0) {
   }
   if (challenged.size > 0) {
     console.error(
-      '\nnpm wants a one-time password for each of these, which is two-factor set to ' +
-        '"authorization and writes". It offers a browser challenge, and this script cannot ' +
-        'present one: the `execFileSync` above pipes stdio, so the prompt goes nowhere and every ' +
-        'registration fails the same way. A passkey account has no code to pass either.\n\n' +
-        'Set two-factor to "authorization only" in npm\'s web settings, re-run, and set it back. ' +
-        'Login stays behind the passkey throughout, and CI is unaffected either way, because ' +
-        'trusted publishing authenticates by OIDC and never sees this.\n',
+      '\nnpm wanted a one-time password for each of these, which is two-factor set to ' +
+        '"authorization and writes", and the browser challenge it offered was not completed. ' +
+        'Each one is retried with the terminal attached, so the URL is presentable now and ' +
+        'answering it lets the run continue; these are the ones still outstanding after that.\n\n' +
+        'There are two registrations per package, so answering a challenge for each is a long ' +
+        'sitting. Setting two-factor to "authorization only" in npm\'s web settings makes the ' +
+        'whole run unattended, and it can go back afterwards. Login stays behind the passkey ' +
+        'throughout, and CI is unaffected either way, because trusted publishing authenticates ' +
+        'by OIDC and never sees this.\n',
     )
   }
   process.exit(1)
