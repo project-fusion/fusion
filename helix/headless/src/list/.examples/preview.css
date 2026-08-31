@@ -43,7 +43,6 @@ helix-headless-icon {
 helix-headless-list-item::part(row) {
   background-color: transparent;
   border: 0;
-  padding: 0.25rem 0.5rem;
 }
 
 helix-headless-icon::part(svg) {

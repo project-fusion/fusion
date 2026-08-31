@@ -49,7 +49,6 @@ helix-headless-date-picker::part(cell) {
 helix-headless-date-picker::part(day) {
   background-color: transparent;
   border: 0;
-  padding: 0.25rem 0.5rem;
 }
 
 helix-headless-date-picker::part(heading) {
