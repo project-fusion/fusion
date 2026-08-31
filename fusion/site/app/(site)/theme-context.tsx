@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react'
 import {
+  clearSiteThemeFrom,
   clearSiteThemeFromRoot,
   OWNED,
   readSiteTheme,
@@ -458,6 +459,15 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
    */
   useEffect(() => {
     const forget = () => {
+      /* **The scope is this component's to clear, and nothing else clears it.**
+         `forgetSiteTheme` takes the palette off the root and out of storage,
+         which is everything it can reach: the scope element is a ref in here.
+         Without this the reset put the controls back and left the page painted,
+         because `applyScope` only runs while `touched` and `touched` is about to
+         go false. */
+      if (scope.current) {
+        clearSiteThemeFrom(scope.current)
+      }
       setBrand(INITIAL.brand)
       setChromaScale(INITIAL.chromaScale)
       setAccentHue(INITIAL.accentHue)
