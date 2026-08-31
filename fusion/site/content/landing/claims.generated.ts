@@ -31,3 +31,35 @@ export const CLAIMS: readonly Claim[] = [
     value: '83%',
   },
 ]
+
+export interface Rival {
+  /** Brotli bytes for the one component, alone. */
+  brotli: number
+  name: string
+  /** Ours, which the page marks rather than infers from the name. */
+  ours?: boolean
+}
+
+export const BUTTON: readonly Rival[] = [
+  {
+    brotli: 10187,
+    name: 'Helix',
+    ours: true,
+  },
+  {
+    brotli: 12591,
+    name: 'Material Web',
+  },
+  {
+    brotli: 15805,
+    name: 'Shoelace',
+  },
+  {
+    brotli: 17685,
+    name: 'Carbon',
+  },
+  {
+    brotli: 18674,
+    name: 'Spectrum',
+  },
+]

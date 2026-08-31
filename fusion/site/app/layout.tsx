@@ -5,7 +5,6 @@ import './site.css'
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import type { ReactNode } from 'react'
-import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { COLOR_MODE_KEY } from '@/utils/color-mode/color-mode'
 import { siteUrl } from '@/utils/metadata/metadata'
 import { SITE } from '@/utils/site/site'
@@ -149,10 +148,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {`try{var d=document.documentElement;var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')d.dataset.colorMode=m;var t=JSON.parse(localStorage.getItem(${JSON.stringify(SITE_THEME_KEY)})||'null');if(t&&t.version===${THEME_VERSION}&&t.tokens){var s=d.style,i;for(i=0;i<t.tokens.length;i++)s.setProperty(${JSON.stringify(OWNED)}+t.tokens[i].name,t.tokens[i].hex);for(i in t.seeds)s.setProperty(${JSON.stringify(OWNED)}+i,t.seeds[i]);d.dataset.helixTheme=''}}catch(e){}`}
         </Script>
       </head>
-      <body>
-        <HelixElements />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   )
 }

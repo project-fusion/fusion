@@ -8,7 +8,7 @@ export interface OutlineEntry {
 }
 
 /**
- * The second-level headings of an MDX document, as an outline.
+ * The second- and third-level headings of an MDX document, as an outline.
  *
  * **Read from the source rather than from the rendered page**, which is the
  * whole reason this is a function and not a hook. Both routes that want an
@@ -25,6 +25,21 @@ export interface OutlineEntry {
  *
  * The anchors come from `slugify`, which is what the heading renderer uses, so
  * the two agree by construction rather than by having been written to match.
+ *
+ * **Flat, at both levels, because this is navigation.** Indenting would need an
+ * active-state rule that knows which parent to hold open, and a `###` is a place
+ * to jump to whether or not a reader can see what it sits under. There are 278
+ * `##` and 16 `###` across the documentation today, so the second level is a
+ * long tail rather than a second structure.
+ *
+ * **A repeated heading is refused rather than rendered.** `slugify` does not
+ * deduplicate, and it cannot usefully: this walks a document in order and the
+ * heading renderer sees one heading at a time with no memory of the last, so any
+ * numbering scheme would have to be invented twice and agree. Two headings with
+ * one slug means two outline entries pointing at whichever the browser finds
+ * first, which looks like a broken link and reads like a bug in the outline.
+ * This runs at build time, so throwing here fails the build with the document
+ * and the word in the message, which is the cheapest place to find it.
  */
 export const outlineOf = (source: string): OutlineEntry[] => {
   /* Frontmatter first, because a `## ` can appear in a description, and fenced
@@ -42,7 +57,7 @@ export const outlineOf = (source: string): OutlineEntry[] => {
     if (fenced) {
       continue
     }
-    const heading = /^##\s+(.+?)\s*$/.exec(line)
+    const heading = /^#{2,3}\s+(.+?)\s*$/.exec(line)
     if (!heading?.[1]) {
       continue
     }
@@ -54,9 +69,17 @@ export const outlineOf = (source: string): OutlineEntry[] => {
       .replace(/[`*_]/g, '')
       .trim()
     const id = slugify(label)
-    if (id) {
-      entries.push({ id, label })
+    if (!id) {
+      continue
     }
+    const clash = entries.find((entry) => entry.id === id)
+    if (clash) {
+      throw new Error(
+        `outline: two headings share the anchor "#${id}" ("${clash.label}" and "${label}"). ` +
+          'Both would link to whichever the browser finds first. Reword one.',
+      )
+    }
+    entries.push({ id, label })
   }
 
   return entries

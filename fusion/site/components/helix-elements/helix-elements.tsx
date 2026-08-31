@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-/**
+/*
  * The one route that must not have the library, and why it cannot say so itself.
  *
  * The spec runner imports a bundle per family from `public/specs`, and each of
@@ -17,13 +17,16 @@ import { useEffect, useState } from 'react'
  * layout is above that intent and overrides it, since a child route cannot
  * un-render a parent's component.
  *
- * **A path test, which is a sniff, and the structural fix is a root layout of
- * its own.** Next supports one per top-level route group, and that is the
- * version with no condition in it, at the cost of moving every route in the app
- * into a group. `fusion spec`'s `isolated` fails if the specs document ever
- * registers the library again, whichever way it is kept out.
+ * **Kept out of the spec runner by not being rendered there**, which replaced a
+ * `window.location.pathname` test in this file. The sniff worked and put a route
+ * into a component that has no other reason to know about routes; the structural
+ * fix was read as needing a root layout per route group, and it did not. This
+ * returns `null` and is a leaf, so where it renders is the whole of the
+ * decision: `(site)`'s layout, the theme builder's layout, and the sandbox
+ * *page* rather than the sandbox layout, which is an ancestor of `specs/`.
+ * `fusion spec`'s `isolated` fails if the specs document ever registers the
+ * library again, whichever way it is kept out.
  */
-const SPECS = '/helix/sandbox/specs'
 
 /**
  * Registers every Helix element the site uses, after React has hydrated.
@@ -52,9 +55,6 @@ export function HelixElements(): null {
   const [, setRegistered] = useState(false)
 
   useEffect(() => {
-    if (window.location.pathname === SPECS) {
-      return
-    }
     let live = true
     void Promise.all([import('@fusion.dev/helix'), import('@fusion.dev/helix-sandbox/specs')]).then(
       () => {

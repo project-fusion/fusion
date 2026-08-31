@@ -775,6 +775,28 @@ const claims = [
   },
 ]
 
+/* **The landing page's comparison, from the same two sources the metrics table
+   uses.** Ours is measured on every run from this repository; theirs comes from
+   `helix/docs/peers.json`, which `turbo run peers` writes and which is
+   committed, so this needs no network and 192's pinning is untouched: refreshing
+   the rivals stays a deliberate act with a date on it, and only the copying
+   stops being one.
+
+   Sorted by what is printed. A table claiming to be ordered and not being so is
+   worse than an unordered one, because a reader stops checking. */
+const buttonRivals = (() => {
+  const mine = styled.rows.find((one) => one.family === 'button')
+  if (!peers || !mine) {
+    return []
+  }
+  return [
+    { brotli: mine.alone.brotli, name: 'Helix', ours: true },
+    ...peers.systems
+      .map((system) => ({ brotli: system.parts.button?.brotli, name: system.name }))
+      .filter((one) => typeof one.brotli === 'number'),
+  ].sort((a, b) => a.brotli - b.brotli)
+})()
+
 const claimsSource = [
   '/* Generated from the built packages by `bun run gen:metrics`. Do not edit. */',
   '',
@@ -793,6 +815,24 @@ const claimsSource = [
     `    label: '${claim.label}',`,
     `    note: '${claim.note.replace(/'/g, "\\'")}',`,
     `    value: '${claim.value}',`,
+    '  },',
+  ]),
+  ']',
+  '',
+  'export interface Rival {',
+  '  /** Brotli bytes for the one component, alone. */',
+  '  brotli: number',
+  '  name: string',
+  '  /** Ours, which the page marks rather than infers from the name. */',
+  '  ours?: boolean',
+  '}',
+  '',
+  'export const BUTTON: readonly Rival[] = [',
+  ...buttonRivals.flatMap((rival) => [
+    '  {',
+    `    brotli: ${rival.brotli},`,
+    `    name: '${rival.name}',`,
+    ...(rival.ours ? ['    ours: true,'] : []),
     '  },',
   ]),
   ']',

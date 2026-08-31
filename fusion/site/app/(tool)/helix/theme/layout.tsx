@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { HelixElements } from '@/components/helix-elements/helix-elements'
 import styles from '../workbench.module.css'
 
 /**
@@ -10,5 +11,10 @@ import styles from '../workbench.module.css'
  * tools is what goes in the panes, which is not a layout question.
  */
 export default function ThemeLayout({ children }: { children: ReactNode }) {
-  return <div className={styles.sandboxShell}>{children}</div>
+  return (
+    <div className={styles.sandboxShell}>
+      <HelixElements />
+      {children}
+    </div>
+  )
 }

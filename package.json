@@ -48,7 +48,7 @@
     "lint": "biome lint .",
     "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "probe:stuck": "bun fusion/scripts/probe-stuck-spec.mjs",
-    "regen": "bun run fix && bun run analyze && bun run gen:element-events && turbo run reference && turbo run token-layer && turbo run tokens && bun run gen:metrics && turbo run routes && turbo run samples && turbo run docs && turbo run content && turbo run catalog && turbo run themed-page && bun run gen:eval",
+    "regen": "bun run fix && bun run analyze && bun run gen:element-events && turbo run reference && turbo run token-layer && turbo run tokens && bun run gen:metrics && turbo run samples && turbo run docs && turbo run build --filter=@fusion.dev/helix-docs && turbo run content && turbo run catalog && turbo run routes && turbo run themed-page && bun run gen:eval",
     "rs:build": "cargo build --workspace",
     "rs:check": "cargo clippy --workspace --all-targets -- -D warnings",
     "rs:fmt": "cargo fmt --all",
