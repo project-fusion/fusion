@@ -113,10 +113,13 @@ jobs:
 
           # Every earlier run of this workflow on this pull request, oldest
           # first, and the head each one read.
-          previous=$(gh api "repos/$REPO/actions/workflows/review.yml/runs?event=pull_request&per_page=100" \
-            --jq "[.workflow_runs[] | select(.id != $RUN_ID)
-                   | select(any(.pull_requests[]?; .number == $NUMBER))
-                   | {sha: .head_sha, at: .run_started_at}] | sort_by(.at)" 2>/dev/null || echo '[]')
+          # One line, because a `--jq` filter carrying newlines is passed to gh
+          # with the YAML block's indentation inside it: the filter failed, gh
+          # printed part of the response *and* exited non-zero, so the `|| echo`
+          # appended a second document and `jq length` answered twice.
+          filter="[.workflow_runs[] | select(.id != $RUN_ID) | select(any(.pull_requests[]?; .number == $NUMBER)) | {sha: .head_sha, at: .run_started_at}] | sort_by(.at)"
+          previous=$(gh api "repos/$REPO/actions/workflows/review.yml/runs?event=pull_request&per_page=100" --jq "$filter" 2>/dev/null) || previous='[]'
+          [ -n "$previous" ] || previous='[]'
 
           spent=$(jq 'length' <<<"$previous")
           if [ "$FORCED" != 'true' ] && [ "$spent" -ge "$ROUNDS" ]; then
