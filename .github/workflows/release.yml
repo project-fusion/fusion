@@ -137,9 +137,13 @@ jobs:
     permissions:
       # `id-token` is the whole authentication story: npm trusted publishing
       # exchanges a short-lived OIDC token for publish rights, so there is no
-      # npm credential in this repository at all. `contents` is for the tag.
+      # npm credential in this repository at all. `contents` is for the tag and
+      # for the branch the stamp-back opens from, `pull-requests` for the pull
+      # request itself: writing the version back needs no access that outranks
+      # branch protection, which is the whole reason it is a pull request.
       contents: write
       id-token: write
+      pull-requests: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -406,3 +410,56 @@ jobs:
           git tag "$tag" "${{ github.sha }}"
           git push origin "$tag"
           gh release create "$tag" --title "$tag" --notes-file notes.md
+
+      # **The number goes back into the manifests, through the front door.**
+      #
+      # `version.mjs` argues the opposite and the reasoning was sound as far as
+      # it went: a release commit pushed to `main` by CI needs a bot whose write
+      # access outranks branch protection, which is a standing hole in the one
+      # place the governance gate has to be strongest. What that argument missed
+      # is that a pull request needs no such thing. `visual-baselines.yml`
+      # already opens one for the same reason, and 272 worked out the one quirk
+      # it has: a run on a branch a token pushed parks at `action_required` and
+      # wants a click.
+      #
+      # **Only here, and only after everything else worked.** This step is last
+      # in an official release, so a manifest only claims a number that was
+      # staged, installed from the registry and promoted. Preview publishes
+      # under `exp-*` stamp nothing back: they are not what a reader means by
+      # the version.
+      #
+      # **The lockfile rides along, and has to.** `bun.lock` records a workspace
+      # package's version nineteen times, so a manifest changed without it fails
+      # `bun install --frozen-lockfile` on the pull request this very step opens.
+      # The non-frozen `bun install` above already refreshed it in this runner,
+      # which is why nothing is regenerated here.
+      #
+      # `chore` is deliberate: `bump.mjs` releases nothing for it, so stamping a
+      # version cannot allocate the next one.
+      - name: Stamp the version back into the manifests
+        if: vars.PUBLISHING == 'on'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          add-paths: |
+            **/package.json
+            bun.lock
+          branch: release/stamp-${{ matrix.target.domain }}
+          delete-branch: true
+          commit-message: |
+            chore(${{ matrix.target.domain }}): stamp ${{ steps.version.outputs.version }} into the manifests
+
+            Written by `release.yml` after ${{ matrix.target.domain }}-v${{ steps.version.outputs.version }}
+            published, installed from the registry and promoted to `latest`.
+
+            The tag is still the record. This is the manifests agreeing with it,
+            so a reader of the source sees the version that shipped rather than
+            the resting `0.0.0-dev`.
+          title: "chore(${{ matrix.target.domain }}): stamp ${{ steps.version.outputs.version }} into the manifests"
+          body: |
+            `${{ matrix.target.domain }}-v${{ steps.version.outputs.version }}` published, installed from the registry and promoted to `latest`. This carries the number back into the manifests so the source agrees with the tag.
+
+            Opened as a pull request rather than pushed, so nothing needs write access that outranks branch protection.
+
+            `bun.lock` is included because it records each workspace package's version, and a manifest changed without it fails `bun install --frozen-lockfile`.
+
+            Merging is safe at any time: the next release computes its number from the tags, not from these files.
