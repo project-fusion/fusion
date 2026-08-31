@@ -27,6 +27,19 @@
 //! explanation sits directly above it and routinely spells out the rule that was
 //! supposed to read it.
 //!
+//! **And to having a writer, which is the direction this rule spent a year
+//! missing.** A `var(--_x, fallback)` that nothing sets is not an error, is not
+//! invalid CSS, and renders as the fallback every time, so the only sign is a
+//! component permanently wearing its default while a comment above it describes
+//! the configurability it lost. Both live cases arrived that way. It is the
+//! same broken promise as a declaration with no reader, seen from the other end.
+//!
+//! **A private is written from a template as legitimately as from a
+//! stylesheet**, a chart putting a computed count into CSS being the reason the
+//! seam exists at all, so a template write counts. Three of the six unwritten
+//! names are written exactly there, and a rule that read only stylesheets would
+//! report all three.
+//!
 //! **A `style="--a: var(--b)"` in a template is a read**, and missing it
 //! reported twenty-four live hooks as dead. A chart puts its series index into
 //! CSS this way precisely because CSS cannot count it. An interpolated
@@ -57,6 +70,15 @@ static PRIVATE_DECLARED: LazyLock<Regex> = LazyLock::new(|| {
 
 static PRIVATE_READ: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"var\(\s*(--_[a-z0-9-]+)").expect("a literal pattern compiles"));
+
+/// A write anywhere on a line rather than at the start of one.
+///
+/// `PRIVATE_DECLARED` is anchored because a stylesheet declares in column one,
+/// and a template does not: the write sits inside a string beside the value it
+/// interpolates. A `var(--_x, y)` cannot match this, carrying a comma where
+/// this wants a colon.
+static PRIVATE_WRITTEN: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(--_[a-z0-9-]+)\s*:").expect("a literal pattern compiles"));
 
 static STYLE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"style="([^"]*)""#).expect("a literal pattern compiles"));
@@ -104,6 +126,9 @@ struct Survey {
     families: BTreeSet<String>,
     private_declared: BTreeMap<String, BTreeMap<String, String>>,
     private_read: BTreeMap<String, BTreeSet<String>>,
+    /// The first file to read each one, so a finding can name somewhere.
+    private_read_at: BTreeMap<String, String>,
+    private_written: BTreeSet<String>,
     read: BTreeMap<String, String>,
 }
 
@@ -195,39 +220,58 @@ fn survey(context: &Context) -> Survey {
                 }
             }
 
-            /* Where the private rule applies: the component layers, and not the
-            examples inside them. A layer that reads hooks without declaring any
-            is how one goes missing, and it owns no privates. */
-            let owns_private = !context.settings.layer.iter().any(|one| {
-                Path::new(one)
-                    .parent()
-                    .is_some_and(|two| two.to_str().is_some_and(|three| where_.starts_with(three)))
-            }) && !where_.contains(".examples/");
-            if !owns_private {
-                continue;
-            }
-            let source = COMMENT.replace_all(&text, "");
-            if stylesheet {
-                for found in PRIVATE_DECLARED.captures_iter(&source) {
-                    survey
-                        .private_declared
-                        .entry(found[1].to_owned())
-                        .or_default()
-                        .entry(package_of(&where_))
-                        .or_insert_with(|| where_.clone());
-                }
-            }
-            for found in PRIVATE_READ.captures_iter(&source) {
-                survey
-                    .private_read
-                    .entry(found[1].to_owned())
-                    .or_default()
-                    .insert(package_of(&where_));
-            }
+            privates(&mut survey, context, &text, &where_, stylesheet);
         }
     }
 
     survey
+}
+
+/// The private half of one file, which is three passes over the same text.
+///
+/// Its own function because the public half above is already the length clippy
+/// allows, and because the three passes are one subject: what this file sets,
+/// what it reads, and what it writes from a template.
+fn privates(survey: &mut Survey, context: &Context, text: &str, where_: &str, stylesheet: bool) {
+    /* Where the private rule applies: the component layers, and not the
+    examples inside them. A layer that reads hooks without declaring any is how
+    one goes missing, and it owns no privates. */
+    let owns_private = !context.settings.layer.iter().any(|one| {
+        Path::new(one)
+            .parent()
+            .is_some_and(|two| two.to_str().is_some_and(|three| where_.starts_with(three)))
+    }) && !where_.contains(".examples/");
+    if !owns_private {
+        return;
+    }
+    let source = COMMENT.replace_all(text, "");
+    if stylesheet {
+        for found in PRIVATE_DECLARED.captures_iter(&source) {
+            survey
+                .private_declared
+                .entry(found[1].to_owned())
+                .or_default()
+                .entry(package_of(where_))
+                .or_insert_with(|| where_.to_owned());
+        }
+    }
+    for found in PRIVATE_READ.captures_iter(&source) {
+        survey
+            .private_read
+            .entry(found[1].to_owned())
+            .or_default()
+            .insert(package_of(where_));
+        survey
+            .private_read_at
+            .entry(found[1].to_owned())
+            .or_insert_with(|| where_.to_owned());
+    }
+    /* Kept apart from `private_declared` rather than folded into it, so the
+    reader half judges exactly what it judged before. A template write answers
+    "is this set at all" and not "does this package own a declaration". */
+    for found in PRIVATE_WRITTEN.captures_iter(&source) {
+        survey.private_written.insert(found[1].to_owned());
+    }
 }
 
 pub fn run(context: &Context) -> Report {
@@ -331,6 +375,15 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
         }
     }
 
+    findings.extend(unpaired(survey));
+
+    findings
+}
+
+/// A private property missing its other half, in either direction.
+fn unpaired(survey: &Survey) -> Vec<Finding> {
+    let mut findings = Vec::new();
+
     for (name, where_) in &survey.private_declared {
         for (package, path) in where_ {
             if survey
@@ -348,6 +401,23 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
                 message: format!("declares `{name}` and nothing in {package} reads it"),
             });
         }
+    }
+
+    /* The same pairing from the other end. A name read and never set resolves
+    to its fallback forever, which is why nothing here has ever looked wrong
+    enough to report itself. */
+    for (name, path) in &survey.private_read_at {
+        if survey.private_declared.contains_key(name) || survey.private_written.contains(name) {
+            continue;
+        }
+        findings.push(Finding {
+            detail: "A private property read with a fallback and written by nothing always \
+                     resolves to the fallback, so the value is fixed and the comment above it \
+                     describes configurability the component does not have."
+                .to_owned(),
+            file: path.clone(),
+            message: format!("reads `{name}` and no stylesheet or template writes it"),
+        });
     }
 
     findings

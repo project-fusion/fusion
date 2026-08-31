@@ -363,21 +363,6 @@
   stroke-width: var(--donut-chart-stroke);
 }
 
-/* `stroke` joins the width so an outlined slice fills in rather than snapping.
-   It costs the other emphases nothing: their stroke does not move on hover, so
-   there is nothing for the transition to run. */
-[part="segment"] {
-  transition:
-    stroke var(--helix-duration-fast) var(--helix-easing-decelerate),
-    stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="segment"] {
-    transition: none;
-  }
-}
-
 /* **A chart must never animate through a value it does not have**, which is why
  * none of this uses `emphasized`.
  *
@@ -410,10 +395,17 @@
  * in rather than appearing: it gives the browser a value to come *from* the
  * first time an element is painted, and there is no other way to transition
  * from nothing. `stroke-dashoffset` is what it starts from, so every slice
- * enters along the circle rather than fading. */
+ * enters along the circle rather than fading.
+ *
+ * `stroke` is in this list rather than in a second block of its own, which is
+ * where it was and where it did nothing: two `transition` declarations on one
+ * selector at one specificity leave only the later, and the later was this one.
+ * An outlined slice fills in rather than snapping because of it, and it costs
+ * the other emphases nothing, their stroke not moving on hover. */
 [part="segment"] {
   transition:
     r var(--helix-duration-normal) var(--helix-easing-decelerate),
+    stroke var(--helix-duration-fast) var(--helix-easing-decelerate),
     stroke-dasharray var(--helix-duration-normal) var(--helix-easing-decelerate),
     stroke-dashoffset var(--helix-duration-normal) var(--helix-easing-decelerate),
     stroke-width var(--helix-duration-fast) var(--helix-easing-decelerate);

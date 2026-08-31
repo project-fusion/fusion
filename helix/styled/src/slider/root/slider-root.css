@@ -196,8 +196,11 @@
  * `currentColor` rather than a color: only the alpha of a mask is read, and it
  * saves inventing a token for a value nobody sees.
  *
- * `pointer-events: none` goes with it. The overlay sits over the control and
- * without this a press that lands on a mark never reaches the range. */
+ * `pointer-events: none` goes with it, and is declared in the block above
+ * rather than repeated here: the overlay sits over the control and without it a
+ * press that lands on a mark never reaches the range. Repeating it, and
+ * `z-index` with it, said the same thing twice at one specificity, where the
+ * second copy could only ever be dead. */
 /* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
   --_slider-hole: calc(var(--_slider-thumb-length) / 2 + var(--helix-border-thin));
@@ -207,8 +210,6 @@
     transparent var(--_slider-hole),
     currentColor var(--_slider-hole)
   );
-  pointer-events: none;
-  z-index: var(--helix-layer-raised);
 }
 
 /* Two thumbs, two holes. Each mask is everything-but-a-hole, so intersecting

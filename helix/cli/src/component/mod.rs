@@ -58,6 +58,7 @@ pub mod platform_fidelity;
 pub mod print;
 pub mod properties;
 pub mod reachable;
+pub mod redeclared;
 pub mod reflected;
 pub mod reflected_defaults;
 pub mod run;
@@ -428,6 +429,12 @@ pub fn all() -> Vec<Rule> {
             name: "attribute-names",
             run: Runner::Source(attribute_names::run),
             summary: "a property mirroring a platform attribute uses the platform's spelling",
+        },
+        Rule {
+            fix: None,
+            name: "redeclared",
+            run: Runner::Source(redeclared::run),
+            summary: "one selector is written once, or the blocks after it add rather than replace",
         },
         Rule {
             fix: None,

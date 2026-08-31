@@ -89,8 +89,13 @@
 [part="popover"] {
   opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
+  /* Declared beside `--_travel` rather than read through a fallback nothing
+     ever set. It was never written, in this file or anywhere, so the panel has
+     always entered at the fallback and the name documented a value rather than
+     carrying one. */
+  --_popover-from: 0.96;
   transform: translateY(var(--_travel));
-  scale: var(--_popover-from, 0.96);
+  scale: var(--_popover-from);
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized),

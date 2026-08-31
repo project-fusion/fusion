@@ -77,9 +77,14 @@
   flex: none;
 }
 
+/* Inset by the offset, which is what the other eleven sheets inset by. This
+   read `--helix-size-focus-ring`, the ring's own width, and the two resolve to
+   the same 2px today so nothing looked wrong: `--helix-size-focus-reach` exists
+   precisely because they are meant to be separable, and the day either is
+   retuned this would have been the one control that moved with the wrong one. */
 [part="trigger"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 :host(:disabled) [part="trigger"] {

@@ -7,10 +7,16 @@
 /* Every one of these comes from the tab set, which sets them all for its
    default and overrides what a variant changes. The fallbacks are what a tab
    would look like with no set around it, which is not an arrangement that
-   ships, so they are the plainest thing rather than a second design. */
+   ships, so they are the plainest thing rather than a second design.
+
+   A resting tab is the exception and is written plainly. `--_tab-surface` was
+   read here and set by no variant and never had been, so every tab that has
+   ever shipped drew the fallback: the set varies the *selected* fill through
+   `--_tab-selected-surface` and has never wanted a resting one. A variant that
+   does can have the property back, in the two lines it takes. */
 [part="tab"] {
   align-items: center;
-  background-color: var(--_tab-surface, transparent);
+  background-color: transparent;
   /* The height a control is. Left to its own text plus whatever padding the
      variant asks for, a tab comes out at 31px beside a 40px button and a toolbar
      looks assembled from parts.
