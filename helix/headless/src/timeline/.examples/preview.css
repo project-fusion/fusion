@@ -44,18 +44,8 @@ helix-headless-icon {
 }
 
 helix-headless-timeline-item::part(dot) {
-  background-color: var(--_gray-strong);
-  block-size: 0.75rem;
   display: block;
-  inline-size: 0.75rem;
   border-radius: 50%;
-}
-
-helix-headless-timeline-item::part(rail) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
 }
 
 helix-headless-icon::part(svg) {
