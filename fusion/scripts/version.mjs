@@ -2,11 +2,23 @@
 /**
  * What version a domain is about to publish, and stamping it in.
  *
- * **The tag is the record, not the manifest.** Every manifest carries
- * `0.0.0-dev` and always will. The alternative is a release commit pushed back
- * to `main` by CI, which needs a bot with write access that outranks branch
- * protection: a standing hole in exactly the place the governance gate is
- * supposed to be strongest, opened to record a number `git tag` already holds.
+ * **The tag is the record, and the manifest now agrees with it.** A manifest
+ * rests at `0.0.0-dev` between releases and carries the real number after one:
+ * `release.yml` opens a pull request with the stamped manifests once a version
+ * has published, installed from the registry and promoted.
+ *
+ * This file used to argue the opposite, that writing it back needs a bot whose
+ * access outranks branch protection and buys nothing `git tag` does not already
+ * hold. The first half was true of a *push* and not of a pull request, which is
+ * the shape `visual-baselines.yml` was already using for the same reason. The
+ * second half was the weaker claim: a reader of the source is not holding the
+ * tags in their head, and every comparable library states its version in the
+ * manifest. Checked rather than assumed: `@mui/material` reads 9.4.0 and
+ * `webawesome` 3.12.0, both with `workspace:` siblings exactly as here, so the
+ * workspace protocol was never what forced the placeholder.
+ *
+ * A preview under `exp-*` stamps nothing back. It is not what a reader means by
+ * the version.
  *
  * The stamping has to happen either way. `bun pm pack` rewrites a
  * `workspace:*` dependency to the version in the depended-on package's own
