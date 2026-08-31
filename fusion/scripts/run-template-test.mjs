@@ -143,10 +143,10 @@ mkdirSync(project)
    not logged in", which is the most expensive kind of wrong error message.
    Written into the project rather than relying on `$HOME/.npmrc` being found,
    so this behaves the same in CI and on a laptop. */
-if (registryTag !== undefined && process.env.NODE_AUTH_TOKEN) {
+if (registryTag !== undefined && process.env.NPM_TOKEN) {
   writeFileSync(
     join(project, '.npmrc'),
-    `//registry.npmjs.org/:_authToken=${process.env.NODE_AUTH_TOKEN}\n`,
+    `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`,
   )
 }
 writeFileSync(
@@ -168,9 +168,9 @@ writeFileSync(
 try {
   run('bun', ['install'], project)
 } catch (error) {
-  if (registryTag !== undefined && !process.env.NODE_AUTH_TOKEN) {
+  if (registryTag !== undefined && !process.env.NPM_TOKEN) {
     console.error(
-      'The published packages did not install, and no `NODE_AUTH_TOKEN` was set. These packages ' +
+      'The published packages did not install, and no `NPM_TOKEN` was set. These packages ' +
         'are restricted, so an unauthenticated install 404s exactly as a missing package would. ' +
         'Log in, or set the token, before reading this as a packaging fault.\n',
     )
