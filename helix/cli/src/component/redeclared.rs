@@ -13,6 +13,21 @@
 //! still has its comment above it describing what it was for. What is missing
 //! is the effect.
 //!
+//! **A selector list is read per selector, and judged per block.** Keyed by the
+//! whole prelude, `[part="segment"]` and `[part="segment"], [part="track"]`
+//! under one at-rule are two different keys and never compare, which left a
+//! live instance in `donut-chart-root.css` invisible to the rule written to
+//! find it, and made `A, B` and `B, A` incomparable too. So the prelude is
+//! split on top-level commas and each selector tracked on its own.
+//!
+//! **But a declaration is dead only if every selector in its block is beaten.**
+//! Six parts sharing one rule and one of them overriding a property below it is
+//! how this repository writes a default and an exception, and the shared
+//! declaration is still doing work for the other five. Reporting that would be
+//! reporting the pattern, and a rule that fires on correct CSS teaches people to
+//! write worse CSS to silence it. Measured: judging per selector reported five
+//! of these and none was a defect.
+//!
 //! **The same selector under a different parent is a different rule**, so
 //! blocks are keyed by the whole path down to them rather than by depth. A
 //! declaration inside `@media (prefers-reduced-motion: reduce)` is meant to beat
@@ -40,10 +55,43 @@ use crate::component::{stylesheets, Context, Finding, Report};
 static COMMENT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
-/// One block: the selector path that reaches it, and what it declares.
+/// One block: every selector path that reaches it, and what it declares.
 struct Block {
     declarations: Vec<String>,
-    path: String,
+    /// One per selector in the prelude, each with the at-rules above it.
+    paths: Vec<String>,
+}
+
+/// One prelude as the selectors it actually names.
+///
+/// Top-level commas only: a comma inside `:is(a, b)` joins one selector rather
+/// than separating two, so depth is tracked and only a comma at zero splits.
+fn split(prelude: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let mut depth = 0;
+    let mut buffer = String::new();
+    for character in prelude.chars() {
+        match character {
+            '(' | '[' => {
+                depth += 1;
+                buffer.push(character);
+            }
+            ')' | ']' => {
+                depth -= 1;
+                buffer.push(character);
+            }
+            ',' if depth == 0 => {
+                out.push(buffer.split_whitespace().collect::<Vec<&str>>().join(" "));
+                buffer.clear();
+            }
+            _ => buffer.push(character),
+        }
+    }
+    let last = buffer.split_whitespace().collect::<Vec<&str>>().join(" ");
+    if !last.is_empty() {
+        out.push(last);
+    }
+    out
 }
 
 /// Every block in a stylesheet, each keyed by the path of selectors above it.
@@ -80,10 +128,20 @@ fn blocks(css: &str) -> Vec<Block> {
             }
             '}' => {
                 flush(&mut buffer, declarations.last_mut());
-                if let (Some(list), Some(_)) = (declarations.pop(), stack.last()) {
+                if let (Some(list), Some(innermost)) = (declarations.pop(), stack.last()) {
+                    let above = stack[..stack.len() - 1].join(" > ");
                     found.push(Block {
                         declarations: list,
-                        path: stack.join(" > "),
+                        paths: split(innermost)
+                            .into_iter()
+                            .map(|one| {
+                                if above.is_empty() {
+                                    one
+                                } else {
+                                    format!("{above} > {one}")
+                                }
+                            })
+                            .collect(),
                     });
                 }
                 stack.pop();
@@ -121,26 +179,48 @@ pub fn run(context: &Context) -> Report {
 
             /* Path to the blocks written at it, in source order, which is the
             order that decides the winner. */
-            let mut written: BTreeMap<String, Vec<Vec<String>>> = BTreeMap::new();
-            for block in blocks(&COMMENT.replace_all(&css, "")) {
-                written.entry(block.path).or_default().push(block.declarations);
+            let parsed = blocks(&COMMENT.replace_all(&css, ""));
+            /* Selector path to the blocks reaching it, in source order, each as
+            an index into `parsed` so a block keeps its whole prelude. */
+            let mut written: BTreeMap<&str, Vec<usize>> = BTreeMap::new();
+            for (index, block) in parsed.iter().enumerate() {
+                for path in &block.paths {
+                    written.entry(path.as_str()).or_default().push(index);
+                }
             }
 
-            for (path, blocks) in &written {
-                if blocks.len() < 2 {
+            /* Judged per block rather than per path: a declaration is dead only
+            where every selector the block names is beaten for it. A shared rule
+            over six parts with one of them overriding below is a default and an
+            exception, and the shared declaration is still doing work. */
+            for (index, block) in parsed.iter().enumerate() {
+                let repeated = block
+                    .paths
+                    .iter()
+                    .any(|path| written.get(path.as_str()).is_some_and(|one| one.len() > 1));
+                if !repeated {
                     continue;
                 }
-                repetitions += blocks.len() - 1;
                 let mut beaten: Vec<String> = Vec::new();
-                for (index, block) in blocks.iter().enumerate() {
-                    for property in block {
-                        let earlier = blocks[..index].iter().any(|one| one.contains(property));
-                        if earlier && !beaten.contains(property) {
-                            beaten.push(property.clone());
-                        }
+                for property in &block.declarations {
+                    let everywhere = block.paths.iter().all(|path| {
+                        written.get(path.as_str()).is_some_and(|reaching| {
+                            reaching
+                                .iter()
+                                .filter(|one| **one > index)
+                                .any(|one| parsed[*one].declarations.contains(property))
+                        })
+                    });
+                    if everywhere && !beaten.contains(property) {
+                        beaten.push(property.clone());
                     }
                 }
+                let path = block.paths.join(", ");
                 if beaten.is_empty() {
+                    /* Counted here rather than before the check, so the note
+                    about repetitions that redeclare nothing does not also count
+                    the ones that do. */
+                    repetitions += 1;
                     continue;
                 }
                 findings.push(Finding {
@@ -150,8 +230,7 @@ pub fn run(context: &Context) -> Report {
                         .to_owned(),
                     file: where_.clone(),
                     message: format!(
-                        "`{path}` is written {} times and the later block redeclares {}",
-                        blocks.len(),
+                        "`{path}` is written more than once and a later block redeclares {}",
                         beaten
                             .iter()
                             .map(|one| format!("`{one}`"))
