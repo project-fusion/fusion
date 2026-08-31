@@ -241,23 +241,30 @@ jobs:
       # The smoke test, against what was actually published rather than against
       # a rebuild of it: installed from the registry, from outside the
       # workspace, the way a consumer gets it.
-      # **A read credential, on this step and nowhere else.** These packages are
-      # restricted, so an unauthenticated install 404s exactly as a missing
-      # package would, and this step is the only one that installs as a consumer
-      # rather than publishing as the workflow.
+      # **One token, on the two steps that need one and nowhere else.** These
+      # packages are restricted, so an unauthenticated install 404s exactly as a
+      # missing package would, and this is the only step that installs as a
+      # consumer rather than publishing as the workflow.
+      #
+      # **It is the same secret the promote step takes**, and it is read-write
+      # because promotion has to be. Splitting it into a read-only twin was
+      # considered and is not worth a second secret to rotate: both steps run in
+      # the same job on the same runner, so anything that could read one could
+      # read the other.
       #
       # **It must not reach the publish step.** That authenticates by OIDC and
       # has to find no credential at all: `registry-url` on `setup-node` used to
       # leave an empty `_authToken` behind, npm read itself as configured, never
       # exchanged the token, and the registry refused the write as a 404. A
-      # token in the job's environment would do the same thing on purpose.
+      # token in the job's environment would do the same thing on purpose, which
+      # is why this sits on the step rather than on the job.
       #
       # `run-template-test.mjs` writes the `.npmrc` into the scratch project
       # itself when it sees this, so nothing outside that directory is
       # authenticated either.
       - name: Prove the staged release installs
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_READ_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: bun run smoke:template --domain "${{ matrix.target.domain }}" --registry-tag next
 
       # **Only at `on`.** At `experimental` the version is published, proved and
@@ -265,15 +272,17 @@ jobs:
       # asking for it, and `latest` still points at whatever it pointed at
       # before. The number is already burnt by the attempt tag above, so
       # stopping here costs nothing and repeats nothing.
-      # **The one credential in this workflow, on the one step that needs it.**
-      # Trusted publishing grants `npm publish` and not `dist-tag add`: npm's
-      # publisher page offers `npm publish` and `npm stage publish` and nothing
-      # else, and a promote by OIDC came back `401` on the dist-tags endpoint.
+      # **Why this step has a credential at all.** Trusted publishing grants
+      # `npm publish` and not `dist-tag add`: npm's publisher page offers
+      # `npm publish` and `npm stage publish` and nothing else, and a promote by
+      # OIDC came back `401` on the dist-tags endpoint. So moving a tag is not a
+      # permission that exists there rather than one nobody granted.
+      #
       # `publish.mjs` writes it to a temporary config it passes on the command
       # line, so it never reaches `~/.npmrc` or any other step.
       - name: Promote to production
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_PROMOTE_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: vars.PUBLISHING == 'on'
         run: |
           node fusion/scripts/publish.mjs \
