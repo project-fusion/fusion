@@ -33,18 +33,6 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-.row {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 helix-headless-icon {
   block-size: 1em;
   display: inline-flex;
