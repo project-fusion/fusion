@@ -487,14 +487,19 @@ jobs:
           git remote set-url origin \
             "https://x-access-token:${{ steps.app.outputs.token }}@github.com/${{ github.repository }}.git"
 
-          # `actions/checkout` runs with `persist-credentials: true`, which writes
-          # the default `GITHUB_TOKEN` into `http.<host>.extraheader` — and that
-          # header outranks the credentials in the remote URL above. Left in
-          # place, this push authenticates as `github-actions[bot]`, which is not
-          # the ruleset's bypass actor, and is refused. Both earlier attempts died
-          # exactly here: the App token was minted correctly and never used.
-          git config --local --unset-all http.https://github.com/.extraheader
-
           git fetch -q origin main
           git rebase -q origin/main
-          git push origin HEAD:main
+
+          # **The push has to be told to forget the runner's own credentials.**
+          # `actions/checkout` runs with `persist-credentials: true`, and an
+          # `AUTHORIZATION: basic` header carrying the default `GITHUB_TOKEN`
+          # outranks the credentials in the remote URL set above. Left in place it
+          # pushes as `github-actions[bot]`, which is not this ruleset's bypass
+          # actor, and `main` refuses it.
+          #
+          # It cannot be unset. `checkout@v7` no longer writes that header into
+          # `.git/config`: it writes it to a file under `_temp` and pulls it in
+          # with `includeIf.gitdir`, so `--unset-all --local` does not see it and
+          # exits 5. Emptying the value resets the multi-valued list for this one
+          # command, which leaves the URL as the only credential on offer.
+          git -c http.https://github.com/.extraheader= push origin HEAD:main
