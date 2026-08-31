@@ -1,12 +1,16 @@
 export function Example() {
   return (
-    <helix-tooltip placement="top">
-      <helix-button>Button</helix-button>
-      <span slot="content">
-        Lorem ipsum dolor
-        <helix-kbd>Cmd</helix-kbd>
-        <helix-kbd>S</helix-kbd>
-      </span>
-    </helix-tooltip>
+    <>
+      <helix-button aria-describedby="rich-content-tip" id="rich-content-trigger">
+        Button
+      </helix-button>
+      <helix-tooltip for="rich-content-trigger" id="rich-content-tip" placement="top">
+        <span slot="content">
+          Lorem ipsum dolor
+          <helix-kbd>Cmd</helix-kbd>
+          <helix-kbd>S</helix-kbd>
+        </span>
+      </helix-tooltip>
+    </>
   )
 }

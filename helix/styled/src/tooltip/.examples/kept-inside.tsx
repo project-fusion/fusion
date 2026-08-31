@@ -2,12 +2,26 @@ export function Example() {
   return (
     <div id="tooltipbounds">
       <helix-flex align="center" gap="sm">
-        <helix-tooltip content="Clamped to the row, not to the window" within="tooltipbounds">
-          <helix-button>At the edge</helix-button>
-        </helix-tooltip>
-        <helix-tooltip content="Placed the ordinary way">
-          <helix-button>In the middle</helix-button>
-        </helix-tooltip>
+        <helix-button aria-describedby="kept-inside-at-the-edge-tip" id="kept-inside-at-the-edge">
+          At the edge
+        </helix-button>
+        <helix-tooltip
+          content="Clamped to the row, not to the window"
+          for="kept-inside-at-the-edge"
+          id="kept-inside-at-the-edge-tip"
+          within="tooltipbounds"
+        ></helix-tooltip>
+        <helix-button
+          aria-describedby="kept-inside-in-the-middle-tip"
+          id="kept-inside-in-the-middle"
+        >
+          In the middle
+        </helix-button>
+        <helix-tooltip
+          content="Placed the ordinary way"
+          for="kept-inside-in-the-middle"
+          id="kept-inside-in-the-middle-tip"
+        ></helix-tooltip>
       </helix-flex>
     </div>
   )

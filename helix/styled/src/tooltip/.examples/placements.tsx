@@ -1,18 +1,42 @@
 export function Example() {
   return (
     <helix-flex gap="lg">
-      <helix-tooltip content="Above" placement="top">
-        <helix-button>Top</helix-button>
-      </helix-tooltip>
-      <helix-tooltip content="Below" placement="bottom">
-        <helix-button>Bottom</helix-button>
-      </helix-tooltip>
-      <helix-tooltip content="Before" placement="left">
-        <helix-button>Left</helix-button>
-      </helix-tooltip>
-      <helix-tooltip content="After" placement="right">
-        <helix-button>Right</helix-button>
-      </helix-tooltip>
+      <helix-button aria-describedby="placements-top-tip" id="placements-top">
+        Top
+      </helix-button>
+      <helix-tooltip
+        content="Above"
+        for="placements-top"
+        id="placements-top-tip"
+        placement="top"
+      ></helix-tooltip>
+      <helix-button aria-describedby="placements-bottom-tip" id="placements-bottom">
+        Bottom
+      </helix-button>
+      <helix-tooltip
+        content="Below"
+        for="placements-bottom"
+        id="placements-bottom-tip"
+        placement="bottom"
+      ></helix-tooltip>
+      <helix-button aria-describedby="placements-left-tip" id="placements-left">
+        Left
+      </helix-button>
+      <helix-tooltip
+        content="Before"
+        for="placements-left"
+        id="placements-left-tip"
+        placement="left"
+      ></helix-tooltip>
+      <helix-button aria-describedby="placements-right-tip" id="placements-right">
+        Right
+      </helix-button>
+      <helix-tooltip
+        content="After"
+        for="placements-right"
+        id="placements-right-tip"
+        placement="right"
+      ></helix-tooltip>
     </helix-flex>
   )
 }

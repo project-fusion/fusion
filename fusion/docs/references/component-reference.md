@@ -3564,6 +3564,8 @@ list moves under the reader rather than the reader moving to find it.
 
 | Property | From | Description |
 | --- | --- | --- |
+| `--listbox-background-color` | - | The panel's fill. `transparent` where the list is already inside one. |
+| `--listbox-border` | - | The panel's border, as a shorthand. `none` where the list is already inside one. |
 | `--listbox-max-block-size` | - | How tall it gets before it scrolls. |
 
 ## Loader

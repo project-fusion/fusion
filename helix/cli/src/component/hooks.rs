@@ -27,6 +27,15 @@
 //! explanation sits directly above it and routinely spells out the rule that was
 //! supposed to read it.
 //!
+//! **A public hook written by one component and declared by none is the same
+//! broken promise as a declared one with no reader.** `combobox-root.css` and
+//! `command-root.css` each set `--listbox-background-color` in a rule whose
+//! comment explains what it is for, `listbox-root.css` hardcoded the fill and
+//! declared nothing, and the write did nothing at all: two writers, no
+//! declaration, no reader, and every run green. The same shape deleted
+//! `--floating-available-width` earlier. A write into a name nobody publishes
+//! is a component talking to a component that is not listening.
+//!
 //! **And to having a writer, which is the direction this rule spent a year
 //! missing.** A `var(--_x, fallback)` that nothing sets is not an error, is not
 //! invalid CSS, and renders as the fallback every time, so the only sign is a
@@ -63,6 +72,12 @@ static DOCUMENTED: LazyLock<Regex> = LazyLock::new(|| {
 
 static READS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"var\(\s*(--[a-z0-9-]+)").expect("a literal pattern compiles"));
+
+/// A public hook set by a stylesheet, which is a declaration at the start of a
+/// line rather than a `var()` anywhere in one.
+static WRITES: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?m)^\s*(--[a-z][a-z0-9-]*)\s*:").expect("a literal pattern compiles")
+});
 
 static PRIVATE_DECLARED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?m)^\s*(--_[a-z0-9-]+)\s*:").expect("a literal pattern compiles")
@@ -130,6 +145,8 @@ struct Survey {
     private_read_at: BTreeMap<String, String>,
     private_written: BTreeSet<String>,
     read: BTreeMap<String, String>,
+    /// Public hooks a stylesheet sets, and the first file to do it.
+    written: BTreeMap<String, String>,
 }
 
 /// Generated stylesheets are the source beside them wrapped in a template, so
@@ -210,6 +227,14 @@ fn survey(context: &Context) -> Survey {
                 }
             }
             if stylesheet {
+                for found in WRITES.captures_iter(&text) {
+                    if ours(&found[1]) {
+                        survey
+                            .written
+                            .entry(found[1].to_owned())
+                            .or_insert_with(|| where_.clone());
+                    }
+                }
                 for found in READS.captures_iter(&text) {
                     if ours(&found[1]) {
                         survey
@@ -406,6 +431,22 @@ fn unpaired(survey: &Survey) -> Vec<Finding> {
     /* The same pairing from the other end. A name read and never set resolves
     to its fallback forever, which is why nothing here has ever looked wrong
     enough to report itself. */
+    /* A write into a name nobody publishes. Read against `declared` rather than
+    against `read`, because the question is whether the hook is API at all. */
+    for (name, path) in &survey.written {
+        if survey.declared.contains_key(name) {
+            continue;
+        }
+        findings.push(Finding {
+            detail: "A hook written by one component and declared by none is a component \
+                     talking to a component that is not listening: nothing publishes the name, \
+                     so nothing has to read it and nothing says when it stops being read."
+                .to_owned(),
+            file: path.clone(),
+            message: format!("writes `{name}`, which no component declares with `@cssproperty`"),
+        });
+    }
+
     for (name, path) in &survey.private_read_at {
         if survey.private_declared.contains_key(name) || survey.private_written.contains(name) {
             continue;

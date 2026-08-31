@@ -595,10 +595,32 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * this should not be the thing to settle it.
    */
   private auditDescription(): void {
-    if (this.audited || this.for === '' || !this.hasContent) {
+    if (this.audited || !this.hasContent) {
       return
     }
     this.audited = true
+    /* **The unlinked form is the one that describes nothing, so it is the one
+       warned about.** This returned on `for === ''`, which made the guard the
+       exact inverse of the risk: the wrapping form is never linked, so it was
+       the single form that could never be reported.
+
+       Measured in Chrome's accessibility tree,
+       `<helix-tooltip content="..."><helix-button>Save</helix-button></helix-tooltip>`
+       exposes `button name="Save" desc=""`. All three routes to fixing it are
+       closed: an `aria-describedby` IDREF resolves only within one tree,
+       `ariaDescribedByElements` is valid outward and this points inward, and
+       `aria-description` is the hydration mismatch 322 closed the library
+       against. So the wrapping form is no longer the documented API, and this
+       says so once, where somebody using it will see it. */
+    if (this.for === '') {
+      console.warn(
+        `<${this.localName}> is wrapping its trigger rather than naming one, so its text ` +
+          "reaches no screen reader: a description in this element's shadow root cannot be " +
+          'referenced from a trigger in the light DOM. Give this tooltip an `id`, set `for` to ' +
+          'the trigger\'s id, and add `aria-describedby="<that id>"` to the trigger.',
+      )
+      return
+    }
     const trigger = this.named
     if (!trigger) {
       console.warn(
