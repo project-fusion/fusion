@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { STORAGE_KEY } from '@/components/preferences/preferences'
+import { forgetSiteTheme } from '@/utils/site-theme/site-theme'
 import { BOUNDS } from '../(tool)/helix/theme/defaults'
 import { BrandPicker } from './brand-picker'
 import styles from './landing-c.module.css'
@@ -160,25 +161,6 @@ export const ThemeFab = () => {
             </div>
 
             <div className={styles.fabRow}>
-              <span className={styles.fabRowLabel}>Accent angle</span>
-              <helix-tooltip
-                class={styles.fabTip}
-                content={`Accent angle · ${c.accentHue}`}
-                placement="top"
-              >
-                <helix-slider
-                  {...BOUNDS.accentHue}
-                  aria-label="Accent angle"
-                  class={styles.fabChannel}
-                  name="accent"
-                  onInput={(event) => c.setAccentHue(Number(event.currentTarget.value))}
-                  style={{ '--slider-track-image': c.derived?.ramps.accent ?? '' }}
-                  value={String(c.accentHue)}
-                ></helix-slider>
-              </helix-tooltip>
-            </div>
-
-            <div className={styles.fabRow}>
               <span className={styles.fabRowLabel}>Corner radius</span>
               <helix-tooltip
                 class={styles.fabTip}
@@ -224,6 +206,36 @@ export const ThemeFab = () => {
                   }}
                 >
                   <helix-icon name={c.scheme === 'dark' ? 'sun' : 'moon'}></helix-icon>
+                </helix-icon-button>
+              </helix-tooltip>
+            </div>
+
+            {/* **Beside the controls it undoes, not beside the close.** The
+                divider below splits the inputs from what the engine made of
+                them, and a reset is an input: it is the one that puts the other
+                four back. Next to the close it would read as a second way out
+                of the bar.
+
+                **Disabled until there is something to reset**, which is what
+                `touched` answers and `derived` cannot: the report is filled the
+                moment the engine loads, whether or not a reader has painted
+                anything with it. Enabled at rest, the control would claim the
+                page is wearing a theme it is not.
+
+                `forgetSiteTheme` rather than a handler of its own, because the
+                preferences drawer's reset is the same act and the event it
+                dispatches is what puts these controls back. Two paths to one
+                reset is how one of them comes to leave half a palette on. */}
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Reset</span>
+              <helix-tooltip content="Back to the shipped palette" placement="top">
+                <helix-icon-button
+                  disabled={!c.touched || undefined}
+                  emphasis="ghost"
+                  label="Reset to the shipped palette"
+                  onClick={() => forgetSiteTheme()}
+                >
+                  <helix-icon name="arrow-counter-clockwise"></helix-icon>
                 </helix-icon-button>
               </helix-tooltip>
             </div>
