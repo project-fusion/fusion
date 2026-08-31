@@ -138,12 +138,12 @@ jobs:
       # `id-token` is the whole authentication story: npm trusted publishing
       # exchanges a short-lived OIDC token for publish rights, so there is no
       # npm credential in this repository at all. `contents` is for the tag and
-      # for the branch the stamp-back opens from, `pull-requests` for the pull
-      # request itself: writing the version back needs no access that outranks
-      # branch protection, which is the whole reason it is a pull request.
+      # for the tag. The stamp-back does not use this token at all: `main`
+      # requires a pull request, so a direct push from `GITHUB_TOKEN` is
+      # declined, and the App installation token it uses instead is minted in
+      # the step above and named in the branch rule's bypass list.
       contents: write
       id-token: write
-      pull-requests: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -411,55 +411,70 @@ jobs:
           git push origin "$tag"
           gh release create "$tag" --title "$tag" --notes-file notes.md
 
-      # **The number goes back into the manifests, through the front door.**
+      # **A GitHub App, because the push has to be allowed and has to be seen.**
       #
-      # `version.mjs` argues the opposite and the reasoning was sound as far as
-      # it went: a release commit pushed to `main` by CI needs a bot whose write
-      # access outranks branch protection, which is a standing hole in the one
-      # place the governance gate has to be strongest. What that argument missed
-      # is that a pull request needs no such thing. `visual-baselines.yml`
-      # already opens one for the same reason, and 272 worked out the one quirk
-      # it has: a run on a branch a token pushed parks at `action_required` and
-      # wants a click.
+      # `GITHUB_TOKEN` cannot do this twice over: `main` requires a pull request,
+      # so a direct push from it is declined before any check is consulted, and
+      # a branch it pushes does not trigger workflows, which is the
+      # `action_required` click 272 recorded on the baselines branch. An App
+      # installation token is exempt from neither by default — it is exempt
+      # because the branch rule names the App in its bypass list, which is a
+      # grant somebody made deliberately and can see in the settings.
       #
-      # **Only here, and only after everything else worked.** This step is last
-      # in an official release, so a manifest only claims a number that was
-      # staged, installed from the registry and promoted. Preview publishes
-      # under `exp-*` stamp nothing back: they are not what a reader means by
-      # the version.
+      # **The bypass is the cost and it is worth naming.** `version.mjs` refused
+      # to write the version back precisely to avoid standing write access that
+      # outranks branch protection. This is that access, narrowed as far as it
+      # goes: one App, `contents: write` and nothing else, used by one step that
+      # runs only after a version published, installed from the registry and
+      # promoted. It cannot merge a pull request, cannot change a setting, and
+      # cannot reach any other branch, because `main` is the only rule that
+      # names it.
       #
-      # **The lockfile rides along, and has to.** `bun.lock` records a workspace
-      # package's version nineteen times, so a manifest changed without it fails
-      # `bun install --frozen-lockfile` on the pull request this very step opens.
-      # The non-frozen `bun install` above already refreshed it in this runner,
-      # which is why nothing is regenerated here.
-      #
-      # `chore` is deliberate: `bump.mjs` releases nothing for it, so stamping a
-      # version cannot allocate the next one.
+      # **`[skip ci]` because there is nothing here for CI to learn.** The push
+      # would otherwise start `verify` on a commit whose entire content is
+      # nineteen version fields and a lockfile the runner just produced, and
+      # `release.yml` itself, which would resolve `chore` to no release and skip.
+      # The tradeoff is real and small: this is the one commit on `main` that
+      # `verify` does not judge.
+      - name: Mint a token that may write to `main`
+        id: app
+        if: vars.PUBLISHING == 'on'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.STAMP_APP_ID }}
+          private-key: ${{ secrets.STAMP_APP_PRIVATE_KEY }}
+
       - name: Stamp the version back into the manifests
         if: vars.PUBLISHING == 'on'
-        uses: peter-evans/create-pull-request@v8
-        with:
-          add-paths: |
-            **/package.json
-            bun.lock
-          branch: release/stamp-${{ matrix.target.domain }}
-          delete-branch: true
-          commit-message: |
-            chore(${{ matrix.target.domain }}): stamp ${{ steps.version.outputs.version }} into the manifests
+        env:
+          DOMAIN: ${{ matrix.target.domain }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
 
-            Written by `release.yml` after ${{ matrix.target.domain }}-v${{ steps.version.outputs.version }}
-            published, installed from the registry and promoted to `latest`.
+          # Taken from the token rather than written here, so renaming the App
+          # or replacing it does not leave a workflow attributing its commits to
+          # something that no longer exists.
+          git config user.name '${{ steps.app.outputs.app-slug }}[bot]'
+          git config user.email \
+            '${{ vars.STAMP_APP_ID }}+${{ steps.app.outputs.app-slug }}[bot]@users.noreply.github.com'
 
-            The tag is still the record. This is the manifests agreeing with it,
-            so a reader of the source sees the version that shipped rather than
-            the resting `0.0.0-dev`.
-          title: "chore(${{ matrix.target.domain }}): stamp ${{ steps.version.outputs.version }} into the manifests"
-          body: |
-            `${{ matrix.target.domain }}-v${{ steps.version.outputs.version }}` published, installed from the registry and promoted to `latest`. This carries the number back into the manifests so the source agrees with the tag.
+          git add -- '**/package.json' bun.lock
+          if git diff --cached --quiet; then
+            echo "Nothing to stamp: the manifests already read $VERSION." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
 
-            Opened as a pull request rather than pushed, so nothing needs write access that outranks branch protection.
+          git commit -q -m "chore($DOMAIN): stamp $VERSION into the manifests [skip ci]" -m \
+            "Written by \`release.yml\` after $DOMAIN-v$VERSION published, installed from the
+          registry and promoted to \`latest\`. The tag is still the record; this is the
+          manifests agreeing with it."
 
-            `bun.lock` is included because it records each workspace package's version, and a manifest changed without it fails `bun install --frozen-lockfile`.
-
-            Merging is safe at any time: the next release computes its number from the tags, not from these files.
+          # **Rebased rather than forced.** Another merge may have landed while
+          # this release was building, and a release must never be the thing
+          # that loses somebody's commit.
+          git remote set-url origin \
+            "https://x-access-token:${{ steps.app.outputs.token }}@github.com/${{ github.repository }}.git"
+          git fetch -q origin main
+          git rebase -q origin/main
+          git push origin HEAD:main
