@@ -100,16 +100,19 @@ jobs:
           set -euo pipefail
           short=$(git rev-parse --short=7 HEAD)
           : > /tmp/released
-          for domain in helix cortex; do
-            level=$(gh api "repos/${{ github.repository }}/issues/$NUMBER/labels" \
-              --jq ".[].name | select(startswith(\"$domain:\"))" | head -1 | cut -d: -f2)
+          # The same reading `release-intent` reports and `release` applies,
+          # from the same file, so a preview cannot be a different version from
+          # the one merging would produce.
+          base=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)
+          resolved=$(node fusion/scripts/bump.mjs "$base..HEAD")
+          while IFS=$'\t' read -r domain level; do
             [ -n "$level" ] || continue
             version=$(node fusion/scripts/version.mjs \
               --domain "$domain" --bump "$level" --pre "exp.$NUMBER.g$short" --write | tail -1)
             printf '%s %s\n' "$domain" "$version" >> /tmp/released
-          done
+          done < <(jq -r '.[] | "\(.domain)\t\(.level)"' <<<"$resolved")
           if [ ! -s /tmp/released ]; then
-            echo "No domain carries a bump label, so there is nothing to publish." \
+            echo "No subject carries a releasing type and a published scope, so there is nothing to publish." \
               >> "$GITHUB_STEP_SUMMARY"
           fi
 

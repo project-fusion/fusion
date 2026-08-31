@@ -54,18 +54,16 @@ jobs:
           subjects=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate \
             --jq '.[].commit.message | split("\n")[0]')
 
-          # `type(scope)!: description`, with the scope and the bang optional.
-          # Anchored, because a subject that merely contains one of these words
-          # is prose rather than a conventional subject.
+          # `type(scope)!: description`, anchored, because a subject that merely
+          # contains one of these words is prose rather than a conventional one.
           pattern='^(feat|fix|perf|refactor|docs|test|ci|build|chore|style|revert)(\([a-z0-9/._-]+\))?!?: .+'
 
           bad=0
           while IFS= read -r subject; do
             [ -n "$subject" ] || continue
-            if ! grep -qE "$pattern" <<<"$subject"; then
-              echo "::error::Not a conventional subject: $subject"
-              bad=1
-            fi
+            grep -qE "$pattern" <<<"$subject" && continue
+            echo "::error::Not a conventional subject: $subject"
+            bad=1
           done <<<"$subjects"
 
           if [ "$bad" -ne 0 ]; then
@@ -79,50 +77,24 @@ jobs:
             exit 1
           fi
 
-          rank() { case "$1" in major) echo 3 ;; minor) echo 2 ;; patch) echo 1 ;; *) echo 0 ;; esac; }
+          # Piped rather than walked, because this job has no checkout and must
+          # keep it that way: `pull_request_target` carries a writable token, so
+          # the commits are read as data through the API and never executed.
+          # `bump.mjs` comes from the base branch, fetched on its own.
+          curl -fsSL -o /tmp/bump.mjs \
+            "https://raw.githubusercontent.com/$REPO/${{ github.event.pull_request.base.sha }}/fusion/scripts/bump.mjs"
 
-          helix=none
-          cortex=none
-          while IFS= read -r subject; do
-            [ -n "$subject" ] || continue
-
-            head=${subject%%:*}
-            type=${head%%(*}
-            type=${type%!}
-            scope=''
-            case "$head" in
-              *'('*')'*) scope=${head#*(}; scope=${scope%%)*} ;;
-            esac
-
-            # A domain is the first segment of the scope, and only two publish.
-            domain=${scope%%/*}
-            case "$domain" in helix|cortex) ;; *) continue ;; esac
-
-            # `!` or a `BREAKING CHANGE:` trailer outranks the type.
-            if [[ "$head" == *'!' ]]; then
-              level=major
-            else
-              case "$type" in
-                feat) level=minor ;;
-                fix|perf|refactor|revert) level=patch ;;
-                *) level=none ;;
-              esac
-            fi
-            [ "$level" = none ] && continue
-
-            current=$(eval "echo \$$domain")
-            [ "$(rank "$level")" -gt "$(rank "$current")" ] && eval "$domain=$level"
-          done <<<"$subjects"
+          resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate \
+            --jq '.[].commit.message' \
+            | while IFS= read -r line; do printf '%s\0' "$line"; done \
+            | node /tmp/bump.mjs --stdin)
 
           {
             echo "### What merging this would release"
             echo
-            released=0
-            for domain in helix cortex; do
-              level=$(eval "echo \$$domain")
-              [ "$level" = none ] && continue
-              released=1
-              echo "- \`$domain\`: **$level**"
-            done
-            [ "$released" -eq 0 ] && echo 'Nothing. No subject carries a `helix` or `cortex` scope with a releasing type.'
+            if [ "$resolved" = '[]' ]; then
+              echo 'Nothing. No subject carries a `helix` or `cortex` scope with a releasing type.'
+            else
+              jq -r '.[] | "- `\(.domain)`: **\(.level)**"' <<<"$resolved"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
