@@ -44,20 +44,29 @@
  * The package does have to exist, and npm/cli#8544 asks for that to change and
  * is still open. It is simply not what a 403 tells you.
  *
- * Bootstrapping is still a real step and it still comes first:
+ * A first publish is still a real step and it still comes first, because npm
+ * attaches a trusted publisher to a package rather than to a scope and OIDC
+ * cannot perform a package's first publish:
  *
  *   bun run build
- *   node fusion/scripts/publish.mjs --domain helix --tag bootstrap
- *   node fusion/scripts/publish.mjs --domain cortex --tag bootstrap
+ *   node fusion/scripts/publish.mjs --domain helix --tag exp-0
+ *   node fusion/scripts/publish.mjs --domain cortex --tag exp-0
  *   bun run trust --apply
  *
- * That publishes the resting version, `0.0.0-dev`, under a `bootstrap` dist-tag,
- * from a machine that is already logged in. A pre-release sorts below every real
- * version and is ignored by version allocation, so it occupies no number and
- * can never be mistaken for a release. It exists so that the package does, and
- * for no other reason.
+ * That publishes the resting version, `0.0.0-dev`, from a machine that is
+ * already logged in. A pre-release sorts below every real version and is
+ * ignored by version allocation, so it occupies no number and can never be
+ * mistaken for a release. It exists so that the package does, and for no other
+ * reason.
  *
- * **`--tag bootstrap` does not keep it off `latest`.** npm points `latest` at
+ * **It used to be a `bootstrap` tag of its own, and that name is retired.** It
+ * named a thing that happens once per package and then never again, so every
+ * package carried a dist-tag nobody would ever move or read, and a reader had
+ * to be told it was spent. `exp-*` is the experimental namespace
+ * `release-experimental.yml` already publishes into, and a first publish is the
+ * most experimental thing there is.
+ *
+ * **No `--tag` keeps a first publish off `latest`.** npm points `latest` at
  * the first version a package ever receives whatever `--tag` asked for:
  * measured, `@fusion.dev/cortex-docs` came back carrying `bootstrap` and
  * `latest` on the same `0.0.0-dev`. The pre-release rule protects ranges and not
@@ -69,11 +78,11 @@
  * restricted packages with no consumers, so the window costs nothing. Taking
  * the tag off earlier is untested: the npm CLI carries no guard against
  * `dist-tag rm latest` and sends the DELETE, and whether the registry accepts
- * one was not tried, there being no package to try it on but the bootstrap
+ * one was not tried, there being no package to try it on but the first publish
  * itself.
  *
  * Read this next to `publish.mjs`, which refuses `--tag latest` outright so
- * nothing reaches `latest` that no smoke test ran. The bootstrap gets there
+ * nothing reaches `latest` that no smoke test ran. A first publish gets there
  * anyway, by a route that file cannot see, and it is the one publish where that
  * does not matter.
  *
@@ -191,10 +200,10 @@ if (failed > 0) {
         '  bun run trust --apply\n\n' +
         'If it already ran that way, then check the package exists, because npm cannot attach a ' +
         'trusted publisher to one that was never published. `npm view <name>` returning 404 is ' +
-        'what that looks like, and bootstrap is the fix:\n\n' +
+        'what that looks like, and a first publish is the fix:\n\n' +
         '  bun run build\n' +
-        '  node fusion/scripts/publish.mjs --domain helix --tag bootstrap\n' +
-        '  node fusion/scripts/publish.mjs --domain cortex --tag bootstrap\n',
+        '  node fusion/scripts/publish.mjs --domain helix --tag exp-0\n' +
+        '  node fusion/scripts/publish.mjs --domain cortex --tag exp-0\n',
     )
   }
   if (challenged.size > 0) {

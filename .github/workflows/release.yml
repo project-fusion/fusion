@@ -159,8 +159,9 @@ jobs:
       # npm 11.5.1 or later on Node 22.14 or later.
       # **No `registry-url`, and that is the whole of the authentication.**
       # `setup-node` writes an `.npmrc` when given one, carrying
-      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`. Nothing in this
-      # job sets `NODE_AUTH_TOKEN`, so that line resolves to an empty string and
+      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`, which is
+      # `setup-node`'s own variable and not the `NPM_TOKEN` the steps below
+      # read. Nothing sets it, so that line resolves to an empty string and
       # npm reads itself as configured with a credential: it stops before the
       # OIDC exchange, publishes as nobody, and the registry refuses the write.
       #
@@ -264,7 +265,7 @@ jobs:
       # authenticated either.
       - name: Prove the staged release installs
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: bun run smoke:template --domain "${{ matrix.target.domain }}" --registry-tag next
 
       # **Only at `on`.** At `experimental` the version is published, proved and
@@ -282,7 +283,7 @@ jobs:
       # line, so it never reaches `~/.npmrc` or any other step.
       - name: Promote to production
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: vars.PUBLISHING == 'on'
         run: |
           node fusion/scripts/publish.mjs \

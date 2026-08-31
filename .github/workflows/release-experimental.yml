@@ -30,7 +30,7 @@
 # often enough to happen and rare enough to look like something else entirely
 # when it does. `g` is what `git describe` prefixes for the same reason.
 #
-# The dist-tag is `pr-42` and never `next` or `latest`. A pre-release also sorts
+# The dist-tag is `exp-42` and never `next` or `latest`. A pre-release also sorts
 # below its own release and satisfies no caret range, so `^1.4.0` can never
 # resolve to one even by accident.
 # **`vars.PUBLISHING` is the switch, the same one `release.yml` carries, and it
@@ -86,8 +86,9 @@ jobs:
       # Trusted publishing needs npm 11.5.1+ on Node 22.14+.
       # **No `registry-url`, and that is the whole of the authentication.**
       # `setup-node` writes an `.npmrc` when given one, carrying
-      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`. Nothing in this
-      # job sets `NODE_AUTH_TOKEN`, so that line resolves to an empty string and
+      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`, which is
+      # `setup-node`'s own variable and not the `NPM_TOKEN` the steps below
+      # read. Nothing sets it, so that line resolves to an empty string and
       # npm reads itself as configured with a credential: it stops before the
       # OIDC exchange, publishes as nobody, and the registry refuses the write.
       #
@@ -154,7 +155,7 @@ jobs:
           set -euo pipefail
           [ -s /tmp/released ] || exit 0
           while read -r domain version; do
-            node fusion/scripts/publish.mjs --domain "$domain" --tag "pr-$NUMBER"
+            node fusion/scripts/publish.mjs --domain "$domain" --tag "exp-$NUMBER"
           done < /tmp/released
 
       - name: Say how to install it
@@ -172,10 +173,10 @@ jobs:
             done < /tmp/released
             echo
             echo '```bash'
-            echo "bun add @fusion.dev/helix@pr-$NUMBER"
+            echo "bun add @fusion.dev/helix@exp-$NUMBER"
             echo '```'
             echo
-            echo "Tagged \`pr-$NUMBER\`. Nothing resolves to this by asking for" \
+            echo "Tagged \`exp-$NUMBER\`. Nothing resolves to this by asking for" \
               "\`next\` or \`latest\`, and the tag stops being updated when this" \
               "pull request closes."
           } > /tmp/comment.md

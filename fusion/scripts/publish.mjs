@@ -37,7 +37,7 @@
  *
  *   node fusion/scripts/publish.mjs --domain helix --tag next
  *   node fusion/scripts/publish.mjs --domain helix --tag next --dry-run
- *   node fusion/scripts/publish.mjs --domain helix --tag bootstrap --otp 123456
+ *   node fusion/scripts/publish.mjs --domain helix --tag exp-0 --otp 123456
  *   node fusion/scripts/publish.mjs --domain helix --promote latest --version 1.4.0
  */
 import { execFileSync } from 'node:child_process'
@@ -139,8 +139,8 @@ function npm(args, doing) {
           '    A token in the environment. A granular or automation token publishes with no ' +
           'one-time password:\n\n' +
           '      env "npm_config_//registry.npmjs.org/:_authToken=$NPM_ADMIN_TOKEN" \\\n' +
-          '        node fusion/scripts/publish.mjs --domain <domain> --tag bootstrap\n\n' +
-          '    A token cannot do `npm trust`, so it finishes the bootstrap and none of the ' +
+          '        node fusion/scripts/publish.mjs --domain <domain> --tag exp-0\n\n' +
+          '    A token cannot do `npm trust`, so it finishes the first publish and none of the ' +
           'registrations that follow it.\n\n' +
           '    Two-factor on "authorization only", set in the web settings and set back after. ' +
           'Login stays behind whatever guards it.\n\n' +
@@ -180,14 +180,14 @@ if (promote !== undefined) {
      configured, never exchanged the OIDC token, and the registry refused the
      write as a 404. */
   let userconfig
-  if (process.env.NODE_AUTH_TOKEN) {
+  if (process.env.NPM_TOKEN) {
     userconfig = join(mkdtempSync(join(tmpdir(), 'promote-')), '.npmrc')
-    writeFileSync(userconfig, `//registry.npmjs.org/:_authToken=${process.env.NODE_AUTH_TOKEN}\n`, {
+    writeFileSync(userconfig, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`, {
       mode: 0o600,
     })
   } else {
     console.error(
-      'promote: no `NODE_AUTH_TOKEN`. Trusted publishing grants `npm publish` and not ' +
+      'promote: no `NPM_TOKEN`. Trusted publishing grants `npm publish` and not ' +
         '`dist-tag add`, so this step needs a token of its own and will fail without one.',
     )
   }
