@@ -363,12 +363,6 @@
   stroke-width: var(--donut-chart-stroke);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="segment"] {
-    transition: none;
-  }
-}
-
 /* **A chart must never animate through a value it does not have**, which is why
  * none of this uses `emphasized`.
  *
