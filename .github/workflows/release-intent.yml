@@ -81,8 +81,13 @@ jobs:
           # keep it that way: `pull_request_target` carries a writable token, so
           # the commits are read as data through the API and never executed.
           # `bump.mjs` comes from the base branch, fetched on its own.
-          curl -fsSL -o /tmp/bump.mjs \
-            "https://raw.githubusercontent.com/$REPO/${{ github.event.pull_request.base.sha }}/fusion/scripts/bump.mjs"
+          #
+          # Through `gh api` and not `raw.githubusercontent.com`: this
+          # repository is private, so the raw host answers an unauthenticated
+          # request with 404 and `curl -f` exits 22. The contents endpoint takes
+          # the job's token and returns the file base64 encoded.
+          gh api "repos/$REPO/contents/fusion/scripts/bump.mjs?ref=${{ github.event.pull_request.base.sha }}" \
+            --jq '.content' | base64 -d > /tmp/bump.mjs
 
           resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate \
             --jq '.[].commit.message' \
