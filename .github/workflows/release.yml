@@ -486,6 +486,15 @@ jobs:
           # that loses somebody's commit.
           git remote set-url origin \
             "https://x-access-token:${{ steps.app.outputs.token }}@github.com/${{ github.repository }}.git"
+
+          # `actions/checkout` runs with `persist-credentials: true`, which writes
+          # the default `GITHUB_TOKEN` into `http.<host>.extraheader` — and that
+          # header outranks the credentials in the remote URL above. Left in
+          # place, this push authenticates as `github-actions[bot]`, which is not
+          # the ruleset's bypass actor, and is refused. Both earlier attempts died
+          # exactly here: the App token was minted correctly and never used.
+          git config --local --unset-all http.https://github.com/.extraheader
+
           git fetch -q origin main
           git rebase -q origin/main
           git push origin HEAD:main
