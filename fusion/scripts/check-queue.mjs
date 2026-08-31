@@ -12,7 +12,7 @@
  * ends. Those render as raw text: in the queue by intention and not in it at
  * all in fact.
  */
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -22,6 +22,59 @@ const text = readFileSync(join(ROOT, FILE), 'utf8')
 const lines = text.split('\n')
 
 const problems = []
+
+/* **Every `check:` name a row cites, held to one that exists.**
+ *
+ * The scopes were swept out of this file on 31 Aug and writing that check found
+ * a larger drift underneath: 219 of the `check:*` names here resolved to no
+ * script, because the gates moved into `helix component` and `fusion prose` and
+ * the rows kept citing the scripts they used to be. A name that runs nothing is
+ * an instruction that cannot be followed, and it is the kind that reads as
+ * current right up until somebody types it.
+ *
+ * Read from `package.json` rather than from a list, so a script renamed again
+ * fails here on the same day rather than the next time anybody greps.
+ */
+const scripts = new Set(
+  Object.keys(JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).scripts ?? {}),
+)
+
+/* And every rule name, from the two CLIs that own them. A rule is a file, so
+   the directory listing is the register: `hook_names.rs` is `hook-names`. */
+const rules = new Set(
+  ['helix/cli/src/component', 'fusion/cli/src/prose', 'fusion/cli/src/rules', 'fusion/cli/src/spec']
+    .flatMap((where) => {
+      try {
+        return readdirSync(join(ROOT, where))
+      } catch {
+        return []
+      }
+    })
+    .filter((one) => one.endsWith('.rs') && one !== 'mod.rs')
+    .map((one) => one.replace(/\.rs$/, '').replaceAll('_', '-')),
+)
+
+/* The row about the drift quotes the old names to say what they were, so it is
+   the one row allowed to carry them. */
+const QUOTING = new Set([340])
+
+for (const [index, line] of lines.entries()) {
+  const found = /^\|\s*(\d+)\s*\|/.exec(line)
+  if (!found || QUOTING.has(Number(found[1]))) {
+    continue
+  }
+  for (const [, name] of line.matchAll(/`(check:[a-z][a-z0-9:-]*)`/g)) {
+    if (scripts.has(name) || name === 'check:') {
+      continue
+    }
+    const base = name.split(':').at(-1)
+    const instead = rules.has(base) ? `the \`${base}\` rule` : 'the script that replaced it'
+    problems.push(
+      `${FILE}:${index + 1}: #${found[1]} cites \`${name}\`, which is not a script in ` +
+        `package.json. The gates moved into the two CLIs, so this wants ${instead}.`,
+    )
+  }
+}
 const seen = new Map()
 /** Columns in the table currently being read, from its own header row. */
 let width
