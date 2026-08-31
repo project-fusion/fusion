@@ -1,5 +1,5 @@
 /**
- * Holds `fusion/docs/19-queue.md` to one number per row.
+ * Holds `.local/queue.md` to one number per row.
  *
  * A check rather than a note in the file, because a note is read by whoever
  * goes looking for one and this mistake is made by whoever does not.
@@ -12,12 +12,27 @@
  * ends. Those render as raw text: in the queue by intention and not in it at
  * all in fact.
  */
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const FILE = 'fusion/docs/19-queue.md'
+/* **`.local`, which is gitignored, and that is the point.** The queue was
+   tracked, moved out to GitHub Issues on 28 Aug, restored on 30 Aug because the
+   issues were never created and the move had been a deletion, and is now a
+   per-machine file instead: it holds the reasoning behind 27 unfinished
+   decisions and 23 that were declined, which is worth keeping and is nobody
+   else's to read.
+
+   **So this check is a local one and says so rather than failing.** It is not in
+   `verify`, `check` or the pre-push hook and never was, so nothing in CI reads
+   the queue; running it on a machine that has no copy is the ordinary case
+   rather than a fault. */
+const FILE = '.local/queue.md'
+if (!existsSync(join(ROOT, FILE))) {
+  console.log(`queue: no ${FILE} on this machine, so there is nothing to check.`)
+  process.exit(0)
+}
 const text = readFileSync(join(ROOT, FILE), 'utf8')
 const lines = text.split('\n')
 
