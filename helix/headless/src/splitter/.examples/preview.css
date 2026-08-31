@@ -46,18 +46,6 @@ helix-headless-splitter {
   display: block;
 }
 
-/* The divider is the component's whole point, so it has to be visible before
-   anything else here matters. */
-helix-headless-splitter::part(separator) {
-  background-color: var(--_gray-line);
-}
-
-helix-headless-splitter::part(separator) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
@@ -73,9 +61,12 @@ helix-headless-splitter::part(end) {
   padding: 0.5rem;
 }
 
+/* The divider is the component's whole point, so it has to be visible before
+   anything else here matters. `flex: none` keeps the row from shrinking it away. */
 helix-headless-splitter::part(separator) {
   background-color: var(--_gray-line);
   block-size: 100%;
   cursor: col-resize;
+  flex: none;
   inline-size: 3px;
 }

@@ -45,6 +45,7 @@ helix-headless-progress::part(track) {
   block-size: 0.5rem;
   display: block;
   inline-size: 100%;
+  overflow: hidden;
 }
 
 helix-headless-progress::part(groove) {
@@ -58,13 +59,6 @@ helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
-}
-
-helix-headless-progress::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  overflow: hidden;
 }
 
 helix-headless-progress::part(indicator) {
