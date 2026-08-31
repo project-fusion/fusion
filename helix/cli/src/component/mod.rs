@@ -44,6 +44,7 @@ pub mod examples_paired;
 pub mod exportparts;
 pub mod fallbacks;
 pub mod floors;
+pub mod focus_ring;
 pub mod glyphs;
 pub mod grounds;
 pub mod hook_names;
@@ -429,6 +430,12 @@ pub fn all() -> Vec<Rule> {
             name: "attribute-names",
             run: Runner::Source(attribute_names::run),
             summary: "a property mirroring a platform attribute uses the platform's spelling",
+        },
+        Rule {
+            fix: None,
+            name: "focus-ring",
+            run: Runner::Source(focus_ring::run),
+            summary: "the focus ring is spelled one of the ways the registry names, and no other",
         },
         Rule {
             fix: None,
