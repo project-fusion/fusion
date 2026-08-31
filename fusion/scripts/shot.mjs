@@ -62,6 +62,12 @@
  * component's examples are rendered in an iframe, so the reference page for
  * Carousel has no `helix-carousel` in its own document, and every selector here
  * has to be resolved against the frame rather than the page.
+ *
+ * A page renders one frame per example and they all share one URL, so
+ * `--frame frame.html#2` takes the second of them, counting from one. Reaching
+ * them from the page instead is not available: the sandbox is served from an
+ * opaque origin on purpose, so `contentDocument` is null and Playwright's frame
+ * list is the only way in.
  */
 import { mkdir } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
@@ -145,10 +151,20 @@ try {
   /* Everything below resolves against this, which is the page unless a frame
      was named. The sandbox is the case that needs it. */
   const where = flag('frame')
-  const scope = where === undefined ? page : page.frames().find((one) => one.url().includes(where))
+  /* **A substring, or a substring and which of them.** A reference page renders
+     one example per frame and every frame is the same `frame.html`, so a URL
+     cannot tell the second from the first and `find` always answered with the
+     first. `frame.html#2` is the second match, counting from one. The sandbox
+     is served from an opaque origin, deliberately, so reaching into it from the
+     page is not the alternative: Playwright's frame list is the only door. */
+  const [pattern, nth] = where === undefined ? [] : where.split('#')
+  const matches =
+    where === undefined ? [] : page.frames().filter((one) => one.url().includes(pattern))
+  const scope = where === undefined ? page : matches[nth === undefined ? 0 : Number(nth) - 1]
   if (scope === undefined) {
     console.error(
-      `shot: no frame whose URL contains \`${where}\`. This page has ` +
+      `shot: no frame ${nth === undefined ? '' : `#${nth} `}whose URL contains ` +
+        `\`${pattern}\`, of ${matches.length} matching. This page has ` +
         `${page.frames().length}: ${page
           .frames()
           .map((one) => one.url())
