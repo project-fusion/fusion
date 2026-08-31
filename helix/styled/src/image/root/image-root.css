@@ -108,12 +108,6 @@
   opacity: 1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="image"] {
-    transition: none;
-  }
-}
-
 /* Print: a picture, which prints.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

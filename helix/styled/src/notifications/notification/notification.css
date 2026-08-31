@@ -257,12 +257,6 @@ slot[name="caption"]::slotted(*) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="trailing"] > * {
-    transition: none;
-  }
-}
-
 /* The seams the grid no longer draws. An empty box still carries its margin, so
    a row with no actions gives twelve pixels of its body width away and nothing
    moves: the trailing controls are placed by the item's own padding, not by what

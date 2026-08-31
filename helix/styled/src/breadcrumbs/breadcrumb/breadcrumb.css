@@ -123,12 +123,6 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  ::slotted(a) {
-    transition: none;
-  }
-}
-
 /* The current page reads as where you are, not as somewhere you can go. It is
    text with no element to select, so this is on the host: color and weight
    inherit into it, where a selector has nothing to match.

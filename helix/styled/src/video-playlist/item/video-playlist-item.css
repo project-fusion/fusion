@@ -137,9 +137,3 @@
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-regular);
 }
-
-@media (prefers-reduced-motion: reduce) {
-  [part="item"] {
-    transition: none;
-  }
-}

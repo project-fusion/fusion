@@ -209,12 +209,6 @@
   opacity: 1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"] {
-    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
-  }
-}
-
 /* Wrong, and the strip says so. Toggle Group is the one of the three that has a
    box already: the track its items sit in. So the error goes on that rather than
    round it, the same way a field turns its own border, and `plain` gets an

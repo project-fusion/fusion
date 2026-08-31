@@ -190,13 +190,6 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="separator"]::before,
-  :host(:is([orientation="vertical"], [data-axis="vertical"])) [part="separator"]::before {
-    transition: none;
-  }
-}
-
 /* The corner, where a nested splitter's divider crosses this one.
  *
  * **Drawn by the outer splitter, and it has to be.** The crossing sits on the
@@ -338,12 +331,6 @@
    color in this shape. */
 :host([variant="grip"]) [part="separator"][data-dragging]::after {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :host([variant="grip"]) [part="separator"]::after {
-    transition: none;
-  }
 }
 
 /* Out of the pointer's way while the divider moves.

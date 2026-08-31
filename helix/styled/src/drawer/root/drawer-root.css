@@ -261,17 +261,6 @@
   padding-inline: var(--helix-size-focus-reach);
 }
 
-/* Both things that move, named one at a time so neither loses on specificity. */
-@media (prefers-reduced-motion: reduce) {
-  [part="panel"] {
-    transition: none;
-  }
-
-  [part="panel"]::backdrop {
-    transition: none;
-  }
-}
-
 /* Not printed, being an overlay.
  *
  * It is over the page rather than part of it, and on paper there is no over: a

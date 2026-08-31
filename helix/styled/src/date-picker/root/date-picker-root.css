@@ -266,12 +266,6 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="day"] {
-    transition: none;
-  }
-}
-
 /* A caret is physical and the thing it points at is not.
  *
  * The row itself already flips, because it is laid out on the inline axis and

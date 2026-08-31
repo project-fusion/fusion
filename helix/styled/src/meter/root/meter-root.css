@@ -138,15 +138,6 @@
   z-index: var(--helix-layer-raised);
 }
 
-/* It arrives at its reading rather than traveling to it, for a reader who asked
-   not to be moved. The reading is still correct: what goes is the sense of it
-   moving, which is what the preference is about. */
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"] {
-    transition: none;
-  }
-}
-
 /* The same reading, drawn round.
  *
  * A gauge and a meter are the same thing measured, so this is a shape rather
@@ -289,13 +280,6 @@
 :host([shape="arc"]) [part="value"],
 :host([shape="ring"]) [part="value"] {
   grid-area: 1 / 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :host([shape="arc"]) [part="indicator"],
-  :host([shape="ring"]) [part="indicator"] {
-    transition: none;
-  }
 }
 
 /* Print: the bar is the reading.

@@ -28,6 +28,6 @@ export const CLAIMS: readonly Claim[] = [
   {
     label: 'Shared across the first component',
     note: 'Ten components are one runtime plus nine additions, not ten of the first number.',
-    value: '82%',
+    value: '83%',
   },
 ]

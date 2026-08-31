@@ -106,13 +106,6 @@
   line-height: var(--helix-leading-tight);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="mark"],
-  [part="box"] {
-    transition: none;
-  }
-}
-
 /* A card is the same radio in a bounded surface, for a set of options that need
  * room: a description, an icon, a price.
  *
@@ -213,14 +206,6 @@
  * radio. */
 :host([variant="card"][hide-control]) [part="box"] {
   display: none;
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  :host([variant="card"]) [part="item"] {
-    transition: none;
-  }
 }
 
 /* A chip is a card that gave up its words.

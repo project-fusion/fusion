@@ -366,20 +366,6 @@
   padding: var(--helix-space-none);
 }
 
-/* The one in use is not marked at all. A ring on it is a focus ring in another
- * color sitting permanently on one swatch: a row of eight then has a mark on it
- * before anything is touched, and pressing another moves the mark rather than
- * doing something. What the swatch is chosen *for* is already showing, twice, on
- * the chip and in the field. `aria-pressed` stays, because a screen reader has
- * neither of those. */
-@media (prefers-reduced-motion: reduce) {
-  [part="eyedropper"],
-  [part="format"],
-  [part="value"] {
-    transition: none;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   /* The confirmation still has to read, so what goes is the press rather than
      the mark: the tick over the chip stays and the chip stops shrinking. */

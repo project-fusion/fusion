@@ -243,17 +243,6 @@
   padding-inline: var(--helix-space-xs);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="first"],
-  [part="gap"],
-  [part="last"],
-  [part="page"],
-  [part="previous"],
-  [part="next"] {
-    transition: none;
-  }
-}
-
 /* Print: a control for reaching pages this one is not.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

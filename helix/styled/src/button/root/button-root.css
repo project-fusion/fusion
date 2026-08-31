@@ -326,12 +326,6 @@
   --icon-size: 1.15em;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="button"] {
-    transition: none;
-  }
-}
-
 /* Not printed, being a control. Paper cannot be pressed, and a printed button
  * carries its chrome, which is the half that says press me.
  *

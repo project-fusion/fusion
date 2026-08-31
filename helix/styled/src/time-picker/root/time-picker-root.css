@@ -267,12 +267,6 @@
   color: var(--helix-color-foreground-on-accent);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="column"] [part="option"]::part(label) {
-    transition: none;
-  }
-}
-
 /* No tick. A listbox marks its answer because a reader has to find it among
    options that are otherwise alike; a dial has exactly one value per column and
    it is the one in the middle, so a mark beside it says what the position

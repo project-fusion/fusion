@@ -1524,12 +1524,6 @@ helix-toggle[disabled]::part(item) {
   transition: outline-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :where([data-card]) {
-    transition: none;
-  }
-}
-
 /* Hover goes to the brand, not to a darker gray.
  *
  * `border-strong` is a hairline moving from 0.91 to 0.71: a twenty point jump
@@ -1630,6 +1624,42 @@ helix-toast:not([data-color-mode]) {
     transition-duration: 0.01ms !important;
   }
   /* biome-ignore-end lint/complexity/noImportantStyles: user preference must win over author styles */
+}
+
+/* And the way in that the rule above does not have.
+ *
+ * **A custom property is the one thing that crosses.** The measurement above is
+ * about `*`, which is a selector and stops at the boundary. An inherited value
+ * does not: every transition in the tier is written with one of these three
+ * duration tokens, so setting them under the preference reaches every shadow
+ * root that reads one, at any depth, without naming a single component.
+ *
+ * That is what replaced 57 `prefers-reduced-motion` blocks in 45 component
+ * sheets, each of them restating this because, as the note above says, a
+ * document rule had no way in. It has one for durations.
+ *
+ * **`0.01ms` rather than `0` or `none`, and the difference is not cosmetic.** A
+ * transition that still runs still fires `transitionend`. A component waiting
+ * on that event to clear a state is the shape the dialog's refusal had: with
+ * `animation: none` the event never arrived, the attribute never cleared, and
+ * every later press added a listener that could not fire. At this duration the
+ * event arrives within a frame and nothing is left waiting.
+ *
+ * **Animations are deliberately not done this way.** They are not all written
+ * with these tokens, `video` spinning at `0.8s` and the gallery at `1.4s` and
+ * `3.4s`, and seven sheets animate `infinite`: a spinner handed a 0.01ms cycle
+ * does not stop, it runs flat out. Those components answer the preference in
+ * their own sheets, which is also where an iteration count can be answered.
+ *
+ * Both selectors, matching the token layer's own block, so a scoped theme gets
+ * this as well as the document does. */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-helix-theme] {
+    --helix-duration-fast: 0.01ms;
+    --helix-duration-normal: 0.01ms;
+    --helix-duration-slow: 0.01ms;
+  }
 }
 
 /* The one moving declaration this file writes *into* a shadow tree.

@@ -363,12 +363,6 @@
   stroke-width: var(--donut-chart-stroke);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="segment"] {
-    transition: none;
-  }
-}
-
 /* **A chart must never animate through a value it does not have**, which is why
  * none of this uses `emphasized`.
  *
@@ -425,13 +419,6 @@
 
 [part="track"] {
   transition: r var(--helix-duration-normal) var(--helix-easing-decelerate);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="segment"],
-  [part="track"] {
-    transition: none;
-  }
 }
 
 /* On the slices rather than the plot, which is the difference between a ring

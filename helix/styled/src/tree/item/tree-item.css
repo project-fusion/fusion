@@ -308,24 +308,6 @@ slot[name="start"]::slotted(*) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="group"] {
-    transition: none;
-  }
-}
-
-/* Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  [part="row"] {
-    transition: none;
-  }
-
-  [part="toggle"] {
-    transition: none;
-  }
-}
-
 /* The chevron obeys the tree's placement.
  *
  * `order` moves the paint and not the DOM, which is correct here and would not

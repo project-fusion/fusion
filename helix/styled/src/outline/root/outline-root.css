@@ -131,16 +131,6 @@
     opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The travel and the swell both go; the fade stays, being the mark arriving
-   rather than moving. Named one selector at a time, because a reduce rule
-   written looser than the rule it answers loses on specificity. */
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"],
-  [part="indicator"][data-moving] {
-    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
-  }
-}
-
 /* The links, back here from the base layer.
  *
  * A `::slotted()` rule loses to a document rule whatever the specificity, and it
@@ -224,15 +214,6 @@
     5 *
     var(--outline-indent, var(--helix-space-sm))
   );
-}
-
-/* The links move, so they answer the preference here rather than in the base
-   layer's block, which no longer names them. The selector is repeated exactly:
-   one written looser loses on specificity and does nothing. */
-@media (prefers-reduced-motion: reduce) {
-  ::slotted(a) {
-    transition: none;
-  }
 }
 
 /* Print: a table of contents, which is what paper invented.

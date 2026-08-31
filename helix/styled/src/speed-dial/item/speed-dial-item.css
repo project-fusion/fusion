@@ -81,9 +81,3 @@
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   white-space: nowrap;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  [part="icon"] {
-    transition: none;
-  }
-}

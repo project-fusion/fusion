@@ -39,12 +39,6 @@
   opacity: 1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"] {
-    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
-  }
-}
-
 /* Print: the same, and the marker under it marks a page nobody is on.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

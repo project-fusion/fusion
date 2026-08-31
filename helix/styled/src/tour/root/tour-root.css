@@ -29,12 +29,6 @@
   z-index: var(--helix-layer-overlay);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="spotlight"] {
-    transition: none;
-  }
-}
-
 /* Not printed. The spotlight is over the page rather than part of it, and on
  * paper there is no over: it would print as a slab across whatever it covered.
  *

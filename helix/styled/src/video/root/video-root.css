@@ -563,16 +563,6 @@
   object-fit: contain;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="controls"],
-  [part="cue"],
-  [part="stage"]::before,
-  [part="start"],
-  [part="volume"] {
-    transition: none;
-  }
-}
-
 /* One width, whatever it says. The label is always a number, which says what the
    speed *is* rather than only offering to change it, and the box is sized for
    the longest one: a button that changed width the moment anyone used it would

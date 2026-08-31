@@ -185,14 +185,6 @@ slot[name="end"]::slotted(*) {
   inline-size: var(--helix-size-icon-tight);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="field"],
-  [part="decrement"],
-  [part="increment"] {
-    transition: none;
-  }
-}
-
 /* The label is the scrub surface, and says so with the cursor.
  *
  * `touch-action: none` is what makes it work on a touch screen at all. Without

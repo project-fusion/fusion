@@ -140,12 +140,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="actions"] {
-    transition: none;
-  }
-}
-
 [part="actions"] {
   /* **A dense row declares the size once, so nothing slotted has to be told.**
      A control takes `--helix-size-control` unless something says otherwise, and

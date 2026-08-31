@@ -183,12 +183,6 @@
   z-index: var(--helix-layer-raised);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part="indicator"] {
-    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
-  }
-}
-
 /* Underline: a bar along the bottom of the strip, on the rule it replaces. */
 :host([variant="underlined"]) [part="indicator"] {
   --_indicator-block: var(--helix-border-thick);
