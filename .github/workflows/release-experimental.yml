@@ -84,10 +84,24 @@ jobs:
           bun-version: 1.1.43
 
       # Trusted publishing needs npm 11.5.1+ on Node 22.14+.
+      # **No `registry-url`, and that is the whole of the authentication.**
+      # `setup-node` writes an `.npmrc` when given one, carrying
+      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`. Nothing in this
+      # job sets `NODE_AUTH_TOKEN`, so that line resolves to an empty string and
+      # npm reads itself as configured with a credential: it stops before the
+      # OIDC exchange, publishes as nobody, and the registry refuses the write.
+      #
+      # **A refused write is reported as a 404**, so this arrived as
+      # `404 Not Found - PUT .../@fusion.dev%2fhelix-core` and read like a
+      # missing package on a package that exists and had a trusted publisher
+      # registered against exactly this workflow and environment. Measured
+      # 31 Aug 2026 on the first release job that ever ran.
+      #
+      # The default registry is already npmjs.org, so the line bought nothing
+      # even when it worked.
       - uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
-          registry-url: 'https://registry.npmjs.org'
 
       # Node 22.20.0 ships npm 10.9.x, so the floor above is not what
       # `setup-node` leaves behind. Same pin as `release.yml`, same reasoning.
