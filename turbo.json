@@ -243,7 +243,23 @@
 
     // `src/tokens.ts` is the whole input: the layer is spelled there and this
     // writes both the stylesheet block and the registry the docs read.
+    // **Uncached, because one of its outputs is partly written by hand.**
+    //
+    // `build-token-layer.mjs` replaces what sits between two markers in
+    // `src/tokens.css` and preserves everything outside them, which the file
+    // relies on: the mode declarations and the reduced-motion block are
+    // authored there and say so. Turbo has no way to express half a file, so
+    // declaring the whole thing as an output meant a cache hit restored the
+    // cached copy over anything hand-written since. Reproduced 31 Aug 2026: a
+    // block appended after the closing marker survived the generator executing
+    // and vanished on the next run reporting FULL TURBO.
+    //
+    // Adding the file to its own `inputs` would fix the hit and make every run
+    // a miss, which is the same cost with a worse name. This task takes about
+    // 200ms, so the cache was never buying much. Same fault as `wasm/**` in
+    // 273, and the third answer there was the same: stop declaring it.
     "token-layer": {
+      "cache": false,
       "inputs": ["src/tokens.ts", "$TURBO_ROOT$/helix/styles/scripts/build-token-layer.mjs"],
       "outputs": ["src/tokens.css", "tokens.json"]
     },
