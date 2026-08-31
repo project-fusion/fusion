@@ -28,7 +28,6 @@
 
 [part="body"] {
   grid-row: 2;
-  min-block-size: 0;
 }
 
 ::slotted([slot="status"]) {

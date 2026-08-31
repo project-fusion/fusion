@@ -308,12 +308,20 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * a listener that could not be removed and an attribute that stayed on. The
    * controller bounds it to one listener, aborted before the next is added.
    *
-   * **And the attribute is cleared at once when nothing is animating**, asked
+   * **And the attribute is cleared at once when no animation is running**, asked
    * of the platform rather than of a media query: this tier does not know what
    * refusing looks like, and the same silence arrives from a consumer's
    * stylesheet, from reduced motion, and from no styled tier being loaded at
-   * all. `getAnimations` is read after the reflow above, which is what makes
-   * the answer current.
+   * all.
+   *
+   * **`CSSAnimation` specifically, because `getAnimations` returns transitions
+   * too.** A panel that is still running its entrance transition answers the
+   * bare `length` check with a truthy number while no animation exists to end,
+   * so a refusal landing inside that window took the listener branch and waited
+   * for an `animationend` that was never coming: the attribute stayed on until
+   * the next refused press. That is the same bug this method exists to close,
+   * one window narrower. `getAnimations` flushes pending style itself, so no
+   * reflow is forced for it.
    */
   private refuse(): void {
     const panel = this.dialog
@@ -326,8 +334,8 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     // two happen in one frame and the animation never restarts.
     void panel.offsetWidth
     panel.setAttribute('data-refused', '')
-    void panel.offsetWidth
-    if (panel.getAnimations().length === 0) {
+    const animating = panel.getAnimations().some((one) => one instanceof CSSAnimation)
+    if (!animating) {
       panel.removeAttribute('data-refused')
       return
     }
