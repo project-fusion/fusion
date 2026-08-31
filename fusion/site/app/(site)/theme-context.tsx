@@ -52,6 +52,14 @@ interface Controls {
   setDensity: (value: number) => void
   setRadius: (value: number) => void
   setScheme: (value: 'dark' | 'light') => void
+  /**
+   * Whether a reader has taken the palette over.
+   *
+   * Exposed for the reset controls, which have to be able to say there is
+   * nothing to reset. `derived` cannot answer that: it is filled the moment the
+   * engine loads, whether or not anything has been painted from it.
+   */
+  touched: boolean
 }
 
 const ThemeControls = createContext<Controls | null>(null)
@@ -79,7 +87,7 @@ const SHOWN = [
 
 const derive = (
   engine: ThemeEngine,
-  settings: Omit<Controls, `set${string}` | 'derived'>,
+  settings: Omit<Controls, `set${string}` | 'derived' | 'touched'>,
 ): Derived => {
   /**
    * **Every field the builder passes, not the six this control moves.**
@@ -502,8 +510,9 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
         setTouched(true)
         setScheme(value)
       },
+      touched,
     }),
-    [accentHue, brand, chromaScale, density, derived, radius, scheme],
+    [accentHue, brand, chromaScale, density, derived, radius, scheme, touched],
   )
 
   return (

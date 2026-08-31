@@ -265,7 +265,15 @@ jobs:
       # asking for it, and `latest` still points at whatever it pointed at
       # before. The number is already burnt by the attempt tag above, so
       # stopping here costs nothing and repeats nothing.
+      # **The one credential in this workflow, on the one step that needs it.**
+      # Trusted publishing grants `npm publish` and not `dist-tag add`: npm's
+      # publisher page offers `npm publish` and `npm stage publish` and nothing
+      # else, and a promote by OIDC came back `401` on the dist-tags endpoint.
+      # `publish.mjs` writes it to a temporary config it passes on the command
+      # line, so it never reaches `~/.npmrc` or any other step.
       - name: Promote to production
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PROMOTE_TOKEN }}
         if: vars.PUBLISHING == 'on'
         run: |
           node fusion/scripts/publish.mjs \

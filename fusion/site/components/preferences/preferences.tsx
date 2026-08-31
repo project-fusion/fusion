@@ -206,13 +206,17 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             second one in the menu itself would be a second copy of the same
             state to keep true. */}
         {themed && (
-          <helix-flex direction="column" gap="2xs">
+          <helix-flex direction="column" gap="xs">
             <helix-text variant="label">Site theme</helix-text>
-            <helix-text tone="muted" variant="caption">
-              Every page is wearing the palette you derived.
-            </helix-text>
+            {/* **`subtle` rather than `outlined`, which light mode decided.** The
+                drawer is glass over a near-white page, so an outlined control is
+                a hairline and a transparent fill on a ground already close to
+                white: the button reads as a disabled slab rather than as
+                something to press, which is the whole of what it is here. A
+                subtle fill gives it a surface of its own to sit on, and it is
+                what the toggle groups above already stand on. */}
             <helix-button
-              emphasis="outlined"
+              emphasis="subtle"
               onClick={() => {
                 forgetSiteTheme()
                 setThemed(false)

@@ -166,12 +166,44 @@ if (promote !== undefined) {
   if (pinned === undefined) {
     fail('--promote needs --version, so the tag is moved onto a release rather than onto "newest".')
   }
+  /* **Promotion needs a credential, and trusted publishing cannot grant one.**
+     Measured 31 Aug 2026 on the first release that got this far: the publish
+     succeeded by OIDC and `dist-tag add` came back
+     `401 Unauthorized - GET .../@fusion.dev%2fhelix-core/dist-tags`. npm's
+     trusted publisher page offers `npm publish` and `npm stage publish` and
+     nothing else, so moving a tag is not a permission it can hand out at all.
+
+     So the token goes here and only here, written to a config file passed on
+     the command line rather than into the environment or into `~/.npmrc`. The
+     publish above has to keep finding no credential: `registry-url` on
+     `setup-node` once left an empty `_authToken` behind, npm read itself as
+     configured, never exchanged the OIDC token, and the registry refused the
+     write as a 404. */
+  let userconfig
+  if (process.env.NODE_AUTH_TOKEN) {
+    userconfig = join(mkdtempSync(join(tmpdir(), 'promote-')), '.npmrc')
+    writeFileSync(userconfig, `//registry.npmjs.org/:_authToken=${process.env.NODE_AUTH_TOKEN}\n`, {
+      mode: 0o600,
+    })
+  } else {
+    console.error(
+      'promote: no `NODE_AUTH_TOKEN`. Trusted publishing grants `npm publish` and not ' +
+        '`dist-tag add`, so this step needs a token of its own and will fail without one.',
+    )
+  }
   for (const [name] of packages) {
     const target = `${name}@${pinned}`
     console.log(`  ${target} -> ${promote}`)
     if (!dry) {
       npm(
-        ['dist-tag', 'add', target, promote, ...(otp === undefined ? [] : ['--otp', otp])],
+        [
+          'dist-tag',
+          'add',
+          target,
+          promote,
+          ...(userconfig === undefined ? [] : ['--userconfig', userconfig]),
+          ...(otp === undefined ? [] : ['--otp', otp]),
+        ],
         `move \`${promote}\` onto ${target}`,
       )
     }
