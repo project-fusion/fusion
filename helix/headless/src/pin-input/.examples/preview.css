@@ -46,12 +46,6 @@ helix-headless-pin-input::part(field) {
   gap: 0.5rem;
 }
 
-helix-headless-pin-input::part(cell) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
 helix-headless-pin-input::part(label) {
   color: var(--_gray-strong);
   font-weight: 600;
