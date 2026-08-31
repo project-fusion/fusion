@@ -48,10 +48,7 @@ helix-headless-command::part(dialog) {
 }
 
 helix-headless-command::part(listbox) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
   color: var(--_gray-strong);
-  padding: 0.5rem;
 }
 
 helix-headless-command::part(listbox-filter-mark) {

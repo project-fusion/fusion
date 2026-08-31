@@ -48,7 +48,6 @@ helix-headless-button-group {
 helix-headless-button::part(button) {
   all: unset;
   box-sizing: border-box;
-  cursor: pointer;
 }
 
 helix-headless-icon::part(svg) {
