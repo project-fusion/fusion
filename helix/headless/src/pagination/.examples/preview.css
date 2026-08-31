@@ -46,12 +46,6 @@ helix-headless-pagination::part(item) {
   padding: 0.25rem 0.5rem;
 }
 
-helix-headless-pagination::part(list) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
 helix-headless-pagination::part(mark) {
   block-size: 1em;
   flex: none;
