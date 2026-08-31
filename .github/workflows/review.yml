@@ -6,6 +6,27 @@
 # a repository with one maintainer a muted reviewer is worse than no reviewer,
 # because it looks like coverage.
 #
+# **Sonnet, and the reason is what a review costs against what it returns.**
+# Measured on 32, a sixteen file diff: Opus took 27 turns and seven minutes for
+# $1.86 and returned four real defects, two of them in the rule that pull
+# request was adding. The findings were worth having and the price was not
+# repeatable across every push, which is what running on `synchronize` makes
+# this. Sonnet reads the same two passes.
+#
+# **It runs on every push now, and reviews only what arrived.** It used to run
+# once, at `opened`, on the argument that a finished diff is worth one careful
+# read. Measured against six pull requests, three of them carried a second
+# commit and the check went with the head it was attached to: the review was
+# orphaned and those three read as green while having no review at all. Green
+# for want of a reviewer is worse than red.
+#
+# **So the diff is the increment and the runs are capped.** The range starts at
+# the head of the last run that actually reviewed something, so a push is read
+# against what came before it rather than against the base, and `ROUNDS` is the
+# ceiling on how many times one pull request may spend. Past it, the `review`
+# label is the way to ask for one more, which is the same escape hatch the
+# manual re-request already used.
+#
 # **Advisory, never required.** `continue-on-error`, and it must stay off the
 # list of checks branch protection requires. A non-deterministic gate that can
 # block a merge at two in the morning is a liability, and the deterministic
@@ -43,7 +64,7 @@ name: review
 # `review` and it runs. Deliberate, and cheap next to a review nobody asked for.
 on:
   pull_request:
-    types: [opened, reopened, labeled]
+    types: [opened, reopened, synchronize, labeled]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -78,18 +99,67 @@ jobs:
       # a path nobody thought about is not on this list, so it counts as source
       # and the review runs.
       - id: scope
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCED: ${{ github.event.action == 'labeled' }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
+
+          # How many times one pull request may spend before it has to ask.
+          ROUNDS=4
+
+          # Every earlier run of this workflow on this pull request, oldest
+          # first, and the head each one read.
+          previous=$(gh api "repos/$REPO/actions/workflows/review.yml/runs?event=pull_request&per_page=100" \
+            --jq "[.workflow_runs[] | select(.id != $RUN_ID)
+                   | select(any(.pull_requests[]?; .number == $NUMBER))
+                   | {sha: .head_sha, at: .run_started_at}] | sort_by(.at)" 2>/dev/null || echo '[]')
+
+          spent=$(jq 'length' <<<"$previous")
+          if [ "$FORCED" != 'true' ] && [ "$spent" -ge "$ROUNDS" ]; then
+            {
+              echo "### Reviewed $spent times already"
+              echo
+              echo "\`ROUNDS\` is $ROUNDS. Add the \`review\` label to ask for another."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "source=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Read from the last head anything was read at, so a push is judged
+          # against what came before it. Falling back to the merge base is what
+          # makes the first run, and a forced one, read the whole pull request.
+          since=$(jq -r 'last.sha // empty' <<<"$previous")
           base=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)
-          source=$(git diff --name-only "$base" HEAD | grep -vE \
+          if [ -z "$since" ] || [ "$FORCED" = 'true' ] || ! git cat-file -e "$since^{commit}" 2>/dev/null; then
+            since=$base
+          fi
+
+          if [ "$since" = "$(git rev-parse HEAD)" ]; then
+            echo "review: nothing new since the last read." >> "$GITHUB_STEP_SUMMARY"
+            echo "source=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          source=$(git diff --name-only "$since" HEAD | grep -vE \
             '(\.generated\.[a-z]+$|custom-elements\.json$|/(jsx|vue|svelte)\.d\.ts$|\.png$|^fusion/docs/references/|helix/styles/src/tokens\.css$|helix/docs/content/metrics\.mdx$|questions\.json$|published\.json$)' \
             || true)
           if [ -z "$source" ]; then
             echo "review: the diff is generated files only, so there is nothing to read." >> "$GITHUB_STEP_SUMMARY"
             echo "source=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "source=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+
+          echo "source=true" >> "$GITHUB_OUTPUT"
+          echo "since=$since" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Reading $(git rev-list --count "$since"..HEAD) commit(s)"
+            echo
+            echo "Round $((spent + 1)) of $ROUNDS, ending at \`$(git rev-parse --short HEAD)\`."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # **There is no API key, and the four identifiers below are not secrets.**
       # Workload identity federation exchanges the run's own GitHub OIDC token
@@ -141,11 +211,20 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           track_progress: true
           use_sticky_comment: true
-          claude_args: --model claude-opus-5
+          claude_args: --model claude-sonnet-5
           prompt: |
-            Review this pull request against the standards this repository has
-            written down for itself. Read AGENTS.md and every file in
-            .claude/rules/ first. Those are the standard. Your own taste is not.
+            Review `${{ steps.scope.outputs.since }}..HEAD` against the standards
+            this repository has written down for itself. Read AGENTS.md and every
+            file in .claude/rules/ first. Those are the standard. Your own taste
+            is not.
+
+            **That range is what arrived since this was last read, not the whole
+            pull request.** On the first run it is the whole of it; after a push
+            it is the push. Read the rest of the branch for context where you
+            need it, and only report on what is in the range: a finding about a
+            line an earlier round already saw is one the author has read and
+            either fixed or decided about, and repeating it is the noise that
+            gets a reviewer muted.
 
             Work in two passes.
 
