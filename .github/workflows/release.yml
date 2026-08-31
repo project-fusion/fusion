@@ -416,10 +416,21 @@ jobs:
       # `GITHUB_TOKEN` cannot do this twice over: `main` requires a pull request,
       # so a direct push from it is declined before any check is consulted, and
       # a branch it pushes does not trigger workflows, which is the
-      # `action_required` click 272 recorded on the baselines branch. An App
-      # installation token is exempt from neither by default — it is exempt
-      # because the branch rule names the App in its bypass list, which is a
-      # grant somebody made deliberately and can see in the settings.
+      # `action_required` click 272 recorded on the baselines branch.
+      #
+      # **What makes the App's push land is the ruleset, not the App.** This was
+      # tried first under classic branch protection with the App named in
+      # `bypass_pull_request_allowances`, and rejected by two rules rather than
+      # one: *"Changes must be made through a pull request"* and *"Required
+      # status check `verify` is expected"*. That list exempts an actor from the
+      # pull request requirement and from nothing else, so `[skip ci]` made the
+      # rejection certain, `verify` being unable to report on a push it had
+      # prevented from running.
+      #
+      # `main` is governed by a ruleset now, where a bypass actor skips every
+      # rule in it. So the grant that matters is the App's entry in that
+      # ruleset's `bypass_actors`, and moving `main` back to classic protection
+      # would break this step without touching this file.
       #
       # **The bypass is the cost and it is worth naming.** `version.mjs` refused
       # to write the version back precisely to avoid standing write access that
@@ -427,8 +438,8 @@ jobs:
       # goes: one App, `contents: write` and nothing else, used by one step that
       # runs only after a version published, installed from the registry and
       # promoted. It cannot merge a pull request, cannot change a setting, and
-      # cannot reach any other branch, because `main` is the only rule that
-      # names it.
+      # cannot reach any other branch, the ruleset targeting the default branch
+      # alone.
       #
       # **`[skip ci]` because there is nothing here for CI to learn.** The push
       # would otherwise start `verify` on a commit whose entire content is
