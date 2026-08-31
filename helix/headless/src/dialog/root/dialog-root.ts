@@ -301,21 +301,45 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
    * this decides only when it happens. Removed first so a second press
    * restarts it: without that, pressing twice does nothing the second time,
    * which is the impression the whole thing exists to avoid.
+   *
+   * **`once: true` is not a release when the event cannot arrive.** Under
+   * `prefers-reduced-motion: reduce` the styled tier sets `animation: none`, so
+   * no animation runs, `animationend` never fires, and every refused press left
+   * a listener that could not be removed and an attribute that stayed on. The
+   * controller bounds it to one listener, aborted before the next is added.
+   *
+   * **And the attribute is cleared at once when nothing is animating**, asked
+   * of the platform rather than of a media query: this tier does not know what
+   * refusing looks like, and the same silence arrives from a consumer's
+   * stylesheet, from reduced motion, and from no styled tier being loaded at
+   * all. `getAnimations` is read after the reflow above, which is what makes
+   * the answer current.
    */
   private refuse(): void {
     const panel = this.dialog
     if (!panel) {
       return
     }
+    this.refusal?.abort()
     panel.removeAttribute('data-refused')
     // Read forces the removal to land before the attribute goes back on, or the
     // two happen in one frame and the animation never restarts.
     void panel.offsetWidth
     panel.setAttribute('data-refused', '')
+    void panel.offsetWidth
+    if (panel.getAnimations().length === 0) {
+      panel.removeAttribute('data-refused')
+      return
+    }
+    this.refusal = new AbortController()
     panel.addEventListener('animationend', () => panel.removeAttribute('data-refused'), {
       once: true,
+      signal: this.refusal.signal,
     })
   }
+
+  /** Bounds the refusal listener to one, whether or not it ever fires. */
+  private refusal: AbortController | undefined
 
   protected override render(): TemplateResult {
     return html`<dialog

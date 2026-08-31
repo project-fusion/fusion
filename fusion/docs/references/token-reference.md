@@ -240,7 +240,7 @@ How long something takes.
 | Token | Value | Reads |
 |---|---|---|
 | `--helix-duration-instant` | `0ms` | 5 |
-| `--helix-duration-fast` | `var(--_helix-ms-120)` | 194 |
+| `--helix-duration-fast` | `var(--_helix-ms-120)` | 193 |
 | `--helix-duration-normal` | `var(--_helix-ms-200)` | 74 |
 | `--helix-duration-slow` | `var(--_helix-ms-320)` | 24 |
 
@@ -252,7 +252,7 @@ The shape of the curve it takes it along.
 |---|---|---|
 | `--helix-easing-standard` | `var(--_helix-curve-standard)` | 173 |
 | `--helix-easing-emphasized` | `var(--_helix-curve-emphasized)` | 33 |
-| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 34 |
+| `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` | 33 |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` | 2 |
 | `--helix-easing-spring` | `linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )` | 5 |
 
@@ -300,8 +300,8 @@ Heights and widths a component takes, all of them multiplied by the density seed
 | `--helix-size-icon-lg` | `calc(1.5rem * var(--_helix-seed-density))` | 9 |
 | `--helix-size-icon-md` | `calc(1.25rem * var(--_helix-seed-density))` | 10 |
 | `--helix-size-icon-sm` | `calc(1rem * var(--_helix-seed-density))` | 24 |
-| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 75 |
-| `--helix-size-focus-offset` | `2px` | 63 |
+| `--helix-size-focus-ring` | `var(--helix-border-thick)` | 74 |
+| `--helix-size-focus-offset` | `2px` | 64 |
 | `--helix-size-focus-reach` | `calc(var(--helix-size-focus-ring) + var(--helix-size-focus-offset))` | 4 |
 
 ## layer
@@ -312,7 +312,7 @@ Position in the stack. Positional, never named after a component.
 |---|---|---|
 | `--helix-layer-beneath` | `-1` | 0 |
 | `--helix-layer-base` | `0` | 7 |
-| `--helix-layer-raised` | `10` | 18 |
+| `--helix-layer-raised` | `10` | 17 |
 | `--helix-layer-sticky` | `100` | 5 |
 | `--helix-layer-overlay` | `1000` | 2 |
 | `--helix-layer-toast` | `1200` | 1 |

@@ -1,6 +1,7 @@
+/* The custom properties only. `display` is set below, where the grid that
+   places the chrome is described, and a `display: block` here was replaced by
+   it rather than competing with it: one selector, one specificity, later wins. */
 :host {
-  display: block;
-
   --_carousel-bleed: var(--carousel-bleed, var(--helix-space-md));
   --_carousel-gap: var(--carousel-gap, var(--helix-space-md));
   --_carousel-per-view: 1;
