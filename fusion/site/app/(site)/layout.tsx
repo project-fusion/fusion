@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { SiteNav } from '@/components/site-nav/site-nav'
 import { PRODUCTS } from '@/content/products/products'
 import styles from '../../components/chrome.module.css'
@@ -86,6 +87,10 @@ const findable = (kind: RouteKind) =>
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
+      {/* Registered here rather than in the root layout, which is an ancestor of
+          the spec runner and cannot register anything without giving that page
+          two copies of the library. */}
+      <HelixElements />
       {/* **Built here, on the server, and handed down.** The registry reads the
           manifest off disk and holds the whole of the writing: it belongs to a
           server component, and a palette that imported it would pull the

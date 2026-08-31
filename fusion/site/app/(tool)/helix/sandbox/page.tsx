@@ -1,3 +1,4 @@
+import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { getFamilies } from '../../../../content/catalog/catalog'
 import { INSIGHTS } from '../../../../content/insights'
 import { SandboxWorkbench } from './workbench'
@@ -23,26 +24,32 @@ export default function SandboxPage() {
      one row where the two destinations genuinely differ: Enter goes to the
      reference and the modifier stays here with a different component loaded. */
   return (
-    <SandboxWorkbench
-      families={families}
-      findable={[
-        {
-          group: 'Components',
-          items: families.map((family) => ({
-            alternate: `/helix/sandbox?family=${family.slug}`,
-            alternateLabel: 'Open in the sandbox',
-            href: `/helix/components/${family.slug}`,
-            label: family.label,
-          })),
-        },
-        {
-          group: 'Writing',
-          items: INSIGHTS.map((insight) => ({
-            href: `/insights/${insight.slug}`,
-            label: insight.title,
-          })),
-        },
-      ]}
-    />
+    <>
+      {/* On the page rather than in `sandbox/layout.tsx`, which is an ancestor
+          of `specs/` and would register the library into the one document that
+          must not have it. */}
+      <HelixElements />
+      <SandboxWorkbench
+        families={families}
+        findable={[
+          {
+            group: 'Components',
+            items: families.map((family) => ({
+              alternate: `/helix/sandbox?family=${family.slug}`,
+              alternateLabel: 'Open in the sandbox',
+              href: `/helix/components/${family.slug}`,
+              label: family.label,
+            })),
+          },
+          {
+            group: 'Writing',
+            items: INSIGHTS.map((insight) => ({
+              href: `/insights/${insight.slug}`,
+              label: insight.title,
+            })),
+          },
+        ]}
+      />
+    </>
   )
 }
