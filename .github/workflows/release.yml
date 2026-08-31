@@ -452,8 +452,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          git config user.name 'fusion-release[bot]'
-          git config user.email '${{ vars.STAMP_APP_ID }}+fusion-release[bot]@users.noreply.github.com'
+          # Taken from the token rather than written here, so renaming the App
+          # or replacing it does not leave a workflow attributing its commits to
+          # something that no longer exists.
+          git config user.name '${{ steps.app.outputs.app-slug }}[bot]'
+          git config user.email \
+            '${{ steps.app.outputs.installation-id }}+${{ steps.app.outputs.app-slug }}[bot]@users.noreply.github.com'
 
           git add -- '**/package.json' bun.lock
           if git diff --cached --quiet; then
