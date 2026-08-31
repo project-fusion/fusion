@@ -335,3 +335,19 @@ tool records which keyboard was used rather than who decided anything.
    you and it is the one class of failure a push will not resolve on its own.
 3. `git push`. The hook judges formatting, reachable host rules and the twelve
    generated files in seconds; `verify.yml` does the rest.
+
+**Regenerated files land in a commit of their own, and no source rides with
+them.** Five generated files are still tracked, deliberately, because people
+read them: the two reference pages, the metrics table, the landing claims and
+`tokens.css`. They are written from the whole tree at once, so any of them may
+carry a change somebody else made in the same checkout, and `git add -A` after
+a `regen` is how that gets swept into a commit named for something else. Twice
+in one session it took work that had not been reviewed, once a private
+repository name.
+
+Committing them separately costs one commit and makes the sweep visible instead
+of silent: a diff holding nothing but generated output is one a reader can skip,
+and a diff holding source is one they can trust names only that source. It is
+also the thing that makes a merge conflict in them resolvable, because the
+answer is always to take either side and run `regen` again rather than to read
+the two.
