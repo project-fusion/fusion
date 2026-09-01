@@ -46,22 +46,6 @@ helix-headless-switch::part(field) {
   gap: 0.5rem;
 }
 
-helix-headless-switch::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
-}
-
-helix-headless-switch::part(control) {
-  appearance: none;
-  background-color: var(--_gray-surface);
-  block-size: 1rem;
-  border: 1px solid var(--_gray-line);
-  inline-size: 1rem;
-  margin: 0;
-}
-
 helix-headless-switch::part(thumb) {
   background-color: var(--_gray-strong);
   block-size: 0.75rem;
@@ -102,6 +86,7 @@ helix-headless-switch::part(control):focus-visible {
 /* The input is the hit target and lies over the track, which is what
    draws. Left visible it is a checkbox sitting beside a switch. */
 helix-headless-switch::part(track) {
+  background-color: var(--_gray-fill);
   block-size: 1rem;
   border-radius: 0.5rem;
   display: inline-block;
@@ -110,7 +95,10 @@ helix-headless-switch::part(track) {
 }
 
 helix-headless-switch::part(control) {
+  appearance: none;
+  background-color: var(--_gray-surface);
   block-size: 100%;
+  border: 1px solid var(--_gray-line);
   inline-size: 100%;
   inset: 0;
   margin: 0;

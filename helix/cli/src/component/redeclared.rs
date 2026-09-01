@@ -38,11 +38,16 @@
 //! same value are as dead as two setting it to different ones, and are the more
 //! confusing case to read, because the file looks like it means it twice.
 //!
-//! **The examples are out of scope here and have their own row.** They carry 22
-//! of these against the component sheets' 4, they are demonstration code rather
-//! than shipped CSS, and folding them in would have made the first run of this
-//! rule a sweep of a different population than the one it was written for. The
-//! `hooks` rule draws the line in the same place.
+//! **The examples are in scope, and they were the larger half.** They were held
+//! out on this rule's first run so it swept the population it was measured
+//! against: 26 findings across the `.examples/` sheets to the component sheets'
+//! 4. Those closed one sheet at a time, because in an example the duplicate is
+//! usually the whole block and the repair is a reading of what the example is
+//! showing rather than a deletion of whatever a later block re-sets. With the
+//! count at zero the skip comes out, which is what turns this from a sweep into
+//! a rule: the next example to grow a dead block fails here on the day it is
+//! written. The `hooks` rule still draws its own line elsewhere, for its own
+//! reasons.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -172,9 +177,6 @@ pub fn run(context: &Context) -> Report {
                 .unwrap_or(&sheet)
                 .to_string_lossy()
                 .replace('\\', "/");
-            if where_.contains("/.examples/") {
-                continue;
-            }
             checked += 1;
 
             /* Path to the blocks written at it, in source order, which is the

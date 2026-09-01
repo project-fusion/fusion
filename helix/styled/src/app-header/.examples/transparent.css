@@ -25,7 +25,6 @@
 .band {
   align-content: center;
   margin-block-start: calc(var(--helix-size-header) * -1);
-  background-color: var(--helix-color-primary-surface);
   background-image:
     repeating-linear-gradient(
       to right,

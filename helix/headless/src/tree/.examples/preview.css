@@ -58,18 +58,11 @@ helix-headless-tree-item::part(row) {
 helix-headless-tree-item::part(toggle) {
   all: unset;
   box-sizing: border-box;
-  cursor: pointer;
 }
 
 helix-headless-tree-item::part(label) {
   color: var(--_gray-strong);
   font-weight: 600;
-}
-
-helix-headless-tree-item::part(group) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
 }
 
 helix-headless-icon::part(svg) {
@@ -98,6 +91,7 @@ helix-headless-tree-item::part(group) {
 }
 
 helix-headless-tree-item::part(group) {
+  gap: 0.25rem;
   padding-inline-start: 1rem;
 }
 
@@ -120,10 +114,10 @@ helix-headless-tree-item:not(:state(open))::part(group) {
 /* The chevron is the toggle itself, not a glyph inside one. */
 helix-headless-tree-item::part(toggle) {
   block-size: 1em;
+  cursor: pointer;
   fill: var(--_gray-muted);
   flex: none;
   inline-size: 1em;
-  cursor: pointer;
 }
 
 helix-headless-tree-item::part(row) {
