@@ -40,17 +40,6 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-/* The column tracks are the component's arithmetic, published as
-   `--table-template` because only it has counted the columns. */
-helix-headless-table::part(table) {
-  display: grid;
-  grid-template-columns: var(--table-template);
-}
-
-helix-headless-table-row {
-  display: contents;
-}
-
 helix-headless-table-cell {
   border-block-end: 1px solid var(--_gray-line);
   padding: 0.375rem 0.5rem;
@@ -62,6 +51,8 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
+/* The column tracks are the component's arithmetic, published as
+   `--table-template` because only it has counted the columns. */
 helix-headless-table::part(table) {
   display: grid;
   gap: 0.25rem 1rem;

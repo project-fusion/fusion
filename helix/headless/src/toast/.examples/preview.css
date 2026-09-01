@@ -70,12 +70,6 @@ helix-headless-toast-item::part(icon-mark) {
   inline-size: 1em;
 }
 
-helix-headless-toast-item::part(item) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
 helix-headless-button::part(button) {
   all: unset;
   box-sizing: border-box;

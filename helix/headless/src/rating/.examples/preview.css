@@ -43,24 +43,6 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-rating::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
-}
-
-helix-headless-rating::part(fill) {
-  background-color: var(--_gray-mark);
-  display: block;
-}
-
-helix-headless-rating::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-headless-rating::part(option) {
   background-color: transparent;
   border: 0;
@@ -107,6 +89,7 @@ helix-headless-rating::part(mark) {
   background-color: currentColor;
   block-size: 0.75rem;
   display: block;
+  flex: none;
   inline-size: 0.75rem;
   rotate: 45deg;
 }

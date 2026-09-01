@@ -40,12 +40,6 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-time-picker::part(list) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
 helix-headless-time-picker::part(option) {
   background-color: transparent;
   border: 0;

@@ -59,7 +59,7 @@ Every color, resolved through `light-dark()` so a theme needs no second file.
 | `--helix-color-accent-subtle` | `light-dark(var(--_helix-accent-50), var(--_helix-accent-900))` | `#ffebcc` | `#412000` | 0 |
 | `--helix-color-accent-surface` | `var(--_helix-accent-600)` | `#984900` | as light | 3 |
 | `--helix-color-accent-surface-hover` | `var(--_helix-accent-700)` | `#883900` | as light | 3 |
-| `--helix-color-primary-surface` | `var(--_helix-brand-600)` | `#0059c8` | as light | 12 |
+| `--helix-color-primary-surface` | `var(--_helix-brand-600)` | `#0059c8` | as light | 11 |
 | `--helix-color-primary-surface-hover` | `var(--_helix-brand-700)` | `#0049b8` | as light | 3 |
 | `--helix-color-focus-ring` | `var(--_helix-brand-500)` | `#1068da` | as light | 70 |
 | `--helix-color-brand-mark` | `light-dark(var(--_helix-brand-500), var(--_helix-brand-400))` | `#1068da` | `#4192ff` | 1 |
