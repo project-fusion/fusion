@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cli",
   "description": "The Helix command line, for a workspace that reaches it through npm.",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "private": true,
   "license": "MIT",
   "repository": {
