@@ -5,6 +5,5 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "removeComments": false
-  },
-  "extends": "./tsconfig.base.json"
+  }
 }
