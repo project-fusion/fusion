@@ -11,9 +11,6 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2023",
-    "types": [
-      "@fusion.dev/helix/jsx"
-    ],
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "incremental": true,
@@ -28,7 +25,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "helix-jsx.d.ts"
   ],
   "exclude": [
     "node_modules"

@@ -121,7 +121,7 @@ The spacing scale, used for gaps, padding and margins alike.
 | `--helix-space-md` | `var(--_helix-scale-4)` | 114 |
 | `--helix-space-lg` | `var(--_helix-scale-6)` | 99 |
 | `--helix-space-xl` | `var(--_helix-scale-8)` | 46 |
-| `--helix-space-2xl` | `var(--_helix-scale-12)` | 50 |
+| `--helix-space-2xl` | `var(--_helix-scale-12)` | 49 |
 | `--helix-space-3xl` | `var(--_helix-scale-16)` | 15 |
 | `--helix-space-control` | `var(--helix-space-md)` | 4 |
 

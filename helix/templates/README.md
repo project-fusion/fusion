@@ -16,7 +16,14 @@ written against.
 |---|---|
 | `react-vite` | React and TypeScript on Vite. The shortest path to a running component. |
 | `react-nextjs` | React and TypeScript on the Next.js App Router, elements registered once. |
-| `html` | One HTML file and a stylesheet. No build step and no framework. |
+
+**There is no build-free HTML template**, and that is a fact about the packages
+rather than an omission. `@fusion.dev/helix`'s published entry re-exports bare
+specifiers — `@fusion.dev/helix-core`, ninety-odd `@fusion.dev/helix-headless/*`
+subpaths, `lit` and its own graph — none of which a browser resolves without an
+import map covering all of it, and an import map that large is a build artifact
+wearing a template's clothes. The honest build-free story is a CDN that rewrites
+the graph, which wants the packages public first.
 
 ## Reading it yourself
 

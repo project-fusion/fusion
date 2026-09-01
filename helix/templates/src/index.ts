@@ -38,9 +38,16 @@ export interface Template {
  * **In the order a chooser should offer them**, which is not alphabetical.
  *
  * `react-vite` is first because it is the shortest path from nothing to a
- * component on screen, and a first release is judged on that. `html` is last
- * because it is the one a reader picks deliberately rather than by default,
- * being the answer for somebody who wants no build at all.
+ * component on screen, and a first release is judged on that.
+ *
+ * **There is no build-free HTML template, and that is a fact about the packages
+ * rather than an omission.** `@fusion.dev/helix`'s published entry re-exports
+ * bare specifiers — `@fusion.dev/helix-core`, ninety-odd
+ * `@fusion.dev/helix-headless/*` subpaths, `lit` and its own graph — which a
+ * browser cannot resolve without an import map covering all of it. An import map
+ * that large is a build artifact wearing a template's clothes. The honest
+ * build-free story is a CDN that rewrites the graph, which wants the packages
+ * public first.
  */
 export const templates: readonly Template[] = [
   {
@@ -55,12 +62,6 @@ export const templates: readonly Template[] = [
     id: 'react-nextjs',
     named: ['app/layout.tsx', 'app/page.tsx', 'package.json'],
     title: 'React (Next.js)',
-  },
-  {
-    description: 'One HTML file and a stylesheet. No build step and no framework.',
-    id: 'html',
-    named: ['index.html', 'package.json'],
-    title: 'Plain HTML',
   },
 ]
 

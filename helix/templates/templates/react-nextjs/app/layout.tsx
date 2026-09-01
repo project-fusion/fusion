@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 
-import '@fusion.dev/helix-styles/all.css'
-import '@fusion.dev/helix/elements.css'
+/* Every layer in one import: the tokens, the reset, the utility layer, and the
+   `:not(:defined)` rules that keep a tag from arriving unstyled. */
+import '@fusion.dev/helix/helix.css'
 
 import { HelixElements } from './helix-elements.js'
 

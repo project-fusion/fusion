@@ -1,8 +1,0 @@
-/* Your own styles. The base layer above has already set the tokens every
-   component reads, so overriding one here moves every component that answers it. */
-body {
-  display: grid;
-  min-block-size: 100dvh;
-  padding: var(--helix-space-2xl);
-  place-items: center;
-}

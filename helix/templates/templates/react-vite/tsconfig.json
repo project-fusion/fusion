@@ -11,13 +11,11 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2023",
-    "types": [
-      "@fusion.dev/helix/jsx"
-    ],
     "verbatimModuleSyntax": true,
     "noEmit": true
   },
   "include": [
-    "src"
+    "src",
+    "helix-jsx.d.ts"
   ]
 }
