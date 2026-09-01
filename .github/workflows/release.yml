@@ -450,7 +450,7 @@ jobs:
       - name: Mint a token that may write to `main`
         id: app
         if: vars.PUBLISHING == 'on'
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ vars.STAMP_APP_ID }}
           private-key: ${{ secrets.STAMP_APP_PRIVATE_KEY }}
