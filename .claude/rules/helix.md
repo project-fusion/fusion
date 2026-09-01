@@ -431,14 +431,7 @@ gone with no way to tell the two apart. Lit SSR does emit reflected attributes
 (verified with `disabled` set as a property), so this is not a client-only
 concern.
 
-*The second half of this measurement has expired, 26 Aug 2026, and is worth
-recording rather than deleting.* It read that the re-parsed element "sees `value`
-declared before its first update, latches controlled, and freezes", so even a
-never-typed-in control came back dead from a copy-paste. There is no latch now
-and nothing to freeze. The reflection is still wrong, for the reason above, and
-one of the two reasons it was wrong has gone.
-
-The line that is actually drawn, and it is not "value is special":
+The line that is drawn, and it is not "value is special":
 
 - **Boolean states mirror to a custom state.** `:state(open)`,
   `:state(checked)`, `:state(invalid)`, `:state(has-label)` and `:state(read)`,
@@ -479,33 +472,19 @@ the payload: a floating label cares whether there is text, not what it says. And
 `helix-input` takes `type="password"`, which a `data-value` would carry straight
 past every session-replay masker that knows to mask `.value` and `input[value]`.
 
-**We used to diverge from native on the name, and no longer do.** *Rewritten 26
-Aug 2026; this described the opposite for months.* It read: native
-`<input value="Ada">` seeds while `<helix-input value="Ada">` claims ownership
-and the control goes quiet, and `requestControlledChange` therefore audits a
-controlled element that asks and is not answered.
+**`value="Ada"` is the seed it looks like, exactly as native.** Control is an
+action, not a mode: the element always owns its state and always applies it, a
+cancelable `helix-before-*` lets a consumer take one decision, and a consumer
+who wants full ownership refuses and assigns their own. That is how the platform
+says the same thing on a form submit, a link click and `beforeinput`.
 
-`value="Ada"` is the seed it looks like. **Control is an action, not a mode**:
-the element always owns its state and always applies it, a cancelable
-`helix-before-*` lets a consumer take one decision, and a consumer who wants
-full ownership refuses and assigns their own. That is how the platform says the
-same thing on a form submit, a link click and `beforeinput`.
-
-**The audit is gone with the divergence, which is the part worth understanding.**
-It existed to catch a trap of our own making, a declared property that read as a
-seed and was not, and it needed two `WeakMap`s, a console warning and an
-argument about judging on the second request rather than on a timer. Remove the
-divergence and the trap cannot happen, so none of that machinery has anything to
-do. The generated `helix-controlled-props` constraint went the same way: a
-`value` prop no longer needs a handler beside it, because it is not a claim.
-
-**What decided it was the reach.** `requestChange` is not a value-control
-mechanism. `MixinControllerValue`, `MixinControllerChecked`, `MixinControllerOpen`
-and `MixinControllerActive` all run on it, so a mode would fork the event
-vocabulary across ninety-two families by prop presence: which event a consumer
-binds would depend on whether they passed a property, and an HTML consumer would
-have no ergonomic spelling for the controlled half at all, a prefixed event
-having no inline handler attribute.
+**Do not reintroduce a controlled mode.** `requestChange` is not a value-control
+mechanism: `MixinControllerValue`, `MixinControllerChecked`,
+`MixinControllerOpen` and `MixinControllerActive` all run on it, so a mode would
+fork the event vocabulary across ninety-two families by prop presence. Which
+event a consumer binds would depend on whether they passed a property, and an
+HTML consumer would have no spelling for the controlled half at all, a prefixed
+event having no inline handler attribute.
 
 **Shared test scaffolding lives in `@fusion.dev/helix-testing`**, one module per
 environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
@@ -1080,21 +1059,16 @@ own. Prefixed, it can be mistaken for neither. PascalCase was proposed as a
 cheaper version of the same protection, on the grounds that every native name is
 lowercase; it is not wrong, and it was given up for the reason below.
 
-**Hyphens are not limited, and the rule that said so was wrong.** *Deleted 19
-Aug 2026.* `bindable-events` barred a second hyphen on the grounds that React
-binds no event whose name carries two. It binds them fine. Measured in Chrome
-against React 19.2.8, `ona-b-c-d` binds exactly as `onhelix-before-open` does, and
-`react-dom` slices `on` off the prop and hands the remainder to
-`addEventListener` without inspecting it. Web Awesome ships `wa-after-hide` and
-`wa-column-resize` to production, which is the same finding from outside.
+**A name may carry any number of hyphens.** Measured in Chrome against React
+19.2.8: `ona-b-c-d` binds exactly as `onhelix-before-open` does, `react-dom`
+slicing `on` off the prop and handing the remainder to `addEventListener`
+without inspecting it.
 
-**What the original probe caught was hydration, read as a fact about names.** On
-a server-rendered page React attaches no custom element listener at all,
-whatever it is called, until it commits an update for some other reason, so
-which names appeared to bind depended on what else was on the page. The earlier
-reading in `docs/09` had already contradicted itself once and said so. A rule
-drawn through noise survives exactly as long as nobody re-runs the probe, which
-is the argument for re-running it.
+**Do not read a binding failure as a fact about the name.** On a
+server-rendered page React attaches no custom element listener at all, whatever
+it is called, until it commits an update for some other reason, so which names
+appear to bind depends on what else is on the page. A rule drawn through that
+noise survives exactly as long as nobody re-runs the probe.
 
 **A verb React has claimed is reachable anyway, because of the prefix.** Its
 synthetic system owns `change`, `input`, `submit`, `copy`, `focus` and the rest,
@@ -1194,11 +1168,9 @@ The bug underneath is React's, [facebook/react#35446](https://github.com/faceboo
 open since January 2026 with a proposed fix unmerged. When it lands this becomes
 dead weight and should go.
 
-*Re-checked 27 Aug 2026: the issue is still open, last touched 17 Aug, and PR
-#35474 is still the proposed fix, still unmerged and last touched 27 June.* Which version this was measured against is not left to prose:
-`check:pkg:react-bridge` reads the number out of this file and fails if the
-installed `react-dom` has moved past it, because a probe is a claim about one
-release's internals and nothing in `verify` reads a comment.
+The version this was measured against is not left to prose: `react-bridge` reads
+the number out of this file and fails when the installed `react-dom` moves past
+it, a probe being a claim about one release's internals.
 
 **Object and function *properties* had the same bug and are fixed now.** React
 skips everything it would have to apply imperatively while hydrating; strings,
@@ -1357,12 +1329,9 @@ and three things ended it:
 - **It hooks `config.webpack`, which Turbopack ignores**, so it would stop
   working silently on that migration. We have already lost time to one silent
   DSD failure.
-- **`@lit-labs/nextjs` has not published since July 2025.** There is no fixed
-  version to wait for. *Re-checked 21 Aug 2026 against the registry: still
-  0.2.4, published 11 July 2025, thirteen months ago. `@lit-labs/ssr-react` did
-  move, to 0.3.4 on 23 December 2025, which makes the point sharper rather than
-  softer: the sibling is maintained and the Next.js integration is the one that
-  is not, and it is the one this depended on.*
+- **`@lit-labs/nextjs` is unmaintained**, last published 0.2.4 in July 2025, so
+  there is no fixed version to wait for. Its sibling `@lit-labs/ssr-react` is
+  still moving; the Next.js integration, which this depended on, is not.
 
 Marking pages `'use client'` did make it work, at 15.1 kB of route JavaScript.
 That is not the trade: it surrenders RSC on every page using a component, to
@@ -1499,30 +1468,22 @@ the spec runner; `fusion/site` is the Next site that renders them. Both dev and
 production work the same way as the marketing site, with element registration in
 one client component.
 
-- **The shell ships from `helix/styled`; the editor does not.** *Reversed 19 Aug
-  2026.* This read "a separate package, never the component library", against
-  the previous Helix having exported ten sandbox classes from `helix/styled`'s
-  public barrel: 119 kB of 1.22 MB, a tenth of the library, shipped to every
-  consumer as tooling for one internal site.
+- **The shell ships from `helix/styled`; the editor does not.** Subpath exports
+  and honestly declared `sideEffects` are what make that safe: a consumer
+  importing `@fusion.dev/helix/card` never sees a sandbox, so the weight is
+  opt-in and the question is what the thing *is* rather than what it costs.
 
-  **That measurement was taken when the barrel was the only way in.** Subpath
-  exports and honestly declared `sideEffects` are what changed it: a consumer
-  importing `@fusion.dev/helix/card` never sees a sandbox. The cost the old rule was
-  protecting against is now opt-in, and what is left is a question about what
-  the thing *is* rather than what it weighs.
-
-  So `Sandbox` is a component, under `@category tooling`, single tier. It earns
+  `Sandbox` is a component, under `@category tooling`, single tier. It earns
   that by the same test as everything else: behavior, state and API. Pane-size
   memory across a content change, panel collapse, `hasPanel` so an omitted panel
   paints no band, and separator labels. Single tier because the headless and
   styled split exists so a consumer can bring their own presentation, and nobody
   reskins a dev tool.
 
-  **And the name is honest, which was checked rather than assumed.**
-  `Sandbox.Preview` hardcodes `sandbox="allow-scripts allow-forms"` on its frame
-  and never `allow-same-origin`: the component *is* the boundary, not a layout
-  that happens to sit near one. Had the isolation stayed behind, the name would
-  have had to go with it.
+  **The name is load-bearing.** `Sandbox.Preview` hardcodes
+  `sandbox="allow-scripts allow-forms"` on its frame and never
+  `allow-same-origin`: the component *is* the boundary. Move the isolation out
+  and the name has to go with it.
 
 - **`editor` and `specs` stayed in `@fusion.dev/helix-sandbox`.** The editor carries
   CodeMirror, about 4 MB installed against a design system of roughly the same
@@ -1675,20 +1636,14 @@ component, plus a `<slug>.css` where one is needed. `default.html` is the
 headline preview and reads as "Preview"; every other slug is a named variant.
 
 **Both syntaxes are authored, and neither is derived from the other.** The
-sandbox used to convert the HTML with `htmlToJsx` when a reader asked for TSX,
-which is the mistake `build-headless-examples.mjs` made one axis over and this
-repository already rejected once: a derived example is a function of its twin
-rather than a thing anybody wrote. It also did not work. Every example carrying a
-`<script>` converted to a JSX fragment with a `<script>` in it, which is a
-*syntax error* rather than a bad example, and three faults hit the script-free
-ones too: a leading comment was not counted as a root so no fragment was emitted,
-the stylesheet-to-import rule required `rel` before `href` and every example
-writes them alphabetically so it had never once fired, and `for` was renamed to
-`htmlFor` on custom elements, where React writes the attribute verbatim and the
-browser lowercases it to something no component reads.
+**Do not derive one from the other.** A converted example is a function of its
+twin rather than a thing anybody wrote, and conversion cannot be made to work:
+an example carrying a `<script>` becomes a JSX fragment holding one, which is a
+syntax error rather than a bad example, and `for` becomes `htmlFor`, which React
+writes verbatim and the browser lowercases to something no component reads.
 
-`htmlToJsx` is deleted. `jsxToHtml` survives for one job, converting a reader's
-live edit in the TSX pane, which by definition has no authored twin.
+`jsxToHtml` survives for one job, converting a reader's live edit in the TSX
+pane, which by definition has no authored twin.
 `helix component`'s `examples-paired` holds the two files to each other and
 `check:spec:visual-parity` holds the two pictures to each other.
 
@@ -1716,11 +1671,11 @@ tell a reader it is about a swallowed submit. `@summary` rather than
 
 **Examples reach the manifest, not the site.** `helix-examples` walks
 `src/<family>/.examples` and records slug and description on the family's root
-declaration. The docs site used to walk that folder itself, which put the
-knowledge in the wrong place: the site is a consumer, and it was reaching past
-the published interface into the library's source tree to find out what a
-component ships. The markup stays on disk: it is the sandbox's payload, it is
-large, and every consumer parses this manifest whether or not it renders one.
+declaration. **The site must not walk that folder itself**: it is a consumer, and
+reading the library's source tree to find out what a component ships reaches past
+the published interface. The markup stays on disk — it is the sandbox's payload,
+it is large, and every consumer parses this manifest whether or not it renders
+one.
 
 A family with an `index.ts` and no `.examples` fails `helix component`'s `examples`. That is
 what makes a directory a family, the same question the package's `exports` map
