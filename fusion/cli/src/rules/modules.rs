@@ -26,14 +26,11 @@
 //! writes out**. Asking instead whether some other plain sheet mentions the name
 //! fails on the exact case this exists for, since the offending rule
 //! `.auraProbe .siteFooter` mentions the name itself and would clear itself.
-//! Found by probing the first version with the fault it was written for, which
-//! passed.
 //!
-//! **The whole workspace, rather than a list of roots.** The script this comes
-//! from named two, which is the shape that let a rule about shader literals go
-//! on scanning a directory that had been renamed and report a green run against
-//! three quarters of its subject. A root list is a thing that goes stale
-//! silently; there is nothing to keep current here.
+//! **The whole workspace, rather than a list of roots.** A root list goes stale
+//! silently: it survives a rename by scanning a directory that is no longer
+//! there and reporting green against a fraction of its subject. There is nothing
+//! to keep current here.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;

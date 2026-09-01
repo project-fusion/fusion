@@ -18,16 +18,10 @@
 //! **A whole-string `toBe` is left alone**: it is not a substring search and
 //! would fail loudly rather than quietly.
 //!
-//! **The script this replaces could not fail, and porting it is how that was
-//! found.** It read the asserted subject with `expect\(\s*([\w.()]+)`, whose
-//! class holds both parens, so `expect(markup).toContain(...)` captured
-//! `markup).toContain(` and the call-stripping step left `markup).toContain` —
-//! a name no binding ever has. Every assertion it looked at was therefore
-//! somebody else's. Two things hid it: the fault it exists for was never
-//! planted, and its success line carries no number, so the meta-rule that
-//! refuses a check counting nothing had nothing to read and skipped it. The
-//! subject is matched with `[\w.]+` here, which stops at the first paren or
-//! bracket on its own and needs no second step.
+//! **The subject is matched with `[\w.]+`**, which stops at the first paren on
+//! its own. A class holding parens captures `markup).toContain(` out of
+//! `expect(markup).toContain(…)`, a name no binding ever has, so every assertion
+//! the rule looks at is somebody else's and it reports clean forever.
 //!
 //! **Making it fire then exposed the second thing it had never had to get
 //! right.** The script keeps one set of raw names per file, and a spec file

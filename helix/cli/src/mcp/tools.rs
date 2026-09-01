@@ -59,12 +59,11 @@ pub fn catalog() -> Vec<serde_json::Value> {
 /// is a model, and "cannot derive: brand is not a hex color" is a thing it can
 /// act on where a number is not.
 pub fn call(name: &str, arguments: &serde_json::Value) -> Result<String, String> {
-    /* **The name is checked before the arguments are read, and the first version
-    had it the other way.** Both tools take an intent, so parsing first was
-    shorter and told a caller who misspelled a tool name that their intent was
-    malformed: `helix_invent` with no arguments answered "that is not a theme
-    intent". An error message that describes the wrong mistake is worse than a
-    generic one, because it sends the reader to fix something that is correct. */
+    /* **The name is checked before the arguments are read**, never the other way
+    round. Both tools take an intent, so parsing first tells a caller who
+    misspelled a tool name that their intent is malformed. An error describing
+    the wrong mistake is worse than a generic one: it sends the reader to fix
+    something that is correct. */
     if name != "helix_audit_theme" && name != "helix_derive_theme" {
         return Err(format!(
             "no tool named {name}. This server has helix_audit_theme and helix_derive_theme."
