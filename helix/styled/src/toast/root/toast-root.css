@@ -52,8 +52,8 @@
  * anchored to, pushing the older ones away. Which flex direction does that
  * depends on the edge, and it is the reverse of what it looks like:
  * `column-reverse` puts the *first* item at main-start, so at the bottom it
- * would put the newest furthest from the corner. Measured before it was
- * believed, because both readings are plausible from the property name.
+ * would put the newest furthest from the corner. Both readings are plausible
+ * from the property name, so check rather than reason about it.
  *
  * So the bottom keeps the default and the top reverses. Reading order is
  * untouched either way: flex moves boxes, and the live region announces in

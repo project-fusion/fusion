@@ -56,11 +56,11 @@
 
 /* **The column that carries the words, and the caption when there is one.**
  *
- * It takes the growth and the min-size the label used to hold, because those
- * belong to whatever fills the middle of the row and the middle is now two
- * things stacked rather than one. `min-inline-size: 0` is what lets either line
- * truncate: a flex item's floor is its content, so without it a long caption
- * pushes the row wider than the panel instead of being cut.
+ * It carries the growth and the min-size, which belong to whatever fills the
+ * middle of the row — here two things stacked rather than one.
+ * `min-inline-size: 0` is what lets either line truncate: a flex item's floor is
+ * its content, so without it a long caption pushes the row wider than the panel
+ * instead of being cut.
  *
  * Always rendered, unlike the caption inside it, and that is safe for the reason
  * the area rules give against wrapping an optional region: this one always holds

@@ -9,11 +9,9 @@
    would look like with no set around it, which is not an arrangement that
    ships, so they are the plainest thing rather than a second design.
 
-   A resting tab is the exception and is written plainly. `--_tab-surface` was
-   read here and set by no variant and never had been, so every tab that has
-   ever shipped drew the fallback: the set varies the *selected* fill through
-   `--_tab-selected-surface` and has never wanted a resting one. A variant that
-   does can have the property back, in the two lines it takes. */
+   A resting tab is the exception and is written plainly: the variants vary the
+   *selected* fill through `--_tab-selected-surface` and none wants a resting
+   one. A variant that does can have a property back in the two lines it takes. */
 [part="tab"] {
   align-items: center;
   background-color: transparent;

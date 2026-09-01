@@ -578,8 +578,8 @@ export class HelixHeadlessCarousel extends HelixElement {
    * an assignment changes, and under `slotAssignment: 'manual'` the only thing
    * that changes an assignment is this component calling `assign`, so a slide
    * appended by a consumer would reach no slot, render nowhere and be counted by
-   * nothing. The default slot used to carry that duty and could, because it took
-   * whatever was there. `Chat` watches for the same reason.
+   * nothing. A default slot needs no watcher, taking whatever is there; a manual
+   * one does. `Chat` watches for the same reason.
    */
   private watcher: MutationObserver | undefined = undefined
 

@@ -103,19 +103,15 @@ const SKIP_SECONDS = 10
  * The keys are the ones every player uses: Space and `k` to play or pause, the
  * arrows to seek and to change the volume, `m` to mute, `f` for fullscreen.
  * They are bound on this element rather than on the document, because a video
- * is not a palette: keys belong to it only while a reader is on it.
+ * is not a palette: keys belong to it only while a reader is on it. Where
+ * `controls` is set they are not bound at all, since two handlers on one press
+ * is a video that seeks twice, and the focus stop goes with them.
  *
- * **And none of them where `controls` is set.** The browser's own bar owns
- * those keys, and two handlers on one press is a video that seeks twice or
- * plays and immediately pauses. The focus stop goes with them, since the native
- * controls bring their own.
- *
- * **`<source>` and `<track>` are copied into the video, not slotted into it.**
- * A media element runs its resource selection over its own child *nodes*, and a
- * slot is one node: the sources and the caption tracks a consumer wrote were
- * assigned into the flattened tree and the video never saw any of them. It had
- * no text tracks, no current source and a `readyState` of zero, so a video
- * given sources this way did not merely lack captions, it did not play.
+ * **`<source>` and `<track>` are copied into the video, never slotted into it.**
+ * A media element runs resource selection over its own child *nodes*, and a slot
+ * is one node, so slotted sources reach it as nothing: no text tracks, no
+ * current source, `readyState` zero. A video given sources that way does not
+ * merely lack captions, it does not play.
  *
  * They are copied rather than moved, because the consumer's light DOM is theirs
  * and a framework that re-renders it would find its children gone. The copies

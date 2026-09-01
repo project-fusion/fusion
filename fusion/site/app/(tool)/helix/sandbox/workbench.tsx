@@ -997,10 +997,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
   const allOpen = expandAll ?? false
 
-  /* Only the state. The sweep that used to be here is the effect above, which
-     fires on `expandAll` and therefore reaches branches the reader opened by
-     hand as well: those changed the element without changing anything React
-     holds, and that is exactly what the button has to override. */
+  /* Only the state. The sweeping is the effect above, which fires on
+     `expandAll` and therefore reaches branches the reader opened by hand:
+     those changed the element without changing anything React holds, and that
+     is exactly what the button has to override. */
   const toggleAll = () => {
     setExpandAll(!allOpen)
   }

@@ -258,16 +258,14 @@ const paintRoot = (
 const clearRoot = (): void => {
   /* **Only when nothing is stored.**
    *
-   * This used to run unconditionally, and the comment on it read "the site is
-   * not ours to leave themed" — right, while a theme was a thing that existed
-   * for as long as a reader stood on the page that made it. A theme they asked
-   * to keep is theirs to leave on, and wiping it here would mean the palette
-   * survived a reload, because the pre-paint script restores it, and died on a
-   * click to the next page, because this ran on the way out. That is the worse
-   * of the two failures: it looks like the feature works until you navigate.
+   * A theme a reader asked to keep is theirs to leave on. Wiping it here makes
+   * the palette survive a reload, because the pre-paint script restores it, and
+   * die on a click to the next page, because this runs on the way out — the
+   * worse of the two failures, since it looks like the feature works until you
+   * navigate.
    *
-   * What it still owns is the unsaved case — a reader who moved a slider,
-   * looked, and left without keeping it. */
+   * This owns the unsaved case: a reader who moved a slider, looked, and left
+   * without keeping it. */
   if (readSiteTheme()) {
     return
   }
