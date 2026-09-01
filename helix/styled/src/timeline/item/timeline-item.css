@@ -103,8 +103,8 @@
 
 /* The dot inside the ring, where nothing was slotted. It is the slot's fallback
    content, so nothing has to detect anything: `::slotted()` cannot go inside
-   `:has()`, and the first version of this tried, matched nothing, and left every
-   unmarked entry as an empty ring. */
+   `:has()`, so a rule that tries matches nothing and leaves every unmarked entry
+   an empty ring. */
 [part="dot"] {
   /* Sized, and nothing else: the glyph is `Steps`' own, at the size the slotted
      marks beside it take. Drawing a circle here instead is how two marks that
