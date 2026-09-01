@@ -193,9 +193,34 @@ for (const family of families) {
  * markdown with frontmatter and no live JSX, so the source is what a reader
  * wants and a conversion step would be a second thing that can be wrong. */
 const { pages: docPages } = await import('../../../helix/docs/src/registry.ts')
+/* **A page the registry names and the tree no longer has is skipped, loudly.**
+ *
+ * `regen` runs `analyze` at position 2, which builds this package, and `gen:docs`
+ * at position 9, which is what rewrites `pages.generated.ts`. Delete a page and
+ * the registry still names it for those seven steps, so opening it threw
+ * `ENOENT` and the whole chain stopped at position 2 — before the step that
+ * would have fixed it ever ran. The recovery was `turbo run docs` before
+ * `regen`, which is one command and was written down nowhere.
+ *
+ * **The message is the point, not the skip.** `No such file or directory` names
+ * a missing page and the fault is a stale registry, so a reader goes looking in
+ * the wrong place. Skipping without saying so would be worse than the crash: a
+ * page genuinely lost would build clean and be silently absent from the site.
+ * So this names the registry, names the generator that rewrites it, and counts
+ * what it dropped. */
+let stale = 0
 for (const page of docPages) {
-  const source = readFileSync(join(ROOT, 'helix/docs/content', `${page.slug}.mdx`), 'utf8')
-  writeFileSync(join(DOCS, `${page.slug}.md`), source)
+  const file = join(ROOT, 'helix/docs/content', `${page.slug}.mdx`)
+  if (!existsSync(file)) {
+    stale += 1
+    console.warn(
+      `catalog: pages.generated.ts names ${page.slug}.mdx and the tree does not have it, ` +
+        'so it is skipped. The registry is stale rather than the page missing: ' +
+        '`turbo run docs` rewrites it, and `regen` does that at position 9.',
+    )
+    continue
+  }
+  writeFileSync(join(DOCS, `${page.slug}.md`), readFileSync(file, 'utf8'))
 }
 
 /* The prose pages.
@@ -281,5 +306,6 @@ for (const route of routes()) {
 const elements = families.reduce((total, family) => total + family.elements.length, 0)
 console.log(
   `catalog: ${families.length} families, ${elements} elements, ${examples.length} examples, ` +
-    `${families.length * 2 + docPages.length + prose} files in public`,
+    `${families.length * 2 + docPages.length - stale + prose} files in public` +
+    (stale > 0 ? `, and ${stale} the registry named that the tree does not have` : ''),
 )
