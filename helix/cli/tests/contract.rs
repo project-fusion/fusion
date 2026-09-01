@@ -588,3 +588,73 @@ fn walk_files(directory: &Path, found: &mut Vec<PathBuf>) {
         }
     }
 }
+
+/// **`name` is a directory and a package name at once**, and holding it to
+/// neither wrote outside the working directory and produced manifests npm
+/// refuses. Absolute first, because `Path::join` replaces the base rather than
+/// appending, so that one is the escape.
+#[test]
+fn a_name_that_is_not_usable_as_both_is_refused() {
+    let at = scratch("names");
+    let escape = std::env::temp_dir().join("helix-new-must-not-exist");
+    let _ = std::fs::remove_dir_all(&escape);
+
+    for name in [
+        escape.to_string_lossy().as_ref(),
+        "../sibling",
+        "MyApp",
+        ".hidden",
+        "_leading",
+        "has space",
+        "",
+    ] {
+        let output = scaffold(&at, &["new", name, "--template", "react-vite"]);
+        assert_eq!(code(&output), 3, "`{name}` should be refused");
+        assert!(
+            err(&output).contains("cannot be a project name"),
+            "`{name}` should say why"
+        );
+    }
+    assert!(!escape.exists(), "an absolute name wrote nothing outside the cwd");
+}
+
+/// The three lines a reader is handed have to work, and with `--into` the first
+/// one named a directory this had not created.
+#[test]
+fn the_closing_hint_names_what_was_written() {
+    let at = scratch("hint");
+
+    let plain = scaffold(&at, &["new", "my-app", "--template", "react-vite"]);
+    assert_eq!(code(&plain), 0, "{}", err(&plain));
+    assert!(out(&plain).contains("cd my-app"), "relative to where they stand");
+
+    let into = scaffold(
+        &at,
+        &["new", "my-app", "--into", "apps/web", "--template", "react-vite"],
+    );
+    assert_eq!(code(&into), 0, "{}", err(&into));
+    assert!(out(&into).contains("cd apps/web"), "the directory it wrote");
+    assert!(!out(&into).contains("cd my-app"), "not the one it did not");
+}
+
+/// A wrong override sent a reader to look in `node_modules`, which the code had
+/// not consulted. Same shape as the `regen` failure that names a missing file
+/// when the fault is a stale registry.
+#[test]
+fn a_wrong_templates_override_says_so_rather_than_blaming_node_modules() {
+    let at = scratch("override");
+    let mut command = Command::new(binary());
+    command
+        .args(["new", "my-app", "--template", "react-vite"])
+        .current_dir(&at)
+        .env("NO_COLOR", "1")
+        .env("HELIX_TEMPLATES", at.join("nothing-here"));
+    let output = command.output().expect("the binary runs");
+
+    assert_eq!(code(&output), 3);
+    assert!(err(&output).contains("HELIX_TEMPLATES is set"));
+    assert!(
+        !err(&output).contains("nothing above this directory"),
+        "the node_modules walk never ran, so it must not be blamed"
+    );
+}

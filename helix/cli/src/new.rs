@@ -47,18 +47,62 @@ struct Template {
 /// **`HELIX_TEMPLATES` first**, for the same reason `HELIX_BIN` comes first in
 /// the npm shim: a caller who knows better should not have to argue, and the
 /// tests need a package that is not installed anywhere.
-fn locate(from: &Path) -> Option<PathBuf> {
+fn locate(from: &Path) -> Result<PathBuf, Failure> {
     if let Ok(named) = std::env::var("HELIX_TEMPLATES") {
         let path = PathBuf::from(named);
-        return path.join(REGISTER).is_file().then_some(path);
+        if path.join(REGISTER).is_file() {
+            return Ok(path);
+        }
+        /* **Named separately, because the walk below never ran.** Falling through
+        to the node_modules message sends a reader to look in a place this code
+        did not consult, which costs them the time it takes to rule out the thing
+        that was never wrong. */
+        return Err(Failure::input(
+            format!("cannot find {REGISTER} under {}", path.display()),
+            "HELIX_TEMPLATES is set, so that is where this looked and node_modules was not consulted",
+        ));
     }
     for directory in from.ancestors() {
         let candidate = directory.join("node_modules").join(PACKAGE);
         if candidate.join(REGISTER).is_file() {
-            return Some(candidate);
+            return Ok(candidate);
         }
     }
-    None
+    Err(Failure::input(
+        format!("cannot find {PACKAGE}"),
+        "it is resolved from node_modules, and nothing above this directory has it",
+    )
+    .hint("npm create helix-app@latest <name>"))
+}
+
+/// Holds `name` to being usable as both of the things it is.
+///
+/// **It is a directory and a package name at once**, which the argument's own
+/// help says, and nothing held it to either: an absolute one replaced the base in
+/// `Path::join` and wrote outside the working directory entirely, and any name
+/// npm forbids reached the manifest and failed the reader's first `npm install`.
+///
+/// The rule is npm's for an unscoped name, which is the stricter of the two and
+/// rules out every separator on the way.
+fn usable(name: &str) -> Result<(), Failure> {
+    let why = if name.is_empty() {
+        "it is empty"
+    } else if name.len() > 214 {
+        "npm allows at most 214 characters"
+    } else if name.starts_with('.') || name.starts_with('_') {
+        "npm refuses a name starting with a dot or an underscore"
+    } else if name.chars().any(char::is_uppercase) {
+        "npm refuses an uppercase letter in a new package name"
+    } else if !name
+        .chars()
+        .all(|one| one.is_ascii_lowercase() || one.is_ascii_digit() || "-._~".contains(one))
+    {
+        "a name is lowercase letters, digits, and `-._~`, so it is also a directory name"
+    } else {
+        return Ok(());
+    };
+    Err(Failure::input(format!("`{name}` cannot be a project name"), why)
+        .hint("helix new my-app --template react-vite"))
 }
 
 /// Every file under `directory`, as paths relative to it, in a stable order.
@@ -84,13 +128,8 @@ fn walk(directory: &Path, base: &Path, found: &mut Vec<PathBuf>) {
 /// [`Failure`] when the templates package is not resolvable, when the template
 /// is unknown, or when the target directory exists and holds anything.
 pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
-    let Some(package) = locate(from) else {
-        return Err(Failure::input(
-            format!("cannot find {PACKAGE}"),
-            "it is resolved from node_modules, and nothing above this directory has it",
-        )
-        .hint("npm create helix-app@latest <name>"));
-    };
+    usable(&args.name)?;
+    let package = locate(from)?;
 
     let raw = fs::read_to_string(package.join(REGISTER)).map_err(|failure| {
         Failure::new(
@@ -168,7 +207,13 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
             template.title,
             target.display()
         );
-        println!("\n  cd {}\n  npm install\n  npm run dev", args.name);
+        /* **The target rather than the name, and relative where it can be.**
+        With `--into` the two are different directories, and printing the name
+        handed a reader a `cd` into one this had just not created. Printing the
+        absolute path instead is correct and unreadable for the ordinary case, so
+        it is shortened back against where they are standing. */
+        let where_ = target.strip_prefix(from).unwrap_or(&target);
+        println!("\n  cd {}\n  npm install\n  npm run dev", where_.display());
     }
     Ok(Code::Ok)
 }
