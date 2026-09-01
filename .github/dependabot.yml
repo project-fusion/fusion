@@ -10,6 +10,23 @@
 # `release.yml` and `release-experimental.yml` decide what is published and
 # under whose authority, and a stale action there is a supply chain question
 # rather than a maintenance one.
+#
+# **`@types/node` majors are ignored, and the reason is already a rule.**
+# `fusion/cli/src/rules/node.rs` holds the type package to `engines.node`,
+# because the types declare what the standard library has: a major ahead of the
+# floor type-checks code using APIs added after the oldest Node this repository
+# supports, nothing fails here, and the consumer on the floor gets a `TypeError`
+# at run time for a call TypeScript approved. That rule's own comment says a
+# dependency bot proposes this every time Node ships a major, and is right about
+# the version and wrong about this repository.
+#
+# It was proposed anyway on 1 Sep 2026, `^22.10.0` to `^26.4.0` against a floor
+# of 22.18, and the rule refused it. The rule caught it and the pull request came
+# regardless, which is the judgment-per-pull-request the rule exists to end.
+# Ignoring the major closes that loop; minors and patches still arrive.
+#
+# **Raising the floor is what unblocks it**, in that order, and that is a
+# decision about who can install this rather than a maintenance chore.
 version: 2
 updates:
   - directory: /
@@ -21,6 +38,9 @@ updates:
         dependency-type: production
         patterns: ['*']
         update-types: [minor, patch]
+    ignore:
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
     open-pull-requests-limit: 5
     package-ecosystem: npm
     schedule:
