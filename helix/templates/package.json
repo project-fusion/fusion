@@ -16,16 +16,19 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./templates.json": "./templates.json"
   },
   "files": [
     "dist",
-    "templates"
+    "templates",
+    "templates.json"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "build": "bun run register && tsc -p tsconfig.json",
+    "register": "bun scripts/build-register.mjs",
+    "typecheck": "bun run register && tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "homepage": "https://fusion.dev",

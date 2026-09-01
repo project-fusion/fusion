@@ -20,6 +20,7 @@ mod config;
 mod error;
 mod exit;
 mod mcp;
+mod new;
 mod style;
 mod theme;
 
@@ -51,6 +52,7 @@ fn main() {
             Component::Check(args) => component::run::check(args, &from, cli.json, paint),
             Component::Fix(args) => component::run::fix(args, &from, cli.json, paint),
         },
+        Noun::New(args) => new::run(args, &from, cli.json, paint),
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
             Theme::Build(args) => theme::build::run(args, &from, cli.json),

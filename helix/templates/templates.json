@@ -1,0 +1,25 @@
+{
+  "placeholder": "__PROJECT_NAME__",
+  "templates": [
+    {
+      "description": "React and TypeScript on Vite. The shortest path to a running component.",
+      "id": "react-vite",
+      "named": [
+        "index.html",
+        "package.json",
+        "src/App.tsx"
+      ],
+      "title": "React (Vite)"
+    },
+    {
+      "description": "React and TypeScript on the Next.js App Router, with the elements registered once.",
+      "id": "react-nextjs",
+      "named": [
+        "app/layout.tsx",
+        "app/page.tsx",
+        "package.json"
+      ],
+      "title": "React (Next.js)"
+    }
+  ]
+}

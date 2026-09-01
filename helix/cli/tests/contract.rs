@@ -441,3 +441,150 @@ fn json_wins_over_plain() {
         .as_array()
         .is_some_and(|pairings| !pairings.is_empty())));
 }
+
+/* `helix new`, which is the one verb that writes a tree rather than a file.
+   Driven through `HELIX_TEMPLATES` at the package in this repository, so the
+   tests do not need it installed and do not assert against a copy that could
+   drift from the one shipped. */
+
+fn templates() -> PathBuf {
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path.pop();
+    path.join("templates")
+}
+
+fn scaffold(directory: &Path, args: &[&str]) -> Output {
+    let mut command = Command::new(binary());
+    command
+        .args(args)
+        .current_dir(directory)
+        .env("NO_COLOR", "1")
+        .env("HELIX_TEMPLATES", templates());
+    command.output().expect("the binary runs")
+}
+
+/// A directory of this test's own, removed first so a rerun is a fresh one.
+fn scratch(name: &str) -> PathBuf {
+    let path = std::env::temp_dir().join(format!("helix-new-{name}"));
+    let _ = std::fs::remove_dir_all(&path);
+    std::fs::create_dir_all(&path).expect("a scratch directory");
+    path
+}
+
+#[test]
+fn an_omitted_template_lists_them_and_succeeds() {
+    let at = scratch("omitted");
+    let output = scaffold(&at, &["new", "my-app"]);
+    assert_eq!(code(&output), 0, "asking what there is, is a question");
+    assert!(out(&output).contains("react-vite"));
+    assert!(!at.join("my-app").exists(), "listing writes nothing");
+}
+
+/// **`Failed` rather than `Input`**: the command line parsed and the answer is no.
+#[test]
+fn an_unknown_template_lists_them_and_fails() {
+    let at = scratch("unknown");
+    let output = scaffold(&at, &["new", "my-app", "--template", "svelte"]);
+    assert_eq!(code(&output), 1);
+    assert!(out(&output).contains("react-vite"), "it says what there is instead");
+    assert!(!at.join("my-app").exists());
+}
+
+#[test]
+fn it_writes_the_template_and_substitutes_only_the_named_files() {
+    let at = scratch("writes");
+    let output = scaffold(&at, &["new", "my-app", "--template", "react-vite"]);
+    assert_eq!(code(&output), 0, "{}", err(&output));
+
+    let project = at.join("my-app");
+    let manifest = std::fs::read_to_string(project.join("package.json")).expect("a manifest");
+    assert!(manifest.contains("\"name\": \"my-app\""));
+
+    /* The placeholder is gone from the whole tree, which is the assertion that
+    catches a `named` list missing a file: the register says which files carry it
+    and this says none of them still do. */
+    let mut found = Vec::new();
+    walk_files(&project, &mut found);
+    assert!(!found.is_empty(), "it wrote something");
+    for file in &found {
+        let read = std::fs::read_to_string(file).unwrap_or_default();
+        assert!(
+            !read.contains("__PROJECT_NAME__"),
+            "{} still holds the placeholder",
+            file.display()
+        );
+    }
+
+    /* A file the register does not name still travels, unchanged. */
+    assert!(project.join("vite.config.ts").is_file());
+}
+
+/// **The guard that matters**, there being no undo for a scaffolder that writes
+/// over somebody's work.
+#[test]
+fn it_refuses_a_directory_that_holds_anything() {
+    let at = scratch("occupied");
+    let project = at.join("my-app");
+    std::fs::create_dir_all(&project).expect("a directory");
+    std::fs::write(project.join("README.md"), "mine").expect("a file");
+
+    let output = scaffold(&at, &["new", "my-app", "--template", "react-vite"]);
+    assert_eq!(code(&output), 3);
+    assert!(err(&output).contains("is not empty"));
+    assert_eq!(
+        std::fs::read_to_string(project.join("README.md")).expect("still there"),
+        "mine",
+        "it wrote nothing over the file that was there"
+    );
+}
+
+#[test]
+fn an_existing_empty_directory_is_fine() {
+    let at = scratch("empty");
+    std::fs::create_dir_all(at.join("my-app")).expect("a directory");
+    let output = scaffold(&at, &["new", "my-app", "--template", "react-vite"]);
+    assert_eq!(code(&output), 0, "{}", err(&output));
+    assert!(at.join("my-app").join("package.json").is_file());
+}
+
+#[test]
+fn the_json_shape_is_parseable_and_names_what_it_wrote() {
+    let at = scratch("json");
+    let output = scaffold(&at, &["new", "my-app", "--template", "react-vite", "--json"]);
+    assert_eq!(code(&output), 0, "{}", err(&output));
+    let value: serde_json::Value = serde_json::from_str(&out(&output)).expect("parseable");
+    assert_eq!(value["name"], "my-app");
+    assert_eq!(value["template"], "react-vite");
+    assert!(value["files"].as_u64().unwrap_or(0) > 0);
+}
+
+/// Without the package there is nothing to read, and the message names the other
+/// door rather than leaving a reader to find it.
+#[test]
+fn it_says_so_when_the_templates_package_is_not_resolvable() {
+    let at = scratch("absent");
+    let mut command = Command::new(binary());
+    command
+        .args(["new", "my-app", "--template", "react-vite"])
+        .current_dir(&at)
+        .env("NO_COLOR", "1")
+        .env_remove("HELIX_TEMPLATES");
+    let output = command.output().expect("the binary runs");
+    assert_eq!(code(&output), 3);
+    assert!(err(&output).contains("@fusion.dev/helix-templates"));
+    assert!(err(&output).contains("npm create helix-app"));
+}
+
+fn walk_files(directory: &Path, found: &mut Vec<PathBuf>) {
+    let Ok(entries) = std::fs::read_dir(directory) else {
+        return;
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_dir() {
+            walk_files(&path, found);
+        } else {
+            found.push(path);
+        }
+    }
+}
