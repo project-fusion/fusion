@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
     "outDir": "dist",
+    "removeComments": true,
     "rootDir": "src"
   },
   "exclude": ["src/**/*.spec.ts", "src/*/.examples/**"],

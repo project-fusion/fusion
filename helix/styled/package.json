@@ -41,7 +41,7 @@
   "sideEffects": true,
   "scripts": {
     "analyze": "cem analyze --config custom-elements-manifest.config.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "styles": "build-styles . && build-elements-css .",
     "test": "bun run test:pure && bun run test:dom && bun run test:ssr",
     "test:dom": "bun test dom.spec",
