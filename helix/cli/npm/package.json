@@ -2,8 +2,8 @@
   "name": "@fusion.dev/helix-cli",
   "description": "The Helix command line, for a workspace that reaches it through npm.",
   "version": "0.0.9",
-  "private": true,
   "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
     "directory": "helix/cli/npm",
     "type": "git",
@@ -18,5 +18,17 @@
   },
   "scripts": {
     "test": "bun test"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "helix",
+    "cli",
+    "design-system",
+    "scaffold",
+    "theme"
+  ],
+  "publishConfig": {
+    "access": "restricted"
   }
 }
