@@ -73,6 +73,16 @@ pub enum Noun {
         verb: Component,
     },
 
+    /* **A noun with no verb, like `mcp` and for the opposite reason.** `new`
+    does one thing to one subject and there is no second verb it could take:
+    `helix new list` would be a word for what an omitted `--template` already
+    prints. */
+    /// Scaffold a project from a Helix template.
+    ///
+    /// Reads `@fusion.dev/helix-templates` from `node_modules`. Omit
+    /// `--template` to be shown what there is.
+    New(New),
+
     /// Derive, verify and inspect a theme.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Theme {
@@ -211,4 +221,24 @@ pub struct Rules {
     /// The workspace to read. Defaults to the current directory.
     #[arg(long)]
     pub root: Option<PathBuf>,
+}
+
+#[derive(Debug, Args)]
+pub struct New {
+    /// The project's name, and the directory it is written into.
+    ///
+    /// Written wherever the template's register says the name belongs, which is
+    /// its manifest and whatever else that template names.
+    pub name: String,
+
+    /// Which template to use.
+    ///
+    /// Omitted, the templates are listed and nothing is written: a scaffolder
+    /// that picks for you writes a project the reader did not choose.
+    #[arg(long)]
+    pub template: Option<String>,
+
+    /// Write into this directory instead of one named after the project.
+    #[arg(long)]
+    pub into: Option<PathBuf>,
 }

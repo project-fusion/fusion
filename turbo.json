@@ -177,6 +177,19 @@
       ],
       "outputs": ["references/component-reference.md"]
     },
+
+    // **Three more that declare a task without caching it, which is a real
+    // answer rather than a gap.** `tokens` counts every read of every token
+    // across two whole domains, so its key changes on nearly every commit and a
+    // cache would cost a hash to miss. `routes` is the same shape one step over.
+    // `samples` writes back into the files it reads, so its own output changes
+    // the key it was stored under and the next run always misses. Declared
+    // anyway, because `turbo run` needs the declaration and because a task in
+    // the graph can be depended on.
+    // The register the Rust door reads, generated from the TypeScript one the
+    // JavaScript door imports. Not cached: it is one file from one file and the
+    // check is cheaper than a cache lookup.
+    "register": { "cache": false },
     "routes": { "cache": false },
     "samples": { "cache": false },
 
@@ -263,15 +276,6 @@
       "inputs": ["src/tokens.ts", "$TURBO_ROOT$/helix/styles/scripts/build-token-layer.mjs"],
       "outputs": ["src/tokens.css", "tokens.json"]
     },
-
-    // **Three more that declare a task without caching it, which is a real
-    // answer rather than a gap.** `tokens` counts every read of every token
-    // across two whole domains, so its key changes on nearly every commit and a
-    // cache would cost a hash to miss. `routes` is the same shape one step over.
-    // `samples` writes back into the files it reads, so its own output changes
-    // the key it was stored under and the next run always misses. Declared
-    // anyway, because `turbo run` needs the declaration and because a task in
-    // the graph can be depended on.
     "tokens": { "cache": false },
     // **`^analyze` and not only `^build`, because the typings are analyzer
     // output.** `jsx.d.ts` is emitted by `analyze` and is gitignored, so on a

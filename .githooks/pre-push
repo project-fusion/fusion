@@ -104,6 +104,7 @@ for check in \
   "turbo run samples -- --check" \
   "turbo run routes -- --check" \
   "turbo run content -- --check" \
+  "turbo run register -- --check" \
   "turbo run themed-page -- --check" \
   "bun run check:gen:element-events" \
   "bun run check:gen:metrics" \

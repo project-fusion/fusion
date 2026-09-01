@@ -18,6 +18,7 @@
       "!**/.turbo",
       "!**/node_modules",
       "!**/custom-elements.json",
+      "!helix/templates/templates.json",
       "!helix/theme/rust/oracle.json",
       "!helix/theme/wasm",
       "!fusion/scripts/eval/questions.json",
