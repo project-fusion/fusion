@@ -7,19 +7,17 @@ import { styles } from './heatmap-root.css.js'
  * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
  *
  * @description
- * One grid, filled down the column and then across, which is what a calendar
- * heatmap is: a week is a column, so the strip reads left to right in weeks and
- * top to bottom in days. `rows="1"` makes it a single row without a second
- * layout.
+ * One grid, filled down the column then across: a week is a column, so the strip
+ * reads left to right in weeks and top to bottom in days. `rows="1"` makes it a
+ * single row.
  *
- * An empty cell takes the quietest ground the palette has rather than being
- * transparent. A strip of holes reads as a broken picture; a strip of empty
- * cells reads as a period with nothing in it, which is what it is.
+ * An empty cell takes the palette's quietest ground rather than being
+ * transparent, so a gap reads as a period with nothing in it rather than as a
+ * hole in the picture.
  *
- * **This tier is what a tone name is worth.** `tones="success"` and
- * `data-tone="danger"` reach the theme's status colors; `tones="1 2 3 4 5"`
- * reaches a five step ramp of one hue, which is the only thing a reader can
- * compare two cells by. Both are hooks, so a page may answer differently.
+ * `tones="success"` and `data-tone="danger"` reach the theme's status colors;
+ * `tones="1 2 3 4 5"` reaches a five-step ramp of one hue, which is the only
+ * thing two cells can be compared by.
  *
  * @since 0.1.0
  * @status experimental

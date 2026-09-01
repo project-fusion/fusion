@@ -97,18 +97,15 @@ pub enum Theme {
     Init(Init),
     /// Emit the theme as CSS.
     Build(Build),
-    /* **The one verb that is a report rather than an artifact**, and both of
-    its forms read one report, so neither is the authoritative one. */
     /// Report every pair the theme was checked against.
     ///
-    /// Exits 1 when a pair fails, so it works as a gate, and prints the whole
-    /// matrix either way, so it works as an answer. On a terminal it opens a
-    /// screen; anywhere else it prints the table.
+    /// Exits 1 when a pair fails, so it works as a gate, and prints the matrix
+    /// either way, so it works as an answer. Opens a screen on a terminal and
+    /// prints the table anywhere else.
     Audit(Audit),
     /// Fail if the theme has violations, and print nothing when it does not.
     ///
-    /// The CI shape of `audit`: same measurement, no output on success, so a
-    /// green pipeline stays quiet.
+    /// The CI shape of `audit`: same measurement, quiet on success.
     Check(Common),
 }
 
@@ -120,9 +117,8 @@ pub struct Common {
 
     /// Read the intent from here instead of searching.
     ///
-    /// The same thing the positional argument does, and it exists for the caller
-    /// who is already passing other flags and wants the source of the intent to
-    /// read as one of them. The positional wins if both are given.
+    /// The positional argument does the same; this reads better beside other
+    /// flags. The positional wins if both are given.
     #[arg(long, value_name = "PATH")]
     pub config: Option<PathBuf>,
 }
@@ -132,13 +128,10 @@ pub struct Audit {
     #[command(flatten)]
     pub common: Common,
 
-    /* **Not the CI flag**: without a tty the table is already what prints, so a
-    pipeline needs nothing, and a flag that had to be remembered there would be
-    one nobody remembered. */
     /// Print the table instead of opening the screen.
     ///
-    /// For scrolling your own scrollback, copying a row, or diffing two runs.
-    /// Not needed in a pipeline, where the table already prints.
+    /// For scrollback, copying a row, or diffing two runs. Not needed in a
+    /// pipeline, where the table already prints.
     #[arg(long)]
     pub plain: bool,
 }

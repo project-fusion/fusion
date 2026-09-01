@@ -4,13 +4,11 @@
 # conventional. It writes no labels: a reviewer wanting a different bump edits
 # the commit.
 #
-# The scope names the domain, and only `helix` and `cortex` publish. A scope of
-# `helix/cli` releases Helix; `fusion/site` and `turbo` release nothing. No
-# scope releases nothing.
+# The scope names the domain, and only `helix` and `cortex` publish: a scope of
+# `helix/cli` releases Helix, `fusion/site` and `turbo` release nothing.
 #
 # **`pull_request_target` with no checkout.** The token is writable, so the
-# commits are read as data through the API and the pull request's code is never
-# fetched or executed. Adding a checkout here would be the vulnerability.
+# commits are read as data through the API and never executed.
 name: release-intent
 
 on:
