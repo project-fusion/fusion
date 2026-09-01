@@ -416,7 +416,7 @@ on a dark icon reads as a bite taken out of the icon.
 | --- | --- | --- | --- | --- | --- |
 | `label` | `label` | `string` | `''` | `HelixHeadlessBadge` | Accessible name. |
 | `max` | `max` | `number \| undefined` | - | `HelixHeadlessBadge` | Cap for a numeric value. |
-| `tone` | `tone` | `'danger' \| 'neutral' \| undefined` | - | - | What the mark means. |
+| `tone` | `tone` | `'danger' \| 'neutral' \| undefined` | - | - | What the mark means, not how loudly it is drawn: the stylesheet picks a fill from what the count *is*. |
 | `value` | `value` | `string` | `''` | `HelixHeadlessBadge` | The count or short text to show. |
 
 #### Slots
@@ -2864,19 +2864,17 @@ A strip of cells colored by how each one went: uptime, contributions, activity.
 
 Extends `HelixHeadlessHeatmap`.
 
-One grid, filled down the column and then across, which is what a calendar
-heatmap is: a week is a column, so the strip reads left to right in weeks and
-top to bottom in days. `rows="1"` makes it a single row without a second
-layout.
+One grid, filled down the column then across: a week is a column, so the strip
+reads left to right in weeks and top to bottom in days. `rows="1"` makes it a
+single row.
 
-An empty cell takes the quietest ground the palette has rather than being
-transparent. A strip of holes reads as a broken picture; a strip of empty
-cells reads as a period with nothing in it, which is what it is.
+An empty cell takes the palette's quietest ground rather than being
+transparent, so a gap reads as a period with nothing in it rather than as a
+hole in the picture.
 
-**This tier is what a tone name is worth.** `tones="success"` and
-`data-tone="danger"` reach the theme's status colors; `tones="1 2 3 4 5"`
-reaches a five step ramp of one hue, which is the only thing a reader can
-compare two cells by. Both are hooks, so a page may answer differently.
+`tones="success"` and `data-tone="danger"` reach the theme's status colors;
+`tones="1 2 3 4 5"` reaches a five-step ramp of one hue, which is the only
+thing two cells can be compared by.
 
 #### Properties
 
