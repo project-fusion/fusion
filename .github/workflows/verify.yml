@@ -1,27 +1,17 @@
 # `verify` split across jobs, with the list of checks derived from `verify`.
 #
-# **This file argued against a matrix until 25 Aug 2026, and the objection was
-# right about the thing it was protecting.** It said: "Not a matrix of steps
-# mirroring what `verify` already does: that is a second definition of correct
-# to keep in step with the first, and the two drift the first time someone adds
-# a check to one of them." That is exactly the fault `.claude/rules/helix.md`
-# records elsewhere, a rule and its enforcement in different files with nothing
-# holding them together.
+# **The list is never mirrored here.** `run-checks.mjs` reads the `verify` script
+# and shards it, so adding a check to `verify` puts it in CI with no second edit,
+# and a step that is neither a check nor one of the dedicated jobs below fails
+# the run rather than being skipped. A matrix written out here would be a second
+# definition of correct, drifting the first time somebody edited one of them.
 #
-# What changed is not the argument but the mechanism. `run-checks.mjs` reads the
-# `verify` script and shards it, so the list is not mirrored here: adding a
-# check to `verify` puts it in CI with no second edit, and a step that is
-# neither a check nor one of the dedicated jobs below fails the run rather than
-# being skipped. The drift the comment feared is now impossible rather than
-# merely discouraged.
+# **The point of the split is reporting, not speed.** `verify` is `a && b && c`,
+# so it stops at the first failure; a shard runs every check it owns and reports
+# them together.
 #
-# **The reason worth the change is not speed.** `verify` is `a && b && c`, so it
-# reports one failure and stops. Four CI runs went to finding four stale
-# artifacts on 25 Aug 2026, one per run, because each fix revealed the next. A
-# shard runs every check it owns and reports all of them together.
-#
-# `verify` still never writes: `biome ci` rather than `biome check --write`, and
-# every shard ends by asserting the tree is unchanged.
+# `verify` never writes: `biome ci` rather than `biome check --write`, and every
+# shard ends by asserting the tree is unchanged.
 name: verify
 
 on:
@@ -38,20 +28,15 @@ concurrency:
 permissions:
   contents: read
 
-# **Turborepo's remote cache, and it is what makes the split affordable.** Every
-# task here declares `dependsOn: ^build`, so each job would otherwise rebuild
-# the workspace from cold: `bun run build` alone measured 76 seconds. Shared,
-# the build becomes a restore and the shards stop paying for it once each.
+# **The remote cache is what makes the split affordable.** Every task declares
+# `dependsOn: ^build`, so each job would otherwise rebuild the workspace from
+# cold. Absent the token turbo falls back to its local cache, so this is inert
+# rather than broken.
 #
-# Absent the token turbo falls back to its local cache and everything still
-# runs, so this is inert until the secret exists rather than broken without it.
-# **Both the slug and the id, because they are different variables.**
-# `TURBO_TEAM` takes the team's slug and `TURBO_TEAMID` takes its `team_`
-# identifier, and only the first was set. The runner reported "Insufficient
-# permissions to write to remote cache" with 19 misses and no hits, which reads
-# like a token problem and was not one: the token was scoped to the team and
-# Remote Cache was enabled for it. What settled it was the local link file,
-# which holds `{"teamId":"team_..."}` and no slug at all, and works.
+# **Both the slug and the id are needed.** `TURBO_TEAM` takes the slug and
+# `TURBO_TEAMID` the `team_` identifier. With only the slug set, the runner
+# reports "Insufficient permissions to write to remote cache", which reads like a
+# token problem and is not one.
 env:
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_TEAMID: ${{ vars.TURBO_TEAMID }}
@@ -154,10 +139,8 @@ jobs:
   # stage. They run beside this one instead, which is also what keeps the added
   # stage from being wall clock spent idle.
   #
-  # Measured across three runs on 26 Aug 2026. Run 32992956211 restored
-  # everything and its slowest job was 2m56s; runs 32999811605 and 32963727401
-  # each missed on three tasks and ran 3m17s to 3m42s, the difference being a
-  # 52 second build paid ten times over. This job pays it once.
+  # A cold build is about 52 seconds, and without this job every shard pays it.
+  # This job pays it once.
   #
   # **It costs a stage the wall clock did not have**, about 40 seconds on a run
   # that restores and 85 on one that does not. That is the trade: the ceiling
@@ -185,21 +168,14 @@ jobs:
       - run: bun run build
       - run: bun run analyze
       # `bunx`, because `turbo` is a workspace binary and a `run:` step does not
-      # get the PATH `bun run` arranges: bare `turbo` here is exit 127, which is
-      # the same fault `run-checks.mjs` carries a comment about after spawning
-      # it eleven times without one. `bunx biome` below is the existing shape.
+      # get the PATH `bun run` arranges: bare `turbo` here is exit 127.
       #
-      # And `turbo run catalog` rather than `bun run catalog`, which is not a
-      # script: the rename moved every generator behind `turbo`, and this job
-      # was written before it. It is the spelling `run-checks.mjs` already lists
-      # as one of its three prerequisites.
+      # `turbo run catalog` rather than `bun run catalog`, which is not a script.
       - run: bunx turbo run catalog
 
-  # **Ten shards rather than six, because `warm` changed what a shard costs.**
-  # A shard was 31 seconds of setup, a build it paid alone, and its share of the
-  # checks; the build is a restore now, so the share is most of what is left and
-  # splitting it is what moves the number. Measured 26 Aug 2026: the worst shard
-  # was 3m42s at six.
+  # **Ten shards, because `warm` makes the build a restore.** What is left in a
+  # shard is setup plus its share of the checks, so splitting the share is what
+  # moves the number.
   checks:
     needs: [plan, warm]
     runs-on: ubuntu-latest
@@ -371,35 +347,17 @@ jobs:
   # the ones worth most: a component can render perfect markup in the wrong
   # place and no DOM without layout will ever say so.
   #
-  # **Split because they were 390 seconds in a row behind one build.** Measured
-  # 25 Aug 2026: contrast 87, specs 80, build 78, smoke 75, playwright 26,
-  # visual 15. Nothing here needs anything another one produces, so the only
-  # thing the sequence bought was one build instead of four. In parallel the
-  # wall clock is the build plus the slowest of them.
-  #
-  # **Which is the case for the remote cache rather than against the split.**
-  # Four cold builds cost four times the compute for the same wall clock; four
-  # restores cost almost nothing.
-  #
-  # **The cache has write access now, and that was not sufficient on its own.**
-  # This paragraph used to end by saying the split traded compute for latency
-  # until `TURBO_TOKEN` could write, which it can: run 32999811605 logged
-  # `Remote caching enabled` and `17 cached, 20 total`. The three that missed
-  # were correct misses, the commit having changed `helix/styled/src` and
-  # `helix/headless/src`, and every job missed them together because they all
-  # start at once. A cache nothing has written to yet is cold however warm the
+  # **Split because nothing here needs what another produces**, so a sequence
+  # bought one build and paid for it in wall clock. In parallel the wall clock
+  # is the build plus the slowest of them, and the remote cache makes that build
+  # a restore. A cache nothing has written to yet is cold however warm the
   # credentials are, which is what `warm` above is for.
   #
-  # The matrix is written out rather than derived, unlike `checks`: these six
-  # are not in `verify` and there is no list to read. Adding a browser check
-  # means adding it here, which is the drift `run-checks.mjs` exists to avoid
-  # and is unavoidable for a set that lives nowhere else.
-  #
-  # **The count in this comment is part of that drift and had already slipped.**
-  # It read "four" against a matrix of five when `parity` was added, `diagnostics`
-  # having arrived without it. A number kept by hand beside a list is the thing
-  # the paragraph above is warning about, so if it is wrong again, trust the
-  # matrix.
+  # The matrix is written out rather than derived, unlike `checks`: these are not
+  # in `verify` and there is no list to read. Adding a browser check means adding
+  # it here, which is the drift `run-checks.mjs` exists to avoid and is
+  # unavoidable for a set that lives nowhere else. Do not write the count into
+  # this comment; it slipped once already. Trust the matrix.
   browser:
     # `plan` decides whether this matrix can fail at all for the diff in hand,
     # and `warm` means the build below is a restore. Skipped is neither a
@@ -421,15 +379,10 @@ jobs:
     # own failure is what the gate catches, so the safe case is unchanged.
     if: needs.plan.outputs.browser != 'false'
     runs-on: ubuntu-latest
-    # Forty-five because `parity` needs it and the others are billed for what
-    # they use rather than for the ceiling. Measured 28 Aug 2026: the check
-    # compares 610 examples in 701 seconds on an M-series Mac, and the 20 it
-    # used to share left it about ten after checkout, install, build and
-    # `playwright install`. It never once finished: three runs, three
-    # `cancelled` conclusions, which report as neither pass nor fail and read  # dialect:quoted, GitHub spells this conclusion value so
-    # in the summary as a job that simply did not object. That is the fault
-    # `check:spec:floors` exists to catch, one level up, in the workflow rather than
-    # in the script.
+    # Sized for `parity`, which compares every example pair and needs most of
+    # it; the others are billed for what they use rather than for the ceiling.
+    # Too low and the job is `cancelled`, which reports as neither pass nor fail  # dialect:quoted, GitHub spells this conclusion value so
+    # and reads in the summary as a job that did not object.
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -586,12 +539,9 @@ jobs:
   # a skipped required check is not a failing one, so the rule would pass on a
   # red run. `always()` makes it run regardless and the result expression is
   # what fails it.
-  # **`skipped` is now two different things and this rule is right about both.**
-  # A job skipped because `plan` scoped it out is a job that could not have
-  # failed, and a job skipped because the thing it needed failed sits beside a
-  # `failure` that this expression reads. So neither case needs a clause: the
-  # first passes because nothing was wrong, the second fails on the upstream
-  # result rather than on the skip.
+  # **`skipped` needs no clause of its own.** A job `plan` scoped out could not
+  # have failed, and a job skipped because what it needed failed sits beside a
+  # `failure` this expression already reads.
   verify:
     if: always()
     needs: [plan, warm, checks, floors, lint, types, tests, browser]

@@ -36,11 +36,9 @@
 # can disagree and somebody has to remember which of the four combinations is
 # meant. These have one meaning each and a reader can hold them in order.
 #
-# **`off` exists because absent is ambiguous.** Unset means the same thing, and it
-# also means "nobody has set this yet" and "somebody deleted it": moving the
-# repository in Aug 2026 emptied every variable, and nothing distinguished a
-# pipeline deliberately held from one whose switch had been lost. `off` is the
-# state that says a person decided.
+# **`off` exists because absent is ambiguous.** Unset also means "nobody has set
+# this yet" and "somebody deleted it" — a repository transfer empties every
+# variable. `off` is the state that says a person decided.
 #
 # **Publishing is switched off, deliberately, and this is the switch.**
 #
@@ -77,12 +75,9 @@ jobs:
   # was open, from the same commits, so by here it is confirmed rather than
   # guessed.
   #
-  # **It used to be a label.** The argument was that Conventional Commits would
-  # cost the history its sentences, so the machine-readable part went beside the
-  # commit rather than in it. The repository took the other side, and a second
-  # channel for one fact is a second place for it to be wrong: the label was the
-  # copy that could drift from what was actually merged, and nothing compared
-  # them.
+  # **Never a label.** A second machine-readable channel for one fact is a second
+  # place for it to be wrong, and the copy that is not in the commit is the one
+  # that drifts from what was merged.
   #
   # **`fetch-depth: 0`, because the range is the point.** A merge commit's second
   # parent is what the pull request brought, and a shallow clone has neither
@@ -161,37 +156,28 @@ jobs:
 
       # bun runs the repo; npm does the publishing, and trusted publishing needs
       # npm 11.5.1 or later on Node 22.14 or later.
-      # **No `registry-url`, and that is the whole of the authentication.**
-      # `setup-node` writes an `.npmrc` when given one, carrying
-      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`, which is
-      # `setup-node`'s own variable and not the `NPM_TOKEN` the steps below
-      # read. Nothing sets it, so that line resolves to an empty string and
-      # npm reads itself as configured with a credential: it stops before the
-      # OIDC exchange, publishes as nobody, and the registry refuses the write.
+      # **Never add `registry-url`, and this is the whole of the
+      # authentication.** Given one, `setup-node` writes an `.npmrc` carrying
+      # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` — its own variable,
+      # not the `NPM_TOKEN` the steps below read. Nothing sets it, so npm reads
+      # itself as configured with a credential, stops before the OIDC exchange,
+      # publishes as nobody, and the registry refuses the write.
       #
-      # **A refused write is reported as a 404**, so this arrived as
-      # `404 Not Found - PUT .../@fusion.dev%2fhelix-core` and read like a
-      # missing package on a package that exists and had a trusted publisher
-      # registered against exactly this workflow and environment. Measured
-      # 31 Aug 2026 on the first release job that ever ran.
-      #
-      # The default registry is already npmjs.org, so the line bought nothing
-      # even when it worked.
+      # **A refused write is reported as a 404**, naming the package as if it did
+      # not exist, so this failure does not look like an auth failure. The
+      # default registry is already npmjs.org, so the line buys nothing anyway.
       - uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
 
-      # The pin above meets half that floor and `setup-node` undoes the other
-      # half: it installs whatever npm ships with the Node it pins, and 22.20.0
-      # ships npm 10.9.x, which predates trusted publishing entirely. The floor
-      # was written above for months with nothing enforcing it, and a run that
-      # finds out reports an authentication failure rather than naming a
-      # version, so it reads as a registry problem and not a runner one.
+      # `setup-node` installs whatever npm ships with the Node it pins, and
+      # 22.20.0 ships npm 10.9.x, which predates trusted publishing. Without
+      # this the run reports an authentication failure rather than naming a
+      # version, so it reads as a registry problem and is a runner one.
       #
-      # Pinned rather than floated to `^11.5.1`: 11.18.0 is the npm the packages
-      # were bootstrapped with by hand, so CI authenticates the way the registry
-      # has already accepted, and a bad npm release cannot reach a publish job
-      # on its own.
+      # Pinned rather than floated to `^11.5.1`: this is the npm the packages
+      # were bootstrapped with, so CI authenticates the way the registry has
+      # already accepted, and a bad npm release cannot reach a publish job.
       - run: npm install -g npm@11.18.0
 
       - run: bun install --frozen-lockfile
@@ -257,12 +243,10 @@ jobs:
       # the same job on the same runner, so anything that could read one could
       # read the other.
       #
-      # **It must not reach the publish step.** That authenticates by OIDC and
-      # has to find no credential at all: `registry-url` on `setup-node` used to
-      # leave an empty `_authToken` behind, npm read itself as configured, never
-      # exchanged the token, and the registry refused the write as a 404. A
-      # token in the job's environment would do the same thing on purpose, which
-      # is why this sits on the step rather than on the job.
+      # **It must not reach the publish step**, which authenticates by OIDC and
+      # has to find no credential at all. A token in the job's environment would
+      # make npm read itself as configured and skip the exchange, which is why
+      # this sits on the step rather than on the job.
       #
       # `run-template-test.mjs` writes the `.npmrc` into the scratch project
       # itself when it sees this, so nothing outside that directory is
@@ -351,12 +335,11 @@ jobs:
           # version computation reads, taken from the other side.
           prev=$(git tag --list "$domain-v*" --sort=-v:refname | head -1)
 
-          # **The first release states its size rather than listing it.** With
-          # no previous tag the range is the whole history, which is 1,202
-          # commits under `helix/` as of 28 Aug 2026: a release body no one
-          # reads and close enough to GitHub's size limit to fail on its own
-          # one day. Naming the count says what is not listed, where a `head -n`
-          # would have read as a complete list that happened to be short.
+          # **The first release states its size rather than listing it.** With no
+          # previous tag the range is the whole history: a release body nobody
+          # reads and close enough to GitHub's size limit to fail. Naming the
+          # count says what is not listed, where a `head -n` would read as a
+          # complete list that happened to be short.
           # A merge commit's subject carries the number and its body is the
           # pull request title, so the two become one line. Anything else keeps
           # its subject.
@@ -497,9 +480,9 @@ jobs:
           # pushes as `github-actions[bot]`, which is not this ruleset's bypass
           # actor, and `main` refuses it.
           #
-          # It cannot be unset. `checkout@v7` no longer writes that header into
-          # `.git/config`: it writes it to a file under `_temp` and pulls it in
-          # with `includeIf.gitdir`, so `--unset-all --local` does not see it and
-          # exits 5. Emptying the value resets the multi-valued list for this one
-          # command, which leaves the URL as the only credential on offer.
+          # It cannot be unset. `checkout@v7` writes the header to a file under
+          # `_temp` and pulls it in with `includeIf.gitdir`, so
+          # `--unset-all --local` does not see it and exits 5. Emptying the value
+          # resets the list for this one command, leaving the URL as the only
+          # credential on offer.
           git -c http.https://github.com/.extraheader= push origin HEAD:main
