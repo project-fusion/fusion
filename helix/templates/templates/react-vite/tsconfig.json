@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2023"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2023",
+    "types": [
+      "@fusion.dev/helix/jsx"
+    ],
+    "verbatimModuleSyntax": true,
+    "noEmit": true
+  },
+  "include": [
+    "src"
+  ]
+}

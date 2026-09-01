@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>__PROJECT_NAME__</title>
+
+    <!-- The base layer: tokens, the reset, and the utility layer. -->
+    <link rel="stylesheet" href="node_modules/@fusion.dev/helix-styles/all.css" />
+    <!-- Hides each tag until its definition lands, so nothing arrives unstyled. -->
+    <link rel="stylesheet" href="node_modules/@fusion.dev/helix/elements.css" />
+    <link rel="stylesheet" href="styles.css" />
+
+    <script type="module" src="node_modules/@fusion.dev/helix/dist/index.js"></script>
+  </head>
+  <body>
+    <helix-flex align="center" direction="column" gap="lg">
+      <helix-text as="h1">__PROJECT_NAME__</helix-text>
+      <helix-text>Every component here is a custom element. No framework required.</helix-text>
+      <helix-button emphasis="solid" tone="primary">Get started</helix-button>
+    </helix-flex>
+  </body>
+</html>

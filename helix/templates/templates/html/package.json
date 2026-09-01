@@ -1,0 +1,13 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve ."
+  },
+  "dependencies": {
+    "@fusion.dev/helix": "^0.0.9",
+    "@fusion.dev/helix-styles": "^0.0.9"
+  }
+}
