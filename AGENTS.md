@@ -97,6 +97,12 @@ push, sharded across `plan`, `warm`, `checks`, `lint`, `types`, `tests` and six
 `browser` jobs, on a clean checkout, and it is better at every part of that than
 a laptop is.
 
+**Deleting a documentation page wants `turbo run docs` before `regen`.** `regen`
+runs `analyze` at position 2 and `gen:docs` at 9, so for seven steps the registry
+still names a page the tree no longer has. `catalog` skips it and says so now
+rather than dying on it, but the run still writes a site missing that page until
+the registry catches up, and the warning names the command.
+
 **What CI cannot do is regenerate**, which is the one thing worth checking before
 a push. `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a
 red build that stays red until somebody runs `turbo run tokens` and
