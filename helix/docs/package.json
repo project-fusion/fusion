@@ -25,7 +25,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "docs": "node scripts/build-docs.mjs",
     "peers": "bun scripts/build-peers.mjs",
     "test": "bun test src",

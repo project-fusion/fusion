@@ -1,8 +1,17 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "declaration": true,
-    "declarationMap": true,
+    // Comments are stripped from the emitted JavaScript and kept in the
+    // declarations, which takes two passes because `removeComments` strips
+    // both. `tsconfig.types.json` is the second, and every publishable package
+    // runs it after this one.
+    //
+    // The JavaScript comments reach no reader: a consumer bundles and minifies,
+    // and unminified they were 71 per cent of `helix/headless/dist`, 307 KB of
+    // it gzipped. The declaration comments are what an editor shows on hover,
+    // which every peer ships and none strips.
+    "declaration": false,
+    "declarationMap": false,
     "esModuleInterop": true,
     "exactOptionalPropertyTypes": true,
     "experimentalDecorators": true,
@@ -18,6 +27,7 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "removeComments": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
