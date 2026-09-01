@@ -1,0 +1,41 @@
+{
+  "name": "@fusion.dev/helix-templates",
+  "description": "Starter templates for Helix, as data. Read by `helix new` and by `npm create helix-app`.",
+  "version": "0.0.9",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "helix/templates",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "helix",
+    "templates",
+    "scaffold",
+    "design-system"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
