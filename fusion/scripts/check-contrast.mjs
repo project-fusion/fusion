@@ -307,11 +307,11 @@ for (const mode of ['light', 'dark']) {
              read 1:1. */
             const masked = style.maskImage !== 'none' && style.maskImage !== ''
             const paint = masked ? null : parse(style.backgroundColor)
-            /* **A modal's scrim is a `::backdrop`, and it has no node.** So the
-             walk used to step straight past it and measure a glass drawer over
-             the page rather than over the scrimmed page, which is wrong in the
-             optimistic direction: the scrim pulls the ground toward the middle,
-             and a translucent panel carries that through to its own inks.
+            /* **A modal's scrim is a `::backdrop` and has no node**, so a walk
+             that steps past it measures a glass drawer over the page rather than
+             over the scrimmed page — wrong in the optimistic direction, since
+             the scrim pulls the ground toward the middle and a translucent panel
+             carries that through to its own inks.
              `getComputedStyle` reads a pseudo-element by name, and an element
              not in the top layer answers with the initial transparent, so this
              costs one read and needs no test for modality.
