@@ -24,35 +24,16 @@ const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
  *
  * @description
  * **It has no opinion about where it sits.** A chat is asked for as a floating
- * button, a page, a palette, a sidebar, a modal and an inline block, and none of
- * those is a variant of a conversation: they are containers a conversation is
- * put in, and the containers already exist. `Popover` and `SpeedDial` make the
- * floating one, `Drawer` the sidebar, `Dialog` the modal, `Command` the palette,
- * and a page is a page. Nothing here is positioned, nothing here has a backdrop,
- * and nothing here owns a trigger, because a trigger opens a container and
- * containers own their own. If a form factor needs a mode on this element, the
- * split is wrong.
+ * button, a page, a palette, a sidebar, a modal and an inline block, and none
+ * of those is a variant of a conversation: they are containers, and the
+ * containers already exist. Nothing here is positioned, nothing has a backdrop,
+ * and nothing owns a trigger. If a form factor needs a mode on this element,
+ * the split is wrong.
  *
- * **Scroll ownership is the behavior everything else depends on, and it is the
- * most-got-wrong thing in the category.** A transcript that grows wants to stay
- * at the bottom, except when the reader has scrolled up to read, where pinning
- * is hostile. The rule: pin while the reader is within `threshold` of the
- * bottom, release the moment they leave it, and offer a way back. **Never scroll
- * a reader who is reading.**
- *
- * The element owns it, because it is the only party that knows a message arrived
- * and where the viewport was when it did. `pinned` announces before it moves, so
- * a consumer who wants to own it refuses the request and assigns their own.
- *
- * **The live region announces on completion, not on arrival.** The transcript is
- * `role="log"` with `aria-live="polite"`, and a streaming message carries
- * `aria-busy` while it arrives: a screen reader reading a stream token by token
- * is unusable, and holding the announcement until the flag clears is the only
- * arrangement that works. Somebody typing is a separate status region, so it
- * never interleaves with what was said.
- *
- * **Not a client.** No transport, no protocol, no model. It renders a
- * conversation and reports what the reader did.
+ * **Scroll ownership is the behavior everything else depends on.** A transcript
+ * that grows wants to stay at the bottom, except when the reader has scrolled
+ * up to read, where pinning is hostile. The rule: pin while the reader is
+ * within `threshold` of the bottom, and let go the moment they leave it.
  *
  * @since 0.1.0
  * @status experimental

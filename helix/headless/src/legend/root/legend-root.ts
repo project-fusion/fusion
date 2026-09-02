@@ -11,32 +11,14 @@ const PALETTE = 24
  * @description
  * A legend is a list, so it is a list: not part of a chart, and shared by
  * whichever of them needs one. It takes its entries from the same table the
- * chart reads, through `for`, so the two cannot disagree about how many series
- * there are or what they are called.
+ * chart reads, through `for`, so the two cannot disagree.
  *
- * `entries` picks which way to read that table, and the two ways are the two
- * shapes a chart comes in. `series` is one entry per data column, named by the
- * header row, which is a line or a bar chart. `categories` is one entry per
- * body row, named by its row header, which is a donut: its slices are the rows,
- * and it has no axis to write their names along.
+ * `entries` picks which way to read that table. `series` is one entry per data
+ * column, named by the header row, which is a line or a bar chart.
+ * `categories` is one entry per body row, which is a donut: its slices are the
+ * rows and it has no axis to write their names along.
  *
- * **The table is resolved on the client and there is no server pass.** `for` is
- * an id and resolving it wants a document, which the server render does not
- * have, so a legend ships empty and fills in on hydration. The table itself is
- * ordinary markup and is served whole, so nothing is missing from the page
- * before then, only from this list.
- *
- * The table is watched, because a legend that goes stale when its data changes
- * is a legend that has to be told, and nothing else in the page would know to
- * tell it.
- *
- * **Not hidden from a screen reader, though the mapping it draws is a color
- * one.** The argument for hiding it is real: the colors mean nothing to a
- * reader who cannot see them, and the names are already in the table. It stays
- * because the cost of being wrong runs one way. A duplicated list of three
- * words is noise; a consumer who took the table out of the accessibility tree
- * and then found the legend hidden too has a chart nobody can read, and neither
- * decision announces itself.
+ * **The table is resolved on the client and there is no server pass.**
  *
  * @since 0.1.0
  * @status experimental

@@ -39,17 +39,13 @@ const SCRUB_FINE = 16
  * @summary A number a reader types or steps to.
  *
  * @description
- * **A family rather than `Input`'s `type="number"`, and rather than a part of
- * it.** `Input` already takes that type and will keep it: a bare numeric field
- * in a form is a text field with a different keyboard, and that is all it needs
- * to be. This is a different control. It renders two buttons, binds four keys
- * that `Input` does not, and owns clamping and stepping, so it is an alternative
- * and not a variant. Namespacing it under `Input` would say it is contained by
- * one, which is what `IconButton` is top-level for.
+ * **A family rather than `Input`'s `type="number"`.** It renders two buttons,
+ * binds four keys `Input` does not, and owns clamping and stepping, so it is an
+ * alternative and not a variant.
  *
  * **The field is `type="text"` with `inputmode="decimal"`, and that is a
- * measurement rather than a preference.** Asked of a real browser, `type=number`
- * fails three ways this control cannot live with:
+ * measurement.** Asked of a real browser, `type=number` fails three ways this
+ * control cannot live with:
  *
  * ```
  * typed "12e" into type=number  → .value === ""
@@ -58,21 +54,16 @@ const SCRUB_FINE = 16
  * same keystrokes into type=text → .value === "12e"
  * ```
  *
- * The first is fatal on its own: the element cannot see what the reader typed,
- * so a controlled value is destroyed by a keystroke and there is nothing left to
- * correct or to report. The second changes a value because a page scrolled past.
- * The third means the caret cannot be managed at all, which any correcting or
- * formatting field needs. `inputmode` is what keeps the phone keypad, which is
+ * The first is fatal alone: the element cannot see what the reader typed. The
+ * second changes a value because a page scrolled past. The third means the
+ * caret cannot be managed at all. `inputmode` keeps the phone keypad, which is
  * the one thing `type=number` was giving.
  *
  * Validity is still the platform's, through `min`, `max` and `step` mirrored
- * onto the host's own `setValidity`. What is not mirrored is the field's
- * `type`, because a text field has no opinion about numbers.
+ * onto the host's own `setValidity`.
  *
- * **Stepping is separate from typing.** A reader mid-way through "1" of "12"
- * has not asked for anything to be clamped, so the value is only pulled into
- * range when they step, blur, or the form asks. Clamping on every keystroke is
- * what makes a field that cannot be typed backwards into.
+ * **Stepping is separate from typing**, so a reader mid-way through a number is
+ * not corrected under their hands.
  *
  * @since 0.1.0
  * @status experimental

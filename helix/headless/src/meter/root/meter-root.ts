@@ -12,31 +12,13 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * **Not `Progress`, and the difference is the whole component.** A progress bar
  * reports how far along a task is: it starts empty, ends full, and full is
  * always the good end. A meter reports a level in a range that is not going
- * anywhere, and which end is good is a fact about the thing being measured.
- * Disk usage, a battery, a score, a rate limit. So there is no `indeterminate`
- * here: a measurement whose value is unknown is not a measurement.
+ * anywhere, and which end is good is a fact about the thing measured. So there
+ * is no `indeterminate`: a measurement whose value is unknown is not one.
  *
- * **`low`, `high` and `optimum` are the reason it exists**, and they follow the
- * HTML specification's own rule. The three thresholds cut the range into a low
- * band, a middle and a high band, and `optimum` says which of the three is the
- * one to be in. The band the value falls in is then the good one, the one next
- * to it is fair, and the one two away is poor.
- *
- * **Without thresholds there are no bands, and this is where it parts company
- * with `<meter>`.** The platform defaults `optimum` to the midpoint and both
- * thresholds to the ends, so a bare `<meter value="20" max="100">` computes as
- * optimum and every browser paints it green. A gauge with nothing said about it
- * is not good news; it is a reading. Declared thresholds turn the color on.
- *
- * **And the bands are drawn as well as colored.** A tick sits at `low` and at
- * `high`, so the reading can be placed against them without seeing color at
- * all, which is the same call the carousel's current dot makes by lengthening
- * rather than only changing color.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * **`low`, `high` and `optimum` are the reason it exists**, following the HTML
+ * specification's own rule. The three cut the range into a low band, a middle
+ * and a high band, and `optimum` says which is the one to be in; the band next
+ * to it is fair and the one two away is poor.
  *
  * @since 0.1.0
  * @status stable

@@ -46,29 +46,13 @@ const dates = (value: string): string[] =>
  * @description
  * **The calendar is `helix-date-picker`, not a second one written here.** It
  * already knows about months, ranges, disabled days, the first day of the week
- * and every keyboard rule a grid owes a reader, and a picker that reimplemented
- * a tenth of that would be a worse grid that also had to be maintained. This
- * element is the field, the overlay, and the translation between them.
+ * and every keyboard rule a grid owes a reader. This element is the field, the
+ * overlay, and the translation between them.
  *
- * **Typed as well as picked, and the typing is the reason it is not
+ * **Typed as well as picked, and the typing is why it is not
  * `<input type="date">`.** The native control gives a free picker and a free
- * locale and takes almost all styling with it, which is a fair trade until a
- * product needs the calendar to match everything around it. What is kept from
- * the native one is the part worth keeping: a real text field, so a reader who
- * knows the date types it and never opens anything.
- *
- * **The value is `YYYY-MM-DD`, always.** That is what a form submits, what
- * `min` and `max` compare against, and what the calendar speaks. What the field
- * *shows* is the same string: a locale-formatted display would have to be parsed
- * back on every keystroke, and half-typed input does not survive a round trip
- * through a formatter. The same reasoning the sandbox records for its two
- * syntaxes, which is that a document being edited must not be a rendering of
- * something else.
- *
- * **Opening does not commit.** The calendar announces a date, this element takes
- * it, and the overlay shuts, because a single date has nothing more to say. A
- * consumer who owns `value` answers the announcement the way they answer any
- * other control here.
+ * locale and takes almost all styling with it. What is kept from it is the part
+ * worth keeping: a real text field.
  *
  * @since 0.1.0
  * @status experimental

@@ -49,38 +49,20 @@ interface EyeDropperConstructor {
  * @summary Picks a color, from a square and two ramps.
  *
  * @description
- * **The picker itself, with no field around it.** Color Input is this element in
- * a panel behind a text field, the same way Date Input is `helix-date-picker` in a
- * panel: a form wants a field, and a settings pane or a toolbar wants the picker
- * sitting flat on the page with nothing to open. Neither should be the other one
- * with parts hidden.
+ * **The picker itself, with no field around it.** Color Input is this element
+ * in a panel behind a text field; a settings pane or a toolbar wants the picker
+ * flat on the page with nothing to open.
  *
- * **The square is two real range inputs.** Saturation and brightness are each an
- * `<input type="range">`, laid over the square and made invisible, and the
- * handle is drawn from their values. The pointer gets the square; the keyboard
- * gets the arrow keys, Home, End and the page keys; a screen reader gets two
- * sliders that announce a name and a number. All of it is the platform's, and
- * nothing here implements a key handler. There is no `role="application"`, which
- * is the usual way this control is built and amounts to asking a screen reader
- * to stop helping.
+ * **The square is two real range inputs.** Saturation and brightness are each
+ * an `<input type="range">`, laid over the square and made invisible, and the
+ * handle is drawn from their values. The keyboard, the announcements and the
+ * touch targets are the platform's, and there is no `role="application"`.
  *
  * **The working model is HSB, and the value is derived from it.** The reverse
  * loses colors: black is `brightness: 0`, whose hue and saturation are both
- * undefined, so a reader who drags to the bottom of the square and back would
- * get gray where they had red. Holding the model means a color survives a trip
- * through one that has no hue. A value arriving from outside is read into the
- * model once, which is the only moment the conversion runs in that direction.
- *
- * **Every syntax is read; the one `format` names is written.** `#f00`,
- * `#ff0000`, `rgb(255 0 0)`, `rgba(255,0,0,.5)` and `hsl(0 100% 50%)` are all
- * colors. Named colors are the exception, and deliberately: resolving
- * `rebeccapurple` means shipping a table of a hundred and forty or asking the
- * browser, and there is no browser during a server render.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * undefined, so dragging to the bottom of the square and back would give gray
+ * where there had been red. A value arriving from outside is read into the
+ * model once.
  *
  * @since 0.1.0
  * @status experimental

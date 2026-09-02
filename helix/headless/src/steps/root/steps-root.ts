@@ -12,34 +12,16 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * @summary A sequence of stages, and where the reader is in it.
  *
  * @description
- * **`active` names where the reader is. `complete` stays on each step.** They
- * are two different facts and only one of them is positional. Deriving both
- * from a position is the obvious design and it is wrong the first time anybody
- * steps back: return to stage one of three and stages one and two are still
- * finished, while "everything before the active one" says only the first is.
- * So this element drives `current` and never touches `complete`.
+ * **`active` names where the reader is. `complete` stays on each step.** Only
+ * one of them is positional: return to stage one of three and stages one and
+ * two are still finished, where "everything before the active one" says only
+ * the first is. So this element drives `current` and never touches `complete`.
  *
  * **`active` is optional, and a sequence without it still renders.** Left
- * unset, each step's own `current` stands and nothing here overwrites it, which
- * is what lets the whole sequence be right in the server's markup: this element
- * would have to count its slotted children to know which one is third, and the
- * server has no children to count. Set it, and it wins, because it is a
- * statement about the sequence where the attribute on a step is a statement
- * about one step.
- *
- * That is also why the numbering is not JavaScript. It is a CSS counter in the
- * tier above, which the browser resolves at layout with no script at all, so
- * the third step reads "3" in the server's own markup.
- *
- * **The connector belongs to the step, not to the list.** Each one draws the
- * line that arrives at it and hides it when it is first, the same arrangement
- * Breadcrumbs uses for its separator and for the same reason: a line drawn
- * between items needs either an index or a parent that counts, and drawing it
- * on the item needs neither.
- *
- * `role="list"` on the host rather than an `<ol>` in the shadow root. The steps
- * are the consumer's elements in the light DOM, so an `<ol>` here would be a
- * list whose items are somewhere else.
+ * unset, each step's own `current` stands, which is what lets the whole
+ * sequence be right in the server's markup: this element would have to count
+ * its slotted children to know which is third, and the server has none to
+ * count.
  *
  * @since 0.1.0
  * @status experimental

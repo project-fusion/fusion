@@ -12,35 +12,16 @@ import { property, state } from 'lit/decorators.js'
  *
  * @description
  * A table of contents, named for the job. It sits beside `Navigation`, which is
- * the same job at the other scale: one navigates a site, the other navigates a
- * document. `Contents` and `TableOfContents` are both taken by something else,
- * `display: contents` and the `content` part in one case and the `Table` family
- * in the other.
+ * the same job at the other scale: one navigates a site, the other a document.
  *
- * **The links are the consumer's own anchors**, the same as `Navigation`. A router
- * renders its own `<a>` and cannot render one inside this shadow root, and the
- * hrefs are fragments the page already knows.
+ * **The links are the consumer's own anchors.** A router renders its own `<a>`
+ * and cannot render one inside this shadow root, and the hrefs are fragments
+ * the page already knows.
  *
- * **What is current is decided by position, not by intersection.** The obvious
- * build is an `IntersectionObserver` with a thin band near the top of the
- * window, and it fails in both directions: with headings far apart nothing is
- * in the band and the marker goes out entirely, and with headings close
- * together several are and it flickers between them. So the observer is only
- * the *trigger*, and the answer is computed from where the headings actually
- * are: the current section is the last one whose top has passed the reading
- * line, or the first heading before any of them has.
- *
- * That rule is what a reader means. Two headings on screen at once are not
- * ambiguous to a person: they are reading under the upper one.
- *
- * **`aria-current="location"`, and it is written onto the consumer's anchor.**
- * This library does not normally write to light-DOM children, because an
- * attribute added after upgrade is one a server's markup never had. It is right
- * here for the reason `Carousel` names its slides: what is current is derived
- * from scroll position, so no server could have rendered it and there is
- * nothing for hydration to disagree with. `location` rather than `page`, which
- * is what `Navigation` uses: `page` means this is the page, and every one of these
- * is the same page.
+ * **What is current is decided by position, not by intersection.** An
+ * `IntersectionObserver` with a band near the top fails in both directions:
+ * with headings far apart nothing is in the band and the marker goes out, and
+ * with headings close together several are in it at once.
  *
  * @since 0.1.0
  * @status experimental

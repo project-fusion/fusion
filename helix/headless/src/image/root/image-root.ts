@@ -7,31 +7,14 @@ import { property, state } from 'lit/decorators.js'
  *
  * @description
  * **An element rather than a recipe, because of the part CSS cannot do.**
- * Reserving the box is `aspect-ratio` and needs nothing from anybody; `Link` and
- * the megamenu row are recipes in `preview.css` for exactly that reason. What
- * cannot be written as a rule is *when the picture arrived*: a stylesheet has no
- * way to know, and no way to hear that it never will. So this owns three states
- * and the two events that move between them, and leaves the box to the
+ * Reserving the box is `aspect-ratio` and needs nothing from anybody. What
+ * cannot be written as a rule is *when the picture arrived*: a stylesheet has
+ * no way to know, and no way to hear that it never will. So this owns three
+ * states and the two events that move between them, and leaves the box to the
  * stylesheet.
  *
  * **The placeholder is a slot with nothing in it by default.** A default of
- * `Skeleton` would be right and is not written here: this tier renders no other
- * component, and reaching for one would make the headless package depend on the
- * styled one. The styled tier draws the resting placeholder instead, and a
- * consumer who wants a `Skeleton`, a blurred thumbnail or a solid color slots
- * it.
- *
- * **No source is a loading state, not a fourth one.** A picture whose `src` has
- * not arrived yet is the common case for anything drawn from data, and the
- * useful answer there is the same as for one still on the wire: stand something
- * in its place and keep the ground reserved. So an element with no `src` shows
- * its placeholder and waits, rather than resolving to an empty box that has to
- * be laid out twice.
- *
- * **`alt` is a property and not an afterthought.** An empty string is a real
- * answer, meaning the picture is decoration and a screen reader should skip it,
- * which is why the attribute is always written even when it is empty: omitting
- * it entirely makes a reader announce the file name instead.
+ * `Skeleton` would make this tier depend on a component it does not ship.
  *
  * @since 0.1.0
  * @status experimental

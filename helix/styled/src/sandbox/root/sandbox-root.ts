@@ -34,41 +34,20 @@ const PANEL_MAX = 0.8
  * @summary Pairs an editable source pane with a live preview.
  *
  * @description
- * Coordination is by event, the same way the accordion does it: a source pane
- * dispatches `helix-before-edit`, which bubbles, and the sandbox hands the value to
- * whatever preview is slotted into it. Neither child knows the other exists, so
- * either can be replaced or used alone.
+ * Coordination is by event: a source pane dispatches `helix-before-edit`, which
+ * bubbles, and the sandbox hands the value to whatever preview is slotted into
+ * it. Neither child knows the other exists, so either can be replaced or used
+ * alone.
  *
  * The event carries the pane's `name`, which is what lets one sandbox hold
- * several panes without the root identifying senders by reference. `html` is
- * the preview's markup and `css` is its stylesheet. A pane named anything else
- * is showing something rather than driving it, and is ignored: the sandbox has
- * a pane rendering the example as JSX, and guessing would have put the text of
- * a React component into the preview.
+ * several panes: `html` is the preview's markup and `css` its stylesheet. A
+ * pane named anything else is showing something rather than driving it, and is
+ * ignored.
  *
- * **The dividers are two nested `helix-splitter`s, not a grid this element
- * drags itself.** The pointer handling, the keyboard handling and the corner are
- * all the splitter's, and the corner arrives on its own wherever a nested
- * splitter crosses the one it is in.
- *
- * The panes are the inner splitter and the panel is the outer one, which is the
- * order that makes the panel span the full width: the outer divider runs edge to
- * edge and the inner stops at it.
- *
- * **Both are controlled from here, so `split` and `panel-size` stay the truth.**
- * A splitter that owned its own position would leave this element reporting one
- * arrangement and showing another, and a consumer restoring a saved layout
- * writes to these two properties. Each splitter announces where it wants to go
- * and this answers, which is the same contract a form control has with a
- * framework.
- *
- * **The panel is in pixels here and a percentage in the splitter, and the
- * conversion belongs here.** A terminal wants a number of lines rather than a
- * share of the window, so its height should not change when the window does. A
- * splitter has no business knowing that, so it stays percentage-pure and this
- * element, which does know what is in the panel, holds the box and converts.
- * That is also what keeps a stored `panelSize` from a previous visit meaning
- * what it meant when it was written.
+ * **The dividers are two nested `helix-splitter`s**, not a grid this element
+ * drags itself, so the pointer handling, the keyboard handling and the corner
+ * are all the splitter's. The panes are the inner splitter and the panel is the
+ * outer one, which is the order that makes the panel span the full width.
  *
  * @since 0.1.0
  * @status experimental

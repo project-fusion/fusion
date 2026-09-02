@@ -20,39 +20,21 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  *
  * @description
  * Renders a real `<input>`, so the caret, selection, autofill, spellcheck, the
- * password manager, and the on-screen keyboard a phone chooses all come from the
- * platform. `delegatesFocus` puts focus on it, and it serializes into the
- * server's markup, so the field is usable before any script loads.
+ * password manager and the on-screen keyboard a phone chooses are all the
+ * platform's. It serializes into the server's markup, so the field is usable
+ * before any script loads.
  *
- * **The input inside a shadow root submits nothing**, because the form is on the
+ * **The input inside a shadow root submits nothing**, the form being on the
  * other side of the boundary. The host is form-associated instead and reports
- * its own value through `ElementInternals`, which is also what carries validity
- * and what answers a form reset.
+ * its own value through `ElementInternals`, which also carries validity and
+ * answers a form reset.
  *
- * `value` and `defaultValue` are separate for the reason `checked` and
- * `defaultChecked` are: `value` is what is in the field now and
- * `defaultValue` is what the markup asked for, which is where a reset returns
- * to and is gone the moment anyone types.
+ * `value` and `defaultValue` are separate the way `checked` and
+ * `defaultChecked` are: `value` is what is in the field now, `defaultValue` is
+ * what the markup asked for and where a reset returns to.
  *
- * **Validity is the platform's.** The `type` and `required` are set on the real
- * input and its `validity` is copied onto the host, so an email field rejects
- * what the browser says is not an email rather than what a regular expression
- * here guesses. What this adds is the anchor, so `reportValidity` points the
- * bubble at the input rather than at the host.
- *
- * `pattern`, `minlength` and `maxlength` are forwarded with them.
- *
- * **`clearable` and `reveal` are the field's, not the consumer's.** Neither is
- * a slot's worth of variation: one empties the value, the other flips the type,
- * and both want the same position, the same size and the same disabled
- * behavior. The `end` slot stays for what actually varies, a unit or a prefix.
- *
- * Both opt in rather than following from `type`, and are booleans that default
- * to false. A Lit boolean property that defaults to *true* cannot be turned off
- * from HTML at all, only from script, which is the wrong way round for
- * revealing a password: a consumer should have to ask for it. Drawer's `modal`
- * defaults true for the opposite reason, that losing a focus trap by forgetting
- * a word is worse than having to say so.
+ * **Validity is the platform's.** `type` and `required` are set on the real
+ * input and its `validity` is copied onto the host.
  *
  * @since 0.1.0
  * @status experimental

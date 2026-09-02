@@ -16,29 +16,14 @@ const CONFIRM = 1600
  * @description
  * **The confirmation is the component.** Writing to the clipboard is three
  * lines; what makes this worth an element is that the platform gives a reader
- * no feedback at all. A press that copies and looks identical to a press that
- * failed is a control nobody trusts, so they press it again, and the second
- * press is indistinguishable from the first.
+ * no feedback at all, so a press that copies looks identical to one that
+ * failed.
  *
  * **Announced after the write, never before.** A clipboard write is a
- * permission the browser may refuse, and it is refused for real reasons: an
- * insecure origin, a document that is not focused, a user agent that requires a
- * gesture this press did not qualify as. So the confirmation and the event both
- * wait for the promise, and a refusal leaves the button exactly as it was.
- * `HelixCopyEvent` is not cancelable for the same reason: by the time there is
- * anything to say, it has already happened.
- *
- * **An icon button, extending IconButton.** Both of this button's faces are
- * icons and it never carries a word, so it is the square control rather than a
- * text button that happens to hold a glyph: it inherits the square box, and
- * with it the rule that an icon-only control must be named. `label` is not
- * optional here for the same reason it is not optional there, and the two
- * faces make it sharper: the accessible name has to describe the press, not
- * whichever picture is showing when a reader arrives.
- *
- * `data-copied`, not a reflected `copied`. State never reflects here: a
- * serialized `copied` attribute would come back from a paste as a button
- * claiming to have copied something it never held.
+ * permission the browser may refuse, for real reasons: an insecure origin, a
+ * document that is not focused, a gesture that did not qualify. The
+ * confirmation and the event both wait for the promise, and a refusal leaves
+ * the button exactly as it was.
  *
  * @since 0.1.0
  * @status experimental

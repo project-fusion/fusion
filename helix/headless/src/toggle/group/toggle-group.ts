@@ -17,32 +17,14 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  *
  * @description
  * The indicator is one element that travels, not a background that appears on
- * whichever item is current. That difference is the whole point: a fill that
- * swaps is two things changing at once and reads as a flicker, while one that
- * moves is a single object the eye follows, and it says where the selection
- * came from as well as where it went.
+ * whichever item is current. A fill that swaps is two things changing at once
+ * and reads as a flicker; one that moves is a single object the eye follows,
+ * and it says where the selection came from as well as where it went.
  *
- * Its whole box is measured from the selected item and written onto
- * the indicator as custom properties, because labels are different lengths and
- * no proportion of the group is the right answer. Measurement is client-side by
- * necessity, so the server renders the indicator hidden and it fades in once it
- * has somewhere to be, which is the harmless direction: it appears rather than
- * jumping from a wrong place.
- *
- * A radio group, and only that. Navigation is links marked with `aria-current`
- * and styled by the `data-navigation-item` recipe: radio semantics would announce a
- * set of destinations as a set of choices. A tab controls a panel.
- *
- * Being a radio group, it is a form control, and it says so through
- * `HelixFormElement`: it reports its value under a `name`, comes back to the
- * markup's choice on reset, and restores the one a reader made when the browser
- * brings a form back.
- *
- * The semantics were already right: the host has carried `role="radiogroup"`
- * and the items `role="radio"` from the start. What none of it did was reach a
- * form. A button in a shadow root submits nothing whatever its role, so the
- * value has to be reported by the host, which is the only thing a form can
- * see.
+ * Its box is measured from the selected item and written onto the indicator as
+ * custom properties, labels being different lengths. Measurement is client-side
+ * by necessity, so the server renders the indicator hidden and it fades in once
+ * it has somewhere to be, which is the harmless direction.
  *
  * @since 0.1.0
  * @status experimental

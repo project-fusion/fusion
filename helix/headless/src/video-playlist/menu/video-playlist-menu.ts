@@ -21,35 +21,13 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  * @description
  * The entries again, reachable without leaving the picture. A playlist beside
  * the player is a list a reader scrolls to; the same list in the control bar is
- * one they open over the video, which is what a full-screen player has and what
- * a phone has room for.
+ * one they open over the video.
  *
  * **It is placed by the consumer, not rendered by the playlist**, and that is
- * forced rather than chosen. A shadow root cannot project into a sibling's
+ * forced rather than chosen: a shadow root cannot project into a sibling's
  * light DOM, so nothing the playlist renders can land inside the player's
  * control bar. What can is an element the consumer writes there, which is what
- * `Video`'s `controls` slot is for:
- *
- * ```html
- * <helix-video-playlist>
- *   <helix-video slot="player" controls>
- *     <helix-video-playlist-menu slot="controls"></helix-video-playlist-menu>
- *   </helix-video>
- *   <helix-video-playlist-item value="one" src="/one.mp4">One</helix-video-playlist-item>
- * </helix-video-playlist>
- * ```
- *
- * So it finds its playlist upward rather than being handed one, and that chain
- * crosses a shadow boundary in the ordinary arrangement, which is why it is
- * `closestInstance` and not `closest`.
- *
- * **Choosing dispatches `helix-select`, the same event an entry dispatches.**
- * It never writes `active` on the playlist, which looks like the shorter path
- * and skips the cancelable request: an assignment applies the change with no
- * `helix-before-activate` for anyone to refuse. Announcing is what an entry
- * does, the playlist already listens for it, and a consumer refusing a
- * selection gets `preventDefault()` on one event rather than two paths that
- * behave differently.
+ * `Video`'s `controls` slot is for.
  *
  * @since 0.1.0
  * @status experimental

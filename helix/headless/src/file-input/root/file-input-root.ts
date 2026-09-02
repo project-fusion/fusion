@@ -68,29 +68,12 @@ const kind = (file: File): string => {
  * replaced.** It is the only way to open a file picker: the dialog is a
  * privileged action a script cannot start on its own, and it opens for a click
  * on the input or on a `<label>` pointing at it. A component that draws its own
- * button ends up calling `.click()` on a hidden input anyway, and then has two
- * things a screen reader can find where there is one control.
+ * button calls `.click()` on a hidden input anyway, and then has two things a
+ * screen reader can find where there is one control.
  *
- * So the input stays, holds the label, the name, the validity and the focus,
- * and the visible trigger is a `<label for>` rather than a button. A label is
- * not focusable and does not need to be: the input is, and Enter and Space on it
- * open the picker because that is what the platform does with a file input.
- *
- * **Dropping is why this is a component rather than an attribute.** A bare file
- * input accepts a drop only on the input itself, which is invisible here, so the
- * field is the drop target and it says when something is over it.
- *
- * **Files are not a value a consumer can hand back.** Every other control here
- * takes the controlled and uncontrolled pair, and this one does not: a `FileList`
- * cannot be constructed from markup, and browsers refuse a consumer writing
- * `value` on a file input outright, because a page that could name a file could
- * read it. So this element owns what was chosen, announces it, and offers
- * `clear()` for the one change a consumer can legitimately ask for.
- *
- * **The list under it is the control's own, not decoration.** A file input with
- * files chosen reports "3 files" and nothing else, which is unusable for
- * checking that the right ones were picked. The names are rendered, and each
- * carries the way to take it back out.
+ * So the input stays, holding the label, the name, the validity and the focus,
+ * and the visible trigger is a `<label for>`. A label is not focusable and does
+ * not need to be: the input is, and Enter and Space on it open the picker.
  *
  * @since 0.1.0
  * @status stable

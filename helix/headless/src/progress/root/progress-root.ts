@@ -7,32 +7,15 @@ import { property } from 'lit/decorators.js'
  *
  * @description
  * Determinate by default, and `indeterminate` for a task whose total is not
- * known yet. `Loader` is still the right answer where the wait is short or has
- * no place of its own on the page; a bar earns its width where the work is the
- * subject of the region it sits in.
+ * known yet. `Loader` is still right where the wait is short or has no place of
+ * its own on the page.
  *
  * A bar that fills at a made-up rate would be a bar that lies, so the
  * indeterminate one does not fill: it runs a segment across the track, which
- * says work is happening and claims no proportion at all. `aria-valuenow` is
- * omitted with it, which is the platform's own signal for the same thing.
+ * says work is happening and claims no proportion. `aria-valuenow` is omitted
+ * with it, which is the platform's own signal for the same thing.
  *
  * **The fill is a fraction of the track, written as a custom property.**
- * `--progress-fraction` is derived from `value` and `max` rather than measured,
- * so it renders on a server with no layout and needs nothing after upgrade. That
- * is what keeps it out of the class of geometry this library writes only on the
- * client. A consumer never sets it: it carries a number this element computed
- * and CSS cannot, which is what lets a stylesheet draw the thing without
- * measuring anything itself.
- *
- * **`value` is clamped, and out-of-range input is not an error.** A count that
- * runs past its own total is ordinary in real applications, and a bar that
- * overflows its track or reports `aria-valuenow` above `aria-valuemax` is worse
- * than one that reads as finished.
- *
- * Semantics are on the host through `ElementInternals`, the same as everywhere
- * else: a `role` in the shadow root announces correctly and leaves the host
- * anonymous to anything walking the light DOM, and a `role` written onto the
- * host as an attribute is one a server's markup never had.
  *
  * @since 0.1.0
  * @status stable

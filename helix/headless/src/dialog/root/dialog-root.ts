@@ -14,37 +14,15 @@ import { property } from 'lit/decorators.js'
  * @description
  * A real `<dialog>` opened with `showModal()`, not a div with a role and a
  * hand-built trap. The platform gives four things that are each a day's work to
- * reimplement and easy to get subtly wrong: the top layer, so the dialog is
- * above everything regardless of what `z-index` anyone else wrote; a real
- * backdrop; Escape; and inert-behind, so the page underneath is not reachable
- * by pointer, keyboard, or a screen reader's virtual cursor.
+ * reimplement: the top layer, so the dialog is above everything whatever
+ * `z-index` anyone wrote; a real backdrop; Escape; and inert-behind, so the
+ * page underneath is unreachable by pointer, keyboard or virtual cursor.
  *
  * **`open` drives `showModal()`, and every way it can close comes back through
- * `requestOpen`.** A native dialog can close from three directions: the
- * property, Escape, and a `<form method="dialog">` submit inside it. Left
- * alone, two of those would shut the dialog while the consumer's state still
- * said open, which is the bug that makes a modal impossible to reopen. Escape
- * is intercepted and routed through the request, so `preventDefault()` on the
- * `helix-before-close` refuses it; a close that happens anyway is reflected back.
- *
- * **Nothing here traps focus.** `showModal()` does it, and better: `inert` on
- * the rest of the document is something no JavaScript trap can achieve.
- * `FocusTrapController` stays for the surfaces that are not modal.
- *
- * The regions are bare slots rather than wrappers, for the reason the card's
- * are: an unassigned `<slot>` is `display: contents` and generates no box, so a
- * dialog with no footer has no empty band where one would be.
- *
- * Opened declaratively with the platform's invoker attributes:
- *
- * ```html
- * <helix-button commandfor="confirm" command="--show">Delete…</helix-button>
- * <helix-dialog id="confirm">…</helix-dialog>
- * ```
- *
- * `--show`, `--close` and `--toggle`. Custom commands rather than the built-in
- * `show-modal`, because those are defined against native elements and do
- * nothing when pointed at a custom one.
+ * `requestOpen`.** A native dialog closes from three directions: the property,
+ * Escape, and a `<form method="dialog">` submit. Left alone, two of them would
+ * shut the dialog while the consumer's state still said open, which is the bug
+ * that makes a modal impossible to reopen.
  *
  * @since 0.1.0
  * @status stable

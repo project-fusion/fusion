@@ -62,32 +62,12 @@ const THICKNESS: Record<string, number> = {
  * The chart with the narrowest honest use, so the component is narrow too.
  *
  * **It reads one column and treats the rows as the parts.** Every other chart
- * here takes a column per series; a ring has one whole to divide, and a second
- * ring inside the first is two charts sharing a picture in the most literal
- * way. So the first column of numbers is the series and each row is a slice.
+ * here takes a column per series; a ring has one whole to divide, so the first
+ * column of numbers is the series and each row is a slice.
  *
- * **It refuses negative values rather than drawing them.** A share of a whole
- * cannot be less than nothing, and an arc for a negative number either runs
- * backwards over its neighbors or is silently dropped. Those rows are skipped
- * and the total is of what is left, which is the only reading that stays true.
- *
- * **The shape is drawn with a dashed stroke, not with arc commands.** One
- * `<circle>` per slice, its dash set to the slice's share of the circumference
- * and its offset to where the slice begins. Arc paths need the sweep flag and a
- * large-arc flag, both of which flip at values a reader never sees coming, and
- * a slice of exactly one whole becomes a path with no length at all.
- *
- * **And it keeps its aspect ratio**, alone among the charts here. The others
- * set `preserveAspectRatio="none"` so one drawing fills any box and rescue
- * their strokes with `vector-effect`; that rescues strokes and not geometry, so
- * a ring drawn the same way is an ellipse in anything but a square.
- *
- * The table is the accessible representation and this drawing is `aria-hidden`.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * **It refuses negative values rather than drawing them.** An arc for a
+ * negative number either runs backwards over its neighbors or is silently
+ * dropped. Those rows are skipped and the total is of what is left.
  *
  * @since 0.1.0
  * @status experimental

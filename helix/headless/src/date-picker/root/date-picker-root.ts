@@ -91,44 +91,19 @@ const addMonths = (date: Date, months: number): Date => {
  *
  * @description
  * A grid of days, per the APG date grid: the whole grid is one tab stop, arrows
- * move by day and week, `PageUp` and `PageDown` move by month, and `Home` and
- * `End` go to the ends of the week. Only the focused cell is in the tab
- * sequence.
+ * move by day and week, `PageUp` and `PageDown` by month, `Home` and `End` to
+ * the ends of the week. Only the focused cell is in the tab sequence.
  *
- * Roving `tabindex` is written on the cells, which is free here because they
- * are rendered into this shadow root rather than being markup a consumer wrote.
+ * **Dates are `YYYY-MM-DD` strings and every calculation is in UTC.** A
+ * local-time `Date` shifts across a timezone or a daylight-saving boundary.
  *
- * Dates are `YYYY-MM-DD` strings and every calculation is in UTC. A local-time
- * `Date` shifts across a timezone or a daylight-saving boundary, so the string
- * is what the component holds and the arithmetic never leaves UTC.
+ * `month` is what the grid shows, separately from `value`, so paging does not
+ * select anything and a consumer can drive the view. Left unset it follows the
+ * first selected date, then the current month.
  *
- * `month` is what the grid shows, separately from `value`, so paging through
- * months does not select anything and a consumer can drive the view. Left
- * unset, it follows the first selected date, and then the current month.
- *
- * `mode` decides how many dates are held. Absent takes one. `range` takes two
- * and marks everything between them, starting over on the third click rather
- * than replacing an end at random. `multiple` toggles, so clicking a chosen
- * date takes it out. All three read and write the same comma-separated
- * `value`.
- *
- * `locale` is worth setting where the output is compared across environments.
- * Left unset, month and day names come from the runtime's own locale, and a
- * server and a browser need not agree on what that is.
- *
- * A control whose value changes dispatches `helix-before-change`:
- * `Input`, `Select`, `Listbox`, `Radio.Group` and `Toggle.Group` all do, and a
- * calendar submitting a date is the same kind of thing. `helix-select` stays
- * what it is elsewhere, which is a row or an item being chosen in something
- * that reports no value at all, such as `Menu` or `Tree`.
- *
- * Paging is `helix-navigate` and not either of those, because it chooses
- * nothing: the view moves and the answer does not.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * `mode` decides how many dates are held: absent takes one, `range` takes two
+ * and marks everything between them, `multiple` toggles. All three read and
+ * write the same comma-separated `value`.
  *
  * @since 0.1.0
  * @status experimental

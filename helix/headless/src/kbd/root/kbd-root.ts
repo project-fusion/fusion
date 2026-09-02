@@ -89,38 +89,20 @@ const onApple = (): boolean =>
  *
  * @description
  * Renders a real `<kbd>`, so the passage still means "press this" to anything
- * reading the markup rather than only to a reader looking at it.
+ * reading the markup.
  *
- * **One key per element, with `keys` as the stated exception.** A *sequence* is
+ * **One key per element, with `keys` as the stated exception.** A sequence is
  * several of these with the separator written between them as ordinary text,
- * because that separator is prose: it is "then" in a sequence and "plus" in a
- * simultaneous press, and a component that inserted one would have to guess
- * which. `keys` cannot be guessing, since a chord written `mod+k` has said
- * which it is.
+ * because that separator is prose: "then" in a sequence, "plus" in a chord, and
+ * a component inserting one would have to guess which.
  *
  * **`keys` exists because the glyphs were being typed by hand and were wrong.**
  * A literal `⌘K` in a template tells a reader on Windows to press a key their
- * keyboard does not have, and nothing catches it, a string being a string.
- * Given `mod` this renders `⌘K` on Apple and `Ctrl+K` everywhere else.
+ * keyboard does not have, and nothing catches it. Given `mod` this renders
+ * `⌘K` on Apple and `Ctrl+K` everywhere else.
  *
- * **`within` is what binds it, and it is absent by default.** Without it this
- * draws a key and listens for nothing, which is what every existing use of this
- * component wants. The two values are the two honest lifetimes:
- *
- * - `control` listens within the element's own parent, which is the case this
- *   is mostly for: a hint sitting inside the control it belongs to, where the
- *   shortcut should work while that control has focus and stop existing when
- *   the control does.
- * - `document` listens on the document, for a chord that works from anywhere.
- *
- * **A hidden `kbd` is a dead shortcut, and that is the point rather than a
- * trap.** Binding here ties the key to its own advertisement, so a hint that is
- * not rendered is a shortcut that is not offered. A chord that must outlive its
- * label is a chord whose owner is not a label: give it to whatever owns the
- * action and let this element only describe it.
- *
- * Nothing binds until this upgrades, so a shortcut is not available in the
- * moments before hydration.
+ * **`within` is what binds it, and it is absent by default**, so this draws a
+ * key and listens for nothing unless asked.
  *
  * @since 0.1.0
  * @status stable

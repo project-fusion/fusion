@@ -7,37 +7,17 @@ import { property } from 'lit/decorators.js'
  *
  * @description
  * Tracks whether the page has scrolled and carries it as the custom state
- * `scrolled`, so the styled tier can lift the bar off the page without a scroll
- * handler of its own. Scroll position is the one piece of state the server
- * genuinely cannot know, so it is read on connect rather than derived: a fresh
- * load starts at the top, which is what the server rendered, and a reload
- * part-way down corrects on hydration.
+ * `scrolled`, so the styled tier can lift the bar without a scroll handler of
+ * its own. It is read on connect rather than derived: a fresh load starts at
+ * the top, which is what the server rendered, and a reload part-way down
+ * corrects on hydration.
  *
  * **A custom state and never `data-scrolled`.** An attribute the element writes
  * onto its own host is one the server did not send, so a hydrating framework
- * reports the tree as mismatched, intermittently: only when the reader reloads
- * far enough down the page to pass the threshold. A consumer can answer that
- * only by suppressing hydration warnings on an element they did not write.
- * `ElementInternals.states` is deliberately not in the DOM, so there is nothing
- * for a hydration pass to disagree with, and `:state(scrolled)` selects it. The
- * base class made the same move for `data-settled` and its note explains the
- * rest.
- *
- * The listener is passive and reads `scrollY` only, so it never blocks
- * scrolling.
- *
- * Three regions, each in its own wrapper, because the row is a grid and a grid
- * needs three items to put the middle one in the middle. A bare slot is
- * `display: contents`, so its assigned elements become grid items themselves:
- * two actions would take two tracks and push the navigation off center. These
- * wrappers earn their boxes, which is the test; they carry no inset or fill of
- * their own, so an empty one still paints nothing.
- *
- * The host is the banner and spans the viewport; the row inside it is what gets
- * centered. A banner that is itself narrowed leaves its background stopping
- * short of the window edges, which reads as a floating bar rather than as the
- * top of the page. That needs one element and one row, not a wrapper as well:
- * the host carries the material and `content` carries the measure.
+ * reports a mismatch, intermittently: only when the reader reloads far enough
+ * down the page. `ElementInternals.states` is not in the DOM, so there is
+ * nothing for a hydration pass to disagree with, and `:state(scrolled)` selects
+ * it.
  *
  * @since 0.1.0
  * @status stable
