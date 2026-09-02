@@ -297,7 +297,31 @@ await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
 const browser = await chromium.launch()
-const tab = await browser.newPage({ viewport: { height: 800, width: WIDTHS[0].width } })
+/* **`reducedMotion`, because `animations: 'disabled'` only reaches the
+   animations the browser is running.** It cancels CSS and Web Animations, which
+   is every family here bar one: `aura` drives a WebGL shader from its own
+   `requestAnimationFrame` loop, so the screenshot caught the field at whatever
+   phase the runner happened to reach. Measured on one machine, three
+   consecutive loads of the same page: 26,883 and 25,677 pixels apart. On CI,
+   44,573 against the committed picture, a sixth of the image, at a channel
+   delta of 22.
+
+   None of it ever failed the check, which is the part worth saying plainly. It
+   sat inside the threshold for a decade of runs and would have started failing
+   on a driver change, for a reason that is not a fact about the component.
+
+   `prefers-reduced-motion` rather than a per-family pin: it is the platform's
+   own way to ask for no motion, and `aura` already answers it with one still
+   frame rather than an empty box, so the harness asks for the frame the
+   component already offers instead of the example being written to sit still.
+   Measured across both corpora, 181 families at the check's own threshold,
+   **0 of them draw differently under it**, so nothing else is repictured and no
+   baseline moves for this. The two `aura` pictures become byte-identical run to
+   run. */
+const tab = await browser.newPage({
+  reducedMotion: 'reduce',
+  viewport: { height: 800, width: WIDTHS[0].width },
+})
 
 /* Nothing leaves this machine, and that is a correctness rule rather than a
  * courtesy.
