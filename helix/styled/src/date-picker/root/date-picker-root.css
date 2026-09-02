@@ -1,6 +1,4 @@
 :host {
-  display: inline-block;
-
   /* Two sizes, not one. The column track is what the grid is laid out on, and
      the day is the smaller shape centered in it. The difference is the space
      between days, and it belongs to the track rather than to a `gap`, so a
@@ -8,6 +6,7 @@
   --_calendar-track: var(--date-picker-track-size, 2.5rem);
   --_calendar-row: var(--date-picker-row-size, 2.25rem);
   --_calendar-day: var(--date-picker-day-size, 1.875rem);
+  display: inline-block;
 }
 
 /* Two months to a row, and the rest underneath.

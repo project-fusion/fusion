@@ -1,9 +1,5 @@
 /* Stacked the same way as every other field. See the input's note. */
 :host {
-  display: inline-flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
-
   --_switch-height: var(--switch-block-size, var(--helix-size-switch));
   /* Derived from the height rather than from the token, which is what keeps the
      proportion whatever the height turns out to be: a consumer setting
@@ -20,6 +16,9 @@
      words rather than under the track. Declared beside the size it is
      derived from, which is the only place the two cannot drift apart. */
   --_field-control-inline-size: var(--_switch-width);
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
 }
 
 [part="field"] {

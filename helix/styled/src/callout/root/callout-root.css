@@ -10,6 +10,7 @@
    straight rectangle, so nothing thins, and the corner it sits in is the host's
    own, so the outside is a rounded box like everything beside it. */
 :host {
+  --_callout-color: var(--helix-color-info);
   /* Its own size rather than the page's. A callout is an aside inside prose, so
      it sets its type a step down from the body it interrupts: inheriting left
      it at 15 while its own title was 14, which is a title smaller than the text
@@ -32,8 +33,6 @@
      bar was a border and the border box was doing this arithmetic. */
   padding: var(--helix-space-md);
   padding-inline-start: calc(var(--helix-space-md) + var(--helix-border-thick));
-
-  --_callout-color: var(--helix-color-info);
 }
 
 /* The accent edge. Straight, and clipped to the host's corners by the overflow

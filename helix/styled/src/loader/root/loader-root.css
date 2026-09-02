@@ -1,4 +1,8 @@
 :host {
+  /* Tokens, so a loader is the same size wherever it is placed. Set
+     `--loader-size: 1em` for one that should match the text beside it, which
+     is the case inside a button. */
+  --_loader-size: var(--helix-size-loader-md);
   color: inherit;
   /* An inline grid rather than an inline flex, and one cell: both children take
      `grid-area: 1 / 1`, so a mark is centered over the circles with no offsets
@@ -8,11 +12,6 @@
   flex-shrink: 0;
   place-items: center;
   vertical-align: middle;
-
-  /* Tokens, so a loader is the same size wherever it is placed. Set
-     `--loader-size: 1em` for one that should match the text beside it, which
-     is the case inside a button. */
-  --_loader-size: var(--helix-size-loader-md);
 }
 
 :host([size="sm"]) {

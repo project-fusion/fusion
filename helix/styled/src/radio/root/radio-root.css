@@ -1,7 +1,6 @@
 :host {
-  display: block;
-
   --_radio-size: var(--radio-size, var(--helix-size-checkbox));
+  display: block;
 }
 
 /* The row is the button, so the whole of it is the target, which is what the

@@ -3,6 +3,11 @@
    holds goes underneath both. The tracks come from the list, which is the only
    thing that knows which way the sequence runs. */
 :host {
+  /* One inset, read twice: by the name, which is a button and takes it as its
+     own padding, and by the description under it, which has none of its own and
+     would otherwise start a dozen pixels to the left of the name above it.
+     Written once so the two cannot drift. */
+  --_step-inset: var(--helix-space-sm);
   align-items: start;
   column-gap: var(--helix-space-2xs);
   counter-increment: helix-step;
@@ -12,12 +17,6 @@
   min-inline-size: 0;
   position: relative;
   row-gap: var(--_steps-row-gap, var(--helix-space-2xs));
-
-  /* One inset, read twice: by the name, which is a button and takes it as its
-     own padding, and by the description under it, which has none of its own and
-     would otherwise start a dozen pixels to the left of the name above it.
-     Written once so the two cannot drift. */
-  --_step-inset: var(--helix-space-sm);
 }
 
 /* Two half lines, one either side of the mark. Each reaches from the mark to

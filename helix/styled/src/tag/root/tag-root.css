@@ -2,20 +2,6 @@
    so a tag beside a control lines up predictably: 24px at md, 20px at sm,
    against a 40px control and a 32px dense one. */
 :host {
-  align-items: center;
-  background-color: var(--tag-background-color, var(--_tag-fill));
-  block-size: var(--_tag-height);
-  border: var(--helix-border-thin) solid var(--tag-border-color, var(--_tag-edge));
-  border-radius: var(--tag-radius, var(--helix-radii-sm));
-  color: var(--tag-foreground-color, var(--_tag-label));
-  display: inline-flex;
-  font-size: var(--_tag-text);
-  font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-2xs);
-  line-height: var(--helix-leading-tight);
-  padding-inline: var(--_tag-inset);
-  white-space: nowrap;
-
   --_tag-height: var(--helix-size-tag);
 
   /* Every tone is one status color, tinted for the fill and used at full
@@ -38,6 +24,19 @@
   --_tag-fill: color-mix(in srgb, var(--_tag-color) 14%, var(--helix-color-background));
   --_tag-edge: color-mix(in srgb, var(--_tag-color) 28%, var(--helix-color-background));
   --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
+  align-items: center;
+  background-color: var(--tag-background-color, var(--_tag-fill));
+  block-size: var(--_tag-height);
+  border: var(--helix-border-thin) solid var(--tag-border-color, var(--_tag-edge));
+  border-radius: var(--tag-radius, var(--helix-radii-sm));
+  color: var(--tag-foreground-color, var(--_tag-label));
+  display: inline-flex;
+  font-size: var(--_tag-text);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  line-height: var(--helix-leading-tight);
+  padding-inline: var(--_tag-inset);
+  white-space: nowrap;
 }
 
 /* *The label stays inside the pill.** The host is `white-space: nowrap` and its

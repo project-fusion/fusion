@@ -18,13 +18,12 @@
  * in the light and 4.53 in the dark. Working around a token in a component would
  * have left the same hole for the next component to fall into. */
 :host {
-  color: var(--trend-color, var(--_trend-color));
-
   /* Gray until told what good means.
    *
    * Not a fallback that never fires: it is the state of every trend whose
    * consumer has not set `good`, and it is meant to be. See the property. */
   --_trend-color: var(--helix-color-foreground-muted);
+  color: var(--trend-color, var(--_trend-color));
 }
 
 [part="icon"] {

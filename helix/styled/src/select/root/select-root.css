@@ -124,8 +124,8 @@
    `2xs` is enough to read as motion and short enough that a fast reader who
    opens and picks in one gesture is not waiting on it. */
 [part="surface"] {
-  opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
+  opacity: 0;
   transform: translateY(var(--_travel));
   /* The panel was already waiting on placement; this makes the wait visible.
      0.96 rather than 0: a list of options collapsed to nothing squashes its own

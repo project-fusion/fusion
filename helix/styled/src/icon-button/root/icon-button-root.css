@@ -1,7 +1,6 @@
 :host {
-  display: inline-flex;
-
   --_icon-button-size: var(--icon-button-size, var(--helix-size-control));
+  display: inline-flex;
 }
 
 /* The same two axes `Button` carries, and the same argument. What differs is

@@ -48,11 +48,11 @@
    read as motion and short enough that a fast reader who opens and picks in one
    gesture is not waiting on it. */
 [part="popover"] {
-  opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
   /* Declared beside `--_travel` rather than read through a fallback nothing ever
      set. */
   --_popover-from: 0.96;
+  opacity: 0;
   transform: translateY(var(--_travel));
   scale: var(--_popover-from);
   transition:

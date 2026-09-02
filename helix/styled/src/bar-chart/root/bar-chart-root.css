@@ -59,11 +59,10 @@
  * writing the column's geometry inline there comes later in the file at the same
  * specificity, turning every horizontal bar back into a column. */
 [part="bar"] {
-  clip-path: inset(var(--_bar-chart-foot, 0) round var(--_bar-chart-corners));
-  fill: var(--_bar-chart-series);
-
   --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0;
   --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0;
+  clip-path: inset(var(--_bar-chart-foot, 0) round var(--_bar-chart-corners));
+  fill: var(--_bar-chart-series);
 }
 
 :host([direction="horizontal"]) [part="bar"] {
@@ -651,11 +650,6 @@
    edges and the horizontal ones. */
 [part="bar"][data-emphasis="outlined"],
 :host([emphasis="outlined"]) [part="bar"]:not([data-emphasis]) {
-  fill: var(--_bar-chart-shade);
-  stroke: var(--_bar-chart-series);
-  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
-  vector-effect: non-scaling-stroke;
-
   /* **No line across the base.** A bar grows from the baseline and is measured
      against the rule there, which this file already says where it rounds the far
      end only. An edge across the base draws a second rule a stroke inside the
@@ -669,20 +663,23 @@
      Which side it comes off is `--_bar-chart-base` rather than this rule, so a
      horizontal bar loses its leading edge and not its bottom one. */
   --_bar-chart-foot: var(--_bar-chart-base);
+  fill: var(--_bar-chart-shade);
+  stroke: var(--_bar-chart-series);
+  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
+  vector-effect: non-scaling-stroke;
 }
 
 /* A wash under the same edge, which is the quiet end of the axis: the column
    keeps its area and its boundary and stops claiming to be the point. */
 [part="bar"][data-emphasis="subtle"],
 :host([emphasis="subtle"]) [part="bar"]:not([data-emphasis]) {
-  stroke: var(--_bar-chart-series);
-  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
-  vector-effect: non-scaling-stroke;
-
   --_bar-chart-area: 0.2;
 
   /* The base, for the reason `outlined` gives above it. */
   --_bar-chart-foot: var(--_bar-chart-base);
+  stroke: var(--_bar-chart-series);
+  stroke-width: var(--bar-chart-bar-stroke, var(--helix-border-thick));
+  vector-effect: non-scaling-stroke;
 }
 
 [part="bar"] {

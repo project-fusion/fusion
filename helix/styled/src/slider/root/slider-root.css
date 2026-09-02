@@ -1,9 +1,5 @@
 /* Stacked the same way as every other field. See the input's note. */
 :host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
-
   /* The same token the progress bar takes, which is the same object: a
      horizontal bar a proportion is read off. At a bare 4px the fill and the
      rules in a table beside it are the same weight. */
@@ -45,6 +41,9 @@
    * A track is a bar rather than a fill, so it takes a line's color: it is the
    * same weight of mark as the rules in a table, drawn thicker. */
   --_slider-track-color: var(--slider-track-color, var(--helix-color-border));
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
 }
 
 [part="field"] {
@@ -515,12 +514,6 @@
 }
 
 :host([orientation="vertical"]) [part="control"] {
-  direction: rtl;
-  inline-size: var(--slider-length, 9rem);
-  margin-block: calc(var(--_slider-thumb-length) / 2);
-  margin-inline: 0;
-  writing-mode: vertical-lr;
-
   /* Bottom to top, to match the axis the line above turned over. A gradient
      takes no logical keyword, so this is the one declaration that has to be
      restated rather than inherited from the horizontal rule. */
@@ -532,6 +525,11 @@
       var(--_slider-track-color) calc(var(--slider-fraction, 0) * 100%)
     )
   );
+  direction: rtl;
+  inline-size: var(--slider-length, 9rem);
+  margin-block: calc(var(--_slider-thumb-length) / 2);
+  margin-inline: 0;
+  writing-mode: vertical-lr;
 }
 
 /* The marks turn with the track: their length becomes the track's thickness,

@@ -11,16 +11,15 @@
 
 /* The resting arrangement, which is bottom-end. */
 :host(:not([placement])) {
-  inset-block-end: var(--_toast-inset);
-
   --_toast-enter: var(--helix-space-lg);
+  inset-block-end: var(--_toast-inset);
 }
 
 [part="region"] {
-  display: flex;
-  flex-direction: column;
   /* No `gap`. */
   --_toast-gap: var(--toast-gap, var(--helix-space-xs));
+  display: flex;
+  flex-direction: column;
 }
 
 ::slotted(*) {
@@ -31,15 +30,13 @@
 /* Which way the nearest edge is, told to the messages rather than worked out by
    them. */
 :host([placement^="bottom"]) {
-  inset-block-end: var(--_toast-inset);
-
   --_toast-enter: var(--helix-space-lg);
+  inset-block-end: var(--_toast-inset);
 }
 
 :host([placement^="top"]) {
-  inset-block-start: var(--_toast-inset);
-
   --_toast-enter: calc(var(--helix-space-lg) * -1);
+  inset-block-start: var(--_toast-inset);
 }
 
 :host([placement^="top"]) [part="region"] {

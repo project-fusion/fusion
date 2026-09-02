@@ -18,9 +18,8 @@
 }
 
 [part="trigger"] {
-  all: unset;
-
   --icon-size: var(--video-playlist-menu-size, var(--helix-size-icon-tight));
+  all: unset;
 
   align-items: center;
   border-radius: var(--helix-radii-sm);

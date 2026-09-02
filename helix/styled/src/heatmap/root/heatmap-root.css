@@ -3,15 +3,6 @@
    and top to bottom in days. `grid-auto-flow: column` is the whole of that, and
    `rows="1"` makes it a single row without a second layout. */
 :host {
-  /* **A grid of one column, so the footer is as wide as the strip and not as
-     wide as the box.** The labels annotate the picture: "Jun" under the first
-     week and "Aug" under the last is the whole of what they say, and a block
-     host stretched the footer to its own width, so a ten week graph 156 pixels
-     across carried an "Aug" floating 400 pixels past its last cell. The track is
-     the strip's max-content, and both children take it. */
-  display: grid;
-  grid-template-columns: minmax(0, max-content);
-
   /* **Two axes, because a square is a contribution graph's shape and not a
      status page's.** A calendar cell is a day and is square; an uptime bar is a
      minute or an hour, and every status page draws those tall and thin, four
@@ -79,6 +70,14 @@
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-5: var(--helix-color-primary-active);
+  /* **A grid of one column, so the footer is as wide as the strip and not as
+     wide as the box.** The labels annotate the picture: "Jun" under the first
+     week and "Aug" under the last is the whole of what they say, and a block
+     host stretched the footer to its own width, so a ten week graph 156 pixels
+     across carried an "Aug" floating 400 pixels past its last cell. The track is
+     the strip's max-content, and both children take it. */
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
 }
 
 /* **`grid-auto-columns`, or the weeks splay.** Implicit tracks are `auto`, and

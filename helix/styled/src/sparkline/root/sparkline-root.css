@@ -1,10 +1,9 @@
 :host {
+  --_sparkline-ink: var(--sparkline-color, var(--helix-color-series-1));
   block-size: var(--sparkline-block-size, 2.5em);
   /* Set once and read by the line, the wash and the terminus, so a consumer
      moving `--sparkline-color` cannot end up with three that disagree. */
   color: var(--_sparkline-ink);
-
-  --_sparkline-ink: var(--sparkline-color, var(--helix-color-series-1));
   /* The mark is positioned against this box, so the box has to be one. */
   position: relative;
 

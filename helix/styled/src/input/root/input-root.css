@@ -9,11 +9,10 @@
    contributes nothing intrinsically, so the host collapsed to zero the moment
    its width came from its content. */
 :host {
+  --_input-size: var(--input-size, var(--helix-size-control));
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
-
-  --_input-size: var(--input-size, var(--helix-size-control));
 }
 
 /* The box is the field, not the input. */
@@ -102,8 +101,8 @@ slot[name="end"]::slotted(*) {
 /* The two marks the field owns, dressed as one thing. */
 [part="clear"],
 [part="reveal"] {
-  all: unset;
   --icon-size: var(--helix-size-icon-tight);
+  all: unset;
 
   align-items: center;
   border-radius: var(--helix-radii-sm);

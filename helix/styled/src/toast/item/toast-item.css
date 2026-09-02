@@ -1,4 +1,15 @@
 :host {
+  /* Dense by nature. Without it a slotted `Retry` comes out at the full 40px
+     beside a 32px dismiss, so the two controls in one row are different heights:
+     measured, three center lines at 654, 660 and 664. */
+  /* The icon step with it. A container that declares the control size and stops
+     there draws an icon in the message at the `md` step inside `sm` controls: 20
+     pixels in a 32 pixel row. */
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-control: var(--helix-size-control-sm);
+  /* The height of one line of the message, which is what everything in the row
+     is aligned against. */
+  --_toast-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
   /* A grid of one row, so the row can be transitioned to nothing. `0fr` is the
      only way to animate a box down to a height it never declared, and it is why
      this is a grid rather than a block. The message inside carries `min-block-
@@ -18,17 +29,6 @@
     margin-block-start var(--helix-duration-normal) var(--helix-easing-standard),
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     translate var(--helix-duration-normal) var(--helix-easing-standard);
-  /* Dense by nature. Without it a slotted `Retry` comes out at the full 40px
-     beside a 32px dismiss, so the two controls in one row are different heights:
-     measured, three center lines at 654, 660 and 664. */
-  /* The icon step with it. A container that declares the control size and stops
-     there draws an icon in the message at the `md` step inside `sm` controls: 20
-     pixels in a 32 pixel row. */
-  --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-control: var(--helix-size-control-sm);
-  /* The height of one line of the message, which is what everything in the row
-     is aligned against. */
-  --_toast-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
   /* The width is the message's, not the region's: the region spans an edge so a
      stack can align along it, and a message as wide as the window is a banner. */
   inline-size: var(--toast-inline-size, 22rem);

@@ -59,9 +59,8 @@
    inline start, so it grows from the same edge in both writing directions
    without the component knowing which one it is in. */
 [part="indicator"] {
-  background-color: var(--_meter-hue);
-
   --_meter-hue: var(--meter-color, var(--helix-color-primary));
+  background-color: var(--_meter-hue);
   block-size: 100%;
   border-radius: inherit;
   inline-size: 100%;
@@ -80,21 +79,18 @@
    a reading that only says "poor" in red says nothing to a reader who cannot see
    red, and says nothing at all in a screenshot printed in gray. */
 [part="indicator"][data-band="good"] {
-  background-color: var(--_meter-hue);
-
   --_meter-hue: var(--meter-color, var(--helix-color-success));
+  background-color: var(--_meter-hue);
 }
 
 [part="indicator"][data-band="fair"] {
-  background-color: var(--_meter-hue);
-
   --_meter-hue: var(--meter-color, var(--helix-color-warning));
+  background-color: var(--_meter-hue);
 }
 
 [part="indicator"][data-band="poor"] {
-  background-color: var(--_meter-hue);
-
   --_meter-hue: var(--meter-color, var(--helix-color-danger));
+  background-color: var(--_meter-hue);
 }
 
 /* Past an end, where the bar has run out of room to say so.
@@ -220,13 +216,12 @@
  * reason. */
 :host([shape="arc"]) [part="indicator"],
 :host([shape="ring"]) [part="indicator"] {
-  scale: none;
-  stroke: var(--_meter-hue);
-
   /* The ring's unbanded ink, muted rather than the bar's primary. Named here
      rather than left in the `stroke` declaration so `emphasis` has one property
      to quieten, whichever shape and whichever band chose the color. */
   --_meter-hue: var(--helix-color-foreground-muted);
+  scale: none;
+  stroke: var(--_meter-hue);
   stroke-dasharray: var(--meter-along) 100;
   stroke-linecap: round;
   transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-standard);
@@ -257,23 +252,20 @@
    already resolved and written onto the element that carries the reading. */
 :host([shape="arc"]) [part="indicator"][data-band="good"],
 :host([shape="ring"]) [part="indicator"][data-band="good"] {
-  stroke: var(--_meter-hue);
-
   --_meter-hue: var(--helix-color-success);
+  stroke: var(--_meter-hue);
 }
 
 :host([shape="arc"]) [part="indicator"][data-band="fair"],
 :host([shape="ring"]) [part="indicator"][data-band="fair"] {
-  stroke: var(--_meter-hue);
-
   --_meter-hue: var(--helix-color-warning);
+  stroke: var(--_meter-hue);
 }
 
 :host([shape="arc"]) [part="indicator"][data-band="poor"],
 :host([shape="ring"]) [part="indicator"][data-band="poor"] {
-  stroke: var(--_meter-hue);
-
   --_meter-hue: var(--helix-color-danger);
+  stroke: var(--_meter-hue);
 }
 
 /* In the middle, which is why the round shapes exist at all. */

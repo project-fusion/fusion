@@ -36,6 +36,11 @@
 }
 
 [part="track"] {
+  --_toggle-height: calc(var(--helix-size-control) - var(--helix-space-2xs) * 2);
+  /* No track, so nothing to be concentric with. */
+  --_toggle-radius: var(--helix-radii-sm);
+  /* And no groove either, which decides the thumb's color. */
+  --_indicator-surface: var(--helix-color-surface-raised);
   display: inline-flex;
   position: relative;
 
@@ -59,25 +64,14 @@
      group instead of filling its own line. */
   min-block-size: var(--helix-size-control);
 
-  --_toggle-height: calc(var(--helix-size-control) - var(--helix-space-2xs) * 2);
-  /* No track, so nothing to be concentric with. */
-  --_toggle-radius: var(--helix-radii-sm);
-
   /* Inset even where nothing is drawn around it. Measured, 40 against the framed
      30. */
   padding: var(--helix-space-2xs);
-  /* And no groove either, which decides the thumb's color. */
-  --_indicator-surface: var(--helix-color-surface-raised);
 }
 
 /* A framed track, and it is what makes the whole control read. */
 :host(:not([separation])) [part="track"],
 :host([separation="outlined"]) [part="track"] {
-  background-color: var(--helix-color-surface-sunken);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  padding: var(--helix-space-2xs);
-
   /* Concentric, which is the outer radius less everything between the two
      curves: the border and the padding. */
   --_toggle-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
@@ -91,6 +85,10 @@
   );
   /* A groove, so the thumb is over it rather than on it. */
   --_indicator-surface: var(--helix-color-surface-overlay);
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  padding: var(--helix-space-2xs);
 }
 
 /* The segments share what is left over, and each label keeps the same space

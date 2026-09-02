@@ -205,8 +205,8 @@
 /* The same mark on a column heading, which wants none of the row version's
    placement. */
 .apiHint {
-  all: unset;
   --icon-size: 1em;
+  all: unset;
 
   align-items: center;
   box-sizing: border-box;

@@ -1,8 +1,4 @@
 :host {
-  display: inline-flex;
-  position: relative;
-  vertical-align: middle;
-
   /* Tokens, like every other component's sizing, and never `em`. The mark does
      not scale with what it decorates: the badge inherits `font-size` from the
      page and an avatar sizes itself from `size`, so an em-sized mark measures
@@ -12,6 +8,9 @@
   --_badge-text: var(--helix-text-xs);
   --_badge-inset: var(--helix-space-2xs);
   --_badge-dot: var(--helix-space-xs);
+  display: inline-flex;
+  position: relative;
+  vertical-align: middle;
 }
 
 [part="indicator"] {

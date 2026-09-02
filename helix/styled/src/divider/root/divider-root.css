@@ -3,14 +3,14 @@
    nothing in it is one continuous line: the second half is zero long and the
    gap collapses with it. */
 :host {
-  align-items: center;
-  display: flex;
   /* No flex gap. A gap is drawn between items whatever their size, so with the
      middle region hidden the two halves still stood 12px apart and every plain
      divider had a break in it. The space belongs to the content, which takes it
      away with it when there is none. */
 
   --_divider-thickness: var(--divider-thickness, var(--helix-border-thin));
+  align-items: center;
+  display: flex;
 }
 
 /* What is set into the rule, and the space either side of it. */

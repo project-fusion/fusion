@@ -58,8 +58,8 @@
 /* The trigger is a mark inside the field rather than a button beside it: a
    second frame inside the first is two controls where a reader sees one. */
 [part="trigger"] {
-  all: unset;
   --icon-size: var(--helix-size-icon);
+  all: unset;
 
   align-items: center;
   color: var(--helix-color-foreground-muted);

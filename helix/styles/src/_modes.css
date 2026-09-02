@@ -10,8 +10,6 @@
    inside it, so the panel was quietly in the other mode and its contrast was
    being judged against the wrong ground. */
 :root {
-  color-scheme: light dark;
-
   --_helix-mode: light;
   --_helix-mode-inverted: dark;
 
@@ -37,6 +35,7 @@
     color-mix(in oklab, var(--_helix-neutral-950) 9%, transparent),
     color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent)
   );
+  color-scheme: light dark;
 }
 
 /* *`[data-helix-theme]` re-derives the whole ramp at a subtree, and it has to be
@@ -48,17 +47,15 @@
 
 /* The color mode, and the only thing that decides it. */
 [data-color-mode="light"] {
-  color-scheme: light;
-
   --_helix-mode: light;
   --_helix-mode-inverted: dark;
+  color-scheme: light;
 }
 
 [data-color-mode="dark"] {
-  color-scheme: dark;
-
   --_helix-mode: dark;
   --_helix-mode-inverted: light;
+  color-scheme: dark;
 }
 
 /* The operating system's answer, where nothing has overridden it. */

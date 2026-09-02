@@ -93,10 +93,9 @@
 /* A wash under the same edge, which is the quiet end of the axis. */
 [part="entry"][data-emphasis="subtle"] [part="swatch"],
 :host([emphasis="subtle"]) [part="entry"]:not([data-emphasis]) [part="swatch"] {
+  --_legend-area: 0.2;
   border: var(--legend-swatch-stroke, var(--helix-border-thick)) solid
     color-mix(in oklab, var(--chart-series) calc(var(--_legend-through, 1) * 100%), transparent);
-
-  --_legend-area: 0.2;
 }
 
 [part="swatch"] {

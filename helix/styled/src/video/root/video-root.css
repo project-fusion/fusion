@@ -186,8 +186,8 @@
  * takes its underline with everything else. The scrubber and the volume are
  * `<input>` and are deliberately not caught: a slider is not this shape. */
 [part="controls"] :where(a, button) {
-  all: unset;
   --icon-size: var(--helix-size-icon-tight);
+  all: unset;
 
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -455,8 +455,8 @@
  * the element stops drawing it, because what it marks is a state that does not
  * come back. */
 [part="start"] {
-  all: unset;
   --icon-size: 40%;
+  all: unset;
 
   align-items: center;
   aspect-ratio: 1;

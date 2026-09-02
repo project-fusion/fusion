@@ -300,6 +300,15 @@
    room in the row has to sit over its neighbors and the pitch has to go from 12
    to 20 to make space for it, at which point the run stops being a run. */
 [part="indicator"] {
+  /* *One duration and one curve for both, which is the whole of the fix.** Color
+     over `fast` and size over `normal` is 120ms against 200ms, so the two halves
+     of one change finish 80ms apart: the arriving dot fully blue while still
+     four fifths grown, the leaving one fully gray while still a fifth wide, and
+     the middle of every move a fat gray stub beside a short blue one. `slow`
+     rather than `normal`, because this is the one transition in the component a
+     reader is meant to watch: at 200ms the pill had arrived before the eye found
+     it. */
+  --_carousel-indicator-motion: var(--helix-duration-slow) var(--helix-easing-emphasized);
   all: unset;
   background-color: var(--helix-color-border);
   block-size: var(--helix-space-xs);
@@ -310,16 +319,6 @@
   transition:
     background-color var(--_carousel-indicator-motion),
     inline-size var(--_carousel-indicator-motion);
-
-  /* *One duration and one curve for both, which is the whole of the fix.** Color
-     over `fast` and size over `normal` is 120ms against 200ms, so the two halves
-     of one change finish 80ms apart: the arriving dot fully blue while still
-     four fifths grown, the leaving one fully gray while still a fifth wide, and
-     the middle of every move a fat gray stub beside a short blue one. `slow`
-     rather than `normal`, because this is the one transition in the component a
-     reader is meant to watch: at 200ms the pill had arrived before the eye found
-     it. */
-  --_carousel-indicator-motion: var(--helix-duration-slow) var(--helix-easing-emphasized);
 }
 
 /* The current one lengthens rather than only changing color, so the set reads at

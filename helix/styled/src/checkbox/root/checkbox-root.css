@@ -1,13 +1,12 @@
 /* Stacked the same way and for the same reason as the input. */
 :host {
-  display: inline-flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
-
   --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox));
   /* What `field-inline.css` indents the hint by, so it starts under the words
      rather than under the box. */
   --_field-control-inline-size: var(--_checkbox-size);
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
 }
 
 /* The row is the label, so the whole of it is the target the browser forwards to

@@ -27,6 +27,11 @@
 }
 
 .anchor {
+  /* **Its own size, because a heading's is not a size for a mark.** A glyph
+     inheriting the heading comes out at the h1's own scale and reads as part of
+     the title rather than as an affordance beside it. An icon sized here is the
+     same mark at every level. */
+  --icon-size: var(--helix-size-icon-sm);
   align-items: center;
   color: var(--helix-color-foreground-subtle);
   display: flex;
@@ -37,12 +42,6 @@
   text-decoration: none;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   translate: 0 -50%;
-
-  /* **Its own size, because a heading's is not a size for a mark.** A glyph
-     inheriting the heading comes out at the h1's own scale and reads as part of
-     the title rather than as an affordance beside it. An icon sized here is the
-     same mark at every level. */
-  --icon-size: var(--helix-size-icon-sm);
 
   /* Further out than a word space. At `xs` the mark sits against the first
      letter and reads as punctuation; a step of its own puts it in the margin,

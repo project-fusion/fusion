@@ -144,8 +144,8 @@
 /* A trash can rather than a cross, and from the icon set rather than drawn as a
    stencil here. */
 [part="remove"] {
-  all: unset;
   --icon-size: var(--helix-size-icon-tight);
+  all: unset;
 
   align-items: center;
   border-radius: var(--helix-radii-sm);

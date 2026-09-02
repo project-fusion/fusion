@@ -1,5 +1,12 @@
 /* The host is the surface. */
 :host {
+  /* One inset for every region, so they narrow together. With a `dense` boolean
+     here instead, a card measured 16px of inset in a `sm` region and 16px in an
+     `lg` one: the region said how tight it was and the card was the one
+     component that did not listen. */
+  --_card-inset: var(--card-padding, var(--helix-space-control));
+  /* How wide the media column is when the card lays out sideways. */
+  --_card-media: var(--card-media-size, 12rem);
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
@@ -31,14 +38,6 @@
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     box-shadow var(--helix-duration-fast) var(--helix-easing-standard);
-
-  /* One inset for every region, so they narrow together. With a `dense` boolean
-     here instead, a card measured 16px of inset in a `sm` region and 16px in an
-     `lg` one: the region said how tight it was and the card was the one
-     component that did not listen. */
-  --_card-inset: var(--card-padding, var(--helix-space-control));
-  /* How wide the media column is when the card lays out sideways. */
-  --_card-media: var(--card-media-size, 12rem);
 }
 
 /* *A lift in the light, and a hairline in the dark, because a shadow is a
@@ -48,17 +47,15 @@
    page's own black had a `shadow-md` of `oklab(0.15 0 0 / 0.1)` painted onto
    `lab(0 0 0)`, a shadow darker than its ground*, and no border to fall back on. */
 :host([separation="elevated"]) {
-  border-color: light-dark(transparent, var(--helix-color-border));
-
   --card-shadow: var(--helix-shadow-md);
+  border-color: light-dark(transparent, var(--helix-color-border));
 }
 
 /* Told apart by its own color and nothing else, which is the fourth mechanism
    `ThemeIntent.separation` carries and no component could ask for. */
 :host([separation="filled"]) {
-  border-color: transparent;
-
   --card-shadow: none;
+  border-color: transparent;
 }
 
 :host([separation="plain"]) {

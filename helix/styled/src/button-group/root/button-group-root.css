@@ -26,13 +26,13 @@
 }
 
 :host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
+  --button-radius-start-start: 0;
+  --button-radius-start-end: 0;
+  --button-radius-start: var(--button-radius, var(--helix-radii-sm));
   margin-block-start: calc(var(--helix-border-thin) * -1);
   /* Cleared, or the row's pull is still in effect sideways and every button
      after the first sits a border to the left of the one above it. */
   margin-inline-start: 0;
-  --button-radius-start-start: 0;
-  --button-radius-start-end: 0;
-  --button-radius-start: var(--button-radius, var(--helix-radii-sm));
 }
 
 :host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:last-child)) {

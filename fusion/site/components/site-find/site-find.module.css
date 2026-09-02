@@ -5,9 +5,8 @@
    reading as one material is what makes the palette feel like it came out of the
    button rather than over it. */
 .siteFind {
-  backdrop-filter: var(--site-glass-backdrop);
-
   --button-background-color: var(--site-glass);
+  backdrop-filter: var(--site-glass-backdrop);
 }
 
 .siteFind helix-kbd {

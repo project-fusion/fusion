@@ -8,6 +8,9 @@
      screen, so a literal token here puts the wordmark and the first card on
      different edges. */
   --site-inset: var(--site-chrome-inset);
+  /* One falloff, named once, because two surfaces wear it: the lattice itself
+     and the layer of shines that light up dots within it. */
+  --site-lattice-mask: radial-gradient(ellipse 90% 78% at 50% 22%, #000 0%, transparent 100%);
   align-items: center;
   background-color: var(--helix-color-background);
   display: flex;
@@ -18,9 +21,6 @@
   position: relative;
   /* The header's own height plus the hairline under it. */
   margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
-  /* One falloff, named once, because two surfaces wear it: the lattice itself
-     and the layer of shines that light up dots within it. */
-  --site-lattice-mask: radial-gradient(ellipse 90% 78% at 50% 22%, #000 0%, transparent 100%);
 
   min-block-size: 28rem;
   padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);

@@ -18,10 +18,6 @@
    beside, because there is no width to save and a name under its mark would
    sit where the line has to run. */
 :host {
-  counter-reset: helix-step;
-  display: flex;
-  gap: var(--steps-gap, var(--helix-space-md));
-
   --_steps-m: var(--steps-marker-size, var(--helix-size-icon));
   --_steps-mark-box: var(--_steps-m);
   /* Air either side of every mark, so the rail arrives at it rather than into
@@ -66,6 +62,9 @@
   );
   --_steps-trail-block-start: calc(var(--_steps-mark-box) / 2);
   --_steps-trail-block-size: var(--helix-border-thin);
+  counter-reset: helix-step;
+  display: flex;
+  gap: var(--steps-gap, var(--helix-space-md));
 }
 
 /* A row hands each step an equal share, so the marks sit at even intervals
@@ -84,8 +83,6 @@
 
    The mark takes the button's box here, because it shares a row with one. */
 :host([orientation="vertical"]) {
-  flex-direction: column;
-
   --_steps-mark-box: var(--helix-size-control-tight);
   --_steps-columns: auto minmax(0, 1fr);
   --_steps-marker-justify: start;
@@ -108,6 +105,7 @@
     var(--steps-gap, var(--helix-space-md)) /
     2
   );
+  flex-direction: column;
 }
 
 /* Numbers, where the order is the point rather than the state.

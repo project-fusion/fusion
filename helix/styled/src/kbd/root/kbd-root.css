@@ -1,4 +1,10 @@
 :host {
+  /* Relative to the surrounding text, because a key inside a heading has to be
+     key-sized in that heading. 0.85 rather than 0.75: three quarters of 13px is
+     a 9.75px glyph, and an arrow that small in the mono face is a smudge. */
+  --_kbd-size: 0.85em;
+  --_kbd-height: 1.5em;
+  --_kbd-inset: 0.4em;
   display: inline-flex;
   font: inherit;
   /* Measured, not chosen: `baseline` hangs the box a descender low and `middle`
@@ -6,13 +12,6 @@
      against the glyph's own bounding box from 12px to 20px, `-0.05em` lands
      within 0.39px everywhere and scales with the em-sized box. */
   vertical-align: -0.05em;
-
-  /* Relative to the surrounding text, because a key inside a heading has to be
-     key-sized in that heading. 0.85 rather than 0.75: three quarters of 13px is
-     a 9.75px glyph, and an arrow that small in the mono face is a smudge. */
-  --_kbd-size: 0.85em;
-  --_kbd-height: 1.5em;
-  --_kbd-inset: 0.4em;
 }
 
 [part="kbd"] {

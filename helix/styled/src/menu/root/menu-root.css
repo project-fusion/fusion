@@ -5,6 +5,10 @@
 }
 
 [part="surface"] {
+  /* Compact by nature, and it says so once, so a control slotted into a row is
+     the size the rows are rather than the size a page is. */
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
   /* A menu taller than the window has to scroll. Without a `max-block-size` and
    * an `overflow` the rows below the fold are reachable by arrow and invisible,
    * and the keyboard path that walks them has nothing to scroll.
@@ -12,10 +16,6 @@
    * this, and `Select`'s surface already reads it. */
   max-block-size: var(--menu-max-block-size, var(--floating-available-block-size, none));
   overflow-y: auto;
-  /* Compact by nature, and it says so once, so a control slotted into a row is
-     the size the rows are rather than the size a page is. */
-  --helix-size-control: var(--helix-size-control-sm);
-  --helix-size-icon: var(--helix-size-icon-sm);
 
   background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
@@ -80,8 +80,8 @@
  * Small on purpose. `2xs` is enough to read as motion and short enough that a
  * fast reader who opens and picks in one gesture is not waiting on it. */
 [part="surface"] {
-  opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
+  opacity: 0;
   transform: translateY(var(--_travel));
   scale: 0.96;
   transition:

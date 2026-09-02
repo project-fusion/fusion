@@ -165,8 +165,8 @@
  * Same shape and the same tokens the slotted path resolves to, so a trigger a
  * consumer passes and one drawn here come out as the same control. */
 [part="trigger"] {
-  all: unset;
   --icon-size: var(--helix-size-icon);
+  all: unset;
 
   align-items: center;
   /* **`primary-surface`, not `primary`, and the difference is a real failure in

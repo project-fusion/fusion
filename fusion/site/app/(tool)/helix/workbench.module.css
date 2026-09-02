@@ -5,6 +5,7 @@
    keyboard reader never finds, and this is a link in a navigation rather than an
    embellishment. */
 .docsJump {
+  --icon-size: var(--helix-size-icon-sm);
   align-items: center;
   block-size: 1.5rem;
   border-radius: var(--helix-radii-sm);
@@ -24,8 +25,6 @@
   /* Off the chevron, which is the same size and the same gray: two 16px marks
      4px apart read as one smudge rather than as a control beside a control. */
   margin-inline-end: var(--helix-space-xs);
-
-  --icon-size: var(--helix-size-icon-sm);
 }
 
 /* A surface, not the accent. */

@@ -1,9 +1,8 @@
 :host {
+  --_drawer-size: var(--drawer-size, 20rem);
   /* No box at all. The `[hidden]` rule from `HelixElement.finalizeStyles` still
      wins over it, being (0,3,0). */
   display: contents;
-
-  --_drawer-size: var(--drawer-size, 20rem);
 }
 
 /* The platform's own backdrop, which the panel gets by being opened with
