@@ -349,6 +349,22 @@ helix-drawer {
    a `button` and takes no `href`.** The routing page states the rule this
    follows: a component that navigates renders its own anchor, and wrapping a
    button in a link to borrow its shape is the third option that page rules out. */
+/* A control in the page chrome labels itself in the accessible tree and not on
+   the page: the filter bar's selects sit under a heading that already says what
+   they filter, and the hero's search field carries its own placeholder.
+
+   `::part(label)` and not `[data-hidden-visually]`, which is the design system's
+   helper for the same job: the attribute would have to land on the part, and a
+   part takes no attributes from outside. This is the published door. */
+[data-chrome-control]::part(label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
 [data-icon-link] {
   align-items: center;
   block-size: var(--helix-size-control-sm);

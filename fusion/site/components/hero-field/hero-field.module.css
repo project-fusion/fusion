@@ -1,0 +1,52 @@
+/* Light on the lattice. */
+.pageHeroField {
+  inset: 0;
+  mask-image: var(--site-lattice-mask);
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+.pageHeroShine {
+  animation: siteHeroShine var(--shine-duration) ease-in-out var(--shine-delay) infinite;
+  aspect-ratio: 1;
+  /* A hard core the size of the lattice dot, then a halo. */
+  background: radial-gradient(
+    circle,
+    var(--helix-color-primary) 0 16%,
+    color-mix(in oklab, var(--helix-color-primary) 40%, transparent) 30%,
+    transparent 68%
+  );
+  border-radius: var(--helix-radii-full);
+  inline-size: 0.75rem;
+  /* A percentage of the section, snapped to the nearest lattice dot. */
+  inset-block-start: calc(50% + round(var(--shine-y) * 1% - 50%, var(--site-lattice-pitch)));
+  inset-inline-start: calc(50% + round(var(--shine-x) * 1% - 50%, var(--site-lattice-pitch)));
+  opacity: 0;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* *The keyframes must stay in this module, beside the only rule that reads
+   them.** A CSS module scopes an animation name, so `animation: siteHeroShine`
+   here resolves to `browser-module__…__siteHeroShine` while an `@keyframes` in a
+   global sheet stays unscoped: two names that cannot meet. It fails silently,
+   `getAnimations()` returning an empty array and the opacity staying at its
+   resting 0, which is exactly what an unlit field looks like. */
+
+/* Interior-only, so 0% and 100% resolve to the resting `opacity: 0` and `scale:
+   1`. Held to 0.55 and to a small swell. */
+@keyframes siteHeroShine {
+  6% {
+    opacity: 0;
+    scale: 1;
+  }
+  11% {
+    opacity: 0.55;
+    scale: 1.45;
+  }
+  17% {
+    opacity: 0;
+    scale: 1;
+  }
+}

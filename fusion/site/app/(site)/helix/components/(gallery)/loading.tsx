@@ -1,4 +1,5 @@
-import browser from '@/components/browser.module.css'
+import { FilterBar } from '@/components/filter-bar/filter-bar'
+import { PageHero } from '@/components/page-hero/page-hero'
 import styles from './gallery.module.css'
 import loading from './loading.module.css'
 
@@ -17,10 +18,10 @@ import loading from './loading.module.css'
  * cards. Standing in with that shape means the layout does not jump when the
  * real thing arrives, which a centered spinner cannot promise.
  *
- * **The chrome is the page's own classes, not a copy of them.** `pageHero` and
- * `filterBar` come from `browser.module.css` and `familyGrid` from the gallery's
- * own, so this cannot drift into a different hero than the one it precedes. What
- * is invented here is only the boxes inside them.
+ * **The chrome is the page's own components, not a copy of them.** `PageHero`
+ * and `FilterBar` are the ones the gallery itself renders, so this cannot drift
+ * into a different hero than the one it precedes. What is invented here is only
+ * the boxes inside them.
  *
  * The count is a guess and has to be: twelve fills a first screen at five
  * columns without running so far down that a reader scrolls a skeleton.
@@ -43,21 +44,17 @@ export default function Loading() {
           not a box: the hero, the bar and the grid stay direct children of the
           layout they are laid out by. */}
       <div className={loading.standIn} inert>
-        <section className={`${browser.pageHero} ${styles.designHero}`}>
-          <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
-            <div className={loading.heroTitle} data-skeleton />
-            <div className={loading.heroLede} data-skeleton />
-            <div className={loading.heroSearch} data-skeleton />
-          </helix-flex>
-        </section>
+        <PageHero className={styles.designHero}>
+          <div className={loading.heroTitle} data-skeleton />
+          <div className={loading.heroLede} data-skeleton />
+          <div className={loading.heroSearch} data-skeleton />
+        </PageHero>
 
-        <div className={browser.filterBar}>
-          <helix-flex align="center" className={browser.filterBarInner} gap="sm" wrap>
-            {[0, 1, 2].map((slot) => (
-              <div className={loading.filterControl} data-skeleton key={slot} />
-            ))}
-          </helix-flex>
-        </div>
+        <FilterBar>
+          {[0, 1, 2].map((slot) => (
+            <div className={loading.filterControl} data-skeleton key={slot} />
+          ))}
+        </FilterBar>
 
         <helix-grid className={styles.familyGrid} columns={5} gap="2xl">
           {CARDS.map((card) => (
@@ -71,7 +68,7 @@ export default function Loading() {
 
       {/* The one thing that is announced. `polite`, because a reader mid-sentence
           should not be interrupted by a page that is merely on its way. */}
-      <p className={browser.visuallyHidden} role="status">
+      <p data-hidden-visually role="status">
         Loading components
       </p>
     </>

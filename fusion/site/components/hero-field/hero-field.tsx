@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import browser from '@/components/browser.module.css'
+import styles from './hero-field.module.css'
 
 /**
  * Which dots on the hero's lattice catch the light, and when.
@@ -75,10 +75,10 @@ const SHINE: readonly (readonly [number, number, number, number])[] = [
  */
 export function HeroField() {
   return (
-    <div aria-hidden="true" className={browser.pageHeroField}>
+    <div aria-hidden="true" className={styles.pageHeroField}>
       {SHINE.map(([x, y, seconds, delay]) => (
         <span
-          className={browser.pageHeroShine}
+          className={styles.pageHeroShine}
           key={`${x}:${y}`}
           style={
             {

@@ -1,6 +1,6 @@
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
-import browser from '@/components/browser.module.css'
 import documents from '@/components/document-page/document-page.module.css'
+import { PageHero } from '@/components/page-hero/page-hero'
 import { ThemeScope } from '@/components/theme-context/theme-context'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
@@ -112,7 +112,7 @@ export default async function Page() {
           flat black with the title floating in it and a screen of nothing
           between the standfirst and the first offer: the space was there
           because the section had padding, not because anything filled it. */}
-        <section className={`${browser.pageHero} ${styles.servicesHero}`}>
+        <PageHero className={styles.servicesHero} shell="plain">
           <helix-flex class={styles.servicesHeroInner} data-shell direction="column" gap="lg">
             <helix-text tone="subtle" variant="label">
               {page?.kicker}
@@ -129,7 +129,7 @@ export default async function Page() {
               Interface and intelligence work, shipped into your repository.
             </helix-text>
           </helix-flex>
-        </section>
+        </PageHero>
 
         {/* **The three offers as one panel, not three cards.**
           Three cards on glass are three edges, and a reader counts the boxes

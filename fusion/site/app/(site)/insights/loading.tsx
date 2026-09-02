@@ -1,4 +1,5 @@
-import browser from '@/components/browser.module.css'
+import { FilterBar } from '@/components/filter-bar/filter-bar'
+import { PageHero } from '@/components/page-hero/page-hero'
 import styles from './insights.module.css'
 import loading from './loading.module.css'
 
@@ -29,21 +30,17 @@ export default function Loading() {
   return (
     <>
       <div className={loading.standIn} inert>
-        <section className={`${browser.pageHero} ${styles.insightsHero}`}>
-          <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
-            <div className={loading.heroTitle} data-skeleton />
-            <div className={loading.heroLede} data-skeleton />
-            <div className={loading.heroSearch} data-skeleton />
-          </helix-flex>
-        </section>
+        <PageHero className={styles.insightsHero}>
+          <div className={loading.heroTitle} data-skeleton />
+          <div className={loading.heroLede} data-skeleton />
+          <div className={loading.heroSearch} data-skeleton />
+        </PageHero>
 
-        <div className={browser.filterBar}>
-          <helix-flex align="center" className={browser.filterBarInner} gap="sm" wrap>
-            {[0, 1, 2].map((slot) => (
-              <div className={loading.filterControl} data-skeleton key={slot} />
-            ))}
-          </helix-flex>
-        </div>
+        <FilterBar>
+          {[0, 1, 2].map((slot) => (
+            <div className={loading.filterControl} data-skeleton key={slot} />
+          ))}
+        </FilterBar>
 
         <helix-grid className={styles.insightGrid} columns={4} gap="xl">
           {CARDS.map((card) => (
@@ -58,7 +55,7 @@ export default function Loading() {
         </helix-grid>
       </div>
 
-      <p className={browser.visuallyHidden} role="status">
+      <p data-hidden-visually role="status">
         Loading writing
       </p>
     </>

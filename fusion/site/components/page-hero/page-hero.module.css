@@ -1,0 +1,90 @@
+/* The page's own color, and it runs up behind the masthead. Left to
+   `--site-band` it came out near 760 pixels, which is most of a laptop screen
+   spent on a heading and a text box before a single component is visible. 28rem
+   is 448. */
+.pageHero {
+  /* Lines up with the masthead, not with the prose column. `--site-chrome-inset`
+     and not `space-2xl` directly: the masthead is 16 on a phone and 48 on a wide
+     screen, so a literal token here puts the wordmark and the first card on
+     different edges. */
+  --site-inset: var(--site-chrome-inset);
+  align-items: center;
+  background-color: var(--helix-color-background);
+  display: flex;
+  /* The lattice is a pseudo-element rather than a background on the section,
+     because it has to be masked and a mask on the section would take the heading
+     and the search with it. */
+  isolation: isolate;
+  position: relative;
+  /* The header's own height plus the hairline under it. */
+  margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
+  /* One falloff, named once, because two surfaces wear it: the lattice itself
+     and the layer of shines that light up dots within it. */
+  --site-lattice-mask: radial-gradient(ellipse 90% 78% at 50% 22%, #000 0%, transparent 100%);
+
+  min-block-size: 28rem;
+  padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
+}
+
+.pageHero::before {
+  background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
+  background-position: center;
+  background-size: var(--site-lattice-pitch) var(--site-lattice-pitch);
+  content: "";
+  inset: 0;
+  mask-image: var(--site-lattice-mask);
+  pointer-events: none;
+  position: absolute;
+  /* `base` under `raised`, rather than a negative z-index. `-1` is the usual
+     answer and is a raw value where a layer token belongs; there is no rung
+     below `base`, so the two are ordered by lifting the content instead. */
+  z-index: var(--helix-layer-base);
+}
+
+.pageHeroInner {
+  inline-size: 100%;
+  position: relative;
+  z-index: var(--helix-layer-raised);
+  margin-inline: auto;
+  max-inline-size: 46rem;
+  padding-inline: var(--site-inset);
+  text-align: center;
+}
+
+/* Held off full strength, the way the lede is everywhere else on the site. */
+.pageHeroLede {
+  color: var(--helix-color-foreground-muted);
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  text-wrap: balance;
+}
+
+/* Exactly as wide as the pair of buttons under it. */
+.heroSearch {
+  --input-background-color: var(--helix-color-surface-sunken);
+
+  inline-size: 100%;
+  max-inline-size: calc(var(--helix-size-button) * 2 - var(--helix-border-thin));
+  text-align: start;
+}
+
+/* The shortcut chip on the hero's search field, which is glass. **`Kbd` ships an
+   opaque key and the hero has nothing opaque on it.** Its ground is
+   `surface-sunken` and its edge is a full-strength `border`, which is right on a
+   page: a key is a physical thing and reads as one against paper. Both hooks the
+   component publishes, and both mixed rather than replaced: the fill is the
+   foreground at 8 percent so it tints whatever is behind it instead of covering
+   it, and the edge is the border token at 45 so it stays a line without becoming
+   the brightest thing on the field. */
+.pageHeroInner helix-kbd {
+  --kbd-background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  --kbd-border-color: color-mix(in oklab, var(--helix-color-border) 45%, transparent);
+}
+
+/* And gone on a phone, for the reason the palette's hints are: the chip says
+   "press slash to get here", and the reader who is reading it has already tapped
+   the field. */
+@media (max-width: 40rem) {
+  .keysOnly {
+    display: none;
+  }
+}

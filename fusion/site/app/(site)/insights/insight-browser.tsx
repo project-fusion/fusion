@@ -3,7 +3,9 @@
 import type { HelixInput } from '@fusion.dev/helix'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useRef, useState } from 'react'
-import browser from '@/components/browser.module.css'
+import { FilterBar, filterBar } from '@/components/filter-bar/filter-bar'
+import { GridBand } from '@/components/grid-band/grid-band'
+import { PageHero, pageHero } from '@/components/page-hero/page-hero'
 import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'
 import { useSearchKey } from '@/hooks/use-search-key/use-search-key'
 import type { Insight } from '../../../content/insights'
@@ -173,136 +175,131 @@ export function InsightBrowser({
 
   return (
     <>
-      <section className={`${browser.pageHero} ${styles.insightsHero}`}>
-        {/* Rays, on the reading that light being cast is what an insight looks
-            like, and so that the two galleries do not read as one page twice.
-            Absolute against the hero, which
-            already isolates and positions itself for the lattice pseudo-element,
-            so the light stays inside the band and `.pageHeroInner` keeps its
-            raised layer above it. No `interactive`, so it never takes the hit
-            test off the search field. */}
-        <helix-aura
-          bloom={0.62}
-          class={styles.insightsAura}
-          gain={1.15}
-          scale={0.45}
-          speed={0.5}
-          variant="rays"
-        ></helix-aura>
-        <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
-          <helix-flex align="center" data-density="sm" direction="column" gap="sm">
-            <helix-text as="h1">Insights</helix-text>
-            <helix-text as="p" className={browser.pageHeroLede}>
-              The arguments behind what we build, written where they can be checked.
-            </helix-text>
-          </helix-flex>
-          <helix-input
-            className={`${browser.heroSearch} ${browser.chromeControl}`}
-            default-value={initialQuery}
-            label="Search insights"
-            onInput={(event) => {
-              setQuery(event.currentTarget.value)
-              mirror('q', event.currentTarget.value)
-            }}
-            placeholder={`Search ${index.length} posts…`}
-            ref={searchField}
-            type="search"
-          >
-            <span className={browser.keysOnly} slot="end">
-              <helix-kbd keys="/" onhelix-shortcut={focusSearch} within="document"></helix-kbd>
-            </span>
-            <helix-icon name="magnifying-glass" slot="start"></helix-icon>
-          </helix-input>
+      <PageHero
+        backdrop={
+          <>
+            {/* Rays, on the reading that light being cast is what an insight looks
+                like, and so that the two galleries do not read as one page twice.
+                Absolute against the hero, which
+                already isolates and positions itself for the lattice pseudo-element,
+                so the light stays inside the band and `.pageHeroInner` keeps its
+                raised layer above it. No `interactive`, so it never takes the hit
+                test off the search field. */}
+            <helix-aura
+              bloom={0.62}
+              class={styles.insightsAura}
+              gain={1.15}
+              scale={0.45}
+              speed={0.5}
+              variant="rays"
+            ></helix-aura>
+          </>
+        }
+        className={styles.insightsHero}
+      >
+        <helix-flex align="center" data-density="sm" direction="column" gap="sm">
+          <helix-text as="h1">Insights</helix-text>
+          <helix-text as="p" className={pageHero.pageHeroLede}>
+            The arguments behind what we build, written where they can be checked.
+          </helix-text>
         </helix-flex>
-      </section>
-
-      <div className={browser.filterBar}>
-        {/* Dense by nature, which is the rule app header and toolbar already
-            follow: a bar of filters over a grid is chrome, and a control in it
-            takes its height from the region rather than asking for one. */}
-        <helix-flex
-          align="center"
-          className={browser.filterBarInner}
-          data-density="sm"
-          data-shell
-          gap="md"
-          justify="between"
-          wrap
+        <helix-input
+          className={pageHero.heroSearch}
+          data-chrome-control
+          default-value={initialQuery}
+          label="Search insights"
+          onInput={(event) => {
+            setQuery(event.currentTarget.value)
+            mirror('q', event.currentTarget.value)
+          }}
+          placeholder={`Search ${index.length} posts…`}
+          ref={searchField}
+          type="search"
         >
-          <helix-flex className={browser.filterGroup} gap="sm" wrap>
+          <span className={pageHero.keysOnly} slot="end">
+            <helix-kbd keys="/" onhelix-shortcut={focusSearch} within="document"></helix-kbd>
+          </span>
+          <helix-icon name="magnifying-glass" slot="start"></helix-icon>
+        </helix-input>
+      </PageHero>
+
+      <FilterBar>
+        <helix-flex className={filterBar.filterGroup} gap="sm" wrap>
+          <helix-select
+            className={filterBar.filterControl}
+            data-chrome-control
+            default-value={topic}
+            label="Topic"
+            onChange={(event) => {
+              setTopic(event.currentTarget.value)
+              mirror('topic', event.currentTarget.value)
+            }}
+          >
+            <helix-icon name="funnel-simple" slot="start"></helix-icon>
+            <helix-icon name="caret-down" slot="indicator"></helix-icon>
+            {/* `suppressHydrationWarning`, because the listbox owns this node
+                  once it upgrades: it writes `data-active` onto whichever option
+                  is current, which React's server HTML never produced. */}
+            <helix-option suppressHydrationWarning value={ALL}>
+              All topics
+            </helix-option>
+            {topics.map((name) => (
+              <helix-option key={name} suppressHydrationWarning value={name}>
+                {name}
+              </helix-option>
+            ))}
+          </helix-select>
+          {kinds.length > 1 && (
             <helix-select
-              className={`${browser.chromeControl} ${browser.filterControl}`}
-              default-value={topic}
-              label="Topic"
+              className={filterBar.filterControl}
+              data-chrome-control
+              default-value={kind}
+              label="Kind"
               onChange={(event) => {
-                setTopic(event.currentTarget.value)
-                mirror('topic', event.currentTarget.value)
+                setKind(event.currentTarget.value)
+                mirror('kind', event.currentTarget.value)
               }}
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {/* `suppressHydrationWarning`, because the listbox owns this node
-                  once it upgrades: it writes `data-active` onto whichever option
-                  is current, which React's server HTML never produced. */}
               <helix-option suppressHydrationWarning value={ALL}>
-                All topics
+                All kinds
               </helix-option>
-              {topics.map((name) => (
+              {kinds.map((name) => (
                 <helix-option key={name} suppressHydrationWarning value={name}>
                   {name}
                 </helix-option>
               ))}
             </helix-select>
-            {kinds.length > 1 && (
-              <helix-select
-                className={`${browser.chromeControl} ${browser.filterControl}`}
-                default-value={kind}
-                label="Kind"
-                onChange={(event) => {
-                  setKind(event.currentTarget.value)
-                  mirror('kind', event.currentTarget.value)
-                }}
-              >
-                <helix-icon name="funnel-simple" slot="start"></helix-icon>
-                <helix-icon name="caret-down" slot="indicator"></helix-icon>
-                <helix-option suppressHydrationWarning value={ALL}>
-                  All kinds
-                </helix-option>
-                {kinds.map((name) => (
-                  <helix-option key={name} suppressHydrationWarning value={name}>
-                    {name}
-                  </helix-option>
-                ))}
-              </helix-select>
-            )}
-          </helix-flex>
-          <helix-flex align="center" className={browser.filterSort} gap="sm">
-            {/* The count is announced and not shown. Filtering is a change
+          )}
+        </helix-flex>
+        <helix-flex align="center" className={filterBar.filterSort} gap="sm">
+          {/* The count is announced and not shown. Filtering is a change
                 nothing else reports, so a reader who cannot see the grid shrink
                 needs to be told; a reader who can see it is being told twice. */}
-            <helix-text aria-live="polite" className={browser.visuallyHidden}>
-              {shown} of {index.length} posts
-            </helix-text>
-            <helix-select
-              className={`${browser.chromeControl} ${browser.filterControl}`}
-              default-value={order}
-              label="Sort"
-              onChange={(event) => sortBy(event.currentTarget.value)}
-            >
-              {/* A different mark from the filters', because it does a different
+          <helix-text aria-live="polite" data-hidden-visually>
+            {shown} of {index.length} posts
+          </helix-text>
+          <helix-select
+            className={filterBar.filterControl}
+            data-chrome-control
+            default-value={order}
+            label="Sort"
+            onChange={(event) => sortBy(event.currentTarget.value)}
+          >
+            {/* A different mark from the filters', because it does a different
                   thing: a funnel takes rows away, and this only changes the
                   order they are in. */}
-              <helix-icon name="arrows-out-line-vertical" slot="start"></helix-icon>
-              <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {sorts.map((name) => (
-                <helix-option key={name} suppressHydrationWarning value={name}>
-                  {titleCase(name)}
-                </helix-option>
-              ))}
-            </helix-select>
-          </helix-flex>
+            <helix-icon name="arrows-out-line-vertical" slot="start"></helix-icon>
+            <helix-icon name="caret-down" slot="indicator"></helix-icon>
+            {sorts.map((name) => (
+              <helix-option key={name} suppressHydrationWarning value={name}>
+                {titleCase(name)}
+              </helix-option>
+            ))}
+          </helix-select>
         </helix-flex>
-      </div>
+      </FilterBar>
 
       {hidden.length > 0 && (
         <style>
@@ -313,7 +310,7 @@ export function InsightBrowser({
         </style>
       )}
 
-      <div className={browser.gridBand} data-filtered-grid data-shell>
+      <GridBand>
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">
@@ -323,7 +320,7 @@ export function InsightBrowser({
           </helix-empty>
         ) : null}
         {children}
-      </div>
+      </GridBand>
     </>
   )
 }

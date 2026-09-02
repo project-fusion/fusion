@@ -4,8 +4,10 @@ import type { HelixInput } from '@fusion.dev/helix'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useRef, useState } from 'react'
-import browser from '@/components/browser.module.css'
+import { FilterBar, filterBar } from '@/components/filter-bar/filter-bar'
+import { GridBand } from '@/components/grid-band/grid-band'
 import { HeroField } from '@/components/hero-field/hero-field'
+import { PageHero, pageHero } from '@/components/page-hero/page-hero'
 import type { stageAppearance } from '@/content/verticals/verticals'
 import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'
 import { useSearchKey } from '@/hooks/use-search-key/use-search-key'
@@ -208,59 +210,58 @@ export function ComponentBrowser({
 
   return (
     <>
-      <section className={`${browser.pageHero} ${styles.designHero}`}>
-        <HeroField />
-        <helix-flex align="center" className={browser.pageHeroInner} direction="column" gap="lg">
-          {/* Eyebrow, title and lede are one block, and the lede belongs inside
-           * it. At `sm` the block reads 12 / 12 internally against 24 to
-           * whatever follows: a clean two to one. Left as a sibling of the
-           * block it takes the outer `lg`, so a line describing the heading
-           * immediately above it is spaced as the next unrelated thing on the
-           * page.
-           *
-           * The tag is over the name rather than beside it. Alongside, it reads
-           * as part of the title and pushes it off center. */}
-          <helix-flex align="center" data-density="sm" direction="column" gap="sm">
-            {/* Two marks, not one. The stage is the one label on this page that
+      <PageHero backdrop={<HeroField />} className={styles.designHero}>
+        {/* Eyebrow, title and lede are one block, and the lede belongs inside
+         * it. At `sm` the block reads 12 / 12 internally against 24 to
+         * whatever follows: a clean two to one. Left as a sibling of the
+         * block it takes the outer `lg`, so a line describing the heading
+         * immediately above it is spaced as the next unrelated thing on the
+         * page.
+         *
+         * The tag is over the name rather than beside it. Alongside, it reads
+         * as part of the title and pushes it off center. */}
+        <helix-flex align="center" data-density="sm" direction="column" gap="sm">
+          {/* Two marks, not one. The stage is the one label on this page that
                 has to stay legible: `Building` means real work with nothing
                 shipped, and folding it into an eyebrow that also names the
                 vertical would soften it by omission. So the vertical names
                 itself and the stage sits beside it, still in its own tone. */}
-            <helix-flex align="center" gap="xs">
-              <helix-tag>{eyebrow}</helix-tag>
-              <helix-tag tone={stageTone}>{stage}</helix-tag>
-            </helix-flex>
-            <helix-text as="h1">{title}</helix-text>
-            <helix-text as="p" className={browser.pageHeroLede}>
-              {lede}
-            </helix-text>
+          <helix-flex align="center" gap="xs">
+            <helix-tag>{eyebrow}</helix-tag>
+            <helix-tag tone={stageTone}>{stage}</helix-tag>
           </helix-flex>
-          {/* "Components" rather than "families", and the count is the
+          <helix-text as="h1">{title}</helix-text>
+          <helix-text as="p" className={pageHero.pageHeroLede}>
+            {lede}
+          </helix-text>
+        </helix-flex>
+        {/* "Components" rather than "families", and the count is the
               catalog's rather than the library's: one card each, not the number
               of custom elements, since Tabs is one card and two elements. The
               library says "family" wherever it has to tell a family from its
               parts, which is an authoring concern; a reader browsing meets the
               word nowhere else on the site, the route being `/helix/components`
               and the label above saying the same. */}
-          <helix-input
-            className={`${browser.heroSearch} ${browser.chromeControl}`}
-            default-value={initialQuery}
-            label="Search components"
-            onInput={(event) => {
-              setQuery(event.currentTarget.value)
-              mirror('q', event.currentTarget.value)
-            }}
-            placeholder={`Search ${index.length} components…`}
-            ref={search}
-            type="search"
-          >
-            <span className={browser.keysOnly} slot="end">
-              <helix-kbd keys="/" onhelix-shortcut={focusSearch} within="document"></helix-kbd>
-            </span>
-            <helix-icon name="magnifying-glass" slot="start"></helix-icon>
-          </helix-input>
-          <helix-flex align="center" className="pageHeroActions" direction="column" gap="lg">
-            {/* One control, not two buttons next to each other. The group
+        <helix-input
+          className={pageHero.heroSearch}
+          data-chrome-control
+          default-value={initialQuery}
+          label="Search components"
+          onInput={(event) => {
+            setQuery(event.currentTarget.value)
+            mirror('q', event.currentTarget.value)
+          }}
+          placeholder={`Search ${index.length} components…`}
+          ref={search}
+          type="search"
+        >
+          <span className={pageHero.keysOnly} slot="end">
+            <helix-kbd keys="/" onhelix-shortcut={focusSearch} within="document"></helix-kbd>
+          </span>
+          <helix-icon name="magnifying-glass" slot="start"></helix-icon>
+        </helix-input>
+        <helix-flex align="center" className="pageHeroActions" direction="column" gap="lg">
+          {/* One control, not two buttons next to each other. The group
                 flattens the inner corners and pulls the pair together by the
                 border width, so they read as a single thing with two halves.
                 That is also why neither is `primary`: a group welds its members
@@ -274,50 +275,38 @@ export function ComponentBrowser({
                 and links get read out of context: a reader listing the page's
                 links hears the label alone, with no hero around it to say what
                 `Explore` would have meant. */}
-            <helix-button-group>
-              {/* An icon each, and neither of them an arrow. An arrow says
+          <helix-button-group>
+            {/* An icon each, and neither of them an arrow. An arrow says
                   "onward" and nothing else, which is what the button's own
                   position already says; put one on a hero button and it is
                   decoration that happens to point right. */}
-              <Link data-button data-button-width="standard" href="/helix/components/button">
-                <helix-icon name="flag-banner-fold"></helix-icon>
-                Start
-              </Link>
-              <Link data-button data-button-width="standard" href="/helix/sandbox">
-                <helix-icon name="microscope"></helix-icon>
-                Sandbox
-              </Link>
-            </helix-button-group>
-          </helix-flex>
+            <Link data-button data-button-width="standard" href="/helix/components/button">
+              <helix-icon name="flag-banner-fold"></helix-icon>
+              Start
+            </Link>
+            <Link data-button data-button-width="standard" href="/helix/sandbox">
+              <helix-icon name="microscope"></helix-icon>
+              Sandbox
+            </Link>
+          </helix-button-group>
         </helix-flex>
-      </section>
+      </PageHero>
 
-      <div className={browser.filterBar}>
-        {/* Dense by nature, which is the rule app header and toolbar already
-            follow: a bar of filters over a grid is chrome, and a control in it
-            takes its height from the region rather than asking for one. */}
-        <helix-flex
-          align="center"
-          className={browser.filterBarInner}
-          data-density="sm"
-          data-shell
-          gap="md"
-          justify="between"
-          wrap
-        >
-          <helix-flex className={browser.filterGroup} gap="sm" wrap>
-            <helix-select
-              className={`${browser.chromeControl} ${browser.filterControl}`}
-              default-value={category}
-              label="Category"
-              onChange={(event) => {
-                setCategory(event.currentTarget.value)
-                mirror('category', event.currentTarget.value)
-              }}
-            >
-              <helix-icon name="funnel-simple" slot="start"></helix-icon>
-              <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {/* `suppressHydrationWarning`, because the listbox owns this node
+      <FilterBar>
+        <helix-flex className={filterBar.filterGroup} gap="sm" wrap>
+          <helix-select
+            className={filterBar.filterControl}
+            data-chrome-control
+            default-value={category}
+            label="Category"
+            onChange={(event) => {
+              setCategory(event.currentTarget.value)
+              mirror('category', event.currentTarget.value)
+            }}
+          >
+            <helix-icon name="funnel-simple" slot="start"></helix-icon>
+            <helix-icon name="caret-down" slot="indicator"></helix-icon>
+            {/* `suppressHydrationWarning`, because the listbox owns this node
                   once it upgrades. It writes `data-active` onto whichever option
                   is current, and a custom element registering early can do that
                   before React hydrates the subtree, so React finds an attribute
@@ -325,67 +314,68 @@ export function ComponentBrowser({
                   the case the flag exists for: the DOM here is written by
                   something that is not React, and the mismatch is expected
                   rather than a symptom. */}
-              <helix-option suppressHydrationWarning value={ALL}>
-                All categories
+            <helix-option suppressHydrationWarning value={ALL}>
+              All categories
+            </helix-option>
+            {categories.map((name) => (
+              <helix-option key={name} suppressHydrationWarning value={name}>
+                {titleCase(name)}
               </helix-option>
-              {categories.map((name) => (
+            ))}
+          </helix-select>
+          {statuses.length > 1 && (
+            <helix-select
+              className={filterBar.filterControl}
+              data-chrome-control
+              default-value={status}
+              label="Status"
+              onChange={(event) => {
+                setStatus(event.currentTarget.value)
+                mirror('status', event.currentTarget.value)
+              }}
+            >
+              <helix-icon name="funnel-simple" slot="start"></helix-icon>
+              <helix-icon name="caret-down" slot="indicator"></helix-icon>
+              <helix-option suppressHydrationWarning value={ALL}>
+                All statuses
+              </helix-option>
+              {statuses.map((name) => (
                 <helix-option key={name} suppressHydrationWarning value={name}>
                   {titleCase(name)}
                 </helix-option>
               ))}
             </helix-select>
-            {statuses.length > 1 && (
-              <helix-select
-                className={`${browser.chromeControl} ${browser.filterControl}`}
-                default-value={status}
-                label="Status"
-                onChange={(event) => {
-                  setStatus(event.currentTarget.value)
-                  mirror('status', event.currentTarget.value)
-                }}
-              >
-                <helix-icon name="funnel-simple" slot="start"></helix-icon>
-                <helix-icon name="caret-down" slot="indicator"></helix-icon>
-                <helix-option suppressHydrationWarning value={ALL}>
-                  All statuses
-                </helix-option>
-                {statuses.map((name) => (
-                  <helix-option key={name} suppressHydrationWarning value={name}>
-                    {titleCase(name)}
-                  </helix-option>
-                ))}
-              </helix-select>
-            )}
-          </helix-flex>
-          <helix-flex align="center" className={browser.filterSort} gap="sm">
-            {/* The count is announced and not shown. Filtering is a change
+          )}
+        </helix-flex>
+        <helix-flex align="center" className={filterBar.filterSort} gap="sm">
+          {/* The count is announced and not shown. Filtering is a change
                 nothing else reports, so a reader who cannot see the grid shrink
                 needs to be told; a reader who can see it is being told twice.
                 `visuallyHidden` is the same treatment the control labels
                 take. */}
-            <helix-text aria-live="polite" className={browser.visuallyHidden}>
-              {shown} of {index.length} components
-            </helix-text>
-            <helix-select
-              className={`${browser.chromeControl} ${browser.filterControl}`}
-              default-value={order}
-              label="Sort"
-              onChange={(event) => sortBy(event.currentTarget.value)}
-            >
-              {/* A different mark from the filters', because it does a
+          <helix-text aria-live="polite" data-hidden-visually>
+            {shown} of {index.length} components
+          </helix-text>
+          <helix-select
+            className={filterBar.filterControl}
+            data-chrome-control
+            default-value={order}
+            label="Sort"
+            onChange={(event) => sortBy(event.currentTarget.value)}
+          >
+            {/* A different mark from the filters', because it does a
                   different thing: a funnel takes rows away, and this only
                   changes the order they are in. */}
-              <helix-icon name="arrows-out-line-vertical" slot="start"></helix-icon>
-              <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {sorts.map((name) => (
-                <helix-option key={name} suppressHydrationWarning value={name}>
-                  {titleCase(name)}
-                </helix-option>
-              ))}
-            </helix-select>
-          </helix-flex>
+            <helix-icon name="arrows-out-line-vertical" slot="start"></helix-icon>
+            <helix-icon name="caret-down" slot="indicator"></helix-icon>
+            {sorts.map((name) => (
+              <helix-option key={name} suppressHydrationWarning value={name}>
+                {titleCase(name)}
+              </helix-option>
+            ))}
+          </helix-select>
         </helix-flex>
-      </div>
+      </FilterBar>
 
       {hidden.length > 0 && (
         <style>
@@ -396,7 +386,7 @@ export function ComponentBrowser({
         </style>
       )}
 
-      <div className={browser.gridBand} data-filtered-grid data-shell>
+      <GridBand>
         {shown === 0 ? (
           <helix-empty>
             <helix-text as="h2" slot="heading">
@@ -406,7 +396,7 @@ export function ComponentBrowser({
           </helix-empty>
         ) : null}
         {children}
-      </div>
+      </GridBand>
     </>
   )
 }

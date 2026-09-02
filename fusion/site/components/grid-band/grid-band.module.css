@@ -1,0 +1,11 @@
+/* Air around the grid, on both block sides. `space-2xl` is the same 48 the grid
+   uses between its own cards, which is what makes the band read as one field of
+   cards rather than as a grid that happens to start somewhere. */
+.gridBand {
+  /* Lines up with the masthead, not with the prose column. `--site-chrome-inset`
+     and not `space-2xl` directly: the masthead is 16 on a phone and 48 on a wide
+     screen, so a literal token here puts the wordmark and the first card on
+     different edges. */
+  --site-inset: var(--site-chrome-inset);
+  padding-block: var(--helix-space-2xl);
+}

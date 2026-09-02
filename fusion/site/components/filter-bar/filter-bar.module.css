@@ -1,0 +1,41 @@
+/* The bar between the hero and the grid, running the full window. */
+.filterBar {
+  /* Lines up with the masthead, not with the prose column. `--site-chrome-inset`
+     and not `space-2xl` directly: the masthead is 16 on a phone and 48 on a wide
+     screen, so a literal token here puts the wordmark and the first card on
+     different edges. */
+  --site-inset: var(--site-chrome-inset);
+  border-block: var(--helix-border-thin) solid var(--helix-color-border);
+}
+
+.filterBarInner {
+  margin-inline: auto;
+  padding-block: var(--helix-space-sm);
+}
+
+/* Wide enough for the longest option and no wider. */
+.filterControl {
+  inline-size: 12rem;
+}
+
+/* *Three fixed controls in a wrapping row, on a phone, is two and an orphan.**
+   12rem is 192px, so a 375px screen fits two of them and drops the third onto a
+   line of its own with two thirds of that line empty. The fixed width comes off
+   here and only here, since the reason for it, two selects agreeing with each
+   other, is met better by both filling half than by both being 192. */
+@media (width < 48rem) {
+  .filterGroup {
+    inline-size: 100%;
+  }
+
+  .filterSort {
+    inline-size: 100%;
+  }
+
+  .filterGroup .filterControl,
+  .filterSort .filterControl {
+    flex: 1 1 0;
+    inline-size: auto;
+    min-inline-size: 0;
+  }
+}
