@@ -1,4 +1,4 @@
-import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix-styles/helix.css'
 import '@fusion.dev/helix-gallery/gallery.css'
 import './fonts.css'
 import './site.css'

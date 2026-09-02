@@ -11,8 +11,9 @@
   },
   "type": "module",
   "exports": {
-    "./all.css": "./dist/all.css",
     "./base.css": "./dist/base.css",
+    "./elements.css": "./dist/elements.css",
+    "./helix.css": "./dist/helix.css",
     "./primitives.css": "./dist/primitives.css",
     "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./dist/tokens.json"
@@ -22,7 +23,8 @@
   ],
   "sideEffects": true,
   "scripts": {
-    "build": "bun run token-layer && node scripts/build-styles-dist.mjs",
+    "build": "bun run token-layer && bun run elements-css && node scripts/build-styles-dist.mjs",
+    "elements-css": "build-elements-css",
     "styles-dist": "node scripts/build-styles-dist.mjs",
     "token-layer": "bun scripts/build-token-layer.mjs"
   },

@@ -8,7 +8,7 @@ npm install @fusion.dev/helix-styles
 ```
 
 ```css
-@import '@fusion.dev/helix-styles/all.css';
+@import '@fusion.dev/helix-styles/helix.css';
 ```
 
 Or take the pieces:
@@ -18,7 +18,7 @@ Or take the pieces:
 | `tokens.css` | the custom properties, light and dark |
 | `base.css` | element defaults and the reset |
 | `primitives.css` | utility layer |
-| `all.css` | all three, in order |
+| `helix.css` | all four, in order |
 | `tokens.json` | the same token names for a build step that needs them |
 
 The tokens are the contract every Helix component reads, so overriding one here

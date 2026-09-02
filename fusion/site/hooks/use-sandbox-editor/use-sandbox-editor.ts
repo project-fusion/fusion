@@ -18,7 +18,7 @@ import { useEffect } from 'react'
  * way, `HelixElement` recording its marks as `ElementInternals.states` entries
  * rather than in the DOM.
  *
- * The window where the tag is unknown is what `@fusion.dev/helix/elements.css`
+ * The window where the tag is unknown is what `@fusion.dev/helix-styles/helix.css`
  * already covers, hiding `:not(:defined)` by visibility so nothing reflows when
  * the definition lands.
  */

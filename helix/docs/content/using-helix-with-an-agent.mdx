@@ -105,7 +105,7 @@ attribute, so the attribute selector paints it as live while it refuses input.
 ### 4. Two stylesheets, then the elements
 
 ```ts
-import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix-styles/helix.css'
 import '@fusion.dev/helix'
 ```
 
@@ -124,7 +124,7 @@ declares `--helix-color-*` at all, while without `primitives.css` all 185
 semantic tokens are declared and every color resolves to `rgba(0, 0, 0, 0)`,
 since `tokens.css` refers to a primitive 297 times and to nothing else. The
 second is the one that looks like a working install, and it is the reason
-`all.css` exists.
+`helix.css` exists.
 
 ## Choosing a family
 

@@ -181,12 +181,12 @@ const STYLESHEETS = [
     path: 'helix/styles/dist/base.css',
   },
   {
-    note: "The components' own layer, generated from every family's stylesheet.",
-    path: 'helix/styled/css/elements.css',
+    note: 'Hides each element until its definition loads, generated from the tags in `@fusion.dev/helix`.',
+    path: 'helix/styles/dist/elements.css',
   },
   {
-    note: 'The three above in one import, in the order they have to be in.',
-    path: 'helix/styles/dist/all.css',
+    note: 'The four above in one import, in the order they have to be in.',
+    path: 'helix/styles/dist/helix.css',
   },
   {
     note: 'The primitive layer. Private, shipped because `tokens.css` resolves into it.',

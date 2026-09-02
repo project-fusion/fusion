@@ -255,7 +255,7 @@ render is broken in any non-browser context.
 
 Shadow styles now arrive with the definition rather than in the markup, so the
 flash window is "before the element upgrades", covered by
-`@fusion.dev/helix/elements.css`. Within that, the risk is still **state, not
+`@fusion.dev/helix-styles/helix.css`. Within that, the risk is still **state, not
 styling**.
 
 1. **Never initialize state in `connectedCallback`.** SSR does not call it.
@@ -1305,7 +1305,7 @@ unregistered tag is just an unknown element in the HTML that upgrades when the
 definition lands. Consumers are on the App Router; asking them to mark every
 page `'use client'` to use a button would not be a design system.
 
-**Import `@fusion.dev/helix/elements.css` beside the base layer.** It is generated
+**`@fusion.dev/helix-styles/helix.css` carries it.** `elements.css` is generated
 from the element sources by `fusion/scripts/build-elements-css.mjs` and hides
 each tag with `:not(:defined)` until it upgrades, using `visibility` so the page
 does not reflow. Without it a card arrives as a run of unstyled text and then

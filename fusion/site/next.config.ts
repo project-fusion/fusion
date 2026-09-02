@@ -14,7 +14,7 @@ import type { NextConfig } from 'next'
  *
  * Consumers are on the App Router, so Helix has to work there without asking
  * them to adopt an experimental patch to React. Elements now upgrade on the
- * client like any other custom element, and `@fusion.dev/helix/elements.css` covers
+ * client like any other custom element, and `@fusion.dev/helix-styles/helix.css` covers
  * the window before they do.
  */
 

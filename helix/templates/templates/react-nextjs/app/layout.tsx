@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 
 /* Every layer in one import: the tokens, the reset, the utility layer, and the
    `:not(:defined)` rules that keep a tag from arriving unstyled. */
-import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix-styles/helix.css'
 
 import { HelixElements } from './helix-elements.js'
 

@@ -20,8 +20,8 @@
  * keeps reading `src`, because what it checks is what somebody wrote. Only `exports` moves, so a consumer writing
  * `@fusion.dev/helix-styles/tokens.css` is unaffected and gets the smaller file.
  *
- * **The relative `@import`s in `all.css` survive because the whole set lands
- * side by side.** `dist/all.css` importing `./tokens.css` finds `dist/tokens.css`.
+ * **The relative `@import`s in `helix.css` survive because the whole set lands
+ * side by side.** `dist/helix.css` importing `./tokens.css` finds `dist/tokens.css`.
  *
  * Run with `turbo run styles-dist`, which `@fusion.dev/helix-styles`' `build` calls.
  */

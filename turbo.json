@@ -32,11 +32,18 @@
       "outputs": ["dist/**", "src/element-events.generated.ts"]
     },
     // `token-layer` writes `src/tokens.css` from `src/_modes.css` and the
-    // registry, so the stylesheet is a build output and has to be declared here
-    // as well, or a cache hit leaves `styles-dist` nothing to strip.
+    // registry, and `elements-css` writes `src/elements.css` from the tags in
+    // `@fusion.dev/helix`, so both stylesheets are build outputs and have to be
+    // declared here as well, or a cache hit leaves `styles-dist` nothing to
+    // strip.
+    //
+    // **`elements-css` and not `^build`.** This package is what `@fusion.dev/helix`
+    // depends on, so waiting for it to build would be a cycle. The generator
+    // reads element source text and needs nothing compiled, which is what lets
+    // the two be ordered at all.
     "@fusion.dev/helix-styles#build": {
-      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
-      "outputs": ["dist/**", "src/tokens.css"]
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles", "elements-css"],
+      "outputs": ["dist/**", "src/tokens.css", "src/elements.css"]
     },
     "@fusion.dev/helix#build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
@@ -163,6 +170,16 @@
     // success from a replayed log. `samples` has the same shape and the same
     // answer.
     "docs": { "cache": false },
+    // Reads `@customElement('tag')` out of the element sources and writes the
+    // sheet that hides each one until it upgrades. A workspace step rather than
+    // a package's, because it reads one package and writes another.
+    "elements-css": {
+      "inputs": [
+        "$TURBO_ROOT$/helix/styled/src/**/*.ts",
+        "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
+      ],
+      "outputs": ["$TURBO_ROOT$/helix/styles/src/elements.css"]
+    },
 
     // **Four that cannot cache, each for its own reason, said rather than
     // discovered.** `faces` fetches a font list over the network, so a cache hit
@@ -172,7 +189,7 @@
     // `wasm-check` derives seventeen themes through the tracked binary, which is
     // the artifact it exists to distrust.
     "faces": { "cache": false },
-    // The fourth layer is `helix/styled/css/elements.css`, and it was not in
+    // The fourth layer is `helix/styles/src/elements.css`, and it was not in
     // `inputs`, so editing any component stylesheet did not invalidate this.
     // `dependsOn` orders the two tasks and ordering is not invalidation: the
     // sandbox stylesheet, which is also what the browser spec runner serves as
@@ -185,7 +202,7 @@
         "preview/preview-frame.css",
         "public/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
-        "$TURBO_ROOT$/helix/styled/css/elements.css",
+        "$TURBO_ROOT$/helix/styles/src/elements.css",
         "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs"
       ],
       "outputs": ["public/sandbox/**"]
@@ -236,7 +253,7 @@
         "$TURBO_ROOT$/fusion/scripts/build-styles.mjs",
         "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
       ],
-      "outputs": ["src/**/*.css.ts", "css/elements.css", "css/*.css.ts"]
+      "outputs": ["src/**/*.css.ts"]
     },
 
     "styles-dist": {

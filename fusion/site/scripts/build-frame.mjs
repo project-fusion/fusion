@@ -36,7 +36,7 @@ const layers = [
   ...['tokens.css', 'primitives.css', 'base.css'].map((name) =>
     fileURLToPath(import.meta.resolve(`@fusion.dev/helix-styles/${name}`)),
   ),
-  fileURLToPath(import.meta.resolve('@fusion.dev/helix/elements.css')),
+  fileURLToPath(import.meta.resolve('@fusion.dev/helix-styles/elements.css')),
   // The frame's own layout modes, which belong to the document rather than to
   // the site around it.
   join(root, 'fusion/site/preview/preview-frame.css'),

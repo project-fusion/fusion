@@ -1480,7 +1480,7 @@ rather than an unthemed version of itself.
 ## The stylesheets go in this order
 
 \`\`\`ts
-import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix-styles/helix.css'
 \`\`\`
 
 One import, and it is four files in the order they have to be in:
@@ -1727,7 +1727,7 @@ Two imports at your app root, in this order, then the elements are usable
 anywhere:
 
 \`\`\`ts
-import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix-styles/helix.css'
 import '@fusion.dev/helix'
 \`\`\`
 
@@ -1935,8 +1935,8 @@ is the whole cost of adopting the base layer on its own.
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
 | \`base.css\` | 23,145 | 3,556 | 3,065 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
-| \`elements.css\` | 8,290 | 1,875 | 1,600 | The components' own layer, generated from every family's stylesheet. |
-| \`all.css\` | 179 | 142 | 110 | The three above in one import, in the order they have to be in. |
+| \`elements.css\` | 7,033 | 1,209 | 1,082 | Hides each element until its definition loads, generated from the tags in \`@fusion.dev/helix\`. |
+| \`helix.css\` | 207 | 148 | 118 | The four above in one import, in the order they have to be in. |
 | \`primitives.css\` | 6,275 | 1,234 | 1,062 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
 | \`tokens.css\` | 19,989 | 2,460 | 2,046 | The 185 semantic tokens. Nothing paints without this. |
 
@@ -2243,9 +2243,9 @@ column is what was removed rather than part of what remains.
 | \`@fusion.dev/helix-core\` | 655,135 | 113 | 154,658 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
 | \`@fusion.dev/helix-headless\` | 8,636,163 | 422 | 699,239 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 65,943 | 11 | 20,928 | none |
-| \`@fusion.dev/helix-styles\` | 83,277 | 5 | 0 | none |
+| \`@fusion.dev/helix-styles\` | 90,338 | 6 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 461,551 | 8 | 4,699 | none |
-| \`@fusion.dev/helix\` | 9,314,242 | 720 | 278,170 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,297,066 | 716 | 278,170 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
@@ -4549,7 +4549,7 @@ attribute, so the attribute selector paints it as live while it refuses input.
 ### 4. Two stylesheets, then the elements
 
 \`\`\`ts
-import '@fusion.dev/helix/helix.css'
+import '@fusion.dev/helix-styles/helix.css'
 import '@fusion.dev/helix'
 \`\`\`
 
@@ -4568,7 +4568,7 @@ declares \`--helix-color-*\` at all, while without \`primitives.css\` all 185
 semantic tokens are declared and every color resolves to \`rgba(0, 0, 0, 0)\`,
 since \`tokens.css\` refers to a primitive 297 times and to nothing else. The
 second is the one that looks like a working install, and it is the reason
-\`all.css\` exists.
+\`helix.css\` exists.
 
 ## Choosing a family
 
@@ -4769,7 +4769,7 @@ would not be a design system.
 
 \`\`\`ts
 import '@fusion.dev/helix-styles/base.css'
-import '@fusion.dev/helix/elements.css'
+import '@fusion.dev/helix-styles/helix.css'
 \`\`\`
 
 It hides each tag with \`:not(:defined)\` until it upgrades, using \`visibility\` so
@@ -5046,107 +5046,29 @@ no build step at all. Two ways, and they suit different things.
 
 \`\`\`html
 <link
-  href="/vendor/helix/all.css"
-  rel="stylesheet"
-/>
-
-<button
-  data-button="solid"
-  data-button-tone="primary"
->Save</button>
-<div data-card>
-  <h2>A card</h2>
-  <p data-prose>Written in your own markup.</p>
-</div>
-\`\`\`
-
-\`@fusion.dev/helix-styles\` has no dependencies and no JavaScript. It carries the token
-layer, the element reset, the type scale on bare headings, and recipes for
-markup this library does not render, so a page can look like Helix without a
-single custom element on it.
-
-This is a real way to adopt Helix rather than a fallback, and it is the whole of
-what some pages need. See [Recipes](./recipes) for what the base layer provides.
-
-## The elements, through an import map
-
-\`\`\`html
-<script type="importmap">
-  {
-    "imports": {
-      "@fusion.dev/helix": "/vendor/helix/styled/dist/index.js",
-      "@fusion.dev/helix-core": "/vendor/helix/core/dist/index.js",
-      "@fusion.dev/helix-icons": "/vendor/helix/icons/dist/index.js",
-      "lit": "/vendor/lit/index.js"
-    }
-  }
-</script>
-<script type="module">
-  import '@fusion.dev/helix'
-</script>
-\`\`\`
-
-The components are built on Lit, so \`lit\` has to resolve too. That is the part
-that makes an import map necessary rather than optional: the package's own
-imports are bare specifiers, and a browser needs to be told where each one is.
-
-**A CDN works, and the tradeoff is worth naming.** An import map pointing at
-someone else's server means your page stops working when theirs does, and
-pinning an exact version matters more there than anywhere else. If you would
-rather not take that on, \`bun add\` and then copy
-\`node_modules/@fusion.dev/helix-*/dist\` into whatever you serve.
-
-## What this costs
-
-**Every element ships, whether the page uses one or not.** A bundler is what
-drops the components you never wrote, and without one the browser fetches the
-whole library. Fine for an internal tool or a prototype; not what you want on a
-landing page.
-
-You can narrow it by importing subpaths instead:
-
-\`\`\`js
-import '@fusion.dev/helix/button'
-import '@fusion.dev/helix/dialog'
-\`\`\`
-
-Each still pulls its own dependencies, so this is a reduction rather than a
-minimum, but for a page using five components it is a large one.
-
-**No TypeScript, so no typings.** A misspelled property is silent here where it
-is a compile error in React, Vue and Svelte, which is worth a note in review.
-Nothing else about writing Helix changes: a declared property is a seed and the
-element applies its own changes. See [State and
-control](./state-and-control).
-
-## The stylesheets are the same
-
-\`\`\`html
-<link
-  href="/vendor/helix/all.css"
-  rel="stylesheet"
-/>
-<link
-  href="/vendor/helix/css/elements.css"
+  href="/vendor/helix-styles/helix.css"
   rel="stylesheet"
 />
 \`\`\`
 
-\`all.css\` carries \`primitives.css\`, \`tokens.css\` and \`base.css\` in the order they
-have to be in, and its \`@import\`s are relative, so a browser resolves them
-against the stylesheet's own URL with no bundler involved. Copy the whole
-\`dist\` folder and link the one file. Verified in Chromium: one \`<link>\` produces
-four requests and both layers resolve.
+\`helix.css\` carries \`primitives.css\`, \`tokens.css\`, \`base.css\` and
+\`elements.css\` in the order they have to be in, and its \`@import\`s are relative,
+so a browser resolves them against the stylesheet's own URL with no bundler
+involved. Copy the whole \`dist\` folder and link the one file. Verified in
+Chromium: one \`<link>\` produces five requests and every layer resolves.
 
 *This page listed \`tokens.css\` and \`base.css\` and no \`primitives.css\` until 24
 Aug 2026. \`tokens.css\` refers to a primitive 297 times and imports nothing, so a
 reader who followed that got all 185 semantic tokens declared and every color
 resolving to \`rgba(0, 0, 0, 0)\`. If your page looks unstyled in exactly that
-way, link \`all.css\` instead.*
+way, link \`helix.css\` instead.*
 
-\`elements.css\` stays its own link, being \`@fusion.dev/helix\`'s rather than this
-package's, and it matters more here than anywhere: with no bundler the module
-graph arrives over the network, so the interval where the markup exists and the
-definitions do not is longer than it is in a built app.
+**\`elements.css\` matters more here than anywhere**, and it is the fourth layer
+\`helix.css\` pulls in: with no bundler the module graph arrives over the network,
+so the interval where the markup exists and the definitions do not is longer
+than it is in a built app. It was a second link until it moved into this package,
+which is what let the import become relative. A bare specifier in an \`@import\`
+is resolved by a bundler and never by a browser, so on this page of all pages it
+could not have been one.
 `,
 }

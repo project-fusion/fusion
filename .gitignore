@@ -33,10 +33,12 @@ bun-debug.log*
 npm-debug.log*
 
 # Generated sources, each written by its own package's `build`.
-helix/*/css/elements.css
 helix/icons/src/generated.ts
 helix/*/src/element-events.generated.ts
 helix/*/.preview/.tsbuild
+helix/*/.tsbuild
+cortex/*/.tsbuild
+helix/styles/src/elements.css
 helix/styles/src/tokens.css
 fusion/site/content/catalog/catalog.generated.json
 fusion/docs/insights/src/pages.generated.ts

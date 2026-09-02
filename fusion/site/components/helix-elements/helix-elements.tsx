@@ -40,7 +40,7 @@ import { useEffect, useState } from 'react'
  * **The effect buys load order, not hydration safety.** The definitions leave
  * the critical path and arrive after the page does, measured at 169ms against a
  * load event at 136. The window where a tag is unknown is what
- * `@fusion.dev/helix/elements.css` covers, hiding `:not(:defined)` by visibility
+ * `@fusion.dev/helix-styles/helix.css` covers, hiding `:not(:defined)` by visibility
  * so the page does not reflow when the definitions land.
  *
  * **What keeps hydration clean is that the four state mirrors are

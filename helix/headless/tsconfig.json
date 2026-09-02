@@ -9,9 +9,5 @@
   "exclude": ["src/**/*.spec.ts", "src/*/.examples/**"],
   "extends": "../../tsconfig.base.json",
   "include": ["src/**/*"],
-  "references": [
-    {
-      "path": "./.preview"
-    }
-  ]
+  "references": [{ "path": "./.preview" }, { "path": "./tsconfig.spec.json" }]
 }

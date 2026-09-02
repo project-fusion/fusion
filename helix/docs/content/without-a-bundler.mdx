@@ -15,105 +15,27 @@ no build step at all. Two ways, and they suit different things.
 
 ```html
 <link
-  href="/vendor/helix/all.css"
-  rel="stylesheet"
-/>
-
-<button
-  data-button="solid"
-  data-button-tone="primary"
->Save</button>
-<div data-card>
-  <h2>A card</h2>
-  <p data-prose>Written in your own markup.</p>
-</div>
-```
-
-`@fusion.dev/helix-styles` has no dependencies and no JavaScript. It carries the token
-layer, the element reset, the type scale on bare headings, and recipes for
-markup this library does not render, so a page can look like Helix without a
-single custom element on it.
-
-This is a real way to adopt Helix rather than a fallback, and it is the whole of
-what some pages need. See [Recipes](./recipes) for what the base layer provides.
-
-## The elements, through an import map
-
-```html
-<script type="importmap">
-  {
-    "imports": {
-      "@fusion.dev/helix": "/vendor/helix/styled/dist/index.js",
-      "@fusion.dev/helix-core": "/vendor/helix/core/dist/index.js",
-      "@fusion.dev/helix-icons": "/vendor/helix/icons/dist/index.js",
-      "lit": "/vendor/lit/index.js"
-    }
-  }
-</script>
-<script type="module">
-  import '@fusion.dev/helix'
-</script>
-```
-
-The components are built on Lit, so `lit` has to resolve too. That is the part
-that makes an import map necessary rather than optional: the package's own
-imports are bare specifiers, and a browser needs to be told where each one is.
-
-**A CDN works, and the tradeoff is worth naming.** An import map pointing at
-someone else's server means your page stops working when theirs does, and
-pinning an exact version matters more there than anywhere else. If you would
-rather not take that on, `bun add` and then copy
-`node_modules/@fusion.dev/helix-*/dist` into whatever you serve.
-
-## What this costs
-
-**Every element ships, whether the page uses one or not.** A bundler is what
-drops the components you never wrote, and without one the browser fetches the
-whole library. Fine for an internal tool or a prototype; not what you want on a
-landing page.
-
-You can narrow it by importing subpaths instead:
-
-```js
-import '@fusion.dev/helix/button'
-import '@fusion.dev/helix/dialog'
-```
-
-Each still pulls its own dependencies, so this is a reduction rather than a
-minimum, but for a page using five components it is a large one.
-
-**No TypeScript, so no typings.** A misspelled property is silent here where it
-is a compile error in React, Vue and Svelte, which is worth a note in review.
-Nothing else about writing Helix changes: a declared property is a seed and the
-element applies its own changes. See [State and
-control](./state-and-control).
-
-## The stylesheets are the same
-
-```html
-<link
-  href="/vendor/helix/all.css"
-  rel="stylesheet"
-/>
-<link
-  href="/vendor/helix/css/elements.css"
+  href="/vendor/helix-styles/helix.css"
   rel="stylesheet"
 />
 ```
 
-`all.css` carries `primitives.css`, `tokens.css` and `base.css` in the order they
-have to be in, and its `@import`s are relative, so a browser resolves them
-against the stylesheet's own URL with no bundler involved. Copy the whole
-`dist` folder and link the one file. Verified in Chromium: one `<link>` produces
-four requests and both layers resolve.
+`helix.css` carries `primitives.css`, `tokens.css`, `base.css` and
+`elements.css` in the order they have to be in, and its `@import`s are relative,
+so a browser resolves them against the stylesheet's own URL with no bundler
+involved. Copy the whole `dist` folder and link the one file. Verified in
+Chromium: one `<link>` produces five requests and every layer resolves.
 
 *This page listed `tokens.css` and `base.css` and no `primitives.css` until 24
 Aug 2026. `tokens.css` refers to a primitive 297 times and imports nothing, so a
 reader who followed that got all 185 semantic tokens declared and every color
 resolving to `rgba(0, 0, 0, 0)`. If your page looks unstyled in exactly that
-way, link `all.css` instead.*
+way, link `helix.css` instead.*
 
-`elements.css` stays its own link, being `@fusion.dev/helix`'s rather than this
-package's, and it matters more here than anywhere: with no bundler the module
-graph arrives over the network, so the interval where the markup exists and the
-definitions do not is longer than it is in a built app.
+**`elements.css` matters more here than anywhere**, and it is the fourth layer
+`helix.css` pulls in: with no bundler the module graph arrives over the network,
+so the interval where the markup exists and the definitions do not is longer
+than it is in a built app. It was a second link until it moved into this package,
+which is what let the import become relative. A bare specifier in an `@import`
+is resolved by a bundler and never by a browser, so on this page of all pages it
+could not have been one.

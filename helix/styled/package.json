@@ -22,14 +22,11 @@
       "default": "./dist/*/index.js"
     },
     "./custom-elements.json": "./custom-elements.json",
-    "./elements.css": "./css/elements.css",
-    "./helix.css": "./css/helix.css",
     "./jsx": "./types/jsx.d.ts",
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts"
   },
   "files": [
-    "css",
     "custom-elements.json",
     "dist",
     "types"
@@ -40,7 +37,7 @@
     "analyze": "cem analyze --config custom-elements-manifest.config.ts",
     "build": "bun run element-events && tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "element-events": "build-element-events --package styled",
-    "styles": "build-styles . && build-elements-css .",
+    "styles": "build-styles .",
     "test": "bun run test:pure && bun run test:dom && bun run test:ssr",
     "test:dom": "bun test dom.spec",
     "test:pure": "bun test pure.spec",
