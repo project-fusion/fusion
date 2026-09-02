@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { readFileSync } from 'node:fs'
 import { resolve } from './bump.mjs'
 
 /* What releases is a policy nothing asserted, and it drifted: `docs` was absent
@@ -66,5 +67,23 @@ describe('across a range', () => {
     expect(resolve(['not a conventional subject', 'fix(helix): a'])).toEqual([
       { domain: 'helix', level: 'patch' },
     ])
+  })
+})
+
+describe("the release's own commit", () => {
+  /* `release.yml` writes a commit after publishing, and that commit lands
+     inside the window the next run reads from the tag. Spelled `chore(helix)`
+     it releases, so every release becomes the cause of the next one — release,
+     stamp, release, forever, whatever the merge contained. It was spelled that
+     way for one merge and both domains re-released on the following push.
+
+     Read out of the workflow rather than copied here, so re-scoping the commit
+     fails this rather than starting the loop again. */
+  test('the stamp commit releases nothing', () => {
+    const workflow = readFileSync('.github/workflows/release.yml', 'utf8')
+    const [, subject] = workflow.match(/git commit -q -m "([^"]+)"/) ?? []
+    expect(subject).toBeDefined()
+    const written = subject.replaceAll('$DOMAIN', 'helix').replaceAll('$VERSION', '1.2.3')
+    expect(resolve([written])).toEqual([])
   })
 })

@@ -484,7 +484,15 @@ jobs:
             exit 0
           fi
 
-          git commit -q -m "chore($DOMAIN): stamp $VERSION into the manifests [skip ci]" -m \
+          # **Unscoped, and it has to stay that way.** `chore(helix)` is a
+          # releasing subject, and this commit lands inside the window the next
+          # run reads from the tag, so a scoped one makes every release the
+          # cause of the next: release, stamp, release, forever, whatever the
+          # merge actually contained. `[skip ci]` does not save it — that stops
+          # the run on *this* push and leaves the commit sitting in the window
+          # for the next one. Unscoped, the domain is empty, and `bump.mjs`
+          # releases nothing. `bump.spec.mjs` reads this line and asserts it.
+          git commit -q -m "chore: stamp $DOMAIN $VERSION into the manifests [skip ci]" -m \
             "Written by \`release.yml\` after $DOMAIN-v$VERSION published, installed from the
           registry and promoted to \`latest\`. The tag is still the record; this is the
           manifests agreeing with it."
