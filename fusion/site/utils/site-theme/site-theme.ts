@@ -144,7 +144,23 @@ export const clearSiteThemeFrom = (node: HTMLElement): void => {
  * because `OWNED` above is the answer to "which properties are ours" and this
  * module holds it precisely so that a second copy cannot drift from it.
  */
-export const clearSiteThemeFromRoot = (): void => clearSiteThemeFrom(document.documentElement)
+export const clearSiteThemeFromRoot = (): void => {
+  const root = document.documentElement
+  clearSiteThemeFrom(root)
+  /* **The same nudge `paintRoot` ends with, and for the same reason.** The aura
+     resolves `--helix-color-primary` through a controller that observes this
+     element with `attributeFilter: ['data-color-mode']` and nothing else, so
+     removing the properties tells it nothing: a reset put every other surface
+     back and left the aura painted in the reader's brand.
+
+     Same value is fine; the mutation record is what the controller wants. Only
+     when the attribute is already there, because absent means "follow the
+     operating system" and adding one would pin the mode a reset never touched. */
+  const mode = root.getAttribute('data-color-mode')
+  if (mode !== null) {
+    root.setAttribute('data-color-mode', mode)
+  }
+}
 
 /**
  * Announced, because the page that made the theme may still be open.

@@ -1,7 +1,7 @@
 import { CONTACT, INCLUDE, NEXT } from '@/content/contact/contact'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { EMAIL, MAILTO } from '@/utils/site/site'
-import styles from './contact.module.css'
+import styles from './page.module.css'
 
 export const metadata = pageMetadata({
   description:

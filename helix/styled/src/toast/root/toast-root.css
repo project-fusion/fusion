@@ -1,31 +1,15 @@
-/* Fixed to the window, and transparent to a pointer.
- *
- * The region spans a whole edge so a stack can grow along it, which means a
- * single message in one corner would otherwise lay an invisible bar across
- * everything beside it. The region catches nothing and the messages take it
- * back, which is the only way a full-width region and a clickable page can both
- * be true. */
+/* Fixed to the window, and transparent to a pointer. */
 :host {
   --_toast-inset: var(--toast-inset, var(--helix-space-lg));
 
   inset-inline: var(--_toast-inset);
   pointer-events: none;
   position: fixed;
-  /* `--helix-layer-toast` is the top of the stack. Without it a message
-     arriving over an open dialog sits at the dialog's own level and is ordered
-     by source order rather than by intent. */
+  /* `--helix-layer-toast` is the top of the stack. */
   z-index: var(--helix-layer-toast);
 }
 
-/* The resting arrangement, which is bottom-end. A reflected property with a
-   default writes its attribute onto every host, including the ones nobody
-   configured, so the placement lives here and `placement` is optional.
- *
-   Behind `:not([placement])` rather than on `:host`: `inset-block-end` and
-   `inset-block-start` are different properties, so a `top-*` toast would take
-   both and stretch the region down the whole viewport. A resting arrangement
-   has to be scoped to the resting state, not left for the departures to undo
-   one declaration at a time. */
+/* The resting arrangement, which is bottom-end. */
 :host(:not([placement])) {
   inset-block-end: var(--_toast-inset);
 
@@ -35,10 +19,7 @@
 [part="region"] {
   display: flex;
   flex-direction: column;
-  /* No `gap`. A message that has gone collapses to nothing, and a flex gap is
-     drawn between items whatever their size, so a dismissed one would leave its
-     spacing behind as a hole in the stack. The spacing is the message's own
-     margin instead, and it collapses with it. */
+  /* No `gap`. */
   --_toast-gap: var(--toast-gap, var(--helix-space-xs));
 }
 
@@ -46,22 +27,9 @@
   pointer-events: auto;
 }
 
-/* Where the stack sits, and which way it grows.
- *
- * A new message is appended, and it should arrive nearest the edge the stack is
- * anchored to, pushing the older ones away. Which flex direction does that
- * depends on the edge, and it is the reverse of what it looks like:
- * `column-reverse` puts the *first* item at main-start, so at the bottom it
- * would put the newest furthest from the corner. Both readings are plausible
- * from the property name, so check rather than reason about it.
- *
- * So the bottom keeps the default and the top reverses. Reading order is
- * untouched either way: flex moves boxes, and the live region announces in
- * document order, so the newest is announced whichever end it is drawn at. */
+/* Where the stack sits, and which way it grows. */
 /* Which way the nearest edge is, told to the messages rather than worked out by
-   them. A message arrives from the border it is anchored to, so a stack at the
-   bottom rises into place and one at the top drops in. Inherited, so the item's
-   own keyframes read it without either component knowing the other's rules. */
+   them. */
 :host([placement^="bottom"]) {
   inset-block-end: var(--_toast-inset);
 
@@ -98,15 +66,7 @@
   align-items: center;
 }
 
-/* Not printed, being an overlay.
- *
- * It is over the page rather than part of it, and on paper there is no over: a
- * message printed into the flow is a slab across whatever it was covering.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Not printed, being an overlay. */
 @media print {
   :host {
     display: none;

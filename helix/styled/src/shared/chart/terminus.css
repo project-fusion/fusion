@@ -1,27 +1,10 @@
-/* The mark on where a series ended, shared by `Sparkline` and `LineChart`.
- *
- * Here rather than in the sparkline for the reason the field stylesheets are
- * shared: a line chart's terminus and a sparkline's are the same mark on the
- * same kind of thing, and two copies drift. A chart takes this sheet, renders
- * `part="terminus"` positioned by its own two custom properties, and gets the
- * shapes with it.
- *
- * A sheet in this folder has to have the second reader the folder exists for.
- * With one, every `--chart-terminus-*` hook is a shared name read by a single
- * family, which is the drift a family hook is watched for and which the `SHARED`
- * exemption would let through.
- *
- * An element rather than a shape inside the drawing, and that is not a
- * preference. A chart that fills its box uses `preserveAspectRatio="none"`,
- * which stretches its whole coordinate space: a `<circle>` in there is an
- * ellipse whose squash depends on how wide the consumer made the chart, and
- * `vector-effect` cannot help, because it takes the stroke out of the transform
- * and leaves the geometry in it. Out here nothing is stretched and a dot is
- * round at every size.
- *
- * `currentColor` throughout, so a chart sets `color` on its host once and the
- * line, the mark and anything else agree without a second hook to keep in step.
- */
+/* The end-of-series mark, shared by `Sparkline` and `LineChart` because the two
+   are the same mark on the same kind of thing.
+
+   An element, not a shape in the drawing: a chart filling its box uses
+   `preserveAspectRatio="none"`, so a `<circle>` is an ellipse whose squash
+   depends on the consumer's width, and `vector-effect` leaves geometry in the
+   transform. `currentColor` throughout, so `color` on the host carries. */
 [part="terminus"] {
   background-color: currentColor;
   block-size: var(--chart-terminus-size, 5px);
@@ -29,13 +12,13 @@
   inset-block-start: var(--chart-terminus-y);
   inset-inline-start: var(--chart-terminus-x);
   position: absolute;
-  /* Centered on the reading rather than hanging below and right of it. */
+  /* Centered on the reading, not hanging below and right of it. */
   translate: -50% -50%;
 }
 
-/* A dot is the base case, so it is the shape an absent attribute draws. A
-   reflecting property with a default would write its attribute onto a host the
-   consumer rendered, which React reports as a hydration mismatch. */
+/* A dot is what an absent attribute draws. A reflecting property with a default
+   would write its attribute onto a consumer-rendered host, which React reports
+   as a hydration mismatch. */
 [part="terminus"] {
   border-radius: var(--helix-radii-full);
 }
@@ -48,30 +31,10 @@
   border-radius: var(--helix-radii-none);
 }
 
-/* Hollow, for a chart drawn over something busy: the ground shows through the
- * middle, so the mark reads as a ring rather than as a blot on the content.
- *
- * **Larger than the dot, and that is what makes it a ring at all.** At the same
- * 5px with a 2px border on every side, the hole left in the middle is one pixel
- * and the mark renders as a slightly soft dot. A ring needs its hole to be the
- * thing you see, so it is drawn at 1.6 times the mark size, leaving a hole a
- * little wider than the stroke around it.
- *
- * Bigger also because a hollow mark reads smaller than a filled one of the same
- * size, so matching the dot's diameter would make the ring look like the
- * quieter of the two when it is meant to be the same weight of statement.
- *
- * **The hole is a hole, and the chart is what makes it one.** A line ends *at*
- * its last reading, which is the ring's center, so a transparent middle shows
- * the stroke running into it and the mark reads as a target. Never fill it with
- * a surface color: measured on a purple card, that hides the stroke and
- * everything else with it, and the ring comes out a disc of the page's color.
- *
- * Color cannot fix it, because no element can ask what is painted behind it.
- * Geometry can: the drawing has this exact disc taken out of it, so the stroke
- * genuinely stops at the ring's inner edge and the middle is free to show
- * whatever is there. The rule that does it belongs to the component that owns
- * the drawing, because only that component knows what to cut. */
+/* 1.6 times the mark, or it is not a ring: at 5px with a 2px border each side
+   the hole is one pixel. Never fill the hole with a surface color, which on a
+   purple card hid the stroke and left a disc of the page. The drawing cuts the
+   disc out instead, and the component that owns the drawing owns that rule. */
 :host([terminus="ring"]) [part="terminus"] {
   background-color: var(--chart-terminus-hole, transparent);
   block-size: calc(var(--chart-terminus-size, 5px) * 1.6);
@@ -79,21 +42,14 @@
   inline-size: calc(var(--chart-terminus-size, 5px) * 1.6);
 }
 
-/* What the ring leaves open, as a radius, for the drawing to cut to.
- *
- * Declared here beside the size it is derived from rather than restated by each
- * chart, which is what would drift. Outer radius less the border it is drawn
- * with, so the disc removed is exactly the disc the reader can see through. */
+/* What the ring leaves open, for the drawing to cut to: outer radius less its
+   border, declared beside the size it derives from. */
 :host([terminus="ring"]) {
   --_chart-terminus-inner: calc(var(--chart-terminus-size, 5px) * 0.8 - var(--helix-border-thick));
 }
 
-/* Pointing along the axis rather than up or down.
- *
- * An arrowhead at the end of a line says "and onward", which is what a terminus
- * means. Pointing it at the last movement instead would make it a second
- * statement about the data, and a triangle aimed up beside a falling line is
- * the kind of thing a reader has to stop and work out. */
+/* Along the axis: an arrowhead says "and onward". Aimed at the last movement it
+   would be a second statement about the data. */
 :host([terminus="triangle"]) [part="terminus"] {
   background-color: currentColor;
   border-radius: var(--helix-radii-none);

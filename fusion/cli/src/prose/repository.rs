@@ -10,16 +10,11 @@
 //! the URL once — the conventional field for it, and declarative there rather
 //! than published, the root being private — and everything else agrees with it.
 //!
-//! **The former names are a list, and that is deliberate.** The alternative is
-//! inferring which paths on the host are ours, which cannot be done: a
-//! dependency's own repository is in this tree too and is nobody's mistake. A
-//! move is an event, so recording the name it moved from is the honest way to
-//! catch what the move missed.
-//!
-//! **The file holding that list is exempt, necessarily.** It names every former
-//! path by definition, so a rule reading it reports the record as the residue.
-//! Exempting the settings file rather than a hardcoded path is what makes that
-//! true for a consumer's settings as well as this one's.
+//! **It checks agreement, not history.** This carried a list of the paths the
+//! repository used to live at and reported any file still naming one. That list
+//! was residue of one move, went clean, and stayed clean: a name nothing
+//! references is a name the next contributor never types. Agreement with the
+//! declared URL is the half that keeps earning its place.
 
 use std::fs;
 use std::sync::LazyLock;
@@ -73,24 +68,6 @@ pub fn run(context: &Context) -> Report {
         let Ok(source) = fs::read_to_string(&file) else {
             continue;
         };
-        if where_ == "fusion.rules.json" {
-            continue;
-        }
-
-        for stale in &context.settings.former {
-            if !source.contains(stale.as_str()) {
-                continue;
-            }
-            findings.push(Finding {
-                detail: format!(
-                    "It is at `{canonical}` now. If it has moved again, record the previous path \
-                     so the next move is caught the same way."
-                ),
-                file: where_.clone(),
-                message: format!("names `{stale}`, which is where this repository used to live"),
-            });
-        }
-
         if where_.ends_with("package.json") {
             let url = serde_json::from_str::<Value>(&source)
                 .ok()

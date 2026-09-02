@@ -1,6 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - about:
+      Questions belong here rather than in an issue, which is for a defect or a
+      proposal.
+    name: Ask a question
+    url: https://github.com/project-fusion/fusion/discussions
+  - about:
       Do not open an issue for a vulnerability. An issue is world readable the
       moment it is filed.
     name: Report a vulnerability privately

@@ -26,6 +26,7 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ARTIFACT } from '@fusion.dev/scripts/workspace'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUT = join(ROOT, 'fusion', 'scripts', 'eval', 'questions.json')
@@ -74,9 +75,7 @@ const families = () => {
 }
 
 const tokens = () =>
-  JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'tokens.json'), 'utf8')).tokens.map(
-    (token) => token.name,
-  )
+  JSON.parse(readFileSync(join(ROOT, ARTIFACT.tokens), 'utf8')).tokens.map((token) => token.name)
 
 /**
  * A name that is not a token but looks exactly like one.
@@ -194,8 +193,8 @@ for (const entry of all) {
 /* Every question is answerable from something in this repository, and this is
    the list of what. Recorded so a reader can see the corpus has no hand-written
    ground truth in it at all. */
-const sources = ['helix/styled/custom-elements.json', 'helix/styles/tokens.json'].filter((path) =>
-  existsSync(join(ROOT, path)),
+const sources = ['helix/styled/custom-elements.json', 'helix/styles/dist/tokens.json'].filter(
+  (path) => existsSync(join(ROOT, path)),
 )
 
 /* **The guard the corpus cannot supply for itself.** A family name is derived

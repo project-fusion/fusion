@@ -8,7 +8,7 @@ npm create helix-app@latest my-app
 ```
 
 You are unlikely to install this package yourself. It exists so that the thing
-that would drift between those two doors — the templates — is one artifact rather
+that would drift between those two doors, the templates, is one artifact rather
 than two copies, and so that a template is versioned with the components it was
 written against.
 
@@ -19,8 +19,8 @@ written against.
 
 **There is no build-free HTML template**, and that is a fact about the packages
 rather than an omission. `@fusion.dev/helix`'s published entry re-exports bare
-specifiers — `@fusion.dev/helix-core`, ninety-odd `@fusion.dev/helix-headless/*`
-subpaths, `lit` and its own graph — none of which a browser resolves without an
+specifiers (`@fusion.dev/helix-core`, ninety-odd `@fusion.dev/helix-headless/*`
+subpaths, `lit` and its own graph) none of which a browser resolves without an
 import map covering all of it, and an import map that large is a build artifact
 wearing a template's clothes. The honest build-free story is a CDN that rewrites
 the graph, which wants the packages public first.

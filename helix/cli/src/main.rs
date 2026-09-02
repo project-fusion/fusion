@@ -7,8 +7,8 @@
 //! its reasoning in it rather than a paragraph in a document nobody opens while
 //! writing a command.
 //!
-//! **Every product CLI works standalone**, which is the Sovereignty Constraint
-//! applied to tooling: `helix theme build` needs nothing else installed, and a
+//! **Every product CLI works standalone**: `helix theme build` needs nothing
+//! else installed, and a
 //! future `fusion` that routes to it is a convenience rather than a gate. A
 //! router that discovers `fusion-*` on `PATH` is a plugin protocol, and a
 //! protocol designed against one plugin is an abstraction validated against

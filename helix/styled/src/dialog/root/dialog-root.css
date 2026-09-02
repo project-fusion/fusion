@@ -1,5 +1,4 @@
-/* The host draws nothing. The dialog is in the top layer, so the host is only
-   where the element lives in the document and has no box worth having. */
+/* The host draws nothing. */
 :host {
   display: contents;
 }
@@ -8,9 +7,7 @@
   background-color: var(--helix-color-surface-overlay);
   border: var(--dialog-border-width, var(--helix-border-floating)) solid
     var(--dialog-border-color, var(--helix-color-border));
-  /* The house radius. Card wrote the argument down: at anything larger the
-     corner is softer than the controls inside it and the container stops
-     receding, which is the one thing a container should do. */
+  /* The house radius. */
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--dialog-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
@@ -19,32 +16,16 @@
   flex-direction: column;
   gap: var(--helix-space-md);
   /* The panel takes the width it is given and stops short of the viewport on a
-     narrow screen. `min` rather than a media query: the same rule holds at
-     every width, and there is no breakpoint where it changes character. */
+     narrow screen. */
   inline-size: min(var(--dialog-inline-size, 28rem), calc(100vw - var(--helix-space-xl)));
-  /* Never taller than the screen, and scrolling inside itself when it would be.
-     A dialog is in the top layer, so a page scroll cannot reach it. */
+  /* Never taller than the screen, and scrolling inside itself when it would be. */
   max-block-size: calc(100dvh - var(--helix-space-xl));
   overflow-y: auto;
   padding: var(--dialog-padding, var(--helix-space-lg));
 }
 
 /* The UA hides a closed dialog with `dialog:not([open]) { display: none }`, and
- * the `display: flex` above silently took that away. Origin beats specificity:
- * any author declaration outranks every UA one, so a one-word layout rule on
- * the panel undoes a rule nothing here mentions and nothing warns about.
- *
- * The symptom does not look like a CSS fault: the dialog paints on load,
- * centered across the frame by the UA's own `margin: auto` and sitting at the
- * top of the flow rather than the middle of the viewport, with no scrim, and
- * every control in it is dead, because the buttons close a dialog that was never
- * opened and `close()` on a closed dialog does nothing. The tell is the missing
- * scrim: `::backdrop` exists only for an element in the top layer, so a panel
- * with no scrim was never shown modally, whatever it looks like.
- *
- * Tooltip and Menu carry their version of this, `:not(:popover-open)` and
- * `[hidden]` respectively, against the same rule in the same stylesheet. Any
- * part that is a native element the UA hides by state needs it. */
+   the `display: flex` above silently took that away. */
 [part="dialog"]:not([open]) {
   display: none;
 }
@@ -63,50 +44,31 @@
   --dialog-inline-size: 44rem;
 }
 
-/* Everything across, and nothing extra to write.
- *
- * `100vw` is not the width this resolves to: the rule above already clamps to
- * `calc(100vw - var(--helix-space-xl))`, which is what keeps every other step
- * off the edge of a narrow screen, and asking for the whole viewport here just
- * lets that clamp be the answer. So a full dialog stops short of the sides by
- * the same margin an `sm` one does on a phone, and the block axis is untouched:
- * `max-block-size: calc(100dvh - var(--helix-space-xl))` was already leaving
- * room above and below, which is what makes this read as a panel over the page
- * rather than as a second page. */
+/* Everything across, and nothing extra to write. `100vw` is not the width this
+   resolves to: the rule above already clamps to `calc(100vw -
+   var(--helix-space-xl))`, which is what keeps every other step off the edge of
+   a narrow screen, and asking for the whole viewport here just lets that clamp
+   be the answer. So a full dialog stops short of the sides by the same margin an
+   `sm` one does on a phone, and the block axis is untouched: `max-block-size:
+   calc(100dvh - var(--helix-space-xl))` was already leaving room above and
+   below, which is what makes this read as a panel over the page rather than as a
+   second page. */
 :host([size="full"]) [part="dialog"] {
   --dialog-inline-size: 100vw;
 }
 
-/* No ring on the panel itself.
- *
- * `showModal()` moves focus into the dialog, and where nothing inside asks for
- * it the platform focuses the dialog element: it matches `:focus-visible` and
- * the base layer draws a ring around the whole panel, which reads as the panel
- * being the thing you are on rather than a place you are in.
- *
- * A container is not a control. The ring belongs to whatever the reader reaches
- * inside, and every one of those still draws its own. Put `autofocus` on the
- * control that should have it and the platform focuses that instead. */
+/* No ring on the panel itself. */
 [part="dialog"]:focus,
 [part="dialog"]:focus-visible {
   outline: none;
 }
 
-/* The platform's own scrim, in the top layer with the dialog. A div positioned
- * behind it would need a `z-index` that beats whatever the page already has,
- * which is a fight nobody wins for long.
- *
- * **A token resolves here, which it did not always.** `::backdrop` originally
- * inherited from nothing, and the CSS working group changed it to inherit from
- * its originating element. Measured in Chromium 148 from a live modal's shadow
- * root: the declaration paints `oklab(0.15 0 0 / 0.64)`, and the property is
- * readable from the pseudo-element. Anywhere that change has not shipped the
- * token comes out as nothing, and a `var()` fallback cannot rescue it, the token
- * resolving to invalid rather than absent.
- *
- * The hook is separate from that: a consumer overriding the scrim needs a name
- * to set, and the host is the right place for it, being where the value resolves
- * with every token in scope. */
+/* The platform's own scrim, in the top layer with the dialog. **A token resolves
+   here, which it did not always.** `::backdrop` originally inherited from
+   nothing, and the CSS working group changed it to inherit from its originating
+   element. Measured in Chromium 148 from a live modal's shadow root: the
+   declaration paints `oklab(0.15 0 0 / 0.64)`, and the property is readable from
+   the pseudo-element. */
 :host {
   --_dialog-scrim: var(--helix-color-overlay);
 }
@@ -115,13 +77,11 @@
   background-color: var(--dialog-scrim, var(--_dialog-scrim));
 }
 
-/* The heading, whatever the consumer slotted, without a wrapper to give it a
-   box of its own. A dialog with no header has no empty band where one is not.
-
-   This can only live here while the document contests nothing: a document rule
-   beats a `::slotted()` one whatever the specificity or the layer, both
-   measured, and it is prose theming sitting behind `[data-prose]` that keeps
-   `:where(h1)`-`:where(h6)` out of the way. */
+/* The heading, whatever the consumer slotted, without a wrapper to give it a box
+   of its own. This can only live here while the document contests nothing: a
+   document rule beats a `::slotted()` one whatever the specificity or the layer,
+   both measured, and it is prose theming sitting behind `[data-prose]` that
+   keeps `:where(h1)`-`:where(h6)` out of the way. */
 ::slotted([slot="header"]) {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
@@ -132,41 +92,18 @@
   margin: var(--helix-space-none);
 }
 
-/* Actions from the leading edge, where the reading starts.
- *
- * They were at the trailing edge on the reasoning that a reader looks there for
- * the way out. That is true of a title bar's close, which is chrome; these are
- * the answer to the question the dialog just asked, and an answer belongs under
- * the question rather than opposite it. It also puts them at a predictable
- * place at any dialog width, where a trailing row moves as the panel does. */
+/* Actions from the leading edge, where the reading starts. */
 ::slotted([slot="footer"]) {
   display: flex;
   gap: var(--helix-space-xs);
   justify-content: flex-start;
 }
 
-/* It arrives *and* it leaves.
- *
- * A transition rather than an animation, because a transition runs in both
- * directions by construction and an entry animation cannot: keyframes on
- * `[open]` play on the way in and snap away on the way out, so the panel is
- * gone before a reader's eye has followed it. Three things make a transition
- * work on an element in the top layer, and all three are needed:
- *
- * - `display` in the transition list with `transition-behavior: allow-discrete`,
- *   or `display: none` lands the instant `open` goes and takes the exit with it.
- * - `overlay` likewise, or the dialog leaves the top layer immediately and
- *   animates out behind whatever it was covering.
- * - `@starting-style`, which is where an element entering the top layer comes
- *   *from*: without it the entry has no start value and only the exit plays.
- *
- * **The rise is `lg`, twenty-four pixels rather than twelve.** A dialog's whole
- * entrance is a fade and that rise, so at twelve the *pace* of it cannot be
- * read: measured, `snappy` settles at 159ms and `gentle` at 262ms, a difference
- * of a hundred milliseconds that nobody can see across twelve pixels. The
- * distance is what makes the duration legible, which is the point of having a
- * motion character at all. Behind a hook so a consumer who wants the smaller
- * move can have it back. */
+/* It arrives *and* it leaves. **The rise is `lg`, twenty-four pixels rather than
+   twelve.** A dialog's whole entrance is a fade and that rise, so at twelve the
+   *pace* of it cannot be read: measured, `snappy` settles at 159ms and `gentle`
+   at 262ms, a difference of a hundred milliseconds that nobody can see across
+   twelve pixels. */
 [part="dialog"] {
   opacity: 0;
   transition:
@@ -208,29 +145,14 @@
 }
 
 /* Below a phone's width it is a sheet, and this is the one breakpoint in the
- * file.
- *
- * The rest of the box is deliberately breakpoint-free: `inline-size` is
- * `min(step, calc(100vw - space-xl))`, which holds at every width, and measured
- * inside a resizing frame it tracks it exactly, 900 to 704, 600 to 564, 420 to
- * 384, 360 to 324. So the panel was already responsive; what it was not was
- * *different*. Every size is identical below about 406px, and what a reader gets
- * there is a slightly narrower centered card, which is the desktop shape shrunk
- * rather than the shape a phone wants.
- *
- * That is what earns the query. The rule this file has followed is that `min()`
- * beats a breakpoint because there is no width at which the panel changes
- * character. Here there is one, and the change *is* the character: a sheet is
- * anchored to the edge a thumb can reach, takes the full width because there is
- * none to spare, and arrives from the edge it is pinned to rather than fading
- * into the middle of the screen. None of that is expressible as a clamp.
- *
- * `30rem`, above every phone in portrait (430px is the widest in wide use) and
- * below any tablet, so nothing lands in it by accident.
- *
- * No opt-out, which is the point: a consumer writes one dialog and it is right
- * in both places. `size` still decides the width above the breakpoint and is
- * simply not a question below it, where there is one answer. */
+   file. The rest of the box is deliberately breakpoint-free: `inline-size` is
+   `min(step, calc(100vw - space-xl))`, which holds at every width, and measured
+   inside a resizing frame it tracks it exactly, 900 to 704, 600 to 564, 420 to
+   384, 360 to 324. Every size is identical below about 406px, and what a reader
+   gets there is a slightly narrower centered card, which is the desktop shape
+   shrunk rather than the shape a phone wants. `30rem`, above every phone in
+   portrait (430px is the widest in wide use) and below any tablet, so nothing
+   lands in it by accident. */
 @media (width < 30rem) {
   [part="dialog"] {
     /* Pinned rather than centered. A `<dialog>` is `position: fixed` with
@@ -240,19 +162,15 @@
     margin-block-start: auto;
     inline-size: 100vw;
     max-inline-size: 100vw;
-    /* Room above, so the page is still visibly there behind it. A sheet that
-       fills the screen is a page, and a reader loses any sense of what they are
-       coming back to. */
+    /* Room above, so the page is still visibly there behind it. */
     max-block-size: calc(100dvh - var(--helix-space-3xl));
-    /* Square where it meets the window, curved where it meets the page, the
-       same pair Drawer draws for the same reason. */
+    /* Square where it meets the window, curved where it meets the page, the same
+       pair Drawer draws for the same reason. */
     border-start-start-radius: var(--helix-radii-sm);
     border-start-end-radius: var(--helix-radii-sm);
     border-end-start-radius: var(--helix-radii-none);
     border-end-end-radius: var(--helix-radii-none);
-    /* Up from the edge it is pinned to. A centered panel rises by a hair because
-       it is arriving in place; a sheet travels its own height, because where it
-       came from is the thing being said. */
+    /* Up from the edge it is pinned to. */
     translate: 0 100%;
   }
 
@@ -263,20 +181,7 @@
   }
 }
 
-/* Saying no, by moving.
- *
- * A persistent dialog that ignores a press on the backdrop is indistinguishable
- * from one that did not notice it, and a reader's next move is to press again
- * harder. Two per cent and back is the smallest thing that reads as "I heard
- * you, and no", and it is the gesture a native alert already makes.
- *
- * `scale` rather than `translate`, which is the property the panel's entrance
- * transitions: an animation outranks a transition for as long as it runs, so
- * refusing on `translate` would fight the arrival on a dialog refused within
- * the first frames of opening. Two properties, no argument.
- *
- * `emphasized` out and back, so it swells faster than it settles: a symmetric
- * curve reads as a pulse rather than as a rebuff. */
+/* Saying no, by moving. */
 [part="dialog"][data-refused] {
   animation: helix-dialog-refuse var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
@@ -294,42 +199,20 @@
   }
 
   /* The refusal is motion and nothing but, so with motion off it does not slow
-     down, it goes. What a reader loses is the answer to a press the dialog was
-     always going to ignore; what they keep is a dialog that has not moved. */
+     down, it goes. */
   [part="dialog"][data-refused] {
     animation: none;
   }
 }
 
-/* The mark above the title, for a dialog that warns.
- *
- * A slot rather than something a consumer puts inside the header, and the
- * difference is who owns the size. Slotted into the header it is an icon in a
- * heading, which is a different thing at a different scale, and every consumer
- * would pick their own. Here the dialog says how big a mark above a title is,
- * once, and every warning in a product matches.
- *
- * Bare, like the header and the footer: an unassigned slot generates no box, so
- * a dialog with no mark has no empty band where one is not.
- *
- * `display: block` and a fixed box, because what is slotted is usually an
- * `<helix-icon>` sized for a line of text. Sizing it here rather than asking for
- * an icon that is already large keeps the markup the same as everywhere else. */
+/* The mark above the title, for a dialog that warns. */
 ::slotted([slot="icon"]) {
   block-size: var(--dialog-icon-size, calc(var(--helix-size-icon-lg) * 2));
   display: block;
   inline-size: var(--dialog-icon-size, calc(var(--helix-size-icon-lg) * 2));
 }
 
-/* Centered, and it has to be on the panel rather than on each region.
- *
- * The dialog's own content is a bare slot, so what a consumer writes there is
- * usually a text node, and `::slotted()` matches elements only: a rule per
- * region could reach the header and the footer and never the sentence between
- * them. `text-align` on the panel inherits to all three, text nodes included.
- *
- * The footer is the exception and needs saying twice, because it is a flex
- * container and `text-align` does not place flex items. */
+/* Centered, and it has to be on the panel rather than on each region. */
 :host([align="center"]) [part="dialog"] {
   text-align: center;
 }
@@ -339,22 +222,12 @@
 }
 
 /* A block box is not centered by `text-align`, so the mark is placed rather than
-   aligned. `fit-content`, or a block at the panel's full width has nothing to
-   center. */
+   aligned. */
 :host([align="center"]) ::slotted([slot="icon"]) {
   margin-inline: auto;
 }
 
-/* Not printed, being an overlay.
- *
- * It is over the page rather than part of it, and on paper there is no over: a
- * dialog prints as a slab across whatever it covered, and a tooltip prints its
- * tip beside nothing that is hovering.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Not printed, being an overlay. */
 @media print {
   :host {
     display: none;

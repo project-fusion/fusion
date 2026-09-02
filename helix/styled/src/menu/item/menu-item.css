@@ -4,10 +4,7 @@
 
 [part="item"] {
   align-items: center;
-  /* The row is an `<a>` where `href` is set, and the UA underlines those. A
-     menu row is a row whether or not it navigates, so the underline goes: what
-     says it is pressable is the whole band lighting up, which it already does.
-     Said here rather than in the base layer, which cannot reach a shadow root. */
+  /* The row is an `<a>` where `href` is set, and the UA underlines those. */
   text-decoration: none;
   /* No corner: a row that reaches both edges of the surface has no outside
      corner to round, and rounding it draws a notch against the surface's own. */
@@ -20,39 +17,23 @@
      toolbar whose buttons read at 12 made the menu the one thing not following
      the room it was opened from. */
   font-size: var(--helix-text-xs);
-  /* A shade heavier than body text. A menu is read by scanning rather than by
-     reading, and at twelve pixels the labels need the extra weight to hold
-     their own against the surface they sit on. */
+  /* A shade heavier than body text. */
   font-weight: var(--helix-weight-medium);
   gap: var(--helix-space-xs);
   /* A column each side of the label, and both are there on every row whether or
-     not anything fills them. Sized rather than auto, so a menu where one row has
-     an icon and three do not still reads as one column of labels: `auto` would
-     collapse the empty ones and step every other label left.
-
-     The leading column takes a hook and the trailing one does not, and the
-     asymmetry is the point. What goes in `start` is whatever the consumer put
-     there, and it is not always a mark: a still from a video, an avatar, a
-     favicon. What goes in the mark column is a tick or a caret this component
-     draws, at icon size, always. */
+     not anything fills them. */
   grid-template-columns:
     var(--menu-item-start, var(--helix-size-icon))
     minmax(0, 1fr)
     var(--helix-size-icon);
   min-block-size: var(--helix-size-control-tight);
-  /* The inset is padding on the row and nothing else. A margin here would put
-     the same gap back that taking the surface's padding away removed: the row
-     would stop short of both edges and hover would light a stripe with unlit
-     surface down either side of it. The row runs edge to edge; the text inside
-     it is what is inset. */
+  /* The inset is padding on the row and nothing else. */
   padding-inline: var(--helix-space-sm);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
   user-select: none;
 }
 
-/* Relative to the menu's own surface. See the note on the ghost button in
-   the base layer: an absolute sunken value darkened the row past the panel it
-   sat on. */
+/* Relative to the menu's own surface. */
 [part="item"]:hover {
   background-color: var(
     --menu-item-hover-color,
@@ -80,11 +61,10 @@
   display: flex;
   inline-size: var(--menu-item-start, var(--helix-size-icon));
   justify-content: center;
-  /* `min-block-size` rather than `block-size`, so the column is at least as
-     tall as a mark on every row and taller where the content is. Fixed, a 16:9
-     still slotted here overflowed a sixteen pixel box and ran under the label,
-     the grid track having stayed at icon width as well. Both were measured on
-     `Video.Playlist.Menu`, which is what a media row in a menu looks like. */
+  /* `min-block-size` rather than `block-size`, so the column is at least as tall
+     as a mark on every row and taller where the content is. Fixed, a 16:9 still
+     slotted here overflowed a sixteen pixel box and ran under the label, the
+     grid track having stayed at icon width as well. */
   min-block-size: var(--helix-size-icon);
 }
 
@@ -96,18 +76,7 @@
 }
 
 /* The mark is monotone, and checked is a step in strength rather than a change
- * of hue.
- *
- * Never `--helix-color-primary`, which on a menu means "this is the action" and
- * here would mean "this is on": a row of settings with three things enabled
- * comes out with three brand-colored ticks reading as three recommendations.
- * `Option`'s tick is `currentColor` for the same reason.
- *
- * The color only has to be legible, not comparative: an unchecked row renders
- * an empty `<span part="mark">` as a spacer rather than a gray tick, so the
- * mark's *presence* is the whole of the state. `foreground-subtle` stays on the
- * rule above because the other thing wearing this part is the submenu caret,
- * which should be quiet. */
+   of hue. */
 svg[part="mark"] {
   color: var(--helix-color-foreground-subtle);
 }
@@ -122,20 +91,7 @@ slot[name="submenu"] {
   display: contents;
 }
 
-/* A caret is physical and the thing it points at is not.
- *
- * The row itself already flips, because it is laid out on the inline axis and
- * the browser reverses that in a right-to-left document. The glyph inside does
- * not, so the mark ends up on the correct side pointing the wrong way, which in
- * that reading direction means the opposite of what it says. Mirrored rather
- * than swapped for the opposite icon, so the pair stays one decision: a reversed
- * `caret-left` is exactly `caret-right`, and two sets of icon imports that have
- * to agree is the kind of thing that drifts.
- *
- * Written out in each component rather than shared, because there is no sheet a
- * shadow root can compose for this and no way for one to know which of a
- * component's glyphs are directional. `Pagination` carries the same rule and the
- * same argument. */
+/* A caret is physical and the thing it points at is not. */
 :host(:dir(rtl)) [part="mark"][data-submenu] {
   scale: -1 1;
 }

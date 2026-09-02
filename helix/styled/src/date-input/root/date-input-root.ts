@@ -1,13 +1,10 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDateInput } from '@fusion.dev/helix-headless/date-input'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect import, because the headless tier's template names `helix-date-picker`
-   rather than the base tag, and a custom element registers on import. Without it
-   a consumer importing this one family got a panel with an unknown element in
-   it: `helix-headless-date-picker` was registered by the tier below and the tag being
-   rendered was not, so the calendar was an empty inert box. It only ever looked
-   right because the sandbox imports the whole barrel. Same arrangement Select
-   uses for its listbox and Pagination for its select. */
+/* The headless template names `helix-date-picker` rather than the base tag, so
+   without this a consumer importing this family alone got a panel whose calendar
+   was an empty inert box. It looked right only because the sandbox imports the
+   whole barrel. Same arrangement Select uses for its listbox. */
 import '../../date-picker/index.js'
 import '../../tag/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'

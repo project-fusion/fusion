@@ -8,7 +8,7 @@
  * Adding a page is now one file.
  *
  * The output is committed and `--check` fails when it and the content disagree,
- * the same arrangement `build-reference.mjs` and `build-tokens.mjs` already
+ * the same arrangement `build-catalog.mjs` already
  * use. A content package must not read the filesystem at runtime: a site
  * importing one that did would trace the whole package into its server bundle,
  * which is a warning `fusion/site` has today for exactly this reason.
@@ -30,7 +30,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const CONTENT = join(ROOT, 'helix/docs/content')
 const OUT = join(ROOT, 'helix/docs/src/pages.generated.ts')
 const SOURCES = join(ROOT, 'helix/docs/src/sources.generated.ts')
-const REGISTRY = join(ROOT, 'helix/styles/tokens.json')
+const REGISTRY = join(ROOT, 'helix/styles/dist/tokens.json')
 const PRIMITIVES = join(ROOT, 'helix/styles/src/primitives.css')
 
 /**

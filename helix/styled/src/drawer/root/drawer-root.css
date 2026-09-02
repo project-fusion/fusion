@@ -1,37 +1,22 @@
 :host {
-  /* No box at all. A custom element with no `display` is `inline`, so the host
-     was a phantom inline box: a flex item of zero width in any flex parent, and
-     a line box worth of height in ordinary flow, for an element whose only
-     rendered content is a `<dialog>` that lives in the top layer.
-
-     `contents` rather than `block`, because the drawer should occupy nothing
-     where it is written rather than a block of nothing. The `[hidden]` rule
-     from `HelixElement.finalizeStyles` still wins over it, being (0,3,0). */
+  /* No box at all. The `[hidden]` rule from `HelixElement.finalizeStyles` still
+     wins over it, being (0,3,0). */
   display: contents;
 
   --_drawer-size: var(--drawer-size, 20rem);
 }
 
 /* The platform's own backdrop, which the panel gets by being opened with
- * `showModal()`. A `<div part="scrim">` in this shadow root would sit under
- * anything with a higher `z-index` anywhere on the page, and would have to be
- * shown and hidden by hand.
- *
- * What the indirection buys is the override, not the default. A property
- * declared on `:host` is substituted *there*, where every token is in scope, so
- * a consumer may write `--drawer-scrim: var(--helix-color-overlay)` and have it
- * resolve, which is the thing that cannot be written inside the rule below. */
+   `showModal()`. */
 :host {
   --_drawer-scrim: var(--helix-color-overlay);
 }
 
 /* Out at rest, in when open, and the `@starting-style` *after* both. A starting
- * style and an ordinary rule of the same specificity are separated by source
- * order, so a starting style written first loses even for the opening frame and
- * the scrim arrives at full strength while the panel is still sliding: measured,
- * every sample from 16ms on read 1.00 while the panel traveled 640 to 480. The
- * exit fades correctly throughout, which makes it look like a transition that
- * only works one way rather than one that never starts. */
+   style and an ordinary rule of the same specificity are separated by source
+   order, so a starting style written first loses even for the opening frame and
+   the scrim arrives at full strength while the panel is still sliding: measured,
+   every sample from 16ms on read 1.00 while the panel traveled 640 to 480. */
 [part="panel"]::backdrop {
   background-color: var(--drawer-scrim, var(--_drawer-scrim));
   opacity: 0;
@@ -41,10 +26,7 @@
     overlay var(--helix-duration-normal) allow-discrete;
 }
 
-/* Closing, the scrim has to hold too. `::backdrop` exists only while its
-   element is in the top layer, so without `overlay` in the list above the
-   backdrop is not faded out, it is deleted: the page behind snaps back to full
-   contrast in one frame while the panel is still sliding. */
+/* Closing, the scrim has to hold too. */
 [part="panel"][open]::backdrop {
   opacity: 1;
 }
@@ -55,39 +37,20 @@
   }
 }
 
-/* **No `appearance`, which `helix component`'s `axes` fails on outright**, and a drawer is
- * the clearest case of why. Its `plain` painted the panel the page's own color,
- * which is invisible to half of all readers, `--helix-color-surface-overlay` and
- * `--helix-color-background` both being `neutral-0` in light mode and measuring
- * an identical `oklch(1 0 0)`. And what it was for cannot happen: a panel opened
- * with `showModal()` is in the top layer with a scrim between it and the layout,
- * so reading as part of the page is the one thing it is not.
- *
- * The siblings are not precedent, because their `plain` means something else.
- * `Card` is in the page already, so dropping its surface really does leave it
- * there. `Popover`'s drops the *padding*, for content that brings its own inset.
- * Neither is asking a surface to stop being one. */
+/* *No `appearance`, which `helix component`'s `axes` fails on outright**, and a
+   drawer is the clearest case of why. Its `plain` painted the panel the page's
+   own color, which is invisible to half of all readers,
+   `--helix-color-surface-overlay` and `--helix-color-background` both being
+   `neutral-0` in light mode and measuring an identical `oklch(1 0 0)`. */
 [part="panel"] {
-  /* The house radius, on the two corners that face the page.
-   *
-   * The edge-anchored pair is deliberately square: a panel pinned to the
-   * window's edge has nothing to curve away from there, and the inner pair is
-   * where it meets the page. `border-start-*` and `border-end-*` are the logical
-   * names, so the placement rules below flip them with the panel. */
+  /* The house radius, on the two corners that face the page. */
   border-radius: var(--drawer-radius, var(--helix-radii-sm));
-  /* The UA's own dialog box, undone.
-   *
-   * A `<dialog>` arrives with `margin: auto`, a 3px `solid` border, `padding:
-   * 1em`, `width: fit-content` and `max-width/height: calc(100% - 6px - 2em)`.
-   * Every one of those fights an edge-anchored panel: with `inset: 0` the auto
-   * margin centers it, so the drawer came out as a bordered box floating in the
-   * middle of the viewport at 320x564 where it should have been flush to the
-   * right edge at full height. Measured, and visible in a screenshot, which is
-   * the only reason it was caught: `:modal` was true and the panel had escaped
-   * `overflow: hidden`, so every assertion about it passed.
-   *
-   * Named rather than `all: unset`, which would take `box-sizing` and the
-   * inherited font with it. */
+  /* The UA's own dialog box, undone. A `<dialog>` arrives with `margin: auto`, a
+     3px `solid` border, `padding: 1em`, `width: fit-content` and
+     `max-width/height: calc(100% - 6px - 2em)`. Every one of those fights an
+     edge-anchored panel: with `inset: 0` the auto margin centers it, so the
+     drawer came out as a bordered box floating in the middle of the viewport at
+     320x564 where it should have been flush to the right edge at full height. */
   margin: var(--helix-space-none);
   border: none;
   max-inline-size: none;
@@ -95,43 +58,24 @@
   /* `auto` on all four, so each placement below sets only the edges it anchors
      to. The UA gives a dialog `inset-inline-start: 0` as well as `-end`, and
      with both at zero and a width set, the start edge wins: `placement="end"`
-     came out flush against the *left*. Reset here rather than negated in each
-     placement, because four rules each undoing the same two declarations is
-     four chances to miss one. */
+     came out flush against the *left*. */
   inset: auto;
-  /* And `fit-content` on both axes, which is the other half of the same
-     problem: `top` and `bottom` stretch themselves with `inset-inline: 0` and
-     set no width, and a `fit-content` box ignores that entirely. Measured, a
-     full-width top drawer came out 119px wide, the width of its own text. */
+  /* And `fit-content` on both axes, which is the other half of the same problem:
+     `top` and `bottom` stretch themselves with `inset-inline: 0` and set no
+     width, and a `fit-content` box ignores that entirely. Measured, a full-width
+     top drawer came out 119px wide, the width of its own text. */
   inline-size: auto;
   block-size: auto;
 
   /* `surface-overlay`, which is the token for a surface that sits over the page
-     with a shadow. The plain page surface is a step away from it in dark mode,
-     so a panel drawn on that one reads as part of the page it is covering. */
+     with a shadow. */
   background-color: var(--helix-color-surface-overlay);
-  /* A drawer's own inset, and nothing about anyone's header.
-
-     A drawer is `position: fixed` with `inset-block: 0`, so it spans the strip a
-     sticky header occupies and its first line of content sits behind one. That
-     clearance is real and belongs to the page: whether a header is there, and
-     how tall it is, is not a fact the drawer holds, and building it into the
-     default costs every app without one seventy two pixels of empty panel. So
-     `--drawer-padding-block-start` is what a page with a masthead sets, and it
-     is the whole top padding rather than something added to it, a drawer
-     clearing chrome twice reading as a gap nobody asked for.
-
-     `--drawer-padding` is the hook for the rest, the same shape
-     `--dialog-padding` already has on the same kind of surface. A nav drawer
-     whose rows run to the edges sets it to zero and puts the inset on its rows,
-     which is what it wants anyway, for the reason the menu gives: a row's hover
-     should reach the full width of the surface rather than stopping short of
-     it. */
+  /* A drawer's own inset, and nothing about anyone's header. A drawer is
+     `position: fixed` with `inset-block: 0`, so it spans the strip a sticky
+     header occupies and its first line of content sits behind one. */
   padding: var(--drawer-padding, var(--helix-space-lg));
   /* The block-start hook falls back to the general one rather than to the token,
-     so `--drawer-padding` governs all four sides. Falling back to the token
-     leaves it governing three, with the top edge, the one a consumer changing
-     the inset is most likely to be looking at, unmoved. */
+     so `--drawer-padding` governs all four sides. */
   padding-block-start: var(
     --drawer-padding-block-start,
     var(--drawer-padding, var(--helix-space-2xl))
@@ -140,11 +84,7 @@
   flex-direction: column;
   outline: none;
   position: fixed;
-  /* `display` and `overlay` are what let the slide run on the way out as well.
-     Measured before they were here: the panel did travel back to its edge, and
-     it did it having already left the top layer, so it slid out behind the page
-     content and its scrim vanished in the first frame. `allow-discrete` defers
-     both flips to the end of the transition instead. */
+  /* `display` and `overlay` are what let the slide run on the way out as well. */
   transition:
     transform var(--helix-duration-normal) var(--helix-easing-decelerate),
     display var(--helix-duration-normal) allow-discrete,
@@ -152,32 +92,17 @@
   z-index: var(--helix-layer-overlay);
 }
 
-/* **Glass, and a drawer is where the pair earns the most.** `Card` and
-   `App Header` draw the same two declarations for the same reason: a filter
-   behind an opaque ground is invisible and a translucent ground over an
-   unfiltered page is a smear, so the component owns both.
-
-   What a drawer adds is something worth seeing through to. A card is glass over
-   whatever a consumer put behind it; a panel that slides over the page is glass
-   over the page, under the scrim that is already there to say the page is not
-   the thing being read. The blur is what keeps that from becoming a competing
-   picture.
-
-   On the panel rather than the host, because the panel is the surface: the host
-   paints nothing and a filter on it would sample the page and hand the result to
-   an element that covers none of it.
-
-   The strength is the theme's. `--helix-material-translucent` and
-   `--helix-material-backdrop` are what the policy moves, and the two hooks
-   override one drawer without touching the language. */
+/* *Glass, and a drawer is where the pair earns the most.** `Card` and `App
+   Header` draw the same two declarations for the same reason: a filter behind an
+   opaque ground is invisible and a translucent ground over an unfiltered page is
+   a smear, so the component owns both. */
 :host([material="glass"]) [part="panel"] {
   backdrop-filter: var(--drawer-backdrop, var(--helix-material-backdrop));
   background-color: var(--drawer-background-color, var(--helix-material-translucent));
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
-   the heavier blur is what stops a ground that opaque reading as a smear. The
-   two move together because either without the other does nothing. */
+   the heavier blur is what stops a ground that opaque reading as a smear. */
 :host([material="frosted"]) [part="panel"] {
   backdrop-filter: var(--drawer-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--drawer-background-color, var(--helix-material-translucent-strong));
@@ -230,13 +155,7 @@
   transform: translate(0, 0);
 }
 
-/* No rule under it either. `:has()` is not allowed inside the functional
-   `:host()`, so `:host(:not(:has([slot="header"])))` is dropped at parse time
-   and hides nothing: measured, with no header slotted the wrapper still came out
-   `display: block` with a one pixel bottom border, so every drawer painted a
-   hairline across its top with nothing above it. A region cannot detect its own
-   emptiness here, so the answer is not to draw anything that depends on it being
-   filled. */
+/* No rule under it either. */
 [part="header"] {
   flex: 0 0 auto;
 }
@@ -244,33 +163,18 @@
 [part="content"] {
   flex: 1 1 auto;
   min-block-size: 0;
-  /* **Room for a focus ring, taken back the moment it is given.** Asking for
-     `overflow-y: auto` and nothing else makes this a horizontal clipper too:
-     CSS computes a `visible` axis to `auto` when the other one is not visible,
-     so a scroller nobody asked to scroll sideways still clips there. A child
-     filling the width then loses the left and right of its ring while keeping
-     the top and bottom, which reads as a drawing fault rather than as focus.
-     Measured on a full width button in this component: `outline` 2px at 2px
-     offset, and zero room either side of it.
-
-     The padding widens the scrollport by exactly what the ring reaches and the
-     negative margin puts the region back where it was, so nothing inside moves
-     and the content still lines up with the header above it. */
+  /* *Room for a focus ring, taken back the moment it is given.** Asking for
+     `overflow-y: auto` and nothing else makes this a horizontal clipper too: CSS
+     computes a `visible` axis to `auto` when the other one is not visible, so a
+     scroller nobody asked to scroll sideways still clips there. Measured on a
+     full width button in this component: `outline` 2px at 2px offset, and zero
+     room either side of it. */
   margin-inline: calc(var(--helix-size-focus-reach) * -1);
   overflow-y: auto;
   padding-inline: var(--helix-size-focus-reach);
 }
 
-/* Not printed, being an overlay.
- *
- * It is over the page rather than part of it, and on paper there is no over: a
- * dialog prints as a slab across whatever it covered, and a tooltip prints its
- * tip beside nothing that is hovering.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Not printed, being an overlay. */
 @media print {
   :host {
     display: none;

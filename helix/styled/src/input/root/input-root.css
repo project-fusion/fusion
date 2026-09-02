@@ -1,22 +1,13 @@
 /* A column, so the label, the field, and whatever is under it stack without any
- * of them needing a margin. Gaps rather than margins because a part that is
- * absent renders nothing at all, and a gap around nothing is nothing, whereas a
- * margin on the field would still be there.
- *
- * **Flex rather than grid, and the inline axis is why.** A grid's single auto
- * column is floored at the min-content of what is in it, and what is in it is a
- * real `<input>`, whose min-content is its default twenty-character width. So
- * the track came out wider than the host and the field hung past its own
- * element: measured at 208px inside a 203px host, which ate the gap after it
- * and overlapped the control beside it by a pixel. `minmax(0, 1fr)` fixes that
- * and breaks the other end, because an `fr` track contributes nothing
- * intrinsically, so the host collapsed to zero the moment its width came from
- * its content.
- *
- * In a column flex container the inline axis is the cross axis, where items
- * stretch to the container rather than the container sizing to them. So the
- * field is as wide as the host whatever the host is, and the host is still as
- * wide as its content wants to be. */
+   of them needing a margin. **Flex rather than grid, and the inline axis is
+   why.** A grid's single auto column is floored at the min-content of what is in
+   it, and what is in it is a real `<input>`, whose min-content is its default
+   twenty-character width. So the track came out wider than the host and the
+   field hung past its own element: measured at 208px inside a 203px host, which
+   ate the gap after it and overlapped the control beside it by a pixel.
+   `minmax(0, 1fr)` fixes that and breaks the other end, because an `fr` track
+   contributes nothing intrinsically, so the host collapsed to zero the moment
+   its width came from its content. */
 :host {
   display: flex;
   flex-direction: column;
@@ -25,10 +16,7 @@
   --_input-size: var(--input-size, var(--helix-size-control));
 }
 
-/* The box is the field, not the input. The input inside it has no border and no
-   background of its own, so an icon slotted at either end sits inside the same
-   frame as the text rather than beside a smaller box, and the focus ring is
-   drawn once around the whole thing. */
+/* The box is the field, not the input. */
 [part="field"] {
   align-items: center;
   background-color: var(--input-background-color, var(--helix-color-well));
@@ -44,34 +32,13 @@
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* `:host(:disabled)`, not `:host([disabled])`.
- *
- * The pseudo-class matches on the element's own attribute *and* on an ancestor
- * `<fieldset disabled>`, where the attribute selector only ever sees the first.
- * Measured: a control inside a disabled fieldset matched `:disabled` from
- * inside its own shadow root while carrying no attribute at all, so this needs
- * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
- */
+/* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:not(:disabled)) [part="field"]:hover {
   border-color: var(--helix-color-primary);
 }
 
 /* On the box, because `delegatesFocus` puts focus on the input inside it and a
-   ring around that would sit within the frame rather than around it.
-
-   One edge, not two rings with a gap down the middle. The border turns accent
-   and the ring is drawn against it rather than offset from it, so the two read
-   as a single thicker edge. Offset, they are a blue line, a dark gap, and a
-   second blue line, and the field looks double-struck rather than focused. The
-   offset is right where a ring surrounds something that is not itself changing
-   color, which is most controls, and wrong here because the border is doing the
-   same job at the same moment.
-
-   Named with `:hover` as well, which is the whole reason this reads right.
-   Hover is a more specific selector than focus here, four to three, so a
-   focused field under the pointer took the hover border back: a gray edge
-   inside a blue ring, which is the two-ring look this was meant to end. Being
-   focused outranks being pointed at, so it has to say so. */
+   ring around that would sit within the frame rather than around it. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {
   border-color: var(--helix-color-primary);
@@ -80,29 +47,9 @@
 }
 
 /* The platform's verdict, which the host copies from the input, so this follows
-   whatever the browser decided rather than a second opinion.
-
-   `:state(invalid)` rather than `:user-invalid`. The idea is the same, that a
-   field is not wrong before anyone has had a go at it, but the selector cannot
-   match: `:user-invalid` tracks interaction with the element it is on, and
-   nobody interacts with this one. The reader types into an `<input>` in the
-   shadow root, so the host's flag is never set. Measured false after submitting
-   an invalid required field, which is exactly when the border should be there.
-   The attribute is written from the same state that decides the message, so the
-   two cannot disagree.
-
-   **Every combination is named, and the ring is recolored with the border.**
-   Being wrong outranks being pointed at and outranks being focused, so it has
-   to say so twice over, for the same reason the focus rule names `:hover`.
-   Unnamed, this was (0,3,0) against hover's (0,4,0), so running a pointer over
-   a field with an error in it put the gray border back.
-
-   Focus was worse than that, and visibly. The focus rule owns the `outline`,
-   and nothing here was changing its color, so a focused field with an error
-   came out as a red border inside a blue ring: two edges in two colors, which
-   is the double-struck look the focus rule exists to prevent, arriving by a
-   different route. The border and the ring are one edge, so when one of them
-   turns they both do. */
+   whatever the browser decided rather than a second opinion. Unnamed, this was
+   (0,3,0) against hover's (0,4,0), so running a pointer over a field with an
+   error in it put the gray border back. */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],
@@ -114,8 +61,7 @@
 [part="control"] {
   all: unset;
   /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
-     `border-box` every shadow root is given comes from a rule this one
-     outranks. */
+     `border-box` every shadow root is given comes from a rule this one outranks. */
   box-sizing: border-box;
   block-size: 100%;
   color: var(--helix-color-foreground);
@@ -146,29 +92,14 @@ slot[name="end"]::slotted(*) {
 }
 
 /* Flush with its ground, which is what `transparent` says and no absolute color
- * can: on a card, `surface` *is* the card, so read-only would be flush by
- * coincidence; on a raised panel it comes out lighter than the thing it sits
- * on, a field rising out of the surface it belongs to.
- *
- * The resting field is a recess, a percentage of the foreground over whatever
- * is behind it, so read-only is the absence of that recess rather than a second
- * color: no fill, the ground showing through, distinct from the resting state
- * on every ground and needing no token to stay that way. */
+   can: on a card, `surface` *is* the card, so read-only would be flush by
+   coincidence; on a raised panel it comes out lighter than the thing it sits on,
+   a field rising out of the surface it belongs to. */
 :host([readonly]) [part="field"] {
   background-color: transparent;
 }
 
-/* The two marks the field owns, dressed as one thing.
- *
- * `all: unset` first, the way File Input's remove button does it: a `<button>`
- * arrives with a background, a border, a font and a padding from the UA, and
- * every one of them has to go before any of this reads as a mark inside a
- * field rather than a button sitting in one.
- *
- * Muted at rest and full ink on hover, which is the same two steps every quiet
- * icon control in the library takes. Not `danger` on hover, which is what File
- * Input's does: taking a file out of a set is a delete, and emptying a field
- * you are about to type in again is not. */
+/* The two marks the field owns, dressed as one thing. */
 [part="clear"],
 [part="reveal"] {
   all: unset;
@@ -198,17 +129,14 @@ slot[name="end"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* A revealed password is a state the reader chose and should be able to see
-   they are in, from the mark alone, without hovering it to find out. */
+/* A revealed password is a state the reader chose and should be able to see they
+   are in, from the mark alone, without hovering it to find out. */
 [part="reveal"][aria-pressed="true"] {
   color: var(--helix-color-foreground);
 }
 
 /* Print: a control prints the value it holds, and a state carried by a fill has
- * to survive, or the paper says the opposite of the truth.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+   to survive, or the paper says the opposite of the truth. */
 @media print {
   :host {
     box-shadow: none;

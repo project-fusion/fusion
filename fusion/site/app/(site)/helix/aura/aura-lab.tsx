@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { HeroCopy } from '../../hero-copy'
+import { HeroCopy } from '@/components/hero-copy/hero-copy'
 
 /** The shapes on the bench, in the order the switcher lists them. */
 const SHAPES = [

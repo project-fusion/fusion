@@ -8,7 +8,7 @@ npm install @fusion.dev/helix-core
 ```
 
 Useful directly if you are writing custom elements that need to sit alongside
-Helix and behave the same way — controlled properties that answer, a single
+Helix and behave the same way: controlled properties that answer, a single
 page-wide ticker rather than one timer per element, scroll-parent resolution that
 crosses shadow boundaries, and duplicate-registration detection.
 

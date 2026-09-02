@@ -6,55 +6,21 @@
 
 /* Each avatar overlaps the one before it and is drawn over it, which falls out
    of document order and needs no `z-index`: nothing here is positioned, so
-   painting follows the tree.
- *
- * Not `row-reverse`, which is the familiar trick for putting the *first* avatar
- * on top. It also reverses the row, measured: the second avatar lands left of
- * the first. A facepile whose reading order is the reverse of its markup is a
- * worse trade than which face is in front.
- *
- * The ring goes on as a shadow rather than a border. `::slotted()` reaches the
- * avatar's host, which is where its size and radius already are, and a border
- * there would sit inside the box the avatar sized itself to and eat into the
- * picture. */
+   painting follows the tree. */
 ::slotted(*) {
   box-shadow: 0 0 0 var(--helix-border-thick) var(--_avatar-group-ring);
   flex: 0 0 auto;
 }
 
-/* The overlap, as a negative margin on everything after the first.
- *
- * Never a negative `gap`: it is a `<length-percentage>` that refuses negative
- * values, so the declaration is invalid and dropped and the row comes out merely
- * adjacent with nothing to say why.
- *
- * `::slotted()` takes a compound selector, and `:not(:first-child)` is one, so
- * the first avatar can keep its edge without the group writing an attribute
- * onto anybody's element to mark it. */
+/* The overlap, as a negative margin on everything after the first. */
 ::slotted(*:not(:first-child)) {
   margin-inline-start: calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)));
 }
 
-/* Past `max`. Hidden rather than removed, so nothing re-renders when the limit
- * changes and the group can still count what it is not showing.
- *
- * In CSS, and never in JavaScript writing `data-overflow` onto each avatar from
- * `updated`. Measured in Chrome 148: append two avatars past `max` to a settled
- * group and read before yielding, and all five are `flex`; they fold to three
- * only on the next Lit update. So a framework rendering a list paints the whole
- * set for a frame, and the group writes attributes onto elements it does not own
- * to do it.
- *
- * `::slotted()` takes a compound selector and `:nth-child()` is a pseudo-class,
- * so a compound selector may hold one exactly as `:not(:first-child)` does in
- * the rule above. Measured: `::slotted(*:nth-child(n + 4))` hides the fourth
- * onward and nothing else.
- *
- * One selector per value of `max`, because `An+B` takes a literal and there is
- * no reading a custom property into it, so this cannot be written once. Twelve,
- * which is more faces than a facepile shows before folding, and `max` past that
- * is no limit at all rather than a limit that quietly does not apply. The
- * component says so, and its count agrees. */
+/* Past `max`. Measured in Chrome 148: append two avatars past `max` to a settled
+   group and read before yielding, and all five are `flex`; they fold to three
+   only on the next Lit update. Measured: `::slotted(*:nth-child(n + 4))` hides
+   the fourth onward and nothing else. */
 :host([max="1"]) ::slotted(:nth-child(n + 2)),
 :host([max="2"]) ::slotted(:nth-child(n + 3)),
 :host([max="3"]) ::slotted(:nth-child(n + 4)),
@@ -70,8 +36,8 @@
   display: none;
 }
 
-/* The count, drawn as one more member of the stack and last along the row,
-   which is where the avatars it stands for would have continued. */
+/* The count, drawn as one more member of the stack and last along the row, which
+   is where the avatars it stands for would have continued. */
 [part="overflow"] {
   align-items: center;
   margin-inline-start: calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)));

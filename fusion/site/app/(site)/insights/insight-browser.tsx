@@ -3,10 +3,10 @@
 import type { HelixInput } from '@fusion.dev/helix'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { type ReactNode, useMemo, useRef, useState } from 'react'
+import browser from '@/components/browser.module.css'
 import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'
 import { useSearchKey } from '@/hooks/use-search-key/use-search-key'
 import type { Insight } from '../../../content/insights'
-import browser from '../browser.module.css'
 import styles from './insights.module.css'
 
 /**

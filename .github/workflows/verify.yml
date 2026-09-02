@@ -56,7 +56,8 @@ jobs:
       # Full history, because `scope` below diffs against the base and a
       # depth-1 checkout has nothing to diff against. Same reason `browser`
       # already takes it for `parity`.
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -67,7 +68,8 @@ jobs:
       # nothing, and every check they would have owned is skipped by a run
       # reporting ten green jobs. Read from `--count` and passed to `checks` as
       # an output, there is one number and nothing to keep in step.
-      - id: shards
+      - name: Decide the shard count
+        id: shards
         run: |
           set -euo pipefail
           of=$(node fusion/scripts/run-checks.mjs --count)
@@ -102,7 +104,8 @@ jobs:
       # nothing of `-v` and means the same thing to every grep. Found by running
       # the classifier on seven inputs before it was committed, which is the
       # only reason it is written this way.
-      - id: scope
+      - name: Decide what this push touched
+        id: scope
         env:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD: ${{ github.sha }}
@@ -152,26 +155,33 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       # The three `PREREQUISITES` in `run-checks.mjs`, in its order. They are
       # named here rather than derived because this job exists to fill a cache
       # and a wrong guess costs a restore, not a wrong answer: a task this
       # misses is one the shard builds itself, exactly as it does today.
-      - run: bun run build
-      - run: bun run analyze
+      - name: Build
+        run: bun run build
+      - name: Write the manifests and framework typings
+        run: bun run analyze
       # `bunx`, because `turbo` is a workspace binary and a `run:` step does not
       # get the PATH `bun run` arranges: bare `turbo` here is exit 127.
       #
       # `turbo run catalog` rather than `bun run catalog`, which is not a script.
-      - run: bunx turbo run catalog
+      - name: Build the catalog
+        run: bunx turbo run catalog
 
   # **Ten shards, because `warm` makes the build a restore.** What is left in a
   # shard is setup plus its share of the checks, so splitting the share is what
@@ -188,11 +198,13 @@ jobs:
       matrix:
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
 
       # Pinned to the version in `packageManager`. A lockfile pins every
       # dependency and nothing pinned the runtime resolving it.
-      - uses: oven-sh/setup-bun@v2
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
 
@@ -202,16 +214,19 @@ jobs:
       # cannot load, the analyzer falls back to a default one and writes a
       # manifest with every Helix plugin missing, and says it succeeded.
       # Every shard runs `analyze`, so every shard needs this floor.
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
 
       # `--frozen-lockfile` so a lockfile that does not match `package.json`
       # fails here rather than being quietly updated in CI and not on the
       # machine that pushed.
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-      - run: node fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of ${{ needs.plan.outputs.of }}
+      - name: Checks, shard ${{ matrix.shard }}
+        run: node fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of ${{ needs.plan.outputs.of }}
 
       # `verify` is meant not to write, and `analyze` is the one step that can:
       # it regenerates the manifests. A tracked manifest that no longer matches
@@ -231,21 +246,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
 
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-      - run: bun run build
+      - name: Build
+        run: bun run build
 
-      - run: bun run check:spec:floors
+      - name: Every rule counts something
+        run: bun run check:spec:floors
 
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
@@ -270,23 +291,30 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
 
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-      - run: bun run build
+      - name: Build
+        run: bun run build
 
-      - run: bun run analyze
+      - name: Write the manifests and framework typings
+        run: bun run analyze
 
-      - run: bun run smoke:template
+      - name: Install a template out of the pack
+        run: bun run smoke:template
 
   # Its own job because it reads every file regardless of who owns it, so
   # sharding it would mean a pass over the same tree per shard.
@@ -294,26 +322,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - run: bun install --frozen-lockfile
-      - run: bunx biome ci .
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Format and lint
+        run: bunx biome ci .
 
   types:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
-      - run: bun install --frozen-lockfile
-      - run: bun run typecheck
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Typecheck
+        run: bun run typecheck
 
   # **One job for all three, because `bun run test` is partly Rust.**
   # `@fusion.dev/helix-theme`'s `test` script is `cargo test -p fusion-helix-theme`, so
@@ -335,19 +372,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
+      - name: Check out
+        uses: actions/checkout@v7
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
-      - run: bun install --frozen-lockfile
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - uses: Swatinem/rust-cache@v2
-      - run: bun run test
+      - name: Restore the Cargo cache
+        uses: Swatinem/rust-cache@v2
+      - name: Run the specs
+        run: bun run test
       # **`check:cli` is here rather than in the shard pool**, because it is the
       # only check that runs a binary: a shard has bun and node and no cargo, so
       # the npm shim would build one from cold on whichever of the six drew it,
@@ -359,8 +403,10 @@ jobs:
       # `build` prerequisite. The one thing `dist` buys is naming the exact
       # subpath in a barrel finding, and without it that advice degrades to
       # `dependency/<part>` in words rather than silently.
-      - run: bun run rs:build
-      - run: bun run check:cli
+      - name: Build the Rust workspace
+        run: bun run rs:build
+      - name: The rules that ship
+        run: bun run check:cli
       # Beside `check:cli` because they are the same binary. A shard that runs
       # one compiles Rust to do it, and six doing that at once took the runner's
       # memory: exit 137 on one shard, SIGTERM on another, a third canceled
@@ -372,12 +418,18 @@ jobs:
       # is gitignored. A shard had it because the shards build first; this job
       # did not, so moving the check here turned seven true references into
       # findings. Cached, so it is a restore rather than a build.
-      - run: bun run build
-      - run: bun run check:css:seeds
-      - run: bun run check:prose
-      - run: bun run fusion spec check
-      - run: bun run rs:check
-      - run: bun run rs:test
+      - name: Build
+        run: bun run build
+      - name: Seed tokens
+        run: bun run check:css:seeds
+      - name: Prose
+        run: bun run check:prose
+      - name: Spec rules
+        run: bun run fusion spec check
+      - name: Clippy
+        run: bun run rs:check
+      - name: Rust tests
+        run: bun run rs:test
 
   # Six jobs, because they need a browser and `verify` deliberately does not:
   # everything in `verify` runs anywhere bun runs. These are the checks behind
@@ -501,34 +553,41 @@ jobs:
       # would have compared all 610 examples on every run while reporting that
       # it had scoped. The other tasks in this matrix do not read history and
       # are not harmed by having it.
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
 
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       # The browser is a 130MB download that changes only when Playwright does,
       # so it is keyed on the lockfile. `--with-deps` still runs: the apt
       # packages are not in this cache, and a headless browser in CI fails on a
       # missing `libnss3` far more often than on anything to do with the tests.
-      - uses: actions/cache@v6
+      - name: Restore the spec bundle cache
+        uses: actions/cache@v6
         with:
           key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
           path: ~/.cache/ms-playwright
 
       # No Rust: since 273 the wasm is tracked and `helix/theme`'s build is
       # `tsc` alone, so `turbo run build` never touches cargo here.
-      - run: bun run build
+      - name: Build
+        run: bun run build
 
-      - run: bunx playwright install --with-deps chromium
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: ${{ matrix.task }}
         run: ${{ matrix.run }}
@@ -546,7 +605,8 @@ jobs:
       # collected a quarter of what a failing run can write, and silently, since
       # `if-no-files-found: ignore` is exactly the setting that cannot say a
       # glob matched nothing.
-      - if: failure()
+      - name: Upload the visual diffs
+        if: failure()
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: ignore
@@ -586,8 +646,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')  # dialect:quoted, GitHub's own job result spelled its way
+      - name: A job did not pass
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')  # dialect:quoted, GitHub's own job result spelled its way
         run: |
           echo "::error::A job in this workflow did not pass."
           exit 1
-      - run: echo "Every job in this workflow passed."
+      - name: All jobs passed
+        run: echo "Every job in this workflow passed."

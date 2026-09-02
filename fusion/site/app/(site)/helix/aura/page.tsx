@@ -1,5 +1,5 @@
 import { AuraLab } from './aura-lab'
-import './aura.css'
+import './page.css'
 import { pageMetadata } from '@/utils/metadata/metadata'
 
 export const metadata = pageMetadata({

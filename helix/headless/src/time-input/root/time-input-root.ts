@@ -15,9 +15,8 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
-/* Side-effect imports, because this renders these in its own shadow root and a
-   custom element registers on import. Base elements here and styled ones in the
-   styled file, the arrangement Date Input has with its calendar. */
+/* Base elements here, styled ones in the styled file. The arrangement Date
+   Input has with its calendar. */
 import '../../icon/index.js'
 import '../../tag/index.js'
 import '../../time-picker/index.js'

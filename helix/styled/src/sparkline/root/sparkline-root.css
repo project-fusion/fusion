@@ -1,10 +1,7 @@
 :host {
   block-size: var(--sparkline-block-size, 2.5em);
   /* Set once and read by the line, the wash and the terminus, so a consumer
-     moving `--sparkline-color` cannot end up with three that disagree. Named as
-     well as assigned, because `emphasis` has to quieten the same value and
-     cannot reach it through `currentColor`: see the note at the foot of this
-     file. */
+     moving `--sparkline-color` cannot end up with three that disagree. */
   color: var(--_sparkline-ink);
 
   --_sparkline-ink: var(--sparkline-color, var(--helix-color-series-1));
@@ -13,8 +10,7 @@
 
   /* Relative to the surrounding text rather than on the type scale, for the
      reason `Kbd` gives: a line set beside a figure has to be a figure-sized
-     thing, and the scale is absolute and cannot say "a little wider than
-     this". */
+     thing, and the scale is absolute and cannot say "a little wider than this". */
   display: inline-block;
   inline-size: var(--sparkline-inline-size, 7em);
   vertical-align: middle;
@@ -24,66 +20,36 @@
   block-size: 100%;
   inline-size: 100%;
   /* The stroke sits astride the path, so a value at the very top or bottom of
-     the range has half its line outside the box. Visible rather than an inset
-     range: an inset costs amplitude and grows with the box, and the overhang is
-     half a stroke whatever the size. */
+     the range has half its line outside the box. */
   overflow: visible;
 }
 
 /* The first series color rather than the brand token, and they are nearly the
    same color on purpose: series 1 is the seed at hue rotation zero, held at a
-   lightness that clears a chart's ground. A sparkline is a chart, so it takes a
-   chart color, and a page carrying one beside a line chart draws both series
-   one in the same ink. Measured against the surface: 5.35 in the light and 6.57
-   in the dark, where a graphic needs 3. */
+   lightness that clears a chart's ground. Measured against the surface: 5.35 in
+   the light and 6.57 in the dark, where a graphic needs 3. */
 [part="line"] {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  /* In `em`, so the line grows with the drawing.
-   *
-   * A fixed `1.5px` leaves a 200 pixel sparkline wearing a hairline.
-   * `vector-effect` below keeps the stroke out of the view
-   * box's stretch, which is what it is for, and it also keeps it out of every
-   * other reason the stroke might want to be bigger. `0.11em` is 1.54px at the
-   * 14px base, so the default weight is where it was and now moves. */
+  /* In `em`, so the line grows with the drawing. A fixed `1.5px` leaves a 200
+     pixel sparkline wearing a hairline. `0.11em` is 1.54px at the 14px base, so
+     the default weight is where it was and now moves. */
   stroke-width: var(--sparkline-width, var(--_sparkline-weight, 0.11em));
 
-  /* The whole reason one drawing fits any box.
-   *
-   * `preserveAspectRatio="none"` stretches the coordinate space to the element,
-   * and a stroke stretches with it: the same 1.5 comes out hairline in a narrow
-   * slot and heavy in a wide one, and thicker across than down in both. This
-   * takes the stroke out of that space, so `1.5px` is 1.5 device-independent
-   * pixels at every size. */
+  /* The whole reason one drawing fits any box. `preserveAspectRatio="none"`
+     stretches the coordinate space to the element, and a stroke stretches with
+     it: the same 1.5 comes out hairline in a narrow slot and heavy in a wide
+     one, and thicker across than down in both. This takes the stroke out of that
+     space, so `1.5px` is 1.5 device-independent pixels at every size. */
   vector-effect: non-scaling-stroke;
 }
 
-/* Nothing until `plot` says otherwise. The region is always drawn, since
- * the shape is the tier below's business; whether it is painted is this one's.
- *
- * A ramp rather than a flat wash, so the fill reads as belonging to the line
- * above it and thins toward the floor, which is the edge of the data's own
- * range and not a true zero: a fill of even weight down to it draws a hard edge
- * along a number that means nothing. Stops rather than an `opacity` on the
- * path, since opacity would fade the stroke along with the fill and
- * `stop-opacity` leaves the line at full strength over it.
- *
- * **The ramp is keyed to the box and not to the line, and the difference shows
- * on a series with a deep trough.** `objectBoundingBox` is the default, so the
- * gradient runs the height of the area's own bounding box: full at the top,
- * gone at the floor. The wash is therefore fullest under the highest reading
- * and already thinning where the line dips, rather than being equally strong
- * just beneath it everywhere. A ramp that followed the line would need a
- * different one per column, which is not something a single fill can be, and
- * every charting library draws it this way for that reason.
- *
- * `currentColor` in the stops, so the wash is the line's own color and a
- * consumer cannot end up with a fill that disagrees with what it sits under.
- *
- * Decorative, and stated as such: the line carries the series and the wash says
- * only which side of it is under. There is no contrast floor for it to clear. */
+/* Nothing until `plot` says otherwise. **The ramp is keyed to the box and not to
+   the line, and the difference shows on a series with a deep trough.**
+   `objectBoundingBox` is the default, so the gradient runs the height of the
+   area's own bounding box: full at the top, gone at the floor. */
 [part="area"] {
   fill: none;
 }
@@ -105,11 +71,7 @@
   stop-opacity: calc(var(--sparkline-area-opacity, 0.45) * var(--helix-material-opacity));
 }
 
-/* The far stop does not reach nothing. At zero the ramp spends itself well
- * before the floor and the lower half of the region does no work: the fill
- * reads as a smudge under the peak rather than as a filled area. A quarter held
- * at the bottom reads as a slab with a gradient on it rather than as a fade. A
- * ninth keeps the floor present with the falloff over most of the height. */
+/* The far stop does not reach nothing. */
 :host(:not([plot="bar"]):not([plot="line"])) [part="wash-end"] {
   stop-opacity: calc(var(--sparkline-area-opacity, 0.45) / 9 * var(--helix-material-opacity));
 }
@@ -123,49 +85,18 @@
   --_sparkline-weight: 0.18em;
 }
 
-/* A column per reading, under `plot="bar"`.
- *
- * Filled rather than stroked, and the geometry comes from the tier below, which
- * insets each column inside its own slot so a series of seven and a series of
- * forty both fill the box. Nothing here needs `vector-effect`: a fill has no
- * stroke to be stretched, so a rect in the view box's own units is exactly as
- * wide as its share of the width whatever the drawing is scaled to, which is
- * the behavior a bar wants and the opposite of what a line wants. */
+/* A column per reading, under `plot="bar"`. */
 [part="bar"] {
   fill: currentColor;
   rx: var(--sparkline-bar-radius, 0.5);
 }
 
-/* The hole in the ring, cut out of the drawing so it is one.
- *
- * A `ring` terminus is a window onto whatever the chart is drawn over, and the
- * line ends at the reading, which is the window's center. Something has to give
- * way. Never the window: painting the middle with the page's surface hides the
- * stroke and also hides the card, the photograph or the panel the chart is
- * sitting on, and measured on a purple card the mark came out a disc of the
- * page color.
- *
- * So the drawing gives way instead. `mask-image` on the `<svg>` takes out a
- * disc of exactly the radius the ring leaves open, centered on the same two
- * percentages the mark is placed with, and the stroke genuinely stops at the
- * ring's inner edge.
- *
- * **On the `<svg>` and not on `[part="line"]`, which is the whole trick.** The
- * ring is an HTML element in CSS pixels and the line is in a coordinate space
- * `preserveAspectRatio="none"` stretches, so a radius means two different
- * things in the two places and no mask written inside the view box can agree
- * with the mark. The `<svg>` element itself is an ordinary replaced box whose
- * border box is in CSS pixels, which is the one surface where both are
- * measured the same way. It is the same reason the mark is a `<span>` rather
- * than a `<circle>`.
- *
- * Everything removed is inside the ring's own hole, so nothing else changes:
- * the wash and any column under the mark are covered by the border in the
- * annulus and only visible through the middle, where the point is to see past
- * them. The half pixel is a feather, since a hard stop on a curved edge aliases.
- *
- * A consumer who wants the old lid back sets `--chart-terminus-hole` to a
- * color: the disc is still cut, and an opaque middle covers the cut. */
+/* The hole in the ring, cut out of the drawing so it is one. **On the `<svg>`
+   and not on `[part="line"]`, which is the whole trick.** The ring is an HTML
+   element in CSS pixels and the line is in a coordinate space
+   `preserveAspectRatio="none"` stretches, so a radius means two different things
+   in the two places and no mask written inside the view box can agree with the
+   mark. */
 :host([terminus="ring"]) [part="svg"] {
   mask-image: radial-gradient(
     circle at var(--chart-terminus-x) var(--chart-terminus-y),
@@ -174,10 +105,7 @@
   );
 }
 
-/* Print: the same.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: the same. */
 @media print {
   :host {
     box-shadow: none;
@@ -185,56 +113,19 @@
   }
 }
 
-/* **Emphasis, and one value, for a drawing whose whole point is its size.**
-   A sparkline sits inside a line of text or a table cell, and the case that
-   arises there is a row that is context beside a row that is being read, which is
-   `subtle` exactly. `outlined` needs a fill to remove and this is a stroke;
-   `ghost` would be an empty cell.
-
-   **And no `material` here, which is a judgment about the size rather than about
-   the axis.** Glass exists so what is behind a mark reads through it. At the size
-   this draws, nothing behind it is resolvable, so the axis would render a
-   difference nobody can see. `BarChart` earns it with gridlines to read through
-   and a donut with a card under it; a sparkline has neither.
-
-   **On the host's `color` and not on the parts, which is the whole trick.**
-   Every mark in this file is `currentColor`: the line strokes it, both gradient
-   stops take it so the wash is the line's own color, and the terminus fills it.
-   Quietening the line alone leaves the wash and the terminus at full strength,
-   which measures as no visible change at all, three sparklines rendering
-   identically. One declaration at the top moves all five.
-
-   **`currentColor` cannot be used here.** In a declaration that sets `color` on
-   the same element,
-   `currentColor` is the *inherited* value, not the one the element's other rule
-   computed: `:host` and `:host([emphasis="subtle"])` both match this host, so
-   `currentColor` resolved to whatever the page's text color was rather than to
-   the series color. Measured, a `subtle` sparkline came out gray. It reads as
-   plausible, which is what makes this survive review: quiet and gray look like
-   the same intention until the loud one beside it is blue.
-
-   So the source value is named on `:host` and mixed by name. A consumer's
-   `--sparkline-color` is then quietened rather than replaced. */
+/* *Emphasis, and one value, for a drawing whose whole point is its size.** A
+   sparkline sits inside a line of text or a table cell, and the case that arises
+   there is a row that is context beside a row that is being read, which is
+   `subtle` exactly. */
 :host([emphasis="subtle"]) {
   color: color-mix(in oklab, var(--_sparkline-ink) 40%, var(--helix-color-background));
 }
 
-/* **The other two ends, and each plot answers them in its own shape.** A
+/* *The other two ends, and each plot answers them in its own shape.** A
    sparkline is three marks behind one property, so emphasis cannot be a single
    declaration the way `subtle` is: quietening ink works whatever is drawn, and
    the difference between a boundary and a fill does not exist until you know
-   which of the three you are looking at.
-
-   So this follows the family each plot belongs to. A bar plot answers like
-   `BarChart`: `outlined` keeps the column, fades it toward the page and holds
-   the edge in the series' color. A line or area plot answers like `LineChart`:
-   `outlined` thins the wash and leaves the line carrying the reading, `solid`
-   takes the wash to full and lets the fill carry it. `solid` on bars is the
-   resting column and selects nothing, per the rule that a resting value lands on
-   the base.
-
-   `ghost` stays refused for the reason the other charts give: a sparkline with
-   no mark is an empty box where a figure was promised. */
+   which of the three you are looking at. */
 :host([emphasis="outlined"]) [part="bar"] {
   fill: color-mix(in oklab, var(--_sparkline-ink) 55%, var(--helix-color-background));
   stroke: var(--_sparkline-ink);

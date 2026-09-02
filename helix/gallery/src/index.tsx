@@ -9,11 +9,10 @@ import { toolingArt } from './tooling'
 /**
  * Abstract art for a family's gallery card, keyed by slug.
  *
- * All ninety-four families have an entry, and the six files are split by kind
- * rather than by anything the build cares about. **The split follows the
- * catalog's own**: a drawer in the catalog is a drawer in the gallery, so
- * splitting one splits the other. The system they all obey is documented at the
- * top of `core.tsx`.
+ * Every family has an entry. The six files are split by kind rather than by
+ * anything the build cares about, and the split is **not** the catalog's: the
+ * catalog has twelve categories, `content.tsx` spans six of them and `core.tsx`
+ * seven. The system they all obey is documented at the top of `core.tsx`.
  *
  * **Ninety-four, not the ninety-three folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
@@ -27,8 +26,8 @@ import { toolingArt } from './tooling'
  * private, and TSX with its stylesheet kept together in `gallery.css`.
  *
  * Not in `helix/styled`, which has no React and no JSX transform, and which every
- * consumer installs. Not a CDN either, and that one fails on mechanics before
- * it reaches the Sovereignty Constraint. An external SVG in an
+ * consumer installs. Not a CDN either, and that one fails on mechanics alone.
+ * An external SVG in an
  * `<img>` is cut off from the page's CSS, so it can read no token and no hover
  * rule can reach it, and every card here is themed through `light-dark()` and
  * 54 of them move. Keeping either property means fetching and inlining

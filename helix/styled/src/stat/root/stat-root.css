@@ -1,31 +1,11 @@
 /* A grid rather than a stack, so the unit sits on the value's baseline and the
-   label spans the full width above it.
-
-   There is no `detail` slot below the number, deliberately: a change beside a
-   figure is a second fact, and the spec that pins it says so. `helix-trend` is
-   that fact and it goes beside the stat. */
+   label spans the full width above it. */
 :host {
-  /* Rows that line up across a group.
-   *
-   * The figure is a grid of auto rows and the group's flex line stretches it to
-   * the tallest figure beside it, which without this shares the extra out
-   * between every row equally: a two-line label next to a one-line label pushed
-   * its own value down and the numbers in a row stopped meeting. Packed to the
-   * start, the extra collects at the bottom where nothing is. */
+  /* Rows that line up across a group. */
   align-content: start;
   /* The unit on the number's baseline, which takes both of them saying so.
-   *
-   * `align-self: baseline` on the unit alone does nothing. Baseline alignment is
-   * relative: an item is aligned against the others in its baseline-sharing
-   * group, and one item is not a group, so it falls back to start and the unit
-   * renders at the top of the number like a superscript. Measured at 14px: the
-   * unit's bottom sat 32.5px above the number's, and 5.5px after this, which is
-   * the descender.
-   *
-   * Both readings of the value are fixed by the same line. A value written as
-   * bare text becomes an anonymous grid item, which has no element to carry
-   * `align-self` at all, and one wrapped in a span looks like it should have
-   * worked. */
+     Measured at 14px: the unit's bottom sat 32.5px above the number's, and 5.5px
+     after this, which is the descender. */
   align-items: baseline;
   display: grid;
   gap: var(--helix-space-2xs);
@@ -33,26 +13,17 @@
 }
 
 /* The three sizes below are relative to whatever the figure is set in, never
- * absolute off the type ramp, because a figure is one of the few things that
- * legitimately has to scale with its surroundings. A `Stat` in a donut's hole is
- * the case: the hole is a proportion of the chart and grows with the ring, while
- * a 44px number does not, so the same markup that fits at one chart size paints
- * across the slices at every other.
- *
- * Each is its own step of the ramp divided by the base, which is the multiplier
- * that reproduces the intended size and says where it came from. Divide the ramp
- * again and the figures follow, which a hand-written `3.143em` would not, and a
- * raw value is refused anyway.
- *
- * `--stat-value-size` still overrides, for a figure that wants a size of its own
- * regardless.
- */
-/* **`muted`, not `subtle`, because a label is content.** `subtle` is
+   absolute off the type ramp, because a figure is one of the few things that
+   legitimately has to scale with its surroundings. A `Stat` in a donut's hole is
+   the case: the hole is a proportion of the chart and grows with the ring, while
+   a 44px number does not, so the same markup that fits at one chart size paints
+   across the slices at every other. Divide the ramp again and the figures
+   follow, which a hand-written `3.143em` would not, and a raw value is refused
+   anyway. */
+/* *`muted`, not `subtle`, because a label is content.** `subtle` is
    `neutral-500` in both modes, which paints `#808080` and reads 3.95 against a
    white card: under the 4.5 that 12px text needs, and measured on this very
-   label. It is the right token for a mark nobody reads, a placeholder standing
-   in for text that is not there yet. The word naming the figure is not that:
-   the number means nothing without it. */
+   label. */
 slot[name="label"]::slotted(*) {
   color: var(--helix-color-foreground-muted);
   font-size: calc(var(--helix-text-xs) / var(--helix-text-md) * 1em);
@@ -61,14 +32,7 @@ slot[name="label"]::slotted(*) {
   letter-spacing: var(--helix-tracking-wide);
 }
 
-/* The inherited half on the slot, the rest on what was slotted.
- *
- * `::slotted()` matches elements and nothing else, so a value written as bare
- * text between the tags got none of this. Inherited properties set on a slot
- * reach its assigned nodes through the flattened tree, text nodes included;
- * anything that is not inherited has to stay on the element, because a text
- * node has no box to put it on. The blockquote had the same fault and it is
- * the same fix. */
+/* The inherited half on the slot, the rest on what was slotted. */
 slot:not([name]) {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-display);
@@ -77,30 +41,19 @@ slot:not([name]) {
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
 }
-/* Quieter and smaller than the number it qualifies. The baseline it sits on is
-   set by `align-items` above, since one item cannot baseline-align alone. */
+/* Quieter and smaller than the number it qualifies. */
 slot[name="unit"]::slotted(*) {
   color: var(--helix-color-foreground-muted);
   font-size: calc(var(--helix-text-md) / var(--helix-text-md) * 1em);
   font-weight: var(--helix-weight-medium);
 }
 
-/* Which way the pair goes.
- *
- * The grid stays a grid whichever direction is set, because the unit has to sit
- * on the value's baseline and that is a grid-area question: switching to a flex
- * row would put the unit beside the label as readily as beside the number.
- * Reversing is a row order rather than a `flex-direction`, so the markup order
- * is untouched and a screen reader still hears the label before the number.
- *
- * `dense` is not used and must not be: the auto-placement would pull the unit up
- * into a gap beside the label the moment the label wrapped. */
+/* Which way the pair goes. */
 :host([direction="column-reverse"]) slot[name="label"]::slotted(*) {
   order: 1;
 }
 
-/* Side by side, where a stacked pair would be two lines of almost nothing. The
-   label loses its full-width span, since spanning is what stacks it. */
+/* Side by side, where a stacked pair would be two lines of almost nothing. */
 :host([direction="row"]),
 :host([direction="row-reverse"]) {
   align-items: baseline;
@@ -117,10 +70,7 @@ slot[name="unit"]::slotted(*) {
   order: 1;
 }
 
-/* Print: a figure and its label, which need no ground.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a figure and its label, which need no ground. */
 @media print {
   :host {
     box-shadow: none;

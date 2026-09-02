@@ -2,36 +2,15 @@
   display: block;
 }
 
-/* Block, not flex. The default slot is where a consumer writes the words, and a
-   flex container blockifies every one of its items: a single `<em>` in an
-   otherwise plain quote became a full-width flex item on a line of its own, so
-   one sixty-six pixel line came out as a hundred and fifty-five pixel stack of
-   three. A quote is prose and lays out as prose.
-
-   The gap goes with it. It was spacing a column of blocks that a plain quote
-   never has; where a consumer does write blocks, `<p>` margins are what space
-   them, which is what the base layer already sets. */
+/* Block, not flex. */
 [part="blockquote"] {
   display: block;
   margin: var(--helix-space-none);
 }
 
-/* On the slot, not on what was slotted into it.
- *
- * `::slotted()` matches elements and nothing else, so a quote written as bare
- * text between the tags gets none of this: measured, that rendered at fifteen
- * pixels and weight four hundred where a quote wrapped in a paragraph got
- * twenty-four and five hundred. The plainest way to write a quote is the one
- * that fails.
- *
- * Every property here is inherited, and inherited properties set on a slot
- * reach its assigned nodes through the flattened tree, text nodes included. The
- * margin is the exception, and it is the one that has to stay on the element,
- * because there is no margin on a text node to remove. */
+/* On the slot, not on what was slotted into it. */
 slot:not([name]) {
-  /* A step back from full strength. The passage is long and set large, and at
-     the page's own foreground a wall of display type is louder than anything
-     around it; muted lets the size carry the emphasis instead of the contrast. */
+  /* A step back from full strength. */
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-display);
   font-size: var(--blockquote-size, var(--helix-text-xl));
@@ -47,26 +26,16 @@ slot:not([name])::slotted(*) {
 [part="attribution"] {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
-  /* Room to be a separate thing. The footer is inside the `<blockquote>` and in
-     normal flow, so with no margin it sat on the quote's last line with only
-     the leading between them, and `leading-tight` on a display-sized quote
-     makes that gap smaller than the one inside the quote itself. A line that
-     belongs to a different voice needs more space above it than the quote's own
-     lines have between them, or it reads as a third line of the quote set
-     small. */
+  /* Room to be a separate thing. */
   margin-block-start: var(--helix-space-sm);
 }
 
-/* Nothing said it, so no footer and no gap under the quote. Only a box that is
-   not generated costs nothing in a flow with spacing between its children. */
+/* Nothing said it, so no footer and no gap under the quote. */
 [part="attribution"][data-empty] {
   display: none;
 }
 
-/* Print: the same.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: the same. */
 @media print {
   :host {
     background-color: transparent;

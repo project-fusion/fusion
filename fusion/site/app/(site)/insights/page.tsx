@@ -1,6 +1,6 @@
+import { InsightCard } from '@/components/insight-card/insight-card'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { INSIGHTS, type Insight } from '../../../content/insights'
-import { InsightCard } from '../insight-card'
 import { InsightBrowser } from './insight-browser'
 import styles from './insights.module.css'
 

@@ -92,13 +92,16 @@ jobs:
       # `fetch-depth: 0` and the tags, because the version is computed from
       # them. A shallow clone reports no tags and every release looks like the
       # first one.
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - run: git fetch --tags --force
+      - name: Fetch the tags, which carry the version
+        run: git fetch --tags --force
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
 
@@ -112,15 +115,18 @@ jobs:
       #
       # The default registry is already npmjs.org, so the line bought nothing
       # even when it worked.
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
 
       # Node 22.20.0 ships npm 10.9.x, so the floor above is not what
       # `setup-node` leaves behind. Same pin as `release.yml`, same reasoning.
-      - run: npm install -g npm@11.18.0
+      - name: Install an npm that can do trusted publishing
+        run: npm install -g npm@11.18.0
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Stamp the experimental version into every domain this touches
         run: |
@@ -146,9 +152,11 @@ jobs:
       # Not `--frozen-lockfile`: the versions just changed, and `bun pm pack`
       # reads a sibling's version from `bun.lock` rather than from its manifest.
       # Packing without this pins every sibling at the previous release.
-      - run: bun install
+      - name: Install dependencies, lockfile free, so the stamped versions resolve
+        run: bun install
 
-      - run: bun run build
+      - name: Build
+        run: bun run build
 
       # **`analyze` is on the critical path of packing, and only since the
       # manifests stopped being tracked.** `files` names `custom-elements.json`
@@ -156,11 +164,13 @@ jobs:
       # turbo has `analyze` depending on `build`, not the other way round, so a
       # build alone leaves them absent and the tarball ships without files its
       # own manifest promises.
-      - run: bun run analyze
+      - name: Write the manifests and framework typings
+        run: bun run analyze
 
       # Against the tarballs, from outside the workspace, before anything is
       # published. A version can be deprecated but never taken back.
-      - run: bun run smoke:template
+      - name: Install a template out of the pack
+        run: bun run smoke:template
 
       - name: Publish under the pull request's own tag
         run: |

@@ -2,31 +2,14 @@
   display: block;
 }
 
-/* Bounded, and scrolling inside that bound.
- *
- * Ninety-six rows at a quarter hour is around three thousand pixels, which is
- * taller than any panel and taller than most pages: an unbounded list here is a
- * component that works in a spec and nowhere else. A height rather than a row
- * count, because what a panel has is room, and a count would need recomputing
- * every time the density moved. */
+/* Bounded, and scrolling inside that bound. */
 [part="list"] {
   --listbox-max-block-size: var(--time-picker-list-block-size, 16rem);
 
   display: block;
 }
 
-/* The listbox brings its own frame and this element does not want it.
- *
- * A bordered, filled, rounded box is right for a listbox standing on a page,
- * and inside Time Input's panel it is a card inside a card: two borders a
- * couple of pixels apart, two radii that do not agree, and rows inset from the
- * edge the eye is following down. This element is bare for the same reason
- * `helix-color-picker` is, so whatever holds it supplies the surface.
- *
- * `::part` reaches it because the listbox is a direct child of this shadow root,
- * which is one boundary. The block padding goes with the frame: it existed to
- * hold the first and last rows clear of rounded corners there are no longer any
- * of. */
+/* The listbox brings its own frame and this element does not want it. */
 [part="list"]::part(items) {
   background-color: transparent;
   border: none;
@@ -34,46 +17,20 @@
   padding-block: var(--helix-space-none);
 }
 
-/* The two ends of a range are the answer, so they are filled rather than
- * washed.
- *
- * Only in a range, where "chosen" means one of two ends and the difference
- * between an end and the times between them is the whole reading. A single
- * selection keeps the listbox's own treatment, which is a row being pointed at
- * rather than a terminus.
- *
- * The label color goes with the fill. A foreground picked to sit on a surface
- * does not sit on the accent, and this is the one place in this component where
- * a row stops being a row on the panel. */
+/* The two ends of a range are the answer, so they are filled rather than washed. */
 :host([mode="range"]) [part="option"]:state(selected)::part(item) {
-  /* **The inverse pair, and never `foreground-muted` carrying
+  /* *The inverse pair, and never `foreground-muted` carrying
      `foreground-on-accent`.** That pairing measures 6.01 in light and 2.96:1 in
      dark, under AA: `foreground-muted` flips to a *light* gray there, and the
-     ink on it is pale.
-
-     `surface-inverse` is the token for a slab that is the opposite of the page
-     whichever page it is, and `foreground-inverse` is the ink solved against
-     it: 7.20:1 in both schemes. It is still a fill that is neither the accent
-     nor black, without depending on which way round the scheme happens to be. */
+     ink on it is pale. `surface-inverse` is the token for a slab that is the
+     opposite of the page whichever page it is, and `foreground-inverse` is the
+     ink solved against it: 7.20:1 in both schemes. */
   background-color: var(--helix-color-surface-inverse);
   color: var(--helix-color-foreground-inverse);
 }
 
 /* The times inside a range, which are part of the answer without having been
- * chosen. A wash rather than the fill, so the two ends stay the things that were
- * picked: the calendar draws its own range the same way, and a reader who has
- * seen one reads this without being told.
- *
- * A translucent wash of the foreground rather than a step on the surface ladder,
- * which is the note Option carries about its own hover: an absolute surface is
- * a fixed lightness on a panel whose lightness is not, and the two collided in
- * dark mode last time somebody tried it. This has to clear a second bar as well,
- * being darker than the hover it sits beside, which is why it is sixteen and
- * twenty against that rule's eight and twelve.
- *
- * `light-dark()` wraps the two mixes rather than the two percentages. Not a
- * style choice: it returns a color, so a percentage inside it is invalid and the
- * whole declaration is dropped. Option records the same. */
+   chosen. */
 [part="option"][data-between]::part(item) {
   background-color: var(
     --time-picker-range-color,
@@ -84,16 +41,7 @@
   );
 }
 
-/* A dot where a terminus has its tick.
- *
- * The ends of a range are marked and the times between them were not marked at
- * all, so a row inside the range read as a row that happened to be tinted. A
- * mark in the same slot says it is part of the answer, and a dot rather than a
- * tick says it was not chosen: a tick on every row between nine and five is
- * seventeen claims that somebody pressed them.
- *
- * The same box the tick occupies, so nothing shifts between a terminus and its
- * neighbor, with the dot drawn as a radius inside it. */
+/* A dot where a terminus has its tick. */
 [part="option"][data-between]::part(item)::after {
   content: "";
   background-color: currentColor;
@@ -106,36 +54,20 @@
   scale: 0.3;
 }
 
-/* Three columns, each scrolling on its own, read as a dial rather than a list.
- *
- * The shape of a dial without pretending to be one: a wheel drawn in
- * perspective is a picture of a control, and the thing under it is three lists,
- * which is what these are. What makes it read as a dial is what a dial does:
- * rows snap to the middle, the ends fade away, and there is nothing marking a
- * choice except where it has come to rest.
- *
- * Equal widths, so the hour column does not sit narrow beside a meridiem saying
- * AM. A separator between rather than a border around each, because three
- * bordered boxes in a panel is three cards and this is one control with three
- * parts. */
+/* Three columns, each scrolling on its own, read as a dial rather than a list. */
 [part="columns"] {
   display: flex;
 }
 
 /* Shorter than the single list, which is a different job: a list is read down
    and a dial is read around its middle, so it wants enough rows to show the
-   neighbors and not so many that the center stops being a center.
-
-   Each column is at least as wide as its own widest row, and they share what is
-   left equally. `flex-basis: 0` with a zero floor collapses them: inside a panel
-   sized to its content there is no content to size to, because every column has
-   offered to be nothing. Measured, `AM` came out as one letter and an
-   ellipsis. */
+   neighbors and not so many that the center stops being a center. `flex-basis:
+   0` with a zero floor collapses them: inside a panel sized to its content there
+   is no content to size to, because every column has offered to be nothing. */
 [part="column"] {
   /* The row is stated once and read three times: by the row itself, by the block
      padding that lets the first and last reach the middle, and by the height,
-     which is five of them. Written separately they drift, and the drift shows up
-     as a wheel resting a few pixels off center. */
+     which is five of them. */
   --_time-row: var(--time-picker-row-size, var(--helix-size-control));
   --listbox-max-block-size: var(--time-picker-wheel-block-size, calc(var(--_time-row) * 5));
 
@@ -143,19 +75,7 @@
   min-inline-size: max-content;
 }
 
-/* The frame off, for the reason the single list gives, and then the dial.
- *
- * `scroll-snap-type` is what makes a row come to rest in the middle rather than
- * wherever the finger left it, and the block padding is what lets the first and
- * last rows get there at all: without it a column can scroll its first row to
- * the top and no further, so midnight can never be the thing in the center. Half
- * the column less half a row, which is the arithmetic for "one row's worth of
- * middle".
- *
- * The mask is the curve. A dial's far rows are turned away from the reader and a
- * flat list's are not, and fading them is the honest flat equivalent: it says
- * these are further from the answer without drawing a perspective that is not
- * there. */
+/* The frame off, for the reason the single list gives, and then the dial. */
 [part="column"]::part(items) {
   background-color: transparent;
   border: none;
@@ -166,10 +86,7 @@
   mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
   padding-block: calc((var(--listbox-max-block-size) - var(--_time-row)) / 2);
   scroll-snap-type: y mandatory;
-  /* No scrollbar. A wheel with a bar down its side is a list again, and there
-     are three of them: the fade already says there is more above and below.
-     `scrollbar-width` is the standard property, rather than a vendor
-     pseudo-element that would have to be reached through `::part`. */
+  /* No scrollbar. */
   scrollbar-width: none;
 }
 
@@ -178,12 +95,7 @@
 }
 
 /* Centered, because a column of numbers read against its own edge is a list and
- * read against its middle is a dial.
- *
- * Both the row and the words. `justify-content` on the row alone did nothing
- * visible, measured: it centers the row's children, and the label is a flex item
- * that fills the row, so the text went on sitting against its own start edge
- * inside a label that was already centered by being the whole width. */
+   read against its middle is a dial. */
 [part="column"] [part="option"]::part(item) {
   justify-content: center;
 }
@@ -192,47 +104,18 @@
   text-align: center;
 }
 
-/* Square, and roomy. A wheel's rows are read as positions rather than as lines
-   of text, so they want the height of a control rather than the height of a
-   sentence, and the same again across: a column sized to `max-content` is
-   otherwise exactly as wide as its widest row, and three columns of bare digits
-   sit against each other with nothing between them.
-
-   The inset is the whole of that separation. No rules between the columns as
-   well: three numbers side by side are already three numbers, and ruling them
-   apart makes a table out of what is meant to read as one control. */
+/* Square, and roomy. */
 [part="column"] [part="option"]::part(item) {
   min-block-size: var(--_time-row);
   min-inline-size: var(--_time-row);
   /* No block padding, which Option gives every row so that a slotted avatar has
-     somewhere to sit. Here the label *is* the row's height, so four pixels above
-     and below make the row forty-eight while `--_time-row` still says forty, and
-     that number is read three times: by this rule, by the column height that is
-     five of them, and by the block padding that lets the first and last rows
-     reach the middle. Measured with the padding left in, the row was 48 and a
+     somewhere to sit. Measured with the padding left in, the row was 48 and a
      column of "five" held 4.17. */
   padding-block: var(--helix-space-none);
   padding-inline: var(--helix-space-sm);
 }
 
-/* A wheel row is a calendar day, and for the same reason it is one there.
- *
- * Both are a number in a grid rather than a line of text, so the mark for
- * "this one" is a shape around the number and not a band across the row. Full
- * width, the fill runs to the rule between two wheels and the three columns
- * read as one striped block; drawn on the number, the columns stay columns and
- * the answer is three marks in a line, which is what the reader is assembling.
- *
- * So the row becomes the calendar's cell, carrying nothing, and the label
- * becomes its day. `min-inline-size` rather than a fixed one, because a day is
- * always one or two digits and a wheel also holds `AM`: fixed, the meridiem
- * clipped.
- *
- * The full row in both axes, where the calendar's day is inset within its cell.
- * The inset exists there to keep two chosen days in a run from touching, and a
- * wheel cannot have a run: it holds exactly one value per column, so there is
- * never a second mark for this one to close a gap with. What is left is a
- * forty pixel row with a twenty-eight pixel mark adrift in it. */
+/* A wheel row is a calendar day, and for the same reason it is one there. */
 [part="column"] [part="option"]::part(item) {
   background-color: transparent;
 }
@@ -250,8 +133,7 @@
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Hover on the mark rather than the row, since the row no longer carries one.
-   The calendar's `surface-sunken`, which is what a day takes under the pointer. */
+/* Hover on the mark rather than the row, since the row no longer carries one. */
 [part="column"] [part="option"]:not([disabled]):hover::part(label),
 [part="column"] [part="option"][data-active]::part(label) {
   background-color: var(--helix-color-surface-sunken);
@@ -260,32 +142,17 @@
 /* And the answer is the calendar's solid mark: `foreground-muted` rather than
    `foreground`, which is a slab of near-black among gray numbers, and
    `foreground-on-accent` for the digits, which is the token for words on a
-   filled control. The list appearance already reads this way for its range
-   termini, so all three surfaces now say "chosen" with one mark. */
+   filled control. */
 [part="column"] [part="option"]:state(selected)::part(label) {
   background-color: var(--time-picker-selected-color, var(--helix-color-foreground-muted));
   color: var(--helix-color-foreground-on-accent);
 }
 
-/* No tick. A listbox marks its answer because a reader has to find it among
-   options that are otherwise alike; a dial has exactly one value per column and
-   it is the one in the middle, so a mark beside it says what the position
-   already said and pushes the number off center doing it. */
+/* No tick. */
 [part="column"] [part="option"]::part(item)::after {
   content: none;
 }
-/* Wrong, and the mark says so.
- *
- * A ring on the answer rather than a border round the surface. A flat picker is
- * a grid or a column with no frame to turn red, and framing one to carry an
- * error would draw a box that exists for nothing else. The field that wraps a
- * picker already owns the message; what only the picker can do is point at the
- * thing that is wrong, and that is the mark on the chosen value.
- *
- * On the same box the focus ring uses, so the two are one edge rather than two
- * concentric ones. Input records the longer version of this: a red border inside
- * a blue ring is the double-struck look the focus rule exists to prevent,
- * arriving by another route. */
+/* Wrong, and the mark says so. */
 :host([invalid]) [part="option"]:state(selected)::part(item),
 :host([invalid]) [part="column"] [part="option"]:state(selected)::part(label) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
@@ -302,12 +169,7 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive. A
- * tick that is a fill prints as an empty box, which is a document saying the
- * opposite of the truth.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a control prints the value it holds, and the state has to survive. */
 @media print {
   :host {
     box-shadow: none;

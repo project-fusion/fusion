@@ -1,4 +1,4 @@
-/* Stacked the same way as every other field. See the input's note. */
+/* Stacked the same way as every other field. */
 :host {
   display: flex;
   flex-direction: column;
@@ -28,14 +28,7 @@
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* `:host(:disabled)`, not `:host([disabled])`.
- *
- * The pseudo-class matches on the element's own attribute *and* on an ancestor
- * `<fieldset disabled>`, where the attribute selector only ever sees the first.
- * Measured: a control inside a disabled fieldset matched `:disabled` from
- * inside its own shadow root while carrying no attribute at all, so this needs
- * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
- */
+/* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:not(:disabled)) [part="trigger"]:hover {
   border-color: var(--helix-color-primary);
 }
@@ -59,21 +52,12 @@
   opacity: 0.5;
 }
 
-/* **Inline: a control in a row of prose or of tools, rather than a field in a
+/* *Inline: a control in a row of prose or of tools, rather than a field in a
    form.** `ghost` is the registry's word for a control with no ground of its
    own, and it is the same one `Button` and `IconButton` take: no fill, no edge,
-   and a wash of the foreground the moment a pointer is on it.
-
-   Three things go with the box. The host stops filling its column and takes the
-   width of what is in it, because a field is as wide as the form and a control
-   in a sentence is as wide as its answer. The trigger stops spacing its two
-   halves apart, so the mark sits against the value rather than at the far end of
-   a width nothing is using. And the step comes down, because a control drawn
-   without a frame beside 32 pixel neighbors is 40 pixels of empty air.
-
-   The label is unaffected and deliberately so: a field with no visible label
-   sets `aria-label` and gets a clipped one, which is a separate question from
-   where its surface ends. */
+   and a wash of the foreground the moment a pointer is on it. And the step comes
+   down, because a control drawn without a frame beside 32 pixel neighbors is 40
+   pixels of empty air. */
 :host([emphasis="ghost"]) {
   inline-size: fit-content;
 }
@@ -98,17 +82,7 @@
 }
 
 /* One line, cut rather than wrapped, so a long answer does not make the closed
-   control taller than the fields beside it.
-
-   The value takes the room, so the trigger reads the same with a leading icon
-   as without one. The trigger is `justify-content: space-between` over two
-   children, which puts
-   the value at the start and the indicator at the end. A third child, which is
-   what slotting into `start` adds, would have spread all three and left the
-   value floating in the middle of its own control. Growing the value pins the
-   indicator to the end whatever is in front of it, and changes nothing for a
-   select with an empty `start`: an unassigned slot is `display: contents` and
-   generates no box at all. */
+   control taller than the fields beside it. */
 [part="value"] {
   flex: 1;
   overflow: hidden;
@@ -119,56 +93,27 @@
 /* Over the page rather than on it, which is what `overlay` means and what its
    shadow says: the panel is not a sunken part of the field it came out of. */
 [part="surface"] {
-  /* Square rows, because they run the full width of the panel. A radius is for
-     a row inset from its container, where the corners have space to sit in; on
-     a band that reaches both edges it rounds against nothing and reads as a
-     rectangle with the corners nibbled. */
+  /* Square rows, because they run the full width of the panel. */
   --option-radius: var(--helix-radii-none);
 
   background-color: var(--helix-color-surface-overlay);
-  /* No border. A panel over the page is told apart by its shadow and by the
-     content it covers, which is what `overlay` means, and a line around it as
-     well reads as a box drawn around something already separate. The shadow is
-     `lg` here rather than `sm` for that reason: it is carrying the separation
-     on its own. */
+  /* No border. */
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--select-shadow, var(--helix-shadow-floating));
-  /* The trigger's width, with the content as the floor.
-   *
-   * From the controller rather than from a percentage: the panel is positioned
-   * `fixed`, so `100%` would be the viewport rather than the field. The
-   * fallback covers the moment before the first measurement.
-   *
-   * `min-inline-size: max-content` is the floor rather than a cap, so an option
-   * longer than the field widens the panel instead of wrapping or being cut.
-   * A dropdown is read, and a name broken across two lines to fit a field it
-   * has no relationship to is worse than a panel that sticks out. */
+  /* The trigger's width, with the content as the floor. From the controller
+     rather than from a percentage: the panel is positioned `fixed`, so `100%`
+     would be the viewport rather than the field. */
   inline-size: var(--floating-anchor-inline-size, 100%);
   min-inline-size: max-content;
   /* Never taller than the room under the trigger, for the same reason as the
      width: the space is measured, not declared. */
   max-block-size: var(--floating-available-block-size, none);
-  /* Block only. The rows run the full width of the panel and bring their own
-     inline padding, so a hovered or selected row is a band across the panel
-     rather than a pill inset from its edges: the highlight lines up with the
-     edge the eye is already following down the list. The block padding stays,
-     because the first and last rows still want air above and below them. */
+  /* Block only. */
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-none);
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
      `border: solid`, so dropping the declaration leaves a three-pixel medium
-     border rather than none at all. The same line the menu's surface carries,
-     for the same reason: this is a popover.
-
-     `inset` and `margin` for the same reason. The UA centers a popover in the
-     window and gives it a margin, and the positioning this panel gets from the
-     controller is applied on top of both, so neither can merely be overridden
-     by something more specific: they have to be cleared.
-
-     No `z-index` and no `position`. Both are a panel's way of trying to get
-     above the page from inside it, and neither works against an ancestor with
-     `overflow: hidden`, which is what does the clipping. The top layer is above
-     everything by construction. */
+     border rather than none at all. */
   border: var(--select-border-width, var(--helix-border-floating)) solid
     var(--select-border-color, var(--helix-color-border));
   inset: auto;
@@ -176,26 +121,8 @@
 }
 
 /* Shown and placed are two different moments, and this waits for the second.
- * The controller positions asynchronously, so a panel revealed by the render
- * sits at its stylesheet's position for one frame first. Opacity rather than
- * `visibility`, so the panel still has a box for the controller to measure.
- *
- * And it travels, a little, out of the edge it opened against.
- *
- * On `transform`, never on `translate`: the floating controller writes the
- * panel's position onto `translate`, and a keyframe animating that property took
- * the position over, so the panel traveled from the corner of the viewport
- * instead of from its anchor. Measured, the two compose in the order translate,
- * scale, transform, which means a `translateY` here is relative to wherever the
- * controller placed the panel and leaves x alone.
- *
- * The direction follows the placement, so it always emerges from the control
- * rather than always from above: a panel opening upward that slid down would
- * read as arriving from the thing it is covering. `transform-origin` below keys
- * on the same signal for the same reason.
- *
- * Small on purpose. `2xs` is enough to read as motion and short enough that a
- * fast reader who opens and picks in one gesture is not waiting on it. */
+   `2xs` is enough to read as motion and short enough that a fast reader who
+   opens and picks in one gesture is not waiting on it. */
 [part="surface"] {
   opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
@@ -205,10 +132,7 @@
      rows on the way out and reads as a toy at panel size, where a tooltip at the
      same figure reads as a mark arriving. */
   scale: 0.96;
-  /* Both directions. `display` and `overlay` with `allow-discrete` are what the
-     exit needs: closing stops `:popover-open` matching, and without them the
-     `display: none` below landed in the same frame and the list vanished where
-     Popover and Menu fade. */
+  /* Both directions. */
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized),
@@ -217,9 +141,7 @@
     overlay var(--helix-duration-fast) allow-discrete;
 }
 
-/* Opening upward, it comes up from the control rather than down onto it. Only
-   the custom property moves, so this rule cannot race the settled one below on
-   equal specificity: source order would decide it, and this sits above. */
+/* Opening upward, it comes up from the control rather than down onto it. */
 [part="surface"][data-placement^="top"] {
   --_travel: var(--helix-space-2xs);
 }
@@ -230,8 +152,7 @@
   transform: none;
 }
 
-/* Out of the edge it opened against. A select has no arrow, so the fallback
-   applies and it grows from the middle of the near edge. */
+/* Out of the edge it opened against. */
 [part="surface"][data-placement^="top"] {
   transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
@@ -249,31 +170,7 @@
   }
 }
 
-/* The indicator turns over as the panel opens.
- *
- * The mark says which way the panel is going, and a mark that never moves says
- * nothing at all.
- *
- * A flip across the x-axis rather than a rotation. The two end in the same
- * place for a symmetric caret and take different routes to get there: a
- * rotation carries the mark sideways through ninety degrees, where a chevron
- * spends the middle of the movement pointing at nothing. A flip stays on its
- * own axis, reads as the same mark turning over, and is what the shape is
- * already symmetric about.
- *
- * Both selectors, and that is the point. The default caret is the indicator
- * slot's *fallback* content, and `::slotted()` matches assigned nodes only:
- * fallback content is never assigned to the slot it sits in, so a rule written
- * for `::slotted` alone reaches the one mark a consumer supplied and misses the
- * one almost every consumer gets. Measured: the default caret's computed `scale`
- * read `none` open and shut. `[part="indicator"]` is the fallback, the
- * `::slotted` half is the replacement.
- *
- * `scale` rather than `transform: scaleY`, so a consumer who wants to translate
- * or rotate the mark can do that without the two fighting over one property.
- *
- * `:state(open)` and not `[open]`: the resolved state, so a controlled select
- * whose consumer has not applied the change yet does not turn early. */
+/* The indicator turns over as the panel opens. */
 [part="indicator"],
 ::slotted([slot="indicator"]) {
   transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
@@ -285,11 +182,7 @@
 }
 
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and every
-   author declaration above outranks it whatever its specificity. Restated here,
-   the same way Tooltip, Menu and Popover restate theirs, and the same rule
-   Dialog had to learn the hard way. `[hidden]` stays alongside it: the attribute
-   is what the server renders, and it is the only thing holding the panel closed
-   before the element upgrades. */
+   author declaration above outranks it whatever its specificity. */
 [part="surface"][hidden],
 [part="surface"]:not(:popover-open) {
   display: none;
@@ -300,11 +193,7 @@
 [part="listbox"]::part(items) {
   background-color: transparent;
   border: none;
-  /* And no radius. The list scrolls, so it clips what is inside it: a four pixel
-     radius on the scroller rounds the first row's top corners and the last
-     row's bottom ones, which reads as the option having a radius when the
-     option has none, and looking at the option is looking at the wrong element.
-     The panel's own radius is the frame; this is inside it. */
+  /* And no radius. */
   border-radius: var(--helix-radii-none);
   max-block-size: var(--select-surface-max-block-size, 14rem);
   padding: var(--helix-space-none);
@@ -316,8 +205,7 @@
 
 /* The fallback caret, sized. An `<svg>` with no dimensions fills the box it is
    given, and this one sat in a flex trigger with room to spare: measured at 247
-   pixels wide before this. A slotted `helix-icon` brings its own size, which is
-   why this only showed on the fallback. */
+   pixels wide before this. */
 [part="indicator"] {
   block-size: var(--helix-size-icon-tight);
   color: var(--helix-color-foreground-muted);
@@ -325,12 +213,7 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
-/* Print: a control prints the value it holds, and the state has to survive. A
- * tick that is a fill prints as an empty box, which is a document saying the
- * opposite of the truth.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a control prints the value it holds, and the state has to survive. */
 @media print {
   :host {
     box-shadow: none;

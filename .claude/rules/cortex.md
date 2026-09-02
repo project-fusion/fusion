@@ -25,11 +25,11 @@ spine, not a module.
 
 - **Local-first is the default, not the fallback.** An AI that remembers you but
   whose memory lives on someone else's server relocates the dependency rather
-  than removing it. The hosted tier is convenience, never a chokepoint.
-- **A local model provider is a thesis requirement, not a feature.** Cognitive
-  sovereignty delivered solely through a remote API is not sovereignty. The
-  `Provider` trait carries `is_local` so a product can tell the user whether
-  their data left the device.
+  than removing it. The hosted tier is a convenience rather than a requirement.
+- **A local model provider is a design requirement, not a feature.** Memory
+  delivered solely through a remote API relocates the dependency instead of
+  removing it. The `Provider` trait carries `is_local` so a product can tell the
+  user whether their data left the device.
 - **Ids are UUIDv7.** The timestamp prefix makes them sort in creation order,
   which turns index locality and time-range scans over episodic memory into a
   property of the key rather than a separate column.

@@ -19,63 +19,37 @@
   --_tag-height: var(--helix-size-tag);
 
   /* Every tone is one status color, tinted for the fill and used at full
-     strength for the label. Deriving beats a token per status, which would be
-     eight tokens whose only job is to be a lighter version of one that already
-     exists, re-derived by every theme. */
+     strength for the label. */
   --_tag-color: var(--helix-color-foreground-muted);
   --_tag-text: var(--helix-text-xs);
   --_tag-inset: var(--helix-space-xs);
 
   /* The default treatment, `subtle`, written here rather than behind an
-     attribute selector so a tag with no `emphasis` needs no second rule.
-   *
-   * The label is the tone mixed *towards the foreground* rather than the tone
-   * itself. At full strength on a wash of the same hue, four of the five tones
-   * failed 4.5:1 at 12px: primary 3.68, success 3.33, warning 2.24, danger
-   * 4.00, with only neutral passing. That is what coloring text with a hue and
-   * then washing the background with the same hue does, and no choice of hue
-   * fixes it. Darkening the label is what opens the gap back up. */
-  /* **These mix in sRGB, and the measurement is why.**
- *
- * oklab is the right space for choosing a color *between* two colors, which is
- * what this is, but against a near-black ground it compresses: measured in
- * Chromium at 14 percent, a tone fill separates from the page by 30 to 33 sRGB
- * levels in light and by **4 to 10 in dark**, where the same mix in sRGB gives
- * 26 to 37 in both. A success tag in dark mode had no fill anybody could see,
- * from a token that works in light. Same asymmetry the surface ramp carries.
- *
- * Only the mixes toward a *ground* change. `--_tag-label` mixes toward the
- * foreground and the solid fill mixes toward it too, which is a different
- * question and is left; the wash toward `transparent` further down is already
- * the pattern to copy, since the alpha survives and the compositor does the
- * rest in sRGB at paint time. */
+     attribute selector so a tag with no `emphasis` needs no second rule. At full
+     strength on a wash of the same hue, four of the five tones failed 4.5:1 at
+     12px: primary 3.68, success 3.33, warning 2.24, danger 4.00, with only
+     neutral passing. */
+  /* *These mix in sRGB, and the measurement is why.** oklab is the right space
+     for choosing a color *between* two colors, which is what this is, but
+     against a near-black ground it compresses: measured in Chromium at 14
+     percent, a tone fill separates from the page by 30 to 33 sRGB levels in
+     light and by **4 to 10 in dark**, where the same mix in sRGB gives 26 to 37
+     in both. */
   --_tag-fill: color-mix(in srgb, var(--_tag-color) 14%, var(--helix-color-background));
   --_tag-edge: color-mix(in srgb, var(--_tag-color) 28%, var(--helix-color-background));
   --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
 }
 
-/* **The label stays inside the pill.**
- *
- * The host is `white-space: nowrap` and its overflow is visible, so a tag given
- * less room than its text paints the words straight out through the rounded
- * end: measured in a table whose Status column had squeezed to 92px around a
- * 95px label, with "Missed window" running past the pink. A pill whose text
- * escapes it reads as a rendering fault rather than as a tight column.
- *
- * Being squeezed is normal rather than exceptional: `helix-table-cell` sets
- * `min-inline-size: 0` on everything slotted into it, on purpose, so a cell can
- * shrink and take its content with it. That reasoning is about text, which
- * wraps. A pill cannot.
- *
- * On the slot rather than the host, and the difference matters: the host also
- * holds the dismiss button, whose focus ring is drawn outside its box, so
- * hiding overflow up there would clip the ring. Truncating the one box that
- * holds the words leaves every other part's overflow alone.
- *
- * `display: block` because a `<slot>` is `display: contents` and generates no
- * box to truncate in, and `min-inline-size: 0` because the block it now
- * generates is a flex item, which keeps an automatic minimum of its own until
- * it is told otherwise. */
+/* *The label stays inside the pill.** The host is `white-space: nowrap` and its
+   overflow is visible, so a tag given less room than its text paints the words
+   straight out through the rounded end: measured in a table whose Status column
+   had squeezed to 92px around a 95px label, with "Missed window" running past
+   the pink. Being squeezed is normal rather than exceptional: `helix-table-cell`
+   sets `min-inline-size: 0` on everything slotted into it, on purpose, so a cell
+   can shrink and take its content with it. `display: block` because a `<slot>`
+   is `display: contents` and generates no box to truncate in, and
+   `min-inline-size: 0` because the block it now generates is a flex item, which
+   keeps an automatic minimum of its own until it is told otherwise. */
 slot:not([name]) {
   display: block;
   min-inline-size: 0;
@@ -83,53 +57,28 @@ slot:not([name]) {
   text-overflow: ellipsis;
 }
 
-/* A slotted icon sits on the middle, not on the baseline.
- *
- * The block above is what makes the words truncate, and it also hands whatever
- * is slotted a text baseline to stand on. `helix-icon` is `inline-flex`, so its
- * baseline is its own bottom edge: the glyph rests on the baseline and the
- * strut's descent is left underneath it, inside a box the host is centering.
- * Measured on the gallery's experimental mark, a 14px icon in a 28px tag: the
- * slot came out 17.39px tall and the icon sat 5.30px from the top against
- * 8.70px from the bottom, lifted 1.7px in a mark small enough that 1.7px is the
- * whole of what anyone sees.
- *
- * `middle` rather than blocking the icon out of the line, and the difference is
- * a regression rather than a preference. `display: block` centers a lone icon
- * exactly, and `::slotted(helix-icon:only-child)` looks like it scopes that to a
- * tag holding nothing else. It does not: `:only-child` counts elements, so an
- * icon beside a bare text label is still an only child, and blocking it puts it
- * on a line of its own above the word it belongs to. Measured, and it is the
- * arrangement the rule would most often meet.
- *
- * What is left is 0.41px, not zero, and that is the honest ceiling for CSS
- * here. `middle` is the baseline plus half an x-height, so the line box stays
- * 0.81px taller than the icon and the icon rides at the bottom of it. Closing
- * that needs the component to know it is holding an icon and nothing else,
- * which is a question `:has()` cannot ask of assigned nodes and the server
- * cannot ask at all. 0.41px is below a device pixel at every density we draw
- * at; 1.7px was not. */
+/* A slotted icon sits on the middle, not on the baseline. Measured on the
+   gallery's experimental mark, a 14px icon in a 28px tag: the slot came out
+   17.39px tall and the icon sat 5.30px from the top against 8.70px from the
+   bottom, lifted 1.7px in a mark small enough that 1.7px is the whole of what
+   anyone sees. What is left is 0.41px, not zero, and that is the honest ceiling
+   for CSS here. `middle` is the baseline plus half an x-height, so the line box
+   stays 0.81px taller than the icon and the icon rides at the bottom of it.
+   0.41px is below a device pixel at every density we draw at; 1.7px was not. */
 slot:not([name])::slotted(helix-icon) {
   vertical-align: middle;
 }
 
-/* Filled with the tone, label on top of it. `foreground-inverse` rather than a
-   per-tone choice: every tone at full strength is dark enough in light mode and
-   light enough in dark for the inverse of the page to read on it.
-
-   The fill is the tone taken a step towards the page's own foreground, not the
-   tone itself. At full strength `primary` measures 4.21:1 against an inverse
-   label, under the 4.5 that 12px text needs; every other tone clears it. One
-   value short is still a failure, and darkening the fill fixes it for all of
-   them without a per-tone exception. */
+/* Filled with the tone, label on top of it. At full strength `primary` measures
+   4.21:1 against an inverse label, under the 4.5 that 12px text needs; every
+   other tone clears it. */
 :host([emphasis="solid"]) {
   --_tag-fill: color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground));
   --_tag-edge: var(--_tag-fill);
   --_tag-label: var(--helix-color-foreground-inverse);
 }
 
-/* The tone at its edge only. No fill, so a dense set of them stays a list
-   rather than becoming a mosaic. */
+/* The tone at its edge only. */
 :host([emphasis="outlined"]) {
   --_tag-fill: transparent;
   --_tag-edge: color-mix(in srgb, var(--_tag-color) 45%, var(--helix-color-background));
@@ -160,25 +109,13 @@ slot:not([name])::slotted(helix-icon) {
   --_tag-color: var(--helix-color-danger);
 }
 
-/* Inside the tag's inline padding, and not pulled past it.
- *
- * Pulled back by its own padding, never by the tag's inset. Canceling the inset
- * sits the control flush to the border, where its hover fill and focus ring run
- * into the tag's edge, and a rounded square touching a rounded rectangle reads
- * as a mistake rather than as a control inside a chip.
- *
- * The control's four pixels are hit area rather than space, so left alone they
- * add to the inset: the gap on the right comes out at the inset plus four while
- * the label's on the left is the inset exactly. Canceling the padding puts the
- * visible gap at the inset on both sides and leaves the control the same size
- * to press. */
+/* Inside the tag's inline padding, and not pulled past it. */
 [part="dismiss"] {
-  /* `font: inherit` first, or the `em` below is not the tag's em.
-   *
-   * The glyph is sized in `em` inside a `<button>`, and a button's font is the
-   * UA's rather than the page's: `0.85em` resolved against 13.333px in Chromium
-   * regardless of the tag's own size, so the cross was the same size on a small
-   * tag and a large one and wrong on both. */
+  /* `font: inherit` first, or the `em` below is not the tag's em. The glyph is
+     sized in `em` inside a `<button>`, and a button's font is the UA's rather
+     than the page's: `0.85em` resolved against 13.333px in Chromium regardless
+     of the tag's own size, so the cross was the same size on a small tag and a
+     large one and wrong on both. */
   font: inherit;
   background: none;
   border: none;
@@ -204,35 +141,19 @@ slot:not([name])::slotted(helix-icon) {
   inline-size: 0.85em;
 }
 
-/* The category a tag belongs to, before the label it qualifies.
- *
- * Heavier than the label rather than a different color, because it is the same
- * kind of word doing a different job: `Priority: high` is one phrase, and
- * coloring the first half would make it two things sitting next to each other.
- * Weight says "this names what follows" without leaving the sentence.
- *
- * No rule between the two: the heavier face and the gap have each said it
- * already, and at tag size a hairline lands within a couple of pixels of the
- * glyphs either side, which reads as a stroke that escaped from a letter. One
- * gap and not a padding and a margin both, which at this size is twice the
- * space the whole tag can afford.
- *
- * **Every declaration is on the slotted element, none on the slot.** A slot is
- * `display: contents` in the UA stylesheet, so an unassigned one generates no
- * box: giving it `display: flex` to hold a border is what takes that away, and
- * measured, a tag with no prefix carried nine pixels of border and padding for
- * a slot with nothing in it. On the slotted element there is nothing to style
- * until something is there. */
+/* The category a tag belongs to, before the label it qualifies. **Every
+   declaration is on the slotted element, none on the slot.** A slot is `display:
+   contents` in the UA stylesheet, so an unassigned one generates no box: giving
+   it `display: flex` to hold a border is what takes that away, and measured, a
+   tag with no prefix carried nine pixels of border and padding for a slot with
+   nothing in it. */
 slot[name="prefix"]::slotted(*) {
   font-weight: var(--helix-weight-semibold);
   margin-inline-end: var(--_tag-inset);
   opacity: 0.75;
 }
 
-/* Print: a label.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a label. */
 @media print {
   :host {
     box-shadow: none;

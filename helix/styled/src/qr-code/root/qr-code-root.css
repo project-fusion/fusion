@@ -1,18 +1,8 @@
-/* A square that holds its own shape.
- *
- * `aspect-ratio` rather than a height to match: the code is square by
- * definition, and saying it once means a consumer setting the width alone
- * cannot make a rectangle a scanner will not read. */
+/* A square that holds its own shape. */
 :host {
   --_qr-size: var(--qr-code-size, 12rem);
 
-  /* Ink on paper, which is the media pair the other way up.
-   *
-   * Never a token that turns over with the color mode: on a dark page the ground
-   * goes dark and the modules go light, which is a code a good half of the
-   * scanners in the world refuse. The media pair is the only one here that does
-   * not turn over, so a code is drawn with it inverted: the light arm is the
-   * paper and the dark arm is the ink. */
+  /* Ink on paper, which is the media pair the other way up. */
   background-color: var(--qr-code-background-color, var(--helix-color-foreground-media));
   block-size: var(--_qr-size);
   border-radius: var(--helix-radii-sm);
@@ -28,33 +18,17 @@
   inline-size: 100%;
 }
 
-/* The corner squares can take their own color, and default to the code's.
-   Two paths rather than one so this is possible at all: a single path is one
-   fill, and the finders are the part of a code a brand most often wants to
-   tint. They stay square whatever the modules do, because they are what a
-   scanner locks onto first. */
+/* The corner squares can take their own color, and default to the code's. */
 [part="finders"] {
   fill: var(--qr-code-finder-color, currentColor);
 }
 
-/* The middle, for a mark that only reads at a high correction.
- *
- * Centered over the code rather than punched into it: the modules underneath are
- * still drawn, and it is the error correction that makes the cover readable,
- * not a hole. A hole would be a code with data missing rather than data
- * obscured, and those are not the same thing to a scanner.
- *
- * The ground reads the code's own `--qr-code-background-color`, so a consumer
- * who sets it gets the same paper under the mark and the join does not read as a
- * second shape. */
+/* The middle, for a mark that only reads at a high correction. */
 [part="logo"] {
   align-items: center;
   background-color: var(--qr-code-background-color, var(--helix-color-surface-raised));
   border-radius: var(--helix-radii-sm);
-  /* A quiet zone of its own. The mark needs the modules held off it for the
-     same reason the code needs a margin: a scanner reads the boundary, and a
-     glyph butted straight against the pattern is a glyph the scanner tries to
-     read as data. It also looks like a sticker rather than a hole without it. */
+  /* A quiet zone of its own. */
   box-sizing: border-box;
   display: flex;
   inset-block-start: 50%;
@@ -70,10 +44,7 @@
 }
 
 /* Whatever is in it is fitted to the room it has, so a consumer's mark of any
-   shape lands inside the quiet zone rather than setting its own size.
-
-   On the slot, not on the box around it: `::slotted()` only ever attaches to a
-   `<slot>`, so written against the wrapper it matches nothing at all. */
+   shape lands inside the quiet zone rather than setting its own size. */
 [part="logo"] slot::slotted(*) {
   block-size: 100%;
   inline-size: 100%;
@@ -81,20 +52,12 @@
 }
 
 /* Nothing at all where nobody filled it, rather than a ground-colored square
-   over the middle of every code.
-
-   On the attribute the element writes, because CSS cannot ask this. `:empty` is
-   false for a box holding a slot, and `::slotted()` is not allowed inside
-   `:has()`: only the element knows what was assigned, so only the element can
-   answer. Command's footer is hidden the same way. */
+   over the middle of every code. */
 [part="logo"][hidden] {
   display: none;
 }
 
-/* Print: the one thing on this list that is more useful on paper than on screen.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: the one thing on this list that is more useful on paper than on screen. */
 @media print {
   :host {
     box-shadow: none;

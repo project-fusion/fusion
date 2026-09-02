@@ -1,42 +1,32 @@
 :host {
-  /* No box of its own: the trigger is the consumer's element and the panel is
-     in the top layer, so anything here would be a third box between them. */
+  /* No box of its own: the trigger is the consumer's element and the panel is in
+     the top layer, so anything here would be a third box between them. */
   display: contents;
 }
 
 /* The UA's own `[popover]` rule sets `overflow: auto`, which makes the surface a
    scroll container, and anything positioned outside a scroll container is
-   clipped. The arrow is drawn deliberately outside it. Measured on a bare
-   popover with a child hanging four pixels past the edge: `scrollHeight`
-   exceeded `clientHeight`, so the box was overflowing and trimming rather than
-   letting the point show.
-
-   Nothing in these surfaces scrolls, so `visible` costs nothing and is what a
-   bubble with a point on it wants. */
+   clipped. */
 [part="popover"] {
   overflow: visible;
   background-color: var(--helix-color-surface-overlay);
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
      `border: solid`, so dropping the declaration leaves a three-pixel medium
-     border rather than none at all. The shadow is what says it is floating; a
-     rule as well only makes it look cut out. */
+     border rather than none at all. */
   border: var(--popover-border-width, var(--helix-border-floating)) solid
     var(--popover-border-color, var(--helix-color-border));
   /* The house radius, so a menu and the dialog it opens from draw the same
-     corner. Card's argument is the one that decides it: at anything larger the
-     corner is softer than the controls inside it, and a surface holding
-     controls should recede. */
+     corner. */
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--popover-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   /* The popover API puts it in the top layer, where the UA's own inset would
      center it in the window and its margin would offset it from wherever the
-     positioning put it. Both have to be cleared, not merely overridden. */
+     positioning put it. */
   inset: auto;
   margin: var(--helix-space-none);
-  /* Never wider than the window, whatever it was asked for. A panel is placed
-     against a trigger that can be anywhere, including hard against an edge. */
+  /* Never wider than the window, whatever it was asked for. */
   max-inline-size: calc(100vw - var(--helix-space-lg));
   padding: var(--popover-padding, var(--helix-space-md));
   inline-size: var(--popover-inline-size, max-content);
@@ -44,55 +34,24 @@
 
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and the
    rules above are author declarations that outrank it whatever their
-   specificity. Restated here, the same way Tooltip and Menu restate theirs, and
-   for the same reason Dialog had to learn: origin beats specificity, so one
-   word of layout can silently undo the rule that hides a thing. */
+   specificity. */
 [part="popover"]:not(:popover-open) {
   display: none;
 }
 
-/* Nothing but the surface. For a panel holding something that brings its own
-   inset, such as a list whose rows run to the edges so their hover reaches
-   them. */
+/* Nothing but the surface. */
 :host([separation="plain"]) [part="popover"] {
   padding: var(--popover-padding, var(--helix-space-none));
 }
 
-/* It travels, a little, out of the edge it opened against.
- *
- * On `transform`, never on `translate`: the floating controller writes the
- * panel's position onto `translate`, and a keyframe animating that property took
- * the position over, so the panel traveled from the corner of the viewport
- * instead of from its anchor. Measured, the two compose in the order translate,
- * scale, transform, which means a `translateY` here is relative to wherever the
- * controller placed the panel and leaves x alone.
- *
- * The direction follows the placement, so it always emerges from the control
- * rather than always from above: a panel opening upward that slid down would
- * read as arriving from the thing it is covering. `transform-origin` below keys
- * on the same signal for the same reason.
- *
- * Small on purpose. `2xs` is enough to read as motion and short enough that a
- * fast reader who opens and picks in one gesture is not waiting on it.
- *
- * Gated on `data-placed` rather than `:popover-open`: the controller positions
- * on a microtask after the panel is revealed, so keying the entrance to the open
- * state starts it a frame before anything knows where the panel goes. This is
- * the same signal Select waits on.
- *
- * `display` and `overlay` with `allow-discrete` are what make an exit possible
- * at all on a top-layer element. Without them, closing removes `data-placed`
- * *and* stops `:popover-open` matching, so the `display: none` rule lands in the
- * same frame and there is nothing left to transition; without `overlay` the
- * panel drops out of the top layer immediately and fades out behind whatever it
- * was covering. Dialog carries the long version of this. */
+/* It travels, a little, out of the edge it opened against. `2xs` is enough to
+   read as motion and short enough that a fast reader who opens and picks in one
+   gesture is not waiting on it. */
 [part="popover"] {
   opacity: 0;
   --_travel: calc(var(--helix-space-2xs) * -1);
-  /* Declared beside `--_travel` rather than read through a fallback nothing
-     ever set. It was never written, in this file or anywhere, so the panel has
-     always entered at the fallback and the name documented a value rather than
-     carrying one. */
+  /* Declared beside `--_travel` rather than read through a fallback nothing ever
+     set. */
   --_popover-from: 0.96;
   transform: translateY(var(--_travel));
   scale: var(--_popover-from);
@@ -104,9 +63,7 @@
     overlay var(--helix-duration-fast) allow-discrete;
 }
 
-/* Opening upward, it comes up from the control rather than down onto it. Only
-   the custom property moves, so this rule cannot race the settled one below on
-   equal specificity: source order would decide it, and this sits above. */
+/* Opening upward, it comes up from the control rather than down onto it. */
 [part="popover"][data-placement^="top"] {
   --_travel: var(--helix-space-2xs);
 }
@@ -120,8 +77,7 @@
 /* Out of the near edge, and out of the arrow where there is one:
    `--floating-arrow-x` and `--floating-arrow-y` are the pointer's center, which
    is the only thing that knows where it landed once `shift` has slid the panel
-   along to keep it on screen. With no arrow the fallback is the middle of that
-   edge, which is the best guess available. */
+   along to keep it on screen. */
 [part="popover"][data-placement^="top"] {
   transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
@@ -138,12 +94,7 @@
   transform-origin: 0 var(--floating-arrow-y, 50%);
 }
 
-/* It arrives instantly rather than not at all. The panel still appears, which is
-   the whole point of it; what is given up is the sense of it moving there. The
-   opacity gate stays, because that is placement rather than motion.
- *
- * Named one selector at a time, because a reduce rule written looser than the
- * rule it answers loses on specificity and does nothing. */
+/* It arrives instantly rather than not at all. */
 @media (prefers-reduced-motion: reduce) {
   [part="popover"],
   [part="popover"][data-placed] {
@@ -153,31 +104,13 @@
   }
 }
 
-/* The scrolling happens in here, not on the panel.
- *
- * The width was capped and the height was not, so a popover taller than the
- * window ran off the bottom with nothing to scroll, and being in the top layer
- * the page behind it could not be scrolled to reach the rest either. The
- * controller measures the room available for exactly this.
- *
- * A region inside the panel rather than the panel itself, because the panel has
- * to stay `overflow: visible` for its arrow, which is drawn deliberately
- * outside it: a scrolling panel clips the point off and scrolls it away with
- * the content. */
+/* The scrolling happens in here, not on the panel. */
 [part="content"] {
   max-block-size: var(--popover-max-block-size, var(--floating-available-block-size, none));
   overflow: auto;
 }
 
-/* Not printed, being an overlay.
- *
- * It is over the page rather than part of it, and on paper there is no over: it
- * would print as a slab across whatever it was covering.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Not printed, being an overlay. */
 @media print {
   :host {
     display: none;

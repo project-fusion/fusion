@@ -38,10 +38,12 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs'
+
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import { brotliCompress, constants, gzip } from 'node:zlib'
+import { ARTIFACT } from '@fusion.dev/scripts/workspace'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUTPUT = 'helix/docs/content/metrics.mdx'
@@ -163,8 +165,7 @@ const PACKAGES = [
  * Every other number on this page is measured, and a typed one is the one that
  * goes stale.
  */
-const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'tokens.json'), 'utf8'))
-  .tokens.length
+const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, ARTIFACT.tokens), 'utf8')).tokens.length
 
 /**
  * The stylesheets a consumer links, which no bundler is involved in.
@@ -181,7 +182,7 @@ const STYLESHEETS = [
   },
   {
     note: "The components' own layer, generated from every family's stylesheet.",
-    path: 'helix/styled/elements.css',
+    path: 'helix/styled/shared/css/elements.css',
   },
   {
     note: 'The three above in one import, in the order they have to be in.',

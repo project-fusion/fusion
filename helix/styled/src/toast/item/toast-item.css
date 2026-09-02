@@ -5,10 +5,10 @@
      size: 0` and `overflow: hidden`, without which the content refuses to be
      squeezed below its own intrinsic height and the collapse does nothing. */
   display: grid;
-  /* `minmax(0, …)` and not a bare `1fr`, which is shorthand for
-     `minmax(auto, 1fr)`: the auto minimum is the row's min-content height, so a
-     bare `0fr` collapses to the content rather than to nothing. Measured: 24px
-     left behind, which is the message's own block padding. */
+  /* `minmax(0, …)` and not a bare `1fr`, which is shorthand for `minmax(auto,
+     1fr)`: the auto minimum is the row's min-content height, so a bare `0fr`
+     collapses to the content rather than to nothing. Measured: 24px left behind,
+     which is the message's own block padding. */
   grid-template-rows: minmax(0, 1fr);
   /* The stack's spacing, held here rather than as the region's flex gap, so it
      goes when the message goes. */
@@ -18,9 +18,7 @@
     margin-block-start var(--helix-duration-normal) var(--helix-easing-standard),
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     translate var(--helix-duration-normal) var(--helix-easing-standard);
-  /* Dense by nature. A toast is a compact region the same way the app header,
-     the toolbar and the announcement are, and every one of those declares this
-     on its own host. Without it a slotted `Retry` comes out at the full 40px
+  /* Dense by nature. Without it a slotted `Retry` comes out at the full 40px
      beside a 32px dismiss, so the two controls in one row are different heights:
      measured, three center lines at 654, 660 and 664. */
   /* The icon step with it. A container that declares the control size and stops
@@ -29,8 +27,7 @@
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
   /* The height of one line of the message, which is what everything in the row
-     is aligned against. Derived from the two tokens that make it, so a theme
-     changing either keeps the row aligned. */
+     is aligned against. */
   --_toast-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
   /* The width is the message's, not the region's: the region spans an edge so a
      stack can align along it, and a message as wide as the window is a banner. */
@@ -40,40 +37,14 @@
 
 [part="item"] {
   /* The mark, the message and anything to do about it, with the close in the
-     corner and out of flow. What goes where is the grid below; this is how the
-     things sharing the first row sit on it.
-   *
-   * Aligned to the top, and then each thing on the first row nudged onto the
-   * *first line* of the message rather than onto the top of its own box.
-   *
-   * `center` is right for a one-line message and wrong for every other: the
-   * mark and the dismiss float to the middle of a four-line paragraph, when
-   * a mark belongs beside the words it qualifies and a close belongs in the
-   * corner. Plain `start` is wrong too: three boxes of 16px, 21px and 32px
-   * sharing a top edge have their centers 8px apart, so a one-line message
-   * comes out visibly staggered.
-   *
-   * Both are fixed by aligning to the line box instead of to the box top. The
-   * offsets are derived, not guessed: the line is the font size times the line
-   * height, and each item moves by half the difference between the line and
-   * itself. On one line that reproduces `center` exactly; on four it leaves the
-   * mark and the control where the reading starts. */
+     corner and out of flow. Plain `start` is wrong too: three boxes of 16px,
+     21px and 32px sharing a top edge have their centers 8px apart, so a one-line
+     message comes out visibly staggered. */
   align-items: start;
   /* Two columns, the mark and everything it qualifies, and the actions in the
-     second of them on a row of their own.
-   *
-   * Not a wrapping flex, which put the actions beside the message when both fit
-   * on one line and under the *mark* when they did not. Both readings are wrong
-   * for the same reason: an action is a thing to do about the message, so it
-   * belongs under the words rather than beside them or under the icon. And
-   * inline, the action is the tallest thing on the line, so a one-line toast has
-   * its text and its mark centered against a 32px control instead of sitting on
-   * their own line.
-   *
-   * Column one is `auto`, so with no mark it is zero wide and the message
-   * starts at the inset. The gap that would otherwise still be drawn beside an
-   * absent mark is on the mark itself, which is the same reason the row's
-   * spacing is on what is slotted into it. */
+     second of them on a row of their own. And inline, the action is the tallest
+     thing on the line, so a one-line toast has its text and its mark centered
+     against a 32px control instead of sitting on their own line. */
   display: grid;
   grid-template-columns: auto 1fr;
   background-color: var(--helix-color-surface-overlay);
@@ -88,9 +59,9 @@
   line-height: var(--helix-leading-normal);
   padding: var(--toast-item-padding, var(--helix-space-sm));
   /* Room for the close, which is out of flow. Reserved here rather than by a
-     grid column, because a column is only as tall as it needs to be and this
-     one was 32px tall next to a 21px line: a one-line message paid eleven
-     pixels of slack under it for a control sitting beside it. */
+     grid column, because a column is only as tall as it needs to be and this one
+     was 32px tall next to a 21px line: a one-line message paid eleven pixels of
+     slack under it for a control sitting beside it. */
   padding-inline-end: calc(
     var(--helix-space-sm) +
     var(--helix-size-control-tight) +
@@ -103,39 +74,24 @@
   /* The containing block for the timer, which is placed against this box. */
   position: relative;
   /* So the timer's square ends are trimmed to the corners rather than sitting
-     proud of them. Nothing here needs to escape: the dismiss control's focus
-     ring is drawn well inside the inset, and a tooltip on a slotted action is
-     in the top layer and clears this regardless. */
+     proud of them. */
   overflow: hidden;
 }
 
-/* The severity mark.
- *
- * A glyph and not a colored bar down the leading edge: a colored line says
- * *something* is different about this message and never says what, so a reader
- * who cannot tell green from red is told nothing at all. The icon carries an
- * `aria-label`, so the severity is in the accessibility tree rather than only in
- * the paint.
- *
- * The same four glyphs `Callout` uses. A reader meets these marks in a passage
- * and in a message, and a vocabulary that changed shape between the two would
- * be two vocabularies.
- */
+/* The severity mark. */
 [part="icon"] {
   color: var(--_toast-severity, var(--helix-color-foreground-muted));
   display: inline-flex;
   grid-area: 1 / 1;
-  /* Its own trailing gap, so an absent mark costs nothing. A `column-gap` on
-     the grid is drawn beside a zero-width column just the same, and every
-     message without a severity would have started eight pixels in. */
+  /* Its own trailing gap, so an absent mark costs nothing. */
   margin-inline-end: var(--helix-space-sm);
-  /* Half the difference between the first line and the glyph, so the two share
-     a center however many lines follow. */
+  /* Half the difference between the first line and the glyph, so the two share a
+     center however many lines follow. */
   margin-block-start: calc((var(--_toast-line) - var(--helix-size-icon)) / 2);
 }
 
-/* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box
-   at width 16, and a value tuned for a 24 box would make it hairline. */
+/* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box at
+   width 16, and a value tuned for a 24 box would make it hairline. */
 [part="icon"] svg {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);
@@ -160,12 +116,7 @@ slot[name="icon"]::slotted(*) {
 
 /* Its own row, in the message's column, so it starts where the words start and
    the space under the mark is a gutter rather than a place to put a button.
- *
- * The gap above sits on what is slotted rather than on this wrapper, and
- * `:empty` cannot do the job: the wrapper always holds a `<slot>` element, so it
- * is never empty however little is assigned. On the wrapper, or as the grid's
- * `row-gap`, a message with nothing to do about it paid for a row that drew
- * nothing. Measured at 12px before this moved. */
+   Measured at 12px before this moved. */
 [part="actions"] {
   display: flex;
   gap: var(--helix-space-2xs);
@@ -176,9 +127,7 @@ slot[name="icon"]::slotted(*) {
   margin-block-start: var(--helix-space-xs);
 }
 
-/* Color on the mark rather than a fill behind the words. A message is text to
-   be read, and a colored panel costs contrast to say what the icon already
-   says in words. */
+/* Color on the mark rather than a fill behind the words. */
 :host([tone="info"]) {
   --_toast-severity: var(--helix-color-primary);
 }
@@ -198,17 +147,13 @@ slot[name="icon"]::slotted(*) {
 [part="dismiss"] {
   all: unset;
   /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
-     `border-box` every shadow root is given comes from a rule this one
-     outranks. Restored at each site because there is nowhere later to put it.
-   *
-   * The first-line offset has to be restored here for the same reason: written
-   * in an earlier rule it is wiped by this one, and the close sits 5.5px below
-   * the mark and the action it is meant to line up with. Measured, which is the
-   * only way that shows. */
+     `border-box` every shadow root is given comes from a rule this one outranks.
+     The first-line offset has to be restored here for the same reason: written
+     in an earlier rule it is wiped by this one, and the close sits 5.5px below
+     the mark and the action it is meant to line up with. */
   box-sizing: border-box;
   /* In the corner and out of the flow, so it cannot set the height of the row
-     the message is on. Placed against the first line the same way it was, which
-     is what keeps it level with the mark. */
+     the message is on. */
   position: absolute;
   inset-block-start: calc(
     var(--toast-item-padding, var(--helix-space-sm)) +
@@ -234,9 +179,7 @@ slot[name="icon"]::slotted(*) {
 }
 
 /* A well under the pointer, not only a brighter glyph, and mixed from the
-   foreground rather than taken from `surface-sunken`. The toast is an overlay
-   surface and an inverted toast is a second one, so an absolute value was
-   wrong on both: it darkened past whichever surface it landed on. */
+   foreground rather than taken from `surface-sunken`. */
 [part="dismiss"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
@@ -247,30 +190,17 @@ slot[name="icon"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* How long is left, and only where a duration was given.
- *
- * A CSS animation rather than a timer writing a width each frame: the item
- * already holds the clock, and a second one counting alongside it is two
- * clocks to keep in step. `animation-play-state` is what makes the pair
- * honest, because the item pauses on hover and focus and the bar has to stop
- * with it rather than merely look like it did.
- *
- * The same color as the severity mark where there is one, so the two things
- * drawn on a message read as one idea rather than two. */
+/* How long is left, and only where a duration was given. */
 [part="timer"] {
   animation: helix-toast-drain var(--toast-duration, 0ms) linear forwards;
   background-color: var(--_toast-severity, var(--helix-color-foreground-muted));
   block-size: var(--helix-space-2xs);
-  /* Along the top edge and edge to edge, so it reads as the message's own
-     border thickening rather than as a bar laid inside it. Square, because the
-     item clips it: a radius here would round the draining end as well, and a
-     corner traveling across the top is a shape rather than a measure. */
+  /* Along the top edge and edge to edge, so it reads as the message's own border
+     thickening rather than as a bar laid inside it. */
   inset-block-start: 0;
   inset-inline: 0;
   position: absolute;
-  /* Physical, because `transform-origin` has no logical keyword. `:dir()` is
-     what puts it at the other end in a right-to-left document, where the bar
-     should drain towards the side the text ends on. */
+  /* Physical, because `transform-origin` has no logical keyword. */
   transform-origin: 0 50%;
 }
 
@@ -288,13 +218,11 @@ slot[name="icon"]::slotted(*) {
   }
 }
 
-/* It arrives rather than appearing. A message that is simply there is one a
-   reader has to notice on their own. */
+/* It arrives rather than appearing. */
 @media (prefers-reduced-motion: no-preference) {
   [part="item"] {
     /* `backwards`, so the `from` state holds through any delay a consumer sets
-       on `::part(item)`. Without it a staggered stack paints in full, then each
-       message jumps back to invisible as its turn arrives. */
+       on `::part(item)`. */
     animation: helix-toast-in var(--helix-duration-normal) var(--helix-easing-decelerate) backwards;
   }
 }
@@ -302,48 +230,22 @@ slot[name="icon"]::slotted(*) {
 @keyframes helix-toast-in {
   from {
     opacity: 0;
-    /* From the border it is anchored to. The region sets this; a bottom stack
-       rises into place and a top one drops in. */
+    /* From the border it is anchored to. */
     translate: 0 var(--_toast-enter, var(--helix-space-lg));
   }
 }
 
-/* Gone, and it takes its own space with it.
- *
- * `display: none` is instant, so the messages under it jump up. Collapsing the
- * row and the margin together means the stack closes at the speed the message
- * leaves at, and the ones below travel rather than teleport.
- *
- * It leaves towards the edge it arrived from, which is the same property the
- * region sets for the entrance. `visibility: hidden` is what takes it out of the
- * accessibility tree once the height is gone, where `display: none` would have
- * ended the transition before it started. The region is
- * `aria-relevant="additions"`, so nothing is announced on the way out either.
- *
- * Here rather than in the headless tier, which has no CSS: what the state means
- * is the component's, how it is drawn is this tier's. A headless consumer reads
- * `data-closed` and decides for themselves. */
+/* Gone, and it takes its own space with it. */
 :host([data-closed]) [part="item"] {
-  /* The last thing holding the box open. Padding is inside the border box and
-     survives a zero height, so it has to collapse with the row. */
+  /* The last thing holding the box open. */
   padding-block: 0;
   transition: padding-block var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
 /* Hidden and still laid out, which is the one case `HelixElement`'s prepended
- * rule leaves open on purpose: it says so itself, that `!important` is not used
- * because a component with a real reason to stay laid out while hidden should
- * be able to answer it.
- *
- * This is that reason. The headless tier writes `hidden` the moment a toast is
- * dismissed, because on that tier there is no sheet and a message that never
- * goes away is the alternative. Here the exit is an animation, and
- * `display: none` from the first frame skips it: the toast vanished instead of
- * collapsing. Same specificity as the rule it answers, and later in the
- * cascade, which is what the prepended rule was arranged to allow.
- *
- * The row below still ends at `visibility: hidden`, so the box leaves the
- * accessibility tree once it has finished traveling. */
+   rule leaves open on purpose: it says so itself, that `!important` is not used
+   because a component with a real reason to stay laid out while hidden should be
+   able to answer it. */
 :host([hidden]:not([hidden="until-found"])) {
   display: grid;
 }
@@ -375,21 +277,11 @@ slot[name="icon"]::slotted(*) {
 }
 
 /* Four moving selectors, and they do not get the same answer, which is why the
-   check asks whether each was named rather than what was done about it.
- *
- * The arrival and the collapse stop: a message sliding in and a stack closing
- * under the pointer are the movement the preference is about.
- *
- * The timer keeps running, and is named here to say so rather than by omission.
- * It is the only thing telling a reader how long is left, and a 2px rule
- * crossing once over the message's own lifetime is nearer a clock than an
- * animation. Restated rather than left out, because left out is
- * indistinguishable from forgotten.
- *
- * The base layer does not cap it either: its `*, *::before, *::after` rule is in
- * the document, and `*` does not cross a shadow boundary. Measured under
- * `prefers-reduced-motion: reduce`, this element kept its full eight seconds
- * while a light-DOM element beside it came back at 1e-05s. */
+   check asks whether each was named rather than what was done about it. It is
+   the only thing telling a reader how long is left, and a 2px rule crossing once
+   over the message's own lifetime is nearer a clock than an animation. Measured
+   under `prefers-reduced-motion: reduce`, this element kept its full eight
+   seconds while a light-DOM element beside it came back at 1e-05s. */
 @media (prefers-reduced-motion: reduce) {
   :host,
   :host([data-closed]),

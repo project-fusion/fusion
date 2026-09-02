@@ -1,4 +1,4 @@
-import browser from '../browser.module.css'
+import browser from '@/components/browser.module.css'
 import styles from './insights.module.css'
 import loading from './loading.module.css'
 

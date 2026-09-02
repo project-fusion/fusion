@@ -1,19 +1,17 @@
-/* Stacked the same way and for the same reason as the input. See its note. */
+/* Stacked the same way and for the same reason as the input. */
 :host {
   display: inline-flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
 
   --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox));
-  /* What `field-inline.css` indents the hint by, so it starts under the
-     words rather than under the box. Declared beside the size it is
-     derived from, which is the only place the two cannot drift apart. */
+  /* What `field-inline.css` indents the hint by, so it starts under the words
+     rather than under the box. */
   --_field-control-inline-size: var(--_checkbox-size);
 }
 
-/* The row is the label, so the whole of it is the target the browser forwards
-   to the box. On the host, with the input and the text as siblings, a press on
-   the text does nothing at all. */
+/* The row is the label, so the whole of it is the target the browser forwards to
+   the box. */
 [part="field"] {
   align-items: center;
   cursor: pointer;
@@ -21,14 +19,7 @@
   gap: var(--helix-space-xs);
 }
 
-/* `:host(:disabled)`, not `:host([disabled])`.
- *
- * The pseudo-class matches on the element's own attribute *and* on an ancestor
- * `<fieldset disabled>`, where the attribute selector only ever sees the first.
- * Measured: a control inside a disabled fieldset matched `:disabled` from
- * inside its own shadow root while carrying no attribute at all, so this needs
- * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
- */
+/* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:disabled) [part="field"] {
   cursor: default;
 }
@@ -37,24 +28,7 @@
   opacity: 0.5;
 }
 
-/* Drawn here rather than by the browser, and the trade is worth naming.
- *
- * Leaving `appearance` alone with `accent-color` set is the better default and
- * it runs out: the tick and the dash come at the browser's own weight, which is
- * heavy beside this type, there is nothing to animate because the mark has no
- * element of its own, and an error has nowhere to go but a second ring outside
- * the box, which reads as a box inside a box rather than as a box that is
- * wrong.
- *
- * `appearance: none` on a real `<input type="checkbox">` changes the painting
- * and nothing else. It is still the control the form submits, still what a
- * screen reader announces, still what a label forwards a press to. What is
- * given up is the platform's drawing, and it is given up deliberately, once,
- * here.
- *
- * The mark is a sibling rather than a pseudo-element because an `<input>` is a
- * replaced element and generates none: `input::before` renders nothing in
- * Chrome whatever `appearance` says. */
+/* Drawn here rather than by the browser, and the trade is worth naming. */
 [part="box"] {
   display: grid;
   flex: 0 0 auto;
@@ -70,17 +44,10 @@
 [part="control"] {
   appearance: none;
   /* The page's own color, so the box reads as a hole punched through to it
-     rather than as a fill that happens to match.
-
-     Never `surface-sunken`: at 0.96 it is the same color as a sunken surface,
-     so a checkbox inside a well has no interior at all, only its border.
-     Measured, it separated from the page by 0.04, from a card by 0.025, and in
-     the one place it was for by nothing.
-
-     `background` cannot have that problem. On the page it is the page, which is
-     what a native checkbox looks like there and leaves the border to define the
-     box. On anything raised above the page it is a hole, which is what a box
-     you put a mark in should be. Both hold in dark, where the page is black. */
+     rather than as a fill that happens to match. Never `surface-sunken`: at 0.96
+     it is the same color as a sunken surface, so a checkbox inside a well has no
+     interior at all, only its border. Measured, it separated from the page by
+     0.04, from a card by 0.025, and in the one place it was for by nothing. */
   background-color: var(--checkbox-background-color, var(--helix-color-background));
   block-size: var(--_checkbox-size);
   border: var(--helix-border-thin) solid var(--checkbox-border-color, var(--helix-color-border));
@@ -94,24 +61,13 @@
 }
 
 /* Monotone, for the reason under the checked rule: a box that turns brand-blue
-   under a pointer says "recommended" about whichever one it happens to be over.
-
-   Through the hook, so a container saying "these are wrong" is not undone by a
-   pointer passing over one of them. The fallback is what this rule has always
-   been; the hook is only ever set by something that has a reason to. */
+   under a pointer says "recommended" about whichever one it happens to be over. */
 :host(:not(:disabled)) [part="field"]:hover [part="control"] {
   border-color: var(--checkbox-border-color, var(--helix-color-foreground-muted));
 }
 
-/* No color, which is the same rule the segmented control's thumb follows:
-   color is reserved for state, and being ticked is not state, it is an answer.
-   The mark is what says so, and a mark is legible on its own. A solid accent
-   fill, at the size a checkbox actually is, is a small blue tile with a shape
-   punched out of it: the block of color becomes the thing you read and the mark
-   stops being it. The edge only firms up.
-
-   Indeterminate is not a third look: the same box with a different mark in it,
-   because it means "some", not "neither". */
+/* No color, which is the same rule the segmented control's thumb follows: color
+   is reserved for state, and being ticked is not state, it is an answer. */
 :host(:state(checked)) [part="control"],
 :host([indeterminate]) [part="control"] {
   border-color: var(
@@ -120,42 +76,23 @@
   );
 }
 
-/* The tick and the dash, as masks rather than glyphs, so their weight is ours.
-   Two and a half units in a twenty-four unit box, which is roughly two thirds
-   of what the platform draws.
-
-   `mask` rather than a background image, because the shape is then a stencil
-   and the color is a token like every other color here. A data URI cannot
-   carry `var()`. */
+/* The tick and the dash, as masks rather than glyphs, so their weight is ours. */
 [part="mark"] {
   /* The foreground, like any other mark made of ink. */
   background-color: var(--checkbox-mark-color, var(--helix-color-foreground));
   block-size: var(--_checkbox-size);
   inline-size: var(--_checkbox-size);
   /* The tick by default, and not only when the box is ticked, which is what
-     stops the mark flashing on the way out.
-
-     `mask-image` does not animate, so it snapped the instant `:state(checked)`
-     went, while `scale` still had a transition to run. Measured mid-uncheck:
-     mask none, scale 1, background white. For the length of that transition the
-     mark was an unmasked white square at full size, shrinking to nothing, which
-     is the flash. Left on the base rule, the stencil is still there while the
-     mark scales away under it.
-
-     One thing this does not fix, and cannot: leaving indeterminate, the dash
-     becomes a tick as it shrinks, because the rule that chose the dash stops
-     matching the moment the attribute goes. Holding it with a delayed
-     `mask-image` transition was tried and does nothing, discrete property or
-     not: Chrome 148 swaps it regardless. It is a shape changing inside a mark
-     that is on its way out rather than a flash of anything, so it is left. */
+     stops the mark flashing on the way out. Measured mid-uncheck: mask none,
+     scale 1, background white. Holding it with a delayed `mask-image` transition
+     was tried and does nothing, discrete property or not: Chrome 148 swaps it
+     regardless. */
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: 100%;
   pointer-events: none;
-  /* Nothing to see until there is something to say. Scaled from the center
-     rather than faded, so the mark arrives with the weight of a thing being
-     put there. */
+  /* Nothing to see until there is something to say. */
   scale: 0;
   transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
@@ -165,8 +102,8 @@
   scale: 1;
 }
 
-/* Indeterminate wins where both are set, because a box that is both is showing
-   a mixed set and the dash is what says so. */
+/* Indeterminate wins where both are set, because a box that is both is showing a
+   mixed set and the dash is what says so. */
 :host([indeterminate]) [part="mark"] {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E");
 }
@@ -177,24 +114,14 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Wrong, and the reader knows it: the box's own edge, not a ring around it.
- *
- * A ring offset outside the box pictures a red square with a rounded gray box
- * sitting inside it. A ring is right where a component has no edge of its own
- * to color, which was true while the browser drew this one and stopped being
- * true the moment we did.
- *
- * The focus ring still outranks it, so a focused invalid box shows the red edge
- * with the accent ring around it. Those are two different facts, in two
- * different places, which is the arrangement the input has as well. */
+/* Wrong, and the reader knows it: the box's own edge, not a ring around it. */
 :host(:state(invalid)) [part="control"],
 :host(:state(invalid)) [part="field"]:hover [part="control"] {
   border-color: var(--helix-color-danger);
 }
 
 /* Color appears here and only here, because this is the one thing about a
-   checkbox that is state. A ticked box that is still wrong takes it too, edge
-   and mark together, rather than being half one thing and half the other. */
+   checkbox that is state. */
 :host(:state(invalid):state(checked)) [part="control"],
 :host(:state(invalid)[indeterminate]) [part="control"] {
   border-color: var(--helix-color-danger);
@@ -204,42 +131,17 @@
   background-color: var(--helix-color-danger);
 }
 
-/* Nothing to read, so nothing to space away from the box.
- *
- * `:state(has-label)` rather than a selector, because there is no selector for
- * this. `[part="label"]:has(slot:empty)` looks like the answer and is not: a
- * slot's children are its fallback, and assigned nodes are not children, so
- * `slot:empty` is true whenever the property is empty whether or not the
- * consumer slotted anything. The component asks the slot in script and says so
- * on the host.
- *
- * `display: none` rather than a zero width, because the gap is the cost here
- * and only a box that is not generated has no gap beside it. */
+/* Nothing to read, so nothing to space away from the box. */
 :host(:not(:state(has-label))) [part="label"] {
   display: none;
 }
 
-/* A card is the same checkbox in a bounded surface. See the radio's note: this
- * is the same appearance and the same reasoning, and the two have to match
- * because a card set of one kind sits beside a card set of the other.
- *
- * Different part, same shape. The checkbox's target is its `<label>` rather
- * than a button, because the label is what forwards a press to the real input,
- * so `field` is what becomes the surface.
- */
+/* A card is the same checkbox in a bounded surface. */
 :host([variant="card"]) {
   display: block;
 }
 
-/* Through hooks, the way `Card` does it.
- *
- * Naming `--helix-color-surface` and `--helix-color-border` outright leaves a
- * consumer able to restyle a `Card`'s surface and unable to restyle the
- * identical surface on a card-shaped choice.
- *
- * Not duplication of `Card`'s rule, whatever it looks like: the two share
- * exactly two declarations, `gap` and `transition`, and everything else that
- * looks copied is four token references doing what tokens are for. */
+/* Through hooks, the way `Card` does it. */
 :host([variant="card"]) [part="field"] {
   align-items: start;
   background-color: var(--checkbox-card-background-color, var(--helix-color-surface));
@@ -259,28 +161,18 @@
   border-color: var(--helix-color-foreground-muted);
 }
 
-/* Chosen, and it looks exactly like a chosen radio card.
- *
- * The two appearances sit in the same forms and often on the same page, and a
- * set of one kind beside a set of the other has to read as the same control
- * answering a different question. All three of the lift, the primary edge and
- * the ring, or a chosen checkbox card is quieter than a chosen radio card for
- * no reason a reader can name from looking at it.
- *
- * See the radio's note for why the ring is drawn rather than the border
- * widened: three pixels is a 1px border with two more laid outside it by
- * `box-shadow`, so nothing about the card's box moves when it is chosen and a
- * column of them does not jump as the answer changes. */
+/* Chosen, and it looks exactly like a chosen radio card. See the radio's note
+   for why the ring is drawn rather than the border widened: three pixels is a
+   1px border with two more laid outside it by `box-shadow`, so nothing about the
+   card's box moves when it is chosen and a column of them does not jump as the
+   answer changes. */
 :host([variant="card"]:state(checked)) [part="field"] {
   background-color: var(--helix-color-surface-raised);
   border-color: var(--helix-color-primary);
   box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
 }
 
-/* The ring goes on the card, because the card is the target. It cannot go on
-   `:focus-visible` of the label: the label never takes focus, the input inside
-   it does, so this reads that through `:has()` rather than inventing a class
-   the component would have to write. */
+/* The ring goes on the card, because the card is the target. */
 :host([variant="card"]) [part="field"]:has([part="control"]:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
@@ -302,11 +194,8 @@
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a
- * tick that is a fill prints as an empty box, which is a document saying the
- * opposite of the truth.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+   tick that is a fill prints as an empty box, which is a document saying the
+   opposite of the truth. */
 @media print {
   :host {
     box-shadow: none;

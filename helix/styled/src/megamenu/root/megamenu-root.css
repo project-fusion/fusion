@@ -1,20 +1,11 @@
-/* A box, unlike `Menu`, which is `display: contents` because it is a wrapper
-   around somebody else's trigger and has nothing of its own in the row.
- *
- * This is an item in that row. `Navigation` measures its marker against every
- * element assigned to its slot, and an element with `display: contents`
- * generates no box at all, so a section holding the current page would have had
- * the marker measured against a zero rect. The panel is in the top layer and
- * takes no space either way. */
+/* A box, unlike `Menu`: `Navigation` measures its marker against every slotted
+   element, and `display: contents` generates none. */
 :host {
   display: inline-flex;
 }
 
-/* The default trigger, which reads as one of the navigation's own items rather
-   than as a button dropped among them. The recipe in the base layer is what
-   every link beside it wears, so this asks for the same shape by hand: a
-   `::part` from the document reaches exactly one boundary and this is inside
-   one, which is the wall `Button` records at length. */
+/* The base layer's link shape by hand: a `::part` reaches exactly one boundary
+   and this is inside one. `Button` records the wall. */
 [part="trigger"] {
   all: unset;
   box-sizing: border-box;
@@ -44,159 +35,68 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Open reads like the current destination does, because while its panel is down
-   it is where the reader is. */
+/* Open reads like the current destination. */
 [part="trigger"][aria-expanded="true"] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 
-/* The panel is in the top layer, which is what `popover` buys: a nav bar is
- * inside a header, and a header is exactly the kind of ancestor that carries
- * `overflow` or a `transform` and would otherwise clip or re-anchor it. The
- * controller's own note has the measurements.
- *
- * The panel is a box and nothing else. What is *in* it is the consumer's own
- * markup, and it is styled by the `data-megamenu-*` recipes in the base layer
- * rather than from here, for the reason `Outline` records against exactly this
- * mistake: a `::slotted()` rule loses to any document rule whatever its
- * specificity, so a rule here naming the anchors loses to the base layer's own
- * and the panel goes on drawing prose links in a box. */
+/* Top layer, because a header carries `overflow` or a `transform`. The panel is
+   a box and nothing else: its contents are styled by the base layer's
+   `data-megamenu-*` recipes, a `::slotted()` rule losing to any document rule
+   whatever its specificity. */
 [part="surface"] {
-  /* The page's own ground, not a raised surface. White in the light and black in
-     the dark: a navigation panel is the site continuing, and `surface-overlay`
-     put a gray card in front of a black page as though the nav were a dialog.
-
-     Both are hooks so a consumer can make the panel glass, which is not an
-     appearance: `full` already occupies that axis with a layout, and a band
-     can be material or not independently of being a band. Two things that can
-     be true at once are two axes, so this is a custom property and not a
-     second value on `appearance`.
-
-     Declared rather than absent, so turning the filter on cannot change what
-     the panel is composited against: `none` is the initial value and costs
-     nothing. */
+  /* The page's ground, not a raised surface: `surface-overlay` put a gray card
+     in front of a black page. Hooks rather than an `appearance` value, `full`
+     already occupying that axis. Declared rather than absent, so turning the
+     filter on cannot change what it composites against. */
   backdrop-filter: var(--megamenu-backdrop, none);
   background-color: var(--megamenu-background-color, var(--helix-color-background));
-  /* A hairline in the dark, and nothing in the light.
-   *
-   * A shadow is a light-mode device. It works by darkening what is behind it,
-   * and in the dark what is behind it is already the darkest value the theme
-   * has: the panel is `oklch(0 0 0)` on a page of `oklch(0 0 0)`, and at four
-   * times zoom the corner of the card is not visible at all. Only the heading
-   * inside says a panel is there. So the edge the shadow draws in the light is
-   * drawn by a line in the dark, rather than by a second shadow that cannot
-   * work or by lifting the panel off the black that was asked for.
-   *
-   * `light-dark()` rather than a media query, so it follows the theme a
-   * consumer sets rather than only the one the system reports.
-   *
-   * Written out in full, not omitted: the user agent gives `[popover]` a border
-   * of its own, `solid` with no width or color, which computes to a medium
-   * black rule. Deleting the declaration once drew a three pixel black box
-   * around the panel instead of no box at all. */
+  /* A hairline in the dark, nothing in the light: a shadow darkens what is
+     behind it, and in the dark that is `oklch(0 0 0)` on `oklch(0 0 0)`.
+     Written out in full, because the UA gives `[popover]` a border of its own
+     and deleting this drew a three pixel black box. */
   border: var(--megamenu-border-width, var(--helix-border-thin)) solid
     light-dark(transparent, var(--helix-color-border));
-  /* The house corner, and being the largest panel in the library is not a
-     reason to take a different one. A radius is read against the corner beside
-     it rather than against the area behind it, so a wide panel at `md` next to
-     a menu at `sm` reads as two systems rather than as one panel that happens
-     to be bigger. Every floating panel is `sm`. */
+  /* The house corner: a radius reads against the one beside it. */
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--megamenu-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
-  /* The panel expands downward rather than appearing, and the clip is what does
-     it: the box is laid out at its full size from the first frame and revealed
-     top to bottom, so nothing inside moves, reflows or scales. A height
-     animation would squash the columns on the way open and a scale would
-     stretch the type.
+  /* Laid out at full size and revealed top to bottom, so nothing inside moves.
+     Negative on three sides because `clip-path` clips the shadow too; the
+     corners survive, an `inset()` with no `round` clipping to a rectangle.
 
-     Negative on three sides, which is not padding for its own sake: `clip-path`
-     clips the shadow too, and a card's shadow spills outside the box on every
-     side. Only the bottom is a real edge, and it is the one that travels. The
-     top is clipped at zero, so the shadow's upward spill goes: the card hangs
-     below its trigger and that spill lands on the bar, which is the same reason
-     the band below clips it.
+     One space step of overshoot, never `100vmax`: on a 267 pixel band that is
+     267 of 1547 pixels of travel, so the reveal finishes in the first 17%.
 
-     The corners survive. An `inset()` with no `round` clips to a rectangle, and
-     the outside of a rounded corner is already transparent, so the radius is
-     still the element's to draw.
-
-     **The overshoot is one space step, and must not be `100vmax`, which reads
-     as a snap.** The clip travels from `100%` of the panel's height to the
-     overshoot, and the panel is fully revealed the moment the bottom inset
-     reaches zero. At `-100vmax` on a 267 pixel band that is 267 of 1547 pixels
-     of travel: the reveal finishes in the first 17% of the duration and the
-     remaining 83% moves a clip edge already past the shadow, so lengthening the
-     duration only lengthens the part nobody can see. One step clears the shadow
-     and nothing more, so nearly all of the travel is the part that shows.
-
-     **Collapsed is the resting value and open is the departure, keyed on
-     `:popover-open`.** Written the other way round, with the closed value on
-     `[hidden]`, the panel opened in one jump: `hidden` is removed by the
-     template while the popover is still closed, so the clip changed on a style
-     recalc where the element was still `display: none`, and the transition it
-     started was canceled a frame later when `showPopover` ran. Measured: a
-     transition existed on the frame the panel opened and was gone twenty
-     milliseconds later with the clip already at rest.
-
-     Keyed here, the only change that carries the clip is the one that puts the
-     panel in the top layer, which is a single recalc that `@starting-style` can
-     supply a before-value for. The exit was never affected, because closing is
-     an ordinary change between two rendered states, which is what made this
-     look like a transition that only worked one way rather than one that never
-     started. `Drawer` has the same note against the same symptom. */
+     Collapsed rests here and open departs, keyed on `:popover-open`. With the
+     closed value on `[hidden]` the panel opened in one jump, `hidden` being
+     removed while the popover was still closed. `Drawer` has the same note. */
   clip-path: inset(0 calc(var(--helix-space-xl) * -1) 100% calc(var(--helix-space-xl) * -1));
-  /* One row of tracks, sized to what is in them, which is what a card is: it
-     has no width of its own to wrap against. Flex was tried here and takes the
-     card back to a single column, because a wrapping flex container's
-     max-content width is one item's, not the row's: measured at 219 pixels
-     against the 653 the tracks give. Wrapping is the band's problem, and the
-     band has a width to solve it with. */
+  /* One row of tracks sized to their contents. Flex takes it to a single
+     column, a wrapping container's max-content width being one item's: 219
+     pixels against the 653 the tracks give. */
   display: grid;
   gap: var(--helix-space-xl);
   grid-auto-columns: minmax(var(--megamenu-column-size, 15rem), 1fr);
   grid-auto-flow: column;
-  /* Sized by what is in it, and that is not optional here: the panel is fixed
-     and in the top layer, so nothing gives it a width, and a track list of
-     `1fr` in a box with no definite size resolves against nothing. Measured
-     without it: a two-column panel came out 34 pixels wide. */
+  /* Nothing gives a fixed top-layer panel a width, so `1fr` resolves against
+     nothing: without this a two-column panel came out 34 pixels wide. */
   inline-size: max-content;
   margin: var(--helix-space-none);
-  /* `100%` rather than `100vw`, and the difference is a scrollbar. The panel is
-     fixed, so a percentage here resolves against the viewport it is positioned
-     in, which is the width you can actually see; `100vw` counts the scrollbar's
-     gutter as usable and hands back a maximum wider than the window. */
+  /* `100%`, not `100vw`: the difference is the scrollbar's gutter. */
   max-inline-size: min(var(--megamenu-size, 52rem), calc(100% - var(--helix-space-xl) * 2));
   padding: var(--helix-space-md);
-  /* `display` and `overlay` ride along with `allow-discrete`, or only the
-     opening animates.
-
-     Both are discrete properties and both flip the instant the panel closes:
-     `display` because the closed panel is `display: none`, and `overlay`
-     because leaving the top layer is what actually removes a popover from the
-     screen. Transitioned discretely they hold their open value until the clip
-     has finished traveling, which is what gives the panel an exit at all.
-     Without them it vanishes on the frame it is told to.
-
-     `decelerate` opening: the panel arrives and settles rather than braking
-     into place, which is the shape of something being pulled down. */
+  /* `display` and `overlay` ride along with `allow-discrete`, or the panel
+     vanishes on the frame it is told to close and there is no exit at all. */
   transition:
     clip-path var(--helix-duration-slow) var(--helix-easing-decelerate),
     display var(--helix-duration-slow) allow-discrete,
     overlay var(--helix-duration-slow) allow-discrete;
 }
 
-/* Where the reveal starts, and where it goes back to.
- *
- * `@starting-style` is the opening half: a transition does not run on an
- * element arriving from `display: none` unless its first style is declared
- * separately, which is exactly what a panel does every time it opens. The
- * `[hidden]` rule is the closing half, and the two carry the same value so the
- * panel leaves the way it came.
- *
- * The bottom inset is `100%`, so the clip sits on the panel's own top edge
- * whatever height the content gave it. */
+/* A transition does not run on an element arriving from `display: none` unless
+   its first style is declared separately. */
 [part="surface"]:popover-open {
   clip-path: inset(
     0 calc(var(--helix-space-xl) * -1) calc(var(--helix-space-xl) * -1)
@@ -204,71 +104,35 @@
   );
 }
 
-/* After the rule it opens from, never before it.
- *
- * A starting style and an ordinary rule of the same specificity are separated
- * by source order, so written first this loses on the opening frame and the
- * panel arrives already open. `Drawer` records the same bug, found the same way
- * and fixed by the same move. */
+/* After the rule it opens from, never before: same specificity, so source order
+   decides and the panel would arrive already open. */
 @starting-style {
   [part="surface"]:popover-open {
     clip-path: inset(0 calc(var(--helix-space-xl) * -1) 100% calc(var(--helix-space-xl) * -1));
   }
 }
 
-/* A band from edge to edge, which is the other shape a navigation panel takes.
- *
- * Placed here rather than by the controller, which is told not to measure: a
- * band spans the viewport, so there is nothing to place it against.
- *
- * **Both edges rather than a width**, or the band overflows.
- * `100vw` is the viewport including the scrollbar's gutter, and
- * `100dvw` is the same measurement taken when retractable browser chrome is out
- * of the way: the `d` is about phone toolbars, not scrollbars, so swapping one
- * for the other fixed nothing. A band that wide on a page with a classic
- * scrollbar overhangs by the width of the scrollbar and gives the page a
- * horizontal scroll to reach it. Anchoring both insets on a fixed element asks
- * for the same thing without naming a number, and the answer excludes the
- * scrollbar because that is what a fixed element is positioned in.
- *
- * The corners go, because an edge-to-edge band has no outside corner to round.
- * What is left is the page's own surface and a shadow, which is what a band
- * under a header is: it is not a card, so it is not outlined like one. */
+/* A band from edge to edge. Both insets rather than a width, or it overflows:
+   `100vw` counts the scrollbar's gutter and `100dvw` is the same measurement
+   with browser chrome out of the way, so it fixed nothing. */
 :host([variant="full"]) [part="surface"],
 :host([data-narrow]) [part="surface"] {
-  /* The same ground the card takes, and the same one the header above it is
-     painted with, so the band reads as the header continuing downward rather
-     than as a card laid over it. Both follow the hooks for the same reason: if
-     the bar goes glass the band has to as well, or the seam between them is the
-     one thing this rule exists to prevent. */
+  /* The header's ground, so the band reads as it continuing. Both follow the
+     hooks, or a glass bar over an opaque band leaves a seam. */
   backdrop-filter: var(--megamenu-backdrop, none);
   background-color: var(--megamenu-background-color, var(--helix-color-background));
-  /* No edge at all. The bottom hairline was there to say where the band ends,
-     which the shadow underneath it already says, and a line under a band that
-     is meant to read as the header continuing downward turns the whole thing
-     back into a card with a rule on it. It is the more visible mistake once the
-     band goes glass: a hard hairline across a translucent surface is the one
-     opaque thing on it. */
+  /* No edge: the shadow says where the band ends, and a hairline across a
+     translucent surface is the one opaque thing on it. */
   border: none;
   border-radius: var(--helix-radii-none);
   box-shadow: var(--helix-shadow-md);
-  /* Shadow on the bottom edge and nowhere else. A blurred shadow spills every
-     way, including up: offset four and blurred twelve reaches eight pixels above
-     the box, which lands on the header the band is flush against and draws a
-     smudge along the edge it is supposed to continue. Clipped to the box on
-     three sides and let out only below, and only once it is open: see the
-     card's note above for why the closed value rests here rather than on
-     `[hidden]`. */
+  /* Shadow below only: offset four blurred twelve reaches eight pixels above
+     the box, onto the header the band is flush against. */
   clip-path: inset(0 0 100% 0);
-  /* Tracks, where the card has flex.
-   *
-   * A band knows how wide it is, so `auto-fit` can work out how many columns
-   * fit and put the rest on the next row *in the same tracks*. Flex wraps but
-   * does not line rows up: the last group, alone on its row, grew to the full
-   * width, and a group is where a row's hover wash comes from, so pointing at
-   * one link lit a bar the width of the window. The card cannot use this, since
-   * it is as wide as its own contents and `auto-fit` against a width that is
-   * not yet known resolves to one column. */
+  /* A band knows its width, so `auto-fit` lines a second row up in the same
+     tracks. Flex wraps without aligning them: the last group grew to full
+     width, and a group carries the row's hover wash, so one link lit a bar the
+     width of the window. The card cannot use this, its width being unknown. */
   display: grid;
   grid-auto-flow: row;
   grid-template-columns: repeat(auto-fit, minmax(var(--megamenu-column-size, 15rem), 1fr));
@@ -276,34 +140,19 @@
   inset-block-start: var(--megamenu-top, 100%);
   inset-inline: 0;
   max-inline-size: none;
-  /* Less above than below, because the bar has already given some.
-   *
-   * Equal padding stacks on the header's own: measured, 13 pixels of header
-   * under the trigger and then 32 of band before the first heading, so 45
-   * before the panel says anything and it read as a gap rather than as the
-   * header continuing. Nothing sits below the band, so the bottom keeps the
-   * fuller measure. */
+  /* Less above, the bar having given some: 13 pixels of header under the
+     trigger plus 32 of band is 45 before the panel says anything. */
   padding-block: var(--helix-space-md) var(--helix-space-xl);
-  /* The contents on the page's measure rather than the band's: a row of links
-     running the whole width of a wide screen is a row nobody reads across. Held
-     with padding rather than a width, so the band stays edge to edge and only
-     what is in it is centered. `100%` for the same reason as above. */
-  /* 80rem, not 72. Four columns and the gaps between them leave 264 each at 72,
-     and a row spends 16 on its own padding and 36 on the mark, so a sentence
-     gets 212: which is, to the pixel, the width of the sentences in the example
-     beside this file. They fitted only because they were forbidden to wrap and
-     were quietly overhanging into the gap. Now that they wrap, the measure has
-     to be one a sentence actually fits in. */
+  /* The page's measure, held with padding so the band stays edge to edge.
+     80rem, not 72: at 72 four columns leave 264 each, less 16 of row padding
+     and 36 for the mark, so a sentence gets 212, which is exactly the width of
+     the ones in the example beside this file. */
   padding-inline: max(var(--helix-space-xl), calc((100% - var(--megamenu-full-size, 80rem)) / 2));
   position: fixed;
 }
 
-/* The band travels the same way, from its own resting clip.
- *
- * Stated separately because the band's is not the card's: it is flush to both
- * sides and its only shadow is below, so the sides are clipped at zero rather
- * than let out. Sharing one starting value would have let the band's shadow out
- * sideways for the length of the animation and pulled it back at the end. */
+/* The band's resting clip is not the card's: flush to both sides, so they clip
+   at zero rather than being let out. */
 :host([variant="full"]) [part="surface"]:popover-open,
 :host([data-narrow]) [part="surface"]:popover-open {
   clip-path: inset(0 0 calc(var(--helix-space-xl) * -1) 0);
@@ -316,44 +165,25 @@
   }
 }
 
-/* Stacked, because a column does not shrink past `--megamenu-column-size` and
- * four of them are four of them however narrow the screen is: laid across, the
- * panel simply ran off the side. One column per row is the only arrangement
- * that fits, and a stack tall enough to leave the screen scrolls inside the
- * panel rather than taking the page with it.
- *
- * `data-narrow` comes from the element, which owns the width it happens at:
- * see `full-below`. */
+/* A column does not shrink past `--megamenu-column-size`, so four of them ran
+   off the side. `data-narrow` comes from the element: see `full-below`. */
 :host([data-narrow]) [part="surface"] {
   grid-auto-flow: row;
   grid-template-columns: 1fr;
-  /* Down to the bottom of the screen, less the height it starts at and a margin
-     to show it ends. */
+  /* To the bottom of the screen, less where it starts and a margin. */
   max-block-size: calc(100dvh - var(--megamenu-top, 0px) - var(--helix-space-xl));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-inline: var(--helix-space-md);
 }
 
-/* The UA hides a closed popover with `[popover]:not(:popover-open)` and every
- * author rule that gives this panel a display overrules it, which is why Menu,
- * Popover, Tooltip and Combobox each restate their own. This one has to be
- * said louder than theirs.
- *
- * **The specificity is the whole point, so do not lower it.** `:host` prefixes
- * a selector that would otherwise be (0,2,0) and lose: the band is
- * `:host([variant="full"]) [part="surface"]`, which is (0,3,0), so a bare
- * `[part="surface"][hidden]` was outranked and a closed band kept its
- * `display: grid`. Measured on the site: `open` false, `hidden` present,
- * `:popover-open` false, and a 1280 by 267 box still laid out over the page the
- * reader had just navigated to. The card never showed it, because a card is
- * styled by the plain `[part="surface"]` at (0,1,0), which the guard did beat.
- *
- * `[hidden]` rather than `:not(:popover-open)`, which is what the others use:
- * the attribute is bound from `open` in the template, so it is the element's
- * own answer and is right whether or not the panel was ever put in the top
- * layer. A band that is placed by the bar rather than by the popover is exactly
- * the case where those two can disagree. */
+/* Every author rule giving this panel a display overrules the UA's own hide, so
+   each overlay family restates it. **Do not lower the specificity**: the band is
+   (0,3,0), so a bare `[part="surface"][hidden]` at (0,2,0) lost and a closed
+   band kept `display: grid`, leaving a 1280 by 267 box over the page.
+
+   `[hidden]` rather than `:not(:popover-open)`, being bound from `open`, so it
+   answers whether or not the panel ever reached the top layer. */
 :host [part="surface"][hidden] {
   display: none;
 }
@@ -363,14 +193,8 @@
     transition: none;
   }
 
-  /* The clip goes and the discrete pair stay.
-
-     Answered here rather than left to the base layer's global cap, because `*`
-     does not cross a shadow boundary. Dropping the whole declaration would take
-     `display` and `overlay` with it, and those are not motion: without them the
-     panel would still be in the top layer with nothing drawn, which is a worse
-     answer to the preference than an instant one. So the clip is removed and
-     the panel opens and closes at once. */
+  /* The clip goes, the discrete pair stay: without them the panel sits in the
+     top layer with nothing drawn. `*` does not cross a shadow boundary. */
   [part="surface"] {
     clip-path: none;
     transition:
@@ -379,16 +203,7 @@
   }
 }
 
-/* Not printed, being chrome.
- *
- * It is how a reader moves around a document rather than any of the document: a
- * printed page has no elsewhere to go to, so a bar of destinations is ink spent
- * on navigation that cannot happen.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Chrome: a printed page has no elsewhere to go to. */
 @media print {
   :host {
     display: none;

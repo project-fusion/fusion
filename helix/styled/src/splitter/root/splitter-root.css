@@ -1,19 +1,9 @@
-/* Flex rather than a grid, and the reason is where the number can live.
- *
- * The position has to reach the layout, and the layout is the host. Writing an
- * inline style onto the host at upgrade is markup a server's output never had
- * and a framework reports the difference, which is the same rule `hostAria`
- * exists for. So the number goes on the first pane, which is an element in this
- * shadow root, and the pane sizes itself: `flex-basis` on the start, `flex: none`
- * on the divider, and the end takes what is left. The host stays exactly as the
- * consumer wrote it. */
+/* Flex rather than a grid, and the reason is where the number can live. */
 :host {
   display: flex;
   min-block-size: 0;
   min-inline-size: 0;
-  /* For the corner, which is positioned against this box. `relative` with an
-     `auto` z-index is not a stacking context, so nothing about how this splitter
-     paints inside its own parent changes. */
+  /* For the corner, which is positioned against this box. */
   position: relative;
 }
 
@@ -23,9 +13,9 @@
 
 [part="start"] {
   flex: 0 0 var(--splitter-position, 50%);
-  /* Both, because a flex item's floor is its content and a pane holding
-     anything scrollable would otherwise refuse to go below it: the divider
-     would stop at a width nobody asked for and nothing would say why. */
+  /* Both, because a flex item's floor is its content and a pane holding anything
+     scrollable would otherwise refuse to go below it: the divider would stop at
+     a width nobody asked for and nothing would say why. */
   min-block-size: 0;
   min-inline-size: 0;
   overflow: auto;
@@ -39,18 +29,12 @@
 }
 
 /* The divider. **The box is only the target and the line is drawn inside it**,
- * never the box doing its own drawing, which fails three ways at once: a line on
- * the box's leading edge puts every one of the eight pixels on one side of it
- * (0px of grab before, 7px after, so reaching for the seam from the left
- * misses), a real flex item takes its whole width out of the second pane, and
- * hovering lights an eight pixel box beside a one pixel line, which reads as the
- * divider changing width and jumping sideways.
- *
- * `margin-inline` pulls back exactly half the width on each side, so the element
- * contributes zero and the panes are the percentage they were asked for. It
- * overlaps both of them by four pixels, which is the point: a target has to
- * straddle the thing it grabs. `z-index` because the second pane is painted
- * after this and would otherwise cover the half of it that reaches underneath. */
+   never the box doing its own drawing, which fails three ways at once: a line on
+   the box's leading edge puts every one of the eight pixels on one side of it
+   (0px of grab before, 7px after, so reaching for the seam from the left
+   misses), a real flex item takes its whole width out of the second pane, and
+   hovering lights an eight pixel box beside a one pixel line, which reads as the
+   divider changing width and jumping sideways. */
 [part="separator"] {
   background-color: transparent;
   box-sizing: border-box;
@@ -59,16 +43,12 @@
   inline-size: var(--splitter-target, var(--helix-space-xs));
   margin-inline: calc(var(--splitter-target, var(--helix-space-xs)) / -2);
   position: relative;
-  /* The pointer stays with the divider once it has it, and a drag that crosses
-     a pane must not select the text under it. */
+  /* The pointer stays with the divider once it has it, and a drag that crosses a
+     pane must not select the text under it. */
   touch-action: none;
   user-select: none;
   /* Every splitter uses the same layer, which decides what happens where two of
-     them cross. A tie goes to document order and a deeper splitter is always
-     later, so the inner divider takes the pointer. That is the right way round,
-     since a reader pointing inside a pane is pointing at that pane's divider,
-     and it costs the outer divider eight pixels of its length where the inner
-     one crosses it. Measured on a three-deep nest. */
+     them cross. */
   z-index: var(--helix-layer-raised);
 }
 
@@ -106,36 +86,20 @@
     block-size var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* **The one being pointed at paints over the other.**
- *
- * Every separator sits on the same layer, so where two cross, the deeper one
- * wins on document order: at rest that is invisible, because both lines are one
- * pixel of the same color and the overlap is a single pixel nobody sees. It
- * stops being invisible the moment one of them is hovered. A hovered divider is
- * two pixels and dark, and the light one crossing it starts exactly at its
- * center, so it repaints the right half of the dark stroke and leaves a notch
- * in it. Only ever the hovered state.
- *
- * One step of the layer is enough, because a hovered inner divider is later
- * again and wins the tie the same way. The rule is simply that interest wins. */
+/* *The one being pointed at paints over the other.** Every separator sits on the
+   same layer, so where two cross, the deeper one wins on document order: at rest
+   that is invisible, because both lines are one pixel of the same color and the
+   overlap is a single pixel nobody sees. */
 [part="separator"]:hover,
 [part="separator"]:focus-visible,
 [part="separator"][data-dragging] {
   z-index: calc(var(--helix-layer-raised) + 1);
 }
 
-/* **A pane shut to nothing gets no line at rest.**
- *
- * There is already an edge there: the divider has been dragged flush against
- * whatever contains the splitter, so the hairline lands on top of a border that
- * is drawn by something else, and the reader sees two lines a pixel apart with
- * nothing between them. A pane shut to a *sliver* keeps its line, because a
- * sliver is a real pane with a real boundary.
- *
- * Idle only. The eight pixel target is still there and still answers, so hover,
- * focus and a drag all bring the line straight back, which is what lets a pane
- * shut to nothing be opened again. Those rules carry the same specificity as
- * this one and sit after it, which is what decides it. */
+/* *A pane shut to nothing gets no line at rest.** There is already an edge
+   there: the divider has been dragged flush against whatever contains the
+   splitter, so the hairline lands on top of a border that is drawn by something
+   else, and the reader sees two lines a pixel apart with nothing between them. */
 [part="separator"][data-flush]::before {
   background-color: transparent;
 }
@@ -151,18 +115,8 @@
   inline-size: var(--helix-border-thick);
 }
 
-/* **And a divider that is actually moving goes primary.**
- *
- * Hover is a question and a drag is an answer, so they should not look the
- * same. It also has a job the hover color cannot do: a corner moves two
- * dividers at once, one of them nowhere near the pointer, and the accent is what
- * makes the pair read as one gesture rather than as a line that happened to
- * darken.
- *
- * `:hover` alone could carry none of this. A drag captures the pointer and a
- * fast one leaves the eight pixel target behind, and the nested divider a corner
- * moves is never hovered at all. After the interest rules, so a divider being
- * dragged under the pointer is primary rather than muted. */
+/* *And a divider that is actually moving goes primary.** Hover is a question and
+   a drag is an answer, so they should not look the same. */
 :host(:not([variant="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
@@ -184,42 +138,21 @@
   outline: none;
 }
 
-/* biome-ignore lint/style/noDescendingSpecificity: the rule above it names the grip and non-grip separators together, which is one focus treatment written once. Moving this above it would separate the two halves of that so the shared case could sit between them. Specificity decides here either way. */
+/* biome-ignore lint/style/noDescendingSpecificity: the rule above it names the
+   grip and non-grip separators together, which is one focus treatment written
+   once. */
 [part="separator"]:focus-visible::before {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The corner, where a nested splitter's divider crosses this one.
- *
- * **Drawn by the outer splitter, and it has to be.** The crossing sits on the
- * boundary between a pane and the divider beside it, so a handle centered on it
- * straddles that boundary, and a pane is `overflow: auto` and clips whatever
- * reaches out of it. Measured on the nested splitter: exactly the half that
- * reached back over the seam was cut off.
- *
- * **And it is a sibling of the divider rather than a child of it.** Inside the
- * separator it is inside the separator's stacking context, which `z-index`
- * creates, so its own layer only orders it against the divider's other children.
- * The whole context still sits at `raised`, tied with the nested splitter's
- * separator, and a tie goes to document order: the nested one is later, so it
- * takes the pointer along the eight pixels where the two dividers overlap.
- * Hit-tested there, the center and the whole inline-forward edge of the corner
- * resolved to the nested splitter. Positioned against the host instead, the
- * corner's layer is read in the host's context and beats every separator in the
- * nest.
- *
- * It needs two numbers and has both: `--splitter-position` is this splitter's
- * own divider, and `--splitter-corner-at` is the nested one's, which the child
- * announces. Each is a percentage of the host on its own axis, and the nested
- * splitter fills its pane, so its position is an offset along this divider too.
- *
- * Sixteen pixels against the divider's eight: it is the target for two dividers
- * rather than one, and the reader is aiming at a point instead of a line. It is
- * centered on the crossing with logical margins rather than `translate`, which is
- * physical and would push the inline half the wrong way in a right-to-left
- * document. Margins on an absolutely positioned box offset it from its inset and
- * do flip. */
+/* The corner, where a nested splitter's divider crosses this one. **Drawn by the
+   outer splitter, and it has to be.** The crossing sits on the boundary between
+   a pane and the divider beside it, so a handle centered on it straddles that
+   boundary, and a pane is `overflow: auto` and clips whatever reaches out of it.
+   **And it is a sibling of the divider rather than a child of it.** Inside the
+   separator it is inside the separator's stacking context, which `z-index`
+   creates, so its own layer only orders it against the divider's other children. */
 [part="corner"] {
   block-size: var(--splitter-corner, var(--helix-space-md));
   /* The four-point arrow: this handle moves two dividers, and `col-resize` or
@@ -244,48 +177,21 @@
   inset-inline-start: var(--splitter-corner-at);
 }
 
-/* **The handle draws nothing, and the cursor is the whole affordance.** `move`
+/* *The handle draws nothing, and the cursor is the whole affordance.** `move`
    already says exactly this, it says it at the moment the reader is on the
-   crossing, and it costs the layout no ink. A crossing is two lines meeting,
-   which is what it looks like.
-
-   A ring on focus is the exception, and it is not decoration: with nothing drawn
-   there is otherwise no way to see where the keyboard is. It goes on the target,
-   because the target is now the only thing the corner has. */
+   crossing, and it costs the layout no ink. */
 [part="corner"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
 /* A grip beside the line, for a splitter that has to be found rather than known.
- *
- * The line alone is right where a reader already knows the panes are resizable,
- * which is most of a tool they use every day. It is wrong the first time: a
- * hairline between two panels is a border until something says otherwise, and
- * the only thing saying otherwise is a cursor that appears once the pointer is
- * already on it.
- *
- * A short capsule at the middle of the run, beside the line rather than on it.
- * On it, the grip has to be wider than the line and the line then bulges, which
- * reads as a defect in the border; beside it, the two are separate marks and the
- * line stays a line.
- *
- * **Nothing at rest, and the grip is the whole answer on approach.** Drawn at
- * rest, a page of nested splitters is a page of pills saying "boundary" at
- * something that already looks like a boundary, and the line under each one is
- * the mark that belongs there. What the grip is for is the moment the pointer
- * arrives, where a cursor change is the only thing a plain divider offers and a
- * cursor is easy to miss.
- *
- * **And it answers alone.** The line keeps its color and its width in this
- * shape, which is what the `:not([variant="grip"])` on the interest rules
- * above is doing. Two marks responding to one pointer reads as two things.
- *
- * Drawn on the separator's second pseudo-element, so it costs no markup and no
- * part: `::before` is already the line. A pseudo-element hit-tests as its
- * originating element, so the grip lights the divider by being pointed at
- * without being a target of its own, which is also why it is `grip` and not
- * `handle`: the corner is the thing here that is a box the reader grabs. */
+   **Nothing at rest, and the grip is the whole answer on approach.** Drawn at
+   rest, a page of nested splitters is a page of pills saying "boundary" at
+   something that already looks like a boundary, and the line under each one is
+   the mark that belongs there. **And it answers alone.** The line keeps its
+   color and its width in this shape, which is what the `:not([variant="grip"])`
+   on the interest rules above is doing. */
 :host([variant="grip"]) [part="separator"]::after {
   background-color: var(--splitter-grip-color, var(--helix-color-foreground-muted));
   border-radius: var(--helix-radii-full);
@@ -314,44 +220,27 @@
   inset-inline-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
 }
 
-/* Interest brings it in. No `data-flush` rule to go with it, unlike the line:
-   the line is hidden when a pane is shut because there is already an edge drawn
-   there by whatever contains the splitter, and the grip is hidden at rest
-   anyway. Both come back the same way, which is what lets a pane shut to
-   nothing be found and opened again. */
+/* Interest brings it in. */
 :host([variant="grip"]) [part="separator"]:hover::after,
 :host([variant="grip"]) [part="separator"]:focus-visible::after,
 :host([variant="grip"]) [part="separator"][data-dragging]::after {
   opacity: 1;
 }
 
-/* And a drag goes accent, for the reason the corner records: hover is a
-   question and a drag is an answer, and a corner moving two dividers at once
-   needs the pair to read as one gesture. The only thing that ever changes
-   color in this shape. */
+/* And a drag goes accent, for the reason the corner records: hover is a question
+   and a drag is an answer, and a corner moving two dividers at once needs the
+   pair to read as one gesture. */
 :host([variant="grip"]) [part="separator"][data-dragging]::after {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
 
-/* Out of the pointer's way while the divider moves.
- *
- * A pane holds whatever a consumer put in it, and a cross-origin `<iframe>` is
- * the case that breaks a drag: it is its own hit-testing world, so a pointer
- * crossing one can be taken by it. The sandbox is that case exactly, a
- * sandboxed preview frame sitting against the panel divider, which makes the
- * drag that grows the panel the drag that passes over the frame.
- *
- * The divider keeps the pointer it captured, so this costs the gesture nothing
- * and only removes what could interrupt it. It lasts for the drag alone. */
+/* Out of the pointer's way while the divider moves. */
 [part="start"][data-dragging],
 [part="end"][data-dragging] {
   pointer-events: none;
 }
 
-/* Print: two panes and no handle between them, there being nothing to drag.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: two panes and no handle between them, there being nothing to drag. */
 @media print {
   :host {
     box-shadow: none;

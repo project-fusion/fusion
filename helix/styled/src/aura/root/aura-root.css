@@ -4,37 +4,14 @@
   inline-size: 100%;
   block-size: 100%;
 
-  /* The fallback, and it needs no detection.
-   *
-   * A reader with no WebGL, or on a machine that refused a context, gets a
-   * canvas that never paints, which is transparent. So the host carries a ramp
-   * of the same tokens the shader ramps between, and the canvas paints over it
-   * when it can. Nothing has to ask whether it worked: the answer is what is
-   * already showing. Same shape as slot fallback, one layer down.
-   *
-   * **The hot stop is mixed into the ground, because the shader's is not a
-   * wash.** This ramped from `primary` at full strength, which is the top of the
-   * shader's range and nothing like its average: the field reaches that value
-   * along thin filaments and sits near the background everywhere else.
-   *
-   * It showed, because the canvas is transparent before its first paint. Off a
-   * recording of four hard reloads, average luma on the landing page went 20.8
-   * to 44.5 in dark and 231 to 199 in light. Resolved at this page's half
-   * opacity, the old center sat at 68.3 against a settled 20.8 in dark and 174
-   * against 231 in light: brighter than the page in one mode and darker in the
-   * other, which is exactly the two directions the recording caught.
-   *
-   * 38% is where the remaining error balances, measured across both modes: 15.6
-   * against 20.8 in dark, 225.8 against 231 in light, about five points either
-   * way instead of fifty. Mixing is perceptual and so is not symmetric, which is
-   * why one number lands differently in the two schemes and why it was swept
-   * rather than guessed.
-   *
-   * **The middle stop is left alone.** `primary-subtle` is already a
-   * background-adjacent tint and measures 17.5 and 245.8 against those same
-   * targets. Mixing it down too, which is the obvious next move, takes it to 2.1
-   * and 251.4 and is worse in both. Only the full-strength stop was ever the
-   * problem. */
+  /* The fallback, needing no detection: a canvas that never paints is
+     transparent, so the host ramps the same tokens underneath it.
+
+     The hot stop is mixed into the ground because the shader's is not a wash.
+     At full `primary` the landing page's average luma went 20.8 to 44.5 in dark
+     and 231 to 199 in light. 38% balances both: 15.6 against 20.8, and 225.8
+     against 231. `primary-subtle` is left alone at 17.5 and 245.8; mixing it
+     down too gives 2.1 and 251.4, worse in both. */
   background-image: radial-gradient(
     120% 90% at 62% 12%,
     color-mix(in oklab, var(--helix-color-primary) 38%, var(--helix-color-background)) 0%,
@@ -43,19 +20,10 @@
   );
 }
 
-/* Decorative, and out of the way of everything it is behind.
- *
- * **Conditional, and it has to be.** A background must not swallow clicks meant
- * for what is laid over it, so the resting state is untouchable. But the
- * element listens for `pointermove` on itself, and an element that is not
- * hit-testable never receives one: measured with a real gesture across it, the
- * host reported `pointer-events: none` and not a single mark reached the wake.
- * Synthetic events hide this completely, because dispatching bypasses
- * hit-testing, so a test of the wake passes while the feature does nothing.
- *
- * So `interactive` reflects, which is the one thing that justifies reflecting
- * it: reflection exists so a selector can reach a value, and this is the
- * selector. A consumer who asks for the pointer is asking for the hit test. */
+/* Decorative, so it must not swallow clicks. But an element that is not
+   hit-testable never receives `pointermove`, which the wake listens for, and
+   synthetic events hide this because dispatching bypasses hit-testing. So
+   `interactive` reflects, and this selector is why. */
 :host {
   pointer-events: none;
 }
@@ -70,10 +38,7 @@
   block-size: 100%;
 }
 
-/* Print: light drawn behind content, and a printer drops it or renders it as a gray slab.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* A printer drops it or renders a gray slab. */
 @media print {
   :host {
     display: none;

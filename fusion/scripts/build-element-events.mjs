@@ -26,14 +26,17 @@
  *
  * `--check` compares without writing, for `verify`.
  */
-import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { formatted } from '@fusion.dev/scripts/formatted'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const PACKAGES = ['headless', 'styled']
 const checking = process.argv.includes('--check')
+/* One package when named, both when not. Each tier generates its own as a
+   prebuild step, so the file is a build output rather than a tracked one. */
+const only = process.argv.indexOf('--package')
+const PACKAGES = only === -1 ? ['headless', 'styled'] : [process.argv[only + 1]]
 
 const mapFor = (pkg) => {
   const manifest = JSON.parse(
@@ -53,13 +56,6 @@ const mapFor = (pkg) => {
 }
 
 /** The text as Biome would leave it, so a later `check` cannot rewrite it. */
-const formatted = (path, source) =>
-  execFileSync('bunx', ['biome', 'format', `--stdin-file-path=${path}`], {
-    cwd: ROOT,
-    encoding: 'utf8',
-    input: source,
-  })
-
 const render = (entries) => {
   const rows = entries
     .map(([tag, names]) => `  '${tag}': [${names.map((name) => `'${name}'`).join(', ')}],`)
@@ -83,7 +79,7 @@ for (const pkg of PACKAGES) {
   const entries = mapFor(pkg)
   total += entries.length
   const path = join(ROOT, 'helix', pkg, 'src', 'element-events.generated.ts')
-  const next = formatted(path, render(entries))
+  const next = formatted(render(entries), 'element-events.generated.ts')
   const held = (() => {
     try {
       return readFileSync(path, 'utf8')
@@ -97,7 +93,7 @@ for (const pkg of PACKAGES) {
   if (checking) {
     stale += 1
     console.error(
-      `helix/${pkg}/src/element-events.generated.ts is behind its manifest. Run \`bun run gen:element-events\` and commit the result.`,
+      `helix/${pkg}/src/element-events.generated.ts is behind its manifest. Run \`bunx turbo run element-events\`.`,
     )
     continue
   }

@@ -59,9 +59,10 @@ The components are built on Lit, so `lit` has to resolve too. That is the part
 that makes an import map necessary rather than optional: the package's own
 imports are bare specifiers, and a browser needs to be told where each one is.
 
-**Copy the files, do not point at a CDN.** An import map pointing at someone
-else's server makes your page stop working when theirs does, which is the
-dependency the Sovereignty Constraint exists to refuse. `bun add` and then copy
+**A CDN works, and the tradeoff is worth naming.** An import map pointing at
+someone else's server means your page stops working when theirs does, and
+pinning an exact version matters more there than anywhere else. If you would
+rather not take that on, `bun add` and then copy
 `node_modules/@fusion.dev/helix-*/dist` into whatever you serve.
 
 ## What this costs
@@ -95,7 +96,7 @@ control](./state-and-control).
   rel="stylesheet"
 />
 <link
-  href="/vendor/helix/styled/elements.css"
+  href="/vendor/helix/shared/css/elements.css"
   rel="stylesheet"
 />
 ```

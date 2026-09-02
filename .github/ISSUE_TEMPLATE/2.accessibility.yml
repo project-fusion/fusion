@@ -1,0 +1,59 @@
+body:
+  - attributes:
+      description:
+        What is unreachable, unreadable, or announced wrongly, and on which
+        component. Name the part if you know it.
+      label: What is wrong
+      placeholder:
+        The listbox inside `helix-combobox` announces its option count on every
+        keystroke.
+    id: what
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        Which one, and its version. Screen reader, magnifier, voice control,
+        switch access, or a keyboard on its own.
+      label: Assistive technology
+      placeholder: VoiceOver on macOS 26.2, Safari 26
+    id: technology
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        The smallest page that shows it. A repository, a StackBlitz, or the
+        markup and the custom properties you set.
+      label: How to reproduce it
+    id: reproduce
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        Which success criterion, if you know it. It is fine not to. A report that
+        names the behavior is worth more than one that names a number.
+      label: WCAG criterion
+      placeholder: 4.1.2 Name, Role, Value
+    id: criterion
+    type: input
+    validations:
+      required: false
+  - attributes:
+      description:
+        Helix ships accessibility in the headless tier, so this tells us which
+        half to look at.
+      label: Does it reproduce on the headless tier alone
+      options:
+        - Yes, headless too
+        - No, only with the styled tier
+        - Have not tried
+    id: tier
+    type: dropdown
+    validations:
+      required: false
+description: Something is unreachable, unreadable, or announced wrongly.
+labels: [accessibility]
+name: Accessibility
+title: "[a11y] "

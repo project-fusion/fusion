@@ -1,9 +1,9 @@
 import Link from 'next/link'
+import { VerticalPage } from '@/components/vertical-page/vertical-page'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { getFamilies } from '../../../content/catalog/catalog'
-import { VerticalPage } from '../vertical-page'
 
 const vertical = findVertical('/helix')
 const product = PRODUCTS.find((entry) => entry.href === '/helix')

@@ -1,28 +1,19 @@
-/* The host is the stack: a label, the track, and one line under it. The track
-   is an element of its own rather than the host, because anything sitting
-   beside it would otherwise be a segment in the same row. */
+/* The host is the stack: a label, the track, and one line under it. */
 :host {
   display: inline-flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
 }
 
-/* The label inside the track, with a rule after it.
- *
- * The track is already a centered flex row, so the label needs no alignment of
- * its own beyond being told not to take a field label's block margin. The rule
- * is what separates a word that names the set from a segment that can be
- * pressed, and it is inset from the track's own padding so it does not run the
- * full height and read as a border. */
+/* The label inside the track, with a rule after it. */
 :host([label-placement="start"]) [part="label"] {
   align-self: center;
   margin-block: 0;
-  /* **The padding is what was holding the word up, not the margin.** A field
+  /* *The padding is what was holding the word up, not the margin.** A field
      label carries four pixels under it as its gap to the control below, and
      centering the label's *box* against the track then leaves its text half that
      above the segments' text: measured at 2.1 pixels, which is plainly visible
-     and is what a box-to-box check misses. Center the text by leaving the box
-     nothing to be lopsided about. */
+     and is what a box-to-box check misses. */
   padding-block: 0;
   padding-inline-start: var(--helix-space-xs);
   white-space: nowrap;
@@ -37,15 +28,9 @@
   margin-inline: var(--helix-space-xs);
 }
 
-/* The label on the track's line rather than over it.
- *
- * `baseline` would be the obvious alignment and is the wrong one: the track is
- * a control with padding and a border, so its first line box sits lower than a
- * bare label's and the word rides high against it. Center is what puts the two
- * on the same optical line.
- *
- * The row gap is `sm` rather than the stack's `2xs`, because horizontal space
- * between two different things has to read as a gap and four pixels does not. */
+/* The label on the track's line rather than over it. The row gap is `sm` rather
+   than the stack's `2xs`, because horizontal space between two different things
+   has to read as a gap and four pixels does not. */
 :host([label-placement="start"]) {
   align-items: start;
 }
@@ -54,71 +39,38 @@
   display: inline-flex;
   position: relative;
 
-  /* **It wraps, because the alternative is a segment nobody can reach.**
-     The track is a flex item at `flex: 1 1 auto`, so its automatic minimum size
-     is its min-content width, and a group with more labels than room refuses to
-     shrink below that and paints the overflow outside its own host. Nothing
-     scrolls and nothing clips visibly: the last segment simply leaves the pane.
-     Measured on the theme builder's six-character Motion group in a 360px form,
-     the track came out 420px against a 312px host and `Instant` sat 79px beyond
-     the panel's right edge, unclickable and with nothing on screen to say so.
-     The four-option group beside it does the same below about 240px.
-
-     Wrapping is what a set of peers wants: the segments are alternatives rather
-     than a sequence, so a second row costs the control nothing. It also needs no
-     breakpoint, which is the point, since the pane is behind a splitter and has
-     no width anybody can name in advance.
-
-     `flex-start` so the rows stack from the top rather than sharing the slack,
-     which matters the moment anything gives the track more height than its
-     rows. */
+  /* *It wraps, because the alternative is a segment nobody can reach.** The
+     track is a flex item at `flex: 1 1 auto`, so its automatic minimum size is
+     its min-content width, and a group with more labels than room refuses to
+     shrink below that and paints the overflow outside its own host. Measured on
+     the theme builder's six-character Motion group in a 360px form, the track
+     came out 420px against a 312px host and `Instant` sat 79px beyond the
+     panel's right edge, unclickable and with nothing on screen to say so. The
+     four-option group beside it does the same below about 240px. */
   align-content: flex-start;
   flex-wrap: wrap;
 
   /* The control is the height of a control, and the segments are what is left
-     inside it. The other way round, items taking the full control height with
-     the track's padding and border added outside them, a forty pixel item makes
-     a fifty pixel control that stands taller than every button beside it.
-
-     **A floor rather than a height, and the row is named rather than inferred.**
-     `block-size` with the item at `100%` lets the box model subtract the padding
-     and the border rather than arithmetic that has to be kept in step with them.
-     That trick cannot survive wrapping: `100%` of a
-     two-row track is two rows, so every segment would grow to the full height of
-     the group instead of filling its own line. The row is therefore derived
-     once, per separation, the way `--_toggle-radius` beside it already is, and
-     the two are the only places the track's own inset is written down. */
+     inside it. *A floor rather than a height, and the row is named rather than
+     inferred.** `block-size` with the item at `100%` lets the box model subtract
+     the padding and the border rather than arithmetic that has to be kept in
+     step with them. That trick cannot survive wrapping: `100%` of a two-row
+     track is two rows, so every segment would grow to the full height of the
+     group instead of filling its own line. */
   min-block-size: var(--helix-size-control);
 
   --_toggle-height: calc(var(--helix-size-control) - var(--helix-space-2xs) * 2);
   /* No track, so nothing to be concentric with. */
   --_toggle-radius: var(--helix-radii-sm);
 
-  /* Inset even where nothing is drawn around it.
-   *
-   * The framed separations get this from their own padding. With none, `plain`
-   * items are the full forty and the control is the item: a selected tab's thumb
-   * runs edge to edge and the group reads as one tall block rather than as a
-   * marker inside a strip. Measured, 40 against the framed 30.
-   *
-   * The padding is the same either way. What `plain` drops is the background
-   * and the border, which is what makes it plain; the room the items sit in is
-   * not decoration. */
+  /* Inset even where nothing is drawn around it. Measured, 40 against the framed
+     30. */
   padding: var(--helix-space-2xs);
-  /* And no groove either, which decides the thumb's color. Without a track the
-     marker is a pill lying *on* whatever surface the group was put on, so it
-     has to be darker than it: that is `raised`. The grooved separations below
-     take `overlay` instead, because a thumb in a groove has to be lighter than
-     the groove, and on a white page those are opposite directions. The
-     sandbox's tabs are `plain` and sit on a white toolbar, where a white thumb
-     is the shadow and nothing else. */
+  /* And no groove either, which decides the thumb's color. */
   --_indicator-surface: var(--helix-color-surface-raised);
 }
 
-/* A framed track, and it is what makes the whole control read. Without it the
-   marker is a lone shape floating on the page and scans as a stray rectangle
-   whatever its corner radius; inside a bordered, sunken track it reads as a
-   thumb sitting in a groove, which is the thing a segmented control is. */
+/* A framed track, and it is what makes the whole control read. */
 :host(:not([separation])) [part="track"],
 :host([separation="outlined"]) [part="track"] {
   background-color: var(--helix-color-surface-sunken);
@@ -127,15 +79,7 @@
   padding: var(--helix-space-2xs);
 
   /* Concentric, which is the outer radius less everything between the two
-     curves: the border and the padding. Derived rather than chosen, so changing
-     the padding cannot put the two out of step.
-
-     The outer one is `lg`. Being concentric turned out to be necessary and not
-     sufficient: at `md` the arithmetic left the thumb a three pixel corner,
-     which is square at that size, so a nearly rectangular thumb sat inside a
-     visibly rounded track and the two read as unrelated even though the gap
-     between them was even the whole way round. A larger outer radius leaves the
-     inner one enough to be a curve. */
+     curves: the border and the padding. */
   --_toggle-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
   /* The border joins the padding in what the row has to give back. */
   --_toggle-height: calc(
@@ -150,39 +94,21 @@
 }
 
 /* The segments share what is left over, and each label keeps the same space
-   around it.
- *
- * `flex-basis: auto` and not `0`, which is the whole point. From zero the
- * shares are equal and the segments come out the same width, so the longest
- * label nearly touches its edges while the shortest floats in the middle of
- * its own: three thirds of a track with three different amounts of air in them,
- * which reads as spacing that was not thought about. From `auto` each segment
- * starts at its label and the free space is divided evenly between them, so
- * every label carries an identical margin and the segments differ instead,
- * which is the thing nobody looks at.
- *
- * Still fills the track, which is `flex-grow: 1`'s job. The thumb changes width
- * as it travels, which is why `inline-size` is in its transition. */
+   around it. `flex-basis: auto` and not `0`, which is the whole point. Still
+   fills the track, which is `flex-grow: 1`'s job. */
 ::slotted(helix-toggle) {
-  /* **The row, and this is the only reader of `--_toggle-height`.** Never a
+  /* *The row, and this is the only reader of `--_toggle-height`.** Never a
      literal `block-size: 100%` in the item's own sheet: it cannot survive
      wrapping, for the reason the track's note above gives. */
   block-size: var(--_toggle-height);
   flex: 1 1 auto;
 }
 
-/* One marker that travels. Its geometry is measured from the selected item and
-   written onto this element, because labels differ in length and no fraction of
-   the group is right for all of them.
-
-   A raised thumb rather than a flat fill: a lifted surface with a hairline of
-   shadow under it is what says "this one", and it does the saying without
-   color, which stays reserved for state. One step rounder than nothing and one
-   step tighter than the track it sits in, so the two are concentric. */
+/* One marker that travels. */
 [part="indicator"] {
   /* Whichever the separation declared, because the two look different for a
-     reason: the token is decided by what is behind the thumb, and `plain` has
-     no track behind it. See `:host` above. */
+     reason: the token is decided by what is behind the thumb, and `plain` has no
+     track behind it. */
   background-color: var(--toggle-group-indicator-color, var(--_indicator-surface));
   block-size: var(--indicator-block-size, 0);
   border-radius: var(--_toggle-radius, var(--helix-radii-sm));
@@ -193,9 +119,7 @@
   opacity: 0;
   position: absolute;
   translate: var(--indicator-x, 0) var(--indicator-y, 0);
-  /* Width is a layout property and the rule is transform and opacity only. The
-     indicator is out of flow, so animating it reflows nothing else, and scaling
-     instead would distort the corner radius. */
+  /* Width is a layout property and the rule is transform and opacity only. */
   transition:
     translate var(--helix-duration-normal) var(--helix-easing-emphasized),
     inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
@@ -203,38 +127,23 @@
   z-index: var(--helix-layer-base);
 }
 
-/* Hidden until it has somewhere to be, so it fades in rather than sliding from
-   a wrong place on first paint. */
+/* Hidden until it has somewhere to be, so it fades in rather than sliding from a
+   wrong place on first paint. */
 [part="indicator"][data-placed] {
   opacity: 1;
 }
 
-/* Wrong, and the strip says so. Toggle Group is the one of the three that has a
-   box already: the track its items sit in. So the error goes on that rather than
-   round it, the same way a field turns its own border, and `plain` gets an
-   outline instead because it has no border to turn.
-   The radius is the track's own, so the mark follows whatever shape it is in. */
+/* Wrong, and the strip says so. */
 :host(:state(invalid)) [part="track"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
-/* The row that holds the track and whatever flanks it.
- *
- * `align-items: center` for the same reason the inline label uses it: the track
- * is a control with padding and a border, so anything beside it that is only
- * text would otherwise sit on a different optical line.
- *
- * **`flex`, not `inline-flex`, and the track grows inside it.**
- *
- * This row sits between the host and the track, and an inline-flex box shrink
- * wraps: a group stretched to its column, which is what a field in a drawer is,
- * then has a full width host with a shrink wrapped row inside it and a track
- * that cannot reach the edges.
- *
- * A block level row fills whatever the host has, and the track is told to take
- * what is left after the slots either side, so a group is shrink wrapped when
- * the host is auto and full width when something stretched it. */
+/* The row that holds the track and whatever flanks it. **`flex`, not
+   `inline-flex`, and the track grows inside it.** This row sits between the host
+   and the track, and an inline-flex box shrink wraps: a group stretched to its
+   column, which is what a field in a drawer is, then has a full width host with
+   a shrink wrapped row inside it and a track that cannot reach the edges. */
 [part="row"] {
   align-items: center;
   display: flex;

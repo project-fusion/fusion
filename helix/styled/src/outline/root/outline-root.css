@@ -1,40 +1,20 @@
 :host {
   display: block;
 
-  /* The gutter the rail and the traveling mark share. Named once: it is both
-     the mark's width and the room every link is pushed clear by, and two copies
-     of a number like that drift.
-   *
-   * Public rather than private, because the rule that reads it for the links is
-   * in the base layer, not in here. Set on `:host`, which is the host element
-   * itself, so the consumer's light-DOM anchors inherit it the same way the
-   * shadow's own indicator does.
-   *
-   * Off the space scale rather than the border scale. It stopped being a border
-   * when it stopped being drawn as one, and the border scale has two steps with
-   * nothing between 2px and nothing: at 2px the mark read as a slightly darker
-   * rule rather than as a thing sitting on it. */
+  /* The gutter the rail and the traveling mark share. It stopped being a border
+     when it stopped being drawn as one, and the border scale has two steps with
+     nothing between 2px and nothing: at 2px the mark read as a slightly darker
+     rule rather than as a thing sitting on it. */
   --outline-rail: var(--helix-space-2xs);
 }
 
 /* The rule is a background rather than a border, for the reason the tabs strip
    learned: a border is part of the element's own box, so a lit segment drawn
    over it has to cover a box edge exactly, and `overflow` clips the border area
-   away. A gradient is painted inside the box and nothing clips it.
-
-   Centered in the gutter rather than at `left`, so the hairline and the mark
-   that covers it share an axis. Off-center, the mark sat beside the rule it was
-   meant to replace and the pair read as two lines. */
+   away. */
 [part="nav"] {
   background-image: linear-gradient(var(--helix-color-border), var(--helix-color-border));
-  /* Logical, like everything else about this gutter.
-   *
-   * `background-position-x` is physical, and every other half of the same
-   * gutter, the mark's `inset-inline-start`, the links' inline padding, is
-   * logical: in a right-to-left document the hairline sat on the far side of
-   * the component from the mark that is meant to cover it, so the pair read as
-   * two lines with the list between them. `background-position` takes a side
-   * keyword, and `inline-start` is the one that follows the text. */
+  /* Logical, like everything else about this gutter. */
   background-position: calc((var(--outline-rail) - var(--helix-border-thin)) / 2) 0;
   background-repeat: repeat-y;
   background-size: var(--helix-border-thin) 100%;
@@ -45,35 +25,7 @@
   position: relative;
 }
 
-/* The mark that travels.
- *
- * One element that moves, rather than a border appearing on each link in turn:
- * a border can only be there or not, and something that moves says these are
- * places in one document rather than a column of separate states. Vertical, so
- * it is the block axis that is measured and animated where the tab strip
- * animates the inline one.
- *
- * Hidden until it has been measured, so it fades in where it belongs rather
- * than sliding down from the top of the list on first paint.
- *
- * Three widths, and the middle one is the whole idea. At rest it is a hairline,
- * thinner than the rail it sits in, because a mark that is only saying "you are
- * here" does not need to be a bar. Hovering the list thickens it a step. And
- * while it is traveling it takes the full rail, then settles back: a mark that
- * swells as it leaves and thins as it lands reads as a thing being carried,
- * where one that keeps its width the whole way reads as a rectangle being
- * repositioned.
- *
- * `data-moving` is written by `IndicatorController` for the length of the
- * travel, because CSS has no state for "a transition is running".
- *
- * The width lives in a custom property because two declarations depend on it:
- * the size and the inset that keeps it centered in the rail. Both are ordinary
- * transitionable properties, so changing the variable animates them together
- * and the mark grows about its own middle rather than off one edge.
- *
- * `fast` on the way out and `normal` on the way back, so the swell is quicker
- * than the settle. Even durations make it pump. */
+/* The mark that travels. */
 [part="indicator"] {
   --_mark-width: var(--helix-border-thin);
 
@@ -86,16 +38,7 @@
   opacity: 0;
   position: absolute;
   translate: 0 var(--indicator-y, 0);
-  /* It springs, and the height trails it.
-   *
-   * `--helix-easing-spring` is a `linear()` of thirteen stops that carries past
-   * the target and settles back over three diminishing bounces, which is a real
-   * spring rather than the single overshoot `emphasized` gives.
-   *
-   * Two durations, not one. On the same curve at the same rate, a mark going to
-   * a heading that wraps to two lines arrives already grown. Slower and
-   * decelerating, the height stretches as it leaves and catches up after it
-   * lands, which is what gives the travel a direction. */
+  /* It springs, and the height trails it. */
   transition:
     translate var(--helix-duration-normal) var(--helix-easing-spring),
     block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
@@ -108,13 +51,12 @@
   opacity: 1;
 }
 
-/* Unless it is already on its way, where the travel's own width wins.
- *
- * Written as a `:not()` rather than left to the cascade, which had it backwards:
- * `:host(:hover) [part="indicator"]` is (0,2,1) and `[part="indicator"][data-moving]`
- * is (0,2,0), so hovering the list held the mark at the hover width for the
- * whole travel and the swell never happened. Measured at 2.00px throughout,
- * where the rail is 4. */
+/* Unless it is already on its way, where the travel's own width wins. Written as
+   a `:not()` rather than left to the cascade, which had it backwards:
+   `:host(:hover) [part="indicator"]` is (0,2,1) and
+   `[part="indicator"][data-moving]` is (0,2,0), so hovering the list held the
+   mark at the hover width for the whole travel and the swell never happened.
+   Measured at 2.00px throughout, where the rail is 4. */
 :host(:hover) [part="indicator"]:not([data-moving]) {
   --_mark-width: var(--helix-border-thick);
 }
@@ -131,34 +73,17 @@
     opacity var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The links, back here from the base layer.
- *
- * A `::slotted()` rule loses to a document rule whatever the specificity, and it
- * loses per declaration: measured against the base layer's old unscoped
- * `:where(a)`, `margin-inline-start` and `font-weight` came through from the
- * shadow while `color` and `text-decoration` did not, so this component asked
- * for `foreground-muted` and no outline ever showed it.
- *
- * Prose theming is behind `[data-prose]` now, so nothing contests these and the
- * component draws its own list again. */
+/* The links, back here from the base layer. */
 ::slotted(a) {
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
-  /* One step down from the prose it sits beside. A contents list is a margin
-     note about the page rather than part of it: at `sm` the rail read as a
-     second column of content competing with the first, and the eye kept being
-     offered a choice it had already made. `xs` is small enough to be reference
-     and large enough to be a target. */
+  /* One step down from the prose it sits beside. */
   font-size: var(--helix-text-xs);
-  /* A step up from body weight even at rest. A contents page is scanned rather
-     than read, and at `regular` against `foreground-muted` the whole column sat
-     back far enough that the current item was doing all the work of saying
-     there was a list there at all. */
+  /* A step up from body weight even at rest. */
   font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-normal);
   /* Margin rather than more padding, so the hover fill starts after the rail
-     instead of covering it. A fill that swallowed the hairline made the rule
-     flicker as the pointer went down the list. */
+     instead of covering it. */
   margin-inline-start: var(--outline-rail, var(--helix-border-thick));
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-sm);
@@ -216,10 +141,7 @@
   );
 }
 
-/* Print: a table of contents, which is what paper invented.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a table of contents, which is what paper invented. */
 @media print {
   :host {
     box-shadow: none;

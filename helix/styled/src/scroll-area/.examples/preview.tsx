@@ -3,14 +3,14 @@ import './preview.css'
 export function Example() {
   return (
     <helix-scroll-area label="Release notes">
-      <p>Cheap intelligence and cheap energy are collapsing in cost at the same moment.</p>
-      <p>What was affordable only to an institution becomes affordable to a person.</p>
-      <p>The sovereignty stack is the vertical: keys, data, compute, power.</p>
-      <p>Personal, then organizational, then national.</p>
-      <p>No Fusion product may create a dependency its user cannot exit.</p>
-      <p>The user holds their own keys, data, and hardware.</p>
-      <p>Fusion may operate a control plane, never a chokepoint.</p>
-      <p>Test any proposal by asking what happens if Fusion shuts down tomorrow.</p>
+      <p>Dialogs return focus to the control that opened them.</p>
+      <p>The date picker formats its own labels from the locale.</p>
+      <p>Tables keep their header row pinned while the body scrolls.</p>
+      <p>Toasts pause their timer while the pointer is over them.</p>
+      <p>Combobox filtering is now case and accent insensitive.</p>
+      <p>The theme builder reports every pair it measured.</p>
+      <p>Charts read their series from a slotted table.</p>
+      <p>Every icon ships as a single sprite.</p>
     </helix-scroll-area>
   )
 }

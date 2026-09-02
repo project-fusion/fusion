@@ -62,7 +62,7 @@ export interface Service {
  *
  * **Finance is deliberately absent.** The old site sold it and the plan drops
  * it: advising on securities for compensation implicates investment-adviser
- * registration, which is not worth the regulatory surface for now. Fusion Capital stays Declared, and this list stays three.
+ * registration, which is not worth the regulatory surface for now, so this list stays three.
  */
 export const SERVICES: Service[] = [
   {

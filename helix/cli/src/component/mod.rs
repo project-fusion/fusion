@@ -14,8 +14,8 @@
 //! cheaper of the two.
 //!
 //! **Where the source is comes from configuration**, because a consumer's
-//! layout is not this repository's. A `helix` key in `fusion.rules.json` names
-//! the tiers, or `helix.rules.json` does where that product is not in use;
+//! layout is not this repository's. A `helix` key in `fusion.json` names
+//! the tiers, or `helix.json` does where that product is not in use;
 //! without either there is nothing to read and the command says so rather than
 //! reporting that it found no faults.
 //!
@@ -271,10 +271,10 @@ impl Settings {
     /// [`crate::config`] states it, because a reader debugging "why did it use
     /// that" needs an answer they can read:
     ///
-    /// 1. `fusion.rules.json`, under a `helix` key. Helix is a plugin of that
+    /// 1. `fusion.json`, under a `helix` key. Helix is a plugin of that
     ///    product, and a product's configuration is where its plugins are
     ///    configured — one file to find, one file to review.
-    /// 2. `helix.rules.json`, for a consumer who has this tool and not that
+    /// 2. `helix.json`, for a consumer who has this tool and not that
     ///    product. Standalone is the constraint every product CLI is built
     ///    under, and it would be broken by *requiring* a file named for
     ///    something they never installed.
@@ -285,23 +285,23 @@ impl Settings {
     /// rules report findings against the configuration itself and a finding
     /// naming a file the reader does not have is worse than no finding at all.
     pub fn read(root: &Path) -> Result<Self, String> {
-        let product = root.join("fusion.rules.json");
+        let product = root.join("fusion.json");
         if let Ok(raw) = fs::read_to_string(&product) {
             let held = serde_json::from_str::<serde_json::Value>(&raw)
                 .map_err(|error| format!("{}: {error}", product.display()))?;
             if let Some(section) = held.get("helix") {
                 let mut settings: Self = serde_json::from_value(section.clone())
                     .map_err(|error| format!("{}: `helix`: {error}", product.display()))?;
-                "fusion.rules.json".clone_into(&mut settings.source);
+                "fusion.json".clone_into(&mut settings.source);
                 return Ok(settings);
             }
         }
 
-        let file = root.join("helix.rules.json");
+        let file = root.join("helix.json");
         let raw = fs::read_to_string(&file).map_err(|_| {
             format!(
-                "no configuration at {}.\n  Helix reads a `helix` key in `fusion.rules.json`, or \
-                 `helix.rules.json` when that product is not in use. Either names the directories \
+                "no configuration at {}.\n  Helix reads a `helix` key in `fusion.json`, or \
+                 `helix.json` when that product is not in use. Either names the directories \
                  holding component source, without which there is nothing to read:\n\n  \
                  {{ \"tiers\": [\"src/components\"] }}",
                 root.display()
@@ -309,7 +309,7 @@ impl Settings {
         })?;
         let mut settings: Self =
             serde_json::from_str(&raw).map_err(|error| format!("{}: {error}", file.display()))?;
-        "helix.rules.json".clone_into(&mut settings.source);
+        "helix.json".clone_into(&mut settings.source);
         Ok(settings)
     }
 

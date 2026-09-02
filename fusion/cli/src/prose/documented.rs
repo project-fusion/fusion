@@ -228,7 +228,7 @@ fn survey(root: &Path) -> Api {
         }
     }
 
-    if let Some(tokens) = read(&root.join("helix/styles/tokens.json"))
+    if let Some(tokens) = read(&root.join("helix/styles/dist/tokens.json"))
         .and_then(|one| Some(one.get("tokens")?.as_array()?.clone()))
     {
         for token in tokens {

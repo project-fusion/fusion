@@ -1,35 +1,9 @@
-/* Opaque by default: an ordinary surface, no translucency and no blur. Glass is
-   opt-in through `material="glass"`, because a filter makes the header a
-   containing block for `position: fixed` descendants, which traps any overlay
-   rendered inside it. Opaque is both the quieter look and the one that does not
-   surprise.
-
-   **No line under it by default, and never one that arrives on scroll.** A
-   hairline fading in once content runs underneath is the conventional answer to
-   "the bar is over something now", and it answers a question the bar has already
-   answered: the default is opaque and `glass` is blurred, so in both the content
-   stops at the bar because it cannot be seen through it.
-
-   `transparent` is the one material where scrolling genuinely changes
-   something: no surface at the top of the page, and the glass when it needs to
-   hide what is passing under it. That is what `:state(scrolled)` is for.
-
-   **But the line itself is a consumer's call, so the box stays.** A header over
-   prose needs nothing; a header sitting straight onto tool chrome, a toolbar
-   with its own rule and panes below it, merges into the bar underneath without
-   one. `--app-header-border-color` is that decision, transparent by default.
-
-   Declared and colored rather than absent and added, so turning it on cannot
-   shift the page by a pixel: the border box is reserved either way, which is
-   the same reason the hover ring on a card is an outline. */
+/* Opaque by default: an ordinary surface, no translucency and no blur. */
 :host {
-  /* Dense by nature, and it says so once. A control put in here takes this
-     without being told, so a row cannot end up with one member the wrong height
-     because somebody added it later and forgot. */
+  /* Dense by nature, and it says so once. */
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   /* The icon step with it. Declaring the control size and stopping there draws
-     an icon at the `md` step inside `sm` controls: 20 pixels in a 32 pixel
-     row. */
+     an icon at the `md` step inside `sm` controls: 20 pixels in a 32 pixel row. */
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
@@ -48,57 +22,28 @@
 }
 
 /* The filter is a hook too, and it has to be, for the seam it otherwise makes.
- *
- * `backdrop-filter` is clipped to the element's own box, so a 57 pixel bar
- * running a 16 pixel blur clamps at both edges and averages to a flat tone,
- * while a tall panel directly beneath it running the same blur keeps its
- * structure. Two boxes, same filter, visibly different results, and a line
- * across the join. There is no way to span one filter across both: the panel is
- * a popover in the top layer, so it cannot sit behind the bar, and the bar
- * cannot grow to cover a panel whose height it does not know.
- *
- * So a consumer pairing the two turns this off on the bar and keeps the fill.
- * Over the soft field these sit on that is nearly free: blurring a smooth
- * gradient returns very nearly the same gradient, and what the filter was
- * contributing at the top of a page is mostly the artifact. */
+   `backdrop-filter` is clipped to the element's own box, so a 57 pixel bar
+   running a 16 pixel blur clamps at both edges and averages to a flat tone,
+   while a tall panel directly beneath it running the same blur keeps its
+   structure. */
 :host([material="glass"]) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
   background-color: var(--app-header-background-color, var(--helix-material-translucent));
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
-   the heavier blur is what stops a ground that opaque reading as a smear. The
-   two move together because either without the other does nothing. */
+   the heavier blur is what stops a ground that opaque reading as a smear. */
 :host([material="frosted"]) {
   backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--app-header-background-color, var(--helix-material-translucent-strong));
 }
 
-/* Nothing behind it at all, until there is something to be legible over.
- *
- * For a banner over a hero: the art reaches the top of the window and the bar
- * is only the wordmark and the navigation sitting on it. The moment anything
- * has scrolled under it, it takes the glass, because a bar over moving content
- * has to be readable and a hero is the one thing it is guaranteed not to still
- * be over.
- *
- * That switch is the whole reason this is worth a material rather than a
- * consumer writing `--app-header-background-color: transparent`: the hook is one
- * value and this is two, keyed on a state only the component knows. The hook
- * still wins where it is set, in both states, which is how a consumer tints a
- * scrolled bar to match their hero.
- *
- * Content color is the consumer's. A pale wordmark over a dark hero is
- * `data-color-mode` on the header, the same way the toast inverts itself. */
+/* Nothing behind it at all, until there is something to be legible over. */
 :host([material="transparent"]) {
   background-color: var(--app-header-background-color, transparent);
 }
 
-/* Scrolled, it takes the glass rather than the opaque fill. A bar that is
- * see-through at the top of a hero and opaque a pixel later announces itself as
- * a state machine; glass is the same promise kept continuously, the content
- * still stopping at the bar because it cannot be read through it, and what is
- * passing under staying legible as motion. */
+/* Scrolled, it takes the glass rather than the opaque fill. */
 :host([material="transparent"]:state(scrolled)) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
   background-color: var(--app-header-background-color, var(--helix-material-translucent));
@@ -110,15 +55,9 @@
   z-index: var(--helix-layer-sticky);
 }
 
-/* The row is what gets centered, so the content lines up with the page while
-   the banner behind it runs edge to edge.
-
-   A grid with equal outer tracks, not a flex row. Flex centering puts the
-   navigation in the middle of whatever space the brand and the actions left,
-   which moves the moment either changes width: a longer wordmark shifts the
-   nav, and so does swapping a button for a menu at a breakpoint. Equal `1fr`
-   tracks put the middle of the nav at the middle of the window and keep it
-   there. */
+/* The row is what gets centered, so the content lines up with the page while the
+   banner behind it runs edge to edge. Equal `1fr` tracks put the middle of the
+   nav at the middle of the window and keep it there. */
 [part="row"] {
   align-items: center;
   block-size: var(--app-header-block-size, var(--helix-size-header));
@@ -146,14 +85,13 @@
   min-inline-size: 0;
 }
 
-/* Navigation beside the brand instead of centered in the banner. The outer
-   tracks stop being equal, so nothing is holding the middle any more. */
+/* Navigation beside the brand instead of centered in the banner. */
 :host([content-align="start"]) [part="row"] {
   grid-template-columns: auto 1fr auto;
 }
 
-/* Brand and actions are bare slots, so an omitted one generates no flex item
-   and takes none of the bar's gap. Their slotted content is styled directly. */
+/* Brand and actions are bare slots, so an omitted one generates no flex item and
+   takes none of the bar's gap. */
 slot[name="start"]::slotted(*) {
   align-items: center;
   color: var(--helix-color-foreground);
@@ -180,10 +118,7 @@ slot[name="start"]::slotted(*) {
   justify-content: flex-start;
 }
 
-/* Print: a bar of destinations, and a printed page has no elsewhere to go.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a bar of destinations, and a printed page has no elsewhere to go. */
 @media print {
   :host {
     display: none;

@@ -5,22 +5,15 @@ this repository.
 
 Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
 `.claude/rules/cortex.md` for `cortex/**`. To add a component, use the
-`adding-helix-components` skill.
+`add-component` skill.
 
 ## Product framing
 
 - **Two cores.** **Helix** is the DNA (design system). **Cortex** is the mind
   (memory, provenance, context). Products build *on top of* them.
-- **Thesis: sovereignty at every scale.** Personal, then organizational, then
-  national. Cheap intelligence and cheap energy are the mechanism.
-- **The Sovereignty Constraint** governs every product:
-
-  > No Fusion product may create a dependency its user cannot exit. The user
-  > holds their own keys, data, and hardware. Fusion may operate a control
-  > plane, never a chokepoint.
-
-  Test any proposal with: *what happens to the user if Fusion shuts down
-  tomorrow?* If they lose the thing, it is not a Fusion product.
+- **Thesis: intelligence belongs in the foundation.** An intelligent design
+  system, intelligent tooling and intelligent services, built on one substrate
+  rather than bolted onto three.
 - **Voice:** plural ("we"), engineer-targeted, spare. No marketing bombast.
 - **Stage labels are honest.** Active ships with users. Building is real work,
   nothing shipped. Declared is committed direction, no work started. Never
@@ -100,9 +93,8 @@ rather than dying on it, but the run still writes a site missing that page until
 the registry catches up, and the warning names the command.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
-a push. `fusion/docs/references/token-reference.md is behind helix/styles/tokens.json` is a
-red build that stays red until somebody runs `turbo run tokens` and
-pushes again, so `.githooks/pre-push` runs `biome ci`, `check:cli` and
+a push. `helix/docs/content/metrics.mdx is behind the built packages` is a red
+build that stays red until somebody runs `bun run gen:metrics` and pushes again, so `.githooks/pre-push` runs `biome ci`, `check:cli` and
 the twelve generated-file checks and nothing else: seconds against four minutes.
 It judges and never writes, because a hook that edits the tree during `git push`
 produces a push that does not contain the edits. `git push --no-verify` skips it.
@@ -159,8 +151,7 @@ helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing cli
 cortex/    core trace engram docs
 fusion/    cli docs scripts site: what belongs to the company rather than to a
-           product. `docs/insights` is the published writing, and two generated
-           references sit above it
+           product. `docs/insights` is the published writing
 .local/    per-machine scratch, gitignored
 ```
 
@@ -196,8 +187,10 @@ fusion/    cli docs scripts site: what belongs to the company rather than to a
   stylesheets several families import, and they are not families.
 
   **The bar is a file more than one family imports**, and `helix component`'s `hooks` holds
-  it: a sheet in there with one reader belongs inside that reader, and every
-  folder under `shared/` is discovered rather than listed.
+  it: a file in there with one reader belongs inside that reader, and every
+  folder under `shared/` is discovered rather than listed. It is not only
+  stylesheets: `shared/mixin-control-surface` is the API half of the same idea,
+  a pair of presentational properties three button families share.
 
   **They cannot move to `@fusion.dev/helix-styles`**, which is the question they
   invite. That package ships document CSS; these are shadow styles, and
@@ -212,8 +205,7 @@ fusion/    cli docs scripts site: what belongs to the company rather than to a
 - **`fusion/` is the company tier, and it is a domain like the other two.** It
   holds what belongs to Fusion rather than to Helix or Cortex: the CLI, the
   writing, and the site that renders everything above it. `fusion/docs/insights`
-  is what gets published, and the two generated references are infrastructure
-  sitting above it.
+  is what gets published.
 
   **The scope already said this.** `@fusion.dev/helix-*` and
   `@fusion.dev/cortex-*` name their domain; `@fusion.dev/*` bare names the
@@ -242,10 +234,11 @@ would take two numbers and keep whichever stamped last. `fusion workspace`'s `pu
 fails both on a crate taking `version.workspace = true` and on
 `[workspace.package]` declaring a version at all.
 
-**The version lives in the tag, not in the manifest.** Every manifest holds
-`0.0.0-dev` and the release stamps the real number in CI seconds before packing.
-Committing it back would need a bot whose push access outranks branch protection,
-to record something `git tag` already holds. `helix-v1.4.0` means a release that
+**The tag is the record, and the two ecosystems differ.** The release computes
+the number from the tag. It stamps that number into the **npm manifests** and
+pushes the result to `main` through a GitHub App with a ruleset bypass, which
+`release.yml` documents at the step that does it. The **crates rest at
+`0.0.0-dev`**, because nothing stamps them. `helix-v1.4.0` means a release that
 promoted; `helix-attempt-v1.4.0` means a number that was spent, and version
 computation reads both so a failed release burns a number rather than poisoning
 the next one.
@@ -260,8 +253,8 @@ directions, so the day the flag changes is the day the workflow has to.
 
 ## Naming
 
-- **Verticals get descriptive names**: Fusion Design, Fusion Mind, Fusion
-  Energy, Fusion Capital, Fusion Studio.
+- **Verticals get descriptive names**: Fusion Studio, Fusion Design, Fusion
+  Mind.
 - **Products get evocative names**: Helix, Cortex. A module earns one only when
   it carries a differentiated idea: inside Cortex that is exactly three, Engram
   (memory), Trace (provenance), Recall (context). The rest stay descriptive.
@@ -299,6 +292,12 @@ directions, so the day the flag changes is the day the workflow has to.
 - **Alphabetize** object keys, interface members, and exported types
   (case-insensitive). Skip where order is semantic: positional arguments,
   middleware chains, CSS box-side shorthand, export conditions.
+- **A markdown table is alphabetical when its first column is a set, and left
+  alone when it is a sequence.** A list of packages, of frameworks, of rules is
+  a set, and a reader scans it for one row. A scale is not: `space-2xs` through
+  `space-2xl`, the surface ladder, the layer stack and the separation policy all
+  read as sequences, and sorting them turns the argument into a list. The same
+  test `TOKEN_GROUPS` applies, and for the same reason.
 - **Always brace** `if`/`else`/`for`/`while` bodies.
 - **Multiline JSDoc** on every `@property` and exported type member.
 - **Specs are `*.spec.ts`**, colocated, excluded from `tsconfig` so they never
@@ -324,11 +323,12 @@ cause is deeper, the fix still goes deeper.
 
 ## Commits
 
-**No `Co-Authored-By` trailer.** `.claude/settings.json` sets
-`includeCoAuthoredBy: false` to stop the one Claude Code adds by default. The
-setting covers that tool and this checkout, so the rule is written here too:
-authorship of a commit is whoever is accountable for it, and a trailer naming a
-tool records which keyboard was used rather than who decided anything.
+**No `Co-Authored-By` trailer.** Authorship of a commit is whoever is
+accountable for it, and a trailer naming a tool records which keyboard was used
+rather than who decided anything. Claude Code adds one by default and
+`includeCoAuthoredBy: false` stops it; that is a per-machine setting now, in
+`~/.claude/settings.json`, because a tool's configuration is not a fact about
+this repository.
 
 ## Before a push
 

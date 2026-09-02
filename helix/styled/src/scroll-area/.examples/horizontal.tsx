@@ -2,27 +2,27 @@ import './horizontal.css'
 
 export function Example() {
   return (
-    <helix-scroll-area label="Verticals">
+    <helix-scroll-area label="Sections">
       <div className="cards">
         <helix-card separation="outlined">
-          <h3 slot="header">Fusion Design</h3>
-          The DNA every interface is built from.
+          <h3 slot="header">Overview</h3>
+          Everything at a glance, updated live.
         </helix-card>
         <helix-card separation="outlined">
-          <h3 slot="header">Fusion Mind</h3>
-          Memory, provenance and context.
+          <h3 slot="header">Reports</h3>
+          Build one, schedule it, share the link.
         </helix-card>
         <helix-card separation="outlined">
-          <h3 slot="header">Fusion Energy</h3>
-          The missing floor of the stack.
+          <h3 slot="header">Billing</h3>
+          Invoices, proration and receipts.
         </helix-card>
         <helix-card separation="outlined">
-          <h3 slot="header">Fusion Capital</h3>
-          Own what you own.
+          <h3 slot="header">Members</h3>
+          Who has access, and to what.
         </helix-card>
         <helix-card separation="outlined">
-          <h3 slot="header">Fusion Studio</h3>
-          The services arm.
+          <h3 slot="header">Settings</h3>
+          Defaults for the whole workspace.
         </helix-card>
       </div>
     </helix-scroll-area>

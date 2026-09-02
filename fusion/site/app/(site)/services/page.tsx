@@ -1,12 +1,12 @@
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
+import browser from '@/components/browser.module.css'
+import documents from '@/components/document-page/document-page.module.css'
+import { ThemeScope } from '@/components/theme-context/theme-context'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { EMAIL, MAILTO } from '@/utils/site/site'
 import { renderDocument } from '../../../utils/mdx/mdx'
-import browser from '../browser.module.css'
-import documents from '../document-page.module.css'
-import { ThemeScope } from '../theme-context'
-import styles from './services.module.css'
+import styles from './page.module.css'
 
 export const metadata = pageMetadata({
   description:
@@ -219,7 +219,7 @@ export default async function Page() {
                       is still true after the engagement ends and so is what a
                       reader should leave with. The shared row is what lands the
                       three labels on one line. */}
-                    <helix-flex class={styles.offerKeep} direction="column" gap="2xs">
+                    <helix-flex direction="column" gap="2xs">
                       <helix-text tone="subtle" variant="label">
                         What you keep
                       </helix-text>

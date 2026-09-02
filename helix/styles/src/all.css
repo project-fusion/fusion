@@ -1,9 +1,9 @@
 /*
  * The three layers this package owns, in the order they have to be in.
  *
- * **Getting the order wrong is silent.** `tokens.css` refers to a primitive 235
- * times and imports nothing, so importing it without `primitives.css` declares
- * all 177 semantic tokens and resolves every one of them to `rgba(0, 0, 0, 0)`.
+ * **Getting the order wrong is silent.** `tokens.css` refers to the primitives
+ * throughout and imports nothing, so importing it without `primitives.css`
+ * declares every semantic token and resolves each one to `rgba(0, 0, 0, 0)`.
  * It also disables theming outright, every public `--helix-seed-*` knob being
  * read in `primitives.css` and nowhere else.
  *

@@ -1,38 +1,17 @@
-/**
- * The three brand faces, declared here rather than through `next/font`.
- *
- * **One URL, because the sandbox frame needs one it can name.** The preview is
- * an iframe at `/sandbox/frame.html` with `allow-scripts` and no
- * `allow-same-origin`, so its document URL is ordinary and its *origin* is
- * opaque: paths resolve, and a CORS-checked request arrives as `Origin: null`.
- * `@font-face` fetches in CORS mode, so the frame could never load a face the
- * site served without a header allowing that, and `next/font` compounded it by
- * emitting hashed URLs only the site's own build knows. The frame inlined all
- * three as data URIs instead, 111,208 bytes of a 292,825 byte `frame.css`, 38%
- * of it, inflated by base64 from 83,340 bytes of woff2.
- *
- * Served from `public/fonts`, they have a stable path both documents can name,
- * and `next.config.ts` allows any origin to fetch them, which is a font file
- * and nothing else. The site and the frame now ask for the same URL and the
- * browser downloads it once, where the data URI was a second copy of bytes the
- * page already had.
- *
- * **The second payoff is caching.** `build-frame.mjs` stamps `frame.css` with a
- * hash of its own contents, so an inlined face rides inside a bundle re-stamped
- * by any change to any token in `helix/styles`: a one-character change to a
- * color costs every preview visitor a fresh 111KB of font. Served as files they
- * cache on their own and change when they change.
- *
- * **What `next/font` did that this has to do by hand** is the preload, which
- * `layout.tsx` now writes as three `<link rel="preload">` tags, and the
- * `font-display` policy, which is on each face below. What it did that is not
- * worth keeping here is the content hash: a face changes when we replace the
- * file, which is approximately never, and the frame cannot be told a new hash
- * without a build step that reaches into it.
- *
- * The variables are mapped onto the Helix tokens in `site.css`, so the design
- * system picks them up without knowing anything about Next.
- */
+/* The three brand faces, declared here rather than through `next/font`. **One
+   URL, because the sandbox frame needs one it can name.** The preview is an
+   iframe at `/sandbox/frame.html` with `allow-scripts` and no
+   `allow-same-origin`, so its document URL is ordinary and its *origin* is
+   opaque: paths resolve, and a CORS-checked request arrives as `Origin: null`.
+   The frame inlined all three as data URIs instead, 111,208 bytes of a 292,825
+   byte `frame.css`, 38% of it, inflated by base64 from 83,340 bytes of woff2.
+   **The second payoff is caching.** `build-frame.mjs` stamps `frame.css` with a
+   hash of its own contents, so an inlined face rides inside a bundle re-stamped
+   by any change to any token in `helix/styles`: a one-character change to a
+   color costs every preview visitor a fresh 111KB of font. **What `next/font`
+   did that this has to do by hand** is the preload, which `layout.tsx` now
+   writes as three `<link rel="preload">` tags, and the `font-display` policy,
+   which is on each face below. */
 
 @font-face {
   font-display: swap;

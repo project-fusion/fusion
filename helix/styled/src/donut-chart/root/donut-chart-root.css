@@ -4,12 +4,10 @@
   display: grid;
   position: relative;
   /* Bigger than the other charts' 12em, because the hole has to hold something.
-   *
-   * The hole is `80 - thickness` percent of the width, so at 12em it is about
-   * 114px, and a `Stat` reading `10,000` measures 138 at the default ramp:
-   * measured, the number painted across four slices. Type in a slot is the
-   * consumer's and does not scale with the ring, so the ring is what gives way.
-   * At 16em the hole is roughly 152px and the same total sits inside it. */
+     The hole is `80 - thickness` percent of the width, so at 12em it is about
+     114px, and a `Stat` reading `10,000` measures 138 at the default ramp:
+     measured, the number painted across four slices. At 16em the hole is roughly
+     152px and the same total sits inside it. */
   inline-size: var(--donut-chart-size, 16em);
   place-items: center;
 }
@@ -18,42 +16,21 @@
   grid-area: 1 / 1;
 }
 
-/* The tooltip's containing block, and it has to be this one.
- *
- * The chart computes where a reading is as a percentage of *the plot*, and the
- * tooltip was positioned against the host, which is the plot plus a gap plus the
- * row of labels. Measured: the percentages were right at every reading and the
- * box landed too low at all of them, worst at the bottom of the range, because
- * they were being resolved against a taller box than the one they describe.
- *
- * Positioned inside the plot, the two agree by construction rather than by a
- * correction that would have to be kept in step with the layout. */
+/* The tooltip's containing block, and it has to be this one. */
 [part="plot"] {
   position: relative;
 
   inline-size: 100%;
 }
 
-/* Square, and it stays square.
- *
- * Every other chart here sets `preserveAspectRatio="none"` so one drawing fills
- * any box, and rescues its strokes with `vector-effect`. That rescues strokes
- * and not geometry: a circle in a stretched coordinate space is an ellipse, and
- * there is no vector-effect that answers for a shape. So this one keeps the
- * default `xMidYMid meet` and takes an aspect ratio instead. */
+/* Square, and it stays square. */
 [part="plot"] svg {
   aspect-ratio: 1;
   display: block;
   inline-size: 100%;
 }
 
-/* Zero at twelve o'clock.
- *
- * A rotation rather than arithmetic below, because where a reader expects the
- * first slice to start is a fact about the picture. `transform-origin` is set
- * in the view box's own units, which is what `transform-box: fill-box` and a
- * percentage give: without it the origin is the SVG viewport's corner and the
- * ring swings out of frame. */
+/* Zero at twelve o'clock. */
 [part="track"],
 [part="segment"] {
   transform: rotate(-90deg);
@@ -61,20 +38,16 @@
   transform-origin: center;
 }
 
-/* The stroke's width is written into the markup beside its radius, not set
-   here, for the reason the radius gives: the two have to agree and only one of
-   them can be a CSS hook. Set here and derived there, every ring came out 12
-   units thick whatever its `hole`, so a pie was a small ring with a hole in it
-   and `large` was drawn bigger than the default. Seen in a browser. */
+/* The stroke's width is written into the markup beside its radius, not set here,
+   for the reason the radius gives: the two have to agree and only one of them
+   can be a CSS hook. Set here and derived there, every ring came out 12 units
+   thick whatever its `hole`, so a pie was a small ring with a hole in it and
+   `large` was drawn bigger than the default. */
 [part="track"] {
   stroke: var(--donut-chart-track-color, var(--helix-color-surface-sunken));
 }
 
-/* Butt caps, not round.
- *
- * A round cap adds half the stroke width to each end of every slice, so the
- * arcs overlap their neighbors and the last one laps the first. On a ring of
- * many small shares that reads as slices in the wrong order. */
+/* Butt caps, not round. */
 [part="segment"] {
   stroke-linecap: butt;
   /* From the markup, which is where the radius is decided, so the two cannot
@@ -84,23 +57,14 @@
 }
 
 /* The hole tells its contents how big it is, twice, because one number cannot
-   say it to everything.
- *
- * **`font-size` is what plain content comes out at.** Anything slotted that
- * does not resize itself, a number in a span, a word, is drawn at this and
- * scales with the ring.
- *
- * **`--stat-value-size` is what a `Stat` comes out at**, and it has to be said
- * separately because a `Stat` multiplies what it inherits by a little over
- * three. A single base tuned to that multiplier sizes a `Stat` correctly and
- * everything else at a third of what it should be: measured, plain text at 14px
- * in a 179px hole, which reads as type that does not scale at all. A component
- * naming another component's hook is explicit where a magic base is not, and
- * `Stat` is what the examples put here.
- *
- * The two are different numbers because they are different jobs: a total is the
- * figure a reader looks at, and plain text in a hole is more often a word beside
- * one. */
+   say it to everything. **`font-size` is what plain content comes out at.**
+   Anything slotted that does not resize itself, a number in a span, a word, is
+   drawn at this and scales with the ring. **`--stat-value-size` is what a `Stat`
+   comes out at**, and it has to be said separately because a `Stat` multiplies
+   what it inherits by a little over three. A single base tuned to that
+   multiplier sizes a `Stat` correctly and everything else at a third of what it
+   should be: measured, plain text at 14px in a 179px hole, which reads as type
+   that does not scale at all. */
 [part="center"] slot {
   --stat-value-size: 24cqi;
 
@@ -109,17 +73,11 @@
 
 [part="center"] {
   /* Centered in the plot, which it sits inside rather than beside.
-   *
-   * **`pointer-events: none`, and the slices stop responding without it.**
-   * `inset: 0` with `margin: auto` centers a box and also stretches it: with no
-   * block size of its own it filled the plot's height, so a transparent column
-   * lay over the middle of the ring and took every `pointerenter` the slices
-   * were listening for. The tooltip simply stopped appearing, with nothing about
-   * the drawing looking different.
-   *
-   * Placed from the middle rather than stretched between the edges, so the box
-   * is the size of the hole and no larger, and transparent to the pointer
-   * regardless, since nothing in the middle is a target. */
+     **`pointer-events: none`, and the slices stop responding without it.**
+     `inset: 0` with `margin: auto` centers a box and also stretches it: with no
+     block size of its own it filled the plot's height, so a transparent column
+     lay over the middle of the ring and took every `pointerenter` the slices
+     were listening for. */
   inset-block-start: 50%;
   inset-inline-start: 50%;
   pointer-events: none;
@@ -131,21 +89,13 @@
      than against the page. The hole is a proportion of the chart and the type
      ramp is not, so absolute type fits at exactly one chart size: measured, a
      `Stat` reading `10,000` painted across four slices at anything but the one
-     the default was tuned to.
-   *
-   * **The sizes are on the slot and not here, which is not a detail.** An
-   * element cannot size itself in its own container's units, that being
-   * circular, so `cqi` written on the container resolves against whatever
-   * container is further up, or the viewport, and the total comes out four times
-   * the width of the ring.
-   *
-   * The width is the hole's own, computed rather than guessed. The ring is drawn
-   * at r=40 in a 100 box with the stroke astride it, so the hole's diameter is
-   * `2 * (40 - thickness / 2)`, which is `80 - thickness`. Written out that way
-   * it follows the hook, so a thinner ring gives its middle more room without
-   * anybody adjusting a second number. Overflow stays visible: clipping a total
-   * that does not fit hides the problem rather than showing it, and a consumer
-   * who wants a bigger hole has the thickness hook. */
+     the default was tuned to. **The sizes are on the slot and not here, which is
+     not a detail.** An element cannot size itself in its own container's units,
+     that being circular, so `cqi` written on the container resolves against
+     whatever container is further up, or the viewport, and the total comes out
+     four times the width of the ring. The ring is drawn at r=40 in a 100 box
+     with the stroke astride it, so the hole's diameter is `2 * (40 - thickness /
+     2)`, which is `80 - thickness`. */
   container-type: inline-size;
   display: grid;
   inline-size: calc(100% * (80 - var(--donut-chart-stroke, 16)) / 100);
@@ -153,40 +103,21 @@
   text-align: center;
 }
 
-/* One rule, not twenty-four. The headless tier knows which series a mark
-   belongs to and writes `--chart-series` onto it, pointing at one of the
-   twenty-four hooks `chart/series.css` defines, so the index reaches CSS
-   without an attribute selector having to carry it.
-
-   Twenty-four rules keyed on `[data-series]` work from in here and cannot be
-   reached from outside: `::part()` takes no attribute selector, so a consumer
-   looking at `data-series="2"` written on the part has no selector able to use
-   it. Measured, `::part(bar)[data-series="2"]` is dropped at parse time.
-   `data-series` stays, because it is what a spec asserts and what a document
-   rule reaching in through the light DOM would still use. */
+/* One rule, not twenty-four. Twenty-four rules keyed on `[data-series]` work
+   from in here and cannot be reached from outside: `::part()` takes no attribute
+   selector, so a consumer looking at `data-series="2"` written on the part has
+   no selector able to use it. Measured, `::part(bar)[data-series="2"]` is
+   dropped at parse time. */
 [part="segment"] {
   stroke: var(--chart-series);
 }
-/* The mark the bubble is anchored to, and the bubble's own content.
- *
- * The mark is invisible: it exists so `Tooltip` has an element to point `for`
- * at, since a reading is a position and not a thing. Placement,
- * flipping, the arrow and the top layer are all `Tooltip`'s, which is the whole
- * reason a chart no longer draws its own. */
-/* **A pixel rather than nothing, because a rect of no area is not trackable.**
-   This is the point the bubble hangs off, so it was written with no size at
-   all, and that is the one thing an anchor may not be. `Tooltip` names the
-   failure in its own source: an element that draws nothing is what "took the
-   bubble to the corner of the window", and the descent that guards against it
-   runs only on the slotted path. Reached through `for`, as a chart reaches it,
-   the element is taken as given.
-
-   `autoUpdate` tracks a reference by observing it, and the move observer
-   derives its root margin from the reference's own rect. A 0 by 0 rect makes
-   that margin degenerate, so the updates that should follow a scroll or a
-   resize do not necessarily fire, and the bubble keeps whatever position it was
-   last given. One pixel is enough to be observable and is still nothing to
-   look at: no fill, no border, and out of the pointer's way. */
+/* The mark the bubble is anchored to, and the bubble's own content. */
+/* *A pixel rather than nothing, because a rect of no area is not trackable.**
+   This is the point the bubble hangs off, so it was written with no size at all,
+   and that is the one thing an anchor may not be. A 0 by 0 rect makes that
+   margin degenerate, so the updates that should follow a scroll or a resize do
+   not necessarily fire, and the bubble keeps whatever position it was last
+   given. */
 [part="mark"] {
   block-size: 1px;
   inline-size: 1px;
@@ -329,79 +260,26 @@
   background-color: var(--helix-color-series-24);
 }
 
-/* The slice under the pointer, thickened rather than recolored.
- *
- * Recoloring would break the agreement with a legend beside it. Growing the
- * stroke keeps the color and still says which one is being asked about, and it
- * grows outward and inward equally because the stroke sits astride its own
- * radius, so the hole does not move.
- */
+/* The slice under the pointer, thickened rather than recolored. */
 [part="segment"][data-active] {
   stroke-width: calc(var(--donut-chart-stroke) * 1.18);
 }
 
-/* **Under `outlined` the slice fills in instead of growing.**
- *
- * Two reasons, and the second is the one that forces it. Recoloring is what the
- * rule above refuses, because a slice already in the series' color has nothing
- * to gain and a legend beside it to disagree with. An outlined slice is not in
- * that color: it is faded toward the track, so filling it in on hover *restores*
- * the agreement rather than breaking it, and the legend is the thing it comes
- * back to.
- *
- * And it cannot grow. The boundary is a path clipped to fixed radii, `EDGE` and
- * `EDGE - thickness`, so a stroke thickened past them spills outside its own
- * outline: the fill would cross the edge that is drawn to contain it, which is
- * the artifact this whole treatment exists to avoid. The width is pinned back to
- * the resting one for that reason, not as a matter of taste.
- *
- * The outline stays where it is and the fill arrives underneath it in the same
- * color, so the two merge and the slice reads solid, which is what a slice being
- * asked about should read as. */
+/* *Under `outlined` the slice fills in instead of growing.** Two reasons, and
+   the second is the one that forces it. */
 :host([emphasis="outlined"]) [part="segment"][data-active] {
   stroke: var(--chart-series);
   stroke-width: var(--donut-chart-stroke);
 }
 
-/* **A chart must never animate through a value it does not have**, which is why
- * none of this uses `emphasized`.
- *
- * That curve is `cubic-bezier(0.3, 0, 0, 1.2)`, and the 1.2 is an overshoot: it
- * carries the property past its target and settles back. That is right for a
- * panel arriving or a mark traveling, where the overshoot is the motion having
- * weight, and it is wrong for a quantity, because the frames past the target are
- * a number the data does not contain. A bar that reads 15 momentarily drawn at
- * 16.8 is showing something untrue, briefly, to look nice.
- *
- * On the donut it is visible rather than theoretical. Four slices partition one
- * circumference, so their shares must sum to it at every frame; each overshooting
- * independently, with the offsets overshooting too, makes the arcs slide past one
- * another and snap back.
- *
- * `decelerate` is `cubic-bezier(0, 0, 0, 1)`, monotonic, so every frame is a
- * value between where the reading was and where it is. */
-/* The ring answers a change in its numbers, and draws itself on arrival.
- *
- * A chart that swaps its shape between frames makes a reader re-read the whole
- * picture; one that moves lets them follow the part that changed, which is the
- * only part they were asking about.
- *
- * The dash is what carries both. A slice's length and where it starts are two
- * numbers on one circle, so a share growing is a `stroke-dasharray` animating
- * and nothing about the element changes: no reflow, no re-layout, and Lit keeps
- * the same node because the template is keyed by position.
- *
- * `@starting-style` for the arrival, which is the whole reason the ring sweeps
- * in rather than appearing: it gives the browser a value to come *from* the
- * first time an element is painted, and there is no other way to transition
- * from nothing. `stroke-dashoffset` is what it starts from, so every slice
- * enters along the circle rather than fading.
- *
- * `stroke` is in this list rather than in a second block of its own, which is
- * where it was and where it did nothing: two `transition` declarations on one
- * selector at one specificity leave only the later, and the later was this one.
- * An outlined slice fills in rather than snapping because of it, and it costs
- * the other emphases nothing, their stroke not moving on hover. */
+/* *A chart must never animate through a value it does not have**, which is why
+   none of this uses `emphasized`. That curve is `cubic-bezier(0.3, 0, 0, 1.2)`,
+   and the 1.2 is an overshoot: it carries the property past its target and
+   settles back. A bar that reads 15 momentarily drawn at 16.8 is showing
+   something untrue, briefly, to look nice. `decelerate` is `cubic-bezier(0, 0,
+   0, 1)`, monotonic, so every frame is a value between where the reading was and
+   where it is. */
+/* The ring answers a change in its numbers, and draws itself on arrival. */
 [part="segment"] {
   transition:
     r var(--helix-duration-normal) var(--helix-easing-decelerate),
@@ -421,30 +299,21 @@
   transition: r var(--helix-duration-normal) var(--helix-easing-decelerate);
 }
 
-/* On the slices rather than the plot, which is the difference between a ring
-   and a chart with axes: a line answers anywhere along its width, so the whole
-   drawing is the target, while a ring answers only where a slice is and the
-   hole in the middle answers nothing. Pointing at the hole and being told it is
-   readable would be a promise the chart does not keep. */
+/* On the slices rather than the plot, which is the difference between a ring and
+   a chart with axes: a line answers anywhere along its width, so the whole
+   drawing is the target, while a ring answers only where a slice is and the hole
+   in the middle answers nothing. */
 [part="segment"] {
   cursor: crosshair;
 }
 
-/* A half circle, opening downward.
- *
- * Three things change and none of them is the drawing, which is why `sweep` is
- * reflected: the geometry is the tier below's, and these are facts about how
- * the picture is presented.
- *
- * **The box is no longer square.** The headless tier crops the view box to the
- * band it actually draws, from the top of the ring to the center line plus the
- * half stroke the flat ends hang below it, so the ratio is the width over that
- * band. `--donut-chart-stroke` is already published on the plot, for the middle
- * to size itself against, and it is the only number here that moves.
- *
- * **The first slice starts at nine o'clock**, not twelve, because the whole is
- * now the top half and a reader reads it left to right. `rotate(180deg)` rather
- * than `-90deg`, and the same rule covers the track so the two cannot part. */
+/* A half circle, opening downward. **The box is no longer square.** The headless
+   tier crops the view box to the band it actually draws, from the top of the
+   ring to the center line plus the half stroke the flat ends hang below it, so
+   the ratio is the width over that band. **The first slice starts at nine
+   o'clock**, not twelve, because the whole is now the top half and a reader
+   reads it left to right. `rotate(180deg)` rather than `-90deg`, and the same
+   rule covers the track so the two cannot part. */
 :host([sweep="half"]) [part="plot"] svg {
   aspect-ratio: 100 / calc(40 + var(--donut-chart-stroke, 16) / 2);
 }
@@ -454,27 +323,17 @@
   transform: rotate(180deg);
 }
 
-/* **And the middle sits at the bottom, because that is where the center of the
-   circle now is.** Cropping put the circle's center on the box's bottom edge,
-   so a middle placed at fifty per cent of the plot floats inside the arc and
-   over its top. Bottom-aligned it lands in the opening, which is where a
-   semi-donut puts its figure. */
+/* *And the middle sits at the bottom, because that is where the center of the
+   circle now is.** Cropping put the circle's center on the box's bottom edge, so
+   a middle placed at fifty per cent of the plot floats inside the arc and over
+   its top. */
 :host([sweep="half"]) [part="center"] {
   inset-block-end: 0;
   inset-block-start: auto;
   translate: -50% 0;
 
-  /* **The opening is a half disc, twice as wide as it is tall**, and that is
-     the whole of what has to change here. The full ring's middle takes its
-     height from its content, which is safe inside a circle and is not inside a
-     half of one: measured, a `Stat` bottom-aligned in the opening grew upward
-     until its label sat on the arc. Capped to the inner radius over the box's
-     own height, both in the view box's units, so it holds at any thickness.
-   *
-   * And the type with it. `cqi` is a hundredth of the *width*, so text tuned
-   * against a circular hole is twice too tall for this one. Halved rather than
-   * moved to `cqmin`, which would need `container-type: size` and a definite
-   * height on the full ring too, where there is deliberately none. */
+  /* *The opening is a half disc, twice as wide as it is tall**, and that is the
+     whole of what has to change here. */
   block-size: calc(
     100% *
     (40 - var(--donut-chart-stroke, 16)) /
@@ -488,10 +347,7 @@
   font-size: 6.5cqi;
 }
 
-/* Print: the same, and a donut with no fill is a ring of nothing.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: the same, and a donut with no fill is a ring of nothing. */
 @media print {
   :host {
     box-shadow: none;
@@ -499,26 +355,9 @@
   }
 }
 
-/* **Emphasis takes three values.** A slice is a stroke on a ring and the edge
-   *is* the mark, with nothing within it to fade, which reads at first as
-   `outlined` requiring slices to be filled paths instead of arcs.
-
-   Both shapes can be present. The arc still draws the slice and still carries
-   the animation; a closed path traces the same wedge beside it,
-   `part="segment-edge"`, and is `stroke: none` until something asks. `renderEdge`
-   on the tier below carries why the dash cannot simply be swapped: it is doing
-   the value transition and the arrival sweep as well as the shape, and a `d`
-   interpolates only between paths of one command structure, which a slice
-   crossing a half turn is not.
-
-   `solid` writes out the resting arrangement and selects nothing, per the rule
-   that a resting value lands on the base. `ghost` stays refused: on a ring it is
-   a chart with no slices.
-
-   `subtle` needs no new geometry: the ring is still a ring and stops being the
-   loudest thing in the region. Mixed toward the track rather than faded toward
-   transparent, since a slice sits on the track and a translucent one would take
-   its color from whatever the track is. */
+/* *Emphasis takes three values.** A slice is a stroke on a ring and the edge is*
+   the mark, with nothing within it to fade, which reads at first as `outlined`
+   requiring slices to be filled paths instead of arcs. */
 :host([emphasis="subtle"]) [part="segment"] {
   stroke: color-mix(
     in oklab,
@@ -527,19 +366,9 @@
   );
 }
 
-/* **The boundary, drawn only when it is asked for.** The path is in the markup
+/* *The boundary, drawn only when it is asked for.** The path is in the markup
    for every donut, because geometry is structural and a stylesheet cannot make a
-   shape, but it paints nothing until this rule. `fill` stays `none` throughout:
-   the arc behind it is already the slice's area, and filling the wedge as well
-   would lay two copies of the same ink on one another and darken every slice by
-   its own opacity.
-
-   **The same trade `BarChart` makes**, which is the point of doing it: the area
-   fades toward the page and the edge holds the series' own color, so the two
-   families answer `outlined` the same way and a reader who learns it on columns
-   has learned it here. Mixed toward the track rather than the background, for
-   the reason `subtle` gives immediately above: a slice sits on the track, and
-   fading toward anything else makes its color depend on what the track is. */
+   shape, but it paints nothing until this rule. */
 [part="segment-edge"] {
   fill: none;
   stroke: none;
@@ -555,28 +384,22 @@
 
 :host([emphasis="outlined"]) [part="segment-edge"] {
   stroke: var(--chart-series);
-  /* Doubled, because the clip keeps the inner half only: the declared
-     width is what is drawn and half of it is what shows. */
+  /* Doubled, because the clip keeps the inner half only: the declared width is
+     what is drawn and half of it is what shows. */
   stroke-width: var(--donut-chart-edge-stroke, 3);
 }
 
-/* **Glass, so a ring on a glass card is in the same substance as the card.**
+/* *Glass, so a ring on a glass card is in the same substance as the card.**
    `BarChart` argues this from its gridlines reading through the columns, and a
    donut has none; what reads through here is the page, which is the case that
-   matters when the chart is on a surface that is itself translucent. A glass
-   header over an opaque ring is the two-designs-sharing-a-window failure the
-   material policy exists to stop, whatever shape the opaque thing is.
-
-   Scaled by the policy, and applied to the slices rather than the track: the
-   track is a groove and a see-through groove is a missing groove. */
+   matters when the chart is on a surface that is itself translucent. */
 :host([material="glass"]) [part="segment"] {
   stroke-opacity: calc(0.62 * var(--helix-material-opacity));
 }
 /* `frosted` admits less, which on a mark is more ink rather than more ground.
    0.88 against glass's 0.62 is the same relationship the surface tokens carry,
-   `material-translucent` at 60% against `material-translucent-strong` at 88%,
-   so a chart and a card mean the same thing by the word. Absent is still fully
-   opaque, so the three points read glass, frosted, then no attribute at all. */
+   `material-translucent` at 60% against `material-translucent-strong` at 88%, so
+   a chart and a card mean the same thing by the word. */
 :host([material="frosted"]) [part="segment"] {
   stroke-opacity: calc(0.88 * var(--helix-material-opacity));
 }

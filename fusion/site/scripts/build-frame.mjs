@@ -26,15 +26,20 @@ const out = join(root, 'fusion/site/public/sandbox')
 const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
 
 /* The layers, in the order a consumer is told to import them. `elements.css` is
-   generated from the element sources and hides each tag until it upgrades. */
+   generated from the element sources and hides each tag until it upgrades.
+ *
+ * **Resolved through each package's `exports`, so the frame gets what a consumer
+ * gets.** Read from `src` these were 108,798 bytes for the three `helix-styles`
+ * layers against 49,409 shipped, the difference being the prose `styles-dist`
+ * strips. A reader of the sandbox was downloading the reasoning. */
 const layers = [
-  'helix/styles/src/tokens.css',
-  'helix/styles/src/primitives.css',
-  'helix/styles/src/base.css',
-  'helix/styled/elements.css',
+  ...['tokens.css', 'primitives.css', 'base.css'].map((name) =>
+    fileURLToPath(import.meta.resolve(`@fusion.dev/helix-styles/${name}`)),
+  ),
+  fileURLToPath(import.meta.resolve('@fusion.dev/helix/elements.css')),
   // The frame's own layout modes, which belong to the document rather than to
   // the site around it.
-  'fusion/site/preview/preview-frame.css',
+  join(root, 'fusion/site/preview/preview-frame.css'),
 ]
 
 await rm(out, { force: true, recursive: true })
@@ -71,7 +76,7 @@ await writeFile(join(out, 'frame.js'), script)
  * URL and the cache still does its job. */
 const stamp = (contents) => createHash('sha256').update(contents).digest('hex').slice(0, 8)
 
-const css = await Promise.all(layers.map((layer) => readFile(join(root, layer), 'utf8')))
+const css = await Promise.all(layers.map((layer) => readFile(layer, 'utf8')))
 
 /* The brand faces, fetched rather than inlined.
  *

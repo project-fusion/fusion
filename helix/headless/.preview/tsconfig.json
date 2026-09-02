@@ -1,0 +1,29 @@
+{
+  // The examples are `.tsx`, and the tier's own `tsconfig.json` excludes them:
+  // they are not compiled into `dist` and never were. Excluded from every
+  // project, though, an editor walking up from one finds only the config that
+  // excludes it, and reports a file with no JSX setting and no typings in scope
+  // as a wall of errors.
+  //
+  // This is that project, and the tier `references` it so an editor is told
+  // where these files belong rather than having to find a config that is not
+  // one of their ancestors.
+  //
+  // **`composite` is what a reference requires, and it rules out `noEmit`**:
+  // TS6304, composite projects may not disable declaration emit. So it emits
+  // declarations nobody reads into `.tsbuild`, which is gitignored. With
+  // `noEmitOnError` inherited from the base, a tree with example errors in it
+  // writes only a `.tsbuildinfo` anyway.
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "jsx": "react-jsx",
+    "outDir": ".tsbuild",
+    "rootDir": ".."
+  },
+  "exclude": [],
+  "extends": "../tsconfig.json",
+  "include": ["*.d.ts", "../src/*/.examples/**/*.tsx"]
+}

@@ -8,12 +8,12 @@ import { essays } from '@fusion.dev/insights'
  * wide: `Design systems` measured 107 of it and did not shrink, because a tag
  * sets `white-space: nowrap` and a flex item's `min-width: auto` holds it at
  * its content width. A label that cannot wrap and cannot shrink is a label that
- * eventually decides the layout. `Business` and `Design` are 71 and 62.
+ * eventually decides the layout. `Engineering` and `Design` are 92 and 62.
  *
  * They also read better as filters. `Design systems` names a discipline where
  * the others name a subject, so the set was not one list.
  */
-export type Topic = 'Business' | 'Design' | 'Engineering' | 'Intelligence' | 'Sovereignty'
+export type Topic = 'Design' | 'Engineering'
 
 /**
  * What kind of writing it is, which is a different question from what it is
@@ -33,9 +33,9 @@ export type Kind = 'Decision' | 'Essay' | 'Note'
  * looking half done.
  *
  * Self-hosted under `public/`, never a vendor URL. Hotlinking a stock library's
- * CDN makes it a runtime dependency of the site, which is the Sovereignty
- * Constraint applied to our own pages, and the permissive licenses are the ones
- * that let you take the file rather than the link. It is also the difference
+ * CDN makes a page depend at runtime on somebody else's uptime and rewrite
+ * rules, and the permissive licenses are the ones that let you take the file
+ * rather than the link. It is also the difference
  * between two sets of terms: the Unsplash *license* asks for no attribution,
  * while their *API* requires it.
  */

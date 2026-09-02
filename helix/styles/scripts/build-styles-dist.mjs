@@ -109,8 +109,10 @@ let raw = 0
 let shipped = 0
 const written = []
 
+/* `_` marks a partial: a file the generated stylesheets are built from rather
+   than one a consumer imports. `_modes.css` is the only one today. */
 for (const name of readdirSync(INPUT)
-  .filter((one) => one.endsWith('.css'))
+  .filter((one) => one.endsWith('.css') && !one.startsWith('_'))
   .sort()) {
   const source = readFileSync(join(INPUT, name), 'utf8')
   const stripped = withoutComments(source)

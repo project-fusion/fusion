@@ -1,8 +1,8 @@
 //! Model provider abstraction.
 //!
-//! A **local** provider is a thesis requirement rather than a feature:
-//! cognitive sovereignty delivered solely through a remote API relocates the
-//! dependency instead of removing it.
+//! A **local** provider is a design requirement rather than a feature: memory
+//! delivered solely through a remote API relocates the dependency instead of
+//! removing it.
 
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};

@@ -34,13 +34,16 @@ jobs:
     # set that is only meaningful whole.
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       # Built first: `specs` bundles from source, which imports the generated
       # `.css.ts` files and the other packages' `dist`, and neither is tracked.
@@ -49,15 +52,19 @@ jobs:
       # pictured at all. `fusion/site/public/sandbox` is gitignored, so a
       # checkout has none of it and this step is the only thing that supplies
       # it.
-      - run: bun run build
+      - name: Build
+        run: bun run build
 
-      - run: bunx playwright install --with-deps chromium
+      - name: Install Chromium
+        run: bunx playwright install --with-deps chromium
 
       # A blank input retakes every picture in both tiers. A family present in
       # one tier only is retaken there and reported.
-      - run: bun run visual:update ${{ inputs.family }}
+      - name: Retake the baselines
+        run: bun run visual:update ${{ inputs.family }}
 
-      - uses: peter-evans/create-pull-request@v8
+      - name: Open the pull request
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: visual-baselines
           title: Retake the visual baselines

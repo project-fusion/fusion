@@ -34,7 +34,7 @@ export function Example() {
       </helix-notification>{' '}
       <helix-notification at={at[2]} default-read dismissible>
         {' '}
-        Your invitation to <strong>Fusion Design</strong> was accepted.{' '}
+        Your invitation to the <strong>Platform</strong> team was accepted.{' '}
       </helix-notification>{' '}
       <a data-link href="#all" slot="footer">
         See everything

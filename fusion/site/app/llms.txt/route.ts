@@ -22,9 +22,9 @@ export async function GET() {
   const lines = [
     '# Fusion Development Group',
     '',
-    '> Intelligence and energy are collapsing in cost at the same moment. Fusion',
-    '> builds the stack that makes sovereignty practical: Helix, a design system,',
-    '> and Cortex, a cognitive substrate.',
+    '> An intelligent design system, intelligent tooling and intelligent',
+    '> services. Fusion builds the foundation underneath: Helix, a design',
+    '> system, and Cortex, a memory layer.',
     '',
     'Every page on this site has a sibling `.md` at the same path plus the',
     'extension. The component reference and the design-system documentation are',

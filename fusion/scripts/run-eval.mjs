@@ -30,6 +30,7 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ARTIFACT } from '@fusion.dev/scripts/workspace'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
@@ -50,9 +51,7 @@ const reference = () => {
     readFileSync(join(ROOT, 'helix', 'styled', 'custom-elements.json'), 'utf8'),
   )
   const tokens = new Set(
-    JSON.parse(readFileSync(join(ROOT, 'helix', 'styles', 'tokens.json'), 'utf8')).tokens.map(
-      (token) => token.name,
-    ),
+    JSON.parse(readFileSync(join(ROOT, ARTIFACT.tokens), 'utf8')).tokens.map((token) => token.name),
   )
   const byAlias = new Map()
   const byDescription = new Map()

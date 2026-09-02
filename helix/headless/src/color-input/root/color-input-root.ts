@@ -11,10 +11,8 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
-/* Side-effect import, because this renders a picker in its own shadow root and
-   a custom element registers on import. The path is relative, so this registers
-   the base picker and the styled file's identical import registers the styled
-   one; `tier` picks which name the template asks for. */
+/* Relative, so this registers the base picker and the styled file's identical
+   import registers the styled one. `tier` picks which the template asks for. */
 import '../../color-picker/index.js'
 import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js'
 

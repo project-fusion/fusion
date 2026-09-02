@@ -20,6 +20,7 @@
     "./workspace": "./lib/workspace.mjs"
   },
   "bin": {
+    "build-element-events": "./build-element-events.mjs",
     "build-elements-css": "./build-elements-css.mjs",
     "build-styles": "./build-styles.mjs"
   }

@@ -1,6 +1,6 @@
 # @fusion.dev/helix-styles
 
-Design tokens and the base layer. Pure CSS and a JSON copy of the tokens — no
+Design tokens and the base layer. Pure CSS and a JSON copy of the tokens. No
 JavaScript at all.
 
 ```sh

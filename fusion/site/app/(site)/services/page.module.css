@@ -1,0 +1,215 @@
+/* The services page. */
+
+/* ======================================================== services ======= */
+
+/* What a reader is left holding, as the card's bottom line. Measured side by
+   side on the audit card, 500px of content against 60, so whichever end the
+   sentence was pinned to left a void beside the other. */
+.serviceKeep {
+  align-items: start;
+  inline-size: 100%;
+}
+
+/* ==================================================== the rebuild ======== */
+
+/* The lit band the head sits on. */
+/* Transparent, so the page's own field shows through it. */
+.servicesHero {
+  background-color: transparent;
+  min-block-size: auto;
+}
+
+/* *No lattice on this one.** `.pageHero` draws a field of dots through its own
+   `::before`, which is the texture the galleries are lit by and is one thing too
+   many here: the page already has a field running its whole height, and a grid
+   of dots over the top of it is a second pattern competing with the first. */
+.servicesHero::before {
+  background-image: none;
+}
+
+/* The field the whole page is lit by, and the thing its panels blur.
+   `block-size: auto` with `inset: 0` so it takes the page's height rather than a
+   screen of it. An opacity below 1 makes a backdrop root of its own descendants,
+   and this has none: the panels that blur it are siblings further down the page,
+   and what they sample is the field as painted. */
+.servicesAura {
+  block-size: auto;
+  inset: 0;
+  /* Faded out at the bottom, the way the landing field is, and for the reason
+     recorded there: each shape ends with a vertical envelope written against an
+     unscaled box, so `scale` can push the lit region past the edge and the light
+     simply stops where the canvas does. */
+  mask-image: linear-gradient(to bottom, black 0%, black 94%, transparent 100%);
+  opacity: 0.5;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* The box the field is measured against, and the ordering that keeps the
+   sections in front of it without either side naming a layer. */
+.servicesField {
+  position: relative;
+}
+
+.servicesField > *:not([data-layer]) {
+  position: relative;
+}
+
+/* Above the light, which the aura and the lattice both sit in. */
+/* *Centered, because there is nothing beside it to line up with.** The insight
+   heads are left aligned and have to be: a title over a paragraph has to start
+   where the paragraph starts or the page has two left edges. */
+.servicesHeroInner {
+  align-items: center;
+  position: relative;
+  text-align: center;
+  z-index: var(--helix-layer-raised);
+}
+
+/* A band that holds a layer, isolated so the layer stays in it. */
+.fieldBand {
+  isolation: isolate;
+  position: relative;
+}
+
+.fieldBand > *:not([data-layer]) {
+  position: relative;
+  z-index: 1;
+}
+
+/* One panel per idea. **The glass is read from the site's own tokens rather than
+   from the landing page's scope.** `--site-glass` and `--site-glass-backdrop`
+   are declared at `:root` in `site.css`, so a page does not have to be inside
+   `.noRules` to be made of the same material; what that scope adds is applying
+   them to every `[data-substrate]` under it, which is a landing page concern. */
+.bandCard {
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
+  /* No border here: `[data-material="glass"]` draws the hairline and `site.css`
+     draws the light that travels it. */
+  border-radius: var(--helix-radii-lg);
+  display: grid;
+  overflow: hidden;
+}
+
+.bandSection {
+  padding: var(--helix-space-xl);
+}
+
+/* Three offers on one panel, and the rules between them are the whole point.
+   **Stacked first and columns at 60rem, which is how the landing rows are
+   written.** Mobile-first is not a style preference here: a row that starts in
+   columns and is narrowed by a query has to un-draw the dividers it already
+   drew, and the landing's own note records what that costs, a first cell wearing
+   a line on the side facing nothing. 60rem is the step the landing bands turn
+   at, so a reader resizing the window sees the two pages break at the same place
+   rather than a hundred pixels apart. */
+.offerRow {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.offer {
+  padding: var(--helix-space-xl);
+}
+
+/* Adjacent, not every cell: a bare rule draws a line on the first one too,
+   doubled against the row's own top border. */
+.offer + .offer {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+@media (min-width: 60rem) {
+  .offerRow {
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    /* The four bands every offer is made of: what it is, how long it runs, what
+       is in it, and what you keep. */
+    grid-template-rows: repeat(4, auto);
+  }
+
+  .offer {
+    display: grid;
+    gap: var(--helix-space-lg);
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+  }
+
+  .offer + .offer {
+    border-block-start: 0;
+    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+  }
+}
+
+/* *Nothing pushes this down, and that is the change subgrid paid for.** It was
+   `margin-block-start: auto`, which bottom-aligns the block inside its own cell:
+   with the takeaways running two lines in one offer and three in another, the
+   three ended on one line and *started* on three, so the labels a reader scans
+   down the row sat 20px apart. Measured: 1089, 1089, 1109. */
+
+/* The two closing panels, side by side. */
+.closingRow {
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 60rem) {
+  .closingRow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* The subheading under the display line. */
+.servicesHeroLede {
+  color: var(--helix-color-foreground-muted);
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+}
+
+/* Edge to edge on a narrow screen, and no corner where there is no gap. The
+   landing bands do this and the reasoning is theirs: `--site-inset` clamps to
+   1.5rem, so a 390px phone spends 48px, an eighth of its width, holding a card
+   away from an edge it is not competing with. One inset, and it is the hero's:
+   the card carries the whole of it and the sections inside add none, so the body
+   copy starts on the line the page opens on rather than 32px inside it. */
+/* *Brighter on a phone, because the field has less room to be seen in.** The
+   shape is drawn against the canvas, so a 390px-wide box shows a slice of the
+   pattern rather than the sweep a desktop window does, and the lit parts that
+   survive are the edges of it. Measured against the landing page at 390, which
+   is the comparison that matters since a reader moves between them: mean screen
+   brightness 27.6 there against 17.7 here, on pages that should read as one
+   site. */
+@media (max-width: 40rem) {
+  .servicesAura {
+    opacity: 0.78;
+  }
+
+  .fieldBand :global([data-shell]) {
+    padding-inline: 0;
+  }
+
+  .bandCard {
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  .bandSection,
+  .offer {
+    padding-inline: var(--site-inset);
+  }
+
+  /* The two closing panels stack with the band's own rhythm between them rather
+     than a gap, now that each is the width of the screen: a gap between two
+     full-bleed panels reads as a seam in one surface. */
+  .closingRow {
+    gap: var(--site-band);
+  }
+
+  /* A button beside another on a phone is two half-width targets and a line
+     break waiting to happen. */
+  .closingRow [data-button] {
+    inline-size: 100%;
+  }
+}

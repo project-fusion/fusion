@@ -26,9 +26,9 @@ export function Example() {
         label="A narrower rail, counting differently"
         marker="rail"
       >
-        <helix-list-item>Personal sovereignty</helix-list-item>
-        <helix-list-item>Organizational sovereignty</helix-list-item>
-        <helix-list-item>National sovereignty</helix-list-item>
+        <helix-list-item>Draft the migration</helix-list-item>
+        <helix-list-item>Run it against a copy</helix-list-item>
+        <helix-list-item>Cut over on a Tuesday</helix-list-item>
       </helix-list>
     </helix-flex>
   )

@@ -22,9 +22,9 @@ import styles from '../chrome.module.css'
  * and hand over another, and `AGENTS.md` already draws that line by giving
  * verticals descriptive names and products evocative ones.
  *
- * The verticals are still one click away, in the panel's third column, because
- * dropping Energy and Capital to keep the column count tidy would be softening
- * them by omission. That is the one thing the stage labels exist to prevent.
+ * The verticals are still one click away, in the panel's third column, so a
+ * reader who wants the shape of the company can have it without the Products
+ * menu being the thing that hands it over.
  *
  * Ordered by what a reader is here to do rather than alphabetically: see what
  * we build, find out what is buyable, read the argument.

@@ -4,9 +4,9 @@
  *
  * **A bigger list, not a new dependency**, which is the whole of why this is
  * allowed. The builder already fetches `fonts.googleapis.com` at runtime and
- * already argues why: a preview is not a deployment, the Sovereignty Constraint
- * governs what a Fusion product does to a *consumer's* page, and the emitted
- * artifact names the family and leaves the loading to whoever pastes it. That
+ * already argues why: a preview is not a deployment, what matters is what the
+ * emitted artifact does to a *consumer's* page, and that artifact names the
+ * family and leaves the loading to whoever pastes it. That
  * policy does not change shape at two thousand families. What changes is that a reader
  * stops being offered nine.
  *

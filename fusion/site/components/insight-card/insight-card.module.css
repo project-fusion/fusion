@@ -1,0 +1,72 @@
+/* The same pair the gallery's cards need, for the same reason. */
+.insightCard,
+.insightCard helix-card {
+  block-size: 100%;
+}
+
+/* The card's regions pushed apart, so the date sits on the bottom edge whatever
+   the title above it wrapped to. **Through `--card-align`, never `align-content`
+   on the host.** A document rule on a shadow host outranks the component's own,
+   so the card's value would be the dead one. */
+.insightCard helix-card {
+  --card-align: space-between;
+}
+
+.insightCard helix-card {
+  --card-media-block-size: auto;
+}
+
+/* The surface, stated here so a card is the same object wherever it appears.
+   **The blur is the card's, the shadow is `separation`'s.** These cards already
+   ask for `separation="elevated"`, so a hand-rolled drop beside it is a second
+   elevation language on a component that ships one. */
+.insightCard helix-card {
+  /* *Through the component's hook, not past it.** `backdrop-filter` written here
+     is a document rule on a shadow host, which wins whatever the specificity and
+     whatever the layer, so the card's own `material` handling stops meaning
+     anything and `helix component`'s `overruled` says so. */
+  --card-backdrop: blur(40px) saturate(1.5);
+}
+
+/* The summary, held to two lines. **A card shows a preview and the page shows
+   the description.** `summary` is the essay's own `description`, which is also
+   its meta description and its line in `llms.txt`, so it is written to be a
+   complete sentence about the post rather than to fit a box. */
+.insightSummary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* The generated plate, at the ratio the card's media region expects. */
+.cover {
+  aspect-ratio: 16 / 7;
+  display: block;
+  inline-size: 100%;
+}
+
+/* The affordances a card link needs, stated once. */
+.insightCard {
+  transition: translate var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.insightCard:hover {
+  translate: 0 -3px;
+}
+
+.insightCard:focus-visible {
+  outline: var(--helix-border-thick) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-space-2xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightCard {
+    transition: none;
+  }
+
+  .insightCard:hover {
+    translate: none;
+  }
+}

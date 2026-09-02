@@ -6,15 +6,15 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "bun run catalog && bun run frame && bun run specs && next build",
+    "build": "bun run themed-page && bun run catalog && bun run frame && bun run specs && next build",
     "catalog": "bun scripts/build-catalog.mjs",
-    "dev": "bun run --filter @fusion.dev/helix-theme wasm && bun run catalog && bun run frame && bun run specs && next dev",
+    "dev": "bun run --filter @fusion.dev/helix-theme wasm && bun run themed-page && bun run catalog && bun run frame && bun run specs && next dev",
     "faces": "bun scripts/build-faces.mjs",
     "frame": "bun scripts/build-frame.mjs",
     "specs": "bun scripts/build-specs.mjs",
     "start": "next start",
     "themed-page": "bun scripts/build-themed-page.mjs",
-    "typecheck": "bun run catalog && bun run frame && bun run specs && tsc -p tsconfig.json --noEmit"
+    "typecheck": "bun run themed-page && bun run catalog && bun run frame && bun run specs && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@fusion.dev/insights": "workspace:*",

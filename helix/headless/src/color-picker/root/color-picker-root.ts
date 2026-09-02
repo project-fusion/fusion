@@ -12,10 +12,8 @@ import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
-/* Side-effect import, because this renders a slider in its own shadow root and
-   a custom element registers on import. The path is relative, so this registers
-   the base slider and the styled file's identical import registers the styled
-   one; `tier` picks which name the template asks for. */
+/* Relative, so this registers the base slider and the styled file's identical
+   import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../slider/index.js'

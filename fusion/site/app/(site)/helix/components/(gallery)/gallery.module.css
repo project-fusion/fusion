@@ -1,79 +1,27 @@
-/* The Helix gallery: the lattice its hero is drawn on, and the grid of families.
- *
- * The lattice is here rather than in the shared hero because it is a fact about
- * *this* gallery: the cards below are drawn on that field, so repeating it
- * behind the heading makes the hero the top of the same sheet. Insights takes
- * the same hero structure and none of the texture, which is why the structure
- * is global and this is not.
- */
+/* The Helix gallery: the lattice its hero is drawn on, and the grid of families. */
 
 /* The controls on the field get an opaque ground, and the field is the reason.
- *
- * `Input` and the `data-button` recipe both fill with a percentage of the
- * foreground mixed toward *transparent*, which is deliberate and is the right
- * default: a translucent wash is a step away from whatever is behind it in
- * either mode, where a fixed neutral is only correct on the one ground it was
- * designed against. `tokens.css` measures that at length on `--helix-color-well`
- * and, in the same paragraph, names the case it does not cover: a field over a
- * picture is tinted by the picture rather than legible against it, and that case
- * wants an opaque ground through the control's own background hook.
- *
- * This hero is that case. The lattice runs under the search and under both
- * links, so the dots read straight through all three, and two dozen of those
- * dots go primary for a couple of seconds each: left alone, a lit one surfaces
- * *inside* the search box as a blue speck in a form control.
- *
- * The value is the same wash composited against the page instead of against
- * transparency, so nothing about the controls changes where the field is plain.
- *
- * **`in srgb`, and that is what makes the sentence above true.** These mixed in
- * oklab, which is the right space for choosing a color between two others and
- * the wrong one for restating an alpha: compositing is defined against the
- * destination, in sRGB, so reproducing "six percent of the foreground over the
- * page" as an opaque color has to mix where the compositor would. Mixed in
- * oklab it lands on the perceptual midpoint instead, and near black that is
- * nowhere near the same place.
- *
- * Measured on the page's own ground, as the sRGB level painted:
- *
- * ```
- *              wash    oklab    srgb
- *  dark   6%     15        1      15
- *  dark  12%     31        6      31
- *  light  6%    240      235     240
- *  light 12%    224      215     224
- * ```
- *
- * In light the two forms agree to within five levels, so the claim looks true
- * there; in dark, oklab puts the rest state one level above the page and the
- * hover six, a step of five where light mode's is twenty, which is a hover
- * nobody can see. Same shape as #145, a step symmetric in the measure and not
- * in the eye: the fix is to mix in the right space rather than to tune a
- * percentage until dark looks right.
- *
- * Not the page's own color: the page color is a hole cut through the band, and
- * these are recesses in it.
- *
- * Scoped to this section, and it has to stay scoped. A background hook set on a
- * container reaches every control inside it, so a solid button put in this hero
- * would be flattened to a six percent wash. There are two links and one search
- * here and they are all of one kind; a hero that grows an emphasized control
- * wants the hooks moved onto the two selectors that need them. */
+   **`in srgb`, and that is what makes the sentence above true.** These mixed in
+   oklab, which is the right space for choosing a color between two others and
+   the wrong one for restating an alpha: compositing is defined against the
+   destination, in sRGB, so reproducing "six percent of the foreground over the
+   page" as an opaque color has to mix where the compositor would. Measured on
+   the page's own ground, as the sRGB level painted: ``` wash oklab srgb dark 6%
+   15 1 15 dark 12% 31 6 31 light 6% 240 235 240 light 12% 224 215 224 ``` In
+   light the two forms agree to within five levels, so the claim looks true
+   there; in dark, oklab puts the rest state one level above the page and the
+   hover six, a step of five where light mode's is twenty, which is a hover
+   nobody can see. Same shape as #145, a step symmetric in the measure and not in
+   the eye: the fix is to mix in the right space rather than to tune a percentage
+   until dark looks right. */
 .designHero {
   --button-background-color: color-mix(
     in srgb,
     var(--helix-color-foreground) 6%,
     var(--helix-color-background)
   );
-  /* And the hover, because setting the fill takes the hover with it.
-   *
-   * Every state's rule reads `--button-background-color`, which is what makes it
-   * a fill rather than a resting color, so setting one alone leaves a control
-   * that does not move under the pointer at all. Measured: rest and hover both
-   * `oklab(0.94 0 0)`, the same value to the last digit.
-   *
-   * The step is the same one the library takes for a resting wash of six, twice
-   * it, so these deepen by the amount any other button of this kind would. */
+  /* And the hover, because setting the fill takes the hover with it. Measured:
+     rest and hover both `oklab(0.94 0 0)`, the same value to the last digit. */
   --button-background-color-hover: color-mix(
     in srgb,
     var(--helix-color-foreground) 12%,
@@ -86,18 +34,13 @@
   );
 }
 
-/* Five across, stepping down as the window narrows.
- *
- * A fixed count rather than a floor, because `auto-fit` cannot express "exactly
- * five": any floor low enough to give five at 1600 gives six or seven at 2560.
- * The cost is that a fixed count is fixed at every width, so the steps below are
- * what keep five columns of a hundred pixels off a phone. An outer-tree rule on
- * the host beats the component's own `:host([columns="5"])`, so none of this
- * needs `!important` or a wrapper.
- *
- * The card is the thing being protected, not the column count: below roughly
- * 240 pixels a drawing stops being legible at all, which is what sets where
- * each step falls rather than a list of device widths. */
+/* Five across, stepping down as the window narrows. A fixed count rather than a
+   floor, because `auto-fit` cannot express "exactly five": any floor low enough
+   to give five at 1600 gives six or seven at 2560. An outer-tree rule on the
+   host beats the component's own `:host([columns="5"])`, so none of this needs
+   `!important` or a wrapper. The card is the thing being protected, not the
+   column count: below roughly 240 pixels a drawing stops being legible at all,
+   which is what sets where each step falls rather than a list of device widths. */
 .familyGrid {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
@@ -131,16 +74,7 @@
   block-size: 100%;
 }
 
-/* The experimental mark on a component card.
- *
- * A tag rather than a bare glyph, because the row already reads as "name, then
- * a small chip", and an icon floating at the end of it reads as a control the
- * card does not have. A tag with only a mark in it keeps that shape without
- * spending a word on something every card in the list would say.
- *
- * Square rather than a pill: the inline inset a tag gives its text is there to
- * keep letters off the edge, and a single centered glyph does not need it on
- * both sides of nothing. */
+/* The experimental mark on a component card. */
 .statusMark {
   --tag-radius: var(--helix-radii-sm);
 

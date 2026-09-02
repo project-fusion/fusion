@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import browser from '@/app/(site)/browser.module.css'
+import browser from '@/components/browser.module.css'
 
 /**
  * Which dots on the hero's lattice catch the light, and when.

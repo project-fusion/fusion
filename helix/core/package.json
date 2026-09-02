@@ -16,7 +16,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./custom-elements.json": "./custom-elements.json"
   },
   "files": [
     "custom-elements.json",

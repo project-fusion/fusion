@@ -56,6 +56,15 @@ export interface HelixCemOptions {
  * the analyzer itself, so that a new plugin is added once here instead of
  * being copied into each package and drifting.
  */
+/**
+ * Where the framework typings land.
+ *
+ * Beside the package rather than in its root, which held six generated files
+ * and four hand-written ones. `exports` is what a consumer reads and it is
+ * unchanged: `@fusion.dev/helix/jsx` still resolves, to a different path.
+ */
+const TYPES = 'shared/types'
+
 export const createHelixCemConfig = ({
   globs = ['src/**/*.ts'],
   frameworkTypes = false,
@@ -93,17 +102,17 @@ export const createHelixCemConfig = ({
             // Standard React handlers and attributes, so `onClick` and
             // `className` typecheck alongside the element's own props.
             includeDefaultDOMEvents: true,
-            outdir: '.',
+            outdir: TYPES,
             // `event.target` typed as the element rather than EventTarget.
             stronglyTypedEvents: true,
           }) as Plugin,
           // Must follow the generator: it references event types it does not
           // import, and an unresolved name degrades to `any` under skipLibCheck.
-          ...(packageName ? [jsxImports({ packageName })] : []),
+          ...(packageName ? [jsxImports({ fileName: `${TYPES}/jsx.d.ts`, packageName })] : []),
           // Also after the generator: its `ref` type is framework-agnostic and
           // rejects the `useRef` every React consumer reaches for.
-          jsxReactRef(),
-          jsxNativeEvents(),
+          jsxReactRef({ fileName: `${TYPES}/jsx.d.ts` }),
+          jsxNativeEvents({ fileName: `${TYPES}/jsx.d.ts` }),
           /* Vue reads none of the above. Its templates are not JSX, so the
              types augment `GlobalComponents` rather than `IntrinsicElements`,
              and a handler is bound with `@helix-input` rather than a prop. Same
@@ -111,17 +120,25 @@ export const createHelixCemConfig = ({
           vuejsTypesPlugin({
             fileName: 'vue.d.ts',
             ...(packageName ? { globalTypePath: packageName } : {}),
-            outdir: '.',
+            outdir: TYPES,
             stronglyTypedEvents: true,
           }) as Plugin,
           /* After everything that rewrites the JSX tag map, because it reuses
              the finished one. */
-          ...(packageName ? [svelteTypes({ packageName })] : []),
+          ...(packageName
+            ? [
+                svelteTypes({
+                  fileName: `${TYPES}/jsx.d.ts`,
+                  outFile: `${TYPES}/svelte.d.ts`,
+                  packageName,
+                }),
+              ]
+            : []),
           /* Last of the generators, because it rewrites what two of them wrote.
              `?: T` is not the same type as `?: T | undefined` under
              `exactOptionalPropertyTypes`, and it is the one a consumer cannot
              forward an optional prop into. */
-          jsxOptionalUndefined(),
+          jsxOptionalUndefined({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
         ]
       : []),
     ...plugins,

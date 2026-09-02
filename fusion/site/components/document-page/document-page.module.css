@@ -1,0 +1,197 @@
+/* The wrapper the head and the body share, and the only reason it exists. */
+.document {
+  /* Tuned so a paragraph sets at about seventy characters, which is where the
+     eye keeps the line. Measured rather than picked: the body is 14px here. */
+  --document-measure: 41rem;
+}
+
+/* The head on a gradient, for a document read as a piece. **A gradient rather
+   than the galleries' lit field, because this band is a cover rather than a
+   place.** `/insights` opens on a lattice with two dozen dots lighting on long
+   cycles: something to look at while a reader decides what to read. **Diagonal,
+   because the light has to come from somewhere.** A vertical ramp over a
+   full-width band reads as a printing artifact; struck across the corner it
+   reads as light falling on a surface. **Mixed from `--helix-color-primary` into
+   `--helix-color-background`**, so it darkens on a dark page and lightens on a
+   light one from one declaration. */
+.documentHero {
+  background-color: var(--helix-color-background);
+  background-image: linear-gradient(
+    152deg,
+    color-mix(in oklab, var(--helix-color-primary) 62%, var(--helix-color-background)) 0%,
+    color-mix(in oklab, var(--helix-color-primary) 38%, var(--helix-color-background)) 30%,
+    color-mix(in oklab, var(--helix-color-primary) 16%, var(--helix-color-background)) 62%,
+    var(--helix-color-background) 100%
+  );
+  /* The header's own height plus the hairline under it, so the band starts at
+     the top of the window rather than under the bar. */
+  margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
+  padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
+  position: relative;
+}
+
+/* The band's column, aligned to the body's. */
+.documentHeroInner {
+  margin-inline: auto;
+  max-inline-size: calc(var(--document-measure) + var(--helix-space-lg) * 2);
+  padding-inline: var(--helix-space-lg);
+  inline-size: 100%;
+}
+
+/* The title on the band, which is a display size rather than a heading size. */
+.documentHeroTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-3xl), 5.5vw, var(--site-text-section));
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  text-wrap: balance;
+}
+
+/* The shell every argued document on this site shares. **Insights, Trust and
+   Thesis are the same kind of page**, which is what 206 settled: each is a
+   single argued document rather than a marketing surface. */
+
+.documentShell {
+  /* Fixed, not `--site-inset`.** That clamp opens to seven rem on a wide screen,
+     which is right for a layout running to the viewport edge and wrong inside a
+     box that is capped and centered: above the cap this shell is nowhere near an
+     edge, so the growing gutter had nothing to hold the text off and ate the
+     reading column instead. */
+  padding-inline: var(--helix-space-lg);
+  margin-inline: auto;
+
+  /* The measure, plus the gutter, rather than a number in `ch` that is not about
+     the text it caps.** A `ch` on the shell resolves against the *shell's* font
+     size rather than the body's, so it never counts the characters it looks like
+     it is counting. Worse, the cap is a border box and the padding came from
+     `[data-shell]`, which is `clamp(space-lg, 6vw, 7rem)`: a gutter meant to
+     hold *full width* layouts off the viewport edge. Measured: the shell sat at
+     928px from 1024 upward while its padding went 61, 77, 86, 112, so the
+     reading column ran 805, 775, 755, 704. The line got *shorter* as the screen
+     got wider, 80 characters at 1440 and 85 at 1024, both past the point where
+     the eye loses the line. */
+  max-inline-size: calc(var(--document-measure) + 2 * var(--helix-space-lg));
+  /* Not a band at the top, because a document is not a section of the landing
+     page.** `--site-band` is the rhythm that gives each claim on the front page
+     a screen of its own, and it clamps to 12vh, which is 108 on a laptop. Above
+     an article that is 108 pixels of nothing between the masthead and the way
+     out, before a reader reaches a single word of the thing they opened. */
+  padding-block: var(--helix-space-2xl) var(--site-band);
+}
+
+/* The eyebrow, which is a register rather than a label.** `variant="label"` sets
+   the kicker at `text-xs` with `tracking-wide`, which is right for a form label
+   and too quiet for the line above a document's title: it reads as a stray word
+   rather than as the class of thing the page is. **Sentence case, not
+   capitals.** An eyebrow reading `ACCEPTABLE USE` is shouting a filing label at
+   somebody who came to read a policy, and it would be the only place on the site
+   that shouts. */
+.documentKicker {
+  letter-spacing: var(--helix-tracking-wide);
+}
+
+/* Left, with the prose under it.** A centered measure is a column the eye can
+   find, which holds for a narrow column and stops holding at this one: the head
+   and the body share an edge wide enough that a centered title starts in a
+   different place from every line beneath it, and the reader's eye has two left
+   edges to keep. */
+.documentHead {
+  text-align: start;
+}
+
+/* One column, and the head does not break out of it.** Giving the head its own
+   wider measure, on the argument that a headline is taken in rather than read
+   and wants a longer line than prose, is sound in print and wrong here: it
+   produces two columns rather than one, a 112ch shell with a 72ch article pinned
+   to its left edge, so the body sits left of the page's center while the title
+   runs past it. */
+
+/* Larger than a section title and smaller than the hero's, which is the whole
+   scale a document needs: it is the only heading on the page at this level and
+   everything under it is an `h2` the base layer already sizes. Headings derive
+   their leading from size through `--helix-leading-heading`, which the base
+   layer applies to `h1`, so nothing is said here: this size is a `clamp` across
+   32 to 44, and a ratio gives one gap over that whole range where a fixed number
+   gives the right one at a single point in it. */
+.documentTitle {
+  font-family: var(--helix-font-display);
+  font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
+  letter-spacing: var(--helix-tracking-tight);
+  text-wrap: balance;
+}
+
+.documentLede {
+  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  /* No cap of its own.** A `34rem` cap holds about 55 characters at the current
+     size and a different number at any other, and it makes the standfirst the
+     narrowest thing on the page: measured, it stopped 118px short of the
+     paragraph beneath it, so the head had a ragged right edge of its own before
+     the shell had one. */
+  text-wrap: balance;
+}
+
+/* A numbered document reads its numbers in a rail.** A claim with prose under it
+   is not a short row, and the platform's marker is placed for short rows:
+   `outside` hangs it just clear of the row's content box, so widening the gutter
+   moves the words right and takes the marker along. **Set by `renderDocument`,
+   not by this selector**, because CSS cannot write an attribute. */
+.documentBody helix-list[kind="ordered"] {
+  --list-gap: var(--helix-space-lg);
+  /* No inset, because a claim here is prose and not a control. The row's default
+     padding is for rows that are targets, and its leading half put the number
+     16px inside the block it is supposed to start: measured, the prose sat at
+     x=24 and the rail at x=40, so the numbers did not line up with the headings
+     they run beside, which is the whole thing a rail is for. */
+  --list-item-padding: var(--helix-space-none);
+}
+
+/* Air between the blocks, said once here rather than on every element: the base
+   layer resets the UA margins and themes prose under `[data-prose]`, and what it
+   cannot know is how far apart this particular kind of page wants its
+   paragraphs. */
+.documentBody > * + * {
+  margin-block-start: var(--helix-space-lg);
+}
+
+/* A heading needs more above it than a paragraph does, or a new section starts
+   at the same distance as the next sentence. */
+.documentBody > * + :where(h2, h3) {
+  margin-block-start: var(--helix-space-2xl);
+}
+
+/* The contents block, between a document's head and its body. **A box, because
+   there is no rail to put this in.** On the docs and the reference the same list
+   is a sticky column beside the prose, held apart from it by two rem of grid
+   gap. */
+.documentContents {
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-md);
+  max-inline-size: var(--document-measure);
+  padding: var(--helix-space-md);
+}
+
+.documentContentsTitle {
+  display: block;
+  padding-block-end: var(--helix-space-xs);
+}
+
+/* A head that is a masthead rather than the top of a column. */
+.documentHeadCentred,
+.documentHeadCentred .documentTitle,
+.documentHeadCentred .documentLede,
+.documentHeadCentred .documentKicker {
+  text-align: center;
+}
+
+/* And the boxes take the column, which `text-align` alone cannot do.** The head
+   is a flex column, so each child shrinks to its own content and the column's
+   `align-items` places that box. Centering the *text* inside a box that is
+   already exactly as wide as the text changes nothing, which is why the title
+   and the standfirst both still began at the same left edge while every computed
+   value said `center`: measured, the title box ran 374..874 and the lede
+   374..1026, two different widths sharing a left edge. */
+.documentHeadCentred .documentTitle,
+.documentHeadCentred .documentLede,
+.documentHeadCentred .documentKicker {
+  inline-size: 100%;
+}

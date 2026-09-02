@@ -8,19 +8,7 @@
   margin-inline-start: calc(var(--helix-border-thin) * -1);
 }
 
-/* One shape, so the inner corners go flat and the outer ones keep their radius.
- *
- * Handed across as custom properties rather than reached for with a rule. The
- * corner belongs to the control inside each button's shadow root, and nothing
- * here can select it: `::slotted()` reaches the button host and stops, and the
- * base layer's `::part` reached one boundary further and stopped there, which
- * was fine until a group sat inside another component and the document was two
- * boundaries away. A custom property set on the host crosses on its own,
- * however deep the group is.
- *
- * `Button` publishes the two hooks and defaults them to `--button-radius`, so a
- * button outside a group is unaffected and a consumer setting `--button-radius`
- * still gets it on the ends. */
+/* One shape, so the inner corners go flat and the outer ones keep their radius. */
 :host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
   --button-radius-start: 0;
 }
@@ -29,17 +17,9 @@
   --button-radius-end: 0;
 }
 
-/* **Stacked, and the shape turns with it.**
- *
- * Everything below joins the buttons along the inline axis: the pull onto a
- * neighbor's border is `margin-inline-start`, and the flattened corners are the
- * inline pair. A column needs all three said again about the other axis, which
- * is why `Button` publishes a hook per corner underneath the pair.
- *
- * `align-items: stretch` so the buttons agree on a width. In a row they agree
- * on a height for free, every button being the same control size; in a column
- * the widths are the labels', and three buttons of different widths sharing
- * edges is not one shape. */
+/* *Stacked, and the shape turns with it.** Everything below joins the buttons
+   along the inline axis: the pull onto a neighbor's border is
+   `margin-inline-start`, and the flattened corners are the inline pair. */
 :host([orientation="vertical"]) {
   align-items: stretch;
   flex-direction: column;
@@ -61,37 +41,22 @@
   --button-radius-end: var(--button-radius, var(--helix-radii-sm));
 }
 
-/* A hovered or focused button has to draw above its neighbors, or the border
-   it lights up is half covered by the one overlapping it. */
+/* A hovered or focused button has to draw above its neighbors, or the border it
+   lights up is half covered by the one overlapping it. */
 ::slotted(*:hover),
 ::slotted(*:focus-within) {
   position: relative;
-  /* The raised step, not a bare 1. A component with its own number cannot be
-     reasoned about against a theme that moves the scale.
-
-     The rule is a layer token unless the value is structurally `0` or `1`.
-     Those two are permitted by name, being structural rather than design
-     decisions: `steps/step/step.css` has three and they are correct. */
+  /* The raised step, not a bare 1. The rule is a layer token unless the value is
+     structurally `0` or `1`. */
   z-index: var(--helix-layer-raised);
 }
 
-/* The same set, spaced. The group keeps its role and its name, which is the
-   whole reason this is an appearance and not a `helix-flex`: a row of related
-   actions is still a set, and a screen reader should hear it as one. */
+/* The same set, spaced. */
 :host([variant="spaced"]) {
   gap: var(--button-group-gap, var(--helix-space-xs));
 }
 
-/* Not printed, being a control.
- *
- * Paper cannot be pressed. A button prints its chrome and its label, and the
- * chrome is the half that says press me, which on a page is an instruction to do
- * the one thing that is not available.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Not printed, being a control. */
 @media print {
   :host {
     display: none;

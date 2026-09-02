@@ -71,6 +71,45 @@ export const SOURCE = {
   styles: 'helix/styles/src',
 }
 
+/**
+ * Where a package's own `exports` says one of its published files is.
+ *
+ * **The package's declaration is the source of truth, not this file.** Reading
+ * `exports` means `tokens.json` moving from the package root into `dist` is one
+ * edit in the manifest that declares it, rather than an edit here and in every
+ * script that had spelled the path out.
+ *
+ * It throws rather than returning a path that is not exported, so a file a
+ * package stopped publishing fails with the package and the subpath named,
+ * instead of an `ENOENT` on a stale path several steps later.
+ */
+const exported = (directory, subpath) => {
+  const manifest = JSON.parse(readFileSync(join(root, directory, 'package.json'), 'utf8'))
+  const target = manifest.exports?.[subpath]
+  const file = typeof target === 'string' ? target : target?.default
+  if (!file) {
+    throw new Error(`${manifest.name} does not export \`${subpath}\``)
+  }
+  return join(directory, file.replace(/^\.\//, ''))
+}
+
+/**
+ * What a package publishes, resolved through the package rather than spelled out.
+ *
+ * **A specifier would be better and is not available.** `@fusion.dev/scripts`
+ * cannot depend on the packages it measures: `helix/styles` and both tiers
+ * already depend on this one, so an edge back is a cycle. Resolving `exports` by
+ * hand is the same answer without the edge, and it fails the same way when a
+ * package stops publishing something. Outside this repository these files are
+ * reached the way a consumer reaches them, by specifier.
+ */
+export const ARTIFACT = {
+  coreManifest: exported('helix/core', './custom-elements.json'),
+  headlessManifest: exported('helix/headless', './custom-elements.json'),
+  styledManifest: exported('helix/styled', './custom-elements.json'),
+  tokens: exported('helix/styles', './tokens.json'),
+}
+
 /** The two component tiers, which is the set six checks read on their own. */
 export const TIERS = [SOURCE.headless, SOURCE.styled]
 

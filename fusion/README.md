@@ -4,10 +4,10 @@ What belongs to the company rather than to a product.
 
 | Package | What it is |
 |---|---|
-| `site` | the public site and the documentation surface it renders |
-| `docs` | company strategy, plus two generated references. `docs/insights` is the published writing |
 | `cli` | `fusion`, the Rust command line: `prose`, `spec`, `workspace`, and `helix` which delegates |
+| `docs` | company strategy. `docs/insights` is the published writing |
 | `scripts` | what is genuinely cross-cutting and cannot be a rule |
+| `site` | the public site and the documentation surface it renders |
 
 Nothing here publishes to npm.
 

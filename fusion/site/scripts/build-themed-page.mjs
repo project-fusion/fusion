@@ -22,7 +22,7 @@
  * rendered by React anywhere; it exists to be posted into a sandboxed frame as
  * text. Generated rather than hand-written so the JSX stays the source, and
  * held by `--check` so the two cannot drift, the same arrangement
- * `build-catalog.mjs` and `build-reference.mjs` already have.
+ * `build-catalog.mjs` already has.
  *
  * **One string per layout and context, which is the whole cost.** Sixteen
  * renderings, and they are far from sixteen times one page: a minimal layout is
@@ -40,10 +40,10 @@
  * read a label would pull three unrendered pages into the browser bundle. What
  * crosses is two short lists and a record of strings.
  */
-import { execFileSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { formatted } from '@fusion.dev/scripts/formatted'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { CONTEXTS } from '../app/(tool)/helix/theme/themed-contexts.tsx'
 import { LAYOUTS } from '../app/(tool)/helix/theme/themed-page.tsx'
@@ -91,7 +91,9 @@ const size = pairs.reduce((total, key) => total + markup[key].length, 0)
  * chose a different quote or wrapped the assignment, which says nothing about
  * whether the markup is current. And the writer formats what it wrote, because
  * `AGENTS.md` asks a generator to, or every run dirties a file `check` has just
- * cleaned. */
+ * cleaned. Through `formatted`, which pipes the source rather than naming the
+ * path: this file is gitignored, and `biome` reads a gitignore, so formatting it
+ * by path exits 1. */
 const say = (state) =>
   `themed page: ${LAYOUTS.length} layouts by ${CONTEXTS.length} contexts, ${size} characters, ${state}`
 
@@ -111,7 +113,6 @@ if (process.argv.includes('--check')) {
   }
   console.log(say('current'))
 } else {
-  writeFileSync(OUT, file)
-  execFileSync('bunx', ['biome', 'format', '--write', OUT], { stdio: 'ignore' })
+  writeFileSync(OUT, formatted(file, 'themed-page-markup.generated.ts'))
   console.log(say('written'))
 }

@@ -11,10 +11,7 @@
   },
   "type": "module",
   "scripts": {
-    "content": "bun scripts/build-content.mjs",
-    "reference": "bun scripts/build-reference.mjs",
-    "routes": "bun scripts/check-routes.mjs",
-    "tokens": "node scripts/build-tokens.mjs"
+    "routes": "bun scripts/check-routes.mjs"
   },
   "devDependencies": {
     "@fusion.dev/scripts": "workspace:*"

@@ -1,10 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessColorPicker } from '@fusion.dev/helix-headless/color-picker'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect imports, because the tier below renders each of these tags and a
-   custom element registers on import. Inherited from the base along with the
-   template, which is why they have to be restated here: this file has none of
-   the tags in it to remind anyone. */
+/* Inherited from the base along with the template: this file has none of these
+   tags in it to remind anyone. */
 import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../icon/index.js'

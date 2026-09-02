@@ -1,50 +1,27 @@
 :host {
   /* A control in a crumb is a crumb-sized target, not an icon-sized one.
-   *
-   * `::slotted(a)` below is a line box with `2xs` above and below, which comes
-   * out at 28. An `IconButton` slotted beside it takes the control size, 40, so
-   * the row stepped around it, and it was pinned to the icon's own size to stop
-   * that: 20 against links of 28, so hovering a step and then the control gave
-   * two different fills. The same arithmetic as the link, so the two agree by
-   * construction rather than by a number kept in step by hand.
-   *
-   * Here and not on the control, because `::slotted()` reaches one level and
-   * the trigger is inside whatever was slotted. A custom property inherits the
-   * rest of the way, and one nothing reads costs nothing.
-   *
-   * **The arithmetic is `text * leading`, never `1lh`.** A custom property is
-   * substituted unresolved, so `lh` resolves against whoever *consumes* it
-   * rather than against the crumb that wrote it.
-   * `IconButton` sets no line-height and inherits the crumb's, so the two agreed
-   * and the unit looked portable; `Button` sets `leading-tight`, so the same
-   * expression measured 23.59 against links of 27.5, four pixels short and in
-   * the same row. The token pair is absolute at both ends, and it is the shape
-   * `Checkbox` already computes its box from. */
+     `::slotted(a)` below is a line box with `2xs` above and below, which comes
+     out at 28. An `IconButton` slotted beside it takes the control size, 40, so
+     the row stepped around it, and it was pinned to the icon's own size to stop
+     that: 20 against links of 28, so hovering a step and then the control gave
+     two different fills. **The arithmetic is `text * leading`, never `1lh`.** A
+     custom property is substituted unresolved, so `lh` resolves against whoever
+     *consumes* it rather than against the crumb that wrote it. `IconButton` sets
+     no line-height and inherits the crumb's, so the two agreed and the unit
+     looked portable; `Button` sets `leading-tight`, so the same expression
+     measured 23.59 against links of 27.5, four pixels short and in the same row. */
   --icon-button-size: var(
     --breadcrumbs-control-size,
     calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
   );
 
-  /* And the same for a labeled one, which the rule above cannot reach.
-   *
-   * `--icon-button-size` is `IconButton`'s alone, so a trail whose control says
-   * a word rather than showing a glyph (a repository switcher, a branch picker)
-   * took the full control height and stepped the row exactly as an unpinned
-   * icon button did. Two hooks because they are two components; one number,
-   * because the crumb's height is the only thing either of them is agreeing
-   * with. */
+  /* And the same for a labeled one, which the rule above cannot reach. */
   --button-size: var(
     --breadcrumbs-control-size,
     calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
   );
 
-  /* And the inline rhythm, which the height alone does not buy.
-   *
-   * The same token `[part="link"]` pads with below, so a trigger and the steps
-   * either side of it cannot drift: `--helix-space-control` is `md` and a crumb
-   * is `xs`, so a labeled trigger sat in twice the room every other crumb
-   * takes and read as a chunk wedged into the row. A control in a crumb is a
-   * crumb, with a chevron on it. */
+  /* And the inline rhythm, which the height alone does not buy. */
   --button-padding-inline: var(--breadcrumbs-control-padding-inline, var(--helix-space-xs));
 
   /* And the gap inside it, which is what sits between a label and its chevron.
@@ -68,23 +45,13 @@
   inline-size: 1em;
 }
 
-/* Each item draws the separator that precedes it, and the first one hides it.
-   Structural pseudo-classes are valid inside `:host()`, unlike `:has()`, so
-   this needs no index, no parent coordination, and no JavaScript.
-
-   After the base rule, not before it: an override that only works because it
-   happens to set a different property is one edit away from silently losing. */
+/* Each item draws the separator that precedes it, and the first one hides it. */
 :host(:first-child) [part="separator"] {
   display: none;
 }
 
 /* The step reads as a subtle button under the pointer: transparent until then,
-   and the sunken surface on hover, which is what `data-button="ghost"` does.
-
-   `::slotted` reaches the link here where it could not reach its color. The
-   base layer's `:where(a)` sets color and text-decoration and nothing else, so
-   the outer tree wins those and leaves box and background uncontested. Color
-   stays with `data-link="quiet"`, which is the recipe that owns it. */
+   and the sunken surface on hover, which is what `data-button="ghost"` does. */
 ::slotted(a) {
   background-color: transparent;
   border-radius: var(--helix-radii-sm);
@@ -92,26 +59,18 @@
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Only the first step is pulled back, and only on the side that faces the
-   edge, so the trail starts where the content around it starts. Pulling every
-   step back on both sides cancels the padding the fill is made of, which
-   collapses the space around each chevron to nothing. */
+/* Only the first step is pulled back, and only on the side that faces the edge,
+   so the trail starts where the content around it starts. */
 :host(:first-child) ::slotted(a) {
   margin-inline-start: calc(var(--helix-space-xs) * -1);
 }
 
 ::slotted(a:hover) {
-  /* A wash of the foreground, not a sunken surface.
-   *
-   * `surface-sunken` means recessed, and a dark page is already at the floor:
-   * measured, the page is pure black and the token is `oklch(0.15)`, so the
-   * hover had to climb to be seen at all and barely was, while the same token
-   * against white gave a clear step. One declaration, two very different
-   * answers.
-   *
-   * A percentage of the foreground steps away from whatever it sits on in
-   * either mode, which is the argument the base layer already makes for
-   * `data-button`, and it is the same wash the tree and list rows hover with. */
+  /* A wash of the foreground, not a sunken surface. `surface-sunken` means
+     recessed, and a dark page is already at the floor: measured, the page is
+     pure black and the token is `oklch(0.15)`, so the hover had to climb to be
+     seen at all and barely was, while the same token against white gave a clear
+     step. */
   background-color: var(
     --breadcrumbs-hover-color,
     color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
@@ -123,25 +82,7 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The current page reads as where you are, not as somewhere you can go. It is
-   text with no element to select, so this is on the host: color and weight
-   inherit into it, where a selector has nothing to match.
-
-   A trail is scanned rather than read, so it carries a step more weight than
-   body copy throughout, and `medium` is the whole of it.
-
-   **The color is what says where you are, and a second weight step says it
-   twice.** `:host([current])` already lifts from `foreground-muted` to
-   `foreground`, which is the louder half of that pair by a distance. `medium`
-   is also what a slotted `Button` takes across the library, and
-   `--button-size`, `--button-padding-inline` and `--button-gap` exist so a
-   trigger takes the crumb's box: a fourth hook forcing a button to `semibold`
-   would say "this button is not a button" to win an emphasis the color has
-   already won.
-
-   Not `regular` either: at `regular` against `foreground-muted` the row sits
-   back far enough that the current crumb does all the work of saying there is a
-   trail there. */
+/* The current page reads as where you are, not as somewhere you can go. */
 :host {
   font-weight: var(--helix-weight-medium);
 }
@@ -150,30 +91,12 @@
   color: var(--helix-color-foreground);
 }
 
-/* A caret is physical and the thing it points at is not.
- *
- * The row itself already flips, because it is laid out on the inline axis and
- * the browser reverses that in a right-to-left document. The glyph inside does
- * not, so the mark ends up on the correct side pointing the wrong way, which in
- * that reading direction means the opposite of what it says. Mirrored rather
- * than swapped for the opposite icon, so the pair stays one decision: a reversed
- * `caret-left` is exactly `caret-right`, and two sets of icon imports that have
- * to agree is the kind of thing that drifts.
- *
- * Written out in each component rather than shared, because there is no sheet a
- * shadow root can compose for this and no way for one to know which of a
- * component's glyphs are directional. `Pagination` carries the same rule and the
- * same argument. */
+/* A caret is physical and the thing it points at is not. */
 :host(:dir(rtl)) [part="separator"] svg {
   scale: -1 1;
 }
 
-/* The crumb itself, whether it is a link or the current page.
- *
- * A row of destinations underlined in brand blue is a trail nobody can scan, so
- * this takes the muted color the slotted-anchor rule above already uses and
- * answers on hover instead. `inline-flex` so `start` and `end` sit on the
- * label's line rather than above it. */
+/* The crumb itself, whether it is a link or the current page. */
 [part="link"] {
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -185,34 +108,18 @@
 }
 
 /* The block half of that padding is what the hover fill is made of, so a crumb
- * that has no fill does not need it.
- *
- * It is rendered for every crumb, a `<span>` where there is no `href`, which is
- * the current page and any crumb holding a control. For a control that padding
- * is counted twice: the control is already sized to a crumb's own box above, so
- * wrapping it in four more pixels made the row 36 against everyone else's 28
- * and the trail stepped around it. Sized smaller to fit inside instead, and the
- * control's hover fill is 20 tall beside links of 28, which is the same
- * mismatch seen from the other end.
- *
- * The inline half stays: it is the rhythm between a crumb and its chevron, and
- * the current page keeps it whether or not anything lights up. */
+   that has no fill does not need it. For a control that padding is counted
+   twice: the control is already sized to a crumb's own box above, so wrapping it
+   in four more pixels made the row 36 against everyone else's 28 and the trail
+   stepped around it. Sized smaller to fit inside instead, and the control's
+   hover fill is 20 tall beside links of 28, which is the same mismatch seen from
+   the other end. */
 :host(:not([href])) [part="link"] {
   padding-block: var(--helix-space-none);
 }
 
-/* The same hover the slotted path has, because `::slotted(a:hover)` cannot
- * reach this one.
- *
- * That rule matches *assigned* nodes, and a crumb with `href` renders its own
- * anchor in this shadow root, where nothing assigned it. Without this rule a
- * crumb rendering its own anchor lights up on hover in color and stays flat
- * while a slotted one takes a background: two ways to write the same trail,
- * behaving differently, with no error anywhere. Same shape as `CopyButton`'s
- * fallback icons, which rendered at the right color and no size at all.
- *
- * Reading the same hook as the slotted rule, so a consumer overriding one
- * overrides both. */
+/* The same hover the slotted path has, because `::slotted(a:hover)` cannot reach
+   this one. */
 a[part="link"]:hover {
   background-color: var(
     --breadcrumbs-hover-color,
@@ -226,9 +133,7 @@ a[part="link"]:hover {
   color: var(--helix-color-foreground);
 }
 
-/* A hidden crumb takes no room. `[hidden]` is `display: none` in the UA sheet
-   only for elements that have not been given another display, and the host is
-   `inline-flex` here, so the attribute would otherwise do nothing at all. */
+/* A hidden crumb takes no room. */
 :host([hidden]) {
   display: none;
 }

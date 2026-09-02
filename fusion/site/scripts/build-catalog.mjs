@@ -26,7 +26,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SOURCE } from '@fusion.dev/scripts/workspace'
+import { ARTIFACT, SOURCE } from '@fusion.dev/scripts/workspace'
 import { catalog } from '../../../helix/docs/src/catalog.ts'
 import { reference } from '../../../helix/docs/src/reference.ts'
 
@@ -48,7 +48,7 @@ const PUBLIC = join(ROOT, 'fusion/site/public')
  * downstream: a name filter would have to be updated every time the private
  * package grew an element, and would be silent when it was not.
  */
-const MANIFESTS = ['helix/styled/custom-elements.json', 'helix/headless/custom-elements.json']
+const MANIFESTS = [ARTIFACT.styledManifest, ARTIFACT.headlessManifest]
 
 /**
  * Where the example files sit, one folder per family, in both tiers.

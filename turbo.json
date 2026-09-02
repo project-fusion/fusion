@@ -23,6 +23,34 @@
   "globalEnv": ["RUNNER_ARCH", "RUNNER_OS"],
   "globalPassThroughEnv": ["GITHUB_OUTPUT", "NODE_AUTH_TOKEN"],
   "tasks": {
+    // The two tiers generate `element-events.generated.ts` from their own
+    // manifest before `tsc` reads it, so it is a build output and has to be
+    // declared: an undeclared one is what a cache hit does not restore, and a
+    // hit then reports success over a tree missing a module `index.ts` imports.
+    "@fusion.dev/helix-headless#build": {
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
+      "outputs": ["dist/**", "src/element-events.generated.ts"]
+    },
+    // `token-layer` writes `src/tokens.css` from `src/_modes.css` and the
+    // registry, so the stylesheet is a build output and has to be declared here
+    // as well, or a cache hit leaves `styles-dist` nothing to strip.
+    "@fusion.dev/helix-styles#build": {
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
+      "outputs": ["dist/**", "src/tokens.css"]
+    },
+    "@fusion.dev/helix#build": {
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
+      "outputs": ["dist/**", "src/element-events.generated.ts"]
+    },
+    // **`pages.generated.ts` is written here, not read here**, and declaring it
+    // as an input was the same mistake `docs` carried: a file a task writes and
+    // does not declare is a file a cache hit leaves at whatever the last run put
+    // there, while the generated module beside it is restored fresh. The two
+    // then disagree and only `-- --check` notices.
+    "@fusion.dev/insights#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
+    },
     // `cem analyze` writes four files and this used to claim one, then three.
     // The manifest is the obvious output; `jsx.d.ts`, `vue.d.ts` and
     // `svelte.d.ts` are written beside it by the framework plugins, and an
@@ -33,13 +61,25 @@
     // already held it. Untracked, the same cache hit leaves nothing at all, and
     // `files` names it, so the package would ship without the typings a Svelte
     // consumer imports.
+    // Its own `build` was in `dependsOn` and did not belong: `inputs` is
+    // `src/**`, the config imports `@fusion.dev/helix-cem` which `^build`
+    // already covers, and a manifest built with `dist` absent is byte-identical
+    // to one built beside it, measured at 75,232 lines on `helix/headless`.
+    // Removing it is what lets `build` depend on `analyze` instead, so a tier
+    // can generate `element-events.generated.ts` as a prebuild step rather than
+    // tracking it.
     "analyze": {
-      "dependsOn": ["^build", "build"],
+      "dependsOn": ["^build"],
       "inputs": ["src/**", "custom-elements-manifest.config.ts"],
-      "outputs": ["custom-elements.json", "jsx.d.ts", "svelte.d.ts", "vue.d.ts"]
+      "outputs": [
+        "custom-elements.json",
+        "shared/types/jsx.d.ts",
+        "shared/types/svelte.d.ts",
+        "shared/types/vue.d.ts"
+      ]
     },
     "build": {
-      "dependsOn": ["^build", "^analyze", "icons", "styles"],
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
       // **`wasm/**` was here and had to go, because a cache hit was deleting
       // tracked files.** It was declared when `@fusion.dev/helix-theme`'s build made
@@ -67,7 +107,7 @@
       // the other half: a generated file that nothing tracks must be.
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/sandbox/**", "public/specs/**"]
     },
-    // The fourth layer is `helix/styled/elements.css` and it was not in `inputs`,
+    // The fourth layer is `helix/styled/shared/css/elements.css` and it was not in
     // so editing any component stylesheet did not invalidate this. `dependsOn`
     // orders the two tasks and ordering is not invalidation: the sandbox
     // stylesheet, which is also what the browser spec runner serves as its
@@ -115,15 +155,9 @@
         "public/insights/**"
       ]
     },
-
-    // **`pages.generated.ts` is written here, not read here**, and declaring it
-    // as an input was the same mistake `docs` carried: a file a task writes and
-    // does not declare is a file a cache hit leaves at whatever the last run put
-    // there, while the generated module beside it is restored fresh. The two
-    // then disagree and only `-- --check` notices.
     "content": {
       "inputs": ["insights/content/**", "$TURBO_ROOT$/fusion/docs/scripts/build-content.mjs"],
-      "outputs": ["insights/src/pages.generated.ts", "insights/src/sources.generated.ts"]
+      "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
     },
 
     "dev": {
@@ -156,7 +190,7 @@
         "preview/preview-frame.css",
         "public/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
-        "$TURBO_ROOT$/helix/styled/elements.css",
+        "$TURBO_ROOT$/helix/styled/shared/css/elements.css",
         "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs"
       ],
       "outputs": ["public/sandbox/**"]
@@ -168,15 +202,6 @@
     "peers": { "cache": false },
 
     // Reads the manifest, so it waits for whoever writes one.
-    "reference": {
-      "dependsOn": ["^analyze"],
-      "inputs": [
-        "$TURBO_ROOT$/helix/styled/custom-elements.json",
-        "$TURBO_ROOT$/helix/docs/src/reference.ts",
-        "$TURBO_ROOT$/fusion/docs/scripts/build-reference.mjs"
-      ],
-      "outputs": ["references/component-reference.md"]
-    },
 
     // **Three more that declare a task without caching it, which is a real
     // answer rather than a gap.** `tokens` counts every read of every token
@@ -216,7 +241,7 @@
         "$TURBO_ROOT$/fusion/scripts/build-styles.mjs",
         "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
       ],
-      "outputs": ["src/**/*.css.ts", "elements.css"]
+      "outputs": ["src/**/*.css.ts", "shared/css/elements.css", "shared/css/*.css.ts"]
     },
 
     "styles-dist": {
@@ -273,10 +298,13 @@
     // 273, and the third answer there was the same: stop declaring it.
     "token-layer": {
       "cache": false,
-      "inputs": ["src/tokens.ts", "$TURBO_ROOT$/helix/styles/scripts/build-token-layer.mjs"],
-      "outputs": ["src/tokens.css", "tokens.json"]
+      "inputs": [
+        "src/_modes.css",
+        "src/tokens.ts",
+        "$TURBO_ROOT$/helix/styles/scripts/build-token-layer.mjs"
+      ],
+      "outputs": ["src/tokens.css", "dist/tokens.json"]
     },
-    "tokens": { "cache": false },
     // **`^analyze` and not only `^build`, because the typings are analyzer
     // output.** `jsx.d.ts` is emitted by `analyze` and is gitignored, so on a
     // clean checkout there is nothing on disk for the site's

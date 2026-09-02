@@ -2,7 +2,7 @@ import { navigation } from '@fusion.dev/helix-docs'
 import Link from 'next/link'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import shell from '../components/(reference)/docs.module.css'
-import styles from './docs-index.module.css'
+import styles from './page.module.css'
 
 /**
  * The guides index, which is a page rather than a redirect to the first page of

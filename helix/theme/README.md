@@ -18,8 +18,8 @@ document.head.append(Object.assign(document.createElement('style'), {
 }))
 ```
 
-Give it what you mean — a brand color, and whatever else you have an opinion
-about — and it returns every token the system needs with the contrast
+Give it what you mean, a brand color and whatever else you have an opinion
+about, and it returns every token the system needs with the contrast
 relationships already satisfied, rather than a palette you then have to check.
 
 **It has to be awaited and there is no way around that.** WebAssembly

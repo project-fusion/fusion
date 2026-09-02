@@ -1,24 +1,7 @@
-/* The palette itself, which is the dialog's own box.
- *
- * `::part()` and not `[part="dialog"]`. The part is forwarded out of this
- * element for a consumer to reach, and forwarding goes outward only: from in
- * here the box still lives in the dialog's shadow root, and a plain attribute
- * selector matches nothing. Measured by writing one and watching the panel stay
- * centered.
- *
- * Against the top of the window rather than centered, which is where every
- * palette a reader has used opens. A centered one moves: the list grows and
- * shrinks as the filter narrows it, and a box centered on the viewport walks up
- * and down the screen under the words being typed, taking the field with it.
- * Pinned at the top, only the bottom edge moves and the field stays still.
- *
- * **A fifth of the window down, and not less.** At 12vh the panel opens 84
- * pixels from the top of a 700 pixel laptop viewport, close enough to the edge
- * that it reads as hanging off the browser chrome rather than floating over the
- * page. A fifth clears it on a short window and still sits inside the upper
- * third on a tall one, which is where a palette belongs: high enough that the
- * list grows downward into empty space, low enough to look placed rather than
- * pinned. */
+/* The palette itself, which is the dialog's own box. **A fifth of the window
+   down, and not less.** At 12vh the panel opens 84 pixels from the top of a 700
+   pixel laptop viewport, close enough to the edge that it reads as hanging off
+   the browser chrome rather than floating over the page. */
 helix-dialog::part(dialog) {
   align-self: start;
   inline-size: min(var(--command-size, 40rem), calc(100vw - var(--helix-space-xl) * 2));
@@ -26,26 +9,13 @@ helix-dialog::part(dialog) {
   padding: var(--helix-space-none);
 }
 
-/* One text column down the whole panel.
- *
- * The panel had three left edges: the rows at their own inset, the magnifier at
- * the search row's, and the field's text a mark's width past that. The column
- * is the magnifier's, so the rows, the group headings and the footer all begin
- * where the mark does and the field's text is the one thing stepped off it,
- * which is what a search row is.
- *
- * Not the field's words: lined up under those, every row sits a mark's width in
- * from the panel's own edge with nothing in the gutter but the magnifier, which
- * is still two columns, just further right.
- *
- * One length, said once here and read by all four. */
+/* One text column down the whole panel. */
 :host {
   --option-padding: var(--helix-space-sm);
 }
 
 /* The list fills the panel, which is already the surface: a second border and a
-   second fill inside one would draw the shape twice. This one is in this
-   element's own shadow root, so it is selected the ordinary way. */
+   second fill inside one would draw the shape twice. */
 [part="listbox"] {
   --listbox-background-color: transparent;
 
@@ -53,27 +23,16 @@ helix-dialog::part(dialog) {
   display: block;
 }
 
-/* Tall enough to be worth scanning and short enough to stay a panel. A palette
-   grown to the window is a page, and a reader looking for one command in nine
-   does not want the field to leave the top of the screen to reach it. */
+/* Tall enough to be worth scanning and short enough to stay a panel. */
 helix-listbox::part(items) {
-  /* And no fill of its own. The host's hook is transparent already, but the
-     scrolling box paints `surface` underneath it, so the panel came out in two
-     shades a hair apart: white at the field and the footer, near-white across
-     the commands. One panel, one surface. */
+  /* And no fill of its own. */
   background-color: transparent;
   border: none;
   max-block-size: var(--command-list-size, 22rem);
 
-  /* **More air than a listbox gives itself, because of what is under it.**
+  /* *More air than a listbox gives itself, because of what is under it.**
      `Listbox` pads its scrollport by `space-2xs`, which is enough to hold the
-     first and last rows off the frame of a box that ends in nothing. This one
-     ends in a footer with a rule across it, so the last row landed against that
-     rule with about two pixels between them and read as cut off rather than
-     finished. A step up gives the list a floor to sit on.
-
-     Both ends rather than the bottom alone: the top meets the field's own rule
-     and the same argument applies there the moment the list is scrolled. */
+     first and last rows off the frame of a box that ends in nothing. */
   padding-block: var(--helix-space-xs);
 }
 
@@ -89,18 +48,7 @@ helix-listbox::part(search-field) {
   font-size: var(--helix-text-md);
 }
 
-/* Room to read, because a palette is scanned rather than filled in.
- *
- * `Option` sizes itself for a select's dropdown, where a row is one of a few and
- * the list is short. A palette is a page of them read at speed, and at the
- * select's inset the rows ran together. Set the hook `Option` already reads and
- * nothing else, so the rows and the group headings above them move together
- * rather than two stylesheets each naming the inset.
- *
- * `data-density` is honored because a consumer putting a palette in a dense
- * region means it, and the recipes in `headless.css` set the same attribute on
- * buttons and fields. Read from the host as well as from an ancestor, so
- * `<helix-command data-density="sm">` works as well as a region around it. */
+/* Room to read, because a palette is scanned rather than filled in. */
 :host {
   --_command-row: var(--helix-space-sm);
 }
@@ -115,19 +63,14 @@ helix-listbox::part(search-field) {
   --_command-row: var(--helix-space-md);
 }
 
-/* Set on the host, not reached for through a part.
- *
- * The rows are `helix-option` elements in this element's own light DOM, slotted
- * onward into the listbox. They are not parts of anything here, so
- * `::part(option)` matched nothing at all: measured, the rows kept the select's
- * 2xs and the rule did nothing. A custom property inherits down the tree and
- * into each row's shadow root, which is the one thing that reaches them. */
+/* Set on the host, not reached for through a part. They are not parts of
+   anything here, so `::part(option)` matched nothing at all: measured, the rows
+   kept the select's 2xs and the rule did nothing. */
 :host {
   --option-block-padding: var(--_command-row);
 }
 
-/* The keys a reader can press, under the list. Quiet, because it is a legend
-   for the thing above it rather than part of the answer. */
+/* The keys a reader can press, under the list. */
 [part="footer"] {
   align-items: center;
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
@@ -143,13 +86,7 @@ helix-listbox::part(search-field) {
   display: none;
 }
 
-/* Not printed, being chrome. A palette is how a reader acts on a document
- * rather than any of the document, and a printed page has no command to run.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Not printed, being chrome. */
 @media print {
   :host {
     display: none;

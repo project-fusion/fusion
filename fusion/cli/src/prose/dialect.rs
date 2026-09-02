@@ -82,7 +82,7 @@ const OUTPUT: [&str; 3] = [".vercel", "coverage", "wasm"];
 /// A fix in one of these would be undone by the next build.
 fn generated() -> Regex {
     Regex::new(
-        r"(\.generated\.\w+|custom-elements\.json|jsx\.d\.ts|vue\.d\.ts|elements\.css|\.css\.ts|component-reference\.md|token-reference\.md|catalog\.generated\.json|peers\.json|oracle\.json|metrics\.mdx)$",
+        r"(\.generated\.\w+|custom-elements\.json|jsx\.d\.ts|vue\.d\.ts|elements\.css|\.css\.ts|catalog\.generated\.json|peers\.json|oracle\.json|metrics\.mdx)$",
     )
     .expect("a literal pattern compiles")
 }
@@ -221,7 +221,7 @@ fn survey(context: &Context) -> (usize, Vec<(PathBuf, String, String)>) {
     let mut checked = 0;
     for file in files {
         /* The list is British by construction. See the docblock. */
-        if file.strip_prefix(&context.root).unwrap_or(&file) == Path::new("fusion.rules.json") {
+        if file.strip_prefix(&context.root).unwrap_or(&file) == Path::new("fusion.json") {
             continue;
         }
         let Ok(before) = fs::read_to_string(&file) else {

@@ -9,10 +9,8 @@ import type { PropertyValues, TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
-/* Side-effect imports, because this renders both in its own shadow root and a
-   custom element registers on import. The paths are relative, so this registers
-   the base pair and the styled file's identical imports register the styled
-   pair; `tier` picks which names the template asks for. */
+/* Relative, so this registers the base pair and the styled file's identical
+   imports register the styled pair. `tier` picks which the template asks for. */
 import '../../dialog/index.js'
 import '../../listbox/index.js'
 

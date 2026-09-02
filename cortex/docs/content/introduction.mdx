@@ -20,12 +20,13 @@ Two properties turn a model call into cognition:
 
 ## Why local-first
 
-An AI that remembers you, but whose memory lives on someone else's server, is
-not cognitive sovereignty. It relocates the dependency instead of removing it.
+An AI that remembers you, but whose memory lives on someone else's server, has
+relocated the dependency rather than removed it.
 
 Cortex will default to a single SQLite file on your machine. The stores in the
 crates today are in-memory references; SQLite and Postgres are required behind a
-trait rather than built. The hosted tier is convenience, never a chokepoint. The
+trait rather than built. The hosted tier is a convenience rather than a
+requirement. The
 `Provider` trait carries an `is_local` flag so a product can tell the user
 whether their data left the device:
 

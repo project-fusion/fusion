@@ -137,9 +137,9 @@ export interface Product {
  * **The masthead says `Products` and lists these, not the verticals.** A
  * vertical is a division and a product is a thing you use: nobody uses Fusion
  * Design, they use Helix. The verticals still ride in the panel's third
- * column, because dropping Energy and Capital from the map to keep the column
- * count tidy would be softening them by omission, which is the one thing the
- * stage labels exist to prevent.
+ * column, so a reader who wants the shape of the company gets it one click
+ * away rather than from a menu that promised products and handed over
+ * divisions.
  *
  * Engram, Trace and Recall are rows carrying their stage rather than a link,
  * because the division of Cortex is the argument even before the modules are

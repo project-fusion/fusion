@@ -168,34 +168,50 @@ bun run fusion --help    # workspace, prose and spec rules
 bun run helix --help     # component conventions, theme derivation, an MCP server
 ```
 
-## Layout
+## Where things are
 
-```
-helix/     styles core headless styled icons theme cem docs diagnostics
-           gallery sandbox testing cli
-cortex/    core trace engram docs
-fusion/    cli docs scripts site
-```
+Three product domains at the root, packages flat inside each. A new product gets
+a new top-level folder. The folder drops the domain prefix and the package name
+keeps it: `helix/styled` is `@fusion.dev/helix`, `cortex/core` is the crate
+`fusion-cortex-core`. Scope a search by path rather than by folder name, since
+bare leaf names recur across domains.
 
-- **Product domains at root, packages flat inside.** A new product gets a new
-  top-level folder.
-- **The folder drops the domain prefix and the package name keeps it.**
-  `helix/styled` is `@fusion.dev/helix`; `cortex/core` is the crate
-  `fusion-cortex-core`. Scope a search by path rather than by folder name, since
-  bare leaf names recur across domains.
-- **`<domain>/docs` is a content package, not a site.** Versioned MDX plus a
-  typed registry. The site that renders it is separate and depends on it.
-- **`fusion/` is the company tier**, and a domain like the other two: the CLI,
-  the writing, and the site that renders everything above it.
+| | What it is | |
+|---|---|---|
+| **[Helix](helix/README.md)** | the design system | |
+| | tokens and the base layer | [helix/styles](helix/styles/README.md) |
+| | `HelixElement`, mixins, controllers | [helix/core](helix/core/README.md) |
+| | structure, a11y, state, form participation | [helix/headless](helix/headless/README.md) |
+| | the styled tier | [helix/styled](helix/styled/README.md) |
+| | the icon set | [helix/icons](helix/icons/README.md) |
+| | palette derivation | [helix/theme](helix/theme/README.md) |
+| | the mistakes that are valid CSS | [helix/diagnostics](helix/diagnostics/README.md) |
+| | the documentation, as content | [helix/docs](helix/docs/README.md) |
+| | project templates | [helix/templates](helix/templates/README.md) |
+| | the editor and spec runner | [helix/sandbox](helix/sandbox/README.md) |
+| | analyzer config, card art, spec helpers, the CLI | `cem` `gallery` `testing` `cli` |
+| **[Cortex](cortex/README.md)** | memory, provenance, context | |
+| | the substrate | `cortex/core` |
+| | provenance capture | `cortex/trace` |
+| | the memory store | `cortex/engram` |
+| | the documentation, as content | [cortex/docs](cortex/docs/README.md) |
+| **[Fusion](fusion/README.md)** | what belongs to the company | |
+| | the published writing | `fusion/docs` |
+| | the site that renders all of it | `fusion/site` |
+| | the workspace CLI and cross-cutting scripts | `fusion/cli` `fusion/scripts` |
+
+Conventions, commands and the full layout are in [`AGENTS.md`](AGENTS.md).
+Contributing is [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md).
 
 Not everything here publishes. `helix-cem`, `helix-gallery`, `helix-sandbox` and
 `helix-testing` are build tooling for this repository, and the Cortex crates
 wait on a consumer worth standing up a registry for.
 
 Versions are **lockstep within a domain** and independent across domains, so
-`@fusion.dev/helix-headless@x` works with `@fusion.dev/helix@x`. **The version
-lives in the tag rather than the manifest**: every manifest holds `0.0.0-dev`
-and the release stamps the real number in CI seconds before packing.
+`@fusion.dev/helix-headless@x` works with `@fusion.dev/helix@x`. **The tag is
+the record.** The release computes the number from the tag and stamps it into
+the npm manifests seconds before packing; the Rust crates rest at `0.0.0-dev`,
+because nothing stamps them.
 
 ## Contributing
 
@@ -233,7 +249,7 @@ Three conventions come up on the first change, and
   shorthand, export conditions.
 
 To add a component, [`AGENTS.md`](AGENTS.md) points at the
-`adding-helix-components` skill, which covers both tiers, the tokens, the specs
+`add-component` skill, which covers both tiers, the tokens, the specs
 and the manifest metadata together.
 
 ## License

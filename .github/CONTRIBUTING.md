@@ -27,24 +27,19 @@ a finding rather than allowing it, and comment any allow at its site.
 
 ## House style
 
-Most of this is enforced, so `bun run fix` will tell you. The parts worth
-knowing before you write:
+Most of this is enforced, so `bun run fix` will tell you.
+[`AGENTS.md`](../AGENTS.md) carries the rules and the reasoning behind them, and
+is the one copy. The three that come up on a first change:
 
 - **No em dashes**, in code, docs, comments or copy. Periods, colons, commas or
   parentheses.
 - **American spelling** everywhere, comments and prose alike. `bun run fix:dialect`
   rewrites and `fusion prose`'s `dialect` judges. Comments are in scope because an
   unwritten convention is learned from the corpus.
-- **Alphabetize** object keys, interface members and exported types, skipping
-  where order is semantic: positional arguments, middleware chains, CSS
-  box-side shorthand, export conditions.
-- **Always brace** `if`, `else`, `for` and `while` bodies.
-- **Multiline JSDoc** on every `@property` and exported type member.
-- **Specs are `*.spec.ts`**, colocated, excluded from `tsconfig`.
-
-**Comments say why, not what.** The code already says what it does. A comment
-earns its place by recording a decision, a measurement, or a thing that was
-tried and did not work.
+- **Comments say why, not what.** A comment earns its place by recording a
+  decision, a measurement, or a thing that was tried and did not work. Where
+  there is a commit, an issue or a pull request to point at, link it rather than
+  restating it.
 
 ## Where a fix lives
 
@@ -54,7 +49,7 @@ the cause is deeper, the fix still goes deeper.
 
 ## Adding a Helix component
 
-There is a skill for it: `.agents/skills/adding-helix-components`. A component
+There is a skill for it: `.agents/skills/add-component`. A component
 is not one file. It is both tiers, tokens, specs on every part, manifest
 metadata and an example, and `helix component --only stable` knows the difference.
 

@@ -1,9 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCommand } from '@fusion.dev/helix-headless/command'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect imports: this renders both, and a custom element registers on
-   import, so a consumer importing this family alone would otherwise get two
-   inert unknown elements. */
 import '../../dialog/index.js'
 import '../../listbox/index.js'
 import { styles } from './command-root.css.js'

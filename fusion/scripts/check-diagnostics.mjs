@@ -27,7 +27,7 @@
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
-import { SOURCE } from '@fusion.dev/scripts/workspace'
+import { ARTIFACT, SOURCE } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
 const root = resolve(import.meta.dirname, '../..')
@@ -75,11 +75,9 @@ if (!bundle.success) {
 const collector = await bundle.outputs[0].text()
 
 const manifests = {
-  '@fusion.dev/helix': JSON.parse(
-    await readFile(join(root, 'helix/styled/custom-elements.json'), 'utf8'),
-  ),
+  '@fusion.dev/helix': JSON.parse(await readFile(join(root, ARTIFACT.styledManifest), 'utf8')),
   '@fusion.dev/helix-headless': JSON.parse(
-    await readFile(join(root, 'helix/headless/custom-elements.json'), 'utf8'),
+    await readFile(join(root, ARTIFACT.headlessManifest), 'utf8'),
   ),
 }
 

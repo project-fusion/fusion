@@ -1,6 +1,6 @@
 /* A row when there is a reading to put beside the bar, and a bare block when
-   there is not: the grid only exists under `show-value`, so a plain progress
-   bar generates exactly the box it always did. */
+   there is not: the grid only exists under `show-value`, so a plain progress bar
+   generates exactly the box it always did. */
 :host {
   display: block;
 }
@@ -25,25 +25,22 @@
   text-align: end;
 }
 
-/* The whole length the work is measured against, and it is always fully drawn:
-   a track that only appears where the fill has not reached leaves the bar
-   without a total, and a proportion needs both halves to be read as one. */
+/* The whole length the work is measured against, and it is always fully drawn: a
+   track that only appears where the fill has not reached leaves the bar without
+   a total, and a proportion needs both halves to be read as one. */
 [part="track"] {
   background-color: var(--progress-track-color, var(--helix-color-surface-sunken));
   block-size: var(--progress-size, var(--helix-size-progress));
   border-radius: var(--helix-radii-full);
   inline-size: 100%;
-  /* The fill is a child with a radius of its own, and at low values its
-     trailing corners would otherwise round outside the track. */
+  /* The fill is a child with a radius of its own, and at low values its trailing
+     corners would otherwise round outside the track. */
   overflow: hidden;
 }
 
 /* `scale` on the inline axis rather than a width, because a transform is
    composited: a bar updated many times a second is the ordinary case, and a
-   width animation lays the track out again on every frame.
- *
- * The origin is the inline start, so it grows from the same edge in both
- * writing directions without the component knowing which one it is in. */
+   width animation lays the track out again on every frame. */
 [part="indicator"] {
   background-color: var(--progress-color, var(--helix-color-primary));
   block-size: 100%;
@@ -58,49 +55,20 @@
   transform-origin: right center;
 }
 
-/* Running, with no knowable end.
- *
- * The same fill the determinate bar draws, doing the same thing it does, over
- * and over. Same color, same corner, same track: an indeterminate bar is the
- * component in a different state, not a different component, and a reader
- * should not have to work out that they are looking at the same control.
- *
- * **The segment is never anchored to either end.** A fill that reaches the end
- * reads as finished and a fill that starts at the start reads as a measurement,
- * and the state that must never say "this much is done" would then say it twice
- * a second: anchored to the inline start, forty per cent of every cycle is a bar
- * fixed to the left edge getting wider, which is a determinate bar filling.
- * Frozen at eight points of one cycle and laid out as a strip, the first half
- * read 0, 15, 55, 60 per cent and stalled there before traveling.
- *
- * So it enters from before the track and leaves past the end of it, and the only
- * frames where it touches an edge are the ones where it is half off the screen.
- * It swells in the middle of the crossing, which is what stops a thin bar
- * reading as a dot without ever making it long enough to be a proportion.
- *
- * `linear`, with the shaping in the spacing of the frames rather than in an
- * easing: it covers 30% of the track in the first third, 40% in the second and
- * 48% in the last, so it accelerates across. An `ease-in-out` over the whole
- * cycle stalls at the loop seam, which reads as a hitch every time it repeats.
- *
- * `translate` then `scale`, which is the order CSS applies the individual
- * transform properties in, both about an origin at the inline start. So
- * `translate: 30%` puts the leading edge three tenths along and `scale: 0.6`
- * makes it six tenths wide, and the two compose without either needing to know
- * the track's pixel width.
- */
-/* Slow enough to read as work rather than as a stripe going past. Derived from
-   the slowest duration token, so a theme that slows its motion slows this
-   with it.
-
-   **On the host, and that is not tidying.** Custom properties inherit downward
-   and the ring's `<svg>` is the indicator's *parent*, so declared on the
-   indicator the rotation written against the `<svg>` resolves
-   `var(--_progress-cycle)` to nothing, the `animation` shorthand fails to parse,
-   and `animation-name` falls back to `none`. The indeterminate ring then never
-   turns: a static arc parked on the groove, which is a value, which is the one
-   thing an indeterminate state must never look like. Measured: `animationName`
-   came back `none` on the element the rule names. */
+/* Running, with no knowable end. **The segment is never anchored to either
+   end.** A fill that reaches the end reads as finished and a fill that starts at
+   the start reads as a measurement, and the state that must never say "this much
+   is done" would then say it twice a second: anchored to the inline start, forty
+   per cent of every cycle is a bar fixed to the left edge getting wider, which
+   is a determinate bar filling. Frozen at eight points of one cycle and laid out
+   as a strip, the first half read 0, 15, 55, 60 per cent and stalled there
+   before traveling. `linear`, with the shaping in the spacing of the frames
+   rather than in an easing: it covers 30% of the track in the first third, 40%
+   in the second and 48% in the last, so it accelerates across. So `translate:
+   30%` puts the leading edge three tenths along and `scale: 0.6` makes it six
+   tenths wide, and the two compose without either needing to know the track's
+   pixel width. */
+/* Slow enough to read as work rather than as a stripe going past. */
 :host([indeterminate]) {
   --_progress-cycle: calc(var(--helix-duration-slow) * 5);
 }
@@ -111,14 +79,7 @@
   transition: none;
 }
 
-/* The travel is signed, because `translate` is physical and the track is not.
- *
- * `:dir(rtl)` flips `transform-origin` above and there is no logical form of
- * `translate`, so the segment kept moving left-to-right: it grew out of the
- * inline-start edge, which in a right-to-left document is the right, and then
- * traveled away from the track instead of across it. One custom property
- * carries the sign and the keyframes read it, which keeps one set of frames
- * rather than two that can drift. */
+/* The travel is signed, because `translate` is physical and the track is not. */
 :host([indeterminate]) [part="indicator"] {
   --_progress-way: 1;
 }
@@ -130,7 +91,7 @@
 /* Every offset carries the sign, including the negative one that puts the
    segment off the near edge: in a right-to-left document `--_progress-way` is
    `-1`, so `-18%` becomes `+18%`, and with the origin at the right edge that is
-   off the right rather than off the left. One set of frames, either direction. */
+   off the right rather than off the left. */
 @keyframes helix-progress-indeterminate {
   0% {
     scale: 0.18 1;
@@ -153,26 +114,9 @@
   }
 }
 
-/* Still, and no longer a segment.
- *
- * This is the one place the two states cannot look alike. A traveling segment
- * that has been stopped is parked somewhere along the track, which is exactly
- * what a value looks like, and a bar that cannot move cannot correct the
- * impression. So when motion is off the fill spans the track and is hatched: a
- * hatch is not a quantity at any speed, and "running, amount unknown" is what
- * is left to say once the movement is gone.
- *
- * Written here rather than left to the base layer, and that is not belt and
- * braces. The global reduced-motion rule is `*, *::before, *::after` in the
- * document, and `*` does not cross a shadow boundary, so it reaches no part of
- * any component in this library. Measured: under `prefers-reduced-motion:
- * reduce`, a light-DOM element came back at 1e-05s and this element at its full
- * authored duration. Every component that animates has to answer the preference
- * in its own sheet.
- *
- * After the rule it overrides, not folded into the reduced-motion block further
- * up: the selectors are identical, so source order is the whole of the cascade
- * and a block written earlier loses. */
+/* Still, and no longer a segment. Measured: under `prefers-reduced-motion:
+   reduce`, a light-DOM element came back at 1e-05s and this element at its full
+   authored duration. */
 @media (prefers-reduced-motion: reduce) {
   :host([indeterminate]) [part="indicator"] {
     animation: none;
@@ -186,21 +130,9 @@
   }
 }
 
-/* ============================================================ ring =======
- *
- * The loader's shape carrying the bar's value, which is what was asked for and
- * what a conic gradient could not give.
- *
- * Not a conic gradient, which fails on one thing: a gradient has hard radial
- * edges and no notion of a cap, so the rounded end the loader has has to be
- * drawn as a disc at each end of the arc, and those discs sit proud of the band
- * and are wider than the arc itself at small values. An SVG stroke has
- * `stroke-linecap: round` and needs none of it.
- *
- * `shape` therefore lives on the headless tier, where markup belongs. See the
- * note there: the value, the ARIA and the form participation are untouched, and
- * the only thing that changes is which shape carries the fraction.
- */
+/* ============================================================ ring ======= The
+   loader's shape carrying the bar's value, which is what was asked for and what
+   a conic gradient could not give. */
 :host([shape="ring"]) {
   display: inline-grid;
   place-items: center;
@@ -211,22 +143,18 @@
 
   /* The bar's own track rule paints this, and here it is an `<svg>`: the fill
      and the full radius it gives a bar came out as a solid gray disc behind the
-     ring, which read as a filled circle with an arc on its edge. The groove is a
-     stroked circle inside the drawing, not a background behind it. */
+     ring, which read as a filled circle with an arc on its edge. */
   background-color: transparent;
   block-size: var(--progress-ring-size, 4rem);
   grid-area: 1 / 1;
   inline-size: var(--progress-ring-size, 4rem);
-  /* Twelve o'clock, where a dial starts. An SVG circle starts at three. */
+  /* Twelve o'clock, where a dial starts. */
   rotate: -90deg;
 }
 
 /* Geometry as CSS rather than as attributes, so both circles read the ring's own
    properties and a consumer changing the thickness moves the circle that carries
-   it without the component recalculating anything.
-
-   `r` in per cent resolves against the diagonal normalized by root two, which
-   for the square this always is comes out as the side. */
+   it without the component recalculating anything. */
 :host([shape="ring"]) [part="groove"],
 :host([shape="ring"]) [part="indicator"] {
   cx: 50%;
@@ -263,36 +191,17 @@
   text-align: center;
 }
 
-/* Running: the arc draws the circle in and takes it away again.
- *
- * Not a fixed third of the ring turning, which is `Loader` exactly. A loader
- * says "something is happening" and has no circle to fill; a progress ring's
- * whole subject is a circle being filled, and its indeterminate state should be
- * that same act with the amount unknown rather than a different component
- * wearing its geometry. So the arc grows to most of the way round and shrinks
- * again, and the ring reads as filling even though nothing here is a
- * proportion.
- *
- * **Two motions, and the sweep is the one that carries it.** `stroke-dasharray`
- * grows the arc while `stroke-dashoffset` moves its tail, so head and tail each
- * advance monotonically and the arc never runs backwards. The rotation
- * underneath is what stops the shrink from reading as the arc retreating: the
- * tail catches up to a head that has already moved on.
- *
- * **The dash cycle ends one full lap along**, offset `-100` against a
- * `pathLength` of 100, so the last frame is the first frame and the loop has no
- * seam to hide. Landing short of a lap ticks once per cycle, where the two
- * frames fail to meet.
- *
- * The two periods are 10:7, so they line up only every seventh turn and the
- * pair never settles into a single beat. Same argument as the spinner's swell.
- *
- * The floor is 10 rather than 3, and that is a measurement rather than a
- * preference: the stroke is 8px on a 64px ring whose path is about 176px long,
- * so three per cent of it is 5px, shorter than the stroke is thick. With round
- * caps the two ends merge and the shortest frames render as a dot sitting on the
- * groove. Ten per cent is 18px, which still reads as an arc.
- */
+/* Running: the arc draws the circle in and takes it away again. **Two motions,
+   and the sweep is the one that carries it.** `stroke-dasharray` grows the arc
+   while `stroke-dashoffset` moves its tail, so head and tail each advance
+   monotonically and the arc never runs backwards. **The dash cycle ends one full
+   lap along**, offset `-100` against a `pathLength` of 100, so the last frame is
+   the first frame and the loop has no seam to hide. The two periods are 10:7, so
+   they line up only every seventh turn and the pair never settles into a single
+   beat. The floor is 10 rather than 3, and that is a measurement rather than a
+   preference: the stroke is 8px on a 64px ring whose path is about 176px long,
+   so three per cent of it is 5px, shorter than the stroke is thick. Ten per cent
+   is 18px, which still reads as an arc. */
 :host([shape="ring"][indeterminate]) [part="track"] {
   animation: helix-progress-ring var(--_progress-cycle) linear infinite;
 }
@@ -329,14 +238,7 @@
   }
 }
 
-/* Still, and the arc has to say "unknown" without moving.
- *
- * The same problem the bar answers with a hatch, and the same answer: a stopped
- * arc parked at some length is a value, and a ring that cannot move cannot
- * correct the impression. Held at a quarter with the groove behind it, which is
- * a fraction nobody would mistake for a reading of one, and the turn crawls
- * rather than stopping so the work still reads as outstanding. Same call the
- * spinner makes two files over. */
+/* Still, and the arc has to say "unknown" without moving. */
 @media (prefers-reduced-motion: reduce) {
   :host([shape="ring"]) [part="indicator"] {
     transition: none;
@@ -352,10 +254,7 @@
   }
 }
 
-/* Print: the same.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: the same. */
 @media print {
   :host {
     box-shadow: none;
@@ -363,25 +262,10 @@
   }
 }
 
-/* **Subtle, which is the quiet end of the axis: the bar keeps its area and stops
+/* *Subtle, which is the quiet end of the axis: the bar keeps its area and stops
    claiming to be the point.** A wash of its own color rather than a different
    color, so what it means does not change with how loudly it is said: `tone` is
-   the other axis and this one must not borrow from it.
-
-   `color-mix` toward the track rather than an `opacity`, because the indicator
-   sits on a groove that is already a surface: fading toward transparent would
-   show the groove through it and the reading would depend on what the groove
-   happened to be. Mixing toward the groove's own token lands where a translucent
-   fill would, without the compositing.
-
-   **Two rules, because the shapes do not paint the same way.** A bar is a box
-   with a `background-color` and the ring is an SVG circle with a `stroke`, which
-   this file already splits every other paint decision across. A single
-   `background-color` rule would have been silently inert on the ring, which is
-   the same quiet failure a `[part=]` selector for an unrendered part has.
-
-   The indeterminate segment needs nothing of its own: it is this same
-   `[part="indicator"]`, running rather than filling. */
+   the other axis and this one must not borrow from it. */
 :host([emphasis="subtle"]) [part="indicator"] {
   background-color: color-mix(
     in oklab,

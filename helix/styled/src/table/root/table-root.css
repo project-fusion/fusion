@@ -1,18 +1,4 @@
-/* The table scrolls its own box rather than squeezing its columns.
- *
- * A column track floors at `max-content`, so a table with more content than
- * room overflows instead of breaking a value mid-token. That overflow has to
- * land somewhere a reader can reach, and this is it.
- *
- * `overflow-x` and no container query, because scrolling is not a decision:
- * the box either has room or it does not, and the scrollbar is the answer at
- * every width. A query would be a second way to say the same thing.
- *
- * A fixed-position overlay is not clipped by an ancestor's overflow, and
- * `@floating-ui/dom` already clears the nearest clipping ancestor, so a select
- * or a tooltip inside a cell still escapes this. Measured rather than assumed:
- * a fixed child of a box reads the viewport through `overflow` and through
- * `container-type`, and only `contain: layout` moves it. */
+/* The table scrolls its own box rather than squeezing its columns. */
 :host {
   display: block;
   overflow-x: auto;
@@ -20,15 +6,9 @@
 
 [part="table"] {
   display: grid;
-  /* One grid for the whole table, which is what aligns every column across
-     every row. Rows are `display: contents` so their cells land here. */
-  /* The consumer's hook first, then what the columns worked out.
-   *
-   * `--table-columns` is the published hook and the component must never write
-   * it inline on the element that reads it: an inline declaration beats any
-   * stylesheet, so a consumer setting the documented name would be overruled
-   * every render. The derived track list carries its own private name, and the
-   * public one wins where it is set. */
+  /* One grid for the whole table, which is what aligns every column across every
+     row. */
+  /* The consumer's hook first, then what the columns worked out. */
   grid-template-columns: var(--table-columns, var(--table-template, minmax(0, 1fr)));
   inline-size: 100%;
 }
@@ -36,10 +16,7 @@
 /* The header row exists for the accessibility tree and must not exist for the
    layout: the whole table is one grid, which is what aligns every column across
    every row, so a wrapper that generated a box would take one cell and put all
-   three headings inside it.
-
-   `display: contents` is what the rows already do for the same reason, and an
-   element with a role stays in the accessibility tree through it. */
+   three headings inside it. */
 [part="head"] {
   display: contents;
 }
@@ -47,8 +24,7 @@
 /* What a collection says instead of rows: the same two lines everywhere, in the
    same voice, because a reader meeting "Loading" in a menu and a different
    arrangement of the same idea in a table is a reader learning the same thing
-   twice. Quiet and centered, since neither is content: they are the absence of
-   it, and an absence set like a heading reads as an error. */
+   twice. */
 [part="empty"],
 [part="loading"] {
   color: var(--helix-color-foreground-subtle);
@@ -60,17 +36,13 @@
   text-align: center;
 }
 
-/* Rows that are already there stay, and dim, while a new set arrives. Removing
-   them would collapse the box and throw the page around under the reader for
-   as long as the request takes; dimming says the same thing and holds still. */
+/* Rows that are already there stay, and dim, while a new set arrives. */
 :host([loading]) [part="table"] {
   opacity: 0.5;
 }
 
-/* Print: zebra striping is a fill printers drop unevenly, which is worse than none.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: zebra striping is a fill printers drop unevenly, which is worse than
+   none. */
 @media print {
   :host {
     background-color: transparent;

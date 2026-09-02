@@ -36,7 +36,7 @@ pub struct Context {
     pub settings: Settings,
 }
 
-/// `fusion.rules.json`, which is what a workspace says about itself.
+/// `fusion.json`, which is what a workspace says about itself.
 ///
 /// **Optional, every key of it.** A rule needing something this does not carry
 /// reports nothing rather than guessing, and `floors` is what makes that visible
@@ -51,15 +51,6 @@ pub struct Settings {
     /// Roots whose modules run under a framework that hydrates, where
     /// registering a custom element at module scope is a fault.
     pub hydrates: Vec<String>,
-
-    /// Paths this repository has lived at before. Add one when it moves again.
-    ///
-    /// **A list rather than an inference**, because which paths on the host are
-    /// ours cannot be inferred: a dependency's own repository is in this tree
-    /// and is nobody's mistake. A move is an event, so the name it moved from is
-    /// what catches whatever the move missed.
-    #[serde(default)]
-    pub former: Vec<String>,
 
     /// British spellings and the American form each is written as.
     ///
@@ -124,7 +115,7 @@ pub struct Spec {
 impl Settings {
     /// Reads the settings beside the workspace, or an empty set.
     pub fn read(root: &Path) -> Self {
-        fs::read_to_string(root.join("fusion.rules.json"))
+        fs::read_to_string(root.join("fusion.json"))
             .ok()
             .and_then(|raw| serde_json::from_str(&raw).ok())
             .unwrap_or_default()

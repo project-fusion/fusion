@@ -63,7 +63,7 @@ A reverse index is maintained on insert, so cascading deletion does not require
 a full scan, and dangling parent references are dropped afterwards so the graph
 stays consistent.
 
-This is the Sovereignty Constraint made mechanical. A user's right to delete is
+This is what makes deletion mechanical rather than nominal. A user's right to delete is
 only real if the system can find everything that was derived from what they
 deleted, and provenance is what makes that tractable.
 

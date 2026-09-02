@@ -1,7 +1,7 @@
+import { VerticalPage } from '@/components/vertical-page/vertical-page'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { VerticalPage } from '../vertical-page'
 import { CORTEX_MODULES } from './modules'
 
 const vertical = findVertical('/cortex')

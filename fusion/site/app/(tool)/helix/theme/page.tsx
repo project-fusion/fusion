@@ -1,10 +1,10 @@
 import { pageMetadata } from '@/utils/metadata/metadata'
+import { intentFrom, type Params, SCOPE, settingsFrom } from '@/utils/theme-defaults/theme-defaults'
 import { getFamilies } from '../../../../content/catalog/catalog'
 import { GOOGLE_FACES } from '../../../../content/faces/faces.generated'
 import { INSIGHTS } from '../../../../content/insights'
 import { serverTheme } from '../../../../utils/theme-engine/theme-engine.server'
 import { ThemeBuilder } from './builder'
-import { intentFrom, type Params, SCOPE, settingsFrom } from './defaults'
 import { THEMED_CONTEXTS, THEMED_LAYOUTS, THEMED_MARKUP } from './themed-page-markup.generated'
 
 /**

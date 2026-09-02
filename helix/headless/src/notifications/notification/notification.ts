@@ -15,9 +15,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
    plain `html` cannot: it renders the placeholder as the element instead, which
    shifts every attribute after it by one. See `renderTime`. */
 import { html } from 'lit/static-html.js'
-/* Side-effect import, because this template interpolates the family's tag and a
-   custom element registers on import. Both tiers import it, the relative path
-   resolving to each tier's own element. */
+/* Both tiers import this, the relative path resolving to each tier's own element. */
 import '../../format-date/index.js'
 
 /**

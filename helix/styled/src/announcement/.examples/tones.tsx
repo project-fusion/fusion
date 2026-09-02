@@ -5,10 +5,10 @@ export function Example() {
         Scheduled maintenance on Sunday, from 02:00 to 04:00 UTC.
       </helix-announcement>
       <helix-announcement tone="surface">
-        Fusion Design ships a new component every week.
+        Read the changelog for everything that shipped this week.
       </helix-announcement>
       <helix-announcement tone="primary">
-        Fusion Mind is available on every plan from today.
+        Single sign-on is available on every plan from today.
       </helix-announcement>
       <helix-announcement tone="info">A new region is open in eu-west-2.</helix-announcement>
       <helix-announcement tone="success">

@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessButton } from '@fusion.dev/helix-headless/button'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { MixinControlSurface } from '../../mixins/mixin-control-surface/mixin-control-surface.js'
+import { MixinControlSurface } from '../../shared/mixin-control-surface/mixin-control-surface.js'
 import { styles } from './button-root.css.js'
 
 /**

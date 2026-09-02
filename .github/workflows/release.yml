@@ -10,12 +10,10 @@
 # a second build, so the bytes users install are bytes no smoke test ever ran,
 # and it cannot be undone, because a version is permanent while a tag moves back.
 #
-# **Nothing here pushes to `main`.** The version is not committed: every
-# manifest holds `0.0.0-dev`, the tag is the record, and the real number is
-# stamped in this job seconds before packing. A release bot with write access
-# that outranks branch protection would be a standing hole in the same place the
-# governance gate is meant to be strongest, and it would buy a number `git tag`
-# already holds. Tags are pushed. Branches are not.
+# **The tag is the record and the npm manifests carry a copy.** The number is
+# computed from the tag, stamped seconds before packing, and pushed back to
+# `main` by the App set up at the stamp step below, which is the one thing here
+# that writes to a branch. The crates are not stamped and rest at `0.0.0-dev`.
 #
 # Domains release independently, which is what per-domain lockstep means: a
 # Cortex fix must not bump the Helix docs to a version in which nothing about
@@ -105,13 +103,16 @@ jobs:
     outputs:
       domains: ${{ steps.resolve.outputs.domains }}
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - run: git fetch --tags --force
+      - name: Fetch the tags, which carry the version
+        run: git fetch --tags --force
 
-      - id: resolve
+      - name: Resolve the release intent
+        id: resolve
         env:
           SHA: ${{ github.sha }}
         run: |
@@ -167,15 +168,18 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v7
+      - name: Check out
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       # The version is computed from tags, and a checkout that has none reports
       # every release as the first one.
-      - run: git fetch --tags --force
+      - name: Fetch the tags, which carry the version
+        run: git fetch --tags --force
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
 
@@ -191,7 +195,8 @@ jobs:
       # **A refused write is reported as a 404**, naming the package as if it did
       # not exist, so this failure does not look like an auth failure. The
       # default registry is already npmjs.org, so the line buys nothing anyway.
-      - uses: actions/setup-node@v7
+      - name: Install Node, which `cem analyze` shells out to
+        uses: actions/setup-node@v7
         with:
           node-version: '22.20.0'
 
@@ -203,11 +208,14 @@ jobs:
       # Pinned rather than floated to `^11.5.1`: this is the npm the packages
       # were bootstrapped with, so CI authenticates the way the registry has
       # already accepted, and a bad npm release cannot reach a publish job.
-      - run: npm install -g npm@11.18.0
+      - name: Install an npm that can do trusted publishing
+        run: npm install -g npm@11.18.0
 
-      - run: bun install --frozen-lockfile
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
-      - id: version
+      - name: Compute the version from the tags
+        id: version
         run: |
           node fusion/scripts/version.mjs \
             --domain "${{ matrix.target.domain }}" --bump "${{ matrix.target.level }}" --write
@@ -239,9 +247,11 @@ jobs:
       # manifest, so packing straight after stamping ships every package pinned
       # to the previous release. `publish.mjs` refuses when it sees it; this is
       # what stops it happening.
-      - run: bun install
+      - name: Install dependencies, lockfile free, so the stamped versions resolve
+        run: bun install
 
-      - run: bun run build
+      - name: Build
+        run: bun run build
 
       # **`analyze` is on the critical path of packing, and only since the
       # manifests stopped being tracked.** `files` names `custom-elements.json`
@@ -249,7 +259,8 @@ jobs:
       # turbo has `analyze` depending on `build`, not the other way round, so a
       # build alone leaves them absent and the tarball ships without files its
       # own manifest promises.
-      - run: bun run analyze
+      - name: Write the manifests and framework typings
+        run: bun run analyze
 
       - name: Publish to staging
         run: node fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next

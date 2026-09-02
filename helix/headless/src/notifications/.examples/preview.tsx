@@ -34,7 +34,7 @@ export function Example() {
       </helix-headless-notification>{' '}
       <helix-headless-notification at={at[2]} default-read dismissible>
         {' '}
-        Your invitation to Fusion Design was accepted.{' '}
+        Your invitation to the Platform team was accepted.{' '}
       </helix-headless-notification>{' '}
       <a href="#all" slot="footer">
         See everything

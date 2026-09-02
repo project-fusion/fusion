@@ -1,50 +1,13 @@
-/* The button styles itself.
- *
- * A part selector crosses exactly one shadow boundary, so a document rule
- * reaches a button on the page and stops one short of a button inside
- * `helix-color-picker`. Measured there: no background, no border, no radius and
- * no padding at all.
- *
- * So the component owns its presentation and the base layer keeps the
- * `data-button` recipe, which is what the recipe is for: `<Link
- * data-button="solid">` is a router's own anchor, a thing this element cannot
- * render, and it needs those declarations written for the light DOM. The two
- * say the same thing twice, deliberately, in the two places they have to be
- * said.
- *
- * Density crosses on its own, as `--helix-text-control` and
- * `--helix-space-control` beside `--helix-size-control`. A custom property is
- * the only thing that reaches into a shadow root without being aimed at it.
- */
+/* The button styles itself. */
 :host {
   display: inline-flex;
 }
 
-/* Two axes, and the color is the one the emphases read.
- *
- * `emphasis` is the fill (solid, outlined, subtle, ghost) and `tone` is what
- * the button means (neutral, primary, danger). One property cannot carry both:
- * a rank ladder with a color wedged into it has no way to write an outlined
- * Delete or a Delete in a menu row, which are the two commonest destructive
- * buttons there are, and no way to write a filled neutral. `Tag` made this same
- * split first and its note carries the argument.
- *
- * Every emphasis below is written once against these four, so a tone is four
- * declarations rather than four rules, and adding one is one block.
- *
- * Neutral's tone *is* the foreground, so the outlined wash below and ghost's
- * hover resolve against the ink rather than against a color of their own. */
+/* Two axes, and the color is the one the emphases read. */
 :host {
   --_button-edge: var(--helix-color-border);
-  /* The solid fill, separate from the tone, and it has to be separate.
-   *
-   * `--_button-tone` is the color of the *ink* on every emphasis but this
-   * one: an outlined or ghost primary draws its label with it, and in dark mode
-   * that is deliberately the lighter brand so the text is legible on a dark
-   * page. A solid button wants the opposite, a fill dark enough to carry white,
-   * so pointing one variable at both made every filled tone fail in dark mode.
-   * Measured: primary 2.80, warning 1.84. Defaults to the tone, which is what
-   * neutral wants. */
+  /* The solid fill, separate from the tone, and it has to be separate. Measured:
+     primary 2.80, warning 1.84. */
   --_button-fill: var(--_button-tone);
   --_button-fill-hover: var(--_button-tone-hover);
   --_button-on-tone: var(--helix-color-background);
@@ -66,11 +29,9 @@
   --_button-tone-hover: var(--helix-color-primary-hover);
 }
 
-/* The second tone, and it takes the same six declarations as the first because
-   a tone that behaves differently from the one beside it is a tone a consumer
-   has to learn separately. What it *is* comes from the palette: a
-   rotation off the brand seed rather than a color of its own, so it stays in
-   relation when somebody rethemes. `--helix-seed-accent-hue` is the angle. */
+/* The second tone, and it takes the same six declarations as the first because a
+   tone that behaves differently from the one beside it is a tone a consumer has
+   to learn separately. */
 :host([tone="accent"]) {
   --_button-edge: var(--helix-color-accent);
   --_button-fill: var(--helix-color-accent-surface);
@@ -85,12 +46,7 @@
   --_button-fill-hover: var(--helix-color-danger-surface-hover);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-danger);
-  /* Mixed toward the ink, for the ink states rather than the fill.
-   *
-   * Never for the solid fill: `--helix-color-foreground` is near-white in dark
-   * mode, so the mix *lightens* it and a hover makes white text on it harder to
-   * read at the moment the reader is aiming at the button. The fill has its own
-   * token and goes one step darker in both modes. */
+  /* Mixed toward the ink, for the ink states rather than the fill. */
   --_button-tone-hover: color-mix(
     in oklab,
     var(--helix-color-danger) 86%,
@@ -99,37 +55,19 @@
 }
 
 /* `all: unset` first, so the UA's own button styling is gone before anything
-   below lands. Without it the UA border and background win on properties these
-   rules do not name. */
+   below lands. */
 [part="button"] {
   all: unset;
   align-items: center;
-  /* A wash of the foreground, inside a hairline.
-   *
-   * Not `surface`, which on a white page is fifteen thousandths off the paper,
-   * so the fill does nothing. A percentage of the foreground is a step away
-   * from whatever it sits on in either mode, which a fixed neutral cannot be,
-   * and the same button drops onto a page, a card and a panel.
-   *
-   * The line separates outlined from ghost by kind, nothing against a line
-   * against a fill. Without it they are six points of the same wash apart and
-   * nothing else, and a row of them reads as one solid button and two ghosts of
-   * slightly different faintness. */
+  /* A wash of the foreground, inside a hairline. */
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 6%, transparent)
   );
-  /* A container that has already sized its own row can say so.
-   *
-   * Density is the general answer and stays the default: a region says `sm` and
-   * every control in it agrees. What density cannot express is a row whose
-   * height is not one of the three steps, and `Breadcrumbs` is that row. A crumb
-   * is `1lh` plus `2xs` either side, 28px, which is between `sm` at 32 and
-   * nothing, so a button slotted into one steps the whole trail: measured 40 at
-   * the default and still 32 under `data-density="sm"`, against links of 28.
-   *
-   * One hook rather than a second control size: the container knows the number
-   * and no scale contains it. */
+  /* A container that has already sized its own row can say so. A crumb is `1lh`
+     plus `2xs` either side, 28px, which is between `sm` at 32 and nothing, so a
+     button slotted into one steps the whole trail: measured 40 at the default
+     and still 32 under `data-density="sm"`, against links of 28. */
   block-size: var(--button-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--_button-edge);
   box-sizing: border-box;
@@ -144,12 +82,7 @@
   justify-content: center;
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-tight);
-  /* The inline rhythm, for the same container that already sets `--button-size`.
-   *
-   * Height alone is not "looks like it belongs": a trigger pinned to a crumb's
-   * height still carried `space-control`, which is `md`, beside crumbs padded
-   * `xs`, so it read as a chunk wedged into a light row. Two properties because
-   * the box has two axes and a container that knows one knows the other. */
+  /* The inline rhythm, for the same container that already sets `--button-size`. */
   padding-inline: var(--button-padding-inline, var(--helix-space-control));
   text-decoration: none;
   transition:
@@ -160,20 +93,10 @@
 }
 
 /* Four corners rather than one `border-radius`, so a group can flatten the two
- * it needs to.
- *
- * `--button-radius-start` and `--button-radius-end` are published for exactly
- * that: `helix-button-group` sets them through `::slotted()`, which reaches the
- * host and hands the value across the boundary the way a custom property can and
- * a rule cannot.
- *
- * **And a corner apiece under those, because a pair groups by one axis only.**
- * `start` and `end` name the two *inline* sides, which is all a row of buttons
- * needs: the first keeps its leading corners and the last its trailing ones. A
- * column needs the other axis, top two and bottom two, and no setting of an
- * inline pair can say that. Each corner reads its own name first and falls
- * through to the pair, so nothing that set the pair changes and a group
- * stacking vertically has something to write. */
+   it needs to. **And a corner apiece under those, because a pair groups by one
+   axis only.** `start` and `end` name the two *inline* sides, which is all a row
+   of buttons needs: the first keeps its leading corners and the last its
+   trailing ones. */
 [part="button"] {
   border-end-end-radius: var(
     --button-radius-end-end,
@@ -193,21 +116,11 @@
   );
 }
 
-/* Hover deepens the wash rather than drawing a line that was not there.
- *
- * A named fill wins outright, hover included, which is why this reads the hook
- * as well: a consumer who names an exact color and then watches it change under
- * the pointer has been given a hook that half works. Wanting a different color
- * on hover is one line and the same hook, on the host, where a custom property
- * crosses into this tree.
- *
- * **Every hover is gated on the control being live.** Disabled is
- * `cursor: not-allowed` and half the opacity and nothing else, so an ungated
- * fill still deepens under the pointer: a button that refuses the press and
- * lights up as though it took it. `:not(:disabled)` rather than
- * `:not([disabled])`, for the reason the disabled rule below records: the
- * pseudo-class also matches a control inside a `<fieldset disabled>`, which the
- * attribute never sees. */
+/* Hover deepens the wash rather than drawing a line that was not there. **Every
+   hover is gated on the control being live.** Disabled is `cursor: not-allowed`
+   and half the opacity and nothing else, so an ungated fill still deepens under
+   the pointer: a button that refuses the press and lights up as though it took
+   it. */
 :host(:not(:disabled)) [part="button"]:hover {
   background-color: var(
     --button-background-color-hover,
@@ -220,17 +133,11 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The three departures from it. `outlined` is the resting state and needs no
- * rule: written out, it selects nothing and lands on the block above, which is
- * how `orientation` and `chevron-placement` already work.
- *
- * **Every one of them names its own hover, including the ones whose fill does
- * not change.** The generic hover above is `:host(:not(:disabled))
- * [part="button"]:hover`, four class-equivalents, and an emphasis rule is
- * three, so without a hover of its own an emphasis loses its fill the moment
- * a pointer touches it. Measured on the old `danger`, which had no hover rule:
- * a red button that turned neutral gray under the pointer, in every build since
- * it was written. */
+/* The three departures from it. **Every one of them names its own hover,
+   including the ones whose fill does not change.** The generic hover above is
+   `:host(:not(:disabled)) [part="button"]:hover`, four class-equivalents, and an
+   emphasis rule is three, so without a hover of its own an emphasis loses its
+   fill the moment a pointer touches it. */
 :host([emphasis="solid"]) [part="button"] {
   background-color: var(--button-background-color, var(--_button-fill));
   border-color: transparent;
@@ -244,8 +151,8 @@
   border-color: transparent;
 }
 
-/* A wash with no line, for a button that should read as colored without
-   reading as the one thing to press. */
+/* A wash with no line, for a button that should read as colored without reading
+   as the one thing to press. */
 :host([emphasis="subtle"]) [part="button"] {
   background-color: var(
     --button-background-color,
@@ -268,16 +175,11 @@
   color: var(--button-foreground-color, var(--_button-tone));
 }
 
-/* A wash of the tone, not a fixed surface.
- *
- * `--helix-color-surface-sunken` is an absolute value, and every one of these
- * sits on a surface whose own lightness is not. Measured on a ghost button
- * inside a dialog: sunken is `oklch(0.15)` in dark mode against a panel at
- * `oklch(0.29)`, so the hover was a 1.39 step darker than the surface it was on,
- * which on a raised panel reads as a hole rather than as a press. On the page,
- * where the token was chosen, the step is 1.11 and correct. A translucent mix
- * composites against whatever is behind it, so one value is right on every
- * surface and there is nothing to keep in sync. */
+/* A wash of the tone, not a fixed surface. Measured on a ghost button inside a
+   dialog: sunken is `oklch(0.15)` in dark mode against a panel at `oklch(0.29)`,
+   so the hover was a 1.39 step darker than the surface it was on, which on a
+   raised panel reads as a hole rather than as a press. On the page, where the
+   token was chosen, the step is 1.11 and correct. */
 :host(:not(:disabled)[emphasis="ghost"]) [part="button"]:hover {
   background-color: var(
     --button-background-color-hover,
@@ -286,35 +188,24 @@
   border-color: transparent;
 }
 
-/* How much of the room available to it the button takes. On the host, since the
-   host is the box in the layout. */
+/* How much of the room available to it the button takes. */
 :host([width="standard"]) {
-  /* **A floor, never a fixed width.** Under `inline-size` a label wider than
-     the standard one fills the box edge to edge and then eats its own padding,
-     so the axis that exists to stop short buttons looking mean makes long ones
-     look broken. `min-inline-size` keeps the pairing intact: a
-     `<Link data-button>` and a `<helix-button>` agree on the floor and on the
-     content above it. */
+  /* *A floor, never a fixed width.** Under `inline-size` a label wider than the
+     standard one fills the box edge to edge and then eats its own padding, so
+     the axis that exists to stop short buttons looking mean makes long ones look
+     broken. */
   min-inline-size: var(--button-inline-size, var(--helix-size-button));
-  /* Never wider than the room it has. A standard width is a floor for tidiness,
-     not a promise to overflow a narrow column to keep it. */
+  /* Never wider than the room it has. */
   max-inline-size: 100%;
 }
 
-/* Block-level, not the resting `inline-flex`. A control that fills its container
-   should not be able to share a line with anything beside it. */
+/* Block-level, not the resting `inline-flex`. */
 :host([width="full"]) {
   display: flex;
   inline-size: 100%;
 }
 
-/* `:host(:disabled)`, not `:host([disabled])`.
- *
- * The pseudo-class matches on the element's own attribute *and* on an ancestor
- * `<fieldset disabled>`; the attribute selector only ever sees the first. On the
- * attribute, a button in a disabled fieldset refuses the click and still paints
- * full primary, which reads as a button that is simply broken. Listbox carries
- * the longer note. */
+/* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:disabled) [part="button"] {
   cursor: not-allowed;
   opacity: 0.5;
@@ -326,12 +217,7 @@
   --icon-size: 1.15em;
 }
 
-/* Not printed, being a control. Paper cannot be pressed, and a printed button
- * carries its chrome, which is the half that says press me.
- *
- * `@media print` does not cross a shadow boundary any more than a
- * reduced-motion rule does, so a page cannot answer this on a component's
- * behalf and every family says it for itself. */
+/* Not printed, being a control. */
 @media print {
   :host {
     display: none;

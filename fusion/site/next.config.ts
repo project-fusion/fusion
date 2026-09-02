@@ -117,18 +117,6 @@ const config: NextConfig = {
         permanent: true,
         source: '/helix/components/editor',
       },
-
-      /* Stage labels are honest was a note arguing that we do not soften
-         Active, Building and Declared. The rule is live and `AGENTS.md` states
-         it, but the labels carry it on the pages that show them, and an essay
-         asserting our own honesty is the company describing itself rather than
-         its work. The address was published and is in `published.json`, so it
-         answers to the writing rather than to nothing. */
-      {
-        destination: '/insights',
-        permanent: true,
-        source: '/insights/stage-labels-are-honest',
-      },
     ]
   },
 

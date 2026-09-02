@@ -13,11 +13,10 @@
 //! would be a second copy of a file, and a second copy is the thing this
 //! repository spends its checks preventing.
 //!
-//! **It runs on the reader's machine and Fusion operates nothing.** The
-//! Sovereignty Constraint decides the shape before the content: a server we host
-//! is a dependency a user cannot exit, and this is a subcommand of a binary they
-//! already installed, speaking over stdio to a client they chose. There is no
-//! network in it.
+//! **It runs on the reader's machine and Fusion operates nothing.** A server we
+//! hosted would be one more thing to keep running and one more thing to trust,
+//! and this is a subcommand of a binary they already installed, speaking over
+//! stdio to a client they chose. There is no network in it.
 //!
 //! **JSON-RPC by hand rather than a framework.** The protocol surface used here
 //! is three methods and a handful of shapes, and the alternative is a dependency

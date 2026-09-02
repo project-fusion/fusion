@@ -1,0 +1,59 @@
+body:
+  - attributes:
+      description:
+        Your issue may already be filed. Search first, then list the words you
+        searched for, so the next person finds this one.
+      label: Search keywords
+    id: keywords
+    type: input
+    validations:
+      required: true
+  - attributes:
+      label: Latest version
+      description: Fixes go out in releases, and the one you are on may already have it.
+      options:
+        - label: I have reproduced this on the latest release
+          required: true
+    id: latest
+    type: checkboxes
+  - attributes:
+      description: What you did, what you expected, and what happened instead.
+      placeholder:
+        Set `shape="pill"` on `helix-button` and the corners stayed square.
+      label: What happened
+    id: what
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        A link to something we can open. A repository, a StackBlitz, or a
+        CodeSandbox. We cannot fix what we cannot reproduce, and markup pasted
+        without the tokens and the imports around it usually will not run.
+      label: How to reproduce it
+      placeholder: https://stackblitz.com/edit/...
+    id: reproduce
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description: Which packages, and at what versions. `bun pm ls` prints them.
+      placeholder: "@fusion.dev/helix 1.4.0, bun 1.1.43, Chrome 141"
+      label: Versions
+    id: versions
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        Anything you tried that did not work, or the point at which you stopped
+        being sure. This is more useful than it feels.
+      label: What you already ruled out
+    id: ruled-out
+    type: textarea
+    validations:
+      required: false
+description: Something does not work the way it is documented to work.
+labels: [bug]
+name: Bug
+title: "[bug] "

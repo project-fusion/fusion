@@ -7,13 +7,14 @@ Packages are flat inside this folder, one directory each, the same arrangement
 
 | Package | Publishes as | What it is |
 |---|---|---|
-| `core` | — | the substrate itself |
-| `trace` | — | provenance capture |
-| `engram` | — | the memory store |
+| `core` | none | the substrate itself |
 | `docs` | `cortex-docs` | the documentation as content, versioned with Cortex |
+| `engram` | none | the memory store |
+| `trace` | none | provenance capture |
 
-Only `docs` publishes today, and it is at `0.0.0-dev`: the domain has taken no
-release, so the rest of this folder is not yet on the registry.
+Only `docs` publishes today, and the release stamps its number into the manifest.
+The crates are not on the registry yet and rest at `0.0.0-dev`, because nothing
+stamps them.
 
 **Versioning is per domain, not per repository.** `cortex-v*` tags allocate
 Cortex's versions and `helix-v*` allocate Helix's, so a release of either does

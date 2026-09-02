@@ -6,18 +6,10 @@
    above it can clip it. `margin: 0` because the UA gives a popover its own, and
    the position written by the controller is measured from the border box. */
 /* A row, so anything slotted in sits on the middle line rather than on the
-   baseline of a text run it is not part of. A plain string is one anonymous
-   item and centers against itself, which is where it already was; an icon
-   beside a word, or a heading over a line of detail, is what moves. */
+   baseline of a text run it is not part of. */
 /* The UA's own `[popover]` rule sets `overflow: auto`, which makes the surface a
    scroll container, and anything positioned outside a scroll container is
-   clipped. The arrow is drawn deliberately outside it. Measured on a bare
-   popover with a child hanging four pixels past the edge: `scrollHeight`
-   exceeded `clientHeight`, so the box was overflowing and trimming rather than
-   letting the point show.
-
-   Nothing in these surfaces scrolls, so `visible` costs nothing and is what a
-   bubble with a point on it wants. */
+   clipped. */
 [part="tooltip"] {
   overflow: visible;
   align-items: center;
@@ -31,37 +23,18 @@
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   /* Stated, because a tooltip inherits from wherever its trigger happens to sit
-     and a trigger sits anywhere. In a table's column header, which is semibold,
-     every word of the tip came out bold: a paragraph of explanation set like a
-     heading, which reads as shouting rather than as the aside it is. The size
-     was already said here for the same reason; the weight was not. */
+     and a trigger sits anywhere. */
   font-weight: var(--helix-weight-regular);
   inline-size: max-content;
   line-height: var(--helix-leading-tight);
   margin: var(--helix-space-none);
   max-inline-size: var(--tooltip-max-inline-size, 16rem);
-  /* Out until placed, and `data-placed` below is what lets it in.
-   *
-   * Not `@starting-style`, which was tried and is a frame too early: it fires
-   * when the element is first rendered, and the controller positions on a
-   * microtask after that, so the entrance began at whatever the stylesheet said
-   * and traveled to the real position. `data-placed` is written once the panel
-   * is measured and placed, cleared when it closes, and left alone while it is
-   * merely repositioned, so it fires exactly once per open and never mid-scroll.
-   * Select already waited on it for the same reason. */
+  /* Out until placed, and `data-placed` below is what lets it in. */
   opacity: 0;
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   position: fixed;
   scale: 0;
-  /* And it leaves the same way it arrived.
-   *
-   * The two lines below are what make an exit possible at all on a top-layer
-   * element, and without them the transition above ran in one direction only:
-   * closing removes `data-placed` *and* stops `:popover-open` matching, so the
-   * `display: none` rule landed in the same frame and there was nothing left to
-   * transition. `overlay` is the second half, or the panel drops out of the top
-   * layer immediately and fades out behind whatever it was covering. Dialog
-   * carries the long version of this. */
+  /* And it leaves the same way it arrived. */
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized),
@@ -75,19 +48,7 @@
 }
 
 /* The point, drawn as a square turned forty-five degrees and half buried under
-   the bubble, so what shows is a triangle in the bubble's own fill. No border,
-   because the bubble has none: it is a solid on an inverse surface, and a
-   rotated square with nothing on its edges needs no seam hidden.
-
-   The controller places it, writing `inset-block-start` and `inset-inline-start`
-   as inline styles from the arrow middleware. Only the axis it travels on is
-   written, so the rules below supply the other one: on a `top` placement it
-   moves horizontally and sits at the bubble's bottom edge, half its own size
-   past it.
-
-   `overflow: visible` above is what lets it show at all. The UA's `[popover]`
-   rule makes the surface a scroll container, and a child hanging outside one is
-   clipped rather than drawn. */
+   the bubble, so what shows is a triangle in the bubble's own fill. */
 [part="arrow"] {
   background-color: var(--tooltip-background-color, var(--helix-color-surface-inverse));
   block-size: var(--tooltip-arrow-size, 0.5rem);
@@ -96,24 +57,11 @@
   rotate: 45deg;
 }
 
-/* **Glass takes the ink with it, which is what makes this different from every
+/* *Glass takes the ink with it, which is what makes this different from every
    other family that carries the axis.** A tooltip's resting state is
    `surface-inverse` with `foreground-inverse` on it, and
    `--helix-material-translucent` is the *page's* ground, `neutral-0` in light
-   and `neutral-900` in dark. Take the one without the other and a light bubble
-   carries light ink, so the whole pair flips.
-
-   The bubble also gains the hairline it did not need while it was the darkest
-   thing on the screen: a glass one has to be told from what is *behind* it. The
-   arrow follows the bubble in both, because a point in a different substance
-   from the surface it is on is a seam rather than a point.
-
-   **The edge is a hairline and not `--helix-border-floating`**, which defaults
-   to zero because floating is shadow-first. This bubble has no shadow, so the
-   replacement cannot be a token whose resting value is nothing.
-
-   Both hooks still win, so a consumer who set `--tooltip-background-color` gets
-   it in either material. */
+   and `neutral-900` in dark. */
 :host([material="glass"]) [part="tooltip"],
 :host([material="glass"]) [part="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, var(--helix-material-backdrop));
@@ -121,8 +69,7 @@
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
-   the heavier blur is what stops a ground that opaque reading as a smear. The
-   two move together because either without the other does nothing. */
+   the heavier blur is what stops a ground that opaque reading as a smear. */
 :host([material="frosted"]) [part="tooltip"],
 :host([material="frosted"]) [part="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, blur(var(--helix-material-blur-lg)));
@@ -151,25 +98,12 @@
   inset-inline-end: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
 }
 
-/* It grows out of its own point, so a tooltip above its trigger expands
-   downward out of the arrow and one to the left expands rightward out of it. A
-   center origin reads as the bubble inflating in place, which says nothing about
-   what it belongs to.
-
-   The arrow is not reliably at the middle of that edge, which is why these read
-   `--floating-arrow-x` and `--floating-arrow-y` rather than `50%`:
-   `top-start` puts it near one end and `shift` slides it anywhere along the
-   edge to keep the bubble on screen. The floating controller writes the center
-   of the pointer it has just placed, on the axis the pointer travels; the other
-   axis is the bubble's edge, and the fallback is what stands there.
-
-   `^=` because each pair of names shares an axis, and the axis is all these
-   rules decide.
-
-   Percentages and lengths rather than keywords, because `transform-origin` has
-   no logical ones. `block-end` and `inline-start` do not merely fail, they make
-   the whole declaration invalid and it is dropped at parse time, silently: the
-   tooltip still scales, from its middle, and nothing reports why. */
+/* It grows out of its own point, so a tooltip above its trigger expands downward
+   out of the arrow and one to the left expands rightward out of it. The arrow is
+   not reliably at the middle of that edge, which is why these read
+   `--floating-arrow-x` and `--floating-arrow-y` rather than `50%`: `top-start`
+   puts it near one end and `shift` slides it anywhere along the edge to keep the
+   bubble on screen. */
 [part="tooltip"][data-placement^="top"] {
   transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
@@ -188,20 +122,15 @@
 
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and the
    rules above are author declarations that outrank it whatever their
-   specificity. Restated here, the same way Popover and Menu restate theirs. */
+   specificity. */
 [part="tooltip"]:not(:popover-open) {
   display: none;
 }
 
 /* The whole effect is the movement, so with motion reduced it is not replaced
-   with a slower one: the tooltip simply appears, which is what it did before.
-   Named one selector at a time, because a reduce rule written looser than the
-   rule it answers loses on specificity and does nothing. */
+   with a slower one: the tooltip simply appears, which is what it did before. */
 @media (prefers-reduced-motion: reduce) {
-  /* The scale and the transition go; the opacity gate stays. It is not motion,
-     it is the panel waiting to be positioned before it is looked at, and
-     lifting it here would put back the one-frame jump `data-placed` exists to
-     stop. What is given up is the movement, not the correctness. */
+  /* The scale and the transition go; the opacity gate stays. */
   [part="tooltip"] {
     scale: 1;
     transition: none;
@@ -212,15 +141,7 @@
   }
 }
 
-/* Not printed, being an overlay.
- *
- * It is over the page rather than part of it, and on paper there is no over: a
- * tooltip prints its tip beside nothing that is hovering.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+/* Not printed, being an overlay. */
 @media print {
   :host {
     display: none;

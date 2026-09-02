@@ -1,41 +1,20 @@
-/* The component docs: three columns, a preview, and an API table.
- *
- * One route's styling, read by this layout and the `[family]` page under it and
- * nowhere else on the site. A module rather than another global sheet, so the
- * names are scoped and cannot collide with a future `.docsMain` somewhere else:
- * a duplicated selector in a global sheet is won silently by the later copy.
- */
+/* The component docs: three columns, a preview, and an API table. */
 
 /* ============================================================ docs ======= */
 
-/* Three columns: what you can go to, what you are reading, and where you are
-   in it. Navigation on the left because that is where a reader looks for it,
-   the rail on the right because it is about this page rather than the site.
-   Both are sticky, so neither scrolls out from under the content it describes.
-
-   The middle track is the only one that grows, and the prose inside it is
-   centered in that track rather than filling it: a reference read at the full
-   width of a desktop is a line nobody can track back from. */
+/* Three columns: what you can go to, what you are reading, and where you are in
+   it. */
 .docsShell {
-  /* The header's inset, not the page's clamp. The chrome runs the width of the
-     window and sits at a fixed distance from its edge; the gallery already
-     matches it, and a reference page that did not would read as a different
-     site one navigation away.
-
-     **Through the variable rather than through its value.** Written out as
-     `space-2xl` this said "the same as the header" and meant "48px", which stops
-     being the same thing below 48rem: the header takes its inset down to
-     `space-md` there and this went on spending 48 a side. On a 375px phone that
-     is 96px of padding around a 279px measure — a quarter of the screen held
-     empty to match a header that had already stopped matching. `--site-chrome-inset`
-     is the number the header actually uses, at every width, which is what the
-     paragraph above was claiming all along. */
+  /* The header's inset, not the page's clamp. *Through the variable rather than
+     through its value.** Written out as `space-2xl` this said "the same as the
+     header" and meant "48px", which stops being the same thing below 48rem: the
+     header takes its inset down to `space-md` there and this went on spending 48
+     a side. On a 375px phone that is 96px of padding around a 279px measure — a
+     quarter of the screen held empty to match a header that had already stopped
+     matching. */
   --site-inset: var(--site-chrome-inset);
 
-  /* Both rails the same width, which is what centers the column between them.
-     Unequal rails put the middle track off center and the prose inside it
-     inherits the error, so this is one number used twice rather than a
-     coincidence maintained by hand. */
+  /* Both rails the same width, which is what centers the column between them. */
   --docs-rail: 15rem;
 
   /* Where the columns begin, which is also where the rails stick. */
@@ -49,9 +28,7 @@
   padding-inline: var(--site-inset);
 }
 
-/* The rails fold away before the measure does. A reference is readable with no
-   navigation beside it and unreadable at half the width, so what goes first is
-   the part a reader can do without. */
+/* The rails fold away before the measure does. */
 @media (width < 90rem) {
   .docsShell {
     grid-template-columns: var(--docs-rail) minmax(0, 1fr);
@@ -72,64 +49,38 @@
   }
 }
 
-/* Anything the rail can send a reader to clears the masthead.
- *
- * **A descendant selector, never a child combinator.** Every section wrapper the
- * outline targets is a `helix-flex` carrying an `id`, at whichever depth the
- * page nests it: the API entries sit one level deeper than the four top-level
- * sections, so `.docsMain > helix-flex > [id]` misses them and their headings
- * land flush against the top of the window behind the sticky header. */
+/* Anything the rail can send a reader to clears the masthead. **A descendant
+   selector, never a child combinator.** Every section wrapper the outline
+   targets is a `helix-flex` carrying an `id`, at whichever depth the page nests
+   it: the API entries sit one level deeper than the four top-level sections, so
+   `.docsMain > helix-flex > [id]` misses them and their headings land flush
+   against the top of the window behind the sticky header. */
 .docsMain helix-flex[id] {
   scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
 .docsMain {
-  /* Fills its track, then caps.
-   *
-   * `100%` said out loud because the auto margins below would otherwise stop it
-   * filling at all: a grid item stretches to its track only while it has no
-   * auto margin in that axis, and one that has is sized to fit its contents
-   * instead. So the article was as wide as whatever the widest thing on the
-   * page happened to be, and two reference pages side by side were different
-   * widths for no reason a reader could see. Measured at 1440: Button Group
-   * came out 768 because its examples reach the track, Breadcrumbs 641 because
-   * nothing on it does.
-   *
-   * The margins still do their job. They only have space to divide once the cap
-   * below is narrower than the track, which is the case this was written for
-   * and the only one it was ever right in. */
+  /* Fills its track, then caps. `100%` said out loud because the auto margins
+     below would otherwise stop it filling at all: a grid item stretches to its
+     track only while it has no auto margin in that axis, and one that has is
+     sized to fit its contents instead. Measured at 1440: Button Group came out
+     768 because its examples reach the track, Breadcrumbs 641 because nothing on
+     it does. */
   inline-size: 100%;
   margin-inline: auto;
-  /* The measure, in the unit that means it. `54rem` was a guess that happened
-     to be near it; `80ch` is the thing itself, and it tracks the font rather
-     than needing to be re-guessed when the font changes. */
+  /* The measure, in the unit that means it. `54rem` was a guess that happened to
+     be near it; `80ch` is the thing itself, and it tracks the font rather than
+     needing to be re-guessed when the font changes. */
   max-inline-size: 80ch;
   min-inline-size: 0;
 }
 
-/* The heading and what can be done to the document, on one line. `wrap` so a
-   long family name and two controls do not force the row to overflow. */
+/* The heading and what can be done to the document, on one line. */
 .docsTitle {
   flex-wrap: wrap;
 }
 
-/* One tier at a time, chosen in preferences and applied here.
- *
- * Both are rendered. The preference lives in `localStorage`, the page is static
- * and server-rendered, and the server cannot read it: filtering in React would
- * mean the server rendering one tier and the client wanting the other, which is
- * a hydration mismatch on every reference page. So the markup carries both and
- * a document attribute decides, which costs a little HTML and cannot disagree
- * with itself.
- *
- * `display: none` rather than `visibility` or a clip, because the hidden tier
- * has to leave the accessibility tree as well as the page. A reader being read
- * the styled API does not want the headless one read out underneath it, and an
- * anchor in the rail pointing at a section that is not shown is a rail that
- * lies about the page.
- *
- * Styled is the default and is expressed as the absence of the attribute, so
- * the document's resting state is the common answer. */
+/* One tier at a time, chosen in preferences and applied here. */
 :root:not([data-api-tier="headless"]) .docsShell [data-tier="headless"] {
   display: none;
 }
@@ -142,12 +93,10 @@
    still reachable by scrolling rather than by patience. */
 .docsPreview {
   /* The height before the frame has measured itself, and what stands if the
-     script never runs at all. `preview.tsx` sets an inline block-size from what
-     the frame reports, which outranks this the moment it arrives. */
+     script never runs at all. */
   block-size: 32rem;
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  /* 4px. `sm` is the seed halved, which is what that number is here, so the
-     corner follows the theme's radius rather than pinning it. */
+  /* 4px. */
   border-radius: var(--helix-radii-sm);
   overflow: hidden;
 }
@@ -159,27 +108,18 @@
   min-block-size: 0;
 }
 
-/* The editor is bounded and scrolls inside itself.
- *
- * It does not overflow today, because the sandbox is a fixed 32rem and the
- * splitter divides that: measured at 153px of editor in a 194px pane. The cap
- * is for the examples that are longer than the pane, where an uncapped editor
- * grows the row it is in and the preview above it gets squeezed by however long
- * the source happens to be. A reference page should not change shape per
- * component.
- *
- * `min-block-size: 0` beside it because this is a grid item: a grid track's
- * default minimum is its content, so a max on its own is quietly ignored the
- * moment the content is taller than the cap. */
+/* The editor is bounded and scrolls inside itself. It does not overflow today,
+   because the sandbox is a fixed 32rem and the splitter divides that: measured
+   at 153px of editor in a 194px pane. `min-block-size: 0` beside it because this
+   is a grid item: a grid track's default minimum is its content, so a max on its
+   own is quietly ignored the moment the content is taller than the cap. */
 .docsPreviewSource helix-sandbox-editor {
   max-block-size: 100%;
   min-block-size: 0;
   overflow: auto;
 }
 
-/* The bar between the preview and the editor. It sits inside the source region
-   rather than in the sandbox's `toolbar` slot, which spans both panes above
-   them: a bar over the whole thing is not a bar between the two. */
+/* The bar between the preview and the editor. */
 .docsPreviewBar {
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
@@ -199,31 +139,16 @@
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 
-/* The two actions sit together at the far end, so the tabs stay a group and
-   what can be done to the file is plainly not one of them. */
+/* The two actions sit together at the far end, so the tabs stay a group and what
+   can be done to the file is plainly not one of them. */
 .docsPreviewCopy {
   margin-inline-start: auto;
 }
 
-/* An anchor that is an icon button.
- *
- * `data-button` is the base layer's helper for a link that looks like a button,
- * and there is no icon-only counterpart to it: `helix-icon-button` is an
- * element and does not take an `href`, so a link to the sandbox cannot be one.
- * What is written here is the icon button's own box, `--helix-size-control`
- * square with the padding taken back off, so the two controls at this end of
- * the bar are the same size and shape.
- *
- * It serves an anchor and a `<button>` both, which is why `border` and `cursor`
- * are here: the layout control beside the sandbox link is a button, and a bar
- * whose two icon controls came from two boxes would drift the first time one was
- * touched.
- *
- * **This belongs in `helix/styles` rather than here.** A `data-icon-button`
- * beside `data-button` is one decision for two surfaces, which is the pattern
- * the base layer already uses; this is that decision made in one consumer
- * because the page needed it today. The sandbox toolbar and the docs title row
- * both want one. */
+/* An anchor that is an icon button. **This belongs in `helix/styles` rather than
+   here.** A `data-icon-button` beside `data-button` is one decision for two
+   surfaces, which is the pattern the base layer already uses; this is that
+   decision made in one consumer because the page needed it today. */
 .docsPreviewOpen {
   aspect-ratio: 1;
   border: none;
@@ -232,8 +157,8 @@
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   display: inline-grid;
-  /* The same token the icon button beside it reads, so `data-density` moves
-     both together rather than shrinking one and leaving the other. */
+  /* The same token the icon button beside it reads, so `data-density` moves both
+     together rather than shrinking one and leaving the other. */
   inline-size: var(--helix-size-control);
   padding: var(--helix-space-none);
   place-items: center;
@@ -250,36 +175,18 @@
   color: var(--helix-color-foreground);
 }
 
-/* The table scrolls sideways rather than colliding with itself.
- *
- * A union member is `nowrap`, so it cannot break, and the Type column's floor
- * fits every literal and most named types but not the longest: twenty-four
- * characters of `HelixHeadlessAccordionItem[]` would need a floor that squeezes the
- * other three columns on every narrow screen to serve one row. Given a member
- * that does not fit, scrolling shows all of it and clipping would show part,
- * which is the difference between a table a reader can use narrow and one they
- * cannot.
- *
- * On the wrapper rather than the component, because a scroll region is the
- * page's decision about its own layout: another consumer may have room. */
+/* The table scrolls sideways rather than colliding with itself. */
 .apiTable {
   overflow-x: auto;
 }
 
-/* The mark beside a property built on a platform feature.
- *
- * Held back to the muted foreground and lifted on hover, because it is
- * secondary to the row it sits in: a table where every annotated property
- * carries a bright mark reads as a table of warnings.
- *
- * `1em`, so it tracks the identifier beside it rather than the page. */
+/* The mark beside a property built on a platform feature. `1em`, so it tracks
+   the identifier beside it rather than the page. */
 .apiReference {
   align-items: center;
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
-  /* Pushed to the end of the row. The cell is a flex line, so `auto` takes
-     whatever is left over and the mark lands against the right edge however
-     long the description is. */
+  /* Pushed to the end of the row. */
   margin-inline-start: auto;
   padding-inline-start: var(--helix-space-xs);
   vertical-align: middle;
@@ -290,21 +197,13 @@
   color: var(--helix-color-foreground);
 }
 
-/* Through the component's own hook, not a rule of ours. `.apiReference
-   helix-icon { block-size }` is a document rule, which beats a shadow one
-   whatever the specificity and whatever the layer, so it would have killed
-   `icon-root.css` rather than adjusted it. `helix component`'s `overruled` said so. */
+/* Through the component's own hook, not a rule of ours. */
 .apiReference {
   --icon-size: 1em;
 }
 
 /* The same mark on a column heading, which wants none of the row version's
-   placement. It sits beside the word rather than at the end of a line, so there
-   is no `auto` margin; and it is a `<button>`, because `Tooltip` opens on focus
-   and a glyph nothing can focus is a hint only a pointer reads, so the browser's
-   own button chrome has to come off. `all: unset` takes `box-sizing` with it,
-   which is the trap written up in the area notes, and this element has padding,
-   so it is restored in the same rule. */
+   placement. */
 .apiHint {
   all: unset;
   --icon-size: 1em;
@@ -324,58 +223,37 @@
 }
 
 .apiName {
-  /* The library's identifier color, not the brand's. The brand color is what
-     the page uses for things a reader can act on, and the first column of six
-     tables holds names that do nothing when clicked. */
+  /* The library's identifier color, not the brand's. */
   color: var(--helix-color-syntax-name);
   /* A property name is one identifier and breaking it is worse than a wider
      column: `defaultValue` came out as `defaultValu` and `e`, which is a name a
-     reader cannot search for and cannot copy from one line.
-     Both halves are needed and the floor alone did nothing. The cell inherits
-     `overflow-wrap: anywhere`, which is right for a description and makes every
-     character a break opportunity, so `min-content` measured one letter and
-     floored at nothing. `normal` puts the word back together and the floor is
-     then the word. The names are short, so the column costs nothing it did not
-     already need. */
+     reader cannot search for and cannot copy from one line. */
   min-inline-size: min-content;
   overflow-wrap: normal;
 }
 
-/* A default value, which is code and is not a union.
- *
- * It shares the type column's colors and none of its wrapping rules: a literal
- * has no members to hold together, and holding it together anyway is what made
- * `"Show password"` overflow an 83px cell and print itself over the description.
- * `anywhere` rather than `break-word`, because only `anywhere` lowers the
- * element's min-content size, which is what lets the column be narrow at all
- * instead of overflowing when it is. */
+/* A default value, which is code and is not a union. It shares the type column's
+   colors and none of its wrapping rules: a literal has no members to hold
+   together, and holding it together anyway is what made `"Show password"`
+   overflow an 83px cell and print itself over the description. */
 .apiDefault {
   color: var(--helix-color-foreground-subtle);
   display: block;
   overflow-wrap: anywhere;
 }
 
-/* The type beside the name, colored by what each part of it is. The tokens are
-   the library's own, so a type on this page is the color the same word takes in
-   the sandbox's editor. */
+/* The type beside the name, colored by what each part of it is. */
 .apiType {
   color: var(--helix-color-foreground-subtle);
   display: block;
-  /* Never narrower than the longest thing in it that cannot break.
-   *
-   * A union's members are held together on purpose, so the column has to be at
-   * least one member wide or the member overflows and prints over the
-   * description. Carousel is the case: `"block-start"` measures 116px and the
-   * column had settled at 112, which is four pixels of a word sitting in the
-   * next column. `min-content` is exactly that floor and asks for nothing more,
-   * so a column with only short types stays narrow. */
+  /* Never narrower than the longest thing in it that cannot break. Carousel is
+     the case: `"block-start"` measures 116px and the column had settled at 112,
+     which is four pixels of a word sitting in the next column. */
   min-inline-size: min-content;
   /* A type wraps rather than scrolls: scrolling keeps every row one line tall
      and hides the end of anything longer than its column behind a gesture, so a
      reader cannot see that `HelixHeadlessAccordionItem[]` is an array without
-     dragging it. `break-word` rather than `anywhere`, so a break is taken only
-     when a single token genuinely cannot fit; `anywhere` splits short unions
-     mid-literal while there is still room to put them on the next line whole. */
+     dragging it. */
   overflow-wrap: break-word;
 }
 
@@ -383,14 +261,7 @@
    at the start of a line rather than wherever the previous line ran out. */
 .apiTypeMember {
   /* Unbreakable, so the only break a union can take is between its members and
-     the bar therefore starts a line rather than ending one.
-     Without it the members hold together anyway, because the bar is attached by
-     margin rather than by a space, and that is not enough: `overflow-wrap:
-     break-word` above will break *inside* a literal once one does not fit, so a
-     narrow column gave `"flat" | "mat` / `erial" | "tra` / `nsparent"`, which is
-     the bar trailing again and a word cut in half as well.
-     It is only safe next to a floor on the column, which `page.tsx` sets: a
-     member that cannot fit and cannot break is a member that overflows. */
+     the bar therefore starts a line rather than ending one. */
   white-space: nowrap;
 }
 
@@ -398,23 +269,15 @@
   color: var(--helix-color-foreground-subtle);
   /* Space on both sides, and it has to be margin rather than a space in the
      markup: the members are adjacent inline spans with no whitespace between
-     them, so text alone would run the bar into the value before it. That is
-     also what keeps a bar with its member, since a margin is not a break
-     opportunity and a space would be.
-     `2xs` rather than an em: `helix component`'s `tokens` refuses a raw value here, and
-     the type column is one size, so there is nothing for an em to track that a
-     token does not. */
+     them, so text alone would run the bar into the value before it. `2xs` rather
+     than an em: `helix component`'s `tokens` refuses a raw value here, and the
+     type column is one size, so there is nothing for an em to track that a token
+     does not. */
   margin-inline: var(--helix-space-2xs);
   opacity: 0.6;
 }
 
-/* A literal value is green. That is `syntax-tag` rather than `syntax-string`,
-   which is navy in this GitHub-derived set: the token names describe an
-   editor's grammar, and what is wanted here is the color.
- *
- * Held back toward the text around it. At full strength a union of six literals
- * is six bright green words in a table cell, which is louder than the prose
- * beside it and louder than the type actually matters. */
+/* A literal value is green. */
 .apiType [data-token="literal"] {
   color: color-mix(
     in oklab,
@@ -428,9 +291,7 @@
   font-style: italic;
 }
 
-/* And every built-in is one color, `string` alongside `boolean`. They are the
-   same kind of word, and separating them made a union of literals read as a
-   list of primitives. */
+/* And every built-in is one color, `string` alongside `boolean`. */
 .apiType [data-token="builtin"] {
   color: var(--helix-color-syntax-keyword);
 }
@@ -439,16 +300,10 @@
   color: var(--helix-color-syntax-callable);
 }
 
-/* Sticky where they already are, so nothing moves when the page does.
- *
- * A sticky offset that does not match the resting position is a jump on the
- * first pixel of scroll. The rails rest at `header + the shell's own top
- * padding`, and an offset of `header + space-md` measured 105 resting against 72
- * stuck, so the first scroll yanked both rails up 33px and they never returned.
- *
- * `--docs-top` is that one number, used by the padding and by the offset, so
- * the two cannot drift apart again. No taller than what is left of the viewport
- * either, so a long list scrolls inside the rail instead of pushing the page. */
+/* Sticky where they already are, so nothing moves when the page does. The rails
+   rest at `header + the shell's own top padding`, and an offset of `header +
+   space-md` measured 105 resting against 72 stuck, so the first scroll yanked
+   both rails up 33px and they never returned. */
 .docsNav,
 .docsRail {
   block-size: fit-content;
@@ -464,8 +319,7 @@
 }
 
 /* The rail is about this page, so it is the first thing to go when there is no
-   room for a margin note. The navigation survives one step longer, because it
-   is how you leave the page. */
+   room for a margin note. */
 @media (max-width: 72rem) {
   .docsShell {
     grid-template-columns: 15rem minmax(0, 1fr);
@@ -487,8 +341,7 @@
   }
 }
 
-/* A component's prose, which comes from its class comment and can run long.
-   Capped so a reference paragraph stays readable in a wide middle column. */
+/* A component's prose, which comes from its class comment and can run long. */
 .description {
   max-inline-size: 68ch;
   white-space: pre-line;

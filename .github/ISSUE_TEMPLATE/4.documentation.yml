@@ -1,0 +1,31 @@
+body:
+  - attributes:
+      description: The URL, or the file if you were reading it in the repository.
+      label: Which page
+      placeholder: https://helix.fusion.dev/docs/theming
+    id: page
+    type: input
+    validations:
+      required: true
+  - attributes:
+      description:
+        What it says, and what is wrong with it. Wrong, missing, out of date and
+        impossible to follow are all worth filing.
+      label: What is wrong with it
+    id: what
+    type: textarea
+    validations:
+      required: true
+  - attributes:
+      description:
+        What you were trying to do when you hit it. A page is usually wrong for
+        somebody in particular, and knowing who helps more than the correction.
+      label: What you were trying to do
+    id: context
+    type: textarea
+    validations:
+      required: false
+description: A page is wrong, missing, or impossible to follow.
+labels: [documentation]
+name: Documentation
+title: "[docs] "

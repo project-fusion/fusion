@@ -1,0 +1,31 @@
+/*
+ * Every layer Helix needs, in one import.
+ *
+ * **Four files in a required order is a list somebody writes three of**, and
+ * `primitives.css` is the one left out: `tokens.css` refers to the primitives
+ * throughout, so a consumer who lists the other three gets every semantic token
+ * declared and each one resolving to `rgba(0, 0, 0, 0)`, and no theming at
+ * all, every public `--helix-seed-*` being read in that file and nowhere else.
+ *
+ * The order is the whole content of this file, and it cannot be got wrong from
+ * outside it.
+ *
+ * **It reaches into `@fusion.dev/helix-styles`, and that is a declared dependency
+ * rather than a hopeful specifier.** This package depends on it, so the
+ * resolution is guaranteed by the manifest rather than by what happens to be
+ * installed. Verified through this repository's own toolchain in development
+ * and in a production build: the primitives, the tokens, the base layer and
+ * `elements.css` all arrive.
+ *
+ * **What it cannot do is be a `<link>`.** A bare specifier in an `@import` is
+ * resolved by a bundler and never by a browser, so this is for the consumers
+ * the documentation describes, who import from JavaScript. Anyone serving CSS
+ * directly takes the four files by path.
+ *
+ * The individual files keep their exports. `@fusion.dev/helix-styles/all.css` is the
+ * three that package owns, for a page that wants Helix's type and color
+ * without any custom elements; the four singles are there for anyone
+ * substituting a layer.
+ */
+@import "@fusion.dev/helix-styles/all.css";
+@import "./elements.css";

@@ -15,10 +15,8 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
-/* Side-effect import, because this renders a listbox in its own shadow root and
-   a custom element registers on import. The path is relative, so this registers
-   the base listbox and the styled file's identical import registers the styled
-   one; `tier` picks which name the template asks for. */
+/* Relative, so this registers the base listbox and the styled file's identical
+   import registers the styled one. `tier` picks which the template asks for. */
 import '../../listbox/index.js'
 /* And the tags, for the same reason: `multiple` renders one per chosen option
    and a custom element registers on import. */

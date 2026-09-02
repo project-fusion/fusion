@@ -1,6 +1,6 @@
 :host {
-  /* The tick drawn beside a chosen option, as a stencil so the color is a
-     token like every other color here. A data URI cannot carry `var()`. */
+  /* The tick drawn beside a chosen option, as a stencil so the color is a token
+     like every other color here. */
   --_option-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E");
   display: block;
 }
@@ -11,10 +11,9 @@
 
 [part="item"] {
   align-items: center;
-  /* From the container, because the container decides whether this row is
-     inset or full-bleed and only a row with space around it has corners worth
-     rounding. A listbox on its own insets its rows and keeps the radius; the
-     select's panel runs them edge to edge and sets this to none. */
+  /* From the container, because the container decides whether this row is inset
+     or full-bleed and only a row with space around it has corners worth
+     rounding. */
   border-radius: var(--option-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   cursor: pointer;
@@ -25,46 +24,25 @@
   /* A stated size rather than one that falls out of the padding, so every row in
      a list is the same height whatever is slotted into it: a row with an icon in
      it is otherwise taller than the one above it, and a list whose rows differ
-     by two pixels reads as a list nobody measured.
-
-     **A floor, not a fixed height.** The `start` slot is documented for an
-     avatar, and an avatar at its default size is taller than a dense row: fixed,
-     it overflows into the rows above and below.
-
-     `control-tight` is derived from the unsuffixed `--helix-size-control`, so a
-     row in a floating panel does follow the region's density. Whether it should
-     is the open question. */
+     by two pixels reads as a list nobody measured. */
   min-block-size: var(--helix-size-control-tight);
   box-sizing: border-box;
-  /* Through a hook, for the reason the inline inset above is: a panel that
-     wants roomier rows says one thing and the group headings move with them.
-     `Command` is that panel, being a page of rows read at speed rather than a
-     select's short list. */
+  /* Through a hook, for the reason the inline inset above is: a panel that wants
+     roomier rows says one thing and the group headings move with them. */
   padding-block: var(--option-block-padding, var(--helix-space-2xs));
   /* `xs`, which is the select's own trigger inset: a row and the closed control
      it came from have to hold their words on the same column, or the chosen
-     answer shifts sideways when the panel opens.
-
-     Through a hook, because the heading above a group reads the same one. A
-     panel that wants its rows on some other column, as the command palette
-     does, moves both by saying one thing. */
+     answer shifts sideways when the panel opens. */
   padding-inline: var(--option-padding, var(--helix-space-xs));
-  /* A picker, not prose. Its three sibling chooseable rows all say this;
-     without it, dragging across a list selects the labels. */
+  /* A picker, not prose. */
   user-select: none;
 }
 
-/* **The column that carries the words, and the caption when there is one.**
- *
- * It carries the growth and the min-size, which belong to whatever fills the
- * middle of the row — here two things stacked rather than one.
- * `min-inline-size: 0` is what lets either line truncate: a flex item's floor is
- * its content, so without it a long caption pushes the row wider than the panel
- * instead of being cut.
- *
- * Always rendered, unlike the caption inside it, and that is safe for the reason
- * the area rules give against wrapping an optional region: this one always holds
- * the label, so it never paints an empty band. */
+/* *The column that carries the words, and the caption when there is one.** It
+   carries the growth and the min-size, which belong to whatever fills the middle
+   of the row — here two things stacked rather than one. `min-inline-size: 0` is
+   what lets either line truncate: a flex item's floor is its content, so without
+   it a long caption pushes the row wider than the panel instead of being cut. */
 [part="text"] {
   display: flex;
   flex: 1 1 auto;
@@ -94,17 +72,7 @@
   white-space: nowrap;
 }
 
-/* The chosen option, which is not the same fact as where the keyboard is. A
- * list that draws the two the same way leaves a reader arrowing through it
- * unable to tell what they have picked from what they are looking at, which is
- * the whole difference between a listbox and a menu.
- *
- * A tick rather than a fill. The cursor below already owns the row's
- * background, so a second background would either fight it or be hidden under
- * it whenever the two land on the same row, which for a listbox opening on its
- * own answer is immediately and always. A mark beside the label is legible
- * under both.
- */
+/* The chosen option, which is not the same fact as where the keyboard is. */
 :host(:state(selected)) [part="item"]::after {
   content: "";
   background-color: currentColor;
@@ -120,22 +88,7 @@
 
 :host([data-active]) [part="item"],
 :host(:not([disabled])) [part="item"]:hover {
-  /* A wash of the foreground rather than a step on the surface ladder.
-   *
-   * Never `surface-raised`: in dark mode it is the same neutral as
-   * `surface-overlay`, which is what the select's panel is made of, so a hovered
-   * option is painted exactly the color it sits on and the highlight vanishes,
-   * in the one place options are used most.
-   *
-   * A translucent wash cannot have that problem: it is a step away from
-   * whatever is underneath it, on a panel, in a standalone listbox, or on
-   * whatever a consumer puts a list on. Eight percent in light and twelve in
-   * dark, because the same alpha over a dark surface reads as less.
-   *
-   * `light-dark()` wraps the two mixes rather than the two percentages, which
-   * is not a style choice: it returns a color, so a percentage inside it is
-   * invalid, the whole declaration is dropped, and the highlight comes out
-   * fully transparent. */
+  /* A wash of the foreground rather than a step on the surface ladder. */
   background-color: var(
     --option-active-color,
     light-dark(
@@ -150,10 +103,9 @@
   opacity: 0.5;
 }
 
-/* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a control prints the value it holds, and the state has to survive: a
+   tick that is a fill prints as an empty box, which is a document saying the
+   opposite of the truth. */
 @media print {
   :host {
     box-shadow: none;

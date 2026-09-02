@@ -1,57 +1,26 @@
-/* Plain by default: a stack of rules and nothing around it.
- *
- * The frame is a second statement of a grouping the seams already make. An
- * accordion is a list, where a card is a surface: a card without its border
- * stops being a card, and an accordion without one is still obviously one
- * accordion, because the rules between its items say so. Which leaves the frame
- * doing its work only in the case it is actually for, an accordion sitting
- * directly on the page with nothing else saying where it starts and stops.
- * Inside a card, a panel, a dialog or a sidebar, which is where an application
- * puts one, it is a line and no meaning.
- *
- * On the host, which is the box. This component renders no `[part="container"]`
- * and its markup is a bare slot, so a frame rule named against one is valid CSS
- * matching nothing: no border, no corner radius, and a `separation` that does
- * nothing, with no error anywhere.
- */
+/* Plain by default: a stack of rules and nothing around it. */
 :host {
   display: block;
 }
 
-/* Framed, for an accordion with nothing around it. The frame must not sit on a
- * bare `:host`, or it is on everything and `separation="outlined"` is a broken
- * switch on an already-lit lamp: writing it and writing nothing give the same
- * picture.
- */
+/* Framed, for an accordion with nothing around it. */
 :host([separation="outlined"]) {
   border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
-  /* The house radius. Card wrote the argument down: at anything larger the
-     corner is softer than the controls inside it and the container stops
-     receding, which is the one thing a container should do. */
+  /* The house radius. */
   border-radius: var(--accordion-radius, var(--helix-radii-sm));
   /* Clips each item's square corners to the stack's radius, so no item needs to
-     know whether it is first or last. Here rather than on the host, because
-     there is no radius to clip to without the frame, and an `overflow: hidden`
-     with nothing to do still trims the focus ring off the first and last
-     triggers. */
+     know whether it is first or last. */
   overflow: hidden;
 }
 
 /* One rule between neighbors rather than one per item, so the seam is a single
-   pixel. `+` reaches slotted siblings because they are siblings in the light
-   DOM, which is the tree the selector runs against.
-
-   Unconditional, which is what carries the grouping in both separations and is
-   why the frame is not needed to say the items belong together. */
+   pixel. */
 ::slotted(* + *) {
   border-block-start: var(--helix-border-thin) solid
     var(--accordion-border-color, var(--helix-color-border));
 }
 
-/* Print: a seam rather than a surface.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a seam rather than a surface. */
 @media print {
   :host {
     background-color: transparent;

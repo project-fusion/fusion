@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { HelixElements } from '@/components/helix-elements/helix-elements'
+import { RevealOnScroll } from '@/components/reveal-on-scroll/reveal-on-scroll'
 import { SiteNav } from '@/components/site-nav/site-nav'
 import { PRODUCTS } from '@/content/products/products'
 import styles from '../../components/chrome.module.css'
 import { type RouteKind, routes } from '../../content/routes/routes'
-import { RevealOnScroll } from './reveal-on-scroll'
 
 /**
  * What the footer links, in three groups.

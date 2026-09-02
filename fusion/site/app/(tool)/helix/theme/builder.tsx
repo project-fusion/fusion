@@ -8,8 +8,6 @@ import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { type FaceRow, GOOGLE_FACES } from '@/content/faces/faces.generated'
-import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
-import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import {
   BOUNDS,
   type Character,
@@ -19,10 +17,12 @@ import {
   queryFrom,
   SCOPE,
   type Settings,
-} from './defaults'
+} from '@/utils/theme-defaults/theme-defaults'
+import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
+import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
 import { FACE_SAMPLE, useFacePreviews } from './use-face-previews'
-import './theme.css'
+import './builder.css'
 import styles from '../workbench.module.css'
 
 /**
@@ -42,9 +42,9 @@ const PREVIEW_SHARE = 68
 /**
  * The faces on offer, fetched rather than vendored.
  *
- * **A preview is not a deployment, which is what makes this fine here.** The
- * Sovereignty Constraint is about what a Fusion product does to a consumer's
- * page: `fusion/site/app/fonts.css` vendors the site's own three faces precisely so
+ * **A preview is not a deployment, which is what makes this fine here.** What
+ * matters is what a Fusion product does to a consumer's page:
+ * `fusion/site/app/fonts.css` vendors the site's own three faces precisely so
  * the wordmark does not sit behind someone else's uptime. Nothing here ships to
  * anybody. A reader is trying faces on, and trying one on means fetching it.
  *

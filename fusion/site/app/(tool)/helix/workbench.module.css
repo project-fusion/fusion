@@ -1,32 +1,9 @@
-/* The two tools: the sandbox workbench and the theme builder.
- *
- * One module for both, because they are one shell with different middles.
- * `sandboxShell`, `workbenchHeader` and `workbenchBody` are applied by each of
- * them, which is the whole reason this is not two files.
- *
- * `(tool)` rather than `(site)`: these are the editor and the palette bench,
- * and nothing under `(site)` reads a line of it.
- */
+/* The two tools: the sandbox workbench and the theme builder. */
 
-/* The way out of the sandbox rail and into a family's own docs page.
- *
- * A mark on the branch rather than a row of its own, because there is one per
- * row and rows would double the length of the rail to say the same thing. A
- * destination that is one among several belongs in the list instead, where it
- * is legible without hovering and in the tab order without a rule saying so.
- *
- * **Hover and focus-within, not hover alone.** A control revealed only by a
- * pointer is one a keyboard reader never finds, and this is a link in a
- * navigation rather than an embellishment. `:focus-within` on the row is what
- * puts it on screen when the link itself takes focus, since the link is the
- * thing inside the row that can hold it.
- *
- * `opacity` rather than `display`, so the row's width does not change as a
- * pointer crosses it: the label would shift under the reader at the moment
- * they are aiming at it. The box is always there and only the ink arrives.
- *
- * Not `visibility: hidden`, which takes it out of the accessibility tree and
- * would hide from a screen reader a link that is genuinely there. */
+/* The way out of the sandbox rail and into a family's own docs page. **Hover and
+   focus-within, not hover alone.** A control revealed only by a pointer is one a
+   keyboard reader never finds, and this is a link in a navigation rather than an
+   embellishment. */
 .docsJump {
   align-items: center;
   block-size: 1.5rem;
@@ -37,8 +14,7 @@
   justify-content: center;
   /* Revealing this is only half of it: a 16 square glyph 4px from a chevron of
      the same size in the same gray is invisible whenever it is shown. A 24
-     square target with twelve pixels of air is what makes the gate worth
-     having. */
+     square target with twelve pixels of air is what makes the gate worth having. */
   opacity: 0;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -52,20 +28,16 @@
   --icon-size: var(--helix-size-icon-sm);
 }
 
-/* A surface, not the accent. `tree-item.css` states the rule one file away,
-   that the accent is reserved for state: painting `--helix-color-primary` here
-   for emphasis makes the current page the loudest thing on screen, and a link
-   inside that tree does not get to disagree with the tree. The surface does the
-   work and the ink goes to full strength, which is what the row's own hover
-   does. */
+/* A surface, not the accent. */
 .docsJump:hover,
 .docsJump:focus-visible {
   background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
 }
 
-/* Named one selector at a time, for the reason `helix component`'s `motion` exists: a reduce
-   rule written looser than the rule it answers loses on specificity. */
+/* Named one selector at a time, for the reason `helix component`'s `motion`
+   exists: a reduce rule written looser than the rule it answers loses on
+   specificity. */
 @media (prefers-reduced-motion: reduce) {
   .docsJump {
     transition: none;
@@ -74,9 +46,7 @@
 
 /* ============================================================ sandbox ==== */
 
-/* The tool owns the viewport. One header, then everything else fills what is
-   left, and nothing on this screen scrolls the page: the panes scroll inside
-   themselves so the chrome never moves. */
+/* The tool owns the viewport. */
 .sandboxShell {
   block-size: 100dvh;
   display: flex;
@@ -97,25 +67,17 @@
    working belongs. */
 /* The rail closes by its own track narrowing, which is the accordion's trick
    turned on its side: a grid track can be interpolated where the presence of a
-   track cannot. This dropped to one column before, and two tracks to one is not
-   a change any browser can animate, so the rail vanished between frames. Two
-   tracks always, and the second one goes to nothing. */
+   track cannot. */
 .workbenchBody {
   flex: 1 1 auto;
   min-block-size: 0;
 }
 
-/* **The rail opens and closes without a transition, and that is not an
+/* *The rail opens and closes without a transition, and that is not an
    oversight.** A `transition: flex-basis` on the pane does not slow the change
-   down, it stops it happening: the inline style goes to
-   `--_splitter-position: 100%` and the computed `flex-basis` stays at `60%` for
-   good, with the pane frozen at its old width. A transition on a property whose
-   value is substituted from an unregistered custom property has nothing it can
-   interpolate, and it holds the start value rather than declining to run.
-
-   Animating it needs `@property` registration for the splitter's own position,
-   which is the splitter's to declare rather than something to reach in and
-   register from here. Left instant until then, which is correct if abrupt. */
+   down, it stops it happening: the inline style goes to `--_splitter-position:
+   100%` and the computed `flex-basis` stays at `60%` for good, with the pane
+   frozen at its old width. */
 
 .workbenchMain {
   block-size: 100%;
@@ -128,20 +90,12 @@
 }
 
 /* Mirrored, because the glyph draws its panel against the leading edge and the
-   rail it switches is against the trailing one. An icon of a thing that has a
-   side is a picture of that side, so pointing at the wrong one is the same
-   mistake as a chevron facing the wrong way.
-
-   Here rather than in the icon, which is a picture and has no opinion about
-   which way round it should be shown. If a second one of these turns up it
-   earns a property; one does not. */
+   rail it switches is against the trailing one. */
 .railToggle helix-icon {
   scale: -1 1;
 }
 
-/* The header holds still and the list moves under it. Two rows rather than one
-   scrolling box: a filter that scrolls away is a filter you have to scroll back
-   to in order to change, which is the moment you most want it. */
+/* The header holds still and the list moves under it. */
 .examplesRail {
   block-size: 100%;
   display: grid;
@@ -151,24 +105,14 @@
   overflow: hidden;
 }
 
-/* The contents hold the width the rail has when it is open, so the column
-   closes over them and clips. Left to fill the track they would reflow the
-   whole way: the filter field shrinking, every label rewrapping, the tree
-   reflowing on each frame. That is the accordion's lesson, which is that
-   whatever is inside a box being animated has to hold still.
-
-   A minimum rather than a fixed size now the rail can be dragged: it holds
-   still while the column closes over it, and grows with the pane when a reader
-   makes the rail wider than it opened. */
+/* The contents hold the width the rail has when it is open, so the column closes
+   over them and clips. */
 .examplesRail > * {
   min-inline-size: var(--rail-open, 17rem);
 }
 
 .examplesHeader {
-  /* The toolbar's surface, not the page's. These two bars are the same height
-     and sit either side of the split, so the same fill is what makes them read
-     as one strip across the window rather than two bars that happen to line
-     up. */
+  /* The toolbar's surface, not the page's. */
   background-color: var(--helix-color-background);
   block-size: var(--helix-size-control-lg);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
@@ -176,21 +120,13 @@
   padding-inline: var(--helix-space-md);
 }
 
-/* **The drawer needs the rail's grid and none of its chrome.**
-   `examplesPane` is shared, and in the rail it is the two rows of
-   `.examplesRail`, the header pinned and the tree scrolling under it. Without
-   that grid the filter scrolls away with the list, which is the thing the
-   comment above `.examplesRail` says a filter must never do.
-
-   And `.examplesHeader` is dressed to line up with the toolbar strip across the
-   window, a background, a border and a fixed control-lg height. There is no
-   strip in a drawer for it to line up with, so it would read as a box floating
-   above the list with a gap over it. */
-/* **The drawer's top padding is `2xl` by default where its sides are `lg`**, which
-   is the room a title needs and this one has none: the label is the accessible
-   name and nothing draws it, so the gap sat above the filter as empty chrome.
-   `--drawer-padding-block-start` is the hook the component documents for exactly
-   this, its own comment saying the site is what sets it. */
+/* *The drawer needs the rail's grid and none of its chrome.** `examplesPane` is
+   shared, and in the rail it is the two rows of `.examplesRail`, the header
+   pinned and the tree scrolling under it. */
+/* *The drawer's top padding is `2xl` by default where its sides are `lg`**,
+   which is the room a title needs and this one has none: the label is the
+   accessible name and nothing draws it, so the gap sat above the filter as empty
+   chrome. */
 .examplesDrawerHost {
   --drawer-padding-block-start: var(--helix-space-lg);
 }
@@ -256,36 +192,21 @@
   }
 }
 
-/* Chrome density, so the marks in a row come down with the type.
- *
- * The chevron sits at the end, which is what lets the children be indented. At
- * the start it takes a gutter every row has to reserve, so a child carries both
- * that and its indent and sits two steps from its parent's name.
- */
+/* Chrome density, so the marks in a row come down with the type. */
 .examplesRail,
 .examplesRail helix-tree {
   --helix-size-icon: var(--helix-size-icon-sm);
 }
 
-/* The mark on the sandbox's confirmation. The dialog sizes it; the color is the
-   product's to say, and this one warns rather than destroys: changing the
-   environment converts what was written, it does not throw it away. */
+/* The mark on the sandbox's confirmation. */
 .dialogWarning {
   color: var(--helix-color-warning);
 }
 
-/* The row reveals it, and only `opacity` is keyed there.
- *
- * **A document rule reaching in from `helix-tree-item` is one `helix component`'s `overruled`
- * fails on, and it is right to**: it wins whatever the specificity and whatever
- * the layer, so a property the component sets there is dead. `color` is one of
- * those. `opacity` is not set anywhere in `tree-item.css`, on the host or on
- * slotted content, so keying the reveal on it collides with nothing and the
- * check stays quiet.
- *
- * `:focus-within` beside `:hover` is not decoration. Gated on hover alone the
- * link is a control a keyboard can focus and never see, which is worse than one
- * a keyboard cannot reach at all. */
+/* The row reveals it, and only `opacity` is keyed there. **A document rule
+   reaching in from `helix-tree-item` is one `helix component`'s `overruled`
+   fails on, and it is right to**: it wins whatever the specificity and whatever
+   the layer, so a property the component sets there is dead. */
 /* Descendant and not a child combinator: the link sits inside a `helix-tooltip`
    now, the way the experimental flask beside it does, so the row's direct child
    is the tooltip rather than the mark. */

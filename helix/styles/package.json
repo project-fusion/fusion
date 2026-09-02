@@ -15,15 +15,14 @@
     "./base.css": "./dist/base.css",
     "./primitives.css": "./dist/primitives.css",
     "./tokens.css": "./dist/tokens.css",
-    "./tokens.json": "./tokens.json"
+    "./tokens.json": "./dist/tokens.json"
   },
   "files": [
-    "dist",
-    "tokens.json"
+    "dist"
   ],
   "sideEffects": true,
   "scripts": {
-    "build": "node scripts/build-styles-dist.mjs",
+    "build": "bun run token-layer && node scripts/build-styles-dist.mjs",
     "styles-dist": "node scripts/build-styles-dist.mjs",
     "token-layer": "bun scripts/build-token-layer.mjs"
   },

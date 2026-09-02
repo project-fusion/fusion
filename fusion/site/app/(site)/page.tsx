@@ -1,5 +1,15 @@
 import { findSitePage } from '@fusion.dev/insights'
 import Link from 'next/link'
+import {
+  DerivationDiagram,
+  DerivationDiagramStacked,
+} from '@/components/derivation-diagram/derivation-diagram'
+import landing from '@/components/landing.module.css'
+import { NewsKicker } from '@/components/news-kicker/news-kicker'
+import { ProofBand } from '@/components/proof-band/proof-band'
+import { Showcase } from '@/components/showcase/showcase'
+import { ThemeScope } from '@/components/theme-context/theme-context'
+import { ThemeFab } from '@/components/theme-fab/theme-fab'
 import { INSIGHTS } from '@/content/insights'
 import {
   DELIVERY,
@@ -11,14 +21,6 @@ import {
 } from '@/content/landing/helix-landing'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { DerivationDiagram, DerivationDiagramStacked } from './derivation-diagram'
-import landing from './landing.module.css'
-import styles from './landing-c.module.css'
-import { NewsKicker } from './news-kicker'
-import { ProofBand } from './proof-band'
-import { Showcase } from './showcase'
-import { ThemeScope } from './theme-context'
-import { ThemeFab } from './theme-fab'
 
 export const metadata = pageMetadata({
   description: HERO.description,
@@ -52,7 +54,7 @@ export default function Home() {
   return (
     <ThemeScope>
       <div
-        className={`${landing.reel} ${styles.oneBrand} ${styles.fabClearance} ${styles.noRules}`}
+        className={`${landing.reel} ${landing.oneBrand} ${landing.fabClearance} ${landing.noRules}`}
       >
         {/* **The field, and nothing tempering it.** A scrim over this, a
           vertical gradient of the page background holding the aura back
@@ -114,11 +116,11 @@ export default function Home() {
               <NewsKicker href="/announcements" label="Coming soon" text={announcements.title} />
             ) : undefined}
 
-            <h1 className={styles.tDisplay}>
-              {HERO.title} <span className={styles.tDisplayAccent}>{HERO.accent}</span>
+            <h1 className={landing.tDisplay}>
+              {HERO.title} <span className={landing.tDisplayAccent}>{HERO.accent}</span>
             </h1>
 
-            <p className={styles.tLede}>{HERO.lede}</p>
+            <p className={landing.tLede}>{HERO.lede}</p>
 
             <helix-flex class={landing.heroActions} direction="column" gap="md">
               <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
@@ -153,20 +155,20 @@ export default function Home() {
 
         {/* The problem, before the answer. A reader who recognizes themselves in
           this reads the next band; one who does not was never the buyer. */}
-        <section className={styles.fieldBand} data-band>
+        <section className={landing.fieldBand} data-band>
           <helix-flex data-shell direction="column">
-            <div className={styles.bandCard} data-material="glass" data-substrate>
-              <helix-flex class={styles.bandSection} direction="column" gap="md">
-                <h2 className={styles.tTitle}>{PROBLEM.title}</h2>
-                <p className={styles.tLede}>{PROBLEM.lede}</p>
+            <div className={landing.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={landing.bandSection} direction="column" gap="md">
+                <h2 className={landing.tTitle}>{PROBLEM.title}</h2>
+                <p className={landing.tLede}>{PROBLEM.lede}</p>
               </helix-flex>
 
-              <div className={`${styles.bandRow} ${styles.stagger}`}>
+              <div className={`${landing.bandRow} ${landing.stagger}`}>
                 {MECHANISMS.map((one) => (
-                  <helix-flex class={styles.bandCell} direction="column" gap="md" key={one.name}>
-                    <p className={styles.tLabel}>{one.name}</p>
-                    <p className={styles.tClaim}>{one.claim}</p>
-                    <ul className={styles.proofList}>
+                  <helix-flex class={landing.bandCell} direction="column" gap="md" key={one.name}>
+                    <p className={landing.tLabel}>{one.name}</p>
+                    <p className={landing.tClaim}>{one.claim}</p>
+                    <ul className={landing.proofList}>
                       {one.bullets.map((line) => (
                         <li key={line}>{line}</li>
                       ))}
@@ -178,9 +180,9 @@ export default function Home() {
           </helix-flex>
         </section>
 
-        <section className={styles.fieldBand} data-band id="mechanism">
+        <section className={landing.fieldBand} data-band id="mechanism">
           <helix-flex data-shell direction="column">
-            <div className={styles.bandCard} data-material="glass" data-substrate>
+            <div className={landing.bandCard} data-material="glass" data-substrate>
               {/* **Labeled as the first of the three, because that is what it
                   is.** The band above ends on three claims and this draws one of
                   them out. A label naming the subject instead, "The derivation",
@@ -188,16 +190,16 @@ export default function Home() {
                   after widening to the interface; naming the card it belongs to,
                   with the lede saying which of the three costs is answered, tells
                   a reader this is depth rather than a change of subject. */}
-              <helix-flex class={styles.bandSection} direction="column" gap="md">
-                <p className={styles.tLabel}>Derived, not picked</p>
-                <h2 className={styles.tTitle}>What happens between the color and the page</h2>
-                <p className={styles.tLede}>
+              <helix-flex class={landing.bandSection} direction="column" gap="md">
+                <p className={landing.tLabel}>Derived, not picked</p>
+                <h2 className={landing.tTitle}>What happens between the color and the page</h2>
+                <p className={landing.tLede}>
                   The first of those three, drawn out. One value goes in, the whole token layer
                   comes out, and every pair it produces is measured against the ground it lands on
                   before any of it reaches a page.
                 </p>
               </helix-flex>
-              <div className={styles.bandSection}>
+              <div className={landing.bandSection}>
                 <DerivationDiagram />
                 <DerivationDiagramStacked />
               </div>
@@ -211,18 +213,18 @@ export default function Home() {
           attention. With the showcase in a card of the same glass as the others,
           the card is the surface and the field runs behind it like everywhere
           else. */}
-        <section className={`${landing.showcaseBand} ${styles.fieldBand}`} data-band>
+        <section className={`${landing.showcaseBand} ${landing.fieldBand}`} data-band>
           <div data-shell>
-            <div className={styles.bandCard} data-material="glass" data-substrate>
-              <div className={styles.bandSplit}>
-                <helix-flex class={styles.bandSection} direction="column" gap="md">
+            <div className={landing.bandCard} data-material="glass" data-substrate>
+              <div className={landing.bandSplit}>
+                <helix-flex class={landing.bandSection} direction="column" gap="md">
                   {/* The card this band draws out, named after it, the way the
                     other two mechanisms are: "Derived, not picked" above and
                     "Measured, not claimed" below. A label naming the subject,
                     "The library", leaves the pattern two-thirds visible. */}
-                  <p className={styles.tLabel}>Standards, not bindings</p>
-                  <h2 className={styles.tTitle}>Every control here is the real one</h2>
-                  <p className={styles.tLede}>
+                  <p className={landing.tLabel}>Standards, not bindings</p>
+                  <h2 className={landing.tTitle}>Every control here is the real one</h2>
+                  <p className={landing.tLede}>
                     Not a screenshot and not a video. These are custom elements from the package,
                     upgrading in your browser on the page you are already reading.
                   </p>
@@ -254,7 +256,7 @@ export default function Home() {
                   </helix-flex>
                 </helix-flex>
 
-                <div className={styles.bandSection}>
+                <div className={landing.bandSection}>
                   <Showcase />
                 </div>
               </div>
@@ -271,7 +273,7 @@ export default function Home() {
           It is anchored here rather than on Services because this is the first
           band after the showcase, and the showcase is the one place the field is
           deliberately absent. */}
-        <section className={styles.fieldBand} data-band>
+        <section className={landing.fieldBand} data-band>
           <ProofBand />
         </section>
 
@@ -283,24 +285,24 @@ export default function Home() {
           one it is really lighting: an absolutely positioned child at 200svh
           starts at this band's top and carries down through the close, so the
           page ends in light rather than trailing off into flat ground. */}
-        <section className={styles.fieldBand} data-band>
+        <section className={landing.fieldBand} data-band>
           <helix-flex data-shell direction="column">
-            <div className={styles.bandCard} data-material="glass" data-substrate>
-              <helix-flex class={styles.bandSection} direction="column" gap="md">
-                <p className={styles.tLabel}>How it arrives</p>
-                <h2 className={styles.tTitle}>{DELIVERY.title}</h2>
-                <p className={styles.tLede}>{DELIVERY.lede}</p>
+            <div className={landing.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={landing.bandSection} direction="column" gap="md">
+                <p className={landing.tLabel}>How it arrives</p>
+                <h2 className={landing.tTitle}>{DELIVERY.title}</h2>
+                <p className={landing.tLede}>{DELIVERY.lede}</p>
               </helix-flex>
 
-              <div className={`${styles.bandRow} ${styles.stagger}`}>
+              <div className={`${landing.bandRow} ${landing.stagger}`}>
                 {SERVICES.map((service) => (
                   <helix-flex
-                    class={styles.bandCell}
+                    class={landing.bandCell}
                     direction="column"
                     gap="sm"
                     key={service.name}
                   >
-                    <p className={styles.tClaim}>{service.name}</p>
+                    <p className={landing.tClaim}>{service.name}</p>
                     <helix-text as="p" tone="muted">
                       {service.summary}
                     </helix-text>
@@ -308,7 +310,7 @@ export default function Home() {
                 ))}
               </div>
 
-              <helix-flex class={styles.bandSection} data-density="lg">
+              <helix-flex class={landing.bandSection} data-density="lg">
                 <Link data-button="subtle" data-button-width="standard" href="/services">
                   See what each costs
                 </Link>
@@ -323,19 +325,19 @@ export default function Home() {
           to know what having them in the repository is like, and the honest
           answers are that the system is already built, that this is why it is
           quick, that they keep it, and that we say what is unfinished. */}
-        <section className={styles.fieldBand} data-band>
+        <section className={landing.fieldBand} data-band>
           <helix-flex data-shell direction="column">
-            <div className={styles.bandCard} data-material="glass" data-substrate>
-              <helix-flex class={styles.bandSection} direction="column" gap="md">
-                <p className={styles.tLabel}>The engagement</p>
-                <h2 className={styles.tTitle}>{ENGAGEMENT_COPY.title}</h2>
-                <p className={styles.tLede}>{ENGAGEMENT_COPY.lede}</p>
+            <div className={landing.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={landing.bandSection} direction="column" gap="md">
+                <p className={landing.tLabel}>The engagement</p>
+                <h2 className={landing.tTitle}>{ENGAGEMENT_COPY.title}</h2>
+                <p className={landing.tLede}>{ENGAGEMENT_COPY.lede}</p>
               </helix-flex>
 
-              <div className={`${styles.bandRow} ${styles.stagger}`}>
+              <div className={`${landing.bandRow} ${landing.stagger}`}>
                 {ENGAGEMENT.map((one) => (
-                  <helix-flex class={styles.bandCell} direction="column" gap="sm" key={one.name}>
-                    <p className={styles.tClaim}>{one.name}</p>
+                  <helix-flex class={landing.bandCell} direction="column" gap="sm" key={one.name}>
+                    <p className={landing.tClaim}>{one.name}</p>
                     <helix-text as="p" tone="muted">
                       {one.body}
                     </helix-text>
@@ -364,14 +366,14 @@ export default function Home() {
           it. Four because that is a row, and because a set that fits on one
           screen does not need controls, an indicator or a scroll position to be
           restored. `Read all` is where the rest go. */}
-        <section className={styles.fieldBand} data-band>
+        <section className={landing.fieldBand} data-band>
           <helix-flex data-shell direction="column">
-            <div className={styles.bandCard} data-material="glass" data-substrate>
-              <helix-flex class={styles.bandSection} direction="column" gap="md">
+            <div className={landing.bandCard} data-material="glass" data-substrate>
+              <helix-flex class={landing.bandSection} direction="column" gap="md">
                 <helix-flex align="center" gap="md" justify="between" wrap>
                   <helix-flex direction="column" gap="sm">
-                    <p className={styles.tLabel}>Insights</p>
-                    <h2 className={styles.tTitle}>The arguments, written down</h2>
+                    <p className={landing.tLabel}>Insights</p>
+                    <h2 className={landing.tTitle}>The arguments, written down</h2>
                   </helix-flex>
                   <Link data-button="subtle" data-button-width="standard" href="/insights">
                     Read all
@@ -379,7 +381,7 @@ export default function Home() {
                 </helix-flex>
                 {/* Below the row rather than inside it, so `Read all` stays on the
                     heading's line and the sentence runs the full measure. */}
-                <p className={styles.tLede}>
+                <p className={landing.tLede}>
                   Design, engineering and business decisions, with the reasoning kept in.
                 </p>
               </helix-flex>
@@ -392,10 +394,10 @@ export default function Home() {
                   exempting it, and the cell is the link so the whole of it is the
                   target. The full card, with its art and its glass, is what
                   `/insights` shows. */}
-              <div className={`${styles.bandRow} ${styles.insightRow}`}>
+              <div className={`${landing.bandRow} ${landing.insightRow}`}>
                 {INSIGHTS.slice(0, 4).map((insight) => (
                   <Link
-                    className={`${styles.bandCell} ${styles.insightCell}`}
+                    className={`${landing.bandCell} ${landing.insightCell}`}
                     href={`/insights/${insight.slug}`}
                     key={insight.slug}
                   >
@@ -418,8 +420,8 @@ export default function Home() {
 
         <section className={landing.closingCard} data-band data-closing data-material="glass">
           <helix-flex align="center" data-shell direction="column" gap="lg">
-            <h2 className={styles.tTitle}>Take on the work</h2>
-            <p className={styles.tLede}>
+            <h2 className={landing.tTitle}>Take on the work</h2>
+            <p className={landing.tLede}>
               Tell us what you need built. We will say plainly if we are not the right people.
             </p>
             <a

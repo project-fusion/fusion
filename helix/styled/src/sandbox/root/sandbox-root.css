@@ -1,16 +1,4 @@
-/* Three rows: a bar, the body, a bar.
- *
- * The panes, both dividers and the corner belong to two nested
- * `helix-splitter`s. What is left here is the part a splitter has no opinion
- * about: a toolbar above and a status bar below, spanning the whole width,
- * which is why they are not part of the split.
- *
- * No border and no radius. Every boundary in a sandbox is already drawn by
- * whatever sits on one side of it: the divider between the panes, the status
- * bar's top edge, and in a page the toolbar above and the rail beside. A box
- * around the whole thing lands on top of those, so each edge was two lines a
- * pixel apart, and the radius rounded a corner that was flush against the
- * window. One line per boundary, owned by one side of it. */
+/* Three rows: a bar, the body, a bar. */
 :host {
   background-color: var(--helix-color-background);
   display: grid;
@@ -19,9 +7,7 @@
   overflow: hidden;
 }
 
-/* Placed rather than left to auto-placement. Every one of these slots is bare,
-   so with nothing in it there is no box at all, and an auto-placed body would
-   move up a row the moment a sandbox was built without a toolbar. */
+/* Placed rather than left to auto-placement. */
 ::slotted([slot="toolbar"]) {
   grid-row: 1;
 }
@@ -35,9 +21,7 @@
 }
 
 /* The dividers, said once for both splitters and inherited across their shadow
-   boundaries, which is what the hooks are for. The grab area is the splitter's
-   own eight pixels and the line inside it is a hairline: the target was never
-   the width of the line, and a thinner line is not a smaller target. */
+   boundaries, which is what the hooks are for. */
 [part="body"],
 [part="panes"] {
   --splitter-color: var(--sandbox-separator-color, var(--helix-color-border));
@@ -46,31 +30,16 @@
   min-inline-size: 0;
 }
 
-/* The nested splitter fills the pane it was slotted into, and has to be told.
- *
- * A splitter is a flex container with no height of its own, so slotted into a
- * pane it sizes to its contents: the preview is an iframe, an iframe's intrinsic
- * height is 150px, and that is what the whole pane became. The color mode then
- * looked like it only painted part of the preview, because the preview *was*
- * only that part, with the pane's own background under the rest. The divider was
- * 150px tall for the same reason, which left most of the seam ungrabbable. */
+/* The nested splitter fills the pane it was slotted into, and has to be told. A
+   splitter is a flex container with no height of its own, so slotted into a pane
+   it sizes to its contents: the preview is an iframe, an iframe's intrinsic
+   height is 150px, and that is what the whole pane became. The divider was 150px
+   tall for the same reason, which left most of the seam ungrabbable. */
 [part="panes"] {
   block-size: 100%;
 }
 
-/* The panel's divider with no panel under it draws nothing and takes nothing.
- *
- * A boundary needs two sides. With the panel slot empty the outer divider is a
- * rule along the floor of the sandbox with nothing behind it, which reads as the
- * border of a pane that is not there. `display: none` rather than a color,
- * because there is also nothing to drag: the position is pinned at a hundred
- * until something is slotted.
- *
- * The flag is on the splitter and never on the host, which is the one thing
- * this rule may not do: `hasPanel` is answered at hydration, so React's server
- * markup has no such attribute and the client's does, and it reports the
- * mismatch and refuses to patch it. Inside the shadow root there is no tree a
- * framework is hydrating. */
+/* The panel's divider with no panel under it draws nothing and takes nothing. */
 [part="body"]:not([data-panel])::part(separator) {
   display: none;
 }
@@ -79,9 +48,7 @@
   display: none;
 }
 
-/* Both panes scroll and neither has a floor. A flex item's minimum is its
-   content, so a pane holding an editor would refuse to go below it and the
-   divider would stop at a width nobody asked for. */
+/* Both panes scroll and neither has a floor. */
 [part="pane"] {
   block-size: 100%;
   min-block-size: 0;
@@ -89,12 +56,7 @@
   overflow: hidden;
 }
 
-/* No fill of its own. The panel is two things and they want different answers:
-   a strip of tab chrome, which is a bar like every other bar in the tool and
-   belongs to the page, and the output under it, which is the one region that is
-   not. Painting the whole slot made them one surface and put the strip on the
-   wrong side of that line. Whoever slots the panel says where the boundary
-   falls, because only they know what is in it. */
+/* No fill of its own. */
 [part="panel"] {
   block-size: 100%;
   min-block-size: 0;
@@ -107,12 +69,7 @@
 }
 
 /* The preview fills its pane, and carries its own background because it can be
-   set to a different color mode than the page around it.
-
-   No padding: the example is in a frame with its own document, so spacing
-   around it belongs to that document, where the Environment menu's layout
-   modes can change it. Padding here would sit outside the frame and no layout
-   mode could reach it. */
+   set to a different color mode than the page around it. */
 ::slotted(helix-sandbox-preview) {
   background-color: var(--helix-color-background);
   block-size: 100%;
@@ -120,10 +77,7 @@
   display: block;
 }
 
-/* Print: an editor, and the whole of it is chrome.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: an editor, and the whole of it is chrome. */
 @media print {
   :host {
     display: none;

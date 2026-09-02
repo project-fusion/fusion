@@ -1,8 +1,4 @@
-/* The box is the element's, and the picture fills it.
- *
- * `display: block` rather than inline, because an inline box carries a
- * descender's worth of space under it that no consumer asked for and everyone
- * ends up fighting with `display: block` on the image itself. */
+/* The box is the element's, and the picture fills it. */
 :host {
   aspect-ratio: var(--image-aspect, auto);
   display: block;
@@ -14,10 +10,7 @@
   border-radius: var(--image-radius, var(--helix-radii-md));
 }
 
-/* Filling the box on both axes, so `object-fit` has something to fit against.
- *
- * Without a size the picture takes its own, and `cover` then crops nothing
- * because there is nothing to crop to. */
+/* Filling the box on both axes, so `object-fit` has something to fit against. */
 [part="image"] {
   block-size: 100%;
   display: block;
@@ -26,9 +19,7 @@
   object-position: var(--image-position, center);
 }
 
-/* Nothing to look at until there is something to look at. `visibility` rather
-   than `opacity`, so a picture that failed is not sitting invisible on top of
-   the fallback taking the pointer. */
+/* Nothing to look at until there is something to look at. */
 :host([data-status="error"]) [part="image"] {
   visibility: hidden;
 }
@@ -43,45 +34,25 @@
   position: absolute;
 }
 
-/* And stop covering it when they are told to.
- *
- * **`hidden` does not hide a thing an author gave a display to.** The rule
- * above is an author rule and `[hidden] { display: none }` is the user agent's,
- * and an author rule beats a user agent rule at any specificity, so the
- * attribute did nothing at all. Measured: a photograph that had loaded, at
- * opacity 1, under a 384 by 216 stand-in painted over the whole of it. Every
- * image in the gallery was a gray rectangle.
- *
- * `Megamenu` carries the same rule for the same reason and says so at greater
- * length. `:host` prefixes this one so it also outranks any later
- * `:host([...]) [part="fallback"]`, which is how the megamenu's version lost the
- * first time. Do not lower it. */
+/* And stop covering it when they are told to. **`hidden` does not hide a thing
+   an author gave a display to.** The rule above is an author rule and `[hidden]
+   { display: none }` is the user agent's, and an author rule beats a user agent
+   rule at any specificity, so the attribute did nothing at all. Measured: a
+   photograph that had loaded, at opacity 1, under a 384 by 216 stand-in painted
+   over the whole of it. */
 :host [part="placeholder"][hidden],
 :host [part="fallback"][hidden] {
   display: none;
 }
 
 /* The resting placeholder, drawn here rather than slotted, so an image with
- * nothing slotted still reserves a surface instead of a hole.
- *
- * A consumer slotting their own gets this behind it, which is what they want:
- * a blurred thumbnail with a transparent edge should still sit on a surface
- * rather than on whatever is under the element. */
+   nothing slotted still reserves a surface instead of a hole. */
 [part="placeholder"] {
   background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
 }
 
 /* A slotted placeholder fills the box rather than sitting in the middle of it.
- *
- * Measured: a slotted `Skeleton` came out 200 wide and nothing high. It has no
- * height of its own, being sized by whatever holds it, and what held it was a
- * centering flex box that gave it its content height of zero. So the stand-in
- * was a plain gray rectangle and the skeleton was never visible at all.
- *
- * Filling is the right default here and centering is not, because everything
- * anybody stands in for a picture with is picture-shaped: a skeleton, a blurred
- * thumbnail, a solid color, a dominant-color swatch. The fallback below keeps
- * centering, because what stands in for a picture that failed is a mark. */
+   Measured: a slotted `Skeleton` came out 200 wide and nothing high. */
 [part="placeholder"] ::slotted(*) {
   block-size: 100%;
   inline-size: 100%;
@@ -92,13 +63,7 @@
   color: var(--helix-color-foreground-subtle);
 }
 
-/* Arriving rather than appearing.
- *
- * The picture is what fades, not the placeholder: fading the placeholder out
- * over an image that has not painted yet shows the page behind it for a frame.
- * `loaded` is the only state that transitions, so a cached picture that is
- * already `loaded` on the first render has nothing to animate and appears at
- * once, which is correct. */
+/* Arriving rather than appearing. */
 [part="image"] {
   opacity: 0;
   transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
@@ -108,10 +73,7 @@
   opacity: 1;
 }
 
-/* Print: a picture, which prints.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* Print: a picture, which prints. */
 @media print {
   :host {
     box-shadow: none;

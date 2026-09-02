@@ -6,7 +6,7 @@ import { pageMetadata } from '@/utils/metadata/metadata'
 import { outlineOf } from '@/utils/outline/outline'
 import { renderMdx } from '../../../../../utils/mdx/mdx'
 import styles from '../../components/(reference)/docs.module.css'
-import prose from '../docs-prose.module.css'
+import prose from './page.module.css'
 
 /**
  * One documentation page.

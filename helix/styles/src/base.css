@@ -1,11 +1,4 @@
-/**
- * Helix base layer. Light-DOM reset and document defaults.
- *
- * Import after `tokens.css`, which this depends on.
- *
- * Shadow DOM gets `box-sizing: border-box` from `HelixElement.finalizeStyles`,
- * so component CSS can rely on border-box on both sides of the boundary.
- */
+/* Helix base layer. */
 
 *,
 *::before,
@@ -13,17 +6,11 @@
   box-sizing: border-box;
 }
 
-/* **The tap highlight is a gray rectangle iOS paints over whatever you touch**,
- * ignoring the border radius under it, and it fires on the first touch of a
- * gesture rather than on a tap: dragging a carousel lights up the card the
- * finger started on, which reads as having pressed something you were only
- * dragging past.
- *
- * Turned off at the document rather than per component, because it is a
- * platform default that arrives on every interactive surface at once and no
- * component can see it coming. What replaces it is each component's own press
- * state, which is drawn in the component's own shape and stops when a scroll
- * takes the gesture over. */
+/* *The tap highlight is a gray rectangle iOS paints over whatever you touch**,
+   ignoring the border radius under it, and it fires on the first touch of a
+   gesture rather than on a tap: dragging a carousel lights up the card the
+   finger started on, which reads as having pressed something you were only
+   dragging past. */
 html {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
@@ -39,20 +26,11 @@ body {
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-normal);
   margin: 0;
-  /* Wide content scrolls inside its own container. The page never scrolls
-     horizontally. */
+  /* Wide content scrolls inside its own container. */
   overflow-x: clip;
 }
 
-/* The margin reset is unscoped and the theming is not. Zeroing a UA margin is a
-   reset: nothing fights it, and a component slotting a heading wants it too.
-   Choosing a size and a weight is theming, and a document rule doing that
-   reaches inside every component that slots a heading, where it beats the
-   component's own stylesheet whatever the specificity and whatever the layer.
-   Both measured.
-
-   So theming is opt-in, on `[data-prose]`. Markdown, a CMS, anything the design
-   system did not render says so once on its container. */
+/* The margin reset is unscoped and the theming is not. */
 :where(h1, h2, h3, h4, h5, h6) {
   margin: 0;
 }
@@ -64,11 +42,10 @@ body {
   line-height: var(--helix-leading-heading);
 }
 
-/* The type scale lives here rather than in a `Text` component, so a heading is
-   a real heading. A component would have to take the level as a prop and would
+/* The type scale lives here rather than in a `Text` component, so a heading is a
+   real heading. A component would have to take the level as a prop and would
    tempt `size` to be set independently of it, which is how a page ends up with
-   an <h4> that looks like a title. This also reaches prose the design system
-   never renders, such as anything coming out of a CMS or a markdown file. */
+   an <h4> that looks like a title. */
 :where([data-prose] h1) {
   font-size: var(--helix-text-3xl);
 }
@@ -107,26 +84,12 @@ body {
   max-inline-size: 100%;
 }
 
-/* The one media that is allowed to be wider than the box it sits in.
- *
- * Card's media runs edge to edge: `card-root.css` pulls the slotted element out
- * to the border with a negative inset and widens it by twice that, and the
- * host's `overflow: hidden` trims it to the corner radius. **A normal
- * declaration in the outer tree beats a `::slotted()` rule in an inner one
- * whatever the specificities are**, so without this the zero-specificity
- * `:where()` reset above outranks the component's own sizing and clamps it back
- * to the content box while the negative margins still apply: a picture visibly
- * hanging off its own card.
- *
- * The fix has to be here for the same reason it broke here. The component
- * cannot win this from inside its shadow root with a normal declaration, and
- * the alternative is `!important` in `card-root.css`, which is the cascade
- * being fought rather than used. This is the pattern the button recipe already
- * follows: where a rule has to reach a light-DOM element the consumer owns, the
- * definition lives in the document.
- *
- * Only the clamp is lifted. The width itself stays in the component, because
- * the inset it is derived from is the component's. */
+/* The one media that is allowed to be wider than the box it sits in. **A normal
+   declaration in the outer tree beats a `::slotted()` rule in an inner one
+   whatever the specificities are**, so without this the zero-specificity
+   `:where()` reset above outranks the component's own sizing and clamps it back
+   to the content box while the negative margins still apply: a picture visibly
+   hanging off its own card. */
 helix-card > [slot="media"] {
   max-inline-size: none;
 }
@@ -135,57 +98,21 @@ helix-card > [slot="media"] {
   font: inherit;
 }
 
-/* Anchors are styled here rather than wrapped in a `Link` component. An <a>
-   already carries everything a link needs, so a wrapper would add a shadow
-   boundary and no behavior; styling the element instead also covers links the
-   design system never renders.
-
-   The underline strengthens in color on hover. That is the decoration's own
-   property rather than a box shadow, because a shadow is drawn on the border
-   box, and an anchor is not always an inline box the width of its text: a flex
-   item is blockified, so a link inside a `column` flex container stretches and
-   the shadow runs the full width of the container instead of underlining the
-   words.
-
-   Measured in Chrome, `text-decoration-thickness` snaps straight to its target
-   rather than tweening, while `text-underline-offset` does animate, which is
-   why the offset is not allowed to change: it would be the only thing visibly
-   moving, carrying the line down the descenders so a link answering the pointer
-   looks like the rule sliding away from the words rather than settling into
-   them. The one pixel of thickness snaps and is imperceptible; the color is
-   what a reader sees. Thickness is listed in the transition anyway, in case it
-   becomes animatable. */
-/* Prose, and anything that says it is a link.
- *
- * `[data-link]` joins the same rule rather than repeating it, which is the
- * helper-beside-the-recipe pattern used for `data-button`: one decision written
- * for two surfaces. **A helper needs its base case, not only its variants.**
- * `data-link="subtle"` and `"quiet"` are departures from this rule, so without
- * the bare attribute here a plain `data-link` outside `[data-prose]` selects
- * nothing and the anchor falls through to the browser's default underlined blue.
- *
- * Two specificities on purpose. The prose half stays inside `:where()` so a
- * consumer's own class beats it; the attribute half is 0-1-0 so it beats the
- * bare-element reset while still losing to a class. The variants below are the
- * same weight and follow in source order, which is what lets them win. */
+/* Anchors are styled here rather than wrapped in a `Link` component. */
+/* Prose, and anything that says it is a link. **A helper needs its base case,
+   not only its variants.** `data-link="subtle"` and `"quiet"` are departures
+   from this rule, so without the bare attribute here a plain `data-link` outside
+   `[data-prose]` selects nothing and the anchor falls through to the browser's
+   default underlined blue. The prose half stays inside `:where()` so a
+   consumer's own class beats it; the attribute half is 0-1-0 so it beats the
+   bare-element reset while still losing to a class. */
 :where([data-prose] a),
 [data-link] {
   color: var(--helix-color-primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
   text-decoration-thickness: 1px;
-  /* One offset, in both states. An offset that moves carries the underline down
-     the descenders while it thickens, and a rule that changes place says
-     "something else is here now" where a rule that thickens where it already
-     was says "this one".
-
-     Thickness grows downward from the offset, so the top edge of the line stays
-     put and the weight is added below it. That is the growing.
-
-     A quarter of an em, which clears a descender at both weights. The line has
-     to sit under the word rather than through the tail of a `g`, and it has to
-     do so at two pixels as well as at one, since the offset does not move to
-     make room. */
+  /* One offset, in both states. */
   text-underline-offset: 0.25em;
   transition:
     color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -200,23 +127,10 @@ helix-card > [slot="media"] {
   text-decoration-thickness: 2px;
 }
 
-/* Link variants, as recipes rather than as a component.
- *
- * The rule above already covers a plain anchor, and these are the departures
- * from it. Selectable without a component, so a link a router renders is styled
- * the same as any other: a router's anchor cannot be produced inside a shadow
- * root, and an element wrapping one nests an anchor inside an anchor.
- *
- * Attribute selectors rather than `:where()`, so a variant beats the base rule
- * while still losing to anything a consumer writes with a class.
- *
- * `rel` is not here, because it is behavior rather than presentation. Biome's
- * `noBlankTarget` fails the build on a missing one.
- */
+/* Link variants, as recipes rather than as a component. */
 
-/* Reads as body text until hovered, for a link among prose that should not
-   pull the eye. Quiet never takes the accent at all, for navigation where
-   every row would otherwise be blue. */
+/* Reads as body text until hovered, for a link among prose that should not pull
+   the eye. */
 [data-link="subtle"],
 [data-link="quiet"] {
   color: var(--helix-color-foreground-muted);
@@ -245,18 +159,11 @@ helix-card > [slot="media"] {
   text-decoration: underline;
 }
 
-/* **`md` is absent, because it is what the surrounding text already is**, and
-   `xl` upward is absent deliberately rather than as a gap. A recipe naming a
-   step of a ramp should reach the whole ramp or say where it stops; this one
-   reaches `xs`, `sm` and `lg` of a seven-step text ramp, and stops there because
-   the ramp stops being text there.
-
-   `data-text` puts `title` at `lg`, `heading` at `2xl` and `display` at `3xl`,
-   so a link asking for `2xl` is asking to be a heading, and a heading that
-   navigates is a heading containing an anchor rather than a link wearing a
-   heading's size. Writing the rules would make that mistake spellable and would
-   say, by covering the range, that the library thinks a link can be display
-   type. */
+/* *`md` is absent, because it is what the surrounding text already is**, and
+   `xl` upward is absent deliberately rather than as a gap. `data-text` puts
+   `title` at `lg`, `heading` at `2xl` and `display` at `3xl`, so a link asking
+   for `2xl` is asking to be a heading, and a heading that navigates is a heading
+   containing an anchor rather than a link wearing a heading's size. */
 [data-link-size="xs"] {
   font-size: var(--helix-text-xs);
 }
@@ -269,29 +176,11 @@ helix-card > [slot="media"] {
   font-size: var(--helix-text-lg);
 }
 
-/* The type ramps, as recipes.
- *
- * One rule per appearance, each setting the five things that move together.
- * Exposing them separately would offer a few hundred combinations of which a
- * handful are right; this is the handful, which is why they are named bundles
- * rather than composable size, weight and leading utilities.
- *
- * **The ramp is written twice and nothing holds the two copies together.** This
- * file carries `data-text` for a plain element and the `[data-prose]` headings;
- * `text-root.css` carries `:host([variant])` and `:host([as])`, which is what
- * actually styles `helix-text`, a host with a `variant` attribute matching no
- * rule in this file. The same four decisions written eight times across two
- * packages, with no check standing between them. Anything moving a size, a
- * weight or a leading has to move in both files.
- *
- * `Text` reaches these through inheritance rather than a copy. Typography
- * inherits across a shadow boundary, so a rule matching the host reaches the
- * element inside it; `text-root.css` resets that element to `font: inherit` so
- * the UA's own heading styles do not win against it.
- *
- * `body` is listed for completeness and is what `body` already sets, so an
- * element with no variant and no pairing needs no rule to look right.
- */
+/* The type ramps, as recipes. **The ramp is written twice and nothing holds the
+   two copies together.** This file carries `data-text` for a plain element and
+   the `[data-prose]` headings; `text-root.css` carries `:host([variant])` and
+   `:host([as])`, which is what actually styles `helix-text`, a host with a
+   `variant` attribute matching no rule in this file. */
 
 [data-text="display"] {
   font-family: var(--helix-font-display);
@@ -365,8 +254,7 @@ helix-card > [slot="media"] {
   line-height: var(--helix-leading-normal);
 }
 
-/* Color carries state, so it stays a separate axis from the ramp. Folding it
-   in would mean `caption-danger` and the rest of the cross product. */
+/* Color carries state, so it stays a separate axis from the ramp. */
 [data-tone="muted"],
 helix-text[tone="muted"] {
   color: var(--helix-color-foreground-muted);
@@ -387,49 +275,19 @@ helix-text[tone="danger"] {
   color: var(--helix-color-danger);
 }
 
-/* The button recipe, for elements this library does not render.
- *
- * `<Link data-button="solid">` is a router's own anchor, and `Button` renders
- * no anchor because a router cannot render one inside a shadow root. So the
- * declarations have to exist for the light DOM, and this is where they live.
- *
- * **Never fold the component back into this rule with
- * `helix-button::part(button)`.** A part selector crosses exactly one shadow
- * boundary: it reaches a button on the page and stops one short of a button
- * inside another component. Measured in `helix-color`, which composes two: no
- * background, no border, no radius, no padding.
- *
- * The component owns its presentation and this is the recipe alone. The two
- * say the same thing twice, in the two places it has to be said, and the density
- * axis is shared rather than repeated: `--helix-text-control` and
- * `--helix-space-control` are read by both, because a custom property is the one
- * thing that crosses a shadow boundary without being aimed at it.
- *
- * A named fill wins outright, hover included, which is why `:hover` reads the
- * hook as well. A consumer who names an exact color and then watches it change
- * under the pointer has been given a hook that half works.
- */
+/* The button recipe, for elements this library does not render. **Never fold the
+   component back into this rule with `helix-button::part(button)`.** A part
+   selector crosses exactly one shadow boundary: it reaches a button on the page
+   and stops one short of a button inside another component. */
 /* Two axes here as well, `data-button` for the fill and `data-button-tone` for
- * the color, matching the component exactly. `data-button-tone` rather than a
- * bare `data-tone` follows `data-button-width`: a second axis on a recipe carries
- * the recipe's name, and it cannot ride in the `data-button` value either,
- * because that value is the appearance and the rules below match it exactly. */
+   the color, matching the component exactly. */
 [data-button] {
   --_button-edge: var(--helix-color-border);
-  /* The solid fill, separate from the tone, and it has to be separate.
-   *
-   * The same split `Button` makes. `--_button-tone` is the color of the *ink* on
-   * every appearance but `solid`: an outlined or ghost primary draws its label
-   * with it, and in dark mode that is deliberately the lighter brand so the
-   * text is legible on a dark page. A solid button wants the opposite, a fill
-   * dark enough to carry white. Pointing one variable at both measures 2.80 for
-   * primary and 1.84 for warning, and a plain
-   * `<a data-button="solid" data-button-tone="primary">` measured 2.80 in dark
-   * and 4.40 in light against its own white label, both under AA, while
-   * `helix-button` beside it measured 5.41.
-   *
-   * Defaulted to the tone, which is what neutral wants, so nothing untoned
-   * moves. */
+  /* The solid fill, separate from the tone, and it has to be separate. Pointing
+     one variable at both measures 2.80 for primary and 1.84 for warning, and a
+     plain `<a data-button="solid" data-button-tone="primary">` measured 2.80 in
+     dark and 4.40 in light against its own white label, both under AA, while
+     `helix-button` beside it measured 5.41. */
   --_button-fill: var(--_button-tone);
   --_button-fill-hover: var(--_button-tone-hover);
   --_button-on-tone: var(--helix-color-background);
@@ -441,26 +299,13 @@ helix-text[tone="danger"] {
   );
 
   align-items: center;
-  /* A wash of the foreground, inside a hairline.
-   *
-   * Not `surface`, which on a white page is fifteen thousandths off the paper,
-   * so the fill does nothing. A percentage of the foreground is a step away from
-   * whatever it sits on in either mode, which a fixed neutral cannot be, and
-   * the same button drops onto a page, a card and a panel.
-   *
-   * **The line is what separates the middle appearance from the quiet one.**
-   * Without it the resting fill and the transparent one are six points of the
-   * same wash apart and nothing else, so a row holding all three reads as one
-   * solid button and two ghosts of slightly different faintness. Rendered side
-   * by side in both modes: giving the outlined one an edge separates the three
-   * by *kind*, nothing against a line against a fill, where six points of a wash
-   * separates them only by degree. The other way round is worse, a resting wash
-   * on the ghost giving two near-identical gray boxes where there had been one.
-   *
-   * Costs no layout, the property already being here as `transparent` and
-   * `solid`, `subtle` and `ghost` each speaking to `border-color`. Button groups
-   * are fine: the group pulls its members together by exactly the border width,
-   * so the seams measure -1.0px and no edge is drawn twice. */
+  /* A wash of the foreground, inside a hairline. **The line is what separates
+     the middle appearance from the quiet one.** Without it the resting fill and
+     the transparent one are six points of the same wash apart and nothing else,
+     so a row holding all three reads as one solid button and two ghosts of
+     slightly different faintness. Button groups are fine: the group pulls its
+     members together by exactly the border width, so the seams measure -1.0px
+     and no edge is drawn twice. */
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 6%, transparent)
@@ -487,12 +332,7 @@ helix-text[tone="danger"] {
   white-space: nowrap;
 }
 
-/* The tones, paired with the component's as everything here is.
-
-   There is no `data-button-variant`, because `Button` has no `variant`:
-   `primary`, `secondary` and `tertiary` are a rank and `danger` is a meaning,
-   which is two axes rather than one word. A recipe answering to a word the
-   component does not know is worse than either half. */
+/* The tones, paired with the component's as everything here is. */
 [data-button][data-button-tone="primary"] {
   --_button-edge: var(--helix-color-primary);
   --_button-fill: var(--helix-color-primary-surface);
@@ -503,9 +343,7 @@ helix-text[tone="danger"] {
 }
 
 /* Every tone the component's `tone` axis takes is written here, or an anchor
-   asking for the missing one falls back to neutral with no error. Six
-   declarations each, the same six, because a tone that behaves differently from
-   the one beside it is a tone a consumer has to learn separately. */
+   asking for the missing one falls back to neutral with no error. */
 [data-button][data-button-tone="accent"] {
   --_button-edge: var(--helix-color-accent);
   --_button-fill: var(--helix-color-accent-surface);
@@ -535,56 +373,27 @@ helix-text[tone="danger"] {
   );
 }
 
-/* How much of the room available to it the button takes.
- *
- * Paired like everything else here, so a `<Link data-button="solid">` and a
- * `<helix-button>` are the same control at every width. Measured side by side:
- * 200 and 200 at `standard`, 600 and 600 at `full`, 65 and 65 unset, and 120 and
- * 120 inside a 120px column.
- *
- * A host is reachable from here, which is what makes the pairing possible at
- * all. `helix-button[width="standard"]` is an ordinary type-and-attribute
- * selector on a light-DOM element, and the outer tree wins over the inner one,
- * so a rule in this file beats `:host([width="standard"])` whatever their
- * specificities. Verified by asking for a width the shadow never declares.
- *
- * On the host rather than on `::part(button)`, because the host is the box a
- * layout sees. Widening only the control inside leaves a host still as wide as
- * its label, which reads as the button not growing at all. The part is already
- * `inline-size: 100%`, so it follows on its own.
- *
- * `data-button-width` rather than a bare `data-width`, following `data-link-size`:
- * a second axis on a recipe carries the recipe's name. It cannot ride in the
- * `data-button` value either, because that value is the appearance and the rules
- * above match it exactly. The component's own `fill` lives on its host, in its
- * own stylesheet.
- */
+/* How much of the room available to it the button takes. Measured side by side:
+   200 and 200 at `standard`, 600 and 600 at `full`, 65 and 65 unset, and 120 and
+   120 inside a 120px column. The part is already `inline-size: 100%`, so it
+   follows on its own. */
 [data-button][data-button-width="standard"] {
-  /* **A floor, never `inline-size`.** A fixed width makes a label wider than the
+  /* *A floor, never `inline-size`.** A fixed width makes a label wider than the
      standard one fill the box edge to edge and then eat its own padding, so the
      axis that exists to stop short buttons looking mean makes long ones look
-     broken, and a consumer's answer is to shorten the label.
-
-     A `<Link data-button>` and a `<helix-button>` still agree, because they
-     agree on the floor and on the content above it. */
+     broken, and a consumer's answer is to shorten the label. */
   min-inline-size: var(--button-inline-size, var(--helix-size-button));
-  /* Never wider than the room it has. A standard width is a floor for tidiness,
-     not a promise to overflow a narrow column to keep it. */
+  /* Never wider than the room it has. */
   max-inline-size: 100%;
 }
 
-/* Block-level, not the recipe's `inline-flex`. A control that fills its
-   container should not be able to share a line with anything beside it. */
+/* Block-level, not the recipe's `inline-flex`. */
 [data-button][data-button-width="full"] {
   display: flex;
   inline-size: 100%;
 }
 
-/* Every appearance names its own hover, including where the fill does not move.
-   `[data-button]:not(:disabled):hover` is three class-equivalents and an
-   appearance rule is one, so an appearance without a hover of its own loses its
-   fill the moment a pointer touches it: measured on `danger`, a red button that
-   turned neutral gray under the pointer. */
+/* Every appearance names its own hover, including where the fill does not move. */
 [data-button="solid"] {
   background-color: var(--button-background-color, var(--_button-fill));
   border-color: transparent;
@@ -615,14 +424,7 @@ helix-text[tone="danger"] {
 }
 
 /* A group of a consumer's own anchors is one shape, so the inner corners go flat
- * and the outer ones keep their radius.
- *
- * The component half lives in the component: `helix-button-group` flattens a
- * `helix-button` by handing it `--button-radius-start` and `--button-radius-end`
- * through `::slotted()`, which is a custom property crossing a boundary rather
- * than a rule reaching through two of them. This half stays here, because a
- * `<Link data-button>` is in the light DOM and there is nothing to cross.
- */
+   and the outer ones keep their radius. */
 helix-button-group:not([variant="spaced"]) > :not(:first-child) [data-button],
 helix-button-group:not([variant="spaced"]) > [data-button]:not(:first-child) {
   border-start-start-radius: 0;
@@ -639,19 +441,12 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   border-color: transparent;
 }
 
-/* A wash of the foreground, not a fixed surface.
- *
- * `--helix-color-surface-sunken` is an absolute value, and every one of these
- * sits on a surface whose own lightness is not. Measured on a ghost button
- * inside a dialog: sunken is `oklch(0.15)` in dark mode against a panel at
- * `oklch(0.29)`, so the hover was a 1.39 step *darker* than the surface it was
- * on, which on a raised panel reads as a hole rather than as a press. On the
- * page, where the same token was chosen, the step is 1.11 and correct.
- *
- * A translucent mix composites against whatever is behind it, so one value is
- * right on every surface and there is nothing to keep in sync. The outlined
- * fill works this way, which is why it measures identically on both panels while
- * a fixed surface does not. 8% wherever the resting state is transparent. */
+/* A wash of the foreground, not a fixed surface. Measured on a ghost button
+   inside a dialog: sunken is `oklch(0.15)` in dark mode against a panel at
+   `oklch(0.29)`, so the hover was a 1.39 step *darker* than the surface it was
+   on, which on a raised panel reads as a hole rather than as a press. On the
+   page, where the same token was chosen, the step is 1.11 and correct. 8%
+   wherever the resting state is transparent. */
 [data-button="ghost"]:not(:disabled):hover {
   background-color: var(
     --button-background-color-hover,
@@ -660,12 +455,12 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   border-color: transparent;
 }
 
-/* **Do not restate type and inset per density stop here.** `[data-button]` above
- * reads `--helix-text-control` and `--helix-space-control` directly, which is
- * the mechanism that crosses a shadow boundary and the only reason the recipe
- * and `helix-button` agree at all. Measured across all three regions:
- * 32/12/12, 40/13/16 and 48/14/24 for height, type and inset, identical for an
- * `<a data-button>` and a `<helix-button>` at every stop. */
+/* *Do not restate type and inset per density stop here.** `[data-button]` above
+   reads `--helix-text-control` and `--helix-space-control` directly, which is
+   the mechanism that crosses a shadow boundary and the only reason the recipe
+   and `helix-button` agree at all. Measured across all three regions: 32/12/12,
+   40/13/16 and 48/14/24 for height, type and inset, identical for an `<a
+   data-button>` and a `<helix-button>` at every stop. */
 
 /* A checkbox's label reads at the density it is in, the same as a button's. */
 [data-density="sm"] helix-checkbox::part(label) {
@@ -681,55 +476,30 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   opacity: 0.5;
 }
 
-/* Density. How big the controls in a region are.
- *
- * The only size axis a control has. A control does not carry one of its own,
- * and that is the point rather than an omission: two controls sitting together
- * never legitimately differ in height, so a per-instance size is only ever used
- * to say something about the region, one element at a time. Said once here, a
- * ragged row is not merely discouraged, it is unwritable. Emphasis is what
- * carries the rest: a filled primary button says "this one matters" far louder
- * than eight more pixels.
- *
- * Custom properties rather than a class per component, so it crosses every
- * shadow boundary on its own and costs no component any API.
- */
-/* **The scale is continuous, and `sm`/`md`/`lg` are three stops on it.**
- * Enumerating nine steps of a control ramp that only has three would invent
- * sizes nothing was drawn at, while a multiplier covers every value between them
- * without naming any.
- *
- * **A container cannot do this by setting the seed, and that is measured rather
- * than argued.** `--helix-seed-density` is a real `ThemeIntent` knob and it
- * multiplies the primitive ramps, but the derived tokens are declared once on
- * `:root`, and custom properties substitute at computed-value time: a descendant
- * inherits the *already substituted* value. Setting the seed on a div and
- * reading `--helix-space-md` inside it returns `calc(1rem * 1)` and resolves to
- * 16px, the same as the page. The 0.5 is read by nothing.
- *
- * It works only when the rule redeclares the tokens, which is what the named
- * stops below do. So the region is the attribute and the amount is the property:
- * `data-density` says a region is one, `--helix-density` says how much, and it
- * defaults to 1 so the bare attribute is the resting size rather than a collapse.
- *
- * **Nesting does not compound.** Each rule redeclares from the same `md` stop
- * rather than from whatever it inherited, so a 0.8 region inside a 0.8 region is
- * 0.8 and not 0.64. Measured: 12.7969px in both. That is the behavior a reader
- * expects and the one they would have to write a reset to get from a multiplying
- * model.
- *
- * **The named stops win because they come after**, at equal specificity. They
- * are not the same numbers as any multiplier: `sm` is the size the checkbox,
- * icon, switch and tag ramps were each drawn at, and a number that happened to
- * land near it would be a coincidence rather than that drawing. */
+/* Density. */
+/* *The scale is continuous, and `sm`/`md`/`lg` are three stops on it.**
+   Enumerating nine steps of a control ramp that only has three would invent
+   sizes nothing was drawn at, while a multiplier covers every value between them
+   without naming any. **A container cannot do this by setting the seed, and that
+   is measured rather than argued.** `--helix-seed-density` is a real
+   `ThemeIntent` knob and it multiplies the primitive ramps, but the derived
+   tokens are declared once on `:root`, and custom properties substitute at
+   computed-value time: a descendant inherits the *already substituted* value.
+   Setting the seed on a div and reading `--helix-space-md` inside it returns
+   `calc(1rem * 1)` and resolves to 16px, the same as the page. The 0.5 is read
+   by nothing. So the region is the attribute and the amount is the property:
+   `data-density` says a region is one, `--helix-density` says how much, and it
+   defaults to 1 so the bare attribute is the resting size rather than a
+   collapse. **Nesting does not compound.** Each rule redeclares from the same
+   `md` stop rather than from whatever it inherited, so a 0.8 region inside a 0.8
+   region is 0.8 and not 0.64. Measured: 12.7969px in both. **The named stops win
+   because they come after**, at equal specificity. */
 [data-density] {
-  /* **The relative pair is redeclared here, and it has to be.** A custom
-     property substitutes at computed-value time, so `--helix-size-control-tight`
-     resolved once on `:root` against the `md` step is what every descendant
-     inherits, whatever region it is in: measured, an option row stayed 32px in
-     all three while the trigger above it moved 32, 40, 48. Recomputing them
-     wherever the step they read is redeclared is what makes them relative to the
-     region rather than to the document. */
+  /* *The relative pair is redeclared here, and it has to be.** A custom property
+     substitutes at computed-value time, so `--helix-size-control-tight` resolved
+     once on `:root` against the `md` step is what every descendant inherits,
+     whatever region it is in: measured, an option row stayed 32px in all three
+     while the trigger above it moved 32, 40, 48. */
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
@@ -761,15 +531,13 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   --helix-size-tag: var(--helix-size-tag-sm);
 }
 
-/* **Every stop declares all seven.**
- *
- * Each re-declares from its own step rather than inheriting, which is what makes
- * nesting not compound. Omit one and it falls through to the `[data-density]`
- * rule above and keeps that rule's `--helix-density` multiplier while the rest
- * of the stop does not: measured with `md` listing only the five
- * `--helix-size-*` tokens, on `<div data-density="md" style="--helix-density:
- * .6">`, a button 40px tall wearing 7.8px type and 9.6px insets. `md` is the
- * stop nobody writes, which is why it is the one to check. */
+/* *Every stop declares all seven.** Each re-declares from its own step rather
+   than inheriting, which is what makes nesting not compound. Omit one and it
+   falls through to the `[data-density]` rule above and keeps that rule's
+   `--helix-density` multiplier while the rest of the stop does not: measured
+   with `md` listing only the five `--helix-size-*` tokens, on `<div
+   data-density="md" style="--helix-density: .6">`, a button 40px tall wearing
+   7.8px type and 9.6px insets. */
 [data-density="md"] {
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
@@ -802,17 +570,7 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   --helix-size-tag: var(--helix-size-tag-lg);
 }
 
-/* The toggle item.
- *
- * Paired the same way the button is, and for a sharper reason: when a consumer
- * slots their own link, the *outer* tree styles it. A `::slotted()` rule in the
- * component loses to any document rule, so `:where(a)` above was painting nav
- * items blue and underlined and the component could not stop it. Styling it
- * from here is not a workaround, it is where the cascade says the rule belongs.
- *
- * `::part(item)` covers the radio form the component renders itself, so both
- * forms take one declaration.
- */
+/* The toggle item. */
 helix-toggle::part(item) {
   align-items: center;
   background: none;
@@ -821,12 +579,9 @@ helix-toggle::part(item) {
      its own text, the group's thumb comes out the height of the token, and the
      two are never the same box, so hovering an item draws a rectangle seven
      pixels shorter than the thumb marking the selected one and `size="sm"`
-     shrinks the thumb and leaves the items alone.
-
-     The fallback is for an item outside a group, which has no control height to
-     inherit and sizes to what it holds. It must not be `100%` either, that being
-     the same value the group sets: the property would resolve to its own
-     fallback in both branches and change nothing. */
+     shrinks the thumb and leaves the items alone. It must not be `100%` either,
+     that being the same value the group sets: the property would resolve to its
+     own fallback in both branches and change nothing. */
   block-size: var(--_toggle-height, auto);
   border: none;
   /* The group's, so the item and the thumb behind it draw the same curve. */
@@ -834,10 +589,7 @@ helix-toggle::part(item) {
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
-  /* Fills the segment rather than sitting at its label width inside it. The
-     host is what the group sizes, and an item narrower than its host leaves a
-     strip along each edge that looks like the control and does not respond to a
-     press. On both forms, which is why the rule covers both. */
+  /* Fills the segment rather than sitting at its label width inside it. */
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
@@ -859,26 +611,14 @@ helix-toggle::part(item):hover {
   color: var(--helix-color-foreground);
 }
 
-/* In a group, the thumb is the only surface.
- *
- * The item fills its segment, so the hover wash above is segment-sized and sits
- * flush against the thumb on the segment next door: two rounded rectangles of
- * near enough the same value, touching, merge into one shape and the control
- * appears to have a selection two segments wide. The thumb's own geometry is
- * exactly one segment and is not what is wrong.
- *
- * So hover says its piece in the label, which the rule above already brightens
- * to full strength. A toggle outside a group keeps the wash: there is no thumb
- * there for it to be confused with. */
+/* In a group, the thumb is the only surface. */
 helix-toggle-group helix-toggle::part(item):hover {
   background-color: transparent;
 }
 
 /* The traveling thumb is behind this item, so the label goes to full strength.
-   Color only, and no change of weight: a heavier label is a wider one, and the
-   thumb measures the item it marks. Measured, the same text came out 94.2px
-   selected against 92.34 unselected, so choosing a file nudged the row it was
-   in. The thumb is the emphasis, and it does not need help. */
+   Measured, the same text came out 94.2px selected against 92.34 unselected, so
+   choosing a file nudged the row it was in. */
 helix-toggle:state(selected)::part(item) {
   background-color: transparent;
   color: var(--helix-color-foreground);
@@ -889,57 +629,24 @@ helix-toggle[disabled]::part(item) {
   opacity: 0.5;
 }
 
-/* The nav item.
- *
- * A recipe, not an element: navigation is links, a router renders its own
- * anchor, and an element wrapping one either nests an anchor inside an anchor
- * or loses the cascade to the outer tree. The landmark is the `<nav>` the
- * header renders.
- *
- * The current item is marked by `aria-current="page"`, which is what navigation
- * actually uses, rather than by a `selected` attribute mirroring it. That makes
- * the correct semantics and the correct look the same act.
- *
- * It looks like a tab and is deliberately not one: `role="tab"` promises an
- * `aria-controls` pointing at a panel, and a tab that controls nothing tells a
- * screen-reader user to expect something that never arrives.
- */
-/* Either the recipe or a link inside a nav bar, which is the same thing said
-   two ways so that neither has to be written by script.
-
-   `helix-navigation a` is what makes this work on the server. Having the
-   component write the attribute onto its anchors after it upgrades leaves a
-   server-rendered nav unstyled until a frame later, and hands a React consumer
-   who writes the attribute themselves a hydration mismatch. A descendant
-   selector needs no script and is true the moment the markup is parsed. The
-   recipe stays for a destination that is not in a nav bar. */
+/* The nav item. */
+/* Either the recipe or a link inside a nav bar, which is the same thing said two
+   ways so that neither has to be written by script. */
 :where([data-navigation-item], helix-navigation a) {
   align-items: center;
-  /* The four a `<button>` needs and an `<a>` never did.
-
-     A nav item that opens a panel is a button, not a link: that is the APG's
-     disclosure pattern and what `Megamenu` renders for its own trigger. Without
-     these it comes out with the UA's gray fill, its border, its center-aligned
-     system font and an arrow cursor, sitting in a row of anchors, which have
-     none of those to undo.
-
-     `:where()` is zero specificity and a UA rule loses to any author rule, so
-     these land without needing weight of their own. */
+  /* The four a `<button>` needs and an `<a>` never did. */
   background: none;
   border: none;
   cursor: pointer;
   font-family: var(--helix-font-sans);
   block-size: 100%;
   /* A floor as well as the percentage, because the percentage only resolves for
-     a direct child of the bar.
-
-     `Navigation` is a fixed-height flex row that centers its items, so an
-     anchor sitting straight in it takes the full 32 from `block-size: 100%`.
-     Nest one and there is nothing to be a percentage of: a `Megamenu` slots its
-     trigger inside its own auto-height host, so the height resolves to `auto`
-     and the item comes out at its content height of 21.5 against 32 for the
-     anchors beside it, sitting visibly short in the row.
-
+     a direct child of the bar. `Navigation` is a fixed-height flex row that
+     centers its items, so an anchor sitting straight in it takes the full 32
+     from `block-size: 100%`. Nest one and there is nothing to be a percentage
+     of: a `Megamenu` slots its trigger inside its own auto-height host, so the
+     height resolves to `auto` and the item comes out at its content height of
+     21.5 against 32 for the anchors beside it, sitting visibly short in the row.
      Additive on purpose: for a direct child both resolve to the same 32, and in
      a taller bar the percentage still wins. */
   min-block-size: var(--helix-size-control-sm);
@@ -963,34 +670,9 @@ helix-toggle[disabled]::part(item) {
 }
 
 /* Pinned to a corner, which is a fact about the page and not about the control.
- *
- * **A recipe rather than a component, and `Toast` is the contrast that makes the
- * line clear.** Toast owns its own placement, because a stack of messages has no
- * other home. A floating action button has plenty: it sits in a card, a panel, a
- * table row, a map, or docked to the window, and an element that fixes itself to
- * the viewport can only ever do the last of those. So the shape is a control's
- * own (`shape="circle"` on `IconButton`) and where it goes is written here.
- *
- * Fixed to the window rather than to a container, which is what a reader means
- * by a control that stays put while a page scrolls under it. A consumer who
- * wants it held inside a box instead has `position: relative` on that box and
- * `data-dock-within` below.
- *
- * `--helix-layer-sticky` rather than the top of the stack: this outranks the
- * page and is outranked by anything the reader opened, so a dialog or a toast
- * covers it rather than being covered by a button they cannot reach past.
- *
- * No hook for the inset, deliberately. A hook is a component's published API and
- * this is a recipe with no component to publish it, and the base layer is a
- * cascade layer, so a consumer writing `inset-block-end` on their own control
- * already wins without asking.
- *
- * The safe area is added, not substituted. `env()` is zero on every screen
- * without a notch or a home indicator, so the inset is the spacing token there
- * and the spacing token plus the hardware's own margin where there is one. This
- * is the first thing in the layer to read `env()`, and it is the case that
- * needs it: a control docked to the bottom edge of a phone is the control the
- * home indicator sits on top of. */
+   **A recipe rather than a component, and `Toast` is the contrast that makes the
+   line clear.** Toast owns its own placement, because a stack of messages has no
+   other home. */
 [data-dock] {
   --_dock-inset: var(--helix-space-lg);
 
@@ -998,8 +680,7 @@ helix-toggle[disabled]::part(item) {
   z-index: var(--helix-layer-sticky);
 }
 
-/* Held inside the nearest positioned ancestor instead of the window. Same
-   corners, same insets, and the consumer says which box by positioning it. */
+/* Held inside the nearest positioned ancestor instead of the window. */
 [data-dock-within] {
   position: absolute;
 }
@@ -1021,37 +702,25 @@ helix-toggle[disabled]::part(item) {
 }
 
 /* Centered along the edge, which needs the axis it is centered on and not an
-   inset. `translate` rather than a margin, because the box's own width is the
-   only thing that can center it and only the browser knows that. */
+   inset. */
 [data-dock$="-center"] {
   inset-inline-start: 50%;
   translate: -50% 0;
 }
 
-/* What goes inside a megamenu panel.
- *
- * **Here rather than in the component, and not by preference.** The panel's
- * contents are the consumer's own markup, slotted, which puts them in the light
- * DOM where every document rule reaches them: a `::slotted()` rule in the
- * component loses to any of them whatever its specificity, so `Megamenu` cannot
- * stop the anchor rules above painting its destinations as prose links in a box.
- * `data-button` and `data-navigation-item` are the same shape of answer.
- *
- * A group is a column, a heading names it, and an item is a destination with
- * room to explain itself. Nothing here is required: a panel of plain
- * `data-navigation-item` links is a smaller megamenu and works.
- */
-/* One gap, and the rhythm it makes has to be the same one everywhere.
- *
- * `2xs` between every child sounds even and is not: a row carries its own
- * padding and a heading does not, so the same 4 pixels come out as 12 between
- * the heading and the first row, 20 between one row and the next, and 4 between
- * a name and the sentence under it. Three spacings from one number.
- *
- * `xs` here plus the row's own `xs` block padding is 24 either side of a row,
- * and the heading takes the same 8 as a bottom margin so it sits 24 off its
- * first row too. What stays tight is the name and its sentence, which are one
- * thing and should look like one. */
+/* What goes inside a megamenu panel. **Here rather than in the component, and
+   not by preference.** The panel's contents are the consumer's own markup,
+   slotted, which puts them in the light DOM where every document rule reaches
+   them: a `::slotted()` rule in the component loses to any of them whatever its
+   specificity, so `Megamenu` cannot stop the anchor rules above painting its
+   destinations as prose links in a box. */
+/* One gap, and the rhythm it makes has to be the same one everywhere. `2xs`
+   between every child sounds even and is not: a row carries its own padding and
+   a heading does not, so the same 4 pixels come out as 12 between the heading
+   and the first row, 20 between one row and the next, and 4 between a name and
+   the sentence under it. `xs` here plus the row's own `xs` block padding is 24
+   either side of a row, and the heading takes the same 8 as a bottom margin so
+   it sits 24 off its first row too. */
 [data-megamenu-group] {
   display: flex;
   flex-direction: column;
@@ -1060,98 +729,54 @@ helix-toggle[disabled]::part(item) {
 
 /* Quiet and small, because it labels a column rather than starting a section of
    a document. Not a heading level: what makes it one is the `<h3>` the consumer
-   wrote, and this only says how it looks.
-   Left in the case it was written in. Uppercasing it here would have been this
-   stylesheet shouting a word the consumer typed quietly, and it also throws away
-   the shape of a name: `API` and `Api` come out the same, and a product with a
-   capital in the middle loses it. Small and subtle already say "label". */
+   wrote, and this only says how it looks. */
 [data-megamenu-heading] {
   align-items: center;
   color: var(--helix-color-foreground-subtle);
   display: flex;
   /* `xs` rather than `2xs`: at four the mark and the name read as one crowded
-     lockup, and the name is a product's rather than a caption on the mark. The
-     rule below holds the name still while this moves, so widening this walks the
-     mark further left and never the text. */
+     lockup, and the name is a product's rather than a caption on the mark. */
   gap: var(--helix-space-xs);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  /* `2xs` below, not `xs`, and the number is derived rather than picked.
-     A reader sees the distance between *text*, so the heading's own margin has
-     to make up whatever the first row's padding does not. Rows touch and carry
-     `sm` of padding, so row to row is 12 and 12; this path is 4 of margin plus
-     the group's 8 gap plus that 12, the same 24. At `xs` it is 28: measured in
-     Chromium, heading bottom at 35 and the first row's name at 63. */
+  /* `2xs` below, not `xs`, and the number is derived rather than picked. Rows
+     touch and carry `sm` of padding, so row to row is 12 and 12; this path is 4
+     of margin plus the group's 8 gap plus that 12, the same 24. At `xs` it is
+     28: measured in Chromium, heading bottom at 35 and the first row's name at
+     63. */
   margin: var(--helix-space-none) var(--helix-space-none) var(--helix-space-2xs);
   padding-inline: var(--helix-space-sm);
 }
 
-/* The product's own mark, where the product is named.
- *
- * At the label's size rather than a row's: this marks a column, and a mark as
- * large as the ones down the rows would read as a fourth destination sitting
- * above the three real ones. Full strength against the subtle text beside it,
- * because a brand mark drawn in the label's gray is a brand mark apologising. */
+/* The product's own mark, where the product is named. */
 [data-megamenu-heading] > :where(helix-icon, img, svg) {
   --icon-size: var(--helix-size-icon-sm);
 
   flex: 0 0 auto;
   /* Hung back into the heading's own inset, so the name starts where the rows
-     under it start.
-
-     The two are laid out by different mechanisms and will not agree by accident.
-     A heading is a flex row, so its mark pushes the name along by the mark plus
-     the gap; a row is a grid whose mark column is `auto` and therefore zero when
-     empty, but a column gap applies beside an empty track just as it does beside
-     a full one. Measured at 1440 without the pull: the name at 116 and the first
-     row's title at 104, twelve apart, which reads as a heading indented from its
-     own list.
-
-     So the pull states where the name has to land rather than how far to move.
-     A row's name sits one `space-sm` gutter past the group's edge; this puts the
-     mark's own width and the gap it wants to the left of exactly that, and the
-     mark falls wherever the arithmetic leaves it. It is the mark that moves and
-     never the rows, because the rows are the column a reader's eye runs down and
-     the heading is the label on it.
-
-     **Written from `--icon-size` rather than a number**, which is what makes it
-     hold: the mark is `icon-sm` here and the site overrides it to `icon-md`, and
-     both land the name on the rows without either knowing about the other. Widen
-     the gap above, resize the mark or change the gutter and the alignment
-     survives all three. A fixed pull survives none of them. */
+     under it start. Measured at 1440 without the pull: the name at 116 and the
+     first row's title at 104, twelve apart, which reads as a heading indented
+     from its own list. */
   margin-inline-start: calc(var(--helix-space-sm) - var(--helix-space-xs) - var(--icon-size));
 }
 
-/* A destination with a name and a sentence about it.
- *
- * Two columns and two rows: a mark down the side of both, the name on the first
- * and the sentence under it. The text is pinned to the second column rather
- * than flowing, so a row with no mark starts where a row with one does and a
- * panel mixing the two still reads as a column of names. The mark's column is
- * `auto`, so with nothing in it there is nothing to indent past. */
+/* A destination with a name and a sentence about it. */
 [data-megamenu-item] {
   align-items: start;
-  /* Said, for the same reason `white-space` is said below: the panel sits
-     inside the nav, so these anchors match `helix-navigation a` up there, and
-     that rule is `block-size: 100%` because a destination in a horizontal bar
-     fills the bar's height. A row in a stacked panel is not in a bar.
-
-     Left at 100%, a row is sized by flex-shrink against its column instead of
-     by its content, so how tall a row is depends on how many rows are beside
-     it. Measured in Chrome at 1440: a column of two came out 88 each and a
-     column of one came out 184, and because the row is a grid of two auto rows
+  /* Said, for the same reason `white-space` is said below: the panel sits inside
+     the nav, so these anchors match `helix-navigation a` up there, and that rule
+     is `block-size: 100%` because a destination in a horizontal bar fills the
+     bar's height. Left at 100%, a row is sized by flex-shrink against its column
+     instead of by its content, so how tall a row is depends on how many rows are
+     beside it. Measured in Chrome at 1440: a column of two came out 88 each and
+     a column of one came out 184, and because the row is a grid of two auto rows
      the extra 96 was split between them, putting the sentence 76 pixels below
-     the name it belongs to. It looks correct whenever every column happens to
-     hold the same number of rows, which is why an example will not show it.
-
-     The plain-link rule further down excludes `[data-megamenu-item]`, a marked
-     row wanting the grid it was given, so this has to be said here. */
+     the name it belongs to. */
   block-size: auto;
   /* Said, because the panel sits inside the nav and these anchors match the nav
      bar's own rule, which sets `nowrap` so a word in a horizontal strip does not
-     break in half. A sentence that cannot wrap does not shrink either: it runs
-     out of its column and out from under its own hover. */
+     break in half. */
   white-space: normal;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground);
@@ -1164,32 +789,18 @@ helix-toggle[disabled]::part(item) {
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Rows touch, so the band between two names belongs to one of them.
- *
- * The group is a flex column with `gap: xs`, which puts eight pixels of nothing
- * between every pair of rows, outside every link in the panel because the anchor
- * ends at its own padding. Measured at 1400 with the panel open, sampling
- * straight down a column, the cursor went hand, arrow, hand, arrow, hand, and
- * the only part of a row that could be clicked was the two lines of text. A
- * destination in a panel is a band, not a phrase.
- *
- * The pitch is unchanged rather than merely close: the padding is `sm` and the
- * pull is the whole `xs` gap, so a row is 8+8+8 of non-content where the gapped
- * version was 8+8 plus an 8 gap. 24 either way, 67 pixels row to row.
- *
- * Between two items only. The gap still separates the column's heading from the
- * first row, and the Verticals column stacks plain links in the same kind of
- * group and is untouched: zeroing the gap on the group would have taken both
- * of those with it. */
+/* Rows touch, so the band between two names belongs to one of them. Measured at
+   1400 with the panel open, sampling straight down a column, the cursor went
+   hand, arrow, hand, arrow, hand, and the only part of a row that could be
+   clicked was the two lines of text. The pitch is unchanged rather than merely
+   close: the padding is `sm` and the pull is the whole `xs` gap, so a row is
+   8+8+8 of non-content where the gapped version was 8+8 plus an 8 gap. 24 either
+   way, 67 pixels row to row. */
 [data-megamenu-item] + [data-megamenu-item] {
   margin-block-start: calc(var(--helix-space-xs) * -1);
 }
 
-/* No color of its own. A mark beside every row in the panel, accented, is a
-   panel of accents: the color stops meaning anything the moment it is on all
-   of them, and it competes with the one thing in a navigation that should be
-   accented, which is where you are. It inherits, so a consumer who wants one
-   row marked can still say so on that row. */
+/* No color of its own. */
 [data-megamenu-item] > :where(helix-icon, img, svg) {
   --icon-size: var(--helix-size-icon-lg);
 
@@ -1205,8 +816,7 @@ helix-toggle[disabled]::part(item) {
 
 /* Regular, and said here rather than left to inherit: the panel sits inside the
    nav, so these rows match the nav bar's own rule and the sentence arrived at
-   the medium weight that rule gives a word in a strip. A sentence at the same
-   weight as the name above it reads as a second name. */
+   the medium weight that rule gives a word in a strip. */
 [data-megamenu-item] > :where(span, p) {
   grid-column: 2;
   color: var(--helix-color-foreground-muted);
@@ -1215,59 +825,28 @@ helix-toggle[disabled]::part(item) {
   margin: var(--helix-space-none);
 }
 
-/* The bar's own hover reaches in here, and the panel does not want it.
- *
- * These rows are anchors inside `helix-navigation`, so they match the strip's
- * rule up there, which washes 5% of the foreground behind a hovered item. That
- * is right for a word in a bar and wrong for a column of destinations.
- *
- * Scoped to the group so the plain links in a verticals column are covered too:
- * a panel where the marked rows do not wash and the plain ones do would read as
- * two kinds of list. What is left for those is the color lift the same bar
- * rule gives them, muted to full, which is emphasis enough for a bare name. */
+/* The bar's own hover reaches in here, and the panel does not want it. These
+   rows are anchors inside `helix-navigation`, so they match the strip's rule up
+   there, which washes 5% of the foreground behind a hovered item. */
 [data-megamenu-group] :where([data-navigation-item], a):hover {
   background-color: transparent;
 }
 
-/* Pointing at a row darkens it, and paints nothing.
- *
- * A wash is what `Option` uses and it is right there, where a row is one of
- * twenty in a scrolling list and the whole strip has to light up so the eye can
- * track it. A panel is six destinations laid out in columns, and a filled bar
- * sliding around inside it is heavier than the thing it is reporting.
- *
- * Contrast rather than color, because color is spoken for: the mark beside
- * each row deliberately has none so that the accent means "where you are" and
- * nothing else, and a hover tint would put the accent on every row in turn.
- *
- * It is the sentence that moves, because the sentence is the only part with
- * anywhere to go: the name and the mark are already at full strength, so the
- * row lifts from two tones to one and reads as coming forward. */
+/* Pointing at a row darkens it, and paints nothing. */
 [data-megamenu-item]:hover > :where(span, p) {
   color: var(--helix-color-foreground);
 }
 
-/* Where you are, marked rather than filled.
- *
- * A tinted fill would be the heaviest mark in the panel spent on the one row a
- * reader is least likely to click, and weight cannot carry it the way it does in
- * the bar, because a row's name is already semibold at rest. So a dot, at the
- * size `Badge` collapses to, which is the only other dot in the system.
- *
- * **Before the name, and reserved on every row so the column holds still.**
- * Ahead of the name the dot is scanned, and a column of rows shows which is
- * current before any of them is read; after the name it reads a row at a time.
- * A mark in front of one name pushes that name right, so the cell is reserved on
- * every row and filled on one: transparent is still 8 pixels wide, and every
- * label starts at the same place whether or not its row is the current one.
- *
- * Only where nothing else claims that column. A row given a leading mark puts
- * it in column 1 spanning both lines, and a dot in the same cell would sit on
- * top of it; those rows keep the mark as their signal and take the weight and
- * color the rules below give them.
- *
- * Decorative and empty, so nothing is announced twice: `aria-current="page"` is
- * on the anchor and is what a reader is told. */
+/* Where you are, marked rather than filled. **Before the name, and reserved on
+   every row so the column holds still.** Ahead of the name the dot is scanned,
+   and a column of rows shows which is current before any of them is read; after
+   the name it reads a row at a time. A mark in front of one name pushes that
+   name right, so the cell is reserved on every row and filled on one:
+   transparent is still 8 pixels wide, and every label starts at the same place
+   whether or not its row is the current one. A row given a leading mark puts it
+   in column 1 spanning both lines, and a dot in the same cell would sit on top
+   of it; those rows keep the mark as their signal and take the weight and color
+   the rules below give them. */
 [data-megamenu-item]:not(:has(> :where(helix-icon, img, svg)))::before {
   align-self: center;
   background-color: transparent;
@@ -1284,19 +863,7 @@ helix-toggle[disabled]::part(item) {
   background-color: var(--helix-color-primary);
 }
 
-/* Interior-only, so 0% and 100% resolve to the resting dot.
- *
- * A `from` that differed from rest would make the mark jump the instant the
- * panel opened, which is the one moment a reader is looking straight at it. The
- * hero's lattice breathes the same way and for the same reason.
- *
- * Held well short of disappearing. This is the answer to "which of these am I
- * on", so it has to be readable at every point in the cycle: it softens rather
- * than blinks, and a reader who never notices it moving has still been told
- * where they are.
- *
- * No reduced-motion block of its own. This is light DOM, so the global cap at
- * the end of this file reaches it and settles it on the resting value. */
+/* Interior-only, so 0% and 100% resolve to the resting dot. */
 @keyframes helix-current-dot {
   50% {
     opacity: 0.45;
@@ -1304,17 +871,7 @@ helix-toggle[disabled]::part(item) {
   }
 }
 
-/* A plain link in a group, which is what makes a panel of them work.
- *
- * A panel sits inside the nav, so its anchors match the nav bar's own rule up
- * there and arrive centered, full-height and nowrapping: correct for a word in a
- * horizontal bar, wrong for a stack, and the giveaway is a column of links
- * centered under a heading that is not. The nav rule is `:where()`, so this
- * needs no `!important`, only to be said.
- *
- * `:not([data-megamenu-item])` keeps it off the rows above, which want the grid
- * they were given. Padding matches theirs, so a plain link, a row with no mark,
- * and the heading all start on the same edge. */
+/* A plain link in a group, which is what makes a panel of them work. */
 [data-megamenu-group] > :where([data-navigation-item], a):not([data-megamenu-item]) {
   block-size: auto;
   justify-content: start;
@@ -1322,10 +879,7 @@ helix-toggle[disabled]::part(item) {
   white-space: normal;
 }
 
-/* No surface of its own. The marker traveling behind it is the one surface,
-   and a fill here as well would mean two things saying the same thing. Weight
-   and full-strength color are what make the current page legible before the
-   marker has been measured, which cannot happen on the server. */
+/* No surface of its own. */
 :where([data-navigation-item], helix-navigation a)[aria-current="page"] {
   color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-semibold);
@@ -1337,40 +891,12 @@ helix-toggle[disabled]::part(item) {
   z-index: var(--helix-layer-raised);
 }
 
-/* The ring turns inward, because the bar has no room to draw it outside.
- *
- * `helix-navigation` scrolls horizontally and is exactly one control tall, and its
- * links fill it exactly, so an outset ring on a focused destination is drawn
- * outside the scroll container and clipped down to a single stroke along one
- * edge. Reproduced in Chrome from the shipped CSS.
- *
- * The house answer is to invert the offset rather than to add padding, which is
- * what the five other components that draw a control inside a scroller do:
- * padding on the bar grows it past its one-control height and moves it in the
- * header row it sits in, where an inset ring costs nothing but two pixels of
- * the link's own inset. */
+/* The ring turns inward, because the bar has no room to draw it outside. */
 :where(helix-navigation a):focus-visible {
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
-/* The clickable-row recipe.
- *
- * `List` deliberately does not become a link. A whole-row target needs the
- * anchor to wrap the layout, and the layout is what `helix-list-item` is, so
- * the anchor goes around the item and this styles it:
- *
- *   <helix-list>
- *     <a data-list-item href="/one"><helix-list-item>One</helix-list-item></a>
- *   </helix-list>
- *
- * Same reasoning as `data-button` and `data-navigation-item`. A router renders its own
- * `<a>` and cannot render it inside a shadow root, so the destination has to be
- * the consumer's element and the styling has to be reachable from here.
- *
- * The item keeps its own inset. This adds no padding of its own, or a row would
- * be inset twice and a row without the wrapper would sit at a different height
- * from one with it.
- */
+/* The clickable-row recipe. */
 :where([data-list-item]) {
   border-radius: var(--helix-radii-sm);
   color: inherit;
@@ -1385,40 +911,19 @@ helix-toggle[disabled]::part(item) {
 }
 
 /* The same `aria-current` the nav item uses, and for the same reason: the
-   correct semantics and the correct look are one act. A `selected` attribute
-   here would be presentation standing in for something the platform already
-   has a word for. */
+   correct semantics and the correct look are one act. */
 :where([data-list-item])[aria-current] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 7%, transparent);
   font-weight: var(--helix-weight-medium);
 }
 
-/* **The two surface axes, reachable from the document.**
- *
- * `material` and `separation` are registered axes with full token sets, and a
- * plain element takes them here: a landing page building its own bands is what
- * needs them, every other recipe in this file being control shaped.
- *
- * **The values are the axis's own, verbatim**, so one word means one thing on a
- * component and on a `<section>`. That is the argument for these existing rather
- * than each page inventing a translucent background: the components are already
- * held to this list, and a document recipe spelling it differently would be a
- * second vocabulary for one idea. `helix component`'s `axes` owns the vocabulary.
- *
- * There is no collision with the component attribute. A component takes
- * `material="glass"` as its own attribute and this is `data-material`, which is
- * the same freedom `data-card` and `Card` already have.
- *
- * **This is the only implementation of `frosted`**, and the only reader of
- * `--helix-material-translucent-strong`. The registry's test for a value is that
- * something needs it, which is why `matte` was refused.
- *
- * Blur is the expensive one and the ramp is deliberate: `glass` takes the `md`
- * step through `--helix-material-backdrop` and `frosted` the `lg`. A
- * `backdrop-filter` makes the compositor re-read what is behind the element on
- * every frame it moves, so a full-width band that stays on screen through a
- * scroll pays continuously. Where the effect is about depth rather than texture,
- * `separation` is the cheaper axis and the honest one. */
+/* *The two surface axes, reachable from the document.** `material` and
+   `separation` are registered axes with full token sets, and a plain element
+   takes them here: a landing page building its own bands is what needs them,
+   every other recipe in this file being control shaped. **The values are the
+   axis's own, verbatim**, so one word means one thing on a component and on a
+   `<section>`. **This is the only implementation of `frosted`**, and the only
+   reader of `--helix-material-translucent-strong`. */
 [data-material="glass"] {
   backdrop-filter: var(--helix-material-backdrop);
   background-color: var(--helix-material-translucent);
@@ -1440,14 +945,8 @@ helix-toggle[disabled]::part(item) {
   border-color: transparent;
 }
 
-/* **What sets a surface apart from what is behind it**, which is the question
-   `separation` asks and the four mechanisms `ThemeIntent.separation` names.
-   These render what the components render: a shadow for `elevated`, a border for
-   `outlined`, a fill for `filled`, and nothing for `plain`.
-
-   `elevated` carries the surface as well as the shadow, where `Card` does not
-   have to because it already has one. A shadow cast by a transparent box reads
-   as a smudge under nothing. */
+/* *What sets a surface apart from what is behind it**, which is the question
+   `separation` asks and the four mechanisms `ThemeIntent.separation` names. */
 [data-separation="elevated"] {
   background-color: var(--helix-color-surface);
   border-color: transparent;
@@ -1473,80 +972,31 @@ helix-toggle[disabled]::part(item) {
   box-shadow: none;
 }
 
-/* The clickable-card recipe.
- *
- * The other half of the same decision, and the one that keeps `selected` and
- * `active` off `Card`. A clickable card is the consumer's own anchor wrapped
- * around a card:
- *
- *   <a data-card href="/one"><helix-card>...</helix-card></a>
- *
- * Everything it does to the card goes through the card's own custom properties
- * rather than through `::part`, because those cross the shadow boundary by
- * inheriting and therefore reach a card at any depth inside the link. A
- * `::part` selector would only reach a card that is the link's own child.
- *
- * A *selected* card is not this. That is a radio whose presentation is a card:
- * it reports a form value, belongs to a named group and moves under arrow keys,
- * none of which a link has. `Radio` and `Checkbox` carry `appearance="card"`
- * for it.
- */
+/* The clickable-card recipe. */
 :where([data-card]) {
   /* Matched to the card so the focus ring traces the surface rather than a
-     rectangle around it.
-
-     **The fallback here and `Card`'s have to name the same token, not merely a
-     similar one.** They are the same custom property read on either side of a
-     shadow boundary, and this recipe's whole documented shape is an anchor
-     around a `helix-card`. `--helix-radii-sm` here against `Card`'s
+     rectangle around it. `--helix-radii-sm` here against `Card`'s
      `--helix-radii-lg` draws the ring at 4px around a surface drawn at 12px for
      every consumer who does not set `--card-radius`, which reads as the border
      looking off kilter. */
   border-radius: var(--card-radius, var(--helix-radii-lg));
   color: inherit;
   display: block;
-  /* Drawn transparent at rest rather than appearing on hover.
-   *
-   * Setting `outline` outright on hover snaps the ring on in the same instant
-   * that the card's border fades to the brand color through the transition it
-   * already carries, and two halves of one gesture moving at different speeds is
-   * what a reader notices even when they cannot say what. An outline takes no
-   * space at any width, so keeping it here and only coloring it on hover costs
-   * nothing and gives the transition something to move.
-   *
-   * `border-thin`, so the ring is two pixels in total rather than three: the
-   * card's own one, plus one outside it. This is the only ring in the file that
-   * adds its border to its outline rather than standing alone, so thick would
-   * make the widest ring in the library out of the quietest signal in it. */
+  /* Drawn transparent at rest rather than appearing on hover. */
   outline: var(--helix-border-thin) solid transparent;
   outline-offset: 0;
   text-decoration: none;
   transition: outline-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Hover goes to the brand, not to a darker gray.
- *
- * `border-strong` is a hairline moving from 0.91 to 0.71: a twenty point jump
- * that says nothing except "slightly more", and gray darkening reads as the card
- * getting heavier rather than as the card being pointed at. The brand already
- * means "this one, now" everywhere else in the library.
- *
- * Two pixels, made of the card's own one plus one outside it. `outline` is the
- * second one because it does not participate in layout, so a card cannot shift
- * when a pointer crosses it. `outline-offset: 0` puts it flush against the
- * border, so the two read as one 2px ring rather than as a ring with a gap in
- * it.
- *
- * And the ring is the whole signal. No shadow: that would put three things on
- * one hover and would say "this is above the page", which the card already was.
- *
- * **Focus still wins, and it has to.** `:where(:focus-visible)` further down
- * this file sets the same property at the same zero specificity, and later
- * wins, so a focused card keeps the focus ring's own 2px offset. That offset is
- * the entire difference between the two states, since both are drawn in the
- * same color: hovered is flush, focused is detached. If the focus ring ever
- * loses its offset, these two become indistinguishable and a keyboard user
- * cannot tell where they are. */
+/* Hover goes to the brand, not to a darker gray. `border-strong` is a hairline
+   moving from 0.91 to 0.71: a twenty point jump that says nothing except
+   "slightly more", and gray darkening reads as the card getting heavier rather
+   than as the card being pointed at. `outline-offset: 0` puts it flush against
+   the border, so the two read as one 2px ring rather than as a ring with a gap
+   in it. **Focus still wins, and it has to.** `:where(:focus-visible)` further
+   down this file sets the same property at the same zero specificity, and later
+   wins, so a focused card keeps the focus ring's own 2px offset. */
 :where([data-card]):hover {
   --card-border-color: var(--helix-color-primary);
   outline-color: var(--helix-color-primary);
@@ -1556,29 +1006,7 @@ helix-toggle[disabled]::part(item) {
   --card-border-color: var(--helix-color-primary);
 }
 
-/* The toast is the opposite of the page it is over.
- *
- * A message arriving in a corner has to be told apart from the page in the
- * fraction of a second before it is read, and inverting is what does that
- * without a color that means something. `Tooltip` inverts by naming the
- * inverse surface directly; a toast cannot, because it holds controls. A
- * consumer's `Retry` button inside a hardcoded inverse surface would resolve
- * the page's own tokens and come out dark on dark. Flipping `color-scheme`
- * instead re-resolves every token in the subtree, so anything slotted in is
- * right without knowing where it is.
- *
- * Here rather than in the component, and not only by the usual outer-tree
- * argument: the value it needs is a private primitive, which nothing outside
- * `helix/styles` may read.
- *
- * `--_helix-mode-inverted` rather than a media query and a pair of descendant
- * selectors. Those cannot express "the nearest ancestor that set the mode", so
- * a light preview inside a dark page would take the page's answer and invert
- * the wrong way. A custom property inherits, which is that rule for free.
- *
- * Opted out of by setting `data-color-mode` on the region, which then wins
- * through the rule above rather than through anything written here.
- */
+/* The toast is the opposite of the page it is over. */
 helix-toast:not([data-color-mode]) {
   color-scheme: var(--_helix-mode-inverted);
 }
@@ -1600,21 +1028,16 @@ helix-toast:not([data-color-mode]) {
   overflow-x: auto;
 }
 
-/* The only place !important is correct: a user asking the OS to reduce motion
-   is overriding author intent, so it has to beat author specificity.
- *
- * **It reaches the document and nothing else.** `*` does not cross a shadow
- * boundary, so this covers prose, layout and the `data-` recipes above and not
- * one part of any component. Measured under `prefers-reduced-motion: reduce`: a
- * light-DOM element came back at 1e-05s and a component's shadow child at its
- * full authored duration.
- *
- * So every component that animates has to answer the preference in its own
- * sheet. That is not a gap to be closed from here, because it cannot be: a
- * document rule has no way in. It is a rule for writing components, and the
- * place to enforce it is a check, not a stylesheet. */
+/* The only place !important is correct: a user asking the OS to reduce motion is
+   overriding author intent, so it has to beat author specificity. **It reaches
+   the document and nothing else.** `*` does not cross a shadow boundary, so this
+   covers prose, layout and the `data-` recipes above and not one part of any
+   component. Measured under `prefers-reduced-motion: reduce`: a light-DOM
+   element came back at 1e-05s and a component's shadow child at its full
+   authored duration. */
 @media (prefers-reduced-motion: reduce) {
-  /* biome-ignore-start lint/complexity/noImportantStyles: user preference must win over author styles */
+  /* biome-ignore-start lint/complexity/noImportantStyles: user preference must
+     win over author styles */
   *,
   *::before,
   *::after {
@@ -1623,36 +1046,21 @@ helix-toast:not([data-color-mode]) {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
-  /* biome-ignore-end lint/complexity/noImportantStyles: user preference must win over author styles */
+  /* biome-ignore-end lint/complexity/noImportantStyles: user preference must win
+     over author styles */
 }
 
-/* And the way in that the rule above does not have.
- *
- * **A custom property is the one thing that crosses.** The measurement above is
- * about `*`, which is a selector and stops at the boundary. An inherited value
- * does not: every transition in the tier is written with one of these three
- * duration tokens, so setting them under the preference reaches every shadow
- * root that reads one, at any depth, without naming a single component.
- *
- * That is what replaced 57 `prefers-reduced-motion` blocks in 45 component
- * sheets, each of them restating this because, as the note above says, a
- * document rule had no way in. It has one for durations.
- *
- * **`0.01ms` rather than `0` or `none`, and the difference is not cosmetic.** A
- * transition that still runs still fires `transitionend`. A component waiting
- * on that event to clear a state is the shape the dialog's refusal had: with
- * `animation: none` the event never arrived, the attribute never cleared, and
- * every later press added a listener that could not fire. At this duration the
- * event arrives within a frame and nothing is left waiting.
- *
- * **Animations are deliberately not done this way.** They are not all written
- * with these tokens, `video` spinning at `0.8s` and the gallery at `1.4s` and
- * `3.4s`, and seven sheets animate `infinite`: a spinner handed a 0.01ms cycle
- * does not stop, it runs flat out. Those components answer the preference in
- * their own sheets, which is also where an iteration count can be answered.
- *
- * Both selectors, matching the token layer's own block, so a scoped theme gets
- * this as well as the document does. */
+/* And the way in that the rule above does not have. **A custom property is the
+   one thing that crosses.** The measurement above is about `*`, which is a
+   selector and stops at the boundary. That is what replaced 57
+   `prefers-reduced-motion` blocks in 45 component sheets, each of them restating
+   this because, as the note above says, a document rule had no way in.
+   **`0.01ms` rather than `0` or `none`, and the difference is not cosmetic.** A
+   transition that still runs still fires `transitionend`. **Animations are
+   deliberately not done this way.** They are not all written with these tokens,
+   `video` spinning at `0.8s` and the gallery at `1.4s` and `3.4s`, and seven
+   sheets animate `infinite`: a spinner handed a 0.01ms cycle does not stop, it
+   runs flat out. */
 @media (prefers-reduced-motion: reduce) {
   :root,
   [data-helix-theme] {
@@ -1662,57 +1070,20 @@ helix-toast:not([data-color-mode]) {
   }
 }
 
-/* The one moving declaration this file writes *into* a shadow tree.
- *
- * The component cannot turn it off for itself: an outer-tree `::part` rule beats
- * an inner-tree `:host` rule for normal declarations, so a `transition: none` in
- * `toggle-root.css` would be a rule that never applies.
- *
- * Button is not here, its transition being declared in its own stylesheet, where
- * its own reduced-motion rule reaches it at any depth. A rule here would only
- * ever reach a button sitting in the document. */
+/* The one moving declaration this file writes *into* a shadow tree. */
 @media (prefers-reduced-motion: reduce) {
   helix-toggle::part(item) {
     transition: none;
   }
 }
 
-/* What a filtered list marks, painted rather than wrapped.
- *
- * An option's words are the consumer's own light DOM, slotted through as many
- * as two shadow roots, so marking the matched part with a `<mark>` would mean a
- * component rewriting markup the consumer wrote. The Custom Highlight API
- * paints a range over the text instead, and `helix-listbox` registers the
- * ranges under this name as it filters.
- *
- * The rule has to be here rather than in the listbox's own stylesheet, and that
- * is the API rather than a preference: a highlight is styled from the tree the
- * text lives in, and that text lives in the document. A `::highlight()` rule
- * inside a shadow root reaches nothing slotted into it.
- *
- * Background only, and no color of its own. Marking a match is saying "this
- * part is why the row is still here", which the eye takes from a wash; changing
- * the ink as well would restate it and take the option's own foreground away,
- * including whatever the consumer put inside it. The same wash a hovered option
- * takes, one step lighter, so a hovered match still reads as hovered.
- *
- * **Turbopack warns on this rule and the warning is wrong.** Its CSS parser
- * does not know `::highlight()`, the Custom Highlight API's pseudo-element, and
- * reports "'highlight' is not recognized as a valid pseudo-element. Did you
- * mean ':highlight'". Checked rather than assumed: the rule is in the built
- * stylesheet, selector intact and `light-dark()` correctly split into the two
- * values, so the parser recovers and passes it through. It is noise, not a
- * dropped rule.
- *
- * **And it is not ours to silence.** `@supports selector(::highlight(x))` was
- * tried and does not help, the parser validating the inner selector regardless
- * and the gate then risking a browser that supports the feature and not the
- * query. What is left is moving the rule out of the bundled stylesheet, and
- * that is the consumer-level patch: this rule belongs to `@fusion.dev/helix-styles`,
- * a highlight can only be styled from the document the text lives in, and
- * relocating it into the site to quiet one build would take it away from every
- * other consumer to fix nothing. It goes when Turbopack's parser learns the
- * selector. */
+/* What a filtered list marks, painted rather than wrapped. **Turbopack warns on
+   this rule and the warning is wrong.** Its CSS parser does not know
+   `::highlight()`, the Custom Highlight API's pseudo-element, and reports
+   "'highlight' is not recognized as a valid pseudo-element. **And it is not ours
+   to silence.** `@supports selector(::highlight(x))` was tried and does not
+   help, the parser validating the inner selector regardless and the gate then
+   risking a browser that supports the feature and not the query. */
 ::highlight(helix-filter-match) {
   background-color: light-dark(
     color-mix(in oklab, var(--helix-color-primary) 22%, transparent),
@@ -1722,36 +1093,16 @@ helix-toast:not([data-color-mode]) {
 
 /* ====================================================== visually hidden === */
 
-/* Present to a screen reader, absent to an eye.
- *
- * The clip, and not `display: none` or `visibility: hidden`, which is the whole
- * reason this exists as a helper rather than as three lines a consumer writes
- * from memory: both of those remove the element from the accessibility tree as
- * well as from the page, so the thing you were hiding *because* it is the
- * accessible representation stops being one. Charts are the case that forced
- * it, where a table is the numbers and the drawing is decoration over them, but
- * it is the same clip every skip link and every form legend wants.
- *
- * `clip-path` rather than the older `clip`, which is deprecated and needs
- * `position: absolute` to work at all. The `1px` box with `overflow: hidden`
- * stays because a zero-sized element is skipped by some screen readers, and
- * `white-space: nowrap` stops a long string wrapping into a tall thin column
- * that pushes layout around before it is clipped.
- *
- * Not `:where()`. A consumer writing this attribute is asking for one specific
- * thing and a stray `display` from somewhere else winning would be silent.
- *
- * **The 1px box does not bind on a table, and that is correct.**
- * Measured in Chrome: a div, a p and a span each collapse to 1 by 1, and a
- * `<table>` carrying this renders 46 by 40, because a CSS table's used width is
- * its min-content width and cannot be set below it. Nothing follows from that
- * here. `clip-path` hides it and clips hit testing with it, and `position:
- * absolute` takes it out of flow, so it paints nothing and pushes nothing.
- *
- * **Do not add `display: block` to make the number match.** A table forced to a
- * block box loses its table semantics in the accessibility tree, which is the
- * one thing this rule exists to keep. The chart work depends on it: the table
- * is the accessible representation and this is how it is hidden. */
+/* Present to a screen reader, absent to an eye. The `1px` box with `overflow:
+   hidden` stays because a zero-sized element is skipped by some screen readers,
+   and `white-space: nowrap` stops a long string wrapping into a tall thin column
+   that pushes layout around before it is clipped. **The 1px box does not bind on
+   a table, and that is correct.** Measured in Chrome: a div, a p and a span each
+   collapse to 1 by 1, and a `<table>` carrying this renders 46 by 40, because a
+   CSS table's used width is its min-content width and cannot be set below it.
+   **Do not add `display: block` to make the number match.** A table forced to a
+   block box loses its table semantics in the accessibility tree, which is the
+   one thing this rule exists to keep. */
 [data-hidden-visually] {
   block-size: 1px;
   border: var(--helix-space-none);

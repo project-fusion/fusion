@@ -65,8 +65,8 @@ pub enum Noun {
     than a linter to be configured into usefulness. */
     /// Hold components to the conventions Helix is built on.
     ///
-    /// Reads the tiers named by a `helix` key in `fusion.rules.json`, or by
-    /// `helix.rules.json` where that product is not in use.
+    /// Reads the tiers named by a `helix` key in `fusion.json`, or by
+    /// `helix.json` where that product is not in use.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Component {
         #[command(subcommand)]

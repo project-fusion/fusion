@@ -2,101 +2,35 @@
   display: inline;
 }
 
-/* Sized against the text around it rather than the scale.
- *
- * A monospace face at the same nominal size reads larger than the prose it sits
- * in, because its x-height and its stems are heavier, so it is set a step down
- * the scale. See the note on `--code-size` below. */
+/* A step down the scale: a monospace face reads larger than the prose it sits in. */
 [part="code"] {
-  /* A wash of the ink, not a surface, and the two modes are why.
-   *
-   * `--helix-color-surface-raised` is an absolute lightness and the page it
-   * sits on is not, so one token gave two very different chips: measured
-   * against the page by rasterizing both, the step was 1.09 in light and 1.48
-   * in dark. That is the same chip reading as a tint in one mode and a solid
-   * block in the other, and it is what makes a fragment of code look crowded by
-   * the words beside it on a dark page while looking settled on a light one.
-   *
-   * A translucent mix composites against whatever is behind it, so one value is
-   * right everywhere. 6% measures 1.14 light and 1.10 dark: within four points
-   * of the light chip this replaces, and a third of the weight of the dark one.
-   * Tuned by measuring rather than by eye, 5 through 10, because the whole
-   * point is a number that means the same thing on both grounds.
-   *
-   * The same trade the ghost button's hover already makes for the same reason,
-   * and unlike a button this one is inline in a sentence, where a surface token
-   * is answering a question about planes that a run of text does not have. */
+  /* A wash of the ink, not a surface: `surface-raised` is absolute lightness and
+     stepped 1.09 against the page in light, 1.48 in dark. A mix composites, so
+     6% measures 1.14 and 1.10. */
   background-color: var(
     --code-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
   );
   border-radius: var(--helix-radii-sm);
-  /* The prose's own ink, pulled back towards it, and never a syntax color.
-   *
-   * A fragment of code inside a sentence is one word of that sentence, and a
-   * colored word in running text reads as a link. Nothing here is highlighted
-   * either. The fill and the face already say it is code, so the ink only has
-   * to be read.
-   *
-   * **`foreground-muted` alone is too far back.** Measured against the chip it
-   * sits on, 5.27 in light and 7.42 in dark, where the prose beside it runs at
-   * 21: quieter than its sentence is right, a third of it is a word the reader
-   * has to lean into, and the two modes disagreeing by two points made the
-   * light one the worse of them.
-   *
-   * The ramp has nothing between `muted` and the full ink, so this is the two
-   * of them mixed: 30% measures 9.98 light and 10.20 dark, which is the same
-   * word on both grounds and still visibly a step down from the prose. */
+  /* Never a syntax color: a colored word in running text reads as a link.
+     `foreground-muted` alone is too far back at 5.27 light and 7.42 dark where
+     the prose runs at 21; mixed 30% it measures 9.98 and 10.20. */
   color: var(
     --code-foreground-color,
     color-mix(in oklab, var(--helix-color-foreground) 30%, var(--helix-color-foreground-muted))
   );
   font-family: var(--helix-font-mono);
-  /* **A ratio of the text it sits in, not a rung of the scale.**
-   *
-   * A fixed rung is paid for in every heading: at `var(--helix-text-sm)`, a
-   * fixed 13px, `## What lands in node_modules` on the metrics page set the
-   * heading at 32px and the chip at 13, a ratio of 0.41, so a fragment of code
-   * in a heading rendered at body size and sat on the line like a footnote.
-   *
-   * Dividing one rung by another yields a number, and multiplying `1em` by it
-   * yields the inherited size scaled by that number. The value names two
-   * tokens, so `helix component`'s `tokens` is satisfied by the thing it was asking for,
-   * and the ratio still moves when a theme moves the scale. A raw value inside
-   * a fallback is refused, which is what rules out writing the number.
-   *
-   * The rungs are the ones this already used: `sm` over `md` is 13 over 14, so
-   * body text is unchanged to the pixel and only the broken cases move. That
-   * step exists because a monospace face at the same nominal size reads larger
-   * than the prose around it, which is a fact about the face rather than about
-   * any one size, and is exactly why it belongs in a ratio. */
+  /* A ratio, not a rung: a fixed 13px inside a 32px heading is 0.41 of it and
+     sits on the line like a footnote. `sm` over `md` leaves body text unchanged
+     to the pixel, and naming two tokens is what `tokens` requires of a fallback. */
   font-size: var(--code-size, calc(var(--helix-text-sm) / var(--helix-text-md) * 1em));
   padding-block: var(--helix-space-none);
-  /* Half a step, and the punctuation is why.
-   *
-   * At `space-2xs`, which is 4px, the chip sat one space too far from anything
-   * that is not a word. Measured against a word space of 3.5px in the same
-   * type: beside a word the gap reads as the ordinary space between any two
-   * words and is right, beside a bracket there is no word space to share the
-   * job and 4px is the whole gap, so `(code)` renders as `( code )` and a
-   * trailing period sits away from the word it ends.
-   *
-   * A margin was the other candidate and is worse: it adds space beside a word
-   * and beside a comma alike, CSS cannot tell them apart, so it would have
-   * doubled exactly this fault rather than fixed it.
-   *
-   * There is no smaller step to reach for, `2xs` being the smallest non-zero
-   * rung, and a raw value is refused. So the scale is halved, which is a factor
-   * rather than a length and is the same shape `--_travel` and the video's
-   * level gap already use. `--code-padding` is how a consumer puts a full step
-   * back, matching `--code-size` directly above. */
+  /* Half a step: `2xs` is 4px against a word space of 3.5px, so `(code)` renders
+     as `( code )`. A margin would add the same space beside a comma. */
   padding-inline: var(--code-padding, calc(var(--helix-space-2xs) * 0.5));
 }
 
-/* Print: the same, inline.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+/* `@media print` does not cross a shadow boundary. */
 @media print {
   [part="code"] {
     background-color: transparent;

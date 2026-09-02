@@ -1,10 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTimePicker } from '@fusion.dev/helix-headless/time-picker'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect imports, because the tier below renders both of these and a custom
-   element registers on import. Inherited from the base along with the template,
-   which is why they are restated here: this file has neither tag in it to remind
-   anyone. */
+/* Inherited from the base along with the template: this file has neither tag in
+   it to remind anyone. */
 import '../../listbox/index.js'
 import '../../option/index.js'
 import { styles } from './time-picker-root.css.js'

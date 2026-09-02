@@ -18,7 +18,7 @@ const FACES = [
 ]
 
 const DESCRIPTION =
-  'Intelligence and energy are collapsing in cost at the same moment. Fusion builds the stack that makes sovereignty practical.'
+  'An intelligent design system, intelligent tooling and intelligent services. Fusion builds the foundation underneath: Helix, a design system, and Cortex, a memory layer.'
 
 /**
  * The defaults every page inherits, and the base every relative URL resolves on.

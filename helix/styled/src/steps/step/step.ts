@@ -1,10 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessStep } from '@fusion.dev/helix-headless/steps'
 import type { CSSResultGroup } from 'lit'
-/* Side-effect import, because the tier below renders `<helix-button>` and a custom
-   element registers on import. Inherited from the base along with the template,
-   which is why it is restated here: this file has no `<helix-button>` in it to
-   remind anyone. */
+/* Inherited from the base along with the template: this file has no
+   `<helix-button>` in it to remind anyone. */
 import '../../button/index.js'
 import { styles } from './step.css.js'
 
