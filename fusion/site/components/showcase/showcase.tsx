@@ -2,8 +2,8 @@
 
 import { initTheme, type ThemeEngine, type ThemeIntent } from '@fusion.dev/helix-theme'
 import { useEffect, useRef, useState } from 'react'
-import landing from '@/components/landing.module.css'
 import { THEME_ENGINE } from '../../utils/theme-engine/theme-engine'
+import styles from './showcase.module.css'
 
 /**
  * The library, running, with a switch that changes what it is showing.
@@ -283,11 +283,11 @@ export function Showcase(): React.ReactElement {
   }, [held])
 
   return (
-    <div className={landing.showcaseStage} ref={stage}>
-      <helix-card class={landing.showcaseAnchor} data-filled>
+    <div className={styles.showcaseStage} ref={stage}>
+      <helix-card class={styles.showcaseAnchor} data-filled>
         <helix-flex direction="column" gap="md">
           <helix-text variant="label">Helix</helix-text>
-          <helix-text as="h3" class={landing.anchorTitle}>
+          <helix-text as="h3" class={styles.anchorTitle}>
             One brand color in. A whole palette out.
           </helix-text>
           <helix-text>
@@ -301,7 +301,7 @@ export function Showcase(): React.ReactElement {
       </helix-card>
 
       <helix-toggle-group
-        class={landing.showcaseSwitch}
+        class={styles.showcaseSwitch}
         label="Showing"
         label-placement="start"
         onChange={(event) => {
@@ -329,7 +329,7 @@ export function Showcase(): React.ReactElement {
           `--helix-size-control` every other control is. */}
       <helix-color-input
         aria-label="Brand"
-        class={landing.showcaseBrand}
+        class={styles.showcaseBrand}
         default-value={BRAND}
         name="brand"
         onChange={(event) => {
@@ -338,7 +338,7 @@ export function Showcase(): React.ReactElement {
         value={brand}
       ></helix-color-input>
 
-      <helix-tooltip class={landing.showcaseReset} content="Back to the Fusion blue">
+      <helix-tooltip class={styles.showcaseReset} content="Back to the Fusion blue">
         <helix-icon-button
           disabled={brand === BRAND || undefined}
           label="Reset the brand color"
@@ -348,13 +348,13 @@ export function Showcase(): React.ReactElement {
         </helix-icon-button>
       </helix-tooltip>
 
-      <div className={landing.showcase}>
-        <div className={landing.showcaseView} hidden={view !== 'controls'}>
+      <div className={styles.showcase}>
+        <div className={styles.showcaseView} hidden={view !== 'controls'}>
           {/* A form, laid out as one: fields first, then the two that are
                 settings. Controls stacked at even spacing are a pile rather
                 than a thing anybody would fill in. */}
           <helix-card
-            class={`showcaseCard ${landing.showcaseTall}`}
+            class={`showcaseCard ${styles.showcaseTall}`}
             data-card-edge
             separation="outlined"
           >
@@ -435,12 +435,12 @@ export function Showcase(): React.ReactElement {
                 the panel is 297, so in one column the scale wrapped onto two
                 rows. A scale that has to be read in two goes is not a scale. */}
           <helix-card
-            class={`showcaseCard ${landing.showcaseWide}`}
+            class={`showcaseCard ${styles.showcaseWide}`}
             data-card-edge
             separation="outlined"
           >
             <helix-radio-group
-              class={landing.showcaseFaces}
+              class={styles.showcaseFaces}
               default-value="good"
               label="How did that go"
               name="mood"
@@ -461,7 +461,7 @@ export function Showcase(): React.ReactElement {
           </helix-card>
         </div>
 
-        <div className={landing.showcaseView} hidden={view !== 'data'}>
+        <div className={styles.showcaseView} hidden={view !== 'data'}>
           {/* **The sparkline spans the card, not one stat.** Aligned to the
                 first of a two stat group it is 98 wide under a 113 wide figure
                 inside a 174 wide group, lining up with nothing and reading as a
@@ -469,11 +469,11 @@ export function Showcase(): React.ReactElement {
                 component: `Stat` slots a value, a label and a unit, and it is a
                 figure rather than a chart container. */}
           <helix-card
-            class={`showcaseCard ${landing.showcaseFigures}`}
+            class={`showcaseCard ${styles.showcaseFigures}`}
             media-placement="end"
             separation="outlined"
           >
-            <helix-stat-group class={landing.showcaseStats} divided>
+            <helix-stat-group class={styles.showcaseStats} divided>
               <helix-stat>
                 1,284
                 <span slot="label">Installs</span>
@@ -584,7 +584,7 @@ export function Showcase(): React.ReactElement {
                   gradient in them read as a chart rather than as a block of
                   color, which is what a showcase wants. */}
               <helix-bar-chart
-                class={landing.showcaseBars}
+                class={styles.showcaseBars}
                 emphasis="outlined"
                 for="showcase-releases"
                 wash="gradient"
@@ -641,7 +641,7 @@ export function Showcase(): React.ReactElement {
                   the value column's own header. */}
               <helix-flex align="center" gap="lg">
                 <helix-donut-chart
-                  class={landing.showcaseRing}
+                  class={styles.showcaseRing}
                   for="showcase-sources"
                 ></helix-donut-chart>
                 <helix-legend entries="categories" for="showcase-sources"></helix-legend>
@@ -657,12 +657,12 @@ export function Showcase(): React.ReactElement {
               sparkline would appear together. */}
         </div>
 
-        <div className={landing.showcaseView} hidden={view !== 'surfaces'}>
+        <div className={styles.showcaseView} hidden={view !== 'surfaces'}>
           {/* Flat, like the code block. `Callout` already draws its own band:
               a tinted ground, a rule and an icon down the side. A card around
               it is a second surface a few pixels outside the first, and the two
               edges argue about which one is the callout. */}
-          <helix-callout class={landing.showcaseWide} tone="info">
+          <helix-callout class={styles.showcaseWide} tone="info">
             <helix-text slot="title" variant="body-strong">
               Nothing here needs us to keep running
             </helix-text>

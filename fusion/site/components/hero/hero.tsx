@@ -1,5 +1,6 @@
 import type { SitePage } from '@fusion.dev/insights'
 import Link from 'next/link'
+import landing from '@/components/landing.module.css'
 import { NewsKicker } from '@/components/news-kicker/news-kicker'
 import { HERO } from '@/content/landing/helix-landing'
 import styles from './hero.module.css'
@@ -32,7 +33,7 @@ export function Hero({ announcement }: { announcement?: SitePage | undefined }) 
           {HERO.title} <span className={styles.tDisplayAccent}>{HERO.accent}</span>
         </h1>
 
-        <p className={styles.tLede}>{HERO.lede}</p>
+        <p className={landing.tLede}>{HERO.lede}</p>
 
         <helix-flex class={styles.heroActions} direction="column" gap="md">
           <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
