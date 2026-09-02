@@ -28,7 +28,7 @@
       "!**/svelte.d.ts",
       "!**/.probe",
       "!helix/icons/raw",
-      "!helix/templates/templates",
+      "!helix/templates/template-*",
       "!.claude/worktrees"
     ]
   },

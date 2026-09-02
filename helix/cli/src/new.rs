@@ -176,7 +176,7 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         }
     }
 
-    let source = package.join("templates").join(&template.id);
+    let source = package.join(format!("template-{}", template.id));
     let mut files = Vec::new();
     walk(&source, &source, &mut files);
     if files.is_empty() {

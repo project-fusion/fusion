@@ -5,7 +5,10 @@ import { findTemplate, PROJECT_NAME, templates } from './index.js'
 
 /* The payloads are data rather than code, so nothing type-checks them and
    nothing imports them. This is what holds the register to the directories. */
-const ROOT = join(import.meta.dirname, '..', 'templates')
+const ROOT = join(import.meta.dirname, '..')
+
+/** Where a template's files live, which is `template-<id>` beside the manifest. */
+const directoryOf = (id: string) => join(ROOT, `template-${id}`)
 
 const walk = (dir: string, base = ''): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -16,7 +19,7 @@ const walk = (dir: string, base = ''): string[] =>
 describe('the register and the directories', () => {
   test('every registered template has a directory', () => {
     for (const one of templates) {
-      expect(statSync(join(ROOT, one.id)).isDirectory()).toBe(true)
+      expect(statSync(directoryOf(one.id)).isDirectory()).toBe(true)
     }
   })
 
@@ -24,8 +27,8 @@ describe('the register and the directories', () => {
      and not registered ships in the package and is offered by nobody. */
   test('every directory is registered', () => {
     const onDisk = readdirSync(ROOT, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => entry.name)
+      .filter((entry) => entry.isDirectory() && entry.name.startsWith('template-'))
+      .map((entry) => entry.name.slice('template-'.length))
     expect(onDisk.toSorted()).toEqual(templates.map((one) => one.id).toSorted())
   })
 
@@ -53,8 +56,8 @@ describe('the project name placeholder', () => {
    */
   for (const one of templates) {
     test(`${one.id} carries the placeholder in exactly the files it names`, () => {
-      const carrying = walk(join(ROOT, one.id)).filter((file) =>
-        readFileSync(join(ROOT, one.id, file), 'utf8').includes(PROJECT_NAME),
+      const carrying = walk(directoryOf(one.id)).filter((file) =>
+        readFileSync(join(directoryOf(one.id), file), 'utf8').includes(PROJECT_NAME),
       )
       expect(carrying.toSorted()).toEqual([...one.named].toSorted())
     })

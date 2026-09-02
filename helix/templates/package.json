@@ -21,7 +21,7 @@
   },
   "files": [
     "dist",
-    "templates",
+    "template-*",
     "templates.json"
   ],
   "sideEffects": false,

@@ -11,7 +11,7 @@
  * written for. A template pinned to nothing is a template that stops compiling on
  * somebody else's release.
  *
- * The payloads sit in `templates/<id>/` and travel in the published package. This
+ * The payloads sit in `template-<id>/` and travel in the published package. This
  * module is the register: what exists, what each one is for, and which file a
  * consumer's project name has to be written into.
  */
@@ -28,7 +28,7 @@ export interface Template {
    * a rename that misses a file fails a test rather than shipping.
    */
   readonly named: readonly string[]
-  /** The directory under `templates/`, and the id a caller passes. */
+  /** Names the `template-<id>/` directory, and is the id a caller passes. */
   readonly id: string
   /** What it is called in a chooser. */
   readonly title: string
