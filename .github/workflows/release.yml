@@ -79,9 +79,26 @@ jobs:
   # place for it to be wrong, and the copy that is not in the commit is the one
   # that drifts from what was merged.
   #
-  # **`fetch-depth: 0`, because the range is the point.** A merge commit's second
-  # parent is what the pull request brought, and a shallow clone has neither
-  # parent to walk.
+  # **The range runs from the domain's last release, not from this merge.** A
+  # merge-shaped range reads only what one merge carried, so a release that
+  # skips or fails orphans those commits: nothing later ever looks at them again
+  # and the work ships in no version. That is not hypothetical. Two
+  # `feat(helix)` subjects — the templates package and `helix new` — sat on main
+  # unreleased behind `helix-v0.0.10` because the merges carrying them resolved
+  # to nothing under the level table of the day.
+  #
+  # From the tag, the window is whatever has not shipped yet, so a skipped
+  # release is picked up by the next push rather than lost, and a release that
+  # succeeds pushes a tag which closes the window behind it. Each domain gets
+  # its own, because they release independently.
+  #
+  # It also removes a trap the merge-shaped range had: a squash has no second
+  # parent and one subject, and that subject is the pull request's title
+  # whenever the branch held more than one commit. #76 was squashed under a
+  # prose title, nothing parsed, and the release was skipped in silence.
+  #
+  # **`fetch-depth: 0` and the tags, because the range is the point.** A shallow
+  # clone reports no tags, and every domain would look like its first release.
   intent:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -92,24 +109,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      - run: git fetch --tags --force
+
       - id: resolve
+        env:
+          SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
 
-          # A merge commit's second parent is what the pull request brought, so
-          # the range is everything on it the first parent did not already have.
-          # A direct push to `main` is its own range.
-          if git rev-parse -q --verify "${{ github.sha }}^2" >/dev/null; then
-            range="${{ github.sha }}^1..${{ github.sha }}^2"
-          else
-            range="${{ github.sha }}^..${{ github.sha }}"
-          fi
+          # `helix-v*` and not `helix-attempt-v*`: an attempt tag says a number
+          # was spent, and spending one without publishing must not close the
+          # window over the work that number was for.
+          : > /tmp/entries
+          for domain in helix cortex; do
+            last=$(git tag --list "$domain-v*" --sort=-v:refname | head -1)
+            # No tag is the first release, and the range is then all of history.
+            range=$SHA
+            [ -n "$last" ] && range="$last..$SHA"
+            node fusion/scripts/bump.mjs "$range" \
+              | jq -c --arg d "$domain" '.[] | select(.domain == $d)' >> /tmp/entries
+          done
+          resolved=$(jq -c -s '.' /tmp/entries)
 
-          resolved=$(node fusion/scripts/bump.mjs "$range")
           echo "domains=$resolved" >> "$GITHUB_OUTPUT"
 
           if [ "$resolved" = '[]' ]; then
-            echo "No subject in this merge carries a releasing type and a published scope." >> "$GITHUB_STEP_SUMMARY"
+            echo "Nothing has landed since the last release of either domain that carries a releasing type." >> "$GITHUB_STEP_SUMMARY"
           else
             jq -r '.[] | "- `\(.domain)`: \(.level)"' <<<"$resolved" >> "$GITHUB_STEP_SUMMARY"
           fi
