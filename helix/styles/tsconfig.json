@@ -1,0 +1,13 @@
+{
+  // `src/tokens.ts` is a build input rather than something this package ships:
+  // `build-token-layer.mjs` imports it and writes `tokens.css` and
+  // `tokens.json` from it. So `noEmit`, and the package still has no JavaScript.
+  //
+  // It went unchecked until 2 Sep 2026. It is the registry every semantic token
+  // is declared in, so a mistake in it is a stylesheet that resolves to nothing.
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "extends": "../../tsconfig.base.json",
+  "include": ["src/**/*.ts"]
+}

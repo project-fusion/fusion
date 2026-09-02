@@ -1689,7 +1689,13 @@ prefix, because that is a real identifier a consumer types.
 
 ## Tree-shaking
 
-One family per module, subpath exports (`@fusion.dev/helix/card`) so consumers need
-not import the barrel, and `sideEffects` declared honestly: `styled` has them
-because `@customElement` registers on import, `headless` does not. Getting it
+One family per module, subpath exports (`@fusion.dev/helix/card`) so consumers
+need not import the barrel, and `sideEffects` declared honestly. Getting it
 wrong is silent both ways.
+
+**Both element tiers have side effects**, because both register: `styled`
+declares `true` and `headless` declares `./dist/**/*.js`, which is the same
+answer narrowed to what it ships. `core` declares `false` and means it, shipping
+mixins and controllers that register nothing. This page said `headless` had none
+until 2 Sep 2026, against 116 files calling `@customElement` and a manifest that
+had always been right.

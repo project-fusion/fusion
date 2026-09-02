@@ -26,7 +26,8 @@
     "build": "bun run token-layer && bun run elements-css && bun scripts/build-styles-dist.mjs",
     "elements-css": "build-elements-css",
     "styles-dist": "bun scripts/build-styles-dist.mjs",
-    "token-layer": "bun scripts/build-token-layer.mjs"
+    "token-layer": "bun scripts/build-token-layer.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
