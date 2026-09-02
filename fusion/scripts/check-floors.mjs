@@ -78,12 +78,20 @@ const expand = (command, seen = new Set()) => {
  * What this does not run, and why each one is out.
  *
  * Matched against the command rather than against a script name, because a name
- * is what just went missing. `turbo run reference -- --check` is the same work
+ * is what just went missing. `turbo run samples -- --check` is the same work
  * whether or not anybody wrapped it in a script.
+ *
+ * **The runner is stripped before comparing, and that is not tidiness.** These
+ * were literal strings carrying `node `, so moving the repository to bun left
+ * three of them matching nothing: this file spawned *itself*, recursing until
+ * the job hit its twenty-minute timeout, and the two browser checks ran in this
+ * shard as well as in the jobs built for them. A list that has to be edited
+ * whenever a command is respelled is a list that will be wrong again.
  */
+const bare = (command) => command.replace(/^(?:node|bun) /, '')
 const EXEMPT = [
   /* Itself. */
-  'node fusion/scripts/check-floors.mjs',
+  'fusion/scripts/check-floors.mjs',
   /* The four that `verify.yml` gives their own `browser` jobs. Running them
      here too makes one shard render the entire browser matrix a second time,
      single file, while the six jobs built for it sit idle, and that shard then
@@ -93,17 +101,15 @@ const EXEMPT = [
      already fails loudly on an empty corpus, because rendering nothing and
      comparing nothing is what they are, whereas a static check that walks an
      empty directory reports a confident zero. */
-  'node fusion/scripts/check-contrast.mjs',
-  'bun fusion/scripts/check-diagnostics.mjs',
-  'node fusion/scripts/check-visual.mjs',
-  'bun fusion/scripts/check-visual-parity.mjs',
+  'fusion/scripts/check-contrast.mjs',
+  'fusion/scripts/check-diagnostics.mjs',
+  'fusion/scripts/check-visual.mjs',
+  'fusion/scripts/check-visual-parity.mjs',
   /* The three that compare a committed file against a fresh derivation of the
      whole corpus. What guards a generator is that its output is committed and
      read; running these here would measure every family a second time for
      fifteen seconds and learn nothing the first run did not. */
-  'bun fusion/scripts/build-metrics.mjs --check',
-  'turbo run reference -- --check',
-  'turbo run tokens -- --check',
+  'fusion/scripts/build-metrics.mjs --check',
 ]
 
 /** Floored in process by the CLI that runs them: a rule returns its count and
@@ -113,7 +119,7 @@ const EXEMPT = [
 const DELEGATED = /\b(?:fusion|helix) (?:workspace|component|prose|spec|theme)\b/
 
 const checks = [...new Set(expand('bun run check'))].filter(
-  (one) => !EXEMPT.includes(one) && !DELEGATED.test(one),
+  (one) => !EXEMPT.includes(bare(one)) && !DELEGATED.test(one),
 )
 
 /* **A floor with nothing under it is what this file exists to refuse**, so it
@@ -121,6 +127,21 @@ const checks = [...new Set(expand('bun run check'))].filter(
    edit that leaves the walk with nowhere to go. No number is asserted: the
    failure worth catching is the fall to nothing, which is the same rule applied
    to every check below. */
+/* **An exemption that matches nothing is the failure this file just had**, so
+   it refuses one. A stale entry is silent in the direction that costs most: the
+   command it meant to exclude runs anyway, and here that meant this file
+   spawning itself until the job timed out. */
+const walked = new Set([...new Set(expand('bun run check'))].map(bare))
+const dead = EXEMPT.filter((one) => !walked.has(one))
+if (dead.length > 0) {
+  console.error(
+    `floors: ${dead.length} exemption${dead.length === 1 ? '' : 's'} match no command that \`check\` reaches.\n` +
+      'Either the command was respelled, or it is gone and the exemption should be too.\n' +
+      dead.map((one) => `  ${one}`).join('\n'),
+  )
+  process.exit(1)
+}
+
 if (checks.length === 0) {
   console.error(
     'floors: walking `check` found no command to floor, so this would have\n' +
