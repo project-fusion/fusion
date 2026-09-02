@@ -34,15 +34,40 @@
   );
 }
 
-/* Five across, stepping down as the window narrows. A fixed count rather than a
-   floor, because `auto-fit` cannot express "exactly five": any floor low enough
-   to give five at 1600 gives six or seven at 2560. An outer-tree rule on the
-   host beats the component's own `:host([columns="5"])`, so none of this needs
-   `!important` or a wrapper. The card is the thing being protected, not the
-   column count: below roughly 240 pixels a drawing stops being legible at all,
-   which is what sets where each step falls rather than a list of device widths. */
+/* Five across at a laptop, stepping down as the window narrows and up on a
+   large display. A fixed count rather than a floor, because `auto-fit` cannot
+   express "exactly five": any floor low enough to give five at 1600 gives six
+   or seven at 2560. An outer-tree rule on the host beats the component's own
+   `:host([columns="5"])`, so none of this needs `!important` or a wrapper.
+
+   **The card is what is protected, not the column count.** Below roughly 240
+   pixels a drawing stops being legible, and that is what sets every step here.
+   A card is `(width - 96 inset - 48 per gap) / columns`, so the two steps up
+   are wherever that arithmetic still clears 240: measured at 1600 the cards are
+   262, and six across needs 1792 to hold 242, seven needs 2080 to hold 242 and
+   eight needs 2560 to hold 266.
+   Written in rem for the same reason everything else here is, so a reader who
+   has scaled their text gets fewer and larger rather than the same and cramped. */
 .familyGrid {
   grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (width >= 112rem) {
+  .familyGrid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 130rem) {
+  .familyGrid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 160rem) {
+  .familyGrid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
 }
 
 @media (width < 90rem) {

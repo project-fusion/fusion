@@ -67,10 +67,23 @@
 /**
  * A band as one card rather than a row of them.
  */
+/* **Capped, so a large display gets more margin rather than a wider card.**
+   The inset is `clamp(1.5rem, 6vw, 7rem)`, which stops growing at 112 pixels,
+   so past about 1630 every extra pixel of window went into the card: measured
+   at 2100 it was 1876 wide, against 1408 at 1600 and 1267 at 1440. A row of
+   three inside that is three columns of 600, which is not the composition any
+   of this was drawn at.
+
+   90rem is the width a large laptop already produces, so nothing below about
+   1630 moves at all and the cap only holds what was already there. The section
+   keeps running edge to edge: it is the card that centres, not the band. */
 .bandCard {
   border-radius: var(--helix-radii-lg);
   display: grid;
+  margin-inline: auto;
+  max-inline-size: 90rem;
   overflow: hidden;
+  inline-size: 100%;
 }
 
 .bandSection {
