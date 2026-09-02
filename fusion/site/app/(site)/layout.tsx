@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { HashTarget } from '@/components/hash-target/hash-target'
 import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { RevealOnScroll } from '@/components/reveal-on-scroll/reveal-on-scroll'
 import { SiteFooter } from '@/components/site-footer/site-footer'
@@ -21,6 +22,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           the spec runner and cannot register anything without giving that page
           two copies of the library. */}
       <HelixElements />
+      <HashTarget />
       {/*
        * *Built here, on the server, and handed down.** The registry reads the
        *           manifest off disk and holds the whole of the writing: it belongs to a
