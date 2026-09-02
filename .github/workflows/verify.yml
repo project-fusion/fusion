@@ -250,6 +250,44 @@ jobs:
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
 
+  # **What we publish, installed from outside the workspace.** `smoke:template`
+  # packs every publishable package, installs the tarballs into a scratch
+  # project that is a workspace of nothing, and typechecks an import of every
+  # exported subpath. Nothing else here asks whether the tarballs are usable.
+  #
+  # **It ran nowhere on a pull request until now.** `release.yml` runs it, but
+  # against the registry and only after a version has been allocated and ten
+  # packages published, so a packaging fault could not be found without spending
+  # a number on it. 75 added a `bin`-only package and 0.3.0 was the cost of
+  # discovering that two of the checks here could not describe one.
+  #
+  # From disk rather than the registry, so it needs no token and no publish.
+  #
+  # `analyze` is not optional: `files` names `custom-elements.json` and the
+  # three framework typings, and `build` does not produce them, so without it
+  # the tarballs ship without files their own manifests promise.
+  packaging:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.1.43
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.20.0'
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run build
+
+      - run: bun run analyze
+
+      - run: bun run smoke:template
+
   # Its own job because it reads every file regardless of who owns it, so
   # sharding it would mean a pass over the same tree per shard.
   lint:
@@ -544,7 +582,7 @@ jobs:
   # `failure` this expression already reads.
   verify:
     if: always()
-    needs: [plan, warm, checks, floors, lint, types, tests, browser]
+    needs: [plan, warm, checks, floors, packaging, lint, types, tests, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
