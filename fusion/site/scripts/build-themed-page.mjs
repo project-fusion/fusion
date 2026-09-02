@@ -40,7 +40,7 @@
  * read a label would pull three unrendered pages into the browser bundle. What
  * crosses is two short lists and a record of strings.
  */
-import { writeFileSync } from 'node:fs'
+import { existsSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { formatted } from '@fusion.dev/scripts/formatted'
@@ -98,6 +98,14 @@ const say = (state) =>
   `themed page: ${LAYOUTS.length} layouts by ${CONTEXTS.length} contexts, ${size} characters, ${state}`
 
 if (process.argv.includes('--check')) {
+  /* **Absent is not stale**, the way `token-layer` reads its own outputs. This
+     is a build output rather than a tracked file, so a tree nobody has built has
+     nothing to compare and `await import` of a missing module throws rather than
+     reporting. A shard that runs this check and no writer is exactly that tree. */
+  if (!existsSync(OUT)) {
+    console.log(say('absent, so nothing to compare'))
+    process.exit(0)
+  }
   const held = await import(OUT)
   const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
   const stale =
