@@ -76,7 +76,7 @@
 
    90rem is the width a large laptop already produces, so nothing below about
    1630 moves at all and the cap only holds what was already there. The section
-   keeps running edge to edge: it is the card that centres, not the band. */
+   keeps running edge to edge: it is the card that centers, not the band. */
 .bandCard {
   border-radius: var(--helix-radii-lg);
   display: grid;
