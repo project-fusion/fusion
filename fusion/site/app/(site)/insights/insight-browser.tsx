@@ -28,10 +28,6 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
 /**
  * The Insights hero, its filter bar, and the grid under both.
  *
- * The same split the Helix gallery uses, for the same reasons. **Sorting is a
- * URL parameter and the server does it; searching and filtering are not, and
- * the client does those.**
- *
  * Filtering hides cards, which CSS can do without touching the DOM, so the
  * order a keyboard walks and the order a reader sees stay the same thing.
  * Sorting reorders, and the obvious client-side trick, `order` on the grid
@@ -48,17 +44,6 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
  * answer. Slugs are checked against `[a-z0-9-]` before they reach that
  * stylesheet: nothing here is reader-supplied today, since they come from the
  * registry, but a value interpolated into CSS is a value interpolated into CSS.
- *
- * **Scoped by an attribute this file writes, never by a class the page does.** A
- * CSS module identifier reaches the document hashed, as
- * `insights-module__AoKrvW__insightGrid`, so a rule naming it matches nothing
- * and every card stays up. It fails silently: the URL, the count and the empty
- * state are all computed from `hidden`, so everything downstream of the filter
- * agrees it ran.
- *
- * No lattice and no shines. Those belong to a page whose cards are drawings on
- * that same field, and repeating them here would be decoration quoting a reason
- * that does not apply.
  */
 export function InsightBrowser({
   children,
@@ -108,13 +93,6 @@ export function InsightBrowser({
 
   /**
    * Mirrors a filter into the URL without a navigation.
-   *
-   * `history.replaceState` rather than `router.replace`: the router would re-run
-   * the server component on every keystroke to produce markup the client is
-   * already showing. `replace` rather than `push`, so typing eight letters does
-   * not put eight entries in the history and make Back mean "delete one
-   * character". Sort is the exception and goes through the router, because the
-   * server is what reorders the grid.
    */
   const mirror = (key: string, value: string): void => {
     const next = new URLSearchParams(params)

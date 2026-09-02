@@ -7,25 +7,6 @@ import styles from './brand-picker.module.css'
 
 /**
  * The brand control, as a swatch that opens the picker.
- *
- * **The short form of `helix-color-picker`, not `helix-color-input`.** The input
- * is a hex field with a swatch beside it, which asks a reader to know what a hex
- * code is before they can change anything. The picker is a square and two ramps,
- * so a color is chosen by looking at colors. `no-value`, `no-format` and
- * `no-eyedropper` take off the text field, the format switcher and the screen
- * sampler, leaving the part that does the job.
- *
- * **The listener is attached to the element, not passed as `onChange`.** The
- * picker sits inside a popover, and a popover that promotes its content to the
- * top layer moves it out of the position React delegates events from: the
- * handler is registered at the React root and the event never travels through
- * it, so the color changed on screen and nothing above it heard. The sliders
- * kept working throughout because they are direct children and never left the
- * tree. A direct listener does not care where the node ends up.
- *
- * Both `input` and `change` are taken. `input` is what fires while a reader
- * drags around the square, which is the difference between the page following
- * the pointer and the page waiting for them to let go.
  */
 export const BrandPicker = () => {
   const c = useThemeControls()

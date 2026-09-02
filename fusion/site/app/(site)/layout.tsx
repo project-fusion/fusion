@@ -13,14 +13,6 @@ const findable = (kind: RouteKind) =>
 
 /**
  * Header, content column, and footer: everything except the tools.
- *
- * The header and the footer run the full width of the viewport and inset
- * themselves; the content column between them keeps the page's `--site-inset`.
- *
- * `view-transition-name` on the content is what makes a route change a
- * cross-fade of the middle of the page while the header and its indicator stay
- * put. The name has to be unique per document, which is why it is here on the
- * one main rather than on anything a page renders.
  */
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
@@ -29,22 +21,18 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           the spec runner and cannot register anything without giving that page
           two copies of the library. */}
       <HelixElements />
-      {/* **Built here, on the server, and handed down.** The registry reads the
-          manifest off disk and holds the whole of the writing: it belongs to a
-          server component, and a palette that imported it would pull the
-          manifest into the client bundle to display a list of names. What
-          crosses is the list.
-
-          **From `routes()` rather than from hand-picked arrays.** Anything left
-          out of such an array is simply unreachable from the palette, on a site
-          whose largest section is documentation, and `turbo run routes -- --check` already
-          holds the registry that the sitemap and `llms.txt` are built from. A
-          second copy of it here would drift.
-
-          **`Route.description` is the caption**, which is what its own comment
-          says it is for: `llms.txt` *and a search result*. Matching is still on
-          the title, so what somebody types is measured against the name rather
-          than against prose about it. */}
+      {/*
+       * *Built here, on the server, and handed down.** The registry reads the
+       *           manifest off disk and holds the whole of the writing: it belongs to a
+       *           server component, and a palette that imported it would pull the
+       *           manifest into the client bundle to display a list of names. What
+       *           crosses is the list.
+       *
+       * *`Route.description` is the caption**, which is what its own comment
+       *           says it is for: `llms.txt` *and a search result*. Matching is still on
+       *           the title, so what somebody types is measured against the name rather
+       *           than against prose about it.
+       */}
       <SiteNav
         findable={[
           { group: 'Components', items: findable('component') },

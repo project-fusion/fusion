@@ -13,18 +13,6 @@ interface RunMessage {
 
 /**
  * Runs a component's own DOM specs, in a real browser.
- *
- * A frame of its own, not the preview's. `mount` replaces the document body for
- * every test, so specs sharing the preview's document would tear down the
- * example a reader is looking at, several dozen times a second.
- *
- * No `@fusion.dev/helix` import here. Each spec bundle brings the family it tests,
- * because that is what the spec file itself imports, so loading every component
- * up front would only mean the definitions race: whichever registered first
- * wins, and `customElements.define` throws on the second.
- *
- * What runs is the same file CI runs. `bun:test` and the DOM helpers are
- * resolved to a browser harness at bundle time, and nothing else is rewritten.
  */
 export function SpecFrame() {
   useEffect(() => {

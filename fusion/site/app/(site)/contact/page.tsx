@@ -26,17 +26,14 @@ export default function Page() {
             the first message and what happens after you send it, so neither is a thing you have to
             guess at.
           </helix-text>
-          {/* **One control with two actions on the same address.**
-              This was a button and a line of text repeating what the button
-              said, which existed because a `mailto:` gives a reader with no mail
-              client nothing to copy. That is a real gap and a second copy of the
-              address is the wrong way to close it: the address appeared twice,
-              and the sentence had to explain itself.
-
-              A group is the shape, because both halves act on one thing.
-              `ButtonGroup` flattens the inner corners of whatever it holds, so
-              an anchor and a copy button read as one object rather than two
-              controls that happen to touch. */}
+          {/*
+           * *One control with two actions on the same address.**
+           *               This was a button and a line of text repeating what the button
+           *               said, which existed because a `mailto:` gives a reader with no mail
+           *               client nothing to copy. That is a real gap and a second copy of the
+           *               address is the wrong way to close it: the address appeared twice,
+           *               and the sentence had to explain itself.
+           */}
           <helix-flex data-density="lg">
             <helix-button-group label="Reach us">
               <a data-button="solid" data-button-tone="primary" href={MAILTO}>

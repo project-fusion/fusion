@@ -4,17 +4,6 @@ import styles from './insight-card.module.css'
 
 /**
  * One post as a card: the link, the picture, the filing, the title and the date.
- *
- * One component, because the landing page's carousel and the gallery both draw
- * it and two copies of the markup drift. A shared class holds the styling
- * together while the markup diverges underneath it, which is the argument for a
- * component rather than a class: the class was never the thing worth sharing.
- *
- * The footer carries the date and the reading time, the reading time being a
- * fact a reader wants before opening something.
- *
- * `slug` is optional and only the gallery passes it. Its browser filters on the
- * client by hiding cards, and it finds them by that attribute.
  */
 export function InsightCard({ insight, slug = false }: { insight: Insight; slug?: boolean }) {
   return (

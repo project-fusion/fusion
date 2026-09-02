@@ -30,22 +30,6 @@ import { useLayoutEffect } from 'react'
  * **The full list of what forms a backdrop root lives in `site.css`**, above
  * `[data-substrate]`, measured rather than taken from the spec. Consult it
  * before adding a mask, a fade or a transition anywhere above a glass surface.
- *
- * **The hidden state is armed from here, not from the stylesheet**, so a reader
- * whose JavaScript never runs is handed a page rather than eight invisible
- * sections. CSS alone cannot make that promise: a rule that hides a section
- * needs something to un-hide it, and if the thing that would have is the script
- * that failed, the content is gone. Arming in script means the failure mode is
- * no animation instead of no page.
- *
- * **In `useLayoutEffect` and with the first screen resolved synchronously**,
- * because arming after paint would show the sections and then hide them. What is
- * already on screen when this runs is marked shown in the same frame and never
- * transitions; only what is below the fold is armed and observed. `IntersectionObserver`
- * would report the visible ones a frame later, which is a frame of blank page.
- *
- * Reduced motion is answered by doing nothing at all, which leaves every section
- * in its served state.
  */
 export function RevealOnScroll() {
   useLayoutEffect(() => {

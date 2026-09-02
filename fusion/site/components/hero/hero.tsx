@@ -16,15 +16,12 @@ export function Hero({ announcement }: { announcement?: SitePage | undefined }) 
   return (
     <section className={styles.hero}>
       <helix-flex align="center" class={styles.heroShell} data-shell direction="column" gap="lg">
-        {/* What is coming, which is what a chip under a heading about the
-            company should say. It pointed at the newest essay, so the first
-            element on the site sent a reader asking "is this real yet" to a
-            list of writing.
-
-            Read off the registry rather than typed here, because a title typed
-            here is correct on the day it is written and silently stale from the
-            next change on. The whole block goes when the page is missing, which
-            is a truthful empty state rather than a chip about nothing. */}
+        {/*
+         *  What is coming, which is what a chip under a heading about the
+         *             company should say. It pointed at the newest essay, so the first
+         *             element on the site sent a reader asking "is this real yet" to a
+         *             list of writing.
+         */}
         {announcement ? (
           <NewsKicker href="/announcements" label="Coming soon" text={announcement.title} />
         ) : undefined}

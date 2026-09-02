@@ -7,18 +7,6 @@ import styles from './page.module.css'
 /**
  * The guides index, which is a page rather than a redirect to the first page of
  * the first section.
- *
- * A landing page in front of a table of contents is a click between a reader
- * and what they asked for, which held while `/helix` was the component gallery
- * and the documentation had no product page to be part of. `/helix` is the
- * overview, so this is one section of a product rather than the whole of it,
- * and a reader arriving from the masthead's Docs row has asked what the
- * documentation covers.
- *
- * The sections come from `navigation()`, which is the same call the sidebar
- * makes. Nothing about the shape of the documentation is written here: a
- * section added to `@fusion.dev/helix-docs` appears without this file being touched,
- * which is the property the registry exists to have.
  */
 export const metadata = pageMetadata({
   description: 'Install it, theme it, and the ideas underneath.',
@@ -47,17 +35,14 @@ export default function DocsIndex() {
         </helix-text>
       </helix-flex>
 
-      {/* **Descriptions, which is what the sidebar cannot show.** Every page
-          carries a one-line summary in its frontmatter, and without them the
-          index is the navigation again in boxes: the same six sections and the
-          same forty-two titles a reader already has two inches to the left, at
-          3,838px of page. A card per section adds a border and an inset and no
-          information.
-
-          The sections flow rather than sitting in a grid of equal-height cards,
-          because they have six, seven, ten and eleven pages: any row of two
-          leaves one of them padded to the other's height, which is the void this
-          page opened with and is a shape the content will keep producing. */}
+      {/*
+       * *Descriptions, which is what the sidebar cannot show.** Every page
+       *           carries a one-line summary in its frontmatter, and without them the
+       *           index is the navigation again in boxes: the same six sections and the
+       *           same forty-two titles a reader already has two inches to the left, at
+       *           3,838px of page. A card per section adds a border and an inset and no
+       *           information.
+       */}
       {navigation().map((section) => (
         <helix-flex class={styles.section} direction="column" gap="md" key={section.title}>
           <helix-text as="h2" variant="subheading">

@@ -6,18 +6,6 @@ import loading from './loading.module.css'
 /**
  * The writing index, in outline, while the registry is sorted.
  *
- * **The same shape as the gallery and a different grid.** Both pages are a hero,
- * a filter bar and a grid of cards, which is not a coincidence: the two are the
- * places on the site where a reader is looking for one of a set, and the
- * insights page's own docstring says they should not be two pages to learn. A
- * skeleton that made them look like two would undo that at the one moment a
- * reader is comparing them, which is while they wait.
- *
- * Four columns rather than five, and text lines rather than a square, because
- * an insight card is a title and a byline where a family card is a drawing.
- * Standing in with the wrong one moves the layout when the real thing lands,
- * which is the single thing a skeleton exists to avoid.
- *
  * At 35ms warm this route is the fastest of the four and the root loader's delay
  * would usually beat it to the screen. It is here because the delay is a
  * quarter second rather than a guarantee: a cold process, a slow machine or a

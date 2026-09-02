@@ -69,13 +69,6 @@ type Fence = ReactElement<{ children?: ReactNode; className?: string }>
 
 /**
  * A fenced block.
- *
- * The text and the language come off the `code` element MDX nests inside the
- * `pre`, which is where remark puts both. A fence whose language has no grammar
- * renders its text as a child rather than as markup: `text` and the unlabeled
- * ones are code, they are just not code anything here can parse, and passing
- * them through the highlighter would hand back the input with no spans in it
- * while claiming otherwise.
  */
 const CodeFence = ({ children }: { children?: ReactNode }) => {
   const fence = children as Fence | undefined
@@ -101,10 +94,6 @@ const CodeFence = ({ children }: { children?: ReactNode }) => {
  * Inline code, which is a different component from a fence and not a variant
  * of one. One flows with a sentence and must never scroll; the other is a
  * figure with its own box, its own overflow and something to copy.
- *
- * A fence reaches here too, since remark nests a `code` inside every `pre`, and
- * `CodeFence` reads that element's props rather than rendering it. So this only
- * ever renders for code that is genuinely inline.
  */
 const InlineCode = ({ children }: { children?: ReactNode }) => <helix-code>{children}</helix-code>
 
@@ -115,17 +104,6 @@ const TableColumn = ({ children }: { children?: ReactNode }) => (
 
 /**
  * A row, or the header row, which is not a row at all.
- *
- * `helix-table` is a grid: its columns and its rows are siblings, and a cell
- * belongs to a row while a heading belongs to the table. GFM emits
- * `thead > tr > th`, so two levels of nesting have to come out, and this is the
- * lower one. It reads its own children rather than taking a flag from a
- * context, because a context needs a client boundary and every one of these
- * pages is a server component rendered once at build.
- *
- * The test is exact rather than structural: `th` maps to `TableColumn` and this
- * asks whether that is what it was handed. A row of cells that merely looks
- * like a heading is still a row.
  */
 const TableRow = ({ children }: { children?: ReactNode }) => {
   const heading = Children.toArray(children).some(
@@ -199,10 +177,6 @@ const SHORT = 32
  * 900px viewport, a `max-content` name column asking for 250 starved both prose
  * columns to exactly `0px` and wrapped their text to forty-eight lines. A floor
  * turns that into an overflow, which the host can scroll.
- *
- * Fourteen characters, which is narrow enough that it binds only when the
- * column is genuinely too small to read a table in, and wide enough to be worth
- * scrolling to.
  */
 const FLOOR = '14ch'
 
@@ -216,15 +190,6 @@ const FLOOR = '14ch'
  * browser to break inside a word. Both were visible on the same page:
  * `--helix-color-background` across three lines, and `appearance` split into
  * `appeara` and `nce` with the inline-code chip broken across the two.
- *
- * So a short column takes `max-content`, which is exactly its longest cell and
- * cannot wrap, and everything else divides what is left in proportion to how
- * much text it holds. The proportion is what stops a two-word column and a
- * two-sentence column being handed the same room.
- *
- * **The last track is `auto` when nothing is long**, because `max-content`
- * tracks do not stretch: a table of five short columns would otherwise sit in a
- * puddle at the left of its own container.
  */
 const tracksOf = (children: ReactNode): string | undefined => {
   const widths = widthsOf(rowsOf(children))
@@ -255,9 +220,6 @@ const tracksOf = (children: ReactNode): string | undefined => {
  * A wrapper reaches nothing: `[part="table"]` is `inline-size: 100%`, so the box
  * a wrapper would scroll never exceeds it. It costs nothing while everything
  * fits, since `auto` shows no scrollbar until there is something to scroll.
- *
- * No `label`. A markdown table has no caption to take one from, and inventing
- * one would put a name on the table that the page never says out loud.
  */
 const Table = ({ children }: { children?: ReactNode }) => {
   const tracks = tracksOf(children)
@@ -273,23 +235,6 @@ const Unwrap = ({ children }: { children?: ReactNode }) => children
 
 /**
  * An address for a heading, derived from what it says.
- *
- * `textOf` is the one the table already uses to measure a column, and a heading
- * needs the same walk for the same reason: a heading can hold a link, a `code`
- * span or an emphasis, so its children are a tree and `String(children)` gives
- * `[object Object]`.
- *
- * Derived rather than counted, so a link keeps working when a section moves and
- * breaks when it is renamed, which is the honest pair: a renamed section is a
- * different section, and a link to the old name should fail rather than land on
- * whatever now sits in that position.
- *
- * **Exported, because a second reader of it exists now.** The page outline lists
- * a document's own sections and has to link to them, which means deriving the
- * same anchors from the same headings without a rendered DOM to read them from.
- * Two implementations of this would be two implementations of a link target,
- * and the failure is silent: every entry in the rail scrolls nowhere and the
- * page looks fine.
  */
 export const slugify = (text: string): string =>
   text
@@ -373,18 +318,6 @@ export const PROSE_COMPONENTS = {
 
 /**
  * The same map, with ordered lists set in a rail.
- *
- * An argued document numbers its claims, and a claim is a sentence with prose
- * under it rather than a short row: the numbers want to read as a column down
- * the left with every claim beginning at one measure, which is `marker="rail"`.
- * A numbered list in the component documentation is a list of steps and wants
- * the platform's marker beside the words, so the two cannot share one map.
- *
- * **A spread over `PROSE_COMPONENTS` and never a map of its own.** A second map
- * written from scratch drifts one element at a time, and an element that falls
- * out of it renders as bare markdown HTML rather than as an error. Spreading
- * keeps the property that matters, which is that no surface can render with less
- * than the base map, while letting one element differ deliberately.
  */
 export const DOCUMENT_COMPONENTS = {
   ...PROSE_COMPONENTS,

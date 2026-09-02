@@ -36,30 +36,9 @@ const titleCase = (word: string): string => word.charAt(0).toUpperCase() + word.
 /**
  * The gallery's hero, its filter bar, and the grid under both.
  *
- * **The cards arrive as `children`, already rendered on the server.** They are
- * not built here and could not be: `ComponentArt` is hand-authored SVG drawings
- * across five modules, and rendering them from a client component would send
- * every one of them to the browser to support a text box. What crosses the
- * boundary instead is `index`, which is the handful of fields above.
- *
- * So the filtering cannot remove children it never had. It writes a stylesheet
- * naming the slugs that did not match, which the grid's own `data-slug`
- * attributes answer. That keeps the DOM whole, keeps the art on the server, and
- * means a card coming back is a repaint rather than a remount: nothing reloads
- * and no drawing restarts its motion.
- *
  * Slugs are checked against `[a-z0-9-]` before they reach that stylesheet.
  * Nothing here is reader-supplied today, since they come from the manifest, but
  * a value interpolated into CSS is a value interpolated into CSS.
- *
- * **The rule is scoped by an attribute this component writes, never by a class
- * the page does.** A CSS module identifier is hashed at build
- * (`gallery-module__uieGra__familyGrid`), so a rule naming `.familyGrid` matches
- * nothing, every card stays on screen, and nothing anywhere reports a fault.
- * `data-filtered-grid` sits on the band below, four lines from the rule that
- * reads it, and both are written here: a generated class name cannot be named
- * from a template string, and the way not to want to is to have nothing outside
- * this file to name.
  */
 export function ComponentBrowser({
   children,
@@ -107,19 +86,6 @@ export function ComponentBrowser({
 
   /**
    * Mirrors a filter into the URL without a navigation.
-   *
-   * `history.replaceState` rather than `router.replace`, and the difference is
-   * the whole point: the router would re-run the server component on every
-   * keystroke to produce markup the client is already showing, since searching
-   * and filtering are done in CSS here. This writes the address bar and nothing
-   * else, so the state is shareable, survives a reload and does not cost a
-   * round trip per character.
-   *
-   * `replace` rather than `push`, so typing eight letters does not put eight
-   * entries in the history and make Back mean "delete one character".
-   *
-   * Sort is the exception and goes through the router, because the server is
-   * what reorders the grid.
    */
   const mirror = (key: string, value: string): void => {
     const next = new URLSearchParams(params)
@@ -211,15 +177,14 @@ export function ComponentBrowser({
   return (
     <>
       <PageHero backdrop={<HeroField />} className={styles.designHero}>
-        {/* Eyebrow, title and lede are one block, and the lede belongs inside
+        {/*
+         *  Eyebrow, title and lede are one block, and the lede belongs inside
          * it. At `sm` the block reads 12 / 12 internally against 24 to
          * whatever follows: a clean two to one. Left as a sibling of the
          * block it takes the outer `lg`, so a line describing the heading
          * immediately above it is spaced as the next unrelated thing on the
          * page.
-         *
-         * The tag is over the name rather than beside it. Alongside, it reads
-         * as part of the title and pushes it off center. */}
+         */}
         <helix-flex align="center" data-density="sm" direction="column" gap="sm">
           {/* Two marks, not one. The stage is the one label on this page that
                 has to stay legible: `Building` means real work with nothing
@@ -261,20 +226,17 @@ export function ComponentBrowser({
           <helix-icon name="magnifying-glass" slot="start"></helix-icon>
         </helix-input>
         <helix-flex align="center" className="pageHeroActions" direction="column" gap="lg">
-          {/* One control, not two buttons next to each other. The group
-                flattens the inner corners and pulls the pair together by the
-                border width, so they read as a single thing with two halves.
-                That is also why neither is `primary`: a group welds its members
-                into one shape, and one filled half beside one outlined half
-                reads as a control that is half broken rather than as a choice.
-                `data-button-width="standard"` keeps both at
-                `--helix-size-button`, so the halves are equal rather than sized
-                by how long their words happen to be.
-
-                One word each, and a noun rather than a verb. These are links,
-                and links get read out of context: a reader listing the page's
-                links hears the label alone, with no hero around it to say what
-                `Explore` would have meant. */}
+          {/*
+           *  One control, not two buttons next to each other. The group
+           *                 flattens the inner corners and pulls the pair together by the
+           *                 border width, so they read as a single thing with two halves.
+           *                 That is also why neither is `primary`: a group welds its members
+           *                 into one shape, and one filled half beside one outlined half
+           *                 reads as a control that is half broken rather than as a choice.
+           *                 `data-button-width="standard"` keeps both at
+           *                 `--helix-size-button`, so the halves are equal rather than sized
+           *                 by how long their words happen to be.
+           */}
           <helix-button-group>
             {/* An icon each, and neither of them an arrow. An arrow says
                   "onward" and nothing else, which is what the button's own

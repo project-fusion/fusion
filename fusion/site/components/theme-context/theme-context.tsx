@@ -92,17 +92,6 @@ const derive = (
 ): Derived => {
   /**
    * **Every field the builder passes, not the six this control moves.**
-   *
-   * `intentFrom` in the theme tool hands the engine twelve fields. Passing only
-   * six and letting the engine default the rest is not the same thing: the
-   * shipped stylesheet was derived against a specific `contrastTarget` and
-   * `status` allowance, so omitting them re-derives the palette against the
-   * engine's own defaults. A draft sitting at the default brand then produces a
-   * primary that does not match the live page's, and the logo and the aura,
-   * which both read that token, change color for no reason a reader can see.
-   *
-   * The six the pill moves come from state. The rest are pinned to `INITIAL`,
-   * which is what the builder opens on and what the stylesheet ships.
    */
   const theme = engine.derive({
     accent: { from: 'brand', rotate: settings.accentHue },
@@ -129,12 +118,6 @@ const derive = (
 
   /**
    * **The tracks are painted with the palette they control.**
-   *
-   * Lifted from the theme builder, which computes the same two: a saturation
-   * ramp from gray to the brand's own chroma at its own lightness and hue, and a
-   * hue wheel stepped every thirty degrees from it. A slider whose track shows
-   * the range it moves through needs no label to say what it does, which is most
-   * of what a nameless control in a dock is missing.
    */
   const primary = theme.tokens.find((t) => t.name === 'color-primary')?.value
   const ramps = primary
@@ -163,15 +146,6 @@ const derive = (
 
 /**
  * What the site is currently showing.
- *
- * Two signals, because the preference has three states: the drawer writes
- * `data-color-mode` for an explicit choice and deletes it for "system", so the
- * media query alone answers only the third. Lifted from `showcase.tsx`, which
- * already had to solve this.
- *
- * Not called during render: the server render and the first client render both
- * take `INITIAL.scheme`, and the correction happens in the effects below rather
- * than as a hydration mismatch.
  */
 const readSiteScheme = (): 'dark' | 'light' => {
   if (typeof document === 'undefined') {
@@ -186,12 +160,6 @@ const readSiteScheme = (): 'dark' | 'light' => {
 
 /**
  * Writes an already-derived theme onto the scope.
- *
- * **Separate from deriving it.** Deriving is unconditional and painting is
- * gated on `touched`, so the controls can describe a palette the page has not
- * adopted. Gating both would leave the sliders blank until the first
- * interaction, since their track gradients are built from the derived primary.
- * Still one derivation per change.
  */
 const applyScope = (
   node: HTMLElement,
@@ -217,27 +185,6 @@ const applyScope = (
 
 /**
  * Pushes the same palette onto the document root.
- *
- * **Two things on this page read tokens from somewhere this scope cannot
- * reach.** The aura resolves `--helix-color-primary` and three siblings through
- * a controller that watches `document.documentElement` for `data-color-mode`
- * and nothing else, so it never noticed a wrapper div's inline landing. The
- * wordmark already maps its three gradient stops onto the same primary, and it
- * lives in the site header, above `main` and outside any scope a page can set.
- *
- * So the root gets the palette too. Touching `data-color-mode` is what makes the
- * aura re-read: `setAttribute` queues a mutation record even when the value is
- * unchanged, which is the signal its controller is already listening for.
- *
- * **Cleaned up on unmount, unless the reader kept it.** A palette nobody saved
- * dies with the page that made it, or navigating away from a draft would leave
- * the rest of the site wearing whatever color was last picked. A saved one is
- * the reader's, and `clearRoot` below says so.
- *
- * `OWNED` and the clearing itself are in `utils/site-theme`, because the
- * preferences drawer resets the theme and has to take off exactly what this put
- * on. Two copies of "which properties are ours" is how a reset comes to leave
- * half a palette behind.
  */
 const paintRoot = (
   theme: { seeds: Record<string, string>; tokens: readonly { hex: string; name: string }[] },
@@ -280,9 +227,6 @@ const clearRoot = (): void => {
  * three drive one derivation over one scope. Holding the state in each chrome
  * would mean a reader who set a color on A and clicked to C re-picked it on
  * arrival, which is the one thing that makes the comparison worthless.
- *
- * A layout is not remounted on a route change within it, so the provider living
- * here is what carries a reader's color across the three.
  */
 export const ThemeScope = ({ children }: { children: ReactNode }) => {
   const scope = useRef<HTMLDivElement | null>(null)
@@ -330,39 +274,11 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
 
   /**
    * **Nothing is painted until a reader moves something.**
-   *
-   * The engine and the shipped stylesheet compute the same palette two different
-   * ways: the stylesheet steps a ramp with fixed relative-color offsets, the
-   * engine runs a contrast search. They agree on direction and not on the exact
-   * numbers, so painting on arrival opens this page in a palette measurably
-   * unlike every other page on the site, and its aura, which reads four of those
-   * tokens, is visibly a different blue from the one on `/`.
-   *
-   * At rest the page is exactly what the stylesheet ships. The first time
-   * somebody touches a control it paints and keeps painting. That also removes
-   * the flash: there is no first paint in one palette followed by a swap into
-   * another.
    */
   const [touched, setTouched] = useState(false)
 
   /**
    * **A theme the reader kept comes back, and comes back already painted.**
-   *
-   * Read after mount rather than during render, for the reason every other
-   * preference here is: the server has no `localStorage`, and seeding state
-   * from it would make the first client render disagree with the HTML.
-   *
-   * The page itself is not repainted from here. The pre-paint script in the
-   * root layout has already put this exact palette on the root, before the
-   * first frame, which is the whole reason the derived hexes are what gets
-   * stored. What this does is put the *controls* back where the reader left
-   * them, so the panel opens showing the theme that is on the screen rather
-   * than the shipped defaults.
-   *
-   * `touched` goes true with them. It is the flag that says a reader has taken
-   * over the palette, and somebody who saved one has; left false, the first
-   * nudge of a slider would derive from the defaults and the page would jump
-   * away from the theme it had been wearing.
    */
   useEffect(() => {
     const stored = readSiteTheme()
@@ -383,16 +299,6 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
 
   /**
    * Two sources, and only one of them stops being listened to.
-   *
-   * The system query is what `chosen` gates, because a system preference is an
-   * ambient default and a latched choice outranks it. `data-color-mode` is
-   * somebody pressing a control, in the masthead's preferences panel, which
-   * outranks everything here, so it is followed for as long as this scope
-   * exists.
-   *
-   * **Do not gate the observer on `chosen` too.** It latches when somebody picks
-   * a scheme in this bar, so picking the other one in preferences afterwards
-   * would never reach this control: one deliberate choice silencing another.
    */
   useEffect(() => {
     const follow = () => setScheme(readSiteScheme())
@@ -448,12 +354,6 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
 
   /**
    * Somebody pressed reset in the preferences drawer.
-   *
-   * The storage and the root are already clear by the time this runs; what is
-   * left is this component still holding the reader's numbers and still
-   * believing it is in charge. Both go back, and `touched` going false is the
-   * important one: it is what returns the page to exactly what the stylesheet
-   * ships, which is what a reset means here.
    */
   useEffect(() => {
     const forget = () => {

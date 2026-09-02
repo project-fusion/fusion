@@ -1,21 +1,5 @@
 /**
  * The theme a reader derived for themselves, kept across pages and reloads.
- *
- * **A plain module, for the reason `color-mode.ts` is one.** The root layout
- * interpolates the key below into a pre-paint script, and a server component
- * that imports a value from a `'use client'` module gets a client reference
- * rather than the value: the constant arrives as `undefined` and the script
- * ships `localStorage.getItem(undefined)`, silently, otherwise intact. Nothing
- * here is a component and nothing here is client-only.
- *
- * **What is stored is the answer, not the question.** The settings are kept so
- * the panel can open showing what is applied, but the palette is kept as the
- * derived hexes, because the thing that has to run before first paint cannot
- * derive anything: the engine is wasm, loading it is asynchronous, and a page
- * that waited for it would paint the shipped palette first and swap. Storing
- * what the engine already produced turns restoring a theme into writing a list
- * of custom properties, which a synchronous script can do before the first
- * frame.
  */
 
 /** Where the reader's derived theme is kept. */
@@ -49,13 +33,6 @@ export interface StoredTheme {
   tokens: readonly { hex: string; name: string }[]
   /**
    * What shape the record is in.
-   *
-   * A stored palette is a snapshot of what one version of the engine produced,
-   * and the roles it names are not promised to be stable. A reader carrying a
-   * palette from before a role was renamed would restore a page with a gap in
-   * it, and the gap would be invisible to them and unreportable to us. So the
-   * number is checked on the way in and anything else is dropped, which costs
-   * that reader their theme once and never leaves them on a broken page.
    */
   version: 1
 }
@@ -102,13 +79,6 @@ export const writeSiteTheme = (theme: Omit<StoredTheme, 'version'>): void => {
 /**
  * Takes the theme off the root element.
  *
- * Removes what the prefix owns and the flag, and nothing else.
- *
- * **`data-color-mode` is not ours to remove.** `paintRoot` writes it as a
- * nudge, to make the token controller notice a palette it has already been
- * handed, but the attribute itself belongs to the reader: `preferences.tsx`
- * persists it and the pre-paint script restores it before the first frame.
- *
  * Deleting it on teardown throws that away, and it showed as a hard flash of
  * light-mode blue on every reload. The mechanism is worth keeping written down,
  * because it is not obvious: the caller registers this as an effect cleanup,
@@ -139,10 +109,6 @@ export const clearSiteThemeFrom = (node: HTMLElement): void => {
  * page wearing the palette regardless: measured after a reset, the root held no
  * `--helix-*` at all and the scope still held 41, so the hero stayed in the
  * reader's color while every control said it had gone.
- *
- * One function over a node rather than a second one written for the scope,
- * because `OWNED` above is the answer to "which properties are ours" and this
- * module holds it precisely so that a second copy cannot drift from it.
  */
 export const clearSiteThemeFromRoot = (): void => {
   const root = document.documentElement
@@ -164,13 +130,6 @@ export const clearSiteThemeFromRoot = (): void => {
 
 /**
  * Announced, because the page that made the theme may still be open.
- *
- * The reset lives in the preferences drawer and the controls live in
- * `ThemeScope`, and on the two pages that carry a scope both are on screen at
- * once. Clearing storage and the root alone would leave those controls still
- * holding the reader's numbers and still believing they are in charge, so the
- * next nudge of any slider would repaint the palette that was just reset —
- * a reset that undoes itself on the next interaction.
  *
  * An event rather than shared state: the drawer is in the site chrome and the
  * scope is inside a page, neither contains the other, and a context spanning

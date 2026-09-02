@@ -13,23 +13,6 @@ import styles from '../insights.module.css'
 /**
  * A line under the masthead that fills as the article is read.
  *
- * **Not the chip, and that is the whole design note.** The obvious home for
- * this is the `n min read` tag, which already states the duration and would
- * state the remainder for free. It cannot: that tag is in the masthead, and the
- * masthead has scrolled away by the second paragraph. A progress indicator that
- * is only legible before you start reading and after you finish is an ornament
- * with a number attached.
- *
- * So it goes where it can be seen the whole time, which is the one strip of the
- * page that never moves. `AppHeader` is `position: sticky` at
- * `--helix-layer-sticky`, and this sits at the same rung, pinned to the header's
- * own height, so it rides the bottom edge of the bar rather than floating under
- * it.
- *
- * **It measures the document, never the article.** Scoping it to the body is the
- * better-sounding idea, since the masthead and "keep reading" are not the
- * argument, and both ways of doing that measure wrong on a real post.
- *
  * `height - innerHeight`, the version everybody writes, is how far the body's
  * box travels: on a 962 body in a 900 window that is 62 pixels of travel, so
  * the bar went 0 to 1 inside one flick of a wheel and was a switch rather than
@@ -44,10 +27,6 @@ import styles from '../insights.module.css'
  * have that distance, always, and it is the same distance the scrollbar is
  * already reporting. The chrome it includes is a masthead and three rows,
  * which is a smaller error than either of the ones it replaces.
- *
- * `scale` on a full-width bar rather than an animated `inline-size`, so the
- * fill is a compositor transform and a scroll handler never triggers layout.
- * `passive` for the same reason.
  */
 export function ReadingProgress() {
   const [progress, setProgress] = useState(0)
@@ -91,15 +70,6 @@ export function ReadingProgress() {
 
 /**
  * The publication date, with how long ago that was on hover.
- *
- * **Client rendered because the answer changes while the file does not.** These
- * pages are static, so a relative phrase computed at build time is a lie that
- * gets worse every day it is cached: a post built as "two days ago" still says
- * so a year later. The absolute date is what renders, which is what a static
- * page can honestly claim, and the relative one arrives when there is a clock.
- *
- * `Intl.RelativeTimeFormat` rather than arithmetic on strings, so the phrasing
- * is the reader's locale's rather than English pretending to be universal.
  */
 export function PublishedOn({ children, date }: { children: string; date: string }) {
   const [ago, setAgo] = useState<string>()

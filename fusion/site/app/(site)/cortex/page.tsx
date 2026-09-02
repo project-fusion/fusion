@@ -9,16 +9,6 @@ const product = PRODUCTS.find((entry) => entry.href === '/cortex')
 
 /**
  * Cortex, which is what this route is now named for.
- *
- * The title is the product and the vertical is the eyebrow, matching `/helix`.
- * Both registries are read rather than either being restated here, so the page,
- * the megamenu and the landing page cannot disagree about what Cortex is.
- *
- * **The three modules are described here and named in no nav row**, which is the
- * reason they have a home at all: a row asserts a destination, and Recall is
- * Declared. Each carries its own stage, so the
- * difference between two that are being built and one that is not is visible
- * rather than flattened into the product's single label.
  */
 export const metadata = pageMetadata({
   description: product?.body ?? vertical?.summary ?? '',

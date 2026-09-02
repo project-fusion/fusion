@@ -5,17 +5,6 @@ import styles from './proof-band.module.css'
 
 /**
  * The numbers, on the front of the site.
- *
- * **A server component with no client boundary.** Nothing here changes after
- * the page lands, and the chart reads the DOM rather than a prop, so the whole
- * band is markup.
- *
- * **The comparison is a real table and the chart is drawn from it.** `for`
- * points `helix-bar-chart` at a `<table>` that is hidden visually and present to
- * everything else: a screen reader gets rows and headers, a page with the
- * script blocked gets the figures, and the drawing is an enhancement over data
- * that was already correct. A chart taking an array prop would have made the
- * numbers unreadable to half of that list.
  */
 export const ProofBand = () => (
   <Band>

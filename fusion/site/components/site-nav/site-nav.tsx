@@ -14,19 +14,6 @@ import styles from './site-nav.module.css'
 
 /**
  * The other two sections of the site, beside the Products panel.
- *
- * **Products, not the verticals.** A vertical is how the company is organized
- * and a product is what a reader uses: nobody uses Fusion Design, they use
- * Helix. A menu labeled Products that listed divisions would promise one thing
- * and hand over another, and `AGENTS.md` already draws that line by giving
- * verticals descriptive names and products evocative ones.
- *
- * The verticals are still one click away, in the panel's third column, so a
- * reader who wants the shape of the company can have it without the Products
- * menu being the thing that hands it over.
- *
- * Ordered by what a reader is here to do rather than alphabetically: see what
- * we build, find out what is buyable, read the argument.
  */
 const SECTIONS = [
   { href: '/company/services', label: 'Services' },
@@ -35,12 +22,6 @@ const SECTIONS = [
 
 /**
  * The top level, with every destination in it exactly once.
- *
- * A vertical is the company's map rather than a place to go, so it is not a row
- * here: listing both taxonomies puts `/helix` in the menu as Helix and as
- * Fusion Design with nothing telling a reader they are one page. `VerticalPage`
- * draws the same line, titling a page with the product and demoting the
- * vertical to an eyebrow over it.
  */
 export const DESTINATIONS = [
   ...PRODUCTS.map((product) => ({ href: product.href, label: product.name })),
@@ -49,16 +30,6 @@ export const DESTINATIONS = [
 
 /**
  * The site's destinations in a drawer, wherever a header has no room for them.
- *
- * Three headers use this and they arrive at it differently. The site's shows it
- * on a narrow viewport, where the bar cannot hold four words beside a search
- * field. The sandbox and the theme builder show it at every width, because a
- * tool's header is already full of the tool: what belongs in those is a way out,
- * and a way out is one button rather than a row of them.
- *
- * The state is the caller's. A drawer that owned its own would need the button
- * that opens it to reach inside, and every one of these has its button
- * somewhere different.
  */
 export function SiteMenu({
   onOpenChange,
@@ -98,17 +69,12 @@ export function SiteMenu({
       placement={placement}
     >
       <div className={styles.navMenu}>
-        {/* A tree, because the depth is real. A flat list of four destinations
-            leaves everything a reader actually goes to inside Helix, the docs,
-            the component reference, the sandbox, the theme builder, reachable
-            only by landing on `/helix` first and looking for it.
-
-            `helix-tree-item` with an `href` rather than a tree of buttons that
-            navigate. The component's own docstring is explicit that this is the
-            navigation flavor of the pattern: given an `href` the row is an
-            `<a>`, so a middle click opens a tab and the platform provides
-            everything a link provides. A tree of handlers would have taken all
-            of that away to look the same. */}
+        {/*
+         *  A tree, because the depth is real. A flat list of four destinations
+         *             leaves everything a reader actually goes to inside Helix, the docs,
+         *             the component reference, the sandbox, the theme builder, reachable
+         *             only by landing on `/helix` first and looking for it.
+         */}
         <helix-tree active={pathname} label="Site navigation">
           {PRODUCTS.map((product) => (
             <helix-tree-item
@@ -122,19 +88,10 @@ export function SiteMenu({
               key={product.href}
             >
               {product.name}
-              {/* The product's own page as a row of its own, because the row
-                  above it is not a link.
-
-                  `helix-tree-item` does support both at once and says so: a
-                  branch that is also a link goes where it points and its chevron
-                  is what opens it. Two targets in one row is still two targets,
-                  and on a touch screen the chevron is the smaller of them by
-                  some margin. A parent that only discloses has one meaning
-                  everywhere in the row, and the page it would have linked to is
-                  the first thing inside it.
-
-                  Only where nothing else already points there. Cortex's `Docs`
-                  is `/cortex`, so Cortex needs no second row saying the same. */}
+              {/*
+               *  The product's own page as a row of its own, because the row
+               *                   above it is not a link.
+               */}
               {!product.destinations.some((destination) => destination.href === product.href) && (
                 <helix-tree-item href={product.href} slot="children" value={product.href}>
                   Overview
@@ -186,17 +143,14 @@ export function SiteMenu({
           Get in touch
         </a>
 
-        {/* **What the bar drops on a narrow screen, picked up here.**
-            The masthead had a wordmark, a repository mark, a preferences button
-            and a Menu on a 390px line, which is four targets and a logo in 342
-            usable pixels. The two that are not navigation move into the panel
-            the Menu already opens, so the bar carries the wordmark and one way
-            in.
-
-            Rows rather than the icon buttons they were. In a bar an icon with a
-            tooltip is the whole control; in a panel every other line is a named
-            row, and a lone glyph beside them reads as a thing that did not
-            finish loading. The icon stays as the row's leading mark. */}
+        {/*
+         * *What the bar drops on a narrow screen, picked up here.**
+         *             The masthead had a wordmark, a repository mark, a preferences button
+         *             and a Menu on a 390px line, which is four targets and a logo in 342
+         *             usable pixels. The two that are not navigation move into the panel
+         *             the Menu already opens, so the bar carries the wordmark and one way
+         *             in.
+         */}
         {onPreferences && (
           <helix-flex class={styles.navExtras} direction="column" gap="2xs">
             <button className={styles.navExtra} onClick={onPreferences} type="button">
@@ -221,27 +175,6 @@ export function SiteMenu({
 
 /**
  * Site navigation: the sections, centered in the masthead.
- *
- * Plain links inside a `Navigation`, marked with `aria-current` and styled by
- * the `data-navigation-item` recipe. Not tabs, because a tab controls a panel
- * and announces itself inside a `tablist`, and these are routes. Not a toggle
- * group either, which is a radio group and would announce a set of destinations
- * as a set of choices. The look was the only part navigation ever wanted from
- * either.
- *
- * The header's regions are named for where they are rather than what is in
- * them, so the wordmark is `start` and the actions are `end`. The `<nav>`
- * landmark and the traveling marker belong to `Navigation`.
- *
- * The current item comes from the pathname, so it is right on a cold load of
- * any URL rather than only after a click.
- *
- * **The header and the drawers are siblings, and have to be.** A filter, which
- * `backdrop-filter` is, makes an element a containing block for
- * `position: fixed` descendants: a drawer rendered inside the header is
- * positioned against the header, comes out one header tall, and shoves the
- * layout around. That is also why this component owns the header rather than
- * being slotted into one, and why the header is flat by default.
  */
 export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const pathname = usePathname()
@@ -388,37 +321,19 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
             suppressHydrationWarning
             variant="full"
           >
-            {/* The trigger is slotted, and it has to be.
-               
-                  `label` names the button the component renders in its own
-                  shadow root, and this repo ships no declarative shadow DOM, so
-                  that button does not exist until the bundle loads and the
-                  element upgrades. Measured on `/helix`: the word `Products`
-                  appeared in the served HTML only as an attribute, so the
-                  masthead's first item was an empty box until hydration, and
-                  because `aria-current` put the navigation's marker on that box
-                  it drew a filled pill around nothing. With JavaScript off it
-                  never arrived at all.
-               
-                  Slotted content is light DOM, so it ships with the page like
-                  every other item in the bar. The component still owns the
-                  disclosure: it carries `aria-expanded` and `aria-controls`
-                  onto whatever is slotted here.
-               
-                  `aria-current` moves here with it, which is where it always
-                  belonged. On the host it was read by `Navigation` to place the
-                  marker and by nothing else, because a host with no role is not
-                  something a screen reader announces a current state for. On the
-                  button it does both.
-               
-                  `suppressHydrationWarning` here as well as on the host, because
-                  the flag is per element and does not reach a child: the
-                  megamenu writes `aria-expanded` and `aria-controls` onto this
-                  button as soon as it upgrades, which is before React hydrates
-                  the subtree, so React finds two attributes its own render never
-                  produced. The disclosure state is the component's to own and
-                  cannot be server-rendered, which is the case this flag is
-                  for. */}
+            {/*
+             *  The trigger is slotted, and it has to be.
+             *
+             *                   `label` names the button the component renders in its own
+             *                   shadow root, and this repo ships no declarative shadow DOM, so
+             *                   that button does not exist until the bundle loads and the
+             *                   element upgrades. Measured on `/helix`: the word `Products`
+             *                   appeared in the served HTML only as an attribute, so the
+             *                   masthead's first item was an empty box until hydration, and
+             *                   because `aria-current` put the navigation's marker on that box
+             *                   it drew a filled pill around nothing. With JavaScript off it
+             *                   never arrived at all.
+             */}
             <button
               aria-current={onProducts ? 'page' : undefined}
               data-navigation-item
@@ -463,16 +378,12 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                       href={destination.href}
                       key={destination.href}
                     >
-                      {/* Two rows, and the second is held to one line. A
-                          summary that wraps turns a row of names into a
-                          paragraph to read before choosing, so a narrow panel
-                          truncates rather than reflows.
-
-                          No mark down the side: one is on the column's heading,
-                          and a glyph on every row under it reads as a set of
-                          icons rather than a set of places to go. The row grid
-                          leaves that column at `auto`, so these start where the
-                          heading does. */}
+                      {/*
+                       *  Two rows, and the second is held to one line. A
+                       *                           summary that wraps turns a row of names into a
+                       *                           paragraph to read before choosing, so a narrow panel
+                       *                           truncates rather than reflows.
+                       */}
                       <strong>{destination.title}</strong>
                       <span>{destination.summary}</span>
                     </Link>

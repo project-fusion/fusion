@@ -60,18 +60,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   return (
     <>
       <main className={docsShell.docsMain}>
-        {/* The section, and then the document.
-          
-          **The page does not render the title, because the document already
-          does.** Every one of these files opens with its own `# Heading`, which
-          is what a reader of `/helix/docs/tokens.md` gets, and stripping it
-          here would make the page and the document disagree about where the
-          page begins. Rendering both put the same words on screen twice and put
-          two `h1` elements on the page, which is worse than untidy.
-          
-          `description` is not shown either. It is a one-line summary for the
-          sidebar, the metadata and `llms.txt`, and every page's own first
-          paragraph is the sentence a reader wants under the title. */}
+        {/*
+         *  The section, and then the document.
+         */}
         <helix-text tone="subtle" variant="label">
           {sectionOf(slug)}
         </helix-text>

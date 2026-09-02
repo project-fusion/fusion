@@ -47,10 +47,6 @@ const SORTS: Record<string, (a: Family, b: Family) => number> = {
  * order of the accessibility tree would still follow the DOM, so a reader
  * tabbing through a grid sorted Z to A would visit it A to Z. That is a
  * 2.4.3 failure introduced for a convenience.
- *
- * Reordering on the server sidesteps it entirely: the markup arrives in the
- * order it is shown. It costs a navigation per sort, which is an RSC round trip
- * and is what makes the choice shareable in a link as well.
  */
 export default async function Page({
   searchParams,

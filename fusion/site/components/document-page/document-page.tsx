@@ -5,20 +5,6 @@ import styles from './document-page.module.css'
 
 /**
  * One argued document, laid out the way this site lays out an argument.
- *
- * **Insights, Trust and Thesis are the same kind of page.** Each is a single
- * sustained argument rather than a marketing surface, so a layout apiece means
- * the measure, the heading scale and the block rhythm differing between three
- * pages a reader reads identically.
- *
- * **What it costs is that the three stop being able to diverge**, which is a
- * real loss only if one of them grows something the others cannot hold. None
- * has yet, and the escape is ordinary: `meta` and `footer` are where a page puts
- * what is only true of it, which is how the insight page keeps its byline and
- * its Keep reading list without either of those reaching Trust.
- *
- * `data-prose` on the body rather than on the shell, because the base layer
- * themes prose with it and the head is components rather than prose.
  */
 export function DocumentPage({
   body,
@@ -38,45 +24,17 @@ export function DocumentPage({
   footer?: ReactNode
   /**
    * The head centered over the body rather than aligned to its left edge.
-   *
-   * **The default is left, and has to be**: a title over a paragraph starts
-   * where the paragraph starts, or the page has two left edges. That holds for
-   * every document whose head is a title and a standfirst and nothing else.
-   *
-   * It stops holding when the head carries a mark of its own. A centered tag over
-   * a centered title is a masthead, and a masthead is what a page announcing
-   * something wants: the reader is being told what this is before they are told
-   * anything else, and a chip pinned to the left margin reads as filing rather
-   * than as a banner.
    */
   centered?: boolean
   /**
    * The head on a lit band rather than on the page, for a document that is read
    * as a piece rather than consulted as a reference.
-   *
-   * **Opt-in, because this shell serves six pages and only some of them are
-   * that.** An insight and the thesis are arguments somebody chose to read, and
-   * a hero is the cover of the piece. Terms of use, the privacy notice and the
-   * acceptable use policy are documents a reader arrives at with a question, and
-   * a full-bleed aura over a legal notice reads as marketing wrapped around a
-   * contract. So the band is a prop the two pass and the other four do not,
-   * rather than a change to the shell.
-   *
-   * The body below is the same in both: same measure, same rhythm, same prose
-   * treatment. What changes is the head.
    */
   hero?: boolean
   /** The small line above the title, where the page has one. */
   kicker?: string
   /**
    * The document's own sections, shown between the head and the body.
-   *
-   * **Inline rather than a rail, because this page is a column.** The docs and
-   * the reference put their outline in a third grid track beside the prose;
-   * this shell is capped at a reading measure and centered, so there is nothing
-   * either side of it to put a rail in without dismantling the one thing the
-   * layout is for. A contents block under the title is how a policy presents
-   * the same list anyway.
    */
   outline?: readonly OutlineEntry[]
   /** The paragraph under the title, where the page shows one before its body. */

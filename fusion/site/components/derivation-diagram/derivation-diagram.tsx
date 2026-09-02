@@ -4,18 +4,6 @@ import styles from './derivation-diagram.module.css'
 /**
  * The derivation, drawn as a routing diagram.
  *
- * **A drawing rather than a chart, and every piece here is what makes that
- * distinction.** A dashed frame with corner ticks says the figure is a detail
- * cropped from a larger sheet. A starfield puts it in space rather than on
- * paper. Dashed dividers on the two columns the routing uses say the layout was
- * planned. None of it is decoration for its own sake: taken away, the diagram
- * reads as a flowchart, which is a weaker and more common thing.
- *
- * **Two layers over one geometry.** The base is quiet and permanent, the pulse
- * moves over it. A single bright layer drawing itself in on a `view()` timeline
- * and looping makes the figure dismantle and rebuild itself every few seconds
- * while somebody is reading it.
- *
  * **The pulses never seam, because every path carries its own length.** A dash
  * of `[16, len - 16]` is exactly one lit segment, and winding the offset by
  * `len` over the cycle returns the pattern to its start, so the loop closes at
@@ -164,21 +152,17 @@ export const DerivationDiagram = () => (
         x="44"
         y="84"
       />
-      {/* **The registration marks, as one rounded rect seen through its own
-          corners.**
-
-          Four `path` elements with a square turn in each is the obvious version
-          and cannot be themed: path data is a string and CSS cannot reach
-          inside it. Every card on the page answers to the radius slider, so
-          that version leaves the drawing frame at right angles around content
-          that has gone soft.
-
-          A `rect` can be themed, because `rx` is an SVG 2 geometry property as
-          well as an attribute and CSS may set it. Drawing the whole rectangle
-          and masking it back to four 24-unit squares gives the same four marks
-          with whatever corner the theme is using: the mask shows the turn and
-          the first dozen units of each arm, and hides the long sides that the
-          dashed frame underneath is already drawing. */}
+      {/*
+       * *The registration marks, as one rounded rect seen through its own
+       *           corners.**
+       *
+       *           A `rect` can be themed, because `rx` is an SVG 2 geometry property as
+       *           well as an attribute and CSS may set it. Drawing the whole rectangle
+       *           and masking it back to four 24-unit squares gives the same four marks
+       *           with whatever corner the theme is using: the mask shows the turn and
+       *           the first dozen units of each arm, and hides the long sides that the
+       *           dashed frame underneath is already drawing.
+       */}
       <rect
         className={styles.diagramCorners}
         fill="none"
@@ -401,17 +385,14 @@ export const DerivationDiagram = () => (
         strokeDasharray="1.5 9"
         strokeWidth="1.1"
       />
-      {/* **Real glass, which needs a `foreignObject` to exist at all.**
-          `backdrop-filter` on an SVG shape does nothing: tested against sharp
-          stripes, a `<circle>` carrying it left them sharp and only an HTML
-          element inside a `foreignObject` blurred them. Without one the disc can
-          only be a flat fill of the page background pretending to be a surface,
-          while every card around it blurs what it sits on.
-
-          Blurred harder than the cards, because this one is the subject rather
-          than a container: the field and the aura behind it go soft enough that
-          the reading in front reads as instrumentation rather than as type on a
-          busy ground. */}
+      {/*
+       * *Real glass, which needs a `foreignObject` to exist at all.**
+       *           `backdrop-filter` on an SVG shape does nothing: tested against sharp
+       *           stripes, a `<circle>` carrying it left them sharp and only an HTML
+       *           element inside a `foreignObject` blurred them. Without one the disc can
+       *           only be a flat fill of the page background pretending to be a surface,
+       *           while every card around it blurs what it sits on.
+       */}
       <foreignObject height="224" width="224" x="488" y="128">
         <div className={styles.diagramGlass} />
       </foreignObject>
@@ -424,17 +405,13 @@ export const DerivationDiagram = () => (
         strokeOpacity="0.18"
         strokeWidth="1"
       />
-      {/* The hub as an instrument: what was measured, on the scale it is judged
-          by, and the reading.
-
-          **Type on a ground, not a drawing of the search.** Rendering the
-          bisection gives a stack of shrinking brackets whose meaning lives in a
-          comment, and a picture that needs a paragraph is not a picture. What
-          the number is about is type on a ground, the form every contrast
-          checker already uses.
-
-          The gauge answers the question the ratio raises: 4.9 means nothing
-          until you can see that 4.5 is the line a build passes or fails on. */}
+      {/*
+       *  The hub as an instrument: what was measured, on the scale it is judged
+       *           by, and the reading.
+       *
+       *           The gauge answers the question the ratio raises: 4.9 means nothing
+       *           until you can see that 4.5 is the line a build passes or fails on.
+       */}
       <g fill="none" strokeLinecap="round">
         <path
           className={styles.diagramGaugeTrack}
@@ -537,21 +514,6 @@ export const DerivationDiagram = () => (
  * at 342px the type comes out near four pixels. Letting it scroll instead is
  * honest and still means dragging a box twice the width of the screen to read
  * the page's central explanation.
- *
- * So the flow runs top to bottom here: four inputs across, converging to the
- * hub, fanning out to three outputs across. Same three beats, same tokens, same
- * words. Only the axis changed.
- *
- * **Leaner on purpose.** The starfield, the corner registration marks and the
- * traveling pulses are all in the wide one and none of them are here. They are
- * atmosphere for a figure with room to breathe, and this is a phone: what
- * survives is the part that carries the argument.
- *
- * Both are in the DOM and CSS shows one, because the choice is a width and a
- * width is the stylesheet's to know. Picking in JavaScript would mean measuring
- * on the client and rendering neither on the server. `aria-hidden` on this one,
- * so the pair reads once: the wide figure carries the `title` and `desc` for
- * both.
  */
 export const DerivationDiagramStacked = () => (
   <div className={styles.diagramStacked}>

@@ -102,14 +102,6 @@ const RESTING: Record<Knob, number> = {
  * The bench, driving the published `helix-aura` rather than a second copy of
  * it, so the knobs are the component's own properties: tuning happens against
  * the published surface, and anything awkward here is awkward for everyone.
- *
- * The new value is read off the element. A control applies before it announces,
- * so `event.currentTarget` already holds the applied value at dispatch, and a
- * declared `value` or `checked` is a seed and a correction rather than a claim
- * of ownership.
- *
- * Slider sends `input` alone rather than `input` and `change` together, being
- * one of the five continuous controls, so the field moves under the thumb.
  */
 export function AuraLab(): React.ReactElement {
   const [shape, setShape] = useState(0)

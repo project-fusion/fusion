@@ -11,28 +11,6 @@ import styles from './theme-fab.module.css'
 
 /**
  * A pill that says "Make it yours", and becomes the toolbar that does it.
- *
- * **The label is an invitation rather than an instruction.** Naming the feature
- * ("Theme this page") is correct and reads like a settings row. What the control
- * offers is the hero's own promise, one color in and the whole page follows, so
- * it borrows the hero's last three words. Three words is also the most a pill
- * can hold before it stops being a dot with a label and starts being a button.
- *
- * **One element that changes size, not two that swap.** Both faces live in the
- * same grid cell and cross-fade while the container's width animates, so the
- * pill grows into the bar rather than being replaced by it. Swapping one node
- * for another would give a pop, and the point of the gesture is that the control
- * was always the same object.
- *
- * **Collapsed by default, and that is the argument.** A landing page's first
- * screen should be the page. A bar of five sliders across the bottom on arrival
- * says the demo is the product; a single pill says there is something here if
- * you want it, and gets out of the way if you do not.
- *
- * **Width is animatable and `auto` is not**, so both states carry an explicit
- * one. That is the cost of the effect: the open width is a number in the
- * stylesheet rather than the sum of what is inside it, and adding a sixth
- * control means changing it.
  */
 export const ThemeFab = () => {
   const c = useThemeControls()
@@ -178,17 +156,14 @@ export const ThemeFab = () => {
               </helix-tooltip>
             </div>
 
-            {/* **One button showing where it goes, not two showing where you
-                are.** A two-option toggle group spends the width of both words
-                on a choice with two states, in a bar that also has to hold
-                three sliders and a picker. The icon is the mode it switches to
-                and the tooltip says so, which is the pair that leaves no doubt
-                about which way the control reads.
-
-                **It writes the site preference, not just the scope.** Painting
-                the scope and the attribute without persisting leaves the
-                masthead's preferences panel showing the old answer and a reload
-                taking the page back to it. Both go through `STORAGE_KEY`. */}
+            {/*
+             * *One button showing where it goes, not two showing where you
+             *                 are.** A two-option toggle group spends the width of both words
+             *                 on a choice with two states, in a bar that also has to hold
+             *                 three sliders and a picker. The icon is the mode it switches to
+             *                 and the tooltip says so, which is the pair that leaves no doubt
+             *                 about which way the control reads.
+             */}
             <div className={styles.fabRow}>
               <span className={styles.fabRowLabel}>Color scheme</span>
               <helix-tooltip
@@ -210,22 +185,13 @@ export const ThemeFab = () => {
               </helix-tooltip>
             </div>
 
-            {/* **Beside the controls it undoes, not beside the close.** The
-                divider below splits the inputs from what the engine made of
-                them, and a reset is an input: it is the one that puts the other
-                four back. Next to the close it would read as a second way out
-                of the bar.
-
-                **Disabled until there is something to reset**, which is what
-                `touched` answers and `derived` cannot: the report is filled the
-                moment the engine loads, whether or not a reader has painted
-                anything with it. Enabled at rest, the control would claim the
-                page is wearing a theme it is not.
-
-                `forgetSiteTheme` rather than a handler of its own, because the
-                preferences drawer's reset is the same act and the event it
-                dispatches is what puts these controls back. Two paths to one
-                reset is how one of them comes to leave half a palette on. */}
+            {/*
+             * *Beside the controls it undoes, not beside the close.** The
+             *                 divider below splits the inputs from what the engine made of
+             *                 them, and a reset is an input: it is the one that puts the other
+             *                 four back. Next to the close it would read as a second way out
+             *                 of the bar.
+             */}
             <div className={styles.fabRow}>
               <span className={styles.fabRowLabel}>Reset</span>
               <helix-tooltip content="Back to the shipped palette" placement="top">
@@ -242,26 +208,12 @@ export const ThemeFab = () => {
 
             <div className={styles.fabDivider} />
 
-            {/* **What the engine made of it, which is the point.** The controls
-                on the left are the inputs; without this the bar is a color
-                picker and the claim that every pair is measured is a sentence
-                somewhere else on the page.
-
-                **The readout says what the engine found and not what it is**, so
-                both halves carry a tooltip that does.
-
-                The swatches are the semantic roles derived from the brand, not
-                a status indicator, which is the reading a row of colored dots
-                invites. The verdict has three findings behind it and they are
-                different measurements: `violations` is a foreground against the
-                ground it is painted on, and `collisions` is two roles against
-                each other, close enough that a reader cannot tell them apart.
-                Neither substitutes for the other, and "roles too close" is the
-                second one with no way to know that from the words.
-
-                `helix-tooltip` rather than the native `title`. A `title` is the
-                browser's own delayed box: it cannot be styled, it cannot be
-                reached by touch, and it arrives late. */}
+            {/*
+             * *What the engine made of it, which is the point.** The controls
+             *                 on the left are the inputs; without this the bar is a color
+             *                 picker and the claim that every pair is measured is a sentence
+             *                 somewhere else on the page.
+             */}
             <div className={styles.fabRow}>
               <span className={styles.fabRowLabel}>What the engine derived</span>
               <div className={styles.fabReadout}>
@@ -317,14 +269,14 @@ export const ThemeFab = () => {
               </div>
             </div>
 
-            {/* **The glyph is a child, not an attribute.** `name` on
-                `IconButton` is the form field name it inherits from `button`,
-                beside `type`, `value` and the `form*` pair. It is not the icon,
-                and setting it to `x-mark` gives the control a form name and no
-                content: an empty button the width of an icon, with no close in
-                it.
-
-                `x` rather than `x-mark`, which is not in the set either. */}
+            {/*
+             * *The glyph is a child, not an attribute.** `name` on
+             *                 `IconButton` is the form field name it inherits from `button`,
+             *                 beside `type`, `value` and the `form*` pair. It is not the icon,
+             *                 and setting it to `x-mark` gives the control a form name and no
+             *                 content: an empty button the width of an icon, with no close in
+             *                 it.
+             */}
             <helix-icon-button
               class={styles.fabClose}
               emphasis="ghost"

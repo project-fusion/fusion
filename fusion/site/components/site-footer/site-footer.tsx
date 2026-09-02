@@ -5,16 +5,6 @@ import styles from './site-footer.module.css'
 
 /**
  * What the footer links, in three groups.
- *
- * **A footer is where a reader goes when the page did not answer them**, so it
- * carries the whole site rather than the two legal pages that prompted it. The
- * products come from `PRODUCTS` rather than being written again here: a footer
- * that lists them separately is a second list to keep in step, which is exactly
- * the drift the destinations module exists to remove.
- *
- * Legal is its own group rather than a line under the tagline. Terms and Privacy
- * are what a reader scans a footer for, and burying them beside a slogan is how
- * a site technically links them without anybody finding them.
  */
 const FOOTER_GROUPS = [
   {

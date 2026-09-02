@@ -13,8 +13,6 @@ import styles from './trouble.module.css'
  * the one page whose whole job is offering a way onward, since that chrome is
  * the group layout's and the root file renders above it.
  *
- * So both files exist and neither holds any markup. This does, once.
- *
  * **The status differs between the two and that is the framework's**, not a
  * defect: an unmatched URL is 404, and a `notFound()` inside a streamed response
  * is 200, because the status is written before the stream opens. It is worth

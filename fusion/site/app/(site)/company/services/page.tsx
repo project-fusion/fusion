@@ -18,36 +18,6 @@ export const metadata = pageMetadata({
 
 /**
  * Services.
- *
- * **No figures on the page, which is a reversal and is worth saying so.** This
- * read "the only page on the site with a price on it", on the argument that an
- * offer whose cost appears only after a conversation cannot be compared. That
- * argument is still true about *offers*; what changed is the judgment about
- * whether this page is where the number belongs, and that is a commercial call
- * rather than a design one.
- *
- * The ranges are still in `services.ts`, where the costing that produces
- * them is argued. Nothing renders them today.
- *
- * The constraint appears here as terms rather than as a principle. Quoted at a
- * buyer mid-page it asks them to care about a governance rule while they are
- * working out what they are committing to; said as what they keep and what they
- * are not signing up for, it is the thing they wanted to know. The rule itself
- * lives on `/trust`.
- *
- * Copy lives in `services.ts` rather than here, so this page and the offer
- * cannot drift on what is actually sold.
- *
- * **It is built out of the landing page's parts, which was the point of the
- * rebuild.** A lit band for the head, one glass panel per idea, and the same
- * `--site-band` rhythm with the same reveal, so a reader arriving from the
- * landing page is on the same site rather than on a plainer one that shares a
- * masthead. What it is not is the landing page's *structure*: there is no reel
- * and no scroll-snap, because this is a page somebody reads to decide something
- * rather than a sequence they are walked through.
- *
- * A server component with no client boundary of its own. Elements upgrade from
- * the single registration in the root layout.
  */
 const page = findSitePage('/company/services')
 
@@ -141,17 +111,13 @@ export default async function Page() {
           on it is for: the rules line the prices up on one grid instead of
           leaving three cards to agree by luck. */}
         <Band reveal>
-          {/* **A head on the card, which is what makes it the same object as
-                the landing's.** That one opens with a label, a heading and a
-                standfirst over its ruled row; this opened straight onto three
-                columns, so the same material and the same rules still read as a
-                table rather than as a panel making a point.
-
-                The standfirst is the page's own, moved down from the band above
-                rather than written for here: a hero carrying a kicker, a display
-                title and a four-line paragraph was asking a reader to take all
-                three before anything was shown, and the paragraph is what the
-                offers under it are the answer to. Nothing new is said. */}
+          {/*
+           * *A head on the card, which is what makes it the same object as
+           *                 the landing's.** That one opens with a label, a heading and a
+           *                 standfirst over its ruled row; this opened straight onto three
+           *                 columns, so the same material and the same rules still read as a
+           *                 table rather than as a panel making a point.
+           */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <helix-text tone="subtle" variant="label">
               What we take on
@@ -167,20 +133,9 @@ export default async function Page() {
           <div className={styles.offerRow}>
             {SERVICES.map((service) => (
               <div className={styles.offer} key={service.name}>
-                {/* **The name, and no summary under it.**
-
-                      Three summaries were the densest block of prose on the
-                      page, and every one of them was answered more usefully by
-                      the four bullets a few lines below it: the summary said
-                      what the engagement is like and the bullets say what
-                      arrives. A reader comparing three offers is reading the
-                      bullets.
-
-                      **No icon either.** Three line glyphs carried nothing the
-                      names did not: a magnifier over "AI capability audit", a
-                      cube over "Design system sprint", a pair of figures over
-                      "Conversational build". A metaphor a reader decodes before
-                      the words beside it is a cost with no return. */}
+                {/*
+                 * *The name, and no summary under it.**
+                 */}
                 <helix-text as="h3" variant="title">
                   {service.name}
                 </helix-text>
@@ -231,19 +186,9 @@ export default async function Page() {
           </div>
         </Band>
 
-        {/* **The closing prose as two panels in a row, one per argument.**
-
-          The document has exactly two sections and they do different jobs: one
-          says what you are not signing up for, the other says how to start. On
-          one panel they read as a single wall of text with a rule through it,
-          and the second, which is the one with the way in, arrives after the
-          reader has already decided whether to keep going.
-
-          Split at the source rather than at the render: `renderDocument` takes a
-          string, so the two halves are two strings and each panel holds a whole
-          document. Splitting the rendered tree would mean reaching into React
-          output to find a heading, which is the kind of thing that works until
-          somebody adds a third section. */}
+        {/*
+         * *The closing prose as two panels in a row, one per argument.**
+         */}
         <Band card={false} reveal>
           <div className={styles.closingRow}>
             {sections.map((section, index) => (

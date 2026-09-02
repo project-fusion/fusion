@@ -6,48 +6,6 @@
  * Contrast between an ink and its ground is measured by the engine and reported
  * in the audit; what a reader is here to judge is the thing the audit cannot
  * see, which is whether the palette holds together across real hierarchy.
- *
- * **Two axes, because two of the answers can be true at once.** A context is
- * whose page this is and lives in `themed-contexts.tsx`; a layout is how much
- * page there is, and that is this file. A minimal storefront and a dense
- * storefront are both real arrangements, which is the area rules' own test for
- * whether something is one question or two.
- *
- * **A layout is its own markup and not the full page with parts hidden.**
- * Hiding sections from a superset makes every layout carry the densest one's
- * structure, so "minimal" would be a workspace wearing `display: none` and a
- * reader inspecting it would find an app shell underneath. These are four
- * separate pages. They share a vocabulary of copy and nothing else.
- *
- * **What each is for:**
- *
- * - `marketing` is the full landing page, and the resting one. Header, hero,
- *   proof, features, a chart, a working detail section, a closing band and a
- *   footer, each landing on a different surface, which puts every ground in the
- *   model on screen at once rather than one at a time.
- * - `minimal` is four surfaces and a dialog. A page with room in it, where a
- *   palette has nowhere to hide behind density.
- * - `editorial` is a rail, a measure and prose. The one layout whose organizing
- *   idea is a margin, and the hardest test of a text palette.
- * - `workspace` is the other end: a rail, a toolbar, statistics, a chart and a
- *   table, with no hero and no marketing bands at all. What somebody looks at
- *   for six hours rather than for six seconds.
- *
- * **A sparse layout hides axes, and that is the reader's call.** Nothing on the
- * minimal page charts anything, so a reader sitting there can move the
- * saturation and never see what it does to a series ramp; nothing there floats,
- * so `separation.floating` acts only on the dialog. That is a real cost and it
- * is not defended against, because somebody who picked "minimal" has said what
- * they are building. The audit is unaffected either way: it measures the
- * palette rather than what is displayed, so the count in the toolbar is the same
- * on all of them.
- *
- * Static on purpose. A layout takes a context and holds no state, so a
- * rendering is final: every change a reader makes to the *theme* reaches it
- * through inherited custom properties rather than through React. Both axes are
- * chosen before the render rather than during it, which is why
- * `turbo run themed-page` emits one string per pair and the builder posts
- * whichever is asked for.
  */
 import { type Context, Mark } from './themed-contexts'
 
@@ -150,11 +108,6 @@ function Walkthrough(context: Context) {
  * read across a short distance. A drawer translates its own full width, so the
  * same hundred milliseconds is the difference between a panel that arrives and
  * one that glides.
- *
- * It also carries the scrim and the glass at a size worth looking at, where the
- * dialog shows them in a box. Between them the three axes have somewhere to
- * land: `motion` here, `material` on both, and `separation.floating` on all of
- * it.
  */
 function Detail(context: Context) {
   const { detail } = context
@@ -189,23 +142,6 @@ function Detail(context: Context) {
 
 /**
  * The chart, in the glass card it is always in.
- *
- * **It exists because the series ramp is a third of the palette and had nothing
- * on screen.** Twenty-four tokens rotate off the brand and not one of them
- * appeared in this preview, so a reader could move the saturation and never see
- * what it did to a chart. The minimal and editorial layouts still do not have
- * it, which is what those layouts cost and is said out loud at the top of this
- * file.
- *
- * It reads a table, which is the whole point of the component: the accessible
- * representation is markup a consumer wrote rather than an `aria-label`
- * generated from an array. The table is clipped rather than hidden, so it stays
- * in the accessibility tree.
- *
- * Glass, so the material policy has something to act on that a reader can
- * compare against the opaque cards beside it. It is an attribute rather than
- * two custom properties because glass is a translucent ground *and* a backdrop,
- * and either alone does nothing.
  */
 function ChartCard(context: Context) {
   const { chart } = context
@@ -252,15 +188,6 @@ function ChartCard(context: Context) {
 }
 /**
  * The full landing page, and the resting layout.
- *
- * **Every ground in the model on screen at once**, which is what a reader is
- * here for and what the other two each give up half of. Header, hero, a
- * recessed band of proof, features, a chart, a working detail section, a
- * closing band on the brand fill and a footer: each lands on a different
- * surface, so `surface`, `surface-raised`, `surface-sunken`, `background` and
- * `primary-surface` are all comparable in one glance rather than one at a time.
- *
- * It is the resting one for that reason rather than because it came first.
  */
 function MarketingPage(context: Context) {
   const { close, company, features, figures, hero, table, trial } = context
@@ -488,19 +415,6 @@ function MarketingPage(context: Context) {
 
 /**
  * A landing page with room in it.
- *
- * **Four surfaces and a dialog**, against the marketing page's nine. The point
- * is not that it is smaller: it is that a palette has nowhere to hide. Density
- * flatters a theme, because a busy page gives the eye somewhere else to go and
- * a hierarchy that is nearly right reads as right. With a header, a hero, three
- * paragraphs and a footer, a foreground that is a little too pale against its
- * ground is the only thing on screen.
- *
- * **The features are text, not cards**, which is most of what makes this
- * different from the marketing page rather than a shorter copy of it. A card
- * puts a surface and a border between the reader and the words; three columns
- * of prose put the ink straight on the page ground, and `foreground-muted`
- * against `background` is a pair a card never shows.
  */
 function MinimalPage(context: Context) {
   const { company, features, hero } = context
@@ -577,28 +491,6 @@ function MinimalPage(context: Context) {
 
 /**
  * What somebody looks at for six hours rather than for six seconds.
- *
- * **No hero, no bands, no footer**, which is the whole difference. A marketing
- * page is read once and an application is inhabited, and the palette questions
- * are not the same ones: what matters here is whether a rail reads as behind
- * the work, whether a card reads as on top of the page, and whether a status
- * tag in a dense row is still a status at a glance. None of those is asked by a
- * hero.
- *
- * **Three grounds stacked, which no other layout puts side by side.** The rail
- * is `surface-sunken`, the page is `background` and the cards are `surface`, all
- * visible at once and touching. On the marketing page the same three tokens
- * appear in bands separated by whitespace, where a ground only has to be
- * distinguishable from the one above it. Here they share edges, which is the
- * harder test and the one an application actually sets.
- *
- * **A plain `<nav>` rather than `helix-navigation`.** The component's
- * contribution is an indicator that travels to the current destination, which
- * is a row's idea: it is positioned for a horizontal set, and turning the
- * container into a column through `::part(nav)` would leave the marker
- * measuring against an axis it is not on. A rail wants a landmark and stacked
- * anchors, which is a `<nav>` and the base layer's `data-navigation-item`
- * helper, so this uses those and claims nothing it does not need.
  */
 function WorkspacePage(context: Context) {
   const { action, company, figures, table } = context
@@ -726,32 +618,6 @@ function WorkspacePage(context: Context) {
 
 /**
  * A rail, a measure, and prose.
- *
- * **The one layout that is a page of writing rather than a page of selling**,
- * and the only one whose organizing idea is a margin. Every row is the same two
- * columns: a label in the rail and the text beside it, so the structure is
- * visible without a single box being drawn. Nothing here is a card, and the
- * only rule on the page is between one entry in the list and the next.
- *
- * **It is the only layout that shows two things the builder can change and no
- * other preview could.** Nothing else in this tool renders a `helix-list`, and
- * nothing else pulls `--helix-font-mono`: the rail is set in it, so this is the
- * only preview the Mono face control moves. A control whose effect
- * is nowhere on screen is a control a reader cannot judge, which is the same
- * argument the chart settles for the series ramp.
- *
- * **And it is the hardest test of a text palette.** A marketing page can carry
- * a weak `foreground-muted` because a card border is doing the separating; here
- * the rail is `foreground-subtle` against the page ground at the smallest size
- * on the page, with nothing else to hold it up. If a theme fails anywhere, it
- * fails visibly here first.
- *
- * **Not `helix-app-header`.** That element lays brand and navigation out as its
- * own flex row, and this masthead is two cells of the same grid every other row
- * uses, with the mark in the rail so the destinations start on the line every
- * paragraph starts on. Reaching for the element would mean fighting its
- * internal layout from outside a shadow boundary, which the area rules say
- * cannot be won.
  */
 function EditorialPage(context: Context) {
   const { company, editorial } = context

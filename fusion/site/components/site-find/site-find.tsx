@@ -7,26 +7,6 @@ import styles from './site-find.module.css'
 
 /**
  * Everywhere the palette can take a reader.
- *
- * The masthead shows two sections because a masthead is a place to stand, not
- * an index. A palette is the index, so it carries the pages a reader would
- * otherwise have to find by reading: the thesis, the trust page, the two
- * substrates, and the sections already on the bar.
- *
- * Written here rather than derived from a route manifest, because Next has no
- * such thing to read at runtime and a generated one would list every preview
- * and every slug. What belongs in a palette is a judgment about what somebody
- * would go looking for.
- *
- * Grouped by what a reader came for rather than by where the route sits: the
- * two substrates are things you take, the services are things you buy, and the
- * rest is things you read. A flat list of five was scannable and said nothing
- * about which of them were the same kind of answer.
- *
- * These are the pages a route manifest could not name usefully. Everything that
- * *is* enumerable, every component and every piece of writing, arrives as
- * `findable` from the layout, which can read the catalog and the registry
- * without either of them crossing into the browser.
  */
 const DESTINATIONS: Findable[] = [
   {
@@ -89,19 +69,6 @@ export interface Findable {
 
 /**
  * A group with its items ordered by how well they answer what was typed.
- *
- * **Within a group and never across one**, which is what the component's own
- * model allows and is also the right answer: `Listbox` filters by *hiding*
- * rather than removing, so the order it draws is the order it is given, and
- * lifting a component above a curated destination would mean pulling it out of
- * the heading that says what it is. The groups the reader just gained would
- * become decoration.
- *
- * Three tiers, because they are the three things "car" can mean: a label that
- * *starts* with it is almost certainly what was meant, a word inside the label
- * starting with it is next, and the rest is a substring that happened to match.
- * Ties keep the order they arrived in, which for components is alphabetical and
- * for writing is newest first, so the fallback is never arbitrary.
  */
 const ranked =
   (needle: string) =>
@@ -133,11 +100,6 @@ const ranked =
  * shared piece is the palette, not the header: each header keeps its own
  * density, its own inset and its own center, and both render this. Without it a
  * reader in the sandbox cannot reach anything without going back to the site.
- *
- * `findable` is built on a server and handed down, in both places. The
- * catalog reads the manifest off disk and the insight registry is the whole
- * of the writing: a palette that imported either would pull it into the browser
- * to display a list of names. What crosses is the list.
  */
 export function SiteFind({
   findable = [],
@@ -147,18 +109,6 @@ export function SiteFind({
   findable?: Findable[]
   /**
    * Which slot the trigger goes in, or `undefined` for whatever it is inside.
-   *
-   * **An assumption about the parent, made explicit.** `slot="end"` is right as
-   * a direct child of `helix-app-header` and wrong anywhere else: the workbench
-   * groups its end-slot items in a `helix-flex`, which has no `end` slot, so
-   * the button is unassigned and generates no box at all. Nothing throws and
-   * nothing warns, and a slot that matches nothing looks exactly like a
-   * component that decided not to render.
-   *
-   * **No default, deliberately.** A default parameter is what `undefined`
-   * selects, so `slot = 'end'` would resolve `slot={undefined}` straight back
-   * to `'end'` and leave the caller no way to opt out. A prop whose whole job
-   * is to say where something goes should be said rather than assumed.
    */
   slot?: string | undefined
   trigger?: boolean
@@ -265,14 +215,12 @@ export function SiteFind({
           ),
         )}
 
-        {/* **Four hints, and each one is a group rather than a clause.** A key
-            and the word for what it does are one object, and the space between
-            objects is what says so; run together in a sentence, a reader has to
-            parse punctuation to find where one key's job ends.
-
-            The fourth is the second destination, which is why it is here rather
-            than in the component: only this knows that a component row's
-            alternate is its sandbox. */}
+        {/*
+         * *Four hints, and each one is a group rather than a clause.** A key
+         *             and the word for what it does are one object, and the space between
+         *             objects is what says so; run together in a sentence, a reader has to
+         *             parse punctuation to find where one key's job ends.
+         */}
         <div className={styles.siteCommandHints} slot="footer">
           <span>
             <helix-kbd>↑</helix-kbd>

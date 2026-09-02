@@ -31,16 +31,6 @@ const apply = (mode: ColorMode): void => {
 
 /**
  * Puts the tier on the document, where CSS can act on it.
- *
- * The same shape as the color mode above, and for a sharper reason here: a
- * reference page is static and server-rendered, and this preference is read
- * from `localStorage`, which the server does not have. So the page renders
- * **both** tiers and this attribute decides which one is shown. Filtering in
- * React instead would mean the server rendering one answer and the client
- * wanting another, which is a hydration mismatch on every docs page.
- *
- * `styled` clears the attribute rather than writing it, so the default state of
- * the document is the default preference and there is one way to be normal.
  */
 const applyTier = (tier: ApiTier): void => {
   if (tier === 'styled') {
@@ -57,17 +47,6 @@ interface Props {
 
 /**
  * The preferences drawer.
- *
- * Takes its open state rather than owning it, because the trigger belongs in
- * the header and the drawer must not be. `backdrop-filter`, and any filter,
- * makes an element a containing block for `position: fixed` descendants, so a
- * drawer rendered inside a header is positioned against the header: it comes
- * out one header tall and pushes the layout around instead of covering the
- * page. Splitting the two is the fix, and it is the only reason they are split.
- *
- * A drawer rather than a popover: this will grow past one setting, and a
- * surface that has to be rebuilt the first time it does is the wrong one to
- * start with.
  */
 export function PreferencesDrawer({ onOpenChange, open }: Props) {
   const [mode, setMode] = useState<ColorMode>('system')
@@ -98,14 +77,6 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
 
   /**
    * Follows the attribute, because this panel is not the only thing that sets it.
-   *
-   * Reading `localStorage` once at mount instead leaves this showing a stale
-   * answer whenever a scheme is chosen elsewhere, such as the landing page's
-   * theme bar.
-   *
-   * `data-color-mode` is the one thing every control agrees on, so watching it
-   * needs no coordination between them. Its absence is the system default,
-   * which is what `system` means here.
    */
   useEffect(() => {
     const follow = () => {
@@ -193,16 +164,12 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           <helix-toggle value="styled">Styled</helix-toggle>
         </helix-toggle-group>
 
-        {/* **Only when there is one, because a reset with nothing to reset is a
-            control that reports the feature rather than offering it.** A reader
-            who has never touched the theme controls should not have to work out
-            what "site theme" means here to conclude it does not concern them.
-
-            **One control for both ways in.** The masthead's preferences button
-            and the mobile menu's Preferences row open this same drawer, so this
-            is the reset in the toolbar and the reset in the mobile menu; a
-            second one in the menu itself would be a second copy of the same
-            state to keep true. */}
+        {/*
+         * *Only when there is one, because a reset with nothing to reset is a
+         *             control that reports the feature rather than offering it.** A reader
+         *             who has never touched the theme controls should not have to work out
+         *             what "site theme" means here to conclude it does not concern them.
+         */}
         {themed && (
           <helix-flex direction="column" gap="xs">
             <helix-text variant="label">Site theme</helix-text>

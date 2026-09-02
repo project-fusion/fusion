@@ -3,25 +3,12 @@ import { absolute, SITE } from '@/utils/site/site'
 
 /**
  * One shape for a page's title, its description, and everything that follows.
- *
- * **The point of a helper rather than a convention is that the second half is
- * derived.** A page states the two things only it knows, what it is called and
- * what it is about, and the canonical URL, the Open Graph block and the Twitter
- * card fall out. Written per page they would be four places to forget, and the
- * one that gets forgotten is always the card, because nothing on the page looks
- * wrong when it is missing.
- *
- * `metadataBase` is set once on the root layout, so every relative image here
- * resolves against the real origin rather than being dropped.
  */
 export interface PageMeta {
   /** What the page is about, in one sentence. Used as the description and the card's. */
   description: string
   /**
    * The card's image, absolute or rooted, or `false` to stand aside.
-   *
-   * Absent takes the site card, which is the honest default: a page with no
-   * picture of its own should not borrow one that is about something else.
    *
    * **`false` is for a route that ships an `opengraph-image` file**, and it
    * exists because setting `images` at all is what silences that file: Next

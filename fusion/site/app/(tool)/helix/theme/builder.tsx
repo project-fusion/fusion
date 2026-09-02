@@ -33,28 +33,11 @@ import styles from '../workbench.module.css'
  * "percentage of the sandbox given to the source pane", and measured with
  * `lead="preview"` a split of 32 gave the *preview* 32 per cent. The area
  * rules have it right, that `split` means the same thing in both directions.
- *
- * The artifact is a column of custom properties whose longest line is a token
- * name and a hex, so it wants a third and the preview wants the rest.
  */
 const PREVIEW_SHARE = 68
 
 /**
  * The faces on offer, fetched rather than vendored.
- *
- * **A preview is not a deployment, which is what makes this fine here.** What
- * matters is what a Fusion product does to a consumer's page:
- * `fusion/site/app/fonts.css` vendors the site's own three faces precisely so
- * the wordmark does not sit behind someone else's uptime. Nothing here ships to
- * anybody. A reader is trying faces on, and trying one on means fetching it.
- *
- * **What is emitted stays free of it.** The artifact names the family and
- * nothing more, because a consumer pasting the block into their own stylesheet
- * should not thereby acquire a dependency on a host they did not pick. The
- * block says which faces it assumes and leaves the loading to them.
- *
- * `family` is what CSS is given; `google` is the request, with the weights the
- * token layer actually uses. The empty value is the stylesheet's own stack.
  */
 interface Face {
   /** Google's own category, which is what the dropdowns are grouped by. */
@@ -109,13 +92,6 @@ const CATALOG_MONO: Face[] = GOOGLE_FACES.filter((row) => row[2] === 1).map(from
 
 /**
  * The six that lead every dropdown, under a heading of their own.
- *
- * A reader with no opinion gets a short list of faces that read well at the
- * sizes the token layer sets rather than the first six words in the alphabet.
- *
- * **"Recommended" is the honest word for them**: not the most downloaded, not
- * the newest and not a partnership, but the ones somebody tried at these sizes
- * and kept, which is what a reader hears when a font picker says recommended.
  */
 const LEADING = ['Inter', 'DM Sans', 'Work Sans', 'Fraunces', 'Playfair Display', 'Source Serif 4']
 
@@ -132,17 +108,6 @@ const CATEGORY_LABEL: Record<number, string> = {
 
 /**
  * The catalog as named runs: the picked few, then Google's own categories.
- *
- * **A face appears once.** The recommended group is drawn from the categories
- * below it, so those exclude it: two options carrying one value is a select that
- * shows the wrong word for the right choice, and a reader scrolling past Inter
- * twice has no way to know the two are the same.
- *
- * **Empty groups are dropped rather than rendered empty**, which matters for the
- * monospace field, where three of the five categories cannot occur at all.
- * Filtering is the listbox's own and it already hides a group whose options a
- * filter has all hidden, so this only has to answer for the ones that were never
- * going to have members.
  */
 const grouped = (faces: Face[], leading: readonly string[]): FaceGroup[] => {
   const picked = leading
@@ -164,12 +129,6 @@ const FACE_GROUPS: FaceGroup[] = grouped(CATALOG, LEADING)
 
 /**
  * The same groups, with a different word for choosing none.
- *
- * `--helix-font-display` is emitted as `display ?? body`, so leaving this alone
- * does not fall back to the system, it follows whatever the body face is: pick
- * Fraunces for the body and the headings are Fraunces too. `Same as body` is
- * true in both cases, the body face being the system default when nobody has
- * chosen one, where `System default` is true only while it is unset.
  */
 const DISPLAY_REST: Face = { category: 0, family: '', label: 'Same as body' }
 
@@ -187,13 +146,6 @@ const ALL_FACES: Face[] = [...CATALOG, ...CATALOG_MONO]
 
 /**
  * The options inside a face dropdown: the resting one loose, then the groups.
- *
- * Written once because three fields render it and the only things that differ
- * are which catalog and which word for choosing none.
- *
- * The resting option is not in a group because it is not a face, and putting it
- * under `Recommended` would recommend the absence of one. It renders loose
- * before the first group, the way a select's own empty option does.
  */
 const faceOptions = (groups: FaceGroup[], rest: Face) => (
   <>
@@ -203,33 +155,9 @@ const faceOptions = (groups: FaceGroup[], rest: Face) => (
         {group.faces.map((face) => (
           <helix-option key={face.family} value={face.family}>
             {face.label}
-            {/* **The specimen, after the name.**
-
-                `Ag` because two letters carry the most: an ascender, a bowl, a
-                descender, and the terminal on the g, which is where a grotesque
-                and a humanist part company. Longer samples say no more and take
-                the width the name needs.
-
-                The `end` slot rather than the start, so the names stay flush
-                against the left edge a reader is scanning down. The column is a
-                fixed width so its own right edge does not go ragged: `Ag` set in
-                Playfair Display is wider than in Inter, and a thousand rows of
-                that reads as a broken list rather than as type that varies.
-
-                **The skeleton is not decoration.** `display=swap` means an
-                unloaded sample renders in the fallback face, so without it a row
-                saying `Playfair Display` would show `Ag` set in Inter: not
-                blank, which a reader forgives, but wrong, which a reader
-                believes. A stand-in says the face has not arrived, which is the
-                one thing the fallback cannot say about itself.
-
-                `aria-hidden` on the wrapper rather than on both children, which
-                hides the subtree in one place and keeps the option's accessible
-                name the family name it already was.
-
-                `data-face-request` is what `useFacePreviews` observes, and it
-                writes `data-face-ready` back when the face has actually loaded.
-                The two swap on that, so neither is guessing. */}
+            {/*
+             * *The specimen, after the name.**
+             */}
             <span aria-hidden="true" className="themeFace" slot="end">
               {/* **The face is named here or the sample is a lie.** It is the
                   one thing in this markup that cannot be moved to a stylesheet,
@@ -298,16 +226,6 @@ export function ThemeBuilder({
   layouts: readonly { label: string; value: string }[]
   /**
    * The preview's page, already a string, once per layout and context.
-   *
-   * Rendered by the server component above, for the reason written out there:
-   * taking it back out of the DOM with `innerHTML` loses every value React set
-   * as a property rather than as an attribute, which on a client navigation is
-   * all of them.
-   *
-   * **Keyed by the pair**, and the labels arrive separately, so this component
-   * never imports `themed-page.tsx`. It is a client component and that module
-   * is three page skeletons nothing renders in a browser: importing it to read
-   * six labels would ship all of them.
    */
   markup: Readonly<Record<string, string>>
 }) {
@@ -319,15 +237,6 @@ export function ThemeBuilder({
   /**
    * Whether the controls are on screen, and how much room they take when they
    * are.
-   *
-   * **One control at every width, because the answer is the same question.**
-   * What changes with the viewport is how far the pane opens, never what the
-   * button means.
-   *
-   * **The pane collapses rather than unmounting.** The stage holds an iframe, and
-   * wrapping it in a condition would tear it down and reload it every time a
-   * reader opened the form. That is the same reasoning the sandbox's rail
-   * carries, and it is why this is a splitter position rather than a drawer.
    */
   const [controlsShown, setControlsShown] = useState(true)
   const [narrow, setNarrow] = useState(false)
@@ -391,10 +300,6 @@ export function ThemeBuilder({
    * **Held here because the toolbar's counts open it.** A tag saying "2 fail"
    * has to reach the Contrast tab, which is the one mapping nobody can guess
    * from the words.
-   *
-   * `active` on Tabs is a seed and a correction rather than a strict controlled
-   * property, so the set still moves itself on a click and this only has to
-   * agree with it. Answering `helix-before-activate` is what keeps them agreeing.
    */
   const [audit, setAudit] = useState('contrast')
 
@@ -464,22 +369,6 @@ export function ThemeBuilder({
 
   /**
    * The link, kept current, so a reader can bookmark a theme or send one.
-   *
-   * **`replaceState` rather than the router.** `router.replace` re-runs the
-   * server component, which would re-derive the theme on a server once per
-   * frame of a slider drag to produce a palette this browser has already
-   * derived. Nothing about the page needs to change: the URL is a record of
-   * what is on screen, not a request for it.
-   *
-   * **Debounced, because `replaceState` is rate limited.** A slider announces
-   * on every pointer move, and Safari has throttled history writes at around a
-   * hundred per thirty seconds for years. A quarter second after the reader
-   * stops is indistinguishable from live for something nobody reads until they
-   * copy it, and it costs one write per gesture instead of forty.
-   *
-   * **Not on the first pass**, or a reader arriving at the bare `/helix/theme`
-   * would have its query rewritten before they touched anything. There is
-   * nothing to record until something moves.
    */
   const written = useRef(false)
 
@@ -761,13 +650,9 @@ export function ThemeBuilder({
 
       <PreferencesDrawer onOpenChange={setPrefsOpen} open={prefsOpen} />
 
-      {/* A splitter for the form, and `helix-sandbox` for everything else.
-
-          **The same component the workbench uses**, rather than a grid shaped
-          like it. It already owns the two-pane split, the collapsible bottom
-          panel, the toolbar row and the separators a keyboard can move, and all
-          of that was going to be rebuilt here badly. What it does not carry is
-          file tabs, because a theme has one artifact and not four. */}
+      {/*
+       *  A splitter for the form, and `helix-sandbox` for everything else.
+       */}
       <helix-splitter
         className={styles.workbenchBody}
         default-position={24}
@@ -793,16 +678,12 @@ export function ThemeBuilder({
               </helix-text>
             </helix-flex>
 
-            {/* **A preview control, in the form, because every input is.** The
-                toolbar above is status and the form is settings, which the
-                toolbar's own comment argues; a control up there would be a
-                second place to look for the same kind of thing.
-
-                First, because it is the frame rather than a setting: a reader
-                picks it once and then judges everything else against it. What
-                keeps it from reading as the most important *theme* decision is
-                the hint, which says out loud that it changes no token. It is
-                absent from `Settings` and from `reset` for the same reason. */}
+            {/*
+             * *A preview control, in the form, because every input is.** The
+             *                 toolbar above is status and the form is settings, which the
+             *                 toolbar's own comment argues; a control up there would be a
+             *                 second place to look for the same kind of thing.
+             */}
             <helix-select
               hint="Only the words change. The palette is the same whichever you pick."
               label="Preview"
@@ -818,18 +699,14 @@ export function ThemeBuilder({
               ))}
             </helix-select>
 
-            {/* **The second axis, and it is a second control because two of the
-                answers can be true at once.** A minimal storefront and a dense
-                storefront are both real arrangements, so who is speaking and how
-                much page they speak on are independent questions. Nine rows in
-                one list would make a reader read every combination to find the
-                two facts they are choosing.
-
-                The hint says what it costs, because it does cost something: a
-                sparse layout has no chart and nothing that floats, so two of
-                the controls further down stop having anything on screen to act
-                on. The audit is unaffected, measuring the palette rather than
-                what is displayed. */}
+            {/*
+             * *The second axis, and it is a second control because two of the
+             *                 answers can be true at once.** A minimal storefront and a dense
+             *                 storefront are both real arrangements, so who is speaking and how
+             *                 much page they speak on are independent questions. Nine rows in
+             *                 one list would make a reader read every combination to find the
+             *                 two facts they are choosing.
+             */}
             <helix-select
               hint="How much page there is. Minimal has no chart and nothing that floats."
               label="Layout"
@@ -911,17 +788,15 @@ export function ThemeBuilder({
               <helix-option value="7">7, AAA</helix-option>
             </helix-select>
 
-            {/* **Painted through `--slider-track-image`, the hook Slider already
-                publishes for exactly this.** `ColorPicker` paints its own hue
-                and alpha channels the same way and is itself built out of
-                `helix-slider`, so a color channel is a slider with a ramp on it
-                rather than a component of its own: it adds no behavior, no
-                state and no API, which is the test for whether something earns
-                an element.
-
-                The ramp is the value it chooses. Saturation runs from gray to
-                the brand at full chroma, both ends at the brand's own lightness
-                and hue, so the track shows what the slider will produce. */}
+            {/*
+             * *Painted through `--slider-track-image`, the hook Slider already
+             *                 publishes for exactly this.** `ColorPicker` paints its own hue
+             *                 and alpha channels the same way and is itself built out of
+             *                 `helix-slider`, so a color channel is a slider with a ramp on it
+             *                 rather than a component of its own: it adds no behavior, no
+             *                 state and no API, which is the test for whether something earns
+             *                 an element.
+             */}
             <helix-slider
               {...BOUNDS.chromaScale}
               className="themeChannel"
@@ -1067,31 +942,24 @@ export function ThemeBuilder({
               value={String(textScale)}
             ></helix-slider>
 
-            {/* **Character rather than a duration**, because the pace and the
-              curve are one decision: a spring over 120ms is a twitch and a soft
-              curve over 120ms is a fade. Leaving it alone emits neither, so the
-              stylesheet's own pace stands.
-
-              `precise` is the one that is not physical: the other three
-              accelerate, settle or overshoot, where linear reads as moved by a
-              mechanism. `instant` is neither a pace nor a curve but the absence
-              of both, and it emits no easings at all, three curves for
-              transitions of zero length being a contradiction. */}
-            {/* **A select, and it is the one of the three that has to be.** Six
-              characters do not fit a form this narrow: measured, the track
-              wanted 420px against a 312px host, so `Instant` sat 79px past the
-              panel's right edge with nothing on screen to say a value was
-              missing. Toggle Group wraps now rather than losing a segment, which
-              is the right thing for it to do everywhere and the wrong thing
-              here, where four across and two below reads as a control that ran
-              out of room. The two separation groups keep their segments, because
-              four and three fit at the widths this pane actually takes and the
-              wrap is there for the extreme.
-
-              What is lost is worth naming: a segmented control shows the whole
-              set, and trying characters on is the one thing a reader does here
-              repeatedly. Six labels they cannot read is not a better version of
-              that. */}
+            {/*
+             * *Character rather than a duration**, because the pace and the
+             *               curve are one decision: a spring over 120ms is a twitch and a soft
+             *               curve over 120ms is a fade. Leaving it alone emits neither, so the
+             *               stylesheet's own pace stands.
+             */}
+            {/*
+             * *A select, and it is the one of the three that has to be.** Six
+             *               characters do not fit a form this narrow: measured, the track
+             *               wanted 420px against a 312px host, so `Instant` sat 79px past the
+             *               panel's right edge with nothing on screen to say a value was
+             *               missing. Toggle Group wraps now rather than losing a segment, which
+             *               is the right thing for it to do everywhere and the wrong thing
+             *               here, where four across and two below reads as a control that ran
+             *               out of room. The two separation groups keep their segments, because
+             *               four and three fit at the widths this pane actually takes and the
+             *               wrap is there for the extreme.
+             */}
             {/* **The placeholder is the resting state's name, not an invitation**,
               for the reason the face fields above carry: the empty-valued option
               contributes no word, so a generic placeholder would report that
@@ -1139,20 +1007,18 @@ export function ThemeBuilder({
               <helix-toggle value="fill">Fill</helix-toggle>
             </helix-toggle-group>
 
-            {/* **Material was an axis the engine took and this could not reach.**
-              `ThemeIntent.material` is two numbers and the builder wrote neither,
-              so a theme made here could say how its surfaces separate and not
-              what they are made of. The header, the menu and the dialog all move
-              on these, which is why they are the three things the preview opens.
-
-              Two sliders rather than a character, because unlike motion the pair
-              does not have to move together: a heavy blur behind a nearly opaque
-              pane is a real look and so is a clear pane with none.
-
-              **And this is the one control that can cost the guarantee.**
-              Anything below full stops being a known ground, so a pair over it
-              comes back `unverifiable` rather than measured, which the pairings
-              panel says out loud when it happens. */}
+            {/*
+             * *Material was an axis the engine took and this could not reach.**
+             *               `ThemeIntent.material` is two numbers and the builder wrote neither,
+             *               so a theme made here could say how its surfaces separate and not
+             *               what they are made of. The header, the menu and the dialog all move
+             *               on these, which is why they are the three things the preview opens.
+             *
+             * *And this is the one control that can cost the guarantee.**
+             *               Anything below full stops being a known ground, so a pair over it
+             *               comes back `unverifiable` rather than measured, which the pairings
+             *               panel says out loud when it happens.
+             */}
             <helix-slider
               {...BOUNDS.blur}
               hint="Pixels behind a translucent surface. Zero is flat."
@@ -1180,14 +1046,10 @@ export function ThemeBuilder({
               leads with its source, being a place to write; here the artifact is
               an output rather than an input and a reader is judging a palette,
               not editing CSS. */}
-          {/* See `PREVIEW_SHARE` for which pane the number is about, which is
-              not what the manifest says.
-
-              Held as state and written back on settle, which is the workbench's
-              pattern and is necessary rather than tidy: `Sandbox` owns `split`
-              and writes it back on every drag, so a bare prop would be reapplied
-              by the next render and undo the reader's drag. `default-split` is
-              not the lever either, being what a *reset* returns to. */}
+          {/*
+           *  See `PREVIEW_SHARE` for which pane the number is about, which is
+           *               not what the manifest says.
+           */}
           <helix-sandbox
             corner-label="Preview, artifact and audit"
             default-split={PREVIEW_SHARE}
@@ -1232,24 +1094,17 @@ export function ThemeBuilder({
                     same red as "2 fail": two identical tags side by side, one of
                     them good news, and the count a reader most wants to see
                     going up is the one that looks like an alarm. */}
-                {/* **Each count opens the panel that lists it.**
-
-                    The tags say pass, fail, unverifiable and collisions; the
-                    panel's tabs say Contrast, Collisions and Unverifiable. Three
-                    map by their own word and the fourth cannot: "2 fail" and
-                    "65 pass" are both the Contrast tab, and nothing on screen
-                    says so. Renaming one to match the other is worse, "2
-                    contrast" not being English and "Contrast failures" not being
-                    a tab label that fits.
-
-                    **Still status rather than settings**, which is the rule the
-                    toolbar's own comment sets and this does not break: none of
-                    them changes the theme. A count that opens its own detail is
-                    a shortcut to reading, not a control over the palette.
-
-                    A real `button` around the tag rather than a handler on it. A
-                    tag is not an affordance, and the keyboard, the focus ring and
-                    the announcement all come free from the element that is. */}
+                {/*
+                 * *Each count opens the panel that lists it.**
+                 *
+                 *                     The tags say pass, fail, unverifiable and collisions; the
+                 *                     panel's tabs say Contrast, Collisions and Unverifiable. Three
+                 *                     map by their own word and the fourth cannot: "2 fail" and
+                 *                     "65 pass" are both the Contrast tab, and nothing on screen
+                 *                     says so. Renaming one to match the other is worse, "2
+                 *                     contrast" not being English and "Contrast failures" not being
+                 *                     a tab label that fits.
+                 */}
                 <button className="themeJump" onClick={() => setAudit('contrast')} type="button">
                   <helix-tag emphasis="subtle" tone="success">
                     {counts.pass ?? 0} pass
@@ -1288,31 +1143,18 @@ export function ThemeBuilder({
               </helix-flex>
             </helix-sandbox-toolbar>
 
-            {/* **A document of its own, and the leak is what forces it.** As a
-                `div` in the site's page the site's own stylesheet reaches it:
-                nineteen bare `helix-*` rules in `site.css`, three of which land
-                here. Measured, the preview's header computed
-                `--app-header-backdrop: none` and
-                `--app-header-background-color: transparent` because the masthead
-                sets those for itself, so the material control could be dragged
-                from zero to forty and the one surface most likely to be glass
-                never moved. The drawer took the site's header clearance too, for
-                a header that is not above it.
-
-                Scoping the site's rules away from the preview is the same fix
-                nineteen times and once more for every rule anybody adds. The
-                cause is that a preview of a page was not a page, and
-                `helix-sandbox-preview` already exists for exactly this: its own
-                docstring says an example that restyles `helix-card` restyled the
-                sandbox too.
-
-                The top layer comes free with it. A dialog opened here covered
-                the whole tool, because `showModal` paints outside every ancestor
-                and the tool was an ancestor; in a document of its own it is
-                confined to the pane, which is what a reader is trying to judge.
-
-                `color-mode` rather than a wrapper attribute, because the frame is
-                a document and inherits nothing from this one. */}
+            {/*
+             * *A document of its own, and the leak is what forces it.** As a
+             *                 `div` in the site's page the site's own stylesheet reaches it:
+             *                 nineteen bare `helix-*` rules in `site.css`, three of which land
+             *                 here. Measured, the preview's header computed
+             *                 `--app-header-backdrop: none` and
+             *                 `--app-header-background-color: transparent` because the masthead
+             *                 sets those for itself, so the material control could be dragged
+             *                 from zero to forty and the one surface most likely to be glass
+             *                 never moved. The drawer took the site's header clearance too, for
+             *                 a header that is not above it.
+             */}
             <helix-sandbox-preview
               color-mode={scheme}
               label="The themed page"
@@ -1322,16 +1164,13 @@ export function ThemeBuilder({
               src="/sandbox/frame.html"
             ></helix-sandbox-preview>
 
-            {/* **The editor, read-only, rather than a code block.** The
-                artifact pane should read as a source file, which is what the
-                workbench puts here: line numbers, the same syntax palette, the
-                same gutter. A code block is a figure in a page and this is a
-                pane in a tool.
-
-                `read-only` because the artifact is an output. The editor takes
-                it through `EditorState.readOnly` rather than by dropping focus,
-                so the text is still selectable and reachable by keyboard, which
-                is the whole point of showing it. */}
+            {/*
+             * *The editor, read-only, rather than a code block.** The
+             *                 artifact pane should read as a source file, which is what the
+             *                 workbench puts here: line numbers, the same syntax palette, the
+             *                 same gutter. A code block is a figure in a page and this is a
+             *                 pane in a tool.
+             */}
             <helix-sandbox-editor
               field-label="The generated stylesheet"
               language="css"

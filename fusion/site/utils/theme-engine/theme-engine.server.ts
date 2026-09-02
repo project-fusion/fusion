@@ -8,11 +8,6 @@
  * primary so the track cannot promise a color the engine will not produce,
  * appeared 287ms after navigation. 26ms of that was the module transfer and the
  * rest was hydration.
- *
- * **The bytes are read rather than fetched**, which is the whole difference from
- * the browser path. Node declines a `file:` URL outright, and the module is
- * sitting on this server's own disk, so there is nothing to fetch: the same file
- * `public/` serves is the one read here.
  */
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'

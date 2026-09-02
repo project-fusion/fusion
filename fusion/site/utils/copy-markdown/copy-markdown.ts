@@ -62,16 +62,6 @@ const COPY: Record<string, PageCopy> = {
 
 /**
  * A vertical's page, which is already nothing but its registry entry.
- *
- * `VerticalPage` renders a name, a stage and a body, and takes all three from
- * `verticals.ts` and `products.ts`. There is no copy module for these and there
- * should not be: writing one would be a second copy of two registries that
- * several consumers already read. The markdown derives from the same place the
- * page does.
- *
- * **The product wins the title where a product fills the vertical**, which is
- * the rule the page follows: a reader who clicks Cortex and lands on a page
- * headed Fusion Mind has been handed a division when they asked for a product.
  */
 const verticalCopy = (path: string): PageCopy | undefined => {
   const vertical = VERTICALS.find((entry) => entry.href === path)
@@ -118,16 +108,6 @@ const insightsCopy = (): PageCopy => ({
 
 /**
  * The component index, which is the catalog with a sentence over it.
- *
- * The same shape as `insightsCopy` and for the same reason: the page is a
- * registry rendered, so its document is that registry rendered too. Writing a
- * copy module for it would be a second list of families that could disagree
- * with the manifest, which is the whole thing this arrangement exists to
- * prevent.
- *
- * Each family's own document says what it can do. This one exists so a reader
- * or an agent can find out *which* family they want, which is the question an
- * index answers and a reference does not.
  */
 const componentsCopy = (): PageCopy => ({
   blocks: [{ from: 'families', title: 'Every family' }],
@@ -166,13 +146,6 @@ export const copyFor = (path: string): PageCopy | undefined => {
 
 /**
  * One band, as its heading, its paragraphs, and its cards.
- *
- * **A band with no heading puts its cards a level up.** On screen the bands are
- * separated by space and a rule, so a section can open straight into its cards;
- * in a document there is nothing between them, and an `h3` under no `h2` is a
- * heading level with nothing above it. The first band is exactly that case: it
- * is two product cards under a sentence, deliberately without a title, because
- * a heading there would name what the reader can already see.
  */
 const block = (entry: CopyBlock, pageTitle: string): string[] => {
   const lines: string[] = []

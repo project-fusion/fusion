@@ -71,11 +71,6 @@ interface Props {
 /**
  * How much room the two panes get, in pixels.
  *
- * **The preview follows its content and the editor does not.** A source pane is
- * worth the same five or six lines whatever is drawn above it, and a fixed share
- * of a fixed box says neither thing: every family gets the same height whether it
- * renders a button or a table.
- *
  * The floor keeps a small example on a stage rather than collapsing it onto its
  * own content, and 180 rather than 300 because a floor should catch the ones that
  * would vanish rather than decide for most of them: measured on the carousel
@@ -93,21 +88,6 @@ const previewSize = (drawn: number | undefined, min = PREVIEW_MIN): number =>
 
 /**
  * The headline example, running.
- *
- * A client component because the sandbox is one: the preview talks to its frame
- * over `postMessage` and the source pane dispatches events the root listens
- * for. The page around it stays a server component, which is the whole point of
- * keeping this in its own file.
- *
- * `lead="preview"` is why the pane order became a property. A workbench is a
- * place to write, so the source leads there; a reference page is a place to
- * look, so the preview leads here and the source is what a reader opens if they
- * want to know how it was done.
- *
- * The bar rides inside the source region rather than in the `toolbar` slot,
- * because the toolbar spans both panes at the top and what is wanted is a bar
- * *between* the preview and the editor. Slotting a wrapper is the same shape
- * the workbench already uses for its own file tabs.
  */
 export function ComponentPreview({
   css,
@@ -211,17 +191,13 @@ export function ComponentPreview({
       split={Math.round((previewSize(drawn, min) / (previewSize(drawn, min) + EDITOR)) * 100)}
       style={{ blockSize: `${previewSize(drawn, min) + EDITOR}px` }}
     >
-      {/* Laid out by the frame, not by this page. The preview renders into a
-          document with its own layout modes; styling the pane from out here
-          instead shrank the iframe to its content and clipped the example,
-          because a centered grid item does not stretch. The frame is the only
-          thing that can lay out its own body.
-
-          **`centered` is safe because the pane is not a fixed box.** It follows
-          what the frame says it drew, so there is no tall pane for a small
-          example to float in, and the space a full-width component fills is the
-          space there is. Centering holds the example against the middle of its
-          own stage rather than the top left corner of one. */}
+      {/*
+       *  Laid out by the frame, not by this page. The preview renders into a
+       *           document with its own layout modes; styling the pane from out here
+       *           instead shrank the iframe to its content and clipped the example,
+       *           because a centered grid item does not stretch. The frame is the only
+       *           thing that can lay out its own body.
+       */}
       {/* **Bound here and not on the sandbox around it.** `helix-resize` is
           composed and does reach the root, but React repairs an `on` prop at the
           moment the element itself dispatches, and an event merely passing
@@ -266,16 +242,14 @@ export function ComponentPreview({
             label={`Copy ${file}`}
             value={file === 'styles.css' ? styles : source}
           ></helix-copy-button>
-          {/* Cycles the four frame layouts, showing the one it is in.
-              **A cycle rather than a menu**, because four is few enough that
-              pressing through them is faster than opening anything, and the
-              control stays one icon wide in a bar that already holds two. The
-              order runs least framing to most, so repeated presses walk one way
-              and come back round.
-
-              The tooltip and the `aria-label` say the same words, so what a
-              pointer reveals and what a screen reader announces cannot
-              disagree. */}
+          {/*
+           *  Cycles the four frame layouts, showing the one it is in.
+           * *A cycle rather than a menu**, because four is few enough that
+           *               pressing through them is faster than opening anything, and the
+           *               control stays one icon wide in a bar that already holds two. The
+           *               order runs least framing to most, so repeated presses walk one way
+           *               and come back round.
+           */}
           <helix-tooltip content={LAYOUT_LABEL[layout]}>
             <button
               aria-label={LAYOUT_LABEL[layout]}

@@ -48,16 +48,6 @@ interface Props {
 
 /**
  * Which syntax the example is written in.
- *
- * One file, not three: the syntaxes are the same tree said differently, and
- * showing all of them at once invites a reader to edit one and wonder why the
- * others disagree. What is on screen is what runs.
- *
- * Two entries and not three, because JSX and TSX produce the same bytes: an
- * example is Helix elements with attributes, so there is no annotation, no
- * generic, and nothing else for TypeScript to hold. TSX is the one kept, because
- * a consumer scaffolding a React app gets TypeScript by default and that is the
- * file they will be pasting into.
  */
 const SYNTAXES = [
   { file: 'index.html', label: 'HTML', language: 'html', value: 'html' },
@@ -639,20 +629,6 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      ordered. */
   /**
    * Reloads the preview when its bundle changes, in development only.
-   *
-   * The frame runs its own build of the component library, carried in as a
-   * classic script because a sandboxed document has an opaque origin and cannot
-   * import a module from this site. That script is outside the module graph, so
-   * nothing about it hot-reloads: the sandbox around the preview updates on
-   * every component change and the preview keeps running whatever it loaded
-   * when the tab was opened. It looks exactly like a fix that did not work.
-   *
-   * `frame.html` is tiny and served `no-store`, and it names both stamped URLs,
-   * so its text *is* the version. Compared rather than its `ETag`, which is
-   * derived from mtime and changes on a rebuild that produced identical output.
-   *
-   * Nothing is resent here: the frame announces itself on load and the preview
-   * answers, which is the same path the first load takes.
    */
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -1018,15 +994,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           value={filter}
         >
           <helix-icon name="funnel-simple" slot="start"></helix-icon>
-          {/* **The one thing on the page that says which key it answers to.**
-              A shortcut nobody is told about is a feature for whoever wrote it,
-              which is the argument `SiteFind` makes for showing its own chord on
-              its own trigger.
-
-              `document`, and that is the exception rather than the default: `/`
-              has to work while the reader is in the tree, which is the whole
-              point of a key that focuses the field. `control` would mean
-              pressing it inside the field it had already focused. */}
+          {/*
+           * *The one thing on the page that says which key it answers to.**
+           *               A shortcut nobody is told about is a feature for whoever wrote it,
+           *               which is the argument `SiteFind` makes for showing its own chord on
+           *               its own trigger.
+           */}
           <helix-kbd
             keys="/"
             onhelix-shortcut={focusFilter}
@@ -1070,16 +1043,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           >
             {shown.map((entry) => (
               <helix-tree-item key={entry.slug} value={entry.slug}>
-                {/* Out of the workbench and into the family's own page, which is
-                    the reading the rail could not otherwise reach: the sandbox
-                    shows what a component does and the docs page says what it
-                    is, and there was no way from the first to the second.
-
-                    On the row that names the family rather than on an example,
-                    because a docs page is about the family. Pressing it must
-                    not open the branch, which is what a press anywhere else in
-                    this row does, and `Tree.Item` asks whether the press landed
-                    on a link before it toggles. */}
+                {/*
+                 *  Out of the workbench and into the family's own page, which is
+                 *                     the reading the rail could not otherwise reach: the sandbox
+                 *                     shows what a component does and the docs page says what it
+                 *                     is, and there was no way from the first to the second.
+                 */}
                 <helix-tooltip content={`${entry.label} documentation`} slot="end">
                   <a
                     aria-label={`${entry.label} documentation`}
@@ -1125,26 +1094,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           this is a tool, so the row runs to the window rather than to the
           site's text column. */}
       <helix-app-header class={styles.workbenchHeader}>
-        {/* The mark and the name, and the way out. No trail beside them: the
-            rail already says which component and which example, and a
-            breadcrumb repeating it is a second answer to a question nobody
-            asked twice.
-
-            The name is the accessible one, so the mark beside it is decoration
-            rather than a second reading of the same word.
-
-            The mark goes to `/`, because it reads "Fusion". Pointing it at
-            `/helix` on the reasoning that the sandbox sits under Helix is a
-            breadcrumb's job rather than a brand mark's: a lockup that says one
-            thing and goes to another is a link nobody can predict. Helix is one
-            row down in the palette either way.
-
-            **A tool is still a page on this site, so it needs a way out.** A
-            button rather than the row of destinations the site's header carries,
-            and ahead of the mark rather than after it. A tool's header is
-            already full of the tool, so what belongs in it is one way out rather
-            than four; and the menu is the outermost thing on the page, so it
-            sits outside the mark that names the page. */}
+        {/*
+         *  The mark and the name, and the way out. No trail beside them: the
+         *             rail already says which component and which example, and a
+         *             breadcrumb repeating it is a second answer to a question nobody
+         *             asked twice.
+         */}
         <helix-flex align="center" gap="2xs" slot="start">
           <helix-tooltip content="Menu" placement="bottom">
             <helix-icon-button label="Menu" onClick={() => setMenuOpen(true)}>
@@ -1367,15 +1322,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                   </helix-menu-item>
                 </helix-menu>
 
-                {/* Beside the settings, because it is the same kind of thing: a
-                  switch for a region of the tool rather than anything to do
-                  with the example.
-
-                  **And it is the only control for the rail at either width.**
-                  On a narrow viewport the rail is a drawer rather than a pane,
-                  so `setShowRail` there positions a pane that is not rendered
-                  and the button does nothing. One control in one place, saying
-                  the same thing at both widths. */}
+                {/*
+                 *  Beside the settings, because it is the same kind of thing: a
+                 *                   switch for a region of the tool rather than anything to do
+                 *                   with the example.
+                 */}
                 <helix-tooltip
                   content={railShown ? 'Hide examples' : 'Show examples'}
                   placement="bottom"
@@ -1437,14 +1388,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               src="/sandbox/frame.html"
             ></helix-sandbox-preview>
 
-            {/* The panel's tabs are `helix-tabs`, not a second tab set built
-              into the sandbox: tabs are the only behavior the region has, and
-              that behavior already exists.
-
-              Dense, like the toolbar. A bar of the tool says so once and the
-              controls in it follow; without it these tabs take the default
-              control height and stand eight pixels taller than the file tabs
-              across the split from them. */}
+            {/*
+             *  The panel's tabs are `helix-tabs`, not a second tab set built
+             *               into the sandbox: tabs are the only behavior the region has, and
+             *               that behavior already exists.
+             */}
             {showPanel && (
               <helix-tabs
                 data-density="sm"
@@ -1480,14 +1428,12 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             )}
           </helix-sandbox>
 
-          {/* Asked because the switch discards. Both syntaxes are authored
-            files, so it loads the other one and whatever was typed here is
-            simply gone. Untouched, there is nothing to lose and the switch is
-            silent.
-
-            Rendered always rather than gated on `pendingSyntax`, because a
-            dialog that unmounts cannot animate out, and `open` is what drives
-            `showModal()`. */}
+          {/*
+           *  Asked because the switch discards. Both syntaxes are authored
+           *             files, so it loads the other one and whatever was typed here is
+           *             simply gone. Untouched, there is nothing to lose and the switch is
+           *             silent.
+           */}
           <helix-dialog
             align="center"
             label="Change environment"

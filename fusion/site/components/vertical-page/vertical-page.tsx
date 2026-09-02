@@ -4,18 +4,6 @@ import styles from './vertical-page.module.css'
 
 /**
  * The shared frame for a vertical's page.
- *
- * One component rather than four near-identical files, so a change to how a
- * vertical presents itself is one edit. What differs between them is content,
- * which is what `children` is for.
- *
- * **`product` is what a page titles itself when a product fills the vertical.**
- * The masthead says Products and names Helix and Cortex, so a reader who
- * clicks Cortex and lands on a page headed `Fusion Mind` has been handed a
- * division when they asked for a product. Given one, the product is the title
- * and the vertical becomes the eyebrow over it, matching `/helix`. Energy and
- * Capital pass nothing, because there is no product in either and inventing an
- * eyebrow to match would be shape for its own sake.
  */
 export function VerticalPage({
   children,

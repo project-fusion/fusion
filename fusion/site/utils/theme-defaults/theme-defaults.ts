@@ -1,33 +1,10 @@
 /**
  * What a fresh builder starts as, stated once.
- *
- * **Four readers, and a default that differs between two of them is a builder
- * whose reset goes somewhere the reader never was, with nothing to say so.**
- * `builder.tsx` needs these as its `useState` initializers, in the `pristine`
- * comparison that decides whether the reset control is live, and in `reset`
- * itself. The fourth is the server, which derives this intent before it renders
- * so the first paint carries a real palette.
- *
- * **Chosen to be what already ships**, not what this file would prefer: the
- * sliders start where the stylesheet already is, so moving one is a departure a
- * reader can see rather than a jump.
  */
 import type { ThemeIntent } from '@fusion.dev/helix-theme'
 
 /**
  * The selector the emitted block is written for.
- *
- * **A data attribute rather than a class**, because this is not styling: it
- * names *which theme* a subtree is in, the same way `data-helix-theme` names
- * that a subtree is themed at all and `data-color-mode` names which half of
- * `light-dark()` resolves. A class would say the preview looks a certain way,
- * where the attribute says it is a particular theme, and the emitted block is
- * about the second.
- *
- * **The preview is styled by exactly the CSS the page is showing**, which is
- * the one property a builder has to have: what you copy is what you saw. The
- * alternative, setting properties on the node and rendering a separate string,
- * is two derivations of the same answer that can disagree.
  */
 export const SCOPE = '[data-theme="preview"]'
 
@@ -135,12 +112,6 @@ export function intentFrom(settings: Settings): ThemeIntent {
 /**
  * The bounds every numeric control answers to, stated once.
  *
- * A URL carries whatever somebody puts in it, so a value arriving that way has
- * to be clamped to the range the slider offers or the builder shows a control
- * sitting outside its own track, unable to return to the value it is
- * displaying. The sliders read these same numbers: clamping against a second
- * copy would drift from them the first time one moved.
- *
  * The step is here for the same reason: a value is snapped to it on the way in,
  * so a URL saying `density=97` produces the 95 a reader could have reached
  * rather than a slider that can never show that number again.
@@ -177,22 +148,6 @@ export const FLOATING: readonly Mechanism[] = ['shadow', 'border', 'fill']
 
 /**
  * What a reader's URL carries, keyed by the field name the control already has.
- *
- * **The query rather than the fragment, and that is the whole design.** A
- * fragment never reaches a server, so a shared link would arrive with the
- * default palette in the HTML and jump to the shared one a moment after
- * hydration, which is precisely the first-paint property `serverTheme` exists
- * to hold. A query string is on the request, so the page derives the theme
- * somebody sent before it renders anything. The insights grid and the component
- * gallery both already seed from the URL on the server for the same reason.
- *
- * **Only departures are written.** Nineteen values would make every link a
- * paragraph, and a reader who changed two things gets two parameters. It also
- * means an empty query is the shipped theme, so `reset` clears the URL by
- * having nothing to say rather than by knowing how to erase it.
- *
- * The keys are the `name` each control already carries, so a field in the form
- * and a parameter in the link are the same word.
  */
 export type Params = Record<string, string | string[] | undefined>
 
@@ -221,13 +176,6 @@ const oneOf = <T>(raw: string | string[] | undefined, set: readonly T[], fallbac
 
 /**
  * A color, or the shipped one.
- *
- * **Validated because it is written into a stylesheet.** The brand reaches the
- * engine and the engine's output reaches a `<style>` block, so a string from
- * somebody else's link that is not a color is a string from somebody else's
- * link inside a declaration. Six hex digits is the whole vocabulary, and
- * anything else is the default rather than an error: a link that has been
- * mangled in a chat client should still open the builder.
  */
 const color = (raw: string | string[] | undefined, fallback: string): string => {
   const value = one(raw)
@@ -238,12 +186,6 @@ const color = (raw: string | string[] | undefined, fallback: string): string => 
 
 /**
  * A face, if it is one we offer.
- *
- * Same reasoning as the color and one step further: a family name is
- * interpolated into a `font-family` *and* into a request to Google, so an
- * unchecked one is both a declaration somebody else wrote and a fetch somebody
- * else aimed. The catalog is the vocabulary, and `mono` decides which half of
- * it applies, so a mono field cannot be handed a display face.
  */
 const face = (
   raw: string | string[] | undefined,

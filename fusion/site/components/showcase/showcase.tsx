@@ -8,27 +8,12 @@ import styles from './showcase.module.css'
 /**
  * The library, running, with a switch that changes what it is showing.
  *
- * **A client component because the switch is the point.** The rest of this page
- * is server rendered and stays that way; what needs state is one segmented
- * control and the cell it swaps, so that is what moved and nothing else.
- *
- * **The switch never moves.** It sits above the grid rather than in it, so
- * pressing a segment changes what is under it and not where it is: a control
- * that jumps to a new position when you use it is a control you have to find
- * again every time. The anchor is pinned above the switch for the same reason,
- * being the one card that is about the page rather than about the library.
- *
  * **And every view is rendered, always.** Swapping them with a conditional
  * unmounts one set of custom elements and mounts another, and a freshly created
  * custom element has no size until it upgrades: the grid lays out around
  * nothing, the definitions arrive, and it lays out again. The containers never
  * moved, measured identical across all three at 664, 491, 644 and a switch at
  * 403, but the contents settled twice and that is what a reader sees.
- *
- * All three are stacked in one grid cell and all but one is `hidden`, so
- * nothing mounts on a press and nothing has to upgrade. `hidden` rather than a
- * conditional is also what keeps the two that are not showing out of the
- * accessibility tree and out of the tab order.
  */
 const VIEWS = [
   { label: 'Controls', name: 'controls' },
@@ -40,14 +25,6 @@ type View = (typeof VIEWS)[number]['name']
 
 /**
  * Five mouths on one head, sad to pleased.
- *
- * **A radio group rather than a rating, and that is not a preference.** A
- * rating's `mark` slot takes one shape and clones it into every position, so
- * five *different* faces cannot be a rating by construction. Five choices that
- * differ from each other is what a radio group is.
- *
- * Only the mouth changes: same head, same eyes, one path. Redrawing the whole
- * face per step is five chances for the heads to disagree about their own size.
  */
 const FACES = [
   { label: 'Awful', mouth: 'M8.5 16.6q3.5-3.2 7 0', value: 'awful' },
@@ -65,40 +42,11 @@ const BRAND = '#3b82f6'
 
 /**
  * True when something above this panel has already themed the document.
- *
- * **The panel derives into itself, which is right until the page does too.**
- * `ThemeScope` paints a derived palette onto `document.documentElement`, and
- * this panel's own tokens land on a node inside it, so they win locally: a
- * reader drags the page's brand control and every band moves except the one
- * band that is explicitly about the palette. That is the worst possible band to
- * leave behind.
- *
- * Read from the root rather than passed in as a prop, because the page that sets
- * it is a layout two levels up and threading a flag through would put knowledge
- * of the drafts into a component the live landing page shares.
  */
 const pageIsThemed = (): boolean => document.documentElement.hasAttribute('data-helix-theme')
 
 /**
  * Re-derives from one color and puts the result on the panel.
- *
- * **All of it comes from the engine, including the seed.** The tokens are
- * computed in JavaScript while the twenty-four series colors a chart reads
- * compute themselves in CSS off `--_helix-seed-brand`, so setting the tokens
- * alone moves the buttons and the tags and leaves every chart on the page the
- * original blue. The engine emits `seeds` for that half, and nothing here
- * reaches past `helix/styles`'s public surface to write a private primitive.
- * `check:css:seeds` holds the two name sets to each other in both directions.
- *
- * **`data-helix-theme` is still set before the values, and that is not
- * cosmetic.** A `var()` inside a custom property is substituted on the element
- * the property is *declared* on, so the ramp has already resolved at `:root`
- * and a seed written on a plain element is read by nothing. The attribute is
- * what re-runs those declarations here.
- *
- * Scoped to the panel rather than the document, because on the live page the
- * rest of the page is not the demonstration. Where a page has themed itself,
- * this stands down: see `pageIsThemed`.
  */
 const restyle = (
   engine: ThemeEngine,
@@ -172,17 +120,6 @@ export function Showcase(): React.ReactElement {
 
   /**
    * It cycles on its own, and stops the moment anybody arrives.
-   *
-   * **A pointer inside the panel is somebody reading it**, and moving what
-   * they are reading out from under them is the worst thing this could do. The
-   * same goes for focus: a reader on a keyboard has no pointer to hold still
-   * with, so focus anywhere inside pauses it too.
-   *
-   * **And it does not run at all for a reader who asked not to be moved.**
-   * Nothing in the base layer covers this. That rule caps animation and
-   * transition durations, and this is neither: it is a state change on a timer,
-   * which no duration reaches. Asked directly, and asked again if the
-   * preference changes rather than only at mount.
    */
   const [held, setHeld] = useState(false)
   const [brand, setBrand] = useState(BRAND)
@@ -407,18 +344,15 @@ export function Showcase(): React.ReactElement {
             </helix-flex>
           </helix-card>
 
-          {/* **The hole under the shorter card, which is why the form spans two
-              rows rather than this being appended.** The two cards above are
-              312 and 154, and the grid aligns to the start, so the right column
-              ended in 158px of nothing. Auto-placement would have put a fourth
-              card under the *taller* one and left the gap exactly where it was;
-              spanning the form is what makes the short column the one that
-              takes another item.
-
-              Two controls that appear nowhere else in this view: a pin is the
-              one field that is several boxes and one value, and a rating is a
-              scale that reports a number rather than a mood, which is the thing
-              the faces below deliberately are not. */}
+          {/*
+           * *The hole under the shorter card, which is why the form spans two
+           *               rows rather than this being appended.** The two cards above are
+           *               312 and 154, and the grid aligns to the start, so the right column
+           *               ended in 158px of nothing. Auto-placement would have put a fourth
+           *               card under the *taller* one and left the gap exactly where it was;
+           *               spanning the form is what makes the short column the one that
+           *               takes another item.
+           */}
           <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="md">
               <helix-pin-input

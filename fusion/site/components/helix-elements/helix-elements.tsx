@@ -31,25 +31,11 @@ import { useEffect, useState } from 'react'
 /**
  * Registers every Helix element the site uses, after React has hydrated.
  *
- * A custom element registers as a side effect of importing its module, and a
- * server component's imports never reach the browser. This is the only client
- * component on the site: pages stay server components, because an unregistered
- * tag is an unknown element in the HTML that upgrades when the definition
- * lands.
- *
  * **The effect buys load order, not hydration safety.** The definitions leave
  * the critical path and arrive after the page does, measured at 169ms against a
  * load event at 136. The window where a tag is unknown is what
  * `@fusion.dev/helix-styles/helix.css` covers, hiding `:not(:defined)` by visibility
  * so the page does not reflow when the definitions land.
- *
- * **What keeps hydration clean is that the four state mirrors are
- * `ElementInternals.states` entries**, which are not in the DOM at all, so an
- * element may upgrade whenever it likes and React finds the markup it rendered.
- * A timing fix could never have been that guarantee: an effect runs after
- * hydration only while hydration is one pass, and anything that splits it, a
- * streamed segment or a suspended boundary, puts an upgrade back inside the
- * window.
  */
 export function HelixElements(): null {
   const [, setRegistered] = useState(false)

@@ -6,25 +6,6 @@
  * against the ground it lands on" is Fusion's pitch wearing a customer's
  * header, and a reader judging a palette should not be reading about the
  * palette. Nothing here refers to theming at all.
- *
- * **And no single company is the page.** Copy that belongs to somebody else is
- * a tax on every reader it does not describe, and the tax is not small: the
- * hero, the features, the table and the drawer are most of the text on screen,
- * so a reader theming a shop would be reading three hundred words about berth
- * windows to find out what their headings look like.
- *
- * **Separate from the layouts because they are two axes.** A context is who is
- * speaking and a layout is how much page they are speaking on, and the test the
- * area rules give for whether something is one axis or two is whether two of
- * the values can be true at once. A minimal storefront and a dense storefront
- * are both real, so they are two questions, and this file answers only the
- * first. `themed-page.tsx` holds the skeletons that ask it.
- *
- * Every layout is a function of one of these, so a bundle has to carry what the
- * densest of them needs: the sidebar reads `nav`, the workspace reads `table`
- * and `chart`, and the landing page reads `hero` and `features`. Nothing here
- * was added for the app shell, which is the sign the split falls in the right
- * place.
  */
 
 type State = 'danger' | 'success' | 'warning'
@@ -40,12 +21,6 @@ type State = 'danger' | 'success' | 'warning'
 export interface Context {
   /**
    * What the toolbar of the application layout does.
-   *
-   * **A conversion CTA is not an application's action**, so this is its own
-   * string rather than `hero.primary`, which would put "Shop the winter range"
-   * above a packing bench. A landing page asks a stranger to begin; an
-   * application gives somebody already inside it a verb. It is the only word
-   * the workspace needs that no other layout does.
    */
   action: string
   /** The bar chart: its heading, its accessible table, and the numbers in it. */
@@ -60,13 +35,6 @@ export interface Context {
   close: { body: string; cta: string; heading: string }
   /**
    * What the editorial layout needs and no other layout has.
-   *
-   * **A page of prose is not a page of features rearranged.** Every other
-   * layout says the same things at different lengths, so they share `hero` and
-   * `features` between them; this one is a company writing rather than
-   * selling, and there is no sentence in the rest of this bundle that reads
-   * that way. `rail` is the label in the margin, which is the layout's whole
-   * organizing idea, and `body` is the paragraphs beside it.
    */
   editorial: {
     contact: string
@@ -714,22 +682,6 @@ export const CONTEXTS: readonly Context[] = [
 ]
 /**
  * The mark, which is a different drawing per company.
- *
- * **Figure and ground rather than one silhouette**, which is most of what
- * separates a logo from a shape. The figure is drawn and the gaps are the page
- * showing through, so each mark has structure at any size instead of being a
- * filled polygon.
- *
- * **And each one has to be its own**, which is why this is a switch rather than
- * one drawing reused: every mark below says something only its own name could
- * say, and handing one to another company would be a mark that means nothing.
- *
- * **Drawn rather than fetched.** A few rectangles is markup, not an asset: an
- * SVG file would need loading, sizing and a license to say the same thing, and
- * `currentColor` lets one definition serve the header and the footer.
- *
- * `aria-hidden`, because the wordmark beside it is the accessible name and a
- * reader should not be told the company twice.
  */
 export function Mark({ mark }: { mark: Context['mark'] }) {
   return (

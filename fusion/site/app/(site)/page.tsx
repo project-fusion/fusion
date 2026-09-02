@@ -36,20 +36,6 @@ export const metadata = pageMetadata({
 /**
  * Draft C: the design system is the product, and the engagements are how it
  * arrives.
- *
- * **The order is the argument.** Opening with the company, or putting two
- * substrates and three offers on the page as peers, asks a reader to care about
- * Fusion before being told what Fusion has. This states a problem, answers it
- * with three mechanisms, shows the mechanism working, proves it with
- * measurements, and only then says what it costs to have someone bring it to
- * you.
- *
- * **Cortex is not on this page and that is deliberate.** It is real and it is
- * Building, and it is also a second thing to understand at the moment a reader
- * is deciding about the first. It keeps its own page.
- *
- * The type scale is C's own rather than the token ramp: see `.tDisplay` and its
- * siblings for why a landing page wants a different curve from a document.
  */
 export default function Home() {
   /* The pill's words are the page's own title, so the two cannot disagree about
@@ -168,18 +154,15 @@ export default function Home() {
                   Explore components
                 </Link>
 
-                {/* **The two tools, under the reference rather than beside
-                        it.** Both are the same claim as the panel above carried
-                        one step further: the controls are real, and these are
-                        where you get to change them. They are quiet links
-                        because the reference is the thing a reader came for and
-                        three buttons of equal weight is a menu rather than an
-                        invitation.
-
-                        The theme pill at the foot of this page is the builder
-                        in miniature, which is the reason to name the full one
-                        here: a reader who has moved a slider and liked it has
-                        nowhere to go with that. */}
+                {/*
+                 * *The two tools, under the reference rather than beside
+                 *                         it.** Both are the same claim as the panel above carried
+                 *                         one step further: the controls are real, and these are
+                 *                         where you get to change them. They are quiet links
+                 *                         because the reference is the thing a reader came for and
+                 *                         three buttons of equal weight is a menu rather than an
+                 *                         invitation.
+                 */}
                 <helix-flex data-density="sm" gap="lg" wrap>
                   <Link data-link="quiet" href="/helix/sandbox">
                     Open the sandbox
@@ -197,15 +180,13 @@ export default function Home() {
           </div>
         </Band>
 
-        {/* **The field picks up again here and runs to the end.** One `200svh`
-          box anchored to this band reaches down through Services and the close,
-          which is the same trick the live page uses for its own late field: an
-          absolutely positioned child does not take part in flow, so it lights
-          the three bands below it without lengthening any of them.
-
-          It is anchored here rather than on Services because this is the first
-          band after the showcase, and the showcase is the one place the field is
-          deliberately absent. */}
+        {/*
+         * *The field picks up again here and runs to the end.** One `200svh`
+         *           box anchored to this band reaches down through Services and the close,
+         *           which is the same trick the live page uses for its own late field: an
+         *           absolutely positioned child does not take part in flow, so it lights
+         *           the three bands below it without lengthening any of them.
+         */}
         <ProofBand />
 
         {/* Delivery, last, because it is what a convinced reader wants and a
@@ -266,24 +247,12 @@ export default function Home() {
           </div>
         </Band>
 
-        {/* **The arguments, before the ask.** The essays are the one thing on this
-          page that is neither a product claim nor a price, so they sit between
-          the offer and the close: a reader who is not ready to talk has
-          somewhere to go that is not away.
-
-          **A card of four, not a carousel.** A reel here is the one band with no
-          glass behind its heading, so it reads as unfinished beside the seven
-          that have one, and the fix that would finish it is not available:
-          dissolving each card at the boundary needs an edge fade, an edge fade is
-          a mask, and a mask flattens every `backdrop-filter` beneath it, which is
-          the cards themselves. The note above `[data-substrate]` in `site.css`
-          has the measurements.
-
-          So the band is a card like every other, the four newest essays are
-          cells inside it, and each one drops its own glass rather than nesting
-          it. Four because that is a row, and because a set that fits on one
-          screen does not need controls, an indicator or a scroll position to be
-          restored. `Read all` is where the rest go. */}
+        {/*
+         * *The arguments, before the ask.** The essays are the one thing on this
+         *           page that is neither a product claim nor a price, so they sit between
+         *           the offer and the close: a reader who is not ready to talk has
+         *           somewhere to go that is not away.
+         */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <helix-flex align="center" gap="md" justify="between" wrap>

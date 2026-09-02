@@ -22,16 +22,6 @@ const DESCRIPTION =
 
 /**
  * The defaults every page inherits, and the base every relative URL resolves on.
- *
- * **`metadataBase` is the one that silently decided everything.** Without it
- * Next drops relative image URLs rather than guessing an origin, so a card
- * declared as `/opengraph-image` reached no crawler at all. Set here once, it is
- * what makes `pageMetadata` able to take a path instead of asking every page to
- * write the domain out.
- *
- * The `openGraph` and `twitter` blocks are defaults rather than the whole story:
- * a page that calls `pageMetadata` replaces them with its own, and a page that
- * forgets still unfurls as the site rather than as a bare domain.
  */
 export const metadata: Metadata = {
   description: DESCRIPTION,
@@ -97,7 +87,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           />
         ))}
 
-        {/* **What the reader chose, applied before the first pixel.**
+        {/*
+         * *What the reader chose, applied before the first pixel.**
          *
          * Two things: the color mode, and the palette they derived on the
          * landing page. One script, because they are one concern — appearance
@@ -114,34 +105,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
          * field at light-mode brightness under chrome that is already dark. The
          * palette has the same problem an order of magnitude wider: every color
          * on the page changing one frame in.
-         *
-         * A blocking script in `head` is the only thing that runs early enough,
-         * and `next/script` at `beforeInteractive` is how this framework writes
-         * one: it is emitted into the server-rendered head rather than injected
-         * by the client, so it executes before the document paints. A bare
-         * `<script dangerouslySetInnerHTML>` does the same thing and is rightly
-         * refused by `noDangerouslySetInnerHtml` while a supported form exists.
-         *
-         * **The palette is restored, never derived.** The engine is wasm and
-         * loading it is asynchronous, so a script that computed the palette
-         * could not be the thing that runs first. What is stored is what the
-         * engine already produced, so this is a list of custom properties being
-         * written to the root: synchronous, and done in the same tick. The flag
-         * goes on last, being what the token layer keys its own declarations
-         * off; set first, the layer would resolve against properties that are
-         * not there yet.
-         *
-         * The keys are interpolated rather than written out, so this and the
-         * panels that write them cannot drift apart. Both come from plain
-         * modules rather than from `preferences.tsx`: that file is
-         * `'use client'`, and a server component importing a non-component value
-         * from a client module gets a reference proxy, so the constant arrives
-         * here as `undefined` and ships `getItem(undefined)`. Wrapped in `try`,
-         * because storage throws rather than returning null in a private window,
-         * and an appearance is not worth a blank page. The version is checked
-         * for a narrower reason: a palette held from before a role was renamed
-         * would restore a page with a hole in it that the reader cannot see and
-         * cannot report. */}
+         */}
         <Script id="site-appearance" strategy="beforeInteractive">
           {`try{var d=document.documentElement;var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')d.dataset.colorMode=m;var t=JSON.parse(localStorage.getItem(${JSON.stringify(SITE_THEME_KEY)})||'null');if(t&&t.version===${THEME_VERSION}&&t.tokens){var s=d.style,i;for(i=0;i<t.tokens.length;i++)s.setProperty(${JSON.stringify(OWNED)}+t.tokens[i].name,t.tokens[i].hex);for(i in t.seeds)s.setProperty(${JSON.stringify(OWNED)}+i,t.seeds[i]);d.dataset.helixTheme=''}}catch(e){}`}
         </Script>

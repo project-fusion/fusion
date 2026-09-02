@@ -26,18 +26,6 @@ import { TierAddress } from './tier-address'
 
 /**
  * One component family, in full.
- *
- * The sandbox is where an example is *edited*; this is where it is *seen*,
- * alongside the API it demonstrates.
- *
- * Every section carries an `id`, because the rail is a real `Outline` and it
- * reads the anchors the page gives it.
- *
- * Tables are `helix-table`, a grid rather than a `<table>`: every column lines
- * up across rows while each row stays a real element. The heading cell is what
- * names the data, which is why none of these tables carries a caption above it.
- * "Prop" over the first column says the same thing a "Properties" heading would
- * and says it inside the table, where a reader scanning columns already is.
  */
 
 export function generateStaticParams() {
@@ -53,13 +41,6 @@ const SECTIONS = [
 
 /**
  * The description column, one width for every table on the page.
- *
- * Fixed here and flexible everywhere else, which is the way round that makes
- * the page line up. Sizing the *first* column instead leaves the description
- * taking whatever is left, so a table with a Type column and one without end up
- * with their prose starting and ending in different places, and the six tables
- * in a section read as six unrelated shapes. Pinning the prose means a reader
- * scanning down the page is scanning one column.
  */
 const DESCRIPTION = '26rem'
 
@@ -71,10 +52,6 @@ const DESCRIPTION = '26rem'
  * measured 115px in a 99px cell and printed its last sixteen pixels over the
  * type beside it. The element already refuses to break, which is right for an
  * identifier, so without a floor on the track the name simply overflowed.
- *
- * `min-content` is the name itself, since the name cannot break, and `auto`
- * takes no more than that, so a table of short names stays as narrow as it
- * always was.
  */
 const NAME = 'minmax(min-content, auto)'
 
@@ -86,10 +63,6 @@ const NAME = 'minmax(min-content, auto)'
  * track by 31px and printed over the column beside it. A union's members are
  * deliberately unbreakable, so the track has to be at least one member wide or
  * there is nowhere for it to go.
- *
- * `min-content` is that width and is never more than it needs. A signature is
- * one member and breaks at its spaces, so its `min-content` is a word rather
- * than the whole of it, and a column of short types stays narrow.
  */
 const TYPE = 'minmax(min-content, 1fr)'
 
@@ -97,28 +70,12 @@ const first = (text: string): string => text.split('\n\n')[0] ?? ''
 
 /**
  * Rows in alphabetical order, by the column a reader scans.
- *
- * The manifest emits members in source order, which is the order the component
- * author found convenient and carries no meaning for anyone reading the table.
- * Alphabetical is the order a reader can search without reading: looking for
- * `disabled` in a list of thirty properties is a scan when the list is sorted
- * and a full read when it is not.
- *
- * `localeCompare` rather than `<`, so the unnamed slot and any name with a
- * dash in it sort where a person would expect rather than where their code
- * points fall.
  */
 const byName = <T extends { name: string }>(rows: T[]): T[] =>
   [...rows].sort((a, b) => a.name.localeCompare(b.name))
 
 /**
  * Examples alphabetically, with the headline held at the top.
- *
- * `preview.html` is the family's canonical example rather than one of its
- * variants, which is why it reads as "Preview" and why both the plugin and the
- * catalog already put it first. Sorting the column flat would file it under P
- * among the variants it is meant to introduce, so the pin survives the sort and
- * everything after it is alphabetical.
  */
 const byExample = (rows: Example[]): Example[] =>
   [...rows].sort((a, b) =>
@@ -152,12 +109,6 @@ function Code({ children }: { children: string }) {
  */
 /**
  * The built-in types, which are one color between them.
- *
- * `string` belongs here and not with the literals. It is the same kind of word
- * as `boolean`: a name the language supplies, sitting where a type goes.
- * `"primary"` is a different kind of thing entirely, a value standing in for a
- * type, and coloring the two alike made a union of literals read as though it
- * were a list of primitives.
  */
 const BUILTIN = new Set([
   'any',
@@ -192,9 +143,6 @@ const kindOf = (token: string): string => {
  * has no members and may contain a space, and `"Show password"` in an 83px
  * column then had nowhere to break. Measured on Input: the text ran 108px in an
  * 83px box and the last nine landed on top of the description beside it.
- *
- * Same colors and the same quote swap, because it is still code and a reader
- * still copies it out. What it does not inherit is the union machinery.
  */
 function DefaultText({ children }: { children: string }) {
   return (
@@ -245,16 +193,6 @@ function TypeText({ children }: { children: string }) {
 
 /**
  * A union split into its members, so a wrap can only happen between them.
- *
- * The bar was loose text between tokens, which put it wherever the line
- * happened to end: a four-member union wrapped to four lines each trailing its
- * own `|`, and a longer one wrapped with the bar leading some lines and
- * trailing others, which reads as two different lists. Carried by the member it
- * introduces, it is always at the start of the line.
- *
- * **Depth-aware, because a union can be inside a generic.**
- * `Record<string, A | B>` is one member and splitting it on every bar would
- * make it three. Quotes are tracked too: a literal may contain anything.
  */
 const union = (type: string): string[] => {
   const members: string[] = []
@@ -300,17 +238,6 @@ function tokens(member: string) {
 
 /**
  * What a column heading means, where one word cannot say it.
- *
- * **A button rather than a bare glyph.** `Tooltip` shows on hover and on focus,
- * so a mark that is not focusable is a mark only a pointer ever reads, and this
- * is the case where that matters most: the heading is one invented word and a
- * keyboard reader has no other way to find out what it means. It does nothing
- * when pressed, which is the accessible pattern for a hint rather than a
- * control, and it carries the sentence as its own name so a screen reader hears
- * the explanation rather than the word "info".
- *
- * Only `Read` has one today. `Prop`, `Type`, `Slot` and `Event` are words a
- * reader arrives already knowing; `Read` is ours.
  */
 function ColumnHint({ hint, label }: { hint: string; label: string }) {
   return (
@@ -370,15 +297,6 @@ function MemberTable({
 
 /**
  * What a reference mark says, in the tooltip and to a screen reader alike.
- *
- * **Composed here rather than carried in the tag**, because the tag's job is to
- * name which specification a member is built on and this is copy about a link.
- * Written into each `@reference` it would be the same sentence in five places
- * and a rewording would be five edits in two packages.
- *
- * One string for both surfaces, and it does not repeat the member's name: that
- * name is already the header of the row a reader is in, so carrying it in the
- * link only makes the announcement longer.
  */
 const opens = (label: string): string => `Open the ${label} specification`
 
@@ -459,14 +377,10 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
 function ElementApi({ element }: { element: Element }) {
   return (
     <helix-flex data-tier={element.tier} direction="column" gap="md" id={element.tagName}>
-      {/* The part, not the family and the part: the page has already said the
-          family name twice above.
-
-          And the tag beside the heading rather than under it. `Root` and
-          `helix-accordion` are one fact stated twice, a role and the name it
-          answers to, and stacked they read as a heading followed by a first
-          line of content. On the same line the name is plainly a label on the
-          heading, and the section starts at its prose instead. */}
+      {/*
+       *  The part, not the family and the part: the page has already said the
+       *           family name twice above.
+       */}
       <helix-flex align="center" data-density="sm" gap="sm" wrap>
         <helix-text as="h3">{element.part || element.label}</helix-text>
         <helix-tag>
@@ -529,17 +443,6 @@ function onlyTier(examples: readonly Example[]): 'headless' | 'styled' | undefin
 
 /**
  * A title and a card for each of the eighty-eight families.
- *
- * This route is most of the site by count, so a shared root title and
- * description would have `Accordion` and `VirtualList` unfurling identically.
- * The family already carries both facts, `label` and `summary`, and the summary
- * is written as the one sentence that says what the component is, which is
- * exactly what a card wants.
- *
- * **The picture is drawn too**, by `opengraph-image.tsx` beside this file, from
- * the same `label`, `summary` and `status`. There is deliberately no *shot* of a
- * family: a card is read at thumbnail size, where a name set large is legible
- * and a screenshot of a control is a gray smudge.
  */
 export async function generateMetadata({
   params,
@@ -790,14 +693,12 @@ export default async function FamilyDocs({
       </article>
 
       <aside className={docsShell.docsRail}>
-        {/* `Outline` rather than a hand-rolled list: it computes what is current
-            from where the headings actually are and writes `aria-current` onto
-            these anchors, so the rail says where you are and not only where you
-            could go.
-
-            The heading is visible as well as accessible. `label` names the
-            navigation for a screen reader and paints nothing, which leaves a
-            column of links with no word saying what they are. */}
+        {/*
+         *  `Outline` rather than a hand-rolled list: it computes what is current
+         *             from where the headings actually are and writes `aria-current` onto
+         *             these anchors, so the rail says where you are and not only where you
+         *             could go.
+         */}
         <helix-text class={docsShell.docsRailTitle} tone="subtle" variant="label">
           On this page
         </helix-text>

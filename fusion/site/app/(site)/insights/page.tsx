@@ -26,14 +26,6 @@ const SORTS: Record<string, (a: Insight, b: Insight) => number> = {
 
 /**
  * Insights: a hero, a filter bar, and a grid of posts.
- *
- * The same shape as the Helix gallery, and deliberately: they are the two
- * places on the site where a reader is looking for one of a set, so they should
- * not be two different pages to learn. The cards differ, being text rather than
- * drawings; the hero does not, and wears the same lit lattice from `HeroField`.
- *
- * A server component. The sort is applied here, for the reading-order reason
- * `InsightBrowser` sets out.
  */
 export default async function Page({
   searchParams,
