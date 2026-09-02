@@ -406,7 +406,7 @@ which is a different and more expensive mechanism: rewriting the tag literals at
 build time, a second distribution to publish, and an artifact per customer.
 Nothing on this page needs any of that.
 
-The sovereignty question answers itself in this direction. You hold the
+The ownership question answers itself in this direction. You hold the
 presentation layer, the tags and the build. If Fusion stopped tomorrow you would
 keep a working design system and lose upstream fixes to the behavior underneath
 it.
@@ -615,9 +615,9 @@ really painted on and reports each pair with its ratio and target, and
 \`helix theme build\` does. Pasting one into a stylesheet is worse than reading a
 warning above it, and an agent does not read warnings.
 
-**You run it and nobody hosts it.** A server we operated would be a dependency
-you cannot exit, which the Sovereignty Constraint refuses; this is a subcommand
-of a binary you installed, talking to a client you chose, with no network in it.
+**You run it and nobody hosts it.** A server we operated would be one more
+service standing between you and your own tokens; this is a subcommand of a
+binary you installed, talking to a client you chose, with no network in it.
 
 ## What is not here
 
@@ -1938,7 +1938,7 @@ is the whole cost of adopting the base layer on its own.
 | \`elements.css\` | 8,290 | 1,875 | 1,600 | The components' own layer, generated from every family's stylesheet. |
 | \`all.css\` | 179 | 142 | 110 | The three above in one import, in the order they have to be in. |
 | \`primitives.css\` | 6,275 | 1,234 | 1,062 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
-| \`tokens.css\` | 19,989 | 2,467 | 2,073 | The 185 semantic tokens. Nothing paints without this. |
+| \`tokens.css\` | 19,989 | 2,460 | 2,046 | The 185 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
@@ -2245,7 +2245,7 @@ column is what was removed rather than part of what remains.
 | \`@fusion.dev/helix-icons\` | 65,943 | 11 | 20,928 | none |
 | \`@fusion.dev/helix-styles\` | 83,277 | 5 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 461,551 | 8 | 4,699 | none |
-| \`@fusion.dev/helix\` | 9,306,931 | 718 | 278,170 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,314,256 | 720 | 278,170 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
@@ -4641,8 +4641,8 @@ for the API.
 | GitHub Copilot | \`.github/copilot-instructions.md\` |
 | Anything else | Whatever it reads. The line is the same |
 
-**We do not write those files for you**, and that is the Sovereignty Constraint
-rather than laziness: a file we generate into your repository is one you then
+**We do not write those files for you**, and that is deliberate rather than
+lazy: a file we generate into your repository is one you then
 maintain against our changes, and a tool that rewrites it on install is a
 dependency you did not ask for in a directory you own. The line above is yours to
 paste and yours to delete.
@@ -5090,9 +5090,10 @@ The components are built on Lit, so \`lit\` has to resolve too. That is the part
 that makes an import map necessary rather than optional: the package's own
 imports are bare specifiers, and a browser needs to be told where each one is.
 
-**Copy the files, do not point at a CDN.** An import map pointing at someone
-else's server makes your page stop working when theirs does, which is the
-dependency the Sovereignty Constraint exists to refuse. \`bun add\` and then copy
+**A CDN works, and the tradeoff is worth naming.** An import map pointing at
+someone else's server means your page stops working when theirs does, and
+pinning an exact version matters more there than anywhere else. If you would
+rather not take that on, \`bun add\` and then copy
 \`node_modules/@fusion.dev/helix-*/dist\` into whatever you serve.
 
 ## What this costs
@@ -5126,7 +5127,7 @@ control](./state-and-control).
   rel="stylesheet"
 />
 <link
-  href="/vendor/helix/styled/elements.css"
+  href="/vendor/helix/shared/css/elements.css"
   rel="stylesheet"
 />
 \`\`\`

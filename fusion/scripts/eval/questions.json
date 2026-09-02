@@ -13499,7 +13499,7 @@
   ],
   "sources": [
     "helix/styled/custom-elements.json",
-    "helix/styles/tokens.json"
+    "helix/styles/dist/tokens.json"
   ],
   "total": 1980
 }
