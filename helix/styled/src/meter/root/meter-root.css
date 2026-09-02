@@ -32,19 +32,9 @@
 [part="track"] {
   background-color: var(--meter-track-color, var(--helix-color-surface-sunken));
   block-size: var(--meter-size, var(--helix-size-meter));
-  /* The house radius, not the pill `Progress` wears, and the ticks are why.
-   *
-   * `radii-full` on an eight pixel bar resolves to a four pixel pill, so it is
-   * indistinguishable from `radii-sm` at that height. The token only starts to
-   * matter at twelve, and at twelve `full` makes this the roundest container in
-   * a library whose house value is four and is on nearly everything.
-   *
-   * The ticks settle it. They cut the fill into segments, so a pill-ended bar
-   * comes out as a run whose outer ends are round and whose inner ends are
-   * square: the first band reads as a capsule and the ones after it as offcuts.
-   * At four the segments agree with each other. `Progress` keeps its pill,
-   * because nothing cuts it and a bar reporting one quantity is a pill
-   * everywhere a reader has seen one. */
+  /*
+ *  The house radius, not the pill `Progress` wears, and the ticks are why.
+ */
   border-radius: var(--helix-radii-sm);
   inline-size: 100%;
   /* The fill has a radius of its own, and at low values its trailing corners
@@ -134,15 +124,13 @@
   z-index: var(--helix-layer-raised);
 }
 
-/* The same reading, drawn round.
+/*
+ *  The same reading, drawn round.
  *
  * A gauge and a meter are the same thing measured, so this is a shape rather
  * than a second component: the value, the range and the bands are untouched and
  * only the geometry carrying them changes. `Progress` made the same call with
  * its ring, and the two are built the same way on purpose.
- *
- * The host becomes a single grid cell so the reading can sit in the middle of
- * the drawing rather than beside it, which is the whole point of a round one.
  */
 :host([shape="arc"]),
 :host([shape="ring"]) {
@@ -227,16 +215,13 @@
   transition: stroke-dasharray var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
-/* A tick is a segment of the same circle rather than a mark placed on it: one
-   unit of a hundred, pushed round to where the threshold falls. No trigonometry,
-   and it stays right at any radius and any thickness. Drawn in the ground's own
-   color rather than a line color, so it reads as a gap in the groove, which is
-   what a scale mark on a dial is.
-
-   `--meter-tick-color` is the same hook the bar's tick takes, so the two shapes
-   answer to one property rather than one of them being correctable and the
-   other not: a bare `--helix-color-background` here leaves the round shapes
-   unable to be told what the meter was put on. */
+/*
+ *  A tick is a segment of the same circle rather than a mark placed on it: one
+ *    unit of a hundred, pushed round to where the threshold falls. No trigonometry,
+ *    and it stays right at any radius and any thickness. Drawn in the ground's own
+ *    color rather than a line color, so it reads as a gap in the groove, which is
+ *    what a scale mark on a dial is.
+ */
 :host([shape="arc"]) [part="tick"],
 :host([shape="ring"]) [part="tick"] {
   /* The bar's tick is a positioned span; on a circle none of that applies and
@@ -285,25 +270,14 @@
   }
 }
 
-/* **Subtle, which is the quiet end of the axis: the reading keeps its area and
-   stops claiming to be the point.** A wash of its own color rather than a
-   different color, so what it means does not change with how loudly it is said:
-   the bands are the other axis and this one must not borrow from them. Written
-   against `--_meter-hue`, which is whatever the band or the shape chose, so one
-   pair of rules quietens all four colors in all three shapes.
-
-   `color-mix` toward the track rather than an `opacity`, because the indicator
-   sits on a groove that is already a surface: fading toward transparent would
-   show the groove through it and the reading would depend on what the groove
-   happened to be. Mixing toward the groove's own token lands where a translucent
-   fill would, without the compositing.
-
-   **Two rules and not one, because the shapes do not paint the same way.** A bar
-   is a box with a `background-color` and a ring is an SVG circle with a
-   `stroke`, which is the same split the bands themselves are written across four
-   rules for. A single `background-color` rule here would have been silently inert
-   on two of the three shapes, which is the failure mode a `[part=]` selector for
-   an unrendered part has and is just as quiet. */
+/*
+ * *Subtle, which is the quiet end of the axis: the reading keeps its area and
+ *    stops claiming to be the point.** A wash of its own color rather than a
+ *    different color, so what it means does not change with how loudly it is said:
+ *    the bands are the other axis and this one must not borrow from them. Written
+ *    against `--_meter-hue`, which is whatever the band or the shape chose, so one
+ *    pair of rules quietens all four colors in all three shapes.
+ */
 :host([emphasis="subtle"]) [part="indicator"] {
   background-color: color-mix(
     in oklab,

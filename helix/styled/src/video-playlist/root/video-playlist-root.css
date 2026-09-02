@@ -1,10 +1,5 @@
-/* Two regions, and which way they sit is the consumer's.
- *
- * Beside on a wide screen and stacked on a narrow one is what every playlist
- * does, and neither is this element's to decide: a playlist in a sidebar is
- * narrow on a desktop, and one filling a phone is not. `--video-playlist-layout`
- * takes a `grid-template-columns`, so a consumer says it once in the terms the
- * property already has rather than through an appearance that guesses.
+/*
+ *  Two regions, and which way they sit is the consumer's.
  */
 :host {
   display: grid;

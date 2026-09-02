@@ -40,33 +40,23 @@
   gap: var(--helix-space-2xl);
 }
 
-/* `3xl` is the top of the space scale, and the pair stops where it does.
- *
- * Without it a layout reaches the step only through a document rule setting
- * `gap` on the element, which beats the shadow rule outright and leaves the
- * `gap` attribute beside it dead text: the markup says one thing and the page
- * does another.
- *
- * `Grid` covers the same step. A pair of layout components whose scales differ
- * by one step is a worse arrangement than either of them alone: the difference
- * is invisible until somebody writes the value on the wrong one and gets
- * nothing. */
+/*
+ *  `3xl` is the top of the space scale, and the pair stops where it does.
+ */
 :host([gap="3xl"]) {
   gap: var(--helix-space-3xl);
 }
 
-/* `align` is a legacy HTML presentational attribute, and the browser applies it
-   to any element that carries one, including this one.
+/*
+ *  `align` is a legacy HTML presentational attribute, and the browser applies it
+ *    to any element that carries one, including this one.
  *
  * `<helix-flex align="center">` therefore also set `text-align: center` on
  * everything inside it, through a hint no rule here declares and none can see.
  * Measured: an invented tag with `align="center"` computes centered text too, so
  * it is nothing to do with being a known element. It centered the placeholder in
  * every field put in a centered row.
- *
- * Restoring inheritance is enough to undo it: a presentational hint is ordered
- * before every author rule, so anything at all wins. `inherit` and not a value,
- * because what should happen is what would have happened without the hint. */
+ */
 :host([align]) {
   text-align: inherit;
 }

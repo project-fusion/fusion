@@ -1,19 +1,11 @@
-/* **It wraps, because a list of links can and a row of them ran out of room.**
+/*
+ * *It wraps, because a list of links can and a row of them ran out of room.**
  *
  * Measured at 320: the control came to 24 past the page. It already windows the
  * run, `siblings` and `boundaries` deciding how many slots there are and a gap
  * standing over what is hidden, so there is no missing setting here; the
  * default simply asks for one slot more than a 272px row holds.
- *
- * Wrapping rather than dropping a slot: which pages are reachable is what
- * `siblings` says, and a component that quietly reduced it to fit would change
- * what a reader can get to without being asked. A second line changes nothing
- * about that.
- *
- * `helix-button-group` is the case that cannot do this and says so: its buttons
- * share edges as one shape, so a wrapped row carries the corners of a first row
- * into a second. These are separate controls with gaps between them, so a
- * second line is just a second line. */
+ */
 :host {
   align-items: center;
   display: flex;
@@ -96,18 +88,8 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Where you are: a raised chip, not a brand fill.
- *
- * Same treatment `Tabs` gives its selected tab, `surface-raised` under
- * `shadow-sm`, and for the same reason. Brand on a page number claims more than
- * the state deserves: it is not a choice the reader made about anything, it is
- * where they happen to be standing, and a row of gray numbers with one blue one
- * reads as the blue one being an action. Lifting it says the same thing in the
- * register the rest of the library uses for it.
- *
- * `aria-current` is the selector rather than a second attribute saying the same
- * thing: the state is already in the accessibility tree and a `data-current`
- * beside it would be two places to keep in step.
+/*
+ *  Where you are: a raised chip, not a brand fill.
  *
  * **The border is what actually distinguishes it, and that is a measurement.**
  * The two grays in play are `oklch(0.97 0 258)` for raised against
@@ -115,15 +97,7 @@
  * lightness apart, so under `surface-raised` and `shadow-sm` alone the page you
  * are on and the page under the pointer are the same chip. A shadow at this size
  * cannot carry a distinction that fine.
- *
- * So the edge does it, and the shadow goes with it. Nothing else in the row is
- * framed, so it is the only mark here doing work no other state claims. The box
- * already reserves a transparent border, so nothing moves when it is colored
- * in.
- *
- * The hover rule is repeated rather than left to the cascade, so the chip keeps
- * its own surface under the pointer. It is already the one you are on and does
- * not need telling twice. */
+ */
 [part="page"][aria-current="page"],
 [part="page"][aria-current="page"]:hover {
   background-color: var(--pagination-current-color, var(--helix-color-surface-raised));
@@ -167,21 +141,9 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
-/* **A caret is physical and "previous" is not.**
- *
- * The row already flips: it is a flex line, so in a right-to-left document the
- * back controls sit at the right edge, which is the inline start and is where
- * they belong. The glyphs inside them did not, so `previous` sat on the right
- * pointing left, which in that reading direction points *forward*. Every control
- * in the row said the opposite of what it did.
- *
- * Mirrored rather than swapped for the other icon, so the pair stays one
- * decision: `caret-double-left` reversed is exactly `caret-double-right`, and
- * two sets of icon imports that must agree is the kind of thing that drifts.
- *
- * A slotted mark is mirrored on the same argument. The rule is about what the
- * glyph means in the reading direction, not about which tree drew it, and a
- * consumer's caret points the wrong way for exactly the reason ours did. */
+/*
+ * *A caret is physical and "previous" is not.**
+ */
 :host(:dir(rtl)) [part="first"] svg,
 :host(:dir(rtl)) [part="last"] svg,
 :host(:dir(rtl)) [part="previous"] svg,
@@ -206,17 +168,9 @@
   user-select: none;
 }
 
-/* Nothing to move between, so nothing to draw.
- *
- * `display: none` and not an empty box: the host is a flex item wherever it is
- * placed, and a zero-width one still has the parent's gap drawn on both sides of
- * it. That is the fault this repository has hit in the toast, the list, the
- * divider and the carousel, and it is the reason this is a rule about the box
- * rather than about the contents.
- *
- * `:state()` and not an attribute. The headless tier sets a custom state, which
- * carries the fact to this stylesheet and nothing to the DOM, so a server's
- * output and a hydrated client's agree. */
+/*
+ *  Nothing to move between, so nothing to draw.
+ */
 :host(:state(empty)) {
   display: none;
 }

@@ -32,25 +32,16 @@
   display: inline-flex;
   font-size: var(--_badge-text);
   font-weight: var(--helix-weight-semibold);
-  /* Pinned to the corner, then pulled back along both axes.
-   *
-   * The pullback is the default rather than something to reach for. At zero the
-   * mark's center sits on the corner of the box, which is only right when the
-   * thing being marked fills its box: on a circle, which is most of what
-   * carries a badge, the corner is outside the shape and the mark floats off
-   * it.
-   *
-   * A proportion of the mark rather than a length, because an absolute inset
-   * positions something that is not absolute: a badge whose size follows the
-   * density stays pinned the same number of pixels in whatever it has become. A
-   * quarter of the mark keeps the overlap looking the same at every size.
-   *
-   * **And the sign is positive, or the pullback pushes out.** A negative inset
-   * moves the mark *away* from the corner: measured on an avatar, a button and
-   * an icon button, its center landed 4px outside the corner in both axes,
-   * which on a 32px circle is well clear of the shape. Positive, the center
-   * sits 4px inside the corner, within a pixel of where that circle's edge
-   * crosses the diagonal. */
+  /*
+ *  Pinned to the corner, then pulled back along both axes.
+ *
+ * **And the sign is positive, or the pullback pushes out.** A negative inset
+ * moves the mark *away* from the corner: measured on an avatar, a button and
+ * an icon button, its center landed 4px outside the corner in both axes,
+ * which on a 32px circle is well clear of the shape. Positive, the center
+ * sits 4px inside the corner, within a pixel of where that circle's edge
+ * crosses the diagonal.
+ */
   inset-block-start: var(--badge-offset, calc(var(--_badge-size) / 4));
   inset-inline-end: var(--badge-offset, calc(var(--_badge-size) / 4));
   justify-content: center;
@@ -65,14 +56,12 @@
   white-space: nowrap;
 }
 
-/* No value, so nothing to read: the mark collapses to a dot. It has its own
-   size rather than borrowing the inline padding, which is a different quantity
-   that happened to be close enough to pass for one. Shape follows content, so
-   there is no attribute saying which one this is.
-
-   `[data-blank]` is never `:empty`, since a value that counts nothing still has
-   text. The two rules cannot both apply, so a mark leaving keeps its size and
-   scales from it rather than snapping to a dot on the way out. */
+/*
+ *  No value, so nothing to read: the mark collapses to a dot. It has its own
+ *    size rather than borrowing the inline padding, which is a different quantity
+ *    that happened to be close enough to pass for one. Shape follows content, so
+ *    there is no attribute saying which one this is.
+ */
 [part="indicator"]:empty {
   block-size: var(--_badge-dot);
   min-inline-size: var(--_badge-dot);

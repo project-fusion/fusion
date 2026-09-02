@@ -62,16 +62,14 @@
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--megamenu-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
-  /* Laid out at full size and revealed top to bottom, so nothing inside moves.
-     Negative on three sides because `clip-path` clips the shadow too; the
-     corners survive, an `inset()` with no `round` clipping to a rectangle.
-
-     One space step of overshoot, never `100vmax`: on a 267 pixel band that is
-     267 of 1547 pixels of travel, so the reveal finishes in the first 17%.
-
-     Collapsed rests here and open departs, keyed on `:popover-open`. With the
-     closed value on `[hidden]` the panel opened in one jump, `hidden` being
-     removed while the popover was still closed. `Drawer` has the same note. */
+  /*
+ *  Laid out at full size and revealed top to bottom, so nothing inside moves.
+ *      Negative on three sides because `clip-path` clips the shadow too; the
+ *      corners survive, an `inset()` with no `round` clipping to a rectangle.
+ *
+ *      One space step of overshoot, never `100vmax`: on a 267 pixel band that is
+ *      267 of 1547 pixels of travel, so the reveal finishes in the first 17%.
+ */
   clip-path: inset(0 calc(var(--helix-space-xl) * -1) 100% calc(var(--helix-space-xl) * -1));
   /* One row of tracks sized to their contents. Flex takes it to a single
      column, a wrapping container's max-content width being one item's: 219
@@ -177,13 +175,12 @@
   padding-inline: var(--helix-space-md);
 }
 
-/* Every author rule giving this panel a display overrules the UA's own hide, so
-   each overlay family restates it. **Do not lower the specificity**: the band is
-   (0,3,0), so a bare `[part="surface"][hidden]` at (0,2,0) lost and a closed
-   band kept `display: grid`, leaving a 1280 by 267 box over the page.
-
-   `[hidden]` rather than `:not(:popover-open)`, being bound from `open`, so it
-   answers whether or not the panel ever reached the top layer. */
+/*
+ *  Every author rule giving this panel a display overrules the UA's own hide, so
+ *    each overlay family restates it. **Do not lower the specificity**: the band is
+ *    (0,3,0), so a bare `[part="surface"][hidden]` at (0,2,0) lost and a closed
+ *    band kept `display: grid`, leaving a 1280 by 267 box over the page.
+ */
 :host [part="surface"][hidden] {
   display: none;
 }

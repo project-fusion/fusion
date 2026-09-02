@@ -17,13 +17,9 @@
   inline-size: var(--skeleton-size, var(--helix-size-control));
 }
 
-/* The base fill, and nothing animated on this element at all.
- *
- * `background-position` on a gradient is the obvious sweep and repaints the
- * element every frame rather than compositing, forever, once per skeleton. A
- * loading state is by definition many of them at once and on a page already busy
- * doing the thing they are standing in for, which makes it the worst place in
- * the library to repaint on a timer. */
+/*
+ *  The base fill, and nothing animated on this element at all.
+ */
 [part="skeleton"] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   block-size: 100%;
@@ -36,15 +32,9 @@
   position: relative;
 }
 
-/* The sweep, on a layer of its own so it can be moved rather than redrawn.
- *
- * `translate` is composited: the gradient is painted once and the compositor
- * slides it, where `background-position` re-rasterizes the element on every
- * frame. Same effect, same duration, same easing.
- *
- * Twice the width and traveling its own width, so the highlight enters from
- * before the element and leaves past the end of it rather than appearing and
- * vanishing at the edges. */
+/*
+ *  The sweep, on a layer of its own so it can be moved rather than redrawn.
+ */
 [part="skeleton"]::after {
   animation: helix-skeleton-sweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
   background-image: linear-gradient(

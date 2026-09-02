@@ -6,16 +6,15 @@
   gap: var(--line-chart-gap, var(--helix-space-2xs));
 }
 
-/* The tooltip's containing block, and it has to be this one.
+/*
+ *  The tooltip's containing block, and it has to be this one.
  *
  * The chart computes where a reading is as a percentage of *the plot*, and the
  * tooltip was positioned against the host, which is the plot plus a gap plus the
  * row of labels. Measured: the percentages were right at every reading and the
  * box landed too low at all of them, worst at the bottom of the range, because
  * they were being resolved against a taller box than the one they describe.
- *
- * Positioned inside the plot, the two agree by construction rather than by a
- * correction that would have to be kept in step with the layout. */
+ */
 [part="plot"] {
   position: relative;
 
@@ -106,20 +105,15 @@
   color: var(--chart-series);
 }
 
-/* One hole per series, which is why the list is written by the component.
- *
- * `mask-image` takes as many layers as it is given and composites them
- * `add` by default, which unions the *opaque* parts and so cuts nothing: with
- * four series the drawing came back whole. `intersect` keeps only what every
- * layer keeps, and every layer keeps everything except its own ring, so what is
- * removed is the union of the rings. That is the one line that makes this work
- * for more than a single line.
+/*
+ *  One hole per series, which is why the list is written by the component.
  *
  * On the `<svg>` rather than on `[part="line"]`, which is Sparkline's trick and
  * the same reason: the ring is an HTML element in CSS pixels and the line is in
  * a space `preserveAspectRatio="none"` stretches, so a radius means two
  * different things in the two places. The `<svg>` element's own border box is
- * the one surface where both are measured the same way. */
+ * the one surface where both are measured the same way.
+ */
 :host([terminus="ring"]) [part="svg"] {
   mask-composite: intersect;
   mask-image: var(--_line-chart-holes);
@@ -134,17 +128,16 @@
  * at, since a reading is a position and not a thing. Placement, flipping, the
  * arrow and the top layer are all `Tooltip`'s, which is the whole reason a chart
  * no longer draws its own. */
-/* **A pixel rather than nothing, because a rect of no area is not trackable.**
-   `autoUpdate` tracks a reference by observing it, and the move observer derives
-   its root margin from the reference's own rect. A 0 by 0 rect makes that margin
-   degenerate, so the updates that should follow a scroll or a resize do not
-   necessarily fire, and the bubble keeps whatever position it was last given:
-   `Tooltip` names this in its own source as what "took the bubble to the corner
-   of the window". Its descent guard runs only on the slotted path, and reached
-   through `for`, as a chart reaches it, the element is taken as given.
-
-   One pixel is enough to be observable and is still nothing to look at: no fill,
-   no border, and out of the pointer's way. */
+/*
+ * *A pixel rather than nothing, because a rect of no area is not trackable.**
+ *    `autoUpdate` tracks a reference by observing it, and the move observer derives
+ *    its root margin from the reference's own rect. A 0 by 0 rect makes that margin
+ *    degenerate, so the updates that should follow a scroll or a resize do not
+ *    necessarily fire, and the bubble keeps whatever position it was last given:
+ *    `Tooltip` names this in its own source as what "took the bubble to the corner
+ *    of the window". Its descent guard runs only on the slotted path, and reached
+ *    through `for`, as a chart reaches it, the element is taken as given.
+ */
 [part="mark"] {
   block-size: 1px;
   inline-size: 1px;
@@ -299,7 +292,8 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* **A chart must never animate through a value it does not have**, which is why
+/*
+ * *A chart must never animate through a value it does not have**, which is why
  * none of this uses `emphasized`.
  *
  * That curve is `cubic-bezier(0.3, 0, 0, 1.2)`, and the 1.2 is an overshoot: it
@@ -309,25 +303,11 @@
  * a number the data does not contain. A bar that reads 15 momentarily drawn at
  * 16.8 is showing something untrue, briefly, to look nice.
  *
- * On the donut it was visible rather than theoretical. Four slices partition one
- * circumference, so their shares must sum to it at every frame; each overshooting
- * independently, with the offsets overshooting too, made the arcs slide past one
- * another and snap back. Reported as ragged and jittery, and that is what it was.
- *
  * `decelerate` is `cubic-bezier(0, 0, 0, 1)`, monotonic, so every frame is a
- * value between where the reading was and where it is. */
-/* The line moves to its new shape, and draws itself on arrival.
- *
- * `d` is transitionable where the two paths have the same commands in the same
- * order, which is true whenever a series keeps its length and changes its
- * numbers, and that is the case worth animating. A series that gains or loses a
- * reading has a different command list and snaps, which is honest: the shape is
- * a different shape and pretending otherwise would interpolate between points
- * that do not correspond.
- *
- * The arrival is a draw-in rather than a fade, using the dash trick: a dash as
- * long as the whole path, offset by the same, is a line that has not been drawn
- * yet.
+ * value between where the reading was and where it is.
+ */
+/*
+ *  The line moves to its new shape, and draws itself on arrival.
  *
  * **The dash is here and not on the element, and it is a flat number rather
  * than a normalized one.** `pathLength="100"` is the tempting version, one dash
@@ -337,11 +317,7 @@
  * nothing, and leaves `stroke-dasharray="100"` as a hundred *user units* on a
  * path some three hundred long. Every line rendered as four dashes with gaps
  * between them, which looked like a chart with missing data.
- *
- * A thousand is longer than any path can be in a hundred-unit box, so the dash
- * covers whatever it is given and the offset hides the whole of it. The
- * drawing speed varies a little with the path's real length, which is the cost
- * of not measuring each one and is not visible. */
+ */
 [part="line"] {
   stroke-dasharray: 1000;
   transition:
@@ -367,33 +343,16 @@
   }
 }
 
-/* A crosshair over the drawing, because the drawing reads a position.
- *
- * `pointer` would be wrong and is the tempting one: it promises a click, and a
- * chart has nothing to click. `crosshair` is the conventional signal for a
- * surface that answers where the pointer is, which is exactly what the tooltip
- * does, and it says so before the reader has moved far enough to see one.
- *
- * On the plot and not the host, so the row of labels underneath keeps the
- * ordinary cursor: they are words, and words that are not links should not look
- * like a target. */
+/*
+ *  A crosshair over the drawing, because the drawing reads a position.
+ */
 [part="plot"] {
   cursor: crosshair;
 }
 
-/* The grid, under `gridlines`, and the slot the pointer is in.
- *
- * Both are furniture: they say how to read the drawing rather than saying
- * anything about the data, so both are quiet enough to be looked past and
- * neither takes a series color. A gridline that competes with a line is a
- * chart with two readings of equal weight, one of which is a ruler.
- *
- * `non-scaling-stroke` for the rules, for the reason the line gives: the view
- * box is stretched to the element, so a hairline in a narrow chart is a rule in
- * a wide one and both are the same declaration.
- *
- * The band is a fill and needs none of that: a rect in the view box's own units
- * is exactly its share of the width at any size, which is what a slot is. */
+/*
+ *  The grid, under `gridlines`, and the slot the pointer is in.
+ */
 [part="gridline"] {
   stroke: var(--line-chart-gridline-color, var(--helix-color-border));
   stroke-width: var(--helix-border-thin);
@@ -415,34 +374,17 @@
   }
 }
 
-/* **Emphasis, and it takes three values.** `area` stays the boolean that decides
-   whether a wash is drawn at all, on the tier below, because whether a shape
-   exists is structural and a stylesheet cannot conjure one.
-
-   **Do not fold this axis into `area`.** That conflates existence with weight.
-   `area` says whether there is a wash; emphasis says which of the two marks is
-   carrying the reading. Both ends need a wash to be present and neither can
-   summon one.
-
-   `outlined` fades the wash further and leaves the line at full weight, so the
-   boundary is the mark, which is the same trade `BarChart` makes on a column.
-   `solid` takes the wash to full strength and the fill becomes the mark. `subtle`
-   quietens both. `solid` is written out rather than left to the base rule here,
-   unlike the other families, because the resting wash is deliberately faint and
-   a reader asking for solid is asking for the departure rather than the default.
-
-   The line is left alone at both ends rather than darkened, which was the first
-   idea and is the one `BarChart` already measured and rejected: a darkened edge
-   reads against its fill and not against the page, 1.35 on the page in dark mode.
-   A line chart's mark sits on the page, so it would be the worse half of that
-   trade. Weight moves instead, and the color stays the series'.
-
-   `ghost` would be a chart with no lines.
-
-   `subtle` mixes toward the page rather than lowering opacity, so a quiet series
-   does not change color depending on what is drawn under it, which on a chart
-   with crossing lines is the whole risk. The wash follows the line, because a
-   quiet line under a full-strength wash reads as the wash being the mark. */
+/*
+ * *Emphasis, and it takes three values.** `area` stays the boolean that decides
+ *    whether a wash is drawn at all, on the tier below, because whether a shape
+ *    exists is structural and a stylesheet cannot conjure one.
+ *
+ *    The line is left alone at both ends rather than darkened, which was the first
+ *    idea and is the one `BarChart` already measured and rejected: a darkened edge
+ *    reads against its fill and not against the page, 1.35 on the page in dark mode.
+ *    A line chart's mark sits on the page, so it would be the worse half of that
+ *    trade. Weight moves instead, and the color stays the series'.
+ */
 :host([emphasis="subtle"]) [part="line"] {
   stroke: color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background));
 }
@@ -463,21 +405,11 @@
   --line-chart-area-opacity: 1;
 }
 
-/* **Glass, for the reason `BarChart` gives: the gridlines read through.** That
-   is the thing translucency is for on a chart rather than decoration, and a line
-   chart is where it costs the least, the marks being thin already.
-
-   On the line and not on the area, and that is the interesting half. The wash is
-   *already* scaled by `--helix-material-opacity`, unconditionally, which is the
-   theme's material policy applied to a thing that is a wash by nature. Scaling it
-   a second time here would compound the policy against itself and a glass area
-   over a glass theme would round to nothing. The line has no such scaling and is
-   the mark, so it is the one this axis has anything to say about.
-
-   **No `wash` on this family**, for the reason the area note above gives: a
-   gradient is `Sparkline`'s because it holds one series, and a line chart may
-   hold several, where gradients stacked over one another read as a third color
-   wherever they cross rather than as two series that overlap. */
+/*
+ * *Glass, for the reason `BarChart` gives: the gridlines read through.** That
+ *    is the thing translucency is for on a chart rather than decoration, and a line
+ *    chart is where it costs the least, the marks being thin already.
+ */
 :host([material="glass"]) [part="line"] {
   stroke-opacity: calc(0.62 * var(--helix-material-opacity));
 }

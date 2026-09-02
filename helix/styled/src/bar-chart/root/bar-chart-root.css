@@ -39,25 +39,14 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* Rounded at the far end only, and the far end depends on which way it grows.
+/*
+ *  Rounded at the far end only, and the far end depends on which way it grows.
  *
  * A bar grows out of the baseline, so rounding its foot would lift it off the
  * rule it is measured against and make short bars look like they start above
  * zero. There is no per-corner radius on an SVG rect, so the shape is drawn
  * square and the corners are taken off with a clip.
- *
- * **The corners are physical and the growth direction is not.** Rounding the
- * top two corners is the far end of a column and the long *side* of a bar, so a
- * horizontal chart comes out rounded along its top edge, every bar with a lid.
- *
- * `inset()` takes its radii in border-radius order, top-left first and
- * clockwise. A column ends at the top, so it is the first two; a bar ends at the
- * right, so it is the second and third.
- *
- * **Which end is the far one, said once.** Both are properties rather than two
- * copies of a shape: `outlined` and `subtle` below need the same answer, and
- * writing the column's geometry inline there comes later in the file at the same
- * specificity, turning every horizontal bar back into a column. */
+ */
 [part="bar"] {
   --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0;
   --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0;
@@ -85,27 +74,22 @@
   white-space: nowrap;
 }
 
-/* Categories down the side, for names that are words rather than dates.
- *
- * A row of long names either overlaps or turns on its side, and neither reads
- * as well as putting them down the left where they are read normally.
+/*
+ *  Categories down the side, for names that are words rather than dates.
  *
  * **Do not rotate the drawing.** `rotate: 90deg` is the shorter CSS and turns
  * about the element's own center, so the plot leaves its grid cell while the
  * labels, being a separate row, stay where they were. The tier below computes
  * the geometry along the other axis instead, and all this does is put the names
- * on the left and stack them. */
+ * on the left and stack them.
+ */
 :host([direction="horizontal"]) {
   grid-template-columns: auto 1fr;
 }
 
-/* Placed by column rather than reordered.
- *
- * The template renders the plot first, because that is the reading order a
- * screen reader would take if either were in the tree, and in a row the names
- * belong on the left. `order` moves one of them and leaves the other wherever
- * the auto-placer put it, so the bars end up left of their own names, floating
- * in the middle of the space beside them. Naming both columns says the whole arrangement in two lines. */
+/*
+ *  Placed by column rather than reordered.
+ */
 :host([direction="horizontal"]) [part="labels"] {
   grid-column: 1;
   grid-row: 1;
@@ -130,13 +114,8 @@
   text-align: end;
 }
 
-/* Index to color, the same twenty-four the legend maps.
- *
- * **They name a color rather than painting one**, because a column fills with
- * it and a line strokes with it, and twenty-four rules would double to
- * forty-eight the moment a series could be either. The two marks read the same
- * property in the two places below, so a series is one color by construction
- * and not by two lists agreeing.
+/*
+ *  Index to color, the same twenty-four the legend maps.
  *
  * **One rule, not twenty-four.** The headless tier knows which series a mark
  * belongs to and writes `--chart-series` onto it, pointing at one of the
@@ -145,16 +124,14 @@
  * works from in here and cannot be reached from outside: `::part()` takes no
  * attribute selector, and `::part(bar)[data-series="2"]` is dropped at parse
  * time. `data-series` stays, because it is what a spec asserts and what a
- * document rule reaching in through the light DOM would still use. */
+ * document rule reaching in through the light DOM would still use.
+ */
 [part="bar"],
 [part="line"] {
   --_bar-chart-series: var(--chart-series);
 }
-/* The mark the bubble is anchored to, and the bubble's own content.
- *
- * The mark is invisible: it exists so `Tooltip` has an element to point `for`
- * at, since a reading is a position and not a thing. Placement, flipping, the
- * arrow and the top layer are all `Tooltip`'s.
+/*
+ *  The mark the bubble is anchored to, and the bubble's own content.
  *
  * **A pixel rather than nothing, because a rect of no area is not trackable.**
  * `Tooltip`'s descent guard against an element that draws nothing runs only on
@@ -163,7 +140,8 @@
  * reference's own rect, and a 0 by 0 rect makes that margin degenerate, so the
  * updates that should follow a scroll or a resize do not necessarily fire and
  * the bubble keeps whatever position it was last given. One pixel is enough to
- * be observable and is still nothing to look at. */
+ * be observable and is still nothing to look at.
+ */
 [part="mark"] {
   block-size: 1px;
   inline-size: 1px;
@@ -177,40 +155,28 @@
   position: absolute;
 }
 
-/* **The bubble is a `Tooltip` and is set like one.**
+/*
+ * *The bubble is a `Tooltip` and is set like one.**
  *
  * These parts are slotted into `Tooltip`, so what surrounds them is that
  * component's own surface: `surface-inverse` with `foreground-inverse` on it,
  * `text-xs`, regular weight, and `2xs xs` of padding. Everything below either
  * inherits that or says why it differs.
  *
- * **Which is why nothing here names a foreground token.**
- * `--helix-color-foreground` and `--helix-color-foreground-muted` are the
- * *page's* ink: on a light page that is near-black text on the near-black
- * ground this bubble is made of. The library publishes `foreground-inverse` and
- * no muted twin of it, so a muted row inside an inverted surface has no token to
- * ask for. `currentColor` at reduced opacity needs no second token and holds in
- * both schemes, being derived from whatever the bubble is already using.
- *
  * **And no rule under the label.** A hairline separator, generous block padding
  * and a semibold title are the vocabulary of a card, and what this carries is
  * still a tooltip. Weight and a single `2xs` gap say "this names the rest"
- * without borrowing a panel's furniture. */
+ * without borrowing a panel's furniture.
+ */
 [part="tooltip-label"] {
   display: block;
   font-weight: var(--helix-weight-medium);
   margin-block-end: var(--helix-space-2xs);
 }
 
-/* **Three columns, where this was a flex row pushed apart.**
- *
- * `justify-content: space-between` holds while every row has a value and breaks
- * the moment one does not: a cell with a dot and a name and nothing to report
- * has no value to push against, so the name sits in the middle of a row whose
- * neighbor starts at the dot.
- *
- * Stated as a grid, the dot, the name and the number each have a column and
- * hold it whether or not the row filled all three. */
+/*
+ * *Three columns, where this was a flex row pushed apart.**
+ */
 [part="tooltip-cell"] {
   align-items: baseline;
   column-gap: var(--helix-space-sm);
@@ -339,15 +305,9 @@
   background-color: var(--helix-color-series-24);
 }
 
-/* The groups the tooltip is not about, faded.
- *
- * Only while one of them is active, which is what the `:has()` guard is for: a
- * chart nobody is pointing at should look like a chart, not like a chart with
- * everything dimmed. Opacity rather than color, so the palette a legend maps
- * is still the palette drawn.
- *
- * `:has()` on a plain descendant, which is supported: the invalid form is
- * `:host(:has(...))`. */
+/*
+ *  The groups the tooltip is not about, faded.
+ */
 [part="plot"]:has([data-active]) [part="group"]:not([data-active]) {
   opacity: 0.45;
 }
@@ -356,7 +316,8 @@
   transition: opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
 }
 
-/* **A chart must never animate through a value it does not have**, which is why
+/*
+ * *A chart must never animate through a value it does not have**, which is why
  * none of this uses `emphasized`.
  *
  * That curve is `cubic-bezier(0.3, 0, 0, 1.2)`, and the 1.2 is an overshoot: it
@@ -366,26 +327,9 @@
  * a number the data does not contain. A bar that reads 15 momentarily drawn at
  * 16.8 is showing something untrue, briefly, to look nice.
  *
- * On a donut it is visible rather than theoretical: four slices partition one
- * circumference and must sum to it at every frame, so each overshooting
- * independently, offsets included, makes the arcs slide past one another and
- * snap back, which reads as ragged and jittery.
- *
  * `decelerate` is `cubic-bezier(0, 0, 0, 1)`, monotonic, so every frame is a
  * value between where the reading was and where it is.
- *
- * Columns grow into place, and move when the numbers do.
- *
- * `x`, `y`, `width` and `height` are geometry properties on an SVG rect, which
- * means CSS can transition them: the same four attributes Lit rewrites when a
- * series changes. Nothing here animates a `transform`, which would scale the
- * corner radius with the column and make a short bar's corners rounder than a
- * tall one's.
- *
- * `@starting-style` gives the arrival a value to come from, and it is a height
- * of zero at the baseline rather than an opacity: a bar chart that fades in
- * says nothing, and one that grows out of its own baseline says what a bar
- * chart is for. */
+ */
 [part="bar"] {
   transition:
     height var(--helix-duration-normal) var(--helix-easing-decelerate),
@@ -405,32 +349,16 @@
   }
 }
 
-/* A crosshair over the drawing, because the drawing reads a position.
- *
- * `pointer` is the tempting one and promises a click, which a chart has nothing
- * of. `crosshair` is the conventional signal for a surface that answers where
- * the pointer is, and it says so before the reader has moved far enough to see a
- * tooltip.
- *
- * On the plot and not the host, so the row of labels underneath keeps the
- * ordinary cursor: they are words, and words that are not links should not look
- * like a target. */
+/*
+ *  A crosshair over the drawing, because the drawing reads a position.
+ */
 [part="plot"] {
   cursor: crosshair;
 }
 
-/* The grid, under `gridlines`, and the slot the pointer is in.
- *
- * Both are furniture, so neither takes a series color: a gridline that competes
- * with a line is a chart with two readings of equal weight, one of which is a
- * ruler.
- *
- * `non-scaling-stroke` for the rules, for the reason the line gives: the view
- * box is stretched to the element, so a hairline in a narrow chart is a rule in
- * a wide one and both are the same declaration.
- *
- * The band is a fill and needs none of that: a rect in the view box's own units
- * is exactly its share of the width at any size, which is what a slot is. */
+/*
+ *  The grid, under `gridlines`, and the slot the pointer is in.
+ */
 [part="gridline"] {
   stroke: var(--bar-chart-gridline-color, var(--helix-color-border));
   stroke-width: var(--helix-border-thin);
@@ -441,21 +369,9 @@
   fill: var(--bar-chart-band-color, var(--helix-color-surface-sunken));
 }
 
-/* A series drawn as a line across the columns, under `lines`.
- *
- * Its own series color through `data-series`, the same channel a column takes,
- * so the legend and the tooltip agree with it without a second rule to keep in
- * step. Heavier than a line chart's line and with round joins, because it is
- * read *against* a field of solid columns rather than on an empty plot: at the
- * line chart's weight it reads as a gridline that wandered.
- *
- * `non-scaling-stroke` for the reason every stroke here has it: the view box is
- * stretched to the element, so without it the same line is a hairline in a
- * narrow chart and a rule in a wide one.
- *
- * `fill: none` matters more than it looks. A `<path>` fills by default, so
- * without it the area under the line is painted in the series color at full
- * opacity and buries the columns it was drawn to be compared against. */
+/*
+ *  A series drawn as a line across the columns, under `lines`.
+ */
 [part="line"] {
   fill: none;
   stroke: var(--bar-chart-line-color, var(--_bar-chart-series, var(--helix-color-series-1)));
@@ -465,7 +381,8 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* The numbers along a scale, drawn only when `secondary` split them in two.
+/*
+ *  The numbers along a scale, drawn only when `secondary` split them in two.
  *
  * **A column of the host grid, not a layer over the plot.** Inside the plot the
  * numbers are drawn over the drawing, which a horizontal chart shows at once
@@ -473,15 +390,7 @@
  * Padding the plot instead is worse: it is the pointer's catchment and the
  * tooltip's containing block, both measured from its box, so every reading
  * would move by half an axis.
- *
- * The grid only grows these tracks under `[secondary]`, which is what the
- * property reflects for. Without it the chart is exactly the two-part grid it
- * has always been.
- *
- * `--bar-chart-axis` is written by the tier below, in characters, because the
- * ticks are absolutely positioned: that is what puts each on the level it names
- * and also what stops any of them giving the column a width. The widest number
- * is known where the ticks are made and unknowable to a selector. */
+ */
 :host([secondary]) {
   grid-template-columns: auto 1fr auto;
 }
@@ -496,22 +405,12 @@
   grid-row: 1;
 }
 
-/* **A series color is a graphic, and these ticks are text.** The series ramp is
-   built to be told apart at 3:1, which is what 1.4.11 asks of a bar. A tick is a
-   number, which 1.4.3 puts at 4.5:1, and the gap is not theoretical: series 2 on
-   the page measured 3.37:1.
-
-   Mixing toward the page's own foreground keeps the axis legibly *that series'*
-   while landing it on a text ink, and it moves the right way in both modes
-   without a second arm, because the foreground already does. The mix is written
-   into a property of its own so the neutral case stays untouched: with no series
-   color to fold in, `color-mix` has nothing to resolve, the property is invalid
-   at computed-value time, and `var()` takes the fallback.
-
-   The tier below writes `--bar-chart-secondary` only when exactly one series is
-   on this axis, which is the only case a single color can describe honestly.
-   Two series sharing a second axis get the neutral, because picking one of
-   their colors would say the axis belongs to that one. */
+/*
+ * *A series color is a graphic, and these ticks are text.** The series ramp is
+ *    built to be told apart at 3:1, which is what 1.4.11 asks of a bar. A tick is a
+ *    number, which 1.4.3 puts at 4.5:1, and the gap is not theoretical: series 2 on
+ *    the page measured 3.37:1.
+ */
 [part="axis"][data-axis="secondary"] {
   --_bar-chart-axis-ink: color-mix(
     in oklab,
@@ -599,55 +498,50 @@
   inset-inline-start: 0;
 }
 
-/* **Emphasis, which is how much ink a column claims.** Two knobs rather than a
-   rule per combination: `--_bar-chart-area` is what emphasis draws and
-   `--_bar-chart-through` is how much of it material lets past, and the paint
-   multiplies them. Written as properties because the alternative is a rule for
-   every pairing of the two axes, which is the cross product a second axis
-   exists to avoid.
-
-   The stroke takes the same factor as the fill, which is what stops the one
-   inert corner: a fill opacity alone on an outlined column sets it on a mark
-   whose fill is `none`, so the material is a silent no-op there. Glass thins
-   whatever emphasis put there, so an outlined series goes see-through at its
-   edge. */
+/*
+ * *Emphasis, which is how much ink a column claims.** Two knobs rather than a
+ *    rule per combination: `--_bar-chart-area` is what emphasis draws and
+ *    `--_bar-chart-through` is how much of it material lets past, and the paint
+ *    multiplies them. Written as properties because the alternative is a rule for
+ *    every pairing of the two axes, which is the cross product a second axis
+ *    exists to avoid.
+ */
 [part="bar"] {
   fill-opacity: calc(var(--_bar-chart-area, 1) * var(--_bar-chart-through, 1));
   stroke-opacity: var(--_bar-chart-through, 1);
 }
 
-/* **The edge, and the fill stays under it.** `outlined` on a button is a border
-   *instead of* a fill, because a control's fill is the loud part. On a column
-   the fill is the mark: its area is what encodes the value, so removing it
-   removes the reading rather than quietening it. The value adapts to the medium
-   the way `outlined` already means one thing on a Card's boundary and another
-   on a Button's ink.
-
-   **The edge is the series' own color and the fill is faded toward the page**,
-   which is the only arrangement that works in both modes.
-
-   Darkening the *edge* reads against the fill but not against the page: 2.63 on
-   the fill in dark and 1.35 on the page, so the outline merges with the thing it
-   is drawn against. Lighter is no help and is inert in dark, 1.06 at every step,
-   a series color in that palette being at the top of its lightness and clipping.
-   Darkening the *fill* fixes dark and breaks light, where a column two steps
-   down reads as a different, heavier chart.
-
-   Fading the fill toward `--helix-color-background` is the one that needs no
-   second arm, because that token already carries the mode: the area moves toward
-   the page in whichever direction the page is, and the boundary stays the color
-   the series actually is. At 60% the edge reads 1.70 against the fill in light
-   and 2.70 in dark, stands off the page at 3.21 and 4.31, and the fill is still
-   a fill at 1.88 and 1.60 rather than a ghost of one.
-
-   The width carries what the color cannot: a pixel at 2:1 is a hairline nobody
-   sees, and two is still thin against a column sixty wide.
-
-   **`vector-effect`, for the reason two other rules in this file already give**:
-   the view box is `0 0 100 H` under `preserveAspectRatio="none"`, so a stroke in
-   user units is stretched by however wide the element happens to be. Without it
-   a 1.5 draws as a band several pixels thick and uneven between the vertical
-   edges and the horizontal ones. */
+/*
+ * *The edge, and the fill stays under it.** `outlined` on a button is a border
+ * instead of* a fill, because a control's fill is the loud part. On a column
+ *    the fill is the mark: its area is what encodes the value, so removing it
+ *    removes the reading rather than quietening it. The value adapts to the medium
+ *    the way `outlined` already means one thing on a Card's boundary and another
+ *    on a Button's ink.
+ *
+ *    Darkening the *edge* reads against the fill but not against the page: 2.63 on
+ *    the fill in dark and 1.35 on the page, so the outline merges with the thing it
+ *    is drawn against. Lighter is no help and is inert in dark, 1.06 at every step,
+ *    a series color in that palette being at the top of its lightness and clipping.
+ *    Darkening the *fill* fixes dark and breaks light, where a column two steps
+ *    down reads as a different, heavier chart.
+ *
+ *    Fading the fill toward `--helix-color-background` is the one that needs no
+ *    second arm, because that token already carries the mode: the area moves toward
+ *    the page in whichever direction the page is, and the boundary stays the color
+ *    the series actually is. At 60% the edge reads 1.70 against the fill in light
+ *    and 2.70 in dark, stands off the page at 3.21 and 4.31, and the fill is still
+ *    a fill at 1.88 and 1.60 rather than a ghost of one.
+ *
+ *    The width carries what the color cannot: a pixel at 2:1 is a hairline nobody
+ *    sees, and two is still thin against a column sixty wide.
+ *
+ * *`vector-effect`, for the reason two other rules in this file already give**:
+ *    the view box is `0 0 100 H` under `preserveAspectRatio="none"`, so a stroke in
+ *    user units is stretched by however wide the element happens to be. Without it
+ *    a 1.5 draws as a band several pixels thick and uneven between the vertical
+ *    edges and the horizontal ones.
+ */
 [part="bar"][data-emphasis="outlined"],
 :host([emphasis="outlined"]) [part="bar"]:not([data-emphasis]) {
   /* **No line across the base.** A bar grows from the baseline and is measured
@@ -690,13 +584,12 @@
   );
 }
 
-/* **Glass, so a chart is in the same language as the page around it.** A glass
-   header over opaque columns reads as two designs sharing a window, which is
-   what a material policy exists to stop. The gridlines read through, which is
-   what translucency is *for* here rather than decoration.
-
-   Scaled by the policy, so a language that is more see-through everywhere is
-   more see-through here too. */
+/*
+ * *Glass, so a chart is in the same language as the page around it.** A glass
+ *    header over opaque columns reads as two designs sharing a window, which is
+ *    what a material policy exists to stop. The gridlines read through, which is
+ *    what translucency is *for* here rather than decoration.
+ */
 [part="bar"][data-material="glass"],
 :host([material="glass"]) [part="bar"]:not([data-material]) {
   --_bar-chart-through: calc(0.62 * var(--helix-material-opacity));
@@ -711,19 +604,12 @@
   --_bar-chart-through: calc(0.88 * var(--helix-material-opacity));
 }
 
-/* **Gradient, into the wash the headless tier already draws.** One per series,
-   colored through `--chart-series` so the stops read a token that tier never
-   names, and pointed at per bar because CSS cannot build a fragment id from a
-   variable.
-
-   **On `wash` rather than on `material`.** A gradient is not what a bar is made
-   of: `glass` and `gradient` set different properties, `fill-opacity` against
-   `fill`, and a chart forced into both renders as a translucent gradient,
-   distinct from either. One enum holding two independent things is the mistake
-   `Card`'s own doc warns about. And it stays local rather than joining the
-   registry: it lives on one family and there it encodes data rather than
-   expressing a theme, so promoted it would put an attribute on eighty-eight
-   components that means nothing on eighty-seven. */
+/*
+ * *Gradient, into the wash the headless tier already draws.** One per series,
+ *    colored through `--chart-series` so the stops read a token that tier never
+ *    names, and pointed at per bar because CSS cannot build a fragment id from a
+ *    variable.
+ */
 :host([wash="gradient"]) [part="bar"] {
   fill: var(--chart-bar-wash);
 }

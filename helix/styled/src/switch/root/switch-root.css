@@ -70,34 +70,29 @@
    this size the shadow was only ever doing the separating a border does
    honestly. */
 [part="thumb"] {
-  /* Over the groove rather than on it, which is `overlay` and is the same token
-     the segmented control's thumb takes for the same reason. `raised` is the
-     one for a surface lying on the page, and a thumb is not lying on the page:
-     it is over a groove cut into it, so it has to be lighter than the groove in
-     light and a step up from it in dark, which is what `overlay` does and what
-     `raised` on a white page cannot.
-
-     Never `background`, the page's own color, which works in light and
-     disappears in dark: the page is black and the groove is a step up from it,
-     so the thumb comes out darker than the track it sits in and reads as a hole
-     punched through rather than a thing lying on top. */
+  /*
+ *  Over the groove rather than on it, which is `overlay` and is the same token
+ *      the segmented control's thumb takes for the same reason. `raised` is the
+ *      one for a surface lying on the page, and a thumb is not lying on the page:
+ *      it is over a groove cut into it, so it has to be lighter than the groove in
+ *      light and a step up from it in dark, which is what `overlay` does and what
+ *      `raised` on a white page cannot.
+ */
   background-color: var(--switch-thumb-color, var(--helix-color-surface-overlay));
   block-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-full);
   inline-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   inset-block-start: 50%;
-  /* Less the border, because the two boxes are not the same box. An absolutely
-     positioned element is placed against its containing block's *padding* box,
-     which starts one border in, so an inset written as the gap it should leave
-     lands a border-width late: measured, three pixels at rest on the left
-     against two above and below, and one pixel at the far end where the travel
-     had already been reckoned from the outside. The thumb read as overshooting
-     its own track.
-
-     The vertical does not need this because it is centered rather than inset,
-     and centering is symmetric whichever box it is done in. This is the same
-     arithmetic the segmented control's indicator does with `clientTop`. */
+  /*
+ *  Less the border, because the two boxes are not the same box. An absolutely
+ *      positioned element is placed against its containing block's *padding* box,
+ *      which starts one border in, so an inset written as the gap it should leave
+ *      lands a border-width late: measured, three pixels at rest on the left
+ *      against two above and below, and one pixel at the far end where the travel
+ *      had already been reckoned from the outside. The thumb read as overshooting
+ *      its own track.
+ */
   inset-inline-start: calc(var(--_switch-inset) - var(--helix-border-thin));
   pointer-events: none;
   position: absolute;
@@ -159,13 +154,12 @@
   display: none;
 }
 
-/* Print: a control prints the value it holds, and the state has to survive.
+/*
+ *  Print: a control prints the value it holds, and the state has to survive.
  * A switch carries no mark, so the fill is the whole difference between on and
  * off, and dropped it prints as an off switch, which is a document saying the
  * opposite of the truth.
- *
- * `@media print` does not cross a shadow boundary, so a page cannot answer this
- * on a component's behalf and every family says it for itself. */
+ */
 @media print {
   :host {
     box-shadow: none;

@@ -4,20 +4,14 @@
      horizontal bar a proportion is read off. At a bare 4px the fill and the
      rules in a table beside it are the same weight. */
   --_slider-track: var(--slider-track-size, var(--helix-size-progress));
-  /* **The thumb has two dimensions and they are relative to travel, not to the
-     screen.** `--_slider-thumb` is the thickness, across the track, and
-     `--_slider-thumb-length` is along it, defaulting to the same so a slider
-     nobody has touched is still round. Bound to one variable, the one control in
-     the library whose whole subject is a handle on a track cannot be given a
-     handle that is not a circle.
-   *
-   * **Naming them for the axes works because the thumb is inside the rotation.**
-   * The vertical control sets `writing-mode: vertical-lr`, so a pseudo-element
-   * of it resolves `block-size` against the turned frame: block is the track's
-   * thickness and inline is its length in both orientations. What does *not*
-   * rotate is a margin, which resolves against the containing block rather than
-   * the element, and that is why the two insets below are written once per
-   * orientation and each names the length. */
+  /*
+ * *The thumb has two dimensions and they are relative to travel, not to the
+ *      screen.** `--_slider-thumb` is the thickness, across the track, and
+ *      `--_slider-thumb-length` is along it, defaulting to the same so a slider
+ *      nobody has touched is still round. Bound to one variable, the one control in
+ *      the library whose whole subject is a handle on a track cannot be given a
+ *      handle that is not a circle.
+ */
   --_slider-thumb: var(--slider-thumb-size, var(--helix-size-checkbox));
   --_slider-thumb-length: var(--slider-thumb-length, var(--_slider-thumb));
   --_slider-thumb-radii: var(--slider-thumb-radius, var(--helix-radii-full));
@@ -31,15 +25,14 @@
     var(--slider-fill-color, var(--helix-color-primary)) 24%,
     transparent
   );
-  /* The unfilled half of the track.
-   *
-   * `border` rather than `surface-sunken`, which is not dark enough for the job:
-   * `sunken` is lightened for the sake of fields, and a white thumb on a 0.96
-   * track has four hundredths to separate it, with the shadow carrying all of
-   * that alone.
-   *
-   * A track is a bar rather than a fill, so it takes a line's color: it is the
-   * same weight of mark as the rules in a table, drawn thicker. */
+  /*
+ *  The unfilled half of the track.
+ *
+ * `border` rather than `surface-sunken`, which is not dark enough for the job:
+ * `sunken` is lightened for the sake of fields, and a white thumb on a 0.96
+ * track has four hundredths to separate it, with the shadow carrying all of
+ * that alone.
+ */
   --_slider-track-color: var(--slider-track-color, var(--helix-color-border));
   display: flex;
   flex-direction: column;
@@ -55,13 +48,9 @@
 /* One cell holding the control and the marks, and it has to be a grid rather
    than a positioned pair: the control's width is what the flex row gives it, so
    anything measured against the track has to be laid out by the same box. */
-/* `data-markers`, not `markers`.
- *
- * `markers` is a property that does not reflect, so selecting the declared
- * attribute applies the whole layout only to a slider whose marks were written
- * in the markup and never to one given them as a property. The element mirrors
- * the boolean fact under a `data-` name instead, which is what this wants to
- * know: whether there are marks, not how many. */
+/*
+ *  `data-markers`, not `markers`.
+ */
 [part="field"][data-markers] {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -104,15 +93,8 @@
   grid-row: 1;
 }
 
-/* What the track is painted with, whole, so a slider can be a ramp.
- *
- * The fill and the track color compose the default and cover every slider that
- * reads as a proportion, which is nearly all of them. What they cannot express
- * is a track whose color is the value rather than a measure of it: a hue ramp
- * has no filled half, and neither does an alpha bar. Color Input needs both, and
- * the alternative was for it to reach through `::part(control)` into
- * `::-webkit-slider-runnable-track` from outside, which is a consumer patching
- * around a gap here and would have needed the Firefox pseudo-element too.
+/*
+ *  What the track is painted with, whole, so a slider can be a ramp.
  *
  * **On the control, not on the host, and that is not a tidiness question.** A
  * custom property whose value contains `var()` is substituted where it is
@@ -120,7 +102,8 @@
  * inside it resolved against the host, where nothing sets it, so the fallback
  * won and both gradient stops landed at `0%`. Every slider painted its unfilled
  * color end to end and the fill was gone. The fraction is an inline style on
- * the control, so the declaration has to be there too. */
+ * the control, so the declaration has to be there too.
+ */
 [part="control"] {
   --_slider-track-image: var(
     --slider-track-image,
@@ -136,14 +119,12 @@
    below, per engine, because the pseudo-elements that name it are not shared
    and a selector list containing an unknown one is dropped whole. */
 
-/* Over the track rather than behind it. Behind was the first attempt and the
-   marks did not appear at all: the native track paints an opaque background,
-   so anything under it is under it. `pointer-events: none` is what keeps the
-   drag the input's, since the marks now lie across the thing being dragged.
-
-   Inset by half a thumb at each end, because that is where the thumb's center
-   can actually reach: a mark at the very edge of the track would be a mark the
-   thumb can never sit on, which is the one thing a mark must not be. */
+/*
+ *  Over the track rather than behind it. Behind was the first attempt and the
+ *    marks did not appear at all: the native track paints an opaque background,
+ *    so anything under it is under it. `pointer-events: none` is what keeps the
+ *    drag the input's, since the marks now lie across the thing being dragged.
+ */
 /* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
   align-self: center;
@@ -176,30 +157,14 @@
   translate: -50% 0;
 }
 
-/* **Above the control, with the thumb punched out of it.**
+/*
+ * *Above the control, with the thumb punched out of it.**
  *
  * `z-index: 0` here is the trap: the control computes to 10, so the marks go
  * under the whole input and every stepped slider draws nothing at all, while
  * still being painted, sized and positioned. `elementFromPoint` at a mark's
  * center returns the host.
- *
- * Raising them is not the whole answer either, because a native range's thumb
- * and its track are one element: there is no z-index that sits between them, so
- * a mark drawn over the input is drawn over the thumb, and in dark mode that is
- * a near-black slash across the thumb at exactly the positions it rests at. What
- * can sit between them is a hole. The overlay is inset by half a thumb at each
- * end, which is exactly the thumb's travel, so a fraction of its own width is
- * the thumb's center and a radial mask there removes the mark the thumb is
- * standing on and nothing else.
- *
- * `currentColor` rather than a color: only the alpha of a mask is read, and it
- * saves inventing a token for a value nobody sees.
- *
- * `pointer-events: none` goes with it, and is declared in the block above
- * rather than repeated here: the overlay sits over the control and without it a
- * press that lands on a mark never reaches the range. Repeating it, and
- * `z-index` with it, said the same thing twice at one specificity, where the
- * second copy could only ever be dead. */
+ */
 /* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
   --_slider-hole: calc(var(--_slider-thumb-length) / 2 + var(--helix-border-thin));
@@ -285,31 +250,15 @@
 
 /* Centered on the track by hand, because a WebKit thumb is laid out from the top
    of the runnable track rather than centered in it. */
-/* No border, and the shadow is what separates it.
- *
- * A hairline drawn all the way round a circle the size of a checkbox reads as a
- * ring rather than as an edge. A shadow separates the thumb from the track by
- * lifting it, which is what a thumb is doing anyway, and it does not compete
- * with the accent fill the track carries on the chosen side.
- *
- * `shadow-md` rather than `sm`, because the thumb is white on a track that is
- * nearly white on the unfilled side: at `sm` there is not enough under it to
- * separate the two and the thumb dissolves into the track's right half.
- *
- * It is offset downward, which also stops the thumb reading as floating: it
- * sits on the track rather than over it. The same reasoning the switch uses in
- * reverse, where a border was chosen precisely because a shadow at twenty
- * pixels was too asymmetric to center. A slider's thumb is larger and moves
- * horizontally, so the asymmetry reads as weight rather than as a mistake.
+/*
+ *  No border, and the shadow is what separates it.
  *
  * **A halo while it is being moved**, by pointer or by key. The thumb is the
  * one thing on the control that moves, so what a reader needs while moving it
  * is confirmation that they have hold of it. A ring drawn as a second shadow
  * layer rather than an `outline`, because a slider's thumb is a pseudo-element
  * and an outline on one is clipped by the track's own overflow in Chrome.
- *
- * `:focus-visible` on the input itself is `outline: none`, so the whole of what
- * a keyboard reader sees is on the thumb. */
+ */
 [part="control"]::-webkit-slider-thumb {
   appearance: none;
   /* `surface-inverse` is the one token that is light where the page is dark and
@@ -329,24 +278,16 @@
   block-size: var(--_slider-thumb);
   border: none;
   border-radius: var(--_slider-thumb-radii);
-  /* A ring of the ground's own color, so the thumb reads against whichever
-     half of the track it is over.
-
-     Contrast against the track is 11.25 and against the fill is 2.57, which is
-     under the three to one non-text contrast wants: the thumb sits on the
-     boundary between the two and at the end of its travel it is over the fill
-     alone. A ring separates it from both without tinting it, and it inverts
-     with the mode for free because it is the ground either sits on.
-
-     **The page is the guess, and `--slider-thumb-ring-color` is how a consumer
-     says otherwise.** A separating ring has to match what the slider was put
-     on, and no element can ask what is painted behind it: on a card this comes
-     out as a ring of the page's color, which is the failure `Timeline`'s
-     marker and the sparkline's ring terminus both had. Neither of those could
-     be fixed with a hook, because a mark that means "a gap in the thing behind
-     me" should be cut rather than filled. This one is different and the hook is
-     the right answer: the ring is not a gap, it is a fence, and it has to be
-     opaque or the thumb merges into the fill again. */
+  /*
+ *  A ring of the ground's own color, so the thumb reads against whichever
+ *      half of the track it is over.
+ *
+ *      Contrast against the track is 11.25 and against the fill is 2.57, which is
+ *      under the three to one non-text contrast wants: the thumb sits on the
+ *      boundary between the two and at the end of its travel it is over the fill
+ *      alone. A ring separates it from both without tinting it, and it inverts
+ *      with the mode for free because it is the ground either sits on.
+ */
   box-shadow:
     0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
     var(--helix-shadow-md);
@@ -399,17 +340,9 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Wrong, and the handle says so.
- *
- * A slider's answer is a position, and the thumb is where that position is, so
- * the thumb takes the mark: it is both the statement of the value and the thing
- * a reader moves to fix it. The track was the other candidate and says the wrong
- * thing, since a red rail reads as a dangerous *region* of the scale rather than
- * as a value that is not allowed.
- *
- * A ring rather than a fill, so the thumb keeps the color that makes it legible
- * against the track, and on the same box the focus halo uses so a focused
- * invalid slider is one ring rather than two. */
+/*
+ *  Wrong, and the handle says so.
+ */
 :host(:state(invalid)) [part="control"]::-webkit-slider-thumb {
   box-shadow: 0 0 0 var(--helix-size-focus-ring) var(--helix-color-danger);
 }
@@ -469,16 +402,10 @@
   background: transparent;
 }
 
-/* The pointer reaches whichever thumb it is over, rather than always the upper
+/*
+ *  The pointer reaches whichever thumb it is over, rather than always the upper
  * input.
- *
- * Two inputs covering the same box means the one painted last takes every
- * press, including presses on the other one's handle. Turning pointer events
- * off on the input and back on at the thumb is what lets a reader grab either.
- *
- * The cost is stated rather than hidden: a press on the bare track moves
- * nothing in this appearance, where a single slider would jump to it. Both
- * thumbs still take the keyboard, which is the path that has to work. */
+ */
 :host([range]) [part="control"] {
   pointer-events: none;
 }
@@ -491,7 +418,8 @@
   pointer-events: auto;
 }
 
-/* Standing the track on end.
+/*
+ *  Standing the track on end.
  *
  * **Which end is the maximum was measured, not assumed.** `writing-mode:
  * vertical-lr` on a native range puts the maximum at the *bottom*: rendered at
@@ -499,11 +427,7 @@
  * head. `vertical-rl` does the same. That is the opposite of what a vertical
  * slider means to anybody who has used a fader, so `direction: rtl` turns the
  * axis over and the maximum is at the top where a reader expects it.
- *
- * The logical properties are what make the rest of this nearly free. With the
- * control in a vertical writing mode its own block axis is horizontal, so
- * `block-size` goes on meaning the track's thickness and `inline-size` goes on
- * meaning its length, and every rule above that uses them keeps working. */
+ */
 :host([orientation="vertical"]) [part="field"] {
   flex-direction: column;
 }
@@ -544,15 +468,10 @@
   translate: 0 50%;
 }
 
-/* The value goes under the track rather than beside it, and the marker overlay
-   turns with it.
- *
- * The overlay is not in the control's writing mode, only the control is, so its
- * own logical properties still mean the horizontal thing: what was the track's
- * thickness as a `block-size` is an `inline-size` here, and the half thumb that
- * kept the end marks reachable moves from the inline margin to the block one.
- * Sized by `align-self: stretch` rather than a length, so it matches whatever
- * `--slider-length` the consumer set without being told the number twice. */
+/*
+ *  The value goes under the track rather than beside it, and the marker overlay
+ *    turns with it.
+ */
 :host([orientation="vertical"]) [part="field"][data-markers] [part="output"] {
   grid-column: 1;
   grid-row: 2;

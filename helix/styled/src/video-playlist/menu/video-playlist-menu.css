@@ -1,17 +1,12 @@
-/* The trigger is drawn here rather than by the bar, and it has to be.
- *
- * `Video` styles its controls with `[part="controls"] :where(a, button)`, a
- * rule inside its own shadow root, and this menu sits in its *light* DOM under
- * `slot="controls"`. A shadow rule reaches assigned nodes only through
- * `::slotted()`, and never their descendants at all, so the button in this
- * element's shadow root is two boundaries away from the rule that styles every
- * button beside it.
+/*
+ *  The trigger is drawn here rather than by the bar, and it has to be.
  *
  * Same failure as a `::slotted()` rule against fallback content: valid CSS
  * matching nothing, no error and no warning, and here the symptom would be one
  * raw browser-chrome button in a row of flat glyphs. So the declarations below
  * are that rule again against the same tokens, which is what makes the two come
- * out identical. */
+ * out identical.
+ */
 :host {
   display: flex;
   flex: 0 0 auto;
@@ -38,28 +33,22 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The leading column widened for a still, through the hook `Menu.Item` exposes
-   for exactly this.
- *
- * A custom property rather than `::part()`, because the width has to reach the
- * grid *track* and not just the element in it: `inline-size` on the part sizes
- * the still and leaves the track at sixteen pixels, so the picture overflows its
- * column and the label is drawn across it. Custom properties inherit through a
- * shadow boundary, so one declaration here reaches both the track and the box. */
+/*
+ *  The leading column widened for a still, through the hook `Menu.Item` exposes
+ *    for exactly this.
+ */
 [part="entry"] {
   --menu-item-start: var(--video-playlist-menu-poster, calc(var(--helix-size-icon-loose) * 2));
 }
 
-/* And the row given room to hold one.
+/*
+ *  And the row given room to hold one.
  *
  * `Menu.Item`'s block padding is sized for text with a mark beside it, so a
  * 48x27 still lands in a 32px row: three pixels above and two below, with five
  * between one still and the next. Nothing overflows and nothing is clipped, and
  * it reads as stills stacked edge to edge rather than as rows carrying one.
- *
- * A media row is a taller row. Stated once here rather than pushed into `Menu`,
- * where it would make every menu in the library pay for a case only this one
- * has. */
+ */
 [part="entry"]::part(item) {
   padding-block: var(--helix-space-2xs);
 }

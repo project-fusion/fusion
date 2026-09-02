@@ -19,13 +19,12 @@
   row-gap: var(--_steps-row-gap, var(--helix-space-2xs));
 }
 
-/* Two half lines, one either side of the mark. Each reaches from the mark to
-   its own step's edge and half the gap beyond, so it meets the one coming the
-   other way in the middle of the gap and the rule reads as continuous without
-   any step knowing the size of its neighbor.
-
-   Under the mark rather than over it, so a line ending at the mark's edge is
-   covered by it and no seam shows where the two meet. */
+/*
+ *  Two half lines, one either side of the mark. Each reaches from the mark to
+ *    its own step's edge and half the gap beyond, so it meets the one coming the
+ *    other way in the middle of the gap and the rule reads as continuous without
+ *    any step knowing the size of its neighbor.
+ */
 [part="lead"],
 [part="trail"] {
   background-color: var(--steps-connector-color, var(--helix-color-border));
@@ -146,19 +145,14 @@ slot[name="marker"]::slotted(*) {
   z-index: 1;
 }
 
-/* The name, which is a `helix-button` rather than a `<button>` reset here. What
+/*
+ *  The name, which is a `helix-button` rather than a `<button>` reset here. What
  * is left to say is only what a step needs that a button has no view on: how
  * tall it is, and that its text is the step's size rather than a control's. The
  * hover wash, the focus ring, the disabled treatment, the pressed state and
  * `--button-background-color` all arrive with it, which is why there is no
  * hover hook of this component's own.
- *
- * Dense, said in the properties density is made of rather than with a
- * `data-density` attribute. That attribute is matched by a rule in the base
- * layer, which is a document rule and cannot reach an element inside a shadow
- * root: written here it would set nothing at all. The text stays at `sm` rather
- * than following density down to `xs`, because this is a name a reader reads
- * across a row and not a label on a control. */
+ */
 [part="label"] {
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-icon: var(--helix-size-icon-sm);

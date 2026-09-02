@@ -19,24 +19,9 @@
   tab-size: 2;
 }
 
-/* No ring on the editor, and the caret instead.
- *
- * A `<textarea>` always matches `:focus-visible`. The pseudo-class exists to
- * tell a keyboard reader apart from a pointer one, and text entry is the case
- * where the platform answers "always": a caret is a focus indicator, so the
- * browser reports that focus should be shown however it arrived. The ring
- * therefore fired on every click into the editor, drawn hard against all four
- * edges of a pane the writer is about to work inside.
- *
- * Which leaves focus visible anyway, and that is the point rather than an
- * exception being made: a blinking caret at an insertion point is the indicator
- * for a text surface, and it says more than a ring does, because it says
- * *where* in the text as well as which pane. The terminal beside this one keeps
- * its ring, and has to: it is focusable so it can be scrolled, holds no caret,
- * and would otherwise show nothing at all.
- *
- * The edge still moves, quietly, so the pane itself reads as the active one in
- * a workbench of several. */
+/*
+ *  No ring on the editor, and the caret instead.
+ */
 [part="source"]:focus-visible {
   background-color: var(--helix-color-surface);
   outline: none;

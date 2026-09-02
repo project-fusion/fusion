@@ -81,12 +81,8 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The panel, in the house shape every floating surface here takes.
- *
- * `border: none` said rather than left out. The UA stylesheet gives `[popover]`
- * `border: solid`, so dropping the declaration leaves a three-pixel medium
- * border rather than none at all. Popover, Menu and Tooltip each record the
- * same.
+/*
+ *  The panel, in the house shape every floating surface here takes.
  *
  * The width is the calendar's own, not the field's. Select is the case where
  * matching the control is right, its panel being a list of the same options its
@@ -94,7 +90,8 @@
  * misaligned. A calendar is not a longer version of a date field: seven columns
  * have a width that belongs to them, and stretching them to a field that happens
  * to be 600 pixels wide gives a month with its days spread across half a
- * screen. */
+ * screen.
+ */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
   border: var(--date-input-border-width, var(--helix-border-floating)) solid
@@ -108,7 +105,8 @@
   position: absolute;
 }
 
-/* And it travels, a little, out of the edge it opened against.
+/*
+ *  And it travels, a little, out of the edge it opened against.
  *
  * On `transform`, never on `translate`: the floating controller writes the
  * panel's position onto `translate`, and a keyframe animating that property took
@@ -117,13 +115,9 @@
  * scale, transform, which means a `translateY` here is relative to wherever the
  * controller placed the panel and leaves x alone.
  *
- * The direction follows the placement, so it always emerges from the control
- * rather than always from above: a panel opening upward that slid down would
- * read as arriving from the thing it is covering. `transform-origin` below keys
- * on the same signal for the same reason.
- *
  * Small on purpose. `2xs` is enough to read as motion and short enough that a
- * fast reader who opens and picks in one gesture is not waiting on it. */
+ * fast reader who opens and picks in one gesture is not waiting on it.
+ */
 [part="surface"] {
   --_travel: calc(var(--helix-space-2xs) * -1);
   opacity: 0;
@@ -228,13 +222,9 @@
   white-space: nowrap;
 }
 
-/* Wrong, and the field says so.
- *
- * The same four selectors Input carries, and for the reason it records at
- * length: the focus rule owns the `outline` and nothing here was changing its
- * color, so a focused field with an error came out as a red border inside a
- * blue ring. Hover is named for the same reason from the other side. The border
- * and the ring are one edge, so when one turns they both do. */
+/*
+ *  Wrong, and the field says so.
+ */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],

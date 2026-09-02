@@ -2,13 +2,11 @@
   display: contents;
 }
 
-/* The panel, which is `Popover`'s panel by another name and is deliberately the
-   same shape: a tour bubble that looked like a different kind of surface would
-   be a second answer to a question the library has already answered.
-
-   The radius follows Popover's `sm`. `helix component`'s `corners` holds it
-   there, because this comment said the same thing while the declaration below
-   disagreed with it, which is what a convention living only in prose is worth. */
+/*
+ *  The panel, which is `Popover`'s panel by another name and is deliberately the
+ *    same shape: a tour bubble that looked like a different kind of surface would
+ *    be a second answer to a question the library has already answered.
+ */
 [part="bubble"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
   border: var(--tour-border-width, var(--helix-border-thin)) solid var(--helix-color-border);
@@ -60,21 +58,9 @@
   margin-inline-end: auto;
 }
 
-/* The point, half outside the panel and pointing at the target.
- *
- * A rotated square rather than a triangle, because a triangle is a `border`
- * trick with no background of its own and cannot continue the panel's own
- * border across it. Rotated, two of its edges are the outer ones and carry the
- * border; the inner half overlaps the panel's edge and its background covers
- * the line there, which is what makes the arrow read as the panel opening out
- * rather than as a shape stuck to it.
- *
- * `rotate` and not `transform`, for the reason `FloatingController` writes out
- * against its own `translate`: the individual properties compose ahead of
- * `transform`, so a panel that ever animates a `scale` cannot multiply this.
- *
- * The floating pass writes the offset *along* the edge. Which edge, and the
- * offset across it, is placement, and that is what the four rules below say. */
+/*
+ *  The point, half outside the panel and pointing at the target.
+ */
 [part="arrow"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
   block-size: var(--tour-arrow-size, 0.625rem);

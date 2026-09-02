@@ -60,16 +60,13 @@
   white-space: nowrap;
 }
 
-/* On the slot rather than on what was slotted.
- *
- * `::slotted()` matches elements and nothing else, so a label written as bare
- * text between the tags would get none of this. Both properties here are
- * inherited, and inherited properties set on a slot reach its assigned nodes
- * through the flattened tree, text nodes included.
+/*
+ *  On the slot rather than on what was slotted.
  *
  * `foreground-muted` rather than the `foreground-subtle` a caption usually
  * takes: subtle is 3.78:1 on the light surface, which is under the 4.5:1 this
- * text needs, and muted is 5.76:1 and still visibly quieter than the metric. */
+ * text needs, and muted is 5.76:1 and still visibly quieter than the metric.
+ */
 slot[name="label"] {
   color: var(--helix-color-foreground-muted);
   font-weight: var(--helix-weight-regular);

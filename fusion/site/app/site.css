@@ -234,13 +234,11 @@ helix-drawer {
   --drawer-padding-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
-/* **A glass panel on a phone in daylight has to admit less.**
-   `--helix-material-translucent` is 30 percent, which is right for a pane over a
-   dark page where the ink behind it is dim and the blur has room to work.
-
-   Said on the element, because it is the site's material policy rather than any
-   one drawer's: the navigation and the preferences panel both stated it, in the
-   same words, from a class they shared. */
+/*
+ * *A glass panel on a phone in daylight has to admit less.**
+ *    `--helix-material-translucent` is 30 percent, which is right for a pane over a
+ *    dark page where the ink behind it is dim and the blur has room to work.
+ */
 @media (max-width: 40rem) {
   helix-drawer[material="glass"] {
     --drawer-background-color: light-dark(
@@ -349,13 +347,11 @@ helix-drawer {
    a `button` and takes no `href`.** The routing page states the rule this
    follows: a component that navigates renders its own anchor, and wrapping a
    button in a link to borrow its shape is the third option that page rules out. */
-/* A control in the page chrome labels itself in the accessible tree and not on
-   the page: the filter bar's selects sit under a heading that already says what
-   they filter, and the hero's search field carries its own placeholder.
-
-   `::part(label)` and not `[data-hidden-visually]`, which is the design system's
-   helper for the same job: the attribute would have to land on the part, and a
-   part takes no attributes from outside. This is the published door. */
+/*
+ *  A control in the page chrome labels itself in the accessible tree and not on
+ *    the page: the filter bar's selects sit under a heading that already says what
+ *    they filter, and the hero's search field carries its own placeholder.
+ */
 [data-chrome-control]::part(label) {
   block-size: 1px;
   clip-path: inset(50%);

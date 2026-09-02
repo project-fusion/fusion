@@ -23,20 +23,9 @@
   flex-wrap: wrap;
 }
 
-/* Wrong, and the set says so, on the controls rather than around them.
- *
- * An outline round the whole run is the tempting reading, since "choose one to
- * continue" is a complaint about the set and not about either option. It draws a
- * full-width red rectangle for a message one line long, a great deal louder than
- * the error is. The controls are where every other field in the library puts
- * wrongness, and a reader scanning a form finds it there.
- *
- * Through `--radio-border-color` rather than by writing `:state(invalid)` onto
- * the members: these are the consumer's elements and the group does not own what
- * they say about themselves. A custom property set here inherits through the slot into each
- * radio's own shadow root, which is the same crossing `data-density` makes, and
- * every rule that paints that circle already reads the hook, so neither a
- * pointer over one nor a selection rubs the mark off it. */
+/*
+ *  Wrong, and the set says so, on the controls rather than around them.
+ */
 :host(:state(invalid)) [part="items"] {
   --radio-border-color: var(--helix-color-danger);
 }

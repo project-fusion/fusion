@@ -23,23 +23,9 @@
   flex-wrap: wrap;
 }
 
-/* Wrong, and the set says so, on the controls rather than around them.
- *
- * A danger outline round the whole run is the other reading, "choose at least
- * one" being a complaint about the set rather than about the third checkbox. It
- * is a full-width red rectangle for a message one line long, a great deal louder
- * than the error is, and the controls are where every other field in the library
- * puts wrongness.
- *
- * Through `--checkbox-border-color` rather than by writing `:state(invalid)`
- * onto the members: these are the consumer's elements and the group does not
- * own what they say about themselves. A custom property set here inherits
- * through the slot into each checkbox's own shadow root, the same crossing
- * `data-density` makes, and every rule that paints that edge already reads the
- * hook, so a pointer over one member does not rub the mark off it.
- *
- * Only the edge. The tick keeps its own ink: a box the reader ticked is not the
- * thing that is wrong, and a run of red ticks says the opposite. */
+/*
+ *  Wrong, and the set says so, on the controls rather than around them.
+ */
 :host(:state(invalid)) [part="items"] {
   --checkbox-border-color: var(--helix-color-danger);
 }

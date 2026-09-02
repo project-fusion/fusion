@@ -15,14 +15,13 @@
    reader arrowing through the rows should not land on it. */
 [part="header"] {
   align-items: center;
-  /* A step above the rows rather than level with them. The header is the one
-     thing on the page that is not a row, and at the rows' own height it reads as
-     the first of them with a different weight of text. `size-control` against
-     the rows' `size-control-tight` is eight pixels at the default density, which
-     is enough to separate the bar from the list without making it a banner.
-
-     Both follow the current control step, so the gap between them holds whatever
-     density the panel is dropped into. */
+  /*
+ *  A step above the rows rather than level with them. The header is the one
+ *      thing on the page that is not a row, and at the rows' own height it reads as
+ *      the first of them with a different weight of text. `size-control` against
+ *      the rows' `size-control-tight` is eight pixels at the default density, which
+ *      is enough to separate the bar from the list without making it a banner.
+ */
   block-size: var(--helix-size-control);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
@@ -118,20 +117,9 @@
   }
 }
 
-/* A caret is physical and the thing it points at is not.
- *
- * The row itself already flips, because it is laid out on the inline axis and
- * the browser reverses that in a right-to-left document. The glyph inside does
- * not, so the mark ends up on the correct side pointing the wrong way, which in
- * that reading direction means the opposite of what it says. Mirrored rather
- * than swapped for the opposite icon, so the pair stays one decision: a reversed
- * `caret-left` is exactly `caret-right`, and two sets of icon imports that have
- * to agree is the kind of thing that drifts.
- *
- * Written out in each component rather than shared, because there is no sheet a
- * shadow root can compose for this and no way for one to know which of a
- * component's glyphs are directional. `Pagination` carries the same rule and the
- * same argument. */
+/*
+ *  A caret is physical and the thing it points at is not.
+ */
 :host(:dir(rtl)) [part="back"] svg {
   scale: -1 1;
 }

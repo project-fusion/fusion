@@ -108,16 +108,12 @@
   cursor: not-allowed;
 }
 
-/* The panel, in the house shape every floating surface here takes. `border: none`
+/*
+ *  The panel, in the house shape every floating surface here takes. `border: none`
  * said rather than left out, for the reason Popover, Menu and Select all record:
  * the UA stylesheet gives `[popover]` `border: solid`, so dropping the
  * declaration leaves three pixels of medium gray rather than none at all.
- *
- * The field's width, unlike Date Input's. A calendar is seven columns with a
- * width of its own and a list of times is a column of single lines, so this one
- * should be as wide as the control it belongs to: Select's reasoning exactly.
- * `max-content` as a floor rather than a cap, so a narrow field still fits its
- * longest time. */
+ */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
   border: var(--time-input-border-width, var(--helix-border-floating)) solid
@@ -128,14 +124,9 @@
   inset: auto;
   margin: var(--helix-space-none);
   min-inline-size: max-content;
-  /* Block padding only.
-   *
-   * A row is a band across the list, so its fill runs edge to edge and the
-   * highlight lines up with the edge the eye follows down: inline padding turns
-   * every row into a pill floating in a panel, and the eye then has two left
-   * edges to choose between. The block padding stays, holding the first and last
-   * rows clear of the panel's own rounded corners, which is the same job the
-   * listbox's own frame gives it. */
+  /*
+ *  Block padding only.
+ */
   overflow: hidden;
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-none);
@@ -240,13 +231,9 @@
   white-space: nowrap;
 }
 
-/* Wrong, and the field says so.
- *
- * The same four selectors Input carries, and for the reason it records at
- * length: the focus rule owns the `outline` and nothing here was changing its
- * color, so a focused field with an error came out as a red border inside a
- * blue ring. Hover is named for the same reason from the other side. The border
- * and the ring are one edge, so when one turns they both do. */
+/*
+ *  Wrong, and the field says so.
+ */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],

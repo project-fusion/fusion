@@ -49,16 +49,12 @@
   stroke-width: 2;
 }
 
-/* And whatever is slotted into the middle breathes with it, in step, so a
-   loader carrying a count or a glyph is one thing rather than a still mark
-   inside a moving ring. Nothing is slotted in the common case and this animates
-   an empty box, which costs nothing.
-
-   Further than the ring goes, and it has to be: the ring's swell is spread over
-   a whole circle at the edge of the picture, where a couple of hundredths of
-   opacity is plenty, and the mark is a small shape in the middle with nothing
-   around it to be read against. At the ring's numbers the center was moving and
-   nobody could see it. */
+/*
+ *  And whatever is slotted into the middle breathes with it, in step, so a
+ *    loader carrying a count or a glyph is one thing rather than a still mark
+ *    inside a moving ring. Nothing is slotted in the common case and this animates
+ *    an empty box, which costs nothing.
+ */
 [part="mark"] {
   animation: helix-loader-breathe-mark 2.4s ease-in-out infinite;
 }
@@ -123,14 +119,12 @@
   }
 }
 
-/* The center. Sized against the loader rather than stated, so a mark stays in
-   proportion at every size the loader comes in: `size` survives on this
-   component precisely because it is a picture, and a fixed mark inside a
-   picture that scales is a mark that is wrong at two of the three sizes.
-
-   `display: contents` when empty is not available here, because the grid needs
-   a cell either way. It carries no fill and no inset, so an unslotted loader
-   paints nothing extra. */
+/*
+ *  The center. Sized against the loader rather than stated, so a mark stays in
+ *    proportion at every size the loader comes in: `size` survives on this
+ *    component precisely because it is a picture, and a fixed mark inside a
+ *    picture that scales is a mark that is wrong at two of the three sizes.
+ */
 [part="mark"] {
   /* Derived from the loader's own size rather than as a percentage. A
      percentage here resolves against the grid cell, which is sized by whatever
@@ -193,16 +187,9 @@
   display: none;
 }
 
-/* Opacity alone, where the default appearance also scales.
- *
- * The default's mark is a small shape inside a turning ring, and a little
- * growth is what keeps it from being lost against the movement around it. With
- * the ring and the arc both gone the mark *is* the loader, and a wordmark that
- * grows and shrinks reads as a logo being animated rather than as a page
- * waiting. Fading is the quietest thing that still says something is happening.
- *
- * `animation-name` rather than the whole shorthand, so the timing and easing
- * stay the ones the default was tuned with and only the frames change. */
+/*
+ *  Opacity alone, where the default appearance also scales.
+ */
 :host([variant="pulse"]) [part="mark"] {
   animation-name: helix-loader-pulse-mark;
 }
@@ -218,14 +205,9 @@
   }
 }
 
-/* And here reduced motion can stop entirely, where the turn cannot.
- *
- * The rule above slows the arc to a crawl instead of halting it, because a
- * spinner frozen mid-turn reads as a page that has hung. A ring and a mark
- * sitting still read as a ring and a mark: there is no arrested movement to
- * misread, so the honest answer to "do not move things" is not to. The `busy`
- * state is on the host through `ElementInternals` and is what actually
- * announces the wait, so nothing is lost by going still. */
+/*
+ *  And here reduced motion can stop entirely, where the turn cannot.
+ */
 @media (prefers-reduced-motion: reduce) {
   /* The mark, because the mark is the whole of this appearance: the ring no
      longer draws, so a rule answering for it would leave a fading logo. */

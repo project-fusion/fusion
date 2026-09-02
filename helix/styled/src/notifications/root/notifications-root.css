@@ -19,16 +19,13 @@
   max-block-size: var(--notifications-max-block-size, none);
 }
 
-/* Something in the feed has media, so every item holds the column open by this
-   much and the text down the feed starts on one edge. Set here rather than on
-   the item because an item cannot see its neighbors: the value inherits through
-   the light DOM to the items and into their shadow roots, which is the one
-   channel that crosses that boundary without either tier importing the other.
-
-   The gutter is in the value, media and the space after it together, so the
-   track a filled item needs and the track an empty one reserves are the same
-   number. `minmax` at the other end lets a larger mark than this grow the track
-   rather than be clipped. */
+/*
+ *  Something in the feed has media, so every item holds the column open by this
+ *    much and the text down the feed starts on one edge. Set here rather than on
+ *    the item because an item cannot see its neighbors: the value inherits through
+ *    the light DOM to the items and into their shadow roots, which is the one
+ *    channel that crosses that boundary without either tier importing the other.
+ */
 :host(:state(media)) {
   --notifications-media-column: calc(var(--helix-size-avatar) + var(--helix-space-sm));
 }
@@ -44,15 +41,10 @@
   padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
 }
 
-/* Empty, the regions take no space: a consumer with no header should not pay for
-   the rule under one.
-
-   **The element says so, because `:has` cannot.** `:not(:has(> slot:has(*)))`
-   fails twice over: `:has()` may not be nested inside `:has()`, so the selector
-   never parses and the rule is discarded whole, and a slot's assigned nodes are
-   not its DOM children, so `slot:has(*)` asks about fallback content rather than
-   about the fill. `slotFilled` is the library's answer and `data-empty` is how
-   it reaches a stylesheet. See `notifications-root.ts`. */
+/*
+ *  Empty, the regions take no space: a consumer with no header should not pay for
+ *    the rule under one.
+ */
 [part="header"][data-empty],
 [part="footer"][data-empty] {
   display: none;

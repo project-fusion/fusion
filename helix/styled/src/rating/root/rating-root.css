@@ -11,13 +11,12 @@
   gap: var(--rating-gap, var(--helix-space-xs));
 }
 
-/* Two rows of the same marks, one over the other, and the top one cut off
+/*
+ *  Two rows of the same marks, one over the other, and the top one cut off
  * partway. That is the whole mechanism: a mark filled to the middle is the
  * ordinary mark with half of it showing, so a half score needs no second glyph
  * and any mark a consumer supplies gets halves for nothing.
- *
- * `position: relative` because the fill is laid over the track rather than
- * beside it, and the track is what gives the pair its size. */
+ */
 [part="marks"] {
   display: inline-flex;
   position: relative;
@@ -97,18 +96,15 @@
   position: absolute;
 }
 
-/* Each step takes a mark's worth of the row, in order.
- *
- * The element hands over two numbers, how many steps there are and which one
- * this is, because those are facts about the set and it is the one that knows
- * them. Where the share lands is arithmetic, and arithmetic is this file's.
- * `Megamenu` splits the same way over where a band starts.
+/*
+ *  Each step takes a mark's worth of the row, in order.
  *
  * The pitch counts one gap per mark, hence `100% + gap` for a row that holds
  * one fewer gap than it holds marks, and each target then starts half a gap
  * early so it is centered on its mark rather than drifting right along the row.
  * The two half-gaps hanging off the ends are deliberate: the alternative is
- * dead pixels between the marks, and a rating that ignores a press. */
+ * dead pixels between the marks, and a rating that ignores a press.
+ */
 [part="option"] {
   --_rating-pitch: calc((100% + var(--_rating-mark-gap)) / var(--rating-steps, 1));
 

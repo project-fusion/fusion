@@ -36,15 +36,13 @@
  * text, which is `color: inherit` unless it names a tone, so nothing inside
  * needs to know it is on a filled ground. */
 .showcaseAnchor {
-  /* **Not `--helix-color-primary`, which does not carry text.** It is solved to
-     be legible *on* the background, so in a dark theme it is light by
-     construction and a card filled with it carries dark text: measured with
-     `foreground-on-accent` over it in dark mode, 2.8 to 1, under the 4.5 body
-     text wants and under the 3 even large text wants.
-
-     `primary-surface` is the brand solved the other way, as a ground dark
-     enough that its own ink clears it, which is what lets everything inside
-     stay `color: inherit`. */
+  /*
+ * *Not `--helix-color-primary`, which does not carry text.** It is solved to
+ *      be legible *on* the background, so in a dark theme it is light by
+ *      construction and a card filled with it carries dark text: measured with
+ *      `foreground-on-accent` over it in dark mode, 2.8 to 1, under the 4.5 body
+ *      text wants and under the 3 even large text wants.
+ */
   --card-background-color: var(--helix-color-primary-surface);
   --card-border-color: var(--helix-color-primary-surface);
 
@@ -62,18 +60,9 @@
    because an overlay needs the color behind it and this panel has no color of
    its own. */
 .showcaseStage {
-  /* **No paper under the components, and no ground behind them.**
-   *
-   * A panel with a shadow says "a picture of an interface". The controls beside
-   * the copy *are* the interface, so a surface under them is the one thing on
-   * the page arguing otherwise.
-   *
-   * It also fights the field. The band sits inside the reel, so there is an aura
-   * behind it, and an opaque stage is a surface hiding the thing the field
-   * exists to draw. The components sit on the light directly.
-   *
-   * The mask, the padding and the overflow stay. Those are about the stage being
-   * a window onto content twice its height. */
+  /*
+ * *No paper under the components, and no ground behind them.**
+ */
   /* Same rule again one level down: the stage is a grid item too, and its
      contents are twice the height of the region it sits in. */
   min-block-size: 0;
@@ -106,28 +95,23 @@
   grid-area: brand;
 }
 
-/* **On the button, not on the tooltip that wraps it.**
- *
- * `helix-tooltip` is `display: contents`, so it generates no box and is not a
- * grid item: every one of these three properties set on it was read by nothing
- * and dropped without an error, which is the same silent class as a `[part=]`
- * selector for a part nothing renders. The icon button is the grid item, so it
- * is the thing that can be placed. */
+/*
+ * *On the button, not on the tooltip that wraps it.**
+ */
 .showcaseReset > helix-icon-button {
   align-self: center;
   grid-area: reset;
   justify-self: start;
 }
 
-/* **No `align-items` on the grid, only on the row that wants it.**
+/*
+ * *No `align-items` on the grid, only on the row that wants it.**
  *
  * Centering every row centers the views row too, and the views are taller than
  * the `1fr` they are given: a centered overflow spills in both directions, so
  * the first card of each view climbed over the switch and into the anchor. What
  * wanted centering was the switch beside the color, which can ask for itself.
- *
- * The views row starts rather than stretches, so a short view sits under the
- * switch instead of being pulled down the panel. */
+ */
 .showcaseStage {
   column-gap: var(--helix-space-md);
   display: grid;
@@ -161,17 +145,15 @@
   grid-row: span 2;
 }
 
-/* **A gap the pair actually fits in.**
+/*
+ * *A gap the pair actually fits in.**
  *
  * `Stat Group` wraps, and its default gap is `2xl`. Two figures measure 113 and
  * 174 with 318 of card to sit in, so 287 of content plus a 48 gap comes to 335
  * and the second one wraps, and the same 48 then becomes the space between the
  * two lines: 345 with the figures stacked against 222 with them side by side,
  * for a component whose drawing never changed size.
- *
- * A custom property rather than a rule on the group, which is what makes this
- * safe from here: it inherits through the shadow boundary and is read inside
- * it, so there is no document declaration racing a shadow one. */
+ */
 .showcaseStats {
   --stat-group-gap: var(--helix-space-lg);
 }
@@ -230,17 +212,15 @@
   inline-size: var(--helix-size-checkbox);
 }
 
-/* The stage's own controls stack too, not only its `views` grid.
+/*
+ *  The stage's own controls stack too, not only its `views` grid.
  *
  * `"switch brand reset"` is one row of three at every width, and at 390 there is
  * not room for it: the toggle group breaks its four options onto four lines and
  * the color field beside it is squeezed until `#3b82f6` renders as `32f6`, the
  * two of them overlapping. Measured at 390, the group occupying x=65 to 240 and
  * the field starting at 245 with its value clipped.
- *
- * The switch takes a row of its own and the color keeps its reset beside it: the
- * two halves that must stay together are the color and the control that undoes
- * it, and the switch is the one that can be anywhere. */
+ */
 @media (width < 56rem) {
   .showcaseView {
     grid-template-columns: minmax(0, 1fr);

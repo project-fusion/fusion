@@ -34,14 +34,11 @@
   position: relative;
 }
 
-/* **Centered, so the light has something to be behind.** The hero is a claim
+/*
+ * *Centered, so the light has something to be behind.** The hero is a claim
  * over a field of moving light, and a claim pushed to one edge leaves the other
  * two thirds of the field looking like space nobody used.
- *
- * The measure comes with it. A centered column that runs the full shell gives a
- * reader a different left edge on every line, which is the failure centering is
- * usually blamed for and is really a width problem: `.heroLede` already carries
- * `.measure`, and the title balances its own lines. */
+ */
 .heroShell {
   position: relative;
   text-align: center;
@@ -68,7 +65,8 @@
   max-inline-size: 100%;
 }
 
-/* **The buttons grow, which is what makes the agreement hold once they stack.**
+/*
+ * *The buttons grow, which is what makes the agreement hold once they stack.**
  *
  * With the cap in place the wrapper is the viewport at 375 and the pill took
  * all of it, 327 against two 200 buttons: the desktop mismatch inverted, the
@@ -77,10 +75,7 @@
  * being exactly the 412 the wrapper asked for, so nothing moves. Stacked, each
  * button is alone on its line and fills it, so the three elements measure 327
  * together.
- *
- * `flex-grow` on the child rather than a width from the recipe: how an item
- * divides a line is the row's business, and `data-button-width` is still the
- * floor it starts from. */
+ */
 .heroActions [data-button] {
   flex-grow: 1;
 }
@@ -113,23 +108,21 @@
 }
 
 .heroInstall helix-copy-button {
-  /* Sized to the line, not to a control.
-   *
-   * `IconButton` is `--helix-size-control` by default, which is 40, and a 40
-   * control inside a chip built for 13px type sets the height of the whole
-   * thing: measured at 50 for a line whose text is 20. Through the component's
-   * own `--icon-button-size`, matched to the row's own line box, so the command
-   * is what the box is sized to and the button is something inside it.
-   *
-   * **Floored at 24, because tying a control to a type scale can shrink it out
-   * of being pressable.** `text-sm` times 1.8 is 23.4, which rounds to 23 and
-   * is a pixel under the 24 minimum a target is meant to hold. The `max` keeps
-   * the size following the ramp everywhere the ramp is large enough and stops
-   * it following the ramp down past a floor that is not about type at all.
-   *
-   * The pull-back is separate and only handles the inline axis: the control's
-   * padding is hit area rather than space, so left alone the gap on the right
-   * came out larger than the inset on the left. */
+  /*
+ *  Sized to the line, not to a control.
+ *
+ * `IconButton` is `--helix-size-control` by default, which is 40, and a 40
+ * control inside a chip built for 13px type sets the height of the whole
+ * thing: measured at 50 for a line whose text is 20. Through the component's
+ * own `--icon-button-size`, matched to the row's own line box, so the command
+ * is what the box is sized to and the button is something inside it.
+ *
+ * **Floored at 24, because tying a control to a type scale can shrink it out
+ * of being pressable.** `text-sm` times 1.8 is 23.4, which rounds to 23 and
+ * is a pixel under the 24 minimum a target is meant to hold. The `max` keeps
+ * the size following the ramp everywhere the ramp is large enough and stops
+ * it following the ramp down past a floor that is not about type at all.
+ */
   --icon-button-radius: var(--helix-radii-xs);
   --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
 
@@ -175,7 +168,8 @@
   }
 }
 
-/* A scale of five, set here rather than taken from the tokens.
+/*
+ *  A scale of five, set here rather than taken from the tokens.
  *
  * **The token scale is right for a page of prose and wrong for this page.** It
  * steps in even ratios because a document needs a rhythm that holds over many
@@ -185,28 +179,16 @@
  * the whole point: without it a 64px display runs straight into a 15px lede, a
  * jump of more than four to one, and the hero reads as a poster with a caption
  * stuck under it.
- *
- * Fluid rather than stepped, because these are single lines given a screen each
- * and a breakpoint would just be a worse version of the same curve. */
-/* **The display face, which a plain `<h1>` does not get.** Helix hangs it on
+ */
+/*
+ * *The display face, which a plain `<h1>` does not get.** Helix hangs it on
  * `helix-text[as="h1"]` and `[data-text="display"]`, so markup written as a bare
  * tag for the sake of this type scale loses it, and the two faces differ most at
  * large sizes and in the details, which is exactly where a hero lives.
- *
- * The section titles take it here too. On the live page they are `heading`
- * variant and set in the body face, which is right for a document; a landing
- * page is six statements and the face earns its keep on all of them. */
-/* The half of the heading the brand paints.
- *
- * **A span rather than a gradient across the whole line.** A duotone made by
- * running a gradient over the entire heading colors words that are not the
- * claim, and on a two-line heading it puts the darkest part of the ramp on
- * whichever words happen to wrap last. Painting one phrase says which phrase.
- *
- * `primary` rather than a mix, because this is the one place on the page where
- * the brand is the subject rather than an accent on something else: it is the
- * color the whole system is derived from, sitting in the sentence that says the
- * system derives things. */
+ */
+/*
+ *  The half of the heading the brand paints.
+ */
 .tDisplayAccent {
   color: var(--helix-color-primary);
   /* **Its own line, so the color break and the line break are the same break.**

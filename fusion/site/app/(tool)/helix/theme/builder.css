@@ -5,10 +5,6 @@
  * page of the marketing site draws on. A tool's chrome is not site chrome, and
  * a file two people are editing at once is a conflict waiting for whichever of
  * them commits second.
- *
- * The shell, the header and the splitter body are the sandbox's, by class:
- * `sandboxShell`, `workbenchHeader` and `workbenchBody`. Only what goes inside
- * the panes is this file's.
  */
 
 /* The form. Its own scroller, because the pane is a fixed height and a theme
@@ -103,13 +99,12 @@ helix-sandbox-editor {
   padding: var(--helix-space-md);
 }
 
-/* **It transitions in, because it appears in response to something the reader
-   just did.** A notice that arrives with no motion reads as having always
-   been there, and the thing it is reporting, that the brand moved, is a
-   consequence of the color they typed a moment ago.
-
-   Keyed on the direction in the markup, so switching from lightened to darkened
-   remounts and plays again rather than silently swapping a word. */
+/*
+ * *It transitions in, because it appears in response to something the reader
+ *    just did.** A notice that arrives with no motion reads as having always
+ *    been there, and the thing it is reporting, that the brand moved, is a
+ *    consequence of the color they typed a moment ago.
+ */
 .themeShift {
   animation: themeShiftIn var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -129,16 +124,9 @@ helix-sandbox-editor {
   }
 }
 
-/* The audit counts, which are buttons wearing a tag.
- *
- * A bare reset rather than `all: unset`, which takes `box-sizing` with it and
- * would need restoring in the same rule. Four properties is the whole of what a
- * button brings that is unwanted here: the tag inside supplies every pixel a
- * reader sees.
- *
- * The focus ring is the reason this is a button at all, so it is stated rather
- * than left to the reset: `:focus-visible` only, because a pointer opening a
- * panel does not need a ring left behind on the tag it came from. */
+/*
+ *  The audit counts, which are buttons wearing a tag.
+ */
 .themeJump {
   background: none;
   border: 0;
@@ -167,18 +155,10 @@ helix-sandbox-editor {
   text-align: center;
 }
 
-/* The specimen column at the end of a face's row, holding either the sample or
+/*
+ *  The specimen column at the end of a face's row, holding either the sample or
  * its stand-in.
- *
- * A fixed inline size, because the whole column has to line up: `Ag` in
- * Playfair Display is wider than in Inter, and a ragged edge down a thousand
- * rows reads as a list that is broken rather than as type that varies. Both
- * children are laid on top of each other in the same box, so the swap when a
- * face lands moves nothing beside it.
- *
- * Not scaled down to the option's text. A sample smaller than the name it
- * describes cannot show a terminal or a bowl, which is the only thing it is
- * here for, so it takes a step up rather than down. */
+ */
 .themeFace {
   align-items: center;
   block-size: var(--helix-text-xl);

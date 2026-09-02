@@ -5,39 +5,26 @@
   gap: var(--helix-space-2xs);
 }
 
-/* The frame is the list rather than the host, so a filter that empties it
-   leaves a box with a message in it instead of a border collapsing to nothing.
-
-   Capped and scrolling, because a list of two hundred options otherwise runs
-   down the page and takes the rest of the form with it. The keyboard brings the
-   active option into this box, which is why the cap is on the same element the
-   scroll happens in. */
+/*
+ *  The frame is the list rather than the host, so a filter that empties it
+ *    leaves a box with a message in it instead of a border collapsing to nothing.
+ */
 [part="items"] {
   /* Square rows, for the reason the select's panel gives: they run the full
      width of this box, and a radius on a band that reaches both edges rounds
      against nothing. */
   --option-radius: var(--helix-radii-none);
 
-  /* `surface`, not `surface-sunken`, and the rows are what decides it. A row
-     hovers and selects at `raised`, which on a white page is a step *darker*
-     than the page: on a sunken fill it came out two hundredths lighter than the
-     list it sits in, so hovering made a row brighter by an amount nobody can
-     see, and the whole list read as a gray slab besides.
-
-     A field is sunken because it is a well you put a value into. This is not
-     that: it is a surface with rows on it, and what it has to do is sit far
-     enough from its own rows for them to read. On `surface` the hover is darker
-     in light and lighter in dark, which is the right direction in both. */
-  /* Through hooks, because two components already write them.
-
-     `combobox-root.css` and `command-root.css` each set
-     `--listbox-background-color: transparent` in a rule whose comment says a
-     nested list must not fill the panel a second time, and neither write did
-     anything: this hardcoded the fill, so the `border: none` half of each rule
-     landed and the fill half was inert, drawing the shape twice. `Select`
-     reaches the part directly and gets it right, which is a different door and
-     stays valid; three consumers wanting the flattening is what makes this a
-     hook rather than a deletion. */
+  /*
+ *  `surface`, not `surface-sunken`, and the rows are what decides it. A row
+ *      hovers and selects at `raised`, which on a white page is a step *darker*
+ *      than the page: on a sunken fill it came out two hundredths lighter than the
+ *      list it sits in, so hovering made a row brighter by an amount nobody can
+ *      see, and the whole list read as a gray slab besides.
+ */
+  /*
+ *  Through hooks, because two components already write them.
+ */
   background-color: var(--listbox-background-color, var(--helix-color-surface));
   border: var(--listbox-border, var(--helix-border-thin) solid var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
@@ -99,18 +86,14 @@
   text-align: center;
 }
 
-/* The mark beside the field, and a slot so it can be something else.
+/*
+ *  The mark beside the field, and a slot so it can be something else.
  *
  * A bare text input in a panel of rows does not read as a place to type: the
  * rows are the content and the field is chrome, and chrome that looks like
  * content is chrome nobody uses. A magnifier is the one glyph a reader does not
  * have to learn.
- *
- * Slotted with a fallback rather than a property, which is the house rule for
- * content: `<helix-icon slot="filter-icon">` replaces it and the two can never
- * both show. `aria-hidden` on the wrapper, because the field already carries
- * `aria-label` and a decorative mark beside a labeled control is a second name
- * for one thing. */
+ */
 [part="filter-icon"] {
   align-items: center;
   color: var(--helix-color-foreground-subtle);
@@ -126,17 +109,9 @@ slot[name="filter-icon"]::slotted(*) {
   inline-size: var(--helix-size-icon-tight);
 }
 
-/* The field that narrows the list.
- *
- * Above the options and outside the scroller, so it stays put while the list
- * moves under it: a filter that scrolled away with its own results is a filter
- * you cannot see to clear.
- *
- * A rule under it rather than a box around it, because it is part of the same
- * surface as the rows rather than a control sitting on one. The panel that
- * frames the list is already the frame.
- *
- * A row, holding the mark and the field. */
+/*
+ *  The field that narrows the list.
+ */
 [part="search"] {
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);

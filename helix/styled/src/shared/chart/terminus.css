@@ -1,10 +1,7 @@
-/* The end-of-series mark, shared by `Sparkline` and `LineChart` because the two
-   are the same mark on the same kind of thing.
-
-   An element, not a shape in the drawing: a chart filling its box uses
-   `preserveAspectRatio="none"`, so a `<circle>` is an ellipse whose squash
-   depends on the consumer's width, and `vector-effect` leaves geometry in the
-   transform. `currentColor` throughout, so `color` on the host carries. */
+/*
+ *  The end-of-series mark, shared by `Sparkline` and `LineChart` because the two
+ *    are the same mark on the same kind of thing.
+ */
 [part="terminus"] {
   background-color: currentColor;
   block-size: var(--chart-terminus-size, 5px);

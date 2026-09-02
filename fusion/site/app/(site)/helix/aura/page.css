@@ -49,15 +49,9 @@
   position: relative;
 }
 
-/* One bar, fixed to the bottom, holding every control.
- *
- * Fixed rather than in the flow, because the field runs the height of the
- * viewport and controls placed under it are controls a reader has to scroll away
- * from the thing they are adjusting to reach.
- *
- * `sticky` layer, so it sits over the aura and under the masthead, and its own
- * material so the field reads through it: an opaque strip across the bottom of a
- * background is a strip taken out of the background. */
+/*
+ *  One bar, fixed to the bottom, holding every control.
+ */
 .auraBar {
   backdrop-filter: blur(var(--helix-material-blur-md));
   background-color: var(--helix-material-translucent);
@@ -105,15 +99,12 @@
   rotate: 180deg;
 }
 
-/* **`grid-template-rows` from 0fr to 1fr, because nothing here has measured a
-   height.** A panel whose contents wrap at eight different widths has no number
-   to animate to, and `max-inline-size` guesses would either clip the sliders or
-   leave the transition finishing against empty space.
-
-   `visibility` rides the same transition so a shut panel leaves the tab order
-   rather than staying reachable underneath, and `transition-behavior` is what
-   lets a discrete property take part at all: without it the controls become
-   focusable the instant the collapse starts. */
+/*
+ * *`grid-template-rows` from 0fr to 1fr, because nothing here has measured a
+ *    height.** A panel whose contents wrap at eight different widths has no number
+ *    to animate to, and `max-inline-size` guesses would either clip the sliders or
+ *    leave the transition finishing against empty space.
+ */
 .auraPanel {
   display: grid;
   grid-template-rows: 0fr;
@@ -148,24 +139,19 @@
   padding-block-start: var(--helix-space-md);
 }
 
-/* No footer under a full-bleed field. The page is the component running at
-   size with a drawer over it, and a copyright line below that is a strip of
-   page furniture stapled to the bottom of a picture. Written here rather than
-   by moving the route out of the group, because everything else the layout
-   gives this page is wanted.
+/*
+ *  No footer under a full-bleed field. The page is the component running at
+ *    size with a drawer over it, and a copyright line below that is a strip of
+ *    page furniture stapled to the bottom of a picture. Written here rather than
+ *    by moving the route out of the group, because everything else the layout
+ *    gives this page is wanted.
  *
  * **`[data-site-footer]`, never `.siteFooter`.** That is the *source* name of a
  * rule in `chrome.module.css`, and a CSS module rewrites its class names, so the
  * element carries `chrome-module__sKhELq__siteFooter` and the only thing that
  * can select it is `styles.siteFooter` from inside the module. From a plain
  * stylesheet the source name matches nothing.
- *
- * That is the same failure as a `[part=]` selector for a part nothing renders,
- * and it is worse here because the module boundary makes it invisible: the rule
- * reads correctly, the name is spelled correctly, and there is no error, no
- * warning and no clue beyond the feature not happening. Any rule reaching a
- * module-styled element from outside its module needs a hook the bundler cannot
- * rename, so the layout marks the element and this asks for the mark. */
+ */
 :root:has(.auraStage) [data-site-footer] {
   display: none;
 }

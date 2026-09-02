@@ -3,27 +3,23 @@
    and top to bottom in days. `grid-auto-flow: column` is the whole of that, and
    `rows="1"` makes it a single row without a second layout. */
 :host {
-  /* **Two axes, because a square is a contribution graph's shape and not a
-     status page's.** A calendar cell is a day and is square; an uptime bar is a
-     minute or an hour, and every status page draws those tall and thin, four
-     pixels by twenty, because the strip's whole job is to fit a long stretch of
-     time into a row. One `--heatmap-cell-size` could say either and not both.
-
-     Each axis falls back to the shared hook, so `--heatmap-cell-size` still sets
-     both, and the rules read the private names, so the fallback chain is written
-     once per axis rather than at every use. */
+  /*
+ * *Two axes, because a square is a contribution graph's shape and not a
+ *      status page's.** A calendar cell is a day and is square; an uptime bar is a
+ *      minute or an hour, and every status page draws those tall and thin, four
+ *      pixels by twenty, because the strip's whole job is to fit a long stretch of
+ *      time into a row. One `--heatmap-cell-size` could say either and not both.
+ */
   --_heatmap-cell-width: var(--heatmap-cell-inline-size, var(--heatmap-cell-size, 0.75rem));
   --_heatmap-cell-height: var(--heatmap-cell-height, var(--heatmap-cell-size, 0.75rem));
 
-  /* **What a tone name is worth, which the tier below cannot say.**
-     `helix/headless` writes `--heatmap-tone: var(--heatmap-tone-success)` onto a
-     cell and stops, exactly as the charts write `--chart-series-3`, because that
-     tier knows which bucket a reading fell in and has no tokens to spend on it.
-     Answering here is what lets a headless consumer answer differently.
-
-     The semantic names are the theme's status colors, so a strip that already
-     knows a day was degraded gets the same red as everything else that means
-     degraded, and a page that restyles danger restyles this with it. */
+  /*
+ * *What a tone name is worth, which the tier below cannot say.**
+ *      `helix/headless` writes `--heatmap-tone: var(--heatmap-tone-success)` onto a
+ *      cell and stops, exactly as the charts write `--chart-series-3`, because that
+ *      tier knows which bucket a reading fell in and has no tokens to spend on it.
+ *      Answering here is what lets a headless consumer answer differently.
+ */
   --heatmap-tone-accent: var(--helix-color-accent);
   --heatmap-tone-danger: var(--helix-color-danger);
   --heatmap-tone-info: var(--helix-color-info);
@@ -32,23 +28,22 @@
   --heatmap-tone-success: var(--helix-color-success);
   --heatmap-tone-warning: var(--helix-color-warning);
 
-  /* **The numbered ones are a ramp, and a ramp is one hue getting louder.**
-     A reader compares two cells by weight and cannot compare two hues at all,
-     so magnitude has to be a single color walked toward the ground it sits on.
-     Mixed rather than picked off the scale because the steps have to be even:
-     the nearest four semantic tokens are `primary-subtle`, `primary`,
-     `primary-hover` and `primary-active`, which is the 50 then 500, 600, 700 of
-     the ramp, one chasm and three hairs.
-
-     **`primary-active` is the far end rather than `primary`, because a ramp is
-     only as legible as the distance it spans.** Walked to the mid weight, the
-     top three steps came out within a few percent of each other and a busy week
-     was indistinguishable from a quiet one; the active weight is the 700 in
-     light and the 200 in dark, so the run is light-gray-to-deep in one mode and
-     near-black-to-bright in the other, and five steps have room to be five.
-
-     Both ends resolve through `light-dark()`, so the mix inverts with the page
-     and the ramp runs quiet-to-loud in either mode without a second declaration. */
+  /*
+ * *The numbered ones are a ramp, and a ramp is one hue getting louder.**
+ *      A reader compares two cells by weight and cannot compare two hues at all,
+ *      so magnitude has to be a single color walked toward the ground it sits on.
+ *      Mixed rather than picked off the scale because the steps have to be even:
+ *      the nearest four semantic tokens are `primary-subtle`, `primary`,
+ *      `primary-hover` and `primary-active`, which is the 50 then 500, 600, 700 of
+ *      the ramp, one chasm and three hairs.
+ *
+ * *`primary-active` is the far end rather than `primary`, because a ramp is
+ *      only as legible as the distance it spans.** Walked to the mid weight, the
+ *      top three steps came out within a few percent of each other and a busy week
+ *      was indistinguishable from a quiet one; the active weight is the 700 in
+ *      light and the 200 in dark, so the run is light-gray-to-deep in one mode and
+ *      near-black-to-bright in the other, and five steps have room to be five.
+ */
   --heatmap-tone-1: color-mix(
     in oklab,
     var(--helix-color-primary-active) 20%,
@@ -167,15 +162,13 @@
   font-weight: var(--helix-weight-medium);
 }
 
-/* A ring on hover is what ties the bubble that appears to the day it came from,
-   which on a strip of ninety near-identical squares is the whole difficulty.
-   `outline` rather than a border or an inset shadow: it is outside the box
-   model, so a cell does not move or change size when the pointer reaches it, and
-   one token of offset keeps the ring clear of both neighbors inside the gap.
-
-   Where the gap is zero the offset would put the ring under the neighboring
-   cell, so it goes inside: a continuous field has no room between tiles to draw
-   in, and an inset ring is what a spreadsheet does for the same reason. */
+/*
+ *  A ring on hover is what ties the bubble that appears to the day it came from,
+ *    which on a strip of ninety near-identical squares is the whole difficulty.
+ *    `outline` rather than a border or an inset shadow: it is outside the box
+ *    model, so a cell does not move or change size when the pointer reaches it, and
+ *    one token of offset keeps the ring clear of both neighbors inside the gap.
+ */
 @media (hover: hover) {
   [part="cell"]:hover {
     outline: var(--helix-border-thin) solid var(--helix-color-foreground);

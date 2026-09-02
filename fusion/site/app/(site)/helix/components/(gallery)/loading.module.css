@@ -4,15 +4,13 @@
   display: contents;
 }
 
-/* The boxes the gallery's skeleton stands in.
- *
- * Sized to what they replace rather than to a convenient number, because the
- * point of a skeleton is that nothing moves when the real thing lands. Each
- * measurement here is the rendered height of the element it precedes.
+/*
+ *  The boxes the gallery's skeleton stands in.
  *
  * `helix-skeleton` is `inline-size: 100%` and takes its height from its
  * container unless `shape` says otherwise, so every rule here is a box and the
- * component fills it. */
+ * component fills it.
+ */
 
 .heroTitle {
   block-size: var(--helix-text-3xl);

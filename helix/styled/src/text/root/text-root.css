@@ -14,25 +14,15 @@
   display: block;
 }
 
-/* The ramps live here, and the `data-text` recipe for a plain element stays in
-   the base layer. Never move these to the document: a document rule reaches
-   inside every component that slots a `helix-text` and beats that component's
-   own stylesheet whatever the specificity and whatever the layer, both measured,
-   so a dialog asking for a smaller title gets the ramp's heading size instead
-   and nothing says why. Split, the mapping is written twice and the values once,
-   since both sides reference the same tokens.
-
-   Those rules match the host, and this element takes them by inheritance:
-   font, color, and tracking all cross a shadow boundary. `font: inherit` is
-   what makes that work rather than merely possible, because the UA's own `h2`
-   rules are declarations on this element and beat an inherited value. Resetting
-   to `inherit` puts the host's computed font back in charge.
-
-   The consequence worth knowing: `Text` needs `@fusion.dev/helix-styles/base.css` loaded
-   to look like anything, and it is not alone in that. `Button`'s entire box
-   lives in the base layer too, paired with the `data-button` recipe, and so do
-   the link, list-item, card and navigation-item recipes. The base layer is not
-   optional for this library. */
+/*
+ *  The ramps live here, and the `data-text` recipe for a plain element stays in
+ *    the base layer. Never move these to the document: a document rule reaches
+ *    inside every component that slots a `helix-text` and beats that component's
+ *    own stylesheet whatever the specificity and whatever the layer, both measured,
+ *    so a dialog asking for a smaller title gets the ramp's heading size instead
+ *    and nothing says why. Split, the mapping is written twice and the values once,
+ *    since both sides reference the same tokens.
+ */
 :host([variant="display"]),
 :host(:not([variant])[as="h1"]) {
   font-family: var(--helix-font-display);
@@ -121,17 +111,9 @@
   margin: var(--helix-space-none);
 }
 
-/* `em` is the one tag in the map with nothing else restoring it.
- *
- * `font: inherit` above is what makes the component take the surrounding type,
- * and `font` is a shorthand: it resets `font-style` to `normal` along with
- * everything else it does not name. Every other tag with a look of its own,
- * the headings, `strong`, `code`, `label`, has a base-layer rule putting that
- * look back. `em` had none, so `as="em"` rendered a real `<em>` that was not
- * italic, which is the whole of what the tag means.
- *
- * On the part rather than the host, because the host is not the `<em>`: the
- * static template renders the tag inside. */
+/*
+ *  `em` is the one tag in the map with nothing else restoring it.
+ */
 :host([as="em"]) [part="text"] {
   font-style: italic;
 }

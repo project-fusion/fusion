@@ -10,17 +10,12 @@
 
   align-items: center;
   background-color: var(--helix-color-background);
-  /* Said, not left to fall out of the padding: four pixels of space around
-     whatever it holds makes the height a consequence of the contents, so a bar
-     beside it holding something else stands at a different height. Stated once,
-     two bars either side of a split line up and stay lined up.
-
-     A fixed step rather than `control`, because this bar declares itself dense
-     and the controls in it are the small size: taking the current step would
-     make the bar the height of one of its own buttons with nothing around it,
-     and would shrink whenever the density did.
-
-     `control-loose`, so forty-eight. */
+  /*
+ *  Said, not left to fall out of the padding: four pixels of space around
+ *      whatever it holds makes the height a consequence of the contents, so a bar
+ *      beside it holding something else stands at a different height. Stated once,
+ *      two bars either side of a split line up and stay lined up.
+ */
   block-size: var(--sandbox-toolbar-size, var(--helix-size-control-loose));
   /* The line under the bar, and the only line at that boundary: the panes below
      draw none of their own. */

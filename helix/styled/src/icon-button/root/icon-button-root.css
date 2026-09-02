@@ -3,34 +3,25 @@
   display: inline-flex;
 }
 
-/* The same two axes `Button` carries, and the same argument. What differs is
+/*
+ *  The same two axes `Button` carries, and the same argument. What differs is
  * where the two rest: a text button rests outlined, because a button with words
  * in it is a thing you are meant to see, and an icon button rests as a ghost,
  * because a toolbar of framed squares is a toolbar of boxes. So the resting
  * emphasis here is `ghost` and the resting ink is muted, lifting to the full
  * foreground under a pointer.
- *
- * A tone replaces both inks with itself: a danger icon button is red at rest
- * and red under the pointer, and dimming it would say the destructive one is
- * the one to ignore. */
+ */
 :host {
   --_icon-button-edge: var(--helix-color-border);
   --_icon-button-ink: var(--helix-color-foreground-muted);
   --_icon-button-ink-hover: var(--helix-color-foreground);
-  /* The solid fill, separate from the tone, and it has to be separate.
-   *
-   * The same split `Button` made and for the same reason. `--_icon-button-tone`
-   * is the color of the *ink* on every emphasis but `solid`: an outlined or
-   * subtle primary draws its glyph with it, and in dark mode that is
-   * deliberately the lighter brand so the mark is legible on a dark page. A
-   * solid control wants the opposite, a fill dark enough to carry white.
-   *
-   * Pointing one variable at both is what 107 measured across the whole accent
-   * ramp, and what put this control's glyph at 3.20 against its own fill on the
-   * contact page while the `Button` sharing its edge sat at 6.44.
-   *
-   * Defaulted to the tone, which is what neutral wants, so nothing untoned
-   * moves. */
+  /*
+ *  The solid fill, separate from the tone, and it has to be separate.
+ *
+ * Pointing one variable at both is what 107 measured across the whole accent
+ * ramp, and what put this control's glyph at 3.20 against its own fill on the
+ * contact page while the `Button` sharing its edge sat at 6.44.
+ */
   --_icon-button-fill: var(--_icon-button-tone);
   --_icon-button-fill-hover: var(--_icon-button-tone-hover);
   --_icon-button-on-tone: var(--helix-color-background);
@@ -51,17 +42,9 @@
   --_icon-button-tone: var(--helix-color-primary);
   --_icon-button-tone-hover: var(--helix-color-primary-hover);
 }
-/* **Another tone, and it arrives with the shared surface.**
- *
- * `tone` lives in `MixinControlSurface`, which `Button` and `CopyButton` take
- * as well, and Button's union has always carried `accent`: a rotation off the
- * brand seed rather than a color of its own, so it stays in relation when
- * somebody rethemes. Nothing about it is specific to a control with words in
- * it, and an icon button doing a second emphasized action wants it.
- *
- * Written here rather than only widened in the type, because a value a
- * stylesheet does not answer is the quietest kind of broken: valid to write,
- * accepted by TypeScript, and drawn as neutral. */
+/*
+ * *Another tone, and it arrives with the shared surface.**
+ */
 :host([tone="accent"]) {
   --_icon-button-edge: var(--helix-color-accent);
   --_icon-button-ink: var(--helix-color-accent);
@@ -96,21 +79,18 @@
   background-color: transparent;
   block-size: var(--_icon-button-size);
   border: var(--helix-border-thin) solid transparent;
-  /* **Four corners, so a group can flatten the two it needs to.**
-   *
-   * One `border-radius` here meant `ButtonGroup` could not reach this control:
-   * the group hands `--button-radius-start` and `--button-radius-end` across as
-   * custom properties, which is the one thing that crosses a shadow boundary
-   * however deep the group is, and `Button` publishes and reads them. This did
-   * not, so a copy button beside a button in a group kept all four corners and
-   * the pair read as two controls that happen to touch rather than one split in
-   * two. Measured on `/contact`: the anchor came out `4px 0 0 4px` and the copy
-   * button `4px` all round.
-   *
-   * The same hook names as `Button`, deliberately. The group's contract is
-   * those two properties, and an icon button that answered to different ones
-   * would be a control a group cannot flatten by design rather than by
-   * omission. `--icon-button-radius` stays as this control's own override. */
+  /*
+ * *Four corners, so a group can flatten the two it needs to.**
+ *
+ * One `border-radius` here meant `ButtonGroup` could not reach this control:
+ * the group hands `--button-radius-start` and `--button-radius-end` across as
+ * custom properties, which is the one thing that crosses a shadow boundary
+ * however deep the group is, and `Button` publishes and reads them. This did
+ * not, so a copy button beside a button in a group kept all four corners and
+ * the pair read as two controls that happen to touch rather than one split in
+ * two. Measured on `/contact`: the anchor came out `4px 0 0 4px` and the copy
+ * button `4px` all round.
+ */
   border-end-end-radius: var(--button-radius-end, var(--icon-button-radius, var(--helix-radii-sm)));
   border-end-start-radius: var(
     --button-radius-start,
@@ -140,19 +120,15 @@
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* A wash of the foreground, not a rung on the surface ladder.
+/*
+ *  A wash of the foreground, not a rung on the surface ladder.
  *
  * `surface-raised` is the same neutral as `surface-overlay` in dark mode, so
  * the hover vanishes inside a menu, a dialog or a popover, which is where most
  * icon buttons live. A percentage of the foreground is a step away from
  * whatever it sits on in either mode, which is the argument the button recipe
  * in the base layer already makes for exactly this.
- *
- * Every hover is gated on the control being live, or a button that refuses the
- * press still deepens under the pointer as though it took it. `:not(:disabled)`
- * rather than `:not([disabled])`, for the reason the disabled rule below
- * records: the pseudo-class also matches a control inside a
- * `<fieldset disabled>`, which the attribute never sees. */
+ */
 :host(:not(:disabled)) [part="button"]:hover {
   background-color: color-mix(in oklab, var(--_icon-button-tone) 8%, transparent);
   color: var(--_icon-button-ink-hover);
@@ -185,13 +161,10 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The three departures. `ghost` is the resting state and needs no rule of its
+/*
+ *  The three departures. `ghost` is the resting state and needs no rule of its
  * own; written out it selects nothing and lands on the block above.
- *
- * Every one names its own hover, including where the fill does not move. The
- * generic hover is four class-equivalents and an emphasis rule is three, so
- * an emphasis without a hover of its own loses its fill the moment a pointer
- * touches it. */
+ */
 :host([emphasis="solid"]) [part="button"] {
   background-color: var(--_icon-button-fill);
   border-color: transparent;
@@ -245,16 +218,13 @@
   opacity: 0.5;
 }
 
-/* Not printed, being a control.
+/*
+ *  Not printed, being a control.
  *
  * Paper cannot be pressed. A button prints its chrome and its label, and the
  * chrome is the half that says press me, which on a page is an instruction to do
  * the one thing that is not available.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+ */
 @media print {
   :host {
     display: none;

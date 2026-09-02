@@ -9,7 +9,8 @@
   display: inline-block;
 }
 
-/* Two months to a row, and the rest underneath.
+/*
+ *  Two months to a row, and the rest underneath.
  *
  * Not a flex row: without `wrap` it can do nothing but overflow, and `months="3"`
  * measured 872px wide in an 820px container, a 560px one and a 320px one alike,
@@ -17,20 +18,7 @@
  * leaves the layout at the mercy of whatever box it is in, so three months are
  * three across in a wide panel and two-and-one in a narrower one, which is a
  * calendar that changes shape as the page does.
- *
- * A grid with a stated column count instead. Two, because that is the pairing a
- * range wants, a start month beside an end month; three across is wider than
- * most panels and a run of four is a wall. The count is written by the tier
- * below, capped at two, because a stylesheet cannot count children into a
- * `repeat()` and only that tier knows how many months there are.
- *
- * `--date-picker-columns` overrides it, for a consumer with the room and the reason.
- *
- * `align-items: start` so a row whose months have different week counts still
- * lines their headers up. Wrapping rather than shrinking, because a month has an
- * honest intrinsic width: seven day cells at `--date-picker-day-size`, and
- * squeezing them makes a grid of dates that no longer reads as a calendar. A
- * consumer who wants more months in less room sets that token. */
+ */
 [part="months"] {
   align-items: start;
   display: grid;
@@ -42,17 +30,15 @@
   justify-content: start;
 }
 
-/* Three columns, whether or not there is anything in the outer two.
+/*
+ *  Three columns, whether or not there is anything in the outer two.
  *
  * Not `space-between` on a flex row: only the first month carries a back arrow
  * while only the last carries a forward one, so a run of three puts the first
  * heading against its arrow, the second hard left and the third against the
  * other arrow. Measured across `months="3"`: three headings, three different
  * positions, none of them centered.
- *
- * A grid places the heading in the middle column whether the arrows exist or
- * not, so every month in a row reads at the same height and the same offset,
- * and nothing has to be rendered to hold a space. */
+ */
 [part="header"] {
   align-items: center;
   display: grid;
@@ -136,13 +122,12 @@
   padding-block-end: calc(var(--_calendar-track) / 2);
 }
 
-/* The cell is the whole track and the day is the shape centered in it. A range
-   paints the cell, so it runs unbroken between days and stops at the ends of a
-   row on its own, where a fill painted on the day has to be bridged across the
-   space between them and then clipped at the row's edge.
-
-   Wider than it is tall: the track carries the space between days across, and
-   the row is only as tall as a day needs. */
+/*
+ *  The cell is the whole track and the day is the shape centered in it. A range
+ *    paints the cell, so it runs unbroken between days and stops at the ends of a
+ *    row on its own, where a fill painted on the day has to be bridged across the
+ *    space between them and then clipped at the row's edge.
+ */
 [part="cell"] {
   align-items: center;
   block-size: var(--_calendar-row);
@@ -166,16 +151,9 @@
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Today, which is a fact about the calendar rather than about the answer.
- *
- * A ring rather than a fill, because a fill is what selection is: the two land
- * on the same cell whenever the reader is choosing today, and one has to read
- * through the other.
- *
- * **The resting hairline, because today is a fact and not an interaction.**
- * Not `border-strong`, which no longer exists: it was there because `border`
- * was invisible against a raised surface in dark mode, and the ramp puts a step
- * between them now. Menu records the same choice. */
+/*
+ *  Today, which is a fact about the calendar rather than about the answer.
+ */
 [part="cell"][data-today] [part="day"] {
   box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
 }
@@ -265,24 +243,9 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* A caret is physical and the thing it points at is not.
- *
- * The row itself already flips, because it is laid out on the inline axis and
- * the browser reverses that in a right-to-left document. The glyph inside does
- * not, so the mark ends up on the correct side pointing the wrong way, which in
- * that reading direction means the opposite of what it says. Mirrored rather
- * than swapped for the opposite icon, so the pair stays one decision: a reversed
- * `caret-left` is exactly `caret-right`, and two sets of icon imports that have
- * to agree is the kind of thing that drifts.
- *
- * Written out in each component rather than shared, because there is no sheet a
- * shadow root can compose for this and no way for one to know which of a
- * component's glyphs are directional. `Pagination` carries the same rule and the
- * same argument.
- *
- * A slotted mark is mirrored too, because the rule is about what the mark means
- * in the reading direction rather than about who drew it: a consumer's caret
- * points the wrong way for exactly the same reason ours does. */
+/*
+ *  A caret is physical and the thing it points at is not.
+ */
 :host(:dir(rtl)) [part="previous"] svg,
 :host(:dir(rtl)) [part="next"] svg,
 :host(:dir(rtl)) ::slotted([slot="previous-icon"]),
@@ -302,18 +265,9 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
-/* Wrong, and the mark says so.
- *
- * A ring on the answer rather than a border round the surface. A flat picker is
- * a grid or a column with no frame to turn red, and framing one to carry an
- * error would draw a box that exists for nothing else. The field that wraps a
- * picker already owns the message; what only the picker can do is point at the
- * thing that is wrong, and that is the mark on the chosen value.
- *
- * On the same box the focus ring uses, so the two are one edge rather than two
- * concentric ones. Input records the longer version of this: a red border inside
- * a blue ring is the double-struck look the focus rule exists to prevent,
- * arriving by another route. */
+/*
+ *  Wrong, and the mark says so.
+ */
 :host([invalid]) [part="cell"][aria-selected] [part="day"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: var(--helix-size-focus-offset);

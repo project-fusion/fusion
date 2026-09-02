@@ -1,12 +1,6 @@
-/* The centered fallback, and the delay that keeps it from flashing.
- *
- * `animation` rather than `transition`, because there is nothing to transition
- * from: the element is painted once and never changes state. A forwards
- * animation with a delay is the shape that says "invisible, then visible" for
- * something that only ever arrives.
- *
- * `dvh` rather than `vh`, so the box is the space actually available on a phone
- * with a retracting toolbar rather than the space there would be without one. */
+/*
+ *  The centered fallback, and the delay that keeps it from flashing.
+ */
 /**
  * The mark, breathing rather than spinning.
  *

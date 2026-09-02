@@ -1,15 +1,6 @@
-/* A video is a dark region, and says so once.
- *
- * `color-scheme: dark` rather than a hand-picked color on every control.
- * Every token in this library is a `light-dark()` pair and `light-dark()`
- * follows `color-scheme`, so one declaration resolves the whole subtree the way
- * a dark page would: the ink comes out light, the surfaces come out dark, and
- * the controls stop needing colors chosen for them one at a time.
- *
- * It also puts the answer where a consumer can change it. Setting
- * `data-color-mode` on the element wins through `tokens.css`, which is the same
- * escape hatch a toast has, and it means a light player is a consumer's
- * decision rather than something this stylesheet forbids. */
+/*
+ *  A video is a dark region, and says so once.
+ */
 :host {
   color-scheme: dark;
 
@@ -32,20 +23,14 @@
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
-/* A box that is the shape of the video before the video says what shape it is.
+/*
+ *  A box that is the shape of the video before the video says what shape it is.
  *
  * Without a ratio a `<video>` is 300 by 150, the default every replaced element
  * starts at, so at 480 wide the box is 150 tall where the frames want 270. The
  * poster is painted into that box, so it comes out letterboxed and half the
  * height of the video that replaces it a moment later.
- *
- * It is also the layout shift. A box that is one height for as long as the
- * network takes and another afterwards moves everything below it, and a poster
- * is shown for exactly that interval.
- *
- * `object-fit: contain` says the rest: whatever ends up in this box, poster or
- * frame, is fitted the same way, so the two cannot disagree even where a
- * consumer's ratio and their file's do. */
+ */
 [part="video"] {
   /* The video's ratio once it is known, and sixteen by nine until then. Not
      `auto`: that takes the element's intrinsic ratio, and a video carrying a
@@ -54,17 +39,15 @@
      `videoWidth` and `videoHeight`, which is the only source that is always
      the video. */
   aspect-ratio: var(--video-aspect-ratio, var(--video-intrinsic-ratio, 16 / 9));
-  /* `surface-media`, the token written for exactly this well, and not a token
-     that turns over with the theme. A video sits in a dark region everywhere it
-     has ever been shown and letterbox bars are black rather than whatever the
-     page is, so `surface-sunken` is wrong (the page's own well, a light gray on
-     a light page) and `surface-inverse` looks like the token for this and is
-     near-white in dark mode, putting a white well behind an unloaded video on a
-     black page with the bar's light ink vanishing into it.
-
-     The bar's ink stays `foreground`, not `foreground-media`. The host declares
-     `color-scheme: dark`, so it already resolves to near-white in either mode,
-     and the pair's other half is for a consumer who has no such region. */
+  /*
+ *  `surface-media`, the token written for exactly this well, and not a token
+ *      that turns over with the theme. A video sits in a dark region everywhere it
+ *      has ever been shown and letterbox bars are black rather than whatever the
+ *      page is, so `surface-sunken` is wrong (the page's own well, a light gray on
+ *      a light page) and `surface-inverse` looks like the token for this and is
+ *      near-white in dark mode, putting a white well behind an unloaded video on a
+ *      black page with the bar's light ink vanishing into it.
+ */
   background-color: var(--video-well-color, var(--helix-color-surface-media));
   block-size: auto;
   display: block;
@@ -104,19 +87,9 @@
   color: var(--helix-color-foreground);
 }
 
-/* The shading reaches higher than the bar does.
- *
- * It is what makes light controls legible over a bright frame, and it needs
- * room above them to fade out in. Taken as padding on the bar, that is a
- * fifty-six pixel bar carrying twenty-four pixels of gradient, a third of it
- * shadow with nothing in it. Drawn separately, the shading is as tall as it
- * needs to be and the bar is as tall as its controls.
- *
- * On the stage's `::before` rather than the bar's, and with no `z-index` at
- * all. A pseudo-element is its originating element's first child, so it paints
- * under everything after it in the tree, and the bar comes after it: tree order
- * does the stacking a negative `z-index` would have done by force. There is no
- * `--helix-layer-*` for "behind", correctly, because nothing should need one. */
+/*
+ *  The shading reaches higher than the bar does.
+ */
 [part="stage"]::before {
   background-image: linear-gradient(to top, var(--helix-color-overlay), transparent);
   block-size: calc(var(--helix-size-icon-loose) + var(--helix-space-2xl));
@@ -151,25 +124,15 @@
   content: none;
 }
 
-/* Gone once the video is playing and the reader has been still for a while.
-
-   On `data-idle`, which the element writes after a delay, rather than on
-   `:not(:hover)`: keyed to hover the bar leaves the instant the pointer does,
-   so a reader crossing the picture to reach a control watches it vanish under
-   them. The element also writes `data-playing`, because CSS cannot ask a video
-   whether it is playing — `paused` is a property and never an attribute, so
-   `video:not([paused])` matches every video in existence.
-
-   Focus still holds it open, which is what keeps the bar reachable without a
-   pointer: a control that is only there on hover is one a keyboard cannot
-   find. And a paused video keeps its bar, because a reader who stopped it is
-   deciding what to do next, which is why `data-idle` is only ever set while
-   playing. */
+/*
+ *  Gone once the video is playing and the reader has been still for a while.
+ */
 :host([data-idle]:not(:focus-within)) [part="controls"] {
   opacity: 0;
 }
 
-/* Every control on the bar, asked for by where it is rather than by name.
+/*
+ *  Every control on the bar, asked for by where it is rather than by name.
  *
  * **Never write the part names out.** A list that has to be joined is a list
  * that will be forgotten, and a control left off it renders as a raw `<button>`:
@@ -181,10 +144,7 @@
  * without anybody adding a line. `:where()` keeps the weight at (0,1,0), the
  * same as the names it replaces, so `[part="speed"]` and the rest still win by
  * source order.
- *
- * `a` as well as `button` because `download` is an anchor, and `all: unset`
- * takes its underline with everything else. The scrubber and the volume are
- * `<input>` and are deliberately not caught: a slider is not this shape. */
+ */
 [part="controls"] :where(a, button) {
   --icon-size: var(--helix-size-icon-tight);
   all: unset;
@@ -221,13 +181,11 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Both ranges are real inputs, stripped rather than replaced: the keyboard, the
-   touch target and the screen reader announcement are the platform's, and only
-   the paint is ours.
-
-   Both carry their own fill, painted from the same number the thumb sits at
-   rather than from a second element kept in step with it. Unfilled, sixty-four
-   pixels of empty groove reads as a hole in the bar rather than as a level. */
+/*
+ *  Both ranges are real inputs, stripped rather than replaced: the keyboard, the
+ *    touch target and the screen reader announcement are the platform's, and only
+ *    the paint is ours.
+ */
 [part="scrubber"],
 [part="volume"] {
   appearance: none;
@@ -236,8 +194,9 @@
   margin: var(--helix-space-none);
 }
 
-/* The groove is a wash of the ink, on every separation, and the filled bar is
-   not an exception to it.
+/*
+ *  The groove is a wash of the ink, on every separation, and the filled bar is
+ *    not an exception to it.
  *
  * `surface-raised` is the tempting token for a bar with a ground of its own and
  * it is invisible here. Measured against the bar it sits in: `surface` is
@@ -246,10 +205,7 @@
  * track is not there and the blue reads as a line stopping at the thumb rather
  * than as a level filling a channel. The ink at 28% lands near `oklch(0.43)`
  * over that same bar, which is a rail a reader can see the whole of.
- *
- * And no inset highlight. `box-shadow` paints above the background, so the thing
- * meant to say "cut into the bar" is laid over the fill as well, lightening the
- * top of the blue for the whole of its length. */
+ */
 [part="scrubber"] {
   background-color: color-mix(in oklab, currentColor 28%, transparent);
   background-image: linear-gradient(
@@ -276,16 +232,10 @@
   --_video-fill: currentColor;
 }
 
-/* The speaker and its level are one control, and the level stands up out of the
-   bar rather than lying along it.
- *
- * A horizontal level is fifty-six pixels of the row taken permanently for
- * something a reader touches rarely. Standing it up puts it over the picture
- * only while it is wanted, and gives the row back to the scrubber.
- *
- * On hover *and* focus-within. A control that appears only under a pointer is a
- * control a keyboard cannot reach, and the level is a real range that Tab lands
- * on. */
+/*
+ *  The speaker and its level are one control, and the level stands up out of the
+ *    bar rather than lying along it.
+ */
 [part="sound"] {
   --_video-level-size: 4.5rem;
   /* The gap the level stands off the speaker, and the lift derived from it.
@@ -344,15 +294,9 @@
   pointer-events: auto;
 }
 
-/* The gap between the speaker and the level, made hoverable.
- *
- * The level opens on hovering the speaker and lives above it with a gap between,
- * so without this, reaching for it leaves the speaker and shuts it before it can
- * be touched. Wider on the filled separation, where the gap is bigger to clear
- * the bar, which is where it goes from fiddly to impossible.
- *
- * Invisible and only while open, so it never eats a press meant for the
- * picture. `::after` because `::before` is the ground the track stands on. */
+/*
+ *  The gap between the speaker and the level, made hoverable.
+ */
 [part="sound"]:hover::after,
 [part="sound"]:focus-within::after {
   block-size: var(--_video-level-gap);
@@ -364,13 +308,10 @@
   translate: -50% 0;
 }
 
-/* The little ground it stands on, so the track is legible over a bright frame
-   the way the bar's own controls are.
-
-   Sized and offset from the same numbers the slider uses, so the two cannot
-   drift: the ground is the track's length plus a pad at each end, and both are
-   centered on the speaker below. Written independently they disagree, and a
-   four-pixel slider inside a thirty-two pixel pill shows every pixel of it. */
+/*
+ *  The little ground it stands on, so the track is legible over a bright frame
+ *    the way the bar's own controls are.
+ */
 [part="sound"]:hover::before,
 [part="sound"]:focus-within::before {
   background-color: var(--helix-color-overlay);
@@ -405,33 +346,24 @@
   inline-size: 12px;
 }
 
-/* On a solid bar the level has to clear the bar itself, not just the speaker.
- *
- * The popup is offset from the sound group, which sits inside the bar's own
- * padding, so on the transparent separations it lands right at the bar's top
- * edge and nobody notices. Given a bar with a ground, four pixels of the slider
- * sit on it. Lifted by the bar's own top padding, which is the number that
- * creates the overlap. */
+/*
+ *  On a solid bar the level has to clear the bar itself, not just the speaker.
+ */
 :host([separation="filled"]) [part="sound"] {
   --_video-level-gap: calc(var(--helix-space-xs) * 2);
 }
 
-/* The menu is a control on the bar like any other, so it takes no width of its
-   own: what a reader sees is the trigger inside it. Its panel is in the top
-   layer and is the menu's business, not this bar's.
- *
- * **Do not set `color-scheme: normal` here.** The panel looks like a surface of
- * the page and is over the picture: the menu opens upward from a bar at the
- * bottom of the video, so it lands on the frame. And `normal` does not mean
- * "whatever the page is", it means the UA default, so on a dark page the panel
- * comes out white. Left alone it inherits the dark region the bar already
- * declares, which is what a menu opened from these controls should look like:
- * the rows that did not fit on the bar. */
+/*
+ *  The menu is a control on the bar like any other, so it takes no width of its
+ *    own: what a reader sees is the trigger inside it. Its panel is in the top
+ *    layer and is the menu's business, not this bar's.
+ */
 [part="overflow"] {
   display: contents;
 }
 
-/* The mark that starts it, in the middle of the picture.
+/*
+ *  The mark that starts it, in the middle of the picture.
  *
  * Sized against the picture rather than fixed, because the thing it has to be
  * legible against is the picture: a fixed 64px mark is generous on a thumbnail
@@ -450,10 +382,7 @@
  * bright frame it reads, and over a dark one it disappears into the picture and
  * leaves the glyph floating on nothing. The hairline is the page's ink, so
  * whichever of the two vanishes the other one is there.
- *
- * It goes when the video starts, which is a render rather than a transition:
- * the element stops drawing it, because what it marks is a state that does not
- * come back. */
+ */
 [part="start"] {
   --icon-size: 40%;
   all: unset;
@@ -500,16 +429,9 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The caption, above the bar and clear of it.
- *
- * Which is the reason the element draws it at all: a browser renders cues
- * inside the video's own box, with no standard way to inset that box, so a
- * caption sits under the controls and stays there. The offset follows the bar,
- * so the line lifts while the bar is up and settles when it has gone.
- *
- * Its own ground, because a caption is light text over a picture that could be
- * anything. Centered and held to a measure rather than run edge to edge: a
- * subtitle as wide as the video is a line nobody tracks back from. */
+/*
+ *  The caption, above the bar and clear of it.
+ */
 [part="cue"] {
   background-color: var(--helix-color-overlay);
   border-radius: var(--helix-radii-sm);
@@ -582,13 +504,9 @@
   color: var(--helix-color-primary);
 }
 
-/* Waiting, and saying so over the picture.
- *
- * Centered on the stage rather than in a corner, because it is standing in for
- * the frame that has not arrived and that is where a reader is already looking.
- * On the media surface tokens, so it reads on a picture rather than on the page:
- * whatever is behind it is a photograph, and a panel in page colors over a
- * photograph is a panel nobody can read. */
+/*
+ *  Waiting, and saying so over the picture.
+ */
 [part="loading"],
 [part="failure"] {
   align-items: center;
@@ -636,17 +554,14 @@
   }
 }
 
-/* A way out of the set, over the frame at the top left.
+/*
+ *  A way out of the set, over the frame at the top left.
  *
  * It rides with the controls rather than sitting on the picture permanently:
  * a control bar that fades and a back button that does not would leave one
  * chrome element floating over a film with nothing around it. Same visibility
  * as the bar, said the same way, so the two can never disagree.
- *
- * `pointer-events` follows, or an invisible button keeps taking presses meant
- * for the picture underneath it. Empty unless something is slotted, and a slot
- * with nothing assigned generates no box, so a player on its own pays nothing
- * for this. */
+ */
 [part="back"] {
   inset-block-start: var(--helix-space-sm);
   inset-inline-start: var(--helix-space-sm);

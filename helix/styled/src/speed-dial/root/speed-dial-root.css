@@ -20,13 +20,10 @@
   padding: var(--helix-space-none);
 }
 
-/* Lined up on the end the trigger is on, which is what makes the marks sit in a
-   column under it rather than wandering by the length of each name.
- *
- * Keyed on the placement the controller resolved rather than on the one that was
- * asked for: a dial docked bottom-right that has to flip is still a dial whose
- * marks line up under its button, and `data-placement` is what says where it
- * actually went. */
+/*
+ *  Lined up on the end the trigger is on, which is what makes the marks sit in a
+ *    column under it rather than wandering by the length of each name.
+ */
 [part="actions"] {
   align-items: flex-end;
 }
@@ -39,7 +36,8 @@
   display: none;
 }
 
-/* The actions arrive from the button, one after another. Motion here says where
+/*
+ *  The actions arrive from the button, one after another. Motion here says where
  * they came from, which is the one thing a fan can say that a list cannot.
  *
  * `data-placed` rather than `@starting-style`, which `Tooltip` records at
@@ -47,10 +45,7 @@
  * so a starting style fires a frame early and the entrance runs from wherever
  * the stylesheet last had it. The floating controller writes this once the
  * panel is measured.
- *
- * Toward the trigger, so a dial that fanned upward starts below itself and one
- * that had to flip starts above. `--_dial-from` is the only thing the two
- * directions disagree about. */
+ */
 [part="actions"] {
   --_dial-from: var(--helix-space-md);
 }
@@ -79,20 +74,11 @@
   translate: 0 0;
 }
 
-/* Nearest the button first, which is the order they would leave it in. A dial
-   fanning upward has its nearest action last in the column, so the count runs
-   from the end; flipped, it runs from the start.
-
-   Five steps, and the sixth action onwards shares the last one. That is not a
-   shrug: a dial holding more than a handful is a menu, and the stagger stopping
-   is a smaller problem than the component being wrong.
-
-   **A third of the fast step rather than forty milliseconds**, which is the same
-   number and follows the theme where the literal did not. A stagger is motion,
-   and a `motion` character moves every duration in the library by its pace: with
-   the delays written out, `gentle` slowed each action and left the gaps between
-   them where they were, so the fan came apart at one pace and arrived at
-   another. */
+/*
+ *  Nearest the button first, which is the order they would leave it in. A dial
+ *    fanning upward has its nearest action last in the column, so the count runs
+ *    from the end; flipped, it runs from the start.
+ */
 [part="actions"] {
   --_speed-dial-stagger: calc(var(--helix-duration-fast) / 3);
 }
@@ -141,19 +127,18 @@
     translate: 0 0;
   }
 
-  /* The lift under the pointer arrives at once instead of easing in. Nothing is
-     displaced by it, so unlike the actions above there is no resting state to
-     write back: the hover shadow still applies, it just applies immediately.
-
-     Named as its own selector rather than folded into the one above. A reduce
-     rule written looser than the rule it answers loses on specificity and does
-     nothing. */
+  /*
+ *  The lift under the pointer arrives at once instead of easing in. Nothing is
+ *      displaced by it, so unlike the actions above there is no resting state to
+ *      write back: the hover shadow still applies, it just applies immediately.
+ */
   [part="trigger"] {
     transition: none;
   }
 }
 
-/* The trigger this component draws when a consumer slots none.
+/*
+ *  The trigger this component draws when a consumer slots none.
  *
  * `::slotted()` matches assigned nodes and fallback content is not assigned, so
  * every rule that styles a slotted trigger reaches nothing here. Left to the
@@ -161,9 +146,7 @@
  * against 40x40 for the `helix-icon-button` the example slots: a floating
  * action button rendering as a gray nub, and only for the consumer who wrote
  * the least markup. Valid CSS, matching nothing, no error and no warning.
- *
- * Same shape and the same tokens the slotted path resolves to, so a trigger a
- * consumer passes and one drawn here come out as the same control. */
+ */
 [part="trigger"] {
   --icon-size: var(--helix-size-icon);
   all: unset;
@@ -203,13 +186,10 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Not printed, being a control. Paper cannot be pressed, and a button's chrome
+/*
+ *  Not printed, being a control. Paper cannot be pressed, and a button's chrome
  * on a page is an instruction to do the one thing that is not available.
- *
- * Here rather than in a consumer's stylesheet, and that is the whole reason
- * every component needs its own: `@media print` does not cross a shadow
- * boundary any more than a reduced-motion rule does, so a page cannot answer
- * this on a component's behalf. */
+ */
 @media print {
   :host {
     display: none;

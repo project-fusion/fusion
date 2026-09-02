@@ -2,15 +2,11 @@
   display: block;
 }
 
-/* Air above a group, but never above the first one, which would be a gap
-   between the panel's own padding and its first row and read as the list
-   starting low rather than as two groups being apart.
- *
- * On the group rather than between the rows, because what needs separating is
- * one set from the next: `gap` on the list would push every row apart and say
- * that each option is its own thing. Margin rather than padding so it collapses
- * to nothing at the top of a scroller, and `:first-of-type` rather than
- * `:first-child` so a group after a loose option still gets its space. */
+/*
+ *  Air above a group, but never above the first one, which would be a gap
+ *    between the panel's own padding and its first row and read as the list
+ *    starting low rather than as two groups being apart.
+ */
 :host(:not(:first-of-type)) {
   margin-block-start: var(--helix-space-xs);
 }

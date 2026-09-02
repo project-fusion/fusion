@@ -35,42 +35,22 @@
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
 }
 
-/* **The ring draws inside, because the row reaches both edges of its scroller.**
+/*
+ * *The ring draws inside, because the row reaches both edges of its scroller.**
  *
  * A row here spans `[part="items"]` exactly, and that region scrolls, so an
  * outline pushed outwards has nowhere to go: measured at a four pixel reach
  * against zero slack either side, which clipped both verticals and left two
  * horizontal lines that read as a drawing fault rather than as focus.
- *
- * Inset rather than widening the scroller, which is the trade the drawer makes
- * and the wrong one here. There the scrolling box is invisible and holds
- * whatever a consumer slotted; here it is the visible list and the rows are the
- * component's own, so the component can simply draw its ring where it fits. It
- * is also what a full bleed row wants regardless of clipping: a ring outside a
- * row that touches the list's edge is a ring on top of the edge. `menu-item`
- * and `tree-item` answer it the same way. */
+ */
 [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
-/* The one playing, and it stays marked under the pointer.
- *
- * Keyed on `aria-current`, which the element already writes, rather than on a
- * second attribute saying the same thing: the accessible fact and the visible
- * one are then the same fact, and they cannot come apart. `Toggle` reads its own
- * state the same way.
- *
- * The bar rather than a fill of the whole row. A playlist is scanned down its
- * leading edge, and a filled row a reader has to compare against ten others is
- * slower to find than a mark in the margin.
- *
- * **Drawn, not shadowed.** It was an inset `box-shadow` offset sideways, which
- * on a rounded rectangle is not a bar: the shadow is the padding box moved over,
- * so what shows through is the leading edge plus a hook of it curling around
- * each corner, and at any size worth looking at it reads as a border that has
- * been clipped wrong. A box with its own radius, inset from the row's ends, is
- * the shape that was wanted. */
+/*
+ *  The one playing, and it stays marked under the pointer.
+ */
 [part="item"][aria-current="true"] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   color: var(--helix-color-foreground);
@@ -91,14 +71,11 @@
   opacity: 0.5;
 }
 
-/* A fixed column, so a set where one entry has a thumbnail and the rest do not
-   still reads as one column of names. The mark's column in a menu row carries
-   the same note.
- *
- * No fill of its own. It had one, and an entry with neither a poster nor
- * anything slotted came out as a gray rectangle per row, which reads as a
- * thumbnail that failed rather than as a row that has none. Empty, the column is
- * space that keeps the names aligned and draws nothing. */
+/*
+ *  A fixed column, so a set where one entry has a thumbnail and the rest do not
+ *    still reads as one column of names. The mark's column in a menu row carries
+ *    the same note.
+ */
 [part="media"] {
   aspect-ratio: 16 / 9;
   border-radius: var(--helix-radii-sm);

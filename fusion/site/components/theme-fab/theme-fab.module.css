@@ -2,14 +2,12 @@
  * The theme bar: the controls, the readout and the rail they sit on.
  */
 
-/* Gone by the time the footer is here. The rail is what moves rather than the
-   pill, so the pill's own arrival animation and its open/close width are left
-   alone: two things animating one element is how a control ends up half open
-   and half retired.
-
-   Down and out rather than a fade alone, so it reads as leaving the screen it
-   was floating over. `visibility` on the same timing with `allow-discrete`, so
-   a retired control is not a transparent thing still taking clicks. */
+/*
+ *  Gone by the time the footer is here. The rail is what moves rather than the
+ *    pill, so the pill's own arrival animation and its open/close width are left
+ *    alone: two things animating one element is how a control ends up half open
+ *    and half retired.
+ */
 .fabRail[data-retired] {
   opacity: 0;
   pointer-events: none;
@@ -40,11 +38,6 @@
 /**
  * The pill, and the bar it becomes.
  *
- * **Both faces occupy one grid cell**, so the container's width is the only
- * thing that moves and the two states cross-fade in place. Swapping one node for
- * another would pop, and the whole gesture is that this was always the same
- * object.
- *
  * **Real transparency, not a tinted panel**, and the site's own rather than a
  * mix tuned here. The pill floats over the same page the bands sit on, so it is
  * the same glass: low enough that the page reads through it and the blur has
@@ -64,12 +57,6 @@
   box-shadow: var(--helix-shadow-floating);
   /**
    * **One height for both states, stated rather than inherited.**
-   *
-   * The collapsed face is a line of text and the open bar holds sliders and a
-   * toggle group, so left to their content the pill is noticeably shorter than
-   * the bar it becomes: the thing grows in two directions at once and the morph
-   * reads as two elements swapping rather than one changing shape. Only the
-   * width should move.
    *
    * **One control tall, as the token rather than as a number.**
    * `--helix-size-control-md` is 2.5rem, the same height the system gives every
@@ -132,19 +119,16 @@
   white-space: nowrap;
 }
 
-/* The swatch on the collapsed pill: the brand, and nothing drawn around it.
- *
- * **No ring.** A hairline keeps a pale brand from disappearing into the glass
- * and outlines the one element on the pill whose whole job is to be a color. A
- * swatch with a stroke reads as a control; without one it reads as paint, which
- * is what it is.
+/*
+ *  The swatch on the collapsed pill: the brand, and nothing drawn around it.
  *
  * **And the corner is the theme's, not `full`.** The pill it lives on and every
  * card behind it answer to the radius slider two controls away, so a `radii-full`
  * dot stays a circle while that slider squares off the entire page around it.
  * `radii-sm` is the step a box this size takes, and at the shipped seed it is
  * 4px against a 10.4px swatch: still visibly round, and round by the same rule
- * as everything else. */
+ * as everything else.
+ */
 .fabDot {
   background: var(--swatch);
   block-size: 0.65rem;
@@ -198,17 +182,6 @@
 
 /**
  * A bar on a pointer, a sheet on a finger.
- *
- * **The labels are the reason, not the layout.** Every control in here is named
- * by a `helix-tooltip` and an `aria-label`. A touch screen has no hover, so the
- * tooltip never opens, and `aria-label` is for a screen reader rather than for
- * looking at: on a phone the open bar was three unlabelled sliders, a picker and
- * a row of colored dots, with nothing on screen saying which slider was
- * saturation. Making it a sheet is what buys the room to say so.
- *
- * `display: contents` above the breakpoint, so the wrapper each row is built
- * from does not exist as far as the bar's flex layout is concerned. The desktop
- * arrangement is unchanged rather than reconstructed.
  */
 .fabRow {
   display: contents;
@@ -258,19 +231,18 @@
     display: none;
   }
 
-  /* **And the same in the other direction, which was missing.**
-   *
-   * The two faces share one grid cell, so the cell is as tall as the taller of
-   * them. Above this breakpoint the open state is a bar and both are one line,
-   * so nothing shows. Below it the open state is a sheet: measured at 390, the
-   * closed pill's button was 200x404 rather than 200x40, because the hidden
-   * sheet was still laying out in the cell it shares. `.fabFace` is
-   * `block-size: 100%`, so the label centered in 404px of button while the pill
-   * clipped to 40, and `Make it yours` was drawn outside its own pill. The
-   * control looked like an empty rounded rectangle on every phone.
-   *
-   * `opacity` alone cannot fix it, which is why the rule above exists at all: an
-   * invisible box still takes its space. */
+  /*
+ * *And the same in the other direction, which was missing.**
+ *
+ * The two faces share one grid cell, so the cell is as tall as the taller of
+ * them. Above this breakpoint the open state is a bar and both are one line,
+ * so nothing shows. Below it the open state is a sheet: measured at 390, the
+ * closed pill's button was 200x404 rather than 200x40, because the hidden
+ * sheet was still laying out in the cell it shares. `.fabFace` is
+ * `block-size: 100%`, so the label centered in 404px of button while the pill
+ * clipped to 40, and `Make it yours` was drawn outside its own pill. The
+ * control looked like an empty rounded rectangle on every phone.
+ */
   .fab:not([data-open]) .fabTools {
     display: none;
   }
@@ -306,13 +278,10 @@
     display: none;
   }
 
-  /* First and hard against the trailing edge, so the sheet opens with its exit
-     where a sheet's exit is, rather than below six controls.
-
-     `align-self` and not `justify-self`: the stack is a flex column, where the
-     cross axis is the inline one and `justify-self` is ignored outright. Written
-     the other way it sat at the leading edge, which is where a flex item goes
-     when you have told it nothing. */
+  /*
+ *  First and hard against the trailing edge, so the sheet opens with its exit
+ *      where a sheet's exit is, rather than below six controls.
+ */
   .fabClose {
     align-self: flex-end;
     order: -1;

@@ -1,12 +1,11 @@
 :host {
-  /* A stated height rather than one falling out of the padding, so every row is
-     the same height whatever is in it: a cell holding a tag or an icon button
-     was taller than the text cell beside it, and a table whose rows differ by a
-     few pixels reads as a table nobody measured. `control-md` is forty, which
-     is a row a pointer can hit and a line of text can breathe in.
-
-     `min-block-size` and not `block-size`, because a cell that wraps to two
-     lines has to be allowed to grow. The height is a floor, not a cage. */
+  /*
+ *  A stated height rather than one falling out of the padding, so every row is
+ *      the same height whatever is in it: a cell holding a tag or an icon button
+ *      was taller than the text cell beside it, and a table whose rows differ by a
+ *      few pixels reads as a table nobody measured. `control-md` is forty, which
+ *      is a row a pointer can hit and a line of text can breathe in.
+ */
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   box-sizing: border-box;
@@ -36,15 +35,13 @@
   min-inline-size: 0;
 }
 
-/* A *row* header, which is content and not a label: "helix-web" names the row
-   and is one of the things being read. Weight carries it, and it keeps the
-   foreground and the size of the cells beside it, because it is one of them.
-   Not capitals, which cost legibility and are read letter by letter by some
-   screen readers.
-
-   Column headings are the ones that recede, and they are `helix-table-column`
-   rather than a cell wearing an attribute, so this selector serves only the row
-   header. */
+/*
+ *  A *row* header, which is content and not a label: "helix-web" names the row
+ *    and is one of the things being read. Weight carries it, and it keeps the
+ *    foreground and the size of the cells beside it, because it is one of them.
+ *    Not capitals, which cost legibility and are read letter by letter by some
+ *    screen readers.
+ */
 :host([header]) {
   font-weight: var(--helix-weight-medium);
 }

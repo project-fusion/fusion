@@ -1,12 +1,10 @@
 :host {
-  /* No box of its own. The panel that is showing is the box, and the ones that
-     are not have to cost nothing: `display: block` here gave every panel host a
-     grid item, so a tab set with four files divided its height four ways and
-     the one panel a reader could see got a quarter of it.
-
-     `display: contents` rather than hiding the host, because hiding it means an
-     attribute the element writes on itself, and the host carries only what the
-     consumer wrote. */
+  /*
+ *  No box of its own. The panel that is showing is the box, and the ones that
+ *      are not have to cost nothing: `display: block` here gave every panel host a
+ *      grid item, so a tab set with four files divided its height four ways and
+ *      the one panel a reader could see got a quarter of it.
+ */
   display: contents;
 }
 

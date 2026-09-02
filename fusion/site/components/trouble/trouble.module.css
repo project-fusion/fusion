@@ -1,12 +1,6 @@
 /**
  * The shape both dead ends share: a 404 and a caught exception.
  *
- * **One stylesheet because they are one layout.** A reader who asked for a page
- * that is not there and a reader whose page threw are in the same position, a
- * stopped journey needing a way on, and the only thing that differs is what the
- * heading says and how many ways out there are. Two stylesheets would be the
- * same rules under two names, drifting the first time one of them is adjusted.
- *
  * The root layout is above both, so the nav and the footer are already on the
  * page. What is styled here is only the block between them, which is why there
  * is no ground color and no chrome: inheriting the page is the point.

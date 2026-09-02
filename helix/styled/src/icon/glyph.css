@@ -1,11 +1,6 @@
-/* Sizing for a glyph drawn from a named import rather than by `<helix-icon>`.
- *
- * Shared the way the field stylesheets are, and imported by every family that
- * draws its own marks. It exists so that swapping `helix-icon` for an inlined
- * `<svg>` changes nothing a consumer can see: `--icon-size` is the hook the
- * element reads, families set it on their containers, and those declarations
- * would go silently dead the moment the element stopped being there. The
- * default is the element's own, so a container that sets nothing is unmoved. */
+/*
+ *  Sizing for a glyph drawn from a named import rather than by `<helix-icon>`.
+ */
 [data-glyph] {
   block-size: var(--icon-size, var(--helix-size-icon));
   flex: 0 0 auto;

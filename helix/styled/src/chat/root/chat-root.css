@@ -37,17 +37,13 @@
   grid-row: 5;
 }
 
-/* The transcript is a scrollport, so it takes the treatment `ScrollArea` settled
-   on for one: `thin` rather than a width in pixels, because the two engines that
-   implement it disagree about what a number means, and the color is the part
-   worth setting. A default bar inside a rounded panel is the one piece of the
-   platform this component would otherwise let through.
-
-   No `scrollbar-gutter: stable`, deliberately. It would reserve the track on
-   every platform, including the ones with overlay scrollbars, and the reserved
-   strip comes off the inline end: the reader's own turns would stop short of the
-   trailing edge that the header's controls and the send button both sit on, and
-   that column is the whole alignment of this component. */
+/*
+ *  The transcript is a scrollport, so it takes the treatment `ScrollArea` settled
+ *    on for one: `thin` rather than a width in pixels, because the two engines that
+ *    implement it disagree about what a number means, and the color is the part
+ *    worth setting. A default bar inside a rounded panel is the one piece of the
+ *    platform this component would otherwise let through.
+ */
 [part="log"] {
   display: flex;
   flex-direction: column;
@@ -57,41 +53,34 @@
   overflow-y: auto;
   padding-block: var(--helix-space-md);
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
-  /* The transcript keeps its turns at the bottom when there are too few to fill
-     it, which is what a conversation looks like: a new one starts at the bottom
-     of the box rather than at the top of an empty column.
-     
-     **`safe` is not a refinement here, it is the whole rule working at all.**
-     A scroll container that end-aligns its content pushes the overflow out of
-     the *start* edge, where there is no scroll position that reaches it: with a
-     plain `flex-end` a transcript taller than its box reported
-     `scrollHeight - clientHeight` of zero while its first turn sat 287 pixels
-     above the scrollport, so the reader could not scroll up and the history was
-     gone. Every part of this component's stated purpose went with it, since
-     `atBottom` is then permanently true, the pin never releases and the way back
-     is never offered. Measured in a 20rem box with six turns: 0 pixels of scroll
-     against 302 with `safe`.
-     
-     `safe` falls back to start alignment exactly when the content overflows,
-     which is the case where bottom alignment had nothing to do anyway. And where
-     `safe` is not understood the declaration is dropped and the transcript aligns
-     to the start, which is the same degradation: a short conversation sits at the
-     top of its box and a long one still scrolls. */
+  /*
+ *  The transcript keeps its turns at the bottom when there are too few to fill
+ *      it, which is what a conversation looks like: a new one starts at the bottom
+ *      of the box rather than at the top of an empty column.
+ *
+ * *`safe` is not a refinement here, it is the whole rule working at all.**
+ *      A scroll container that end-aligns its content pushes the overflow out of
+ *      the *start* edge, where there is no scroll position that reaches it: with a
+ *      plain `flex-end` a transcript taller than its box reported
+ *      `scrollHeight - clientHeight` of zero while its first turn sat 287 pixels
+ *      above the scrollport, so the reader could not scroll up and the history was
+ *      gone. Every part of this component's stated purpose went with it, since
+ *      `atBottom` is then permanently true, the pin never releases and the way back
+ *      is never offered. Measured in a 20rem box with six turns: 0 pixels of scroll
+ *      against 302 with `safe`.
+ */
   justify-content: safe flex-end;
 }
 
-/* **A region the consumer left empty is not laid out, and `hidden` is how it
-   says so.** Never `:not(:has(> slot:has(*)))`, which is how the rest of the
-   library hides an empty region and is inert here: the slots are assigned by
-   hand, so a filled region's slot has no more children than an empty one's and
-   the test never matches. Measured with it in place, a chat with nothing
-   slotted drew a hairline under an empty header and another over an empty
-   composer, 25 pixels of chrome each.
-
-   `display: none` has to be said rather than left to the platform. A `[hidden]`
-   rule in the UA stylesheet loses to any author rule that sets `display`, and
-   two of these set one: the way back is a grid and it stayed on screen through
-   every pin, which is the one control whose whole job is to appear and go. */
+/*
+ * *A region the consumer left empty is not laid out, and `hidden` is how it
+ *    says so.** Never `:not(:has(> slot:has(*)))`, which is how the rest of the
+ *    library hides an empty region and is inert here: the slots are assigned by
+ *    hand, so a filled region's slot has no more children than an empty one's and
+ *    the test never matches. Measured with it in place, a chat with nothing
+ *    slotted drew a hairline under an empty header and another over an empty
+ *    composer, 25 pixels of chrome each.
+ */
 [part="header"][hidden],
 [part="resume"][hidden],
 [part="status"][hidden],
@@ -152,14 +141,13 @@
   pointer-events: auto;
 }
 
-/* **A control over content is a surface over content, and takes the lift.**
-   That is the separation policy's own rule: this library leads with the edge on
-   the page and with the lift above it, and the way back is the one part of this
-   component that is genuinely above the page rather than on it. Without it a
-   subtle control floated over a bubble with the sentence showing through it.
-
-   On what is slotted rather than on the region, because the region is a
-   full-width band and a shadow on that is a line across the transcript. */
+/*
+ * *A control over content is a surface over content, and takes the lift.**
+ *    That is the separation policy's own rule: this library leads with the edge on
+ *    the page and with the lift above it, and the way back is the one part of this
+ *    component that is genuinely above the page rather than on it. Without it a
+ *    subtle control floated over a bubble with the sentence showing through it.
+ */
 [part="resume"] slot::slotted(*) {
   /* **The edge that goes with the lift.** The separation policy pairs
      `--helix-border-floating` with `--helix-shadow-floating`, so hooking the

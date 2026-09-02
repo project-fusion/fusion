@@ -30,9 +30,6 @@
  * the type legible and costs a horizontal drag twice the width of a phone. The
  * stacked one needs no floor: it was drawn for 340 units and reads at any width
  * a phone has. So the breakpoint is simply where the wide figure stops fitting.
- *
- * `display` rather than mounting one or the other, so both are server-rendered
- * and the choice never depends on a measurement taken on the client.
  */
 .diagramStacked {
   display: none;
@@ -95,10 +92,6 @@
 /**
  * The fan composites as one shape, not as four strokes.
  *
- * The paths inside take no alpha of their own; the group carries it, so where
- * the four flatten onto their shared tangent an overlap is the same value as a
- * single line instead of stacking to nearly twice it.
- *
  * **Declared after `.diagramBase path` rather than outranking it.** Both are
  * (0,1,1), so the tie goes to source order. Scoping this through the parent to
  * win on weight instead put a (0,2,1) selector above a (0,1,1) one, which is
@@ -120,10 +113,6 @@
  * winding the offset by `len` over one cycle returns the pattern to its starting
  * position, so the loop closes on itself no matter how long the run is. That is
  * what `pathLength` was supposed to buy and does not deliver in WebKit.
- *
- * **Nothing here is ever undrawn.** A route that draws itself in and then resets
- * dismantles and rebuilds the diagram every few seconds while a reader is
- * looking at it.
  */
 .diagramPulse path {
   stroke: var(--helix-color-primary);
@@ -216,12 +205,6 @@
  * `surface-overlay` is white, and what showed through a light fill was the field
  * behind it rather than the face. Dark never had the problem, a light-on-dark
  * wash being plenty to separate the hub from its ground.
- *
- * *That finding is kept rather than deleted, because it is the thing to re-check
- * if the disc ever looks wrong in light again, and because reversing this is
- * then one edit made knowingly.* What overrode it is that a page cannot hold two
- * answers to what its glass is made of, and the disc sits in a diagram
- * surrounded by bands made of the other one.
  */
 .diagramGlass {
   backdrop-filter: var(--site-glass-backdrop);
@@ -274,9 +257,6 @@
  * chosen against the diameter gets wrong every time. 54 below the center of a
  * 112 radius disc there are only 198 units to spend, so a string that measures
  * wider than that breaks the edge on both sides.
- *
- * The size itself is on the element, like every other size in the drawing. See
- * the note above `.diagramMeta`.
  */
 .diagramCoreSmall {
   fill: var(--helix-color-foreground);
@@ -287,17 +267,6 @@
 
 /**
  * Hovering an input dims every channel but that one.
- *
- * **`:has()` relates the row to its wire without nesting them.** A label and the
- * route it feeds are in different layers of the drawing, drawn at different
- * depths so the pulse can sit over the base; putting them in a shared group to
- * make a `:hover` cascade work would flatten that ordering. Tagging both with
- * the same channel and letting the svg match on `:has()` keeps the paint order
- * and the relationship independent, which is what they are.
- *
- * **Decoration, not information.** The svg is `role="img"` with a description
- * that already names every input and output, so nothing here is the only way to
- * learn something. A reader who cannot hover has lost an emphasis, not a fact.
  */
 .diagramSvg [data-ch] {
   transition:

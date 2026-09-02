@@ -30,16 +30,9 @@
   scrollbar-width: var(--scroll-area-scrollbar, thin);
 }
 
-/* What says there is more.
- *
- * Drawn on the host as pseudo-elements rather than as parts, because a fade is
- * not a thing a consumer composes into: it has no content, takes no pointer,
- * and its whole job is to be over the edge it names. Two of them cover four
- * edges, since a box that overflows both ways is rarer than one that does not
- * and a second pair can be added the day something needs it.
- *
- * `pointer-events: none` because a fade over the last row of a list would
- * otherwise be a fade that eats the click on it. */
+/*
+ *  What says there is more.
+ */
 :host::before,
 :host::after {
   content: "";

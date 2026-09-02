@@ -22,13 +22,9 @@ slot[name="heading"]::slotted(*) {
   margin: var(--helix-space-none);
 }
 
-/* The inherited half on the slot, the rest on what was slotted.
- *
- * `::slotted()` matches elements and nothing else, so a value written as bare
- * text between the tags gets none of this. Inherited properties set on a slot
- * reach its assigned nodes through the flattened tree, text nodes included;
- * anything that is not inherited has to stay on the element, because a text
- * node has no box to put it on. */
+/*
+ *  The inherited half on the slot, the rest on what was slotted.
+ */
 slot:not([name]) {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);

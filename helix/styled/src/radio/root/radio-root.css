@@ -27,18 +27,15 @@
 /* One cell, both children in it, so the dot is centered in the circle with no
    offsets to keep in step with the size. */
 [part="box"] {
-  /* The page's own color, so the box reads as a hole punched through to it
-     rather than as a fill that happens to match.
-
-     Never `surface-sunken`, which stopped working when `sunken` was lightened
-     to 0.96: a checkbox inside a well then had no interior at all, only its
-     border. Measured, it separated from the page by 0.04, from a card by 0.025,
-     and from the well it was for by nothing.
-
-     `background` cannot have that problem. On the page it is the page, which is
-     what a native checkbox looks like there and leaves the border to define the
-     box. On anything raised above the page it is a hole, which is what a box
-     you put a mark in should be. Both hold in dark, where the page is black. */
+  /*
+ *  The page's own color, so the box reads as a hole punched through to it
+ *      rather than as a fill that happens to match.
+ *
+ *      Never `surface-sunken`, which stopped working when `sunken` was lightened
+ *      to 0.96: a checkbox inside a well then had no interior at all, only its
+ *      border. Measured, it separated from the page by 0.04, from a card by 0.025,
+ *      and from the well it was for by nothing.
+ */
   background-color: var(--radio-background-color, var(--helix-color-background));
   block-size: var(--_radio-size);
   border: var(--helix-border-thin) solid var(--radio-border-color, var(--helix-color-border));
@@ -105,17 +102,9 @@
   line-height: var(--helix-leading-tight);
 }
 
-/* A card is the same radio in a bounded surface, for a set of options that need
+/*
+ *  A card is the same radio in a bounded surface, for a set of options that need
  * room: a description, an icon, a price.
- *
- * The half a `data-card` link cannot do. A link has no value to report, no
- * group to belong to and no place in a roving tab order, so a "selected card"
- * has to be a real radio and the presentation is what changes. This is still
- * `<button role="radio">` inside a group that owns the name and the value.
- *
- * **The circle stays.** A card whose only marker was its own border would be
- * asking the reader to compare surfaces across a row to find the answer, and
- * would leave nothing at all for a monochrome or high-contrast display.
  */
 :host([variant="card"]) {
   display: block;
@@ -188,40 +177,16 @@
   );
 }
 
-/* The card is the control, so the circle can go.
- *
- * Only safe because the card already carries the answer: `surface-raised`, a
- * primary edge and a three-pixel ring of it. Without that ring nothing would be
- * left saying which card was chosen.
- *
- * `display: none`, never `visibility: hidden`. Keeping the column to let a mixed
- * set align down the left answers a set nobody builds: `hide-control` is a
- * decision about a group, and every card in that group makes it. What it leaves
- * instead is an empty gutter and the row's gap beside it on every card, which is
- * asking for the circle's space back after asking for the circle to go.
- *
- * On the box alone either way, so the control the shadow root renders is still
- * there, still focusable and still reported: this takes away a graphic, never a
- * radio. */
+/*
+ *  The card is the control, so the circle can go.
+ */
 :host([variant="card"][hide-control]) [part="box"] {
   display: none;
 }
 
-/* A chip is a card that gave up its words.
- *
- * The shape a rating scale wants: a round target holding one mark, in a row of
- * them, where the answer is which mark rather than which sentence. A satisfaction
- * scale is the case, and it is a set of choices rather than a quantity, which is
- * why it lives here and not in `Rating`: five faces are five drawings and no
- * fraction of one means anything, where five stars are one drawing five times
- * and three and a half of them is a real answer.
- *
- * **The circle goes, unasked.** `hide-control` is a decision on a card, which
- * has room for both and loses nothing by keeping the circle. A chip is the size
- * of a control and holds a mark: a radio circle beside the mark would not fit,
- * and there is nowhere to put it that is not on top of the thing it is meant to
- * annotate. What carries the answer instead is weight and height, which the
- * selected rule below draws. */
+/*
+ *  A chip is a card that gave up its words.
+ */
 :host([variant="chip"]) [part="box"] {
   display: none;
 }
@@ -265,13 +230,9 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The words name the choice without taking room in it.
- *
- * A face scale slots both: the mark is what a reader picks between, and the
- * sentence is what a screen reader reads instead of "graphic". They cannot share
- * the default slot, because this rule would hide the mark with the words, which
- * is why `Radio` grew an `icon` slot. A chip with no mark slotted is an empty
- * circle, and that is the consumer having asked for one. */
+/*
+ *  The words name the choice without taking room in it.
+ */
 :host([variant="chip"]) [part="label"] {
   clip-path: inset(50%);
   block-size: 1px;

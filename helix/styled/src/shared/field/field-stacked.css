@@ -4,15 +4,13 @@
 
 [part="label"] {
   display: block;
-  /* On top of the stack's own gap, so the label sits a step further from the
-     control than the hint under it does. The two distances are not the same
-     job: a label names the thing below it and wants a beat of air to read as a
-     heading for it, while a hint is a continuation of the control it follows
-     and belongs close to it. Padding rather than a larger gap, which would move
-     both.
-
-     Here rather than in the block every control copies, or a beside-label takes
-     four pixels of padding under its text: its box comes out four pixels taller
-     than its ink, and centering the box puts the ink two pixels high. */
+  /*
+ *  On top of the stack's own gap, so the label sits a step further from the
+ *      control than the hint under it does. The two distances are not the same
+ *      job: a label names the thing below it and wants a beat of air to read as a
+ *      heading for it, while a hint is a continuation of the control it follows
+ *      and belongs close to it. Padding rather than a larger gap, which would move
+ *      both.
+ */
   padding-block-end: var(--helix-space-2xs);
 }

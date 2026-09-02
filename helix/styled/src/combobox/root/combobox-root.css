@@ -25,20 +25,9 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* With tags in it the field grows, and only then.
- *
- * On `:has([part="tags"])` rather than on a reflected `multiple`, which needs no
- * attribute on the host: a `multiple` combobox with nothing chosen yet is a
- * plain field and should look like one.
- *
- * `block-size: auto` with a floor rather than the fixed height every other
- * field has: six tags wrap to three lines and a field that kept one line would
- * clip two of them. The floor keeps a field with one tag the same height as a
- * field with none, so a form does not jump as the first choice is made.
- *
- * The block padding arrives with the wrapping. At a fixed height the tags are
- * centered by `align-items` and need none; once the box can grow, nothing is
- * holding them off the border. */
+/*
+ *  With tags in it the field grows, and only then.
+ */
 [part="field"]:has([part="tags"]) {
   block-size: auto;
   flex-wrap: wrap;
@@ -49,33 +38,23 @@
   position: relative;
 }
 
-/* And it turns over as the panel opens, saying which way the panel is going.
- *
- * Both selectors: the default caret is the slot's *fallback* content,
- * `::slotted()` matches assigned nodes only, and fallback content is never
- * assigned. One half is the fallback, the other the consumer's replacement.
- *
- * A flip across the x-axis rather than a rotation: the two end in the same
- * place for a symmetric caret and take different routes, and a rotation spends
- * the middle of the movement pointing at nothing.
- *
- * `:state(open)` and not `[open]`: the resolved state, so a controlled combobox
- * whose consumer has not applied the change yet does not turn early. */
+/*
+ *  And it turns over as the panel opens, saying which way the panel is going.
+ */
 [part="indicator"],
 ::slotted([slot="indicator"]) {
   transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* And the caret comes out of the wrap.
+/*
+ *  And the caret comes out of the wrap.
  *
  * Measured with eight tags: as the last flex item it wrapped with the text field
  * onto a third line and sat there alone against the right edge, which reads as a
  * field that has broken rather than one that has grown. It says the panel opens,
  * which is true of the whole control and not of whichever line it landed on, so
  * it belongs at the field's end rather than at the end of the content.
- *
- * Both selectors for the reason the flip rule gives: the default caret is the
- * slot's fallback content and `::slotted()` cannot match it. */
+ */
 [part="field"]:has([part="tags"]) [part="indicator"],
 [part="field"]:has([part="tags"]) ::slotted([slot="indicator"]) {
   inset-block-start: 50%;
@@ -192,7 +171,8 @@ slot[name="end"]::slotted(*) {
   flex: 0 0 auto;
 }
 
-/* The panel, in the house shape every floating surface here takes. `border: none`
+/*
+ *  The panel, in the house shape every floating surface here takes. `border: none`
  * said rather than left out: the UA stylesheet gives `[popover]` `border: solid`,
  * so dropping the declaration leaves three pixels of medium gray rather than none
  * at all.
@@ -201,13 +181,9 @@ slot[name="end"]::slotted(*) {
  * panel is positioned `fixed`, so `100%` would be the viewport and not the
  * field.
  *
- * `min-inline-size: max-content` is a floor rather than a cap, so an option
- * longer than the field widens the panel instead of wrapping. A name broken
- * across two lines to fit a field it has no relationship to is worse than a
- * panel that sticks out.
- *
  * And never taller than the room under the field: the space is measured, not
- * declared. */
+ * declared.
+ */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
   border: var(--combobox-border-width, var(--helix-border-floating)) solid
@@ -225,15 +201,12 @@ slot[name="end"]::slotted(*) {
   position: absolute;
 }
 
-/* The row offering to add what was typed, dressed as a row of the list rather
+/*
+ *  The row offering to add what was typed, dressed as a row of the list rather
  * than as a button: it sits under the options in the same panel and is chosen
  * the same way. `all: unset` first, since a `<button>` arrives with a
  * background, a border and a font of its own.
- *
- * Separated by a rule rather than by space alone. It is not one of the
- * consumer's options and pressing it does something none of them do, and a row
- * that looked identical to the ones above it would be an option the reader
- * believes was in the list all along. */
+ */
 [part="create"] {
   all: unset;
 

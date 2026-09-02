@@ -21,14 +21,10 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Stripped rather than replaced, so the caret, the selection and the keyboard a
-   phone chooses are all the platform's.
-
-   The field's own face, not mono. A color is a code in the syntax and not in
-   the field: nobody scans a column of colors for alignment, and one field in a
-   form set in a different typeface reads as a mistake in the form. The syntax
-   toggle in the panel keeps mono, where it is genuinely a token rather than a
-   word. */
+/*
+ *  Stripped rather than replaced, so the caret, the selection and the keyboard a
+ *    phone chooses are all the platform's.
+ */
 [part="control"] {
   all: unset;
   box-sizing: border-box;
@@ -58,15 +54,10 @@
   color: var(--helix-color-foreground-subtle);
 }
 
-/* The trigger fills the trailing end of the field rather than sitting in it as
+/*
+ *  The trigger fills the trailing end of the field rather than sitting in it as
  * an icon.
- *
- * A color field has one thing to show and it is a color, so the swatch is
- * given the height of the control and reads as a block of it rather than as a
- * mark beside the text. It is the one field here whose trailing affordance is
- * the value: Date Input's calendar mark stands for an action, and an action
- * stretched to field height is just a large icon. The field carries
- * `overflow: hidden` so the swatch takes the rounded corner with it. */
+ */
 [part="trigger"] {
   align-items: stretch;
   all: unset;
@@ -112,18 +103,15 @@
   inline-size: var(--helix-size-control);
 }
 
-/* The panel, in the house shape every floating surface here takes. `border: none`
+/*
+ *  The panel, in the house shape every floating surface here takes. `border: none`
  * said rather than left out, for the reason Popover, Menu and Select all record:
  * the UA stylesheet gives `[popover]` `border: solid`, so dropping the
  * declaration leaves three pixels of medium gray rather than none at all.
  *
  * Its own width, not the field's. A picker is not a longer text field, and a
  * square stretched to a 600 pixel field is a square no longer.
- *
- * **No padding, and `overflow: hidden` instead.** The square runs to the panel's
- * edge and takes its rounded corners from the panel clipping it, rather than
- * sitting inset with a margin of overlay showing on all four sides. The picker
- * pads its own lower rows, which is why the padding cannot simply live here. */
+ */
 [part="surface"] {
   background-color: var(--helix-color-surface-overlay);
   border: var(--color-input-border-width, var(--helix-border-floating)) solid
@@ -199,17 +187,9 @@
   }
 }
 
-/* The swatch shape: the block of color is the whole control.
- *
- * The native `<input type="color">` in one line of layout. The field stops being
- * a box with something in it and becomes the thing itself, so the frame, the
- * fill and the inset all come off and the preview takes the height it was going
- * to fill anyway.
- *
- * `inline-size: auto` on the host, because a color swatch has a size rather
- * than a width to fill: stretched across a form column it is a banner, and the
- * one thing this appearance exists for is to be small. A consumer who wants it
- * wider sets `--color-input-swatch-size`. */
+/*
+ *  The swatch shape: the block of color is the whole control.
+ */
 :host([variant="swatch"]) [part="field"] {
   background-color: transparent;
   border: none;
@@ -217,13 +197,9 @@
   padding-inline: var(--helix-space-none);
 }
 
-/* One edge and one corner, on the preview.
- *
- * The trigger carried a border and clipped the preview to it, which draws two
- * curves rather than one: `overflow` clips to the padding box, so the inside of
- * a border-radius is that radius less the border width, and at any size where a
- * swatch is worth looking at the two read as a ring around a slightly wrongly
- * rounded square. The preview is the only thing in this shape, so it takes both. */
+/*
+ *  One edge and one corner, on the preview.
+ */
 :host([variant="swatch"]) [part="trigger"] {
   block-size: var(--color-input-swatch-size, var(--helix-size-control));
   inline-size: var(--color-input-swatch-size, var(--helix-size-control));

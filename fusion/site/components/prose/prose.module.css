@@ -1,28 +1,22 @@
-/* An anchor beside every prose heading, for sending somebody to one section.
+/*
+ *  An anchor beside every prose heading, for sending somebody to one section.
  *
  * **Outside the text column, not before it.** The obvious version puts the mark
  * in front of the words, which moves the heading left of every paragraph under
  * it and gives a document two left edges. `inset-inline-end: 100%` puts it just
  * outside the heading's own box, so the words start exactly where they did and
  * the mark lives in the margin the shell already has.
- *
- * **Shown on hover and on focus, present at rest.** Hidden with `opacity` and
- * not with `display`, so it keeps its place in the tab order and a reader
- * moving through a document with the keyboard can reach it. A mark that only a
- * pointer can find is a feature half the readers do not have. */
+ */
 .heading {
   position: relative;
 
-  /* **Room for the masthead, or following the link hides what it points at.**
-     A fragment scrolls its target to the top of the viewport, and the top of
-     this viewport is under a `position: sticky` header, so without this a
-     heading's own link puts that heading behind the bar. The reader arrives at
-     the right place and cannot see it, which is worse than not moving at all.
-
-     `scroll-margin` rather than padding or a negative margin: it changes where
-     scrolling stops and nothing about the layout, so the heading sits where it
-     always did and only the landing moves. The header's own height plus a step,
-     because arriving with the title flush against the bar reads as clipped. */
+  /*
+ * *Room for the masthead, or following the link hides what it points at.**
+ *      A fragment scrolls its target to the top of the viewport, and the top of
+ *      this viewport is under a `position: sticky` header, so without this a
+ *      heading's own link puts that heading behind the bar. The reader arrives at
+ *      the right place and cannot see it, which is worse than not moving at all.
+ */
   scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 

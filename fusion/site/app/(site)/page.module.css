@@ -1,24 +1,16 @@
 /*
  * The landing page: its light, its bands and the rhythm between them.
- *
- * What is left after the parts became components. `Hero`, `Showcase`, `Band`,
- * the diagram, the theme bar, the kicker and the proof panel each own their own
- * sheet now, and the type scale they share is `components/type.module.css`.
- * This is the page: the reel the aura is drawn against, the bands' spacing, and
- * the few arrangements that exist only here.
  */
 
 /* The containing block for the aura, which is absolute against it. */
 .reel {
-  /* **Clipped, because an absolutely positioned child pushes the page taller.**
-     Abspos boxes do not take part in flow but they do contribute scrollable
-     overflow, so an aura taller than the reel leaves the footer no longer the
-     last thing on the page. The reel is the right edge to clip at: it is the lit
-     region by definition, and it ends exactly where the footer begins.
-
-     `clip` rather than `hidden`: it establishes no scroll container, so nothing
-     inside gains a scrollport it can be scrolled within. Nothing here is sticky,
-     which is the other thing a clip context would change. */
+  /*
+ * *Clipped, because an absolutely positioned child pushes the page taller.**
+ *      Abspos boxes do not take part in flow but they do contribute scrollable
+ *      overflow, so an aura taller than the reel leaves the footer no longer the
+ *      last thing on the page. The reel is the right edge to clip at: it is the lit
+ *      region by definition, and it ends exactly where the footer begins.
+ */
   overflow: clip;
 
   /* **The air under the closing card belongs to the reel, not to the card.**
@@ -51,23 +43,6 @@
 
 /**
  * One field, over the whole reel.
- *
- * Absolute rather than a background, because it is a canvas: it has to fill the
- * region without being in the flow, or the band grows by its height and the type
- * stops being the only thing on screen. `pointer-events: none` is said rather
- * than relied on, because the field covers both calls to action and a layer over
- * those is one refactor away from swallowing the press that pays for the site.
- *
- * **One field, not one per band.** A per-band aura anchored to its own band's
- * top cuts against its neighbor at every band boundary and draws a hard
- * horizontal line across the page. Matching their settings cannot fix that: the
- * line is the boundary between two canvases, not a difference between them.
- * Stretched to the reel there is no boundary inside it, and one WebGL context
- * for the compositor to carry rather than one per band.
- *
- * **No `z-index`, and one is actively wrong here.** This is positioned, the
- * sections after it are positioned, and positioned boxes with no layer of their
- * own paint in tree order, so the markup already says what the order is.
  *
  * `--helix-layer-beneath` is -1, and `.reel` establishes no stacking context:
  * no `isolation`, no `contain`, no transform, and `overflow: clip` does not
@@ -124,7 +99,8 @@
    column, and `media-placement="end"` could not work at all, `order` having
    nothing to order. The card already knows what it is. */
 
-/* **The closing call to action, as a card rather than a band.** Capped and
+/*
+ * *The closing call to action, as a card rather than a band.** Capped and
  * centered, all four sides are the object's own, so the border the material
  * carries is doing the job it exists for: keeping a translucent surface a shape
  * when it takes its color from whatever is behind it.
@@ -137,39 +113,30 @@
  * ground is in front of it, and a `backdrop-filter` that changes nothing still
  * makes the compositor re-read the page on every frame the element moves, which
  * these do for a whole scroll.
- *
- * Two rules for that, because the attribute is absent for a reader who has never
- * chosen, which is most of them. `[data-color-mode="light"]` catches an explicit
- * choice and the query catches the system following light with nothing declared.
- * `:not([data-color-mode])` rather than `:not([data-color-mode="dark"])`, since
- * the second also matches a system-dark reader and would take the blur away from
- * the one mode it is for. */
+ */
 .closingCard {
   background-color: light-dark(
     var(--helix-color-surface-sunken),
     var(--helix-material-translucent)
   );
   border-radius: var(--helix-radii-lg);
-  /* **As wide as every other band's content, which is the inset and nothing
-     else.** A fixed cap is narrower than the page: the bands above run to the
-     viewport less `--site-inset`, so the one element meant to close the page
-     would be the only one not aligned to them. Deriving the width from the same
-     inset makes the card's edges land on that column.
-
-     The content inside is inset again by the inner `data-shell`, which is what a
-     card's padding is and is why the text reads narrower than the text above it
-     without the edges disagreeing. */
+  /*
+ * *As wide as every other band's content, which is the inset and nothing
+ *      else.** A fixed cap is narrower than the page: the bands above run to the
+ *      viewport less `--site-inset`, so the one element meant to close the page
+ *      would be the only one not aligned to them. Deriving the width from the same
+ *      inset makes the card's edges land on that column.
+ */
   margin-inline: auto;
-  /* **The one band whose spacing would otherwise come out half.**
-   *
-   * Every other band is a card inside a section, so the section's
-   * `padding-block` sits outside the card and two neighbors put a full
-   * `--site-band` each between them: 216px measured. This card *is* its section,
-   * so that same padding lands inside the card as its own inset and the gap
-   * above it is one band's worth rather than two.
-   *
-   * A margin rather than moving the padding out, because the inset is doing real
-   * work: it is what makes the close read as airy instead of cramped. */
+  /*
+ * *The one band whose spacing would otherwise come out half.**
+ *
+ * Every other band is a card inside a section, so the section's
+ * `padding-block` sits outside the card and two neighbors put a full
+ * `--site-band` each between them: 216px measured. This card *is* its section,
+ * so that same padding lands inside the card as its own inset and the gap
+ * above it is one band's worth rather than two.
+ */
   margin-block-start: var(--site-band);
   max-inline-size: calc(100% - 2 * var(--site-inset));
 }
@@ -186,22 +153,6 @@
 
 /**
  * The hero on load: a blur that clears while the column rises.
- *
- * **A keyframe animation rather than the scroll reveal's transition**, because
- * this fires once on load with nothing to observe. It is the same argument the
- * reveal makes in reverse: that one needs an end state a transition can be
- * driven to, and this one needs a start state that exists before any script has
- * run. An animation carries both in the stylesheet, so the hero arrives even if
- * the page never hydrates.
- *
- * **`filter` is safe here and would not be inside a band.** A filter makes an
- * element a backdrop root, which is the fault that took the fade off the scroll
- * reveal. Nothing in the hero carries a `backdrop-filter`: the kicker is a flat
- * tint, the buttons are solid, and the install line is its own surface. The
- * cards that care live further down the page and are never inside this element.
- *
- * Staggered by depth rather than by counting children, so adding a control to
- * the hero does not mean renumbering anything.
  */
 @keyframes site-hero-arrive {
   from {
@@ -287,9 +238,6 @@
  * WebKit simply holds the start value. The dash was sitting at offset 0 on every
  * path, which is why the routing looked painted rather than moving: the segment
  * was parked at the start of each run, in the same place, forever.
- *
- * Registered as a number, the same value now resolves in the keyframe and the
- * offset animates.
  */
 @property --len {
   syntax: "<number>";
@@ -330,16 +278,6 @@
 
 /**
  * Hides the showcase's own brand input inside a draft.
- *
- * **The panel derives into itself, and the page derives too.** `Showcase` sets
- * `data-helix-theme` on its own stage, which sits inside the page's scope and so
- * wins locally: two controls, two sources of truth, and a reader who drags the
- * pill watches every band move except the one that is explicitly about the
- * palette. They agree at rest only because both start from the same default.
- *
- * Hiding one is the draft's fix, not the real one. The real one is for the
- * showcase to take its brand from the same place the page does, which is a
- * change to a component the live page shares and does not belong in a draft.
  */
 .oneBrand :global(helix-color-input) {
   display: none;
@@ -412,22 +350,6 @@
  * across the screen directly under an edge that has no border. Photographed at
  * the seam between two sections it reads as a printing fault rather than as one
  * card sitting above another.
- *
- * There is nothing for it to do there either. The cast exists to separate a card
- * from what is behind it, and full-bleed sections stacked edge to edge have no
- * behind: the fill and the seam already say where one ends. The wide layout,
- * where cards float inset with page showing around them, keeps it.
- *
- * **The color rather than the layer, so the geometry is written once.** Turning
- * the whole shadow off would take the inset hairline with it, and restating the
- * shadow with a different color would put the offsets in two places for the day
- * somebody changes one of them.
- *
- * `light-dark()` rather than a `[data-color-mode]` selector: it resolves from
- * the used `color-scheme`, so the reader who has chosen a mode and the reader
- * who has chosen nothing and is on a light system are both answered by one
- * declaration. The dark arm restates the literal because a custom property
- * cannot refer to itself.
  */
 @media (max-width: 40rem) {
   .noRules :global([data-substrate]),
@@ -467,17 +389,6 @@
  * every 40 units, so translating by exactly 40 in each axis lands on an
  * arrangement identical to the start: the loop closes on itself and there is no
  * moment where the grid jumps back.
- *
- * Slow enough to be noticed only on a second look. A grid that visibly slides is
- * a parallax effect; this is meant to read as the drawing being alive rather
- * than printed.
- *
- * **Horizontal only, and the vertical axis is the reason.** Drifting diagonally
- * moves the horizontal rules too, so the one alignment a reader measures the
- * figure against, whether it sits evenly between the lines above and below it,
- * is different at every instant and never the registered one. Sliding along a
- * single axis leaves those rules fixed where the composition puts them and still
- * gives the field motion.
  */
 @keyframes preview-field-drift {
   from {
@@ -493,15 +404,13 @@
 
 /* ── Glass, thinner ────────────────────────────────────────────────── */
 
-/* **`.fab` had a second fill here and this is where it went.** The pill is
-   declared once, far above, and was declared again in this section with a
-   different base token and a different mix; same specificity, later in the file,
-   so this one won and the one anybody reads first did nothing. Nothing said so,
-   and the two disagreed for as long as they both existed.
-
-   That is the whole argument for `--site-glass`: a value stated twice is a value
-   that will differ, and the second statement is the one that is invisible. The
-   pill takes the token at its own rule now, and there is nothing to override. */
+/*
+ * *`.fab` had a second fill here and this is where it went.** The pill is
+ *    declared once, far above, and was declared again in this section with a
+ *    different base token and a different mix; same specificity, later in the file,
+ *    so this one won and the one anybody reads first did nothing. Nothing said so,
+ *    and the two disagreed for as long as they both existed.
+ */
 
 /* The shared components carry their own fills, and those are opaque tokens
  * rather than mixes, so they need the same treatment where a draft uses them.
@@ -539,15 +448,6 @@
 /**
  * **The closing card and the header were mixing their own surfaces.**
  *
- * `closingCard` sets `light-dark(surface-sunken, material-translucent)` and the
- * header carries its own material, so a page that had settled on one glass
- * recipe still showed three: the chart panel reading as glass over the field,
- * the close reading as a sunken slab, and the header as a third thing again. A
- * material is a claim about what a surface is made of, and a page cannot hold
- * three answers to that.
- *
- * The chart card's is the one that won, so it is the one everything takes.
- *
  * **Specificity rather than `!important`, and the number is the reason.** The
  * closing card is also reached by `:root:not([data-color-mode]) .closingCard`,
  * which is (0,3,0), against this selector's (0,2,0): the override was losing on
@@ -566,26 +466,6 @@
 
 /**
  * Four essays in one card, and the row answers the pointer.
- *
- * **The cell is the link.** A title that is the only target makes three
- * quarters of a cell dead to the pointer, and the cell is what a reader is
- * aiming at; the chips and the summary belong to the same choice.
- *
- * **The hover is on the row, not only the cell.** A cell that lifts on its own
- * says "this one is a target" and nothing about the other three; receding the
- * siblings at the same time says "this one, out of four", which is the sentence
- * a set of peers wants. The two halves are one gesture and share a duration.
- *
- * **`opacity` is safe here and would not be one level up**, which is worth
- * saying beside the declaration rather than trusting to memory. It flattens the
- * `backdrop-filter` of anything beneath it, and beneath this there is none:
- * these cells are text, and the only glass in the band is the card above them,
- * whose filter a descendant's opacity has never had anything to do with. Had
- * the four stayed cards, this rule would have flattened all of them. See the
- * note above `[data-substrate]` in `site.css`.
- *
- * Reduced motion keeps the change and drops the travel: the dimming carries the
- * meaning and the rise only carries the motion.
  */
 .insightCell {
   color: inherit;
@@ -631,15 +511,6 @@
 
 /**
  * The carousel runs to the page edges; the first card does not move.
- *
- * **Two halves, and the component already owns the harder one.** A negative
- * margin takes the track out of the shell's inset and out to the viewport
- * edges. Setting `--carousel-bleed` to that same inset gives the track back the
- * room it just escaped, and because the component applies the bleed as
- * `scroll-padding` as well as padding, the snapport is inset by it too: the
- * leading slide rests where the shell's content starts rather than against the
- * clip edge. Padding alone would have put the card in the right place and let
- * the first snap pull it straight back out.
  */
 .reelBleed {
   --carousel-bleed: var(--site-inset);
@@ -647,18 +518,9 @@
   margin-inline: calc(var(--site-inset) * -1);
 }
 
-/* **The code block on the same material as everything around it.**
- *
- * It sits in the showcase among cards that all take the page's glass. Left
- * alone it is an opaque `surface-raised` bar over a block of flat page
- * background, which beside a row of translucent cards reads as a screenshot of a
- * different site. Written entirely in the properties `CodeBlock` publishes, so
- * nothing here reaches past the component.
- *
- * The site's glass, through the same two tokens the cards take, so the two are
- * the same material rather than two attempts at one. The header takes a lighter
- * mix than the body, which is the one difference kept: it is what makes the bar
- * a bar rather than the block growing a title. */
+/*
+ * *The code block on the same material as everything around it.**
+ */
 .noRules :global(helix-code-block) {
   --code-block-backdrop: var(--site-glass-backdrop);
   --code-block-background-color: var(--site-glass);
@@ -680,29 +542,13 @@
  * rather than as sliding in from somewhere off screen, which is what a pill
  * pinned to the bottom of the viewport has no room to do.
  *
- * `easing-spring` for the same reason the scroll reveal uses it: an overshoot
- * is what separates a thing that arrived from a thing that was always there.
- * On a scale it is the difference between a pop and a fade-up.
- *
  * `backwards` so the pill is held at `scale(0)` through the delay rather than
  * sitting at full size and then jumping to nothing when the animation starts.
- *
- * **Width alone, not `scale`, so it opens rather than grows.** A scale takes the
- * height with it and squashes everything inside: the label arrives compressed
- * and stretches out, which reads as the pill being pulled into shape rather than
- * opening. Animating `inline-size` against the `overflow: hidden` this already
- * has makes the pill a shutter, so the face keeps its own size and is revealed,
- * never distorted.
  *
  * **No `to` block, deliberately.** The resting width is `13rem` and it is
  * declared once, on the rule above. A keyframe naming it again is a second copy
  * that goes stale the day the pill is resized; with only a `from`, the end of
  * the animation is whatever the element's own style says.
- *
- * **Opacity as well, which the width alone does not cover.** A shutter opening
- * from nothing puts a hard vertical edge on screen and drags it outward, and the
- * eye reads that edge before it reads the pill. Fading across the same interval
- * softens the leading edge without touching what is actually animating.
  *
  * **Three properties to reach an actual zero, not one.** `inline-size: 0` on its
  * own does not make the pill disappear: the used width cannot fall below the
@@ -729,13 +575,6 @@
 
 /**
  * Room at the foot of the page for the pill to float over nothing.
- *
- * **Without it the fixed control lands on the closing call to action**, which is
- * the one thing the page exists to get a reader to press. A floating control
- * that covers the primary action has hidden the point of the page.
- *
- * Sized against the pill's own height plus its inset, rather than a round
- * number, so it stays correct if either changes.
  */
 .fabClearance {
   padding-block-end: calc(

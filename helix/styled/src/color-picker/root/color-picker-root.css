@@ -1,13 +1,6 @@
-/* The inset the rows under the square take, and the picker's own bottom.
- *
- * Zero by default, because flat on a page this element is the content and
- * whatever holds it owns the margin. Color Input's panel sets it, so the square
- * runs edge to edge and only the rows beneath are brought in: a square inset on
- * all four sides leaves a band of overlay around it and reads as a picture of a
- * picker rather than as one.
- *
- * On the rows rather than on the host, which is the whole point. Padding here
- * would inset the square too. */
+/*
+ *  The inset the rows under the square take, and the picker's own bottom.
+ */
 :host {
   display: block;
   padding-block-end: var(--color-picker-padding, var(--helix-space-none));
@@ -40,17 +33,10 @@
   box-sizing: border-box;
 }
 
-/* The square: saturation left to right over brightness top to bottom, which is
+/*
+ *  The square: saturation left to right over brightness top to bottom, which is
  * the picker every reader has already used.
- *
- * Three layers in one declaration, painted back to front: the hue underneath,
- * white sliding in from the left to take the saturation out, black rising from
- * the bottom to take the brightness out. The hue is `--color-picker-hue`, written by the
- * tier below, so the square repaints as the ramp moves.
- *
- * The hue is raw `hsl()` and takes no token. Every other color in this file is
- * a role a theme may change; the wheel is not one, and a themed picker would be
- * one that lies about what it selects. */
+ */
 [part="grid"] {
   aspect-ratio: var(--color-picker-grid-ratio, 1 / 0.7);
   background-image:
@@ -78,17 +64,9 @@
   translate: -50% -50%;
 }
 
-/* The two axes, as real range inputs.
- *
- * Invisible and laid over the square rather than hidden away from it, so the
- * focus ring lands on the square a reader is looking at. `pointer-events: none`
- * because the square handles the pointer itself: a native range would otherwise
- * answer a click with its own one-dimensional idea of where the thumb goes, and
- * the vertical one would fight the horizontal one for the same pixel.
- *
- * Not `display: none` and not `visibility: hidden`, either of which would take
- * them out of the tab order and out of the accessibility tree, which is the
- * whole reason they exist. */
+/*
+ *  The two axes, as real range inputs.
+ */
 [part="grid-saturation"],
 [part="grid-brightness"] {
   appearance: none;
@@ -114,17 +92,14 @@
   padding-inline: var(--color-picker-padding, var(--helix-space-none));
 }
 
-/* The chip, and it copies.
+/*
+ *  The chip, and it copies.
  *
  * 36 rather than a token, because it is measured against the two ramps beside
  * it rather than against the icon scale: at `icon-lg` it was 24 against a stack
  * of 36 and sat in the middle of a gap it did not fill. A hook, so a consumer
  * whose panel is a different width can bring it back in line.
- *
- * A `<button>` rather than a `<span>`, so the copy is reachable by keyboard and
- * announced. The cursor is a copy cursor rather than a pointer: pressing it does
- * not navigate or open anything, and `copy` is the one cursor that says exactly
- * what will happen. */
+ */
 [part="sample"] {
   /* Reset by name rather than with `all: unset`, which silently wipes the chip.
      `all` resets every property the rule does not restate, and the fill and the
@@ -244,13 +219,10 @@
   display: none;
 }
 
-/* The value and the tools share the row: the color as text on the left, the
+/*
+ *  The value and the tools share the row: the color as text on the left, the
  * two controls on the right.
- *
- * The text is what makes this element complete standing on a page. A square and
- * two ramps can build a color and cannot state one, and a reader who already
- * has a hex should not have to find it by dragging. Color Input sets `no-value`
- * and the tools then take the row, since its own field is that input. */
+ */
 [part="footer"] {
   display: flex;
   gap: var(--helix-space-xs);
@@ -314,7 +286,8 @@
   flex: 1 1 0;
 }
 
-/* A slotted dropper is sized here, because nothing else sizes it.
+/*
+ *  A slotted dropper is sized here, because nothing else sizes it.
  *
  * The mark this component draws is an inlined `<svg data-glyph>`, and
  * `icon/glyph.css` gives it a size. That sheet is in this shadow root, so it
@@ -322,9 +295,7 @@
  * and a shadow-tree rule are two selectors for two trees, never one for both.
  * Without this, a consumer's own dropper arrives at whatever intrinsic size it
  * has, which for a bare `<svg>` with a `viewBox` and no dimensions is 300x150.
- *
- * Same declarations as the sheet, same hook, so `--icon-size` set on the row
- * still moves both. */
+ */
 ::slotted([slot="eyedropper-icon"]) {
   block-size: var(--icon-size, var(--helix-size-icon));
   flex: 0 0 auto;

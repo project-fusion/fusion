@@ -4,14 +4,12 @@
 
 /* A rule under the active tab rather than a filled pill: the row stays flat,
    and the underline reads as one mark moving rather than two fills swapping. */
-/* Every one of these comes from the tab set, which sets them all for its
-   default and overrides what a variant changes. The fallbacks are what a tab
-   would look like with no set around it, which is not an arrangement that
-   ships, so they are the plainest thing rather than a second design.
-
-   A resting tab is the exception and is written plainly: the variants vary the
-   *selected* fill through `--_tab-selected-surface` and none wants a resting
-   one. A variant that does can have a property back in the two lines it takes. */
+/*
+ *  Every one of these comes from the tab set, which sets them all for its
+ *    default and overrides what a variant changes. The fallbacks are what a tab
+ *    would look like with no set around it, which is not an arrangement that
+ *    ships, so they are the plainest thing rather than a second design.
+ */
 [part="tab"] {
   align-items: center;
   background-color: transparent;
@@ -44,16 +42,15 @@
   white-space: nowrap;
 }
 
-/* A wash under the pointer, not a color change alone.
+/*
+ *  A wash under the pointer, not a color change alone.
  *
  * Darkening the label is the quietest answer a control can give and is invisible
  * on a tab already at full foreground: the selected tab, and every tab in the
  * sandbox's own chrome, would answer the pointer with nothing at all. The same
  * five percent wash the nav bar uses, so a row of tabs and a row of navigation
  * behave alike.
- *
- * Under the selected rule below, so a selected tab keeps its own surface: it is
- * already the one you are on and does not need telling twice. */
+ */
 [part="tab"]:hover:not(:disabled) {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);

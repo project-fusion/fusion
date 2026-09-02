@@ -13,13 +13,6 @@
 
 /**
  * Tall enough for five bars to be compared rather than glanced at.
- *
- * **The second series is forced neutral, and that is an honesty fix.** The
- * chart's default series palette paints the second one red, so every competitor
- * reads as an error, including Material Web, which beats us on this row. A
- * comparison that colors the winner as a failure is not a comparison. Ours takes
- * the brand, theirs a muted neutral: the distinction a reader needs is which bar
- * is which, not which is good.
  */
 .proofBars {
   block-size: 14rem;

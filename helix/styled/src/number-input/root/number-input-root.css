@@ -17,16 +17,9 @@
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
   display: flex;
-  /* The field clips its own corners, which is what rounds the steppers.
-   *
-   * They stretch to the full height and fill on hover, and the fill had square
-   * corners inside a rounded field: a gray rectangle poking out past the curve
-   * at both ends. Clipping here rather than rounding each button, because the
-   * inside of a border-radius is that radius less the border width, and stating
-   * that arithmetic twice is two places to get it wrong when the token moves.
-   *
-   * The focus ring is unaffected: it is an `outline` on this element, and an
-   * outline is not clipped by the overflow of the box it is drawn on. */
+  /*
+ *  The field clips its own corners, which is what rounds the steppers.
+ */
   overflow: hidden;
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -48,16 +41,14 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* `:state(invalid)` rather than `:user-invalid`, and rather than an `invalid`
-   property. `MixinField` mirrors "wrong, and the reader knows it" onto the host
-   under that name, because `:user-invalid` tracks interaction with the element
-   it is on and nobody interacts with this one: the reader types into an
-   `<input>` in the shadow root, so the host's own flag is never set. `Input`
-   carries the same rule and the full measurement.
-
-   Never `:host([invalid])`: it works, which is the problem, because it would be
-   an API declared in a stylesheet and nowhere else. All four states, so the edge
-   turns whichever route it arrives by. */
+/*
+ *  `:state(invalid)` rather than `:user-invalid`, and rather than an `invalid`
+ *    property. `MixinField` mirrors "wrong, and the reader knows it" onto the host
+ *    under that name, because `:user-invalid` tracks interaction with the element
+ *    it is on and nobody interacts with this one: the reader types into an
+ *    `<input>` in the shadow root, so the host's own flag is never set. `Input`
+ *    carries the same rule and the full measurement.
+ */
 :host(:state(invalid)) [part="field"],
 :host(:state(invalid)) [part="field"]:hover,
 :host(:state(invalid):focus-within) [part="field"],
@@ -74,22 +65,18 @@
   opacity: 0.5;
 }
 
-/* Still readable, and still submitted. A read-only field is not a disabled one:
+/*
+ *  Still readable, and still submitted. A read-only field is not a disabled one:
  * it is a value the reader may take and may not change. Same treatment `Input`
  * and `Textarea` give it, and the reason `read-only` reflects at all: a
  * reflected attribute nothing selects on is one more thing written onto a host
  * that a server's output never had.
  *
- * Flush with its ground, which is what `transparent` says and no color can. An
- * absolute step is wrong here: on a card, `surface` *is* the card, so read-only
- * would be flush by coincidence, while on a raised panel it comes out lighter
- * than the thing it sits on, which is a field rising out of the surface it
- * belongs to.
- *
  * The resting field is a recess, a percentage of the foreground over whatever
  * is behind it, so read-only is the absence of that recess rather than a second
  * color: no fill, the ground showing through, distinct from the resting state
- * on every ground and needing no token to stay that way. */
+ * on every ground and needing no token to stay that way.
+ */
 :host([readonly]) [part="field"] {
   background-color: transparent;
 }
@@ -113,14 +100,10 @@
   text-align: center;
 }
 
-/* A unit or an icon at either end: quieter than the number, and never shrinking
+/*
+ *  A unit or an icon at either end: quieter than the number, and never shrinking
  * when the field is narrow. `Input` answers both the same way.
- *
- * The room is this component's own. The padding that separates the number from
- * the edges is on the control rather than around the region, and the buttons
- * are flush to the frame, so slotted content butts straight against a stepper
- * unless it carries its own. Matched to the control's padding, so a unit sits
- * the same distance from the number as from the button beside it. */
+ */
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
   color: var(--helix-color-foreground-subtle);
@@ -185,17 +168,9 @@ slot[name="end"]::slotted(*) {
   inline-size: var(--helix-size-icon-tight);
 }
 
-/* The label is the scrub surface, and says so with the cursor.
- *
- * `touch-action: none` is what makes it work on a touch screen at all. Without
- * it the browser claims a horizontal drag for scrolling before the second
- * `pointermove` arrives, so the gesture is taken away mid-drag and the value
- * stops following the finger with nothing to say why.
- *
- * `ew-resize` rather than `grab`: the value moves on one axis and a cursor
- * offering both offers something that does not happen. `user-select: none`
- * because a press-and-drag across a word is a text selection everywhere else,
- * and here it has been asked to be something else. */
+/*
+ *  The label is the scrub surface, and says so with the cursor.
+ */
 :host([scrub]) [part="label"] {
   cursor: ew-resize;
   touch-action: none;

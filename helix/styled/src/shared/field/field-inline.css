@@ -1,19 +1,8 @@
-/* A label beside its control, which is the checkbox and the switch: a row with
-   a small mark in it, then the words. Compose with `field.css`, never instead
-   of it.
-
-   The label takes neither `display: block` nor a bottom padding, both of which
-   belong to a label above a control. In a row centered on its items, padding
-   under the text makes the label's box taller than its ink and the control
-   reads as sitting low beside its own words.
-
-   The control declares its own width and the indent follows, because the two
-   have to agree and only the control knows the number:
-
-     --_field-control-inline-size: var(--_checkbox-size);
-
-   Left unset the indent is zero, so a control composing this sheet without
-   declaring the property gets a hint at the host's own edge. */
+/*
+ *  A label beside its control, which is the checkbox and the switch: a row with
+ *    a small mark in it, then the words. Compose with `field.css`, never instead
+ *    of it.
+ */
 
 [part="hint"],
 [part="feedback"] {
