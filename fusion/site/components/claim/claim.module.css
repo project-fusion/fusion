@@ -1,0 +1,8 @@
+/* A sentence carrying weight on its own, set heavier than the lede around it. */
+
+.claim {
+  font-size: clamp(var(--helix-text-lg), 1.5vw, calc(var(--helix-text-lg) * 1.2));
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}

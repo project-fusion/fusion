@@ -1,5 +1,5 @@
 import { Band, band } from '@/components/band/band'
-import type_ from '@/components/type.module.css'
+import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { BUTTON, CLAIMS, METRICS_HREF } from '@/content/landing/proof'
 import styles from './proof-band.module.css'
 
@@ -20,7 +20,7 @@ import styles from './proof-band.module.css'
 export const ProofBand = () => (
   <Band>
     <helix-flex class={band.bandSection} direction="column" gap="sm">
-      <p className={type_.tLabel}>Measured, not claimed</p>
+      <Eyebrow>Measured, not claimed</Eyebrow>
       {/* **Not "fast" and not "small".** Both are adjectives a reader has been
           promised by every library they have ever evaluated, and neither is
           checkable. The kicker above carries the epistemics, so this heading

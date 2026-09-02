@@ -1,16 +1,19 @@
 import { findSitePage } from '@fusion.dev/insights'
 import Link from 'next/link'
 import { Band, band } from '@/components/band/band'
+import { Claim } from '@/components/claim/claim'
 import {
   DerivationDiagram,
   DerivationDiagramStacked,
 } from '@/components/derivation-diagram/derivation-diagram'
+import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Hero } from '@/components/hero/hero'
+import { Lede } from '@/components/lede/lede'
 import { ProofBand } from '@/components/proof-band/proof-band'
+import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
 import { ThemeScope } from '@/components/theme-context/theme-context'
 import { ThemeFab } from '@/components/theme-fab/theme-fab'
-import type_ from '@/components/type.module.css'
 import { INSIGHTS } from '@/content/insights'
 import {
   DELIVERY,
@@ -99,15 +102,15 @@ export default function Home() {
           this reads the next band; one who does not was never the buyer. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <h2 className={type_.tTitle}>{PROBLEM.title}</h2>
-            <p className={type_.tLede}>{PROBLEM.lede}</p>
+            <SectionTitle>{PROBLEM.title}</SectionTitle>
+            <Lede>{PROBLEM.lede}</Lede>
           </helix-flex>
 
           <div className={`${band.bandRow} ${styles.stagger}`}>
             {MECHANISMS.map((one) => (
               <helix-flex class={band.bandCell} direction="column" gap="md" key={one.name}>
-                <p className={type_.tLabel}>{one.name}</p>
-                <p className={type_.tClaim}>{one.claim}</p>
+                <Eyebrow>{one.name}</Eyebrow>
+                <Claim>{one.claim}</Claim>
                 <ul className={styles.proofList}>
                   {one.bullets.map((line) => (
                     <li key={line}>{line}</li>
@@ -127,13 +130,13 @@ export default function Home() {
                   with the lede saying which of the three costs is answered, tells
                   a reader this is depth rather than a change of subject. */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <p className={type_.tLabel}>Derived, not picked</p>
-            <h2 className={type_.tTitle}>What happens between the color and the page</h2>
-            <p className={type_.tLede}>
+            <Eyebrow>Derived, not picked</Eyebrow>
+            <SectionTitle>What happens between the color and the page</SectionTitle>
+            <Lede>
               The first of those three, drawn out. One value goes in, the whole token layer comes
               out, and every pair it produces is measured against the ground it lands on before any
               of it reaches a page.
-            </p>
+            </Lede>
           </helix-flex>
           <div className={band.bandSection}>
             <DerivationDiagram />
@@ -154,12 +157,12 @@ export default function Home() {
                     other two mechanisms are: "Derived, not picked" above and
                     "Measured, not claimed" below. A label naming the subject,
                     "The library", leaves the pattern two-thirds visible. */}
-              <p className={type_.tLabel}>Standards, not bindings</p>
-              <h2 className={type_.tTitle}>Every control here is the real one</h2>
-              <p className={type_.tLede}>
+              <Eyebrow>Standards, not bindings</Eyebrow>
+              <SectionTitle>Every control here is the real one</SectionTitle>
+              <Lede>
                 Not a screenshot and not a video. These are custom elements from the package,
                 upgrading in your browser on the page you are already reading.
-              </p>
+              </Lede>
               <helix-flex data-density="lg" direction="column" gap="md">
                 <Link data-button="subtle" data-button-width="standard" href="/helix">
                   Explore components
@@ -215,15 +218,15 @@ export default function Home() {
           page ends in light rather than trailing off into flat ground. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <p className={type_.tLabel}>How it arrives</p>
-            <h2 className={type_.tTitle}>{DELIVERY.title}</h2>
-            <p className={type_.tLede}>{DELIVERY.lede}</p>
+            <Eyebrow>How it arrives</Eyebrow>
+            <SectionTitle>{DELIVERY.title}</SectionTitle>
+            <Lede>{DELIVERY.lede}</Lede>
           </helix-flex>
 
           <div className={`${band.bandRow} ${styles.stagger}`}>
             {SERVICES.map((service) => (
               <helix-flex class={band.bandCell} direction="column" gap="sm" key={service.name}>
-                <p className={type_.tClaim}>{service.name}</p>
+                <Claim>{service.name}</Claim>
                 <helix-text as="p" tone="muted">
                   {service.summary}
                 </helix-text>
@@ -246,15 +249,15 @@ export default function Home() {
           quick, that they keep it, and that we say what is unfinished. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <p className={type_.tLabel}>The engagement</p>
-            <h2 className={type_.tTitle}>{ENGAGEMENT_COPY.title}</h2>
-            <p className={type_.tLede}>{ENGAGEMENT_COPY.lede}</p>
+            <Eyebrow>The engagement</Eyebrow>
+            <SectionTitle>{ENGAGEMENT_COPY.title}</SectionTitle>
+            <Lede>{ENGAGEMENT_COPY.lede}</Lede>
           </helix-flex>
 
           <div className={`${band.bandRow} ${styles.stagger}`}>
             {ENGAGEMENT.map((one) => (
               <helix-flex class={band.bandCell} direction="column" gap="sm" key={one.name}>
-                <p className={type_.tClaim}>{one.name}</p>
+                <Claim>{one.name}</Claim>
                 <helix-text as="p" tone="muted">
                   {one.body}
                 </helix-text>
@@ -285,8 +288,8 @@ export default function Home() {
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <helix-flex align="center" gap="md" justify="between" wrap>
               <helix-flex direction="column" gap="sm">
-                <p className={type_.tLabel}>Insights</p>
-                <h2 className={type_.tTitle}>The arguments, written down</h2>
+                <Eyebrow>Insights</Eyebrow>
+                <SectionTitle>The arguments, written down</SectionTitle>
               </helix-flex>
               <Link data-button="subtle" data-button-width="standard" href="/insights">
                 Read all
@@ -294,9 +297,7 @@ export default function Home() {
             </helix-flex>
             {/* Below the row rather than inside it, so `Read all` stays on the
                     heading's line and the sentence runs the full measure. */}
-            <p className={type_.tLede}>
-              Design, engineering and business decisions, with the reasoning kept in.
-            </p>
+            <Lede>Design, engineering and business decisions, with the reasoning kept in.</Lede>
           </helix-flex>
 
           {/* **No card and no art, because the band is the card.**
@@ -331,10 +332,10 @@ export default function Home() {
 
         <section className={styles.closingCard} data-band data-closing data-material="glass">
           <helix-flex align="center" data-shell direction="column" gap="lg">
-            <h2 className={type_.tTitle}>Take on the work</h2>
-            <p className={type_.tLede}>
+            <SectionTitle>Take on the work</SectionTitle>
+            <Lede>
               Tell us what you need built. We will say plainly if we are not the right people.
-            </p>
+            </Lede>
             <a
               data-button="solid"
               data-button-tone="primary"

@@ -1,0 +1,8 @@
+/* The small label above a heading. */
+
+.eyebrow {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: 0.01em;
+}

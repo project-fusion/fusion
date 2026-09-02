@@ -1,0 +1,8 @@
+/* The size the argument is made at, under a band's heading. */
+
+.lede {
+  font-size: clamp(var(--helix-text-lg), 1.45vw, calc(var(--helix-text-lg) * 1.16));
+  line-height: 1.55;
+  max-inline-size: 54ch;
+  text-wrap: pretty;
+}
