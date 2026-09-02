@@ -62,8 +62,19 @@
 }
 
 .troubleWays {
+  align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--helix-space-sm);
+  /* A step up from `sm`, which put a solid button and the control beside it
+     close enough to read as one object. */
+  gap: var(--helix-space-md);
   justify-content: center;
+}
+
+/* The way out that is not one of the two above: quieter, and on its own line so
+   it is not a third peer in a row of two. */
+.troubleAside {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  margin: 0;
 }

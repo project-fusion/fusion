@@ -41,7 +41,14 @@ export default function SiteError({
 
   return (
     <div className={styles.trouble}>
-      <p className={styles.troubleKicker}>Error</p>
+      {/* A tag rather than the mono kicker the 404 wears. That one is a status
+          code set in the voice of a server; this is a state the page is in, and
+          `danger` is the tone the system already has for it. It also stops the
+          word being shouted: the kicker uppercases, which turns a plain English
+          word into ERROR. */}
+      <helix-tag emphasis="subtle" tone="danger">
+        Error
+      </helix-tag>
       <h1 className={styles.troubleTitle}>This page did not finish loading.</h1>
       <p className={styles.troubleLede}>
         Something on our side threw while rendering. The rest of the site is unaffected, and trying
@@ -50,17 +57,23 @@ export default function SiteError({
 
       {error.digest ? <p className={styles.troubleDigest}>Reference: {error.digest}</p> : null}
 
+      {/* **Two actions and an aside, rather than three things in a row.**
+          Retrying and leaving are peers and read as buttons; telling us is a
+          different kind of act and was sitting between them as unstyled text.
+          `data-button` on an anchor is the base layer's recipe, which is what
+          it is for: a control this library does not render. */}
       <div className={styles.troubleWays}>
-        <helix-button emphasis="solid" onClick={() => retry()} tone="primary">
+        <helix-button emphasis="solid" onClick={() => retry()} tone="primary" width="standard">
           Try again
         </helix-button>
-        <Link data-link="quiet" href="/">
+        <Link data-button="subtle" data-button-width="standard" href="/">
           Go to the front page
         </Link>
-        <Link data-link="quiet" href="/contact">
-          Tell us about it
-        </Link>
       </div>
+
+      <p className={styles.troubleAside}>
+        Still stuck? <Link href="/contact">Tell us about it</Link>
+      </p>
     </div>
   )
 }
