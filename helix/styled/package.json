@@ -38,7 +38,7 @@
     "build": "bun run element-events && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "element-events": "build-element-events --package styled",
     "styles": "build-styles .",
-    "test": "bun run test:pure && bun run test:dom && bun run test:ssr",
+    "test": "bun run element-events && bun run test:pure && bun run test:dom && bun run test:ssr",
     "test:dom": "bun test dom.spec",
     "test:pure": "bun test pure.spec",
     "test:ssr": "bun test ssr.spec",

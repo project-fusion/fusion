@@ -260,8 +260,14 @@
       "inputs": ["src/**", "$TURBO_ROOT$/helix/styles/scripts/build-styles-dist.mjs"],
       "outputs": ["dist/**"]
     },
+    // **`analyze`, because two packages generate a source file from their own
+    // manifest.** `element-events` reads `custom-elements.json`, and the tiers
+    // run it before their specs. Without it here the task graph is free to run
+    // the specs first, and it did: CI failed on
+    // `Cannot find module './element-events.generated.js'` while every local
+    // run passed on a file an earlier build had left behind.
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "analyze"],
       "inputs": ["src/**", "tests/**"],
       "outputs": []
     },
@@ -317,8 +323,10 @@
     // It passed locally the whole time, because a developer who has ever run
     // `analyze` has the file. Four errors across two site files, and the job
     // that catches it runs `bun install` and `typecheck` and nothing between.
+    // `analyze` for the reason `test` gives: `typecheck` runs `element-events`
+    // first in the two tiers, and that reads the manifest.
     "typecheck": {
-      "dependsOn": ["^build", "^analyze"],
+      "dependsOn": ["^build", "^analyze", "analyze"],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
