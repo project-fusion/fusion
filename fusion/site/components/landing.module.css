@@ -47,54 +47,6 @@
   display: grid;
 }
 
-/* Tall enough that the claim is the only thing on screen. Not a full viewport:
-   a sliver of what follows is what tells the reader there is more. */
-.hero {
-  align-items: center;
-  display: flex;
-  min-block-size: min(82vh, 46rem);
-  /* The aura is placed against this, so the hero has to be the containing
-     block. `overflow: hidden` because the field is drawn to the element's own
-     box and a canvas that overhangs the section would put light on the band
-     below it, which is a different statement than the one being made here. */
-  overflow: hidden;
-  padding-block: var(--site-band);
-  position: relative;
-}
-
-.reel > .hero {
-  /* Reaches up behind the masthead, which is transparent on this page.
-   *
-   * The header is `position: sticky`, so it takes a row in flow and the hero
-   * would begin under it: with the bar see-through, that leaves a strip of flat
-   * page across the top of the light, which is worse than an opaque bar because
-   * it looks like the aura failed rather than like a decision. The negative
-   * start margin pulls the band up and the padding puts the words back, so the
-   * light runs to the top of the window and nothing inside the hero moves.
-   *
-   * **The header's height plus the hairline under it, not the height alone.**
-   * `--helix-size-header` is the bar's own 56 and `AppHeader` draws a
-   * `border-block-end` under that, so the thing occupying the top of the window
-   * is 57 while the sheet that paints it is 56. Pulled up by 56 the hero starts
-   * one pixel late and that row is painted by neither, so the body shows through
-   * as a white line across the top of the window. Same construction `.pageHero`
-   * uses in `browser.module.css`. */
-  margin-block-start: calc((var(--helix-size-header) + var(--helix-border-thin)) * -1);
-  /* `svh`, never `vh` or `dvh`. `vh` is the tallest the viewport ever gets, so
-     on a phone the band overflows by the height of the browser chrome. `dvh` is
-     whatever it currently is, so the band resizes while that chrome hides and
-     the page moves under the reader's thumb mid-scroll. `svh` is the small
-     stable one and moves for nothing. */
-  min-block-size: 100svh;
-  /* `max`, not a sum. Added together the band ran twelve pixels past the
-     viewport and broke the one-band-one-screen rhythm the rest of the page
-     keeps. The words are centered in the box, so all the top padding has to
-     guarantee is that they clear the bar if the hero ever grows tall enough for
-     the centering to stop doing it, and the band inset is already larger than
-     the header at every width this clamps to. */
-  padding-block-start: max(var(--site-band), var(--helix-size-header));
-}
-
 /* ============================================================ hero ======= */
 
 /**
@@ -163,80 +115,6 @@
    paints under a fixed element instead of over it. */
 .reel > section {
   position: relative;
-}
-
-/* **Centered, so the light has something to be behind.** The hero is a claim
- * over a field of moving light, and a claim pushed to one edge leaves the other
- * two thirds of the field looking like space nobody used.
- *
- * The measure comes with it. A centered column that runs the full shell gives a
- * reader a different left edge on every line, which is the failure centering is
- * usually blamed for and is really a width problem: `.heroLede` already carries
- * `.measure`, and the title balances its own lines. */
-.heroShell {
-  position: relative;
-  text-align: center;
-}
-
-/* **`max-content` around `stretch`, so the buttons name the width.**
- *
- * The install pill sized itself to its own text, 214 around 164 of code, under
- * a button pair measuring 412: the hero column ended in an element hugging
- * itself beneath a row twice its width. Padding is the gentler lever and does
- * not reach, `md` measuring 222 and `lg` 238.
- *
- * A `min-inline-size` on the pill would be 412 written down, and wrong the day
- * either button's label changes. Here the wrapper is as wide as its widest
- * child, which is the button row, and the pill stretches to it. The number
- * stays a consequence of the copy rather than a constant beside it. */
-.heroActions {
-  align-items: stretch;
-  inline-size: max-content;
-  /* `max-content` alone re-broke the thing the button row already handled: it
-     is the width the row wants *unwrapped*, so at 375 the wrapper stood 412
-     wide and hung off the viewport while the row's own `wrap` had nothing left
-     to do. The cap hands the decision back. */
-  max-inline-size: 100%;
-}
-
-/* **The buttons grow, which is what makes the agreement hold once they stack.**
- *
- * With the cap in place the wrapper is the viewport at 375 and the pill took
- * all of it, 327 against two 200 buttons: the desktop mismatch inverted, the
- * pill now the wide one. Growing the buttons settles both layouts with one
- * rule. Side by side there is no free space to take, 200 and 200 and a gap
- * being exactly the 412 the wrapper asked for, so nothing moves. Stacked, each
- * button is alone on its line and fills it, so the three elements measure 327
- * together.
- *
- * `flex-grow` on the child rather than a width from the recipe: how an item
- * divides a line is the row's business, and `data-button-width` is still the
- * floor it starts from. */
-.heroActions [data-button] {
-  flex-grow: 1;
-}
-
-/* The install line: a command and the one thing you do with it.
- *
- * `surface` with a hairline rather than the code block's own treatment, because
- * this is one line in a hero rather than a listing in a document, and at hero
- * scale a filled block reads as a third button. */
-.heroInstall {
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-sm);
-  padding-block: var(--helix-space-2xs);
-  /* `md` rather than `sm`, now that the box is the button row's width: the
-     command sits off the edge by the same amount the buttons' labels do. */
-  padding-inline: var(--helix-space-md);
-}
-
-@media (max-width: 48rem) {
-  .hero {
-    min-block-size: auto;
-  }
 }
 
 /* One cell, with every view stacked in it. The columns live on the views
@@ -625,44 +503,6 @@
   }
 }
 
-.heroInstall code {
-  color: var(--helix-color-foreground-muted);
-}
-
-.heroInstall helix-copy-button {
-  /* Sized to the line, not to a control.
-   *
-   * `IconButton` is `--helix-size-control` by default, which is 40, and a 40
-   * control inside a chip built for 13px type sets the height of the whole
-   * thing: measured at 50 for a line whose text is 20. Through the component's
-   * own `--icon-button-size`, matched to the row's own line box, so the command
-   * is what the box is sized to and the button is something inside it.
-   *
-   * **Floored at 24, because tying a control to a type scale can shrink it out
-   * of being pressable.** `text-sm` times 1.8 is 23.4, which rounds to 23 and
-   * is a pixel under the 24 minimum a target is meant to hold. The `max` keeps
-   * the size following the ramp everywhere the ramp is large enough and stops
-   * it following the ramp down past a floor that is not about type at all.
-   *
-   * The pull-back is separate and only handles the inline axis: the control's
-   * padding is hit area rather than space, so left alone the gap on the right
-   * came out larger than the inset on the left. */
-  --icon-button-radius: var(--helix-radii-xs);
-  --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
-
-  margin-inline-end: calc(var(--helix-space-2xs) * -1);
-}
-
-/* The compatibility line under the hero's actions. Quiet on purpose: it is a
-   fact a reader needs before they can want anything else on the page, and it is
-   not a claim worth the size of one. */
-.heroWorks {
-  color: var(--helix-color-foreground-subtle);
-  font-size: var(--helix-text-sm);
-  max-inline-size: 46ch;
-  text-wrap: pretty;
-}
-
 /**
  * The hero on load: a blur that clears while the column rises.
  *
@@ -693,35 +533,6 @@
     filter: blur(0);
     opacity: 1;
     transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .heroShell > * {
-    animation: site-hero-arrive calc(var(--helix-duration-slow) * 3) var(--helix-easing-decelerate)
-      backwards;
-  }
-
-  /* Each element waits a beat longer than the one above it. `fast` is the step
-     rather than a round number, so the cadence moves with the motion scale. */
-  .heroShell > :nth-child(1) {
-    animation-delay: var(--helix-duration-fast);
-  }
-
-  .heroShell > :nth-child(2) {
-    animation-delay: calc(var(--helix-duration-fast) * 2);
-  }
-
-  .heroShell > :nth-child(3) {
-    animation-delay: calc(var(--helix-duration-fast) * 3);
-  }
-
-  .heroShell > :nth-child(4) {
-    animation-delay: calc(var(--helix-duration-fast) * 4);
-  }
-
-  .heroShell > :nth-child(5) {
-    animation-delay: calc(var(--helix-duration-fast) * 5);
   }
 }
 
@@ -1492,61 +1303,6 @@
 
 /* ── Draft C's type scale ──────────────────────────────────────────── */
 
-/* A scale of five, set here rather than taken from the tokens.
- *
- * **The token scale is right for a page of prose and wrong for this page.** It
- * steps in even ratios because a document needs a rhythm that holds over many
- * paragraphs. A landing page is a handful of statements at very different
- * weights, and the sizes it wants are not evenly spaced: a display line, a
- * subhead that carries real reading, and body. `.tLede` is the middle size and
- * the whole point: without it a 64px display runs straight into a 15px lede, a
- * jump of more than four to one, and the hero reads as a poster with a caption
- * stuck under it.
- *
- * Fluid rather than stepped, because these are single lines given a screen each
- * and a breakpoint would just be a worse version of the same curve. */
-/* **The display face, which a plain `<h1>` does not get.** Helix hangs it on
- * `helix-text[as="h1"]` and `[data-text="display"]`, so markup written as a bare
- * tag for the sake of this type scale loses it, and the two faces differ most at
- * large sizes and in the details, which is exactly where a hero lives.
- *
- * The section titles take it here too. On the live page they are `heading`
- * variant and set in the body face, which is right for a document; a landing
- * page is six statements and the face earns its keep on all of them. */
-/* The half of the heading the brand paints.
- *
- * **A span rather than a gradient across the whole line.** A duotone made by
- * running a gradient over the entire heading colors words that are not the
- * claim, and on a two-line heading it puts the darkest part of the ramp on
- * whichever words happen to wrap last. Painting one phrase says which phrase.
- *
- * `primary` rather than a mix, because this is the one place on the page where
- * the brand is the subject rather than an accent on something else: it is the
- * color the whole system is derived from, sitting in the sentence that says the
- * system derives things. */
-.tDisplayAccent {
-  color: var(--helix-color-primary);
-  /* **Its own line, so the color break and the line break are the same break.**
-     `text-wrap: balance` on the heading optimises for even line lengths and
-     knows nothing about the two tones: it stranded "and" at the end of the first
-     line, which put the change of color mid-sentence on a conjunction. A painted
-     phrase that starts with the last word of the line above it is not a phrase
-     any more. Block, so the accent always begins a line, at every width. */
-  display: block;
-}
-
-.tDisplay {
-  font-family: var(--helix-font-display);
-  /* Fluid between two rungs of the ramp rather than between two numbers
-     nobody chose. `helix component`'s `tokens` was right to flag the originals: a page that
-     invents its own sizes is how a scale stops being one. */
-  font-size: clamp(var(--helix-text-3xl), 5.6vw, calc(var(--helix-text-3xl) * 1.6));
-  font-weight: var(--helix-weight-semibold);
-  letter-spacing: -0.028em;
-  line-height: 1.02;
-  text-wrap: balance;
-}
-
 .tTitle {
   font-family: var(--helix-font-display);
   font-size: clamp(var(--helix-text-xl), 3vw, calc(var(--helix-text-2xl) * 1.16));
@@ -1554,14 +1310,6 @@
   letter-spacing: -0.02em;
   line-height: 1.1;
   text-wrap: balance;
-}
-
-/* The size the argument is made at. */
-.tLede {
-  font-size: clamp(var(--helix-text-lg), 1.45vw, calc(var(--helix-text-lg) * 1.16));
-  line-height: 1.55;
-  max-inline-size: 54ch;
-  text-wrap: pretty;
 }
 
 .tClaim {
