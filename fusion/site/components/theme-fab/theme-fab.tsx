@@ -262,7 +262,7 @@ export const ThemeFab = () => {
                 `helix-tooltip` rather than the native `title`. A `title` is the
                 browser's own delayed box: it cannot be styled, it cannot be
                 reached by touch, and it arrives late. */}
-            <div className={`${styles.fabRow} ${styles.fabReadoutRow}`}>
+            <div className={styles.fabRow}>
               <span className={styles.fabRowLabel}>What the engine derived</span>
               <div className={styles.fabReadout}>
                 <helix-tooltip

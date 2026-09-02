@@ -1,0 +1,149 @@
+/* The same inset as the masthead, for the same reason. Not `--site-inset`, which
+   is a clamp opening to seven rem: at 1600 that puts the wordmark at 48 and the
+   copyright at 96. */
+.siteFooter {
+  /* The chrome's inset, not the page's, which is what keeps the logo here on the
+     same line down the left edge as the wordmark in the header. One variable and
+     never `2xl` written in place: written in place the footer stays at 48 a side
+     while the header narrows to 16 below 48rem, and at 320 that leaves 224 for
+     three link groups needing 231, so Legal wraps alone onto a second row. */
+  --site-inset: var(--site-chrome-inset);
+
+  /* A rule, because the footer now holds links rather than one quiet line and
+     needs to read as its own region rather than as the end of the page. */
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-2xl);
+}
+
+/* Brand at the start, links at the end, and both wrap onto their own line when
+   the row runs out. */
+.footerInner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xl);
+  justify-content: space-between;
+}
+
+/* The lockup: a mark in its own column, and both lines of type in the other.
+   **Not a row with a line beneath it**, which gives the block two left edges:
+   the mark and the tagline start at the block's edge while the name begins past
+   the mark, so a three-line lockup has a step in it and reads as two things
+   stacked rather than one object. **The indent is derived, not measured.** It is
+   whatever the mark's column turns out to be plus the column gap, so a mark that
+   changes size takes the tagline with it. */
+.footerBrand {
+  align-items: start;
+  /* *Rows sized to their content, not to the space around them.** This is a
+     stretched item of the footer's own flex row, so it inherits the height of
+     the tallest column beside it, and a grid hands that surplus to its rows:
+     without this, two lines of type come out 66px apart. */
+  align-content: start;
+  column-gap: var(--helix-space-xs);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  row-gap: var(--helix-space-2xs);
+}
+
+/* *Everything after the mark, not only the last thing.** `> :last-child` holds
+   only while the lockup is a mark, a name and a tagline; add a fourth child and
+   the tagline falls back to auto-placement and lands in the mark's column. */
+.footerBrand > * + * {
+  grid-column: 2;
+}
+
+/* The mark set to its glyph rather than to its box. **An icon is padded and a
+   logo in a lockup is not.** `fusion.svg` draws into a 256 viewBox with the
+   artwork spanning 42.5 to 213.9, which is 16.6 percent of clear space on each
+   side. Measured in the footer at a 1.25rem mark: the glyph began 3.3px right of
+   "Developing" below it, and the 8px between mark and name read as 11.3. */
+.footerBrand helix-icon {
+  margin-inline: calc(var(--icon-size) * -0.166);
+}
+
+.footerNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xl);
+}
+
+/* A column of links, floored so three of them read as a directory. **Flex items
+   size to their content, and these three have nothing in common to size to.**
+   Products holds two short names, Company five medium ones and Legal one long
+   one, so the columns came out at three different widths with an identical gap
+   between them: the eye reads the gap as the thing that varies and the block
+   looks misaligned rather than ragged-by-design. `1fr` columns would divide the
+   footer's whole remaining width and push Legal out to the far edge, which is a
+   table of contents rather than a footer; a minimum makes the three regular
+   while each still ends where its longest link does. `12ch` is measured on the
+   widest of them, "Acceptable use", so the floor clears the content it has to
+   hold. */
+.footerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 12ch;
+}
+
+/* *The heading is a heading, and the gap is what says so.** One `2xs` between
+   every line put `Products` the same distance from `Helix` as `Helix` is from
+   `Cortex`, so the column read as four peers of which the first happened to be
+   bold. */
+.footerGroup > :first-child {
+  padding-block-end: var(--helix-space-2xs);
+}
+
+/* Clear of the tagline by more than the brand's own row gap: the marks are a
+   different kind of thing from the two lines above them, and at the row gap they
+   read as a third line of the lockup. */
+.footerSocials {
+  padding-block-start: var(--helix-space-xs);
+}
+
+/* *The glyph shrinks and the target does not.** At the full icon size these
+   three read as loud as the wordmark above them, which is not what a set of
+   profile links is for. **`data-icon-link` keeps its box**, which is the point
+   of doing this here rather than on the shared recipe: the recipe is also what
+   the masthead's icons wear, and the 2rem square is a pointer target before it
+   is a picture. */
+.footerSocials helix-icon {
+  --icon-size: var(--helix-size-icon-tight);
+}
+
+/* *Narrow: tighten the gaps so the three groups stay one row.** Measured at 375,
+   `space-2xl` between them left Products and Company on the first line and
+   stranded Legal alone on a second, which reads as a fourth thing rather than
+   the third of three. The groups are 52, 55 and 76 wide, so a `space-lg` gap
+   fits all of them in the 279 the inset leaves. 48rem is the breakpoint the rest
+   of the site's chrome already turns at. */
+@media (width < 48rem) {
+  .siteFooter {
+    padding-block: var(--helix-space-xl);
+  }
+
+  .footerInner {
+    gap: var(--helix-space-xl);
+  }
+
+  /* *The groups spread to both edges; nothing is centered.** Left-aligning the
+     nav as well left it ending 128 pixels short of the right edge at 375, so a
+     footer that had wrapped onto two lines looked like it had wrapped rather
+     than like a layout. */
+  .footerNav {
+    gap: var(--helix-space-lg);
+    inline-size: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Quiet at rest and plainly a link on hover. */
+.siteFooterLink {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.siteFooterLink:hover,
+.siteFooterLink:focus-visible {
+  color: var(--helix-color-foreground);
+}

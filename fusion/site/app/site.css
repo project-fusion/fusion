@@ -234,6 +234,22 @@ helix-drawer {
   --drawer-padding-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
+/* **A glass panel on a phone in daylight has to admit less.**
+   `--helix-material-translucent` is 30 percent, which is right for a pane over a
+   dark page where the ink behind it is dim and the blur has room to work.
+
+   Said on the element, because it is the site's material policy rather than any
+   one drawer's: the navigation and the preferences panel both stated it, in the
+   same words, from a class they shared. */
+@media (max-width: 40rem) {
+  helix-drawer[material="glass"] {
+    --drawer-background-color: light-dark(
+      var(--helix-material-translucent-strong),
+      var(--site-glass)
+    );
+  }
+}
+
 [data-statement] {
   font-size: clamp(var(--helix-text-xl), 4vw, var(--helix-text-3xl));
   letter-spacing: var(--helix-tracking-tight);

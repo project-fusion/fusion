@@ -1,0 +1,15 @@
+/* Mixed case, and large enough to be worth setting. **Never `text-transform:
+   uppercase` here**, however much a wordmark is read as a shape rather than as
+   letters: everything that identifies Funnel Display lives in its lowercase, the
+   angled cut on the `F` and the wide round `u`. */
+.wordmark::part(text) {
+  /* Full strength, black on a white page and white on a black one. The lockup
+     sits inside `<a data-link="quiet">`, which paints navigation in the muted
+     foreground so that a column of rows does not shout, and the wordmark was
+     inheriting it: measured at oklch(0.5), a mid gray, in both modes. */
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-display);
+  font-size: var(--site-text-wordmark);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+}

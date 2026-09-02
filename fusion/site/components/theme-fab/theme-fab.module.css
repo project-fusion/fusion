@@ -343,11 +343,11 @@
 }
 
 /* **Written here rather than up in the sheet's own block, and the reason is the
-   cascade.** As `.fabReadoutRow .fabReadout` it is two selectors beating one,
-   which `noDescendingSpecificity` flags because it only works by outweighing a
-   rule that comes later. At equal weight the order decides, so the override
-   belongs after the thing it overrides. Same trap as the `.bandSplit` reset and
-   the closing card's radius. */
+   cascade.** Scoping it to the row would be two selectors beating one, which
+   `noDescendingSpecificity` flags because it only works by outweighing a rule
+   that comes later. At equal weight the order decides, so the override belongs
+   after the thing it overrides. Same trap as the `.bandSplit` reset and the
+   closing card's radius. */
 @media (max-width: 40rem) {
   .fabReadout {
     justify-content: space-between;

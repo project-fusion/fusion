@@ -1,0 +1,107 @@
+/* The one glass. **`--site-glass`, which is what the landing bands are made
+   of.** The bar had its own filter written out and its fill from
+   `--helix-material-translucent`, so the masthead floating over a band was a
+   different material from the band. */
+.navGlass {
+  backdrop-filter: var(--site-glass-backdrop);
+  background-color: var(--site-glass);
+  block-size: var(--helix-size-header);
+  inset-block-start: 0;
+  inset-inline: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition:
+    block-size var(--helix-duration-slow) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    visibility var(--helix-duration-normal) allow-discrete;
+  visibility: hidden;
+  z-index: var(--helix-layer-raised);
+}
+
+.navGlass[data-lit] {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navGlass {
+    transition: none;
+  }
+}
+
+/* The panel and the bar are one sheet, so the panel stops drawing its own.
+   **`.navGlass` already grows to the panel's bottom**, measured by the nav and
+   set as a block size, so a single blurred surface covers the bar and whatever
+   it opened. The panel kept its own edge inside that: a top border, two top
+   corners, and a `0 4px 12px` shadow whose blur reaches back up over the bar. */
+.navPanel::part(surface) {
+  border-block-start: 0;
+  border-start-end-radius: 0;
+  border-start-start-radius: 0;
+  /* Offset past its own blur, so nothing reaches back over the bar. */
+  box-shadow: 0 14px 28px -10px color-mix(in oklab, var(--helix-color-background) 70%, transparent);
+}
+
+/* The navigation drawer is a menu, not prose. **`data-link` is the prose recipe
+   and must not be applied to these rows**: primary color, underlined, sized to
+   sit inside a sentence. 2.75rem is 44px, which is the smallest comfortable
+   touch target and the one number in here that is not a token, tokens being
+   about rhythm rather than about the size of a fingertip. */
+.navMenu {
+  display: grid;
+  gap: var(--helix-space-xl);
+  inline-size: 100%;
+}
+
+.navAction {
+  inline-size: 100%;
+  margin-block-start: var(--helix-space-xs);
+}
+
+/* The breakpoint is CSS, not React state. **`narrow` starts false, so the server
+   always shipped the wide header.** It only became the narrow one after
+   `matchMedia` ran in an effect, which means every phone got a first paint with
+   four nav words and a search field laid over each other in a 375 pixel bar, and
+   then a second layout once JavaScript arrived. 48rem, which is the breakpoint
+   the rest of this file already turns at. */
+@media (width < 48rem) {
+  .wideOnly {
+    display: none;
+  }
+}
+
+@media (width >= 48rem) {
+  .narrowOnly {
+    display: none;
+  }
+}
+
+/* The two controls the bar drops on a narrow screen, as rows in the panel. */
+.navExtras {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  margin-block-start: var(--helix-space-md);
+  padding-block-start: var(--helix-space-md);
+}
+
+/* A row that matches the tree above it: same height, same inset, same quiet ink
+   until it is pointed at. */
+.navExtra {
+  align-items: center;
+  all: unset;
+  block-size: var(--helix-size-control);
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  gap: var(--helix-space-sm);
+  padding-inline: var(--helix-space-sm);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.navExtra:hover,
+.navExtra:focus-visible {
+  background-color: var(--helix-color-surface-raised);
+  color: var(--helix-color-foreground);
+}

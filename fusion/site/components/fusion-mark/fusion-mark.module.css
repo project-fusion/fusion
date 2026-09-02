@@ -1,0 +1,9 @@
+/* **The stops are computed from `primary`, not borrowed from hover and active.**
+   Those two are interaction states, and the palette is free to move them
+   whichever way suits the scheme: the shipped stylesheet takes them *darker*
+   than primary, and a derived palette takes them *lighter*. */
+.mark {
+  --logo-color-from: var(--helix-color-primary);
+  --logo-color-mid: oklch(from var(--helix-color-primary) calc(l - 0.09) c h);
+  --logo-color-to: oklch(from var(--helix-color-primary) calc(l - 0.17) c h);
+}
