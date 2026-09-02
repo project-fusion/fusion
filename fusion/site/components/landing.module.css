@@ -184,45 +184,6 @@
   }
 }
 
-.showcaseBand {
-  /* `stretch` on this band alone, overriding the centering every other band
-     wants, or its rows cluster in the middle instead of dividing the height. */
-  align-content: stretch;
-  /* **A floor rather than a fixed height, because the content does not fit at
-     every window.**
-
-     One screen minus the header is the right ambition for a stage: the showcase
-     is the page's demonstration and it should own the view when it can. Written
-     as `block-size` it is a promise the content cannot keep. Measured at 1280 by
-     900: the band resolves to 844px and the card inside it to 979, so the card
-     runs 232px past the section's own bottom edge and overlaps the next band's
-     card by 136. Every other band ends exactly 96px above its section's bottom,
-     which is the section's end padding, and this one ends below it: the gap
-     between two cards is 192 everywhere the sections size to their content, and
-     here it collapses to a negative number.
-
-     `min-block-size` keeps the ambition and drops the promise: the band is a
-     screen tall wherever the content fits in one, and taller where it does not.
-     The stage inside still clips and fades, since that is its own `overflow`
-     and mask rather than anything this height provides.
-
-     **Minus the header, because a screen means a screen you can see.** The
-     masthead is sticky and takes a row in flow, so a band of exactly 100svh
-     starts below it and ends the same distance past the fold: measured at 57 to
-     777 against a 720 window, a full viewport tall and not once visible all at
-     once. */
-  min-block-size: calc(100svh - var(--helix-size-header));
-}
-
-@media (width < 64rem) {
-  /* Stacked where a split would be two narrow strips, and the rule turns with
-     it: a vertical divider between stacked blocks points the wrong way. */
-  .showcaseBand {
-    align-content: center;
-    block-size: auto;
-  }
-}
-
 /**
  * The hero on load: a blur that clears while the column rises.
  *
@@ -315,27 +276,6 @@
 }
 
 /* ── The field ─────────────────────────────────────────────────────── */
-
-/**
- * Everything in a band that carries a field has to out-rank it, or the field
- * paints over the type. One rule here rather than a z-index on each.
- *
- * **`[data-layer]` rather than excluding each layer by class.** Excluded by
- * name, the next layer added matches the rule instead, takes `position:
- * relative`, and puts its whole canvas into the flow — measured once at 1296px,
- * which pushed the hero's display line 2,850px down the page under a screen of
- * white. Marking what a layer *is* excludes the next one by being one, rather
- * than by somebody remembering to extend a selector.
- */
-.fieldBand {
-  isolation: isolate;
-  position: relative;
-}
-
-.fieldBand > *:not([data-layer]) {
-  position: relative;
-  z-index: 1;
-}
 
 @keyframes preview-settle {
   from {
@@ -1574,117 +1514,6 @@
 }
 
 /**
- * A band as one card rather than a row of them.
- *
- * **One panel, because each panel is an edge.** A banner, four figures and a
- * chart each on their own glass read as unrelated claims that happen to be
- * stacked, and every one of them has a corner that appears over the aura and
- * vanishes over the page, because a translucent fill has an edge only where
- * there is something behind it to differ from. One ground has one edge, and the
- * parts are told apart by a rule between them instead.
- *
- * The rule is `material-border`, which is the token for a line drawn on a
- * translucent pane: it carries its own alpha, so it reads against whatever the
- * aura is doing behind it rather than against an assumed ground.
- */
-.bandCard {
-  border-radius: var(--helix-radii-lg);
-  display: grid;
-  overflow: hidden;
-}
-
-.bandSection {
-  padding: var(--helix-space-xl);
-}
-
-.bandSection + .bandSection,
-.bandRow + .bandSection {
-  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
-}
-
-/**
- * Stacked below the wrap and in a row above it, and the divider turns with it.
- *
- * `auto-fit` was the obvious way to write this and the wrong one: a sibling
- * rule cannot know a wrap happened, so the first item of every wrapped row wore
- * a divider on the side facing nothing. Stating both layouts states where the
- * line goes in each.
- */
-.bandRow {
-  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
-  display: grid;
-  grid-template-columns: 1fr;
-}
-
-/**
- * Two unequal halves of one card, and no rule between them.
- *
- * `.bandRow` gives every cell the same width, which is right for figures and
- * wrong here: the prose wants a measure and the showcase wants the rest.
- *
- * **No divider, unlike every other band.** The showcase is not a list of peer
- * cells: it is a panel of live components that already draw their own edges, so
- * a rule beside them is a border against a wall of borders. The dividers
- * elsewhere separate prose from prose and still earn their keep.
- */
-.bandSplit {
-  display: grid;
-  grid-template-columns: 1fr;
-}
-
-/**
- * **Stated, because `.bandSection + .bandSection` would otherwise draw one.**
- * Both halves of a split are sections, so the second matches that rule and wore
- * a line across the top of the showcase. The rule is right where it was written,
- * for sections stacked down a card; a split lays them side by side, where the
- * same border is a lid rather than a divider.
- *
- * **Two classes deep, because the rule it answers is.** Written
- * `.bandSplit > * + *` it is one class against `.bandSection + .bandSection`'s
- * two: it loses the cascade and does nothing at all, so the lid stays on the
- * showcase while reading as canceled. Matching the compound is what makes it
- * win.
- */
-.bandSplit > .bandSection + .bandSection {
-  border-block-start: 0;
-}
-
-@media (min-width: 60rem) {
-  .bandSplit {
-    grid-template-columns: minmax(20rem, 30rem) minmax(0, 1fr);
-  }
-}
-
-.bandCell {
-  padding: var(--helix-space-xl);
-}
-
-/**
- * The divider between cells, stated for both layouts like `.bandRow` above.
- *
- * **Adjacent, not every cell.** A bare `.bandCell` draws the line on the first
- * one too: doubled against the row's own top border when stacked, and drawn
- * against nothing at the start of the row when in columns. That is the exact
- * failure the note on `.bandRow` describes.
- */
-.bandCell + .bandCell {
-  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
-}
-
-@media (min-width: 60rem) {
-  .bandRow {
-    grid-auto-columns: 1fr;
-    grid-auto-flow: column;
-    grid-template-columns: none;
-  }
-
-  .bandCell + .bandCell {
-    border-block-start: 0;
-    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
-  }
-}
-
-/**
  * Four essays in one card, and the row answers the pointer.
  *
  * **The cell is the link.** A title that is the only target makes three
@@ -1737,55 +1566,7 @@
   }
 }
 
-/**
- * Edge to edge on a narrow screen, and no corner where there is no gap.
- *
- * **The inset is a proportion of the page and stops being one at the bottom.**
- * `--site-inset` clamps to `1.5rem`, so a 390px phone spends 48px, an eighth of
- * its width, holding the cards away from an edge they are not competing with.
- * The card is the page there: it is the full width of the content, there is
- * nothing beside it, and the margin is only making the measure narrower.
- *
- * The radius goes with it. A rounded corner says where a surface ends against
- * something else, and flush against the viewport there is nothing on the other
- * side of it; kept, it reads as a card that has been cropped rather than one
- * that fills the screen. The vertical rhythm is untouched, so the bands still
- * separate the way they do everywhere else.
- *
- * Only the field bands, which are the ones that are a card in a section. The
- * header, the footer and every other page keep their inset, because a shell is
- * a page-wide convention and this is one page's cards.
- */
 @media (max-width: 40rem) {
-  .fieldBand :global([data-shell]) {
-    padding-inline: 0;
-  }
-
-  .bandCard {
-    border-inline: 0;
-    border-radius: 0;
-  }
-
-  /* **One inset, and it is the hero's.**
-   *
-   * Summing two paddings written for a card floating on a field, `space-lg` on
-   * the substrate and `space-xl` on the section, comes to 56px. Against a hero
-   * whose text starts at `--site-inset`, 24px, that puts the body copy a full
-   * 32px inside the line the page opens on, so the measure steps in at the first
-   * band and stays there.
-   *
-   * The card carries the whole inset and the section adds none, which keeps one
-   * number in one place rather than two that have to sum to the right answer.
-   * Block padding is untouched: the vertical rhythm is not the problem. */
-  .fieldBand :global([data-substrate]) {
-    padding-inline: var(--site-inset);
-  }
-
-  .bandSection,
-  .bandCell {
-    padding-inline: 0;
-  }
-
   /* **Written here, at the weight the rule it answers carries.** The close is
      reached by `.noRules [data-closing]` above, which is two selectors; the same
      declaration in `landing.module.css` is one and lost, so the card went full
