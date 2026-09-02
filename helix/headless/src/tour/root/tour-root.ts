@@ -21,36 +21,13 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  *
  * **The spotlight is a shadow, not a hole.** The scrim is a box the size of the
  * current target with an enormous spread on its `box-shadow`, so the darkness
- * is what the shadow paints and the target is simply where the box is. A
- * `clip-path` on a full-screen scrim is the other way to do it and is worse
- * here: it needs the viewport in the same coordinate space as the cut, which
- * stops being true the moment anything between them is transformed.
+ * is what the shadow paints. A `clip-path` on a full-screen scrim needs the
+ * viewport in the same coordinate space as the cut, which stops being true the
+ * moment anything between them is transformed.
  *
- * **It measures, and this is a case where measuring is the only option.** The
- * target is an element somewhere else on the page whose position nothing can
- * know statically. That is different from a trail folding by width, where the
- * design rule was expressible and the measurement was answering a question
- * nobody had asked. Here the question is "where is that button", and there is
- * no other way to ask it.
- *
- * **Nothing is measured on the server and nothing needs to be.** A tour starts
- * closed and a closed tour draws nothing, so the server renders the stops as
- * inert markup and the first frame is correct. This is also what makes it
- * acceptable for the root to write `current` onto stops it does not own: there
- * is no server state for the write to disagree with.
- *
- * **It cannot point inside a modal, and nothing can fix that here.**
- * `showModal()` makes everything outside the dialog's own subtree inert, so a
- * panel anywhere else is unpressable however the top layer is ordered: this is
- * what modal means rather than a stacking accident. Measured with a modal
- * `Drawer` open, `elementsFromPoint` over the tour's own Done button returned
- * the drawer, the press light-dismissed the drawer, and the tour heard nothing
- * at all. Anything a tour points into has to stay reachable, which for `Drawer`
- * and `Dialog` means not modal while the tour is running.
- *
- * **Focus is not trapped.** A reader has to be able to look at, and reach, the
- * thing being pointed at. `Escape` leaves, which is the one binding a tour
- * needs and the one every reader already tries.
+ * **It measures, and the target is an element elsewhere on the page whose
+ * position nothing can know statically.** Nothing is measured on the server and
+ * nothing needs to be: a tour starts when a reader asks for it.
  *
  * @since 0.1.0
  * @status experimental

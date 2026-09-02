@@ -14,45 +14,22 @@ import { property } from 'lit/decorators.js'
  *
  * @description
  * A real `<input type="range">`, so the drag, the arrow keys, Home and End, the
- * page keys and the touch target are all the platform's. Every one of those is
- * a thing a hand-built slider gets wrong, and the last is the one nobody
+ * page keys and the touch target are the platform's. The last is the one nobody
  * notices: a native range has a hit area larger than its thumb, sized by the
  * platform for a finger.
  *
  * **The value is a string, like every other form control's.** A range submits
  * text and `MixinControllerValue` holds text, so the number is a reading of the
- * value rather than the value itself. `valueAsNumber` is there for anything
- * doing arithmetic on it.
+ * value. `valueAsNumber` is there for arithmetic.
  *
- * **Marks are drawn rather than left to `<datalist>`.** A datalist's ticks
- * cannot be styled at all, and Firefox does not render them for a range at all,
- * so the platform's version is a mark that looks like someone else's design
- * where it appears and no mark where it does not. Drawing them costs the
- * semantics nothing, because a mark is decoration: what a reader can actually
- * land on is `step`, which the input enforces whether or not anything is drawn.
+ * **Marks are drawn rather than left to `<datalist>`**, whose ticks cannot be
+ * styled and which Firefox does not render for a range at all. A mark is
+ * decoration; what a reader can land on is `step`, which the input enforces
+ * whether or not anything is drawn. `markers` is a count rather than a flag, so
+ * a slider from zero to a hundred cannot silently ask for a hundred and one.
  *
- * `markers` is a count rather than a flag tied to `step`. A flag reads well
- * until a slider from zero to a hundred stepping by one asks for a hundred and
- * one ticks, and then it is either noise or a silent refusal to draw. A number
- * is what the reader sees, so it cannot surprise anyone.
- *
- * **A range is two of them, not a hand-built one.** There is no native
- * two-thumb range, so two are stacked on one track and each thumb keeps its own
- * drag, its own arrow keys, its own Home and End and its own finger-sized hit
- * area. Rebuilding would throw away every argument this component is made of,
- * to gain a second handle.
- *
- * Crossing is stopped in the handler rather than by the bounds, and that is not
- * the obvious way round. Giving the lower input `max` of the upper reads well
- * and breaks the drawing: an input's thumb sits at a fraction of *its own*
- * range, so a lower thumb bounded at the upper one paints against a shorter
- * track and the two stop lining up. Both inputs span the whole range and the
- * values are clamped against each other on the way in.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * **A range is two of them.** There is no native two-thumb range, so two are
+ * stacked on one track and each thumb keeps its own.
  *
  * @since 0.1.0
  * @status experimental

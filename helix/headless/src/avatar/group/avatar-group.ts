@@ -18,40 +18,15 @@ export const FOLDS_UP_TO = 12
  *
  * @description
  * A part of `Avatar` rather than a family of its own: it arranges avatars and
- * is about nothing else, and its member is a complete `Avatar` the group did
- * not have to explain.
+ * is about nothing else.
  *
  * **The overflow count is the group's, not a slot.** Which avatars are hidden
- * is a fact the group works out from `max` and how many it was given, so a
- * consumer writing the "+3" themselves would be writing a number that has to
- * agree with a list they do not control.
+ * is a fact the group works out from `max`, so a consumer writing the "+3"
+ * would be writing a number that has to agree with a list they do not control.
  *
- * **Hidden, not removed.** Past `max`, the extra avatars stay in the DOM and
+ * **Hidden, not removed.** Past `max` the extra avatars stay in the DOM and
  * stop being shown, so nothing re-renders when `max` changes and the accessible
- * name can still be built from all of them. The count is what a sighted reader
- * gets; the group's own name is what everyone else gets, and "Seven people" is
- * more useful than seven names read in a row.
- *
- * **And hidden by the stylesheet, not by this class.** Hiding from `updated` is
- * one update too late and one element too far out: Lit renders on a microtask,
- * so an avatar appended past the limit is laid out and painted before anything
- * runs to hide it, and marking each one means writing attributes onto markup a
- * consumer owns. The styled tier's
- * `:host([max="N"]) ::slotted(:nth-child(n + N+1))` is right at the first style
- * resolution and writes nothing.
- *
- * **The fold is finite, and the count agrees with it.** `An+B` takes a literal,
- * so there is one selector per value of `max` and the range stops at twelve.
- * Past that the group shows everyone, counts nothing and says so, because
- * showing everyone is a defensible answer and showing everyone beside a "+5" is
- * not. `max` above twelve is a list the consumer should be slicing themselves.
- *
- * **It is a list.** A row of faces is a set of separate people, and a group
- * with no role announces as one run of text. `role="list"` needs its children
- * to be `listitem`, which they cannot be told to become without writing an
- * attribute onto a consumer's element, so the group carries `role="group"` and
- * its name instead: one announcement, correct, and nothing written to anyone
- * else's markup.
+ * name is still built from all of them.
  *
  * @since 0.1.0
  * @status stable

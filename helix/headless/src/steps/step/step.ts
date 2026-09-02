@@ -12,51 +12,21 @@ import '../../button/index.js'
  * @summary One stage in a sequence.
  *
  * @description
- * **The name is a button, and only the name.** A stepper is something a reader
- * goes back through, and the thing they reach for is the name of the stage. The
- * marker is `aria-hidden` decoration, so wrapping it in the button would add
- * hit area and no meaning: the accessible name would be the text either way,
- * and what is pressable would stop being the same shape as what is readable.
+ * **The name is a button, and only the name.** The marker is `aria-hidden`
+ * decoration, so wrapping it would add hit area and no meaning. It is
+ * `helix-button` rather than a `<button>` this element resets: the hover wash,
+ * the focus ring and the disabled treatment are decisions the button carries.
  *
- * It is `helix-button`, not a `<button>` this element resets and dresses: the
- * hover wash, the focus ring and the disabled treatment are decisions the
- * button already carries. `ghost` is the quiet shape, transparent until it is
- * pointed at.
- *
- * It says nothing about where a reader may go. Every step is pressable and
+ * **It says nothing about where a reader may go.** Every step is pressable and
  * announces itself with `helix-select`; refusing the ones ahead is `disabled`,
- * which the consumer sets because only the consumer knows whether a form can be
- * skipped. A component that guessed would be wrong on the first wizard that
- * lets you jump to the end.
+ * which the consumer sets, because only they know whether a form can be
+ * skipped.
  *
  * **The marker is a slot whose fallback is the state.** A finished stage shows
- * a check, the current one a target, and one not yet reached an empty ring:
- * three marks that say what a reader wants to know without a legend. A consumer
- * who wants their own fills the slot instead.
- *
- * The step renders exactly one of the three, chosen from its own two booleans.
- * Rendering all three and hiding two in CSS would work and is worse: the
- * accessibility tree would carry marks that are not there, and the markup would
- * say three things about a stage that is one.
- *
- * Numbering belongs to the tier above. `numeric` hides the mark and shows a CSS
- * counter, which the browser resolves at layout, so the digit costs no script
- * and is right in the server's markup however the steps are ordered. Nothing
- * here knows which appearance is in use.
- *
- * **`complete` and `current` are separate, and both can be false.** A stage
- * that is neither is one the reader has not reached, which is the majority of
- * any sequence and therefore the state that needs no attribute. They can also
- * both be true: a reader who steps back into a finished stage is in it and has
- * finished it, and a stepper that forgets the second is one that loses its
- * checks the moment somebody reviews their answers.
- *
- * **The `content` slot opens on the current step, and only down a column.** A
- * row has no room under a step to put a form in, and stretching one to fit
- * would set every step's height by the tallest. `current` is what opens it, so
- * the state that says where the reader is is also the state that shows them the
- * stage: one attribute, no second flag to keep in step with it, and it renders
- * open on the server rather than after hydration.
+ * a check, the current one a target, one not yet reached an empty ring. Exactly
+ * one is rendered, chosen from the step's own two booleans, rather than three
+ * with two hidden in CSS: the accessibility tree would otherwise carry marks
+ * that are not there.
  *
  * @since 0.1.0
  * @status experimental

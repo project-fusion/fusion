@@ -119,37 +119,15 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * **The listbox is the control and the options are its vocabulary.** A Select
  * is this with a trigger in front of it, a Combobox is this with a text input,
  * and a command palette is this again: they differ in what opens the list and
- * what filters it, not in what the list is. Building it as its own family is
- * what stops each of those reimplementing the keyboard and the filtering.
+ * what filters it, not in what the list is.
  *
  * **`value` is comma separated when `multiple` is set**, the way
  * `Checkbox.Group`'s is. It stays a string because that is what a form submits
- * and what `MixinControllerValue` holds; an array property would be a second
- * shape for the same fact, and the two would disagree the first time one was
- * set without the other.
+ * and what `MixinControllerValue` holds.
  *
  * **Chosen and active are two different things.** Chosen is the answer; active
- * is where the keyboard is. In a single-select list they move together, which
- * is the radio group pattern and is what a reader expects from arrow keys. With
- * `multiple` they come apart: the arrows move without choosing and Space
- * chooses, because a reader passing over four options on the way to the fifth
- * did not mean to pick all five.
- *
- * **This does not use `KeyboardNavigationController`, and the reason is where
- * focus lives rather than whether moving chooses.** The controller already
- * separates those, taking `origin: 'focus' | 'selection'`. What it cannot do is
- * leave focus alone: `NavigableItem.focusItem()` moves DOM focus to the item,
- * its model being a roving tab stop. A filterable list cannot have that, focus
- * having to stay in the field or typing stops, so what moves is a virtual
- * cursor and `aria-activedescendant` is what says where it is. No flag
- * reconciles the two.
- *
- * **Filtering hides rather than removes.** An option the filter has hidden is
- * still the consumer's element in the consumer's order, so a filter that clears
- * puts the list back exactly as it was with nothing re-rendered. What counts as
- * a match is a plain case-insensitive substring, and a consumer wanting more
- * hides options itself: `filter` is a convenience over the same `hidden` the
- * component uses.
+ * is where the keyboard is. Only the second moves with the arrows, and
+ * `aria-activedescendant` names it while focus stays on the list.
  *
  * @since 0.1.0
  * @status experimental

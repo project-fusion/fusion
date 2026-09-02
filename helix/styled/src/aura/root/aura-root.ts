@@ -45,43 +45,22 @@ const OPENING_PATIENCE = 500
  *
  * @description
  * One fragment shader over a full-screen triangle, with the palette read from
- * the tokens rather than given as colors. That is the whole reason this belongs
- * in a design system instead of in a page: a background written with hex values
- * is an asset that has to be re-cut when the brand moves, and one written
- * against `--helix-color-primary` is a consequence of it.
+ * the tokens rather than given as colors. A background written with hex values
+ * is an asset that has to be re-cut when the brand moves; one written against
+ * `--helix-color-primary` is a consequence of it.
  *
  * **Every shape ramps through four token stops**, and the token layer inverts
- * each of them: the page's own background, `primary-subtle`, `primary`, and
- * then a peak. The peak is the foreground on a dark page and `primary-active`
- * on a light one, because mixing a saturated hue toward near-black takes the
- * chroma out of exactly the pixels carrying the most of it. Which way the page
- * runs is not asked of the mode, which is a private token: it is read off the
- * ground's own luminance, which the shader already has.
+ * each: the page's background, `primary-subtle`, `primary`, then a peak. The
+ * peak is the foreground on a dark page and `primary-active` on a light one,
+ * because mixing a saturated hue toward near-black takes the chroma out of the
+ * pixels carrying most of it. Which way the page runs is read off the ground's
+ * own luminance rather than asked of the mode, which is a private token.
  *
  * **No dependency, and no scene graph.** The geometry is three vertices derived
- * from `gl_VertexID`, so there is no attribute, no buffer and no upload. The
- * common implementations of this reach for a 3D library to draw one quad, which
- * is a camera and a material system for four vertices that never move.
+ * from `gl_VertexID`, so there is no attribute, no buffer and no upload.
  *
  * **It stops when nobody is looking**, off screen and in a background tab, and
- * `prefers-reduced-motion` gets one still frame rather than an empty box: the
- * composition is the point and the drift is a garnish.
- *
- * **A layer over an interactive aura has to let the pointer through.** The
- * element is hit-testable only when `interactive` is set, because a background
- * that swallows clicks is worse than one that does nothing, but a scrim or an
- * overlay a consumer paints on top will absorb the move before it arrives. Any
- * decorative layer above this wants `pointer-events: none`. It has already
- * caught this repository's own bench once.
- *
- * **The fallback needs no detection.** Where WebGL is refused the canvas never
- * paints and is transparent, and the host carries a gradient of the same tokens
- * underneath. Nothing has to ask whether it worked.
- *
- * Presentation only, so there is no headless tier: the split exists to keep
- * behavior separate from styling, and there is no structure or semantics here
- * to separate. Decorative, so the host is hidden from assistive technology and
- * takes no pointer events.
+ * `prefers-reduced-motion` gets one still frame rather than an empty box.
  *
  * @since 0.1.0
  * @status experimental

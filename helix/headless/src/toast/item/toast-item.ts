@@ -16,40 +16,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @description
  * An element rather than a slot, because it carries a timeout, a tone, a
- * dismiss control and a lifetime that pauses: behavior, state and API, which
- * is the test for whether a region becomes an element in this library.
+ * dismiss control and a lifetime that pauses: behavior, state and API.
  *
  * **The timer is the item's own.** Held by the region, one message arriving
  * would restart another's, so a stack of three would go from three seconds each
- * to nine for the last one. Each message is on its own clock from the moment it
- * is rendered.
+ * to nine for the last.
  *
- * **A message is the opposite of the page it is over.** Inverted by default,
- * because a thing arriving in a corner has to be told apart from the page in
- * the moment before it is read, and inverting does that without spending a
- * color that means something. It is a flip of `color-scheme` rather than a
- * named inverse surface: every token in the subtree re-resolves, so a `Retry`
- * a consumer slots in comes out right without knowing where it is. `Tooltip`
- * can name the inverse surface directly because it holds no controls; this
- * cannot. Set `data-color-mode` on the region to take the page's mode instead.
- *
- * **No duration means it stays.** That is the safe default rather than the
- * common one: anything carrying an action has to still be there when the reader
- * decides to take it, and a component cannot tell from the outside whether the
- * message it was given is disposable.
- *
- * **The clock stops while it is being read.** Hover pauses it, and so does
- * focus landing anywhere inside, which is the case that matters more: a
- * keyboard reader tabbing towards the action in a toast is exactly the person a
- * timer must not race. Both resume where they left off rather than starting
- * again, so a message half-read does not get a full second life every time a
- * pointer crosses it.
- *
- * **Going away is a request, never an act.** It dispatches a cancelable
- * `helix-dismiss` and does nothing else: the consumer owns the list, so the
- * item removing itself would leave the two disagreeing. Auto-dismiss and the
- * dismiss control raise the same event, so a consumer handles one path and not
- * two.
+ * **A message is the opposite of the page it is over.** Inverted by default, so
+ * a thing arriving in a corner is told apart from the page before it is read,
+ * and by a flip of `color-scheme` rather than by spending a color that means
+ * something.
  *
  * @since 0.1.0
  * @status experimental

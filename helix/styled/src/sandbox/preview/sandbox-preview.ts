@@ -71,41 +71,21 @@ export type PreviewMessage =
  * @summary Renders sandbox source in a frame of its own.
  *
  * @description
- * A sandboxed `<iframe>` pointed at `src`, which is a document the consumer
- * provides. That document imports whatever the examples need, listens for a
- * render message, and writes the markup into itself.
+ * A sandboxed `<iframe>` pointed at `src`, a document the consumer provides.
+ * That document imports whatever the examples need, listens for a render
+ * message, and writes the markup into itself.
  *
  * **A frame rather than the page.** Rendering into the page meant an example
- * was styled by whatever surrounded it, which flatters the preview and lies
- * about it: an example that restyles `helix-card` restyled the sandbox too, a
- * script in an example ran against the real document, and a stray
- * `position: fixed` escaped the pane. It also left nothing to capture console
- * output from, and the terminal has to come from somewhere.
- *
- * The cost is that the frame starts empty. Styles and element definitions do
- * not cross into it, because a document has its own stylesheets and a window
- * has its own custom element registry, so `src` has to load them. That is the
- * consumer's document rather than something guessed at here.
+ * was styled by whatever surrounded it: an example restyling `helix-card`
+ * restyled the sandbox too, a script ran against the real document, and a stray
+ * `position: fixed` escaped the pane. The cost is that the frame starts empty,
+ * a document having its own stylesheets and a window its own registry, so `src`
+ * has to load them.
  *
  * **The source is not trusted, and the frame is what makes that safe.**
- * `sandbox="allow-scripts"` and no `allow-same-origin`, so the document runs on
- * an opaque origin: script in an example cannot reach this page, its storage,
- * its cookies, or the editor the source was typed into. Without it they could,
- * measured, through an `onerror` handler on an image that fails to load, which
- * `innerHTML` does not strip the way it refuses a `<script>` tag. That is what
- * lets a sandbox hold markup a reader pasted from somewhere, or one day arrived
- * in a shared link, rather than only what its owner typed.
- *
- * `allow-forms` is granted because examples have forms in them and a submit
- * that silently does nothing is a worse lie than one that navigates a frame
- * nobody is looking at. Top-level navigation, popups and modals are not.
- *
- * **`allow="clipboard-write *; fullscreen *"`, and the stars matter.** Both
- * policies default to `self`, and a frame on an opaque origin is not `self`, so
- * the default denies both: a component that copies to the clipboard and a video
- * offering a fullscreen button each become a control that silently does nothing,
- * a denied request rejecting a promise nobody was watching. Nothing else is
- * granted, and a copy still needs the reader's own gesture.
+ * `sandbox="allow-scripts"` and never `allow-same-origin`: the two together are
+ * the same as no sandbox at all, a document on its own origin being able to
+ * reach up and remove the attribute.
  *
  * @since 0.1.0
  * @status experimental

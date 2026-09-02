@@ -13,45 +13,23 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @summary One node in a tree.
  *
  * @description
- * **`open`, on `MixinControllerOpen`, rather than a bare boolean of its own.** A
- * branch showing its children is the same state a disclosure holds, and
- * `AccordionItem` is on that mixin too. A hand-written toggle announces nothing,
- * so a consumer can neither know a branch opened nor own the state.
- * `aria-expanded` is still what the row renders, because that is the attribute a
- * tree uses; the property is what differs, not the semantics.
+ * **`open`, on `MixinControllerOpen`, rather than a bare boolean of its own.**
+ * A branch showing its children is the same state a disclosure holds. A
+ * hand-written toggle announces nothing, so a consumer could neither know a
+ * branch opened nor own the state. `aria-expanded` is still what the row
+ * renders: the property differs, not the semantics.
  *
- * An element rather than a slot because it owns state: whether it is open,
- * whether it is selected, and whether it is the one holding focus.
+ * An element rather than a slot, because it owns state: whether it is open,
+ * selected, and whether it holds focus.
  *
  * A branch is any item with something slotted into `children`, detected in
- * `firstUpdated` rather than declared by the consumer. That is a client-side
- * enhancement by necessity, since the server cannot inspect children, so the
- * server renders the node as a leaf and the twisty appears on hydration. It
- * appears rather than disappearing, which is the harmless direction.
+ * `firstUpdated` because the server cannot inspect children. The server renders
+ * the node as a leaf and the twisty appears on hydration, which is the harmless
+ * direction.
  *
- * **`href` makes the row itself the link.** A tree used as navigation is a list
- * of links, and the row is what a reader presses: with the anchor slotted into
- * the name instead, everything outside the words is dead, Enter does nothing,
- * and there is no middle-click, no status bar and no open-in-new-tab. Given an
- * `href` the row *is* an `<a>`, so the platform provides all of that and the
- * keyboard needs no handler at all.
- *
- * It changes the shape of the ARIA, which is why it is a property and not the
- * default. An anchor cannot contain the group, since the group holds more
- * anchors and nesting them is invalid, so the row carries `treeitem` and the
- * group becomes its sibling under a presentational wrapper. That is exactly the
- * navigation flavor of the tree pattern, and the arrangement without an `href`
- * stays as it was: `treeitem` containing `group`, which is what an `<li>`
- * holding a `<ul>` is.
- *
- * A consumer whose framework owns routing slots its own link instead and leaves
- * `href` unset. The row follows that one too, so the whole row works either
- * way; what the anchor adds is what only a real anchor can give.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * **`href` makes the row itself the link.** With the anchor slotted into the
+ * name instead, everything outside the words is dead: no Enter, no middle
+ * click, no status bar. Given an `href` the row *is* an `<a>`.
  *
  * @since 0.1.0
  * @status experimental

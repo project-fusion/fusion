@@ -16,49 +16,26 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @summary A strip of cells colored by how each one went: uptime, contributions, activity.
  *
  * @description
- * **One family covers both readings, and the split people expect does not
- * exist.** The argument for two is that a contribution graph needs a continuous
- * ramp where uptime needs a category. GitHub's contribution graph is five
- * discrete levels rather than a gradient, so a cell that takes a tone covers
- * both: `rows="1"` is a status strip, `rows="7"` is a contribution graph, and
- * heatmap is the name of that.
+ * **One family covers both readings.** `rows="1"` is a status strip, `rows="7"`
+ * is a contribution graph, and a cell that takes a tone covers both: GitHub's
+ * contribution graph is five discrete levels rather than a gradient.
  *
  * **What it cannot be is a bar chart with flat values**, and the data model is
- * what closes that rather than taste: chart color is per *series* everywhere
- * else here, `--chart-series-1` through `-15`, so ninety differently colored
- * cells would be ninety series.
+ * what closes that: chart color is per *series* everywhere else here, so ninety
+ * differently colored cells would be ninety series.
  *
- * The data is a real `<table>` named by `for`, the same convention every chart
- * in this library uses, which also answers the accessibility question without
- * inventing anything: **the table is the accessible representation**, it is
- * already in the markup, and the drawing is a picture of it. Hide it with
- * `data-hidden-visually` and the reading is still there for anyone who needs it.
+ * **The data is a real `<table>` named by `for`**, the convention every chart
+ * in this library uses, and it is the accessible representation. Hide it with
+ * `data-hidden-visually` and the reading is still there.
  *
  * A cell takes its tone from its own `data-tone`, or from `thresholds` and
- * `tones` bucketing its value. The first is what a status page wants and the
- * second is what a contribution graph wants; the cell's own wins, so a page that
- * already knows a day was degraded does not have to encode that as a number for
- * this component to decode again.
+ * `tones` bucketing its value. The cell's own wins, so a page that already
+ * knows a day was degraded does not encode that as a number to be decoded.
  *
  * **A tone is a name this tier never resolves.** `tone="success"` writes
- * `--heatmap-tone: var(--heatmap-tone-success)` onto the cell and stops there,
- * so what a name is worth is the answering tier's to say: `helix/styled` points
- * the semantic names at the theme's status colors and the numbered ones at a
- * ramp, and a consumer on `headless` declares the same names as whatever they
- * like. Reaching for `var(--helix-color-${tone})` here is the dependency the
- * tiers exist to prevent, and it fails loudly rather than quietly: off-tier that
- * property is not undefined, it is *invalid*, so
- * `background-color: var(--heatmap-tone, …)` declines its own fallback and every
- * cell comes out transparent, leaving a blank page under a row of footer text.
- * `shared/chart/series.css` records the same fault in Bar Chart.
- *
- * **On a narrow container it draws fewer cells rather than thinner ones.**
- * Ninety cells in 320 pixels is three and a half pixels each, which is a smear
- * and not a strip. The cells it drops are the oldest, and it reflects `visible`
- * and fires `helix-resize` when the number changes, because **a summary saying
- * "99.2% over 90 days" above a strip drawing 45 of them is telling the reader
- * something false about the picture in front of them** and nothing about the
- * picture says so.
+ * `--heatmap-tone: var(--heatmap-tone-success)` and stops, so what a name is
+ * worth is the answering tier's to say. Reaching for `var(--helix-color-*)`
+ * here is the dependency the tiers exist to prevent.
  *
  * @since 0.1.0
  * @status experimental

@@ -27,10 +27,9 @@ import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.
  *
  * @description
  * **The schema is markup and the data is a property.** Columns are declared as
- * `helix-table-column` children, because a schema is small, declarative, and
- * something a reader should be able to see in the HTML; rows are handed over as
- * an array, because data is large and a table that draws ten thousand elements
- * cannot window them.
+ * `helix-table-column` children, because a schema is small and something a
+ * reader should see in the HTML; rows are handed over as an array, because a
+ * table that draws ten thousand elements cannot window them.
  *
  * ```html
  * <helix-data-table .rows=${rows} sort="name:asc" page-size="20">
@@ -43,35 +42,13 @@ import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.
  * twelve things a person wrote out.
  *
  * **Sort and filter apply to the whole set, never the page.** Sorting the drawn
- * window is correct on the first screen and wrong on every other one, which is
- * how it survives being looked at. The arithmetic lives in `order.ts` where
- * nothing can see a window, and its spec asserts the composition rather than the
- * three steps, because each step alone passes either way.
+ * window is correct on the first screen and wrong on every other one.
  *
- * **What it does not do, stated where a consumer will read it: the cell values
- * do not server-render.** The headings do, because a column renders its own, and
- * the row elements do, because their count comes from `rows`. Reading a cell
- * needs the columns, and the columns are markup children that Lit SSR does not
- * hand this element: `children` is undefined there. So a crawler and a reader on
- * a slow connection see a table of the right shape with nothing in it, which is
- * strictly less than `helix-table` serves for a table whose rows are markup.
- *
- * That is the cost of "the schema is markup and the data is a property". Use
- * `helix-table` where the content has to be in the served HTML and the result is
- * small enough to write out; use this where the result is large, and accept that
- * the first paint is a shell. The obvious workaround, a `columns` property
- * beside the markup columns, is deliberately not offered: it splits one source
- * of truth for the columns into two that nothing checks against each other, and
- * a table rendering one way on the server and another in the browser is that
- * failure with a hydration mismatch on top.
- *
- * **Every axis is controlled or uncontrolled, and that is what makes a server
- * mode fall out rather than be bolted on.** `sort`, `filter`, `page` and
- * `page-size` each defer to the consumer when set and seed themselves from a
- * `default-*` when not. A consumer who answers all four holds the data flow:
- * they hear the reader's request, fetch, and hand back a new `rows` with a
- * `total`. Retrofitting that inverts the flow and is a rewrite, so it is here
- * from the start.
+ * **The cell values do not server-render.** The headings do, and the row
+ * elements do, but reading a cell needs the columns, and the columns are markup
+ * children Lit SSR does not hand this element. So a crawler sees a table of the
+ * right shape with nothing in it. That is the cost of the first paragraph: use
+ * `helix-table` where the served HTML has to carry the values.
  *
  * @since 0.1.0
  * @status experimental

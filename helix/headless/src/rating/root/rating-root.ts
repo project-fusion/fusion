@@ -17,39 +17,16 @@ import { property, state } from 'lit/decorators.js'
  * @description
  * **Half marks decide the shape.** Supporting them means the value is not an
  * integer and the targets are not the marks: five stars at a half step is ten
- * places to press, and a mark that is filled to the middle. The pointer handling
- * and `step` are both built around that rather than added over it.
+ * places to press. The pointer handling and `step` are built around that
+ * rather than added over it.
  *
- * **A partial mark is the whole mark, clipped.** Not a second glyph filled to
- * the middle: that needs a matching pair drawn for every mark anybody uses, and
- * the moment a consumer wants a heart or a circle they need to draw one too. The
- * fill is the same marks over the same marks, cut off partway, so any mark works
- * and any fraction does.
+ * **A partial mark is the whole mark, clipped**, not a second glyph filled to
+ * the middle: the fill is the same marks over the same marks, cut off partway,
+ * so any mark works and any fraction does.
  *
- * **Read-only is not this control grayed out, it is a different thing.** The
- * commoner use is showing a score nobody is being asked for, a product's
- * average, and that is not a control at all: it takes no focus, answers no keys,
- * has no options to choose between, and reads as one thing rather than as five.
- * So `readonly` is `role="img"` with the score in its name, where the control is
- * a radio group. A disabled control is still a control and still says so; this
- * is not one.
- *
- * **Moving is choosing here**, which is the radio group's reading and the
- * opposite of `Menu`'s: arriving at four stars *is* rating it four, because
- * nothing else follows and there is nothing to confirm. That is what
- * `KeyboardNavigationController` takes `selects` for, and why this can use it
- * where a menu cannot.
- *
- * **The mark is a stylesheet's, not a slot's.** A slot projects its content
- * once, and there are two layers of marks here: slotting a star would put it in
- * the track or the fill and leave the other empty. So the mark is a shape the
- * styled tier masks with, which is also what lets a partial one be a clip of the
- * whole rather than a second drawing of it.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * **Read-only is not this control grayed out.** The commoner use is showing a
+ * score nobody is being asked for, which is a reading rather than a disabled
+ * input, and it is announced as one.
  *
  * @since 0.1.0
  * @status experimental
