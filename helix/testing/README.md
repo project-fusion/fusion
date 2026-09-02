@@ -24,5 +24,7 @@ fixture it built, which `noUncheckedIndexedAccess` cannot see is safe, and a
 cast would trade a real check for silence. This throws with the index and the
 length instead.
 
-The source ships as TypeScript through `exports`, with no build, because
-everything that consumes it is bun.
+It builds to `dist` like every other package. `exports` pointed at `./src/*.ts`
+until 2 Sep 2026, which every consumer here resolves because every consumer is
+bun; anything reading it with Node would have been handed TypeScript. `test`
+already depends on `^build`, so compiling it costs the task graph nothing.

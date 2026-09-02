@@ -1,6 +1,12 @@
 {
+  // Built rather than exported as source. `exports` pointed at `./src/*.ts`
+  // until 2 Sep 2026, which every consumer here resolves because every consumer
+  // is bun; anything that reads this package with Node would have got
+  // TypeScript. `test` already depends on `^build`, so compiling it costs the
+  // task graph nothing.
   "compilerOptions": {
-    "noEmit": true,
+    "outDir": "dist",
+    "rootDir": "src",
     "types": ["bun"]
   },
   "extends": "../../tsconfig.base.json",
