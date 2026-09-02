@@ -155,6 +155,10 @@ fusion/    cli docs scripts site: what belongs to the company rather than to a
 .local/    per-machine scratch, gitignored
 ```
 
+- **The root holds configuration and the three documents.** Manifests,
+  lockfiles, tool configs, the license, and `README`, `AGENTS`, `CLAUDE`.
+  Anything a tool does not read at startup belongs to the package or the domain
+  that owns it.
 - **Product domains at root, packages flat inside.** A new product gets a new
   top-level folder.
 - **A check belongs to a CLI noun; a script belongs where its output belongs.**
@@ -196,10 +200,20 @@ fusion/    cli docs scripts site: what belongs to the company rather than to a
   invite. That package ships document CSS; these are shadow styles, and
   `:host([terminus="ring"])` and `[part="label"]` mean nothing outside a shadow
   root.
+- **A component owns its markup and the sheet that styles it.** A rule reaching
+  from one component's sheet into another's markup is the coupling that stops
+  either being moved, and CSS modules punish it further: a class hashes per
+  file, so one name in two sheets is two classes and a selector spanning two
+  sheets matches nothing. Moving a component moves its rules in the same commit.
 - **The folder drops the domain prefix; the package name keeps it.**
   `helix/styled` is `@fusion.dev/helix`; `cortex/core` is the crate
   `fusion-cortex-core`. Scope searches by path (`cortex/core`), not folder name,
   since bare leaf names recur across domains.
+- **A package is reached by what it exports.** An import naming another
+  package's `src/` or `dist/` pins that package's layout, so a file moves and a
+  consumer that never asked for it breaks. Public declaration files live in
+  `<package>/types/` and are named in `exports`, which is why no `.d.ts` sits
+  beside a package root and none is copied into `src`.
 - **`<domain>/docs` is a content package, not a site**: versioned MDX plus a
   typed registry. The site that renders it is separate and depends on it.
 - **`fusion/` is the company tier, and it is a domain like the other two.** It
@@ -282,6 +296,9 @@ directions, so the day the flag changes is the day the workflow has to.
   and neither does the history of how a comment reached its current wording. A
   rule enforced by a `check:` has that check as its record; say what the rule is
   and let the guard hold it.
+- **Measure it rather than assert it.** "Too small" ages into a claim nobody can
+  check; "192 against a 240 floor" tells the next reader what to re-measure when
+  they doubt it. Date a measurement that could drift.
 - **No em dashes** in code, docs, comments, or copy. Use periods, colons,
   commas, or parentheses.
 - **American spelling** everywhere, comments and prose alike. It is checked

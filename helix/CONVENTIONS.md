@@ -993,6 +993,12 @@ known by other names. `helix-convention-lint` **fails the build** without
 `@since`, `@status`, `@documentation`, or a description, which `@summary` alone
 satisfies.
 
+**`@description` is published prose.** It renders on the family's reference
+page, so it is read by consumers rather than by contributors, and it takes the
+comment rule in [AGENTS.md](../AGENTS.md) the same way a comment does: the
+contested thing, not the settled one. A description restating `@summary` costs a
+reader the same sentence twice.
+
 **`@category` is asked of a family root and not of its parts**, which is the one
 exception and is a rule about the question rather than about the tag. It answers
 what a component is for, and `Tabs.Tab` has no answer to that separate from
