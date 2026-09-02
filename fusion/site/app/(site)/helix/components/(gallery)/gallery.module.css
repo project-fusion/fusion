@@ -41,11 +41,26 @@
    `:host([columns="5"])`, so none of this needs `!important` or a wrapper.
 
    **The card is what is protected, not the column count.** Below roughly 240
-   pixels a drawing stops being legible, and that is what sets every step here.
-   A card is `(width - 96 inset - 48 per gap) / columns`, so the two steps up
-   are wherever that arithmetic still clears 240: measured at 1600 the cards are
-   262, and six across needs 1792 to hold 242, seven needs 2080 to hold 242 and
-   eight needs 2560 to hold 266.
+   pixels a drawing stops being legible, and 230 is where that line is actually
+   drawn: five across at 90rem comes out at exactly 230, and holding five to the
+   93rem where it would clear 240 puts a 1440 window on four columns, which is
+   the width most of these are read at. Every other boundary is then set to the
+   same 230 rather than to a rounder number, so one tolerance governs the whole
+   ladder instead of each step having its own.
+
+   Measured on the page, at the boundary, where a card is
+   `(grid - 48 per gap) / columns` and the grid is the window less its inset:
+   three at 56rem holds 235, four at 73rem holds 232, five at 90rem holds 230
+   and six at 112rem holds 243. Two across is the loose one at 248, because
+   36rem is where the page's own padding narrows rather than where two columns
+   would reach 230, which is nearer 34. Seven and eight are
+   the two comfortable ones, since the inset stops growing at 112 pixels and
+   everything past it goes to the cards.
+
+   The round breakpoints this replaced were not derived from anything: they put
+   three across at 768 on cards of 192, twenty per cent under, and four at 1120
+   on 220.
+
    Written in rem for the same reason everything else here is, so a reader who
    has scaled their text gets fewer and larger rather than the same and cramped. */
 .familyGrid {
@@ -76,19 +91,19 @@
   }
 }
 
-@media (width < 70rem) {
+@media (width < 73rem) {
   .familyGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (width < 48rem) {
+@media (width < 56rem) {
   .familyGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (width < 30rem) {
+@media (width < 36rem) {
   .familyGrid {
     grid-template-columns: minmax(0, 1fr);
   }
