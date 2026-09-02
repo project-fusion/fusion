@@ -27,7 +27,7 @@
   "sideEffects": false,
   "scripts": {
     "analyze": "bun --bun cem analyze --config cem.config.ts",
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig.types.json",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

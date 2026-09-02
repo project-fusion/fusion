@@ -15,7 +15,7 @@
 # so it is the artifact that most needs review.
 name: Visual baselines
 
-# **Queued rather than cancelled**, for the reason the timeout below gives: a
+# **Queued rather than canceled**, for the reason the timeout below gives: a
 # retake killed halfway leaves the `visual-baselines` branch holding part of a
 # set that is only meaningful whole. Two dispatches would otherwise both push to
 # that one branch and the pull request would carry a mix of the two.

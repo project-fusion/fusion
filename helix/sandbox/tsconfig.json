@@ -4,8 +4,7 @@
     "rootDir": "src",
     "types": ["bun"]
   },
-  "exclude": ["src/**/*.spec.ts"],
+  "exclude": [],
   "extends": "../../tsconfig.base.json",
-  "include": ["src/**/*"],
-  "references": [{ "path": "./tsconfig.spec.json" }]
+  "include": ["src/**/*"]
 }

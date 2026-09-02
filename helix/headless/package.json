@@ -35,7 +35,7 @@
   "sideEffects": true,
   "scripts": {
     "analyze": "bun --bun cem analyze --config cem.config.ts",
-    "build": "bun run element-events && tsc -p tsconfig.json && tsc -p tsconfig.types.json",
+    "build": "bun run element-events && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "element-events": "build-element-events --package headless",
     "test": "bun run test:pure && bun run test:dom && bun run test:ssr",
     "test:dom": "bun test dom.spec",

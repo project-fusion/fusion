@@ -4,10 +4,15 @@
     "declarationMap": false,
     "outDir": "dist",
     "removeComments": true,
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": ["bun"]
   },
-  "exclude": ["src/**/*.spec.ts", "src/*/.examples/**"],
+  "exclude": ["src/*/.examples/**"],
   "extends": "../../tsconfig.base.json",
   "include": ["src/**/*"],
-  "references": [{ "path": "./.preview" }, { "path": "./tsconfig.spec.json" }]
+  "references": [
+    {
+      "path": "./.preview"
+    }
+  ]
 }

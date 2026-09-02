@@ -26,7 +26,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "bun run register && tsc -p tsconfig.json && tsc -p tsconfig.types.json",
+    "build": "bun run register && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "register": "bun scripts/build-register.mjs",
     "typecheck": "bun run register && tsc -p tsconfig.json --noEmit"
   },

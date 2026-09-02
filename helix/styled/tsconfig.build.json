@@ -1,0 +1,17 @@
+{
+  // What `build` compiles: the sources, without the specs.
+  //
+  // **The split is this way round because the editor reads `tsconfig.json` and
+  // nothing else.** With the specs excluded there, a spec file falls into an
+  // inferred project with no `types`, and every one of them opens on
+  // `Cannot find module 'bun:test'`. Putting them in the main config fixes that
+  // and moves the emit here.
+  //
+  // A referenced `tsconfig.spec.json` was the first answer and was worse: a
+  // composite project that `include`s `src/**/*` *claims* those files, so the
+  // parent stops emitting them and `tsc` exits 0 having written nothing. Every
+  // package built empty on a clean checkout for exactly as long as a stale
+  // `dist` was sitting there to hide it.
+  "exclude": ["src/**/*.spec.ts", "src/*/.examples/**"],
+  "extends": "./tsconfig.json"
+}

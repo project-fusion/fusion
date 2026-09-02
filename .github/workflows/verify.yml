@@ -53,6 +53,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      # **This job needs bun installed and the jobs below did not tell it so.**
+      # It ran `node` until 2 Sep 2026, and a runner has node already; bun is
+      # not on one. The step that reads the shard count died with
+      # `bun: command not found` and took every job that needs `plan` with it.
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
       # **The count comes from the sharder, because it is a fact about the
       # list.** It was written here and defaulted separately in
       # `run-checks.mjs`, and the two disagreed: a matrix of ten shards each
