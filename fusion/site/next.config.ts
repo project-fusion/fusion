@@ -77,60 +77,6 @@ const config: NextConfig = {
 
   reactStrictMode: true,
 
-  /**
-   * The old vertical routes, kept alive.
-   *
-   * `/design` and `/mind` were the verticals' routes, and the pages under them
-   * were always the products. The masthead says `Products` and names Helix and
-   * Cortex, so the URL says so too.
-   *
-   * Permanent, because these are the addresses of the two pages worth linking
-   * to and a 308 is what tells a search engine the move is the new truth. The
-   * wildcards carry the gallery's children with them, so a bookmarked
-   * `/design/components/card` and a shared `/design/sandbox?e=card.default`
-   * both land where they used to, query string intact.
-   */
-  async redirects() {
-    return [
-      { destination: '/helix', permanent: true, source: '/design' },
-      { destination: '/helix/:path*', permanent: true, source: '/design/:path*' },
-      { destination: '/cortex', permanent: true, source: '/mind' },
-
-      /* The six pages that gained a section. Each was a published address and
-         is in `llms.txt`, so each answers for itself rather than through a
-         wildcard: there is no `/legal/*` or `/company/*` shape to match, only
-         these. */
-      { destination: '/legal/acceptable-use', permanent: true, source: '/acceptable-use' },
-      { destination: '/legal/privacy', permanent: true, source: '/privacy' },
-      { destination: '/legal/terms', permanent: true, source: '/terms' },
-      { destination: '/company/services', permanent: true, source: '/services' },
-      { destination: '/company/thesis', permanent: true, source: '/thesis' },
-      { destination: '/company/trust', permanent: true, source: '/trust' },
-
-      /* `for-coding-agents` lost its preposition. The old address is in
-         `llms.txt`, so an agent may hold it, and an
-         agent is the one kind of reader that will not think to try the other
-         spelling. */
-      {
-        destination: '/helix/docs/coding-agents',
-        permanent: true,
-        source: '/helix/docs/for-coding-agents',
-      },
-
-      /* Editor was never a component a reader could install. It is
-         `helix-sandbox-editor`, from `@fusion.dev/helix-sandbox`, which is
-         `private: true` build tooling for this repository, and it reached the
-         reference only because the catalog was reading that package's manifest
-         alongside the two that publish. The Sandbox document is where the
-         editor is explained. */
-      {
-        destination: '/helix/docs/sandbox',
-        permanent: true,
-        source: '/helix/components/editor',
-      },
-    ]
-  },
-
   // Helix ships ESM from workspace packages; Next has to compile it rather
   // than treat it as prebuilt CommonJS. Production resolves `dist` through
   // package `exports`, which is what a consumer installs.

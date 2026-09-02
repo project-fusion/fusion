@@ -85,7 +85,8 @@ pub struct Settings {
 #[derive(Debug, Default, Deserialize)]
 #[serde(default)]
 pub struct Gallery {
-    /// The folder holding the hand-written card drawings and their stylesheet.
+    /// The package `src` holding `gallery.css` and the drawings, one per file
+    /// under `art/`.
     pub art: String,
 
     /// The tier whose exporting folders the prose counts against.

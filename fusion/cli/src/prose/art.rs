@@ -149,25 +149,23 @@ pub fn run(context: &Context) -> Report {
         }
     }
 
-    let drawings: Vec<String> = fs::read_dir(&art)
+    /* **The file name is the slug**, one drawing per file under `art/`. It used
+    to be a regex over the keys of a record literal, which is a weaker signal:
+    the same pattern appears inside a `style` object and a nested JSX prop, and
+    the name it reported was whatever the formatter had indented by two. */
+    let drawings = art.join("art");
+    let drawn: BTreeSet<String> = fs::read_dir(&drawings)
         .into_iter()
         .flatten()
         .flatten()
         .filter(|entry| entry.path().extension().is_some_and(|one| one == "tsx"))
-        .map(|entry| entry.file_name().to_string_lossy().to_string())
+        .filter_map(|entry| {
+            entry
+                .path()
+                .file_stem()
+                .map(|stem| stem.to_string_lossy().to_string())
+        })
         .collect();
-
-    let keyed =
-        Regex::new(r#"(?m)^ {2}['"]?([a-zA-Z-]+)['"]?: \("#).expect("a literal pattern compiles");
-    let mut drawn: BTreeSet<String> = BTreeSet::new();
-    for name in drawings.iter().filter(|one| *one != "index.tsx") {
-        let Ok(source) = fs::read_to_string(art.join(name)) else {
-            continue;
-        };
-        for caught in keyed.captures_iter(&source) {
-            drawn.insert(caught[1].to_owned());
-        }
-    }
 
     for family in &families {
         if !drawn.contains(family) {
@@ -271,8 +269,8 @@ pub fn run(context: &Context) -> Report {
         .expect("a literal pattern compiles");
     let inline = Regex::new(r#"(^|\s)stroke=""#).expect("a literal pattern compiles");
     let classed = Regex::new(r#"className="([^"]*)""#).expect("a literal pattern compiles");
-    for name in &drawings {
-        let Ok(source) = fs::read_to_string(art.join(name)) else {
+    for name in &drawn {
+        let Ok(source) = fs::read_to_string(drawings.join(format!("{name}.tsx"))) else {
             continue;
         };
         for caught in shape.captures_iter(&source) {

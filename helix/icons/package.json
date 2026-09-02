@@ -25,7 +25,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "bun run icons && tsc -p tsconfig.json && tsc -p tsconfig.types.json",
-    "icons": "node scripts/build-icons.mjs",
+    "icons": "bun scripts/build-icons.mjs",
     "typecheck": "bun run icons && tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",

@@ -1,11 +1,7 @@
-      # **Not for `cem analyze` any more.** That was the reason until the
-      # manifests were diffed under `bun --bun` and came back byte for byte
-      # identical, so `analyze` runs under bun now. What still needs Node is the
-      # repository's own scripts: about twenty `check:*` entries invoke
-      # `node fusion/scripts/*.mjs` directly, `run-checks.mjs` among them.
 # `verify` split across jobs, with the list of checks derived from `verify`
-# itself rather than mirrored here. The shape, and why the browser matrix is
-# skippable for some diffs, are in [VERIFYING.md](../VERIFYING.md).
+# itself rather than mirrored here. The shape, why the browser matrix is
+# skippable for some diffs, and why there is no Node on the runner are in
+# [VERIFYING.md](../VERIFYING.md).
 
 name: verify
 
@@ -37,10 +33,6 @@ env:
   TURBO_TEAMID: ${{ vars.TURBO_TEAMID }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
-# Held once. `engines.node` is the consumer floor; this is what CI runs on.
-env:
-  NODE_VERSION: "22.20.0"
-
 jobs:
   # The shard count lives in one place and the matrix is built from it, so a
   # matrix of six against `--of 8` cannot silently drop a third of the checks.
@@ -71,9 +63,9 @@ jobs:
         id: shards
         run: |
           set -euo pipefail
-          of=$(node fusion/scripts/run-checks.mjs --count)
+          of=$(bun fusion/scripts/run-checks.mjs --count)
           echo "of=$of" >> "$GITHUB_OUTPUT"
-          echo "shards=$(node fusion/scripts/run-checks.mjs --list --of "$of")" >> "$GITHUB_OUTPUT"
+          echo "shards=$(bun fusion/scripts/run-checks.mjs --list --of "$of")" >> "$GITHUB_OUTPUT"
 
       # An allowlist of what is skippable, never a denylist of what is not, and
       # an unresolvable base runs everything:
@@ -97,10 +89,6 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - name: Install Node, which the repository's own scripts run on
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -144,10 +132,6 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      - name: Install Node, which the repository's own scripts run on
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
 
       # `--frozen-lockfile` so a lockfile that does not match `package.json`
       # fails here rather than being quietly updated in CI and not on the
@@ -156,7 +140,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Checks, shard ${{ matrix.shard }}
-        run: node fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of ${{ needs.plan.outputs.of }}
+        run: bun fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of ${{ needs.plan.outputs.of }}
 
       # `verify` is meant not to write, and `analyze` is the one step that can:
       # it regenerates the manifests. A tracked manifest that no longer matches
@@ -184,10 +168,6 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      - name: Install Node, which the repository's own scripts run on
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -229,10 +209,6 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      - name: Install Node, which the repository's own scripts run on
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -273,10 +249,6 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - name: Install Node, which the repository's own scripts run on
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Typecheck
@@ -294,10 +266,6 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - name: Install Node, which the repository's own scripts run on
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Install Rust
@@ -309,7 +277,7 @@ jobs:
       - name: Run the specs
         run: bun run test
       # **`check:cli` is here rather than in the shard pool**, because it is the
-      # only check that runs a binary: a shard has bun and node and no cargo, so
+      # only check that runs a binary: a shard has bun and no cargo, so
       # the npm shim would build one from cold on whichever of the six drew it,
       # while the other five paid for a toolchain they never used. Here the
       # cache is warm and `rs:build` is the same compile `rs:check` and
@@ -467,10 +435,6 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      - name: Install Node, which the repository's own scripts run on
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
