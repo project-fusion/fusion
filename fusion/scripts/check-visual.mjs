@@ -325,6 +325,8 @@ await tab.route('**/*', (route) => {
 
 const changed = []
 const written = []
+/** Baselines a retake left alone, because the comparison would have passed. */
+const held = []
 const compared = new Map(TIERS.map((tier) => [tier.name, 0]))
 
 for (const { suffix, width } of WIDTHS) {
@@ -366,20 +368,14 @@ for (const { suffix, width } of WIDTHS) {
          which width it is and the path says which tier. */
       const what = `${tier.name}/${family}${suffix}`
 
-      if (update) {
-        mkdirSync(dirname(baseline), { recursive: true })
-        writeFileSync(baseline, shot)
-        written.push(what)
-        continue
-      }
-
       /* A missing baseline is a failure and not a chance to write one. Seeding on a
          bare run is the version of this that passes forever: CI would take its own
          picture, agree with it, report success and commit nothing, so the check
          would be green from the day it was added without ever having compared
          anything. `--update` is the only thing that writes, and what it writes is
          reviewed as a diff before it counts. */
-      if (!existsSync(baseline)) {
+      const has = existsSync(baseline)
+      if (!has && !update) {
         changed.push(
           `${what}: no baseline. Dispatch the \`Visual baselines\` workflow and look at the pull ` +
             'request it opens: the first picture is the one every later comparison trusts.',
@@ -387,11 +383,54 @@ for (const { suffix, width } of WIDTHS) {
         continue
       }
 
-      const before = PNG.sync.read(readFileSync(baseline))
       const after = PNG.sync.read(shot)
+      const before = has ? PNG.sync.read(readFileSync(baseline)) : undefined
+      const resized =
+        before !== undefined && (before.width !== after.width || before.height !== after.height)
+
+      let moved = 0
+      let diff
+      if (before !== undefined && !resized) {
+        diff = new PNG({ height: before.height, width: before.width })
+        /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
+           tolerated pixels, because this only ever compares Linux to Linux and a
+           single moved pixel is the fault it exists to catch. The threshold is off
+           the floor only so a renderer's own dithering does not read as a change. */
+        moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
+          threshold: 0.1,
+        })
+      }
+
+      /* **Writing only what the comparison would have rejected**, which is not
+         the same as writing what changed. A PNG whose bytes differ is not a
+         picture that differs: re-encoding the same page produced files unequal
+         to `git` and equal to `pixelmatch` on ten of the ninety-three families,
+         and a retake that committed them proposed twenty-three files for review
+         when two had actually moved. The sub-threshold ones measured 3 to 5
+         pixels a side apart, at a channel delta of 1, except `styled/aura`,
+         which redraws a soft field across 44,573 pixels at a delta of 22 and
+         still lands inside the threshold.
+
+         Holding those keeps a retake reviewable, since every file in it is one
+         somebody has to look at, and keeps the baseline the picture a reviewer
+         approved rather than the newest byte-identical rendering of it. It also
+         bounds the drift: each comparison is against the committed baseline, so
+         sub-threshold movement cannot accumulate past the threshold by being
+         re-recorded a run at a time. */
+      if (update) {
+        if (!has || resized || moved > 0) {
+          mkdirSync(dirname(baseline), { recursive: true })
+          writeFileSync(baseline, shot)
+          written.push(what)
+        } else {
+          held.push(what)
+        }
+        continue
+      }
+
       compared.set(tier.name, compared.get(tier.name) + 1)
 
-      if (before.width !== after.width || before.height !== after.height) {
+      if (resized) {
         changed.push(
           `${what}: ${before.width}x${before.height} became ${after.width}x${after.height}. A size ` +
             'change is a layout change, and no diff image is written because there is nothing to ' +
@@ -400,14 +439,6 @@ for (const { suffix, width } of WIDTHS) {
         continue
       }
 
-      const diff = new PNG({ height: before.height, width: before.width })
-      /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
-         tolerated pixels, because this only ever compares Linux to Linux and a
-         single moved pixel is the fault it exists to catch. The threshold is off
-         the floor only so a renderer's own dithering does not read as a change. */
-      const moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
-        threshold: 0.1,
-      })
       if (moved > 0) {
         const where = join(tier.source, family, `.examples/preview${suffix}.diff.png`)
         writeFileSync(where, PNG.sync.write(diff))
@@ -436,6 +467,14 @@ if (changed.length > 0) {
   process.exit(1)
 }
 
+if (update && written.length === 0) {
+  console.log(
+    `visual: ${held.length} baseline(s) already agree with the page, and none was rewritten. ` +
+      'A retake writes only what the comparison would have rejected, so nothing here needs review.',
+  )
+  process.exit(0)
+}
+
 if (written.length > 0) {
   const by = new Map(TIERS.map((tier) => [tier.name, 0]))
   for (const what of written) {
@@ -449,6 +488,7 @@ if (written.length > 0) {
          report; one family is four, which is exactly what somebody running
          `visual:update accordion` wants to see. */
       (written.length <= 12 ? `: ${written.join(', ')}` : '') +
+      `. ${held.length} left alone, agreeing with the page already` +
       '. Commit them: an unreviewed baseline records whatever was on screen as correct.',
   )
   process.exit(0)
