@@ -1,23 +1,34 @@
-# An installable build of a pull request, published when governance says so.
+# An installable build of a pull request, published for the people who own it.
 #
-# Label a pull request `release:experimental` and this waits for a reviewer on
-# the `experimental` environment before it publishes anything. The pause is the
-# gate: GitHub records who approved which deployment, which is what "opened or
-# approved by the governance team" has to mean if it is to mean anything. A
-# governance member who opened the pull request approves their own in one click,
-# so both halves of the rule are the same mechanism.
+# Label a pull request `release:experimental` and, if the author is on the team,
+# it publishes. Two conditions and both are read from the event.
 #
-# **Approving this runs the pull request's code with a publish token.** The job
-# builds and packs the branch, so an approval is a statement about the diff and
-# not only about whether a preview would be useful. That is the residual risk
-# and there is no configuration that removes it.
+# **The author, not an approval.** The `experimental` environment carries no
+# protection rules and never has: required reviewers on a private repository
+# need Enterprise, and the API refuses to set them here with a 422. This file
+# claimed for months that the job "waits for a reviewer", which was prose
+# describing a gate that did not exist — anyone who could add a label could
+# publish. `author_association` says the same thing the approval was meant to
+# say, and says it where it is actually enforced.
+#
+# **The label stays, because npm is permanent.** Every run publishes ten
+# packages, and a published version can be deprecated but never withdrawn.
+# Authorship answers who may publish a preview; the label answers whether this
+# particular branch wants one. Dropping it would put ten permanent versions on
+# the registry for every push to every open pull request.
+#
+# **This runs the pull request's code with a publish token.** The job builds and
+# packs the branch, so the label is a statement about the diff. That is the
+# residual risk and no configuration removes it — which is exactly why the
+# author check is not decoration.
 #
 # `pull_request`, not `pull_request_target`: a fork gets no secrets on this
-# event, so a fork's build simply cannot publish, which is the safe failure.
-# This repository is private and takes branches rather than forks, so nothing is
-# lost today. If that changes, the fix is `pull_request_target` with an explicit
-# checkout of the head, and that combination is only defensible behind the
-# environment gate below.
+# event, so a fork's build cannot publish whatever it is labeled, and that is
+# the safe failure. An outside contributor works through a fork, so the fork
+# check and the author check are two spellings of one intent; both are written
+# down because the day someone adds `pull_request_target` here, only one of them
+# still holds. This repository is private and takes branches rather than forks,
+# so neither is load-bearing today.
 #
 # Versions are `1.4.0-exp.42.ga1b2c3d`: the version this would release if it
 # merged, marked as not being it, carrying the pull request that produced it and
@@ -39,8 +50,13 @@
 # state exists for, so holding it back until the whole pipeline is live would
 # make the middle state mean nothing.
 #
-# The label and the environment approval both still apply. This is a third lock
-# rather than a replacement for either, and it is the loosest of the three.
+# The label and the author check both still apply. This is a third lock rather
+# than a replacement for either, and it is the loosest of the three.
+#
+# **`environment: experimental` is kept for npm, not for people.** A trusted
+# publisher is registered against a workflow file and an environment name, so
+# the name has to keep matching what `npm trust` was told or the OIDC exchange
+# publishes as nobody and the registry answers 404.
 
 name: release-experimental
 
@@ -63,6 +79,9 @@ jobs:
     if: >-
       contains(github.event.pull_request.labels.*.name, 'release:experimental')
       && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING)
+      && !github.event.pull_request.head.repo.fork
+      && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'),
+                  github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: experimental
