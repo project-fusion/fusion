@@ -29,7 +29,7 @@ import styles from './site-nav.module.css'
  * we build, find out what is buyable, read the argument.
  */
 const SECTIONS = [
-  { href: '/services', label: 'Services' },
+  { href: '/company/services', label: 'Services' },
   { href: '/insights', label: 'Insights' },
 ]
 

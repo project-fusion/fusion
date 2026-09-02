@@ -1,0 +1,68 @@
+---
+description: An intelligent design system, intelligent tooling and intelligent services, built on one foundation rather than bolted onto three.
+kicker: Thesis
+path: /company/thesis
+title: Intelligence belongs in the foundation.
+---
+
+Most software is acquiring intelligence the same way: a panel on the side that
+can be asked questions. It is the easiest place to put it and the least useful,
+because the panel knows nothing the rest of the system knows and the system
+learns nothing from the panel.
+
+The interesting version is underneath. A design system that can tell a model
+what it contains. Tooling that checks rather than guesses. Services delivered by
+the people who built both. Those are foundations, and a foundation is not
+somewhere you bolt a feature.
+
+## An intelligent design system
+
+[Helix](/helix) derives an accessible palette from one brand color, so contrast
+is computed rather than reviewed, and it refuses to emit a palette that fails
+its own targets. It publishes a custom elements manifest and a token file as
+addressable endpoints, so a model reading the system gets the authoritative
+description of every component rather than a scrape of the documentation.
+
+That is what intelligent means here. Not a component that calls a model, but a
+system a model can read correctly, and one that will not hand back something
+broken because the asker had no way to tell.
+
+## Intelligent tooling
+
+The tools check. `helix component` audits the library rule by rule and returns
+counts rather than opinions, and `fusion prose`, `fusion spec` and `fusion
+workspace` do the same for the writing, the specs and the packages. The MCP
+server is a subcommand of a binary you already installed, speaking over stdio to
+a client you chose.
+
+Generation is cheap now, which makes verification the expensive half. Tooling
+that returns a number is the half worth building.
+
+## Intelligent services
+
+[Fusion Studio](/services) is the practice: interface and intelligence work,
+delivered into your repository under your license, three offers with every price
+stated. The engagements we take are the ones whose deliverable feeds Helix or
+Cortex, so the work compounds into the foundation instead of ending when the
+invoice does.
+
+## What holds the three together
+
+[Cortex](/cortex) is the memory layer underneath them: what a system knows,
+where it learned it, and how much of it to trust. Engram holds the memory, Trace
+holds the provenance, Recall assembles the context.
+
+It is one problem showing up in three places. A design system that can say what
+it contains, tooling that can say what it checked, and a memory layer that can
+say where something came from are all the same property: a system that can
+account for itself. That was optional while a person wrote every line. It stops
+being optional when most of the lines are generated.
+
+## Where the work stands
+
+Helix is Building: real work with published packages and nothing we would call
+finished. Cortex is Building, with Engram and Trace under way and Recall
+declared and not started. Fusion Studio is Active, and is the part that can be
+bought today.
+
+We would rather write that than round it up.

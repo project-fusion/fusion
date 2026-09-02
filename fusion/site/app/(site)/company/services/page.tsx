@@ -3,15 +3,15 @@ import documents from '@/components/document-page/document-page.module.css'
 import { PageHero } from '@/components/page-hero/page-hero'
 import { ThemeScope } from '@/components/theme-context/theme-context'
 import { SERVICES } from '@/content/services/services'
+import { renderDocument } from '@/utils/mdx/mdx'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { EMAIL, MAILTO } from '@/utils/site/site'
-import { renderDocument } from '../../../utils/mdx/mdx'
 import styles from './page.module.css'
 
 export const metadata = pageMetadata({
   description:
     'Three offers: an AI capability audit, a design system sprint, and conversational build.',
-  path: '/services',
+  path: '/company/services',
   title: 'Services',
 })
 
@@ -48,7 +48,7 @@ export const metadata = pageMetadata({
  * A server component with no client boundary of its own. Elements upgrade from
  * the single registration in the root layout.
  */
-const page = findSitePage('/services')
+const page = findSitePage('/company/services')
 
 export default async function Page() {
   const source = page ? sitePageSources[page.slug] : undefined
@@ -266,7 +266,7 @@ export default async function Page() {
                       that panel has not asked yet. */}
                     {index === sections.length - 1 && (
                       <helix-flex data-density="lg" gap="sm" wrap>
-                        <a data-button href="/trust">
+                        <a data-button href="/company/trust">
                           The trust bar
                         </a>
                         <a data-button="solid" data-button-tone="primary" href={MAILTO}>

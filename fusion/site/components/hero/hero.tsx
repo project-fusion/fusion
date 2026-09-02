@@ -45,7 +45,7 @@ export function Hero({ announcement }: { announcement?: SitePage | undefined }) 
             >
               Open Helix
             </Link>
-            <Link data-button="subtle" data-button-width="standard" href="/services">
+            <Link data-button="subtle" data-button-width="standard" href="/company/services">
               Work with us
             </Link>
           </helix-flex>

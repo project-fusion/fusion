@@ -24,19 +24,19 @@ const FOOTER_GROUPS = [
   {
     heading: 'Company',
     items: [
-      { href: '/services', label: 'Services' },
+      { href: '/company/services', label: 'Services' },
       { href: '/insights', label: 'Insights' },
-      { href: '/thesis', label: 'Thesis' },
-      { href: '/trust', label: 'Trust' },
+      { href: '/company/thesis', label: 'Thesis' },
+      { href: '/company/trust', label: 'Trust' },
       { href: '/contact', label: 'Contact' },
     ],
   },
   {
     heading: 'Legal',
     items: [
-      { href: '/terms', label: 'Terms of use' },
-      { href: '/privacy', label: 'Privacy' },
-      { href: '/acceptable-use', label: 'Acceptable use' },
+      { href: '/legal/terms', label: 'Terms of use' },
+      { href: '/legal/privacy', label: 'Privacy' },
+      { href: '/legal/acceptable-use', label: 'Acceptable use' },
     ],
   },
 ]

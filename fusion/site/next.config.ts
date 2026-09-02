@@ -96,8 +96,19 @@ const config: NextConfig = {
       { destination: '/helix/:path*', permanent: true, source: '/design/:path*' },
       { destination: '/cortex', permanent: true, source: '/mind' },
 
+      /* The six pages that gained a section. Each was a published address and
+         is in `llms.txt`, so each answers for itself rather than through a
+         wildcard: there is no `/legal/*` or `/company/*` shape to match, only
+         these. */
+      { destination: '/legal/acceptable-use', permanent: true, source: '/acceptable-use' },
+      { destination: '/legal/privacy', permanent: true, source: '/privacy' },
+      { destination: '/legal/terms', permanent: true, source: '/terms' },
+      { destination: '/company/services', permanent: true, source: '/services' },
+      { destination: '/company/thesis', permanent: true, source: '/thesis' },
+      { destination: '/company/trust', permanent: true, source: '/trust' },
+
       /* `for-coding-agents` lost its preposition. The old address is in
-         `llms.txt` and in `published.json`, so an agent may hold it, and an
+         `llms.txt`, so an agent may hold it, and an
          agent is the one kind of reader that will not think to try the other
          spelling. */
       {

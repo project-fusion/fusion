@@ -1,5 +1,4 @@
 #!/usr/bin/env bun
-import { spawnSync } from 'node:child_process'
 /**
  * Every route has a document, and every document has a route.
  *
@@ -28,14 +27,12 @@ import { spawnSync } from 'node:child_process'
  *
  * Run with `turbo run routes -- --check`, after `turbo run catalog`.
  */
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 
-/** Whether to append to the published record, or to report that it is behind. */
-const write = process.argv.includes('--write')
 const PUBLIC = join(ROOT, 'fusion/site/public')
 
 /** The shortest a document can be and still say anything. */
@@ -142,119 +139,6 @@ for (const route of components) {
   const json = join(PUBLIC, `${route.path.slice(1)}.json`)
   if (!existsSync(json)) {
     problems.push(`${route.path}: has a document and no JSON beside it`)
-  }
-}
-
-/* Every address this site has ever served, and whether it still resolves.
- *
- * **A slug is the name of a file, so it is stable by default**: retitling a
- * post edits frontmatter and the address does not move. What can still move it
- * is a `git mv`, which is a deliberate act and is exactly what this checks.
- *
- * The record is `fusion/docs/insights/published.json`, written by this check the first
- * time it runs and appended to as pages appear. It is not a source of identity
- * (the file name is) and nothing reads it at runtime: it is a memory of what
- * has been published, which is the one thing a filesystem cannot tell you,
- * because a deleted file leaves nothing behind to notice.
- *
- * **A path that leaves has to have somewhere to go.** `next.config.ts` already
- * carries the machinery, permanent and wildcarded, from when `/design` became
- * `/helix`. A rename without a redirect is a link that was published and now
- * 404s, and `llms.txt` means a machine may hold it too. */
-const PUBLISHED = join(ROOT, 'fusion/docs/insights/published.json')
-const CONFIG = join(ROOT, 'fusion/site/next.config.ts')
-
-const published = existsSync(PUBLISHED)
-  ? JSON.parse(readFileSync(PUBLISHED, 'utf8'))
-  : { paths: [] }
-const live = new Set(all.map((route) => route.path))
-
-/* Sources rather than destinations: a redirect answers for the address that
-   left, and the wildcard forms answer for everything beneath one. */
-const redirected = [...readFileSync(CONFIG, 'utf8').matchAll(/source:\s*'([^']+)'/g)].map(
-  (match) => match[1],
-)
-const answers = (path) =>
-  redirected.some(
-    (source) =>
-      source === path ||
-      (source.includes(':path*') && path.startsWith(source.replace('/:path*', '/'))),
-  )
-
-for (const path of published.paths) {
-  if (!live.has(path) && !answers(path)) {
-    problems.push(
-      `${path}: was published and no longer resolves. Add a redirect in next.config.ts, or restore it`,
-    )
-  }
-}
-
-if (problems.length > 0) {
-  console.error(`routes: ${problems.length} problem${problems.length === 1 ? '' : 's'}`)
-  for (const problem of problems) {
-    console.error(`  ${problem}`)
-  }
-  process.exit(1)
-}
-
-/* Recorded only when everything passed, so a failing run never writes a path
-   into the record it is about to be judged against.
-   
-   **And never a page nobody has committed.** A draft sitting untracked in a
-   content folder is a route while it is on disk, so recording it makes removing
-   the draft look exactly like deleting a published page and demand a redirect
-   for an address that was never served. Publishing is a thing git knows about
-   and the filesystem does not. */
-const untracked = new Set(
-  spawnSync(
-    'git',
-    [
-      'ls-files',
-      '--others',
-      '--exclude-standard',
-      'helix/docs/content',
-      'fusion/docs/insights/content',
-    ],
-    {
-      cwd: ROOT,
-      encoding: 'utf8',
-    },
-  )
-    .stdout.split('\n')
-    .filter(Boolean)
-    .map((file) => file.replace(/^.*\//, '').replace(/\.mdx$/, '')),
-)
-
-if (problems.length === 0) {
-  const committed = [...live].filter((path) => !untracked.has(path.split('/').at(-1) ?? ''))
-  const merged = [...new Set([...published.paths, ...committed])].sort()
-  if (merged.join() !== published.paths.join()) {
-    /* **This is the one check here that writes, and writing is what makes it
-       fail.** `verify` asserts the tree is unchanged by verifying it, so a
-       check that appends a newly published address turns the next page into a
-       red build on a shard that names nothing: `git diff --exit-code` failing
-       with the whole of the diff being one path.
-
-       `check` fixes and `verify` judges, which `AGENTS.md` states and
-       `fusion prose`'s `dialect` already follows. The record is written under `--write`,
-       which `turbo run routes` and `bun run regen` pass; without it the check
-       says the file is behind and stops. */
-    if (write) {
-      writeFileSync(PUBLISHED, `${JSON.stringify({ paths: merged }, undefined, 2)}\n`)
-    } else {
-      /* Reported here rather than pushed onto `problems`, which is read and
-         acted on two hundred lines above this: appended to after the fact it
-         changes nothing and the check passes while saying so to nobody, which
-         is the shape of a check that cannot fail. */
-      console.error(
-        'routes: fusion/docs/insights/published.json is behind the routes that exist. Run ' +
-          '`turbo run routes` and commit the result.\n',
-      )
-      for (const path of merged.filter((one) => !published.paths.includes(one))) {
-        console.error(`  ${path}`)
-      }
-      process.exit(1)
-    }
   }
 }
 

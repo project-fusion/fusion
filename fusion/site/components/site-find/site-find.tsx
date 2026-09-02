@@ -61,7 +61,7 @@ const DESTINATIONS: Findable[] = [
   {
     group: 'Services',
     items: [
-      { description: 'What you can buy today', href: '/services', label: 'Services' },
+      { description: 'What you can buy today', href: '/company/services', label: 'Services' },
       { description: 'What to put in the first message', href: '/contact', label: 'Contact' },
     ],
   },
@@ -69,8 +69,8 @@ const DESTINATIONS: Findable[] = [
     group: 'Reading',
     items: [
       { href: '/insights', label: 'Insights' },
-      { href: '/thesis', label: 'Thesis' },
-      { href: '/trust', label: 'Trust' },
+      { href: '/company/thesis', label: 'Thesis' },
+      { href: '/company/trust', label: 'Trust' },
     ],
   },
 ]

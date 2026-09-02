@@ -235,7 +235,7 @@ export default function Home() {
           </div>
 
           <helix-flex class={band.bandSection} data-density="lg">
-            <Link data-button="subtle" data-button-width="standard" href="/services">
+            <Link data-button="subtle" data-button-width="standard" href="/company/services">
               See what each costs
             </Link>
           </helix-flex>

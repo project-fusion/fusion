@@ -62,7 +62,7 @@ export interface Vertical {
 export const VERTICALS: Vertical[] = [
   {
     body: 'The practice. Interface and intelligence work, delivered into your repository under your license. It is the only part of Fusion that can be bought today, and the engagements it takes are chosen for whether their deliverable feeds Helix or Cortex.',
-    href: '/services',
+    href: '/company/services',
     icon: 'briefcase',
     label: 'Studio',
     name: 'Fusion Studio',
