@@ -120,13 +120,13 @@
     var(--helix-material-translucent)
   );
   border-radius: var(--helix-radii-lg);
-  /*
- * *As wide as every other band's content, which is the inset and nothing
- *      else.** A fixed cap is narrower than the page: the bands above run to the
- *      viewport less `--site-inset`, so the one element meant to close the page
- *      would be the only one not aligned to them. Deriving the width from the same
- *      inset makes the card's edges land on that column.
- */
+  /* **As wide as every other band's content, and no wider.** This card *is* its
+     section, so nothing above it applies the cap the bands get from
+     `.bandCard`, and it ran to the inset while they stopped at
+     `--site-band-measure`: 1696 against 1440 at a 1920 window, which put the
+     one element meant to close the page 128px proud of the column every band
+     above it lands on. The inset still wins on a narrow screen, where it is the
+     smaller of the two. */
   margin-inline: auto;
   /*
  * *The one band whose spacing would otherwise come out half.**
@@ -138,7 +138,7 @@
  * above it is one band's worth rather than two.
  */
   margin-block-start: var(--site-band);
-  max-inline-size: calc(100% - 2 * var(--site-inset));
+  max-inline-size: min(var(--site-band-measure), calc(100% - 2 * var(--site-inset)));
 }
 
 [data-color-mode="light"] .closingCard {

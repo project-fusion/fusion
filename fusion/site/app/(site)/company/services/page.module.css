@@ -114,11 +114,18 @@
    three ended on one line and *started* on three, so the labels a reader scans
    down the row sat 20px apart. Measured: 1089, 1089, 1109. */
 
-/* The two closing panels, side by side. */
+/* The two closing panels, side by side.
+
+   **The cap goes on the row, not on the panels.** Each panel is a `.bandCard`
+   and already carries `--site-band-measure`, but a cap on a grid item is not a
+   cap on the grid: the row ran to the inset and handed each panel half of that,
+   so two 836s spanned 1696 where every band above closed at 1440. */
 .closingRow {
   display: grid;
   gap: var(--helix-space-lg);
   grid-template-columns: 1fr;
+  margin-inline: auto;
+  max-inline-size: var(--site-band-measure);
 }
 
 @media (min-width: 60rem) {

@@ -43,6 +43,18 @@
      floor. */
   --site-band: clamp(var(--helix-space-2xl), 7.5vw, 9rem);
 
+  /* How wide a band's content is allowed to get. **Capped, so a large display
+     gets more margin rather than a wider card.** `--site-inset` stops growing at
+     112px, so past about 1630 every extra pixel of window went into the card:
+     measured at 2100 it was 1876 wide, against 1408 at 1600. A row of three
+     inside that is three columns of 600, which is not the composition any of
+     this was drawn at. 90rem is the width a large laptop already produces, so
+     nothing below about 1630 moves and the cap only holds what was there.
+
+     Shared, because a band that opts out of it is the one element on the page
+     whose edges miss the column every other band lands on. */
+  --site-band-measure: 90rem;
+
   /* Display type past the component scale's top step. Helix stops at `3xl`
      because that is the largest size a component should ever set for itself. */
   --site-text-hero: clamp(2.75rem, 9vw, 6.5rem);
