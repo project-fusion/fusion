@@ -261,6 +261,11 @@ fn survey(root: &Path) -> Api {
 /// skill is agent-facing content and only the directory it sits in is one
 /// vendor's. Scanning both would find the same `SKILL.md` twice and report every
 /// fault in it twice, under a path that is not where anybody would fix it.
+///
+/// **The conventions are read the same way**, in `<domain>/CONVENTIONS.md`.
+/// `.claude/rules/<domain>.md` carries the `paths:` frontmatter that loads them
+/// and nothing else, so scanning it as well costs one thin file and keeps the
+/// pointer honest.
 fn pages(root: &Path) -> Vec<PathBuf> {
     let mut found = Vec::new();
     let ordered = |directory: PathBuf| {
@@ -282,6 +287,10 @@ fn pages(root: &Path) -> Vec<PathBuf> {
             if page.extension().is_some_and(|one| one == "mdx") {
                 found.push(page);
             }
+        }
+        let conventions = domain.join("CONVENTIONS.md");
+        if conventions.is_file() {
+            found.push(conventions);
         }
     }
     for page in ordered(root.join(".claude/rules")) {

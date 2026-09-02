@@ -3,8 +3,8 @@
 This file provides guidance for AI agents and contributors working with code in
 this repository.
 
-Area rules load automatically: `.claude/rules/helix.md` for `helix/**`,
-`.claude/rules/cortex.md` for `cortex/**`. To add a component, use the
+Area conventions load automatically: [helix/CONVENTIONS.md](helix/CONVENTIONS.md)
+for `helix/**`, [cortex/CONVENTIONS.md](cortex/CONVENTIONS.md) for `cortex/**`. To add a component, use the
 `add-component` skill.
 
 ## Product framing

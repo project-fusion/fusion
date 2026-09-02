@@ -21,5 +21,5 @@ Cortex's versions and `helix-v*` allocate Helix's, so a release of either does
 not wait on the other. That is why a documentation package carries the version of
 the thing it documents.
 
-Conventions for this folder are in `.claude/rules/cortex.md`, and it loads
+Conventions for this folder are in [CONVENTIONS.md](CONVENTIONS.md), and they load
 automatically for work under `cortex/**`.

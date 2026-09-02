@@ -5,7 +5,7 @@ description: Adds a component to the Helix design system, across the headless an
 
 # Adding a Helix component
 
-Conventions live in `.claude/rules/helix.md` and load automatically. This is the
+Conventions live in `helix/CONVENTIONS.md` and load automatically. This is the
 procedure.
 
 ## Checklist
@@ -52,7 +52,7 @@ New event? Add a class to `helix/core/src/events.ts` carrying its own
 `eventName` and augmenting `HTMLElementEventMap`, then reference it as
 `@event {HelixThingEvent} thing-change - …`.
 
-**Watch the SSR rules in `.claude/rules/helix.md`.** State seeded in
+**Watch the SSR rules in `helix/CONVENTIONS.md`.** State seeded in
 `connectedCallback` does not exist on the server, and `querySelector` is
 undefined there.
 

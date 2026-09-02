@@ -23,7 +23,7 @@ bun run --filter @fusion.dev/helix-sandbox test        # dom then ssr
 bunx turbo run styles --filter @fusion.dev/helix-sandbox
 ```
 
-Same conventions as the rest of Helix: `.claude/rules/helix.md` loads for
+Same conventions as the rest of Helix: `helix/CONVENTIONS.md` loads for
 `helix/**` and applies here too, and `helix component` holds these elements to
 it like any other. **Single tier**, because the headless and styled split exists
 so a consumer can bring their own presentation, and nobody reskins a dev tool.

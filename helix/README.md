@@ -29,5 +29,5 @@ that is hard to get right and invisible when it is wrong; `styled` owns
 everything about how it looks. A consumer takes one or the other, and taking the
 headless tier is a supported way to build a design system that is not ours.
 
-Conventions for this folder are in `.claude/rules/helix.md`, and it loads
+Conventions for this folder are in [CONVENTIONS.md](CONVENTIONS.md), and they load
 automatically for work under `helix/**`.
