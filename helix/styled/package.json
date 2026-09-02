@@ -22,16 +22,17 @@
       "default": "./dist/*/index.js"
     },
     "./custom-elements.json": "./custom-elements.json",
-    "./elements.css": "./shared/css/elements.css",
-    "./helix.css": "./shared/css/helix.css",
-    "./jsx": "./shared/types/jsx.d.ts",
-    "./svelte": "./shared/types/svelte.d.ts",
-    "./vue": "./shared/types/vue.d.ts"
+    "./elements.css": "./css/elements.css",
+    "./helix.css": "./css/helix.css",
+    "./jsx": "./types/jsx.d.ts",
+    "./svelte": "./types/svelte.d.ts",
+    "./vue": "./types/vue.d.ts"
   },
   "files": [
+    "css",
     "custom-elements.json",
     "dist",
-    "shared"
+    "types"
   ],
   "customElements": "custom-elements.json",
   "sideEffects": true,

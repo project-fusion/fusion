@@ -59,11 +59,15 @@ export interface HelixCemOptions {
 /**
  * Where the framework typings land.
  *
- * Beside the package rather than in its root, which held six generated files
- * and four hand-written ones. `exports` is what a consumer reads and it is
- * unchanged: `@fusion.dev/helix/jsx` still resolves, to a different path.
+ * A directory rather than the package root, which held six generated files and
+ * four hand-written ones. It sits beside `css/` and `dist/`, the three of them
+ * being what `files` publishes, and the name says what is in it: a `shared/`
+ * wrapper over both only collided with `src/shared`, which is the source
+ * families share and is a different thing entirely.
+ *
+ * `exports` is what a consumer reads: `@fusion.dev/helix/jsx` still resolves.
  */
-const TYPES = 'shared/types'
+const TYPES = 'types'
 
 export const createHelixCemConfig = ({
   globs = ['src/**/*.ts'],

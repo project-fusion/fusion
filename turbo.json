@@ -71,12 +71,7 @@
     "analyze": {
       "dependsOn": ["^build"],
       "inputs": ["src/**", "custom-elements-manifest.config.ts"],
-      "outputs": [
-        "custom-elements.json",
-        "shared/types/jsx.d.ts",
-        "shared/types/svelte.d.ts",
-        "shared/types/vue.d.ts"
-      ]
+      "outputs": ["custom-elements.json", "types/jsx.d.ts", "types/svelte.d.ts", "types/vue.d.ts"]
     },
     "build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
@@ -107,12 +102,6 @@
       // the other half: a generated file that nothing tracks must be.
       "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/sandbox/**", "public/specs/**"]
     },
-    // The fourth layer is `helix/styled/shared/css/elements.css` and it was not in
-    // so editing any component stylesheet did not invalidate this. `dependsOn`
-    // orders the two tasks and ordering is not invalidation: the sandbox
-    // stylesheet, which is also what the browser spec runner serves as its
-    // whole token layer, could sit a build behind the components it is meant to
-    // paint.
     // Reads the manifests and every `.examples` file, so it depends on the
     // analyzer having run: `analyze` writes `custom-elements.json`, and a
     // catalog built before it would describe whatever the last analysis left.
@@ -183,6 +172,12 @@
     // `wasm-check` derives seventeen themes through the tracked binary, which is
     // the artifact it exists to distrust.
     "faces": { "cache": false },
+    // The fourth layer is `helix/styled/css/elements.css`, and it was not in
+    // `inputs`, so editing any component stylesheet did not invalidate this.
+    // `dependsOn` orders the two tasks and ordering is not invalidation: the
+    // sandbox stylesheet, which is also what the browser spec runner serves as
+    // its whole token layer, could sit a build behind the components it is
+    // meant to paint.
     "frame": {
       "dependsOn": ["^build"],
       "inputs": [
@@ -190,7 +185,7 @@
         "preview/preview-frame.css",
         "public/fonts/**",
         "$TURBO_ROOT$/helix/styles/src/*.css",
-        "$TURBO_ROOT$/helix/styled/shared/css/elements.css",
+        "$TURBO_ROOT$/helix/styled/css/elements.css",
         "$TURBO_ROOT$/fusion/site/scripts/build-frame.mjs"
       ],
       "outputs": ["public/sandbox/**"]
@@ -241,7 +236,7 @@
         "$TURBO_ROOT$/fusion/scripts/build-styles.mjs",
         "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
       ],
-      "outputs": ["src/**/*.css.ts", "shared/css/elements.css", "shared/css/*.css.ts"]
+      "outputs": ["src/**/*.css.ts", "css/elements.css", "css/*.css.ts"]
     },
 
     "styles-dist": {

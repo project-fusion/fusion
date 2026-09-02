@@ -49,7 +49,7 @@ const aligned = sorted.map((tag) => `${tag}[align]`).join(',\n')
 /* Beside `helix.css` rather than in the package root, which held six generated
    files and four hand-written ones. `exports` is unchanged, so a consumer
    writing `@fusion.dev/helix/elements.css` is unaffected. */
-const out = join(root, 'shared/css')
+const out = join(root, 'css')
 mkdirSync(out, { recursive: true })
 
 writeFileSync(

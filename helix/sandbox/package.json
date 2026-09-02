@@ -21,14 +21,14 @@
       "types": "./dist/*/index.d.ts",
       "default": "./dist/*/index.js"
     },
-    "./jsx": "./shared/types/jsx.d.ts",
-    "./svelte": "./shared/types/svelte.d.ts",
-    "./vue": "./shared/types/vue.d.ts"
+    "./jsx": "./types/jsx.d.ts",
+    "./svelte": "./types/svelte.d.ts",
+    "./vue": "./types/vue.d.ts"
   },
   "files": [
     "custom-elements.json",
     "dist",
-    "shared"
+    "types"
   ],
   "customElements": "custom-elements.json",
   "sideEffects": true,

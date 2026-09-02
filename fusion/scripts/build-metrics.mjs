@@ -182,7 +182,7 @@ const STYLESHEETS = [
   },
   {
     note: "The components' own layer, generated from every family's stylesheet.",
-    path: 'helix/styled/shared/css/elements.css',
+    path: 'helix/styled/css/elements.css',
   },
   {
     note: 'The three above in one import, in the order they have to be in.',
