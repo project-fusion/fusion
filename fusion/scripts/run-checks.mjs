@@ -4,9 +4,10 @@
  *
  * **The list is derived from `verify` rather than restated beside it.** A
  * workflow that names its own checks is a second source of truth. So this reads
- * the `verify` script, splits it, and refuses any step it does not recognize. Adding a check to `verify` puts it in
- * CI with no second edit, and adding a step that is neither a check nor one of
- * the dedicated jobs stops the run rather than being skipped quietly.
+ * the `verify` script, splits it, and refuses any step it does not recognize.
+ * Adding a check to `verify` puts it in CI with no second edit, and a step that
+ * is neither a check nor one of the dedicated jobs stops the run rather than
+ * being skipped quietly.
  *
  * **Failures accumulate instead of short-circuiting**, which is the other half
  * and the reason this exists at all. `verify` is `a && b && c`, so it reports
@@ -45,13 +46,10 @@ const DEDICATED = new Set([
      would never use. It runs beside `rs:check` and `rs:test`, where the cargo
      cache is already warm and the binaries it calls have just been built. */
   'bun run check:cli',
-  /* **The CLI's own subcommands, for the reason above and measured.** `bin.mjs`
-     resolves a built binary or builds one, so a shard without the cargo cache
-     compiles it, and six shards compiling Rust at once took the runner's
-     memory: shard 2 was `Killed` at exit 137 and shard 5 took a SIGTERM, both
-     inside a `fusion` subcommand, and shard 3 was canceled behind them. They
-     had never run before, `--list` having refused ahead of them, so this was
-     the first time six of them tried at once. */
+  /* **The CLI's own subcommands, for the reason above.** `bin.mjs` resolves a
+     built binary or builds one, so a shard without the cargo cache compiles it,
+     and several shards compiling Rust at once exhaust the runner's memory:
+     `Killed` at exit 137, a SIGTERM, and the neighbors canceled behind them. */
   'bun run check:css:seeds',
   'bun run check:prose',
   'bun run fusion spec check',
@@ -80,14 +78,10 @@ const PREREQUISITES = ['bun run build', 'bun run analyze', 'turbo run catalog']
 const steps = readVerify()
 const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))
 
-/* **A generated-file check is a `turbo run` invocation now, and it is still a
-   check.** `verify` used to spell every one of them as a `check:` script; the
-   script rename moved them to `turbo run x -- --check`, and the test below was
-   still the old spelling, so the first of them refused the whole listing.
-   `plan` then emitted nothing, the `checks` matrix expanded to zero jobs, and
-   the aggregator failed a run in which every job that existed had passed.
-   Measured on a pull request of nothing but pictures, where it read as the
-   pictures being wrong.
+/* **A generated-file check is a `turbo run` invocation, and it is still a
+   check.** A test that does not recognize one refuses the whole listing, `plan`
+   emits nothing, the `checks` matrix expands to zero jobs, and the aggregator
+   fails a run in which every job that existed passed.
 
    Two spellings because the corpus has two: most pass `-- --check` to a task
    that also writes, and `wasm-check` is its own task and says so in the name.
@@ -125,14 +119,10 @@ const argument = (name) => {
 /**
  * How many shards the checks divide into, and why it lives here.
  *
- * **The count is a fact about the list, so it belongs with the list.** It was
- * in two places and they disagreed: the workflow declared ten in a shell
- * variable while this file defaulted to six, so `--list` and `--shard 0 --of 6`
- * run by hand described a different sixth than CI ran a tenth of. Whichever was
- * read last was the answer.
- *
- * `--count` is what the workflow reads, so the number leaves this file and
- * arrives there rather than being written twice and compared by eye.
+ * **The count is a fact about the list, so it belongs with the list.** Declared
+ * in the workflow as well, the two disagree and `--list` run by hand describes a
+ * different shard than CI runs. `--count` is what the workflow reads, so the
+ * number leaves this file rather than being written twice.
  */
 const SHARDS = 10
 
@@ -160,12 +150,10 @@ if (!Number.isInteger(shard) || !Number.isInteger(of) || of < 1) {
 const mine = checks.filter((_, index) => index % of === shard)
 
 /* **`turbo` is a workspace binary and is not on a plain `PATH`.** `spawnSync`
-   without a shell gets the environment it is given, so `turbo run catalog`
-   returned ENOENT and the prerequisite loop reported the whole shard dead
-   before a single check ran. The pre-push hook prepends the same directory for
-   the same reason and says so; this file spawned eleven commands assuming a
-   PATH it never arranged. Invisible until now, because `--list` refused ahead
-   of it and no shard ever reached a `turbo` step. */
+   without a shell gets the environment it is given, so a bare `turbo run` is
+   ENOENT and the prerequisite loop reports the whole shard dead before a single
+   check runs. The pre-push hook prepends the same directory for the same
+   reason. */
 const PATH = `${join(ROOT, 'node_modules', '.bin')}:${process.env.PATH ?? ''}`
 
 const run = (step) => {

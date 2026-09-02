@@ -62,8 +62,8 @@ const config: NextConfig = {
        * credentials and no user data.
        *
        * Immutable because the faces are replaced by hand and approximately
-       * never, which is the property `next/font`'s content hash used to buy and
-       * the frame could not use, having no way to learn a new hash.
+       * never. A content hash would give the same guarantee and the frame
+       * cannot use one, having no way to learn a new hash.
        */
       {
         headers: [

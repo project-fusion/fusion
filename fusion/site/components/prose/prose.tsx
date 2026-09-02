@@ -195,12 +195,10 @@ const SHORT = 32
 /**
  * The least room a wrapping column may be given before the table scrolls.
  *
- * **`minmax(0, …)` is what made the first version of this worse than what it
- * replaced.** A zero minimum lets a track vanish: measured on the docs column at
- * a 900px viewport, where the sidebar leaves 240px, a `max-content` name column
- * asking for 250 starved both prose columns to exactly `0px` and the text
- * inside them wrapped to forty-eight lines. A floor turns that into an overflow
- * instead, and an overflow is a thing the host can scroll.
+ * **Never `minmax(0, …)`.** A zero minimum lets a track vanish: measured at a
+ * 900px viewport, a `max-content` name column asking for 250 starved both prose
+ * columns to exactly `0px` and wrapped their text to forty-eight lines. A floor
+ * turns that into an overflow, which the host can scroll.
  *
  * Fourteen characters, which is narrow enough that it binds only when the
  * column is genuinely too small to read a table in, and wide enough to be worth

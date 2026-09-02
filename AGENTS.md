@@ -57,15 +57,11 @@ what a guard reads rather than by what kind of fault it catches, because the
 useful question after an edit is "what covers the thing I just touched" and never
 "run me every consistency check".
 
-**How many there are is not written down, and the absence is the decision.**
-Every count that used to be in the paragraph above had rotted: `check:css` was
-"the twenty in that group" while running four, `check` was "all 78" against a
-real 89, and the groups were listed as `api`, `css`, `gen`, `pkg`, `prose` and
-`spec`, two of which have never existed. A count is derivable and each command
-prints its own, so writing one here is a second source of truth whose copy is
-always the stale one. That is the same argument that makes the reference pages
-generated rather than typed, and it applies to a number in a sentence as much as
-to a table.
+**Do not write down how many there are.** A count is derivable and each command
+prints its own, so one written here is a second source of truth and always the
+stale copy. Every count this paragraph once carried had rotted. That is the same
+argument that makes the reference pages generated rather than typed, and it
+applies to a number in a sentence as much as to a table.
 
 The names are worth stating and the arithmetic is not, because the names are the
 vocabulary somebody has to guess right to run the thing.

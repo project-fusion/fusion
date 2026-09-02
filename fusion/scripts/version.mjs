@@ -7,15 +7,10 @@
  * `release.yml` opens a pull request with the stamped manifests once a version
  * has published, installed from the registry and promoted.
  *
- * This file used to argue the opposite, that writing it back needs a bot whose
- * access outranks branch protection and buys nothing `git tag` does not already
- * hold. The first half was true of a *push* and not of a pull request, which is
- * the shape `visual-baselines.yml` was already using for the same reason. The
- * second half was the weaker claim: a reader of the source is not holding the
- * tags in their head, and every comparable library states its version in the
- * manifest. Checked rather than assumed: `@mui/material` reads 9.4.0 and
- * `webawesome` 3.12.0, both with `workspace:` siblings exactly as here, so the
- * workspace protocol was never what forced the placeholder.
+ * A reader of the source is not holding the tags in their head, and every
+ * comparable library states its version in the manifest: `@mui/material` and
+ * `webawesome` both do, with `workspace:` siblings exactly as here, so the
+ * workspace protocol is not what would force a placeholder.
  *
  * A preview under `exp-*` stamps nothing back. It is not what a reader means by
  * the version.

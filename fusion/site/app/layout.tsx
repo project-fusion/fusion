@@ -79,15 +79,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
      */
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* **The preload `next/font` used to write, written by hand.**
-            The faces moved to `public/fonts` so the sandbox frame can name the
-            same URL the site does, which cost the automatic preload that came
-            with `localFont`. Without these three the first paint is in the
-            fallback stack and reflows when the faces land, which is the whole
-            thing `font-display: swap` is arranging for and the reason to ask
-            early. `crossOrigin` is required rather than decorative: a font is
-            fetched in CORS mode, so a preload without it is a second, separate
-            request rather than a warm cache entry. */}
+        {/* **The preload written by hand, because `localFont` is not in use.**
+            The faces live in `public/fonts` so the sandbox frame can name the
+            same URL the site does, which costs the automatic preload. Without
+            these the first paint is in the fallback stack and reflows when the
+            faces land. `crossOrigin` is required rather than decorative: a font
+            is fetched in CORS mode, so a preload without it is a second request
+            rather than a warm cache entry. */}
         {FACES.map((href) => (
           <link
             as="font"

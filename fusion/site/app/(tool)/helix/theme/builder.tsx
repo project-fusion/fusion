@@ -100,11 +100,10 @@ const fromCatalog = (row: FaceRow): Face => ({
   preview: `${row[0].replace(/ /g, '+')}:wght@${row[1].split(';')[0]}`,
 })
 
-/* **`!== 1` rather than `=== 0`.** The third field is a category now and
-   monospace kept the 1 it had, so the mono half is unchanged and the
-   proportional half is every other category rather than the one value that used
-   to mean "not mono". Read the old way, this list would have held sans-serif
-   alone and lost 1,172 serif, display and handwriting families in silence. */
+/* **`!== 1` rather than `=== 0`.** The third field is a category and monospace
+   is 1, so the proportional half is every other category. Written `=== 0` this
+   list holds sans-serif alone and drops over a thousand serif, display and
+   handwriting families in silence. */
 const CATALOG: Face[] = GOOGLE_FACES.filter((row) => row[2] !== 1).map(fromCatalog)
 const CATALOG_MONO: Face[] = GOOGLE_FACES.filter((row) => row[2] === 1).map(fromCatalog)
 
@@ -176,7 +175,7 @@ const DISPLAY_REST: Face = { category: 0, family: '', label: 'Same as body' }
 
 /* Monospace is a category in the catalog rather than a list here, so a face that
    calls itself mono is offered where mono is asked for and nowhere else. The
-   three that used to be hardcoded lead it for the same reason as above. */
+   three named below lead it for the same reason as above. */
 const MONO_LEADING = ['JetBrains Mono', 'IBM Plex Mono', 'Space Mono']
 
 const MONO_GROUPS: FaceGroup[] = grouped(CATALOG_MONO, MONO_LEADING)
@@ -288,13 +287,11 @@ export function ThemeBuilder({
   /**
    * The default theme, derived on the server.
    *
-   * **This is what the engine being synchronous used to buy for free.** It ran
-   * during server rendering without anybody arranging it, so the first paint
-   * carried a real palette: the slider ramps, which are drawn off the *derived*
-   * primary rather than the brand, and the emitted block, and the counts. The
-   * engine is WebAssembly now and instantiates asynchronously, and measured
-   * without this the ramps appeared 287ms after navigation, of which 26ms was
-   * the module transfer and the rest was hydration.
+   * **The engine is WebAssembly and instantiates asynchronously**, so nothing
+   * derives during server rendering unless it is arranged. Without this the
+   * first paint carries no palette and the slider ramps — drawn off the
+   * *derived* primary rather than the brand — appear 287ms after navigation,
+   * mostly hydration rather than transfer.
    */
   initialTheme: DerivedTheme
   /** How much page there is, which is the axis the context is not. */

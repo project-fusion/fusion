@@ -59,10 +59,9 @@
  * mistaken for a release. It exists so that the package does, and for no other
  * reason.
  *
- * **It used to be a `bootstrap` tag of its own, and that name is retired.** It
- * named a thing that happens once per package and then never again, so every
- * package carried a dist-tag nobody would ever move or read, and a reader had
- * to be told it was spent. `exp-*` is the experimental namespace
+ * **`exp-*` rather than a tag of its own.** A dedicated `bootstrap` tag would
+ * name a thing that happens once per package and then never again, leaving every
+ * package carrying a dist-tag nobody moves or reads. `exp-*` is the namespace
  * `release-experimental.yml` already publishes into, and a first publish is the
  * most experimental thing there is.
  *

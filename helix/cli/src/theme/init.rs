@@ -39,15 +39,12 @@ pub fn run(args: &Init, from: &Path, json: bool) -> Outcome<Code> {
     is a hundred decisions, and it goes stale the first time a default moves: a
     written-out default is a value this file then owns.
 
-    **And no `$schema` line, which the first version of this had.** It pointed at
-    a URL nothing publishes, and the intent reader refuses unknown keys, so the
-    tool's own starter file was rejected by the tool on the very next command. It
-    is the right convention and it needs two things this does not have yet: a
-    published schema, and a reader that knows to ignore the key. Serde's
-    `deny_unknown_fields` does not compose with `flatten`, so allowing one key
-    through cannot be done in a wrapper without giving up the typo-catching that
-    is the whole reason unknown keys are refused. Both halves land together or
-    neither does. */
+    **And no `$schema` line.** The intent reader refuses unknown keys, so adding
+    one makes the tool reject its own starter file on the next command. It is the
+    right convention and wants two things first: a published schema, and a reader
+    that ignores the key. Serde's `deny_unknown_fields` does not compose with
+    `flatten`, so allowing one key through costs the typo-catching that is the
+    reason unknown keys are refused. Both halves land together or neither. */
     let starter = format!("{{\n  \"brand\": \"{}\"\n}}\n", args.brand);
     std::fs::write(&path, &starter).map_err(|failure| {
         Failure::input(

@@ -356,7 +356,7 @@
  * headless root. The pane is therefore the flex item and the box that snaps, and
  * the sizing had to move onto it with the layout. `display: flex` is what
  * passes the size through, the slide below being a lone flex child told to grow
- * into both axes, so it still fills the space it used to occupy directly. */
+ * into both axes so it fills the pane. */
 [part="slide"] {
   display: flex;
   flex: 0 0
@@ -367,13 +367,12 @@
   scroll-snap-align: start;
 }
 
-/* The slide fills the pane, which is what the sizing used to do to it directly.
+/* The slide fills the pane, and has to be told to.
  *
- * A `flex-basis` beats a `width` on a flex item, so while the slide was the
- * flex item its own declared width was overridden by the per-view arithmetic. A
- * pane that merely contained it would silently hand that width back, and a slide
- * narrower than its share would sit against one edge with the gap after it. The
- * same two properties on the same axis keep the same answer. */
+ * A `flex-basis` beats a `width` on a flex item, so the per-view arithmetic
+ * overrides a slide's own declared width. A pane that merely contained it would
+ * hand that width back, and a slide narrower than its share would sit against
+ * one edge with the gap after it. */
 [part="slide"] ::slotted(*) {
   flex: 1 1 0;
   min-block-size: 0;

@@ -18,10 +18,9 @@
 //! **`false`, the empty string, `undefined` and `null` are not defaults**, they
 //! are the absence of one written out. Reflecting any of them writes nothing.
 //!
-//! **A type annotation may sit between the name and the `=`**, which is what a
-//! first version of this missed: `orientation: 'horizontal' | 'vertical' =
-//! 'vertical'` looks nothing like `orientation = 'vertical'` to a pattern that
-//! assumed the simple form, and it reported none of the seven that existed.
+//! **A type annotation may sit between the name and the `=`.** A pattern
+//! assuming the simple form sees nothing in
+//! `orientation: 'horizontal' | 'vertical' = 'vertical'` and reports clean.
 
 use std::fs;
 use std::sync::LazyLock;

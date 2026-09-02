@@ -609,9 +609,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        exposes `button name="Save" desc=""`. All three routes to fixing it are
        closed: an `aria-describedby` IDREF resolves only within one tree,
        `ariaDescribedByElements` is valid outward and this points inward, and
-       `aria-description` is the hydration mismatch 322 closed the library
-       against. So the wrapping form is no longer the documented API, and this
-       says so once, where somebody using it will see it. */
+       `aria-description` is a hydration mismatch this library refuses. So the
+       wrapping form is not the documented API, and this says so once, where
+       somebody using it will see it. */
     if (this.for === '') {
       console.warn(
         `<${this.localName}> is wrapping its trigger rather than naming one, so its text ` +

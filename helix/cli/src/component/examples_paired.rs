@@ -1,14 +1,11 @@
 //! Every example is authored on both layers and in both syntaxes.
 //!
 //! **Neither is generated from the other, and that is the point.** Deriving the
-//! React view from the HTML at read time emitted a `<script>` into a JSX
-//! fragment, so every script-bearing example produced a *syntax error* rather
-//! than a wrong picture. It was wrong on script-free examples too, silently: a
-//! leading comment was not counted as a root so no fragment was emitted, a
-//! stylesheet-to-import rule required its attributes in an order no example
-//! writes so it never once fired, and `for` was renamed to `htmlFor` on custom
-//! elements, where React writes the attribute verbatim and the browser
-//! lowercases it to something no component reads.
+//! React view from the HTML emits a `<script>` into a JSX fragment, so every
+//! script-bearing example is a *syntax error* rather than a wrong picture, and
+//! it fails silently on the rest: `for` becomes `htmlFor` on a custom element,
+//! where React writes the attribute verbatim and the browser lowercases it to
+//! something no component reads.
 //!
 //! **The canonical example reads the same on both layers**, because the two are
 //! the same demonstration drawn twice, and a difference is a real edit made to

@@ -1,29 +1,14 @@
-# What a merge of this pull request would release, read off its commits.
+# What a merge of this pull request would release, read off its commit subjects.
 #
-# **The bump comes from the subject line.** It used to be a label this workflow
-# proposed and a reviewer could raise, on the argument that Conventional Commits
-# would cost the history its sentences. The repository went the other way: the
-# subjects are conventional now, so a second machine-readable channel is a
-# second place for the same fact to be wrong, and the one that is not in the
-# commit is the one that drifts.
+# Reports the bump each domain would take and fails on a subject that is not
+# conventional. It writes no labels: a reviewer wanting a different bump edits
+# the commit.
 #
-# **So this proposes nothing and writes no labels.** It reads what the commits
-# already say, reports the bump each domain would take, and fails when a subject
-# is not conventional, which is what makes the convention a rule rather than a
-# habit. A reviewer who wants a different bump changes the commit, which is the
-# same edit they would have made to the label and leaves the reason in the
-# history rather than beside it.
+# The scope names the domain, and only `helix` and `cortex` publish: a scope of
+# `helix/cli` releases Helix, `fusion/site` and `turbo` release nothing.
 #
-# **The scope names the domain, and only `helix` and `cortex` publish.** A scope
-# of `helix/cli` releases Helix; `fusion/site` and `turbo` release nothing,
-# being the site and the tooling. A subject with no scope releases nothing,
-# which is the honest reading: a commit that does not say what it touches has
-# not asked for a version.
-#
-# **`pull_request_target`, deliberately, and with no checkout**, unchanged from
-# when this wrote labels: a fork's `pull_request` run gets a read-only token and
-# could not report, and nothing here checks out or executes the pull request's
-# code. It reads the commits from the API.
+# **`pull_request_target` with no checkout.** The token is writable, so the
+# commits are read as data through the API and never executed.
 name: release-intent
 
 on:
@@ -77,15 +62,9 @@ jobs:
             exit 1
           fi
 
-          # Piped rather than walked, because this job has no checkout and must
-          # keep it that way: `pull_request_target` carries a writable token, so
-          # the commits are read as data through the API and never executed.
-          # `bump.mjs` comes from the base branch, fetched on its own.
-          #
-          # Through `gh api` and not `raw.githubusercontent.com`: this
-          # repository is private, so the raw host answers an unauthenticated
-          # request with 404 and `curl -f` exits 22. The contents endpoint takes
-          # the job's token and returns the file base64 encoded.
+          # `bump.mjs` from the base branch, since this job has no checkout.
+          # Through `gh api` rather than `raw.githubusercontent.com`, which
+          # answers 404 for a private repository without a token.
           gh api "repos/$REPO/contents/fusion/scripts/bump.mjs?ref=${{ github.event.pull_request.base.sha }}" \
             --jq '.content' | base64 -d > /tmp/bump.mjs
 

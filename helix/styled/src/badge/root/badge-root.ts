@@ -25,12 +25,8 @@ import { styles } from './badge-root.css.js'
 @customElement('helix-badge')
 export class HelixBadge extends HelixHeadlessBadge {
   /**
-   * What the mark means.
-   *
-   * `danger` and `neutral` are meanings, not treatments: the stylesheet picks a
-   * fill by what the count *is*, not by how loudly it is drawn. Filed under
-   * `appearance` it would read as a treatment, which is the confusion the split
-   * exists to stop.
+   * What the mark means, not how loudly it is drawn: the stylesheet picks a fill
+   * from what the count *is*.
    */
   @property({ reflect: true })
   tone?: 'danger' | 'neutral'

@@ -220,11 +220,10 @@ const reactPropsOf = (node: EventTarget): Record<string, unknown> | undefined =>
 const audited = new WeakSet<EventTarget>()
 
 /**
- * Properties that were public API until 19 Aug 2026 and are events now.
+ * Removed callback properties, named so a consumer who wrote one is told.
  *
- * Worth naming for a release or two: they were documented, a consumer may have
- * written one, and removing a property is silent in a way removing an event is
- * not.
+ * They are events now. Removing a property is silent in a way removing an event
+ * is not, so these are worth warning about for a release or two.
  */
 const REMOVED = new Set(['onActiveChange', 'onCheckedChange', 'onOpenChange', 'onValueChange'])
 
@@ -561,13 +560,11 @@ export class HelixElement extends LitElement {
    * references. An engine without `CustomStateSet` records nothing and keeps
    * whatever the resting rule draws, which is the safe direction to fail.
    *
-   * **Lit's server shim is no longer one of them**, and this said it was.
-   * `@lit-labs/ssr-dom-shim@1.6.0` sets `this.states = new Set()` in its
-   * `ElementInternals` constructor, so the guard passes on the server and a
-   * custom state is recorded where nothing reads it, which is harmless. The
-   * engines the test is for are browsers: Safari below 17.4 and Firefox below
-   * 126. There the write is a `TypeError`, so a component that bypasses this
+   * **The engines the test is for are browsers**: Safari below 17.4 and Firefox
+   * below 126, where the write is a `TypeError`, so a component bypassing this
    * fails to render rather than rendering without whatever the state draws.
+   * Lit's server shim sets `states`, so the guard passes there and records a
+   * state nothing reads, which is harmless.
    */
   protected toggleState(name: string, on: boolean): void {
     if ('states' in this.internals) {
@@ -578,19 +575,14 @@ export class HelixElement extends LitElement {
   /**
    * Resolves a frame after the first update, when transitions are switched on.
    *
-   * **Named `whenSettled` because `settled` was taken four times over.** Image
-   * and Splitter each have a private `settle`, and both color controls carry a
-   * `settled` of their own, all of them older than this and none of them about
-   * transitions. A base class takes the name every subclass then cannot use, so
-   * it takes the one nobody wanted.
+   * **Named `whenSettled` because `settled` is taken four times over**, by
+   * Image, Splitter and both color controls, none of them about transitions. A
+   * base class takes the name every subclass then cannot use.
    *
    * **The state it reports cannot be watched, which is why this exists.** A
-   * `MutationObserver` could see `[data-settled]` arrive and there is no
-   * equivalent for `ElementInternals.states`: a custom state is deliberately not
-   * in the DOM, which is the whole reason it replaced the attribute. Anything
-   * that used to wait on the attribute waits on this instead, and gets a better
-   * signal for it, an awaited promise being what the callers wanted rather than
-   * a mutation they had to interpret.
+   * custom state is deliberately not in the DOM, so there is no
+   * `MutationObserver` equivalent for `ElementInternals.states`. Await this
+   * instead.
    *
    * Separate from `updateComplete`, which resolves in the microtask checkpoint
    * the suppression is still active in. That is the distinction `readyToMove`

@@ -17,17 +17,13 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-/* **`.local`, which is gitignored, and that is the point.** The queue was
-   tracked, moved out to GitHub Issues on 28 Aug, restored on 30 Aug because the
-   issues were never created and the move had been a deletion, and is now a
-   per-machine file instead: it holds the reasoning behind 27 unfinished
-   decisions and 23 that were declined, which is worth keeping and is nobody
-   else's to read.
+/* **`.local` is gitignored, and that is the point.** The queue holds the
+   reasoning behind unfinished and declined decisions, which is worth keeping and
+   is nobody else's to read.
 
-   **So this check is a local one and says so rather than failing.** It is not in
-   `verify`, `check` or the pre-push hook and never was, so nothing in CI reads
-   the queue; running it on a machine that has no copy is the ordinary case
-   rather than a fault. */
+   **So this check is local and says so rather than failing.** It is not in
+   `verify`, `check` or the pre-push hook, so nothing in CI reads the queue and a
+   machine with no copy is the ordinary case rather than a fault. */
 const FILE = '.local/queue.md'
 if (!existsSync(join(ROOT, FILE))) {
   console.log(`queue: no ${FILE} on this machine, so there is nothing to check.`)

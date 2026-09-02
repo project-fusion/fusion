@@ -19,11 +19,10 @@
 //! own family is exempt, since a part rendering a sibling part is one folder
 //! composing itself and there is no tier decision in it.
 //!
-//! **It reads the interpolation, not a literal tag**, and reading literals is
-//! how the first version stopped working. A template names no tag: `this.tag()`
-//! resolves to the base element here and the styled one in the tier above, so a
-//! scan for a literal `<helix-...` matched nothing at all and reported "0
-//! families compose another" as a pass.
+//! **It reads the interpolation, never a literal tag.** A template names no tag:
+//! `this.tag()` resolves to the base element here and the styled one in the tier
+//! above, so a scan for a literal `<helix-…` matches nothing at all and reports
+//! "0 families compose another" as a pass.
 //!
 //! **Which tier is the base is configuration, because it is a fact about a
 //! layout rather than about a language.** So is the prefix on an element name,

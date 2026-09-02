@@ -115,8 +115,8 @@ export class HelixHeadlessScrollArea extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback()
     /* Both the box and what is in it. The box changing size is a layout change
-       and the content changing size is a data change, and a fade that only
-       answered one of them was wrong every time a list was filtered. */
+       and the content changing size is a data change; a fade answering only one
+       of them is wrong every time a list is filtered. */
     this.watcher = new ResizeObserver(this.measure)
     /* And what it watches, which rebuilding the observer does not restore. A
      * fresh observer watches nothing until something calls `observe`, so a

@@ -12,15 +12,11 @@
 //! select's panel opens directly under its own trigger; a menu and a tooltip
 //! land on the same screen; a dialog and a toast share a page.
 //!
-//! **Three had drifted when this was written, and the way they drifted is the
-//! argument for a check rather than a convention.** Select's panel took `md`
-//! from the commit that created the file, against its own trigger's `sm`, and no
-//! comment ever said why. Megamenu took `md` with a size argument available and
-//! unwritten. Tour's bubble took `md` under a comment that reads "which is
-//! `Popover`'s panel by another name and is deliberately the same shape" — and
-//! `Popover` is `sm`. That last one is the whole case: the convention was
-//! written down, in the right file, directly above the declaration that broke
-//! it, and it held for exactly as long as nobody had to act on it.
+//! **A check rather than a convention, because the convention does not hold.**
+//! One panel drifted under a comment reading "which is `Popover`'s panel by
+//! another name and is deliberately the same shape", while `Popover` is `sm` and
+//! it had taken `md`. The rule was written down, in the right file, directly
+//! above the declaration that broke it.
 //!
 //! **A floating panel is one that lifts, which the stylesheet already says.**
 //! `--helix-shadow-floating` is the separation policy for a surface over

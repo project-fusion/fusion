@@ -72,13 +72,12 @@
  * Everything in a band that carries a field has to out-rank it, or the field
  * paints over the type. One rule here rather than a z-index on each.
  *
- * **`[data-layer]` rather than `:not(.gridField)`, and the difference was a
- * bug.** The first version excluded the grid by class, so when an aura joined
- * the band it matched the rule instead, took `position: relative`, and put
- * 1296px of canvas into the flow: the hero's own display line ended up 2,850px
- * down the page under a screen of white. Marking what a layer *is* means the
- * next one added is excluded by being one, rather than by somebody remembering
- * to extend a selector.
+ * **`[data-layer]` rather than excluding each layer by class.** Excluded by
+ * name, the next layer added matches the rule instead, takes `position:
+ * relative`, and puts its whole canvas into the flow — measured once at 1296px,
+ * which pushed the hero's display line 2,850px down the page under a screen of
+ * white. Marking what a layer *is* excludes the next one by being one, rather
+ * than by somebody remembering to extend a selector.
  */
 .fieldBand {
   isolation: isolate;

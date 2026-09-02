@@ -13,19 +13,14 @@
 # repeatable across every push, which is what running on `synchronize` makes
 # this. Sonnet reads the same two passes.
 #
-# **It runs on every push now, and reviews only what arrived.** It used to run
-# once, at `opened`, on the argument that a finished diff is worth one careful
-# read. Measured against six pull requests, three of them carried a second
-# commit and the check went with the head it was attached to: the review was
-# orphaned and those three read as green while having no review at all. Green
-# for want of a reviewer is worse than red.
+# **It runs on every push and reviews only what arrived.** Reviewing once at
+# `opened` leaves a later push carrying no review at all while reading green,
+# and green for want of a reviewer is worse than red.
 #
-# **So the diff is the increment and the runs are capped.** The range starts at
-# the head of the last run that actually reviewed something, so a push is read
-# against what came before it rather than against the base, and `ROUNDS` is the
-# ceiling on how many times one pull request may spend. Past it, the `review`
-# label is the way to ask for one more, which is the same escape hatch the
-# manual re-request already used.
+# **The diff is the increment and the runs are capped.** The range starts at the
+# head of the last run that reviewed something, so a push is read against what
+# came before it rather than against the base. `ROUNDS` caps how many times one
+# pull request may spend; past it, the `review` label asks for one more.
 #
 # **Advisory, never required.** `continue-on-error`, and it must stay off the
 # list of checks branch protection requires. A non-deterministic gate that can
@@ -42,23 +37,12 @@
 # than here, so the two do not both review the same diff. Nothing in this file
 # turns it on or off.
 #
-# Forks are skipped rather than failed, and since the move to federated auth the
-# reason is authentication rather than an absent secret. See the guard's own
-# comment on the job: the federated subject carries nothing about who opened the
-# pull request, so the `if:` is what scopes the workspace's budget to this
-# repository's own branches. It is not dead weight left over from a key that no
-# longer exists.
+# Forks are skipped rather than failed, and the reason is authentication: the
+# federated subject carries nothing about who opened the pull request, so the
+# `if:` on the job is what scopes the workspace's budget to this repository's own
+# branches.
 name: review
 
-# **Not `synchronize`, because that reviewed every push.** Measured 30 Aug 2026:
-# twenty-eight runs in a day at about seven and a half minutes of Opus each,
-# where eight pull requests were opened. `ci-green` was reviewed six times and
-# `visual-baselines` five, almost all of it re-reading a diff already reviewed
-# after a one-line fix-up. The workspace limit ran out at 15:00 and every review
-# after that failed at startup, which `continue-on-error` then hid.
-#
-# None of the findings worth having came from a re-review. They came from the
-# first read of a finished diff, which is what this now does.
 #
 # `labeled` is how a diff that has genuinely changed gets read again: add
 # `review` and it runs. Deliberate, and cheap next to a review nobody asked for.

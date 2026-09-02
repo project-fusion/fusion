@@ -1,35 +1,18 @@
 # Retakes the visual baselines, on the one platform allowed to take them.
 #
 # **A baseline is a Linux artifact and development is darwin.** No headless
-# example sets `font-family`, so the default stack, the rasterizer and subpixel
-# antialiasing all differ, and a baseline taken on a contributor's Mac fails on
-# `ubuntu-latest` at nearly every glyph. `check:spec:visual` refuses to compare across
-# platforms for that reason rather than widening a threshold until real faults
-# fit under it.
+# example sets `font-family`, so the font stack, rasterizer and antialiasing all
+# differ and a baseline taken on a Mac fails on `ubuntu-latest` at nearly every
+# glyph. `check:spec:visual` refuses to compare across platforms rather than
+# widening a threshold until real faults fit under it.
 #
-# **Both tiers since 25 Aug 2026, which is what doubled the corpus.** The styled
-# families are pictured beside the headless ones, at the same two widths, so a
-# run takes 342 pictures rather than 166 and a blank `family` retakes all of
-# them. The check's own header carries the measurement that reopened the styled
-# tier and the one that says it needs `frame.css` to be pictured truthfully.
+# **`workflow_dispatch`, never a trigger.** A baseline that refreshes itself on
+# push agrees with whatever just landed and reports success forever. A person
+# asks for this and reviews the diff.
 #
-# **So refreshing one was a person standing up a container by hand**, running
-# `bun run visual:update` and committing what it took, which is the step most
-# likely to be skipped on the day a diff looks obviously fine. That is the day it
-# matters.
-#
-# **`workflow_dispatch` rather than a trigger, and that is the whole design.** A
-# baseline that refreshes itself on push is a check that agrees with whatever
-# just landed and reports success forever, which is the failure `check:spec:visual`
-# already had to be taught not to have: a missing baseline used to be written
-# rather than refused. A person asks for this, looks at the diff in the pull
-# request it opens, and approves it.
-#
-# **A pull request rather than a push to `main`.** This is the only workflow here
-# with `contents: write`, and the reason `release.yml` refuses a bot push that
-# outranks branch protection applies with more force to a picture: a baseline is
-# what every future run is judged against, so it is exactly the artifact that
-# should not arrive unreviewed.
+# **A pull request, never a push to `main`.** This is the only workflow here with
+# `contents: write`, and a baseline is what every future run is judged against,
+# so it is the artifact that most needs review.
 name: Visual baselines
 
 on:
@@ -47,9 +30,8 @@ permissions:
 jobs:
   retake:
     runs-on: ubuntu-latest
-    # Thirty rather than twenty, because the styled tier doubled the number of
-    # pictures and a timeout that kills a retake halfway leaves a branch holding
-    # some of a set that is only meaningful whole.
+    # A timeout that kills a retake halfway leaves a branch holding part of a
+    # set that is only meaningful whole.
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -60,30 +42,19 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
-      # Built first, for the reason the browser job in `verify.yml` builds
-      # first: `specs` bundles from source, and source imports the generated
-      # `.css.ts` files and the other packages' `dist`, neither of which is
-      # tracked.
+      # Built first: `specs` bundles from source, which imports the generated
+      # `.css.ts` files and the other packages' `dist`, and neither is tracked.
       #
-      # **It is also what writes the frame, and the styled tier cannot be
-      # pictured without it.** `fusion/site`'s own build is
-      # `catalog && frame && specs && next build`, and `frame` is
-      # `fusion/site/scripts/build-frame.mjs`, which empties
-      # `fusion/site/public/sandbox` and writes `frame.js`, `frame.css` and
-      # `frame.html` together. The whole directory is gitignored, so a checkout
-      # has none of it and this step is the only thing that supplies it.
-      # `check:spec:visual` hard-fails naming `turbo run frame` when either the bundle
-      # or the stylesheet is missing, rather than taking eighty-eight styled
-      # pictures in which no token resolved.
+      # It also writes the frame, without which the styled tier cannot be
+      # pictured at all. `fusion/site/public/sandbox` is gitignored, so a
+      # checkout has none of it and this step is the only thing that supplies
+      # it.
       - run: bun run build
 
       - run: bunx playwright install --with-deps chromium
 
-      # A blank input appends nothing and retakes every picture in both tiers.
-      # The script reads the family as the first argument that is not a flag,
-      # which is what it was taught after `visual:update accordion` once rewrote
-      # every baseline. A family that exists in one tier only is reported and
-      # retaken in the tier that has it.
+      # A blank input retakes every picture in both tiers. A family present in
+      # one tier only is retaken there and reported.
       - run: bun run visual:update ${{ inputs.family }}
 
       - uses: peter-evans/create-pull-request@v8
