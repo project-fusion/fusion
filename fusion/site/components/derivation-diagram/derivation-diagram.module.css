@@ -1,0 +1,342 @@
+/**
+ * The derivation diagram, which draws what the engine does.
+ */
+
+/**
+ * A wide technical figure, with a floor under how small it may be drawn.
+ *
+ * **Everything in the drawing is sized in user units**, so the whole figure
+ * scales with its container and the type scales with it: at a 375px viewport
+ * the row labels came out near 6px, which is a drawing nobody can read rather
+ * than a small one. Below the floor the figure keeps its size and the container
+ * scrolls, which is what a schematic does on paper too.
+ */
+.diagram {
+  margin: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.diagramSvg {
+  block-size: auto;
+  inline-size: 100%;
+  min-inline-size: 52rem;
+}
+
+/**
+ * Which of the two figures is showing, decided by width alone.
+ *
+ * The wide one scrolls below its 52rem floor rather than shrinking, which keeps
+ * the type legible and costs a horizontal drag twice the width of a phone. The
+ * stacked one needs no floor: it was drawn for 340 units and reads at any width
+ * a phone has. So the breakpoint is simply where the wide figure stops fitting.
+ *
+ * `display` rather than mounting one or the other, so both are server-rendered
+ * and the choice never depends on a measurement taken on the client.
+ */
+.diagramStacked {
+  display: none;
+}
+
+.diagramStackedSvg {
+  block-size: auto;
+  inline-size: 100%;
+}
+
+@media (max-width: 40rem) {
+  .diagram {
+    display: none;
+  }
+
+  .diagramStacked {
+    display: block;
+  }
+}
+
+/* Type inside the drawing. `text` inherits nothing useful from the page, so each
+   role is stated rather than assumed, and every one takes tokens so it moves
+   with the theme like the strokes around it. */
+/**
+ * **Sizes live on the elements, not here.**
+ *
+ * These are user units inside a viewBox that scales with its container, so a
+ * `--helix-text-*` token would be the wrong quantity entirely: it would set a
+ * page size on something measured in the drawing's own coordinates. `helix component`'s `tokens`
+ * is right that a raw number in page CSS is a smell, and right that this is not
+ * page CSS, so the numbers moved to where SVG has always put them.
+ */
+.diagramMeta {
+  fill: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+}
+
+.diagramLabel {
+  fill: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  letter-spacing: 0.01em;
+}
+
+/**
+ * The routing: a quiet permanent base with a moving highlight over it.
+ *
+ * **The base is deliberately quiet.** A single bright layer is the loudest thing
+ * in the band while the labels it connects are the quietest, which is backwards:
+ * the drawing is about what is at the ends, not about the wires.
+ */
+.diagramBase path {
+  stroke: var(--helix-color-foreground-muted);
+  /* Quiet, not invisible. At 0.32 the run from `brand` to the bus is hard to
+     follow at all, and the figure stops explaining a route and becomes a pulse
+     floating over a grid. The base has to be readable on its own; the pulse is
+     an emphasis on something already there. */
+  stroke-opacity: 0.45;
+}
+
+/**
+ * The fan composites as one shape, not as four strokes.
+ *
+ * The paths inside take no alpha of their own; the group carries it, so where
+ * the four flatten onto their shared tangent an overlap is the same value as a
+ * single line instead of stacking to nearly twice it.
+ *
+ * **Declared after `.diagramBase path` rather than outranking it.** Both are
+ * (0,1,1), so the tie goes to source order. Scoping this through the parent to
+ * win on weight instead put a (0,2,1) selector above a (0,1,1) one, which is
+ * the descending specificity `lint` refuses and the harder thing to read.
+ */
+.diagramFan {
+  opacity: 0.45;
+}
+
+.diagramFan path {
+  stroke-opacity: 1;
+}
+
+/**
+ * One pulse per path, and it never seams.
+ *
+ * `--len` is the path's own length, emitted with the geometry that produced it.
+ * A dash of `[16, len - 16]` puts exactly one lit segment on the path, and
+ * winding the offset by `len` over one cycle returns the pattern to its starting
+ * position, so the loop closes on itself no matter how long the run is. That is
+ * what `pathLength` was supposed to buy and does not deliver in WebKit.
+ *
+ * **Nothing here is ever undrawn.** A route that draws itself in and then resets
+ * dismantles and rebuilds the diagram every few seconds while a reader is
+ * looking at it.
+ */
+.diagramPulse path {
+  stroke: var(--helix-color-primary);
+  /* Lifted above the brand so the traveling head reads against a field that is
+     itself brand-colored. At the token value it disappeared into the aura. */
+  stroke-opacity: 0.92;
+  /* Wide and weak rather than tight and bright: a tight halo on a short fast
+     dash reads as a hard object with an outline, and what a light moving along a
+     wire does is bleed. Two shadows so the falloff is not a single hard ring. */
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-primary) 28%, transparent));
+}
+
+/* With no motion the highlight would sit frozen mid-path, which reads as a
+   defect rather than as a still. The base carries the drawing on its own. */
+@media (prefers-reduced-motion: reduce) {
+  .diagramPulse {
+    display: none;
+  }
+
+  .diagramBase path {
+    stroke: var(--helix-color-primary);
+    stroke-opacity: 0.75;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* The engine turning, slowly enough to read as machined rather than as a
+       spinner saying the page is busy. `transform-box: fill-box` so the origin
+       is the circle's own box and not the SVG's. */
+    .diagramRing {
+      animation: preview-ring 48s linear infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+  }
+}
+
+/* A number meant to be read before its label. */
+.diagramFigure {
+  fill: var(--helix-color-foreground);
+  font-family: var(--helix-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* The registration marks, themed with everything else. See the note in
+   `derivation-diagram.tsx` for why this is a masked rect rather than four
+   paths. */
+.diagramCorners {
+  rx: var(--helix-radii-lg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Very slow and very small. A starfield that visibly blinks is a screensaver;
+     this is only enough to stop the field reading as a static texture. */
+  .diagramStars {
+    animation: preview-twinkle 7s ease-in-out infinite alternate;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .diagramField {
+    animation: preview-field-drift 26s linear infinite;
+  }
+}
+
+.diagramSample {
+  fill: var(--helix-color-primary);
+  font-family: var(--helix-font-display);
+  font-weight: var(--helix-weight-semibold);
+  text-anchor: middle;
+}
+
+.diagramCoreMuted {
+  fill: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  letter-spacing: 0.04em;
+}
+
+/**
+ * The instrument face the gauge and the reading are drawn on.
+ *
+ * **The site's glass, and this is the one surface that had an argument against
+ * it.** The disc used to mix from `surface-overlay` in light and hold a much
+ * heavier fill than the bands do, on a measured finding: mixed from `surface`
+ * it read as a pale blue lens rather than as the white instrument face it is
+ * meant to be, because `surface` is `oklch(0.985)` in light where
+ * `surface-overlay` is white, and what showed through a light fill was the field
+ * behind it rather than the face. Dark never had the problem, a light-on-dark
+ * wash being plenty to separate the hub from its ground.
+ *
+ * *That finding is kept rather than deleted, because it is the thing to re-check
+ * if the disc ever looks wrong in light again, and because reversing this is
+ * then one edit made knowingly.* What overrode it is that a page cannot hold two
+ * answers to what its glass is made of, and the disc sits in a diagram
+ * surrounded by bands made of the other one.
+ */
+.diagramGlass {
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
+  block-size: 100%;
+  border-radius: var(--helix-radii-full);
+  inline-size: 100%;
+}
+
+/**
+ * The gauge: the scale the reading is judged on.
+ *
+ * The track is the whole range a contrast ratio can usefully take, 1:1 to 7:1.
+ * The value arc fills to what the engine actually landed on, in step with the
+ * search converging below it, so the two are legibly one event. The ticks are
+ * the thresholds a build passes or fails on, and only AA gets a word, because it
+ * is the only one that decides anything.
+ */
+.diagramGaugeTrack {
+  stroke: var(--helix-color-foreground-muted);
+  stroke-opacity: 0.2;
+}
+
+.diagramGaugeValue {
+  stroke: var(--helix-color-primary);
+  stroke-opacity: 0.9;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-primary) 45%, transparent));
+}
+
+.diagramGaugeTick {
+  stroke: var(--helix-color-foreground-muted);
+}
+
+.diagramGaugeLabel {
+  fill: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  letter-spacing: 0.08em;
+}
+
+/* Without motion the arc cannot fill, so it stands at its reading. */
+@media (prefers-reduced-motion: reduce) {
+  .diagramGaugeValue {
+    stroke-dasharray: none;
+  }
+}
+
+/**
+ * The reading inside the disc. **A circle is not a box:** the room a line has
+ * inside one depends on how far from the center it sits, which a font size
+ * chosen against the diameter gets wrong every time. 54 below the center of a
+ * 112 radius disc there are only 198 units to spend, so a string that measures
+ * wider than that breaks the edge on both sides.
+ *
+ * The size itself is on the element, like every other size in the drawing. See
+ * the note above `.diagramMeta`.
+ */
+.diagramCoreSmall {
+  fill: var(--helix-color-foreground);
+  font-family: var(--helix-font-mono);
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+}
+
+/**
+ * Hovering an input dims every channel but that one.
+ *
+ * **`:has()` relates the row to its wire without nesting them.** A label and the
+ * route it feeds are in different layers of the drawing, drawn at different
+ * depths so the pulse can sit over the base; putting them in a shared group to
+ * make a `:hover` cascade work would flatten that ordering. Tagging both with
+ * the same channel and letting the svg match on `:has()` keeps the paint order
+ * and the relationship independent, which is what they are.
+ *
+ * **Decoration, not information.** The svg is `role="img"` with a description
+ * that already names every input and output, so nothing here is the only way to
+ * learn something. A reader who cannot hover has lost an emphasis, not a fact.
+ */
+.diagramSvg [data-ch] {
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    stroke-opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+.diagramSvg:has([data-ch]:hover) [data-ch] {
+  opacity: 0.22;
+}
+
+.diagramSvg:has([data-ch="brand"]:hover) [data-ch="brand"],
+.diagramSvg:has([data-ch="saturation"]:hover) [data-ch="saturation"],
+.diagramSvg:has([data-ch="density"]:hover) [data-ch="density"],
+.diagramSvg:has([data-ch="radius"]:hover) [data-ch="radius"] {
+  opacity: 1;
+}
+
+/* The hovered route lifts out of the base's usual near-invisibility, so the
+   path from one input to the hub reads as a single continuous thing. */
+.diagramSvg:has([data-ch]:hover) .diagramFan {
+  opacity: 1;
+}
+
+.diagramSvg:has([data-ch="brand"]:hover) .diagramBase [data-ch="brand"],
+.diagramSvg:has([data-ch="saturation"]:hover) .diagramBase [data-ch="saturation"],
+.diagramSvg:has([data-ch="density"]:hover) .diagramBase [data-ch="density"],
+.diagramSvg:has([data-ch="radius"]:hover) .diagramBase [data-ch="radius"] {
+  stroke: var(--helix-color-primary);
+  stroke-opacity: 0.9;
+}
+
+/* The label rows need a hit area; text alone is a thin target. */
+.diagramSvg g[data-ch] {
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagramSvg [data-ch] {
+    transition-duration: var(--helix-duration-instant);
+  }
+}

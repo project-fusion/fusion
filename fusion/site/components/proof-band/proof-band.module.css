@@ -1,0 +1,46 @@
+/**
+ * The measured comparison: the panel, its bars and its legend.
+ */
+
+/** A figure printed large enough to be the thing you read first. */
+.claimValue {
+  font-size: var(--helix-text-2xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1;
+}
+
+/**
+ * Tall enough for five bars to be compared rather than glanced at.
+ *
+ * **The second series is forced neutral, and that is an honesty fix.** The
+ * chart's default series palette paints the second one red, so every competitor
+ * reads as an error, including Material Web, which beats us on this row. A
+ * comparison that colors the winner as a failure is not a comparison. Ours takes
+ * the brand, theirs a muted neutral: the distinction a reader needs is which bar
+ * is which, not which is good.
+ */
+.proofBars {
+  block-size: 14rem;
+  inline-size: 100%;
+}
+
+/**
+ * Centered under the bars, not left-aligned with the title above them.
+ *
+ * A key belongs to the thing it explains, and the thing it explains is a
+ * full-width row of bars, so a left-aligned key sits under the first bar and
+ * reads as belonging to that one rather than to the row.
+ */
+.proofLegend {
+  display: flex;
+  justify-content: center;
+}
+
+/* On the panel rather than the chart, because the legend is the chart's sibling
+   and would otherwise keep the default palette while the bars changed. */
+.proofPanel {
+  --helix-color-series-1: var(--helix-color-primary);
+  --helix-color-series-2: var(--helix-color-foreground-subtle);
+}

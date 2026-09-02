@@ -1,5 +1,5 @@
-import landing from '@/components/landing.module.css'
 import { StillWhenUnseen } from '@/components/still-when-unseen/still-when-unseen'
+import styles from './derivation-diagram.module.css'
 
 /**
  * The derivation, drawn as a routing diagram.
@@ -30,10 +30,10 @@ import { StillWhenUnseen } from '@/components/still-when-unseen/still-when-unsee
  * "67" across the same figure, which says the inputs matter less. They do not.
  */
 export const DerivationDiagram = () => (
-  <StillWhenUnseen className={landing.diagram}>
+  <StillWhenUnseen className={styles.diagram}>
     <svg
       aria-labelledby="derivation-title derivation-desc"
-      className={landing.diagramSvg}
+      className={styles.diagramSvg}
       role="img"
       viewBox="0 44 1200 366"
     >
@@ -92,7 +92,7 @@ export const DerivationDiagram = () => (
             past each edge so the translation never exposes its own boundary, and
             the travel is 40, the pattern's pitch, so the loop returns to an
             identical arrangement and has no seam. */}
-        <g className={landing.diagramField}>
+        <g className={styles.diagramField}>
           <rect
             fill="url(#derivation-grid)"
             height="440"
@@ -105,7 +105,7 @@ export const DerivationDiagram = () => (
       </g>
 
       {/* The field. Small enough to be noticed second. */}
-      <g className={landing.diagramStars} fill="var(--helix-color-foreground)">
+      <g className={styles.diagramStars} fill="var(--helix-color-foreground)">
         <circle cx="597" cy="234" opacity="0.39" r="1.7" />
         <circle cx="1138" cy="362" opacity="0.20" r="1.3" />
         <circle cx="870" cy="155" opacity="0.17" r="1.2" />
@@ -180,7 +180,7 @@ export const DerivationDiagram = () => (
           the first dozen units of each arm, and hides the long sides that the
           dashed frame underneath is already drawing. */}
       <rect
-        className={landing.diagramCorners}
+        className={styles.diagramCorners}
         fill="none"
         height="312"
         mask="url(#derivation-corners)"
@@ -207,7 +207,7 @@ export const DerivationDiagram = () => (
           nothing balancing it below, and the block including them centers on 227
           where the four rows center on the hub at 240. Lifted out, the frame
           holds only the rows, and the rows are already centered. */}
-      <text className={landing.diagramLabel} fontSize="13" x="72" y="72">
+      <text className={styles.diagramLabel} fontSize="13" x="72" y="72">
         What you choose
       </text>
 
@@ -245,7 +245,7 @@ export const DerivationDiagram = () => (
       <g data-ch="brand">
         <rect fill="transparent" height="64" width="200" x="64" y="88" />
         <rect fill="var(--helix-color-primary)" height="32" rx="9" width="32" x="158.5" y="104" />
-        <text className={landing.diagramMeta} fontSize="15" textAnchor="end" x="246" y="126">
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="126">
           brand
         </text>
       </g>
@@ -253,7 +253,7 @@ export const DerivationDiagram = () => (
       <g data-ch="saturation">
         <rect fill="transparent" height="64" width="200" x="64" y="168" />
         <rect fill="url(#derivation-chroma)" height="14" rx="7" width="32" x="129.3" y="193" />
-        <text className={landing.diagramMeta} fontSize="15" textAnchor="end" x="246" y="206">
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="206">
           saturation
         </text>
       </g>
@@ -265,7 +265,7 @@ export const DerivationDiagram = () => (
           <line x1="147.9" x2="179.9" y1="280" y2="280" />
           <line x1="147.9" x2="179.9" y1="288" y2="288" />
         </g>
-        <text className={landing.diagramMeta} fontSize="15" textAnchor="end" x="246" y="286">
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="286">
           density
         </text>
       </g>
@@ -278,13 +278,13 @@ export const DerivationDiagram = () => (
           stroke="var(--helix-color-foreground-muted)"
           strokeWidth="1.6"
         />
-        <text className={landing.diagramMeta} fontSize="15" textAnchor="end" x="246" y="366">
+        <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="366">
           radius
         </text>
       </g>
 
       {/* ── The routing ─────────────────────────────────────────── */}
-      <g className={landing.diagramBase} fill="none" strokeLinecap="round" strokeWidth="1.8">
+      <g className={styles.diagramBase} fill="none" strokeLinecap="round" strokeWidth="1.8">
         {/* **Each run is one path, and each side is one group.** Two reasons,
             and the second is the one that shows. Four strokes flattening onto a
             shared tangent stack unless they composite together, which is what
@@ -292,19 +292,19 @@ export const DerivationDiagram = () => (
             another began there put five round caps on one point and handed the
             pulse off: one light arriving and ending, a different one starting.
             A flow drawn as a relay is not a flow. */}
-        <g className={landing.diagramFan}>
+        <g className={styles.diagramFan}>
           <path d="M280 120C340 120,340 240,400 240H488" data-ch="brand" />
           <path d="M280 200C340 200,340 240,400 240H488" data-ch="saturation" />
           <path d="M280 280C340 280,340 240,400 240H488" data-ch="density" />
           <path d="M280 360C340 360,340 240,400 240H488" data-ch="radius" />
         </g>
-        <g className={landing.diagramFan}>
+        <g className={styles.diagramFan}>
           <path d="M712 240H800C860 240,860 160,920 160" />
           <path d="M712 240H920" />
           <path d="M712 240H800C860 240,860 320,920 320" />
         </g>
       </g>
-      <g className={landing.diagramPulse} fill="none" strokeLinecap="round" strokeWidth="1.6">
+      <g className={styles.diagramPulse} fill="none" strokeLinecap="round" strokeWidth="1.6">
         <path d="M280 120C340 120,340 240,400 240H488" data-ch="brand" strokeDasharray="16.0 251.4">
           <animate
             attributeName="stroke-dashoffset"
@@ -392,7 +392,7 @@ export const DerivationDiagram = () => (
       {/* ── The engine ──────────────────────────────────────────── */}
       <circle cx="600" cy="240" fill="url(#derivation-bloom)" r="180" />
       <circle
-        className={landing.diagramRing}
+        className={styles.diagramRing}
         cx="600"
         cy="240"
         fill="none"
@@ -413,7 +413,7 @@ export const DerivationDiagram = () => (
           the reading in front reads as instrumentation rather than as type on a
           busy ground. */}
       <foreignObject height="224" width="224" x="488" y="128">
-        <div className={landing.diagramGlass} />
+        <div className={styles.diagramGlass} />
       </foreignObject>
       <circle
         cx="600"
@@ -437,12 +437,12 @@ export const DerivationDiagram = () => (
           until you can see that 4.5 is the line a build passes or fails on. */}
       <g fill="none" strokeLinecap="round">
         <path
-          className={landing.diagramGaugeTrack}
+          className={styles.diagramGaugeTrack}
           d="M532.1 307.9A96 96 0 1 1 667.9 307.9"
           strokeWidth="2"
         />
         <path
-          className={landing.diagramGaugeValue}
+          className={styles.diagramGaugeValue}
           d="M532.1 307.9A96 96 0 0 1 662.3 167.0"
           strokeDasharray="294.1"
           strokeWidth="3"
@@ -455,14 +455,14 @@ export const DerivationDiagram = () => (
             values="294.1;294.1;0;0"
           />
         </path>
-        <g className={landing.diagramGaugeTick} strokeLinecap="butt">
+        <g className={styles.diagramGaugeTick} strokeLinecap="butt">
           <path d="M534.6 174.6L529.6 169.6" strokeOpacity="0.5" strokeWidth="1.2" />
           <path d="M634.3 157.3L639.2 145.3" strokeOpacity="0.9" strokeWidth="1.8" />
           <path d="M665.4 305.4L670.4 310.4" strokeOpacity="0.5" strokeWidth="1.2" />
         </g>
       </g>
       <text
-        className={landing.diagramGaugeLabel}
+        className={styles.diagramGaugeLabel}
         fontSize="13"
         textAnchor="middle"
         x="625.3"
@@ -481,25 +481,25 @@ export const DerivationDiagram = () => (
         x="552"
         y="194"
       />
-      <text className={landing.diagramSample} fontSize="34" x="600" y="232">
+      <text className={styles.diagramSample} fontSize="34" x="600" y="232">
         Aa
       </text>
 
-      <text className={landing.diagramCoreSmall} fontSize="26" x="600" y="292">
+      <text className={styles.diagramCoreSmall} fontSize="26" x="600" y="292">
         4.9:1
       </text>
-      <text className={landing.diagramCoreMuted} fontSize="13" textAnchor="middle" x="600" y="312">
+      <text className={styles.diagramCoreMuted} fontSize="13" textAnchor="middle" x="600" y="312">
         measured contrast
       </text>
 
       {/* ── What comes out ──────────────────────────────────────── */}
-      <text className={landing.diagramLabel} fontSize="13" x="1030" y="72">
+      <text className={styles.diagramLabel} fontSize="13" x="1030" y="72">
         What comes out
       </text>
-      <text className={landing.diagramFigure} fontSize="34" x="954" y="164">
+      <text className={styles.diagramFigure} fontSize="34" x="954" y="164">
         179
       </text>
-      <text className={landing.diagramMeta} fontSize="15" x="954" y="185">
+      <text className={styles.diagramMeta} fontSize="15" x="954" y="185">
         semantic tokens
       </text>
 
@@ -513,14 +513,14 @@ export const DerivationDiagram = () => (
         x="988"
         y="227"
       />
-      <text className={landing.diagramMeta} fontSize="15" x="1030" y="246">
+      <text className={styles.diagramMeta} fontSize="15" x="1030" y="246">
         both schemes
       </text>
 
-      <text className={landing.diagramFigure} fontSize="34" x="954" y="324">
+      <text className={styles.diagramFigure} fontSize="34" x="954" y="324">
         67
       </text>
-      <text className={landing.diagramMeta} fontSize="15" x="954" y="345">
+      <text className={styles.diagramMeta} fontSize="15" x="954" y="345">
         pairs measured
       </text>
     </svg>
@@ -554,13 +554,13 @@ export const DerivationDiagram = () => (
  * both.
  */
 export const DerivationDiagramStacked = () => (
-  <div className={landing.diagramStacked}>
+  <div className={styles.diagramStacked}>
     {/* Hidden on the element rather than only on the wrapper: the pair must read
         once, the wide figure carries the `title` and `desc` for both, and the
         a11y lint asks the question of the `svg` itself. */}
     <svg
       aria-hidden="true"
-      className={landing.diagramStackedSvg}
+      className={styles.diagramStackedSvg}
       role="presentation"
       viewBox="0 0 340 374"
     >
@@ -571,7 +571,7 @@ export const DerivationDiagramStacked = () => (
         </linearGradient>
       </defs>
 
-      <text className={landing.diagramLabel} fontSize="11" x="8" y="14">
+      <text className={styles.diagramLabel} fontSize="11" x="8" y="14">
         What you choose
       </text>
 
@@ -579,7 +579,7 @@ export const DerivationDiagramStacked = () => (
           is what `saturation` needs at 11 and the widest of the four. */}
       <g>
         <rect fill="var(--helix-color-primary)" height="24" rx="7" width="24" x="30" y="34" />
-        <text className={landing.diagramMeta} fontSize="11" textAnchor="middle" x="42" y="76">
+        <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="42" y="76">
           brand
         </text>
       </g>
@@ -593,7 +593,7 @@ export const DerivationDiagramStacked = () => (
           x="115"
           y="40"
         />
-        <text className={landing.diagramMeta} fontSize="11" textAnchor="middle" x="127" y="76">
+        <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="127" y="76">
           saturation
         </text>
       </g>
@@ -603,7 +603,7 @@ export const DerivationDiagramStacked = () => (
         <line x1="200" x2="224" y1="46" y2="46" />
         <line x1="200" x2="224" y1="52" y2="52" />
       </g>
-      <text className={landing.diagramMeta} fontSize="11" textAnchor="middle" x="212" y="76">
+      <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="212" y="76">
         density
       </text>
 
@@ -613,21 +613,21 @@ export const DerivationDiagramStacked = () => (
         stroke="var(--helix-color-foreground-muted)"
         strokeWidth="1.6"
       />
-      <text className={landing.diagramMeta} fontSize="11" textAnchor="middle" x="297" y="76">
+      <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="297" y="76">
         radius
       </text>
 
       {/* In to the hub, out to the readings. One group so the four strokes
           composite together rather than stacking where they meet, which is the
           same reason the wide figure groups its runs. */}
-      <g className={landing.diagramBase} fill="none" strokeLinecap="round" strokeWidth="1.6">
-        <g className={landing.diagramFan}>
+      <g className={styles.diagramBase} fill="none" strokeLinecap="round" strokeWidth="1.6">
+        <g className={styles.diagramFan}>
           <path d="M42 88C42 132,170 128,170 168" />
           <path d="M127 88C127 132,170 134,170 168" />
           <path d="M212 88C212 132,170 134,170 168" />
           <path d="M297 88C297 132,170 128,170 168" />
         </g>
-        <g className={landing.diagramFan}>
+        <g className={styles.diagramFan}>
           <path d="M170 168C170 208,57 206,57 248" />
           <path d="M170 168V248" />
           <path d="M170 168C170 208,283 206,283 248" />
@@ -639,13 +639,13 @@ export const DerivationDiagramStacked = () => (
       {/* Three across, each number over its two words. Split onto two lines
           rather than shrunk: 113 units a column will not hold `semantic tokens`
           on one line at a size anybody reads. */}
-      <text className={landing.diagramFigure} fontSize="26" textAnchor="middle" x="57" y="288">
+      <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="57" y="288">
         179
       </text>
-      <text className={landing.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="308">
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="308">
         semantic
       </text>
-      <text className={landing.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="322">
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="322">
         tokens
       </text>
 
@@ -659,24 +659,24 @@ export const DerivationDiagramStacked = () => (
         x="173"
         y="264"
       />
-      <text className={landing.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="308">
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="308">
         both
       </text>
-      <text className={landing.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="322">
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="322">
         schemes
       </text>
 
-      <text className={landing.diagramFigure} fontSize="26" textAnchor="middle" x="283" y="288">
+      <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="283" y="288">
         67
       </text>
-      <text className={landing.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="308">
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="308">
         pairs
       </text>
-      <text className={landing.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="322">
+      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="322">
         measured
       </text>
 
-      <text className={landing.diagramLabel} fontSize="11" textAnchor="end" x="332" y="360">
+      <text className={styles.diagramLabel} fontSize="11" textAnchor="end" x="332" y="360">
         What comes out
       </text>
     </svg>

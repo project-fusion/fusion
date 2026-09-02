@@ -1,0 +1,412 @@
+/**
+ * The theme bar: the controls, the readout and the rail they sit on.
+ */
+
+/* Gone by the time the footer is here. The rail is what moves rather than the
+   pill, so the pill's own arrival animation and its open/close width are left
+   alone: two things animating one element is how a control ends up half open
+   and half retired.
+
+   Down and out rather than a fade alone, so it reads as leaving the screen it
+   was floating over. `visibility` on the same timing with `allow-discrete`, so
+   a retired control is not a transparent thing still taking clicks. */
+.fabRail[data-retired] {
+  opacity: 0;
+  pointer-events: none;
+  translate: 0 calc(var(--helix-space-3xl) * 1.5);
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fabRail {
+    transition:
+      opacity var(--helix-duration-slow) var(--helix-easing-standard),
+      translate var(--helix-duration-slow) var(--helix-easing-standard),
+      visibility var(--helix-duration-slow) allow-discrete;
+  }
+}
+
+.fabRail {
+  display: flex;
+  inset-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
+  inset-inline: 0;
+  justify-content: center;
+  padding-inline: var(--helix-space-md);
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--helix-layer-sticky);
+}
+
+/**
+ * The pill, and the bar it becomes.
+ *
+ * **Both faces occupy one grid cell**, so the container's width is the only
+ * thing that moves and the two states cross-fade in place. Swapping one node for
+ * another would pop, and the whole gesture is that this was always the same
+ * object.
+ *
+ * **Real transparency, not a tinted panel**, and the site's own rather than a
+ * mix tuned here. The pill floats over the same page the bands sit on, so it is
+ * the same glass: low enough that the page reads through it and the blur has
+ * something to do, and `saturate` above 1 putting back the chroma a heavy blur
+ * washes out, which is the difference between glass and frosted plastic. Both
+ * of those are what `--site-glass` is; neither was a reason to state a second
+ * mix, which is all the old one turned out to be.
+ */
+.fab {
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
+  /* **No stroke.** The shadow already separates the pill from whatever it is
+     over, and a line around a translucent object reads as the edge of a sheet
+     rather than the shape of a control. */
+  border: 0;
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  /**
+   * **One height for both states, stated rather than inherited.**
+   *
+   * The collapsed face is a line of text and the open bar holds sliders and a
+   * toggle group, so left to their content the pill is noticeably shorter than
+   * the bar it becomes: the thing grows in two directions at once and the morph
+   * reads as two elements swapping rather than one changing shape. Only the
+   * width should move.
+   *
+   * **One control tall, as the token rather than as a number.**
+   * `--helix-size-control-md` is 2.5rem, the same height the system gives every
+   * other medium control, and the `sm` icon button inside it is 2rem by the same
+   * scale. Stating it as the token is what makes the contents proportional
+   * rather than separately tuned, and a theme that moves the density seed moves
+   * the bar and its controls together.
+   */
+  block-size: var(--helix-size-control-md);
+  display: grid;
+  grid-template-areas: "stack";
+  inline-size: 13rem;
+  overflow: hidden;
+  padding-inline: var(--helix-space-2xs);
+  /* **Centered down the block, stretched across the inline.** `center` on both
+     axes shrink-wrapped each face to its own content, so the collapsed pill was
+     13rem of glass with a hit area only as wide as "Make it yours" and the band
+     either side of it did nothing on click. Stretching the inline axis makes
+     each face fill the shape it is drawn as, which is also what lets the open
+     bar's sliders take their `flex` share of the width instead of sitting at
+     their minimum. */
+  place-items: center stretch;
+  pointer-events: auto;
+  transition:
+    inline-size var(--helix-duration-slow) var(--helix-easing-spring),
+    background var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+/* An explicit number, because `auto` does not animate. The cost of the effect is
+   that a sixth control means changing this line. */
+.fabOpen {
+  inline-size: min(54rem, calc(100vw - 2.5rem));
+}
+
+.fabFace,
+.fabTools {
+  grid-area: stack;
+  min-inline-size: 0;
+}
+
+.fabFace {
+  align-items: center;
+  block-size: 100%;
+  background: none;
+  border: 0;
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  /* Semibold at 14px, because the pill is a label rather than a line of prose:
+     at regular weight it read as a caption that happened to be on glass. */
+  font-weight: var(--helix-weight-semibold);
+  gap: var(--helix-space-sm);
+  justify-content: center;
+  /* `sm` rather than `md`. The face is centered in a pill whose width is set
+     elsewhere, so its inline padding was buying nothing but distance between
+     the dot and the words. */
+  padding-inline: var(--helix-space-sm);
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-accelerate);
+  white-space: nowrap;
+}
+
+/* The swatch on the collapsed pill: the brand, and nothing drawn around it.
+ *
+ * **No ring.** A hairline keeps a pale brand from disappearing into the glass
+ * and outlines the one element on the pill whose whole job is to be a color. A
+ * swatch with a stroke reads as a control; without one it reads as paint, which
+ * is what it is.
+ *
+ * **And the corner is the theme's, not `full`.** The pill it lives on and every
+ * card behind it answer to the radius slider two controls away, so a `radii-full`
+ * dot stays a circle while that slider squares off the entire page around it.
+ * `radii-sm` is the step a box this size takes, and at the shipped seed it is
+ * 4px against a 10.4px swatch: still visibly round, and round by the same rule
+ * as everything else. */
+.fabDot {
+  background: var(--swatch);
+  block-size: 0.65rem;
+  border-radius: var(--helix-radii-sm);
+  flex: none;
+  inline-size: 0.65rem;
+}
+
+/* **The row fills the pill, which is what puts the close control at its end.**
+ *
+ * `fabTools` is a flex container holding one `helix-flex`, and a child with no
+ * `flex` of its own sizes to its content: on a pill opened to 54rem the controls
+ * sit against the left and the rest is dead glass. The close button is the last
+ * thing in the row, so it stops wherever the content does rather than at the
+ * edge a reader looks for it, which reads as the control not being there at all.
+ *
+ * Filling the row is also what the sliders ask for. Each channel is
+ * `flex: 1 1 0`, which distributes free space and otherwise has none. */
+.fabTools > * {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.fabTools {
+  align-items: center;
+  block-size: 100%;
+  display: flex;
+  opacity: 0;
+  padding-inline: var(--helix-space-xs);
+  pointer-events: none;
+  /* Held back until the pill has most of its width, so the controls arrive into
+     room that already exists rather than being squeezed out of a closing gap. */
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-decelerate)
+    var(--helix-duration-fast);
+}
+
+.fabOpen .fabFace {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fabOpen .fabTools {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fabChannel {
+  flex: 1 1 0;
+  min-inline-size: 4rem;
+}
+
+/**
+ * A bar on a pointer, a sheet on a finger.
+ *
+ * **The labels are the reason, not the layout.** Every control in here is named
+ * by a `helix-tooltip` and an `aria-label`. A touch screen has no hover, so the
+ * tooltip never opens, and `aria-label` is for a screen reader rather than for
+ * looking at: on a phone the open bar was three unlabelled sliders, a picker and
+ * a row of colored dots, with nothing on screen saying which slider was
+ * saturation. Making it a sheet is what buys the room to say so.
+ *
+ * `display: contents` above the breakpoint, so the wrapper each row is built
+ * from does not exist as far as the bar's flex layout is concerned. The desktop
+ * arrangement is unchanged rather than reconstructed.
+ */
+.fabRow {
+  display: contents;
+}
+
+.fabRowLabel {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  /* The rail stops centering a pill and starts holding a sheet against the
+     bottom edge. The closed pill keeps its own gap, so only the open state is
+     flush. */
+  .fabRail {
+    inset-block-end: 0;
+    padding-inline: 0;
+  }
+
+  .fab:not([data-open]) {
+    margin-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /**
+   * **Tall enough for its contents and no taller.** A sheet that takes the
+   * screen is a page, and this is a set of controls for the page behind it:
+   * covering that page hides the thing every one of these sliders is changing.
+   * `block-size: auto` lets the six rows decide, and the cap is only there so a
+   * future seventh cannot push it over the fold.
+   */
+  .fab[data-open] {
+    block-size: auto;
+    border-end-end-radius: 0;
+    border-end-start-radius: 0;
+    border-start-end-radius: var(--helix-radii-lg);
+    border-start-start-radius: var(--helix-radii-lg);
+    inline-size: 100%;
+    max-block-size: 80dvh;
+    overflow-y: auto;
+    padding: var(--helix-space-md);
+    padding-block-end: calc(var(--helix-space-md) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* The two faces share one grid cell so the pill can morph into the bar. A
+     sheet sizes to its contents, so the collapsed face has to stop contributing
+     a height once it is not the thing being shown. */
+  .fab[data-open] .fabFace {
+    display: none;
+  }
+
+  /* **And the same in the other direction, which was missing.**
+   *
+   * The two faces share one grid cell, so the cell is as tall as the taller of
+   * them. Above this breakpoint the open state is a bar and both are one line,
+   * so nothing shows. Below it the open state is a sheet: measured at 390, the
+   * closed pill's button was 200x404 rather than 200x40, because the hidden
+   * sheet was still laying out in the cell it shares. `.fabFace` is
+   * `block-size: 100%`, so the label centered in 404px of button while the pill
+   * clipped to 40, and `Make it yours` was drawn outside its own pill. The
+   * control looked like an empty rounded rectangle on every phone.
+   *
+   * `opacity` alone cannot fix it, which is why the rule above exists at all: an
+   * invisible box still takes its space. */
+  .fab:not([data-open]) .fabTools {
+    display: none;
+  }
+
+  /* Stated on the element rather than passed as `direction`, because the row is
+     right on a pointer and this is the same markup. A document rule outranks the
+     component's own `:host`, which is what makes one attribute serve both. */
+  .fabStack {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--helix-space-md);
+  }
+
+  .fabRow {
+    display: grid;
+    gap: var(--helix-space-2xs);
+  }
+
+  .fabRowLabel {
+    color: var(--helix-color-foreground-muted);
+    display: block;
+    font-size: var(--helix-text-xs);
+  }
+
+  /* Full width, which is the whole point of the sheet: a slider is a target
+     before it is a readout, and 4rem of track is a poor one for a thumb. */
+  .fabChannel {
+    inline-size: 100%;
+  }
+
+  /* A rule between columns says nothing once they are rows; the gap does. */
+  .fabDivider {
+    display: none;
+  }
+
+  /* First and hard against the trailing edge, so the sheet opens with its exit
+     where a sheet's exit is, rather than below six controls.
+
+     `align-self` and not `justify-self`: the stack is a flex column, where the
+     cross axis is the inline one and `justify-self` is ignored outright. Written
+     the other way it sat at the leading edge, which is where a flex item goes
+     when you have told it nothing. */
+  .fabClose {
+    align-self: flex-end;
+    order: -1;
+  }
+}
+
+/* The morph is the decoration; the two states are not. A reader who asked for
+   less motion gets the same control, arriving instantly. */
+@media (prefers-reduced-motion: reduce) {
+  .fab,
+  .fabFace,
+  .fabTools {
+    transition-duration: var(--helix-duration-instant);
+  }
+}
+
+.fabDivider {
+  align-self: stretch;
+  background: color-mix(in oklab, var(--helix-color-border) 70%, transparent);
+  inline-size: 1px;
+  margin-inline: var(--helix-space-2xs);
+}
+
+.fabReadout {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+}
+
+/* **Written here rather than up in the sheet's own block, and the reason is the
+   cascade.** As `.fabReadoutRow .fabReadout` it is two selectors beating one,
+   which `noDescendingSpecificity` flags because it only works by outweighing a
+   rule that comes later. At equal weight the order decides, so the override
+   belongs after the thing it overrides. Same trap as the `.bandSplit` reset and
+   the closing card's radius. */
+@media (max-width: 40rem) {
+  .fabReadout {
+    justify-content: space-between;
+  }
+}
+
+.fabSwatches {
+  display: flex;
+  /* Overlapped, so eight roles read as one palette rather than as eight chips. */
+  padding-inline-start: var(--helix-space-2xs);
+}
+
+.fabSwatch {
+  background: var(--swatch);
+  block-size: 0.85rem;
+  border-radius: var(--helix-radii-full);
+  box-shadow: 0 0 0 2px var(--helix-color-surface-overlay);
+  inline-size: 0.85rem;
+  margin-inline-start: calc(var(--helix-space-2xs) * -1);
+}
+
+/**
+ * The verdict. Neutral when everything clears, because a green badge on every
+ * palette is a badge that means nothing; it only earns a color when it fails.
+ */
+.fabVerdict {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.fabVerdict[data-failing] {
+  color: var(--helix-color-danger);
+}
+
+/**
+ * Eight swatches and a verdict need room, and at 66rem the bar spans nearly the
+ * whole viewport and stops reading as a floating instrument. Wide enough to hold
+ * the row, narrow enough to still be an object on the page rather than a second
+ * header stuck to the bottom.
+ */
+.fabOpen {
+  inline-size: min(58rem, calc(100vw - 3rem));
+}
+
+/* The tooltip is now the flex child, so it carries the sizing the slider had. */
+.fabTip {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
+.fabTip .fabChannel {
+  inline-size: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fab {
+    animation: site-fab-arrive calc(var(--helix-duration-slow) * 2) var(--helix-easing-spring)
+      calc(var(--helix-duration-slow) * 5) backwards;
+  }
+}

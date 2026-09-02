@@ -6,11 +6,11 @@ import {
   DerivationDiagramStacked,
 } from '@/components/derivation-diagram/derivation-diagram'
 import { Hero } from '@/components/hero/hero'
-import landing from '@/components/landing.module.css'
 import { ProofBand } from '@/components/proof-band/proof-band'
 import { Showcase } from '@/components/showcase/showcase'
 import { ThemeScope } from '@/components/theme-context/theme-context'
 import { ThemeFab } from '@/components/theme-fab/theme-fab'
+import type_ from '@/components/type.module.css'
 import { INSIGHTS } from '@/content/insights'
 import {
   DELIVERY,
@@ -22,6 +22,7 @@ import {
 } from '@/content/landing/helix-landing'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
+import styles from './page.module.css'
 
 export const metadata = pageMetadata({
   description: HERO.description,
@@ -54,9 +55,7 @@ export default function Home() {
 
   return (
     <ThemeScope>
-      <div
-        className={`${landing.reel} ${landing.oneBrand} ${landing.fabClearance} ${landing.noRules}`}
-      >
+      <div className={`${styles.reel} ${styles.oneBrand} ${styles.fabClearance} ${styles.noRules}`}>
         {/* **The field, and nothing tempering it.** A scrim over this, a
           vertical gradient of the page background holding the aura back
           everywhere at once, answers a problem already solved elsewhere: every
@@ -85,7 +84,7 @@ export default function Home() {
             gradient rather than a seam, and is the price of one canvas over nine
             screens instead of two over four. */}
         <helix-aura
-          class={landing.reelAura}
+          class={styles.reelAura}
           data-layer
           gain={1.05}
           scale={3.5}
@@ -100,16 +99,16 @@ export default function Home() {
           this reads the next band; one who does not was never the buyer. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <h2 className={landing.tTitle}>{PROBLEM.title}</h2>
-            <p className={landing.tLede}>{PROBLEM.lede}</p>
+            <h2 className={type_.tTitle}>{PROBLEM.title}</h2>
+            <p className={type_.tLede}>{PROBLEM.lede}</p>
           </helix-flex>
 
-          <div className={`${band.bandRow} ${landing.stagger}`}>
+          <div className={`${band.bandRow} ${styles.stagger}`}>
             {MECHANISMS.map((one) => (
               <helix-flex class={band.bandCell} direction="column" gap="md" key={one.name}>
-                <p className={landing.tLabel}>{one.name}</p>
-                <p className={landing.tClaim}>{one.claim}</p>
-                <ul className={landing.proofList}>
+                <p className={type_.tLabel}>{one.name}</p>
+                <p className={type_.tClaim}>{one.claim}</p>
+                <ul className={styles.proofList}>
                   {one.bullets.map((line) => (
                     <li key={line}>{line}</li>
                   ))}
@@ -128,9 +127,9 @@ export default function Home() {
                   with the lede saying which of the three costs is answered, tells
                   a reader this is depth rather than a change of subject. */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <p className={landing.tLabel}>Derived, not picked</p>
-            <h2 className={landing.tTitle}>What happens between the color and the page</h2>
-            <p className={landing.tLede}>
+            <p className={type_.tLabel}>Derived, not picked</p>
+            <h2 className={type_.tTitle}>What happens between the color and the page</h2>
+            <p className={type_.tLede}>
               The first of those three, drawn out. One value goes in, the whole token layer comes
               out, and every pair it produces is measured against the ground it lands on before any
               of it reaches a page.
@@ -155,9 +154,9 @@ export default function Home() {
                     other two mechanisms are: "Derived, not picked" above and
                     "Measured, not claimed" below. A label naming the subject,
                     "The library", leaves the pattern two-thirds visible. */}
-              <p className={landing.tLabel}>Standards, not bindings</p>
-              <h2 className={landing.tTitle}>Every control here is the real one</h2>
-              <p className={landing.tLede}>
+              <p className={type_.tLabel}>Standards, not bindings</p>
+              <h2 className={type_.tTitle}>Every control here is the real one</h2>
+              <p className={type_.tLede}>
                 Not a screenshot and not a video. These are custom elements from the package,
                 upgrading in your browser on the page you are already reading.
               </p>
@@ -216,15 +215,15 @@ export default function Home() {
           page ends in light rather than trailing off into flat ground. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <p className={landing.tLabel}>How it arrives</p>
-            <h2 className={landing.tTitle}>{DELIVERY.title}</h2>
-            <p className={landing.tLede}>{DELIVERY.lede}</p>
+            <p className={type_.tLabel}>How it arrives</p>
+            <h2 className={type_.tTitle}>{DELIVERY.title}</h2>
+            <p className={type_.tLede}>{DELIVERY.lede}</p>
           </helix-flex>
 
-          <div className={`${band.bandRow} ${landing.stagger}`}>
+          <div className={`${band.bandRow} ${styles.stagger}`}>
             {SERVICES.map((service) => (
               <helix-flex class={band.bandCell} direction="column" gap="sm" key={service.name}>
-                <p className={landing.tClaim}>{service.name}</p>
+                <p className={type_.tClaim}>{service.name}</p>
                 <helix-text as="p" tone="muted">
                   {service.summary}
                 </helix-text>
@@ -247,15 +246,15 @@ export default function Home() {
           quick, that they keep it, and that we say what is unfinished. */}
         <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <p className={landing.tLabel}>The engagement</p>
-            <h2 className={landing.tTitle}>{ENGAGEMENT_COPY.title}</h2>
-            <p className={landing.tLede}>{ENGAGEMENT_COPY.lede}</p>
+            <p className={type_.tLabel}>The engagement</p>
+            <h2 className={type_.tTitle}>{ENGAGEMENT_COPY.title}</h2>
+            <p className={type_.tLede}>{ENGAGEMENT_COPY.lede}</p>
           </helix-flex>
 
-          <div className={`${band.bandRow} ${landing.stagger}`}>
+          <div className={`${band.bandRow} ${styles.stagger}`}>
             {ENGAGEMENT.map((one) => (
               <helix-flex class={band.bandCell} direction="column" gap="sm" key={one.name}>
-                <p className={landing.tClaim}>{one.name}</p>
+                <p className={type_.tClaim}>{one.name}</p>
                 <helix-text as="p" tone="muted">
                   {one.body}
                 </helix-text>
@@ -286,8 +285,8 @@ export default function Home() {
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <helix-flex align="center" gap="md" justify="between" wrap>
               <helix-flex direction="column" gap="sm">
-                <p className={landing.tLabel}>Insights</p>
-                <h2 className={landing.tTitle}>The arguments, written down</h2>
+                <p className={type_.tLabel}>Insights</p>
+                <h2 className={type_.tTitle}>The arguments, written down</h2>
               </helix-flex>
               <Link data-button="subtle" data-button-width="standard" href="/insights">
                 Read all
@@ -295,7 +294,7 @@ export default function Home() {
             </helix-flex>
             {/* Below the row rather than inside it, so `Read all` stays on the
                     heading's line and the sentence runs the full measure. */}
-            <p className={landing.tLede}>
+            <p className={type_.tLede}>
               Design, engineering and business decisions, with the reasoning kept in.
             </p>
           </helix-flex>
@@ -308,10 +307,10 @@ export default function Home() {
                   exempting it, and the cell is the link so the whole of it is the
                   target. The full card, with its art and its glass, is what
                   `/insights` shows. */}
-          <div className={`${band.bandRow} ${landing.insightRow}`}>
+          <div className={`${band.bandRow} ${styles.insightRow}`}>
             {INSIGHTS.slice(0, 4).map((insight) => (
               <Link
-                className={`${band.bandCell} ${landing.insightCell}`}
+                className={`${band.bandCell} ${styles.insightCell}`}
                 href={`/insights/${insight.slug}`}
                 key={insight.slug}
               >
@@ -330,10 +329,10 @@ export default function Home() {
           </div>
         </Band>
 
-        <section className={landing.closingCard} data-band data-closing data-material="glass">
+        <section className={styles.closingCard} data-band data-closing data-material="glass">
           <helix-flex align="center" data-shell direction="column" gap="lg">
-            <h2 className={landing.tTitle}>Take on the work</h2>
-            <p className={landing.tLede}>
+            <h2 className={type_.tTitle}>Take on the work</h2>
+            <p className={type_.tLede}>
               Tell us what you need built. We will say plainly if we are not the right people.
             </p>
             <a

@@ -1,6 +1,7 @@
 import { Band, band } from '@/components/band/band'
-import landing from '@/components/landing.module.css'
+import type_ from '@/components/type.module.css'
 import { BUTTON, CLAIMS, METRICS_HREF } from '@/content/landing/proof'
+import styles from './proof-band.module.css'
 
 /**
  * The numbers, on the front of the site.
@@ -19,7 +20,7 @@ import { BUTTON, CLAIMS, METRICS_HREF } from '@/content/landing/proof'
 export const ProofBand = () => (
   <Band>
     <helix-flex class={band.bandSection} direction="column" gap="sm">
-      <p className={landing.tLabel}>Measured, not claimed</p>
+      <p className={type_.tLabel}>Measured, not claimed</p>
       {/* **Not "fast" and not "small".** Both are adjectives a reader has been
           promised by every library they have ever evaluated, and neither is
           checkable. The kicker above carries the epistemics, so this heading
@@ -36,7 +37,7 @@ export const ProofBand = () => (
     <div className={band.bandRow}>
       {CLAIMS.map((claim) => (
         <helix-flex class={band.bandCell} direction="column" gap="2xs" key={claim.label}>
-          <helix-text as="p" class={landing.claimValue}>
+          <helix-text as="p" class={styles.claimValue}>
             {claim.value}
           </helix-text>
           <helix-text as="p" variant="label">
@@ -49,7 +50,7 @@ export const ProofBand = () => (
       ))}
     </div>
 
-    <helix-flex class={`${landing.proofPanel} ${band.bandSection}`} direction="column" gap="md">
+    <helix-flex class={`${styles.proofPanel} ${band.bandSection}`} direction="column" gap="md">
       <helix-flex direction="column" gap="2xs">
         <helix-text as="h3" data-substrate-name>
           One button, five systems
@@ -93,12 +94,12 @@ export const ProofBand = () => (
       </table>
 
       <helix-bar-chart
-        class={landing.proofBars}
+        class={styles.proofBars}
         emphasis="outlined"
         for="proof-button"
         wash="gradient"
       ></helix-bar-chart>
-      <helix-legend class={landing.proofLegend} for="proof-button"></helix-legend>
+      <helix-legend class={styles.proofLegend} for="proof-button"></helix-legend>
 
       <helix-flex data-density="lg">
         <a data-button="subtle" data-button-width="standard" href={METRICS_HREF}>

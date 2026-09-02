@@ -2,8 +2,8 @@
 
 import type { HelixColorPicker } from '@fusion.dev/helix'
 import { useEffect, useRef } from 'react'
-import landing from '@/components/landing.module.css'
 import { useThemeControls } from '@/components/theme-context/theme-context'
+import styles from './brand-picker.module.css'
 
 /**
  * The brand control, as a swatch that opens the picker.
@@ -59,7 +59,7 @@ export const BrandPicker = () => {
     <helix-popover placement="bottom-start">
       <button
         aria-label={`Brand color, currently ${c.brand}`}
-        className={landing.brandSwatch}
+        className={styles.brandSwatch}
         slot="trigger"
         style={{ '--swatch': c.brand } as React.CSSProperties}
         type="button"

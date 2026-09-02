@@ -1,0 +1,57 @@
+/**
+ * The chip under the hero heading, pointing at what is coming.
+ */
+
+/**
+ * **No border, a fill instead.** The whole page is losing its strokes, and this
+ * is the smallest element to prove the rule on: a pill outlined in a hairline
+ * reads as a control, and a pill that is just a tint reads as a label you can
+ * press.
+ */
+.kicker {
+  align-items: center;
+  background: color-mix(in oklab, var(--helix-color-primary) 12%, transparent);
+  /* **The theme's corner, not a pill.** Every card, button and control on the
+     page answers to the radius slider, so a `radii-full` banner and chip stay
+     capsules while the page squares off around them. `md` on the banner and `sm`
+     on the chip keeps the size relationship without either opting out of the
+     theme. */
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground);
+  display: inline-flex;
+  font-size: var(--helix-text-md);
+  gap: var(--helix-space-sm);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-2xs) var(--helix-space-md);
+  text-decoration: none;
+  transition: background var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.kicker:hover {
+  background: color-mix(in oklab, var(--helix-color-primary) 20%, transparent);
+}
+
+.kickerBadge {
+  background: var(--helix-color-primary);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-on-accent);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-semibold);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
+}
+
+.kickerText {
+  color: var(--helix-color-foreground-muted);
+}
+
+/* Slides on hover, which is the only motion a link this small can carry without
+   becoming a distraction next to a display line. */
+.kickerArrow {
+  color: var(--helix-color-primary);
+  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.kicker:hover .kickerArrow {
+  translate: 3px 0;
+}

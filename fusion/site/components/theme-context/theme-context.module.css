@@ -1,0 +1,44 @@
+/**
+ * The scope a page-local palette is painted onto.
+ */
+
+/**
+ * The themed scope has to paint its own ground.
+ *
+ * A scope that sets `--helix-color-background` and does not paint with it has
+ * described a ground rather than drawn one: switch the scheme and the tokens
+ * move to light while the page under them stays the site's dark, so the derived
+ * light border reads as bright white gridlines over a black page and the body
+ * text goes near-invisible.
+ *
+ * `color-scheme` is the half a token cannot cover: form controls, scrollbars and
+ * the canvas behind an overscroll are the browser's, and they follow this
+ * property rather than any custom one.
+ */
+/**
+ * **A page made of the site's glass needs this ancestor, and that is not
+ * obvious from anything the glass itself says.**
+ *
+ * The services page was built with the same `--site-glass`, the same
+ * `--site-glass-backdrop`, the same field and the same panel markup, and did not
+ * look the same. Every computed property on the two cards matched, the filter
+ * was live, and the backdrop-root topology above them was identical; what
+ * differed was that the landing page had this wrapper and the other page did
+ * not. Adding it settled it at once.
+ *
+ * What it supplies is a *stated* ground and a *stated* scheme: an opaque
+ * `--helix-color-background` for the glass to composite against, and a
+ * `color-scheme` for every `light-dark()` under it to resolve against. Left to
+ * the document, both are whatever the document happens to be.
+ *
+ * So it is `ThemeScope` rather than a class anybody remembers to add, and a page
+ * that wants the site's panels wraps itself in that component. Recorded here
+ * because the cost of not knowing it was several hours of measuring the cards
+ * and finding nothing wrong with them.
+ */
+.themedScope {
+  background: var(--helix-color-background);
+  color: var(--helix-color-foreground);
+  color-scheme: var(--preview-color-scheme, light dark);
+  min-block-size: 100svh;
+}

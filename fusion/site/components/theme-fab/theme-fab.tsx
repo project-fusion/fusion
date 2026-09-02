@@ -3,11 +3,11 @@
 import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { BrandPicker } from '@/components/brand-picker/brand-picker'
-import landing from '@/components/landing.module.css'
 import { STORAGE_KEY } from '@/components/preferences/preferences'
 import { useThemeControls } from '@/components/theme-context/theme-context'
 import { forgetSiteTheme } from '@/utils/site-theme/site-theme'
 import { BOUNDS } from '@/utils/theme-defaults/theme-defaults'
+import styles from './theme-fab.module.css'
 
 /**
  * A pill that says "Make it yours", and becomes the toolbar that does it.
@@ -102,9 +102,9 @@ export const ThemeFab = () => {
   }, [open])
 
   return (
-    <div className={landing.fabRail} data-retired={nearFooter ? '' : undefined}>
+    <div className={styles.fabRail} data-retired={nearFooter ? '' : undefined}>
       <div
-        className={`${landing.fab} ${open ? landing.fabOpen : ''}`}
+        className={`${styles.fab} ${open ? styles.fabOpen : ''}`}
         data-open={open || undefined}
         ref={shell}
       >
@@ -112,16 +112,16 @@ export const ThemeFab = () => {
             takes a tab stop from the bar that replaced it. */}
         <button
           aria-expanded={open}
-          className={landing.fabFace}
+          className={styles.fabFace}
           inert={open || undefined}
           onClick={() => setOpen(true)}
           type="button"
         >
-          <span className={landing.fabDot} style={{ '--swatch': c.brand } as CSSProperties} />
+          <span className={styles.fabDot} style={{ '--swatch': c.brand } as CSSProperties} />
           Make it yours
         </button>
 
-        <div className={landing.fabTools} inert={!open || undefined}>
+        <div className={styles.fabTools} inert={!open || undefined}>
           {/* **Rows, not a bar, once the pointer is a finger.** Every control
               here is named by a `helix-tooltip` and an `aria-label`, and a touch
               screen has neither a hover nor a screen reader in play, so without
@@ -131,27 +131,27 @@ export const ThemeFab = () => {
               breakpoint, so the bar is unchanged there. */}
           <helix-flex
             align="center"
-            class={landing.fabStack}
+            class={styles.fabStack}
             data-density="sm"
             gap="md"
             wrap={false}
           >
-            <div className={landing.fabRow}>
-              <span className={landing.fabRowLabel}>Brand color</span>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Brand color</span>
               <BrandPicker />
             </div>
 
-            <div className={landing.fabRow}>
-              <span className={landing.fabRowLabel}>Saturation</span>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Saturation</span>
               <helix-tooltip
-                class={landing.fabTip}
+                class={styles.fabTip}
                 content={`Saturation · ${c.chromaScale}`}
                 placement="top"
               >
                 <helix-slider
                   {...BOUNDS.chromaScale}
                   aria-label="Saturation"
-                  class={landing.fabChannel}
+                  class={styles.fabChannel}
                   name="chroma"
                   onInput={(event) => c.setChromaScale(Number(event.currentTarget.value))}
                   style={{ '--slider-track-image': c.derived?.ramps.saturation ?? '' }}
@@ -160,17 +160,17 @@ export const ThemeFab = () => {
               </helix-tooltip>
             </div>
 
-            <div className={landing.fabRow}>
-              <span className={landing.fabRowLabel}>Corner radius</span>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Corner radius</span>
               <helix-tooltip
-                class={landing.fabTip}
+                class={styles.fabTip}
                 content={`Corner radius · ${c.radius}`}
                 placement="top"
               >
                 <helix-slider
                   {...BOUNDS.radius}
                   aria-label="Corner radius"
-                  class={landing.fabChannel}
+                  class={styles.fabChannel}
                   name="radius"
                   onInput={(event) => c.setRadius(Number(event.currentTarget.value))}
                   value={String(c.radius)}
@@ -189,8 +189,8 @@ export const ThemeFab = () => {
                 the scope and the attribute without persisting leaves the
                 masthead's preferences panel showing the old answer and a reload
                 taking the page back to it. Both go through `STORAGE_KEY`. */}
-            <div className={landing.fabRow}>
-              <span className={landing.fabRowLabel}>Color scheme</span>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Color scheme</span>
               <helix-tooltip
                 content={c.scheme === 'dark' ? 'Switch to light' : 'Switch to dark'}
                 placement="top"
@@ -226,8 +226,8 @@ export const ThemeFab = () => {
                 preferences drawer's reset is the same act and the event it
                 dispatches is what puts these controls back. Two paths to one
                 reset is how one of them comes to leave half a palette on. */}
-            <div className={landing.fabRow}>
-              <span className={landing.fabRowLabel}>Reset</span>
+            <div className={styles.fabRow}>
+              <span className={styles.fabRowLabel}>Reset</span>
               <helix-tooltip content="Back to the shipped palette" placement="top">
                 <helix-icon-button
                   disabled={!c.touched || undefined}
@@ -240,7 +240,7 @@ export const ThemeFab = () => {
               </helix-tooltip>
             </div>
 
-            <div className={landing.fabDivider} />
+            <div className={styles.fabDivider} />
 
             {/* **What the engine made of it, which is the point.** The controls
                 on the left are the inputs; without this the bar is a color
@@ -262,17 +262,17 @@ export const ThemeFab = () => {
                 `helix-tooltip` rather than the native `title`. A `title` is the
                 browser's own delayed box: it cannot be styled, it cannot be
                 reached by touch, and it arrives late. */}
-            <div className={`${landing.fabRow} ${landing.fabReadoutRow}`}>
-              <span className={landing.fabRowLabel}>What the engine derived</span>
-              <div className={landing.fabReadout}>
+            <div className={`${styles.fabRow} ${styles.fabReadoutRow}`}>
+              <span className={styles.fabRowLabel}>What the engine derived</span>
+              <div className={styles.fabReadout}>
                 <helix-tooltip
                   content="The roles the engine derived from your brand color."
                   placement="top"
                 >
-                  <div className={landing.fabSwatches}>
+                  <div className={styles.fabSwatches}>
                     {(c.derived?.swatches ?? []).map((one) => (
                       <span
-                        className={landing.fabSwatch}
+                        className={styles.fabSwatch}
                         key={one.name}
                         style={{ '--swatch': one.hex } as React.CSSProperties}
                       />
@@ -292,7 +292,7 @@ export const ThemeFab = () => {
                   placement="top"
                 >
                   <span
-                    className={landing.fabVerdict}
+                    className={styles.fabVerdict}
                     data-failing={c.derived && c.derived.violations.length > 0 ? '' : undefined}
                   >
                     {/* **Never assert a pass count here.** Counting the derived
@@ -326,7 +326,7 @@ export const ThemeFab = () => {
 
                 `x` rather than `x-mark`, which is not in the set either. */}
             <helix-icon-button
-              class={landing.fabClose}
+              class={styles.fabClose}
               emphasis="ghost"
               label="Close the theme controls"
               onClick={() => setOpen(false)}

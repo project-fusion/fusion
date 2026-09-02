@@ -10,7 +10,6 @@ import {
   useRef,
   useState,
 } from 'react'
-import landing from '@/components/landing.module.css'
 import {
   clearSiteThemeFrom,
   clearSiteThemeFromRoot,
@@ -21,6 +20,7 @@ import {
 } from '@/utils/site-theme/site-theme'
 import { INITIAL } from '@/utils/theme-defaults/theme-defaults'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
+import styles from './theme-context.module.css'
 
 /** What the last derivation produced, for anything that wants to show it. */
 export interface Derived {
@@ -527,7 +527,7 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
     <ThemeControls.Provider value={value}>
       {/* Paints its own ground rather than inheriting the site's: see
           `.themedScope` for the light-on-dark failure that put it there. */}
-      <div className={landing.themedScope} ref={scope}>
+      <div className={styles.themedScope} ref={scope}>
         {children}
       </div>
     </ThemeControls.Provider>

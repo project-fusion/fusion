@@ -1,0 +1,19 @@
+/**
+ * The swatch a reader picks a brand color from.
+ */
+
+.brandSwatch {
+  background: var(--swatch);
+  block-size: 2rem;
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--helix-color-border) 80%, transparent);
+  border-radius: var(--helix-radii-md);
+  cursor: pointer;
+  inline-size: 2rem;
+  padding: 0;
+}
+
+.brandSwatch:focus-visible {
+  outline: 2px solid var(--helix-color-focus-ring);
+  outline-offset: 2px;
+}
