@@ -26,7 +26,7 @@
     },
     "cortex/docs": {
       "name": "@fusion.dev/cortex-docs",
-      "version": "0.0.3",
+      "version": "0.0.4",
     },
     "fusion/cli/npm": {
       "name": "@fusion.dev/cli",
