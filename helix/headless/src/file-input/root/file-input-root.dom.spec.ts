@@ -76,9 +76,9 @@ describe('input file', () => {
     // The native `change` is stopped and relayed, so a consumer hears one event
     // from one element rather than two from two.
     const host = await field('multiple')
-    const said: { property: string; value: string }[] = []
+    const said: { value: string }[] = []
     host.addEventListener('helix-before-change', (event) => {
-      said.push((event as CustomEvent<{ property: string; value: string }>).detail)
+      said.push((event as CustomEvent<{ value: string }>).detail)
     })
     await choose(host, 'one.txt', 'two.txt')
     expect(said).toEqual([{ value: 'one.txt, two.txt' }])

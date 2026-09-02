@@ -10,7 +10,7 @@ const host = () => {
     removeController: () => {},
     requestUpdate: () => {},
     updateComplete: Promise.resolve(true),
-  } as unknown as Parameters<typeof FloatingController.prototype.constructor>[0] & {
+  } as unknown as ConstructorParameters<typeof FloatingController>[0] & {
     controllers: unknown[]
   }
 }

@@ -25,15 +25,6 @@ const chart = async (table: string, attributes: string): Promise<HTMLElement> =>
   return host
 }
 
-const _bars = (host: HTMLElement): Element[] => [
-  ...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? []),
-]
-
-const _labels = (host: HTMLElement): string[] =>
-  [...(host.shadowRoot?.querySelectorAll('[part="label"]') ?? [])].map(
-    (one) => one.textContent?.trim() ?? '',
-  )
-
 /* What the drawing measures, which is the stylesheet's stroke and the SVG it is drawn in.
 
    The behavior is the headless element's and is tested there. */

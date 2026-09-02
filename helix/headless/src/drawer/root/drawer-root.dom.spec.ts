@@ -61,7 +61,7 @@ describe('drawer', () => {
     /* One decision, not two: `showModal` brings a backdrop, a focus trap and
        `inert` behind it, and `show` brings none of them. Both raise the panel,
        which is what a drawer needs either way. */
-    const drawer = (await mount(markup)) as Updatable
+    const drawer = (await mount(markup)) as Updatable & { modal: boolean }
     drawer.modal = false
     drawer.requestOpen(true)
     await drawer.updateComplete
@@ -80,7 +80,7 @@ describe('drawer', () => {
       seen = (event as CustomEvent<{ open: boolean }>).detail.open
     })
     drawer.requestOpen(true)
-    expect(seen).toBe(true)
+    expect<boolean | null>(seen).toBe(true)
   })
 
   test('opening moves focus into the panel', async () => {

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * A group turning its members off, and giving them back what they had.
@@ -50,14 +50,14 @@ describe('a group that is disabled', () => {
      the consumer had disabled on purpose, and the group would have overruled
      them without either of them knowing. */
   test('so a member the consumer disabled stays disabled', () => {
-    const [one] = items(true)
+    const one = at(items(true), 0)
     inheritDisabled(true, [one])
     inheritDisabled(false, [one])
     expect(one.disabled).toBe(true)
   })
 
   test('and disabling twice does not overwrite what was remembered', () => {
-    const [one] = items(true)
+    const one = at(items(true), 0)
     inheritDisabled(true, [one])
     inheritDisabled(true, [one])
     inheritDisabled(false, [one])
@@ -77,7 +77,7 @@ describe('a member that leaves', () => {
   /* Held in a `WeakMap`, so a member that is dropped is collected; forgetting is
      for the member that leaves a group and stays on the page. */
   test('is forgotten, so rejoining starts from what it is now', () => {
-    const [one] = items(false)
+    const one = at(items(false), 0)
     inheritDisabled(true, [one])
     forgetDisabled(one)
     one.disabled = true

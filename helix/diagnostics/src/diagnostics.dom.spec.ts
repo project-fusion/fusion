@@ -16,11 +16,11 @@ beforeAll(() => {
   registerDom()
 })
 
-const { analyze } = await import('./analyze.ts')
-const { collect } = await import('./collect.ts')
-const { diagnose } = await import('./index.ts')
-const { index, nearest } = await import('./manifest.ts')
-const { report } = await import('./console.ts')
+const { analyze } = await import('./analyze.js')
+const { collect } = await import('./collect.js')
+const { diagnose } = await import('./index.js')
+const { index, nearest } = await import('./manifest.js')
+const { report } = await import('./console.js')
 
 /** Two tiers, shaped like the real manifests and small enough to read. */
 const tiers = [

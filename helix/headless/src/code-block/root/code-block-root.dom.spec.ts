@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -8,22 +8,26 @@ beforeAll(async () => {
 
 describe('code block', () => {
   test('renders pre wrapping code, which is what a block of code is', async () => {
-    const el = await mount('<helix-headless-code-block>one</helix-headless-code-block>')
+    const el = (await mount(
+      '<helix-headless-code-block>one</helix-headless-code-block>',
+    )) as Updatable
     const block = el.shadowRoot?.querySelector('[part="block"]')
     expect([block?.tagName, block?.firstElementChild?.tagName]).toEqual(['PRE', 'CODE'])
   })
 
   test('draws no header when there is nothing to put in it', async () => {
-    const el = await mount('<helix-headless-code-block no-copy>one</helix-headless-code-block>')
+    const el = (await mount(
+      '<helix-headless-code-block no-copy>one</helix-headless-code-block>',
+    )) as Updatable
     expect(el.shadowRoot?.querySelector('[part="header"]')).toBeNull()
   })
 
   /* The copy value comes from the slot, not a property, so there is no second
      copy of the code to go stale. */
   test('copies what was slotted', async () => {
-    const el = await mount(
+    const el = (await mount(
       '<helix-headless-code-block>bun add @fusion.dev/helix</helix-headless-code-block>',
-    )
+    )) as Updatable
     /* Twice. The slot is empty on the first render, because assignment happens
        after it; `slotchange` then schedules the update that fills the button.
        One `updateComplete` catches the render that has nothing in it. */
@@ -47,7 +51,9 @@ describe('code block', () => {
  */
 describe('the no-copy attribute follows the property', () => {
   test('a property write reflects, which is the only way the gutter rule hears it', async () => {
-    const el = await mount('<helix-headless-code-block>one</helix-headless-code-block>')
+    const el = (await mount(
+      '<helix-headless-code-block>one</helix-headless-code-block>',
+    )) as Updatable
     expect(el.hasAttribute('no-copy')).toBe(false)
 
     ;(el as HTMLElement & { noCopy: boolean }).noCopy = true
@@ -61,7 +67,9 @@ describe('the no-copy attribute follows the property', () => {
      is the attribute's absence, so nothing is stamped onto a block that never
      asked. */
   test('and clearing it takes the attribute back off', async () => {
-    const el = await mount('<helix-headless-code-block no-copy>one</helix-headless-code-block>')
+    const el = (await mount(
+      '<helix-headless-code-block no-copy>one</helix-headless-code-block>',
+    )) as Updatable
     expect(el.hasAttribute('no-copy')).toBe(true)
 
     ;(el as HTMLElement & { noCopy: boolean }).noCopy = false

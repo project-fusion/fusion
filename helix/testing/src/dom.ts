@@ -373,3 +373,24 @@ export const readyToMove = async (element: Element | null): Promise<void> => {
  * There is a harness per environment; the file you imported already knows.
  */
 export const hasLayout = (): boolean => false
+
+/**
+ * The item at `index`, or a failure naming the list.
+ *
+ * **A spec indexes a fixture it built**, so `rows[1]` is known to be there in a
+ * way `noUncheckedIndexedAccess` cannot see, and writing `rows[1] as Row` at
+ * every call site trades a real check for a cast. This keeps the check and
+ * makes it say something: an absent row fails with the index and the length
+ * rather than with `Cannot read properties of undefined`.
+ *
+ * Not a matcher, because the failure is in the fixture rather than in what is
+ * being asserted: a spec that cannot find its second row has not got as far as
+ * having an opinion.
+ */
+export const at = <T>(list: ArrayLike<T>, index: number): T => {
+  const item = list[index]
+  if (item === undefined) {
+    throw new Error(`at(${index}): the list has ${list.length}`)
+  }
+  return item
+}

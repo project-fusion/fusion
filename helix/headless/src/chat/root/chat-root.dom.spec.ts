@@ -211,9 +211,9 @@ describe('the pin', () => {
    */
   test('a pin change is announced as a change to `pinned`', async () => {
     const element = await chat()
-    const seen: Array<{ property: string; value: string }> = []
+    const seen: Array<{ value: string }> = []
     element.addEventListener('helix-before-pin', (event) => {
-      seen.push((event as CustomEvent<{ property: string; value: string }>).detail)
+      seen.push((event as CustomEvent<{ value: string }>).detail)
     })
     element.pinned = false
     await element.updateComplete

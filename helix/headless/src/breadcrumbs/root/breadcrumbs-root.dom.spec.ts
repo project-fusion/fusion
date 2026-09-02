@@ -61,7 +61,9 @@ describe('breadcrumb items', () => {
     // Linking a page to itself is a known screen-reader annoyance, and
     // aria-current is what actually conveys position.
     const crumbs = await mount(trail)
-    const current = [...crumbs.querySelectorAll('helix-headless-breadcrumb')][2] as HTMLElement & {
+    const current = [
+      ...crumbs.querySelectorAll('helix-headless-breadcrumb'),
+    ][2] as unknown as HTMLElement & {
       internals?: ElementInternals
     }
     expect(current.querySelector('a')).toBeNull()

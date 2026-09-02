@@ -150,7 +150,7 @@ describe('video playlist menu', () => {
     entries(menu)[1]?.dispatchEvent(
       new CustomEvent('helix-select', { bubbles: true, composed: true, detail: { value: 'two' } }),
     )
-    expect(from).toBe(menu)
+    expect<EventTarget | null>(from).toBe(menu)
   })
 
   test('re-reads when an entry is added after it rendered', async () => {

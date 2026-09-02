@@ -19,9 +19,6 @@ const items = (host: HTMLElement): HTMLElement[] => [
   ...host.querySelectorAll<HTMLElement>('helix-headless-tree-item'),
 ]
 
-const _labelLeft = (item: HTMLElement): number =>
-  (part(item, 'label') as HTMLElement).getBoundingClientRect().left
-
 describe('tree item structure', () => {
   test('a branch draws a chevron and a leaf does not', async () => {
     const tree = await mount(mixed)

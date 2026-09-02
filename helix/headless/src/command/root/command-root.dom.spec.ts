@@ -119,7 +119,9 @@ describe('command', () => {
 
   test('the list is filterable, which is where the search comes from', async () => {
     const host = await palette()
-    expect((listbox(host) as HTMLElement & { filterable: boolean }).filterable).toBe(true)
+    expect((listbox(host) as unknown as HTMLElement & { filterable: boolean }).filterable).toBe(
+      true,
+    )
   })
 })
 

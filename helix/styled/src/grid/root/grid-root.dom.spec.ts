@@ -12,7 +12,7 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Grid = HTMLElement & { min?: string; updateComplete: Promise<boolean> }
+type Grid = HTMLElement & { min?: string | undefined; updateComplete: Promise<boolean> }
 
 const rule = (grid: HTMLElement): string => {
   const sheet = grid.shadowRoot?.querySelector('#template')

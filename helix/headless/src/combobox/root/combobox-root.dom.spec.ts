@@ -297,7 +297,7 @@ describe('combobox that takes an answer it was not given', () => {
   }
 
   const row = (host: Updatable): HTMLElement | null =>
-    (host as HTMLElement).shadowRoot?.querySelector<HTMLElement>('[part="create"]')
+    (host as HTMLElement).shadowRoot?.querySelector<HTMLElement>('[part="create"]') ?? null
 
   test('the row is offered beside near misses, not only when nothing matches', async () => {
     // A reader typing "Ruby on Rails" with "Ruby" in the list wants the one

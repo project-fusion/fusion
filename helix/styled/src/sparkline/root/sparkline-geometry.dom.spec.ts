@@ -6,27 +6,6 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-const _spark = async (attributes: string): Promise<HTMLElement> =>
-  mount(`<helix-sparkline ${attributes}></helix-sparkline>`)
-
-const path = (host: HTMLElement): string | null => part(host, 'line')?.getAttribute('d') ?? null
-
-/**
- * The `y` of each reading in the drawing, in the view box's own units.
- *
- * **Anchor points, not every coordinate in the path.** The resting curve is
- * smooth, so a cubic segment carries two control points before the reading it
- * lands on, and counting every pair makes a series of three look like a series
- * of seven. The anchor is the last pair of whatever command drew the segment,
- * which is the same point in a straight path and a curved one and is the only
- * one that is a reading rather than a means of getting to it.
- */
-const _heights = (host: HTMLElement): number[] =>
-  [...(path(host) ?? '').matchAll(/([MLC])([^MLCHVZ]*)/g)].map((command) => {
-    const pairs = (command[2] ?? '').trim().split(/\s+/)
-    return Number((pairs.at(-1) ?? '').split(',')[1])
-  })
-
 /* The stroke, the wash and the mark, which are lengths and paints this tier owns.
 
    The behavior is the headless element's and is tested there. */

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, hasState, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason:
    `@customElement` runs on import, static imports are hoisted, and an element
@@ -55,26 +55,26 @@ describe('moving through a menu with the keyboard', () => {
   test('Down and Up walk the rows, and the ends join up', async () => {
     const { host, rows } = await opened()
     press(host, 'ArrowDown')
-    expect(focused(rows[0])).toBe(rows[0])
+    expect(focused(at(rows, 0))).toBe(at(rows, 0))
 
     press(host, 'ArrowDown')
-    expect(focused(rows[0])).toBe(rows[1])
+    expect(focused(at(rows, 0))).toBe(at(rows, 1))
 
     press(host, 'ArrowUp')
-    expect(focused(rows[0])).toBe(rows[0])
+    expect(focused(at(rows, 0))).toBe(at(rows, 0))
 
     /* Back off the top lands on the bottom. */
     press(host, 'ArrowUp')
-    expect(focused(rows[0])).toBe(rows[2])
+    expect(focused(at(rows, 0))).toBe(at(rows, 2))
   })
 
   test('Home and End go to the ends', async () => {
     const { host, rows } = await opened()
     press(host, 'End')
-    expect(focused(rows[0])).toBe(rows[2])
+    expect(focused(at(rows, 0))).toBe(at(rows, 2))
 
     press(host, 'Home')
-    expect(focused(rows[0])).toBe(rows[0])
+    expect(focused(at(rows, 0))).toBe(at(rows, 0))
   })
 
   test('and arriving at a row does not choose it', async () => {
@@ -134,7 +134,7 @@ describe('a menu row that navigates', () => {
     const host = await menu(`<helix-headless-menu-item ${attrs}>Docs</helix-headless-menu-item>`)
     host.open = true
     await host.updateComplete
-    const item = host.querySelector('helix-headless-menu-item') as Item & {
+    const item = host.querySelector('helix-headless-menu-item') as unknown as Item & {
       renderRoot: ShadowRoot
       updateComplete: Promise<boolean>
     }

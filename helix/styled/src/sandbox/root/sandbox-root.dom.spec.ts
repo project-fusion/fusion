@@ -361,16 +361,16 @@ describe('sandbox dividers', () => {
   })
 
   test('the corner arrives on its own where the two dividers cross', async () => {
-    const sandbox = await mount(withPanel)
+    const sandbox = (await mount(withPanel)) as Updatable
     await body(sandbox).updateComplete
     await sandbox.updateComplete
     expect(body(sandbox).shadowRoot?.querySelector('[part="corner"]')).not.toBeNull()
   })
 
   test('and not when the panes are stacked, where the two run parallel', async () => {
-    const sandbox = await mount(
+    const sandbox = (await mount(
       withPanel.replace('<helix-sandbox>', '<helix-sandbox orientation="vertical">'),
-    )
+    )) as Updatable
     await body(sandbox).updateComplete
     await sandbox.updateComplete
     expect(body(sandbox).shadowRoot?.querySelector('[part="corner"]')).toBeNull()

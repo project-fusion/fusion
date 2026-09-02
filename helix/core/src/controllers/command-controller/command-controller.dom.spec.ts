@@ -40,7 +40,7 @@ beforeAll(async () => {
 
 const scene = (
   commands: Record<string, (source: Element | null) => void>,
-): { host: HTMLElement; run: CommandController } => {
+): { host: HTMLElement; run: InstanceType<Module['CommandController']> } => {
   document.body.innerHTML = '<button id="trigger">go</button><span id="target"></span>'
   const host = document.getElementById('target') as HTMLElement
   Object.assign(host, { addController: () => {} })
@@ -69,7 +69,7 @@ describe('a command the host answers to', () => {
       },
     })
     host.dispatchEvent(new HelixFallbackCommandEvent('--show', trigger()))
-    expect(asked).toBe(trigger())
+    expect<Element | null>(asked).toBe(trigger())
   })
 
   test('picking the right one out of several', () => {

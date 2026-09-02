@@ -7,24 +7,13 @@ import {
   readyToMove,
   registerDom,
   settle,
+  type Updatable,
 } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
 })
-
-type Checkbox = HTMLElement & {
-  checked: boolean
-  checked: boolean | undefined
-  indeterminate: boolean
-  updateComplete: Promise<unknown>
-}
-
-const _checkbox = async (attrs = ''): Promise<Checkbox> =>
-  (await mount(`<helix-checkbox ${attrs}>Terms</helix-checkbox>`)) as Checkbox
-
-const _control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HTMLInputElement
 
 /* Where the box, its mark and its message sit, which is this tier's arrangement.
 
@@ -125,7 +114,9 @@ if (hasLayout()) {
       await readyToMove(host)
       host.checked = true
       await host.updateComplete
-      expect(mark.getAnimations().map((a) => a.transitionProperty)).toContain('scale')
+      expect(mark.getAnimations().map((a) => (a as CSSTransition).transitionProperty)).toContain(
+        'scale',
+      )
       for (const moving of mark.getAnimations()) {
         moving.finish()
       }
@@ -133,7 +124,9 @@ if (hasLayout()) {
 
       host.checked = false
       await host.updateComplete
-      expect(mark.getAnimations().map((a) => a.transitionProperty)).toContain('scale')
+      expect(mark.getAnimations().map((a) => (a as CSSTransition).transitionProperty)).toContain(
+        'scale',
+      )
       for (const moving of mark.getAnimations()) {
         moving.finish()
       }

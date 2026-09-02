@@ -17,7 +17,7 @@ describe('radio group server output', () => {
        at upgrade is markup a React consumer's server output never had, and
        hydration reports it. */
     const markup = ssr(html`<helix-headless-radio-group label="L"></helix-headless-radio-group>`)
-    expect(hostTag(markup)).not.toContain('role=')
+    expect(hostTag(markup, 'helix-headless-radio-group')).not.toContain('role=')
   })
 
   test('which item is chosen is not a server fact', () => {

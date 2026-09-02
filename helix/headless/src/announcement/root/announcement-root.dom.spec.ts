@@ -40,7 +40,7 @@ describe('announcement', () => {
     })
 
     part(announcement, 'dismiss')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    expect(heard).toBe('Trial ending')
+    expect<string | null>(heard).toBe('Trial ending')
     expect(announcement.isConnected).toBe(true)
   })
 

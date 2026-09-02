@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, settled } from '@fusion.dev/helix-testing/dom'
+import { at, hasLayout, mount, part, registerDom, settled } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -7,14 +7,6 @@ beforeAll(async () => {
 })
 
 type Section = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
-
-const _section = async (label = 'Products'): Promise<Section> => {
-  const host = (await mount(
-    `<helix-megamenu label="${label}"><a href="/one">One</a></helix-megamenu>`,
-  )) as Section
-  await host.updateComplete
-  return host
-}
 
 const trigger = (host: Section) => part(host, 'trigger') as HTMLElement
 
@@ -32,11 +24,6 @@ const press = (host: Section, pointerType: string, detail = 1): void => {
   }
   trigger(host).dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
 }
-
-const _settle = (ms: number): Promise<void> =>
-  new Promise((done) => {
-    setTimeout(done, ms)
-  })
 
 /* Where the panel lands and what shape it takes, which is this tier's: the
    card as wide as its columns, the band spanning the page and starting under
@@ -219,7 +206,7 @@ if (hasLayout()) {
       const links = [...host.querySelectorAll('[data-navigation-item]')] as HTMLElement[]
       expect(links.map(edge)).toEqual([edge(heading), edge(heading)])
       /* Differing lengths, so a shared edge cannot be two equal boxes centered. */
-      expect(links[0].textContent).not.toBe(links[1].textContent)
+      expect(at(links, 0).textContent).not.toBe(at(links, 1).textContent)
     })
 
     test('a screen too narrow for columns gets the band, and they stack', async () => {
@@ -364,19 +351,19 @@ if (hasLayout()) {
       const bottom = (element: Element) => element.getBoundingClientRect().bottom
 
       const headingToFirst = Math.round(
-        top(rows[0].querySelector('strong') as Element) - bottom(heading),
+        top(at(rows, 0).querySelector('strong') as Element) - bottom(heading),
       )
       const rowToRow = Math.round(
-        top(rows[1].querySelector('strong') as Element) -
-          bottom(rows[0].querySelector('span') as Element),
+        top(at(rows, 1).querySelector('strong') as Element) -
+          bottom(at(rows, 0).querySelector('span') as Element),
       )
       expect(headingToFirst).toBe(rowToRow)
 
       /* And a name and its sentence stay tighter than that, because they are one
          thing and a reader should see them as one. */
       const nameToSentence = Math.round(
-        top(rows[0].querySelector('span') as Element) -
-          bottom(rows[0].querySelector('strong') as Element),
+        top(at(rows, 0).querySelector('span') as Element) -
+          bottom(at(rows, 0).querySelector('strong') as Element),
       )
       expect(nameToSentence).toBeLessThan(rowToRow)
     })

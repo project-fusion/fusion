@@ -445,7 +445,7 @@ describe('splitter collapsing', () => {
 
   test('opening it again returns to where it was, with nothing remembering', async () => {
     const host = (await splitter('default-position="35"')) as Splitter & {
-      collapsed?: 'end' | 'start'
+      collapsed?: 'end' | 'start' | undefined
     }
     host.collapsed = 'start'
     await host.updateComplete
@@ -468,7 +468,7 @@ describe('splitter collapsing', () => {
 
   test('a drag ending shut opens back to where the drag began, not to the edge', async () => {
     const host = (await splitter('default-position="60"')) as Splitter & {
-      collapsed?: 'end' | 'start'
+      collapsed?: 'end' | 'start' | undefined
     }
     const bar = separator(host)
     await grab(host, bar, 'pointerdown')
@@ -485,7 +485,7 @@ describe('splitter collapsing', () => {
 
   test('any move opens it, so a shut pane is still draggable', async () => {
     const host = (await splitter('default-collapsed="start" step="5"')) as Splitter & {
-      collapsed?: 'end' | 'start'
+      collapsed?: 'end' | 'start' | undefined
     }
     expect(host.position).toBe(0)
     await press(host, 'ArrowRight')

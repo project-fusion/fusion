@@ -6,7 +6,7 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Picture = HTMLElement & { status: string; updateComplete: Promise<unknown> }
+type Picture = HTMLElement & { src: string; status: string; updateComplete: Promise<unknown> }
 
 const image = async (attrs = ''): Promise<Picture> => {
   /* The caller's `alt` wins rather than being written twice: a duplicate

@@ -77,7 +77,7 @@ describe('slider', () => {
     const host = await mount(
       '<helix-slider label="A" max="200" min="0" default-value="50"></helix-slider>',
     )
-    const control = part(host, 'control')
+    const control = part(host, 'control') as HTMLElement | null
     expect(control?.style.getPropertyValue('--slider-fraction')).toBe('0.25')
     expect(host.style.getPropertyValue('--slider-fraction')).toBe('')
   })

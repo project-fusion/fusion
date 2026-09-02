@@ -39,7 +39,7 @@ describe('input', () => {
     const host = await mount('<helix-input label="Search"></helix-input>')
     const label = part(host, 'label') as HTMLLabelElement
     expect(label.textContent?.trim()).toBe('Search')
-    expect(label.getAttribute('for')).toBe(control(host)?.id)
+    expect(label.getAttribute('for')).toBe(control(host)?.id ?? null)
   })
 
   test('disabled and read-only reach the control, not just the host', async () => {
@@ -217,7 +217,7 @@ describe('input parts that are not always used', () => {
     const label = part(host, 'label') as HTMLLabelElement
     expect(label).not.toBeNull()
     expect(label.hasAttribute('data-hidden')).toBe(true)
-    expect(label.getAttribute('for')).toBe(control(host)?.id)
+    expect(label.getAttribute('for')).toBe(control(host)?.id ?? null)
     expect(control(host)?.labels?.length).toBe(1)
     expect(label.textContent?.trim()).toBe('Filter')
   })

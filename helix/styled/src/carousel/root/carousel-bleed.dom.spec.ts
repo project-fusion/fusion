@@ -1,24 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
 })
-
-type Carousel = HTMLElement & {
-  index: number
-  loop: boolean
-  updateComplete: Promise<unknown>
-  internals?: ElementInternals
-}
-
-const _carousel = async (attrs = ''): Promise<Carousel> =>
-  (await mount(`<helix-carousel label="Verticals" ${attrs}>
-    <div>Design</div>
-    <div>Mind</div>
-    <div>Energy</div>
-  </helix-carousel>`)) as Carousel
 
 /* The room the scroller keeps for whatever a slide draws outside itself, which is a length this tier sets.
 
@@ -51,7 +37,7 @@ if (hasLayout()) {
       expect(bleed).toBeGreaterThan(0)
       expect(track.scrollLeft).toBe(0)
       const room =
-        host.children[0].getBoundingClientRect().left - track.getBoundingClientRect().left
+        at(host.children, 0).getBoundingClientRect().left - track.getBoundingClientRect().left
       expect(Math.round(room)).toBe(Math.round(bleed))
     })
 
@@ -60,7 +46,7 @@ if (hasLayout()) {
       const track = part(host, 'track') as HTMLElement
       track.scrollTo({ behavior: 'instant', left: track.scrollWidth })
       await new Promise((resolve) => requestAnimationFrame(resolve))
-      const last = host.children[host.children.length - 1].getBoundingClientRect()
+      const last = at(host.children, host.children.length - 1).getBoundingClientRect()
       const room = track.getBoundingClientRect().right - last.right
       expect(Math.round(room)).toBe(Math.round(bleedOf(track)))
     })

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { arrowDown, arrowUp, minus } from '@fusion.dev/helix-icons'
-import { mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, slotted, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -74,7 +74,7 @@ describe('trend judgment', () => {
   })
 
   test('both properties reflect, since the stylesheet reads the pair', async () => {
-    const host = (await trend('')) as HTMLElement & { direction?: string; good?: string }
+    const host = (await trend('')) as Updatable & { direction?: string; good?: string }
     expect(host.hasAttribute('direction')).toBe(false)
     expect(host.hasAttribute('good')).toBe(false)
     host.direction = 'down'

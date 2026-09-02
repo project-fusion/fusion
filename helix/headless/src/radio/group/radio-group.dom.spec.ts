@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  at,
+  formValue,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -181,7 +188,7 @@ describe('radio group disabled cascades', () => {
     host.disabled = false
     await settle(host)
 
-    const [first] = options(host) as unknown as { disabled: boolean }[]
+    const first = at(options(host) as unknown as { disabled: boolean }[], 0)
     first.disabled = true
     await settle(host)
     expect(first.disabled).toBe(true)

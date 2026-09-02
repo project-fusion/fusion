@@ -48,7 +48,7 @@ describe('toggle group', () => {
       seen = (event as CustomEvent<{ value: string }>).detail.value
     })
 
-    const dark = items(group)[2] as HTMLElement & { select: () => void }
+    const dark = items(group)[2] as unknown as HTMLElement & { select: () => void }
     dark.select()
     await Promise.resolve()
 

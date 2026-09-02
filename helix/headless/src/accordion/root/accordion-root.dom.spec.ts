@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -137,16 +137,16 @@ describe('accordion keyboard navigation', () => {
     }
 
     press(list[0] as HTMLElement, 'ArrowDown')
-    expect(focused).toBe(list[1] as HTMLElement)
+    expect<HTMLElement | null>(focused).toBe(at(list, 1) as HTMLElement)
 
     press(list[0] as HTMLElement, 'ArrowUp')
-    expect(focused).toBe(list[2] as HTMLElement)
+    expect<HTMLElement | null>(focused).toBe(at(list, 2) as HTMLElement)
 
     press(list[1] as HTMLElement, 'End')
-    expect(focused).toBe(list[2] as HTMLElement)
+    expect<HTMLElement | null>(focused).toBe(at(list, 2) as HTMLElement)
 
     press(list[2] as HTMLElement, 'Home')
-    expect(focused).toBe(list[0] as HTMLElement)
+    expect<HTMLElement | null>(focused).toBe(at(list, 0) as HTMLElement)
   })
 
   test('an unrelated key is left alone, so the page still scrolls', async () => {

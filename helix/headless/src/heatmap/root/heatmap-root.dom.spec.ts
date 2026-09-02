@@ -16,6 +16,7 @@ beforeAll(async () => {
 
 interface Strip extends HTMLElement {
   gap: number
+  requestUpdate: () => void
   minCell: number
   rows: number
   updateComplete: Promise<unknown>

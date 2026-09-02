@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -58,7 +58,7 @@ describe('tree selection can be refused', () => {
     /* The value is never written straight from the item's event, which would
        make the announcement one nobody can answer. Tabs shares the mixin that
        closes this. */
-    const host = (await mount(markup)) as Updatable & { value: string }
+    const host = (await mount(markup)) as Updatable & { active: string; value: string }
     await host.updateComplete
     const started = host.active
 

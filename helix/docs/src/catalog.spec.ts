@@ -45,22 +45,42 @@ const manifest: HelixManifest = {
 }
 
 const examples: ExampleSource[] = [
-  { css: '', family: 'pagination', html: '<helix-pagination></helix-pagination>', slug: 'compact' },
-  { css: '', family: 'pagination', html: '<helix-pagination></helix-pagination>', slug: 'window' },
-  { css: '', family: 'pagination', html: '<helix-pagination></helix-pagination>', slug: 'preview' },
+  {
+    css: '',
+    family: 'pagination',
+    html: '<helix-pagination></helix-pagination>',
+    slug: 'compact',
+    tsx: '',
+  },
+  {
+    css: '',
+    family: 'pagination',
+    html: '<helix-pagination></helix-pagination>',
+    slug: 'window',
+    tsx: '',
+  },
+  {
+    css: '',
+    family: 'pagination',
+    html: '<helix-pagination></helix-pagination>',
+    slug: 'preview',
+    tsx: '',
+  },
   {
     css: '',
     family: 'pagination',
     html: '<helix-pagination></helix-pagination>',
     slug: 'compact-counts',
+    tsx: '',
   },
   {
     css: 'a{}',
     family: 'pagination',
     html: '<helix-headless-pagination></helix-headless-pagination>',
     slug: 'headless',
+    tsx: '',
   },
-  { css: '', family: 'qr-code', html: '<helix-qr-code></helix-qr-code>', slug: 'preview' },
+  { css: '', family: 'qr-code', html: '<helix-qr-code></helix-qr-code>', slug: 'preview', tsx: '' },
 ]
 
 describe('catalog', () => {

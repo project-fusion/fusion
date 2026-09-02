@@ -23,7 +23,7 @@ describe('a scroll area', () => {
        Anything bringing a row into view has to be told which box to move, and
        that box is in here. */
     const host = await area('label="Notes"')
-    const scroller = (host as HTMLElement & { scroller: HTMLElement | null }).scroller
+    const scroller = (host as unknown as HTMLElement & { scroller: HTMLElement | null }).scroller
     expect(scroller).toBe(part(host, 'viewport') as HTMLElement)
     expect(scroller).not.toBe(host)
   })

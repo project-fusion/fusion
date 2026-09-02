@@ -8,12 +8,6 @@ beforeAll(async () => {
 
 type Area = HTMLElement & { updateComplete: Promise<unknown> }
 
-const _area = async (attrs = '', body = '<p>One</p>'): Promise<Area> => {
-  const host = (await mount(`<helix-scroll-area ${attrs}>${body}</helix-scroll-area>`)) as Area
-  await host.updateComplete
-  return host
-}
-
 /* The fades at the edges, which are drawn here and opted out of by giving one no depth.
 
    The behavior is the headless element's and is tested there. */

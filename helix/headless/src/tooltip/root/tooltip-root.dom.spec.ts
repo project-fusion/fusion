@@ -192,7 +192,7 @@ describe('tooltip for', () => {
     const host = await mount(
       `<div><button ${triggerAttrs}>Save</button><helix-headless-tooltip ${tipAttrs}></helix-headless-tooltip></div>`,
     )
-    const tip = host.querySelector('helix-headless-tooltip') as Tooltip
+    const tip = host.querySelector('helix-headless-tooltip') as unknown as Tooltip
     await tip.updateComplete
     return { button: host.querySelector('button') as HTMLElement, tip }
   }
@@ -220,7 +220,7 @@ describe('tooltip for', () => {
       `<div><button id="target" aria-describedby="tip">Save</button>` +
         `<helix-headless-tooltip id="tip" for="target"><span slot="content">Save <b>now</b></span></helix-headless-tooltip></div>`,
     )
-    const tip = host.querySelector('helix-headless-tooltip') as Tooltip
+    const tip = host.querySelector('helix-headless-tooltip') as unknown as Tooltip
     await tip.updateComplete
     expect(tip.internals?.ariaLabel).toBe('Save now')
   })

@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -40,11 +40,11 @@ describe('a timeline', () => {
     const host = await timeline(three)
     const entries = [...host.querySelectorAll('helix-headless-timeline-item')] as Entry[]
 
-    const dated = part(entries[0], 'time') as HTMLElement
+    const dated = part(at(entries, 0), 'time') as HTMLElement
     expect(dated.tagName).toBe('TIME')
     expect(dated.getAttribute('datetime')).toBe('2026-08-19T09:12')
 
-    const undated = part(entries[2], 'time') as HTMLElement
+    const undated = part(at(entries, 2), 'time') as HTMLElement
     expect(undated.tagName).toBe('SPAN')
     expect(undated.hasAttribute('datetime')).toBe(false)
   })

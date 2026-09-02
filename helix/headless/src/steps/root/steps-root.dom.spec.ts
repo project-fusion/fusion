@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -63,7 +63,9 @@ describe('steps', () => {
        <helix-headless-step complete current>B</helix-headless-step></helix-headless-steps>`,
     )) as Steps
     await host.updateComplete
-    const [done, back] = [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]
+    const steps = [...host.querySelectorAll('helix-headless-step')] as HTMLElement[]
+    const done = at(steps, 0)
+    const back = at(steps, 1)
     for (const step of [done, back]) {
       await (step as unknown as Steps).updateComplete
     }

@@ -12,12 +12,6 @@ const markup = `<helix-toggle-group label="Color mode" default-value="light">
   <helix-toggle value="dark">Dark</helix-toggle>
 </helix-toggle-group>`
 
-const _items = (group: HTMLElement) =>
-  [...group.querySelectorAll('helix-toggle')] as (HTMLElement & {
-    selected: boolean
-    value: string
-  })[]
-
 /* Where the thumb lands and how it is inset, which is this tier's drawing. The
    headless tier has no thumb to place, so the numbers there are the box's own and
    mean nothing. Selection, the form value and the keyboard stay on the base. */

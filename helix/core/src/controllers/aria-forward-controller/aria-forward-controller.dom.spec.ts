@@ -55,7 +55,10 @@ const scene = (attributes: string, instead?: () => HTMLElement | null): Scene =>
 }
 
 const held = (control: HTMLElement, property: string): string[] | null => {
-  const value = (control as unknown as Record<string, Element[] | null>)[property]
+  /* `?? null` and not a `null` check alone: indexing a `Record` answers
+     `undefined` for a key that is not there, which is the same "nothing
+     forwarded" this returns `null` for. */
+  const value = (control as unknown as Record<string, Element[] | null>)[property] ?? null
   return value === null ? null : value.map((one) => one.id)
 }
 

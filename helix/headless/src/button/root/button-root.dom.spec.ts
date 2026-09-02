@@ -107,6 +107,6 @@ describe('button invokers', () => {
     })
 
     ;(control(button) as HTMLElement).click()
-    expect(received).toBe('--go')
+    expect<string | null>(received).toBe('--go')
   })
 })

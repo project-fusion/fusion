@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  mount,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -8,7 +15,6 @@ beforeAll(async () => {
 
 type Checkbox = HTMLElement & {
   checked: boolean
-  checked: boolean | undefined
   indeterminate: boolean
   updateComplete: Promise<unknown>
 }

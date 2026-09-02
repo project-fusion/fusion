@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -49,8 +49,8 @@ describe('a timeline, as the stylesheet draws it', () => {
       const entries = [...host.querySelectorAll('helix-timeline-item')] as Entry[]
       const rail = (one: Entry) =>
         getComputedStyle(part(one, 'rail') as HTMLElement, '::after').visibility
-      expect(rail(entries[0])).toBe('visible')
-      expect(rail(entries[2])).toBe('hidden')
+      expect(rail(at(entries, 0))).toBe('visible')
+      expect(rail(at(entries, 2))).toBe('hidden')
     })
 
     test('the mark sits on the title, not at the top of the entry', async () => {

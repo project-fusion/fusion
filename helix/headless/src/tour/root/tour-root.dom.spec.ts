@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -141,7 +141,7 @@ describe('moving through it', () => {
 describe('a stop', () => {
   test('finds its target by id, the way a tooltip does', async () => {
     const tour = await run()
-    const stop = tour.stops[1] as HTMLElement & { target: HTMLElement | null }
+    const stop = at(tour.stops, 1) as unknown as HTMLElement & { target: HTMLElement | null }
     expect(stop.target?.id).toBe('two')
   })
 
@@ -150,7 +150,7 @@ describe('a stop', () => {
       '<helix-headless-tour open><helix-headless-tour-stop for="nowhere">X</helix-headless-tour-stop></helix-headless-tour>',
     )) as Tour
     await host.updateComplete
-    const stop = host.stops[0] as HTMLElement & { target: HTMLElement | null }
+    const stop = at(host.stops, 0) as unknown as HTMLElement & { target: HTMLElement | null }
     expect(stop.target).toBeNull()
   })
 })

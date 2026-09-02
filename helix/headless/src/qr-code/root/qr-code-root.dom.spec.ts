@@ -201,7 +201,7 @@ describe('qr code', () => {
   test('a code that changes is re-encoded', async () => {
     const host = await code('<helix-headless-qr-code value="one"></helix-headless-qr-code>')
     const before = svgOf(host).querySelector('path')?.getAttribute('d')
-    ;(host as HTMLElement & { value: string }).value = 'two'
+    ;(host as unknown as HTMLElement & { value: string }).value = 'two'
     await host.updateComplete
     expect(svgOf(host).querySelector('path')?.getAttribute('d')).not.toBe(before)
   })

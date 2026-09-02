@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -45,7 +45,7 @@ describe('a speed dial', () => {
        application's commands. These are commands. */
     const { actions, host } = await dial()
     expect(role(part(host, 'actions') as HTMLElement)).toBe('menu')
-    expect(role(part(actions[0], 'item') as HTMLElement)).toBe('menuitem')
+    expect(role(part(at(actions, 0), 'item') as HTMLElement)).toBe('menuitem')
   })
 
   test('a slotted trigger is told what it is doing, by property', async () => {
@@ -117,7 +117,7 @@ describe('a speed dial', () => {
     host.open = true
     await host.updateComplete
     await host.updateComplete
-    expect(focused(actions[0])).toBe(actions[0])
+    expect(focused(at(actions, 0))).toBe(at(actions, 0))
   })
 
   test('every arrow moves, because a dial reserves nothing', async () => {
@@ -130,16 +130,16 @@ describe('a speed dial', () => {
     await host.updateComplete
 
     press(host, 'ArrowDown')
-    expect(focused(actions[0])).toBe(actions[1])
+    expect(focused(at(actions, 0))).toBe(at(actions, 1))
 
     press(host, 'ArrowRight')
-    expect(focused(actions[0])).toBe(actions[2])
+    expect(focused(at(actions, 0))).toBe(at(actions, 2))
 
     press(host, 'ArrowLeft')
-    expect(focused(actions[0])).toBe(actions[1])
+    expect(focused(at(actions, 0))).toBe(at(actions, 1))
 
     press(host, 'ArrowUp')
-    expect(focused(actions[0])).toBe(actions[0])
+    expect(focused(at(actions, 0))).toBe(at(actions, 0))
   })
 
   test('and arriving at an action does not take it', async () => {
@@ -161,7 +161,7 @@ describe('a speed dial', () => {
     const { actions, host } = await dial()
     host.open = true
     await host.updateComplete
-    ;(part(actions[1], 'item') as HTMLElement).click()
+    ;(part(at(actions, 1), 'item') as HTMLElement).click()
     await host.updateComplete
     expect(host.open).toBe(false)
   })
