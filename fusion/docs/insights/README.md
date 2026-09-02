@@ -13,7 +13,10 @@ only consumer.
 frontmatter is where it is served from, so moving a page between sections is a
 frontmatter edit rather than a rename.
 
-**Both generated modules are checked in on purpose**: the app imports them, so a
-build that had to walk `content/` would be a filesystem read this app cannot
-statically scope. `turbo run content -- --check` fails when they and the MDX
-disagree.
+**Both generated modules are build outputs and neither is checked in.** The app
+imports them, so a build that had to walk `content/` would be a filesystem read
+it cannot statically scope; `turbo run content` writes them and
+`turbo run content -- --check` fails when they and the MDX disagree. `build` and
+`typecheck` both run the generator first, because a task that reads a generated
+file and does not depend on the one that writes it passes only while an earlier
+run has left the file behind.
