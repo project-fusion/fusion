@@ -27,6 +27,11 @@ permissions:
   contents: write
   pull-requests: write
 
+# Held once, and pinned for the reason a lockfile is: nothing else pins the
+# runtime that resolves it.
+env:
+  BUN_VERSION: "1.1.43"
+
 jobs:
   retake:
     runs-on: ubuntu-latest
@@ -40,8 +45,17 @@ jobs:
       - name: Install bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.1.43
+          bun-version: ${{ env.BUN_VERSION }}
 
+      # **Keyed on the lockfile, because that is what decides the answer.**
+      # `setup-bun` caches the binary and not what it installs, so without this
+      # every job pays a cold resolve of 518 packages.
+      - name: Cache the installed dependencies
+        uses: actions/cache@v6
+        with:
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          path: ~/.bun/install/cache
+          restore-keys: bun-${{ runner.os }}-
       - name: Install dependencies
         run: bun install --frozen-lockfile
 

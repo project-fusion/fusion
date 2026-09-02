@@ -50,6 +50,13 @@ correctly. `ugrep`, a drop-in replacement common enough to be on a contributor's
 inverts and the browser jobs are skipped for a change to `helix/styled`. Comparing
 two counts asks nothing of `-v` and means the same thing to every grep.
 
+## What every job pays
+
+`setup-bun` caches the binary and not what it installs, so each job used to pay a
+cold resolve of 518 packages. The cache is keyed on `bun.lock`, which is exactly
+what decides the answer, and the bun version is held once in a workflow-level
+`env` rather than in eight places.
+
 ## One build, before the sixteen that would each do their own
 
 Every check shard runs `build`, `analyze` and `catalog` as prerequisites and
