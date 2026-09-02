@@ -1,11 +1,11 @@
 import { docSources, findPage, navigation, pages } from '@fusion.dev/helix-docs'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { docsShell } from '@/components/docs-shell/docs-shell'
 import { PageOutline } from '@/components/page-outline/page-outline'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { outlineOf } from '@/utils/outline/outline'
 import { renderMdx } from '../../../../../utils/mdx/mdx'
-import styles from '../../components/(reference)/docs.module.css'
 import prose from './page.module.css'
 
 /**
@@ -59,7 +59,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <>
-      <main className={styles.docsMain}>
+      <main className={docsShell.docsMain}>
         {/* The section, and then the document.
           
           **The page does not render the title, because the document already
@@ -81,8 +81,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </div>
       </main>
 
-      <aside className={styles.docsRail}>
-        <PageOutline className={styles.docsRailTitle} entries={outline} />
+      <aside className={docsShell.docsRail}>
+        <PageOutline className={docsShell.docsRailTitle} entries={outline} />
       </aside>
     </>
   )

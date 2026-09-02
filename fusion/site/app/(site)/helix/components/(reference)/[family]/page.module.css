@@ -1,0 +1,135 @@
+/* The heading and what can be done to the document, on one line. */
+.docsTitle {
+  flex-wrap: wrap;
+}
+
+/* The table scrolls sideways rather than colliding with itself. */
+.apiTable {
+  overflow-x: auto;
+}
+
+/* The mark beside a property built on a platform feature. `1em`, so it tracks
+   the identifier beside it rather than the page. */
+.apiReference {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  /* Pushed to the end of the row. */
+  margin-inline-start: auto;
+  padding-inline-start: var(--helix-space-xs);
+  vertical-align: middle;
+}
+
+.apiReference:hover,
+.apiReference:focus-visible {
+  color: var(--helix-color-foreground);
+}
+
+/* Through the component's own hook, not a rule of ours. */
+.apiReference {
+  --icon-size: 1em;
+}
+
+/* The same mark on a column heading, which wants none of the row version's
+   placement. */
+.apiHint {
+  --icon-size: 1em;
+  all: unset;
+
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: help;
+  display: inline-flex;
+  margin-inline-start: var(--helix-space-2xs);
+  vertical-align: middle;
+}
+
+.apiHint:hover,
+.apiHint:focus-visible {
+  color: var(--helix-color-foreground);
+}
+
+.apiName {
+  /* The library's identifier color, not the brand's. */
+  color: var(--helix-color-syntax-name);
+  /* A property name is one identifier and breaking it is worse than a wider
+     column: `defaultValue` came out as `defaultValu` and `e`, which is a name a
+     reader cannot search for and cannot copy from one line. */
+  min-inline-size: min-content;
+  overflow-wrap: normal;
+}
+
+/* A default value, which is code and is not a union. It shares the type column's
+   colors and none of its wrapping rules: a literal has no members to hold
+   together, and holding it together anyway is what made `"Show password"`
+   overflow an 83px cell and print itself over the description. */
+.apiDefault {
+  color: var(--helix-color-foreground-subtle);
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+/* The type beside the name, colored by what each part of it is. */
+.apiType {
+  color: var(--helix-color-foreground-subtle);
+  display: block;
+  /* Never narrower than the longest thing in it that cannot break. Carousel is
+     the case: `"block-start"` measures 116px and the column had settled at 112,
+     which is four pixels of a word sitting in the next column. */
+  min-inline-size: min-content;
+  /* A type wraps rather than scrolls: scrolling keeps every row one line tall
+     and hides the end of anything longer than its column behind a gesture, so a
+     reader cannot see that `HelixHeadlessAccordionItem[]` is an array without
+     dragging it. */
+  overflow-wrap: break-word;
+}
+
+/* A union wraps between its members and never inside one, so the bar is always
+   at the start of a line rather than wherever the previous line ran out. */
+.apiTypeMember {
+  /* Unbreakable, so the only break a union can take is between its members and
+     the bar therefore starts a line rather than ending one. */
+  white-space: nowrap;
+}
+
+.apiTypeBar {
+  color: var(--helix-color-foreground-subtle);
+  /* Space on both sides, and it has to be margin rather than a space in the
+     markup: the members are adjacent inline spans with no whitespace between
+     them, so text alone would run the bar into the value before it. `2xs` rather
+     than an em: `helix component`'s `tokens` refuses a raw value here, and the
+     type column is one size, so there is nothing for an em to track that a token
+     does not. */
+  margin-inline: var(--helix-space-2xs);
+  opacity: 0.6;
+}
+
+/* A literal value is green. */
+.apiType [data-token="literal"] {
+  color: color-mix(
+    in oklab,
+    var(--helix-color-syntax-tag) 72%,
+    var(--helix-color-foreground-muted)
+  );
+}
+
+.apiUnnamed {
+  color: var(--helix-color-foreground-subtle);
+  font-style: italic;
+}
+
+/* And every built-in is one color, `string` alongside `boolean`. */
+.apiType [data-token="builtin"] {
+  color: var(--helix-color-syntax-keyword);
+}
+
+.apiType [data-token="custom"] {
+  color: var(--helix-color-syntax-callable);
+}
+
+/* A component's prose, which comes from its class comment and can run long. */
+.description {
+  max-inline-size: 68ch;
+  white-space: pre-line;
+}

@@ -1,0 +1,122 @@
+/* Three columns: what you can go to, what you are reading, and where you are in
+   it. */
+.docsShell {
+  /* The header's inset, not the page's clamp. *Through the variable rather than
+     through its value.** Written out as `space-2xl` this said "the same as the
+     header" and meant "48px", which stops being the same thing below 48rem: the
+     header takes its inset down to `space-md` there and this went on spending 48
+     a side. On a 375px phone that is 96px of padding around a 279px measure — a
+     quarter of the screen held empty to match a header that had already stopped
+     matching. */
+  --site-inset: var(--site-chrome-inset);
+
+  /* Both rails the same width, which is what centers the column between them. */
+  --docs-rail: 15rem;
+
+  /* Where the columns begin, which is also where the rails stick. */
+  --docs-top: calc(var(--helix-size-header) + var(--helix-space-2xl));
+
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-2xl);
+  grid-template-columns: var(--docs-rail) minmax(0, 1fr) var(--docs-rail);
+  padding-block: var(--helix-space-2xl);
+  padding-inline: var(--site-inset);
+}
+
+/* The rails fold away before the measure does. */
+@media (width < 90rem) {
+  .docsShell {
+    grid-template-columns: var(--docs-rail) minmax(0, 1fr);
+  }
+
+  .docsRail {
+    display: none;
+  }
+}
+
+@media (width < 64rem) {
+  .docsShell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docsNav {
+    display: none;
+  }
+}
+
+/* Anything the rail can send a reader to clears the masthead. **A descendant
+   selector, never a child combinator.** Every section wrapper the outline
+   targets is a `helix-flex` carrying an `id`, at whichever depth the page nests
+   it: the API entries sit one level deeper than the four top-level sections, so
+   `.docsMain > helix-flex > [id]` misses them and their headings land flush
+   against the top of the window behind the sticky header. */
+.docsMain helix-flex[id] {
+  scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
+}
+
+.docsMain {
+  /* Fills its track, then caps. `100%` said out loud because the auto margins
+     below would otherwise stop it filling at all: a grid item stretches to its
+     track only while it has no auto margin in that axis, and one that has is
+     sized to fit its contents instead. Measured at 1440: Button Group came out
+     768 because its examples reach the track, Breadcrumbs 641 because nothing on
+     it does. */
+  inline-size: 100%;
+  margin-inline: auto;
+  /* The measure, in the unit that means it. `54rem` was a guess that happened to
+     be near it; `80ch` is the thing itself, and it tracks the font rather than
+     needing to be re-guessed when the font changes. */
+  max-inline-size: 80ch;
+  min-inline-size: 0;
+}
+
+/* One tier at a time, chosen in preferences and applied here. */
+:root:not([data-api-tier="headless"]) .docsShell [data-tier="headless"] {
+  display: none;
+}
+
+:root[data-api-tier="headless"] .docsShell [data-tier="styled"] {
+  display: none;
+}
+
+/* Sticky where they already are, so nothing moves when the page does. The rails
+   rest at `header + the shell's own top padding`, and an offset of `header +
+   space-md` measured 105 resting against 72 stuck, so the first scroll yanked
+   both rails up 33px and they never returned. */
+.docsNav,
+.docsRail {
+  block-size: fit-content;
+  inset-block-start: var(--docs-top);
+  max-block-size: calc(100vh - var(--docs-top) - var(--helix-space-lg));
+  overflow-y: auto;
+  position: sticky;
+}
+
+.docsRailTitle {
+  display: block;
+  padding-block-end: var(--helix-space-xs);
+}
+
+/* The rail is about this page, so it is the first thing to go when there is no
+   room for a margin note. */
+@media (max-width: 72rem) {
+  .docsShell {
+    grid-template-columns: 15rem minmax(0, 1fr);
+  }
+
+  .docsRail {
+    display: none;
+  }
+}
+
+@media (max-width: 56rem) {
+  .docsShell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docsNav {
+    max-block-size: none;
+    position: static;
+  }
+}

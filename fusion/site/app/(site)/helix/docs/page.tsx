@@ -1,7 +1,7 @@
 import { navigation } from '@fusion.dev/helix-docs'
 import Link from 'next/link'
+import { docsShell } from '@/components/docs-shell/docs-shell'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import shell from '../components/(reference)/docs.module.css'
 import styles from './page.module.css'
 
 /**
@@ -35,7 +35,7 @@ export default function DocsIndex() {
        the header, the two stack: the index's title sits at 249 where every page
        it links to starts at 134, and 108px below its own sidebar. An index that
        does not line up with its siblings reads as a different kind of page. */
-    <main className={shell.docsMain}>
+    <main className={docsShell.docsMain}>
       <helix-flex class={styles.head} direction="column" gap="sm">
         <helix-flex align="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>

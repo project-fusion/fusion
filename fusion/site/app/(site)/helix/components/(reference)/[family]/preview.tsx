@@ -8,7 +8,7 @@ import type {
 } from '@fusion.dev/helix'
 import { useEffect, useRef, useState } from 'react'
 import { useSandboxEditor } from '@/hooks/use-sandbox-editor/use-sandbox-editor'
-import docs from '../docs.module.css'
+import sheet from './preview.module.css'
 
 /**
  * The cycle order, which is deliberate rather than alphabetical.
@@ -203,7 +203,7 @@ export function ComponentPreview({
 
   return (
     <helix-sandbox
-      class={docs.docsPreview}
+      class={sheet.docsPreview}
       lead="preview"
       onhelix-before-edit={sourceEdited}
       orientation="vertical"
@@ -238,16 +238,16 @@ export function ComponentPreview({
         src="/sandbox/frame.html"
       ></helix-sandbox-preview>
 
-      <div className={docs.docsPreviewSource} slot="source">
+      <div className={sheet.docsPreviewSource} slot="source">
         {/* Dense, because a toolbar is dense by nature and the library's own say
             so themselves. Without it the two controls come out at the full 40px
             control height inside a 49px bar. `data-density` costs the controls no
             API and crosses their shadow boundaries on its own. */}
-        <div className={docs.docsPreviewBar} data-density="sm">
+        <div className={sheet.docsPreviewBar} data-density="sm">
           {files.map((name) => (
             <button
               aria-pressed={file === name}
-              className={docs.docsPreviewTab}
+              className={sheet.docsPreviewTab}
               key={name}
               onClick={() => setFile(name)}
               type="button"
@@ -261,7 +261,7 @@ export function ComponentPreview({
               the file so the confirmation cannot survive a tab change and claim
               the new file was the one copied. */}
           <helix-copy-button
-            className={docs.docsPreviewCopy}
+            className={sheet.docsPreviewCopy}
             key={file}
             label={`Copy ${file}`}
             value={file === 'styles.css' ? styles : source}
@@ -279,7 +279,7 @@ export function ComponentPreview({
           <helix-tooltip content={LAYOUT_LABEL[layout]}>
             <button
               aria-label={LAYOUT_LABEL[layout]}
-              className={docs.docsPreviewOpen}
+              className={sheet.docsPreviewOpen}
               onClick={() =>
                 setLayout(LAYOUTS[(LAYOUTS.indexOf(layout) + 1) % LAYOUTS.length] as PreviewLayout)
               }
@@ -296,7 +296,11 @@ export function ComponentPreview({
               two different kinds of control. This is an icon button's box, and
               the tooltip is what the copy button already has. */}
           <helix-tooltip content="Open in the sandbox">
-            <a aria-label="Open in the sandbox" className={docs.docsPreviewOpen} href={sandboxHref}>
+            <a
+              aria-label="Open in the sandbox"
+              className={sheet.docsPreviewOpen}
+              href={sandboxHref}
+            >
               <helix-icon name="arrow-square-out"></helix-icon>
             </a>
           </helix-tooltip>

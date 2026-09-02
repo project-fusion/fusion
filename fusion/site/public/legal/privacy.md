@@ -18,7 +18,7 @@ type into the site reaches us, because there is no path for it to take.
 
 The sandbox is the same story from the other direction: the code you write there
 runs in your browser against an opaque origin and is never sent to a server. See
-the [terms](/terms) for how that is built.
+the [terms](/legal/terms) for how that is built.
 
 ## Three keys in local storage, all of them preferences
 

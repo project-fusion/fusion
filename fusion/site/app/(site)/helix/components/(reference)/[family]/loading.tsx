@@ -1,4 +1,4 @@
-import styles from '../docs.module.css'
+import { docsShell } from '@/components/docs-shell/docs-shell'
 import loading from './loading.module.css'
 
 /**
@@ -30,7 +30,7 @@ export default function Loading() {
   return (
     <>
       <div className={loading.standIn} inert>
-        <article className={styles.docsMain}>
+        <article className={docsShell.docsMain}>
           <div className={loading.stack}>
             {/* The title block: the name, its description, and the three tags
                 every family carries. */}
@@ -71,7 +71,7 @@ export default function Loading() {
         </article>
 
         {/* The outline, which is a short column of links whatever the family. */}
-        <aside className={styles.docsRail}>
+        <aside className={docsShell.docsRail}>
           <div className={loading.railHead} data-skeleton />
           {[0, 1, 2].map((entry) => (
             <div className={loading.railRow} data-skeleton key={entry} />

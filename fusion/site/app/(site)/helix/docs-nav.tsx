@@ -2,8 +2,8 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { type MouseEvent as ReactMouseEvent, useCallback, useRef } from 'react'
+import { docsShell } from '@/components/docs-shell/docs-shell'
 import type { NavEntry, NavSection } from '@/content/helix-nav/helix-nav'
-import styles from './components/(reference)/docs.module.css'
 
 /* The sidebar for everything under `/helix`, from `helixNavigation()`.
  *
@@ -102,7 +102,7 @@ export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
     // biome-ignore lint/a11y/useKeyWithClickEvents: delegates to real anchors
     <nav
       aria-label="Helix documentation"
-      className={styles.docsNav}
+      className={docsShell.docsNav}
       onClick={navigate}
       onFocus={warm}
       onPointerOver={warm}

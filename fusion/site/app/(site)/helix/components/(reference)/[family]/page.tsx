@@ -8,6 +8,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
+import { docsShell } from '@/components/docs-shell/docs-shell'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import {
   type ApiMember,
@@ -18,8 +19,8 @@ import {
   type PropertyDoc,
 } from '../../../../../../content/catalog/catalog'
 import { sourceUrl } from '../../../../../../utils/source/source'
-import styles from '../docs.module.css'
 import { DocumentActions } from './document-actions'
+import api from './page.module.css'
 import { ComponentPreview, type PreviewLayout } from './preview'
 import { TierAddress } from './tier-address'
 
@@ -128,7 +129,7 @@ const byExample = (rows: Example[]): Example[] =>
 
 function Code({ children }: { children: string }) {
   return (
-    <helix-text class={styles.apiName} variant="code">
+    <helix-text class={api.apiName} variant="code">
       {children}
     </helix-text>
   )
@@ -197,7 +198,7 @@ const kindOf = (token: string): string => {
  */
 function DefaultText({ children }: { children: string }) {
   return (
-    <helix-text class={styles.apiDefault} variant="code">
+    <helix-text class={api.apiDefault} variant="code">
       {tokens(children.replace(/'([^']*)'/g, '"$1"'))}
     </helix-text>
   )
@@ -220,7 +221,7 @@ function TypeText({ children }: { children: string }) {
    * member, and it has spaces it would otherwise be glad to break at. */
   const held = members.length > 1
   return (
-    <helix-text class={styles.apiType} variant="code">
+    <helix-text class={api.apiType} variant="code">
       {members.map((member, at) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
         <Fragment key={at}>
@@ -232,8 +233,8 @@ function TypeText({ children }: { children: string }) {
               no character, so the union still reads as one run and can still
               only fold where a member starts. */}
           {at > 0 && <wbr />}
-          <span className={held ? styles.apiTypeMember : undefined}>
-            {at > 0 && <span className={styles.apiTypeBar}>|</span>}
+          <span className={held ? api.apiTypeMember : undefined}>
+            {at > 0 && <span className={api.apiTypeBar}>|</span>}
             {tokens(member)}
           </span>
         </Fragment>
@@ -314,7 +315,7 @@ function tokens(member: string) {
 function ColumnHint({ hint, label }: { hint: string; label: string }) {
   return (
     <helix-tooltip content={hint} placement="top">
-      <button aria-label={`${label}: ${hint}`} className={styles.apiHint} type="button">
+      <button aria-label={`${label}: ${hint}`} className={api.apiHint} type="button">
         <helix-icon name="info" />
       </button>
     </helix-tooltip>
@@ -337,7 +338,7 @@ function MemberTable({
     return null
   }
   return (
-    <div className={styles.apiTable}>
+    <div className={api.apiTable}>
       <helix-table label={label}>
         <helix-table-column width={NAME}>
           {label}
@@ -353,7 +354,7 @@ function MemberTable({
               {row.name ? (
                 <Code>{row.name}</Code>
               ) : (
-                <span className={styles.apiUnnamed}>(default)</span>
+                <span className={api.apiUnnamed}>(default)</span>
               )}
             </helix-table-cell>
             {typed && (
@@ -409,7 +410,7 @@ function Described({
           {' '}
           <a
             aria-label={opens(reference.label)}
-            className={styles.apiReference}
+            className={api.apiReference}
             href={reference.url}
             rel="noreferrer"
             target="_blank"
@@ -429,7 +430,7 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
     return null
   }
   return (
-    <div className={styles.apiTable}>
+    <div className={api.apiTable}>
       <helix-table label="Properties">
         <helix-table-column width={NAME}>Prop</helix-table-column>
         <helix-table-column width={TYPE}>Type</helix-table-column>
@@ -474,7 +475,7 @@ function ElementApi({ element }: { element: Element }) {
       </helix-flex>
 
       {element.summary && (
-        <helix-text as="p" class={styles.description} tone="muted" variant="caption">
+        <helix-text as="p" class={api.description} tone="muted" variant="caption">
           {element.summary}
         </helix-text>
       )}
@@ -620,7 +621,7 @@ export default async function FamilyDocs({
           }}
         />
       )}
-      <article className={styles.docsMain}>
+      <article className={docsShell.docsMain}>
         {/* `3xl`, the top of the scale, because a section break should be the
             largest space on the page: at `2xl` Usage sits as far from Preview as
             Root sits from Group, so the page has one rhythm and no hierarchy.
@@ -631,7 +632,7 @@ export default async function FamilyDocs({
             {/* Title and its actions on one line. The ellipsis holds everything
                 that is about the *document* rather than about the component, so
                 the one button worth a word of its own keeps it. */}
-            <helix-flex align="center" class={styles.docsTitle} gap="md" justify="between">
+            <helix-flex align="center" class={api.docsTitle} gap="md" justify="between">
               <helix-text as="h1">{family.label}</helix-text>
               <helix-flex align="center" data-density="sm" gap="xs">
                 {/* An anchor, because it leaves the site. The URL is composed
@@ -646,7 +647,7 @@ export default async function FamilyDocs({
               </helix-flex>
             </helix-flex>
 
-            <helix-text as="p" class={styles.description} tone="muted" variant="caption">
+            <helix-text as="p" class={api.description} tone="muted" variant="caption">
               {first(prose)}
             </helix-text>
 
@@ -788,7 +789,7 @@ export default async function FamilyDocs({
         </helix-flex>
       </article>
 
-      <aside className={styles.docsRail}>
+      <aside className={docsShell.docsRail}>
         {/* `Outline` rather than a hand-rolled list: it computes what is current
             from where the headings actually are and writes `aria-current` onto
             these anchors, so the rail says where you are and not only where you
@@ -797,7 +798,7 @@ export default async function FamilyDocs({
             The heading is visible as well as accessible. `label` names the
             navigation for a screen reader and paints nothing, which leaves a
             column of links with no word saying what they are. */}
-        <helix-text class={styles.docsRailTitle} tone="subtle" variant="label">
+        <helix-text class={docsShell.docsRailTitle} tone="subtle" variant="label">
           On this page
         </helix-text>
         <helix-outline label="On this page">
