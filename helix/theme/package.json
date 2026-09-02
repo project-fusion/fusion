@@ -24,7 +24,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "test": "cargo test -p fusion-helix-theme --manifest-path ../../Cargo.toml",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "wasm": "node scripts/build-wasm.mjs",

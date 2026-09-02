@@ -25,7 +25,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "samples": "node scripts/build-samples.mjs",
     "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"

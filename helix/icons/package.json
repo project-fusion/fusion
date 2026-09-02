@@ -24,7 +24,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "bun run icons && tsc -p tsconfig.json",
+    "build": "bun run icons && tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "icons": "node scripts/build-icons.mjs",
     "typecheck": "bun run icons && tsc -p tsconfig.json --noEmit"
   },
