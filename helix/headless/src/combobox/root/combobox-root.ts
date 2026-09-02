@@ -39,73 +39,31 @@ const isInsertion = (event: Event): boolean =>
  * @summary A field that filters a list as it is typed into.
  *
  * @description
- * **The list is `helix-listbox`, and the filtering is its own.** It already
- * owns narrowing, the empty state, the highlight, `aria-activedescendant` and
- * scrolling an option into view. Rewriting them here would be a second copy to
- * keep in step; what is left for this element is the field, the panel and the
- * traffic between them.
+ * **The list is `helix-listbox`, and the filtering is its own.** It owns
+ * narrowing, the empty state, the highlight, `aria-activedescendant` and
+ * scrolling an option into view. What is left for this element is the field,
+ * the panel and the traffic between them.
  *
- * **The text and the value are two things.** What a reader types is a filter,
- * not an answer: it narrows the list and is thrown away. The value is whichever
- * option they then choose, and the field is rewritten to that option's words
- * once they have. A combobox that treated the typing as the value would submit
- * "jav" to a form, which is the mistake a plain input makes and the reason this
- * component exists.
- *
- * That is also why the field is emptied of its filter on close rather than left
- * holding it: a control reopened still narrowed by the last visit's search is a
- * control whose second use starts from the first one's leftovers. Select
- * records the same.
+ * **The text and the value are two things.** What a reader types is a filter:
+ * it narrows the list and is thrown away. The value is whichever option they
+ * then choose, and the field is rewritten to that option's words once they
+ * have. The filter is cleared on close, so a reopened control does not start
+ * from the last visit's leftovers.
  *
  * **Focus stays in the field, which is the whole of what a combobox is.** The
- * arrows move the list without leaving the text, which is why the listbox has a
- * public `navigate`: the moving, the wrapping, the skipping of disabled options
- * and the seeding from the current value all stay in the one place that already
- * does them.
+ * arrows move the list without leaving the text, through the listbox's public
+ * `navigate`. `role="combobox"` is on the input rather than on a wrapper,
+ * because the thing the pattern describes is the text field.
  *
- * `role="combobox"` on the input rather than on a wrapper, because the thing
- * the pattern describes is the text field, and `aria-controls` can name the
- * listbox because both are in this shadow root. The active option cannot be
- * named that way, being the consumer's light DOM, so it is linked by element
- * reference for the reason Listbox records at length.
- *
- * **With `multiple`, the chosen options are tags in the field.** A field that
- * says "Rust, Ruby, Go" is a sentence the reader has to parse to find out what
- * is in it, and offers nothing to press to take one out: Select does that today
- * and it is the weakest part of it. A tag apiece is one object per answer, each
- * with its own remove control, which is what the reader already believes they
- * are looking at.
- *
- * The panel stays open while more than one can be chosen, because a control
- * that shut after each pick is one the reader has to reopen to keep using. The
- * filter clears on each choice instead, so the next pick starts from the whole
- * list rather than from the last search.
+ * **With `multiple`, the chosen options are tags in the field**, one object per
+ * answer, each with its own remove control. The panel stays open while more
+ * than one can be chosen and the filter clears on each choice, so the next pick
+ * starts from the whole list.
  *
  * **`creatable` announces, and does not write.** The options are the consumer's
  * light DOM and nothing here puts an element into it: a component that grew the
- * consumer's markup would be a component their framework re-renders over. What
- * this does is offer a row saying what would be added, take the value when the
- * reader presses it, and say so with `helix-create`. A consumer who has to
- * validate first refuses the event and adds nothing.
- *
- * Which leaves a value naming no option, and that is what the words fall back
- * to: for anything chosen the field shows the option's text if there is one and
- * the value itself otherwise. No copy is stored, so a consumer who then adds a
- * real option with that value has its words take over on the next render.
- *
- * **`suggest` finishes the word, and only ever forwards.** The field completes
- * to the first option the typing begins, with the part the reader did not type
- * selected, so the next character replaces it and Delete removes it. Applied on
- * insertion alone: completing after a deletion would put back what the reader
- * just took out, and a field that cannot be shortened is a field that cannot be
- * corrected. Measured as the difference between `insertText` and the several
- * `delete*` input types, which is what the platform already says about which
- * happened.
- *
- * The filter stays what was typed rather than what was completed. Filtering on
- * the completion would narrow the list to the one option it came from, so a
- * reader typing "ru" would be shown "Rust" alone and never learn Ruby was
- * there.
+ * consumer's markup would be one their framework re-renders over. It offers the
+ * row and fires the event; adding the option is the consumer's.
  *
  * @since 0.1.0
  * @status experimental

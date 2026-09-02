@@ -69,67 +69,34 @@ const fill = (
  * @summary Moves between pages of a longer result.
  *
  * @description
- * The component is the truncation. Given a page and a total it works out which
- * numbers to show and where the runs break, which is the whole of what a
- * consumer would otherwise write by hand and get subtly wrong; everything else
- * here is markup around that. So this is data-driven rather than composed:
- * `<helix-pagination page="4" pages="12">` rather than twelve slotted children
- * a consumer has to keep in step with their own query.
+ * **The component is the truncation.** Given a page and a total it works out
+ * which numbers to show and where the runs break, so this is data-driven rather
+ * than composed: `<helix-pagination page="4" pages="12">` rather than twelve
+ * slotted children a consumer keeps in step with their own query.
  *
  * **The width does not change as you page.** The run around the current page is
- * `siblings` either side normally, and grows to absorb a gap slot when it meets
- * a boundary, so the control holds the same number of slots from the first page
- * to the last. Every arrangement that lets the count vary makes the buttons move
- * under the pointer between one click and the next.
+ * `siblings` either side, and grows to absorb a gap slot at a boundary, so the
+ * control holds the same number of slots from the first page to the last.
+ * Anything that lets the count vary moves the buttons under the pointer between
+ * one click and the next.
  *
- * **A gap is only drawn where it hides more than one page.** An ellipsis
- * standing in for a single number costs the same space as the number and tells
- * the reader less.
- *
- * **And a gap is a control.** It goes to the middle of the run it stands over,
- * which is the binary-search step: any page in a set of any size is a handful of
- * presses, where a jump of a fixed size would need forty of them on a set of a
- * hundred and twenty-eight. A menu listing the hidden pages was the other idea
- * and the arithmetic refuses it, for the reasons on `renderGap`.
+ * **A gap is only drawn where it hides more than one page, and a gap is a
+ * control.** It goes to the middle of the run it stands over, which is the
+ * binary-search step: any page in a set of any size is a handful of presses.
  *
  * **`href` is what makes these links.** Set it and every page renders an `<a>`
- * with `{page}` filled in, so the server's output is crawlable, a middle click
- * opens a tab, and the address bar is the state. Left unset they are buttons,
- * which is right for a table paging in place. Either way the click announces
- * `helix-navigate` first, and `preventDefault()` on it stops the navigation as
- * well as the change: that is how a router takes over without the page reloading
- * underneath it.
+ * with `{page}` filled in, so the output is crawlable, a middle click opens a
+ * tab, and the address bar is the state. Left unset they are buttons, which is
+ * right for a table paging in place. Either way the click announces
+ * `helix-navigate` first, and `preventDefault()` stops the navigation as well
+ * as the change, which is how a router takes over.
  *
- * **`helix-navigate` and not `helix-change`**, for the reason the calendar pages
- * with it too. Moving to page four chooses nothing; it moves the view over a
- * result that has not changed. A consumer driving the view has to be able to
- * hear that without being told an answer changed.
+ * **`helix-navigate` and not `helix-change`.** Moving to page four chooses
+ * nothing; it moves the view over a result that has not changed.
  *
- * **The count and the page-size control are their own elements.** A slot can
- * only offer one place: at one end of one row, in one order, on one axis.
- * `Pagination.Summary` and `Pagination.Size` sit beside this one instead, so
- * the direction and the order of a footer are the consumer's, which is what
- * they were always going to want. `total` and `page-size` stay here for the
- * arithmetic below and nothing else.
- *
- * **A single page renders nothing.** A control offering one page offers no
- * navigation, and the row it sits in should close over it rather than hold a
- * space for a thing that cannot be used. Reported through
- * `ElementInternals.states` rather than an attribute on the host, because an
- * attribute written at upgrade is markup a server's output never had and a
- * framework reports the difference; a custom state carries the same fact to a
- * stylesheet and none of that to the DOM.
- *
- * **And a page change is announced.** Moving the page moves `aria-current` onto
- * a different element, which a screen reader does not announce, so a reader who
- * pressed 5 hears the word "5" from the button they were on and nothing at all
- * about having arrived. A polite live region says where they now are. It ships
- * empty and is filled only on a change, because a region populated as it enters
- * the document announces itself on arrival.
- *
- * `page` is what the element holds and `default-page` seeds it. A consumer
- * paging through a router refuses `helix-navigate` and assigns their own, which
- * is how they take the decision.
+ * **The count and the page-size control are their own elements.**
+ * `Pagination.Summary` and `Pagination.Size` sit beside this one, because a
+ * slot can only offer one place: at one end of one row, in one order.
  *
  * @since 0.1.0
  * @status experimental

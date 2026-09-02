@@ -84,57 +84,29 @@ const SKIP_SECONDS = 10
  *
  * @description
  * **The picture is a real `<video>`.** Decoding, buffering, captions, Picture
- * in Picture, AirPlay and the codecs a device happens to have are all the
- * platform's, and none of them can be had from anything else. What is replaced
- * is the control bar, which is the one part of a video element that cannot be
- * styled and looks different in every browser.
+ * in Picture, AirPlay and whatever codecs a device has are the platform's. What
+ * is replaced is the control bar, which is the one part that cannot be styled.
  *
  * **Every control is a real control.** The scrubber and the volume are
- * `<input type="range">`, so a reader gets arrow keys, Home and End, the
- * platform's own touch target and its screen reader announcement without this
- * element implementing any of it. Drawing a div and listening for pointer moves
- * is how a media player ends up unusable from a keyboard.
+ * `<input type="range">`, so arrow keys, Home and End, the platform's touch
+ * target and its screen reader announcement all come for free.
  *
  * **Native controls are the fallback, not the default.** Where a consumer sets
- * `controls`, the browser's bar is used and this one is not drawn: two sets of
- * controls over one video is worse than either alone, and a consumer who asked
- * for the native bar has a reason.
+ * `controls` the browser's bar is used and this one is not drawn, and the keys
+ * below are not bound: two handlers on one press is a video that seeks twice.
  *
  * The keys are the ones every player uses: Space and `k` to play or pause, the
- * arrows to seek and to change the volume, `m` to mute, `f` for fullscreen.
- * They are bound on this element rather than on the document, because a video
- * is not a palette: keys belong to it only while a reader is on it. Where
- * `controls` is set they are not bound at all, since two handlers on one press
- * is a video that seeks twice, and the focus stop goes with them.
+ * arrows to seek and to change volume, `m` to mute, `f` for fullscreen. They
+ * are bound on this element rather than on the document, because a video is not
+ * a palette.
  *
  * **`<source>` and `<track>` are copied into the video, never slotted into it.**
  * A media element runs resource selection over its own child *nodes*, and a slot
  * is one node, so slotted sources reach it as nothing: no text tracks, no
  * current source, `readyState` zero. A video given sources that way does not
- * merely lack captions, it does not play.
- *
- * They are copied rather than moved, because the consumer's light DOM is theirs
- * and a framework that re-renders it would find its children gone. The copies
- * are rebuilt whenever the slot changes and the video is asked to load again,
- * which is what makes a `<track>` added later take effect.
- *
- * **The lock screen and a headset's buttons work, and one player owns them.**
- * There is one `navigator.mediaSession` per page, so the rule is stated rather
- * than left to render order: whichever player was started last owns it, which
- * is what a reader means by "this one" when they press play on their
- * headphones. The title comes from `label` and the artwork from `poster`.
- *
- * **`remote` sends the picture somewhere else.** The Remote Playback API is
- * what Safari implements for AirPlay and Chrome for Cast, so one control covers
- * both and the platform supplies the device list. It is offered only once
- * something has answered `watchAvailability`: a button that opens an empty list
- * is worse than no button, and a consumer who wants none can set
- * `disableremoteplayback` on this element.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * merely lack captions, it does not play. They are copied rather than moved,
+ * because the consumer's light DOM is theirs, and rebuilt whenever the slot
+ * changes.
  *
  * @since 0.1.0
  * @status experimental

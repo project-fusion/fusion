@@ -15,58 +15,19 @@ type Row = Record<string, string>
  * `<template>` child says what one row looks like: elements carrying
  * `data-field="name"` are filled with that field of the item.
  *
- * Both halves are markup, and that is the whole reason for the shape.
- * `VirtualizeController` says why the obvious alternatives are shut: an `items`
+ * Both halves are markup, and that is the reason for the shape. An `items`
  * property cannot survive React hydration, which skips every property it would
  * have to apply imperatively, and light-DOM children exist by the time anything
- * could decide not to create them. Text in the document is neither. A server
- * emits it, React re-emits it as a child rather than applying it, and it is one
- * node whatever the row count.
+ * could decide not to create them. Text in the document is neither, and it is
+ * one node whatever the row count.
  *
  * **The accessible version is not a `<table>`**, the way it is for the charts
  * that share this `for="<id>"` shape: ten thousand rows in one is the cost this
- * exists to avoid. It is the rendered window plus `aria-setsize` and
- * `aria-posinset`, which is what says "four thousand of ten thousand" rather
- * than "four of twenty".
+ * exists to avoid. It is the rendered window plus `aria-setsize`.
  *
- * **Rows are light DOM, deliberately.** They are cloned from the consumer's
- * template and appended to the host, so a document rule reaches them, the base
- * layer applies, and a class in the template means what it says. Cloned into
- * the shadow root they would be markup the consumer wrote and could not style,
- * which is the one thing a row template must not be.
- *
- * **Reading the source is client-only**, because a server has no document to
- * query. The window renders empty from the server and fills on the first update,
- * which is the same client-side enhancement rule every tree-reading component
- * here follows.
- *
- * **On this tier the consumer gives the viewport its box**, and the component
- * cannot do it for them: `helix/headless` ships no stylesheet, and a height is a
- * decision rather than a fact this could publish. So a base list wants two rules
- * before it is a list at all:
- *
- * ```css
- * helix-headless-virtual-list::part(viewport) {
- *   block-size: 12rem;
- *   overflow-y: auto;
- * }
- * ```
- *
- * **Without them it is not a scroller**, and the failure is worse than it
- * sounds. `scrollTop` is always zero, so nothing ever windows; and the box has
- * no height of its own, so `clientHeight` is a function of the rows just drawn.
- * Measuring then moves what is being measured, and the two need not converge:
- * measured in Chromium at 500 rows, it settled into a two-cycle between 378 and
- * 379 rows and stayed there, at two and a half thousand passes in eight seconds.
- * `VirtualizeController` gives up after ten passes and says so, so this now
- * draws a bad window rather than stopping the page, but a bad window is still
- * the answer until the rules are written.
- *
- * The styled tier writes them for you, with `--virtual-list-block-size`.
- *
- * @category layout
  * @since 0.1.0
  * @status experimental
+ * @category layout
  * @documentation https://helix.fusion.dev/components/virtual-list
  *
  * @csspart after - The space standing in for rows below the window.

@@ -28,49 +28,17 @@ let showing: HelixHeadlessMegamenu | undefined
  * **A disclosure, not a menu, and that is the whole design.** `role="menu"` and
  * `menuitem` are for an application's commands: they take over the arrow keys,
  * announce "menu" to a reader who asked for navigation, and put every link
- * inside a role that is not a link. What this is, is a button that shows and
- * hides a region of the consumer's own anchors, which is the pattern the APG
- * gives for site navigation and the one that leaves a middle click, a modified
+ * inside a role that is not a link. This is a button that shows and hides a
+ * region of the consumer's own anchors, which leaves a middle click, a modified
  * click and the status bar working. `Menu` remains right for a row of commands.
  *
- * **It renders no links**, for the reason `Navigation` gives: a router renders
- * its own anchor and cannot render one inside this shadow root. The panel is a
- * slot, and what goes in it is lists and headings the consumer wrote.
+ * **It renders no links.** A router renders its own anchor and cannot render
+ * one inside this shadow root, so the panel is a slot and what goes in it is
+ * the lists and headings the consumer wrote.
  *
  * **It opens on hover, and a press is always the fallback.** `open-on` says
- * which, and hover is the resting value because a nav bar is the one place a
- * reader expects to sweep along a row and see each section: making them click,
- * read, click again to compare two is the interaction hover exists to save.
- *
- * Hover is not the only way in, and the code is mostly about that. There is no
- * hover on a touch screen, so a tap opens the panel there whatever `open-on`
- * says, which is why the pointer type is checked rather than assumed. Focus
- * still opens nothing, for the same reason a tab through a nav bar should not
- * unfold it, but Enter on the trigger does, and a keyboard press arrives as a
- * click with no pointer behind it.
- *
- * A mouse click on a trigger the pointer is already sitting on is the case
- * worth naming: toggling there would close the panel and the pointer, still on
- * the trigger, would open it again, so the trigger would flicker and never
- * close. In hover mode the mouse's own clicks are left alone and hover governs
- * on its own. Escape and a click away still close it.
- *
- * The delays are intent, not decoration. Opening waits, so a pointer crossing
- * the bar on its way somewhere else opens nothing; closing waits longer, so the
- * diagonal from the trigger down into the panel does not pass through a gap and
- * shut it. Moving along a bar where a panel is already down opens the next one
- * at once, because at that point the reader is reading the bar, not crossing it.
- *
- * **Focus is not trapped and not moved.** A disclosure leaves the reader on the
- * trigger and the panel follows in the tab order, which is what the markup
- * already says, so Tab walks into the links and out the far side without
- * anything managing it. Escape closes and puts focus back, because Escape is
- * the one key that has to return the reader to where they were.
- *
- * The custom property below is written by this component and read by whoever
- * draws it. A consumer never sets it: it carries a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * which, and hover is the resting value because a nav bar is where a reader
+ * expects to sweep along a row and see each section.
  *
  * @since 0.1.0
  * @status experimental

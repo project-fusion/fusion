@@ -32,9 +32,7 @@
     "types"
   ],
   "customElements": "custom-elements.json",
-  "sideEffects": [
-    "./dist/**/*.js"
-  ],
+  "sideEffects": true,
   "scripts": {
     "analyze": "bun --bun cem analyze --config cem.config.ts",
     "build": "bun run element-events && tsc -p tsconfig.json && tsc -p tsconfig.types.json",

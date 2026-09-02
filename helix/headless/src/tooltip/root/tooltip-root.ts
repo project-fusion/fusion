@@ -19,57 +19,35 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @description
  * The trigger is slotted and stays the consumer's own element. The bubble is
  * rendered here, in the top layer through the popover API, so it clears any
- * ancestor with `overflow: hidden` without a `z-index` anywhere.
+ * ancestor with `overflow: hidden` without a `z-index` anywhere. Position comes
+ * from `FloatingController`, which flips to another side when the preferred one
+ * does not fit.
  *
- * Position comes from `FloatingController`, which flips to another side when
- * the preferred one does not fit and slides along it to stay in view.
- *
- * **Two forms, and they are not equivalent for a screen reader.**
- *
- * Wrapping is the convenience form and is right where the bubble decorates a
- * control that already says what it is. The trigger stays the consumer's own
- * element, slotted, and nothing here can describe it: an IDREF cannot cross a
- * shadow boundary, an element reference is valid only into the same tree or a
- * shadow-including *ancestor* (the bubble's tree is neither, it is inward), and
- * a string on the trigger means writing to markup the consumer server-rendered.
- * All three measured.
+ * **Two forms, and they are not equivalent for a screen reader.** Wrapping is
+ * the convenience form and is right where the bubble decorates a control that
+ * already says what it is: nothing here can describe a slotted trigger, an
+ * IDREF being unable to cross a shadow boundary.
  *
  * `for` is the form that works. The tooltip sits *beside* the trigger in the
- * consumer's own tree and names it by id, so both are in one tree and an IDREF
- * between them is legal in the ordinary way:
+ * consumer's own tree and names it by id, so an IDREF between them is legal in
+ * the ordinary way:
  *
  * ```html
  * <helix-button id="save" aria-describedby="save-tip">Save</helix-button>
  * <helix-tooltip id="save-tip" for="save" content="Save your work"></helix-tooltip>
  * ```
  *
- * Note that the reference points at *this host*, not at the bubble inside its
- * shadow root: the description is computed from the flat tree, which descends
- * into shadow content on its own.
+ * The reference points at *this host*, not at the bubble in its shadow root:
+ * the description is computed from the flat tree, which descends into shadow
+ * content on its own.
  *
  * **The consumer writes that `aria-describedby`, and nothing here writes it for
- * them.** WebAwesome and Spectrum Web Components both do write it, with
- * `setAttribute` on the trigger at runtime, which is the one thing this library
- * declines everywhere: React rendered that element on the server without the
- * attribute and reports a mismatch it will not patch up. Two ids in the markup
- * is the whole cost of the version that is correct before any JavaScript runs.
- *
- * Because it is the consumer's line to write, it is also theirs to forget, so
- * `for` audits itself on first open and says so once, rather than on every
- * open, since a warning that repeats is one people learn to filter out.
+ * them.** Setting it at runtime is a hydration mismatch React will not patch
+ * up. `for` audits itself on first open and warns once where it is missing.
  *
  * It shows on hover and on focus, and hides on leave, on blur, on Escape, and
  * once the trigger has been activated: the hint is spent when the control has
  * been used.
- * A tooltip that answers only the pointer is one a keyboard reader never sees.
- *
- * The pointer waits out `delay` first, or sweeping a row of controls flashes a
- * tooltip for each of them. Focus does not wait: a keyboard reader landing on a
- * control has already committed to it.
- *
- * Open state comes from `MixinControllerOpen`, so it announces `helix-before-open` and
- * `helix-before-close` like every other overlay here, and a consumer can drive it with
- * `open` where they need to.
  *
  * @since 0.1.0
  * @status experimental
