@@ -221,7 +221,7 @@
     },
     "helix/templates": {
       "name": "@fusion.dev/helix-templates",
-      "version": "0.0.0-dev",
+      "version": "0.0.9",
     },
     "helix/testing": {
       "name": "@fusion.dev/helix-testing",

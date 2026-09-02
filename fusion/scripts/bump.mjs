@@ -34,8 +34,35 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 
-/** Which types release, and how far. Everything absent releases nothing. */
-const LEVELS = { feat: 'minor', fix: 'patch', perf: 'patch', refactor: 'patch', revert: 'patch' }
+/**
+ * Which types release, and how far. Everything absent releases nothing.
+ *
+ * **Only `test` and `ci` are absent, and the reason is that nothing they touch
+ * is packed.** Specs are excluded from `dist` and workflows are not in `files`,
+ * so neither can change a byte a consumer receives.
+ *
+ * **Everything else can, which is why everything else releases.** The two
+ * documentation packages publish their `content` directory, so `docs` edits a
+ * shipped package; `style` changes the emitted bytes; `chore` changes what npm
+ * serves; and `build` moves the output directly, a `tsconfig` edit having once
+ * taken a megabyte off every package. A type that can reach the registry and
+ * does not release is a package describing a version it is not.
+ *
+ * Releasing too often costs a version number, which is free. Releasing too
+ * rarely costs a consumer reading documentation that does not match what they
+ * installed.
+ */
+const LEVELS = {
+  build: 'patch',
+  chore: 'patch',
+  docs: 'patch',
+  feat: 'minor',
+  fix: 'patch',
+  perf: 'patch',
+  refactor: 'patch',
+  revert: 'patch',
+  style: 'patch',
+}
 
 /** The two domains that publish. A scope outside them is not a release. */
 const DOMAINS = ['helix', 'cortex']
