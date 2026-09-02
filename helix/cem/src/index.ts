@@ -55,6 +55,14 @@ export interface HelixCemOptions {
  * Every package that ships custom elements uses this rather than configuring
  * the analyzer itself, so that a new plugin is added once here instead of
  * being copied into each package and drifting.
+ *
+ * **Each package names its config on the command line and must keep doing so.**
+ * The file is `cem.config.ts`, and the analyzer discovers
+ * `custom-elements-manifest.config.*` and nothing else, so an `analyze` script
+ * that loses its `--config` runs with the analyzer's defaults rather than
+ * failing: a manifest is still written, with none of the plugins below in it,
+ * and every tier, part, example and source path silently disappears from the
+ * docs built on top of it.
  */
 /**
  * Where the framework typings land.

@@ -77,7 +77,7 @@
     // tracking it.
     "analyze": {
       "dependsOn": ["^build"],
-      "inputs": ["src/**", "custom-elements-manifest.config.ts"],
+      "inputs": ["src/**", "cem.config.ts"],
       "outputs": ["custom-elements.json", "types/jsx.d.ts", "types/svelte.d.ts", "types/vue.d.ts"]
     },
     "build": {
