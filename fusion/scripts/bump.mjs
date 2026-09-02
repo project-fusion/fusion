@@ -123,7 +123,12 @@ if (import.meta.main) {
   const raw =
     argument === '--stdin'
       ? readFileSync(0, 'utf8')
-      : execFileSync('git', ['log', '--format=%B%x00', argument], { encoding: 'utf8' })
+      : execFileSync('git', ['log', '--format=%B%x00', argument], {
+          encoding: 'utf8',
+          /* A domain with no release tag reads all of history, and the default
+             1 MB buffer is an `ENOBUFS` crash at about 2,000 commits. */
+          maxBuffer: 512 * 1024 * 1024,
+        })
   const messages = raw
     .split('\0')
     .map((one) => one.trim())
