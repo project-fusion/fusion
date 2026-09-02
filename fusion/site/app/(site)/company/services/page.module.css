@@ -5,11 +5,6 @@
 /* What a reader is left holding, as the card's bottom line. Measured side by
    side on the audit card, 500px of content against 60, so whichever end the
    sentence was pinned to left a void beside the other. */
-.serviceKeep {
-  align-items: start;
-  inline-size: 100%;
-}
-
 /* ==================================================== the rebuild ======== */
 
 /* The lit band the head sits on. */

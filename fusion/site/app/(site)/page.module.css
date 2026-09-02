@@ -168,21 +168,6 @@
   }
 }
 
-/** Two navs stacked for comparison, each in its own frame. */
-.navSample {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
-  padding: var(--helix-space-md);
-}
-
-/* Reads as chrome rather than as content, which is what a nav sample is. */
-.navRow {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-lg);
-}
-
 /* ── The field ─────────────────────────────────────────────────────── */
 
 @keyframes preview-settle {
@@ -507,15 +492,6 @@
     border-radius: 0;
     max-inline-size: 100%;
   }
-}
-
-/**
- * The carousel runs to the page edges; the first card does not move.
- */
-.reelBleed {
-  --carousel-bleed: var(--site-inset);
-
-  margin-inline: calc(var(--site-inset) * -1);
 }
 
 /*
