@@ -1,50 +1,19 @@
-# Who the governance gate actually asks.
-#
-# The release workflows talk about approval by governance, and until this file
-# existed that was a description of an intention rather than a rule anything
-# enforced. A required review from a code owner is what turns it into one.
-#
-# Two things still have to be set in the GitHub UI, because a file in the repo
-# cannot grant itself authority:
-#
-#   Settings > Branches > main: require a pull request, require the `verify`
-#   check, and refuse force pushes and deletion. Nothing in CI pushes to `main`,
-#   by design, so there is no bot that needs an exemption.
-#
-#   Settings > Environments > experimental: required reviewers. That is the
-#   gate on publishing from a pull request, and it is the one that works for
-#   forks, where a workflow gets no secrets and a label proves nothing.
-#
-# **Two of those have moved since this was written, and both are worth knowing
-# before anyone sets them.**
-#
-# This file used to name `verify` and `browser-specs` as the checks to require.
-# A branch rule matches a *job* name and not a workflow name, and 274 sharded
-# `verify.yml` into `plan`, `checks (0)` through `checks (5)`, `lint`, `types`,
-# `tests` and four `browser` entries, so neither name existed any more and
-# requiring either would have blocked every pull request on a check that never
-# reports. `verify.yml` now ends in an aggregation job called `verify` that
-# needs all of them: one context to require, immune to a shard count or a
-# renamed script, and it is why the line above is true again.
-#
-# Required reviewers on an environment returned HTTP 422 on 26 Aug 2026,
-# *"ensure the billing plan supports the required reviewers protection rule"*,
-# against an organization on the Team plan. The setting is available once the
-# repository is public, which 272 is about, so this closes with that flip rather
-# than before it. Until then `release-experimental.yml` describes an approval
-# that nothing enforces, and that is the state, not an oversight.
-#
-# Today this is one person, and naming that plainly is better than a team that
-# does not exist yet. **Required review is therefore off rather than on**:
+# **Required review is deliberately off, and turning it on locks `main`.**
 # GitHub does not let an author approve their own pull request, so requiring one
-# with a single code owner makes `main` unmergeable except by admin bypass,
-# which is a gate that exists only by being ignored. Required approvals go to 1
-# and `require_code_owner_reviews` goes on the day there is a second person.
-# Replace the owner with @project-fusion/governance then too.
+# from a single code owner leaves no one who can approve anything: a gate that
+# exists only by being bypassed. It was set once and did exactly that.
+#
+# On the day there is a second person: required approvals to 1,
+# `require_code_owner_reviews` on, and this file names a team instead.
+#
+# The `main` ruleset requires the `verify` context, which is a *job* name and
+# not a workflow name. `verify.yml` shards into `checks (0..9)`, four `browser`
+# entries and the rest; `verify` is the aggregation job that needs them all, so
+# the required check survives the shard count changing under it.
 
 * @irontitan76
 
-# The release path itself. A change here changes what is published and under
-# whose authority, so it is worth its own line even when the owner is the same.
+# The release path. A change here changes what is published, and under whose
+# authority.
 /.github/           @irontitan76
 /fusion/scripts/    @irontitan76
