@@ -1,18 +1,104 @@
 import type { ReactNode } from 'react'
-import { chartsArt } from './charts'
-import { contentArt } from './content'
-import { coreArt } from './core'
-import { formsArt } from './forms'
-import { overlaysArt } from './overlays'
-import { toolingArt } from './tooling'
+import { accordionArt } from './art/accordion'
+import { announcementArt } from './art/announcement'
+import { appHeaderArt } from './art/app-header'
+import { auraArt } from './art/aura'
+import { avatarArt } from './art/avatar'
+import { badgeArt } from './art/badge'
+import { barChartArt } from './art/bar-chart'
+import { blockquoteArt } from './art/blockquote'
+import { breadcrumbsArt } from './art/breadcrumbs'
+import { buttonArt } from './art/button'
+import { buttonGroupArt } from './art/button-group'
+import { calloutArt } from './art/callout'
+import { cardArt } from './art/card'
+import { carouselArt } from './art/carousel'
+import { chatArt } from './art/chat'
+import { checkboxArt } from './art/checkbox'
+import { checkboxGroupArt } from './art/checkbox-group'
+import { codeArt } from './art/code'
+import { codeBlockArt } from './art/code-block'
+import { colorInputArt } from './art/color-input'
+import { colorPickerArt } from './art/color-picker'
+import { comboboxArt } from './art/combobox'
+import { commandArt } from './art/command'
+import { copyButtonArt } from './art/copy-button'
+import { dataTableArt } from './art/data-table'
+import { dateInputArt } from './art/date-input'
+import { datePickerArt } from './art/date-picker'
+import { dialogArt } from './art/dialog'
+import { dividerArt } from './art/divider'
+import { donutChartArt } from './art/donut-chart'
+import { drawerArt } from './art/drawer'
+import { drilldownArt } from './art/drilldown'
+import { editorArt } from './art/editor'
+import { emptyArt } from './art/empty'
+import { fileInputArt } from './art/file-input'
+import { flexArt } from './art/flex'
+import { formatDateArt } from './art/format-date'
+import { gridArt } from './art/grid'
+import { heatmapArt } from './art/heatmap'
+import { iconArt } from './art/icon'
+import { iconButtonArt } from './art/icon-button'
+import { imageArt } from './art/image'
+import { inputArt } from './art/input'
+import { kbdArt } from './art/kbd'
+import { legendArt } from './art/legend'
+import { lineChartArt } from './art/line-chart'
+import { listArt } from './art/list'
+import { listboxArt } from './art/listbox'
+import { loaderArt } from './art/loader'
+import { megamenuArt } from './art/megamenu'
+import { menuArt } from './art/menu'
+import { meterArt } from './art/meter'
+import { navigationArt } from './art/navigation'
+import { notificationsArt } from './art/notifications'
+import { numberInputArt } from './art/number-input'
+import { optionArt } from './art/option'
+import { outlineArt } from './art/outline'
+import { paginationArt } from './art/pagination'
+import { pinInputArt } from './art/pin-input'
+import { popoverArt } from './art/popover'
+import { progressArt } from './art/progress'
+import { qrCodeArt } from './art/qr-code'
+import { quoteArt } from './art/quote'
+import { radioArt } from './art/radio'
+import { ratingArt } from './art/rating'
+import { sandboxArt } from './art/sandbox'
+import { scrollAreaArt } from './art/scroll-area'
+import { selectArt } from './art/select'
+import { skeletonArt } from './art/skeleton'
+import { sliderArt } from './art/slider'
+import { sparklineArt } from './art/sparkline'
+import { speedDialArt } from './art/speed-dial'
+import { splitterArt } from './art/splitter'
+import { statArt } from './art/stat'
+import { stepsArt } from './art/steps'
+import { switchArt } from './art/switch'
+import { tableArt } from './art/table'
+import { tabsArt } from './art/tabs'
+import { tagArt } from './art/tag'
+import { textArt } from './art/text'
+import { textareaArt } from './art/textarea'
+import { timeInputArt } from './art/time-input'
+import { timePickerArt } from './art/time-picker'
+import { timelineArt } from './art/timeline'
+import { toastArt } from './art/toast'
+import { toggleArt } from './art/toggle'
+import { toolbarArt } from './art/toolbar'
+import { tooltipArt } from './art/tooltip'
+import { tourArt } from './art/tour'
+import { treeArt } from './art/tree'
+import { trendArt } from './art/trend'
+import { videoArt } from './art/video'
+import { videoPlaylistArt } from './art/video-playlist'
+import { virtualListArt } from './art/virtual-list'
 
 /**
  * Abstract art for a family's gallery card, keyed by slug.
  *
- * Every family has an entry. The six files are split by kind rather than by
- * anything the build cares about, and the split is **not** the catalog's: the
- * catalog has twelve categories, `content.tsx` spans six of them and `core.tsx`
- * seven. The system they all obey is documented at the top of `core.tsx`.
+ * Every family has an entry, and every entry is a file under `art/` named for
+ * the family it draws. The system they all obey is `system.md`.
  *
  * **Ninety-four, not the ninety-three folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
@@ -50,12 +136,100 @@ import { toolingArt } from './tooling'
  * that simply has no picture, and looks deliberate until someone draws one.
  */
 const art: Record<string, ReactNode> = {
-  ...chartsArt,
-  ...contentArt,
-  ...coreArt,
-  ...formsArt,
-  ...overlaysArt,
-  ...toolingArt,
+  accordion: accordionArt,
+  announcement: announcementArt,
+  'app-header': appHeaderArt,
+  aura: auraArt,
+  avatar: avatarArt,
+  badge: badgeArt,
+  'bar-chart': barChartArt,
+  blockquote: blockquoteArt,
+  breadcrumbs: breadcrumbsArt,
+  button: buttonArt,
+  'button-group': buttonGroupArt,
+  callout: calloutArt,
+  card: cardArt,
+  carousel: carouselArt,
+  chat: chatArt,
+  checkbox: checkboxArt,
+  'checkbox-group': checkboxGroupArt,
+  code: codeArt,
+  'code-block': codeBlockArt,
+  'color-input': colorInputArt,
+  'color-picker': colorPickerArt,
+  combobox: comboboxArt,
+  command: commandArt,
+  'copy-button': copyButtonArt,
+  'data-table': dataTableArt,
+  'date-input': dateInputArt,
+  'date-picker': datePickerArt,
+  dialog: dialogArt,
+  divider: dividerArt,
+  'donut-chart': donutChartArt,
+  drawer: drawerArt,
+  drilldown: drilldownArt,
+  editor: editorArt,
+  empty: emptyArt,
+  'file-input': fileInputArt,
+  flex: flexArt,
+  'format-date': formatDateArt,
+  grid: gridArt,
+  heatmap: heatmapArt,
+  icon: iconArt,
+  'icon-button': iconButtonArt,
+  image: imageArt,
+  input: inputArt,
+  kbd: kbdArt,
+  legend: legendArt,
+  'line-chart': lineChartArt,
+  list: listArt,
+  listbox: listboxArt,
+  loader: loaderArt,
+  megamenu: megamenuArt,
+  menu: menuArt,
+  meter: meterArt,
+  navigation: navigationArt,
+  notifications: notificationsArt,
+  'number-input': numberInputArt,
+  option: optionArt,
+  outline: outlineArt,
+  pagination: paginationArt,
+  'pin-input': pinInputArt,
+  popover: popoverArt,
+  progress: progressArt,
+  'qr-code': qrCodeArt,
+  quote: quoteArt,
+  radio: radioArt,
+  rating: ratingArt,
+  sandbox: sandboxArt,
+  'scroll-area': scrollAreaArt,
+  select: selectArt,
+  skeleton: skeletonArt,
+  slider: sliderArt,
+  sparkline: sparklineArt,
+  'speed-dial': speedDialArt,
+  splitter: splitterArt,
+  stat: statArt,
+  steps: stepsArt,
+  switch: switchArt,
+  table: tableArt,
+  tabs: tabsArt,
+  tag: tagArt,
+  text: textArt,
+  textarea: textareaArt,
+  'time-input': timeInputArt,
+  'time-picker': timePickerArt,
+  timeline: timelineArt,
+  toast: toastArt,
+  toggle: toggleArt,
+  toolbar: toolbarArt,
+  tooltip: tooltipArt,
+  tour: tourArt,
+  tree: treeArt,
+  trend: trendArt,
+  video: videoArt,
+  'video-playlist': videoPlaylistArt,
+  'virtual-list': virtualListArt,
 }
 
 /**
