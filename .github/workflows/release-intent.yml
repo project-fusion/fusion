@@ -27,16 +27,21 @@ jobs:
       NUMBER: ${{ github.event.pull_request.number }}
       REPO: ${{ github.repository }}
     steps:
-      # **Only for the script below.** This job reads the commits through the
-      # API rather than from a clone, and `bump.mjs` comes from the base branch
-      # for the same reason: what merging does is decided by the base's copy,
-      # not by whatever this branch changed it to. What a checkout gives is
-      # `.github/scripts/`, and without one the step exits 127 on a file that
-      # was inline until 2 Sep 2026.
-      - name: Check out
+      # **The base, never the head, because this is `pull_request_target`.**
+      # That event runs with a writable token, so checking out the pull
+      # request's own code would run a contributor's script with it. What is
+      # wanted here is only `.github/scripts/`, and the base's copy is the one
+      # that decides what merging does anyway, exactly as `bump.mjs` is fetched
+      # from the base inside that script.
+      #
+      # Without a checkout the step exits 127: it was inline until 2 Sep 2026,
+      # and `pull_request_target` takes the workflow file from the base branch,
+      # so a fix to it only takes effect once merged.
+      - name: Check out the base
         uses: actions/checkout@v7
         with:
           fetch-depth: 1
+          ref: ${{ github.event.pull_request.base.sha }}
 
       - name: Read the bump off the commits
         env:
