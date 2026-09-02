@@ -1,4 +1,5 @@
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
+import { Band, band } from '@/components/band/band'
 import documents from '@/components/document-page/document-page.module.css'
 import { PageHero } from '@/components/page-hero/page-hero'
 import { ThemeScope } from '@/components/theme-context/theme-context'
@@ -139,10 +140,8 @@ export default async function Page() {
           It is also what lets them be compared, which is what a page with prices
           on it is for: the rules line the prices up on one grid instead of
           leaving three cards to agree by luck. */}
-        <section className={styles.fieldBand} data-band data-reveal>
-          <helix-flex data-shell direction="column">
-            <div className={styles.bandCard} data-material="glass" data-substrate>
-              {/* **A head on the card, which is what makes it the same object as
+        <Band reveal>
+          {/* **A head on the card, which is what makes it the same object as
                 the landing's.** That one opens with a label, a heading and a
                 standfirst over its ruled row; this opened straight onto three
                 columns, so the same material and the same rules still read as a
@@ -153,22 +152,22 @@ export default async function Page() {
                 title and a four-line paragraph was asking a reader to take all
                 three before anything was shown, and the paragraph is what the
                 offers under it are the answer to. Nothing new is said. */}
-              <helix-flex class={styles.bandSection} direction="column" gap="md">
-                <helix-text tone="subtle" variant="label">
-                  What we take on
-                </helix-text>
-                <helix-text as="h2" data-section-title>
-                  Three offers, in the order they usually happen
-                </helix-text>
-                <helix-text as="p" data-measure tone="muted">
-                  {page?.lede}
-                </helix-text>
-              </helix-flex>
+          <helix-flex class={band.bandSection} direction="column" gap="md">
+            <helix-text tone="subtle" variant="label">
+              What we take on
+            </helix-text>
+            <helix-text as="h2" data-section-title>
+              Three offers, in the order they usually happen
+            </helix-text>
+            <helix-text as="p" data-measure tone="muted">
+              {page?.lede}
+            </helix-text>
+          </helix-flex>
 
-              <div className={styles.offerRow}>
-                {SERVICES.map((service) => (
-                  <div className={styles.offer} key={service.name}>
-                    {/* **The name, and no summary under it.**
+          <div className={styles.offerRow}>
+            {SERVICES.map((service) => (
+              <div className={styles.offer} key={service.name}>
+                {/* **The name, and no summary under it.**
 
                       Three summaries were the densest block of prose on the
                       page, and every one of them was answered more usefully by
@@ -182,57 +181,55 @@ export default async function Page() {
                       cube over "Design system sprint", a pair of figures over
                       "Conversational build". A metaphor a reader decodes before
                       the words beside it is a cost with no return. */}
-                    <helix-text as="h3" variant="title">
-                      {service.name}
-                    </helix-text>
+                <helix-text as="h3" variant="title">
+                  {service.name}
+                </helix-text>
 
-                    {/* **How long, in the unit the buyer thinks in.**
+                {/* **How long, in the unit the buyer thinks in.**
                       It reads as the third of four labeled facts rather than as
                       a footnote to a figure, which is what it was while it sat
                       under a price in caption type. What somebody is committing
                       to is a fortnight or two months of their team's attention,
                       and on a page with no number on it that is the commitment
                       being described. */}
-                    <helix-flex direction="column" gap="2xs">
-                      <helix-text tone="subtle" variant="label">
-                        How long it runs
-                      </helix-text>
-                      <helix-text as="p">{service.duration}</helix-text>
-                    </helix-flex>
+                <helix-flex direction="column" gap="2xs">
+                  <helix-text tone="subtle" variant="label">
+                    How long it runs
+                  </helix-text>
+                  <helix-text as="p">{service.duration}</helix-text>
+                </helix-flex>
 
-                    <helix-flex direction="column" gap="sm">
-                      <helix-text tone="subtle" variant="label">
-                        What is in it
-                      </helix-text>
-                      {/* `unordered`, because these are a set and the order does
+                <helix-flex direction="column" gap="sm">
+                  <helix-text tone="subtle" variant="label">
+                    What is in it
+                  </helix-text>
+                  {/* `unordered`, because these are a set and the order does
                         not carry information. `label` because the host takes
                         `role="list"` and a list announced with no name in a row
                         of three tells a reader nothing about which one it is. */}
-                      <helix-list kind="unordered" label={`What ${service.name} includes`}>
-                        {service.includes.map((item) => (
-                          <helix-list-item key={item}>{item}</helix-list-item>
-                        ))}
-                      </helix-list>
-                    </helix-flex>
+                  <helix-list kind="unordered" label={`What ${service.name} includes`}>
+                    {service.includes.map((item) => (
+                      <helix-list-item key={item}>{item}</helix-list-item>
+                    ))}
+                  </helix-list>
+                </helix-flex>
 
-                    {/* What you keep, last, because it is the one line here that
+                {/* What you keep, last, because it is the one line here that
                       is still true after the engagement ends and so is what a
                       reader should leave with. The shared row is what lands the
                       three labels on one line. */}
-                    <helix-flex direction="column" gap="2xs">
-                      <helix-text tone="subtle" variant="label">
-                        What you keep
-                      </helix-text>
-                      <helix-text as="p" tone="muted" variant="caption">
-                        {service.outcome}
-                      </helix-text>
-                    </helix-flex>
-                  </div>
-                ))}
+                <helix-flex direction="column" gap="2xs">
+                  <helix-text tone="subtle" variant="label">
+                    What you keep
+                  </helix-text>
+                  <helix-text as="p" tone="muted" variant="caption">
+                    {service.outcome}
+                  </helix-text>
+                </helix-flex>
               </div>
-            </div>
-          </helix-flex>
-        </section>
+            ))}
+          </div>
+        </Band>
 
         {/* **The closing prose as two panels in a row, one per argument.**
 
@@ -247,39 +244,32 @@ export default async function Page() {
           document. Splitting the rendered tree would mean reaching into React
           output to find a heading, which is the kind of thing that works until
           somebody adds a third section. */}
-        <section className={styles.fieldBand} data-band data-reveal>
-          <helix-flex data-shell direction="column">
-            <div className={styles.closingRow}>
-              {sections.map((section, index) => (
-                <div
-                  className={styles.bandCard}
-                  data-material="glass"
-                  data-substrate
-                  key={section.key}
-                >
-                  <helix-flex class={styles.bandSection} direction="column" gap="lg">
-                    <div className={documents.documentBody} data-prose>
-                      {section.body}
-                    </div>
-                    {/* The way in belongs with the half that describes it, which is
+        <Band card={false} reveal>
+          <div className={styles.closingRow}>
+            {sections.map((section, index) => (
+              <div className={band.bandCard} data-material="glass" data-substrate key={section.key}>
+                <helix-flex class={band.bandSection} direction="column" gap="lg">
+                  <div className={documents.documentBody} data-prose>
+                    {section.body}
+                  </div>
+                  {/* The way in belongs with the half that describes it, which is
                       the second. On the first it would be an answer to a question
                       that panel has not asked yet. */}
-                    {index === sections.length - 1 && (
-                      <helix-flex data-density="lg" gap="sm" wrap>
-                        <a data-button href="/company/trust">
-                          The trust bar
-                        </a>
-                        <a data-button="solid" data-button-tone="primary" href={MAILTO}>
-                          {EMAIL}
-                        </a>
-                      </helix-flex>
-                    )}
-                  </helix-flex>
-                </div>
-              ))}
-            </div>
-          </helix-flex>
-        </section>
+                  {index === sections.length - 1 && (
+                    <helix-flex data-density="lg" gap="sm" wrap>
+                      <a data-button href="/company/trust">
+                        The trust bar
+                      </a>
+                      <a data-button="solid" data-button-tone="primary" href={MAILTO}>
+                        {EMAIL}
+                      </a>
+                    </helix-flex>
+                  )}
+                </helix-flex>
+              </div>
+            ))}
+          </div>
+        </Band>
       </div>
     </ThemeScope>
   )

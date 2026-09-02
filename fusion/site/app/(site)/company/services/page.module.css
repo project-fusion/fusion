@@ -66,36 +66,6 @@
   z-index: var(--helix-layer-raised);
 }
 
-/* A band that holds a layer, isolated so the layer stays in it. */
-.fieldBand {
-  isolation: isolate;
-  position: relative;
-}
-
-.fieldBand > *:not([data-layer]) {
-  position: relative;
-  z-index: 1;
-}
-
-/* One panel per idea. **The glass is read from the site's own tokens rather than
-   from the landing page's scope.** `--site-glass` and `--site-glass-backdrop`
-   are declared at `:root` in `site.css`, so a page does not have to be inside
-   `.noRules` to be made of the same material; what that scope adds is applying
-   them to every `[data-substrate]` under it, which is a landing page concern. */
-.bandCard {
-  backdrop-filter: var(--site-glass-backdrop);
-  background: var(--site-glass);
-  /* No border here: `[data-material="glass"]` draws the hairline and `site.css`
-     draws the light that travels it. */
-  border-radius: var(--helix-radii-lg);
-  display: grid;
-  overflow: hidden;
-}
-
-.bandSection {
-  padding: var(--helix-space-xl);
-}
-
 /* Three offers on one panel, and the rules between them are the whole point.
    **Stacked first and columns at 60rem, which is how the landing rows are
    written.** Mobile-first is not a style preference here: a row that starts in
@@ -186,16 +156,6 @@
     opacity: 0.78;
   }
 
-  .fieldBand :global([data-shell]) {
-    padding-inline: 0;
-  }
-
-  .bandCard {
-    border-inline: 0;
-    border-radius: 0;
-  }
-
-  .bandSection,
   .offer {
     padding-inline: var(--site-inset);
   }

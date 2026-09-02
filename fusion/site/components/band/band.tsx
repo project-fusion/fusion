@@ -16,32 +16,41 @@ import styles from './band.module.css'
  * one band that sizes to its content rather than to the measure.
  */
 export function Band({
+  card = true,
   children,
   id,
+  reveal,
   shell = 'flex',
   wide,
 }: {
+  /** Whether the shell holds one glass card, which is the usual shape. */
+  card?: boolean
   children: ReactNode
   id?: string | undefined
+  /** Marks the band for `RevealOnScroll`. */
+  reveal?: boolean | undefined
   shell?: 'flex' | 'plain'
   wide?: boolean | undefined
 }) {
-  const card = (
+  const inner = card ? (
     <div className={styles.bandCard} data-material="glass" data-substrate>
       {children}
     </div>
+  ) : (
+    children
   )
   return (
     <section
       className={wide ? `${styles.showcaseBand} ${styles.fieldBand}` : styles.fieldBand}
       data-band
       id={id}
+      {...(reveal ? { 'data-reveal': true } : {})}
     >
       {shell === 'plain' ? (
-        <div data-shell>{card}</div>
+        <div data-shell>{inner}</div>
       ) : (
         <helix-flex data-shell direction="column">
-          {card}
+          {inner}
         </helix-flex>
       )}
     </section>
