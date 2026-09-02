@@ -95,7 +95,17 @@ const dependencies = {}
    pack` derives the filename from the scope, the name and the version, and a
    guess at it would be a second copy of that rule. */
 for (const [name, { directory }] of registryTag === undefined ? published : []) {
-  if (!existsSync(join(root, directory, 'dist')) && !existsSync(join(root, directory, 'src'))) {
+  /* **"Nothing to pack" is a build that did not run, so it can only be asked of
+     a package that builds.** `@fusion.dev/helix-cli` ships a checked-in
+     `bin.mjs` and declares no `build` script, so `dist` is not missing — it was
+     never going to exist, and the guard rejected the package before anything
+     could look at it. */
+  const own = JSON.parse(readFileSync(join(root, directory, 'package.json'), 'utf8'))
+  if (
+    own.scripts?.build !== undefined &&
+    !existsSync(join(root, directory, 'dist')) &&
+    !existsSync(join(root, directory, 'src'))
+  ) {
     problems.push(`${directory}: nothing to pack. Run \`bun run build\` first.`)
     continue
   }
@@ -271,6 +281,33 @@ for (const name of packed) {
         )
       }
     }
+  }
+
+  /* **A binary is not a module, and probing it as one invents a promise the
+     package never made.** `@fusion.dev/helix-cli` ships `bin.mjs` and nothing
+     else — no `exports`, no `main`, no `types` — so the probe wrote
+     `import * as m from '@fusion.dev/helix-cli'` and TypeScript answered
+     TS2307. That read as a packaging fault and was the manifest being correct.
+     What such a package does promise is the binary, so that is what is checked. */
+  const importable = ['exports', 'main', 'module', 'types'].some(
+    (field) => manifest[field] !== undefined,
+  )
+  if (!importable) {
+    if (manifest.bin === undefined) {
+      problems.push(
+        `${name}: publishes no module surface and no binary, so nothing in it is reachable.`,
+      )
+      continue
+    }
+    for (const [command, file] of Object.entries(manifest.bin)) {
+      if (!existsSync(join(installed, file))) {
+        problems.push(
+          `${name}: declares the \`${command}\` binary as \`${file}\`, which did not ship. ` +
+            'Named in `bin` and missing from `files`, most likely.',
+        )
+      }
+    }
+    continue
   }
 
   for (const { file, subpath } of exported(installed, manifest.exports)) {
