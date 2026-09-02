@@ -28,101 +28,33 @@ const STACK_BELOW = 512
  * @summary Two panes and a divider the reader can move.
  *
  * @description
- * **One axis, and nesting is how you get two.** The sandbox this was taken from
- * moves a cross: a divider down the middle, another across the bottom, and a
- * corner that moves both. That is a layout rather than a component, and every
- * part of it that is worth sharing is one divider between two panes. A splitter
- * inside a splitter gives the cross back, and gives the three-pane and the
- * four-pane arrangements it never had.
+ * **One axis, and nesting is how you get two.** A splitter inside a splitter
+ * gives back the cross, and gives the three-pane and four-pane arrangements a
+ * single divider never had.
  *
  * **Where two of them cross there is a corner, and it moves both.** A splitter
- * slotted into a pane of another, at right angles to it, has one end of its
- * divider sitting exactly on the other's. That end grows a handle: `move` under
- * the pointer, both arrow axes on the keyboard, and a drag that carries the two
- * positions at once.
+ * slotted into a pane of another, at right angles to it, grows a handle at the
+ * crossing: `move` under the pointer, both arrow axes on the keyboard, and a
+ * drag that carries the two positions at once. It appears at `firstUpdated`
+ * rather than in the served markup, being an affordance rather than content,
+ * and a splitter with no corner yet is a splitter with two working dividers.
  *
- * **The outer splitter draws it and the nested one announces itself upward.**
- * The nested one drawing its own is the tempting version, since it already
- * knows where its divider begins and needs no measurement of the other, and it
- * is clipped: the crossing lies on the boundary between a pane and the divider
- * beside it, a handle centered there reaches back over the boundary, and a pane
- * is `overflow: auto`. Exactly half the corner is cut off. The outer separator
- * is the one element that already straddles the seam, so the corner belongs in
- * it.
- *
- * That makes the channel between the two a single call in a single direction:
- * `cross(child, at)` says where the child crosses, `moveTo` drives either one,
- * and neither reads the other's state. The child is what calls it, because a
- * parent cannot poll for a child that has not upgraded yet.
- *
- * The one number it carries is a percentage rather than a measurement, which is
- * what keeps either of them from measuring the other, and it assumes the nested
- * splitter fills its pane. That is what slotting one into a pane does. Give the
- * nested splitter its own inset, or wrap it in something smaller than the pane,
- * and the corner is drawn where the crossing would be rather than where it is.
- *
- * **It is a client-side enhancement and says so.** Finding the parent means
- * inspecting the tree, which a server cannot do, so the corner appears at
- * `firstUpdated` and never in the served markup. That is allowed for exactly
- * this: it is an affordance rather than content, and a splitter with no corner
- * yet is a splitter with two working dividers.
- *
- * Where two dividers are parallel there is no corner, because there is nothing
- * to take hold of. Where they cross without a corner, the inner divider takes
- * the pointer: every separator sits on the same layer, so a tie goes to document
- * order and a deeper splitter is always later.
- *
- * **A divider that is moving says so, whoever is moving it.** `:hover` cannot
- * carry that: a drag holds the pointer through capture and a fast one leaves the
- * target behind, and a corner moves the nested divider while the reader is on
- * the crossing, nowhere near it. So a drag in progress is a state, and both
- * dividers a corner moves are lit for as long as it moves them.
- *
- * **The divider is a real `role="separator"` with `aria-valuenow`, moved by the
- * arrow keys as well as by pointer.** A divider only a mouse can move is
- * unusable without one, which is the reason the sandbox's carries the same, and
- * `Home` and `End` take it to its bounds.
+ * **The divider is a real `role="separator"` with `aria-valuenow`**, moved by
+ * the arrow keys as well as by pointer, with `Home` and `End` taking it to its
+ * bounds. A drag in progress is a state rather than `:hover`, so both dividers
+ * a corner moves are lit for as long as it moves them.
  *
  * **It goes where it is put, all the way to either end.** `min` and `max` are
  * nothing and everything unless a consumer says otherwise, because a divider
- * that stops dead short of the edge gives a reader no way to put a pane away.
- * Where a pane should keep a sliver of itself, only whoever put the tabs on it
- * knows how much, so they say so.
+ * that stops short of the edge gives a reader no way to put a pane away.
  *
  * **A pane can be shut, and that is not the same as a divider at the edge.**
  * The geometry is identical and the knowledge is not: only a shut pane knows
  * where to open back to. So `collapsed` is a second state rather than a reading
- * of the position, and the position it opens to is simply the one collapsing
- * never overwrote. `collapsed-size` keeps a sliver showing where a pane has a
- * tab strip worth leaving, and collapse overrides `min` and `max`, which is
- * what those are for: they keep a pane from vanishing by accident, and this is
- * the deliberate version.
- *
- * The two are kept in step in one direction only: a drag that settles on the
- * collapsed size latches shut, and any move opens it again. Otherwise a reader
- * could drag a pane closed and the consumer's own button would still be
- * offering to close it.
- *
- * A pane shut to nothing is told apart from one shut to a sliver, because the
- * two want different dividers: a sliver still has a boundary worth drawing, and
- * nothing leaves the divider sitting on the container's own edge.
- *
- * **The box is measured once, when a drag starts.** Measuring per move is a
- * forced layout on every pointer event, in the middle of a gesture whose whole
- * job is to stay ahead of the pointer, and nothing about the box moves while the
- * divider does.
- *
- * **`helix-before-resize` fires when it settles, not while it moves.** A drag is a
- * stream of positions and only the one it ends at is a preference; announcing
- * each would ask a consumer to write to storage a hundred times to record one
- * decision. Nothing is stored here either: where a preference lives, and whether
- * it should be kept at all, is the consumer's to decide, and a component writing
- * to storage on its own would be deciding for all of them under a key it chose.
- *
- * The properties below are written by this component and read by whoever draws
- * it. A consumer sets none of them: they carry a number this element computed
- * and CSS cannot, which is what lets a stylesheet on this tier draw the thing
- * without measuring anything itself.
+ * of the position, and the position it opens to is the one collapsing never
+ * overwrote. `collapsed-size` keeps a sliver showing where a pane has a tab
+ * strip worth leaving, and collapse overrides `min` and `max`, which is what
+ * those are for.
  *
  * @since 0.1.0
  * @status experimental
@@ -143,6 +75,32 @@ const STACK_BELOW = 512
  *
  * @cssproperty --splitter-corner-at - Where a nested splitter crosses this one, as a percentage.
  * @cssproperty --splitter-position - Where the divider sits, as a percentage of the box.
+ */
+/*
+ * How a corner is drawn, which is not a consumer's business and is worth
+ * writing down.
+ *
+ * **The outer splitter draws it and the nested one announces itself upward.**
+ * The nested one drawing its own is the tempting version, since it already knows
+ * where its divider begins, and it is clipped: the crossing lies on the boundary
+ * between a pane and the divider beside it, a handle centered there reaches back
+ * over the boundary, and a pane is `overflow: auto`. Exactly half the corner is
+ * cut off. The outer separator is the one element that straddles the seam.
+ *
+ * That makes the channel a single call in a single direction: `cross(child, at)`
+ * says where the child crosses, `moveTo` drives either one, and neither reads
+ * the other's state. The child calls it, because a parent cannot poll for a
+ * child that has not upgraded yet.
+ *
+ * The one number it carries is a percentage rather than a measurement, which is
+ * what keeps either from measuring the other, and it assumes the nested splitter
+ * fills its pane. Give it its own inset and the corner is drawn where the
+ * crossing would be rather than where it is.
+ *
+ * Where two dividers are parallel there is no corner, there being nothing to
+ * take hold of. Where they cross without one, the inner divider takes the
+ * pointer: every separator sits on the same layer, so a tie goes to document
+ * order and a deeper splitter is always later.
  */
 @customElement('helix-headless-splitter')
 export class HelixHeadlessSplitter extends HelixElement {
