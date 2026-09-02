@@ -34,7 +34,7 @@
   "customElements": "custom-elements.json",
   "sideEffects": true,
   "scripts": {
-    "analyze": "cem analyze --config cem.config.ts",
+    "analyze": "bun --bun cem analyze --config cem.config.ts",
     "build": "bun run element-events && tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "element-events": "build-element-events --package styled",
     "styles": "build-styles .",

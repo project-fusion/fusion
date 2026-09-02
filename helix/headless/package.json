@@ -36,7 +36,7 @@
     "./dist/**/*.js"
   ],
   "scripts": {
-    "analyze": "cem analyze --config cem.config.ts",
+    "analyze": "bun --bun cem analyze --config cem.config.ts",
     "build": "bun run element-events && tsc -p tsconfig.json && tsc -p tsconfig.types.json",
     "element-events": "build-element-events --package headless",
     "test": "bun run test:pure && bun run test:dom && bun run test:ssr",

@@ -1,62 +1,8 @@
 # An installable build of a pull request, published for the people who own it.
 #
-# Label a pull request `release:experimental` and, if the author is on the team,
-# it publishes. Two conditions and both are read from the event.
-#
-# **The author, not an approval.** The `experimental` environment carries no
-# protection rules and never has: required reviewers on a private repository
-# need Enterprise, and the API refuses to set them here with a 422. This file
-# claimed for months that the job "waits for a reviewer", which was prose
-# describing a gate that did not exist — anyone who could add a label could
-# publish. `author_association` says the same thing the approval was meant to
-# say, and says it where it is actually enforced.
-#
-# **The label stays, because npm is permanent.** Every run publishes ten
-# packages, and a published version can be deprecated but never withdrawn.
-# Authorship answers who may publish a preview; the label answers whether this
-# particular branch wants one. Dropping it would put ten permanent versions on
-# the registry for every push to every open pull request.
-#
-# **This runs the pull request's code with a publish token.** The job builds and
-# packs the branch, so the label is a statement about the diff. That is the
-# residual risk and no configuration removes it — which is exactly why the
-# author check is not decoration.
-#
-# `pull_request`, not `pull_request_target`: a fork gets no secrets on this
-# event, so a fork's build cannot publish whatever it is labeled, and that is
-# the safe failure. An outside contributor works through a fork, so the fork
-# check and the author check are two spellings of one intent; both are written
-# down because the day someone adds `pull_request_target` here, only one of them
-# still holds. This repository is private and takes branches rather than forks,
-# so neither is load-bearing today.
-#
-# Versions are `1.4.0-exp.42.ga1b2c3d`: the version this would release if it
-# merged, marked as not being it, carrying the pull request that produced it and
-# the exact commit, so it is unique per push and a re-run never collides.
-#
-# **The `g` is not decoration.** A pre-release identifier made only of digits is
-# numeric, and a numeric identifier may not carry a leading zero, so a short SHA
-# that happens to be all digits and starts with one (`0123456`) is not a valid
-# semver at all and npm refuses it. That is about one commit in 270, which is
-# often enough to happen and rare enough to look like something else entirely
-# when it does. `g` is what `git describe` prefixes for the same reason.
-#
-# The dist-tag is `exp-42` and never `next` or `latest`. A pre-release also sorts
-# below its own release and satisfies no caret range, so `^1.4.0` can never
-# resolve to one even by accident.
-# **`vars.PUBLISHING` is the switch, the same one `release.yml` carries, and it
-# has three states.** Unset, this job is skipped however the pull request is
-# labeled. `experimental` or `on`, it runs: a preview is the thing the middle
-# state exists for, so holding it back until the whole pipeline is live would
-# make the middle state mean nothing.
-#
-# The label and the author check both still apply. This is a third lock rather
-# than a replacement for either, and it is the loosest of the three.
-#
-# **`environment: experimental` is kept for npm, not for people.** A trusted
-# publisher is registered against a workflow file and an environment name, so
-# the name has to keep matching what `npm trust` was told or the OIDC exchange
-# publishes as nobody and the registry answers 404.
+# Label it `release:experimental` and, if the author is on the team, it
+# publishes under `exp-<number>`. Why the author and not an approval, and why
+# the label stays, are in [RELEASING.md](../RELEASING.md).
 
 name: release-experimental
 
@@ -73,6 +19,10 @@ permissions:
   # Trusted publishing authenticates by OIDC, so no npm credential is stored.
   id-token: write
   pull-requests: write
+
+# Held once. `engines.node` is the consumer floor; this is what CI runs on.
+env:
+  NODE_VERSION: "22.20.0"
 
 jobs:
   publish:
@@ -115,10 +65,10 @@ jobs:
       #
       # The default registry is already npmjs.org, so the line bought nothing
       # even when it worked.
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
 
       # Node 22.20.0 ships npm 10.9.x, so the floor above is not what
       # `setup-node` leaves behind. Same pin as `release.yml`, same reasoning.
@@ -129,26 +79,9 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Stamp the experimental version into every domain this touches
-        run: |
-          set -euo pipefail
-          short=$(git rev-parse --short=7 HEAD)
-          : > /tmp/released
-          # The same reading `release-intent` reports and `release` applies,
-          # from the same file, so a preview cannot be a different version from
-          # the one merging would produce.
-          base=$(git merge-base "${{ github.event.pull_request.base.sha }}" HEAD)
-          resolved=$(node fusion/scripts/bump.mjs "$base..HEAD")
-          while IFS=$'\t' read -r domain level; do
-            [ -n "$level" ] || continue
-            version=$(node fusion/scripts/version.mjs \
-              --domain "$domain" --bump "$level" --pre "exp.$NUMBER.g$short" --write | tail -1)
-            printf '%s %s\n' "$domain" "$version" >> /tmp/released
-          done < <(jq -r '.[] | "\(.domain)\t\(.level)"' <<<"$resolved")
-          if [ ! -s /tmp/released ]; then
-            echo "No subject carries a releasing type and a published scope, so there is nothing to publish." \
-              >> "$GITHUB_STEP_SUMMARY"
-          fi
-
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: .github/scripts/stamp-experimental.sh
       # Not `--frozen-lockfile`: the versions just changed, and `bun pm pack`
       # reads a sibling's version from `bun.lock` rather than from its manifest.
       # Packing without this pins every sibling at the previous release.
@@ -181,26 +114,4 @@ jobs:
           done < /tmp/released
 
       - name: Say how to install it
-        run: |
-          set -euo pipefail
-          [ -s /tmp/released ] || exit 0
-
-          # One line per domain, because a pull request can release both and
-          # they carry different versions.
-          {
-            echo "Experimental build published from \`$(git rev-parse --short=7 HEAD)\`."
-            echo
-            while read -r domain version; do
-              echo "- \`$domain\` at \`$version\`"
-            done < /tmp/released
-            echo
-            echo '```bash'
-            echo "bun add @fusion.dev/helix@exp-$NUMBER"
-            echo '```'
-            echo
-            echo "Tagged \`exp-$NUMBER\`. Nothing resolves to this by asking for" \
-              "\`next\` or \`latest\`, and the tag stops being updated when this" \
-              "pull request closes."
-          } > /tmp/comment.md
-
-          gh pr comment "$NUMBER" --edit-last --create-if-none --body-file /tmp/comment.md
+        run: .github/scripts/comment-install.sh

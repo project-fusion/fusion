@@ -1,17 +1,12 @@
-# `verify` split across jobs, with the list of checks derived from `verify`.
-#
-# **The list is never mirrored here.** `run-checks.mjs` reads the `verify` script
-# and shards it, so adding a check to `verify` puts it in CI with no second edit,
-# and a step that is neither a check nor one of the dedicated jobs below fails
-# the run rather than being skipped. A matrix written out here would be a second
-# definition of correct, drifting the first time somebody edited one of them.
-#
-# **The point of the split is reporting, not speed.** `verify` is `a && b && c`,
-# so it stops at the first failure; a shard runs every check it owns and reports
-# them together.
-#
-# `verify` never writes: `biome ci` rather than `biome check --write`, and every
-# shard ends by asserting the tree is unchanged.
+      # **Not for `cem analyze` any more.** That was the reason until the
+      # manifests were diffed under `bun --bun` and came back byte for byte
+      # identical, so `analyze` runs under bun now. What still needs Node is the
+      # repository's own scripts: about twenty `check:*` entries invoke
+      # `node fusion/scripts/*.mjs` directly, `run-checks.mjs` among them.
+# `verify` split across jobs, with the list of checks derived from `verify`
+# itself rather than mirrored here. The shape, and why the browser matrix is
+# skippable for some diffs, are in [VERIFYING.md](../VERIFYING.md).
+
 name: verify
 
 on:
@@ -41,6 +36,10 @@ env:
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_TEAMID: ${{ vars.TURBO_TEAMID }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+# Held once. `engines.node` is the consumer floor; this is what CI runs on.
+env:
+  NODE_VERSION: "22.20.0"
 
 jobs:
   # The shard count lives in one place and the matrix is built from it, so a
@@ -76,81 +75,18 @@ jobs:
           echo "of=$of" >> "$GITHUB_OUTPUT"
           echo "shards=$(node fusion/scripts/run-checks.mjs --list --of "$of")" >> "$GITHUB_OUTPUT"
 
-      # **Which jobs this diff can possibly fail.** The browser matrix is six
-      # jobs that each want a build, a browser and three minutes, and a change
-      # to a `docs/` page cannot move a pixel in any of them.
-      #
-      # **An allowlist of what is skippable, not a denylist of what is not.**
-      # The set below is the paths that reach no component and no page:
-      # `docs/` is the repository's own writing, `cortex/` is Rust and MDX with
-      # nothing rendered, and `.claude/` is tooling for the agent. Everything
-      # else runs the browser jobs, `tooling/` included, because
-      # `build-frame.mjs` and `build-styles.mjs` live there and both are read by
-      # every example. A path nobody thought about lands outside the list and
-      # runs, which is the direction this has to fail in.
-      #
-      # **An unresolvable base assumes everything**, which is the default
-      # `check:visual-parity` already takes for the same question. A force push
-      # leaves `github.event.before` naming a commit this checkout does not
-      # have, and a first push to a branch names all zeroes.
-      #
-      # **Counted rather than tested with `grep -qv`, because that answer is not
-      # portable.** The obvious spelling is one `grep -qvE` asking whether any
-      # changed file falls outside the list. GNU grep, which is what a runner
-      # has, answers correctly. `ugrep`, which is a drop-in replacement common
-      # enough to be on a contributor's `PATH`, exits 1 on the same input where
-      # it exits 0 without `-q`, so the condition inverts and the browser jobs
-      # are skipped for a change to `helix/styled`. Comparing two counts asks
-      # nothing of `-v` and means the same thing to every grep. Found by running
-      # the classifier on seven inputs before it was committed, which is the
-      # only reason it is written this way.
+      # An allowlist of what is skippable, never a denylist of what is not, and
+      # an unresolvable base runs everything:
+      # [VERIFYING.md](../VERIFYING.md#which-jobs-a-diff-can-possibly-fail).
       - name: Decide what this push touched
         id: scope
         env:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          if ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
-            echo 'browser=true' >> "$GITHUB_OUTPUT"
-            echo "Base ${BASE} is unresolvable, so every job runs." >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          changed=$(git diff --name-only "$BASE" "$HEAD")
-          total=$(printf '%s\n' "$changed" | grep -c . || true)
-          skippable=$(printf '%s\n' "$changed" | grep -cE '^(docs/|cortex/|\.claude/)' || true)
-          if [ "$total" -gt 0 ] && [ "$total" -eq "$skippable" ]; then
-            echo 'browser=false' >> "$GITHUB_OUTPUT"
-            echo "All $total changed files are outside the browser's reach, so those jobs are skipped." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo 'browser=true' >> "$GITHUB_OUTPUT"
-          fi
-
-  # **One build, before the sixteen jobs that would each do their own.**
-  #
-  # Every check shard runs `build`, `analyze` and `catalog` as prerequisites and
-  # every browser job runs `build`, so with a warm remote cache they all cost a
-  # restore. The gap this job fills is that the cache is warm *across* runs and
-  # cold *within* one: sixteen jobs start at the same second on a commit that
-  # invalidates the build, none of them can restore what none of them has
-  # written yet, and all sixteen pay for it.
-  #
-  # **Only `checks` and `browser` wait on it**, which is the whole of the trade.
-  # `lint` reads files and builds nothing. `types` and `tests` do pay a cold
-  # build, and at 1m19s and 2m14s they are inside the budget already, so gating
-  # them would buy a faster job nobody is waiting on and cost every run the
-  # stage. They run beside this one instead, which is also what keeps the added
-  # stage from being wall clock spent idle.
-  #
-  # A cold build is about 52 seconds, and without this job every shard pays it.
-  # This job pays it once.
-  #
-  # **It costs a stage the wall clock did not have**, about 40 seconds on a run
-  # that restores and 85 on one that does not. That is the trade: the ceiling
-  # on any single job comes down, and the floor under every run goes up. It is
-  # the right way round here because a job that overruns is the thing being
-  # fixed, and because ten cold builds is ten times the compute for the same
-  # wall clock, which is the case the `browser` comment below already makes.
+        run: .github/scripts/touched.sh
+  # One build, before the sixteen that would each do their own: the remote
+  # cache is warm across runs and cold within one.
+  # [VERIFYING.md](../VERIFYING.md#one-build-before-the-sixteen-that-would-each-do-their-own)
   warm:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -161,10 +97,10 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -208,16 +144,10 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      # Pinned for the same reason bun is, and it is not decoration: `cem
-      # analyze` is a Node CLI, so `bun run analyze` hands it to whatever Node
-      # is on `PATH`, and its config is TypeScript. Below 22.18 that config
-      # cannot load, the analyzer falls back to a default one and writes a
-      # manifest with every Helix plugin missing, and says it succeeded.
-      # Every shard runs `analyze`, so every shard needs this floor.
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
 
       # `--frozen-lockfile` so a lockfile that does not match `package.json`
       # fails here rather than being quietly updated in CI and not on the
@@ -254,10 +184,10 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -299,10 +229,10 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -343,31 +273,17 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Typecheck
         run: bun run typecheck
 
-  # **One job for all three, because `bun run test` is partly Rust.**
-  # `@fusion.dev/helix-theme`'s `test` script is `cargo test -p fusion-helix-theme`, so
-  # `turbo run test` needs a toolchain: split out on its own it failed with
-  # cargo's exit 101. Run beside `rs:check` and `rs:test` they share one cargo
-  # cache and one compile, where two jobs would each pay for their own.
-  #
-  # Every one of them is invoked through `bun run`, so bun is needed even for
-  # the cargo steps. Omitted once, and `rs:check` failed with `bun: command not
-  # found` in ten seconds.
-  #
-  # No `wasm32` target and no `wasm-bindgen-cli`: 261 added them because
-  # `helix/theme` compiled against a gitignored artifact, 273 tracked the
-  # artifact and made it an input, and the install then cost 133 seconds a run
-  # to build a binary nothing asks for. `clippy` because `rs:check` runs it;
-  # `rustfmt` is not needed, since `cargo fmt` writes and `verify` does not
-  # call it.
+  # One job for all three: `bun run test` is partly Rust, and splitting it
+  # would pay for a toolchain twice.
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -378,10 +294,10 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.1.43
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Install Rust
@@ -433,21 +349,9 @@ jobs:
 
   # Six jobs, because they need a browser and `verify` deliberately does not:
   # everything in `verify` runs anywhere bun runs. These are the checks behind
-  # `hasLayout()`, which happy-dom skips because it has no boxes, and they are
-  # the ones worth most: a component can render perfect markup in the wrong
-  # place and no DOM without layout will ever say so.
-  #
-  # **Split because nothing here needs what another produces**, so a sequence
-  # bought one build and paid for it in wall clock. In parallel the wall clock
-  # is the build plus the slowest of them, and the remote cache makes that build
-  # a restore. A cache nothing has written to yet is cold however warm the
-  # credentials are, which is what `warm` above is for.
-  #
-  # The matrix is written out rather than derived, unlike `checks`: these are not
-  # in `verify` and there is no list to read. Adding a browser check means adding
-  # it here, which is the drift `run-checks.mjs` exists to avoid and is
-  # unavoidable for a set that lives nowhere else. Do not write the count into
-  # this comment; it slipped once already. Trust the matrix.
+  # `hasLayout()`, which happy-dom skips because it has no boxes, and a
+  # component can render perfect markup in the wrong place with no DOM saying
+  # so. Split because nothing here needs what another produces.
   browser:
     # `plan` decides whether this matrix can fail at all for the diff in hand,
     # and `warm` means the build below is a restore. Skipped is neither a
@@ -563,10 +467,10 @@ jobs:
         with:
           bun-version: 1.1.43
 
-      - name: Install Node, which `cem analyze` shells out to
+      - name: Install Node, which the repository's own scripts run on
         uses: actions/setup-node@v7
         with:
-          node-version: '22.20.0'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -619,27 +523,9 @@ jobs:
             helix/headless/src/*/.examples/*.parity.png
             helix/styled/src/*/.examples/*.parity.png
 
-  # **One context to require, because the job names are not stable enough to
-  # require directly.** A branch protection rule matches a job name, and this
-  # workflow's are `checks (0)` through `checks (9)` and
-  # `browser (smoke, bun run smoke:examples)`: the shard count is an argument and the
-  # matrix label carries the command, so renaming a script or changing the count
-  # silently un-requires whatever was named. Naming this one job instead means
-  # the rule keeps holding, and a job added to `needs` is covered without anyone
-  # touching the branch settings.
-  #
-  # It also makes `.github/CODEOWNERS` true rather than editing it. That file
-  # says to require `verify` and `browser-specs`, which were the job names
-  # before 274 sharded this workflow and are now neither of them; requiring
-  # either would have blocked every pull request on a check that never reports.
-  #
-  # **`needs` alone is not enough.** A needed job that fails skips this one, and
-  # a skipped required check is not a failing one, so the rule would pass on a
-  # red run. `always()` makes it run regardless and the result expression is
-  # what fails it.
-  # **`skipped` needs no clause of its own.** A job `plan` scoped out could not
-  # have failed, and a job skipped because what it needed failed sits beside a
-  # `failure` this expression already reads.
+  # The one required context, because the shard count is an argument and the
+  # job names move with it. `always()` is load-bearing:
+  # [VERIFYING.md](../VERIFYING.md#one-context-to-require)
   verify:
     if: always()
     needs: [plan, warm, checks, floors, packaging, lint, types, tests, browser]

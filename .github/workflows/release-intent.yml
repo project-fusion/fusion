@@ -1,32 +1,9 @@
 # What a merge of this pull request would release, read off its commit subjects.
 #
-# Reports the bump each domain would take and fails on a subject that is not
-# conventional. It writes no labels: a reviewer wanting a different bump edits
-# the commit.
-#
-# **The title is checked as a subject too, because a squash merge makes it one.**
-# GitHub squashes under the sole commit's subject when a branch holds one commit
-# and under the pull request's title when it holds more, so a prose title is a
-# subject that reaches `main` and parses as nothing. #76 merged that way: two
-# `fix(helix)` commits collapsed under `Release on docs, style and chore`, and
-# the release was skipped in silence.
-#
-# The title being conventional does not make a squash safe, only quiet in one
-# fewer way. A squash keeps one subject, so a branch spanning both domains still
-# loses whichever the title does not name, and no later run can recover a
-# subject that is no longer written down anywhere.
-#
-# **Which is why the repository now merges by rebase only**, squash and merge
-# commits both off in Settings. A rebase replays every subject onto `main`
-# individually, so nothing is collapsed and the history stays linear. This check
-# is then a guard against squash being turned back on rather than a fix for it
-# being on — a setting is one click, and this file is what notices.
-#
-# The scope names the domain, and only `helix` and `cortex` publish: a scope of
-# `helix/cli` releases Helix, `fusion/site` and `turbo` release nothing.
-#
-# **`pull_request_target` with no checkout.** The token is writable, so the
-# commits are read as data through the API and never executed.
+# Fails on a subject that is not conventional, and checks the title as one
+# because a squash merge makes it one. The incident that produced this check is
+# in [RELEASING.md](../RELEASING.md).
+
 name: release-intent
 
 on:
@@ -51,61 +28,6 @@ jobs:
       REPO: ${{ github.repository }}
     steps:
       - name: Read the bump off the commits
-        run: |
-          set -euo pipefail
-
-          title=$(gh api "repos/$REPO/pulls/$NUMBER" --jq '.title')
-          subjects=$(
-            gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate \
-              --jq '.[].commit.message | split("\n")[0]'
-            printf '%s\n' "$title"
-          )
-
-          # `type(scope)!: description`, anchored, because a subject that merely
-          # contains one of these words is prose rather than a conventional one.
-          pattern='^(feat|fix|perf|refactor|docs|test|ci|build|chore|style|revert)(\([a-z0-9/._-]+\))?!?: .+'
-
-          bad=0
-          while IFS= read -r subject; do
-            [ -n "$subject" ] || continue
-            grep -qE "$pattern" <<<"$subject" && continue
-            echo "::error::Not a conventional subject: $subject"
-            bad=1
-          done <<<"$subjects"
-
-          if [ "$bad" -ne 0 ]; then
-            {
-              echo "### Not every subject is conventional"
-              echo
-              echo 'Each one wants `<type>(<scope>): <description>`, where the scope'
-              echo 'names the domain it touches. The bump is read from here, so a'
-              echo 'subject that does not parse is a release nobody can predict.'
-              echo
-              echo 'The title is one of them: a squash merge of more than one commit'
-              echo 'lands under the title, and that is the subject `main` then keeps.'
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-
-          # `bump.mjs` from the base branch, since this job has no checkout.
-          # Through `gh api` rather than `raw.githubusercontent.com`, which
-          # answers 404 for a private repository without a token.
-          gh api "repos/$REPO/contents/fusion/scripts/bump.mjs?ref=${{ github.event.pull_request.base.sha }}" \
-            --jq '.content' | base64 -d > /tmp/bump.mjs
-
-          # NUL between whole messages rather than between lines. Split per line, a
-          # `BREAKING CHANGE:` trailer becomes its own record, parses as no
-          # subject, and the major it asks for is dropped.
-          resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate --slurp \
-            | jq -j '.[][].commit.message + "\u0000"' \
-            | node /tmp/bump.mjs --stdin)
-
-          {
-            echo "### What merging this would release"
-            echo
-            if [ "$resolved" = '[]' ]; then
-              echo 'Nothing. No subject carries a `helix` or `cortex` scope with a releasing type.'
-            else
-              jq -r '.[] | "- `\(.domain)`: **\(.level)**"' <<<"$resolved"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: .github/scripts/report-intent.sh
