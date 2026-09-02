@@ -14,6 +14,21 @@
   <a href="https://fusion.dev">fusion.dev</a>
 </div>
 
+<div align="center">
+  <a href="https://github.com/project-fusion/fusion/actions/workflows/verify.yml">
+    <img
+      src="https://github.com/project-fusion/fusion/actions/workflows/verify.yml/badge.svg?branch=main"
+      alt="verify workflow status on main"
+    />
+  </a>
+  <a href="https://github.com/project-fusion/fusion/actions/workflows/release.yml">
+    <img
+      src="https://github.com/project-fusion/fusion/actions/workflows/release.yml/badge.svg?branch=main"
+      alt="release workflow status on main"
+    />
+  </a>
+</div>
+
 ## Helix
 
 A design system of web components: tokens, a headless tier, a styled tier, and
