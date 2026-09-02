@@ -97,7 +97,6 @@
   --option-radius: var(--helix-radii-none);
 
   background-color: var(--helix-color-surface-overlay);
-  /* No border. */
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--select-shadow, var(--helix-shadow-floating));
   /* The trigger's width, with the content as the floor. From the controller
@@ -108,7 +107,6 @@
   /* Never taller than the room under the trigger, for the same reason as the
      width: the space is measured, not declared. */
   max-block-size: var(--floating-available-block-size, none);
-  /* Block only. */
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-none);
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
@@ -193,7 +191,6 @@
 [part="listbox"]::part(items) {
   background-color: transparent;
   border: none;
-  /* And no radius. */
   border-radius: var(--helix-radii-none);
   max-block-size: var(--select-surface-max-block-size, 14rem);
   padding: var(--helix-space-none);

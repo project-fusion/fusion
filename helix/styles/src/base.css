@@ -570,7 +570,6 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
   --helix-size-tag: var(--helix-size-tag-lg);
 }
 
-/* The toggle item. */
 helix-toggle::part(item) {
   align-items: center;
   background: none;
