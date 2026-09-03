@@ -6,7 +6,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react'
-import styles from './prose.module.css'
+import { SectionHeading } from '@/components/section-heading/section-heading'
 
 /*
  * What MDX renders its elements as, for every prose surface on this site.
@@ -244,33 +244,14 @@ export const slugify = (text: string): string =>
 
 const slugOf = (node: ReactNode): string => slugify(textOf(node))
 
-/**
- * A heading, at the level markdown asked for, with a link to itself.
- *
- * The link is what makes a section shareable: with no `id` on a heading, the
- * only address a reader can send is the whole page.
- *
- * `aria-hidden` on the mark and a label on the link, so a screen reader hears
- * "link, Section name" once rather than the heading text followed by a hash.
- */
+/** A heading, at the level markdown asked for, addressed by its own slug. */
 const heading = (as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') =>
   function Heading({ children }: { children?: ReactNode }) {
     const id = slugOf(children)
     return (
-      <helix-text as={as} class={styles.heading} id={id || undefined}>
-        {id && (
-          /* An anchor rather than `helix-icon-button`, which is a `button` and
-             has no `href`. What this is for is sending somebody the address, so
-             it has to be a real link: middle-click opens a tab, the context menu
-             offers "copy link address", and the status bar shows where it goes.
-             None of that is reachable from a button with a click handler. It
-             takes the icon button's *appearance* instead. */
-          <a aria-label={`Link to ${textOf(children)}`} className={styles.anchor} href={`#${id}`}>
-            <helix-icon name="link"></helix-icon>
-          </a>
-        )}
+      <SectionHeading as={as} id={id} label={textOf(children)} target={id}>
         {children}
-      </helix-text>
+      </SectionHeading>
     )
   }
 

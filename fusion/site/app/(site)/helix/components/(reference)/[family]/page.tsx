@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
 import { docsShell } from '@/components/docs-shell/docs-shell'
+import { SectionHeading } from '@/components/section-heading/section-heading'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import {
   type ApiMember,
@@ -382,7 +383,9 @@ function ElementApi({ element }: { element: Element }) {
        *           family name twice above.
        */}
       <helix-flex align="center" data-density="sm" gap="sm" wrap>
-        <helix-text as="h3">{element.part || element.label}</helix-text>
+        <SectionHeading as="h3" label={element.part || element.label} target={element.tagName}>
+          {element.part || element.label}
+        </SectionHeading>
         <helix-tag>
           <helix-text variant="code">{element.tagName}</helix-text>
         </helix-tag>
@@ -565,7 +568,9 @@ export default async function FamilyDocs({
           </helix-flex>
 
           <helix-flex direction="column" gap="md" id="usage">
-            <helix-text as="h2">Usage</helix-text>
+            <SectionHeading as="h2" label="Usage" target="usage">
+              Usage
+            </SectionHeading>
             {/* The import, and only the import: a block holding the tag the
                 heading two lines above already says teaches nothing and is
                 still a line a reader has to read. And deliberately no CDN
@@ -595,7 +600,9 @@ export default async function FamilyDocs({
           </helix-flex>
 
           <helix-flex direction="column" gap="md" id="preview">
-            <helix-text as="h2">Preview</helix-text>
+            <SectionHeading as="h2" label="Preview" target="preview">
+              Preview
+            </SectionHeading>
             {/* The family's headline example, which is `preview.html` and is
                 first in the list by construction. A family with no examples
                 shows nothing rather than an empty frame. */}
@@ -634,7 +641,9 @@ export default async function FamilyDocs({
               the component does not offer it, which is the component being right
               about how far apart two things in one flow should ever be. */}
           <helix-flex direction="column" gap="2xl" id="api">
-            <helix-text as="h2">API Reference</helix-text>
+            <SectionHeading as="h2" label="API Reference" target="api">
+              API Reference
+            </SectionHeading>
             {family.elements.map((element) => (
               <ElementApi element={element} key={element.tagName} />
             ))}
@@ -653,7 +662,9 @@ export default async function FamilyDocs({
               gap="md"
               id="examples"
             >
-              <helix-text as="h2">Examples</helix-text>
+              <SectionHeading as="h2" label="Examples" target="examples">
+                Examples
+              </SectionHeading>
               <helix-table label="Examples">
                 <helix-table-column>Name</helix-table-column>
                 <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
