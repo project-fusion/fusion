@@ -85,4 +85,24 @@ describe('option', () => {
     expect(host.text).not.toContain('icon')
     expect(host.text).not.toContain('Cmd')
   })
+
+  test('leaves a comment out, which is what Lit puts inside every option it renders', async () => {
+    /* The filter admitted anything that was not an element, and a comment is
+       not an element: `textContent` on one is the comment's own body. Every
+       option rendered from a template carries a child-binding marker,
+       `<!--?lit$1234$-->`, so `pagination/footer`'s trigger painted
+       `?lit$090648746$25` where it meant `25`, on both of its twins.
+
+       Worse than a wrong label, for the six readers listed above: the filter and
+       Combobox's match compare against this string, so a marker in it is in
+       every comparison. And the marker's digits change per render, which is what
+       made that example's width move between loads and kept it out of
+       `check:spec:visual-parity` for as long as the exclusion stood. */
+    const host = (await mount(
+      '<helix-headless-option value="25"><!--?lit$090648746$-->25</helix-headless-option>',
+    )) as HTMLElement & { text: string }
+
+    expect(host.text).toBe('25')
+    expect(host.text).not.toContain('lit$')
+  })
 })

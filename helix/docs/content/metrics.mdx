@@ -59,10 +59,10 @@ repository does that. The per-component tables are what a page pays.
 | Package | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
 | `@fusion.dev/helix-core` | 134,650 | 44,269 | 37,972 | Element base class, mixins, decorators, floating positioning. |
-| `@fusion.dev/helix-headless` | 519,154 | 131,672 | 103,150 | Every headless family, which is what the barrel means. |
+| `@fusion.dev/helix-headless` | 519,180 | 131,672 | 103,273 | Every headless family, which is what the barrel means. |
 | `@fusion.dev/helix-icons` | 47,484 | 14,907 | 12,553 | The whole glyph set. |
 | `@fusion.dev/helix-theme` | 3,288 | 1,571 | 1,355 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| `@fusion.dev/helix` | 956,738 | 216,839 | 158,952 | Every styled family. |
+| `@fusion.dev/helix` | 956,764 | 216,852 | 159,062 | Every styled family. |
 | `lit` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -85,7 +85,7 @@ is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 13,974 bytes gzipped alone and adds 2,413 to a page that already has Helix on it, so 83 percent of the first one is shared and 17 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is `code` at 9,065 gzipped alone, the dearest `data-table` at 49,860, over 93 components. Every family at once is 216,839.
+Across the tier: the cheapest is `code` at 9,065 gzipped alone, the dearest `data-table` at 49,883, over 93 components. Every family at once is 216,852.
 
 **No family imports a barrel, and the `barrels` rule in `fusion workspace` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 131,672 bytes gzipped whatever else the page does, which is 9 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
 
@@ -202,10 +202,10 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | `code-block` | 113,692 | 37,922 | 32,016 | 12,788 | 3,652 | 2,639 |
 | `color-input` | 131,269 | 42,548 | 35,825 | 26,066 | 7,147 | 5,811 |
 | `color-picker` | 100,398 | 32,385 | 26,772 | 19,492 | 5,701 | 4,633 |
-| `combobox` | 127,329 | 41,037 | 34,567 | 20,327 | 5,496 | 4,194 |
-| `command` | 100,670 | 32,023 | 26,366 | 17,317 | 4,911 | 3,740 |
+| `combobox` | 127,355 | 41,056 | 34,608 | 20,353 | 5,513 | 4,239 |
+| `command` | 100,696 | 32,041 | 26,374 | 17,343 | 4,929 | 3,758 |
 | `copy-button` | 112,372 | 37,654 | 31,723 | 11,469 | 3,401 | 2,453 |
-| `data-table` | 143,864 | 45,643 | 38,407 | 37,364 | 9,893 | 7,960 |
+| `data-table` | 143,890 | 45,667 | 38,373 | 37,390 | 9,914 | 7,915 |
 | `date-input` | 124,144 | 40,441 | 34,068 | 19,388 | 5,369 | 4,179 |
 | `date-picker` | 85,626 | 28,231 | 23,302 | 9,805 | 3,135 | 2,243 |
 | `dialog` | 30,484 | 10,235 | 9,019 | 2,717 | 1,104 | 676 |
@@ -225,7 +225,7 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | `legend` | 29,187 | 10,066 | 8,845 | 1,097 | 576 | 307 |
 | `line-chart` | 69,788 | 23,947 | 21,209 | 10,514 | 3,620 | 2,519 |
 | `list` | 27,887 | 9,360 | 8,245 | 1,727 | 574 | 273 |
-| `listbox` | 92,543 | 30,186 | 24,704 | 10,677 | 3,389 | 2,396 |
+| `listbox` | 92,569 | 30,206 | 24,732 | 10,703 | 3,408 | 2,386 |
 | `loader` | 27,072 | 9,293 | 8,182 | 900 | 468 | 278 |
 | `megamenu` | 55,893 | 19,552 | 17,265 | 4,934 | 1,726 | 1,127 |
 | `menu` | 110,293 | 37,007 | 31,290 | 8,105 | 2,369 | 1,697 |
@@ -233,9 +233,9 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | `navigation` | 28,831 | 9,815 | 8,680 | 1,582 | 681 | 374 |
 | `notifications` | 84,980 | 28,095 | 23,139 | 8,640 | 2,559 | 1,816 |
 | `number-input` | 86,974 | 28,468 | 23,363 | 7,100 | 2,289 | 1,635 |
-| `option` | 28,849 | 9,639 | 8,506 | 2,680 | 870 | 522 |
+| `option` | 28,875 | 9,651 | 8,521 | 2,706 | 887 | 543 |
 | `outline` | 31,837 | 10,811 | 9,517 | 4,539 | 1,764 | 1,122 |
-| `pagination` | 132,398 | 42,069 | 35,542 | 26,097 | 6,580 | 5,177 |
+| `pagination` | 132,424 | 42,092 | 35,470 | 26,123 | 6,601 | 5,213 |
 | `pin-input` | 37,535 | 12,009 | 10,627 | 5,135 | 1,840 | 1,193 |
 | `popover` | 53,190 | 18,820 | 16,606 | 1,985 | 821 | 478 |
 | `progress` | 28,113 | 9,566 | 8,450 | 1,949 | 754 | 475 |
@@ -244,7 +244,7 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | `radio` | 35,977 | 11,448 | 10,088 | 3,138 | 1,126 | 610 |
 | `rating` | 38,033 | 12,238 | 10,784 | 5,617 | 2,006 | 1,328 |
 | `scroll-area` | 28,465 | 9,748 | 8,556 | 2,612 | 1,065 | 599 |
-| `select` | 121,561 | 39,765 | 33,471 | 15,389 | 4,419 | 3,323 |
+| `select` | 121,587 | 39,788 | 33,486 | 15,415 | 4,438 | 3,220 |
 | `skeleton` | 25,544 | 8,786 | 7,725 | 544 | 322 | 158 |
 | `slider` | 37,896 | 12,065 | 10,659 | 5,250 | 1,807 | 1,217 |
 | `sparkline` | 31,645 | 11,088 | 9,794 | 2,530 | 1,051 | 727 |
@@ -257,8 +257,8 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | `tabs` | 33,935 | 11,060 | 9,721 | 4,469 | 1,277 | 735 |
 | `tag` | 74,439 | 24,760 | 20,435 | 897 | 464 | 219 |
 | `textarea` | 37,001 | 11,743 | 10,362 | 4,115 | 1,414 | 884 |
-| `time-input` | 136,201 | 43,547 | 36,687 | 28,643 | 7,661 | 6,120 |
-| `time-picker` | 100,564 | 32,606 | 26,818 | 18,154 | 5,495 | 4,270 |
+| `time-input` | 136,227 | 43,569 | 36,701 | 28,669 | 7,681 | 6,037 |
+| `time-picker` | 100,590 | 32,627 | 26,839 | 18,180 | 5,514 | 4,294 |
 | `timeline` | 74,971 | 24,767 | 20,563 | 1,896 | 659 | 373 |
 | `toast` | 78,169 | 25,872 | 21,292 | 4,007 | 1,240 | 834 |
 | `toggle` | 38,209 | 12,101 | 10,670 | 3,928 | 1,322 | 846 |
@@ -298,10 +298,10 @@ The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gi
 | `code-block` | 126,792 | 40,099 | 33,850 | 25,869 | 5,746 | 4,543 |
 | `color-input` | 162,845 | 47,382 | 40,160 | 57,622 | 11,940 | 10,003 |
 | `color-picker` | 126,684 | 36,610 | 30,418 | 45,772 | 9,885 | 8,303 |
-| `combobox` | 140,947 | 43,524 | 36,724 | 33,924 | 7,926 | 6,453 |
-| `command` | 110,979 | 34,028 | 28,065 | 27,611 | 6,899 | 5,511 |
+| `combobox` | 140,973 | 43,542 | 36,718 | 33,950 | 7,944 | 6,393 |
+| `command` | 111,005 | 34,045 | 28,055 | 27,637 | 6,916 | 5,516 |
 | `copy-button` | 122,914 | 39,510 | 33,293 | 21,993 | 5,159 | 3,983 |
-| `data-table` | 171,797 | 49,860 | 42,064 | 65,277 | 14,162 | 11,607 |
+| `data-table` | 171,823 | 49,883 | 42,093 | 65,303 | 14,185 | 11,572 |
 | `date-input` | 138,992 | 43,265 | 36,574 | 34,214 | 8,152 | 6,687 |
 | `date-picker` | 91,241 | 29,414 | 24,351 | 15,402 | 4,300 | 3,321 |
 | `dialog` | 34,819 | 11,243 | 9,909 | 7,037 | 2,144 | 1,590 |
@@ -323,7 +323,7 @@ The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gi
 | `legend` | 34,021 | 11,147 | 9,781 | 5,923 | 1,713 | 1,162 |
 | `line-chart` | 82,192 | 26,074 | 23,014 | 22,899 | 5,821 | 4,352 |
 | `list` | 31,940 | 10,292 | 9,050 | 5,770 | 1,514 | 1,193 |
-| `listbox` | 96,658 | 31,152 | 25,519 | 14,779 | 4,353 | 3,162 |
+| `listbox` | 96,684 | 31,172 | 25,595 | 14,805 | 4,372 | 3,307 |
 | `loader` | 30,078 | 10,034 | 8,834 | 3,891 | 1,154 | 851 |
 | `megamenu` | 60,316 | 20,594 | 18,232 | 9,342 | 2,769 | 2,010 |
 | `menu` | 116,491 | 38,409 | 32,510 | 14,285 | 3,707 | 2,833 |
@@ -331,9 +331,9 @@ The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gi
 | `navigation` | 30,214 | 10,212 | 8,987 | 2,949 | 1,059 | 653 |
 | `notifications` | 92,539 | 29,630 | 24,493 | 16,186 | 4,088 | 3,113 |
 | `number-input` | 91,816 | 29,585 | 24,291 | 11,928 | 3,384 | 2,533 |
-| `option` | 32,116 | 10,548 | 9,315 | 5,935 | 1,758 | 1,282 |
+| `option` | 32,142 | 10,562 | 9,308 | 5,961 | 1,781 | 1,247 |
 | `outline` | 35,566 | 11,582 | 10,202 | 8,251 | 2,548 | 1,862 |
-| `pagination` | 149,982 | 45,085 | 38,125 | 43,663 | 9,528 | 7,773 |
+| `pagination` | 150,008 | 45,108 | 38,107 | 43,689 | 9,550 | 7,817 |
 | `pin-input` | 40,676 | 12,803 | 11,279 | 8,259 | 2,653 | 1,870 |
 | `popover` | 55,826 | 19,462 | 17,177 | 4,603 | 1,485 | 1,034 |
 | `progress` | 33,160 | 10,749 | 9,508 | 6,978 | 1,941 | 1,447 |
@@ -343,7 +343,7 @@ The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gi
 | `rating` | 41,008 | 13,169 | 11,612 | 8,574 | 2,933 | 2,137 |
 | `sandbox` | 60,999 | 16,779 | 14,889 | 34,537 | 8,003 | 6,518 |
 | `scroll-area` | 31,431 | 10,376 | 9,102 | 5,561 | 1,739 | 1,152 |
-| `select` | 133,741 | 42,054 | 35,483 | 27,548 | 6,622 | 5,236 |
+| `select` | 133,767 | 42,076 | 35,481 | 27,574 | 6,641 | 5,196 |
 | `skeleton` | 28,062 | 9,544 | 8,416 | 2,242 | 826 | 495 |
 | `slider` | 47,778 | 13,853 | 12,267 | 15,115 | 3,565 | 2,777 |
 | `sparkline` | 35,411 | 12,016 | 10,618 | 6,284 | 2,004 | 1,556 |
@@ -357,8 +357,8 @@ The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gi
 | `tag` | 77,632 | 25,630 | 21,117 | 4,075 | 1,238 | 981 |
 | `text` | 29,734 | 9,670 | 8,508 | 3,922 | 958 | 605 |
 | `textarea` | 40,350 | 12,544 | 11,034 | 7,447 | 2,227 | 1,615 |
-| `time-input` | 156,102 | 46,926 | 39,555 | 48,525 | 10,996 | 9,070 |
-| `time-picker` | 111,867 | 34,716 | 28,718 | 29,452 | 7,606 | 6,047 |
+| `time-input` | 156,128 | 46,948 | 39,616 | 48,551 | 11,016 | 8,943 |
+| `time-picker` | 111,893 | 34,736 | 28,737 | 29,478 | 7,627 | 6,095 |
 | `timeline` | 78,237 | 25,530 | 21,180 | 5,151 | 1,368 | 987 |
 | `toast` | 85,446 | 27,485 | 22,753 | 11,271 | 2,866 | 2,249 |
 | `toggle` | 43,242 | 13,258 | 11,703 | 8,953 | 2,508 | 1,907 |
@@ -382,11 +382,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | `@fusion.dev/helix-core` | 655,135 | 113 | 154,658 | `@floating-ui/dom`, `@fusion.dev/helix-icons` |
-| `@fusion.dev/helix-headless` | 8,355,625 | 422 | 698,334 | `@fusion.dev/helix-core`, `@fusion.dev/helix-icons`, `uqr` |
+| `@fusion.dev/helix-headless` | 8,358,616 | 422 | 698,381 | `@fusion.dev/helix-core`, `@fusion.dev/helix-icons`, `uqr` |
 | `@fusion.dev/helix-icons` | 65,943 | 11 | 20,928 | none |
 | `@fusion.dev/helix-styles` | 90,338 | 6 | 0 | none |
 | `@fusion.dev/helix-theme` | 461,551 | 8 | 4,699 | none |
-| `@fusion.dev/helix` | 9,278,068 | 716 | 278,080 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
+| `@fusion.dev/helix` | 9,280,256 | 716 | 278,080 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
 
 ## Not measured yet
 

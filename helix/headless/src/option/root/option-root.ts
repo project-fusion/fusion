@@ -190,10 +190,24 @@ export class HelixHeadlessOption extends HelixElement {
    * the platform applies at assignment. Asking the same question here rather
    * than a second one is what stops the two disagreeing. Text nodes are
    * always the default slot's and cannot say otherwise.
+   *
+   * **Text and elements, named rather than "not an element".** The filter read
+   * `!(node instanceof Element) || node.slot === ''`, which admits a comment,
+   * and `textContent` on a comment is the comment's own body. Every option Lit
+   * renders carries one: a child binding is marked with `<!--?lit$1234$-->`, so
+   * an option written as `` html`<${option}>${size}</${option}>` `` read back as
+   * `?lit$090648746$25`. Measured in `pagination/footer`, where the trigger
+   * painted exactly that instead of `25`, on both twins.
+   *
+   * It is worse than one wrong label, because of the six readers listed above:
+   * the filter and Combobox's match compare against this string, so a marker in
+   * it is in every comparison too.
    */
   get text(): string {
     return [...this.childNodes]
-      .filter((node) => !(node instanceof Element) || node.slot === '')
+      .filter(
+        (node) => node.nodeType === Node.TEXT_NODE || (node instanceof Element && node.slot === ''),
+      )
       .map((node) => node.textContent ?? '')
       .join('')
       .trim()
