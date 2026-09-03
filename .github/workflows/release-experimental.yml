@@ -56,7 +56,9 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
-      # Trusted publishing needs npm 11.5.1+ on Node 22.14+.
+      # **Node is here for npm and for nothing else**, every script in this
+      # workflow being invoked with `bun`. Trusted publishing needs npm 11.5.1+
+      # on Node 22.14+, and npm is a Node program.
       # **Never add `registry-url`.** Given one, `setup-node` writes an `.npmrc`
       # carrying its own `NODE_AUTH_TOKEN`, which nothing sets, so npm reads
       # itself as configured, skips the OIDC exchange and publishes as nobody.
@@ -66,7 +68,7 @@ jobs:
       #
       # The default registry is already npmjs.org, so the line bought nothing
       # even when it worked.
-      - name: Install Node, which the repository's own scripts run on
+      - name: Install Node, which npm runs on
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -120,7 +122,7 @@ jobs:
           set -euo pipefail
           [ -s /tmp/released ] || exit 0
           while read -r domain version; do
-            node fusion/scripts/publish.mjs --domain "$domain" --tag "exp-$NUMBER"
+            bun fusion/scripts/publish.mjs --domain "$domain" --tag "exp-$NUMBER"
           done < /tmp/released
 
       - name: Say how to install it

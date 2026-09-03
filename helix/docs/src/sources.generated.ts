@@ -2241,11 +2241,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | \`@fusion.dev/helix-core\` | 655,135 | 113 | 154,658 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
-| \`@fusion.dev/helix-headless\` | 8,354,890 | 422 | 698,334 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
+| \`@fusion.dev/helix-headless\` | 8,355,625 | 422 | 698,334 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 65,943 | 11 | 20,928 | none |
 | \`@fusion.dev/helix-styles\` | 90,338 | 6 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 461,551 | 8 | 4,699 | none |
-| \`@fusion.dev/helix\` | 9,277,333 | 716 | 278,080 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,278,068 | 716 | 278,080 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 

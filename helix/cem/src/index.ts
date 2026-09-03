@@ -7,6 +7,7 @@ import { type ConventionLintOptions, conventionLint } from './plugins/convention
 import { declaredEvents } from './plugins/declared-events.js'
 import { examples } from './plugins/examples.js'
 import { helixTier } from './plugins/helix-tier.js'
+import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxNativeEvents } from './plugins/jsx-native-events.js'
 import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
@@ -125,6 +126,9 @@ export const createHelixCemConfig = ({
           // rejects the `useRef` every React consumer reaches for.
           jsxReactRef({ fileName: `${TYPES}/jsx.d.ts` }),
           jsxNativeEvents({ fileName: `${TYPES}/jsx.d.ts` }),
+          // After it, which is what makes `BaseEvents` generic, and before
+          // `jsxOptionalUndefined` so these entries get the same `| undefined`.
+          jsxDeclaredEvents({ fileName: `${TYPES}/jsx.d.ts` }),
           /* Vue reads none of the above. Its templates are not JSX, so the
              types augment `GlobalComponents` rather than `IntrinsicElements`,
              and a handler is bound with `@helix-input` rather than a prop. Same
@@ -210,6 +214,7 @@ export {
   declaredEvents,
   examples,
   helixTier,
+  jsxDeclaredEvents,
   jsxImports,
   jsxNativeEvents,
   jsxOptionalUndefined,

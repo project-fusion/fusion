@@ -88,10 +88,15 @@ jobs:
         with:
           bun-version: ${{ env.BUN_VERSION }}
 
+      # **Node is here for npm and for nothing else.** Every script this workflow
+      # runs is invoked with `bun`, which executes `.mjs` directly; what still
+      # needs Node is the `npm` below, since trusted publishing is an npm feature
+      # and npm is a Node program.
+      #
       # Never add `registry-url` here: it writes an `.npmrc` that stops the OIDC
       # exchange and the refusal reports as a 404.
       # [RELEASING.md](../RELEASING.md#two-traps-in-the-runner-setup)
-      - name: Install Node, which the repository's own scripts run on
+      - name: Install Node, which npm runs on
         uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -116,7 +121,7 @@ jobs:
       - name: Compute the version from the tags
         id: version
         run: |
-          node fusion/scripts/version.mjs \
+          bun fusion/scripts/version.mjs \
             --domain "${{ matrix.target.domain }}" --bump "${{ matrix.target.level }}" --write
 
       # Before anything is published, and deliberately so. A version that has
@@ -159,7 +164,7 @@ jobs:
         run: bun run analyze
 
       - name: Publish to staging
-        run: node fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next
+        run: bun fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next
 
       # Against what was published rather than a rebuild of it: installed from
       # the registry, from outside the workspace, the way a consumer gets it.
@@ -179,7 +184,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: vars.PUBLISHING == 'on'
         run: |
-          node fusion/scripts/publish.mjs \
+          bun fusion/scripts/publish.mjs \
             --domain "${{ matrix.target.domain }}" \
             --promote latest \
             --version "${{ steps.version.outputs.version }}"
