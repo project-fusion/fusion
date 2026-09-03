@@ -477,23 +477,22 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
 }
 
 /* Density. */
-/* *The scale is continuous, and `sm`/`md`/`lg` are three stops on it.**
-   Enumerating nine steps of a control ramp that only has three would invent
-   sizes nothing was drawn at, while a multiplier covers every value between them
-   without naming any. **A container cannot do this by setting the seed, and that
-   is measured rather than argued.** `--helix-seed-density` is a real
-   `ThemeIntent` knob and it multiplies the primitive ramps, but the derived
-   tokens are declared once on `:root`, and custom properties substitute at
-   computed-value time: a descendant inherits the *already substituted* value.
-   Setting the seed on a div and reading `--helix-space-md` inside it returns
-   `calc(1rem * 1)` and resolves to 16px, the same as the page. The 0.5 is read
-   by nothing. So the region is the attribute and the amount is the property:
-   `data-density` says a region is one, `--helix-density` says how much, and it
-   defaults to 1 so the bare attribute is the resting size rather than a
-   collapse. **Nesting does not compound.** Each rule redeclares from the same
-   `md` stop rather than from whatever it inherited, so a 0.8 region inside a 0.8
-   region is 0.8 and not 0.64. Measured: 12.7969px in both. **The named stops win
-   because they come after**, at equal specificity. */
+/* **The scale is continuous, and `sm`/`md`/`lg` are three stops on it.**
+   Enumerating nine steps of a ramp that has three would invent sizes nothing was
+   drawn at; a multiplier covers every value between them without naming any.
+
+   **A container cannot do this by setting the seed**, and that is measured
+   rather than argued: the derived tokens are declared once on `:root`, and
+   custom properties substitute at computed-value time, so a descendant inherits
+   the *already substituted* value. Setting the seed on a div and reading
+   `--helix-space-md` inside it returns `calc(1rem * 1)`. So the region is the
+   attribute and the amount is the property, defaulting to 1 so the bare
+   attribute is the resting size rather than a collapse.
+
+   **Nesting does not compound.** Each rule redeclares from the same `md` stop
+   rather than from what it inherited, so 0.8 inside 0.8 is 0.8 and not 0.64:
+   measured 12.7969px in both. The named stops win by coming after, at equal
+   specificity. */
 [data-density] {
   /* *The relative pair is redeclared here, and it has to be.** A custom property
      substitutes at computed-value time, so `--helix-size-control-tight` resolved
@@ -639,15 +638,12 @@ helix-toggle[disabled]::part(item) {
   cursor: pointer;
   font-family: var(--helix-font-sans);
   block-size: 100%;
-  /* A floor as well as the percentage, because the percentage only resolves for
-     a direct child of the bar. `Navigation` is a fixed-height flex row that
-     centers its items, so an anchor sitting straight in it takes the full 32
-     from `block-size: 100%`. Nest one and there is nothing to be a percentage
+  /* A floor as well as the percentage, because the percentage only resolves for a
+     direct child of the bar. Nest one and there is nothing to be a percentage
      of: a `Megamenu` slots its trigger inside its own auto-height host, so the
-     height resolves to `auto` and the item comes out at its content height of
-     21.5 against 32 for the anchors beside it, sitting visibly short in the row.
-     Additive on purpose: for a direct child both resolve to the same 32, and in
-     a taller bar the percentage still wins. */
+     item came out at its content height of 21.5 against 32 for the anchors
+     beside it. Additive on purpose: a direct child resolves both to the same 32,
+     and in a taller bar the percentage still wins. */
   min-block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
@@ -763,15 +759,14 @@ helix-toggle[disabled]::part(item) {
 /* A destination with a name and a sentence about it. */
 [data-megamenu-item] {
   align-items: start;
-  /* Said, for the same reason `white-space` is said below: the panel sits inside
-     the nav, so these anchors match `helix-navigation a` up there, and that rule
-     is `block-size: 100%` because a destination in a horizontal bar fills the
-     bar's height. Left at 100%, a row is sized by flex-shrink against its column
-     instead of by its content, so how tall a row is depends on how many rows are
-     beside it. Measured in Chrome at 1440: a column of two came out 88 each and
-     a column of one came out 184, and because the row is a grid of two auto rows
-     the extra 96 was split between them, putting the sentence 76 pixels below
-     the name it belongs to. */
+  /* Said, for the same reason `white-space` is below: the panel sits inside the
+     nav, so these anchors match `helix-navigation a`, which is `block-size: 100%`
+     because a destination in a horizontal bar fills it. Left at 100% a row is
+     sized by flex-shrink against its column rather than by its content, so how
+     tall a row is depends on how many rows are beside it. Measured in Chrome at
+     1440: a column of two came out 88 each and a column of one 184, and the
+     extra 96 was split between the row's two auto rows, putting the sentence 76
+     pixels below the name it belongs to. */
   block-size: auto;
   /* Said, because the panel sits inside the nav and these anchors match the nav
      bar's own rule, which sets `nowrap` so a word in a horizontal strip does not
@@ -837,15 +832,12 @@ helix-toggle[disabled]::part(item) {
 }
 
 /* Where you are, marked rather than filled. **Before the name, and reserved on
-   every row so the column holds still.** Ahead of the name the dot is scanned,
-   and a column of rows shows which is current before any of them is read; after
-   the name it reads a row at a time. A mark in front of one name pushes that
-   name right, so the cell is reserved on every row and filled on one:
-   transparent is still 8 pixels wide, and every label starts at the same place
-   whether or not its row is the current one. A row given a leading mark puts it
-   in column 1 spanning both lines, and a dot in the same cell would sit on top
-   of it; those rows keep the mark as their signal and take the weight and color
-   the rules below give them. */
+   every row so the column holds still.** Ahead of the name the dot is scanned
+   and a column shows which row is current before any of them is read; after the
+   name it reads a row at a time. Reserving the cell on every row and filling it
+   on one keeps every label starting in the same place: transparent is still 8
+   pixels wide. A row given a leading mark of its own keeps that as its signal,
+   a dot in the same cell landing on top of it. */
 [data-megamenu-item]:not(:has(> :where(helix-icon, img, svg)))::before {
   align-self: center;
   background-color: transparent;
@@ -1050,16 +1042,14 @@ helix-toast:not([data-color-mode]) {
 }
 
 /* And the way in that the rule above does not have. **A custom property is the
-   one thing that crosses.** The measurement above is about `*`, which is a
-   selector and stops at the boundary. That is what replaced 57
-   `prefers-reduced-motion` blocks in 45 component sheets, each of them restating
-   this because, as the note above says, a document rule had no way in.
-   **`0.01ms` rather than `0` or `none`, and the difference is not cosmetic.** A
-   transition that still runs still fires `transitionend`. **Animations are
-   deliberately not done this way.** They are not all written with these tokens,
-   `video` spinning at `0.8s` and the gallery at `1.4s` and `3.4s`, and seven
-   sheets animate `infinite`: a spinner handed a 0.01ms cycle does not stop, it
-   runs flat out. */
+   one thing that crosses**: that measurement is about `*`, a selector, which
+   stops at the shadow boundary. This replaced 57 `prefers-reduced-motion` blocks
+   across 45 component sheets.
+
+   **`0.01ms` rather than `0` or `none`**, because a transition that still runs
+   still fires `transitionend`. **Animations are deliberately left out**: they
+   are not all written with these tokens, and seven sheets animate `infinite` —
+   a spinner handed a 0.01ms cycle does not stop, it runs flat out. */
 @media (prefers-reduced-motion: reduce) {
   :root,
   [data-helix-theme] {
@@ -1094,14 +1084,15 @@ helix-toast:not([data-color-mode]) {
 
 /* Present to a screen reader, absent to an eye. The `1px` box with `overflow:
    hidden` stays because a zero-sized element is skipped by some screen readers,
-   and `white-space: nowrap` stops a long string wrapping into a tall thin column
-   that pushes layout around before it is clipped. **The 1px box does not bind on
-   a table, and that is correct.** Measured in Chrome: a div, a p and a span each
-   collapse to 1 by 1, and a `<table>` carrying this renders 46 by 40, because a
-   CSS table's used width is its min-content width and cannot be set below it.
-   **Do not add `display: block` to make the number match.** A table forced to a
-   block box loses its table semantics in the accessibility tree, which is the
-   one thing this rule exists to keep. */
+   and `white-space: nowrap` stops a long string wrapping into a tall column
+   before it is clipped.
+
+   **The 1px box does not bind on a table, and that is correct.** Measured in
+   Chrome, a div, p and span each collapse to 1 by 1 and a `<table>` renders 46
+   by 40, a CSS table's used width being its min-content width. **Do not add
+   `display: block` to make the number match**: a table forced to a block box
+   loses its table semantics in the accessibility tree, which is the one thing
+   this rule exists to keep. */
 [data-hidden-visually] {
   block-size: 1px;
   border: var(--helix-space-none);

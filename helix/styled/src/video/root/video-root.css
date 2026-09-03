@@ -132,18 +132,16 @@
 }
 
 /*
- *  Every control on the bar, asked for by where it is rather than by name.
+ * Every control on the bar, asked for by where it is rather than by name.
  *
- * **Never write the part names out.** A list that has to be joined is a list
- * that will be forgotten, and a control left off it renders as a raw `<button>`:
+ * **Never write the part names out.** A list that has to be joined is one that
+ * will be forgotten, and a control left off renders as a raw `<button>`:
  * measured, 36x29 with a gray fill and a 2px border beside 24x24 transparent for
- * every control next to it. Nothing catches that, and nothing can: the static
- * rule asks whether a selector has a part, which is the other direction.
+ * every control next to it. Nothing catches that, and nothing can, the static
+ * rule asking whether a selector has a part rather than the other way round.
  *
- * So the question is "is it a control on this bar", which the next one answers
- * without anybody adding a line. `:where()` keeps the weight at (0,1,0), the
- * same as the names it replaces, so `[part="speed"]` and the rest still win by
- * source order.
+ * `:where()` keeps the weight at (0,1,0), the same as the names it replaces, so
+ * `[part="speed"]` and the rest still win by source order.
  */
 [part="controls"] :where(a, button) {
   --icon-size: var(--helix-size-icon-tight);
@@ -363,25 +361,21 @@
 }
 
 /*
- *  The mark that starts it, in the middle of the picture.
+ * The mark that starts it, in the middle of the picture.
  *
- * Sized against the picture rather than fixed, because the thing it has to be
- * legible against is the picture: a fixed 64px mark is generous on a thumbnail
- * and lost on a hero. The clamp keeps it a control at both ends, never smaller
- * than a comfortable target and never a decoration filling the frame.
+ * Sized against the picture rather than fixed, because what it has to be legible
+ * against is the picture: 64px is generous on a thumbnail and lost on a hero.
+ * The clamp keeps it a control at both ends.
  *
- * A plain percentage, which resolves against the stage because this is
- * positioned out of it. **The stage cannot be a container query.**
- * `container-type: size` contains both axes, and the stage takes its height from
- * the `<video>` inside it, the aspect ratio being on that element rather than on
- * the host: measured, every video on the page collapsed to 528 by 0. A
- * percentage needs no containment to read the same number.
+ * A plain percentage, which resolves against the stage. **The stage cannot be a
+ * container query**: `container-type: size` contains both axes, and the stage
+ * takes its height from the `<video>` inside it, so measured, every video on the
+ * page collapsed to 528 by 0.
  *
- * A disc *and* a ring, because the frame underneath could be anything. The
- * scrim alone is 64% of near-black in this region, which is a dark disc: over a
- * bright frame it reads, and over a dark one it disappears into the picture and
- * leaves the glyph floating on nothing. The hairline is the page's ink, so
- * whichever of the two vanishes the other one is there.
+ * A disc *and* a ring, because the frame underneath could be anything. The scrim
+ * alone is 64% of near-black, which reads over a bright frame and disappears
+ * into a dark one. The hairline is the page's ink, so whichever of the two
+ * vanishes the other is there.
  */
 [part="start"] {
   --icon-size: 40%;

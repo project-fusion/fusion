@@ -13,18 +13,22 @@
    thing 145 says should not spread, so one token and no compensation. */
 .insightsHero {
   background-color: var(--helix-color-surface);
+
+  /* **No dots under the rays.** `.pageHero` draws a lattice through its own
+     `::before`, and this page already has a field: two textures where it wants
+     one. Same call as `services`, which is the other page carrying an aura. The
+     gallery keeps its dots, having no field of its own for them to compete
+     with. */
+  --page-hero-lattice: none;
 }
 
 /* The rays field behind the insights hero. **Rays rather than the lattice the
    gallery wears**, because the two pages should not be interchangeable: one is a
    set of drawings and this is a set of arguments, and light being cast is what
-   an insight looks like. **Two things about it are unsettled.** The hero still
-   carries the shared lattice underneath from `.pageHero::before`, so there are
-   two textures where the page wants one; the dots are faint under the rays and
-   it has not been decided whether they should be turned off here. And the frame
-   cost of a WebGL context on a page that is otherwise text has not been
-   measured: the 8.3ms figure on record is the landing page's field, not this
-   one. */
+   an insight looks like. The lattice is off here, for the reason
+   recorded on `.insightsHero`. **What is still unmeasured** is the frame cost of
+   a WebGL context on a page that is otherwise text: the 8.3ms figure on record
+   is the landing page's field, not this one. */
 .insightsAura {
   inset: 0;
   pointer-events: none;

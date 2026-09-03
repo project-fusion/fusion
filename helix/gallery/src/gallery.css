@@ -218,23 +218,17 @@
 }
 
 /*
- *  Two steps, an early gesture and then a hold, from one keyframe that starts
- * where the card already is.
- *
- * A single `50%` over the 5.5s sustain puts the peak 2750ms after the pointer
- * arrives, and nobody holds a pointer for two and three quarter seconds waiting
- * to find out whether a card responded. The first step lands at 660ms and the
- * second is the breath it settles into.
+ * Two steps, an early gesture and then a hold, from one keyframe that starts
+ * where the card already is. A single `50%` over the 5.5s sustain puts the peak
+ * 2750ms after the pointer arrives, and nobody holds a pointer that long to find
+ * out whether a card responded.
  *
  * **The gesture is a translate and a fade, not only a scale.** A scale is
- * relative, and these drawings are mostly small marks on a large frame: at
- * 1.035 the same keyframe moved Announcement's band 1.8 screen pixels and
- * Avatar's circle 0.7, because `artBody`'s box is the drawing rather than the
- * canvas. So the amplitude was a function of how much happened to be drawn,
- * which is not a property anything should depend on. Five units of travel and a
- * fade to 0.7 are absolute: the smallest card in the set gets the same gesture
- * as the largest, and the scale rides on top for the panels big enough to show
- * it.
+ * relative and these drawings are small marks on a large frame: at 1.035 the
+ * same keyframe moved Announcement's band 1.8 screen pixels and Avatar's circle
+ * 0.7, because `artBody`'s box is the drawing rather than the canvas. Five units
+ * of travel and a fade to 0.7 are absolute, so the smallest card gets the same
+ * gesture as the largest and the scale rides on top.
  */
 @keyframes helixArtSwell {
   12% {
@@ -363,16 +357,13 @@
 }
 
 /*
- *  turn: a mark that reverses, for a reading whose whole subject is direction.
- * It is the only card where the motion is the meaning rather than a replay of
- * an entrance: two readings side by side say "here are two of them" where the
- * component says "here is which way it went".
+ * turn: a mark that reverses, for a reading whose subject is direction. The only
+ * card where the motion is the meaning rather than a replay of an entrance.
  *
  * **The angle is a variable, because a half turn is not the only reversal.**
- * Trend's arrow flips, which is 180. A speed dial's plus becomes its own close,
- * which is 45, and that is the same statement about the same kind of mark: this
- * glyph is one press away from meaning the opposite. A second keyframe for it
- * would be two names for one gesture.
+ * Trend's arrow flips, which is 180; a speed dial's plus becomes its own close,
+ * which is 45, and that is the same statement about the same kind of mark. A
+ * second keyframe would be two names for one gesture.
  */
 :has(> .componentArt):hover .artTurn {
   animation: helixArtTurn var(--art-sustain) var(--art-curve) infinite;
@@ -403,17 +394,15 @@
 
 /* The withdrawal carries its own curve, and it has to.
  *
- * `--art-curve` is an ease-out: nine tenths of its travel is spent in the first
- * tenth of the interval. That is right for a mark arriving and wrong for both
- * halves of this one. Measured at 80ms of 1100 on the ease-out, the chart's two
- * series had already pulled back to a quarter of their length and then sat
- * blank until the keyframe, which is the flash this file's motion section
- * exists to forbid, held for three hundred milliseconds instead of one frame.
+ * `--art-curve` is an ease-out: nine tenths of its travel in the first tenth of
+ * the interval, right for a mark arriving and wrong for both halves of this one.
+ * Measured at 80ms of 1100, the chart's two series had already pulled back to a
+ * quarter of their length and then sat blank until the keyframe — the flash this
+ * file's motion section exists to forbid, held for three hundred milliseconds.
  *
- * An ease-in-out over the withdrawal means the line leaves slowly, touches
- * nothing at 38 percent for exactly one instant, and is written back out under
- * the file's own curve. The blank is a point the gesture passes through rather
- * than a state it rests in. */
+ * An ease-in-out means the line leaves slowly, touches nothing at 38 percent for
+ * one instant, and is written back out under the file's own curve: a point the
+ * gesture passes through rather than a state it rests in. */
 @keyframes helixArtDraw {
   0% {
     animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);

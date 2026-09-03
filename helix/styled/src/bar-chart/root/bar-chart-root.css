@@ -317,18 +317,15 @@
 }
 
 /*
- * *A chart must never animate through a value it does not have**, which is why
- * none of this uses `emphasized`.
+ * **A chart must never animate through a value it does not have**, which is why
+ * none of this uses `emphasized`. That curve is `cubic-bezier(0.3, 0, 0, 1.2)`,
+ * and the 1.2 carries the property past its target and settles back: right for a
+ * panel arriving, wrong for a quantity, because the frames past the target are a
+ * number the data does not contain. A bar that reads 15 drawn momentarily at
+ * 16.8 is showing something untrue to look nice.
  *
- * That curve is `cubic-bezier(0.3, 0, 0, 1.2)`, and the 1.2 is an overshoot: it
- * carries the property past its target and settles back. That is right for a
- * panel arriving or a mark traveling, where the overshoot is the motion having
- * weight, and it is wrong for a quantity, because the frames past the target are
- * a number the data does not contain. A bar that reads 15 momentarily drawn at
- * 16.8 is showing something untrue, briefly, to look nice.
- *
- * `decelerate` is `cubic-bezier(0, 0, 0, 1)`, monotonic, so every frame is a
- * value between where the reading was and where it is.
+ * `decelerate` is monotonic, so every frame is a value between where the reading
+ * was and where it is.
  */
 [part="bar"] {
   transition:
@@ -512,49 +509,39 @@
 }
 
 /*
- * *The edge, and the fill stays under it.** `outlined` on a button is a border
- * instead of* a fill, because a control's fill is the loud part. On a column
- *    the fill is the mark: its area is what encodes the value, so removing it
- *    removes the reading rather than quietening it. The value adapts to the medium
- *    the way `outlined` already means one thing on a Card's boundary and another
- *    on a Button's ink.
+ * **The edge, and the fill stays under it.** `outlined` on a button trades a
+ * fill for a border, because a control's fill is the loud part. On a column the
+ * fill *is* the mark: its area encodes the value, so removing it removes the
+ * reading rather than quietening it.
  *
- *    Darkening the *edge* reads against the fill but not against the page: 2.63 on
- *    the fill in dark and 1.35 on the page, so the outline merges with the thing it
- *    is drawn against. Lighter is no help and is inert in dark, 1.06 at every step,
- *    a series color in that palette being at the top of its lightness and clipping.
- *    Darkening the *fill* fixes dark and breaks light, where a column two steps
- *    down reads as a different, heavier chart.
+ * Three ways of drawing that edge fail. Darkening it reads against the fill and
+ * not against the page, 2.63 on the fill in dark against 1.35 on the page.
+ * Lightening it is inert in dark at 1.06 every step, a series color there being
+ * at the top of its lightness and clipping. Darkening the *fill* fixes dark and
+ * breaks light, where a column two steps down reads as a heavier chart.
  *
- *    Fading the fill toward `--helix-color-background` is the one that needs no
- *    second arm, because that token already carries the mode: the area moves toward
- *    the page in whichever direction the page is, and the boundary stays the color
- *    the series actually is. At 60% the edge reads 1.70 against the fill in light
- *    and 2.70 in dark, stands off the page at 3.21 and 4.31, and the fill is still
- *    a fill at 1.88 and 1.60 rather than a ghost of one.
+ * Fading the fill toward `--helix-color-background` needs no second arm, that
+ * token already carrying the mode: the area moves toward the page whichever
+ * direction the page is, and the boundary stays the series color. At 60% the
+ * edge reads 1.70 against the fill in light and 2.70 in dark, stands off the
+ * page at 3.21 and 4.31, and the fill is still a fill at 1.88 and 1.60.
  *
- *    The width carries what the color cannot: a pixel at 2:1 is a hairline nobody
- *    sees, and two is still thin against a column sixty wide.
- *
- * *`vector-effect`, for the reason two other rules in this file already give**:
- *    the view box is `0 0 100 H` under `preserveAspectRatio="none"`, so a stroke in
- *    user units is stretched by however wide the element happens to be. Without it
- *    a 1.5 draws as a band several pixels thick and uneven between the vertical
- *    edges and the horizontal ones.
+ * **`vector-effect`, for the reason two other rules here give**: the view box is
+ * `0 0 100 H` under `preserveAspectRatio="none"`, so a stroke in user units is
+ * stretched by however wide the element is, and a 1.5 draws as a band uneven
+ * between the vertical edges and the horizontal ones.
  */
 [part="bar"][data-emphasis="outlined"],
 :host([emphasis="outlined"]) [part="bar"]:not([data-emphasis]) {
   /* **No line across the base.** A bar grows from the baseline and is measured
-     against the rule there, which this file already says where it rounds the far
-     end only. An edge across the base draws a second rule a stroke inside the
-     real one.
+     against the rule there; an edge across the base draws a second rule a stroke
+     inside the real one.
 
      **Inward by half the stroke, and the sign is easy to get backwards.** A
-     stroke straddles the edge it is drawn on, so `inset(0)` already clips the
-     outer half and leaves the inner one; taking that away is a *positive* inset
-     of half the width. Negative expands the clip past the box and shows the half
-     that had been hidden, which is a heavier line than doing nothing at all.
-     Which side it comes off is `--_bar-chart-base` rather than this rule, so a
+     stroke straddles its edge, so `inset(0)` already clips the outer half and
+     leaves the inner: taking that away is a *positive* inset of half the width.
+     Negative expands the clip and shows the half that was hidden, a heavier line
+     than doing nothing. Which side it comes off is `--_bar-chart-base`, so a
      horizontal bar loses its leading edge and not its bottom one. */
   --_bar-chart-foot: var(--_bar-chart-base);
   fill: var(--_bar-chart-shade);

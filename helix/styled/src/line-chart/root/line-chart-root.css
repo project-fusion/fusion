@@ -83,17 +83,16 @@
   white-space: nowrap;
 }
 
-/* One rule, not twenty-four. The headless tier knows which series a mark
-   belongs to and writes `--chart-series` onto it, pointing at one of the
-   twenty-four hooks `chart/series.css` defines, so the index reaches CSS
-   without an attribute selector having to carry it.
+/* One rule, not twenty-four. The headless tier knows which series a mark belongs
+   to and writes `--chart-series` onto it, pointing at one of the twenty-four
+   hooks `chart/series.css` defines, so the index reaches CSS without an
+   attribute selector carrying it.
 
    It was twenty-four rules keyed on `[data-series]`, which worked from in here
-   and could not be reached from outside: `::part()` takes no attribute
-   selector, so a consumer looking at `data-series="2"` written on the part had
-   no selector able to use it. Measured, `::part(bar)[data-series="2"]` is
-   dropped at parse time. `data-series` stays, because it is what a spec asserts
-   and what a document rule reaching in through the light DOM would still use. */
+   and could not be reached from outside: `::part()` takes no attribute selector,
+   and measured, `::part(bar)[data-series="2"]` is dropped at parse time.
+   `data-series` stays, being what a spec asserts and what a document rule
+   reaching through the light DOM would use. */
 [part="line"] {
   stroke: var(--chart-series);
 }
@@ -293,18 +292,14 @@
 }
 
 /*
- * *A chart must never animate through a value it does not have**, which is why
- * none of this uses `emphasized`.
+ * **A chart must never animate through a value it does not have**, which is why
+ * none of this uses `emphasized`. That curve is `cubic-bezier(0.3, 0, 0, 1.2)`,
+ * and the 1.2 carries the property past its target and settles back: right for a
+ * panel arriving, wrong for a quantity, because the frames past the target are a
+ * number the data does not contain.
  *
- * That curve is `cubic-bezier(0.3, 0, 0, 1.2)`, and the 1.2 is an overshoot: it
- * carries the property past its target and settles back. That is right for a
- * panel arriving or a mark traveling, where the overshoot is the motion having
- * weight, and it is wrong for a quantity, because the frames past the target are
- * a number the data does not contain. A bar that reads 15 momentarily drawn at
- * 16.8 is showing something untrue, briefly, to look nice.
- *
- * `decelerate` is `cubic-bezier(0, 0, 0, 1)`, monotonic, so every frame is a
- * value between where the reading was and where it is.
+ * `decelerate` is monotonic, so every frame is a value between where the reading
+ * was and where it is.
  */
 /*
  *  The line moves to its new shape, and draws itself on arrival.

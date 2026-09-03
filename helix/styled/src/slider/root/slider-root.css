@@ -94,15 +94,14 @@
 }
 
 /*
- *  What the track is painted with, whole, so a slider can be a ramp.
+ * What the track is painted with, whole, so a slider can be a ramp.
  *
- * **On the control, not on the host, and that is not a tidiness question.** A
- * custom property whose value contains `var()` is substituted where it is
- * *declared*, not where it is used: declared on `:host`, the `--slider-fraction`
- * inside it resolved against the host, where nothing sets it, so the fallback
- * won and both gradient stops landed at `0%`. Every slider painted its unfilled
- * color end to end and the fill was gone. The fraction is an inline style on
- * the control, so the declaration has to be there too.
+ * **On the control, not on the host.** A custom property whose value contains
+ * `var()` is substituted where it is *declared*: on `:host`, the
+ * `--slider-fraction` inside it resolved against the host, where nothing sets
+ * it, so the fallback won, both stops landed at `0%`, and every slider painted
+ * its unfilled color end to end. The fraction is an inline style on the control,
+ * so the declaration has to be there too.
  */
 [part="control"] {
   --_slider-track-image: var(
@@ -262,31 +261,26 @@
 [part="control"]::-webkit-slider-thumb {
   appearance: none;
   /* `surface-inverse` is the one token that is light where the page is dark and
-     dark where the page is light, so it has contrast with the track, with the
-     fill, and with any surface either sits on, in both modes and without a
-     second value to keep in step. It is what this library already reaches for
-     when something has to read as emphasis.
+     dark where it is light, so it has contrast with the track, the fill and any
+     surface either sits on, in both modes and without a second value to keep in
+     step.
 
-     **Neither of the two obvious tokens works.** `background`, the page's own
-     color, makes the thumb white on a white page and black on a black one: no
-     contrast, by construction. `surface-overlay` fixes the page and not the
-     track, which is the surface a thumb actually sits on, and in dark mode it is
-     neutral-800 against a neutral-700 track, higher numbers being darker here,
-     so the thumb is darker than the thing it slides along and disappears
+     **Neither of the two obvious tokens works.** `background` makes the thumb
+     white on a white page and black on a black one, by construction.
+     `surface-overlay` fixes the page and not the track, which is the surface a
+     thumb actually sits on: in dark it is neutral-800 against a neutral-700
+     track, so the thumb is darker than the thing it slides along and disappears
      outright on a raised surface. */
   background-color: var(--slider-thumb-color, var(--helix-color-surface-inverse));
   block-size: var(--_slider-thumb);
   border: none;
   border-radius: var(--_slider-thumb-radii);
   /*
- *  A ring of the ground's own color, so the thumb reads against whichever
- *      half of the track it is over.
- *
- *      Contrast against the track is 11.25 and against the fill is 2.57, which is
- *      under the three to one non-text contrast wants: the thumb sits on the
- *      boundary between the two and at the end of its travel it is over the fill
- *      alone. A ring separates it from both without tinting it, and it inverts
- *      with the mode for free because it is the ground either sits on.
+ * A ring of the ground's own color, so the thumb reads against whichever half of
+ * the track it is over. Contrast against the track is 11.25 and against the fill
+ * 2.57, under the 3:1 non-text contrast wants, and at the end of its travel the
+ * thumb is over the fill alone. A ring separates it from both without tinting
+ * it, and inverts with the mode for free.
  */
   box-shadow:
     0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),

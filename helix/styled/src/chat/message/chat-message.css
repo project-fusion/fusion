@@ -142,20 +142,16 @@
   display: none;
 }
 
-/* *A wash of the foreground, not a rung on the surface ladder**, which is the
-   answer `Option` already wrote down for the same problem: a step on the ladder
-   is an absolute color, and a bubble has no idea what it is sitting on. Measured
-   across all six of those, with `surface-sunken` and then with this: | ground |
-   sunken | wash | | ----------------- | ------ | ---- | | light page | 1.12 |
-   1.38 | | light card | 1.07 | 1.38 | | light overlay | 1.12 | 1.38 | | dark
-   page | 1.07 | 1.35 | | dark card | 1.11 | 1.54 | | dark overlay | 1.39 | 1.57
-   | A ladder rung was between 1.07 and 1.12 in five of the six, which is a
-   bubble nobody can see, and it moved with the ground. *One percentage rather
-   than `light-dark()` of two**, which is where this differs from `Option`'s
-   hover: that mixes a fixed ink and needs 8 in light against 12 in dark, and
-   `--helix-color-foreground` already flips with the mode, so the same 14% is the
-   same step in both. Measured rather than assumed: 1.38 light against 1.35 dark
-   on the page. */
+/* **A wash of the foreground, not a rung on the surface ladder**, which is the
+   answer `Option` already wrote down: a rung is an absolute color, and a bubble
+   has no idea what it is sitting on. Measured across six grounds, a rung ran
+   1.07 to 1.12 in five of them — a bubble nobody can see — and moved with the
+   ground, where the wash holds 1.35 to 1.57.
+
+   **One percentage rather than `light-dark()` of two**, which is where this
+   differs from `Option`'s hover: that mixes a fixed ink and needs 8 in light
+   against 12 in dark, and `--helix-color-foreground` already flips with the
+   mode. Measured rather than assumed: 1.38 light against 1.35 dark. */
 [part="content"] {
   background-color: var(
     --chat-message-background-color,
@@ -220,18 +216,17 @@
   max-inline-size: 100%;
 }
 
-/* *The wait before the first token, which is the one moment a transcript has
-   nothing to show.** A turn marked `streaming` with nothing in it yet renders an
-   empty bubble, and an empty bubble is indistinguishable from a bug. *Do not
-   animate `background-size` here; it is inert.** A `circle closest-side`
-   gradient takes its radius from the *smaller* half of its layer box, and the
-   layers are wider than they are tall: growing the height from 30% to 60% leaves
-   the width untouched, so the closest side never changes and the dot never
-   changes with it. Measured in a browser mid-cycle: `background-size: 20% 30%,
-   20% 59.7%, 20% 30.3%` against three dots the same size. A percentage positions
-   a layer in the space left over after its own size, so 50% is centered and 10%
-   is most of the way up, and a dot hopping is what a typing indicator has always
-   looked like. */
+/* **The wait before the first token, the one moment a transcript has nothing to
+   show.** A turn marked `streaming` with nothing in it renders an empty bubble,
+   and an empty bubble is indistinguishable from a bug.
+
+   **Do not animate `background-size` here; it is inert.** A `circle
+   closest-side` gradient takes its radius from the *smaller* half of its layer
+   box, and the layers are wider than they are tall, so growing the height leaves
+   the closest side untouched: measured mid-cycle, `20% 30%, 20% 59.7%, 20%
+   30.3%` against three dots the same size. A percentage positions a layer in the
+   space left after its own size, so the dot hops, which is what a typing
+   indicator has always looked like. */
 :host([state="streaming"]) [part="content"][data-empty]::after {
   animation: helix-chat-typing 1.2s infinite ease-in-out;
   background-image:
