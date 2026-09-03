@@ -287,14 +287,14 @@
 }
 
 /*
- *  A slotted dropper is sized here, because nothing else sizes it.
+ * A slotted dropper is sized here, because nothing else sizes it.
  *
- * The mark this component draws is an inlined `<svg data-glyph>`, and
- * `icon/glyph.css` gives it a size. That sheet is in this shadow root, so it
- * reaches the fallback and it does not reach an assigned node: `::slotted()`
- * and a shadow-tree rule are two selectors for two trees, never one for both.
- * Without this, a consumer's own dropper arrives at whatever intrinsic size it
- * has, which for a bare `<svg>` with a `viewBox` and no dimensions is 300x150.
+ * The mark this component draws is an inlined `<svg data-glyph>` that
+ * `icon/glyph.css` sizes. That sheet is in this shadow root, so it reaches the
+ * fallback and not an assigned node: `::slotted()` and a shadow-tree rule are
+ * two selectors for two trees, never one for both. Without this, a consumer's
+ * dropper arrives at its intrinsic size, which for a bare `<svg>` with a
+ * `viewBox` and no dimensions is 300x150.
  */
 ::slotted([slot="eyedropper-icon"]) {
   block-size: var(--icon-size, var(--helix-size-icon));

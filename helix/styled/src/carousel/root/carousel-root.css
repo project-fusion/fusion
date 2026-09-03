@@ -195,21 +195,20 @@
   inline-size: 1em;
 }
 
-/* A scroller with snap points, so a drag, a trackpad swipe, and the browser's
-   own momentum all work without any of them being reimplemented. **Room inside
-   the scroller, so a slide's own edge is not shaved by it.** `overflow-x: auto`
-   makes the other axis `auto` too, and a scroll container clips at its padding
-   box on both. **Sized to clear a shadow rather than a hairline.**
-   `--helix-shadow-md` is `0 4px 12px`, so it reaches 16px below the box it is
-   on, and 4px here clips every slide carrying one on all four sides at once.
-   `--helix-space-md` is that 16px exactly. A slide on `--helix-shadow-lg`
-   reaches 44px and wants `--carousel-bleed` raised, which is what the hook is
-   for. **`scroll-padding` as well, or snapping takes the room straight back.** A
-   snap position aligns a slide to the *snapport*, which is the scrollport inset
-   by `scroll-padding` and, with none set, is the padding box: the leading slide
-   snaps its own edge onto the clip edge and the first and last slides are shaved
-   at rest no matter how much padding is here. Measured without it, the track sat
-   at `scrollLeft: 4` with 0px of leading room, the whole bleed scrolled away. */
+/* A scroller with snap points, so a drag, a trackpad swipe and the browser's own
+   momentum all work without any of them being reimplemented.
+
+   **Room inside the scroller, so a slide's own edge is not shaved by it.**
+   `overflow-x: auto` makes the other axis `auto` too, and a scroll container
+   clips at its padding box on both. **Sized to clear a shadow rather than a
+   hairline**: `--helix-shadow-md` reaches 16px below its box, which
+   `--helix-space-md` is exactly, and 4px clipped every slide carrying one. A
+   slide on `--helix-shadow-lg` reaches 44px and wants `--carousel-bleed` raised.
+
+   **`scroll-padding` as well, or snapping takes the room straight back.** A snap
+   position aligns to the *snapport*, which with no `scroll-padding` is the
+   padding box, so the leading slide snaps its edge onto the clip edge. Measured
+   without it, the track sat at `scrollLeft: 4` with 0px of leading room. */
 [part="track"] {
   display: flex;
   gap: var(--_carousel-gap);
@@ -300,14 +299,13 @@
    room in the row has to sit over its neighbors and the pitch has to go from 12
    to 20 to make space for it, at which point the run stops being a run. */
 [part="indicator"] {
-  /* *One duration and one curve for both, which is the whole of the fix.** Color
+  /* **One duration and one curve for both, which is the whole of the fix.** Color
      over `fast` and size over `normal` is 120ms against 200ms, so the two halves
-     of one change finish 80ms apart: the arriving dot fully blue while still
-     four fifths grown, the leaving one fully gray while still a fifth wide, and
-     the middle of every move a fat gray stub beside a short blue one. `slow`
-     rather than `normal`, because this is the one transition in the component a
-     reader is meant to watch: at 200ms the pill had arrived before the eye found
-     it. */
+     of one change finish 80ms apart: the arriving dot fully blue while four
+     fifths grown, the leaving one fully gray while a fifth wide, and the middle
+     of every move a fat gray stub beside a short blue one. `slow` rather than
+     `normal`, this being the one transition a reader is meant to watch: at 200ms
+     the pill had arrived before the eye found it. */
   --_carousel-indicator-motion: var(--helix-duration-slow) var(--helix-easing-emphasized);
   all: unset;
   background-color: var(--helix-color-border);

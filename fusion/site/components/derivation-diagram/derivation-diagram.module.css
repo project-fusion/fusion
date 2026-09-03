@@ -57,10 +57,10 @@
  * **Sizes live on the elements, not here.**
  *
  * These are user units inside a viewBox that scales with its container, so a
- * `--helix-text-*` token would be the wrong quantity entirely: it would set a
- * page size on something measured in the drawing's own coordinates. `helix component`'s `tokens`
- * is right that a raw number in page CSS is a smell, and right that this is not
- * page CSS, so the numbers moved to where SVG has always put them.
+ * `--helix-text-*` token would be the wrong quantity: a page size on something
+ * measured in the drawing's own coordinates. `helix component`'s `tokens` is
+ * right that a raw number in page CSS is a smell, and right that this is not
+ * page CSS.
  */
 .diagramMeta {
   fill: var(--helix-color-foreground-muted);
@@ -198,11 +198,9 @@
  * The instrument face the gauge and the reading are drawn on.
  *
  * **The site's glass, and this is the one surface that had an argument against
- * it.** The disc used to mix from `surface-overlay` in light and hold a much
- * heavier fill than the bands do, on a measured finding: mixed from `surface`
- * it read as a pale blue lens rather than as the white instrument face it is
- * meant to be, because `surface` is `oklch(0.985)` in light where
- * `surface-overlay` is white, and what showed through a light fill was the field
+ * it.** Mixed from `surface` the disc read as a pale blue lens rather than the
+ * white instrument face it is meant to be, `surface` being `oklch(0.985)` in
+ * light where `surface-overlay` is white, so what showed through was the field
  * behind it rather than the face. Dark never had the problem, a light-on-dark
  * wash being plenty to separate the hub from its ground.
  */

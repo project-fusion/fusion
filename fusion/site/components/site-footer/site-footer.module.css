@@ -24,13 +24,12 @@
   justify-content: space-between;
 }
 
-/* The lockup: a mark in its own column, and both lines of type in the other.
-   **Not a row with a line beneath it**, which gives the block two left edges:
-   the mark and the tagline start at the block's edge while the name begins past
-   the mark, so a three-line lockup has a step in it and reads as two things
-   stacked rather than one object. **The indent is derived, not measured.** It is
-   whatever the mark's column turns out to be plus the column gap, so a mark that
-   changes size takes the tagline with it. */
+/* The lockup: a mark in its own column, both lines of type in the other. **Not a
+   row with a line beneath it**, which gives the block two left edges — the mark
+   and the tagline start at the block's edge while the name begins past the mark,
+   so a three-line lockup has a step in it. **The indent is derived**: whatever
+   the mark's column turns out to be plus the gap, so a mark that changes size
+   takes the tagline with it. */
 .footerBrand {
   align-items: start;
   /* *Rows sized to their content, not to the space around them.** This is a
@@ -68,15 +67,11 @@
 
 /* A column of links, floored so three of them read as a directory. **Flex items
    size to their content, and these three have nothing in common to size to.**
-   Products holds two short names, Company five medium ones and Legal one long
-   one, so the columns came out at three different widths with an identical gap
-   between them: the eye reads the gap as the thing that varies and the block
-   looks misaligned rather than ragged-by-design. `1fr` columns would divide the
-   footer's whole remaining width and push Legal out to the far edge, which is a
-   table of contents rather than a footer; a minimum makes the three regular
-   while each still ends where its longest link does. `12ch` is measured on the
-   widest of them, "Acceptable use", so the floor clears the content it has to
-   hold. */
+   Products holds two short names, Company five medium and Legal one long, so the
+   columns came out at three widths with an identical gap between them: the eye
+   reads the gap as the thing that varies. `1fr` columns would divide the whole
+   remaining width and push Legal to the far edge, which is a table of contents
+   rather than a footer. `12ch` is measured on "Acceptable use", the widest. */
 .footerGroup {
   display: flex;
   flex-direction: column;

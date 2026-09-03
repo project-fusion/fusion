@@ -277,11 +277,11 @@ slot[name="icon"]::slotted(*) {
 }
 
 /* Four moving selectors, and they do not get the same answer, which is why the
-   check asks whether each was named rather than what was done about it. It is
+   check asks whether each was named rather than what was done about it. This is
    the only thing telling a reader how long is left, and a 2px rule crossing once
-   over the message's own lifetime is nearer a clock than an animation. Measured
-   under `prefers-reduced-motion: reduce`, this element kept its full eight
-   seconds while a light-DOM element beside it came back at 1e-05s. */
+   over the message's lifetime is nearer a clock than an animation. Measured under
+   `prefers-reduced-motion: reduce`, this element kept its full eight seconds
+   while a light-DOM element beside it came back at 1e-05s. */
 @media (prefers-reduced-motion: reduce) {
   :host,
   :host([data-closed]),

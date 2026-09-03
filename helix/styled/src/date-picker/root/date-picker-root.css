@@ -10,14 +10,12 @@
 }
 
 /*
- *  Two months to a row, and the rest underneath.
+ * Two months to a row, and the rest underneath.
  *
  * Not a flex row: without `wrap` it can do nothing but overflow, and `months="3"`
- * measured 872px wide in an 820px container, a 560px one and a 320px one alike,
- * always three across and always past the edge. Wrapping cures the overflow and
- * leaves the layout at the mercy of whatever box it is in, so three months are
- * three across in a wide panel and two-and-one in a narrower one, which is a
- * calendar that changes shape as the page does.
+ * measured 872px wide in an 820px container, a 560px one and a 320px one alike.
+ * Wrapping cures the overflow and leaves the layout at the mercy of whatever box
+ * it is in, so a calendar changes shape as the page does.
  */
 [part="months"] {
   align-items: start;
@@ -210,16 +208,14 @@
   border-start-end-radius: var(--helix-radii-sm);
 }
 
-/* The ends of a range, and a single date, are the solid mark. The days between
-   them carry only the band. Grays rather than the accent, the same call Time's
-   range takes.
+/* The ends of a range, and a single date, are the solid mark; the days between
+   carry only the band. Grays rather than the accent, the same call Time's range
+   takes.
 
    **`foreground-muted` is an ink, and this is a ground.** It measures 6.01
-   against white in light mode, where muted is a dark gray, and 2.58:1 in dark,
-   where an ink follows the page and inverts with it. A ground that must stay
-   dark while the page goes light is `surface-inverse`, which is what it says:
-   the opposite of the page, in either direction, carrying
-   `foreground-inverse`. */
+   against white in light and 2.58:1 in dark, an ink following the page and
+   inverting with it. A ground that must stay dark while the page goes light is
+   `surface-inverse`, which is what it says. */
 [part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
   background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
   color: var(--helix-color-foreground-inverse);

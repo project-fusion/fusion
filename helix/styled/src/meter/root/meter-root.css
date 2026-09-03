@@ -85,12 +85,11 @@
 
 /* Past an end, where the bar has run out of room to say so.
  *
- * A fill at its maximum and a fill well past it are the same picture, so the
- * words carry it and this carries what a picture can: the trailing corner
- * squares off, which is the convention for a quantity continuing past the frame
- * it is drawn in. Only the corner, because "over" is not a judgment: a hundred
- * and ten per cent of a stretch goal is good news and of a disk is not, and the
- * band is what says which. */
+ * A fill at its maximum and one well past it are the same picture, so the words
+ * carry it and this carries what a picture can: the trailing corner squares off,
+ * the convention for a quantity continuing past its frame. Only the corner,
+ * because "over" is not a judgment — a hundred and ten per cent of a stretch
+ * goal is good news and of a disk is not, and the band says which. */
 [part="indicator"][data-beyond="over"] {
   border-end-end-radius: var(--helix-radii-none);
   border-start-end-radius: var(--helix-radii-none);
@@ -271,12 +270,12 @@
 }
 
 /*
- * *Subtle, which is the quiet end of the axis: the reading keeps its area and
- *    stops claiming to be the point.** A wash of its own color rather than a
- *    different color, so what it means does not change with how loudly it is said:
- *    the bands are the other axis and this one must not borrow from them. Written
- *    against `--_meter-hue`, which is whatever the band or the shape chose, so one
- *    pair of rules quietens all four colors in all three shapes.
+ * **Subtle, the quiet end of the axis: the reading keeps its area and stops
+ * claiming to be the point.** A wash of its own color rather than a different
+ * one, so what it means does not change with how loudly it is said — the bands
+ * are the other axis and this must not borrow from them. Written against
+ * `--_meter-hue`, so one pair of rules quietens all four colors in all three
+ * shapes.
  */
 :host([emphasis="subtle"]) [part="indicator"] {
   background-color: color-mix(

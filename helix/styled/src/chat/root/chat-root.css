@@ -9,14 +9,13 @@
   min-block-size: 0;
 }
 
-/* **Each region names its own row**, which is the same rule `chat-message` keeps
-   about its columns and for the same reason: a `display: none` grid item leaves
-   the grid entirely, so with implicit placement every region below a hidden one
-   moves up a track and takes that track's sizing with it. Measured in the
-   sidebar example the moment empty regions started hiding for real: with no
-   header, the log landed on the `auto` track at 166 pixels and the composer
-   landed on the `1fr` one at 741, which is a text field seven hundred pixels
-   tall under a transcript that had stopped scrolling. */
+/* **Each region names its own row**, the same rule `chat-message` keeps about
+   its columns: a `display: none` grid item leaves the grid entirely, so with
+   implicit placement every region below a hidden one moves up a track and takes
+   that track's sizing with it. Measured in the sidebar example, with no header
+   the log landed on the `auto` track and the composer on the `1fr` one at 741 —
+   a text field seven hundred pixels tall under a transcript that had stopped
+   scrolling. */
 [part="header"] {
   grid-row: 1;
 }
@@ -54,20 +53,16 @@
   padding-block: var(--helix-space-md);
   padding-inline: var(--chat-padding-inline, var(--helix-space-md));
   /*
- *  The transcript keeps its turns at the bottom when there are too few to fill
- *      it, which is what a conversation looks like: a new one starts at the bottom
- *      of the box rather than at the top of an empty column.
+ * The transcript keeps its turns at the bottom when there are too few to fill
+ * it, which is what a conversation looks like.
  *
- * *`safe` is not a refinement here, it is the whole rule working at all.**
- *      A scroll container that end-aligns its content pushes the overflow out of
- *      the *start* edge, where there is no scroll position that reaches it: with a
- *      plain `flex-end` a transcript taller than its box reported
- *      `scrollHeight - clientHeight` of zero while its first turn sat 287 pixels
- *      above the scrollport, so the reader could not scroll up and the history was
- *      gone. Every part of this component's stated purpose went with it, since
- *      `atBottom` is then permanently true, the pin never releases and the way back
- *      is never offered. Measured in a 20rem box with six turns: 0 pixels of scroll
- *      against 302 with `safe`.
+ * **`safe` is not a refinement here, it is the whole rule working at all.** A
+ * scroll container that end-aligns its content pushes the overflow out of the
+ * *start* edge, where no scroll position reaches it: with a plain `flex-end` a
+ * transcript taller than its box reported `scrollHeight - clientHeight` of zero
+ * while its first turn sat 287 pixels above the scrollport, so the history was
+ * gone and `atBottom` was permanently true, the pin never releasing. Measured in
+ * a 20rem box with six turns: 0 pixels of scroll against 302 with `safe`.
  */
   justify-content: safe flex-end;
 }
