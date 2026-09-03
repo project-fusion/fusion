@@ -1,7 +1,8 @@
 import { FilterBar } from '@/components/filter-bar/filter-bar'
 import { PageHero } from '@/components/page-hero/page-hero'
-import styles from './insights.module.css'
+import browser from './insight-browser.module.css'
 import loading from './loading.module.css'
+import styles from './page.module.css'
 
 /**
  * The writing index, in outline, while the registry is sorted.
@@ -18,7 +19,7 @@ export default function Loading() {
   return (
     <>
       <div className={loading.standIn} inert>
-        <PageHero className={styles.insightsHero}>
+        <PageHero className={browser.insightsHero}>
           <div className={loading.heroTitle} data-skeleton />
           <div className={loading.heroLede} data-skeleton />
           <div className={loading.heroSearch} data-skeleton />

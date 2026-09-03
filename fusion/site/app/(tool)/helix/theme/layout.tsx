@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { HelixElements } from '@/components/helix-elements/helix-elements'
-import styles from '../workbench.module.css'
+import styles from '../tool-shell.module.css'
 
 /**
  * The theme builder owns the whole viewport, as the sandbox does.

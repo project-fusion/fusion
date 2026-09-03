@@ -2,7 +2,7 @@ import { InsightCard } from '@/components/insight-card/insight-card'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { INSIGHTS, type Insight } from '../../../content/insights'
 import { InsightBrowser } from './insight-browser'
-import styles from './insights.module.css'
+import styles from './page.module.css'
 
 export const metadata = pageMetadata({
   description: 'The arguments behind what we build, written where they can be checked.',

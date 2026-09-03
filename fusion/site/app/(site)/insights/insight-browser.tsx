@@ -9,7 +9,7 @@ import { PageHero, pageHero } from '@/components/page-hero/page-hero'
 import { useFocusOnLoad } from '@/hooks/use-focus-on-load/use-focus-on-load'
 import { useSearchKey } from '@/hooks/use-search-key/use-search-key'
 import type { Insight } from '../../../content/insights'
-import styles from './insights.module.css'
+import styles from './insight-browser.module.css'
 
 /**
  * One post, reduced to what searching and filtering need.

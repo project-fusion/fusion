@@ -1,3 +1,5 @@
+/* The sandbox workbench: the rail, the examples drawer and the source list. */
+
 /* The two tools: the sandbox workbench and the theme builder. */
 
 /* The way out of the sandbox rail and into a family's own docs page. **Hover and
@@ -41,35 +43,6 @@
   .docsJump {
     transition: none;
   }
-}
-
-/* ============================================================ sandbox ==== */
-
-/* The tool owns the viewport. */
-.sandboxShell {
-  block-size: 100dvh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.workbenchHeader {
-  --app-header-padding: var(--helix-space-md);
-  --app-header-max-inline-size: none;
-
-  border-block-end-color: var(--helix-color-border);
-  flex: 0 0 auto;
-}
-
-/* Editor and preview take what is left; the examples keep a fixed rail on the
-   right, which is where they were asked for and where a list you scan while
-   working belongs. */
-/* The rail closes by its own track narrowing, which is the accordion's trick
-   turned on its side: a grid track can be interpolated where the presence of a
-   track cannot. */
-.workbenchBody {
-  flex: 1 1 auto;
-  min-block-size: 0;
 }
 
 /* *The rail opens and closes without a transition, and that is not an
@@ -181,14 +154,6 @@
 
 .sourceFiles helix-sandbox-editor {
   min-block-size: 0;
-}
-
-/* Below the rail's width the examples move into a drawer, so the editor keeps
-   the whole screen rather than sharing it with a list. */
-@media (max-width: 60rem) {
-  .workbenchBody {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 /* Chrome density, so the marks in a row come down with the type. */

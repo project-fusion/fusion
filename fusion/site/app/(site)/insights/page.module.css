@@ -1,0 +1,37 @@
+/* The index: the grid the cards sit in. `loading.tsx` imports it too, because a
+   skeleton that does not match the grid it stands in for is a layout shift. */
+
+/* ======================================================== insights ======= */
+
+/* Five across, stepping down as the window narrows. **Five is what the summary
+   being two lines pays for.** Unclamped, a summary ran to whatever length the
+   essay's own description happened to be, four and five sentences in places, so
+   the tallest card in a row set the height of all of them. */
+.insightGrid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* Four steps down rather than three, because five across needs one more. */
+@media (width < 100rem) {
+  .insightGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (width < 88rem) {
+  .insightGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width < 70rem) {
+  .insightGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width < 44rem) {
+  .insightGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

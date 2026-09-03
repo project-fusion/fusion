@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import styles from '../insights.module.css'
+import styles from './reading.module.css'
 
 /* How far through the argument a reader is, and how long ago it was written.
 

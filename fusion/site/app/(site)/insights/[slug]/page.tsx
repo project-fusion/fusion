@@ -6,7 +6,7 @@ import { DocumentPage } from '@/components/document-page/document-page'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { findInsight, formatDate, INSIGHTS } from '../../../../content/insights'
 import { renderDocument } from '../../../../utils/mdx/mdx'
-import styles from '../insights.module.css'
+import styles from './page.module.css'
 import { PublishedOn, ReadingProgress } from './reading'
 
 export function generateStaticParams(): { slug: string }[] {

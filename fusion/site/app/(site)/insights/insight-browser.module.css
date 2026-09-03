@@ -1,0 +1,59 @@
+/* The browser above the grid: its hero and the light behind it. `loading.tsx`
+   imports the hero for the reason it imports the grid. */
+
+/* Insights: the gallery's own hero and grid, and everything a post is made of. */
+
+/* A step off the page, and the masthead is see-through so it takes the step too.
+   Insights has neither, so without a color of its own the only thing marking the
+   band is the filter bar's hairline, 448 pixels down. **One token in both
+   modes.** `surface-sunken` is thirteen values off white across 448 pixels of a
+   hero, which is a gray panel rather than a step; `surface` is five, and the
+   band is a change in the paper rather than a block on it. Pairing two tokens
+   through `light-dark()` to compensate for the neutral ramp's asymmetry is the
+   thing 145 says should not spread, so one token and no compensation. */
+.insightsHero {
+  background-color: var(--helix-color-surface);
+}
+
+/* The rays field behind the insights hero. **Rays rather than the lattice the
+   gallery wears**, because the two pages should not be interchangeable: one is a
+   set of drawings and this is a set of arguments, and light being cast is what
+   an insight looks like. **Two things about it are unsettled.** The hero still
+   carries the shared lattice underneath from `.pageHero::before`, so there are
+   two textures where the page wants one; the dots are faint under the rays and
+   it has not been decided whether they should be turned off here. And the frame
+   cost of a WebGL context on a page that is otherwise text has not been
+   measured: the 8.3ms figure on record is the landing page's field, not this
+   one. */
+.insightsAura {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}
+
+/* A ground for the masthead, and an edge for the band. **Two gradients rather
+   than one, because they answer different things.** The linear one is the
+   masthead's: `rays` puts its brightest light at the top center, which is
+   exactly where the nav sits, and `Products` and `Services` are muted labels by
+   design, so they lost against it while the current item kept its own filled
+   pill. */
+.insightsHero::after {
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--helix-color-background) 72%, transparent) 0,
+      color-mix(in srgb, var(--helix-color-background) 0%, transparent)
+        calc(var(--helix-size-header) * 2)
+    ),
+    radial-gradient(
+      ellipse 86% 72% at 50% 44%,
+      color-mix(in srgb, var(--helix-color-background) 0%, transparent) 0%,
+      color-mix(in srgb, var(--helix-color-background) 58%, transparent) 100%
+    );
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: var(--helix-layer-base);
+}

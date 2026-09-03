@@ -23,7 +23,7 @@ import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
 import { FACE_SAMPLE, useFacePreviews } from './use-face-previews'
 import './builder.css'
-import styles from '../workbench.module.css'
+import styles from '../tool-shell.module.css'
 
 /**
  * What share of the stage the preview starts with.

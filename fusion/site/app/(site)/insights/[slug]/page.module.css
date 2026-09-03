@@ -1,0 +1,82 @@
+/* One insight: its trail, its filing line and the next-up row under it. */
+
+/* A post is a centered column, and the column is the page's measure rather than
+   the shell's full width. */
+/* The chevron sits on the column, and the label sits after it. Aligning the
+   *label* instead is the better-sounding argument: a reader aligns on words, not
+   on icons, and with the chevron on the column the label starts 29 inside it, so
+   the masthead has a title and a standfirst at one edge and the only other words
+   at another. Measured at 24 against 53. Pulling back far enough to land the
+   label on the column drags the whole control 44 to the left, and the hover fill
+   goes with it, since anything that hangs still has to sit inside the thing that
+   lights up. That gives a wash reaching 44 one way and 16 the other, hanging off
+   the side of a centered column with nothing under it. A resting misalignment of
+   29 costs less than a moving one of 44: the first is a slightly indented label,
+   the second is a shape that looks broken every time a pointer crosses it. */
+.insightTrail {
+  margin-inline-start: calc(var(--helix-space-control) * -1);
+}
+
+/* The avatar sized to sit inside the chip that carries it. `Avatar`'s own `sm`
+   is 24, which is exactly the height of a tag at this density, so slotted as a
+   prefix it filled the chip edge to edge and pushed it taller than the four
+   beside it. The 0.75 the prefix slot puts on everything it holds is left alone. */
+
+/* A row that is a link. **No rules between the rows.** A hairline above every
+   row plus a fill on hover is two separators for one boundary: the wash says
+   where a row begins and ends more exactly than a line between them does, and it
+   says it on the row the reader is actually pointing at. **Inset, and pulled
+   back by the same amount.** The padding gives the wash room, so it reads as a
+   row containing the text rather than a stripe behind it, and the negative
+   margin puts the text back on the article's own measure, so nothing moves when
+   the fill appears and the column of prose above still lines up with the titles
+   below. */
+.insightNext {
+  border-radius: var(--helix-radii-sm);
+  color: inherit;
+  display: block;
+  margin-inline: calc(var(--helix-space-md) * -1);
+  padding: var(--helix-space-md);
+  text-decoration: none;
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+}
+
+/* The arrow leans the way the row goes: a static glyph is a picture of a
+   direction rather than a sign of one, since nothing about it answers the
+   pointer. */
+.insightNext helix-icon {
+  transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.insightNext:hover helix-icon {
+  translate: var(--helix-space-2xs) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightNext helix-icon {
+    transition: none;
+  }
+
+  .insightNext:hover helix-icon {
+    translate: none;
+  }
+}
+
+/* The tags in the byline separate by fill, not by edge. */
+.insightFiling helix-tag {
+  --tag-border-color: transparent;
+}
+
+/* Two of the five are links, and the chip is the whole target. */
+.insightFiling a {
+  display: inline-flex;
+}
+
+/* The arrow holds the end of the row rather than wrapping under it. */
+.insightNextRow > helix-flex:first-child {
+  min-inline-size: 0;
+}

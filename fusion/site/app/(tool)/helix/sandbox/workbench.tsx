@@ -28,9 +28,10 @@ import type { Family } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
 import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
-import styles from '../workbench.module.css'
+import shell from '../tool-shell.module.css'
 import { readHashState, writeHashState } from './hash-state'
 import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
+import styles from './workbench.module.css'
 
 /**
  * The sandbox workbench: source files, a live preview, and the example tree.
@@ -1093,7 +1094,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           instead of being restated here. The class only makes it full bleed:
           this is a tool, so the row runs to the window rather than to the
           site's text column. */}
-      <helix-app-header class={styles.workbenchHeader}>
+      <helix-app-header class={shell.workbenchHeader}>
         {/*
          *  The mark and the name, and the way out. No trail beside them: the
          *             rail already says which component and which example, and a
@@ -1161,7 +1162,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           goes through the same clamp, and a minimum would hold the panel open
           at the floor instead of letting it shut. */}
       <helix-splitter
-        className={styles.workbenchBody}
+        className={shell.workbenchBody}
         default-position={railHome}
         min="20rem"
         onhelix-before-resize={railMoved}

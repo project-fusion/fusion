@@ -1,0 +1,40 @@
+/* The shell both tools sit in: the sandbox workbench and the theme builder.
+   Kept together because both layouts render it, which is what `shared` means
+   here. Everything only the workbench draws is in its own sheet beside it. */
+
+/* ============================================================ sandbox ==== */
+
+/* The tool owns the viewport. */
+.sandboxShell {
+  block-size: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.workbenchHeader {
+  --app-header-padding: var(--helix-space-md);
+  --app-header-max-inline-size: none;
+
+  border-block-end-color: var(--helix-color-border);
+  flex: 0 0 auto;
+}
+
+/* Editor and preview take what is left; the examples keep a fixed rail on the
+   right, which is where they were asked for and where a list you scan while
+   working belongs. */
+/* The rail closes by its own track narrowing, which is the accordion's trick
+   turned on its side: a grid track can be interpolated where the presence of a
+   track cannot. */
+.workbenchBody {
+  flex: 1 1 auto;
+  min-block-size: 0;
+}
+
+/* Below the rail's width the examples move into a drawer, so the editor keeps
+   the whole screen rather than sharing it with a list. */
+@media (max-width: 60rem) {
+  .workbenchBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
