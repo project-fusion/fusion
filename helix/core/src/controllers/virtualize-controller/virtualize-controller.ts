@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { Heights } from './heights.js'
 
 /** What the controller needs of a set and the box it is shown in. */
 export interface VirtualizeOptions {
@@ -14,6 +15,20 @@ export interface VirtualizeOptions {
    * fast scrolling at a 32 pixel row.
    */
   overscan?: number
+  /**
+   * The rendered rows, in window order, for a set whose items differ in height.
+   *
+   * **Supplying this is what turns measurement on**, and leaving it off keeps
+   * the straight line the note below defends. A host that returns its row
+   * elements gets each one measured after it renders and placed by what it
+   * came to; a host that returns nothing gets every item at `estimate`, which
+   * is right whenever the rows really are uniform and is cheaper.
+   *
+   * The first element returned is `window.first`. Order is the only thing
+   * connecting an element to an index, since the controller cannot ask a row
+   * which item it drew.
+   */
+  rows?: () => Iterable<HTMLElement>
 }
 
 /** Which slice is rendered, and how much empty space stands in for the rest. */
@@ -128,9 +143,13 @@ export class VirtualizeController implements ReactiveController {
   /** The slice to render, recomputed on scroll and on resize. */
   window: Window = { after: 0, before: 0, first: 0, last: 0 }
 
+  /** Where each item starts, once any of them has been seen. */
+  private readonly heights: Heights
+
   constructor(host: ReactiveControllerHost, options: VirtualizeOptions) {
     this.host = host
     this.options = options
+    this.heights = new Heights(() => this.options.estimate())
     host.addController(this)
   }
 
@@ -201,15 +220,9 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     const overscan = this.options.overscan ?? 4
-    const first = Math.max(0, Math.floor(box.scrollTop / size) - overscan)
-    const fits = Math.ceil(box.clientHeight / size) + overscan * 2
-    const last = Math.min(total, first + fits)
-    const next: Window = {
-      after: Math.max(0, (total - last) * size),
-      before: first * size,
-      first,
-      last,
-    }
+    const next = this.options.rows
+      ? this.measured(box, total, overscan)
+      : this.uniform(box, total, size, overscan)
     /* The host's own numbers changing is an outside cause, the same as a scroll
        or a resize: a set that grew is not this controller chasing itself. */
     if (this.last?.count !== total || this.last.estimate !== size) {
@@ -240,6 +253,97 @@ export class VirtualizeController implements ReactiveController {
     this.settling += 1
     this.window = next
     this.host.requestUpdate()
+  }
+
+  /** The straight line: one estimate, so offset and index convert by division. */
+  private uniform(box: HTMLElement, total: number, size: number, overscan: number): Window {
+    const first = Math.max(0, Math.floor(box.scrollTop / size) - overscan)
+    const fits = Math.ceil(box.clientHeight / size) + overscan * 2
+    const last = Math.min(total, first + fits)
+    return { after: Math.max(0, (total - last) * size), before: first * size, first, last }
+  }
+
+  /**
+   * The measured version, which asks where each item starts rather than dividing.
+   *
+   * The scan for `last` walks forward from `first` rather than searching,
+   * because it stops at the bottom of the viewport: it is bounded by what fits
+   * on screen plus the overscan, whatever the set's length.
+   */
+  private measured(box: HTMLElement, total: number, overscan: number): Window {
+    const first = Math.max(0, this.heights.indexAt(box.scrollTop, total) - overscan)
+    const bottom = box.scrollTop + box.clientHeight
+    let last = this.heights.indexAt(box.scrollTop, total)
+    while (last < total && this.heights.before(last, total) < bottom) {
+      last += 1
+    }
+    last = Math.min(total, last + overscan)
+    return {
+      after: Math.max(0, this.heights.total(total) - this.heights.before(last, total)),
+      before: this.heights.before(first, total),
+      first,
+      last,
+    }
+  }
+
+  /**
+   * Measures what was just drawn, and holds the reader still if it moved.
+   *
+   * **This is the pass the fixed-estimate note warns about, made to terminate.**
+   * Measuring after a render, and re-windowing on what was measured, is a loop
+   * that feeds itself. What bounds it is that a height is news exactly once:
+   * `record` answers false for a size it already holds, so an item can move the
+   * window on the render that first shows it and never again. A set of ten
+   * thousand can therefore surprise this ten thousand times over its life and
+   * not twice for the same row.
+   *
+   * **The scroll offset is corrected before anything is drawn again.** An item
+   * above the window turning out taller than its estimate moves everything
+   * below it, including what the reader is looking at. Adding the same
+   * difference to `scrollTop` puts the content back under them, which is why a
+   * list of variable rows can be scrolled through without it walking away.
+   * Skipped at the very top, where there is nothing above to have moved.
+   */
+  hostUpdated(): void {
+    const rows = this.options.rows?.()
+    if (!rows) {
+      return
+    }
+    const total = Math.max(0, this.options.count())
+    const was = this.heights.before(this.window.first, total)
+    let news = false
+    let index = this.window.first
+    for (const row of rows) {
+      if (this.heights.record(index, row.getBoundingClientRect().height)) {
+        news = true
+      }
+      index += 1
+    }
+    if (!news) {
+      return
+    }
+    /* An outside cause, on the same terms as a resize: the set told this
+       something it did not know. Bounded, per the note above. */
+    this.settling = 0
+    const box = this.options.container()
+    const now = this.heights.before(this.window.first, total)
+    if (box && box.scrollTop > 0 && now !== was) {
+      box.scrollTop += now - was
+    }
+    this.measure()
+  }
+
+  /**
+   * Drops every measurement, for a host that swapped its data.
+   *
+   * Not called on a count change, which would be the obvious place and is
+   * wrong: appending to a transcript leaves every existing index naming the
+   * same item, and forgetting there would re-measure the whole set on every
+   * message. A host that replaces its set calls this, because only it knows
+   * that index 900 is now a different row.
+   */
+  forget(): void {
+    this.heights.forget()
   }
 
   /**

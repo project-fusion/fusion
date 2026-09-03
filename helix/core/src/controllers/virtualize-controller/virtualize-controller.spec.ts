@@ -313,3 +313,134 @@ describe('a list being scrolled for a long time', () => {
     expect(made.window.first).toBeGreaterThan(300)
   })
 })
+
+/**
+ * A box whose `scrollTop` can be written, which the measured path needs.
+ *
+ * The uniform helper above hands back a fresh object per call and never reads
+ * a write, which is right for arithmetic and useless for anchoring: the whole
+ * assertion there is that the controller *moved* the reader.
+ */
+const scroller = (scrollTop: number, clientHeight: number) => {
+  const it = {
+    addEventListener: () => {},
+    clientHeight,
+    removeEventListener: () => {},
+    scrollTop,
+  }
+  return it as unknown as HTMLElement & { scrollTop: number }
+}
+
+/** Rows of a fixed height, standing in for what a host just rendered. */
+const drawn = (heights: number[]): HTMLElement[] =>
+  heights.map((height) => ({ getBoundingClientRect: () => ({ height }) }) as unknown as HTMLElement)
+
+describe('a set whose items are not the same height', () => {
+  test('places by what was measured rather than by the estimate', () => {
+    const owner = host()
+    const box = scroller(0, 100)
+    let rows: HTMLElement[] = []
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 100,
+      estimate: () => 10,
+      overscan: 0,
+      rows: () => rows,
+    })
+
+    controller.measure()
+    // Nothing measured yet, so ten items of ten fill the hundred-pixel box.
+    expect(controller.window.first).toBe(0)
+    expect(controller.window.before).toBe(0)
+
+    // The first row turns out to be a hundred tall, so it fills the box alone.
+    rows = drawn([100])
+    controller.hostUpdated()
+    expect(controller.window.first).toBe(0)
+    expect(controller.window.last).toBe(1)
+    // 100 for the measured row, then 99 unmeasured at ten.
+    expect(controller.window.after).toBe(990)
+  })
+
+  test('holds the reader still when something above them grows', () => {
+    /* The reason the measured path is not simply the uniform one with better
+       numbers. An item above the window turning out taller moves everything
+       below it, and a reader watching the middle of a list would see it walk. */
+    const owner = host()
+    const box = scroller(500, 100)
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 1000,
+      estimate: () => 10,
+      overscan: 0,
+      rows: () => drawn([30]),
+    })
+
+    controller.measure()
+    const first = controller.window.first
+    expect(first).toBe(50)
+
+    controller.hostUpdated()
+    /* Item 50 measured 30 rather than 10, so everything from 51 down moved by
+       twenty, and the offset moved with it. */
+    expect(box.scrollTop).toBe(500)
+    expect(controller.window.before).toBe(500)
+  })
+
+  test('stops asking, because a height is news exactly once', () => {
+    /* What bounds the loop the fixed-estimate note warns about: measuring feeds
+       the window and the window feeds the render. The second pass over the same
+       rows records nothing new, so it returns without asking for an update. */
+    const owner = host()
+    const box = scroller(0, 100)
+    const rows = drawn([40, 40, 40])
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 50,
+      estimate: () => 10,
+      overscan: 0,
+      rows: () => rows,
+    })
+
+    controller.measure()
+    controller.hostUpdated()
+    const settled = owner.updates
+    controller.hostUpdated()
+    expect(owner.updates).toBe(settled)
+  })
+
+  test('keeps the straight line when no rows are offered', () => {
+    /* The option is the switch. Without it nothing is measured and the window
+       is the division it always was, which is what every existing consumer
+       gets. */
+    const owner = host()
+    const controller = new VirtualizeController(owner, {
+      container: () => box(0, 320),
+      count: () => 10_000,
+      estimate: () => 32,
+    })
+    controller.measure()
+    controller.hostUpdated()
+    expect(controller.window).toEqual({ after: 319_424, before: 0, first: 0, last: 18 })
+  })
+
+  test('forgets on request, for a host that swapped its set', () => {
+    const owner = host()
+    const box = scroller(0, 100)
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 100,
+      estimate: () => 10,
+      overscan: 0,
+      rows: () => drawn([100]),
+    })
+    controller.measure()
+    controller.hostUpdated()
+    expect(controller.window.after).toBe(990)
+
+    controller.forget()
+    controller.measure()
+    // Back to a hundred items of ten, less the ten that fit.
+    expect(controller.window.after).toBe(900)
+  })
+})
