@@ -127,3 +127,27 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('placing rows by what they came to', () => {
+  test('stamps each row with the item it drew, not its place in the window', async () => {
+    /* The controller reads this rather than counting from `window.first`,
+       because `hostUpdated` runs before `updated`: what is in the tree when it
+       asks is what the previous pass appended. Counting would record the right
+       heights against the wrong items every time the window moved. */
+    const host = (await mount(
+      `<helix-headless-virtual-list for="rows" measured>
+         <template><div><span data-field="name"></span></div></template>
+       </helix-headless-virtual-list>
+       <script id="rows" type="application/json">
+         [{"name":"a"},{"name":"b"},{"name":"c"}]
+       </script>`,
+    )) as HTMLElement
+
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    const stamped = [...host.querySelectorAll('[data-index]')]
+    expect(stamped.length).toBeGreaterThan(0)
+    expect(stamped.map((row) => row.getAttribute('data-index'))).toEqual(
+      stamped.map((_, at) => String(at)),
+    )
+  })
+})

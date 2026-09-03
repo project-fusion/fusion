@@ -56,6 +56,7 @@ export {
   TokenColorController,
 } from './controllers/token-color-controller/token-color-controller.js'
 export {
+  type Rendered,
   VirtualizeController,
   type VirtualizeOptions,
   type Window as VirtualizeWindow,

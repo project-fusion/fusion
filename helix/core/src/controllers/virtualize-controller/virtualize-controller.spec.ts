@@ -332,14 +332,17 @@ const scroller = (scrollTop: number, clientHeight: number) => {
 }
 
 /** Rows of a fixed height, standing in for what a host just rendered. */
-const drawn = (heights: number[]): HTMLElement[] =>
-  heights.map((height) => ({ getBoundingClientRect: () => ({ height }) }) as unknown as HTMLElement)
+const drawn = (heights: number[], from = 0) =>
+  heights.map((height, at) => ({
+    element: { getBoundingClientRect: () => ({ height }) } as unknown as HTMLElement,
+    index: from + at,
+  }))
 
 describe('a set whose items are not the same height', () => {
   test('places by what was measured rather than by the estimate', () => {
     const owner = host()
     const box = scroller(0, 100)
-    let rows: HTMLElement[] = []
+    let rows: ReturnType<typeof drawn> = []
     const controller = new VirtualizeController(owner, {
       container: () => box,
       count: () => 100,
@@ -373,7 +376,7 @@ describe('a set whose items are not the same height', () => {
       count: () => 1000,
       estimate: () => 10,
       overscan: 0,
-      rows: () => drawn([30]),
+      rows: () => drawn([30], 50),
     })
 
     controller.measure()

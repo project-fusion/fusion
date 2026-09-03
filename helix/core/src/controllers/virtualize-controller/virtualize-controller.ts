@@ -24,11 +24,36 @@ export interface VirtualizeOptions {
    * came to; a host that returns nothing gets every item at `estimate`, which
    * is right whenever the rows really are uniform and is cheaper.
    *
-   * The first element returned is `window.first`. Order is the only thing
-   * connecting an element to an index, since the controller cannot ask a row
-   * which item it drew.
+   * **Each row carries its own index rather than being counted off from
+   * `window.first`.** A host is free to place its rows whenever it likes, and
+   * `hostUpdated` runs *before* `updated`, so a host that appends there has the
+   * previous window's rows in the tree when this is asked. Counting positionally
+   * would then record the heights of the right elements against the wrong
+   * items, and be silently wrong exactly when the window moved.
    */
-  rows?: () => Iterable<HTMLElement>
+  rows?: () => Iterable<Rendered>
+  /**
+   * Whether to place by measurement on this pass, for a host that can be told.
+   *
+   * **Separate from `rows` because the two answer different questions**: `rows`
+   * says a host is able to report what it drew, and this says it wants the
+   * measured placement today. A host with a `measured` attribute needs to
+   * change its mind at runtime, and a controller is constructed once.
+   *
+   * True by default, so a host that supplies `rows` and nothing else measures.
+   * The uniform path is kept for the case it is better at: it converts offset
+   * to index by division, where the measured one builds prefix sums across the
+   * whole set the first time it is asked.
+   */
+  measured?: () => boolean
+}
+
+/** A row that has been drawn, and which item of the set it drew. */
+export interface Rendered {
+  /** The element, measured along the scroll axis. */
+  element: HTMLElement
+  /** Which item it is, in the whole set rather than in the window. */
+  index: number
 }
 
 /** Which slice is rendered, and how much empty space stands in for the rest. */
@@ -220,8 +245,8 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     const overscan = this.options.overscan ?? 4
-    const next = this.options.rows
-      ? this.measured(box, total, overscan)
+    const next = this.measuring()
+      ? this.placed(box, total, overscan)
       : this.uniform(box, total, size, overscan)
     /* The host's own numbers changing is an outside cause, the same as a scroll
        or a resize: a set that grew is not this controller chasing itself. */
@@ -263,6 +288,11 @@ export class VirtualizeController implements ReactiveController {
     return { after: Math.max(0, (total - last) * size), before: first * size, first, last }
   }
 
+  /** Whether this pass places by measurement: offered, and wanted. */
+  private measuring(): boolean {
+    return this.options.rows !== undefined && (this.options.measured?.() ?? true)
+  }
+
   /**
    * The measured version, which asks where each item starts rather than dividing.
    *
@@ -270,7 +300,7 @@ export class VirtualizeController implements ReactiveController {
    * because it stops at the bottom of the viewport: it is bounded by what fits
    * on screen plus the overscan, whatever the set's length.
    */
-  private measured(box: HTMLElement, total: number, overscan: number): Window {
+  private placed(box: HTMLElement, total: number, overscan: number): Window {
     const first = Math.max(0, this.heights.indexAt(box.scrollTop, total) - overscan)
     const bottom = box.scrollTop + box.clientHeight
     let last = this.heights.indexAt(box.scrollTop, total)
@@ -305,6 +335,9 @@ export class VirtualizeController implements ReactiveController {
    * Skipped at the very top, where there is nothing above to have moved.
    */
   hostUpdated(): void {
+    if (!this.measuring()) {
+      return
+    }
     const rows = this.options.rows?.()
     if (!rows) {
       return
@@ -312,12 +345,10 @@ export class VirtualizeController implements ReactiveController {
     const total = Math.max(0, this.options.count())
     const was = this.heights.before(this.window.first, total)
     let news = false
-    let index = this.window.first
-    for (const row of rows) {
-      if (this.heights.record(index, row.getBoundingClientRect().height)) {
+    for (const { element, index } of rows) {
+      if (this.heights.record(index, element.getBoundingClientRect().height)) {
         news = true
       }
-      index += 1
     }
     if (!news) {
       return

@@ -38,6 +38,9 @@ type Row = Record<string, string>
 export class HelixHeadlessVirtualList extends HelixElement {
   /**
    * How tall one row is, in pixels, used to map scroll offset to an index.
+   *
+   * An estimate rather than a measurement while `measured` is off, which is
+   * right whenever the rows really are one height and is the cheaper of the two.
    */
   @property({ type: Number })
   estimate = 32
@@ -55,6 +58,18 @@ export class HelixHeadlessVirtualList extends HelixElement {
   label = ''
 
   /**
+   * Places rows by what they came to rather than by `estimate`.
+   *
+   * **Off by default, because the straight line is better when it holds.** One
+   * estimate makes offset and index convert by division, which can never
+   * disagree with itself; measuring is what a set of genuinely different
+   * heights needs and costs a read of each row as it renders. A list of
+   * one-line rows should leave this alone.
+   */
+  @property({ type: Boolean })
+  measured = false
+
+  /**
    * The parsed source.
    *
    * Empty on a server, which has nothing to read.
@@ -69,7 +84,25 @@ export class HelixHeadlessVirtualList extends HelixElement {
     container: () => this.renderRoot.querySelector<HTMLElement>('[part="viewport"]'),
     count: () => this.rows.length,
     estimate: () => this.estimate,
+    measured: () => this.measured,
+    rows: () => this.drawn(),
   })
+
+  /**
+   * The rows in the tree, each with the item it drew.
+   *
+   * **Read off `data-index` rather than counted**, because what is in the tree
+   * when the controller asks is what `place` appended on the *previous* pass:
+   * `hostUpdated` runs before `updated`, so counting from the current window
+   * would record the right heights against the wrong items every time the
+   * window moved.
+   */
+  private drawn(): { element: HTMLElement; index: number }[] {
+    return [...this.querySelectorAll<HTMLElement>('[data-index]')].map((element) => ({
+      element,
+      index: Number(element.dataset.index),
+    }))
+  }
 
   /**
    * Reads the source named by `for`, once the document exists to read.
@@ -146,6 +179,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
         element.setAttribute('role', 'listitem')
         element.setAttribute('aria-posinset', String(at + 1))
         element.setAttribute('aria-setsize', String(total))
+        /* Which item this drew, for the controller to measure it against. The
+           real index, the same one `aria-posinset` carries one higher. */
+        element.setAttribute('data-index', String(at))
       }
       fragment.append(clone)
     }
