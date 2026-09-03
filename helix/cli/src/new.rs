@@ -101,8 +101,10 @@ fn usable(name: &str) -> Result<(), Failure> {
     } else {
         return Ok(());
     };
-    Err(Failure::input(format!("`{name}` cannot be a project name"), why)
-        .hint("helix new my-app --template react-vite"))
+    Err(
+        Failure::input(format!("`{name}` cannot be a project name"), why)
+            .hint("helix new my-app --template react-vite"),
+    )
 }
 
 /// Every file under `directory`, as paths relative to it, in a stable order.
@@ -116,6 +118,14 @@ fn walk(directory: &Path, base: &Path, found: &mut Vec<PathBuf>) {
     paths.sort();
     for path in paths {
         if path.is_dir() {
+            /* **`node_modules` is not part of a template**, and a contributor
+            who has ever run one locally has one inside it. Nothing here
+            reads an ignore file, so without this the walk copies an install
+            into every new project: measured on `react-vite` with a local
+            install present, 4,774 files written where the template is 7. */
+            if path.file_name().is_some_and(|name| name == "node_modules") {
+                continue;
+            }
             walk(&path, base, found);
         } else if let Ok(relative) = path.strip_prefix(base) {
             found.push(relative.to_path_buf());
@@ -156,10 +166,7 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         return Ok(offer(&register, json, paint, Some(wanted)));
     };
 
-    let target = args
-        .into
-        .clone()
-        .unwrap_or_else(|| from.join(&args.name));
+    let target = args.into.clone().unwrap_or_else(|| from.join(&args.name));
 
     /* **An empty directory or none at all.** Writing into a directory that holds
     something is how a scaffolder overwrites work somebody wanted, and there is
@@ -176,7 +183,11 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         }
     }
 
-    let source = package.join(format!("template-{}", template.id));
+    /* `templates/<id>`, so the directory is the id rather than a decoration of
+    it. Flat at the package root, a tenth template is a tenth entry beside
+    `dist` and `templates.json`, and the prefix that kept them apart there is
+    the folder's job now. */
+    let source = package.join("templates").join(&template.id);
     let mut files = Vec::new();
     walk(&source, &source, &mut files);
     if files.is_empty() {
@@ -187,7 +198,14 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         ));
     }
 
-    lay_down(&source, &target, &files, template, &register.placeholder, &args.name)?;
+    lay_down(
+        &source,
+        &target,
+        &files,
+        template,
+        &register.placeholder,
+        &args.name,
+    )?;
 
     if json {
         println!(
@@ -242,7 +260,11 @@ fn offer(register: &Register, json: bool, paint: Paint, unknown: Option<&str>) -
         );
     } else {
         if let Some(named) = unknown {
-            println!("{} is not a template. There are {}:", paint.fail(named), register.templates.len());
+            println!(
+                "{} is not a template. There are {}:",
+                paint.fail(named),
+                register.templates.len()
+            );
         } else {
             println!("Choose a template with --template:");
         }
@@ -250,7 +272,11 @@ fn offer(register: &Register, json: bool, paint: Paint, unknown: Option<&str>) -
             println!("  {:<14} {}", paint.pass(&one.id), one.description);
         }
     }
-    if unknown.is_some() { Code::Failed } else { Code::Ok }
+    if unknown.is_some() {
+        Code::Failed
+    } else {
+        Code::Ok
+    }
 }
 
 /// Copies one template into `target`, substituting only where the register says.
