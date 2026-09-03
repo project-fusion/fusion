@@ -91,13 +91,29 @@
   z-index: var(--helix-layer-overlay);
 }
 
-/* *Glass, and a drawer is where the pair earns the most.** `Card` and `App
+/* **Glass, and a drawer is where the pair earns the most.** `Card` and `App
    Header` draw the same two declarations for the same reason: a filter behind an
    opaque ground is invisible and a translucent ground over an unfiltered page is
-   a smear, so the component owns both. */
+   a smear, so the component owns both.
+
+   **Light admits less, because a drawer samples its own scrim.**
+   `[part="panel"]::backdrop` paints behind the panel, so the `backdrop-filter`
+   above reads the page with the scrim already over it. Measured on a white page:
+   the scrim takes the ground to L 0.66, and 30 per cent white over that lands at
+   L 0.76 — a mid gray panel where `surface-overlay` white was meant.
+   `translucent-strong` lands at 0.96. Dark has no such problem, a dim page under
+   a dim scrim being what the blur is for, so it keeps the lighter mix.
+
+   **Not a mask.** That is the reflex for forcing a surface opaque and it is the
+   one thing that cannot be used here: `mask-image` disables `backdrop-filter`
+   outright, even a mask with nothing to mask, so it would take the glass with
+   it. The alpha is the only lever that leaves the filter running. */
 :host([material="glass"]) [part="panel"] {
   backdrop-filter: var(--drawer-backdrop, var(--helix-material-backdrop));
-  background-color: var(--drawer-background-color, var(--helix-material-translucent));
+  background-color: var(
+    --drawer-background-color,
+    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+  );
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and

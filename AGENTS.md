@@ -36,7 +36,7 @@ that edits your files cannot tell you whether they were correct. `fix` writes;
 `check` and `verify` judge.
 
 **A generated file is committed when somebody reads it, and not otherwise.** The
-two reference pages, the metrics table and `tokens.css` are committed, and
+two reference pages, the metrics table and the landing claims are committed, and
 `verify.yml` holds them to their generators by running those and then
 `git diff --exit-code`. What `cem analyze` writes is not: four files per tier,
 nine megabytes, and nobody reads a manifest in a diff. So a fresh clone has no
@@ -356,9 +356,10 @@ this repository.
    generated files in seconds; `verify.yml` does the rest.
 
 **Regenerated files land in a commit of their own, and no source rides with
-them.** Five generated files are still tracked, deliberately, because people
-read them: the two reference pages, the metrics table, the landing claims and
-`tokens.css`. They are written from the whole tree at once, so any of them may
+them.** Four generated files are still tracked, deliberately, because people
+read them: the two reference pages, the metrics table and the landing claims.
+`tokens.css` is *not* one of them, whatever this file used to say: it is in
+`.gitignore` and a fresh clone builds it. They are written from the whole tree at once, so any of them may
 carry a change somebody else made in the same checkout, and `git add -A` after
 a `regen` is how that gets swept into a commit named for something else. Twice
 in one session it took work that had not been reviewed, once a private

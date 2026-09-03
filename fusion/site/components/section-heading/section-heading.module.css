@@ -76,11 +76,24 @@
     translate: none;
   }
 
-  .heading {
+  /* **On the part, not on the host.** `helix-text` renders
+     `<h2 part="text"><slot></slot></h2>`, so the mark and the words are inside
+     that element rather than being children of the host: a flex container on the
+     host has exactly one item, the `h2`, and reordering or centering it does
+     nothing to the two things a reader sees. Measured at 700 before this, the
+     anchor came out 151px wide and top-aligned in a 68px heading with every
+     computed value saying `center`, and the glyph drew on its own line above the
+     words. */
+  .heading::part(text) {
     align-items: center;
     display: flex;
     flex-direction: row-reverse;
     gap: var(--helix-space-2xs);
-    justify-content: end;
+    /* `start`, not `end`. Box alignment resolves against the writing mode rather
+       than against the flex direction, so `end` is the right edge whatever
+       `row-reverse` did to the order, and every heading on a narrow screen hung
+       off the right of a page whose paragraphs start on the left. `flex-end`
+       would say the same thing the other way round. */
+    justify-content: start;
   }
 }

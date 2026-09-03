@@ -3,7 +3,7 @@
    generated block fenced between two markers inside it, which left a source file
    nobody could regenerate and a generated file nobody could fully own. */
 
-/* *The mode, and only the root decides it.** These are defaults that
+/* **The mode, and only the root decides it.** These are defaults that
    `[data-color-mode]` overrides on any element, so they must not be restated by
    a subtree. Measured with the OS in dark and the page set to light:
    `--helix-color-warning` resolved to the 600 outside the panel and the 400
@@ -13,7 +13,7 @@
   --_helix-mode: light;
   --_helix-mode-inverted: dark;
 
-  /* *The shadow ink is per mode, because the two modes are not the same
+  /* **The shadow ink is per mode, because the two modes are not the same
      problem.** One value served both, and it could not: a shadow is a dark ink
      at low alpha, which is the whole idea in light mode and close to nothing in
      dark. Measured on an elevated card, the `md` ink over white composites to
@@ -38,7 +38,7 @@
   color-scheme: light dark;
 }
 
-/* *`[data-helix-theme]` re-derives the whole ramp at a subtree, and it has to be
+/* **`[data-helix-theme]` re-derives the whole ramp at a subtree, and it has to be
    on the block rather than anywhere else.** A `var()` inside a custom property
    is substituted on the element the property is *declared* on, not on the
    element that consumes it. Measured in Chrome 148: a leaf reading an overridden

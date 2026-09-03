@@ -165,31 +165,25 @@ export const TOKENS: Token[] = [
      The second was a hairline moving from 0.91 to 0.71 on hover, a twenty
      point jump in gray that reads as the control getting heavier rather than
      as the control being pointed at. */
-  /* *Softened between the steps, and deliberately not by one.** A rule wants
-     to be the quietest thing that is still a rule, and flat 300 and 700 read
-     as a drawn line rather than an edge. One ramp step in each direction is
-     the obvious move and the one thing this cannot do: light lands on
-     `neutral-200`, which is `surface-sunken`, and dark on `neutral-800`, which
-     is `surface-raised`. In light that is `surface-sunken`, where the line
-     reads 1.094:1; the page, the surface and the raised rung are all easier
-     than that. Dark is mixed up from 800 toward 700, and the percentage is
-     solved against that figure rather than chosen: 30 percent lands on
-     `surface-raised`, its own worst ground, at 1.103:1. Measured across the
-     candidates, 40 percent gives 1.130 and 25 gives 1.077, so 30 is the one
-     that reads as the same line rather than as the same arithmetic. It used to
-     mix down from 800 toward 900, and that stopped working when the dark
-     ladder came down.* The old arrangement put the line between `surface` and
-     `surface-raised`, which was room that existed while those sat 0.08 apart;
-     they sit 0.028 apart now and nothing fits between them. Left alone the mix
-     followed the surfaces down and measured 1.019:1 on raised, which is one
-     code point and is no line at all, on the five components that fill with
-     raised and draw a border. So the line now sits above raised rather than
-     under it, in the gap between that rung and 700, where no surface sits and
-     nothing can collide. *And it is what 700 is for.** That rung was read by
-     nothing at all until this: the note in `primitives.css` kept it as the
-     only step left between the inks and the surfaces, which is where a dark
-     border has to come from once a mix of two surface rungs stops separating
-     from them. */
+  /* **Softened between the steps, and deliberately not by one.** A rule wants to
+     be the quietest thing that is still a rule, and flat 300 and 700 read as a
+     drawn line rather than an edge. One ramp step either way is the obvious move
+     and the one thing this cannot do: it lands on `surface-sunken` in light,
+     where the line reads 1.094:1, and on `surface-raised` in dark.
+
+     Dark mixes up from 800 toward 700, and the percentage is solved rather than
+     chosen: 30 percent lands on `surface-raised`, its own worst ground, at
+     1.103:1, against 1.130 at 40 and 1.077 at 25.
+
+     **Mixing down from 800 toward 900 is what this replaced**, and it stopped
+     working when the dark ladder came down: that put the line between `surface`
+     and `surface-raised`, room that existed while those sat 0.08 apart and does
+     not now they sit 0.028 apart. Left alone the mix followed the surfaces down
+     and measured 1.019:1 on raised, one code point and no line at all, on the
+     five components that fill with raised and draw a border. The line now sits
+     above raised, in the gap between that rung and 700 where no surface sits.
+
+     **And it is what 700 is for**: that rung was read by nothing until this. */
   [
     'color-border',
     'light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-700) 30%, var(--_helix-neutral-800)))',
@@ -271,37 +265,34 @@ export const TOKENS: Token[] = [
      short of what a word needs, so these tokens could not be used for the
      thing their names most suggest. */
   /* A series is a thing being compared, not a thing being reported. Rotating
-     hue at a fixed lightness makes some steps far paler than others against
-     the same paper, measured at 1.00 and 1.04 contrast for two of the eight,
-     so each mode states a band that clears the surface and the steps alternate
-     inside it. *Twenty-four, as eight hues in three tones.** 1 to 8 are as
-     bright as sRGB allows the hue to be, 9 to 16 the same hues at a balanced
-     weight, and 17 to 24 the same hues drained almost to gray. A chart of
-     three takes 1 to 3; a chart that wants one line loud and the rest quiet
-     takes one from 9 to 16 and the rest from 17 to 24. *Bright moves lightness
-     and the other two do not**, because for three of the eight hues there is
-     no more chroma to be had at the balanced lightness: the teal, the cyan and
-     the yellow-green cap at 0.105 there, so a brighter variant at the same
-     lightness would be the same color, measured at a difference of zero.
-     Bright therefore sits wherever its own hue holds the most chroma while
-     still clearing 3:1 against the strictest surface, which is a different
-     lightness per hue. Even so, the cyan barely separates: base and bright
-     differ by 0.031 in the light, the smallest gap in the whole palette,
-     because sRGB has almost no headroom there at any lightness. *Chroma is
-     written per series, and they differ because sRGB is not chroma-uniform.**
-     One number for all eight is a claim the file cannot keep: with every light
-     series at 0.16, 5 painted 0.108, 8 painted 0.121 and 4 painted 0.125,
-     because that chroma is outside sRGB at those hues and the browser maps it
-     quietly back in. So each is the most its own hue can hold at its own
-     lightness, capped at 0.17 in the light and 0.16 in the dark so the
-     magenta, which could take 0.296, does not shout down the cyan, which
-     cannot exceed 0.105. Worst of the eight, per ground: light surface 3.30
-     raised 3.16 sunken 3.08 dark surface 6.16 raised 4.92 sunken 6.83 So every
-     series clears the 3:1 a graphic needs, and the light end clears it by very
-     little. 3.08 is the number to design against, not the 3.45 a measurement
-     against `surface` alone reports. The weakest pair under deuteranopia is 1
-     and 8 of the balanced eight in the light, and they are closer than is
-     comfortable. */
+     hue at a fixed lightness makes some steps far paler than others against the
+     same paper, measured at 1.00 and 1.04 for two of the eight, so each mode
+     states a band that clears the surface and the steps alternate inside it.
+
+     **Twenty-four, as eight hues in three tones.** 1 to 8 are as bright as sRGB
+     allows the hue to be, 9 to 16 the same hues at a balanced weight, 17 to 24
+     the same drained almost to gray.
+
+     **Bright moves lightness and the other two do not**, because three of the
+     eight have no more chroma to be had at the balanced lightness: teal, cyan
+     and yellow-green cap at 0.105 there, so a brighter variant at the same
+     lightness would be the same color. Bright therefore sits wherever its hue
+     holds the most chroma while still clearing 3:1, which is a different
+     lightness per hue. Cyan barely separates even so, base and bright differing
+     by 0.031 in the light.
+
+     **Chroma is written per series, because sRGB is not chroma-uniform.** One
+     number for all eight is a claim the file cannot keep: at 0.16, series 5
+     painted 0.108 and 4 painted 0.125, the browser mapping the rest quietly back
+     in. Each is the most its hue can hold at its own lightness, capped at 0.17
+     light and 0.16 dark so the magenta, which could take 0.296, does not shout
+     down the cyan, which cannot exceed 0.105.
+
+     Worst of the eight per ground: light surface 3.30, raised 3.16, sunken 3.08;
+     dark surface 6.16, raised 4.92, sunken 6.83. **3.08 is the number to design
+     against**, not the 3.45 a measurement against `surface` alone reports. The
+     weakest pair under deuteranopia is 1 and 8 of the balanced eight in light,
+     and they are closer than is comfortable. */
   [
     'color-series-1',
     'light-dark( oklch( from var(--_helix-seed-brand) 0.595 calc(0.221 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-seed-brand) 0.62 calc(0.206 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
