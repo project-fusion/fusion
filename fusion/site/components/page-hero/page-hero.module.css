@@ -26,8 +26,18 @@
   padding-block: calc(var(--helix-space-3xl) + var(--helix-size-header)) var(--helix-space-3xl);
 }
 
+/* **The dots are a custom property so a page can decline them without winning a
+   specificity fight.** `.servicesHero::before { background-image: none }` is
+   (0,1,1) against this rule's (0,1,1), so which one applied came down to which
+   stylesheet the bundler emitted last: one sheet on a production build, where
+   the page's own rule lands after this one and wins, and a sheet per route in
+   development, where the order can invert and the lattice comes back on a
+   client-side navigation. A custom property inherits and never competes. */
 .pageHero::before {
-  background-image: radial-gradient(var(--site-lattice) 1px, transparent 1px);
+  background-image: var(
+    --page-hero-lattice,
+    radial-gradient(var(--site-lattice) 1px, transparent 1px)
+  );
   background-position: center;
   background-size: var(--site-lattice-pitch) var(--site-lattice-pitch);
   content: "";

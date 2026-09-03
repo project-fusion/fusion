@@ -14,12 +14,14 @@
   min-block-size: auto;
 }
 
-/* *No lattice on this one.** `.pageHero` draws a field of dots through its own
-   `::before`, which is the texture the galleries are lit by and is one thing too
-   many here: the page already has a field running its whole height, and a grid
-   of dots over the top of it is a second pattern competing with the first. */
-.servicesHero::before {
-  background-image: none;
+/* **No lattice on this one.** `.pageHero` draws a field of dots through its own
+   `::before`, which is one thing too many here: the page already has a field
+   running its whole height, and a grid of dots over it is a second pattern
+   competing with the first. Set through the hook rather than by overriding the
+   pseudo-element, which was a tie on specificity that the bundler's sheet order
+   decided. */
+.servicesHero {
+  --page-hero-lattice: none;
 }
 
 /* The field the whole page is lit by, and the thing its panels blur.
