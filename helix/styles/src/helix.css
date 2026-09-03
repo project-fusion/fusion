@@ -6,6 +6,22 @@
  * declares every semantic token and resolves each one to `rgba(0, 0, 0, 0)`.
  * It also disables theming outright, every public `--helix-seed-*` knob being
  * read in `primitives.css` and nowhere else.
+ *
+ * **`@fusion.dev/helix` deliberately re-exports none of this, and the reason it
+ * once had to is gone.** Up to 0.0.9 that package shipped its own `helix.css`,
+ * a two-line file importing `@fusion.dev/helix-styles/all.css` and its own local
+ * `elements.css`. It existed because the order above spanned two packages: three
+ * layers here and the elements layer there, so no single import could state it.
+ * `elements.css` now lives in this package and `all.css` became this file, so
+ * one import carries all four and there is nothing left to aggregate. A
+ * re-export would be a file whose whole body is one `@import` of this one, and
+ * it would put a `css/` directory back in `helix/styled` to hold it.
+ *
+ * A consumer therefore declares `@fusion.dev/helix-styles` alongside
+ * `@fusion.dev/helix` and imports from it by name. `@fusion.dev/helix` depends
+ * on this package, so it is installed either way; what the declaration buys is
+ * that the import names a dependency the consumer actually took, rather than
+ * reaching through a transitive one.
  */
 @import "./primitives.css";
 @import "./tokens.css";

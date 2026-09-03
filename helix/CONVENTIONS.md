@@ -1314,6 +1314,22 @@ snaps into a card. CSS cannot select "any custom element", and a bare
 `:not(:defined)` would also catch Next's own dev overlay, so the tags are
 enumerated.
 
+**`@fusion.dev/helix` re-exports no stylesheet, and this is settled rather than
+pending.** Up to 0.0.9 it shipped its own `helix.css`, two `@import` lines
+pulling `@fusion.dev/helix-styles/all.css` and a local `elements.css`. That
+existed because the required order spanned two packages, three layers in
+`helix/styles` and the elements layer in `helix/styled`, so no single import
+could state it. Moving `elements.css` into `helix/styles` and renaming
+`all.css` to `helix.css` left one import carrying all four, so the aggregator
+has nothing to aggregate: re-adding it means a file whose body is one `@import`
+of another package's, and a `css/` directory back in `helix/styled` to hold it.
+
+So a consumer declares `@fusion.dev/helix-styles` alongside `@fusion.dev/helix`,
+as both templates do. It is installed either way, `@fusion.dev/helix` depending
+on it; the declaration is what makes the import name a dependency the consumer
+took rather than reaching through a transitive one, which is the rule
+[AGENTS.md](../AGENTS.md) states for every other package here.
+
 ### Why there is no declarative shadow DOM
 
 `@lit-labs/nextjs` and `@lit-labs/ssr-react` were removed. They rendered DSD by
