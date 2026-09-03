@@ -8,20 +8,21 @@
 /* Fusion marketing site. */
 
 :root {
-  /* *The one glass this site is made of, as a fill and a filter.** The landing
+  /* **The one glass this site is made of, as a fill and a filter.** The landing
      bands, the closing card, the showcase's code block, the masthead and the
-     command palette are all the same pane over the same page, and until this
-     token existed each of them said so by carrying its own copy of the values.
-     They drifted exactly as that arrangement predicts: the bands were written
-     out as `blur(40px) saturate(1.5)` in four places and the chrome reached for
+     command palette are the same pane over the same page. Before this token
+     each carried its own copy and they drifted: the bands wrote
+     `blur(40px) saturate(1.5)` in four places while the chrome reached for
      `--helix-material-backdrop`, so the header floating over a band was a
-     different material from the band, on the one page a reader sees both on at
-     once. **Not `--helix-material-*`, and the difference is a decision rather
-     than an oversight.** Those are the design system's answer for any consumer's
-     glass. **The fill is re-declared inside a themed scope and the filter is
-     not.** A `var()` inside a custom property resolves on the element the
-     property is *declared* on, so a fill mixed from `surface` at `:root` carries
-     the page's color scheme into a scope that forced its own. */
+     different material from the band.
+
+     **Not `--helix-material-*`**, which is the design system's answer for any
+     consumer's glass rather than this site's.
+
+     **The fill is re-declared inside a themed scope and the filter is not.** A
+     `var()` inside a custom property resolves on the element it is *declared*
+     on, so a fill mixed from `surface` at `:root` carries the page's color
+     scheme into a scope that forced its own. */
   --site-glass: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
   --site-glass-backdrop: blur(40px) saturate(1.5);
 
@@ -45,14 +46,13 @@
 
   /* How wide a band's content is allowed to get. **Capped, so a large display
      gets more margin rather than a wider card.** `--site-inset` stops growing at
-     112px, so past about 1630 every extra pixel of window went into the card:
-     measured at 2100 it was 1876 wide, against 1408 at 1600. A row of three
-     inside that is three columns of 600, which is not the composition any of
-     this was drawn at. 90rem is the width a large laptop already produces, so
-     nothing below about 1630 moves and the cap only holds what was there.
+     112px, so past about 1630 every extra pixel went into the card: measured at
+     2100 it was 1876 wide against 1408 at 1600, and a row of three inside that
+     is three columns of 600. 90rem is what a large laptop already produces, so
+     the cap only holds what was there.
 
-     Shared, because a band that opts out of it is the one element on the page
-     whose edges miss the column every other band lands on. */
+     Shared, because a band that opts out is the one element whose edges miss
+     the column every other band lands on. */
   --site-band-measure: 90rem;
 
   /* Display type past the component scale's top step. Helix stops at `3xl`
@@ -103,17 +103,16 @@ helix-megamenu {
   --megamenu-background-color: transparent;
 }
 
-/* *The band runs the width of the window and its contents do not.**
-   `variant="full"` is the band: a sheet the whole masthead sits on rather than a
-   card hanging off one word. It holds two columns, and a grid with room for four
-   spreads them to opposite edges, 592px each with the whole middle empty and
-   Cortex's single row stranded against the right rim. **Padding and not a
-   maximum.** Capping the surface with `max-inline-size` and centering it with an
-   auto margin reads as the obvious way to say it and breaks the band: the tracks
-   are `repeat(auto-fit, minmax(15rem, 1fr))`, and `auto-fit` can only count
-   columns against a width it knows. Measured at 2000: capped, the track list
-   came out as a single 240px column with Cortex stacked under Helix; padded, it
-   is two columns as it should be. */
+/* **The band runs the width of the window and its contents do not.**
+   `variant="full"` is a sheet the whole masthead sits on rather than a card
+   hanging off one word. It holds two columns, and a grid with room for four
+   spreads them to opposite edges with the middle empty.
+
+   **Padding and not a maximum.** Capping the surface and centering it reads as
+   the obvious way to say it and breaks the band: the tracks are
+   `repeat(auto-fit, minmax(15rem, 1fr))`, and `auto-fit` can only count columns
+   against a width it knows. Measured at 2000: capped, one 240px column with
+   Cortex stacked under Helix; padded, two columns. */
 /* A row for something named and not yet built. */
 [data-megamenu-item][data-soon] {
   cursor: default;
@@ -170,16 +169,15 @@ helix-megamenu::part(surface) {
   --logo-color-to: transparent;
 }
 
-/* *One inset for the site's chrome, because a reader sees it as one edge.** The
-   masthead and the bands under it, the hero, the filter bar and the card grid,
-   all line up down the left of the page, and `browser.module.css` says at length
-   why the grid opts out of `--site-inset` to do it. *Sixteen on a phone, because
-   forty-eight is a desktop's margin.** At `2xl` a 375px screen spends a quarter
-   of the bar on air either side, and the wordmark and the search field ran into
-   each other with room to spare outside them both. *One variable, because the
-   header and the grid have to move together.** Where the header alone took the
-   sixteen and the grid kept the forty-eight, the wordmark sat at 16 with the
-   first card at 48. */
+/* **One inset for the site's chrome, because a reader sees it as one edge.**
+   The masthead, the bands under it, the hero, the filter bar and the card grid
+   all line up down the left of the page; `browser.module.css` says why the grid
+   opts out of `--site-inset` to do it.
+
+   **Sixteen on a phone, because forty-eight is a desktop's margin.** At `2xl` a
+   375px screen spends a quarter of the bar on air, and the wordmark and search
+   field ran into each other. One variable, because the header and the grid have
+   to move together: apart, the wordmark sat at 16 with the first card at 48. */
 :root {
   --site-chrome-inset: var(--helix-space-2xl);
 }
@@ -279,34 +277,43 @@ helix-drawer {
 /* A panel, and the recipe is shared by three bands: the substrates, the services
    and the reasons. **This is not the argument the verticals rule makes below**,
    and the two do not collide. */
-/* *What breaks glass, and what does not.** Read this before putting a mask, a
-   fade or a transition on anything that contains a glass surface. Its computed
-   `backdrop-filter` still reads `blur(40px)` the whole time, which is why this
-   keeps being rediscovered rather than noticed. Measured with a stripe test, a
-   hard black and white grating behind a blurring box, rather than reasoned from
-   the spec, because the spec's list and this engine's behavior are not the same
-   list: BREAKS IT `opacity` below 1, including 0.99 `mask-image`, even a mask
-   with nothing to mask `filter` an `animation` or `transition` that lands on any
-   of those, for as long as it stays attached to the element SAFE `overflow:
-   hidden`, and clipping with a radius `isolation: isolate` `transform` `contain:
-   paint` Three separate bugs have come from the left column. The aura carries
-   `opacity: 0.5` and is only safe because nothing inside it blurs. */
+/* **What breaks glass, and what does not.** Read this before putting a mask, a
+   fade or a transition on anything containing a glass surface: the computed
+   `backdrop-filter` still reads `blur(40px)` throughout, which is why this keeps
+   being rediscovered rather than noticed.
 
-/* A light that travels the edge of every band card, on every page. **Here rather
-   than in a page's module, because two pages wear it.** It was the landing
-   page's, scoped to that page's own class, so the services panels were the same
-   glass with a static hairline: the same card by every other measure and visibly
-   a different one. **A masked ring, because clipping the fill does not mask a
-   translucent one.** The standard gradient-border trick paints the gradient into
-   the border box and the card's own ground into the padding box, and depends on
-   that ground being opaque. This one is 30 percent glass, so the conic gradient
-   reads straight through the middle of every card. `border-image` is the other
-   obvious answer and is worse: it ignores `border-radius`, so a 12px card gets a
-   square ring around it. **It renders on a shadow host, which is worth saying
-   rather than assuming.** `helix-card` has a shadow root, and light-DOM children
-   of a shadow host do not render unless slotted. **No filter, opacity or
-   transform on the card**, which is what keeps this off the backdrop-root path
-   the glass cannot survive. */
+   Breaks it:
+   - `opacity` below 1, including 0.99
+   - `mask-image`, even a mask with nothing to mask
+   - `filter`
+   - an animation or transition landing on any of those, while it stays attached
+
+   Safe:
+   - `overflow: hidden`, and clipping with a radius
+   - `isolation: isolate`
+   - `transform`
+   - `contain: paint`
+
+   Measured with a stripe test rather than reasoned from the spec, because the
+   spec's list and this engine's are not the same list. Three separate bugs have
+   come from the first column. The aura carries `opacity: 0.5` and is safe only
+   because nothing inside it blurs. */
+
+/* A light that travels the edge of every band card, on every page.
+
+   **Here rather than in a page's module, because two pages wear it.** Scoped to
+   the landing page, the services panels were the same glass with a static
+   hairline: the same card by every other measure and visibly a different one.
+
+   **A masked ring, because clipping the fill does not mask a translucent one.**
+   The standard gradient-border trick paints the card's own ground into the
+   padding box and depends on that ground being opaque; this one is 30 percent
+   glass, so the conic gradient reads straight through. `border-image` ignores
+   `border-radius`, so a 12px card gets a square ring.
+
+   It renders on a shadow host, and light-DOM children of one do not render
+   unless slotted. **No filter, opacity or transform on the card**, which keeps
+   this off the backdrop-root path the glass cannot survive. */
 @property --card-edge-angle {
   inherits: false;
   initial-value: 0deg;
@@ -432,22 +439,18 @@ helix-drawer {
   letter-spacing: var(--helix-tracking-tight);
 }
 
-/* *The page opens in light and closes in it.** The last band is otherwise the
-   sixth in a row on the page's own color, so a reader scrolling reaches the one
-   thing they are being asked to do and it looks like another section. **The
-   ground alone, with no light rising into it.** A radial wash of the brand
-   coming up from below the bottom edge, echoing the hero's aura as a gradient,
-   reads as a shadow: 26% of primary over a near-white band is a soft gray-blue
-   smudge along the bottom, and a smudge under a call to action looks like a drop
-   shadow that failed rather than like a horizon. **The fill is decided in
-   `landing-c.module.css`**, on `.closingCard` and the
-   `[data-closing][data-closing][data-closing]` glass override, not here. The
-   measurement that settled it: a card is told apart by its edge in both modes,
-   at 1.31 light and 1.71 dark against fills of 1.04 and 1.18, so a card's fill
-   is the quieter half of a cue and may stay quiet. `surface` alone is five
-   values off white across the 352 pixels this band stands, and five values with
-   no boundary is not a band; `surface-sunken` at thirteen values reads as a
-   panel dropped on the page. */
+/* **The page opens in light and closes in it**, or the last band is the sixth
+   in a row on the page's own color and the one thing a reader is asked to do
+   looks like another section.
+
+   **The ground alone, with no light rising into it.** A radial wash of the
+   brand from below the edge reads as a shadow: 26% of primary over a near-white
+   band is a gray-blue smudge, and a smudge under a call to action looks like a
+   drop shadow that failed. `surface` alone is five values off white across the
+   352 pixels this band stands, which is not a band; `surface-sunken` at thirteen
+   reads as a panel dropped on the page.
+
+   **The fill is decided in `landing-c.module.css`**, not here. */
 [data-closing] {
   text-align: center;
 }
@@ -510,29 +513,25 @@ helix-drawer helix-tree {
 /* ============================================================ motion ===== */
 
 /* Sections arrive as they are scrolled to, once, and never on the way back up.
-   **Driven from `reveal-on-scroll.tsx` rather than from a view timeline**, and
-   that component's own note carries the argument: a scroll-driven animation with
-   `fill: both` never detaches from its element, which makes the section a
-   permanent backdrop root and takes the `backdrop-filter` off every card inside
-   it. A transition ends, and when it does the section is at exactly `opacity: 1`
-   with nothing bound to it. **Nothing here hides anything on its own.** The
-   armed state is written by script, so a page whose JavaScript never ran has no
-   rule that can hide a section. **A rise and no fade, because a fade breaks the
-   glass on the way in.** An element at less than full opacity is a backdrop
-   root: every card inside a fading section stops being able to sample the field
-   behind it and renders as a flat 30 percent tint, and the blur returns the
-   instant the value reaches exactly 1, which puts a visible snap from *more
-   transparent* to *less* at the end of the reveal, at the moment the card is
-   fully opaque and being looked at. Measured against hard stripes: a
-   `translateZ(0)` ancestor passed the backdrop through and only `opacity: .99`
-   blocked it. **Bigger, slower and sprung, because a rise has to earn its own
-   visibility.** A fade does that work for free and is the one thing this cannot
-   use, so what is left is distance, time and shape, and all three have to be
-   spent. 96px, three times `slow`, and `easing-spring`: a `linear()` curve that
-   carries past its target to 1.043 and settles back. **And a scale, which is the
-   second thing a transform can say.** A rise alone is one axis of one property,
-   and at a glance it is hard to separate from the scroll carrying the section up
-   anyway. */
+
+   **Driven from `reveal-on-scroll.tsx` rather than a view timeline**, whose own
+   note carries the argument: a scroll-driven animation with `fill: both` never
+   detaches, which makes the section a permanent backdrop root and takes the
+   `backdrop-filter` off every card in it. A transition ends.
+
+   **Nothing here hides anything on its own.** The armed state is written by
+   script, so a page whose JavaScript never ran has no rule that can hide a
+   section.
+
+   **A rise and no fade, because a fade breaks the glass on the way in.** An
+   element below full opacity is a backdrop root, and the blur returns the
+   instant the value reaches exactly 1, which snaps at the end of the reveal.
+   Measured against hard stripes: only `opacity: .99` blocked it.
+
+   **Bigger, slower and sprung**, because a rise has to earn visibility that a
+   fade gets for free: 96px, three times `slow`, and `easing-spring`. The scale
+   is the second thing the transform can say, a rise alone being hard to
+   separate from the scroll carrying the section up anyway. */
 [data-reveal="armed"] {
   transform: translateY(calc(var(--helix-space-3xl) * 1.5)) scale(0.97);
 }

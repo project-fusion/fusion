@@ -5,15 +5,14 @@
   --document-measure: 41rem;
 }
 
-/* The head on a gradient, for a document read as a piece. **A gradient rather
-   than the galleries' lit field, because this band is a cover rather than a
-   place.** `/insights` opens on a lattice with two dozen dots lighting on long
-   cycles: something to look at while a reader decides what to read. **Diagonal,
-   because the light has to come from somewhere.** A vertical ramp over a
-   full-width band reads as a printing artifact; struck across the corner it
-   reads as light falling on a surface. **Mixed from `--helix-color-primary` into
-   `--helix-color-background`**, so it darkens on a dark page and lightens on a
-   light one from one declaration. */
+/* The head on a gradient, for a document read as a piece.
+
+   **A gradient rather than the galleries' lit field**, because this band is a
+   cover rather than a place: `/insights` opens on a lattice, something to look
+   at while a reader decides what to read. **Diagonal, because the light has to
+   come from somewhere**: a vertical ramp over a full-width band reads as a
+   printing artifact. Mixed from `--helix-color-primary` into
+   `--helix-color-background`, so one declaration serves both modes. */
 .documentHero {
   background-color: var(--helix-color-background);
   background-image: linear-gradient(
@@ -60,16 +59,13 @@
   padding-inline: var(--helix-space-lg);
   margin-inline: auto;
 
-  /* The measure, plus the gutter, rather than a number in `ch` that is not about
-     the text it caps.** A `ch` on the shell resolves against the *shell's* font
-     size rather than the body's, so it never counts the characters it looks like
-     it is counting. Worse, the cap is a border box and the padding came from
-     `[data-shell]`, which is `clamp(space-lg, 6vw, 7rem)`: a gutter meant to
-     hold *full width* layouts off the viewport edge. Measured: the shell sat at
-     928px from 1024 upward while its padding went 61, 77, 86, 112, so the
-     reading column ran 805, 775, 755, 704. The line got *shorter* as the screen
-     got wider, 80 characters at 1440 and 85 at 1024, both past the point where
-     the eye loses the line. */
+  /* **The measure plus the gutter, rather than a number in `ch`.** A `ch` on the
+     shell resolves against the *shell's* font size rather than the body's, so it
+     never counts the characters it looks like it counts, and the cap is a border
+     box whose padding came from `[data-shell]` — a gutter meant to hold full
+     width layouts off the viewport edge. Measured, the line got *shorter* as the
+     screen got wider: 80 characters at 1440 and 85 at 1024, both past the point
+     where the eye loses the line. */
   max-inline-size: calc(var(--document-measure) + 2 * var(--helix-space-lg));
   /* Not a band at the top, because a document is not a section of the landing
      page.** `--site-band` is the rhythm that gives each claim on the front page
@@ -107,12 +103,9 @@
    runs past it. */
 
 /* Larger than a section title and smaller than the hero's, which is the whole
-   scale a document needs: it is the only heading on the page at this level and
-   everything under it is an `h2` the base layer already sizes. Headings derive
-   their leading from size through `--helix-leading-heading`, which the base
-   layer applies to `h1`, so nothing is said here: this size is a `clamp` across
-   32 to 44, and a ratio gives one gap over that whole range where a fixed number
-   gives the right one at a single point in it. */
+   scale a document needs. Leading is not set here: headings derive it from size
+   through `--helix-leading-heading`, and a ratio gives one gap across a `clamp`
+   where a fixed number gives the right one at a single point in it. */
 .documentTitle {
   font-family: var(--helix-font-display);
   font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
@@ -183,13 +176,11 @@
   text-align: center;
 }
 
-/* And the boxes take the column, which `text-align` alone cannot do.** The head
-   is a flex column, so each child shrinks to its own content and the column's
-   `align-items` places that box. Centering the *text* inside a box that is
-   already exactly as wide as the text changes nothing, which is why the title
-   and the standfirst both still began at the same left edge while every computed
-   value said `center`: measured, the title box ran 374..874 and the lede
-   374..1026, two different widths sharing a left edge. */
+/* **And the boxes take the column, which `text-align` alone cannot do.** The
+   head is a flex column, so each child shrinks to its content and centering the
+   text inside a box exactly as wide as the text changes nothing. Measured, the
+   title box ran 374..874 and the lede 374..1026: two widths sharing a left edge
+   while every computed value said `center`. */
 .documentHeadCentred .documentTitle,
 .documentHeadCentred .documentLede,
 .documentHeadCentred .documentKicker {

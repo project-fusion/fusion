@@ -13,12 +13,10 @@
  */
   overflow: clip;
 
-  /* **The air under the closing card belongs to the reel, not to the card.**
-     A margin on the card lands *outside* the clip: the reel would end at the
-     card's own bottom edge, so the field stops dead there and the strip above
-     the footer is black with a hard line across it. Padding here keeps the space
-     inside the lit region, so the light carries under the card and fades into
-     the footer instead of stopping at it. */
+  /* **The air under the closing card belongs to the reel, not to the card.** A
+     margin on the card lands outside the clip, so the field stops dead at the
+     card's bottom edge and the strip above the footer is black with a hard line
+     across it. Padding keeps the space inside the lit region. */
   padding-block-end: var(--site-band);
   position: relative;
 }
@@ -44,12 +42,10 @@
 /**
  * One field, over the whole reel.
  *
- * `--helix-layer-beneath` is -1, and `.reel` establishes no stacking context:
- * no `isolation`, no `contain`, no transform, and `overflow: clip` does not
- * make one. A negative layer therefore does not settle behind the sections, it
- * escapes to the nearest ancestor that does form a context and paints behind
- * *that* element's background, which is opaque. The field disappears entirely.
- * `.reel > section` is what orders this, and is sufficient on its own.
+ * `--helix-layer-beneath` is -1 and `.reel` establishes no stacking context, so
+ * a negative layer does not settle behind the sections: it escapes to the
+ * nearest ancestor that does form one and paints behind that element's opaque
+ * background, and the field disappears. `.reel > section` is what orders this.
  */
 .reelAura {
   /* Absolute against the reel, not fixed against the window. Fixed pins the
@@ -57,30 +53,24 @@
      which is a wallpaper rather than a page. */
   block-size: auto;
   inset: 0;
-  /* Half strength. The field is the page's ground rather than its subject, and
-     `gain` would have been the other lever: that one changes what the shader
-     draws, brightening the lit parts and leaving the dark ones, which flattens
-     the braid. Opacity takes the whole field down evenly and keeps its shape.
+  /* Half strength. The field is the page's ground rather than its subject.
+     `gain` was the other lever and flattens the braid: it brightens the lit
+     parts and leaves the dark ones, where opacity takes the whole field down
+     evenly and keeps its shape.
 
-     Safe on this element specifically. An opacity below 1 makes a backdrop root
-     of its own descendants, and this has none: the cards that blur it are
-     siblings further down the page, and what they sample is the field as
-     painted, at whatever strength it was painted. */
+     Safe on this element specifically: an opacity below 1 makes a backdrop root
+     of its own descendants, and this has none. */
   opacity: 0.5;
-  /* **Faded out at the bottom, because the shape does not reliably do it.**
-     Each shape ends with a vertical envelope, but those are written against an
-     unscaled box: `scale` multiplies the sampled coordinates after the rotation,
-     so the lit region can reach past the edge and the light simply stops where
-     the canvas does. A mask rather than more envelope, because it holds for
-     every shape, every tilt and every scale, including the ones nobody has
-     tried.
+  /* **Faded out at the bottom, because the shape does not reliably do it.** Each
+   shape ends with a vertical envelope written against an unscaled box, and
+   `scale` multiplies the sampled coordinates after the rotation, so the light
+   can reach past the edge and simply stop where the canvas does. A mask holds
+   for every shape, tilt and scale, including the ones nobody has tried.
 
-     The mark is late because the fade only has to begin below the last thing a
-     reader looks at, and a section's own end padding is already empty. An
-     earlier mark masks the closing call to action instead of the space under it.
-     Measured at 1200 wide: the reel ends at 6632, the 98 percent mark falls at
-     6499, and the closing call to action's content stops around 6452, so the
-     fade starts in the padding under it and has 133px to run. */
+   The mark is late because the fade only has to begin below the last thing a
+   reader looks at. Measured at 1200 wide: the 98 percent mark falls at 6499
+   and the closing call to action stops around 6452, so it runs in the padding
+   under it. */
   mask-image: linear-gradient(to bottom, black 0%, black 98%, transparent 100%);
   pointer-events: none;
   position: absolute;
@@ -93,26 +83,20 @@
 }
 
 /* **No `display` here.** `.showcaseCard { display: block }` sat here and beat
-   the card's own `:host { display: grid }`, because a document rule outranks a
-   shadow one whatever the specificity. Every showcase card was a block: the
-   region gap did nothing, the stat group sized to its content instead of the
-   column, and `media-placement="end"` could not work at all, `order` having
-   nothing to order. The card already knows what it is. */
+   the card's own `:host { display: grid }`, a document rule outranking a shadow
+   one whatever the specificity. The card already knows what it is. */
 
 /*
- * *The closing call to action, as a card rather than a band.** Capped and
+ * **The closing call to action, as a card rather than a band.** Capped and
  * centered, all four sides are the object's own, so the border the material
- * carries is doing the job it exists for: keeping a translucent surface a shape
- * when it takes its color from whatever is behind it.
+ * carries keeps a translucent surface a shape.
  *
  * **And glass admits what is behind it, which in light mode is nothing.** The
  * ground is white at 72%, so over a near-white page the card reads *lighter*
- * than the page and stops being a card at all. The sunken ground is what light
- * mode wants and the translucent one is what dark mode wants, which
- * `light-dark()` says in one declaration. The blur comes off with it: an opaque
- * ground is in front of it, and a `backdrop-filter` that changes nothing still
- * makes the compositor re-read the page on every frame the element moves, which
- * these do for a whole scroll.
+ * than the page and stops being a card. `light-dark()` gives the sunken ground
+ * to light and the translucent one to dark. The blur comes off with it: an
+ * opaque ground is in front of it, and a `backdrop-filter` that changes nothing
+ * still makes the compositor re-read the page on every frame.
  */
 .closingCard {
   background-color: light-dark(
@@ -121,12 +105,9 @@
   );
   border-radius: var(--helix-radii-lg);
   /* **As wide as every other band's content, and no wider.** This card *is* its
-     section, so nothing above it applies the cap the bands get from
-     `.bandCard`, and it ran to the inset while they stopped at
-     `--site-band-measure`: 1696 against 1440 at a 1920 window, which put the
-     one element meant to close the page 128px proud of the column every band
-     above it lands on. The inset still wins on a narrow screen, where it is the
-     smaller of the two. */
+     section, so nothing above it applies `.bandCard`'s cap: it ran to the inset
+     at 1696 against their 1440 at a 1920 window. The inset still wins on a
+     narrow screen, where it is the smaller of the two. */
   margin-inline: auto;
   /*
  * *The one band whose spacing would otherwise come out half.**
@@ -216,13 +197,10 @@
 }
 
 /**
- * **`--len` has to be registered or nothing animates.**
- *
- * An unregistered custom property is a string to the cascade, so
- * `calc(var(--len) * -1)` in a keyframe has no type to interpolate between and
- * WebKit simply holds the start value. The dash was sitting at offset 0 on every
- * path, which is why the routing looked painted rather than moving: the segment
- * was parked at the start of each run, in the same place, forever.
+ * **`--len` has to be registered or nothing animates.** An unregistered custom
+ * property is a string to the cascade, so `calc(var(--len) * -1)` in a keyframe
+ * has no type to interpolate and WebKit holds the start value: the dash sat at
+ * offset 0 on every path, which is why the routing looked painted.
  */
 @property --len {
   syntax: "<number>";
@@ -327,14 +305,9 @@
 }
 
 /**
- * **The cast comes off a light phone.**
- *
- * Black at 55 per cent under a card is depth on a dark page, where it deepens a
- * ground that is already dark. On a light one it is a gray smear, and at 390px
- * the sections run the full width, so what it smears is a band the whole way
- * across the screen directly under an edge that has no border. Photographed at
- * the seam between two sections it reads as a printing fault rather than as one
- * card sitting above another.
+ * **The cast comes off a light phone.** Black at 55 per cent deepens a dark
+ * ground and smears a light one, and at 390px the sections run full width, so
+ * what it smears is a band the whole way across under a borderless edge.
  */
 @media (max-width: 40rem) {
   .noRules :global([data-substrate]),
@@ -397,15 +370,14 @@
  *    and the two disagreed for as long as they both existed.
  */
 
-/* The shared components carry their own fills, and those are opaque tokens
- * rather than mixes, so they need the same treatment where a draft uses them.
+/* The shared components carry opaque fills rather than mixes, so they need the
+ * same treatment where a draft uses them.
  *
- * **Except a card that was already given a fill on purpose**, which is what
- * `:not([data-filled])` is for. The showcase's anchor is a brand surface that
- * supplies its own `foreground-on-accent` text, so replacing its ground with 30
- * percent glass leaves white type on a near-transparent panel: measured on the
- * draft as `oklab(0.21 0 0 / 0.3)` under `lab(100 0 0)`, on the card the page
- * uses to advertise that it measures contrast. */
+ * **Except a card already given a fill on purpose**, which is what
+ * `:not([data-filled])` is for: the showcase's anchor supplies its own
+ * `foreground-on-accent` text, so 30 percent glass leaves white type on a
+ * near-transparent panel. On the card the page uses to advertise that it
+ * measures contrast. */
 /* Named once, because the animated edge further down has to paint this same
    ground itself: a two-layer background clips the fill to the padding box and
    the gradient to the border box, so the fill has to be a layer rather than a
@@ -433,13 +405,11 @@
 /**
  * **The closing card and the header were mixing their own surfaces.**
  *
- * **Specificity rather than `!important`, and the number is the reason.** The
- * closing card is also reached by `:root:not([data-color-mode]) .closingCard`,
- * which is (0,3,0), against this selector's (0,2,0): the override was losing on
- * weight, not on source order, and `!important` was papering over the gap by
- * reversing the cascade for every future rule too. Matching the attribute three
- * times reaches (0,4,0) and wins on the same terms everything else competes on.
- * Measured identical across dark, light and the no-attribute case.
+ * **Specificity rather than `!important`.** The card is also reached by
+ * `:root:not([data-color-mode]) .closingCard` at (0,3,0), against this
+ * selector's (0,2,0): the override was losing on weight, and `!important`
+ * would have reversed the cascade for every future rule too. Naming the
+ * attribute three times reaches (0,4,0) and wins on the same terms.
  */
 .noRules :global([data-closing][data-closing][data-closing]) {
   backdrop-filter: var(--site-glass-backdrop);
@@ -511,28 +481,18 @@
 /**
  * The theme pill, arriving after everything else has settled.
  *
- * **Last, and from nothing.** It is the one control on the page that is an
- * invitation rather than part of the argument, so it should not compete with
- * the hero for the first look: it grows in once the column above it has
- * finished arriving. `scale(0)` to full is the shape that reads as *appearing*
- * rather than as sliding in from somewhere off screen, which is what a pill
- * pinned to the bottom of the viewport has no room to do.
+ * **Last, and from nothing.** It is an invitation rather than part of the
+ * argument, so it grows in once the column above it has finished. `scale(0)` to
+ * full reads as appearing rather than sliding in from off screen, which a pill
+ * pinned to the viewport has no room to do. `backwards` holds it at zero
+ * through the delay instead of jumping to nothing when the animation starts.
  *
- * `backwards` so the pill is held at `scale(0)` through the delay rather than
- * sitting at full size and then jumping to nothing when the animation starts.
+ * **No `to` block**: the resting width is declared once on the rule above, and
+ * a keyframe naming it again goes stale the day the pill is resized.
  *
- * **No `to` block, deliberately.** The resting width is `13rem` and it is
- * declared once, on the rule above. A keyframe naming it again is a second copy
- * that goes stale the day the pill is resized; with only a `from`, the end of
- * the animation is whatever the element's own style says.
- *
- * **Three properties to reach an actual zero, not one.** `inline-size: 0` on its
- * own does not make the pill disappear: the used width cannot fall below the
- * element's own `padding-inline`, so a sliver of glass sits on screen through
- * the whole delay, and `shadow-floating` draws around that sliver whether or not
- * there is anything inside it to cast from. All three collapse together, so what
- * is held through the delay is a box with no width, no inset and nothing drawn
- * outside it.
+ * **Three properties to reach an actual zero.** `inline-size: 0` alone cannot
+ * fall below the element's own `padding-inline`, so a sliver of glass sits on
+ * screen through the delay with `shadow-floating` drawn around it.
  */
 @keyframes site-fab-arrive {
   from {

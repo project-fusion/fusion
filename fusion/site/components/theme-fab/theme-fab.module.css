@@ -39,12 +39,9 @@
  * The pill, and the bar it becomes.
  *
  * **Real transparency, not a tinted panel**, and the site's own rather than a
- * mix tuned here. The pill floats over the same page the bands sit on, so it is
- * the same glass: low enough that the page reads through it and the blur has
- * something to do, and `saturate` above 1 putting back the chroma a heavy blur
- * washes out, which is the difference between glass and frosted plastic. Both
- * of those are what `--site-glass` is; neither was a reason to state a second
- * mix, which is all the old one turned out to be.
+ * mix tuned here: the pill floats over the same page the bands sit on, so it is
+ * the same glass. `--site-glass` already carries both halves, the alpha the blur
+ * needs and the `saturate` that puts back the chroma a heavy blur washes out.
  */
 .fab {
   backdrop-filter: var(--site-glass-backdrop);
@@ -120,14 +117,12 @@
 }
 
 /*
- *  The swatch on the collapsed pill: the brand, and nothing drawn around it.
+ * The swatch on the collapsed pill: the brand, and nothing drawn around it.
  *
- * **And the corner is the theme's, not `full`.** The pill it lives on and every
- * card behind it answer to the radius slider two controls away, so a `radii-full`
- * dot stays a circle while that slider squares off the entire page around it.
- * `radii-sm` is the step a box this size takes, and at the shipped seed it is
- * 4px against a 10.4px swatch: still visibly round, and round by the same rule
- * as everything else.
+ * **The corner is the theme's, not `full`.** The pill it sits on answers to the
+ * radius slider two controls away, so a `radii-full` dot stays a circle while
+ * that slider squares off the page around it. At the shipped seed `radii-sm` is
+ * 4px against a 10.4px swatch: still visibly round, by the same rule.
  */
 .fabDot {
   background: var(--swatch);
@@ -139,14 +134,12 @@
 
 /* **The row fills the pill, which is what puts the close control at its end.**
  *
- * `fabTools` is a flex container holding one `helix-flex`, and a child with no
- * `flex` of its own sizes to its content: on a pill opened to 54rem the controls
- * sit against the left and the rest is dead glass. The close button is the last
- * thing in the row, so it stops wherever the content does rather than at the
- * edge a reader looks for it, which reads as the control not being there at all.
- *
- * Filling the row is also what the sliders ask for. Each channel is
- * `flex: 1 1 0`, which distributes free space and otherwise has none. */
+ * `fabTools` holds one `helix-flex`, and a child with no `flex` of its own sizes
+ * to its content: on a pill opened to 54rem the controls sit left and the rest
+ * is dead glass, with the close button stopping where the content does rather
+ * than at the edge a reader looks for it. Filling the row is also what the
+ * sliders ask for, each channel being `flex: 1 1 0`.
+ */
 .fabTools > * {
   flex: 1;
   min-inline-size: 0;
@@ -232,16 +225,13 @@
   }
 
   /*
- * *And the same in the other direction, which was missing.**
+ * **And the same in the other direction, which was missing.**
  *
- * The two faces share one grid cell, so the cell is as tall as the taller of
- * them. Above this breakpoint the open state is a bar and both are one line,
- * so nothing shows. Below it the open state is a sheet: measured at 390, the
- * closed pill's button was 200x404 rather than 200x40, because the hidden
- * sheet was still laying out in the cell it shares. `.fabFace` is
- * `block-size: 100%`, so the label centered in 404px of button while the pill
- * clipped to 40, and `Make it yours` was drawn outside its own pill. The
- * control looked like an empty rounded rectangle on every phone.
+ * The two faces share one grid cell, so the cell is as tall as the taller. Above
+ * this breakpoint both are one line; below it the open state is a sheet, and the
+ * hidden sheet was still laying out in the shared cell: measured at 390, the
+ * closed pill's button was 200x404 rather than 200x40, so the label centered in
+ * 404px while the pill clipped to 40 and `Make it yours` was drawn outside it.
  */
   .fab:not([data-open]) .fabTools {
     display: none;
