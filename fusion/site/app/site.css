@@ -244,18 +244,26 @@ helix-drawer {
   --drawer-padding-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
-/*
- * *A glass panel on a phone in daylight has to admit less.**
- *    `--helix-material-translucent` is 30 percent, which is right for a pane over a
- *    dark page where the ink behind it is dim and the blur has room to work.
- */
-@media (max-width: 40rem) {
-  helix-drawer[material="glass"] {
-    --drawer-background-color: light-dark(
-      var(--helix-material-translucent-strong),
-      var(--site-glass)
-    );
-  }
+/* **A drawer samples its own scrim, so in light mode 30 percent glass is gray.**
+   `[part="panel"]::backdrop` paints *behind* the panel, and the panel's
+   `backdrop-filter` therefore reads the page with the scrim already over it.
+   Measured on a white page: the scrim is `oklch(0.15)` at 40 percent, taking the
+   ground to L 0.66, and `--helix-material-translucent` at 30 percent white over
+   that lands at L 0.76 — a mid gray panel that should have read as a white
+   overlay. `translucent-strong` at 88 percent lands at 0.96.
+
+   **Not a media query, which is how this was wrong before.** It was scoped to
+   40rem as a daylight-on-a-phone problem, and the nav collapses to the drawer at
+   48rem, so every window between 640 and 768 got the gray one. The scrim is
+   behind the panel at every width; only the mode decides whether that reads.
+
+   Dark keeps `--site-glass`, where a dim page under a dim scrim is what the
+   blur is for. */
+helix-drawer[material="glass"] {
+  --drawer-background-color: light-dark(
+    var(--helix-material-translucent-strong),
+    var(--site-glass)
+  );
 }
 
 [data-statement] {
