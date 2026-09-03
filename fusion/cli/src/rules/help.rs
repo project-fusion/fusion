@@ -39,8 +39,9 @@ static DECLARES: LazyLock<Regex> = LazyLock::new(|| {
 });
 
 /// The line that opens the type a derive applies to.
-static OPENS: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^\s*(pub )?(struct|enum) \w+").expect("a literal pattern compiles"));
+static OPENS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^\s*(pub )?(struct|enum) \w+").expect("a literal pattern compiles")
+});
 
 /// A doc comment line, which is what clap prints.
 static DOC: LazyLock<Regex> =

@@ -130,13 +130,7 @@ pub fn run(reports: &[(&Rule, &Report)]) -> io::Result<()> {
             findings: report
                 .findings
                 .iter()
-                .map(|one| {
-                    (
-                        one.file.clone(),
-                        one.message.clone(),
-                        one.detail.clone(),
-                    )
-                })
+                .map(|one| (one.file.clone(), one.message.clone(), one.detail.clone()))
                 .collect(),
             name: rule.name.to_owned(),
             notes: report.notes.clone(),
@@ -231,7 +225,11 @@ fn render(frame: &mut Frame, view: &View) {
                 view.rules.len() - failed,
                 if findings == 1 { "" } else { "s" }
             )),
-            Span::raw(if view.failing { "   [failing only]" } else { "" }),
+            Span::raw(if view.failing {
+                "   [failing only]"
+            } else {
+                ""
+            }),
         ])),
         head,
     );
@@ -267,7 +265,11 @@ fn render(frame: &mut Frame, view: &View) {
         .block(
             Block::default()
                 .borders(Borders::RIGHT)
-                .title(if view.inside { " rules " } else { " rules ◂ " }),
+                .title(if view.inside {
+                    " rules "
+                } else {
+                    " rules ◂ "
+                }),
         )
         .row_highlight_style(Style::new().add_modifier(Modifier::REVERSED)),
         left,
@@ -317,7 +319,11 @@ fn detail(view: &View) -> Paragraph<'_> {
 
     for (at, (file, message, detail)) in rule.findings.iter().enumerate() {
         lines.push(Line::raw(""));
-        let mark = if view.inside && at == view.at { "▸ " } else { "  " };
+        let mark = if view.inside && at == view.at {
+            "▸ "
+        } else {
+            "  "
+        };
         lines.push(Line::from(vec![
             Span::raw(mark),
             Span::styled(file.clone(), Style::new().add_modifier(Modifier::BOLD)),
@@ -332,7 +338,11 @@ fn detail(view: &View) -> Paragraph<'_> {
     }
 
     Paragraph::new(lines)
-        .block(Block::default().title(if view.inside { " detail ◂ " } else { " detail " }))
+        .block(Block::default().title(if view.inside {
+            " detail ◂ "
+        } else {
+            " detail "
+        }))
         .wrap(Wrap { trim: false })
         .scroll((u16::try_from(view.at.saturating_mul(3)).unwrap_or(0), 0))
 }

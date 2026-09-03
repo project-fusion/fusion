@@ -16,9 +16,9 @@
 
 mod prose;
 mod route;
-mod tui;
 mod rules;
 mod spec;
+mod tui;
 mod workspace;
 
 use std::io::IsTerminal;

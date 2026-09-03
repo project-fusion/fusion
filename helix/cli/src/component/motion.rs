@@ -83,9 +83,8 @@ static ANSWERED_BY_THE_LAYER: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^\s*transition(-duration)?\s*:").expect("a literal pattern compiles")
 });
 
-static DURATION_TOKEN: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"var\(\s*--helix-duration-").expect("a literal pattern compiles")
-});
+static DURATION_TOKEN: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"var\(\s*--helix-duration-").expect("a literal pattern compiles"));
 
 static LITERAL_TIME: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"[0-9](\.[0-9]+)?m?s\b").expect("a literal pattern compiles"));

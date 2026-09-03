@@ -284,7 +284,9 @@ pub fn run(context: &Context) -> Report {
     for one in &families {
         if !known.contains(one) {
             findings.push(said(
-                format!("the engine writes a `--helix-{one}-*` family and no stylesheet declares one"),
+                format!(
+                    "the engine writes a `--helix-{one}-*` family and no stylesheet declares one"
+                ),
                 "Every token in it sets a property nothing reads.",
                 &named,
             ));

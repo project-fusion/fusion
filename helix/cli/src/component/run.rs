@@ -139,8 +139,10 @@ pub fn audit(
     read the same measurement, so neither can disagree with the other. */
     if !args.plain && std::io::stdout().is_terminal() {
         let code = verdict(&reports);
-        let drawn: Vec<(&Rule, &Report)> =
-            reports.iter().map(|(rule, report)| (rule, report)).collect();
+        let drawn: Vec<(&Rule, &Report)> = reports
+            .iter()
+            .map(|(rule, report)| (rule, report))
+            .collect();
         if let Err(why) = tui::run(&drawn) {
             return Err(Failure::new(
                 Code::Internal,

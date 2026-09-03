@@ -42,8 +42,10 @@ use crate::component::{sources, Context, Finding, Report};
 
 /// The member a decorator sits on, past any further decorators.
 static MEMBER: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^\s*(?:accessor\s+|declare\s+|override\s+|readonly\s+)*([A-Za-z_$][\w$]*)\s*[?!:=(]")
-        .expect("a literal pattern compiles")
+    Regex::new(
+        r"^\s*(?:accessor\s+|declare\s+|override\s+|readonly\s+)*([A-Za-z_$][\w$]*)\s*[?!:=(]",
+    )
+    .expect("a literal pattern compiles")
 });
 
 /// One property: where its run starts, where it ends, and what it is called.
@@ -263,7 +265,10 @@ mod tests {
             after.starts_with("class X {\n  /** First. */\n  @property()\n  alpha?: string\n"),
             "the block and the member move together:\n{after}"
         );
-        assert!(after.contains("| 'a'\n    | 'b'"), "the union survives:\n{after}");
+        assert!(
+            after.contains("| 'a'\n    | 'b'"),
+            "the union survives:\n{after}"
+        );
         assert!(sorted(&after).is_none(), "a sorted file is left alone");
     }
 
@@ -295,7 +300,10 @@ mod tests {
         ] {
             let at = after.find(block).expect("the description survives");
             let member = after.find(member).expect("the member survives");
-            assert!(at < member, "`{block}` still sits above its member:\n{after}");
+            assert!(
+                at < member,
+                "`{block}` still sits above its member:\n{after}"
+            );
             assert!(
                 after[at..member].matches("@property").count() == 1,
                 "nothing else came between them:\n{after}"
@@ -325,7 +333,10 @@ mod tests {
         let described = after.find("What zeta is.").expect("kept");
         let argued = after.find("Why zeta has no initializer.").expect("kept");
         let member = after.find("zeta?").expect("kept");
-        assert!(described < argued && argued < member, "both blocks travel:\n{after}");
+        assert!(
+            described < argued && argued < member,
+            "both blocks travel:\n{after}"
+        );
         assert!(
             after.find("What alpha is.").expect("kept") < described,
             "alpha still sorts first:\n{after}"
@@ -341,6 +352,9 @@ mod tests {
         let render = after.find("render()").expect("kept");
         let alpha = after.find("alpha?").expect("kept");
         let zeta = after.find("zeta?").expect("kept");
-        assert!(alpha < render && render < zeta, "render stays put:\n{after}");
+        assert!(
+            alpha < render && render < zeta,
+            "render stays put:\n{after}"
+        );
     }
 }

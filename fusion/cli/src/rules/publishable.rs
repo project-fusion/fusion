@@ -585,7 +585,10 @@ mod tests {
     #[test]
     fn a_file_below_the_root_is_not_one_of_them() {
         for name in ["src/README.md", "docs/LICENSE", "packed.js"] {
-            assert!(!always(name), "{name} is not what npm packs unconditionally");
+            assert!(
+                !always(name),
+                "{name} is not what npm packs unconditionally"
+            );
         }
     }
 

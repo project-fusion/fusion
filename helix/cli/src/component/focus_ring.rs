@@ -45,7 +45,10 @@ const OFFSETS: [(&str, &str); 3] = [
         "calc(var(--helix-size-focus-offset) * -1)",
         "inset, for a control a container clips",
     ),
-    ("0", "flush, where the control's own border is what thickens"),
+    (
+        "0",
+        "flush, where the control's own border is what thickens",
+    ),
 ];
 
 /// What the ring is drawn with. `none` is the fourth situation, not a fourth

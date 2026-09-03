@@ -36,18 +36,13 @@ fn built(name: &str) -> Option<PathBuf> {
         .ok()
         .and_then(|here| find_root(&here))
         .unwrap_or_else(|| PathBuf::from("."));
-    let target = env::var_os("CARGO_TARGET_DIR")
-        .map_or_else(|| root.join("target"), PathBuf::from);
+    let target = env::var_os("CARGO_TARGET_DIR").map_or_else(|| root.join("target"), PathBuf::from);
     let mut found: Vec<PathBuf> = ["release", "debug"]
         .iter()
         .map(|profile| target.join(profile).join(name))
         .filter(|path| path.is_file())
         .collect();
-    found.sort_by_key(|path| {
-        std::fs::metadata(path)
-            .and_then(|one| one.modified())
-            .ok()
-    });
+    found.sort_by_key(|path| std::fs::metadata(path).and_then(|one| one.modified()).ok());
     found.pop()
 }
 

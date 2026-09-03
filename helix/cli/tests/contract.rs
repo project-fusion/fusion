@@ -443,9 +443,9 @@ fn json_wins_over_plain() {
 }
 
 /* `helix new`, which is the one verb that writes a tree rather than a file.
-   Driven through `HELIX_TEMPLATES` at the package in this repository, so the
-   tests do not need it installed and do not assert against a copy that could
-   drift from the one shipped. */
+Driven through `HELIX_TEMPLATES` at the package in this repository, so the
+tests do not need it installed and do not assert against a copy that could
+drift from the one shipped. */
 
 fn templates() -> PathBuf {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
@@ -486,7 +486,10 @@ fn an_unknown_template_lists_them_and_fails() {
     let at = scratch("unknown");
     let output = scaffold(&at, &["new", "my-app", "--template", "svelte"]);
     assert_eq!(code(&output), 1);
-    assert!(out(&output).contains("react-vite"), "it says what there is instead");
+    assert!(
+        out(&output).contains("react-vite"),
+        "it says what there is instead"
+    );
     assert!(!at.join("my-app").exists());
 }
 
@@ -550,7 +553,10 @@ fn an_existing_empty_directory_is_fine() {
 #[test]
 fn the_json_shape_is_parseable_and_names_what_it_wrote() {
     let at = scratch("json");
-    let output = scaffold(&at, &["new", "my-app", "--template", "react-vite", "--json"]);
+    let output = scaffold(
+        &at,
+        &["new", "my-app", "--template", "react-vite", "--json"],
+    );
     assert_eq!(code(&output), 0, "{}", err(&output));
     let value: serde_json::Value = serde_json::from_str(&out(&output)).expect("parseable");
     assert_eq!(value["name"], "my-app");
@@ -615,7 +621,10 @@ fn a_name_that_is_not_usable_as_both_is_refused() {
             "`{name}` should say why"
         );
     }
-    assert!(!escape.exists(), "an absolute name wrote nothing outside the cwd");
+    assert!(
+        !escape.exists(),
+        "an absolute name wrote nothing outside the cwd"
+    );
 }
 
 /// The three lines a reader is handed have to work, and with `--into` the first
@@ -626,11 +635,21 @@ fn the_closing_hint_names_what_was_written() {
 
     let plain = scaffold(&at, &["new", "my-app", "--template", "react-vite"]);
     assert_eq!(code(&plain), 0, "{}", err(&plain));
-    assert!(out(&plain).contains("cd my-app"), "relative to where they stand");
+    assert!(
+        out(&plain).contains("cd my-app"),
+        "relative to where they stand"
+    );
 
     let into = scaffold(
         &at,
-        &["new", "my-app", "--into", "apps/web", "--template", "react-vite"],
+        &[
+            "new",
+            "my-app",
+            "--into",
+            "apps/web",
+            "--template",
+            "react-vite",
+        ],
     );
     assert_eq!(code(&into), 0, "{}", err(&into));
     assert!(out(&into).contains("cd apps/web"), "the directory it wrote");

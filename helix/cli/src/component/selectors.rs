@@ -484,8 +484,7 @@ fn parts_of(
                 /* Joined, because these are root-relative: reading one bare is
                 a question about the working directory rather than about the
                 workspace. */
-                fs::read_to_string(survey.root.join(path))
-                    .is_ok_and(|text| text.contains(&wanted))
+                fs::read_to_string(survey.root.join(path)).is_ok_and(|text| text.contains(&wanted))
             })
             .map(|(name, _)| name.clone())
             .collect();
