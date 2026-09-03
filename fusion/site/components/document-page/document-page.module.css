@@ -75,12 +75,12 @@
   padding-block: var(--helix-space-2xl) var(--site-band);
 }
 
-/* The eyebrow, which is a register rather than a label.** `variant="label"` sets
-   the kicker at `text-xs` with `tracking-wide`, which is right for a form label
-   and too quiet for the line above a document's title: it reads as a stray word
+/* **The eyebrow, which is a register rather than a label.** `variant="label"`
+   sets the kicker at `text-xs` with `tracking-wide`, right for a form label and
+   too quiet for the line above a document's title: it reads as a stray word
    rather than as the class of thing the page is. **Sentence case, not
-   capitals.** An eyebrow reading `ACCEPTABLE USE` is shouting a filing label at
-   somebody who came to read a policy, and it would be the only place on the site
+   capitals** — an eyebrow reading `ACCEPTABLE USE` shouts a filing label at
+   somebody who came to read a policy, and would be the only place on the site
    that shouts. */
 .documentKicker {
   letter-spacing: var(--helix-tracking-wide);

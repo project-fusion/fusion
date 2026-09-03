@@ -63,35 +63,35 @@
   --_helix-neutral-200: oklch(0.96 var(--_helix-neutral-cast));
   /* This rung and 700 below it are read by exactly one token,
      `--helix-color-border`, so moving them moves every resting border in the
-     library and nothing else: a card, a field, a table rule, a key, an accordion
-     seam, twenty-eight components in all. Measured against the surfaces it sits
-     on, a light page being 1.0 and a light surface 0.985, 0.91 is a nine percent
-     step, where a resting edge wants to be the quietest mark in the frame. *This
-     is decoration, not an affordance, and it is worth being clear which.** At
-     0.91 on white the line is about 1.3:1, nowhere near the 3:1 that WCAG 1.4.11
-     asks of anything required to identify a control. What keeps a field
+     library and nothing else: twenty-eight components in all. Against the
+     surfaces it sits on, 0.91 is a nine percent step, where a resting edge wants
+     to be the quietest mark in the frame.
+
+     **This is decoration, not an affordance, and it is worth being clear
+     which.** At 0.91 on white the line is about 1.3:1, nowhere near the 3:1 WCAG
+     1.4.11 asks of anything required to identify a control. What keeps a field
      identifiable is that a field is also filled: `surface-sunken` at 0.96
      against a 1.0 page. */
   --_helix-neutral-300: oklch(0.91 var(--_helix-neutral-cast));
   --_helix-neutral-400: oklch(0.71 var(--_helix-neutral-cast));
-  /* The two half steps, and they exist because 4.5:1 puts a hard ceiling on how
-     quiet a *readable* ink can be. Light grounds run 0.96 to 1.0, so any ink
-     above about 0.53 is under 4.5 on one of them: 500 at 0.6 measured 3.53 on
-     `surface-sunken`, 3.62 raised, 3.78 on surface and 3.95 on the page, and it
-     was carrying inactive tab labels, the pagination summary and an input's own
-     text. Dark was the mirror, `surface-raised` being the worst ground and 0.67
-     the floor: at the 0.29 that rung then held, 500 measured 3.59 on it. **The
-     dark half of that argument has since been paid off by the ladder rather than
-     by the ink.** `surface-raised` now sits at 0.21, and 500 measures 4.50
-     against it: the worst dark ground clears AA with no half step involved. 450
-     stays because it is what `foreground-subtle` points at in dark and because
-     moving an ink is a decision about the ink, not a consequence of a surface
-     moving under it. 0.53 and 0.67 are those thresholds with nothing to spare,
-     measured rather than picked, and they clear every ground in their own mode
-     at 4.69 and 4.73. **They sit three and four hundredths from 600 and 400,
-     which is the finding and not an accident.** The readable range in light is
-     the whole of 0 to 0.53, and two inks that are both quiet and both readable
-     have to share the top of it. */
+  /* The two half steps exist because 4.5:1 puts a hard ceiling on how quiet a
+     *readable* ink can be. Light grounds run 0.96 to 1.0, so any ink above about
+     0.53 is under 4.5 on one of them: 500 at 0.6 measured 3.53 on
+     `surface-sunken` and 3.95 on the page, while carrying inactive tab labels,
+     the pagination summary and an input's own text.
+
+     **The dark half of that argument has since been paid off by the ladder
+     rather than by the ink.** `surface-raised` now sits at 0.21 and 500 measures
+     4.50 against it, so the worst dark ground clears AA with no half step. 450
+     stays because it is what `foreground-subtle` points at in dark, and because
+     moving an ink is a decision about the ink rather than a consequence of a
+     surface moving under it.
+
+     0.53 and 0.67 are those thresholds with nothing to spare, clearing every
+     ground in their own mode at 4.69 and 4.73. **They sit three and four
+     hundredths from 600 and 400, which is the finding and not an accident**: the
+     readable range in light is the whole of 0 to 0.53, so two inks that are both
+     quiet and both readable share the top of it. */
   --_helix-neutral-450: oklch(0.67 var(--_helix-neutral-cast));
   --_helix-neutral-500: oklch(0.6 var(--_helix-neutral-cast));
   --_helix-neutral-550: oklch(0.53 var(--_helix-neutral-cast));
@@ -106,29 +106,37 @@
      `surface-raised`, against 1.083 before, so the question is now open rather
      than hypothetical. White is 1.0 with nothing above it competing, so 300
      takes the whole reduction. */
-  /* Two of these four moved, and none of it was the metrics asking.** 800 came
-     down from 0.29 to 0.21 and 900 from 0.21 to 0.182, which paints dark
-     `surface` #121212 and both `surface-raised` and `surface-overlay` #181818.
-     Measured in Chromium as painted sRGB, then converted, for `surface` against
-     the page, at the rungs now shipping: OKLab L light 0.0150 dark 0.1820 dark
-     separates 12.1x more sRGB code light 0.0196 dark 0.0706 dark separates 3.6x
-     more WCAG excess light 0.0438 dark 0.1210 dark separates 2.8x more linear Y
-     light 0.0440 dark 0.0060 LIGHT separates 7.3x more The last line is the one
-     that matters most and it reverses the finding. `surface-sunken` behaves the
-     same way: light 0.053 against dark 0.043 in sRGB, and light ahead by 1.8x on
-     WCAG, where OKLab L alone says dark is 3.7x ahead. Those two are unchanged:
-     950 did not move. A fault whose magnitude runs from 0.1x to 12x and whose
-     sign* depends on the metric is not a measured fault. `neutral-900` is dark
-     `surface` *and* light `surface-inverse` *and* the dark translucent material,
-     so a light tooltip went to #121212 with the dark page it was named after,
-     and the glass panels darkened by the same amount. `neutral-950` is dark
-     `surface-sunken` *and* the modal scrim in both modes, and stayed. **What is
-     left, and it is one thing rather than a ramp.** `surface-overlay` in light
+  /* **Two of these four moved, and none of it was the metrics asking.** 800 came
+     down from 0.29 to 0.21 and 900 from 0.21 to 0.182, painting dark `surface`
+     #121212 and both `surface-raised` and `surface-overlay` #181818.
+
+     Measured in Chromium as painted sRGB, for `surface` against the page, at the
+     rungs now shipping:
+
+     | metric      | light  | dark   | separates            |
+     | ----------- | ------ | ------ | -------------------- |
+     | OKLab L     | 0.0150 | 0.1820 | dark, by 12.1x       |
+     | sRGB code   | 0.0196 | 0.0706 | dark, by 3.6x        |
+     | WCAG excess | 0.0438 | 0.1210 | dark, by 2.8x        |
+     | linear Y    | 0.0440 | 0.0060 | **light**, by 7.3x   |
+
+     The last line reverses the finding, and `surface-sunken` behaves the same
+     way: light 0.053 against dark 0.043 in sRGB, light ahead by 1.8x on WCAG
+     where OKLab L alone says dark is 3.7x ahead. A fault whose magnitude runs
+     from 0.1x to 12x and whose *sign* depends on the metric is not a measured
+     fault. 950 did not move.
+
+     `neutral-900` is dark `surface` *and* light `surface-inverse` *and* the dark
+     translucent material, so a light tooltip went to #121212 with the dark page
+     it was named after. `neutral-950` is dark `surface-sunken` and the modal
+     scrim in both modes, and stayed.
+
+     **What is left is one thing rather than a ramp.** `surface-overlay` in light
      is `neutral-0`, the page color exactly, so its separation is zero by all
-     four metrics rather than small by three of them. That is deliberate and the
-     policy says so: floating leads with shadow, which is why `border-floating`
-     rests at 0. Closing it needs a new primitive between 1.0 and 0.985, since
-     nothing sits there, and it buys about seven thousandths of sRGB. */
+     four metrics rather than small by three. That is deliberate: floating leads
+     with shadow, which is why `border-floating` rests at 0. Closing it needs a
+     new primitive between 1.0 and 0.985 and buys about seven thousandths of
+     sRGB. */
   --_helix-neutral-700: oklch(0.33 var(--_helix-neutral-cast));
   --_helix-neutral-800: oklch(0.21 var(--_helix-neutral-cast));
   /* 0.182 and not 0.18, which is the same gray to read and not the same gray to
@@ -141,24 +149,25 @@
   --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
 
   /* ------------------------------------------------------ series ------ */
-  /* Eight colors for eight things that are not each other. **Lightness must
-     not.** Offsetting it from the seed with `calc(l + 0.14)` on every other step
-     puts two of the eight at 1.04 and 1.00 contrast against a light background:
-     the same color as the paper. A hue rotation changes how light a color looks*
-     at a fixed L, and yellow at 0.72 on white is nothing at all. So lightness is
-     stated per mode and held in a band that clears 3:1 against the surface it is
-     drawn on, and the alternation that keeps adjacent pairs apart happens inside
-     that band rather than around the seed. **Hue alone is not enough, which is
-     the other half.** Around one in twelve men cannot separate the red and green
-     ends, so two series differing only in hue are two some readers cannot tell
-     apart. **Eight slots 45 degrees apart, visited three at a time.** Even
-     spacing puts adjacent *slots* only 45 degrees apart, and the answer to that
-     is the order the slots are taken in rather than the spacing between them:
-     stepping three each time visits all eight and leaves consecutive series 135
-     degrees apart, so one, two and three sit 135, 90 and 135 from each other,
-     which is what most charts use. Measured in OKLab, the even cut holds the
-     closest dark pair at 0.133, the worst deuteranopia pair at 0.054 and the
-     smallest hue gap at 45 degrees. */
+  /* Eight colors for eight things that are not each other.
+
+     **Lightness must not come off the seed.** Offsetting it with
+     `calc(l + 0.14)` on every other step puts two of the eight at 1.04 and 1.00
+     against a light background: the color of the paper. A hue rotation changes
+     how light a color *looks* at a fixed L, and yellow at 0.72 on white is
+     nothing at all. So lightness is stated per mode and held in a band that
+     clears 3:1 against the surface it is drawn on, and the alternation happens
+     inside that band rather than around the seed.
+
+     **Hue alone is not enough**, which is the other half: around one in twelve
+     men cannot separate the red and green ends.
+
+     **Eight slots 45 degrees apart, visited three at a time.** Even spacing puts
+     adjacent slots only 45 apart, and the answer is the order they are taken in:
+     stepping three visits all eight and leaves consecutive series 135 apart, so
+     one, two and three sit 135, 90 and 135 from each other. Measured in OKLab,
+     the even cut holds the closest dark pair at 0.133 and the worst deuteranopia
+     pair at 0.054. */
   --_helix-series-hue-1: 0;
   --_helix-series-hue-2: 135;
   --_helix-series-hue-3: 270;
@@ -172,18 +181,16 @@
   --_helix-brand-500: var(--_helix-seed-brand);
   --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);
   --_helix-brand-700: oklch(from var(--_helix-seed-brand) calc(l - 0.1) c h);
-  /* `0.13`, and it was once the difference between passing and not.** This rung
-     is `--helix-color-primary` in dark mode, and against the 0.29 that
+  /* **`0.13`, and it was once the difference between passing and not.** This rung
+     is `--helix-color-primary` in dark, and against the 0.29 that
      `surface-raised` and `surface-overlay` then held, `+ 0.12` measured 4.431:1
-     on the two lightest grounds a dark page has: under AA, on the pair a dark
-     theme uses most. Measured in a browser by walking the lightness: 0.664 gave
-     4.48 and 0.669 gave 4.572, so the step became 0.13 and the margin was real
-     rather than a rounding away. *Those two grounds have since come down to
-     0.21, and the margin is now large.** `+ 0.12` measures 5.556:1 there and `+
-     0.13` measures 5.733:1, so the rung no longer sits against a threshold. It
-     stays at 0.13 because a shipped color is not re-picked for having got
-     easier, and because the hundredth is what the light side's `- 0.05` and `-
-     0.10` are measured against below. */
+     on the two lightest grounds a dark page has. Walking the lightness in a
+     browser, 0.664 gave 4.48 and 0.669 gave 4.572, so the step became 0.13.
+
+     Those grounds have since come down to 0.21 and the margin is now large, `+
+     0.13` measuring 5.733:1. It stays because a shipped color is not re-picked
+     for having got easier, and because the hundredth is what the light side's
+     `- 0.05` and `- 0.10` are measured against below. */
   --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.13) c h);
   /* The dark side of the ramp.** 600 and 700 step down from the seed for a light
      page, where pressing a control should sink it into the ground. A dark page

@@ -57,14 +57,12 @@
 }
 
 /* The hole tells its contents how big it is, twice, because one number cannot
-   say it to everything. **`font-size` is what plain content comes out at.**
-   Anything slotted that does not resize itself, a number in a span, a word, is
-   drawn at this and scales with the ring. **`--stat-value-size` is what a `Stat`
-   comes out at**, and it has to be said separately because a `Stat` multiplies
-   what it inherits by a little over three. A single base tuned to that
-   multiplier sizes a `Stat` correctly and everything else at a third of what it
-   should be: measured, plain text at 14px in a 179px hole, which reads as type
-   that does not scale at all. */
+   say it to everything. **`font-size` is what plain content comes out at** —
+   anything slotted that does not resize itself. **`--stat-value-size` is what a
+   `Stat` comes out at**, said separately because a `Stat` multiplies what it
+   inherits by a little over three: a single base tuned to that multiplier sizes
+   the `Stat` correctly and everything else at a third, measured as plain text at
+   14px in a 179px hole. */
 [part="center"] slot {
   --stat-value-size: 24cqi;
 
@@ -85,17 +83,17 @@
   translate: -50% -50%;
 
   box-sizing: border-box;
-  /* A container, so what is slotted here can be sized against the hole rather
-     than against the page. The hole is a proportion of the chart and the type
-     ramp is not, so absolute type fits at exactly one chart size: measured, a
-     `Stat` reading `10,000` painted across four slices at anything but the one
-     the default was tuned to. **The sizes are on the slot and not here, which is
-     not a detail.** An element cannot size itself in its own container's units,
-     that being circular, so `cqi` written on the container resolves against
-     whatever container is further up, or the viewport, and the total comes out
-     four times the width of the ring. The ring is drawn at r=40 in a 100 box
-     with the stroke astride it, so the hole's diameter is `2 * (40 - thickness /
-     2)`, which is `80 - thickness`. */
+  /* A container, so what is slotted here sizes against the hole rather than the
+     page. The hole is a proportion of the chart and the type ramp is not, so
+     absolute type fits at exactly one chart size: measured, a `Stat` reading
+     `10,000` painted across four slices at anything but the default.
+
+     **The sizes are on the slot and not here.** An element cannot size itself in
+     its own container's units, that being circular, so `cqi` written on the
+     container resolves against whatever container is further up and the total
+     comes out four times the width of the ring. The ring is drawn at r=40 in a
+     100 box with the stroke astride it, so the hole's diameter is
+     `80 - thickness`. */
   container-type: inline-size;
   display: grid;
   inline-size: calc(100% * (80 - var(--donut-chart-stroke, 16)) / 100);
@@ -307,13 +305,12 @@
   cursor: crosshair;
 }
 
-/* A half circle, opening downward. **The box is no longer square.** The headless
-   tier crops the view box to the band it actually draws, from the top of the
-   ring to the center line plus the half stroke the flat ends hang below it, so
-   the ratio is the width over that band. **The first slice starts at nine
-   o'clock**, not twelve, because the whole is now the top half and a reader
-   reads it left to right. `rotate(180deg)` rather than `-90deg`, and the same
-   rule covers the track so the two cannot part. */
+/* A half circle, opening downward. **The box is no longer square**: the headless
+   tier crops the view box to the band it draws, from the top of the ring to the
+   center line plus the half stroke the flat ends hang below it. **The first
+   slice starts at nine o'clock**, not twelve, because the whole is now the top
+   half and a reader reads it left to right. `rotate(180deg)` rather than
+   `-90deg`, and the same rule covers the track so the two cannot part. */
 :host([sweep="half"]) [part="plot"] svg {
   aspect-ratio: 100 / calc(40 + var(--donut-chart-stroke, 16) / 2);
 }

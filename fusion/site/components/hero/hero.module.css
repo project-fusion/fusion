@@ -43,15 +43,14 @@
 
 /* **`max-content` around `stretch`, so the buttons name the width.**
  *
- * The install pill sized itself to its own text, 214 around 164 of code, under
- * a button pair measuring 412: the hero column ended in an element hugging
- * itself beneath a row twice its width. Padding is the gentler lever and does
- * not reach, `md` measuring 222 and `lg` 238.
+ * The install pill sized itself to its own text, 214 around 164 of code, under a
+ * button pair measuring 412: the hero column ended in an element hugging itself
+ * beneath a row twice its width. Padding does not reach, `md` measuring 222 and
+ * `lg` 238.
  *
- * A `min-inline-size` on the pill would be 412 written down, and wrong the day
- * either button's label changes. Here the wrapper is as wide as its widest
- * child, which is the button row, and the pill stretches to it. The number
- * stays a consequence of the copy rather than a constant beside it. */
+ * A `min-inline-size` would be 412 written down, and wrong the day either
+ * button's label changes. The wrapper is as wide as its widest child and the
+ * pill stretches to it, so the number stays a consequence of the copy. */
 .heroActions {
   align-items: stretch;
   inline-size: max-content;
@@ -106,19 +105,17 @@
 
 .heroInstall helix-copy-button {
   /*
- *  Sized to the line, not to a control.
+ * Sized to the line, not to a control.
  *
- * `IconButton` is `--helix-size-control` by default, which is 40, and a 40
- * control inside a chip built for 13px type sets the height of the whole
- * thing: measured at 50 for a line whose text is 20. Through the component's
- * own `--icon-button-size`, matched to the row's own line box, so the command
- * is what the box is sized to and the button is something inside it.
+ * `IconButton` defaults to `--helix-size-control`, which is 40, and a 40 control
+ * inside a chip built for 13px type sets the height of the whole thing: measured
+ * at 50 for a line whose text is 20. Through the component's own
+ * `--icon-button-size` instead, matched to the row's line box.
  *
- * **Floored at 24, because tying a control to a type scale can shrink it out
- * of being pressable.** `text-sm` times 1.8 is 23.4, which rounds to 23 and
- * is a pixel under the 24 minimum a target is meant to hold. The `max` keeps
- * the size following the ramp everywhere the ramp is large enough and stops
- * it following the ramp down past a floor that is not about type at all.
+ * **Floored at 24, because tying a control to a type scale can shrink it out of
+ * being pressable.** `text-sm` times 1.8 is 23.4, a pixel under the 24 minimum a
+ * target holds. The `max` follows the ramp wherever it is large enough and stops
+ * following it down past a floor that is not about type at all.
  */
   --icon-button-radius: var(--helix-radii-xs);
   --icon-button-size: max(1.5rem, calc(var(--helix-text-sm) * 1.8));
@@ -166,16 +163,14 @@
 }
 
 /*
- *  A scale of five, set here rather than taken from the tokens.
+ * A scale of five, set here rather than taken from the tokens.
  *
  * **The token scale is right for a page of prose and wrong for this page.** It
  * steps in even ratios because a document needs a rhythm that holds over many
- * paragraphs. A landing page is a handful of statements at very different
- * weights, and the sizes it wants are not evenly spaced: a display line, a
- * subhead that carries real reading, and body. `.tLede` is the middle size and
- * the whole point: without it a 64px display runs straight into a 15px lede, a
- * jump of more than four to one, and the hero reads as a poster with a caption
- * stuck under it.
+ * paragraphs; a landing page is a handful of statements at very different
+ * weights. `.tLede` is the middle size and the whole point: without it a 64px
+ * display runs straight into a 15px lede, more than four to one, and the hero
+ * reads as a poster with a caption stuck under it.
  */
 /*
  * *The display face, which a plain `<h1>` does not get.** Helix hangs it on

@@ -29,20 +29,18 @@
   --heatmap-tone-warning: var(--helix-color-warning);
 
   /*
- * *The numbered ones are a ramp, and a ramp is one hue getting louder.**
- *      A reader compares two cells by weight and cannot compare two hues at all,
- *      so magnitude has to be a single color walked toward the ground it sits on.
- *      Mixed rather than picked off the scale because the steps have to be even:
- *      the nearest four semantic tokens are `primary-subtle`, `primary`,
- *      `primary-hover` and `primary-active`, which is the 50 then 500, 600, 700 of
- *      the ramp, one chasm and three hairs.
+ * **The numbered ones are a ramp, and a ramp is one hue getting louder.** A
+ * reader compares two cells by weight and cannot compare two hues at all, so
+ * magnitude is a single color walked toward the ground it sits on. Mixed rather
+ * than picked off the scale because the steps have to be even: the nearest four
+ * semantic tokens are the 50 then 500, 600, 700 of the ramp, one chasm and three
+ * hairs.
  *
- * *`primary-active` is the far end rather than `primary`, because a ramp is
- *      only as legible as the distance it spans.** Walked to the mid weight, the
- *      top three steps came out within a few percent of each other and a busy week
- *      was indistinguishable from a quiet one; the active weight is the 700 in
- *      light and the 200 in dark, so the run is light-gray-to-deep in one mode and
- *      near-black-to-bright in the other, and five steps have room to be five.
+ * **`primary-active` is the far end rather than `primary`**, a ramp being only
+ * as legible as the distance it spans. Walked to the mid weight the top three
+ * steps came out within a few percent of each other, and a busy week was
+ * indistinguishable from a quiet one. The active weight is the 700 in light and
+ * the 200 in dark, so five steps have room to be five.
  */
   --heatmap-tone-1: color-mix(
     in oklab,
@@ -92,16 +90,14 @@
   position: relative;
 }
 
-/* A cell is a square with a tone in it and nothing else. The default is the
-   quietest ground the palette has rather than transparent: a strip of holes
-   reads as a broken picture, where a strip of empty cells reads as a period
-   with nothing in it, which is what it is.
+/* A cell is a square with a tone in it. The default is the quietest ground the
+   palette has rather than transparent: a strip of holes reads as a broken
+   picture, where a strip of empty cells reads as a period with nothing in it.
 
    **Half of `radii-sm`, because a corner is a fraction of the box it rounds.**
-   The scale's smallest step is 4px, which is a third of a 12px cell, and a third
-   is a dot: ninety of them read as beads on a string rather than as a row of
-   days. Halved they read as cells, and the value still comes off the seed, so a
-   theme that squares its corners squares these too. */
+   The scale's smallest step is 4px, a third of a 12px cell, and a third is a
+   dot: ninety of them read as beads on a string. Halved they read as cells, and
+   the value still comes off the seed. */
 [part="cell"] {
   background-color: var(--heatmap-tone, var(--helix-color-surface-sunken));
   border-radius: var(--heatmap-cell-radius, calc(var(--helix-radii-sm) * 0.5));
@@ -112,19 +108,16 @@
    with no size that the bubble hangs off; the anchor covers the strip and takes
    no pointer events, so it can never eat the hover that summoned it. */
 /* **A pixel rather than nothing, because a rect of no area is not trackable.**
-   This is the point the bubble hangs off, so it was written with no size at
-   all, and that is the one thing an anchor may not be. `Tooltip` names the
-   failure in its own source: an element that draws nothing is what "took the
-   bubble to the corner of the window", and the descent that guards against it
-   runs only on the slotted path. Reached through `for`, as a chart reaches it,
-   the element is taken as given.
+   This is the point the bubble hangs off, and it was written with no size at
+   all. `Tooltip` names the failure in its own source — an element that draws
+   nothing "took the bubble to the corner of the window" — and the descent that
+   guards against it runs only on the slotted path, where reaching it through
+   `for`, as a chart does, takes the element as given.
 
-   `autoUpdate` tracks a reference by observing it, and the move observer
-   derives its root margin from the reference's own rect. A 0 by 0 rect makes
-   that margin degenerate, so the updates that should follow a scroll or a
-   resize do not necessarily fire, and the bubble keeps whatever position it was
-   last given. One pixel is enough to be observable and is still nothing to
-   look at: no fill, no border, and out of the pointer's way. */
+   `autoUpdate` observes a reference, and the move observer derives its root
+   margin from that rect. A 0 by 0 rect makes the margin degenerate, so updates
+   that should follow a scroll do not necessarily fire. One pixel is enough to be
+   observable and is still nothing to look at. */
 [part="mark"] {
   block-size: 1px;
   inline-size: 1px;
