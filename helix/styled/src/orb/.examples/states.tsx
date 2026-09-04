@@ -1,0 +1,17 @@
+export function Example() {
+  return (
+    <helix-flex
+      align="center"
+      gap="lg"
+    >
+      {/* The four shapes, side by side. In use only one is on the screen at a
+          time and it carries itself into the next: the point of the set is that
+          they are the same cloud read differently, so a change of state is a
+          move rather than a cut. */}
+      <helix-orb state="thinking"></helix-orb>
+      <helix-orb state="fetching"></helix-orb>
+      <helix-orb state="working"></helix-orb>
+      <helix-orb state="done"></helix-orb>
+    </helix-flex>
+  )
+}

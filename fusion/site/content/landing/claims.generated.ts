@@ -13,7 +13,7 @@ export const CLAIMS: readonly Claim[] = [
   {
     label: 'Components',
     note: 'Two tiers. Headless behavior and a styled layer over it, both shipped.',
-    value: '93',
+    value: '94',
   },
   {
     label: 'The token layer, compressed',
@@ -28,7 +28,7 @@ export const CLAIMS: readonly Claim[] = [
   {
     label: 'Shared across the first component',
     note: 'Ten components are one runtime plus nine additions, not ten of the first number.',
-    value: '83%',
+    value: '82%',
   },
 ]
 

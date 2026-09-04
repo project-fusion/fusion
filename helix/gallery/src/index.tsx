@@ -55,6 +55,7 @@ import { navigationArt } from './art/navigation'
 import { notificationsArt } from './art/notifications'
 import { numberInputArt } from './art/number-input'
 import { optionArt } from './art/option'
+import { orbArt } from './art/orb'
 import { outlineArt } from './art/outline'
 import { paginationArt } from './art/pagination'
 import { pinInputArt } from './art/pin-input'
@@ -100,7 +101,7 @@ import { virtualListArt } from './art/virtual-list'
  * Every family has an entry, and every entry is a file under `art/` named for
  * the family it draws. The system they all obey is `system.md`.
  *
- * **Ninety-four, not the ninety-three folders in `helix/styled/src`.** The catalog is
+ * **Ninety-five, not the ninety-four folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@fusion.dev/helix-sandbox`. The count that matters is whatever `getFamilies`
  * returns, never a directory listing.
@@ -192,6 +193,7 @@ const art: Record<string, ReactNode> = {
   notifications: notificationsArt,
   'number-input': numberInputArt,
   option: optionArt,
+  orb: orbArt,
   outline: outlineArt,
   pagination: paginationArt,
   'pin-input': pinInputArt,

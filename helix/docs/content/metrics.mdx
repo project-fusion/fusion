@@ -62,7 +62,7 @@ repository does that. The per-component tables are what a page pays.
 | `@fusion.dev/helix-headless` | 523,719 | 133,055 | 104,253 | Every headless family, which is what the barrel means. |
 | `@fusion.dev/helix-icons` | 47,484 | 14,907 | 12,553 | The whole glyph set. |
 | `@fusion.dev/helix-theme` | 3,288 | 1,571 | 1,355 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| `@fusion.dev/helix` | 961,770 | 218,408 | 160,100 | Every styled family. |
+| `@fusion.dev/helix` | 969,618 | 221,400 | 162,184 | Every styled family. |
 | `lit` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -76,18 +76,18 @@ is the whole cost of adopting the base layer on its own.
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
 | `base.css` | 23,145 | 3,556 | 3,065 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
-| `elements.css` | 7,033 | 1,209 | 1,082 | Hides each element until its definition loads, generated from the tags in `@fusion.dev/helix`. |
+| `elements.css` | 7,076 | 1,217 | 1,094 | Hides each element until its definition loads, generated from the tags in `@fusion.dev/helix`. |
 | `helix.css` | 207 | 148 | 118 | The four above in one import, in the order they have to be in. |
 | `primitives.css` | 6,275 | 1,234 | 1,062 | The primitive layer. Private, shipped because `tokens.css` resolves into it. |
 | `tokens.css` | 19,989 | 2,460 | 2,044 | The 185 semantic tokens. Nothing paints without this. |
 
 ## What the numbers say
 
-**Most of a first component is the runtime under it.** The median styled family is 13,974 bytes gzipped alone and adds 2,403 to a page that already has Helix on it, so 83 percent of the first one is shared and 17 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
+**Most of a first component is the runtime under it.** The median styled family is 13,914 bytes gzipped alone and adds 2,450 to a page that already has Helix on it, so 82 percent of the first one is shared and 18 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is `code` at 9,065 gzipped alone, the dearest `data-table` at 51,725, over 93 components. Every family at once is 218,408.
+Across the tier: the cheapest is `code` at 9,065 gzipped alone, the dearest `data-table` at 51,725, over 94 components. Every family at once is 221,400.
 
-**No family imports a barrel, and the `barrels` rule in `fusion workspace` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 133,055 bytes gzipped whatever else the page does, which is 10 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
+**No family imports a barrel, and the `barrels` rule in `fusion workspace` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 133,055 bytes gzipped whatever else the page does, which is 10 times the median family measured above. The styled tier imports the family it extends instead, all 94 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
 
 The headless tier never had the problem, and it is the control: `@fusion.dev/helix-core` is `sideEffects: false`, and a headless family is a median of 16,187 bytes gzipped alone.
 
@@ -332,6 +332,7 @@ The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gi
 | `notifications` | 92,539 | 29,630 | 24,493 | 16,186 | 4,067 | 3,165 |
 | `number-input` | 91,816 | 29,585 | 24,291 | 11,928 | 3,372 | 2,518 |
 | `option` | 32,142 | 10,562 | 9,308 | 5,961 | 1,790 | 1,236 |
+| `orb` | 33,900 | 12,026 | 10,637 | 7,677 | 3,262 | 2,518 |
 | `outline` | 35,566 | 11,582 | 10,202 | 8,251 | 2,540 | 1,760 |
 | `pagination` | 150,008 | 45,108 | 38,107 | 43,689 | 9,548 | 7,716 |
 | `pin-input` | 40,676 | 12,803 | 11,279 | 8,259 | 2,639 | 1,829 |
@@ -384,9 +385,9 @@ column is what was removed rather than part of what remains.
 | `@fusion.dev/helix-core` | 679,080 | 115 | 161,519 | `@floating-ui/dom`, `@fusion.dev/helix-icons` |
 | `@fusion.dev/helix-headless` | 8,396,649 | 422 | 703,895 | `@fusion.dev/helix-core`, `@fusion.dev/helix-icons`, `uqr` |
 | `@fusion.dev/helix-icons` | 65,943 | 11 | 20,928 | none |
-| `@fusion.dev/helix-styles` | 90,338 | 6 | 0 | none |
+| `@fusion.dev/helix-styles` | 90,381 | 6 | 0 | none |
 | `@fusion.dev/helix-theme` | 461,551 | 8 | 4,699 | none |
-| `@fusion.dev/helix` | 9,314,715 | 716 | 278,117 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
+| `@fusion.dev/helix` | 9,393,801 | 724 | 300,554 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
 
 ## Not measured yet
 

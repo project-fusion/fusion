@@ -1,0 +1,67 @@
+:host {
+  /* Sized from a token, so an orb is the same size wherever it is placed. Set
+     `--orb-size: 1lh` for one that should match the line it sits on, which is
+     the case beside a message. */
+  --_orb-size: calc(var(--helix-size-loader-lg) * 1.5);
+
+  /* The two ends of the depth ramp, named rather than sampled.
+   *
+   * A dot's color is its ink mixed toward the ground by how far away it is,
+   * and both ends have to be real colors for that to mean anything. The far
+   * end cannot be read off the host: an element with no background of its own
+   * computes `transparent`, and mixing toward transparent leaves the far side
+   * of the sphere at full strength over whatever is behind it. So the ground is
+   * a token with an override, and a consumer placing an orb on a colored
+   * surface says so once. */
+  --_orb-color: var(--orb-color, currentColor);
+  --_orb-ground: var(--orb-ground, var(--helix-color-background));
+
+  block-size: var(--orb-size, var(--_orb-size));
+  /* Inline, so an orb beside text sits on the line with it, and shrink-proof,
+     so a flex row cannot squash it into an ellipse. */
+  display: inline-block;
+  flex-shrink: 0;
+  inline-size: var(--orb-size, var(--_orb-size));
+  vertical-align: middle;
+}
+
+:host([size="sm"]) {
+  --_orb-size: var(--helix-size-loader-md);
+}
+
+:host([size="lg"]) {
+  --_orb-size: calc(var(--helix-size-loader-lg) * 2);
+}
+
+/* The canvas fills the host and is measured from it, so `--orb-size`, the
+   `size` attribute and a consumer's own `inline-size` all work the same way and
+   none of them has to be read by script. */
+[part="canvas"] {
+  block-size: 100%;
+  /* **Both ends of the ramp are carried on real color properties, because a
+     custom property does not resolve to one.** `getComputedStyle` hands back a
+     custom property as the text that was written: `currentColor` stays the word
+     `currentColor`, `light-dark(...)` stays the function, and neither is a
+     number the canvas can mix. A color-typed property is resolved by the
+     engine before it is reported, so the script reads two `rgb()` triples and
+     never parses CSS itself.
+
+     `text-decoration-color` because it is inert here: a canvas draws no text
+     and takes no decoration, so the property paints nothing and is free to
+     carry the far end of the ramp. */
+  color: var(--_orb-color);
+  display: block;
+  inline-size: 100%;
+  text-decoration-color: var(--_orb-ground);
+}
+
+/* Print: an orb is a promise that something is coming, which on paper it is
+   not.
+
+   `@media print` does not cross a shadow boundary, so a page cannot answer this
+   on a component's behalf and every family says it for itself. */
+@media print {
+  :host {
+    display: none;
+  }
+}
