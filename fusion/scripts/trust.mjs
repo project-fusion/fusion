@@ -107,6 +107,14 @@ const PUBLISHERS = [
   { environment: 'experimental', file: 'release-experimental.yml' },
 ]
 
+/**
+ * npm refusing to create a registration that is already there.
+ *
+ * Matched on the status rather than on the sentence, because the sentence is
+ * npm's to change and the status is the protocol's.
+ */
+const CONFLICT = /\b409\b|conflict/i
+
 const apply = process.argv.includes('--apply')
 const packages = [...manifests()]
   .filter(([name, { manifest }]) => domainOf(name) !== undefined && publishes(manifest))
@@ -119,6 +127,7 @@ if (packages.length === 0) {
 }
 
 let failed = 0
+let existing = 0
 const denied = new Set()
 const challenged = new Set()
 for (const name of packages) {
@@ -164,10 +173,23 @@ for (const name of packages) {
         }
       }
       const error = first
-      failed += 1
       /* npm's own message, rather than "Command failed". Getting this wrong is
          how a registry error becomes an afternoon. */
       const output = String(error.stderr ?? error.message)
+
+      /* **A conflict is the registration already being there, which is the
+         answer this script exists to give.** npm attaches one trusted publisher
+         per package, workflow and environment and refuses a second, so a 409 is
+         what a re-run gets for work that is done. Counting it as a failure
+         makes the second run report twenty-two problems with no way to tell
+         them from the real ones, which defeats re-running as the check. */
+      if (CONFLICT.test(output)) {
+        existing += 1
+        console.log(`  ${name} <- ${file} (${environment}): already registered`)
+        continue
+      }
+
+      failed += 1
       console.error(`  ${name} <- ${file} (${environment}) FAILED`)
       console.error(`    ${output.trim().split('\n').join('\n    ')}`)
       if (/403|forbidden/i.test(output)) {
@@ -220,4 +242,7 @@ if (failed > 0) {
   }
   process.exit(1)
 }
-console.log(`\ntrust: ${packages.length * PUBLISHERS.length} registrations in place`)
+console.log(
+  `\ntrust: ${packages.length * PUBLISHERS.length} registrations in place` +
+    (existing > 0 ? ` (${existing} already were)` : ''),
+)
