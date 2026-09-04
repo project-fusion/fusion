@@ -25,17 +25,19 @@ export function Example() {
             <helix-icon name="x" />
           </helix-icon-button>
 
+          {/* No avatar on the assistant's turns. This panel says whose it is twice
+              before a word is read -- the drawer is labeled `Assistant` and so is
+              the header above the log -- and a mark on every answer would be the
+              third. The slot is there for a transcript with more than one voice
+              in it. */}
           <helix-chat-message author="me" state="sent">
             Summarize what changed in this release.
           </helix-chat-message>
           <helix-chat-message author="them" separation="plain" state="sent">
-            <helix-avatar name="AI" shape="circle" size="sm" slot="avatar" />
             Eleven components changed. The largest is the date picker, which now reads its own value
             as a date rather than a string.
           </helix-chat-message>
-          <helix-chat-message author="them" separation="plain" state="streaming">
-            <helix-avatar name="AI" shape="circle" size="sm" slot="avatar" />
-          </helix-chat-message>
+          <helix-chat-message author="them" separation="plain" state="streaming" />
 
           <helix-chat-composer placeholder="Ask about the release" slot="composer">
             <helix-icon-button emphasis="ghost" label="Stop answering" slot="end">

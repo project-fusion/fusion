@@ -44,13 +44,19 @@ export function Example() {
       {/* `separation="plain"` because an answer is a passage rather than a remark.
              The reader's own turns keep their bubbles, so the two sides of the
              conversation are told apart by what they are as well as by which edge they
-             sit against. */}{' '}
+             sit against.
+
+             **No avatar on the answer, and the slot is still there for one.** A mark
+             per message earns its place where a reader has to tell speakers apart,
+             and a conversation with one assistant in it has nobody to confuse it
+             with: the bubble, the edge it sits against and the header have each
+             already said who is talking. The slot is for the transcript that has
+             several agents, or several people, in it. */}{' '}
       <helix-chat-message author="them" separation="plain" state="sent">
         {' '}
-        <helix-avatar name="AI" shape="circle" size="sm" slot="avatar"></helix-avatar> The migration
-        is waiting on a lock. Another connection has held <helix-code>ACCESS EXCLUSIVE</helix-code>{' '}
-        on <helix-code>orders</helix-code> since 09:14, so the deploy is queued behind it rather
-        than failing.{' '}
+        The migration is waiting on a lock. Another connection has held{' '}
+        <helix-code>ACCESS EXCLUSIVE</helix-code> on <helix-code>orders</helix-code> since 09:14, so
+        the deploy is queued behind it rather than failing.{' '}
         {/* What the answer was drawn from, set as a footnote: the marks stack the
                way an avatar group does and the words stay small and quiet, because a
                citation is a reference rather than a control. */}{' '}
@@ -84,10 +90,7 @@ export function Example() {
       {/* The wait before the first token. `streaming` with nothing in it yet draws
              the typing indicator; the moment content arrives it stops, and nothing
              decorates the text after that because the text arriving is the signal. */}{' '}
-      <helix-chat-message author="them" separation="plain" state="streaming">
-        {' '}
-        <helix-avatar name="AI" shape="circle" size="sm" slot="avatar"></helix-avatar>{' '}
-      </helix-chat-message>{' '}
+      <helix-chat-message author="them" separation="plain" state="streaming" />{' '}
       <helix-button emphasis="solid" slot="resume">
         {' '}
         <helix-icon name="arrow-down" slot="start"></helix-icon> Jump to latest{' '}
