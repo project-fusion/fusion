@@ -90,8 +90,10 @@ fi
 # something releases, so a docs-only pull request stays quiet, and updated
 # whenever one already exists so it can go back to saying nothing.
 marker='<!-- release-intent -->'
-existing=$(gh api "repos/$REPO/issues/$NUMBER/comments" --paginate --slurp \
-  --jq "[.[][] | select(.body | startswith(\"$marker\")) | .id] | first // empty")
+# **`--paginate` with `--jq` and never `--slurp`**, which `gh` rejects together:
+# the filter runs per page and the ids concatenate, so `head -1` is the first.
+existing=$(gh api "repos/$REPO/issues/$NUMBER/comments" --paginate \
+  --jq "[.[] | select(.body | startswith(\"$marker\")) | .id] | first // empty" | head -1)
 body=$(printf '%s\n\n%s\n' "$marker" "$report")
 
 if [ -n "$existing" ]; then
