@@ -27,6 +27,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "docs": "bun scripts/build-docs.mjs",
+    "metrics": "build-metrics",
     "peers": "bun scripts/build-peers.mjs",
     "test": "bun test src",
     "timings": "bun scripts/build-timings.mjs",

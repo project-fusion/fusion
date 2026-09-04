@@ -35,13 +35,18 @@ for `helix/**`, [cortex/CONVENTIONS.md](cortex/CONVENTIONS.md) for `cortex/**`. 
 that edits your files cannot tell you whether they were correct. `fix` writes;
 `check` and `verify` judge.
 
-**A generated file is committed when somebody reads it, and not otherwise.** The
-two reference pages, the metrics table and the landing claims are committed, and
-`verify.yml` holds them to their generators by running those and then
-`git diff --exit-code`. What `cem analyze` writes is not: four files per tier,
-nine megabytes, and nobody reads a manifest in a diff. So a fresh clone has no
-manifests until `bun run analyze` has run, and every rule that reads one says so
-rather than reporting a clean tree it never looked at.
+**No generated file is committed.** Each one is written by the build of the
+package that needs it and named in that task's `outputs`, so a fresh clone has
+none of them until the thing that reads them has been built, and every rule that
+reads one says so rather than reporting a clean tree it never looked at. The
+`-- --check` runs stay: they no longer catch a commit somebody forgot, and they
+still catch a hand-edit and a generator that has stopped being deterministic.
+
+The reference pages, the metrics table and the landing claims were tracked until
+then, on the argument that people read them in a diff. What that bought was a
+file that could disagree with its generator; what it cost was a sweep, described
+under [Before a push](#before-a-push), that twice took unreviewed work into a
+commit named for something else.
 
 **A name runs a leaf or everything under it, and never both.** `helix component`'s
 `tokens` is one guard, `check:css` is every guard in that group, `check` is all
@@ -95,7 +100,7 @@ the registry catches up, and the warning names the command.
 **What CI cannot do is regenerate**, which is the one thing worth checking before
 a push. `helix/docs/content/metrics.mdx is behind the built packages` is a red
 build that stays red until somebody runs `bun run gen:metrics` and pushes again, so `.githooks/pre-push` runs `biome ci`, `check:cli` and
-the twelve generated-file checks and nothing else: seconds against four minutes.
+the generated-file checks and nothing else: seconds against four minutes.
 It judges and never writes, because a hook that edits the tree during `git push`
 produces a push that does not contain the edits. `git push --no-verify` skips it.
 
@@ -352,22 +357,13 @@ this repository.
 1. `bun run fix` if anything is unformatted or out of order.
 2. `bun run regen` if you changed a generator's source. CI cannot do this for
    you and it is the one class of failure a push will not resolve on its own.
-3. `git push`. The hook judges formatting, reachable host rules and the twelve
+3. `git push`. The hook judges formatting, reachable host rules and the
    generated files in seconds; `verify.yml` does the rest.
 
-**Regenerated files land in a commit of their own, and no source rides with
-them.** Four generated files are still tracked, deliberately, because people
-read them: the two reference pages, the metrics table and the landing claims.
-`tokens.css` is *not* one of them, whatever this file used to say: it is in
-`.gitignore` and a fresh clone builds it. They are written from the whole tree at once, so any of them may
-carry a change somebody else made in the same checkout, and `git add -A` after
-a `regen` is how that gets swept into a commit named for something else. Twice
-in one session it took work that had not been reviewed, once a private
-repository name.
-
-Committing them separately costs one commit and makes the sweep visible instead
-of silent: a diff holding nothing but generated output is one a reader can skip,
-and a diff holding source is one they can trust names only that source. It is
-also the thing that makes a merge conflict in them resolvable, because the
-answer is always to take either side and run `regen` again rather than to read
-the two.
+**Nothing generated is staged, because nothing generated is tracked.** These
+files are written from the whole tree at once, so while they were committed any
+of them could carry a change somebody else had made in the same checkout, and
+`git add -A` after a `regen` was how that got swept into a commit named for
+something else: twice in one session, once a private repository name. Ignoring
+them ends the sweep rather than making it visible, and a merge conflict in one
+is no longer possible.

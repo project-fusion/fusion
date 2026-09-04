@@ -23,7 +23,7 @@
  *
  * Run with `bun run gen:eval`; `check:gen:eval` holds the result.
  */
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { ARTIFACT } from '@fusion.dev/scripts/workspace'
@@ -251,6 +251,7 @@ if (process.argv.includes('--check')) {
   }
   console.log(`eval corpus: ${corpus.total} questions, current with ${sources.length} artifacts`)
 } else {
+  mkdirSync(dirname(OUT), { recursive: true })
   writeFileSync(OUT, wanted)
   console.log(
     `eval corpus: ${corpus.total} questions (${Object.entries(corpus.counts)

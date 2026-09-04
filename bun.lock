@@ -340,7 +340,7 @@
 
     "@fusion.dev/insights": ["@fusion.dev/insights@workspace:fusion/docs/insights", { "devDependencies": { "@fusion.dev/scripts": "fusion/scripts" } }],
 
-    "@fusion.dev/scripts": ["@fusion.dev/scripts@workspace:fusion/scripts", { "bin": { "build-element-events": "./build-element-events.mjs", "build-elements-css": "./build-elements-css.mjs", "build-styles": "./build-styles.mjs" } }],
+    "@fusion.dev/scripts": ["@fusion.dev/scripts@workspace:fusion/scripts", { "bin": { "build-element-events": "./build-element-events.mjs", "build-elements-css": "./build-elements-css.mjs", "build-eval": "./build-eval.mjs", "build-metrics": "./build-metrics.mjs", "build-styles": "./build-styles.mjs" } }],
 
     "@fusion.dev/site": ["@fusion.dev/site@workspace:fusion/site", { "dependencies": { "@fusion.dev/helix": "helix/styled", "@fusion.dev/helix-docs": "helix/docs", "@fusion.dev/helix-gallery": "helix/gallery", "@fusion.dev/helix-sandbox": "helix/sandbox", "@fusion.dev/helix-styles": "helix/styles", "@fusion.dev/helix-theme": "helix/theme", "@fusion.dev/insights": "fusion/docs/insights", "next": "^16.3.1", "react": "^19.0.0", "react-dom": "^19.0.0" }, "devDependencies": { "@fusion.dev/scripts": "fusion/scripts", "@mdx-js/mdx": "^3.1.1", "@types/react": "^19.0.0", "@types/react-dom": "^19.0.0", "remark-frontmatter": "^5.0.0", "remark-gfm": "^4.0.1" } }],
 

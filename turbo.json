@@ -23,6 +23,36 @@
   "globalEnv": ["RUNNER_ARCH", "RUNNER_OS"],
   "globalPassThroughEnv": ["GITHUB_OUTPUT", "NODE_AUTH_TOKEN"],
   "tasks": {
+    // `metrics` and `docs` run at the head of this build, so what they write is
+    // build output and an undeclared one is what a cache hit does not restore.
+    //
+    // **Here and not on the shared `build`, because of the last one.** A
+    // package-relative glob there would be harmless, resolving under each
+    // package to a path that does not exist. `$TURBO_ROOT$` does not: every
+    // package's build would claim the one absolute path, and a cache hit on any
+    // of them restores its own empty set over it. `claims.generated.ts` belongs
+    // to the site and is written from here because one pass over the packages
+    // produces it and `metrics.mdx` together; the site depends on this package,
+    // so `^build` puts it on disk before anything reads it.
+    // **`docs`, and through it `metrics`, before `tsc` reads what they write.**
+    // Both are uncached and always run, so what they leave on disk is there for
+    // a cache hit that restores only `dist`. `typecheck` and `test` below want
+    // the same ordering for the same reason: one reads the generated modules,
+    // the other imports them.
+    "@fusion.dev/helix-docs#build": {
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles", "docs"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
+      "outputs": ["dist/**"]
+    },
+    "@fusion.dev/helix-docs#test": {
+      "dependsOn": ["^build", "analyze", "docs"],
+      "inputs": ["src/**", "tests/**"],
+      "outputs": []
+    },
+    "@fusion.dev/helix-docs#typecheck": {
+      "dependsOn": ["^build", "^analyze", "analyze", "docs"],
+      "inputs": ["$TURBO_DEFAULT$"]
+    },
     // The two tiers generate `element-events.generated.ts` from their own
     // manifest before `tsc` reads it, so it is a build output and has to be
     // declared: an undeclared one is what a cache hit does not restore, and a
@@ -57,6 +87,20 @@
     "@fusion.dev/insights#build": {
       "dependsOn": ["^build"],
       "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
+    },
+    // `faces` runs at the head of this build and the font list is gitignored, so
+    // it is an output like `public/sandbox` beside it.
+    "@fusion.dev/site#build": {
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "public/sandbox/**",
+        "public/specs/**",
+        "content/faces/faces.generated.ts"
+      ]
     },
     // `cem analyze` writes four files and this used to claim one, then three.
     // The manifest is the obvious output; `jsx.d.ts`, `vue.d.ts` and
@@ -169,7 +213,7 @@
     // disagree, and `-- --check` says stale while the plain task reports
     // success from a replayed log. `samples` has the same shape and the same
     // answer.
-    "docs": { "cache": false },
+    "docs": { "cache": false, "dependsOn": ["^build", "metrics"] },
     // Reads `@customElement('tag')` out of the element sources and writes the
     // sheet that hides each one until it upgrades. A workspace step rather than
     // a package's, because it reads one package and writes another.
@@ -210,6 +254,23 @@
     "icons": {
       "inputs": ["icons.txt", "raw/**", "$TURBO_ROOT$/helix/icons/scripts/build-icons.mjs"],
       "outputs": ["src/generated.ts"]
+    },
+    // **The three tiers by name, because no dependency edge reaches them.**
+    // `helix/docs` devDepends on the manifest reader and the shared scripts and
+    // on neither tier, while this measures `dist/index.js` for both and the
+    // stylesheets `helix-styles` ships. Ordered only by `^build` the docs built
+    // first and the generator exited on a missing `helix/headless/dist`.
+    "metrics": {
+      "dependsOn": [
+        "@fusion.dev/helix#build",
+        "@fusion.dev/helix-headless#build",
+        "@fusion.dev/helix-styles#build"
+      ],
+      "inputs": ["$TURBO_ROOT$/fusion/scripts/build-metrics.mjs"],
+      "outputs": [
+        "content/metrics.mdx",
+        "$TURBO_ROOT$/fusion/site/content/landing/claims.generated.ts"
+      ]
     },
     "peers": { "cache": false },
 

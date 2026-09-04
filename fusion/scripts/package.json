@@ -22,6 +22,8 @@
   "bin": {
     "build-element-events": "./build-element-events.mjs",
     "build-elements-css": "./build-elements-css.mjs",
+    "build-eval": "./build-eval.mjs",
+    "build-metrics": "./build-metrics.mjs",
     "build-styles": "./build-styles.mjs"
   }
 }

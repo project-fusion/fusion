@@ -20,7 +20,7 @@
     "check:css:seeds": "bun run helix component check --only seeds",
     "check:gen": "turbo run content -- --check && turbo run register -- --check && turbo run docs -- --check && bun run check:gen:element-events && bun run check:gen:eval && bun run check:gen:metrics && turbo run routes -- --check && turbo run samples -- --check && turbo run themed-page -- --check && turbo run token-layer -- --check",
     "check:gen:element-events": "bun fusion/scripts/build-element-events.mjs --check",
-    "check:gen:eval": "bun fusion/scripts/build-eval.mjs --check && bun fusion/scripts/run-eval.mjs --check",
+    "check:gen:eval": "bun fusion/scripts/build-eval.mjs && bun fusion/scripts/run-eval.mjs --check",
     "check:gen:metrics": "bun fusion/scripts/build-metrics.mjs --check",
     "check:prose": "bun run fusion prose check",
     "check:queue": "bun fusion/scripts/check-queue.mjs",

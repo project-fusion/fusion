@@ -46,6 +46,12 @@ fusion/site/content/catalog/catalog.generated.json
 fusion/docs/insights/src/pages.generated.ts
 fusion/docs/insights/src/sources.generated.ts
 fusion/site/app/*/helix/theme/themed-page-markup.generated.ts
+helix/docs/src/pages.generated.ts
+helix/docs/src/sources.generated.ts
+helix/docs/content/metrics.mdx
+fusion/site/content/faces/faces.generated.ts
+fusion/site/content/landing/claims.generated.ts
+fusion/scripts/eval/questions.json
 
 # What `cem analyze` writes: nine megabytes nobody reads in a diff. Untracked,
 # it cannot go stale, because every consumer builds it. See d350fe53f.
