@@ -34,15 +34,10 @@ export function Hero({ announcement }: { announcement?: SitePage | undefined }) 
 
         <helix-flex class={styles.heroActions} direction="column" gap="md">
           <helix-flex align="center" data-density="lg" gap="sm" justify="center" wrap>
-            <Link
-              data-button="solid"
-              data-button-tone="primary"
-              data-button-width="standard"
-              href="/helix"
-            >
+            <Link data-button="solid" data-button-tone="primary" href="/helix">
               Open Helix
             </Link>
-            <Link data-button="subtle" data-button-width="standard" href="/company/services">
+            <Link data-button="subtle" href="/company/services">
               Work with us
             </Link>
           </helix-flex>

@@ -233,20 +233,20 @@ export function ComponentBrowser({
            *                 That is also why neither is `primary`: a group welds its members
            *                 into one shape, and one filled half beside one outlined half
            *                 reads as a control that is half broken rather than as a choice.
-           *                 `data-button-width="standard"` keeps both at
+           *                 `--button-inline-size` on the group keeps both at
            *                 `--helix-size-button`, so the halves are equal rather than sized
            *                 by how long their words happen to be.
            */}
-          <helix-button-group>
+          <helix-button-group class="siteActions">
             {/* An icon each, and neither of them an arrow. An arrow says
                   "onward" and nothing else, which is what the button's own
                   position already says; put one on a hero button and it is
                   decoration that happens to point right. */}
-            <Link data-button data-button-width="standard" href="/helix/components/button">
+            <Link data-button href="/helix/components/button">
               <helix-icon name="flag-banner-fold"></helix-icon>
               Start
             </Link>
-            <Link data-button data-button-width="standard" href="/helix/sandbox">
+            <Link data-button href="/helix/sandbox">
               <helix-icon name="microscope"></helix-icon>
               Sandbox
             </Link>

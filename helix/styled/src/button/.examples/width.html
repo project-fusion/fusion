@@ -1,4 +1,9 @@
 <!-- @summary A button that takes the width it is given rather than the width of its label. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
 <helix-flex
   direction="column"
   gap="md"
@@ -11,24 +16,27 @@
     <helix-button>Button</helix-button>
   </helix-flex>
 
-  <helix-flex gap="sm">
+  <helix-flex
+    class="width-floor"
+    gap="sm"
+  >
     <helix-button
       emphasis="solid"
       tone="primary"
-      width="standard"
     >Button</helix-button>
-    <helix-button width="standard">Button</helix-button>
+    <helix-button>Button</helix-button>
   </helix-flex>
 
-  <helix-flex gap="sm">
+  <helix-flex
+    class="width-floor"
+    gap="sm"
+  >
     <helix-button
       emphasis="solid"
       tone="primary"
-      width="standard"
     >Button</helix-button>
     <a
       data-button=""
-      data-button-width="standard"
       href="#cancel"
     >Button</a>
   </helix-flex>

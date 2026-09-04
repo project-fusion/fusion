@@ -1,3 +1,5 @@
+import './preview.css'
+
 export function Example() {
   return (
     <helix-empty>
@@ -11,7 +13,6 @@ export function Example() {
         emphasis="solid"
         slot="actions"
         tone="primary"
-        width="standard"
       >
         New project
       </helix-button>

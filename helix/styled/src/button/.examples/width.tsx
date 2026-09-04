@@ -1,3 +1,5 @@
+import './width.css'
+
 export function Example() {
   return (
     <helix-flex
@@ -14,28 +16,31 @@ export function Example() {
         <helix-button>Button</helix-button>
       </helix-flex>
 
-      <helix-flex gap="sm">
+      <helix-flex
+        className="width-floor"
+        gap="sm"
+      >
         <helix-button
           emphasis="solid"
           tone="primary"
-          width="standard"
         >
           Button
         </helix-button>
-        <helix-button width="standard">Button</helix-button>
+        <helix-button>Button</helix-button>
       </helix-flex>
 
-      <helix-flex gap="sm">
+      <helix-flex
+        className="width-floor"
+        gap="sm"
+      >
         <helix-button
           emphasis="solid"
           tone="primary"
-          width="standard"
         >
           Button
         </helix-button>
         <a
           data-button=""
-          data-button-width="standard"
           href="#cancel"
         >
           Button

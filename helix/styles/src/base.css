@@ -283,6 +283,8 @@ helix-text[tone="danger"] {
    the color, matching the component exactly. */
 [data-button] {
   --_button-edge: var(--helix-color-border);
+  min-inline-size: var(--button-inline-size, auto);
+  max-inline-size: 100%;
   /* The solid fill, separate from the tone, and it has to be separate. Pointing
      one variable at both measures 2.80 for primary and 1.84 for warning, and a
      plain `<a data-button="solid" data-button-tone="primary">` measured 2.80 in
@@ -371,20 +373,6 @@ helix-text[tone="danger"] {
     --button-background-color-hover,
     var(--button-background-color, color-mix(in oklab, var(--_button-tone) 12%, transparent))
   );
-}
-
-/* How much of the room available to it the button takes. Measured side by side:
-   200 and 200 at `standard`, 600 and 600 at `full`, 65 and 65 unset, and 120 and
-   120 inside a 120px column. The part is already `inline-size: 100%`, so it
-   follows on its own. */
-[data-button][data-button-width="standard"] {
-  /* *A floor, never `inline-size`.** A fixed width makes a label wider than the
-     standard one fill the box edge to edge and then eat its own padding, so the
-     axis that exists to stop short buttons looking mean makes long ones look
-     broken, and a consumer's answer is to shorten the label. */
-  min-inline-size: var(--button-inline-size, var(--helix-size-button));
-  /* Never wider than the room it has. */
-  max-inline-size: 100%;
 }
 
 /* Block-level, not the recipe's `inline-flex`. */

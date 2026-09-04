@@ -48,11 +48,11 @@ export default function SiteError({
           different kind of act and was sitting between them as unstyled text.
           `data-button` on an anchor is the base layer's recipe, which is what
           it is for: a control this library does not render. */}
-      <div className={styles.troubleWays}>
-        <helix-button emphasis="solid" onClick={() => retry()} tone="primary" width="standard">
+      <div className={`${styles.troubleWays} siteActions`}>
+        <helix-button emphasis="solid" onClick={() => retry()} tone="primary">
           Try again
         </helix-button>
-        <Link data-button="subtle" data-button-width="standard" href="/">
+        <Link data-button="subtle" href="/">
           Go to the front page
         </Link>
       </div>

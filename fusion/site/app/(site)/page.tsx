@@ -149,8 +149,8 @@ export default function Home() {
                 Not a screenshot and not a video. These are custom elements from the package,
                 upgrading in your browser on the page you are already reading.
               </Lede>
-              <helix-flex data-density="lg" direction="column" gap="md">
-                <Link data-button="subtle" data-button-width="standard" href="/helix">
+              <helix-flex class="siteActions" data-density="lg" direction="column" gap="md">
+                <Link data-button="subtle" href="/helix">
                   Explore components
                 </Link>
 
@@ -215,8 +215,8 @@ export default function Home() {
             ))}
           </div>
 
-          <helix-flex class={band.bandSection} data-density="lg">
-            <Link data-button="subtle" data-button-width="standard" href="/company/services">
+          <helix-flex class={`${band.bandSection} siteActions`} data-density="lg">
+            <Link data-button="subtle" href="/company/services">
               See what each costs
             </Link>
           </helix-flex>
@@ -260,7 +260,7 @@ export default function Home() {
                 <Eyebrow>Insights</Eyebrow>
                 <SectionTitle>The arguments, written down</SectionTitle>
               </helix-flex>
-              <Link data-button="subtle" data-button-width="standard" href="/insights">
+              <Link className="siteActions" data-button="subtle" href="/insights">
                 Read all
               </Link>
             </helix-flex>
@@ -306,9 +306,9 @@ export default function Home() {
               Tell us what you need built. We will say plainly if we are not the right people.
             </Lede>
             <a
+              className="siteActions"
               data-button="solid"
               data-button-tone="primary"
-              data-button-width="standard"
               data-density="lg"
               href="/contact"
             >

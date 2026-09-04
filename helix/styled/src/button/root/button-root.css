@@ -1,6 +1,9 @@
 /* The button styles itself. */
 :host {
   display: inline-flex;
+  /* `auto` is the initial value, so an unset hook changes nothing. */
+  min-inline-size: var(--button-inline-size, auto);
+  max-inline-size: 100%;
 }
 
 /* Two axes, and the color is the one the emphases read. */
@@ -186,17 +189,6 @@
     var(--button-background-color, color-mix(in oklab, var(--_button-tone) 8%, transparent))
   );
   border-color: transparent;
-}
-
-/* How much of the room available to it the button takes. */
-:host([width="standard"]) {
-  /* *A floor, never a fixed width.** Under `inline-size` a label wider than the
-     standard one fills the box edge to edge and then eats its own padding, so
-     the axis that exists to stop short buttons looking mean makes long ones look
-     broken. */
-  min-inline-size: var(--button-inline-size, var(--helix-size-button));
-  /* Never wider than the room it has. */
-  max-inline-size: 100%;
 }
 
 /* Block-level, not the resting `inline-flex`. */

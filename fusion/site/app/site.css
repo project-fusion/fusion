@@ -200,12 +200,17 @@ helix-app-header {
   }
 }
 
+/* A row of calls to action, lined up rather than sized by their words. */
+.siteActions {
+  --button-inline-size: var(--helix-size-button);
+}
+
 /* *The hero's button pair is 400px of fixed width in a 375px window.**
-   `data-button-width="standard"` pins each half to `--helix-size-button`, twelve
-   and a half rem, which is what makes the two halves equal rather than sized by
-   how long their words are. Two of them do not fit a phone: measured on the
-   components page, the group reached 387 in a 375 viewport and the page scrolled
-   sideways by twelve pixels. */
+   The floor above pins each half to `--helix-size-button`, twelve and a half
+   rem, which is what makes the two halves equal rather than sized by how long
+   their words are. Two of them do not fit a phone: measured on the components
+   page, the group reached 387 in a 375 viewport and the page scrolled sideways
+   by twelve pixels. */
 @media (width < 48rem) {
   /* Width only. */
   .pageHeroActions helix-button-group {
@@ -213,7 +218,7 @@ helix-app-header {
   }
 
   .pageHeroActions helix-button-group > * {
-    --helix-size-button: 100%;
+    --button-inline-size: 100%;
 
     flex: 1 1 0;
     min-inline-size: 0;

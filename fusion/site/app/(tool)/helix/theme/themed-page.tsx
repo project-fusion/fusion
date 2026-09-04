@@ -82,16 +82,10 @@ function Walkthrough(context: Context) {
         <helix-input label="Work email" name="email" placeholder="you@company.com" />
       </helix-flex>
       <helix-flex gap="sm" slot="footer">
-        <helix-button
-          command="--close"
-          commandfor="walkthrough"
-          emphasis="solid"
-          tone="primary"
-          width="standard"
-        >
+        <helix-button command="--close" commandfor="walkthrough" emphasis="solid" tone="primary">
           {walkthrough.cta}
         </helix-button>
-        <helix-button command="--close" commandfor="walkthrough" width="standard">
+        <helix-button command="--close" commandfor="walkthrough">
           Not now
         </helix-button>
       </helix-flex>

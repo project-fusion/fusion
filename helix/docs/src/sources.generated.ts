@@ -1921,7 +1921,7 @@ repository does that. The per-component tables are what a page pays.
 | \`@fusion.dev/helix-headless\` | 523,719 | 133,055 | 104,253 | Every headless family, which is what the barrel means. |
 | \`@fusion.dev/helix-icons\` | 47,484 | 14,907 | 12,553 | The whole glyph set. |
 | \`@fusion.dev/helix-theme\` | 3,288 | 1,571 | 1,355 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| \`@fusion.dev/helix\` | 969,618 | 221,400 | 162,184 | Every styled family. |
+| \`@fusion.dev/helix\` | 969,566 | 221,384 | 162,258 | Every styled family. |
 | \`lit\` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -1934,7 +1934,7 @@ is the whole cost of adopting the base layer on its own.
 
 | File | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
-| \`base.css\` | 23,145 | 3,556 | 3,065 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
+| \`base.css\` | 23,077 | 3,548 | 3,058 | The base layer. Recipes for markup Helix does not render, usable with no JavaScript at all. |
 | \`elements.css\` | 7,076 | 1,217 | 1,094 | Hides each element until its definition loads, generated from the tags in \`@fusion.dev/helix\`. |
 | \`helix.css\` | 207 | 148 | 118 | The four above in one import, in the order they have to be in. |
 | \`primitives.css\` | 6,275 | 1,234 | 1,062 | The primitive layer. Private, shipped because \`tokens.css\` resolves into it. |
@@ -1944,7 +1944,7 @@ is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 13,914 bytes gzipped alone and adds 2,450 to a page that already has Helix on it, so 82 percent of the first one is shared and 18 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is \`code\` at 9,065 gzipped alone, the dearest \`data-table\` at 51,725, over 94 components. Every family at once is 221,400.
+Across the tier: the cheapest is \`code\` at 9,065 gzipped alone, the dearest \`data-table\` at 51,725, over 94 components. Every family at once is 221,384.
 
 **No family imports a barrel, and the \`barrels\` rule in \`fusion workspace\` is what keeps it that way.** \`@fusion.dev/helix-headless\` is \`sideEffects\` over every module in \`dist\`, which is true of a file that calls \`customElements.define\` and which means a bundler may drop none of it: one \`import { HelixHeadlessButton } from '@fusion.dev/helix-headless'\` costs 133,055 bytes gzipped whatever else the page does, which is 10 times the median family measured above. The styled tier imports the family it extends instead, all 94 of them, and the check refuses the shape rather than the package name, so the rule follows \`sideEffects\` wherever it goes.
 
@@ -1960,7 +1960,7 @@ Four other libraries of custom elements, pinned and measured on 2026-08-24 by \`
 
 | Component | System | Raw | Gzip | Brotli |
 |---|---|---|---|---|
-| \`button\` | **Helix** | 37,399 | 11,545 | 10,187 |
+| \`button\` | **Helix** | 37,347 | 11,529 | 10,175 |
 | | Carbon | 133,058 | 20,959 | 17,685 |
 | | Material Web | 47,060 | 14,173 | 12,591 |
 | | Shoelace | 62,628 | 18,287 | 15,805 |
@@ -2145,7 +2145,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`bar-chart\` | 87,351 | 27,296 | 24,053 | 28,056 | 6,997 | 5,438 |
 | \`blockquote\` | 28,015 | 9,529 | 8,383 | 2,077 | 727 | 391 |
 | \`breadcrumbs\` | 78,416 | 25,590 | 21,198 | 5,334 | 1,435 | 997 |
-| \`button\` | 37,399 | 11,545 | 10,187 | 9,236 | 2,215 | 1,678 |
+| \`button\` | 37,347 | 11,529 | 10,175 | 9,184 | 2,203 | 1,636 |
 | \`button-group\` | 28,508 | 9,547 | 8,419 | 2,320 | 713 | 411 |
 | \`callout\` | 76,172 | 25,232 | 20,980 | 2,913 | 999 | 686 |
 | \`card\` | 30,099 | 10,015 | 8,818 | 3,915 | 1,176 | 844 |
@@ -2155,8 +2155,8 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`checkbox-group\` | 39,793 | 12,366 | 10,895 | 6,888 | 2,183 | 1,429 |
 | \`code\` | 26,546 | 9,065 | 7,981 | 1,529 | 528 | 264 |
 | \`code-block\` | 126,792 | 40,099 | 33,850 | 25,869 | 5,728 | 4,471 |
-| \`color-input\` | 162,845 | 47,382 | 40,160 | 57,622 | 11,971 | 9,985 |
-| \`color-picker\` | 126,684 | 36,610 | 30,418 | 45,772 | 9,897 | 8,243 |
+| \`color-input\` | 162,793 | 47,369 | 40,118 | 57,570 | 11,958 | 9,992 |
+| \`color-picker\` | 126,632 | 36,596 | 30,485 | 45,720 | 9,886 | 8,246 |
 | \`combobox\` | 140,973 | 43,542 | 36,718 | 33,950 | 7,936 | 6,297 |
 | \`command\` | 111,005 | 34,045 | 28,055 | 27,637 | 6,894 | 5,413 |
 | \`copy-button\` | 122,914 | 39,510 | 33,293 | 21,993 | 5,137 | 3,964 |
@@ -2210,7 +2210,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`speed-dial\` | 110,306 | 36,505 | 30,879 | 11,251 | 2,711 | 1,908 |
 | \`splitter\` | 42,441 | 12,678 | 11,269 | 16,259 | 3,927 | 3,167 |
 | \`stat\` | 29,954 | 9,789 | 8,646 | 3,774 | 1,005 | 663 |
-| \`steps\` | 96,250 | 29,577 | 24,391 | 19,641 | 4,209 | 3,244 |
+| \`steps\` | 96,198 | 29,562 | 24,364 | 19,589 | 4,197 | 3,315 |
 | \`switch\` | 38,602 | 12,159 | 10,741 | 6,071 | 1,874 | 1,314 |
 | \`table\` | 35,190 | 10,865 | 9,580 | 7,692 | 1,916 | 1,280 |
 | \`tabs\` | 40,196 | 12,348 | 10,882 | 10,719 | 2,586 | 1,866 |
@@ -2224,7 +2224,7 @@ The headless tier plus presentation. This is what \`bun add @fusion.dev/helix\` 
 | \`toggle\` | 43,242 | 13,258 | 11,703 | 8,953 | 2,496 | 1,820 |
 | \`toolbar\` | 29,632 | 10,054 | 8,841 | 3,813 | 1,474 | 902 |
 | \`tooltip\` | 60,498 | 20,576 | 18,184 | 9,763 | 2,932 | 2,000 |
-| \`tour\` | 71,822 | 22,543 | 19,985 | 20,127 | 4,588 | 3,572 |
+| \`tour\` | 71,770 | 22,532 | 19,965 | 20,075 | 4,577 | 3,584 |
 | \`tree\` | 89,446 | 29,019 | 23,862 | 12,065 | 3,535 | 2,606 |
 | \`trend\` | 76,798 | 25,221 | 20,897 | 4,083 | 1,159 | 824 |
 | \`video\` | 150,914 | 45,853 | 38,970 | 48,454 | 10,806 | 9,092 |
@@ -2244,9 +2244,9 @@ column is what was removed rather than part of what remains.
 | \`@fusion.dev/helix-core\` | 679,080 | 115 | 161,519 | \`@floating-ui/dom\`, \`@fusion.dev/helix-icons\` |
 | \`@fusion.dev/helix-headless\` | 8,396,649 | 422 | 703,895 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-icons\`, \`uqr\` |
 | \`@fusion.dev/helix-icons\` | 65,943 | 11 | 20,928 | none |
-| \`@fusion.dev/helix-styles\` | 90,381 | 6 | 0 | none |
+| \`@fusion.dev/helix-styles\` | 90,313 | 6 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 461,551 | 8 | 4,699 | none |
-| \`@fusion.dev/helix\` | 9,393,801 | 724 | 300,554 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,389,209 | 724 | 300,529 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 

@@ -1455,16 +1455,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               Both syntaxes are authored files, so switching loads the other one and whatever was
               typed here is gone.
             </helix-text>
-            {/* **No `width="standard"` here.** That axis sets a 200px floor so a
-                lone short button does not look mean, and two of them plus a 12px
-                gap need 412px. This dialog is `sm`, which is 352px less 24px of
-                padding a side: 304px. The row overflowed by 108px, and a
-                centered dialog centers its footer, so it hung 54px off both
-                edges with the focus ring clipped by the corner. */}
             <helix-flex gap="sm" slot="footer">
-              {/* `danger` rather than `primary`: this discards work, and the
-                  accent tone reads as the recommended way out. The dialog's own
-                  `centered` example marks its discard the same way. */}
               <helix-button
                 emphasis="solid"
                 onClick={() => {

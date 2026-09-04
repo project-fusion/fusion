@@ -32,7 +32,7 @@ import { styles } from './button-root.css.js'
  * @cssproperty --button-background-color-hover - Fill behind the button under the pointer. Only needed beside the one above, which otherwise holds through hover.
  * @cssproperty --button-foreground-color - Label and icon color.
  * @cssproperty --button-gap - Space between the label and whatever flanks it.
- * @cssproperty --button-inline-size - Width taken by `width="standard"`.
+ * @cssproperty --button-inline-size - A width floor. Inherits, so a section can set it once for every button under it.
  * @cssproperty --button-padding-inline - Inline padding, for a container whose rhythm is not the control default.
  * @cssproperty --button-radius - Corner radius of the control.
  * @cssproperty --button-radius-end - Trailing corners, which a group flattens.
@@ -50,38 +50,28 @@ export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {
    *
    * - `auto` is the default and is never written: the button is as wide as its
    *   label, which is what a control in a toolbar or beside a field should be.
-   * - `standard` is one width for every button that takes it, so a column or
-   *   row of actions lines up instead of following the length of each word.
    * - `full` fills the container, for a single action at the foot of a form or
    *   a card, and on a phone where a control is a target before it is a label.
    *
-   * **Not `fill`, and not `size`.** `fill` means a surface's own color
-   * everywhere else in the library, in `separation="filled"`, in
-   * `ThemeIntent.separation`'s `fill` mechanism and in every chart, so it cannot
-   * also mean geometry beside an `emphasis` documented as "How filled it is
-   * drawn". `size` fails the rule's own test, which is whether two of them
-   * sitting together could legitimately differ: two buttons can, because this is
-   * a width *policy* rather than a scale, and `standard` exists precisely to
-   * stop a row being ragged.
+   * For a row that should line up rather than follow the length of each word,
+   * set `--button-inline-size` on the container. It inherits, and it reaches a
+   * plain anchor wearing `data-button` as well as this element.
    *
-   * Width and not weight. `emphasis` says how much a button matters and this
-   * says how much room it takes, and the three are independent: a `ghost
-   * standard` Cancel beside a `solid primary standard` Save is exactly the
-   * pairing a dialog wants.
-   *
-   * **A consumer's own anchor takes it as `data-button-width`**, the way it
-   * takes the emphasis as `data-button`:
+   * A consumer's own anchor takes this attribute as `data-button-width`:
    *
    * ```html
-   * <a data-button="solid" data-button-width="standard" data-button-tone="primary" href="/save">Save</a>
+   * <a data-button="solid" data-button-width="full" data-button-tone="primary" href="/save">Save</a>
    * ```
    *
-   * Both are one declaration in the base layer, and both are needed: this class
-   * promises a link styled as a button and a real button are indistinguishable,
-   * and a dialog's button row is built on `standard`.
+   * **Not `fill`, and not `size`.** `fill` means a surface's own color
+   * everywhere else in the library, so it cannot also mean geometry beside an
+   * `emphasis` documented as "How filled it is drawn". `size` fails the rule's
+   * own test, which is whether two of them sitting together could legitimately
+   * differ: two buttons can, because this is a width *policy* rather than a
+   * scale.
    */
   @property({ reflect: true })
-  width?: 'auto' | 'full' | 'standard'
+  width?: 'auto' | 'full'
 
   static override styles: CSSResultGroup = styles
 }

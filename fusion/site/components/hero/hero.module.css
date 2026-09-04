@@ -53,6 +53,8 @@
  * pill stretches to it, so the number stays a consequence of the copy. */
 .heroActions {
   align-items: stretch;
+  --button-inline-size: var(--helix-size-button);
+
   inline-size: max-content;
   /* `max-content` alone re-broke the thing the button row already handled: it
      is the width the row wants *unwrapped*, so at 375 the wrapper stood 412

@@ -42,7 +42,7 @@ export interface Rival {
 
 export const BUTTON: readonly Rival[] = [
   {
-    brotli: 10187,
+    brotli: 10175,
     name: 'Helix',
     ours: true,
   },

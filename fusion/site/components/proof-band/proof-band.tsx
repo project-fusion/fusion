@@ -90,8 +90,8 @@ export const ProofBand = () => (
       ></helix-bar-chart>
       <helix-legend class={styles.proofLegend} for="proof-button"></helix-legend>
 
-      <helix-flex data-density="lg">
-        <a data-button="subtle" data-button-width="standard" href={METRICS_HREF}>
+      <helix-flex class="siteActions" data-density="lg">
+        <a data-button="subtle" href={METRICS_HREF}>
           The method
         </a>
       </helix-flex>
