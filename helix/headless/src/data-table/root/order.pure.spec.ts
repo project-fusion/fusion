@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
   type Axis,
+  arranged,
   cycle,
   type DataRow,
   filter,
@@ -204,6 +205,36 @@ describe('window', () => {
 
   test('a size of zero is every row, which is what "no paging" means', () => {
     expect(window_(rows, 1, 0)).toHaveLength(4)
+  })
+})
+
+describe('arranged', () => {
+  /* What a windowing caller holds between renders. `ordered` is this plus one
+     `window_`, and both are asserted because a caller now has the choice. */
+  test('filters and sorts, and takes nothing off either end', () => {
+    const result = arranged(rows, axes, { query: '', spec: 'name:asc' })
+    expect(names(result.rows)).toEqual(['alpha', 'bravo', 'charlie', 'delta'])
+    expect(result.total).toBe(4)
+  })
+
+  test('sorts what the filter left, rather than filtering a sorted page', () => {
+    const result = arranged(rows, axes, { query: 'a', spec: 'size:desc' })
+    expect(names(result.rows)).toEqual(['charlie', 'delta', 'alpha', 'bravo'])
+  })
+
+  test('`total` counts before the filter, which is what says a filter is on', () => {
+    const result = arranged(rows, axes, { query: 'alpha', spec: '' })
+    expect(result.rows).toHaveLength(1)
+    expect(result.total).toBe(4)
+  })
+
+  test('windowing it agrees with paging through `ordered`', () => {
+    /* The property that lets a caller hold one and slice it: taking a page off
+       an arrangement has to equal asking `ordered` for that page, or the two
+       paths through this module disagree about what page two is. */
+    const held = arranged(rows, axes, { query: '', spec: 'name:asc' })
+    const page = ordered(rows, axes, { page: 2, query: '', size: 2, spec: 'name:asc' })
+    expect(names(window_(held.rows, 2, 2))).toEqual(names(page.rows))
   })
 })
 

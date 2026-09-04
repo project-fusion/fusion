@@ -363,18 +363,25 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * How many rows there are to window over: the page, or the result.
    *
-   * Counted without sorting, because a count does not need an order and this is
-   * read on every scroll. `matched` filters and stops.
+   * **Read off the held arrangement rather than counted afresh**, because the
+   * controller asks this on every scroll and `matched` walks the whole result
+   * whenever a filter is on. Held, a scroll through a filtered table of five
+   * thousand rows costs a lookup; counted, it costs five thousand comparisons a
+   * frame, which is the cost windowing was added to avoid.
+   *
+   * `matched` still answers where nothing is windowing, which is the path that
+   * holds nothing and should not start.
    */
   private get available(): number {
     if (this.mode === 'server') {
       return this.rows.length
     }
+    const matched = this.windowed ? this.arrange().rows.length : this.matched
     const size = this.pageSize
     if (size <= 0) {
-      return this.matched
+      return matched
     }
-    return Math.max(0, Math.min(size, this.matched - (this.page - 1) * size))
+    return Math.max(0, Math.min(size, matched - (this.page - 1) * size))
   }
 
   /**

@@ -592,6 +592,21 @@ describe('windowing', () => {
     remove()
   })
 
+  test('a filter narrows the result the window is over', async () => {
+    /* The count the controller windows over is read off the held arrangement
+       rather than counted again, so a filtered window is the case that proves
+       the held copy is the filtered one and not the whole result. */
+    const { element, remove } = await mount(WINDOWED, many(500))
+    element.filter = 'row 049'
+    await settled(element)
+
+    // `row 0490` through `row 0499`, and the head.
+    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('11')
+    expect(cells(element)[0]).toBe('row 0490')
+    expect(bodyRows(element)[0]?.getAttribute('aria-rowindex')).toBe('2')
+    remove()
+  })
+
   test('server mode windows the chunk it was handed', async () => {
     const { element, remove } = await mount(
       `<helix-headless-data-table windowed mode="server" total="9000">
