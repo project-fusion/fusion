@@ -1,7 +1,14 @@
 import { HelixElements } from '@/components/helix-elements/helix-elements'
+import { pageMetadata } from '@/utils/metadata/metadata'
 import { getFamilies } from '../../../../content/catalog/catalog'
 import { INSIGHTS } from '../../../../content/insights'
 import { SandboxWorkbench } from './workbench'
+
+export const metadata = pageMetadata({
+  description: 'Edit any Helix example and watch it render, in either syntax.',
+  path: '/helix/sandbox',
+  title: 'Sandbox',
+})
 
 /**
  * One sandbox, not one page per example.
