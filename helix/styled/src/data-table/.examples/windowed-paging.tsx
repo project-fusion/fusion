@@ -16,7 +16,7 @@ export function Example() {
 
        `aria-rowindex` counts through both offsets, so row one of the window on
        page two is row 501 of the result and a screen reader says so. */
-    <helix-data-table label="Assets" pageSize={500} rows={rows} windowed>
+    <helix-data-table label="Assets" page-size={500} rows={rows} windowed>
       <helix-table-column field="name" sortable width="14rem">
         File
       </helix-table-column>

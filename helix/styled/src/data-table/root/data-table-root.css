@@ -114,9 +114,18 @@
   text-align: center;
 }
 
-/* Windowing scrolls the grid's own box, which is the one thing this sheet has
-   to add for it: the headless tier draws the window and the spacers, and
-   neither means anything in a box with no height to overflow. */
+/*
+ *  Windowing scrolls the grid's own box, which is the one thing this sheet has to
+ *    add for it: the headless tier draws the window and the spacers, and neither
+ *    means anything in a box with no height to overflow.
+ *
+ *    **`block-size` and not `max-block-size`**, which would fit a short result and
+ *    is the more considerate looking of the two. A maximum leaves the height a
+ *    function of the rows drawn while the rows drawn are a function of the height,
+ *    and the controller settles that loop by giving up on it rather than by
+ *    measuring anything. A definite height is one reading, taken once. The cost is
+ *    a short result keeping the whole box, with space under the last row.
+ */
 :host([windowed]) [part="table"] {
   block-size: var(--data-table-block-size, 24em);
   overflow-y: auto;

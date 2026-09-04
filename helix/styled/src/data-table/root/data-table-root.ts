@@ -39,7 +39,11 @@ import '../../table/index.js'
  * @csspart table - The grid.
  *
  * @cssproperty --data-table-block-size - How tall the scrolling box is while `windowed`.
- * Ignored otherwise, where the grid is as tall as its rows.
+ * Ignored otherwise, where the grid is as tall as its rows. A definite height rather than a
+ * maximum, so a short result under `windowed` keeps the full box with space below it: a
+ * maximum would leave the height a function of the rows drawn, and the rows drawn a function
+ * of the height, which is the loop the window controller has to guard against rather than
+ * one worth entering on purpose.
  * @cssproperty --data-table-color - Ink in a cell.
  * @cssproperty --data-table-columns - Track list for the columns, which wins over the one the columns worked out.
  * @cssproperty --data-table-heading-background-color - Fill behind a heading while `windowed`.

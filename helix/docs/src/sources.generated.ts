@@ -2245,7 +2245,7 @@ column is what was removed rather than part of what remains.
 | \`@fusion.dev/helix-icons\` | 65,943 | 11 | 20,928 | none |
 | \`@fusion.dev/helix-styles\` | 90,338 | 6 | 0 | none |
 | \`@fusion.dev/helix-theme\` | 461,551 | 8 | 4,699 | none |
-| \`@fusion.dev/helix\` | 9,311,547 | 716 | 278,113 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
+| \`@fusion.dev/helix\` | 9,313,527 | 716 | 278,117 | \`@fusion.dev/helix-core\`, \`@fusion.dev/helix-headless\`, \`@fusion.dev/helix-styles\` |
 
 ## Not measured yet
 
