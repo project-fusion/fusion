@@ -1,3 +1,13 @@
+/* Two axes that do not cross evenly, which is why the first row is written out
+   and the other two are not. At rest a tag has a neutral with no tone at all, so
+   that row is five and names the tones; `solid` and `outlined` have nothing
+   neutral to show, so they are four and name the emphasis instead. */
+const TONES = ['primary', 'success', 'warning', 'danger'] as const
+const EMPHASES = ['solid', 'outlined'] as const
+
+/** `primary` to `Primary`. Each row's words are its own axis, spelled for reading. */
+const title = (word: string) => `${word[0]?.toUpperCase()}${word.slice(1)}`
+
 export function Example() {
   return (
     <helix-flex
@@ -9,71 +19,33 @@ export function Example() {
         wrap
       >
         <helix-tag>Neutral</helix-tag>
-        <helix-tag tone="primary">Primary</helix-tag>
-        <helix-tag tone="success">Success</helix-tag>
-        <helix-tag tone="warning">Warning</helix-tag>
-        <helix-tag tone="danger">Danger</helix-tag>
+        {TONES.map((tone) => (
+          <helix-tag
+            key={tone}
+            tone={tone}
+          >
+            {title(tone)}
+          </helix-tag>
+        ))}
       </helix-flex>
 
-      <helix-flex
-        gap="sm"
-        wrap
-      >
-        <helix-tag
-          emphasis="solid"
-          tone="primary"
+      {EMPHASES.map((emphasis) => (
+        <helix-flex
+          gap="sm"
+          key={emphasis}
+          wrap
         >
-          Solid
-        </helix-tag>
-        <helix-tag
-          emphasis="solid"
-          tone="success"
-        >
-          Solid
-        </helix-tag>
-        <helix-tag
-          emphasis="solid"
-          tone="warning"
-        >
-          Solid
-        </helix-tag>
-        <helix-tag
-          emphasis="solid"
-          tone="danger"
-        >
-          Solid
-        </helix-tag>
-      </helix-flex>
-
-      <helix-flex
-        gap="sm"
-        wrap
-      >
-        <helix-tag
-          emphasis="outlined"
-          tone="primary"
-        >
-          Outlined
-        </helix-tag>
-        <helix-tag
-          emphasis="outlined"
-          tone="success"
-        >
-          Outlined
-        </helix-tag>
-        <helix-tag
-          emphasis="outlined"
-          tone="warning"
-        >
-          Outlined
-        </helix-tag>
-        <helix-tag
-          emphasis="outlined"
-          tone="danger"
-        >
-          Outlined
-        </helix-tag>
-      </helix-flex>
+          {TONES.map((tone) => (
+            <helix-tag
+              emphasis={emphasis}
+              key={tone}
+              tone={tone}
+            >
+              {title(emphasis)}
+            </helix-tag>
+          ))}
+        </helix-flex>
+      ))}
     </helix-flex>
   )
 }
