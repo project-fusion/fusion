@@ -7,14 +7,20 @@ export function Example() {
   const [said, setSaid] = useState(RESTING)
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-text variant="body">
         Press <helix-kbd keys="mod+k" /> to search. Written once as <code>mod+k</code>: an Apple
         keyboard is told the Command glyph and every other keyboard is told Ctrl, so neither is
         asked for a key it does not have.
       </helix-text>
 
-      <helix-input aria-label="Filter" placeholder="Filter">
+      <helix-input
+        aria-label="Filter"
+        placeholder="Filter"
+      >
         <helix-kbd
           keys="/"
           onhelix-shortcut={(event) => setSaid(`Heard ${event.detail.keys} inside the field.`)}
@@ -23,7 +29,10 @@ export function Example() {
         />
       </helix-input>
 
-      <helix-text tone="subtle" variant="caption">
+      <helix-text
+        tone="subtle"
+        variant="caption"
+      >
         {said}
       </helix-text>
     </helix-flex>

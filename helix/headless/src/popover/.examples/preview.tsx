@@ -2,7 +2,10 @@ import './preview.css'
 
 export function Example() {
   return (
-    <helix-headless-popover id="details" label="Details">
+    <helix-headless-popover
+      id="details"
+      label="Details"
+    >
       <helix-headless-button slot="trigger">Details</helix-headless-button>
       <div className="stack">
         <p>
@@ -10,7 +13,10 @@ export function Example() {
           without a z-index.
         </p>
         <div className="actions">
-          <helix-headless-button command="--close" commandfor="details">
+          <helix-headless-button
+            command="--close"
+            commandfor="details"
+          >
             Close
           </helix-headless-button>
         </div>

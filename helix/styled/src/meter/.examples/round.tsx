@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex align="center" gap="lg">
+    <helix-flex
+      align="center"
+      gap="lg"
+    >
       <helix-meter
         high={80}
         label="Disk"
@@ -19,7 +22,12 @@ export function Example() {
         show-value
         value={34}
       ></helix-meter>
-      <helix-meter label="Signal" shape="arc" show-value value={88}></helix-meter>
+      <helix-meter
+        label="Signal"
+        shape="arc"
+        show-value
+        value={88}
+      ></helix-meter>
     </helix-flex>
   )
 }

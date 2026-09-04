@@ -31,7 +31,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-splitter
         collapsed-size="8"
         default-position="50"
@@ -39,15 +42,24 @@ export function Example() {
         onhelix-before-resize={settling}
         style={{ blockSize: '10rem' }}
       >
-        <helix-card separation="plain" slot="start">
+        <helix-card
+          separation="plain"
+          slot="start"
+        >
           <helix-text>Navigator</helix-text>
         </helix-card>
-        <helix-card separation="plain" slot="end">
+        <helix-card
+          separation="plain"
+          slot="end"
+        >
           <helix-text>Editor</helix-text>
         </helix-card>
       </helix-splitter>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

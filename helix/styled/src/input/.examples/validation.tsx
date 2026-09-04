@@ -3,7 +3,10 @@ export function Example() {
     <>
       {/* Preview frame: the submit is swallowed. */}
       <form onSubmit={(event) => event.preventDefault()}>
-        <helix-flex direction="column" gap="md">
+        <helix-flex
+          direction="column"
+          gap="md"
+        >
           <helix-input
             hint="Six or more, letters and digits"
             label="Handle"

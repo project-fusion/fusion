@@ -2,8 +2,14 @@ import './emphasis.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
-      <table data-hidden-visually id="latency">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <table
+        data-hidden-visually
+        id="latency"
+      >
         <caption>Latency by week</caption>
         <thead>
           <tr>
@@ -35,10 +41,25 @@ export function Example() {
           </tr>
         </tbody>
       </table>
-      <helix-line-chart area for="latency"></helix-line-chart>
-      <helix-line-chart area emphasis="outlined" for="latency"></helix-line-chart>
-      <helix-line-chart area emphasis="solid" for="latency"></helix-line-chart>
-      <helix-line-chart area emphasis="subtle" for="latency"></helix-line-chart>
+      <helix-line-chart
+        area
+        for="latency"
+      ></helix-line-chart>
+      <helix-line-chart
+        area
+        emphasis="outlined"
+        for="latency"
+      ></helix-line-chart>
+      <helix-line-chart
+        area
+        emphasis="solid"
+        for="latency"
+      ></helix-line-chart>
+      <helix-line-chart
+        area
+        emphasis="subtle"
+        for="latency"
+      ></helix-line-chart>
     </helix-flex>
   )
 }

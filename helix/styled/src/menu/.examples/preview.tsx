@@ -5,20 +5,36 @@ export function Example() {
 
       <helix-menu-item value="one">
         Item One
-        <helix-menu-item checkable checked slot="submenu" value="one-a">
+        <helix-menu-item
+          checkable
+          checked
+          slot="submenu"
+          value="one-a"
+        >
           Option One
         </helix-menu-item>
-        <helix-menu-item checkable slot="submenu" value="one-b">
+        <helix-menu-item
+          checkable
+          slot="submenu"
+          value="one-b"
+        >
           Option Two
         </helix-menu-item>
       </helix-menu-item>
 
       <helix-divider announced></helix-divider>
 
-      <helix-menu-item checkable checked value="two">
+      <helix-menu-item
+        checkable
+        checked
+        value="two"
+      >
         Item Two
       </helix-menu-item>
-      <helix-menu-item checkable value="three">
+      <helix-menu-item
+        checkable
+        value="three"
+      >
         Item Three
       </helix-menu-item>
     </helix-menu>

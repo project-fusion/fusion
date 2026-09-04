@@ -23,9 +23,16 @@ export function Example() {
   }, [])
 
   return (
-    <helix-flex direction="column" gap="sm">
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
       <helix-text>
-        Elapsed: <helix-format-date date={at} elapsed></helix-format-date>
+        Elapsed:{' '}
+        <helix-format-date
+          date={at}
+          elapsed
+        ></helix-format-date>
       </helix-text>
 
       <helix-text>

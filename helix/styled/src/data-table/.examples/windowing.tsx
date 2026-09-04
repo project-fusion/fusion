@@ -16,11 +16,23 @@ export function Example() {
 
        `--data-table-block-size` sets how tall the scrolling box is; it defaults
        to 24em, which is what this shows. */
-    <helix-data-table label="Assets" rows={rows} windowed>
-      <helix-table-column field="name" sortable width="14rem">
+    <helix-data-table
+      label="Assets"
+      rows={rows}
+      windowed
+    >
+      <helix-table-column
+        field="name"
+        sortable
+        width="14rem"
+      >
         File
       </helix-table-column>
-      <helix-table-column align="end" field="size" sortable>
+      <helix-table-column
+        align="end"
+        field="size"
+        sortable
+      >
         Size
       </helix-table-column>
       <helix-table-column field="kind">Kind</helix-table-column>

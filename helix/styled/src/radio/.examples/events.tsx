@@ -34,7 +34,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-radio-group
         label="Plan"
         name="plan"
@@ -48,7 +51,10 @@ export function Example() {
         <helix-radio value="scale">Scale</helix-radio>
       </helix-radio-group>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

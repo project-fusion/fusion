@@ -1,31 +1,54 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-flex gap="sm">
         <helix-icon-button label="Confirm">
           <helix-icon name="check"></helix-icon>
         </helix-icon-button>
-        <helix-icon-button label="Confirm" tone="primary">
+        <helix-icon-button
+          label="Confirm"
+          tone="primary"
+        >
           <helix-icon name="check"></helix-icon>
         </helix-icon-button>
-        <helix-icon-button label="Delete" tone="danger">
+        <helix-icon-button
+          label="Delete"
+          tone="danger"
+        >
           <helix-icon name="trash"></helix-icon>
         </helix-icon-button>
       </helix-flex>
 
       <helix-flex gap="sm">
-        <helix-icon-button emphasis="outlined" label="Notes">
+        <helix-icon-button
+          emphasis="outlined"
+          label="Notes"
+        >
           <helix-icon name="notebook"></helix-icon>
         </helix-icon-button>
-        <helix-icon-button emphasis="solid" label="Confirm" tone="primary">
+        <helix-icon-button
+          emphasis="solid"
+          label="Confirm"
+          tone="primary"
+        >
           <helix-icon name="check"></helix-icon>
         </helix-icon-button>
-        <helix-icon-button emphasis="subtle" label="Delete" tone="danger">
+        <helix-icon-button
+          emphasis="subtle"
+          label="Delete"
+          tone="danger"
+        >
           <helix-icon name="trash"></helix-icon>
         </helix-icon-button>
       </helix-flex>
 
-      <helix-icon-button disabled label="Unavailable">
+      <helix-icon-button
+        disabled
+        label="Unavailable"
+      >
         <helix-icon name="x"></helix-icon>
       </helix-icon-button>
     </helix-flex>

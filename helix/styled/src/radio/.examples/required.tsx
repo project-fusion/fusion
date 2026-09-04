@@ -1,12 +1,24 @@
 export function Example() {
   return (
     <form onSubmit={(event) => event.preventDefault()}>
-      <helix-flex direction="column" gap="sm">
-        <helix-radio-group hint="Hint" label="Label" name="choice" required>
+      <helix-flex
+        direction="column"
+        gap="sm"
+      >
+        <helix-radio-group
+          hint="Hint"
+          label="Label"
+          name="choice"
+          required
+        >
           <helix-radio value="one">Option One</helix-radio>
           <helix-radio value="two">Option Two</helix-radio>
         </helix-radio-group>
-        <helix-button emphasis="solid" tone="primary" type="submit">
+        <helix-button
+          emphasis="solid"
+          tone="primary"
+          type="submit"
+        >
           Submit
         </helix-button>
       </helix-flex>

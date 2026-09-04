@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="linechartgrid">
+      <table
+        data-hidden-visually
+        id="linechartgrid"
+      >
         <caption>Response time</caption>
         <thead>
           <tr>
@@ -39,7 +42,11 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-line-chart for="linechartgrid" gridlines="both" zero></helix-line-chart>
+      <helix-line-chart
+        for="linechartgrid"
+        gridlines="both"
+        zero
+      ></helix-line-chart>
     </>
   )
 }

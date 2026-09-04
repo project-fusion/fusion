@@ -3,7 +3,10 @@ import './material.css'
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="donutmaterial">
+      <table
+        data-hidden-visually
+        id="donutmaterial"
+      >
         <caption>Spend by category</caption>
         <thead>
           <tr>
@@ -34,7 +37,10 @@ export function Example() {
         </figure>
         <figure>
           <figcaption>Glass</figcaption>
-          <helix-donut-chart for="donutmaterial" material="glass"></helix-donut-chart>
+          <helix-donut-chart
+            for="donutmaterial"
+            material="glass"
+          ></helix-donut-chart>
         </figure>
       </div>
     </>

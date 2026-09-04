@@ -5,7 +5,11 @@ export function Example() {
 
       <helix-breadcrumb>
         <helix-menu label="Hidden steps">
-          <helix-icon-button emphasis="ghost" label="Show hidden steps" slot="trigger">
+          <helix-icon-button
+            emphasis="ghost"
+            label="Show hidden steps"
+            slot="trigger"
+          >
             <helix-icon name="dots-three"></helix-icon>
           </helix-icon-button>
           <helix-menu-item href="/design">Design</helix-menu-item>

@@ -16,7 +16,10 @@ export function Example() {
         is asked for a key it does not have.
       </p>
 
-      <helix-headless-input aria-label="Filter" placeholder="Filter">
+      <helix-headless-input
+        aria-label="Filter"
+        placeholder="Filter"
+      >
         <helix-headless-kbd
           keys="/"
           onhelix-shortcut={(event) => setSaid(`Heard ${event.detail.keys} inside the field.`)}

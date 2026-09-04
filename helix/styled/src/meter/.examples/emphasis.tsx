@@ -1,7 +1,16 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-meter high={80} label="Disk" low={40} show-value value={88}></helix-meter>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-meter
+        high={80}
+        label="Disk"
+        low={40}
+        show-value
+        value={88}
+      ></helix-meter>
       <helix-meter
         emphasis="subtle"
         high={80}

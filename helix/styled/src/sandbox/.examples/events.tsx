@@ -44,7 +44,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-sandbox
         onhelix-before-edit={edited}
         onhelix-before-panel-resize={panelDragged}
@@ -53,12 +56,19 @@ export function Example() {
         onhelix-console={logged}
         onhelix-resize={measured}
       >
-        <helix-sandbox-source name="html" slot="source" value="<p>Hello</p>" />
+        <helix-sandbox-source
+          name="html"
+          slot="source"
+          value="<p>Hello</p>"
+        />
         <helix-sandbox-preview slot="preview" />
         <helix-sandbox-terminal slot="panel" />
       </helix-sandbox>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

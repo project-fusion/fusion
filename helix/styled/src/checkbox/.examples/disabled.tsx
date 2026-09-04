@@ -2,8 +2,15 @@ import './disabled.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
-      <helix-checkbox default-checked disabled name="a">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-checkbox
+        default-checked
+        disabled
+        name="a"
+      >
         Ticked and written off
       </helix-checkbox>
 

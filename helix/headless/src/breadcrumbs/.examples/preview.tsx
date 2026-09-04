@@ -4,12 +4,18 @@ export function Example() {
   return (
     <helix-headless-breadcrumbs aria-label="Breadcrumb">
       <helix-headless-breadcrumb>
-        <a data-link="quiet" href="/">
+        <a
+          data-link="quiet"
+          href="/"
+        >
           Home
         </a>
       </helix-headless-breadcrumb>
       <helix-headless-breadcrumb>
-        <a data-link="quiet" href="/section">
+        <a
+          data-link="quiet"
+          href="/section"
+        >
           Section
         </a>
       </helix-headless-breadcrumb>

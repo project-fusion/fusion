@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-number-input
         default-value="50"
         hint="Between 0 and 100"
@@ -9,7 +12,12 @@ export function Example() {
         min={0}
         step={5}
       ></helix-number-input>
-      <helix-number-input default-value="1.5" label="Rate" min={0} step={0.25}></helix-number-input>
+      <helix-number-input
+        default-value="1.5"
+        label="Rate"
+        min={0}
+        step={0.25}
+      ></helix-number-input>
     </helix-flex>
   )
 }

@@ -1,16 +1,30 @@
 export function Example() {
   return (
     <>
-      <helix-button command="--show" commandfor="confirm" emphasis="solid" tone="primary">
+      <helix-button
+        command="--show"
+        commandfor="confirm"
+        emphasis="solid"
+        tone="primary"
+      >
         Delete project
       </helix-button>
 
-      <helix-dialog id="confirm" label="Delete project">
-        <helix-text as="h2" slot="header">
+      <helix-dialog
+        id="confirm"
+        label="Delete project"
+      >
+        <helix-text
+          as="h2"
+          slot="header"
+        >
           Delete project
         </helix-text>
         <helix-text>This removes the project and everything in it. It cannot be undone.</helix-text>
-        <helix-flex gap="sm" slot="footer">
+        <helix-flex
+          gap="sm"
+          slot="footer"
+        >
           <helix-button
             command="--close"
             commandfor="confirm"
@@ -20,7 +34,11 @@ export function Example() {
           >
             Delete
           </helix-button>
-          <helix-button command="--close" commandfor="confirm" width="standard">
+          <helix-button
+            command="--close"
+            commandfor="confirm"
+            width="standard"
+          >
             Cancel
           </helix-button>
         </helix-flex>

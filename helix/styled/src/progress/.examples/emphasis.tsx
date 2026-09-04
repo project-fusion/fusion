@@ -1,7 +1,14 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-progress label="Importing" show-value value={62}></helix-progress>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-progress
+        label="Importing"
+        show-value
+        value={62}
+      ></helix-progress>
       <helix-progress
         emphasis="subtle"
         label="Syncing in the background"

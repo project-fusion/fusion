@@ -4,7 +4,10 @@ export function Example() {
   return (
     <>
       <div className="page">
-        <helix-text as="h1" variant="display">
+        <helix-text
+          as="h1"
+          variant="display"
+        >
           Scroll this page
         </helix-text>
         <helix-text as="p">
@@ -17,9 +20,17 @@ export function Example() {
         </helix-text>
       </div>
 
-      <helix-drawer default-open label="Drawer Title" material="glass" placement="end">
+      <helix-drawer
+        default-open
+        label="Drawer Title"
+        material="glass"
+        placement="end"
+      >
         <span slot="header">Drawer Title</span>
-        <helix-flex direction="column" gap="md">
+        <helix-flex
+          direction="column"
+          gap="md"
+        >
           <helix-text variant="body">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
             incididunt ut labore.

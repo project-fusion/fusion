@@ -12,7 +12,10 @@ export function Example() {
     <>
       <div className="app">
         {' '}
-        <aside className="rail" id="rail">
+        <aside
+          className="rail"
+          id="rail"
+        >
           {' '}
           <p>Project</p> <p>Drafts</p> <p>Published</p> <p>Archive</p>{' '}
         </aside>{' '}
@@ -22,12 +25,18 @@ export function Example() {
             {' '}
             <helix-headless-button id="publish">Publish</helix-headless-button>{' '}
             <helix-headless-button id="preview">Preview</helix-headless-button>{' '}
-            <helix-headless-icon-button id="settings" label="Settings">
+            <helix-headless-icon-button
+              id="settings"
+              label="Settings"
+            >
               {' '}
               <helix-headless-icon name="gear"></helix-headless-icon>{' '}
             </helix-headless-icon-button>{' '}
           </header>{' '}
-          <section className="sheet" id="sheet">
+          <section
+            className="sheet"
+            id="sheet"
+          >
             {' '}
             <h2>Quarterly review</h2>{' '}
             <p>
@@ -54,7 +63,10 @@ export function Example() {
         open={open}
       >
         {' '}
-        <helix-headless-tour-stop for="rail" placement="right-start">
+        <helix-headless-tour-stop
+          for="rail"
+          placement="right-start"
+        >
           {' '}
           <helix-headless-card>
             {' '}
@@ -73,7 +85,10 @@ export function Example() {
             </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
-        <helix-headless-tour-stop for="preview" placement="bottom">
+        <helix-headless-tour-stop
+          for="preview"
+          placement="bottom"
+        >
           {' '}
           <helix-headless-card>
             {' '}
@@ -81,7 +96,10 @@ export function Example() {
             <p> Opens the same page anybody with the link gets. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
-        <helix-headless-tour-stop for="publish" placement="bottom-start">
+        <helix-headless-tour-stop
+          for="publish"
+          placement="bottom-start"
+        >
           {' '}
           <helix-headless-card>
             {' '}

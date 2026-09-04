@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <span className="label">Small, 0.5rem</span>
       <helix-heatmap
         className="small"
@@ -10,7 +13,10 @@ export function Example() {
         thresholds="1 3 5 7 9"
         tones="1 2 3 4 5"
       >
-        <table data-hidden-visually id="sizesmall">
+        <table
+          data-hidden-visually
+          id="sizesmall"
+        >
           <caption>Commits</caption>
           <tbody>
             <tr>
@@ -146,7 +152,10 @@ export function Example() {
         thresholds="1 3 5 7 9"
         tones="1 2 3 4 5"
       >
-        <table data-hidden-visually id="sizemedium">
+        <table
+          data-hidden-visually
+          id="sizemedium"
+        >
           <caption>Commits</caption>
           <tbody>
             <tr>
@@ -282,7 +291,10 @@ export function Example() {
         thresholds="1 3 5 7 9"
         tones="1 2 3 4 5"
       >
-        <table data-hidden-visually id="sizelarge">
+        <table
+          data-hidden-visually
+          id="sizelarge"
+        >
           <caption>Commits</caption>
           <tbody>
             <tr>

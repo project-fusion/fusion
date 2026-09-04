@@ -46,7 +46,10 @@ export function Example() {
   }, [])
 
   return (
-    <helix-notifications label="Activity" mark-all>
+    <helix-notifications
+      label="Activity"
+      mark-all
+    >
       <Owned at={at}>
         <strong>cortex-core</strong> finished indexing.
       </Owned>

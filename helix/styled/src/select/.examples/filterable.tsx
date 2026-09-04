@@ -1,6 +1,10 @@
 export function Example() {
   return (
-    <helix-select filterable label="Time zone" placeholder="Choose one">
+    <helix-select
+      filterable
+      label="Time zone"
+      placeholder="Choose one"
+    >
       <helix-option value="utc">UTC</helix-option>
       <helix-option value="lisbon">Europe/Lisbon</helix-option>
       <helix-option value="london">Europe/London</helix-option>

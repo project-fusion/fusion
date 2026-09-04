@@ -34,8 +34,16 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-button command="--show" commandfor="panel" emphasis="solid" tone="primary">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-button
+        command="--show"
+        commandfor="panel"
+        emphasis="solid"
+        tone="primary"
+      >
         Open drawer
       </helix-button>
 
@@ -48,12 +56,18 @@ export function Example() {
         onToggle={moved}
       >
         <helix-text>Everything the list is narrowed by.</helix-text>
-        <helix-button command="--close" commandfor="panel">
+        <helix-button
+          command="--close"
+          commandfor="panel"
+        >
           Done
         </helix-button>
       </helix-drawer>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

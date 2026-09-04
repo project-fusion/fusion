@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <table data-hidden-visually id="legended">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <table
+        data-hidden-visually
+        id="legended"
+      >
         <caption>Sessions by source</caption>
         <thead>
           <tr>

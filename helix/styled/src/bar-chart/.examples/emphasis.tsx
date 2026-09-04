@@ -3,7 +3,10 @@ import './emphasis.css'
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="barchartemphasis">
+      <table
+        data-hidden-visually
+        id="barchartemphasis"
+      >
         <caption>Deploys per quarter</caption>
         <thead>
           <tr>

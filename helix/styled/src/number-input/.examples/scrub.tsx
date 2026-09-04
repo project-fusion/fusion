@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-number-input
         default-value="120"
         hint="Drag the label. Hold Shift for tens, Alt for a slower hand."

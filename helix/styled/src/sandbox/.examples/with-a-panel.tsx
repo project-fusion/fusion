@@ -14,7 +14,10 @@ export function Example() {
           <helix-tag>index.html</helix-tag>
         </helix-sandbox-toolbar>
 
-        <helix-tree label="Files" slot="panel">
+        <helix-tree
+          label="Files"
+          slot="panel"
+        >
           <helix-tree-item value="index">index.html</helix-tree-item>
           <helix-tree-item value="styles">styles.css</helix-tree-item>
         </helix-tree>
@@ -26,7 +29,10 @@ export function Example() {
         ></helix-sandbox-source>
 
         <div slot="preview">
-          <helix-button emphasis="solid" tone="primary">
+          <helix-button
+            emphasis="solid"
+            tone="primary"
+          >
             Save
           </helix-button>
         </div>

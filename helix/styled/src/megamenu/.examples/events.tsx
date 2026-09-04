@@ -30,7 +30,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-navigation label="Main">
         <a href="#overview">Overview</a>
         <helix-megamenu
@@ -41,14 +44,20 @@ export function Example() {
         >
           <div data-megamenu-group>
             <h3 data-megamenu-heading>Design</h3>
-            <a data-megamenu-item href="#helix">
+            <a
+              data-megamenu-item
+              href="#helix"
+            >
               Helix
             </a>
           </div>
         </helix-megamenu>
       </helix-navigation>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

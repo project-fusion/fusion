@@ -3,7 +3,10 @@ import './preview.css'
 export function Example() {
   return (
     <div className="stack">
-      <table data-hidden-visually id="sessions">
+      <table
+        data-hidden-visually
+        id="sessions"
+      >
         <caption>Sessions a month</caption>
         <thead>
           <tr>

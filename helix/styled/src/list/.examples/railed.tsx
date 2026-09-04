@@ -2,8 +2,15 @@ import './railed.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="xl">
-      <helix-list kind="ordered" label="The constraint" marker="rail">
+    <helix-flex
+      direction="column"
+      gap="xl"
+    >
+      <helix-list
+        kind="ordered"
+        label="The constraint"
+        marker="rail"
+      >
         <helix-list-item>
           The user holds their own keys
           <span slot="supporting">

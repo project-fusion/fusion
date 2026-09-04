@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-sparkline
         label="Sessions rose from 1,240 to 1,318, then fell to 1,102 over seven days"
         plot="area"

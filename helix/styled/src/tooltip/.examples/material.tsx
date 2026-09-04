@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-button aria-describedby="material-inverse-tip" id="material-inverse">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-button
+        aria-describedby="material-inverse-tip"
+        id="material-inverse"
+      >
         Inverse
       </helix-button>
       <helix-tooltip
@@ -9,7 +15,10 @@ export function Example() {
         for="material-inverse"
         id="material-inverse-tip"
       ></helix-tooltip>
-      <helix-button aria-describedby="material-glass-tip" id="material-glass">
+      <helix-button
+        aria-describedby="material-glass-tip"
+        id="material-glass"
+      >
         Glass
       </helix-button>
       <helix-tooltip

@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="sm">
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
       <helix-announcement tone="neutral">
         Scheduled maintenance on Sunday, from 02:00 to 04:00 UTC.
       </helix-announcement>

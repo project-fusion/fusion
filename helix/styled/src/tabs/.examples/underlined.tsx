@@ -1,12 +1,22 @@
 export function Example() {
   return (
-    <helix-tabs default-active="one" label="Label" variant="underlined">
+    <helix-tabs
+      default-active="one"
+      label="Label"
+      variant="underlined"
+    >
       <helix-tab value="one">Tab One</helix-tab>
       <helix-tab value="two">Tab Two</helix-tab>
-      <helix-tab-panel slot="panels" value="one">
+      <helix-tab-panel
+        slot="panels"
+        value="one"
+      >
         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
       </helix-tab-panel>
-      <helix-tab-panel slot="panels" value="two">
+      <helix-tab-panel
+        slot="panels"
+        value="two"
+      >
         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
       </helix-tab-panel>
     </helix-tabs>

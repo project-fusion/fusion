@@ -18,7 +18,10 @@ export function Example() {
     <dl>
       <dt>Elapsed:</dt>
       <dd>
-        <helix-headless-format-date date={at} elapsed></helix-headless-format-date>
+        <helix-headless-format-date
+          date={at}
+          elapsed
+        ></helix-headless-format-date>
       </dd>
 
       <dt>Date:</dt>

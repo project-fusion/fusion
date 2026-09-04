@@ -22,12 +22,22 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-announcement dismissible onhelix-dismiss={dismissed} tone="info">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-announcement
+        dismissible
+        onhelix-dismiss={dismissed}
+        tone="info"
+      >
         A new version is available.
       </helix-announcement>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

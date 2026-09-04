@@ -9,8 +9,14 @@ export function Example() {
   const [sessions, setSessions] = useState(OPENING)
 
   return (
-    <helix-flex direction="column" gap="md">
-      <table data-hidden-visually id="live">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <table
+        data-hidden-visually
+        id="live"
+      >
         <caption>Sessions a month</caption>
         <thead>
           <tr>
@@ -28,7 +34,10 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-line-chart curve="smooth" for="live" />
+      <helix-line-chart
+        curve="smooth"
+        for="live"
+      />
 
       <helix-button
         emphasis="solid"

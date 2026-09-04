@@ -3,7 +3,10 @@ export function Example() {
     <helix-sandbox>
       <helix-sandbox-toolbar slot="toolbar">
         <helix-tag>index.html</helix-tag>
-        <helix-button emphasis="ghost" slot="end">
+        <helix-button
+          emphasis="ghost"
+          slot="end"
+        >
           Reset
         </helix-button>
       </helix-sandbox-toolbar>
@@ -18,7 +21,10 @@ export function Example() {
              an example has no document to point one at, so what would show is an
              empty frame. */}
       <div slot="preview">
-        <helix-button emphasis="solid" tone="primary">
+        <helix-button
+          emphasis="solid"
+          tone="primary"
+        >
           Save
         </helix-button>
       </div>

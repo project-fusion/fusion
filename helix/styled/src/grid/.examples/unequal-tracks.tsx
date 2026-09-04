@@ -2,7 +2,10 @@ import './unequal-tracks.css'
 
 export function Example() {
   return (
-    <helix-grid className="page" gap="lg">
+    <helix-grid
+      className="page"
+      gap="lg"
+    >
       <p className="rail">26 Aug 2026</p>
       <p className="prose">
         A rail of metadata beside a prose measure, the composition centered so the prose is not.

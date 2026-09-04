@@ -26,7 +26,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-pagination
         default-page="4"
         onhelix-before-change={proposed}
@@ -34,7 +37,10 @@ export function Example() {
         pages={12}
       />
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

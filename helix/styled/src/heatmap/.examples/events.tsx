@@ -26,9 +26,19 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-heatmap for="uptime" label="Uptime, last 30 days" onhelix-resize={measured}>
-        <table data-hidden-visually id="uptime">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-heatmap
+        for="uptime"
+        label="Uptime, last 30 days"
+        onhelix-resize={measured}
+      >
+        <table
+          data-hidden-visually
+          id="uptime"
+        >
           <caption>Uptime</caption>
           <tbody>
             <tr>
@@ -47,7 +57,10 @@ export function Example() {
         </table>
       </helix-heatmap>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

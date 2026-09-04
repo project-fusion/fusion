@@ -30,7 +30,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-checkbox-group
         label="Scopes"
         name="scopes"
@@ -43,7 +46,10 @@ export function Example() {
         <helix-checkbox value="admin">Admin</helix-checkbox>
       </helix-checkbox-group>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

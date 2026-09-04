@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <table data-hidden-visually id="pied">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <table
+        data-hidden-visually
+        id="pied"
+      >
         <caption>Sessions by source</caption>
         <thead>
           <tr>
@@ -29,7 +35,10 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-donut-chart for="pied" hole="none"></helix-donut-chart>
+      <helix-donut-chart
+        for="pied"
+        hole="none"
+      ></helix-donut-chart>
     </helix-flex>
   )
 }

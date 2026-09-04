@@ -31,7 +31,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-tabs
         default-active="usage"
         label="Account"
@@ -41,18 +44,30 @@ export function Example() {
         <helix-tab value="usage">Usage</helix-tab>
         <helix-tab value="billing">Billing</helix-tab>
         <helix-tab value="danger">Danger</helix-tab>
-        <helix-tab-panel slot="panels" value="usage">
+        <helix-tab-panel
+          slot="panels"
+          value="usage"
+        >
           Requests, storage and egress.
         </helix-tab-panel>
-        <helix-tab-panel slot="panels" value="billing">
+        <helix-tab-panel
+          slot="panels"
+          value="billing"
+        >
           Invoices and the card on file.
         </helix-tab-panel>
-        <helix-tab-panel slot="panels" value="danger">
+        <helix-tab-panel
+          slot="panels"
+          value="danger"
+        >
           Nothing reaches here.
         </helix-tab-panel>
       </helix-tabs>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

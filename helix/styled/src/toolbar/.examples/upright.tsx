@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-toolbar label="Drawing" orientation="vertical">
+    <helix-toolbar
+      label="Drawing"
+      orientation="vertical"
+    >
       <helix-icon-button label="Navigate">
         <helix-icon name="compass"></helix-icon>
       </helix-icon-button>

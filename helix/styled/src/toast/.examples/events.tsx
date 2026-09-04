@@ -25,17 +25,33 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-toast label="Notifications" onhelix-dismiss={dismissed} placement="bottom-end">
-        <helix-toast-item dismissible tone="success">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-toast
+        label="Notifications"
+        onhelix-dismiss={dismissed}
+        placement="bottom-end"
+      >
+        <helix-toast-item
+          dismissible
+          tone="success"
+        >
           Project saved.
         </helix-toast-item>
-        <helix-toast-item dismissible tone="danger">
+        <helix-toast-item
+          dismissible
+          tone="danger"
+        >
           The build failed.
         </helix-toast-item>
       </helix-toast>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

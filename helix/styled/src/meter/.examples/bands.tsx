@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-meter
         high={80}
         label="Disk used"

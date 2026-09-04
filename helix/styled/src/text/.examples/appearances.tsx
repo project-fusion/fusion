@@ -1,31 +1,61 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="sm">
-      <helix-text as="p" variant="display">
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
+      <helix-text
+        as="p"
+        variant="display"
+      >
         Display
       </helix-text>
-      <helix-text as="p" variant="heading">
+      <helix-text
+        as="p"
+        variant="heading"
+      >
         Heading
       </helix-text>
-      <helix-text as="p" variant="subheading">
+      <helix-text
+        as="p"
+        variant="subheading"
+      >
         Subheading
       </helix-text>
-      <helix-text as="p" variant="title">
+      <helix-text
+        as="p"
+        variant="title"
+      >
         Title
       </helix-text>
-      <helix-text as="p" variant="body">
+      <helix-text
+        as="p"
+        variant="body"
+      >
         Body
       </helix-text>
-      <helix-text as="p" variant="body-strong">
+      <helix-text
+        as="p"
+        variant="body-strong"
+      >
         Body strong
       </helix-text>
-      <helix-text as="p" variant="caption">
+      <helix-text
+        as="p"
+        variant="caption"
+      >
         Caption
       </helix-text>
-      <helix-text as="p" variant="label">
+      <helix-text
+        as="p"
+        variant="label"
+      >
         Label
       </helix-text>
-      <helix-text as="p" variant="code">
+      <helix-text
+        as="p"
+        variant="code"
+      >
         Code
       </helix-text>
     </helix-flex>

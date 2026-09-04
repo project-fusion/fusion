@@ -2,8 +2,14 @@ import './vertical.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="2xl">
-      <helix-flex align="end" gap="2xl">
+    <helix-flex
+      direction="column"
+      gap="2xl"
+    >
+      <helix-flex
+        align="end"
+        gap="2xl"
+      >
         <helix-slider
           default-value="70"
           label="Low"
@@ -40,7 +46,11 @@ export function Example() {
              foot, and its label floats above theirs, which is a ragged row of names
              that no amount of aligning the row fixes. The hook is the fix, put where
              a length actually belongs. */}
-      <helix-flex align="end" className="tall" gap="2xl">
+      <helix-flex
+        align="end"
+        className="tall"
+        gap="2xl"
+      >
         <helix-slider
           default-value="80"
           label="Left"

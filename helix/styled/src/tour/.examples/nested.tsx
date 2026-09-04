@@ -33,18 +33,32 @@ export function Example() {
   return (
     <>
       <div className="bar">
-        <helix-menu id="actions" label="Actions" open={arranged === 1}>
-          <helix-button id="actions-trigger" slot="trigger">
+        <helix-menu
+          id="actions"
+          label="Actions"
+          open={arranged === 1}
+        >
+          <helix-button
+            id="actions-trigger"
+            slot="trigger"
+          >
             Actions
           </helix-button>
           <helix-menu-item value="duplicate">Duplicate</helix-menu-item>
-          <helix-menu-item id="export" value="export">
+          <helix-menu-item
+            id="export"
+            value="export"
+          >
             Export
           </helix-menu-item>
           <helix-menu-item value="delete">Delete</helix-menu-item>
         </helix-menu>
 
-        <helix-button command="--show" commandfor="settings" emphasis="outlined">
+        <helix-button
+          command="--show"
+          commandfor="settings"
+          emphasis="outlined"
+        >
           Settings
         </helix-button>
       </div>
@@ -56,7 +70,10 @@ export function Example() {
         open={arranged === 2}
         placement="end"
       >
-        <helix-flex direction="column" gap="md">
+        <helix-flex
+          direction="column"
+          gap="md"
+        >
           <helix-switch id="autosave">Autosave</helix-switch>
           <helix-switch>Send me a weekly digest</helix-switch>
         </helix-flex>
@@ -79,14 +96,20 @@ export function Example() {
         onhelix-complete={() => setOpen(false)}
         open={open}
       >
-        <helix-tour-stop for="actions-trigger" placement="bottom-start">
+        <helix-tour-stop
+          for="actions-trigger"
+          placement="bottom-start"
+        >
           <helix-card separation="plain">
             <helix-text as="h3">Everything you can do to a file</helix-text>
             <helix-text tone="muted">Behind one control, so the bar stays short.</helix-text>
           </helix-card>
         </helix-tour-stop>
 
-        <helix-tour-stop for="export" placement="right">
+        <helix-tour-stop
+          for="export"
+          placement="right"
+        >
           <helix-card separation="plain">
             <helix-text as="h3">Export lives in here</helix-text>
             <helix-text tone="muted">
@@ -95,7 +118,10 @@ export function Example() {
           </helix-card>
         </helix-tour-stop>
 
-        <helix-tour-stop for="autosave" placement="left">
+        <helix-tour-stop
+          for="autosave"
+          placement="left"
+        >
           <helix-card separation="plain">
             <helix-text as="h3">And this is on by default</helix-text>
             <helix-text tone="muted">

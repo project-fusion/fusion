@@ -1,7 +1,14 @@
 export function Example() {
   return (
-    <helix-file-input accept="image/*" label="Profile photo" name="photo">
-      <helix-icon name="upload-simple" slot="trigger"></helix-icon>
+    <helix-file-input
+      accept="image/*"
+      label="Profile photo"
+      name="photo"
+    >
+      <helix-icon
+        name="upload-simple"
+        slot="trigger"
+      ></helix-icon>
       <span slot="trigger">Choose an image</span>
     </helix-file-input>
   )

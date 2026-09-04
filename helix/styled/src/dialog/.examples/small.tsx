@@ -1,19 +1,34 @@
 export function Example() {
   return (
     <>
-      <helix-button command="--show" commandfor="small-dialog" emphasis="solid" tone="primary">
+      <helix-button
+        command="--show"
+        commandfor="small-dialog"
+        emphasis="solid"
+        tone="primary"
+      >
         Open dialog
       </helix-button>
 
-      <helix-dialog id="small-dialog" label="Dialog Title" size="sm">
-        <helix-text as="h2" slot="header">
+      <helix-dialog
+        id="small-dialog"
+        label="Dialog Title"
+        size="sm"
+      >
+        <helix-text
+          as="h2"
+          slot="header"
+        >
           Dialog Title
         </helix-text>
         <helix-text>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
           ut labore et dolore magna aliqua.
         </helix-text>
-        <helix-flex gap="sm" slot="footer">
+        <helix-flex
+          gap="sm"
+          slot="footer"
+        >
           <helix-button
             command="--close"
             commandfor="small-dialog"
@@ -23,7 +38,11 @@ export function Example() {
           >
             Save
           </helix-button>
-          <helix-button command="--close" commandfor="small-dialog" width="standard">
+          <helix-button
+            command="--close"
+            commandfor="small-dialog"
+            width="standard"
+          >
             Cancel
           </helix-button>
         </helix-flex>

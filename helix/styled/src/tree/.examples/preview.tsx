@@ -1,12 +1,24 @@
 export function Example() {
   return (
-    <helix-tree default-active="two" label="Label">
-      <helix-tree-item default-open value="one">
+    <helix-tree
+      default-active="two"
+      label="Label"
+    >
+      <helix-tree-item
+        default-open
+        value="one"
+      >
         Item One
-        <helix-tree-item slot="children" value="two">
+        <helix-tree-item
+          slot="children"
+          value="two"
+        >
           Item Two
         </helix-tree-item>
-        <helix-tree-item slot="children" value="three">
+        <helix-tree-item
+          slot="children"
+          value="three"
+        >
           Item Three
         </helix-tree-item>
       </helix-tree-item>

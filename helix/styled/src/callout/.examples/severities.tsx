@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="sm">
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
       <helix-callout tone="info">
         <span slot="title">Information</span>
         The next release ships on Tuesday.

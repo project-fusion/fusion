@@ -1,17 +1,23 @@
 export function Example() {
   return (
-    <helix-video-playlist default-active="two" label="Episodes">
-      {' '}
-      <helix-video label="One of several" slot="player"></helix-video>{' '}
-      <helix-video-playlist-menu label="Episodes" placement="top-end"></helix-video-playlist-menu>{' '}
+    <helix-video-playlist
+      default-active="two"
+      label="Episodes"
+    >
+      <helix-video
+        label="One of several"
+        slot="player"
+      ></helix-video>
+      <helix-video-playlist-menu
+        label="Episodes"
+        placement="top-end"
+      ></helix-video-playlist-menu>
       <helix-video-playlist-item value="one">
-        {' '}
-        Getting started <span slot="meta">4:12</span>{' '}
-      </helix-video-playlist-item>{' '}
+        Getting started <span slot="meta">4:12</span>
+      </helix-video-playlist-item>
       <helix-video-playlist-item value="two">
-        {' '}
-        Tokens and themes <span slot="meta">6:40</span>{' '}
-      </helix-video-playlist-item>{' '}
+        Tokens and themes <span slot="meta">6:40</span>
+      </helix-video-playlist-item>
     </helix-video-playlist>
   )
 }

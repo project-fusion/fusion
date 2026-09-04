@@ -1,7 +1,14 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
-      <helix-flex gap="sm" justify="between" wrap>
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-flex
+        gap="sm"
+        justify="between"
+        wrap
+      >
         <helix-tag>Design</helix-tag>
         <helix-tag>Engineering</helix-tag>
         <helix-tag>Research</helix-tag>
@@ -14,7 +21,10 @@ export function Example() {
 
       <p>
         Deploys are gated on{' '}
-        <helix-flex gap="2xs" inline>
+        <helix-flex
+          gap="2xs"
+          inline
+        >
           <helix-tag tone="success">passing</helix-tag>
           <helix-tag tone="warning">review</helix-tag>
         </helix-flex>{' '}

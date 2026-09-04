@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="sm">
-      <helix-sparkline label="Line, full strength" values="4 9 6 11 8 14 12 18"></helix-sparkline>
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
+      <helix-sparkline
+        label="Line, full strength"
+        values="4 9 6 11 8 14 12 18"
+      ></helix-sparkline>
       <helix-sparkline
         emphasis="subtle"
         label="Line, as context"

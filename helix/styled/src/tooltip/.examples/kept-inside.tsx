@@ -1,8 +1,14 @@
 export function Example() {
   return (
     <div id="tooltipbounds">
-      <helix-flex align="center" gap="sm">
-        <helix-button aria-describedby="kept-inside-at-the-edge-tip" id="kept-inside-at-the-edge">
+      <helix-flex
+        align="center"
+        gap="sm"
+      >
+        <helix-button
+          aria-describedby="kept-inside-at-the-edge-tip"
+          id="kept-inside-at-the-edge"
+        >
           At the edge
         </helix-button>
         <helix-tooltip

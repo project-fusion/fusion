@@ -1,6 +1,12 @@
 export function Example() {
   return (
-    <helix-listbox default-filter="two" filterable hint="Hint" label="Label" name="choice">
+    <helix-listbox
+      default-filter="two"
+      filterable
+      hint="Hint"
+      label="Label"
+      name="choice"
+    >
       <helix-option-group label="Group One">
         <helix-option value="one">Option One</helix-option>
         <helix-option value="two">Option Two</helix-option>

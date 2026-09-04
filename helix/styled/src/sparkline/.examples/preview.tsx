@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex gap="xl" wrap>
+    <helix-flex
+      gap="xl"
+      wrap
+    >
       <helix-sparkline
         label="Sessions over seven days, as bars"
         plot="bar"

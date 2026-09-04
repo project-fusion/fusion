@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <table data-hidden-visually id="revenue">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <table
+        data-hidden-visually
+        id="revenue"
+      >
         <caption>Revenue by quarter</caption>
         <thead>
           <tr>
@@ -32,8 +38,16 @@ export function Example() {
           </tr>
         </tbody>
       </table>
-      <helix-bar-chart for="revenue" outlined="Forecast" subtle="Renewals"></helix-bar-chart>
-      <helix-legend for="revenue" outlined="Forecast" subtle="Renewals"></helix-legend>
+      <helix-bar-chart
+        for="revenue"
+        outlined="Forecast"
+        subtle="Renewals"
+      ></helix-bar-chart>
+      <helix-legend
+        for="revenue"
+        outlined="Forecast"
+        subtle="Renewals"
+      ></helix-legend>
     </helix-flex>
   )
 }

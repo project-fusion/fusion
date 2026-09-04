@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-tabs default-active="overview" manual>
+    <helix-tabs
+      default-active="overview"
+      manual
+    >
       <helix-tab value="overview">Overview</helix-tab>
       <helix-tab value="usage">Usage</helix-tab>
       <helix-tab value="billing">Billing</helix-tab>

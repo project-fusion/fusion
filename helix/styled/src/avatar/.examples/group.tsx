@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-avatar-group label="Reviewers" max={4}>
+    <helix-avatar-group
+      label="Reviewers"
+      max={4}
+    >
       <helix-avatar name="Ada Lovelace"></helix-avatar>
       <helix-avatar name="Grace Hopper"></helix-avatar>
       <helix-avatar name="Alan Turing"></helix-avatar>

@@ -34,11 +34,23 @@ const rows = [
 
 export function Example() {
   return (
-    <helix-data-table default-sort="name:asc" label="Objects" page-size="4" rows={rows}>
-      <helix-table-column field="name" sortable width="14rem">
+    <helix-data-table
+      default-sort="name:asc"
+      label="Objects"
+      page-size="4"
+      rows={rows}
+    >
+      <helix-table-column
+        field="name"
+        sortable
+        width="14rem"
+      >
         Name
       </helix-table-column>
-      <helix-table-column field="region" sortable>
+      <helix-table-column
+        field="region"
+        sortable
+      >
         Region
       </helix-table-column>
       <helix-table-column

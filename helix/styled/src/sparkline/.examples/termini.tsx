@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-sparkline
         label="A dot, which is where a line ends unless it is told otherwise"
         values="1240 1318 1102 1291 1244 1180 1408"

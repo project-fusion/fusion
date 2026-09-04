@@ -1,15 +1,28 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
-      <helix-toggle-group default-value="one" hint="Hint" label="Label">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-toggle-group
+        default-value="one"
+        hint="Hint"
+        label="Label"
+      >
         <helix-toggle value="one">Chosen</helix-toggle>
         <helix-toggle value="two">Not chosen</helix-toggle>
-        <helix-toggle disabled value="three">
+        <helix-toggle
+          disabled
+          value="three"
+        >
           Disabled
         </helix-toggle>
       </helix-toggle-group>
 
-      <helix-toggle-group aria-label="Label" default-value="two">
+      <helix-toggle-group
+        aria-label="Label"
+        default-value="two"
+      >
         <helix-toggle value="one">Option One</helix-toggle>
         <helix-toggle value="two">Option Two</helix-toggle>
       </helix-toggle-group>

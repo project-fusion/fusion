@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
-      <table data-hidden-visually id="curved">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <table
+        data-hidden-visually
+        id="curved"
+      >
         <caption>Sessions a month</caption>
         <thead>
           <tr>
@@ -38,8 +44,14 @@ export function Example() {
       </table>
 
       <helix-line-chart for="curved"></helix-line-chart>
-      <helix-line-chart curve="smooth" for="curved"></helix-line-chart>
-      <helix-line-chart curve="step" for="curved"></helix-line-chart>
+      <helix-line-chart
+        curve="smooth"
+        for="curved"
+      ></helix-line-chart>
+      <helix-line-chart
+        curve="step"
+        for="curved"
+      ></helix-line-chart>
     </helix-flex>
   )
 }

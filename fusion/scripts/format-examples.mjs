@@ -11,8 +11,13 @@
  * starts costing something.
  *
  * **Three bodies of markup are under it**, because a reader copies whichever one
- * is in front of them: the `.examples` in `helix/styled` and `helix/sandbox`, and
- * the fenced HTML in the documentation.
+ * is in front of them: the `.examples` on both tiers, the ones in
+ * `helix/sandbox`, and the fenced HTML in the documentation.
+ *
+ * `TIERS` rather than `SOURCE.styled` alone, which is what this walked until the
+ * headless examples were counted: 41 open tags carrying two or more attributes on
+ * a line, in a tier whose examples sit in the same sandbox pane the rule is
+ * written for. A rule that governs one tier is a rule a reader meets half of.
  *
  * **Biome sorts attributes too, now that `useSortedAttributes` is on**, and this
  * has to agree with it or the two take turns undoing each other inside a single
@@ -43,7 +48,7 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const ROOTS = [SOURCE.styled, SOURCE.sandbox]
+const ROOTS = [...TIERS, SOURCE.sandbox]
 
 /* And the prose, whose HTML samples are copied exactly as often as an example
    is. `check:cli:component` holds these fences to the rules about inline styles
@@ -64,7 +69,7 @@ const walk = (dir, found = []) => {
 }
 
 import { format } from '@fusion.dev/scripts/format-open-tags'
-import { SOURCE } from '@fusion.dev/scripts/workspace'
+import { SOURCE, TIERS } from '@fusion.dev/scripts/workspace'
 
 /* Fenced HTML only, and the fence is reformatted in place rather than the file:
    an MDX page is mostly prose, and prose has angle brackets in it. */

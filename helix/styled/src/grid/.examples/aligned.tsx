@@ -1,6 +1,10 @@
 export function Example() {
   return (
-    <helix-grid align="center" columns={3} gap="md">
+    <helix-grid
+      align="center"
+      columns={3}
+      gap="md"
+    >
       <helix-card>
         <h3>One</h3>
       </helix-card>

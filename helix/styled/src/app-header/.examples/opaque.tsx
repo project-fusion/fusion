@@ -6,18 +6,27 @@ export function Example() {
       <helix-app-header sticky>
         <span slot="start">Logo</span>
         <helix-navigation label="Sections">
-          <a aria-current="page" href="#one">
+          <a
+            aria-current="page"
+            href="#one"
+          >
             Item One
           </a>
           <a href="#two">Item Two</a>
         </helix-navigation>
-        <helix-icon-button label="Settings" slot="end">
+        <helix-icon-button
+          label="Settings"
+          slot="end"
+        >
           <helix-icon name="gear"></helix-icon>
         </helix-icon-button>
       </helix-app-header>
 
       <div className="band">
-        <helix-text as="h1" variant="display">
+        <helix-text
+          as="h1"
+          variant="display"
+        >
           Scroll this page
         </helix-text>
         <helix-text as="p">
@@ -27,7 +36,10 @@ export function Example() {
       </div>
 
       <div className="prose">
-        <helix-text as="h2" variant="title">
+        <helix-text
+          as="h2"
+          variant="title"
+        >
           Section One
         </helix-text>
         <helix-text as="p">
@@ -35,7 +47,10 @@ export function Example() {
           ut labore et dolore magna aliqua.
         </helix-text>
 
-        <helix-text as="h2" variant="title">
+        <helix-text
+          as="h2"
+          variant="title"
+        >
           Section Two
         </helix-text>
         <helix-text as="p">
@@ -43,7 +58,10 @@ export function Example() {
           commodo consequat.
         </helix-text>
 
-        <helix-text as="h2" variant="title">
+        <helix-text
+          as="h2"
+          variant="title"
+        >
           Section Three
         </helix-text>
         <helix-text as="p">

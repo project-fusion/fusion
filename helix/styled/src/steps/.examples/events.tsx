@@ -26,14 +26,24 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-steps label="Checkout" onhelix-before-activate={proposed} onhelix-select={pressed}>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-steps
+        label="Checkout"
+        onhelix-before-activate={proposed}
+        onhelix-select={pressed}
+      >
         <helix-step value="details">Details</helix-step>
         <helix-step value="payment">Payment</helix-step>
         <helix-step value="review">Review</helix-step>
       </helix-steps>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

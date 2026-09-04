@@ -2,7 +2,10 @@ import './disabled.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-slider
         default-value="40"
         disabled

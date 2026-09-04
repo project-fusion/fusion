@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex gap="lg" wrap>
-      <table data-hidden-visually id="mix">
+    <helix-flex
+      gap="lg"
+      wrap
+    >
+      <table
+        data-hidden-visually
+        id="mix"
+      >
         <caption>Spend by category</caption>
         <thead>
           <tr>
@@ -25,8 +31,14 @@ export function Example() {
         </tbody>
       </table>
       <helix-donut-chart for="mix"></helix-donut-chart>
-      <helix-donut-chart emphasis="outlined" for="mix"></helix-donut-chart>
-      <helix-donut-chart emphasis="subtle" for="mix"></helix-donut-chart>
+      <helix-donut-chart
+        emphasis="outlined"
+        for="mix"
+      ></helix-donut-chart>
+      <helix-donut-chart
+        emphasis="subtle"
+        for="mix"
+      ></helix-donut-chart>
     </helix-flex>
   )
 }

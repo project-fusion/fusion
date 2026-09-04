@@ -1,10 +1,17 @@
 export function Example() {
   return (
     <>
-      <helix-button aria-describedby="save-tip" id="save">
+      <helix-button
+        aria-describedby="save-tip"
+        id="save"
+      >
         Button
       </helix-button>
-      <helix-tooltip content="Lorem ipsum dolor sit amet" for="save" id="save-tip"></helix-tooltip>
+      <helix-tooltip
+        content="Lorem ipsum dolor sit amet"
+        for="save"
+        id="save-tip"
+      ></helix-tooltip>
     </>
   )
 }

@@ -9,7 +9,10 @@ export function Example() {
       <helix-headless-icon name="lightbulb"></helix-headless-icon>{' '}
       <helix-headless-icon name="magnifying-glass"></helix-headless-icon>{' '}
       <helix-headless-icon name="shield-check"></helix-headless-icon>{' '}
-      <helix-headless-icon label="Warning" name="warning"></helix-headless-icon>
+      <helix-headless-icon
+        label="Warning"
+        name="warning"
+      ></helix-headless-icon>
     </>
   )
 }

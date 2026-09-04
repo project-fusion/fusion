@@ -7,7 +7,10 @@ export function Example() {
       rounded
       src="/does-not-exist.jpg"
     >
-      <helix-icon name="warning" slot="fallback"></helix-icon>
+      <helix-icon
+        name="warning"
+        slot="fallback"
+      ></helix-icon>
     </helix-image>
   )
 }

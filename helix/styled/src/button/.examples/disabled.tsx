@@ -3,7 +3,11 @@ import './disabled.css'
 export function Example() {
   return (
     <helix-flex gap="sm">
-      <helix-button disabled emphasis="solid" tone="primary">
+      <helix-button
+        disabled
+        emphasis="solid"
+        tone="primary"
+      >
         Button
       </helix-button>
       <helix-button disabled>Button</helix-button>

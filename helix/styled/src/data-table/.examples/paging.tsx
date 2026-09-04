@@ -14,11 +14,23 @@ export function Example() {
        first eight rows and no way to learn there are more. Write
        `paginated={false}` to take the control back and put your own in the
        `footer` slot. */
-    <helix-data-table label="Assets" page-size={8} rows={rows}>
-      <helix-table-column field="name" sortable width="14rem">
+    <helix-data-table
+      label="Assets"
+      page-size={8}
+      rows={rows}
+    >
+      <helix-table-column
+        field="name"
+        sortable
+        width="14rem"
+      >
         File
       </helix-table-column>
-      <helix-table-column align="end" field="size" sortable>
+      <helix-table-column
+        align="end"
+        field="size"
+        sortable
+      >
         Size
       </helix-table-column>
       <helix-table-column field="kind">Kind</helix-table-column>

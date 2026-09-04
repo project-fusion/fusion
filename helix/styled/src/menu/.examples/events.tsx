@@ -34,7 +34,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-menu
         label="Actions"
         onhelix-before-close={closing}
@@ -48,7 +51,10 @@ export function Example() {
         <helix-menu-item value="archive">Archive</helix-menu-item>
       </helix-menu>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

@@ -9,7 +9,10 @@ export function Example() {
         <span slot="prefix">Env</span>
         Staging
       </helix-tag>
-      <helix-tag dismissible tone="success">
+      <helix-tag
+        dismissible
+        tone="success"
+      >
         <span slot="prefix">Owner</span>
         Ada
       </helix-tag>

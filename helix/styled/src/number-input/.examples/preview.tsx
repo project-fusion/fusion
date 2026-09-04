@@ -1,3 +1,9 @@
 export function Example() {
-  return <helix-number-input default-value="3" label="Guests" min={1}></helix-number-input>
+  return (
+    <helix-number-input
+      default-value="3"
+      label="Guests"
+      min={1}
+    ></helix-number-input>
+  )
 }

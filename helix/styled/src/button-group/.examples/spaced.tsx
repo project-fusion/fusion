@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-button-group label="Record actions" variant="spaced">
-      <helix-button emphasis="solid" tone="primary">
+    <helix-button-group
+      label="Record actions"
+      variant="spaced"
+    >
+      <helix-button
+        emphasis="solid"
+        tone="primary"
+      >
         Save
       </helix-button>
       <helix-button>Duplicate</helix-button>

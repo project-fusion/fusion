@@ -22,21 +22,36 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-drilldown label="Settings" onhelix-select={chosen}>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-drilldown
+        label="Settings"
+        onhelix-select={chosen}
+      >
         <helix-drilldown-item value="appearance">
           Appearance
-          <helix-drilldown-item slot="page" value="theme">
+          <helix-drilldown-item
+            slot="page"
+            value="theme"
+          >
             Theme
           </helix-drilldown-item>
-          <helix-drilldown-item slot="page" value="density">
+          <helix-drilldown-item
+            slot="page"
+            value="density"
+          >
             Density
           </helix-drilldown-item>
         </helix-drilldown-item>
         <helix-drilldown-item value="account">Account</helix-drilldown-item>
       </helix-drilldown>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

@@ -19,13 +19,23 @@ export function Example() {
   return (
     <>
       <div className="bar">
-        <helix-button emphasis="solid" id="compose" tone="primary">
+        <helix-button
+          emphasis="solid"
+          id="compose"
+          tone="primary"
+        >
           Compose
         </helix-button>
-        <helix-button emphasis="outlined" id="filter">
+        <helix-button
+          emphasis="outlined"
+          id="filter"
+        >
           Filter
         </helix-button>
-        <helix-icon-button id="refresh" label="Refresh">
+        <helix-icon-button
+          id="refresh"
+          label="Refresh"
+        >
           <helix-icon name="arrow-clockwise"></helix-icon>
         </helix-icon-button>
       </div>
@@ -47,46 +57,97 @@ export function Example() {
         open={open}
         ref={tour}
       >
-        <helix-tour-stop for="compose" placement="bottom-start">
+        <helix-tour-stop
+          for="compose"
+          placement="bottom-start"
+        >
           <helix-text as="h3">Start something</helix-text>
           <helix-text tone="muted">The only control here that makes anything new.</helix-text>
-          <helix-flex align="center" gap="xs" slot="actions">
-            <helix-text className="count" tone="subtle" variant="caption">
+          <helix-flex
+            align="center"
+            gap="xs"
+            slot="actions"
+          >
+            <helix-text
+              className="count"
+              tone="subtle"
+              variant="caption"
+            >
               {count}
             </helix-text>
-            <helix-button emphasis="solid" onClick={() => tour.current?.next()} tone="primary">
+            <helix-button
+              emphasis="solid"
+              onClick={() => tour.current?.next()}
+              tone="primary"
+            >
               Next
             </helix-button>
           </helix-flex>
         </helix-tour-stop>
 
-        <helix-tour-stop for="filter" placement="bottom">
+        <helix-tour-stop
+          for="filter"
+          placement="bottom"
+        >
           <helix-text as="h3">Narrow it down</helix-text>
           <helix-text tone="muted">Filters stack, and the set says how many are on.</helix-text>
-          <helix-flex align="center" gap="xs" slot="actions">
-            <helix-text className="count" tone="subtle" variant="caption">
+          <helix-flex
+            align="center"
+            gap="xs"
+            slot="actions"
+          >
+            <helix-text
+              className="count"
+              tone="subtle"
+              variant="caption"
+            >
               {count}
             </helix-text>
-            <helix-button emphasis="ghost" onClick={() => tour.current?.back()}>
+            <helix-button
+              emphasis="ghost"
+              onClick={() => tour.current?.back()}
+            >
               Back
             </helix-button>
-            <helix-button emphasis="solid" onClick={() => tour.current?.next()} tone="primary">
+            <helix-button
+              emphasis="solid"
+              onClick={() => tour.current?.next()}
+              tone="primary"
+            >
               Next
             </helix-button>
           </helix-flex>
         </helix-tour-stop>
 
-        <helix-tour-stop for="refresh" placement="bottom-end">
+        <helix-tour-stop
+          for="refresh"
+          placement="bottom-end"
+        >
           <helix-text as="h3">And when you want it now</helix-text>
           <helix-text tone="muted">It refreshes itself, but not while you are reading.</helix-text>
-          <helix-flex align="center" gap="xs" slot="actions">
-            <helix-text className="count" tone="subtle" variant="caption">
+          <helix-flex
+            align="center"
+            gap="xs"
+            slot="actions"
+          >
+            <helix-text
+              className="count"
+              tone="subtle"
+              variant="caption"
+            >
               {count}
             </helix-text>
-            <helix-button emphasis="ghost" onClick={() => tour.current?.back()}>
+            <helix-button
+              emphasis="ghost"
+              onClick={() => tour.current?.back()}
+            >
               Back
             </helix-button>
-            <helix-button emphasis="solid" onClick={() => tour.current?.next()} tone="primary">
+            <helix-button
+              emphasis="solid"
+              onClick={() => tour.current?.next()}
+              tone="primary"
+            >
               Got it
             </helix-button>
           </helix-flex>

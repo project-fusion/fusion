@@ -3,7 +3,10 @@ import './preview.css'
 export function Example() {
   return (
     <div className="stack">
-      <table data-hidden-visually id="traffic">
+      <table
+        data-hidden-visually
+        id="traffic"
+      >
         <caption>Sessions by source</caption>
         <thead>
           <tr>

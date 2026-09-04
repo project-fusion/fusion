@@ -8,7 +8,10 @@ export function Example() {
       thresholds="0 1 2 3 4"
       tones="1 2 3 4 5"
     >
-      <table data-hidden-visually id="load">
+      <table
+        data-hidden-visually
+        id="load"
+      >
         <caption>Average load</caption>
         <tbody>
           <tr>

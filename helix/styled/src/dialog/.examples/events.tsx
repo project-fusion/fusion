@@ -41,8 +41,16 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-button command="--show" commandfor="unsaved" emphasis="solid" tone="primary">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-button
+        command="--show"
+        commandfor="unsaved"
+        emphasis="solid"
+        tone="primary"
+      >
         Open
       </helix-button>
 
@@ -55,12 +63,19 @@ export function Example() {
         onToggle={moved}
       >
         <helix-text>There are changes that have not been written yet.</helix-text>
-        <helix-button command="--close" commandfor="unsaved" slot="footer">
+        <helix-button
+          command="--close"
+          commandfor="unsaved"
+          slot="footer"
+        >
           Close
         </helix-button>
       </helix-dialog>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

@@ -32,21 +32,39 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-chat label="Support" onhelix-before-pin={pinned} onhelix-send={sent}>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-chat
+        label="Support"
+        onhelix-before-pin={pinned}
+        onhelix-send={sent}
+      >
         <strong slot="header">Support</strong>
-        <helix-chat-message author="them" state="sent">
+        <helix-chat-message
+          author="them"
+          state="sent"
+        >
           How can I help?
         </helix-chat-message>
         {turns.map((turn, at) => (
-          <helix-chat-message at={turn.when} author="me" key={`${turn.when}-${at}`} state="sent">
+          <helix-chat-message
+            at={turn.when}
+            author="me"
+            key={`${turn.when}-${at}`}
+            state="sent"
+          >
             {turn.said}
           </helix-chat-message>
         ))}
         <helix-chat-composer slot="composer" />
       </helix-chat>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

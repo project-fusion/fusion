@@ -2,8 +2,14 @@ import './from-a-table.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <table data-hidden-visually id="deploys">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <table
+        data-hidden-visually
+        id="deploys"
+      >
         <caption>Deploys per day</caption>
         <tbody>
           <tr>

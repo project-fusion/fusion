@@ -2,10 +2,17 @@ export function Example() {
   return (
     <helix-navigation label="Main">
       <a href="#overview">Overview</a>
-      <helix-megamenu full-below label="Products" open-on="hover">
+      <helix-megamenu
+        full-below
+        label="Products"
+        open-on="hover"
+      >
         <div data-megamenu-group>
           <h3 data-megamenu-heading>Build</h3>
-          <a data-megamenu-item href="#helix">
+          <a
+            data-megamenu-item
+            href="#helix"
+          >
             <helix-icon name="cube"></helix-icon>
             <strong>Helix</strong>
             <span>Components, tokens and the base layer.</span>
@@ -13,7 +20,10 @@ export function Example() {
         </div>
         <div data-megamenu-group>
           <h3 data-megamenu-heading>Run</h3>
-          <a data-megamenu-item href="#trace">
+          <a
+            data-megamenu-item
+            href="#trace"
+          >
             <helix-icon name="pulse"></helix-icon>
             <strong>Trace</strong>
             <span>Where an answer came from.</span>

@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
-      <table data-hidden-visually id="thinned">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <table
+        data-hidden-visually
+        id="thinned"
+      >
         <caption>Sessions by source</caption>
         <thead>
           <tr>
@@ -29,7 +35,10 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-donut-chart for="thinned" hole="large">
+      <helix-donut-chart
+        for="thinned"
+        hole="large"
+      >
         <helix-stat>
           10,000
           <span slot="label">Sessions</span>

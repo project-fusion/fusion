@@ -3,7 +3,10 @@ import './material.css'
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="linematerial">
+      <table
+        data-hidden-visually
+        id="linematerial"
+      >
         <caption>Latency by week</caption>
         <thead>
           <tr>
@@ -39,7 +42,11 @@ export function Example() {
       <div className="panel">
         <figure>
           <figcaption>Opaque</figcaption>
-          <helix-line-chart area for="linematerial" gridlines="both"></helix-line-chart>
+          <helix-line-chart
+            area
+            for="linematerial"
+            gridlines="both"
+          ></helix-line-chart>
         </figure>
         <figure>
           <figcaption>Glass</figcaption>

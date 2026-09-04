@@ -30,8 +30,14 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-button aria-describedby="events-deploy-tip" id="events-deploy">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-button
+        aria-describedby="events-deploy-tip"
+        id="events-deploy"
+      >
         Deploy
       </helix-button>
       <helix-tooltip
@@ -43,7 +49,10 @@ export function Example() {
         onToggle={moved}
       ></helix-tooltip>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

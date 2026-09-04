@@ -1,10 +1,19 @@
 export function Example() {
   return (
-    <helix-steps label="Label" variant="numeric">
-      <helix-step complete value="one">
+    <helix-steps
+      label="Label"
+      variant="numeric"
+    >
+      <helix-step
+        complete
+        value="one"
+      >
         Step One
       </helix-step>
-      <helix-step current value="two">
+      <helix-step
+        current
+        value="two"
+      >
         Step Two
       </helix-step>
       <helix-step value="three">Step Three</helix-step>

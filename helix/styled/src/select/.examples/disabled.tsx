@@ -2,15 +2,29 @@ import './disabled.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
-      <helix-select default-value="two" disabled hint="Hint" label="Written off" name="a">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <helix-select
+        default-value="two"
+        disabled
+        hint="Hint"
+        label="Written off"
+        name="a"
+      >
         <helix-option value="one">Option One</helix-option>
         <helix-option value="two">Option Two</helix-option>
       </helix-select>
 
       {/* The same state, arriving from an ancestor fieldset. */}
       <fieldset disabled>
-        <helix-select default-value="one" hint="Hint" label="Off from the fieldset" name="b">
+        <helix-select
+          default-value="one"
+          hint="Hint"
+          label="Off from the fieldset"
+          name="b"
+        >
           <helix-option value="one">Option One</helix-option>
           <helix-option value="two">Option Two</helix-option>
         </helix-select>

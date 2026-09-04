@@ -1,12 +1,18 @@
 export function Example() {
   return (
-    <helix-card aria-label="Card Title" orientation="horizontal">
+    <helix-card
+      aria-label="Card Title"
+      orientation="horizontal"
+    >
       <img
         alt=""
         slot="media"
         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%234a7fe0'/%3E%3C/svg%3E"
       />
-      <helix-text as="h3" slot="header">
+      <helix-text
+        as="h3"
+        slot="header"
+      >
         Card Title
       </helix-text>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit.

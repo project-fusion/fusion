@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="xl">
+    <helix-flex
+      direction="column"
+      gap="xl"
+    >
       <helix-carousel
         controls-align="center"
         controls-placement="block-start"

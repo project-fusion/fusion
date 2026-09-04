@@ -2,10 +2,23 @@ import './proportions.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="2xl">
-      <helix-slider default-value="60" label="Default" max={100} min={0} show-value></helix-slider>
+    <helix-flex
+      direction="column"
+      gap="2xl"
+    >
+      <helix-slider
+        default-value="60"
+        label="Default"
+        max={100}
+        min={0}
+        show-value
+      ></helix-slider>
 
-      <helix-flex className="thick" direction="column" gap="2xl">
+      <helix-flex
+        className="thick"
+        direction="column"
+        gap="2xl"
+      >
         <helix-slider
           default-value="60"
           label="Thick track"
@@ -24,7 +37,11 @@ export function Example() {
         ></helix-slider>
       </helix-flex>
 
-      <helix-flex align="end" className="thick" gap="2xl">
+      <helix-flex
+        align="end"
+        className="thick"
+        gap="2xl"
+      >
         <helix-slider
           default-value="70"
           label="Upright"

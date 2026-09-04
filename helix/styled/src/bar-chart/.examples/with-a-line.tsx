@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="barchartline">
+      <table
+        data-hidden-visually
+        id="barchartline"
+      >
         <caption>Bookings against target</caption>
         <thead>
           <tr>
@@ -39,7 +42,11 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-bar-chart for="barchartline" gridlines="value" lines="Target"></helix-bar-chart>
+      <helix-bar-chart
+        for="barchartline"
+        gridlines="value"
+        lines="Target"
+      ></helix-bar-chart>
     </>
   )
 }

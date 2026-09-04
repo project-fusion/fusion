@@ -2,8 +2,14 @@ import './from-zero.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
-      <table data-hidden-visually id="incidents">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <table
+        data-hidden-visually
+        id="incidents"
+      >
         <caption>Open incidents at month end</caption>
         <thead>
           <tr>
@@ -39,18 +45,33 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-flex direction="column" gap="2xs">
-        <helix-text as="p" tone="muted">
+      <helix-flex
+        direction="column"
+        gap="2xs"
+      >
+        <helix-text
+          as="p"
+          tone="muted"
+        >
           Its own range, 8 to 15. June looks like zero and March like a crisis.
         </helix-text>
         <helix-line-chart for="incidents"></helix-line-chart>
       </helix-flex>
 
-      <helix-flex direction="column" gap="2xs">
-        <helix-text as="p" tone="muted">
+      <helix-flex
+        direction="column"
+        gap="2xs"
+      >
+        <helix-text
+          as="p"
+          tone="muted"
+        >
           From zero. Eight is most of fifteen, and neither month was quiet.
         </helix-text>
-        <helix-line-chart for="incidents" zero></helix-line-chart>
+        <helix-line-chart
+          for="incidents"
+          zero
+        ></helix-line-chart>
       </helix-flex>
     </helix-flex>
   )

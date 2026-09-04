@@ -1,7 +1,14 @@
 export function Example() {
   return (
-    <helix-flex align="center" gap="lg" wrap>
-      <helix-button aria-describedby="timing-eager-tip" id="timing-eager">
+    <helix-flex
+      align="center"
+      gap="lg"
+      wrap
+    >
+      <helix-button
+        aria-describedby="timing-eager-tip"
+        id="timing-eager"
+      >
         Eager
       </helix-button>
       <helix-tooltip
@@ -12,7 +19,10 @@ export function Example() {
         id="timing-eager-tip"
       ></helix-tooltip>
 
-      <helix-button aria-describedby="timing-patient-tip" id="timing-patient">
+      <helix-button
+        aria-describedby="timing-patient-tip"
+        id="timing-patient"
+      >
         Patient
       </helix-button>
       <helix-tooltip
@@ -22,7 +32,10 @@ export function Example() {
         id="timing-patient-tip"
       ></helix-tooltip>
 
-      <helix-button aria-describedby="timing-roomy-tip" id="timing-roomy">
+      <helix-button
+        aria-describedby="timing-roomy-tip"
+        id="timing-roomy"
+      >
         Roomy
       </helix-button>
       <helix-tooltip

@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-sparkline
         label="Straight, which joins the readings and claims nothing between them"
         values="1240 1318 1102 1291 1244 1180 1408"

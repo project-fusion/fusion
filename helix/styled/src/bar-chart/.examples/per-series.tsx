@@ -3,7 +3,10 @@ import './per-series.css'
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="barchartperseries">
+      <table
+        data-hidden-visually
+        id="barchartperseries"
+      >
         <caption>Deploys per quarter against target</caption>
         <thead>
           <tr>

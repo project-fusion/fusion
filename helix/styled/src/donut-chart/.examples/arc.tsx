@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="donutchartarc">
+      <table
+        data-hidden-visually
+        id="donutchartarc"
+      >
         <caption>Storage used</caption>
         <thead>
           <tr>
@@ -29,7 +32,10 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-donut-chart for="donutchartarc" sweep="half">
+      <helix-donut-chart
+        for="donutchartarc"
+        sweep="half"
+      >
         <helix-stat>
           850
           <span slot="unit">GB</span>

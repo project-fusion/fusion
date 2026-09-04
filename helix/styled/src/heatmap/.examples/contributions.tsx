@@ -7,7 +7,10 @@ export function Example() {
       thresholds="1 3 5 7 9"
       tones="1 2 3 4 5"
     >
-      <table data-hidden-visually id="commits">
+      <table
+        data-hidden-visually
+        id="commits"
+      >
         <caption>Commits</caption>
         <tbody>
           <tr>

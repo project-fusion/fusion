@@ -70,6 +70,14 @@
         }
       },
       "includes": ["**/package.json"]
+    },
+    {
+      "includes": ["**/.examples/*.tsx"],
+      "javascript": {
+        "formatter": {
+          "attributePosition": "multiline"
+        }
+      }
     }
   ],
   "vcs": {

@@ -26,19 +26,28 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-video-playlist
         default-active="one"
         label="Episodes"
         onhelix-before-activate={proposed}
         onhelix-select={pressed}
       >
-        <helix-video label="One of several" slot="player" />
+        <helix-video
+          label="One of several"
+          slot="player"
+        />
         <helix-video-playlist-item value="one">Getting started</helix-video-playlist-item>
         <helix-video-playlist-item value="two">Theming</helix-video-playlist-item>
       </helix-video-playlist>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

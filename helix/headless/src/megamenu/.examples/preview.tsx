@@ -7,12 +7,18 @@ export function Example() {
       <helix-headless-megamenu label="Products">
         <div data-megamenu-group>
           <h3 data-megamenu-heading>Design</h3>
-          <a data-megamenu-item href="#helix">
+          <a
+            data-megamenu-item
+            href="#helix"
+          >
             <helix-headless-icon name="cube"></helix-headless-icon>
             <strong>Helix</strong>
             <span>Components, tokens and the base layer.</span>
           </a>
-          <a data-megamenu-item href="#icons">
+          <a
+            data-megamenu-item
+            href="#icons"
+          >
             <helix-headless-icon name="palette"></helix-headless-icon>
             <strong>Icons</strong>
             <span>One set, drawn at a single weight.</span>
@@ -20,12 +26,18 @@ export function Example() {
         </div>
         <div data-megamenu-group>
           <h3 data-megamenu-heading>Mind</h3>
-          <a data-megamenu-item href="#cortex">
+          <a
+            data-megamenu-item
+            href="#cortex"
+          >
             <helix-headless-icon name="pulse"></helix-headless-icon>
             <strong>Cortex</strong>
             <span>Memory, provenance and context.</span>
           </a>
-          <a data-megamenu-item href="#trace">
+          <a
+            data-megamenu-item
+            href="#trace"
+          >
             <helix-headless-icon name="strategy"></helix-headless-icon>
             <strong>Trace</strong>
             <span>Where an answer came from.</span>

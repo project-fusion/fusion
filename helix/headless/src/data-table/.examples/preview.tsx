@@ -9,14 +9,31 @@ const rows = [
 
 export function Example() {
   return (
-    <helix-headless-data-table default-sort="name:asc" label="Objects" page-size="4" rows={rows}>
-      <helix-headless-table-column field="name" sortable width="14rem">
+    <helix-headless-data-table
+      default-sort="name:asc"
+      label="Objects"
+      page-size="4"
+      rows={rows}
+    >
+      <helix-headless-table-column
+        field="name"
+        sortable
+        width="14rem"
+      >
         Name
       </helix-headless-table-column>
-      <helix-headless-table-column field="region" sortable>
+      <helix-headless-table-column
+        field="region"
+        sortable
+      >
         Region
       </helix-headless-table-column>
-      <helix-headless-table-column align="end" field="size" sortable width="8rem">
+      <helix-headless-table-column
+        align="end"
+        field="size"
+        sortable
+        width="8rem"
+      >
         Size
       </helix-headless-table-column>
     </helix-headless-data-table>

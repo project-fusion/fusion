@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="barchartaxes">
+      <table
+        data-hidden-visually
+        id="barchartaxes"
+      >
         <caption>Bookings and conversion</caption>
         <thead>
           <tr>

@@ -8,7 +8,10 @@ export function Example() {
       multiple
       name="attachments"
     >
-      <helix-headless-icon name="upload-simple" slot="trigger"></helix-headless-icon>
+      <helix-headless-icon
+        name="upload-simple"
+        slot="trigger"
+      ></helix-headless-icon>
       <span slot="trigger">Choose files, or drop them here</span>
     </helix-headless-file-input>
   )

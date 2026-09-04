@@ -3,7 +3,10 @@ import './material.css'
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="barchartmaterial">
+      <table
+        data-hidden-visually
+        id="barchartmaterial"
+      >
         <caption>Deploys per service</caption>
         <thead>
           <tr>

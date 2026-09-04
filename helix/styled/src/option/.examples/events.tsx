@@ -23,14 +23,23 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-listbox label="Assignee" onhelix-select={chosen}>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-listbox
+        label="Assignee"
+        onhelix-select={chosen}
+      >
         <helix-option value="ada">Ada Okonjo</helix-option>
         <helix-option value="grace">Grace Hopper</helix-option>
         <helix-option value="alan">Alan Turing</helix-option>
       </helix-listbox>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

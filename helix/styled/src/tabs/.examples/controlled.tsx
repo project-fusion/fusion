@@ -4,7 +4,10 @@ export function Example() {
   const [active, setActive] = useState('usage')
 
   return (
-    <helix-tabs active={active} onhelix-before-activate={(event) => setActive(event.detail.value)}>
+    <helix-tabs
+      active={active}
+      onhelix-before-activate={(event) => setActive(event.detail.value)}
+    >
       <helix-tab value="overview">Overview</helix-tab>
       <helix-tab value="usage">Usage</helix-tab>
 

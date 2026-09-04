@@ -6,7 +6,10 @@ export function Example() {
       multiple
       name="attachments"
     >
-      <helix-icon name="upload-simple" slot="trigger"></helix-icon>
+      <helix-icon
+        name="upload-simple"
+        slot="trigger"
+      ></helix-icon>
       <span slot="trigger">Choose files, or drop them here</span>
     </helix-file-input>
   )

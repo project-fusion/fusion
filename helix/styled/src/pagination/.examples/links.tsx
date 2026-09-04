@@ -1,3 +1,9 @@
 export function Example() {
-  return <helix-pagination default-page="3" href="?page={page}" pages={8}></helix-pagination>
+  return (
+    <helix-pagination
+      default-page="3"
+      href="?page={page}"
+      pages={8}
+    ></helix-pagination>
+  )
 }

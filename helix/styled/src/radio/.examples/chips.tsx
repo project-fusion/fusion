@@ -1,7 +1,14 @@
 export function Example() {
   return (
-    <helix-radio-group default-value="1" label="How was your experience?" orientation="horizontal">
-      <helix-radio value="-2" variant="chip">
+    <helix-radio-group
+      default-value="1"
+      label="How was your experience?"
+      orientation="horizontal"
+    >
+      <helix-radio
+        value="-2"
+        variant="chip"
+      >
         <svg
           aria-hidden="true"
           fill="none"
@@ -15,7 +22,10 @@ export function Example() {
         </svg>
         Very dissatisfied
       </helix-radio>
-      <helix-radio value="-1" variant="chip">
+      <helix-radio
+        value="-1"
+        variant="chip"
+      >
         <svg
           aria-hidden="true"
           fill="none"
@@ -29,7 +39,10 @@ export function Example() {
         </svg>
         Dissatisfied
       </helix-radio>
-      <helix-radio value="0" variant="chip">
+      <helix-radio
+        value="0"
+        variant="chip"
+      >
         <svg
           aria-hidden="true"
           fill="none"
@@ -43,7 +56,10 @@ export function Example() {
         </svg>
         Neutral
       </helix-radio>
-      <helix-radio value="1" variant="chip">
+      <helix-radio
+        value="1"
+        variant="chip"
+      >
         <svg
           aria-hidden="true"
           fill="none"
@@ -57,7 +73,10 @@ export function Example() {
         </svg>
         Satisfied
       </helix-radio>
-      <helix-radio value="2" variant="chip">
+      <helix-radio
+        value="2"
+        variant="chip"
+      >
         <svg
           aria-hidden="true"
           fill="none"

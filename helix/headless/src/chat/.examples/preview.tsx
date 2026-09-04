@@ -31,31 +31,54 @@ export function Example() {
     >
       <strong slot="header">Support</strong>
 
-      <helix-headless-chat-message at={at[0]} author="them" state="sent">
+      <helix-headless-chat-message
+        at={at[0]}
+        author="them"
+        state="sent"
+      >
         How can I help?
       </helix-headless-chat-message>
 
-      <helix-headless-chat-message at={at[1]} author="me" state="sent">
+      <helix-headless-chat-message
+        at={at[1]}
+        author="me"
+        state="sent"
+      >
         The deploy is stuck on the migration step.
       </helix-headless-chat-message>
 
-      <helix-headless-chat-message at={at[2]} author="them" state="streaming">
+      <helix-headless-chat-message
+        at={at[2]}
+        author="them"
+        state="streaming"
+      >
         Let me look at the run now
       </helix-headless-chat-message>
 
-      <helix-headless-chat-message author="me" state="failed">
+      <helix-headless-chat-message
+        author="me"
+        state="failed"
+      >
         Thanks
       </helix-headless-chat-message>
 
       {sent.map((turn) => (
-        <helix-headless-chat-message at={turn.at} author="me" key={turn.at} state="sent">
+        <helix-headless-chat-message
+          at={turn.at}
+          author="me"
+          key={turn.at}
+          state="sent"
+        >
           {turn.body}
         </helix-headless-chat-message>
       ))}
 
       <span slot="status">Support is typing</span>
 
-      <helix-headless-chat-composer placeholder="Write a message" slot="composer" />
+      <helix-headless-chat-composer
+        placeholder="Write a message"
+        slot="composer"
+      />
     </helix-headless-chat>
   )
 }

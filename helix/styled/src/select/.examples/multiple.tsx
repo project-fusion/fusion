@@ -1,7 +1,16 @@
 export function Example() {
   return (
-    <helix-select default-value="one,three" hint="Hint" label="Label" multiple name="choice">
-      <helix-icon name="caret-down" slot="indicator"></helix-icon>
+    <helix-select
+      default-value="one,three"
+      hint="Hint"
+      label="Label"
+      multiple
+      name="choice"
+    >
+      <helix-icon
+        name="caret-down"
+        slot="indicator"
+      ></helix-icon>
       <helix-option-group label="Group One">
         <helix-option value="one">Option One</helix-option>
         <helix-option value="two">Option Two</helix-option>

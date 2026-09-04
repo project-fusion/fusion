@@ -2,7 +2,10 @@ import './disabled.css'
 
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-input
         default-value="Cannot be edited"
         disabled

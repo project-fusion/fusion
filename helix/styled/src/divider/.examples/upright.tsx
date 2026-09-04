@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex align="center" gap="md">
+    <helix-flex
+      align="center"
+      gap="md"
+    >
       <helix-text>Drafts</helix-text>
       <helix-divider orientation="vertical"></helix-divider>
       <helix-text>Published</helix-text>

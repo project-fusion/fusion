@@ -1,10 +1,20 @@
 export function Example() {
   return (
-    <helix-toast data-color-mode="light" label="Notifications" placement="bottom-end">
-      <helix-toast-item dismissible tone="success">
+    <helix-toast
+      data-color-mode="light"
+      label="Notifications"
+      placement="bottom-end"
+    >
+      <helix-toast-item
+        dismissible
+        tone="success"
+      >
         Project saved.
       </helix-toast-item>
-      <helix-toast-item dismissible tone="danger">
+      <helix-toast-item
+        dismissible
+        tone="danger"
+      >
         Could not reach the server.
         <helix-button slot="actions">Retry</helix-button>
       </helix-toast-item>

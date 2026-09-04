@@ -15,30 +15,49 @@ export function Example() {
   }, [])
 
   return (
-    <helix-headless-notifications id="raw" label="Notifications" mark-all>
-      {' '}
-      <h2 slot="header">Notifications</h2>{' '}
-      <helix-headless-notification at={at[0]} dismissible>
-        {' '}
-        Ada Okonjo approved your deploy to production.{' '}
-        <button slot="actions" type="button">
+    <helix-headless-notifications
+      id="raw"
+      label="Notifications"
+      mark-all
+    >
+      <h2 slot="header">Notifications</h2>
+      <helix-headless-notification
+        at={at[0]}
+        dismissible
+      >
+        Ada Okonjo approved your deploy to production.
+        <button
+          slot="actions"
+          type="button"
+        >
           View
-        </button>{' '}
-      </helix-headless-notification>{' '}
-      <helix-headless-notification at={at[1]} dismissible>
-        {' '}
-        Build #4821 failed on main{' '}
-        <button slot="actions" type="button">
+        </button>
+      </helix-headless-notification>
+      <helix-headless-notification
+        at={at[1]}
+        dismissible
+      >
+        Build #4821 failed on main
+        <button
+          slot="actions"
+          type="button"
+        >
           Logs
-        </button>{' '}
-      </helix-headless-notification>{' '}
-      <helix-headless-notification at={at[2]} default-read dismissible>
-        {' '}
-        Your invitation to the Platform team was accepted.{' '}
-      </helix-headless-notification>{' '}
-      <a href="#all" slot="footer">
+        </button>
+      </helix-headless-notification>
+      <helix-headless-notification
+        at={at[2]}
+        default-read
+        dismissible
+      >
+        Your invitation to the Platform team was accepted.
+      </helix-headless-notification>
+      <a
+        href="#all"
+        slot="footer"
+      >
         See everything
-      </a>{' '}
+      </a>
     </helix-headless-notifications>
   )
 }

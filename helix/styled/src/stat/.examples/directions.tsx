@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="lg">
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
       <helix-stat direction="column-reverse">
         1,284
         <span slot="label">The number first, the word under it</span>

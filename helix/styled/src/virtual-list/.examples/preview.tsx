@@ -36,7 +36,11 @@ export function Example() {
     <>
       <style dangerouslySetInnerHTML={{ __html: SHEET }} />
 
-      <helix-virtual-list estimate={32} for="people" label="Two thousand rows">
+      <helix-virtual-list
+        estimate={32}
+        for="people"
+        label="Two thousand rows"
+      >
         <template dangerouslySetInnerHTML={{ __html: ROW }} />
       </helix-virtual-list>
 

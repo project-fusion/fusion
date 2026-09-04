@@ -22,10 +22,19 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-copy-button onhelix-copy={copied} value="bun add @fusion.dev/helix" />
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-copy-button
+        onhelix-copy={copied}
+        value="bun add @fusion.dev/helix"
+      />
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

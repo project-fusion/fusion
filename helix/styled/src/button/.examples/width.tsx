@@ -1,30 +1,52 @@
 export function Example() {
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-flex gap="sm">
-        <helix-button emphasis="solid" tone="primary">
+        <helix-button
+          emphasis="solid"
+          tone="primary"
+        >
           Button
         </helix-button>
         <helix-button>Button</helix-button>
       </helix-flex>
 
       <helix-flex gap="sm">
-        <helix-button emphasis="solid" tone="primary" width="standard">
+        <helix-button
+          emphasis="solid"
+          tone="primary"
+          width="standard"
+        >
           Button
         </helix-button>
         <helix-button width="standard">Button</helix-button>
       </helix-flex>
 
       <helix-flex gap="sm">
-        <helix-button emphasis="solid" tone="primary" width="standard">
+        <helix-button
+          emphasis="solid"
+          tone="primary"
+          width="standard"
+        >
           Button
         </helix-button>
-        <a data-button="" data-button-width="standard" href="#cancel">
+        <a
+          data-button=""
+          data-button-width="standard"
+          href="#cancel"
+        >
           Button
         </a>
       </helix-flex>
 
-      <helix-button emphasis="solid" tone="primary" width="full">
+      <helix-button
+        emphasis="solid"
+        tone="primary"
+        width="full"
+      >
         Button
       </helix-button>
     </helix-flex>

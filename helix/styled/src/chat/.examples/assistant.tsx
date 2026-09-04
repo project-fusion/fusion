@@ -2,42 +2,79 @@ import './assistant.css'
 
 export function Example() {
   return (
-    <helix-chat className="assistant" id="assistant" label="Assistant">
+    <helix-chat
+      className="assistant"
+      id="assistant"
+      label="Assistant"
+    >
       {' '}
-      <helix-text as="strong" slot="header" variant="body-strong">
+      <helix-text
+        as="strong"
+        slot="header"
+        variant="body-strong"
+      >
         Assistant
       </helix-text>{' '}
       {/* Controls for the conversation rather than for any turn in it, which is
              what the header's trailing edge is for. The one that gets used goes on the
              row; the rest go behind a menu, because a header is not a toolbar and four
              glyphs beside a title read as one. */}{' '}
-      <helix-flex gap="2xs" slot="actions">
+      <helix-flex
+        gap="2xs"
+        slot="actions"
+      >
         {' '}
-        <helix-icon-button emphasis="ghost" label="New conversation">
+        <helix-icon-button
+          emphasis="ghost"
+          label="New conversation"
+        >
           {' '}
           <helix-icon name="plus"></helix-icon>{' '}
         </helix-icon-button>{' '}
-        <helix-menu className="assistant-menu" label="Conversation" placement="bottom-end">
+        <helix-menu
+          className="assistant-menu"
+          label="Conversation"
+          placement="bottom-end"
+        >
           {' '}
-          <helix-icon-button emphasis="ghost" label="More" slot="trigger">
+          <helix-icon-button
+            emphasis="ghost"
+            label="More"
+            slot="trigger"
+          >
             {' '}
             <helix-icon name="dots-three"></helix-icon>{' '}
           </helix-icon-button>{' '}
           <helix-menu-item value="export">
             {' '}
-            <helix-icon name="download" slot="start"></helix-icon> Export transcript{' '}
+            <helix-icon
+              name="download"
+              slot="start"
+            ></helix-icon>{' '}
+            Export transcript{' '}
           </helix-menu-item>{' '}
           <helix-menu-item value="share">
             {' '}
-            <helix-icon name="share-network" slot="start"></helix-icon> Share a link{' '}
+            <helix-icon
+              name="share-network"
+              slot="start"
+            ></helix-icon>{' '}
+            Share a link{' '}
           </helix-menu-item>{' '}
           <helix-menu-item value="clear">
             {' '}
-            <helix-icon name="trash" slot="start"></helix-icon> Clear conversation{' '}
+            <helix-icon
+              name="trash"
+              slot="start"
+            ></helix-icon>{' '}
+            Clear conversation{' '}
           </helix-menu-item>{' '}
         </helix-menu>{' '}
       </helix-flex>{' '}
-      <helix-chat-message author="me" state="sent">
+      <helix-chat-message
+        author="me"
+        state="sent"
+      >
         {' '}
         Why is the deploy stuck on the migration step?{' '}
       </helix-chat-message>{' '}
@@ -52,7 +89,11 @@ export function Example() {
              with: the bubble, the edge it sits against and the header have each
              already said who is talking. The slot is for the transcript that has
              several agents, or several people, in it. */}{' '}
-      <helix-chat-message author="them" separation="plain" state="sent">
+      <helix-chat-message
+        author="them"
+        separation="plain"
+        state="sent"
+      >
         {' '}
         The migration is waiting on a lock. Another connection has held{' '}
         <helix-code>ACCESS EXCLUSIVE</helix-code> on <helix-code>orders</helix-code> since 09:14, so
@@ -60,44 +101,90 @@ export function Example() {
         {/* What the answer was drawn from, set as a footnote: the marks stack the
                way an avatar group does and the words stay small and quiet, because a
                citation is a reference rather than a control. */}{' '}
-        <helix-flex align="center" gap="2xs" slot="sources">
+        <helix-flex
+          align="center"
+          gap="2xs"
+          slot="sources"
+        >
           {' '}
-          <helix-avatar-group className="assistant-sources" label="Three sources">
+          <helix-avatar-group
+            className="assistant-sources"
+            label="Three sources"
+          >
             {' '}
-            <helix-avatar name="RM" shape="circle" size="sm"></helix-avatar>{' '}
-            <helix-avatar name="D4" shape="circle" size="sm"></helix-avatar>{' '}
-            <helix-avatar name="PG" shape="circle" size="sm"></helix-avatar>{' '}
+            <helix-avatar
+              name="RM"
+              shape="circle"
+              size="sm"
+            ></helix-avatar>{' '}
+            <helix-avatar
+              name="D4"
+              shape="circle"
+              size="sm"
+            ></helix-avatar>{' '}
+            <helix-avatar
+              name="PG"
+              shape="circle"
+              size="sm"
+            ></helix-avatar>{' '}
           </helix-avatar-group>{' '}
           <helix-text variant="caption">runbook/migrations.md and two more</helix-text>{' '}
         </helix-flex>{' '}
-        <helix-flex gap="2xs" slot="actions">
+        <helix-flex
+          gap="2xs"
+          slot="actions"
+        >
           {' '}
           <helix-copy-button
             emphasis="ghost"
             label="Copy"
             value="The migration is waiting on a lock."
           ></helix-copy-button>{' '}
-          <helix-icon-button emphasis="ghost" label="Try again">
+          <helix-icon-button
+            emphasis="ghost"
+            label="Try again"
+          >
             {' '}
             <helix-icon name="arrow-clockwise"></helix-icon>{' '}
           </helix-icon-button>{' '}
         </helix-flex>{' '}
       </helix-chat-message>{' '}
-      <helix-chat-message author="me" state="sent">
+      <helix-chat-message
+        author="me"
+        state="sent"
+      >
         {' '}
         Can I clear it without dropping the deploy?{' '}
       </helix-chat-message>{' '}
       {/* The wait before the first token. `streaming` with nothing in it yet draws
              the typing indicator; the moment content arrives it stops, and nothing
              decorates the text after that because the text arriving is the signal. */}{' '}
-      <helix-chat-message author="them" separation="plain" state="streaming" />{' '}
-      <helix-button emphasis="solid" slot="resume">
+      <helix-chat-message
+        author="them"
+        separation="plain"
+        state="streaming"
+      />{' '}
+      <helix-button
+        emphasis="solid"
+        slot="resume"
+      >
         {' '}
-        <helix-icon name="arrow-down" slot="start"></helix-icon> Jump to latest{' '}
+        <helix-icon
+          name="arrow-down"
+          slot="start"
+        ></helix-icon>{' '}
+        Jump to latest{' '}
       </helix-button>{' '}
-      <helix-chat-composer placeholder="Ask a follow up" slot="composer">
+      <helix-chat-composer
+        placeholder="Ask a follow up"
+        slot="composer"
+      >
         {' '}
-        <helix-icon-button emphasis="ghost" label="Attach a file" slot="start">
+        <helix-icon-button
+          emphasis="ghost"
+          label="Attach a file"
+          slot="start"
+        >
           {' '}
           <helix-icon name="plus"></helix-icon>{' '}
         </helix-icon-button>{' '}
@@ -116,7 +203,11 @@ export function Example() {
           <helix-option value="sonnet-5">Sonnet 5</helix-option>{' '}
           <helix-option value="haiku-4-5">Haiku 4.5</helix-option>{' '}
         </helix-select>{' '}
-        <helix-icon-button emphasis="ghost" label="Stop answering" slot="end">
+        <helix-icon-button
+          emphasis="ghost"
+          label="Stop answering"
+          slot="end"
+        >
           {' '}
           <helix-icon name="stop"></helix-icon>{' '}
         </helix-icon-button>{' '}

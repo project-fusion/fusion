@@ -31,31 +31,54 @@ export function Example() {
     >
       <strong slot="header">Support</strong>
 
-      <helix-chat-message at={at[0]} author="them" state="sent">
+      <helix-chat-message
+        at={at[0]}
+        author="them"
+        state="sent"
+      >
         How can I help?
       </helix-chat-message>
 
-      <helix-chat-message at={at[1]} author="me" state="sent">
+      <helix-chat-message
+        at={at[1]}
+        author="me"
+        state="sent"
+      >
         The deploy is stuck on the migration step.
       </helix-chat-message>
 
-      <helix-chat-message at={at[2]} author="them" state="streaming">
+      <helix-chat-message
+        at={at[2]}
+        author="them"
+        state="streaming"
+      >
         Let me look at the run now
       </helix-chat-message>
 
-      <helix-chat-message author="me" state="failed">
+      <helix-chat-message
+        author="me"
+        state="failed"
+      >
         Thanks
       </helix-chat-message>
 
       {sent.map((turn) => (
-        <helix-chat-message at={turn.at} author="me" key={turn.at} state="sent">
+        <helix-chat-message
+          at={turn.at}
+          author="me"
+          key={turn.at}
+          state="sent"
+        >
           {turn.body}
         </helix-chat-message>
       ))}
 
       <span slot="status">Support is typing</span>
 
-      <helix-chat-composer placeholder="Write a message" slot="composer" />
+      <helix-chat-composer
+        placeholder="Write a message"
+        slot="composer"
+      />
     </helix-chat>
   )
 }

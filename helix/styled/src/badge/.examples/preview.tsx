@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-badge label="3 unread" value="3">
+    <helix-badge
+      label="3 unread"
+      value="3"
+    >
       <helix-icon-button label="Notifications">
         <helix-icon name="bell"></helix-icon>
       </helix-icon-button>

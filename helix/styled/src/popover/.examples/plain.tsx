@@ -1,6 +1,10 @@
 export function Example() {
   return (
-    <helix-popover id="plain-details" label="Details" separation="plain">
+    <helix-popover
+      id="plain-details"
+      label="Details"
+      separation="plain"
+    >
       <helix-button slot="trigger">Details</helix-button>
       <helix-text variant="body">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut

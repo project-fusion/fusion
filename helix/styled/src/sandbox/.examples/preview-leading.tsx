@@ -3,7 +3,11 @@ import './preview-leading.css'
 export function Example() {
   return (
     <div className="stage">
-      <helix-sandbox default-split={60} lead="preview" orientation="vertical">
+      <helix-sandbox
+        default-split={60}
+        lead="preview"
+        orientation="vertical"
+      >
         <helix-sandbox-toolbar slot="toolbar">
           <helix-tag>card.html</helix-tag>
         </helix-sandbox-toolbar>

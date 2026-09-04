@@ -25,8 +25,14 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
-      <helix-outline label="On this page" onhelix-before-activate={reading}>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-outline
+        label="On this page"
+        onhelix-before-activate={reading}
+      >
         <a href="#install">Install</a>
         <a href="#usage">Usage</a>
         <a href="#api">API</a>
@@ -44,7 +50,10 @@ export function Example() {
         </section>
       </div>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

@@ -3,15 +3,32 @@ import './sidebar.css'
 export function Example() {
   return (
     <>
-      <helix-button command="--show" commandfor="sidebar-chat" emphasis="solid" tone="primary">
+      <helix-button
+        command="--show"
+        commandfor="sidebar-chat"
+        emphasis="solid"
+        tone="primary"
+      >
         Ask the assistant
       </helix-button>
 
       {/* The drawer's own header is left empty and the conversation carries the
           title, so there is one header at one inset rather than two stacked. */}
-      <helix-drawer className="sidebar" id="sidebar-chat" label="Assistant" placement="end">
-        <helix-chat className="sidebar-chat" label="Assistant">
-          <helix-text as="strong" slot="header" variant="body-strong">
+      <helix-drawer
+        className="sidebar"
+        id="sidebar-chat"
+        label="Assistant"
+        placement="end"
+      >
+        <helix-chat
+          className="sidebar-chat"
+          label="Assistant"
+        >
+          <helix-text
+            as="strong"
+            slot="header"
+            variant="body-strong"
+          >
             Assistant
           </helix-text>
 
@@ -30,17 +47,35 @@ export function Example() {
               the header above the log -- and a mark on every answer would be the
               third. The slot is there for a transcript with more than one voice
               in it. */}
-          <helix-chat-message author="me" state="sent">
+          <helix-chat-message
+            author="me"
+            state="sent"
+          >
             Summarize what changed in this release.
           </helix-chat-message>
-          <helix-chat-message author="them" separation="plain" state="sent">
+          <helix-chat-message
+            author="them"
+            separation="plain"
+            state="sent"
+          >
             Eleven components changed. The largest is the date picker, which now reads its own value
             as a date rather than a string.
           </helix-chat-message>
-          <helix-chat-message author="them" separation="plain" state="streaming" />
+          <helix-chat-message
+            author="them"
+            separation="plain"
+            state="streaming"
+          />
 
-          <helix-chat-composer placeholder="Ask about the release" slot="composer">
-            <helix-icon-button emphasis="ghost" label="Stop answering" slot="end">
+          <helix-chat-composer
+            placeholder="Ask about the release"
+            slot="composer"
+          >
+            <helix-icon-button
+              emphasis="ghost"
+              label="Stop answering"
+              slot="end"
+            >
               <helix-icon name="stop" />
             </helix-icon-button>
           </helix-chat-composer>

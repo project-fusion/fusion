@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <helix-accordion>
-      <helix-accordion-item chevron-placement="end" default-open>
+      <helix-accordion-item
+        chevron-placement="end"
+        default-open
+      >
         <span slot="summary">Delivery</span>
         Two to four working days across the mainland.
       </helix-accordion-item>

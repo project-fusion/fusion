@@ -1,7 +1,13 @@
 export function Example() {
   return (
-    <helix-steps default-active="two" label="Label">
-      <helix-step complete value="one">
+    <helix-steps
+      default-active="two"
+      label="Label"
+    >
+      <helix-step
+        complete
+        value="one"
+      >
         Step One
       </helix-step>
       <helix-step value="two">Step Two</helix-step>

@@ -45,7 +45,10 @@ export function Example() {
   }
 
   return (
-    <helix-flex direction="column" gap="md">
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-data-table
         label="Objects"
         onhelix-filter={filtered}
@@ -55,16 +58,29 @@ export function Example() {
         ref={objects}
         rows={ROWS}
       >
-        <helix-input onhelix-before-change={searched} placeholder="Search" slot="toolbar" />
-        <helix-table-column field="name" sortable>
+        <helix-input
+          onhelix-before-change={searched}
+          placeholder="Search"
+          slot="toolbar"
+        />
+        <helix-table-column
+          field="name"
+          sortable
+        >
           Name
         </helix-table-column>
-        <helix-table-column field="size" sortable>
+        <helix-table-column
+          field="size"
+          sortable
+        >
           Size
         </helix-table-column>
       </helix-data-table>
 
-      <helix-list divided label="What arrived">
+      <helix-list
+        divided
+        label="What arrived"
+      >
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}

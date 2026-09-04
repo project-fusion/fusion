@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <>
-      <table data-hidden-visually id="barchartgrid">
+      <table
+        data-hidden-visually
+        id="barchartgrid"
+      >
         <caption>Deploys per service</caption>
         <thead>
           <tr>
@@ -29,7 +32,11 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-bar-chart direction="horizontal" for="barchartgrid" gridlines="both"></helix-bar-chart>
+      <helix-bar-chart
+        direction="horizontal"
+        for="barchartgrid"
+        gridlines="both"
+      ></helix-bar-chart>
     </>
   )
 }

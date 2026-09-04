@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <helix-flex gap="lg">
-      <helix-button aria-describedby="placements-top-tip" id="placements-top">
+      <helix-button
+        aria-describedby="placements-top-tip"
+        id="placements-top"
+      >
         Top
       </helix-button>
       <helix-tooltip
@@ -10,7 +13,10 @@ export function Example() {
         id="placements-top-tip"
         placement="top"
       ></helix-tooltip>
-      <helix-button aria-describedby="placements-bottom-tip" id="placements-bottom">
+      <helix-button
+        aria-describedby="placements-bottom-tip"
+        id="placements-bottom"
+      >
         Bottom
       </helix-button>
       <helix-tooltip
@@ -19,7 +25,10 @@ export function Example() {
         id="placements-bottom-tip"
         placement="bottom"
       ></helix-tooltip>
-      <helix-button aria-describedby="placements-left-tip" id="placements-left">
+      <helix-button
+        aria-describedby="placements-left-tip"
+        id="placements-left"
+      >
         Left
       </helix-button>
       <helix-tooltip
@@ -28,7 +37,10 @@ export function Example() {
         id="placements-left-tip"
         placement="left"
       ></helix-tooltip>
-      <helix-button aria-describedby="placements-right-tip" id="placements-right">
+      <helix-button
+        aria-describedby="placements-right-tip"
+        id="placements-right"
+      >
         Right
       </helix-button>
       <helix-tooltip

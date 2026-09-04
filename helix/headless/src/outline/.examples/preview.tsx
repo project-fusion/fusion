@@ -3,13 +3,22 @@ import './preview.css'
 export function Example() {
   return (
     <div className="layout">
-      <helix-headless-outline className="nav" label="On this page">
+      <helix-headless-outline
+        className="nav"
+        label="On this page"
+      >
         <a href="#install">Install</a>
-        <a data-level="2" href="#requirements">
+        <a
+          data-level="2"
+          href="#requirements"
+        >
           Requirements
         </a>
         <a href="#usage">Usage</a>
-        <a data-level="2" href="#options">
+        <a
+          data-level="2"
+          href="#options"
+        >
           Options
         </a>
         <a href="#api">API</a>

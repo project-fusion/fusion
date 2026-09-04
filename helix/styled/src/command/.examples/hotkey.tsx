@@ -1,6 +1,10 @@
 export function Example() {
   return (
-    <helix-command empty-text="Nothing by that name" hotkey="mod+shift+p" label="Commands">
+    <helix-command
+      empty-text="Nothing by that name"
+      hotkey="mod+shift+p"
+      label="Commands"
+    >
       <helix-option value="reload">Reload the window</helix-option>
       <helix-option value="reset">Reset the workspace</helix-option>
       <helix-text slot="footer">Command Shift P</helix-text>
