@@ -34,14 +34,12 @@ export function Example() {
             commandfor="small-dialog"
             emphasis="solid"
             tone="primary"
-            width="standard"
           >
             Save
           </helix-button>
           <helix-button
             command="--close"
             commandfor="small-dialog"
-            width="standard"
           >
             Cancel
           </helix-button>
