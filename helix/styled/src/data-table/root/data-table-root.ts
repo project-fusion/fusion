@@ -17,6 +17,11 @@ import '../../table/index.js'
  * search field that slides sideways when a reader scrolls the columns is a
  * search field they lose.
  *
+ * `windowed` draws only the rows in view, for a result too long to lay out at
+ * once, and the headings stay put while they scroll. It is independent of
+ * `paginated` and of `mode`, so a page can be windowed and a server-fed chunk
+ * can be too.
+ *
  * **The cell values do not server-render**, which is the headless tier's
  * limitation and worth repeating where a consumer chooses between the two: use
  * `helix-table` where the content has to be in the served HTML.
@@ -33,8 +38,13 @@ import '../../table/index.js'
  * @csspart cell - One cell.
  * @csspart table - The grid.
  *
+ * @cssproperty --data-table-block-size - How tall the scrolling box is while `windowed`.
+ * Ignored otherwise, where the grid is as tall as its rows.
  * @cssproperty --data-table-color - Ink in a cell.
  * @cssproperty --data-table-columns - Track list for the columns, which wins over the one the columns worked out.
+ * @cssproperty --data-table-heading-background-color - Fill behind a heading while `windowed`.
+ * Opaque on purpose: rows scroll under a sticky heading and a transparent one lets them
+ * through. Unset otherwise, so the headings stay weight rather than a band.
  * @cssproperty --data-table-heading-color - Ink in a heading.
  * @cssproperty --data-table-padding-block - Space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - Space either side of a cell's content.

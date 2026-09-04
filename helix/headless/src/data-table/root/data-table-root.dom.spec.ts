@@ -33,6 +33,7 @@ interface Table extends HTMLElement {
   sort: string
   toggleSort: (field: string) => boolean
   updateComplete: Promise<unknown>
+  windowed: boolean
 }
 
 const rows = [
@@ -486,5 +487,123 @@ describe('the data property', () => {
     expect(element.rows).toBe(rows)
     expect(bodyRows(element)).toHaveLength(4)
     element.remove()
+  })
+})
+
+describe('windowing', () => {
+  /* Enough rows that a window is unmistakably smaller than the result, and
+     named so their order is readable: `size` counts down while `name` counts
+     up, so a sort on one is visibly not the order of the other. */
+  const many = (count: number) =>
+    Array.from({ length: count }, (_, at) => ({
+      name: `row ${String(at).padStart(4, '0')}`,
+      size: count - at,
+    }))
+
+  const WINDOWED = `
+    <helix-headless-data-table windowed>
+      <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      <helix-headless-table-column field="size">Size</helix-headless-table-column>
+    </helix-headless-data-table>`
+
+  /* Read off the attribute rather than through `style.blockSize`: the logical
+     property is what the component writes and what happy-dom reflects back
+     through the typed accessor is not something a spec should depend on. */
+  const room = (element: HTMLElement, end: 'after' | 'before') =>
+    Number.parseFloat(
+      part(element, end)
+        ?.getAttribute('style')
+        ?.match(/([\d.]+)px/)?.[1] ?? '0',
+    )
+
+  test('draws a window, and stands room in for the rest', async () => {
+    const { element, remove } = await mount(WINDOWED, many(500))
+    const drawn = bodyRows(element).length
+    expect(drawn).toBeGreaterThan(0)
+    expect(drawn).toBeLessThan(500)
+    /* The room below is what the scrollbar is built from. Without it the box
+       scrolls a few rows while claiming five hundred, and the thumb fills the
+       track. */
+    expect(room(element, 'after')).toBeGreaterThan(0)
+    expect(room(element, 'before')).toBe(0)
+    remove()
+  })
+
+  test('the count is the result, and the indices describe it', async () => {
+    const { element, remove } = await mount(WINDOWED, many(500))
+    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('501')
+    expect(bodyRows(element)[0]?.getAttribute('aria-rowindex')).toBe('2')
+    remove()
+  })
+
+  test('a sort orders the result rather than the window', async () => {
+    /* The classic virtualization bug in its other form. `order.pure.spec.ts`
+       holds the paged version -- sorting a page instead of paging a sort -- and
+       a window is the second way to order eight rows and call it a table. */
+    const { element, remove } = await mount(WINDOWED, many(500))
+    element.sort = 'size:asc'
+    await settled(element)
+    expect(cells(element)[0]).toBe('row 0499')
+    remove()
+  })
+
+  test('a window over a page counts from the page it is over', async () => {
+    const { element, remove } = await mount(
+      `<helix-headless-data-table windowed page-size="100" page="2">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`,
+      many(500),
+    )
+    expect(cells(element)[0]).toBe('row 0100')
+    /* Both offsets, stacked: the page starts at 100 and the window at the top
+       of it, so the reader hears row 102 counting the head. */
+    expect(bodyRows(element)[0]?.getAttribute('aria-rowindex')).toBe('102')
+    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('501')
+    remove()
+  })
+
+  test('a scrolled window still counts from the result', async () => {
+    /* The offsets above are all measured at the top, where the window starts at
+       zero and adding it proves nothing. This is the case that reads a row's
+       index off a window that has moved: without the window in `rowIndex` a
+       reader hears row two, a hundred rows into the result. */
+    const { element, remove } = await mount(WINDOWED, many(500))
+    const box = part(element, 'table') as HTMLElement
+    box.scrollTop = 3_200
+    box.dispatchEvent(new Event('scroll'))
+    await settled(element)
+
+    const first = bodyRows(element)[0]
+    const at = Number(first?.getAttribute('aria-rowindex'))
+    expect(at).toBeGreaterThan(2)
+    /* Row `n` of the result is `n + 2` counting the head, and the cell beside
+       it has to be the same row: an index that moved while the rows did not is
+       the bug this is here for. */
+    expect(cells(element)[0]).toBe(`row ${String(at - 2).padStart(4, '0')}`)
+    remove()
+  })
+
+  test('server mode windows the chunk it was handed', async () => {
+    const { element, remove } = await mount(
+      `<helix-headless-data-table windowed mode="server" total="9000">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`,
+      many(300),
+    )
+    const drawn = bodyRows(element).length
+    expect(drawn).toBeGreaterThan(0)
+    expect(drawn).toBeLessThan(300)
+    /* The consumer's total: not the chunk they sent and not the window drawn
+       from it. */
+    expect(part(element, 'table')?.getAttribute('aria-rowcount')).toBe('9001')
+    remove()
+  })
+
+  test('draws every row and no spacers when it is off', async () => {
+    const { element, remove } = await mount(SCHEMA)
+    expect(bodyRows(element)).toHaveLength(4)
+    expect(part(element, 'before')).toBeNull()
+    expect(part(element, 'after')).toBeNull()
+    remove()
   })
 })

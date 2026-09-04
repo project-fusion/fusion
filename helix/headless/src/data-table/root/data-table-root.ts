@@ -8,6 +8,7 @@ import {
   MixinCollection,
   requestChange,
   slotFilled,
+  VirtualizeController,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -20,7 +21,17 @@ import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import '../../pagination/index.js'
-import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.js'
+import {
+  type Arranged,
+  type Axis,
+  arranged,
+  cycle,
+  type DataRow,
+  format,
+  ordered,
+  parse,
+  window_,
+} from './order.js'
 
 /**
  * @summary A table that owns a result: rows as data, with sort, filter and paging.
@@ -64,6 +75,8 @@ import { type Axis, cycle, type DataRow, format, ordered, parse } from './order.
  * @event {HelixNavigateEvent} helix-navigate - Fired when a reader asks for another page, and cancelable.
  * @event {HelixSortEvent} helix-sort - Fired when a reader asks for a different order, and cancelable.
  *
+ * @csspart after - The room the rows below the window would have taken. Windowed only.
+ * @csspart before - The room the rows above the window would have taken. Windowed only.
  * @csspart cell - One cell.
  * @csspart empty - Shown when no rows match.
  * @csspart footer - The region below the grid.
@@ -117,17 +130,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   defaultSort = ''
 
   /**
-   * The field naming a row's stable identity.
+   * How tall a row is taken to be before it has been drawn, in pixels.
    *
-   * **Needed before selection exists, not after.** Lit keys the rendered rows by
-   * it, so a sort moves a row's element rather than rewriting every cell in
-   * place, which is what keeps focus inside a cell and keeps a CSS transition
-   * attached to the row it belongs to. Left unset the index is the key, which is
-   * correct only while nothing reorders: it is why this defaults to something
-   * that works and is worth setting anyway.
+   * Only read while `windowed`, and a starting guess rather than a claim: a
+   * cell that wraps makes its row taller than its neighbors, and the window
+   * replaces this with what each row came to as it draws. It still has to be
+   * close, because it is what the scrollbar is built from before anything has
+   * been measured.
    */
-  @property()
-  key = ''
+  @property({ type: Number })
+  estimate = 32
 
   /**
    * The order, as `field:direction`.
@@ -148,10 +160,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Accessible name for the grid.
+   * The field naming a row's stable identity.
+   *
+   * **Needed before selection exists, not after.** Lit keys the rendered rows by
+   * it, so a sort moves a row's element rather than rewriting every cell in
+   * place, which is what keeps focus inside a cell and keeps a CSS transition
+   * attached to the row it belongs to. Left unset the index is the key, which is
+   * correct only while nothing reorders: it is why this defaults to something
+   * that works and is worth setting anyway.
    */
   @property()
-  label = ''
+  key = ''
 
   /**
    * What the rows are narrowed to, as one query across every column.
@@ -172,17 +191,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Whether this element does the work or asks the consumer to.
-   *
-   * `client` filters, sorts and pages `rows` itself. `server` applies none of
-   * them: `rows` is the page, `total` is the size of the whole result, and the
-   * three events are requests the consumer answers by fetching. Past some size
-   * the client cannot hold the data, so this is not an optimization, it is the
-   * only mode that works, and it is here from the start because adding it later
-   * inverts the data flow.
+   * Accessible name for the grid.
    */
   @property()
-  mode: 'client' | 'server' = 'client'
+  label = ''
 
   /**
    * The page on show, from 1.
@@ -202,6 +214,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.pageState = next
     this.requestUpdate('page', previous)
   }
+
+  /**
+   * Whether this element does the work or asks the consumer to.
+   *
+   * `client` filters, sorts and pages `rows` itself. `server` applies none of
+   * them: `rows` is the page, `total` is the size of the whole result, and the
+   * three events are requests the consumer answers by fetching. Past some size
+   * the client cannot hold the data, so this is not an optimization, it is the
+   * only mode that works, and it is here from the start because adding it later
+   * inverts the data flow.
+   */
+  @property()
+  mode: 'client' | 'server' = 'client'
 
   /**
    * The whole result, in the order it arrived.
@@ -249,6 +274,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   total = 0
 
   /**
+   * Draws the rows in view and stands empty space in for the rest.
+   *
+   * **Not a `mode`.** `mode` says where the rows come from and who filtered
+   * them; this says how many of the ones we hold get drawn. They are
+   * independent: a consumer fetching five thousand rows a chunk at a time wants
+   * `mode="server"` and this at once, and folding this into `mode` would be an
+   * API that forbids that combination for no reason.
+   *
+   * **Composes with `paginated` rather than excluding it.** A window over a
+   * page is coherent -- the page is the slice of the result, the window is the
+   * part of that slice on screen -- and the arithmetic is the same either way,
+   * so there is nothing to forbid. Together they suit a table paging at a
+   * thousand rows, where the page is a reasonable fetch and a poor render.
+   *
+   * Off by default. Windowing costs a scroll listener, a measurement per row
+   * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
+   * should pay none of them.
+   */
+  @property({ reflect: true, type: Boolean })
+  windowed = false
+
+  /**
    * Whether to draw a pagination under the grid.
    *
    * On by default once a page size is set, because a paged table with no way to
@@ -281,6 +328,89 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   @state()
   private paginatedState: boolean | undefined = undefined
+
+  /* No `overscan`. The controller's four is a frame of fast scrolling at a 32
+     pixel row, which is a fact about the platform rather than a preference. */
+  private readonly virtualize = new VirtualizeController(this, {
+    /* Null while `windowed` is off, which is what keeps the controller inert
+       rather than conditionally constructed: a controller is built once and
+       this property can change at runtime. */
+    container: () =>
+      this.windowed ? this.renderRoot.querySelector<HTMLElement>('[part="table"]') : null,
+    count: () => this.available,
+    estimate: () => this.estimate,
+    /* Always measured when windowing at all. The uniform path converts offset
+       to index by division and is right when rows are one height; a grid whose
+       cells wrap is the case it is wrong for. */
+    measured: () => this.windowed,
+    rows: () => (this.windowed ? this.drawn() : []),
+  })
+
+  /**
+   * The rows in the shadow tree, each with the row of the page it drew.
+   *
+   * **Read off `data-index` rather than counted.** `hostUpdated` runs before
+   * `updated`, so what is in the tree when the controller asks is the previous
+   * window; counting from the current one would record the right heights
+   * against the wrong rows every time the window moved.
+   */
+  private drawn(): { element: HTMLElement; index: number }[] {
+    return [...this.renderRoot.querySelectorAll<HTMLElement>('[part="row"][data-index]')].map(
+      (element) => ({ element, index: Number(element.dataset.index) }),
+    )
+  }
+
+  /**
+   * How many rows there are to window over: the page, or the result.
+   *
+   * Counted without sorting, because a count does not need an order and this is
+   * read on every scroll. `matched` filters and stops.
+   */
+  private get available(): number {
+    if (this.mode === 'server') {
+      return this.rows.length
+    }
+    const size = this.pageSize
+    if (size <= 0) {
+      return this.matched
+    }
+    return Math.max(0, Math.min(size, this.matched - (this.page - 1) * size))
+  }
+
+  /**
+   * The arranged result, kept between renders.
+   *
+   * **A window moves and the order does not.** Every scroll that reveals a row
+   * re-renders, and deriving that render from `rows` would filter and sort the
+   * whole result again each time: 23.7ms at five thousand rows, three frames
+   * spent before a cell is drawn. Held against the inputs that change it, a
+   * scroll costs a slice.
+   *
+   * Only the windowed path uses this. A paged table re-renders when the reader
+   * asks for a page, which is rare enough that holding a second copy of the
+   * result to save a sort is the wrong trade.
+   */
+  private held: { key: string; source: readonly DataRow[]; value: Arranged } | undefined
+
+  private arrange(): Arranged {
+    const axes = this.axes
+    const key = `${this.filter}\u0000${this.sort}\u0000${axes.map((axis) => axis.field).join('\u0001')}`
+    if (this.held?.key === key && this.held.source === this.rows) {
+      return this.held.value
+    }
+    const value = arranged(this.rows, axes, { query: this.filter, spec: this.sort })
+    this.held = { key, source: this.rows, value }
+    return value
+  }
+
+  /** The part of a page the reader can see, which is every row when not windowed. */
+  private windowOf(rows: DataRow[]): DataRow[] {
+    if (!this.windowed) {
+      return rows
+    }
+    const { first, last } = this.virtualize.window
+    return rows.slice(first, last)
+  }
 
   /** The columns declared as children, in the order they are written. */
   get tableColumns(): HelixHeadlessTableColumn[] {
@@ -329,15 +459,26 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * which means the out-of-the-box arrangement is the unbounded one and nothing
    * about it says that a result of any size will simply be drawn.
    *
-   * **Windowing was refused**, which is worth recording because it is the
-   * obvious answer. This element already has two mechanisms: `paginated` with a
-   * `page-size`, and `mode="server"` where `rows` is one page, `total` is the
-   * whole result and `aria-rowcount` already reports the result rather than the
-   * window, which is the hard half of virtualization done correctly. A third
-   * would fight the first two, and virtualizing a grid means variable row
-   * heights, a sticky header and keeping `aria-rowindex` honest against a result
-   * the element is no longer holding. `VirtualizeController` exists for the case
-   * where the rows are a flat list and this is not that.
+   * **Windowing was refused here, and is now `windowed`.** The refusal is kept
+   * because most of it was right, and because what changed is not that somebody
+   * disagreed with it. It rested on four claims: that a third mechanism would
+   * fight `paginated` and `mode="server"`; that a grid has rows of different
+   * heights; that it needs a sticky header; and that `aria-rowindex` has to keep
+   * describing a result the element no longer holds in full.
+   *
+   * Three stopped being true. `VirtualizeController` learnt to measure each row
+   * and place the next by what the one above came to, which is the variable
+   * heights. `aria-rowindex` was already result-relative because paging needed
+   * it, so a window is a second offset on arithmetic that existed. And the
+   * sticky header is one `position: sticky` on the heading cells rather than on
+   * `[part="head"]`, which is `display: contents` and generates no box to stick
+   * -- that is why it looked hard and is not.
+   *
+   * The first was avoided rather than answered. `windowed` is not a `mode` and
+   * does not exclude `paginated`: it says how much of what we hold gets drawn,
+   * where `mode` says where it came from, so there is no third axis to fight the
+   * other two. What survives is the cost, which is why windowing is off by
+   * default and why this warning still fires for a table that has none of them.
    *
    * Warned once per element, in a browser only: a warning during a server render
    * is one nobody can act on and one that would print per request.
@@ -367,19 +508,37 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * would be this element filtering a page it was handed, which narrows one
    * screen and calls it a search.
    */
-  private get view(): { matched: number; rows: DataRow[]; total: number } {
+  private get view(): {
+    available: number
+    matched: number
+    rows: DataRow[]
+    total: number
+  } {
     if (this.mode === 'server') {
       const total = Math.max(this.total, this.rows.length)
-      return { matched: total, rows: [...this.rows], total }
+      return {
+        available: this.rows.length,
+        matched: total,
+        rows: this.windowOf([...this.rows]),
+        total,
+      }
     }
-    const view = ordered(this.rows, this.axes, {
-      page: this.page,
-      query: this.filter,
-      size: this.pageSize,
-      spec: this.sort,
-    })
-    this.warnIfCrowded(view.rows.length)
-    return view
+    if (!this.windowed) {
+      const view = ordered(this.rows, this.axes, {
+        page: this.page,
+        query: this.filter,
+        size: this.pageSize,
+        spec: this.sort,
+      })
+      this.warnIfCrowded(view.rows.length)
+      return { ...view, available: view.rows.length }
+    }
+    /* No crowding warning on this path. Windowing is the answer to the warning
+       rather than a case of it: the result being larger than a table can draw
+       is the reason the window exists. */
+    const { rows: inOrder, total } = this.arrange()
+    const page = window_(inOrder, this.page, this.pageSize)
+    return { available: page.length, matched: inOrder.length, rows: this.windowOf(page), total }
   }
 
   /** How many pages the result makes, which is at least one even when empty. */
@@ -523,6 +682,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
+    if (changed.has('rows')) {
+      /* A new result makes every recorded height a measurement of a row that is
+         no longer at that index. Keeping them is worse than having none: the
+         estimate is at least honest about not knowing. */
+      this.virtualize.forget()
+    }
   }
 
   /**
@@ -565,6 +730,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.markEmpty()
     this.assign()
     this.announceSort()
+    /* After the rows are in the tree, so the pass that measures them is looking
+       at the window this render drew. The controller holds its answer when it
+       stops changing, so this settles rather than looping. */
+    if (this.windowed) {
+      this.virtualize.measure()
+    }
   }
 
   /**
@@ -613,14 +784,20 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     /* Keyed, so a sort moves a row's element rather than rewriting every cell
        in place: focus inside a cell survives and a transition stays attached to
        the row it belongs to. The index is the fallback and is correct only
-       while nothing reorders, which is why `key` is worth setting. */
+       while nothing reorders, which is why `key` is worth setting.
+
+       Counted from the window's start rather than from the row's place in it,
+       or every window would key its first row `0` and hand a scroll the element
+       belonging to a row it has just left. */
+    const start = this.windowStart
     return html`${repeat(
       rows,
-      (row, index) => (field ? String(row[field] ?? index) : index),
+      (row, index) => (field ? String(row[field] ?? start + index) : start + index),
       (row, index) => html`<div
         part="row"
         role="row"
         aria-rowindex=${this.rowIndex(index)}
+        data-index=${this.windowed ? start + index : nothing}
       >
         ${columns.map((column) => this.renderCell(column, row))}
       </div>`,
@@ -634,15 +811,53 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * reason a virtualized or paged grid needs `aria-rowindex` at all: a screen
    * reader on page three should hear row 41, and a grid whose indices restart at
    * every page tells a reader the result is twenty rows long however many it has.
+   *
+   * A window is the second offset and stacks on the page: with both on, row one
+   * of the window is the page's start plus how far down the page it begins.
    */
   private rowIndex(within: number): number {
     const size = this.pageSize
-    const offset = size > 0 ? (this.page - 1) * size : 0
-    return offset + within + 2
+    const page = size > 0 ? (this.page - 1) * size : 0
+    return page + this.windowStart + within + 2
+  }
+
+  /** Where the window begins in the page, which is the top when there is none. */
+  private get windowStart(): number {
+    return this.windowed ? this.virtualize.window.first : 0
+  }
+
+  /**
+   * The room the rows outside the window would have taken.
+   *
+   * **`role="presentation"`, because this is geometry standing inside a
+   * `rowgroup`.** A bare `div` there is a child the role does not allow, and a
+   * screen reader walking the rows would meet something that is not one. The
+   * room itself is what keeps the scrollbar honest: a box that scrolls twenty
+   * rows while claiming ten thousand gives a thumb the size of its track.
+   */
+  private renderSpacer(end: 'after' | 'before'): TemplateResult | typeof nothing {
+    if (!this.windowed) {
+      return nothing
+    }
+    const { after, before } = this.virtualize.window
+    /* Written out rather than bound through `part=${end}`. A part assembled at
+       run time is one nothing can check: the rule that pairs a documented part
+       with a rendered one reads the template, and a name it cannot see is a
+       `::part()` a consumer styles to no effect. */
+    return end === 'before'
+      ? html`<div part="before" role="presentation" style="block-size: ${before}px"></div>`
+      : html`<div part="after" role="presentation" style="block-size: ${after}px"></div>`
+  }
+
+  /** The controller owns the geometry; this is only what tells it to look again. */
+  private readonly handleScroll = (): void => {
+    if (this.windowed) {
+      this.virtualize.measure()
+    }
   }
 
   protected override render(): TemplateResult {
-    const { matched, rows } = this.view
+    const { available, matched, rows } = this.view
     const template = this.template
     const columns = this.tableColumns
     const pagination = this.tag('pagination')
@@ -651,14 +866,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         part="table"
         role="rowgroup"
         aria-busy=${this.loading ? 'true' : nothing}
-        aria-rowcount=${this.mode === 'server' ? Math.max(this.total, rows.length) + 1 : matched + 1}
+        aria-rowcount=${this.mode === 'server' ? Math.max(this.total, available) + 1 : matched + 1}
         aria-colcount=${columns.length || nothing}
         style=${template ? `--data-table-template: ${template}` : nothing}
+        @scroll=${this.handleScroll}
       >
         <div part="head" role="row">
           <slot name="columns" @slotchange=${this.handleSlotChange}></slot>
         </div>
-        ${this.renderRows(rows)} ${this.renderStatus(rows.length > 0)}
+        ${this.renderSpacer('before')}${this.renderRows(rows)}${this.renderSpacer('after')}
+        ${this.renderStatus(available > 0)}
       </div>
       <div part="footer">
         <slot name="footer"></slot>

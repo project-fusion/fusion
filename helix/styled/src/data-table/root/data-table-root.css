@@ -114,6 +114,44 @@
   text-align: center;
 }
 
+/* Windowing scrolls the grid's own box, which is the one thing this sheet has
+   to add for it: the headless tier draws the window and the spacers, and
+   neither means anything in a box with no height to overflow. */
+:host([windowed]) [part="table"] {
+  block-size: var(--data-table-block-size, 24em);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/*
+ *  The headings stick, and it is the cells that do it. `[part="head"]` is
+ *    `display: contents`, so the whole grid stays one grid and every column lines
+ *    up across every row; an element with no box cannot be stuck to anything, so
+ *    the sticking happens on the column elements that are the grid items.
+ *
+ *    The fill is not the header band this sheet refuses elsewhere. Rows scroll
+ *    *under* a sticky heading, and without an opaque background they show through
+ *    it. It is the surface the table already sits on rather than a tint, so once
+ *    nothing is passing beneath it the heading reads as weight again.
+ */
+:host([windowed]) ::slotted(helix-table-column) {
+  background-color: var(--data-table-heading-background-color, var(--helix-color-background));
+  inset-block-start: 0;
+  position: sticky;
+  z-index: 1;
+}
+
+/* The spacers are geometry rather than content: they carry the room the rows
+   outside the window would have taken, so the scrollbar is honest about the
+   real length. A box that scrolls twenty rows while claiming ten thousand gives
+   a thumb the size of its track. Spanning every column, because they are grid
+   items like a cell and would otherwise take the first column and leave the
+   room one column wide. */
+[part="before"],
+[part="after"] {
+  grid-column: 1 / -1;
+}
+
 /* Rows that are already there stay, and dim, while a new set arrives. Removing
    them collapses the box and throws the page around under the reader for as long
    as the request takes, which is the whole of what a server-mode table does on
@@ -133,6 +171,14 @@
 
   [part="table"] {
     overflow-x: visible;
+  }
+
+  /* A windowed table prints the rows it drew and cannot print the ones it did
+     not, so this only stops the box clipping them: a 24em scroller on paper is
+     one screenful and a cut edge where the rest would be. */
+  :host([windowed]) [part="table"] {
+    block-size: auto;
+    overflow-y: visible;
   }
 
   [part="footer"] {
