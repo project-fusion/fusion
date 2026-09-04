@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { at, label, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { readColor } from './orb-color.js'
 import {
   blendParams,
   evenSphere,
@@ -210,4 +211,27 @@ describe('orb shapes', () => {
     expect(small.shadeSpan).toBeLessThan(large.shadeSpan)
     expect(small.aMin).toBeGreaterThan(large.aMin)
   })
+})
+
+describe('reading a color the engine resolved but did not convert', () => {
+  /* Registered only where there is a real 2D context, rather than skipped:
+     happy-dom refuses one and the browser runner has no `test.if`. The reader
+     answers gray without a context by design, which the element spec covers. */
+  const painting =
+    typeof document !== 'undefined' && !!document.createElement('canvas').getContext('2d')
+
+  if (painting) {
+    test('converts lab, which is what these tokens compute to', () => {
+      expect(readColor('lab(100 0 0)')).toEqual([255, 255, 255])
+      expect(readColor('lab(0 0 0)')).toEqual([0, 0, 0])
+    })
+
+    test('leaves rgb alone', () => {
+      expect(readColor('rgb(12, 34, 56)')).toEqual([12, 34, 56])
+    })
+
+    test('answers gray for a value no engine will parse', () => {
+      expect(readColor('not-a-color')).toEqual([128, 128, 128])
+    })
+  }
 })

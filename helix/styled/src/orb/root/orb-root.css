@@ -42,9 +42,12 @@
      custom property does not resolve to one.** `getComputedStyle` hands back a
      custom property as the text that was written: `currentColor` stays the word
      `currentColor`, `light-dark(...)` stays the function, and neither is a
-     number the canvas can mix. A color-typed property is resolved by the
-     engine before it is reported, so the script reads two `rgb()` triples and
-     never parses CSS itself.
+     number the canvas can mix. A color-typed property is resolved by the engine
+     before it is reported.
+
+     Resolved is not converted, though: these tokens are built through `oklab`
+     and come back as `lab(...)`, so the script paints each one and reads the
+     pixel rather than trusting the text.
 
      `text-decoration-color` because it is inert here: a canvas draws no text
      and takes no decoration, so the property paints nothing and is free to

@@ -2,6 +2,7 @@ import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
+import { readColor } from './orb-color.js'
 import { styles } from './orb-root.css.js'
 import {
   blendParams,
@@ -440,14 +441,6 @@ export class HelixOrb extends HelixElement {
  * value this cannot parse costs the orb its depth rather than its existence,
  * and a test environment with no layout engine is exactly such a value.
  */
-const readColor = (value: string): [number, number, number] => {
-  const parts = value.match(/-?[\d.]+/g)
-  if (!parts || parts.length < 3) {
-    return [128, 128, 128]
-  }
-  return [Number(parts[0]) || 0, Number(parts[1]) || 0, Number(parts[2]) || 0]
-}
-
 declare global {
   interface HTMLElementTagNameMap {
     'helix-orb': HelixOrb
