@@ -569,6 +569,15 @@ describe('windowing', () => {
        reader hears row two, a hundred rows into the result. */
     const { element, remove } = await mount(WINDOWED, many(500))
     const box = part(element, 'table') as HTMLElement
+    /* The box is given here because this tier does not ship one. A headless
+       table has no stylesheet, so `[part="table"]` is not a scroll container
+       and `scrollTop` clamps to zero in a real browser -- which is what a
+       consumer windowing this tier has to supply for themselves, and what the
+       styled tier writes on their behalf. Measured: without this the spec
+       passes under happy-dom, where nothing scrolls anyway, and fails under
+       `specs:browser` with the window still at row one. */
+    box.style.blockSize = '200px'
+    box.style.overflowY = 'auto'
     box.scrollTop = 3_200
     box.dispatchEvent(new Event('scroll'))
     await settled(element)

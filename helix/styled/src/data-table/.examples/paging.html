@@ -1,0 +1,31 @@
+<!-- @summary Eight rows at a time, with a pagination the table draws itself. -->
+
+<helix-data-table
+  id="assets"
+  label="Assets"
+  page-size="8"
+>
+  <helix-table-column
+    field="name"
+    sortable
+    width="14rem"
+  >File</helix-table-column>
+  <helix-table-column
+    align="end"
+    field="size"
+    sortable
+  >Size</helix-table-column>
+  <helix-table-column field="kind">Kind</helix-table-column>
+</helix-data-table>
+
+<script>
+  /* No `paginated` attribute: a page size turns it on by itself, because a
+     paged table with no way to change pages shows a reader the first eight rows
+     and no way to learn there are more. Set `paginated="false"` to take the
+     control back and put your own in the `footer` slot. */
+  document.getElementById('assets').rows = Array.from({ length: 40 }, (_, index) => ({
+    kind: index % 4 === 0 ? 'font' : 'image',
+    name: `asset-${String(index + 1).padStart(3, '0')}.webp`,
+    size: 12000 + index * 837,
+  }))
+</script>
