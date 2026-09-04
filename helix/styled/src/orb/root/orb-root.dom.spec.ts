@@ -3,12 +3,14 @@ import { at, label, mount, registerDom, role } from '@fusion.dev/helix-testing/d
 import { readColor } from './orb-color.js'
 import {
   blendParams,
+  blendStaged,
   evenSphere,
   meshFor,
   ORB_PARAMS,
   orbPoint,
   paramsFor,
   project,
+  stateDistance,
 } from './orb-shapes.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
@@ -106,7 +108,38 @@ describe('orb shapes', () => {
   test('a blend of two states lands between them, key by key', () => {
     const mid = blendParams(ORB_PARAMS.thinking, ORB_PARAMS.fetching, 0.5)
     expect(mid.belt).toBeCloseTo((ORB_PARAMS.thinking.belt + ORB_PARAMS.fetching.belt) / 2, 6)
-    expect(mid.scan).toBeCloseTo(0.5, 6)
+    expect(mid.orbit).toBeCloseTo(0.5, 6)
+  })
+
+  test('the silhouette leads and what it is doing follows', () => {
+    /* Structure at half way, character still held back by the trail: a light
+       must not be orbiting a shape that is still a sash. */
+    const shape = blendStaged(ORB_PARAMS.thinking, ORB_PARAMS.fetching, 0.5, 0)
+    expect(shape.belt).toBeCloseTo((ORB_PARAMS.thinking.belt + 1) / 2, 6)
+    expect(shape.orbit).toBe(ORB_PARAMS.thinking.orbit)
+  })
+
+  test('a near pair is given less time than a far one', () => {
+    const near = stateDistance(ORB_PARAMS.waiting, ORB_PARAMS.done)
+    const far = stateDistance(ORB_PARAMS.thinking, ORB_PARAMS.working)
+    expect(near).toBeLessThan(far)
+    expect(near).toBeGreaterThan(0)
+    expect(far).toBeLessThanOrEqual(1)
+  })
+
+  test('the ring is a hole, not a squashed ball', () => {
+    /* Every dot of a torus sits off the unit sphere: the ones through the hole
+       are nearer the axis than any point of a sphere can be. A `ring` that
+       normalized with the rest would read as a ball again. */
+    const even = evenSphere(6, 12)
+    let nearest = 1
+    for (let band = 0; band < 6; band++) {
+      for (let s = 0; s < 12; s++) {
+        const [x, , z] = orbPoint(band / 5, s / 12, 0, ORB_PARAMS.working, band * 12 + s, even)
+        nearest = Math.min(nearest, Math.hypot(x, z))
+      }
+    }
+    expect(nearest).toBeLessThan(0.4)
   })
 
   test('the even sphere is ordered by band and then by longitude', () => {
@@ -142,20 +175,27 @@ describe('orb shapes', () => {
     }
   })
 
-  test('every dot of every state sits on the shell', () => {
-    /* A point off the unit sphere is a point the depth ramp reads wrongly, and
-       one at the origin is a point the projection sends somewhere arbitrary. */
+  test('every dot of every state sits where the projection can use it', () => {
+    /* A point at the origin is one the projection sends somewhere arbitrary,
+       and a point outside the ball is one the depth ramp reads wrongly.
+       **The shell is an invariant only for the states that are spheres**: the
+       ring's inner edge is nearer the axis than any point of a sphere can be,
+       which is exactly what gives it a hole. */
     const mesh = meshFor(64)
     const even = evenSphere(mesh.lanes, mesh.segs)
     for (const [name, params] of Object.entries(ORB_PARAMS)) {
+      const outer = 1 + params.pulse + 0.001
       for (let i = 0; i < 200; i++) {
         const u = (i % 13) / 12
         const v = (i % 17) / 17
         const [x, y, z] = orbPoint(u, v, 1.4, params, i, even)
         const length = Math.hypot(x, y, z)
         expect(Number.isFinite(length)).toBe(true)
-        expect(`${name}:${length > 0.55}`).toBe(`${name}:true`)
-        expect(length).toBeLessThanOrEqual(1.001)
+        expect(`${name}:${length > 0.2}`).toBe(`${name}:true`)
+        expect(`${name}:${length <= outer}`).toBe(`${name}:true`)
+        if (params.ring < 0.001) {
+          expect(`${name}:${length > 0.55 * (1 - params.pulse)}`).toBe(`${name}:true`)
+        }
       }
     }
   })

@@ -4,7 +4,15 @@
  * Exported so the component can validate an attribute against the same list the
  * generator reads, rather than keeping a second copy that drifts.
  */
-export const ORB_STATES = ['thinking', 'fetching', 'working', 'done'] as const
+export const ORB_STATES = [
+  'waiting',
+  'connecting',
+  'thinking',
+  'fetching',
+  'listening',
+  'working',
+  'done',
+] as const
 
 /** What the agent is doing. */
 export type OrbState = (typeof ORB_STATES)[number]
@@ -30,12 +38,18 @@ export interface OrbParams {
   edge: number
   /** How far toward an even sphere, `0` the banded grid and `1` fully relaxed. */
   jitter: number
+  /** How far the whole cloud swells and settles, `0` still. */
+  breathe: number
+  /** Strength of a highlight traveling around the ball, `0` absent. */
+  orbit: number
+  /** A ripple over the surface, applied after the sphere is closed. */
+  pulse: number
   /** How fast this state's own clock runs. */
   rate: number
+  /** How far the ball has opened into a ring, `0` a sphere and `1` a torus. */
+  ring: number
   /** Which way the axis leans, in radians. */
   rot: number
-  /** Where the sweeping highlight is, `0` absent and `1` full strength. */
-  scan: number
   /** How hard the bands slide past each other. */
   shear: number
   /** How flattened the ball is along its axis, `1` round. */
@@ -55,28 +69,68 @@ export interface OrbParams {
  * than as a shuffle.
  */
 export const ORB_PARAMS: Record<OrbState, OrbParams> = {
+  /* The same sash as `thinking` on the same lean, thinner and calmer: the route
+     between them is a narrowing rather than a change of shape. */
+  connecting: {
+    belt: 0.32,
+    breathe: 0.07,
+    edge: 1,
+    jitter: 0,
+    orbit: 0,
+    pulse: 0,
+    rate: 1.05,
+    ring: 0,
+    rot: 1.52,
+    shear: 0,
+    squash: 1,
+    waveA: 0.035,
+    waveB: 0,
+  },
   /* Settled: an even ball, breathing, with nothing traveling through it. */
   done: {
     belt: 1,
+    breathe: 0.035,
     edge: 0,
     jitter: 1,
+    orbit: 0,
+    pulse: 0,
     rate: 1.1,
+    ring: 0,
     rot: 0,
-    scan: 0,
     shear: 0,
     squash: 1,
     waveA: 0,
     waveB: 0,
   },
-  /* The sash opened out into a globe, with a highlight sweeping pole to pole:
-     the shape of looking through something. */
+  /* A globe with a light going round it, which is the shape of looking through
+     something. */
   fetching: {
     belt: 1,
+    breathe: 0,
     edge: 0,
-    jitter: 0,
-    rate: 2.4,
+    jitter: 0.62,
+    orbit: 1,
+    pulse: 0,
+    rate: 2,
+    ring: 0,
     rot: 0,
-    scan: 1,
+    shear: 0,
+    squash: 1,
+    waveA: 0,
+    waveB: 0,
+  },
+  /* Receptive: a closed sphere with a ripple crossing it, slower than
+     `connecting` and symmetric where that one is a band. */
+  listening: {
+    belt: 1,
+    breathe: 0.03,
+    edge: 0,
+    jitter: 1,
+    orbit: 0,
+    pulse: 0.055,
+    rate: 1.15,
+    ring: 0,
+    rot: 0,
     shear: 0,
     squash: 1,
     waveA: 0,
@@ -86,29 +140,54 @@ export const ORB_PARAMS: Record<OrbState, OrbParams> = {
      the face rather than sitting level. */
   thinking: {
     belt: 0.47,
+    breathe: 0,
     edge: 1,
     jitter: 0,
+    orbit: 0,
+    pulse: 0,
     rate: 2.1,
+    ring: 0,
     rot: 1.52,
-    scan: 0,
     shear: 0,
     squash: 1,
     waveA: 0.16,
     waveB: 0.07,
   },
-  /* Flattened and tilted, bands shearing past each other. **The squash is what
-     makes this state legible at 20px**: `fetching` and `working` are both full
-     spheres, and at that size a difference in motion alone is not a difference
-     a reader can see. A silhouette is. */
+  /* The same settled ball as `done` at a slower tempo, which is the difference
+     between not having started and having finished. */
+  waiting: {
+    belt: 1,
+    breathe: 0.075,
+    edge: 0,
+    jitter: 1,
+    orbit: 0,
+    pulse: 0,
+    rate: 0.55,
+    ring: 0,
+    rot: 0,
+    shear: 0,
+    squash: 1,
+    waveA: 0,
+    waveB: 0,
+  },
+  /* **A ring, which is a different object rather than an adjusted ball.** This
+     was a squashed sphere with its bands shearing, and a sphere adjusted is
+     still a sphere: at 20px it read as the same mark as every other state. A
+     torus has a hole. The bands run around the tube, so the shear twists it
+     like rope instead of sliding flat layers past each other, and the light is
+     what makes that turning visible at all. */
   working: {
     belt: 1,
+    breathe: 0.035,
     edge: 0,
     jitter: 0,
-    rate: 2.4,
-    rot: 0.5,
-    scan: 0,
-    shear: 1.3,
-    squash: 0.72,
+    orbit: 0.7,
+    pulse: 0,
+    rate: 1.9,
+    ring: 1,
+    rot: 0.3,
+    shear: 0.62,
+    squash: 1,
     waveA: 0,
     waveB: 0,
   },
@@ -124,6 +203,80 @@ export const blendParams = (a: OrbParams, b: OrbParams, k: number): OrbParams =>
   }
   return out
 }
+
+/** Each key's own range, so a distance can be measured across all of them. */
+const SPANS: Record<keyof OrbParams, number> = {
+  belt: 1,
+  breathe: 0.08,
+  edge: 1,
+  jitter: 1,
+  orbit: 1,
+  pulse: 0.09,
+  rate: 2.5,
+  ring: 1,
+  rot: 1.6,
+  shear: 1.3,
+  squash: 1,
+  waveA: 0.2,
+  waveB: 0.1,
+}
+
+/** What the shape is. */
+const STRUCTURE = [
+  'belt',
+  'edge',
+  'jitter',
+  'ring',
+  'rot',
+  'shear',
+  'squash',
+  'waveA',
+  'waveB',
+] as const
+
+/** What it is doing. */
+const CHARACTER = ['breathe', 'orbit', 'pulse', 'rate'] as const
+
+/**
+ * How far apart two states are, `0` to `1`, each key against its own range.
+ *
+ * Two states differing in one small number should not be given the time
+ * `thinking` to `done` needs. One length for every pair reads as rushed at one
+ * end of the set and slack at the other.
+ */
+export const stateDistance = (a: OrbParams, b: OrbParams): number => {
+  let sum = 0
+  for (const key of KEYS) {
+    sum += Math.abs(b[key] - a[key]) / SPANS[key]
+  }
+  return Math.min(1, sum / 3.2)
+}
+
+/**
+ * Two states blended on two clocks: the silhouette, and then what it is doing.
+ *
+ * **The other order shows a light orbiting a sash.** Every number moving on one
+ * curve makes a change of state read as a cross-fade between two pictures; the
+ * shape arriving first makes it read as one thing becoming another.
+ */
+export const blendStaged = (
+  a: OrbParams,
+  b: OrbParams,
+  shape: number,
+  character: number,
+): OrbParams => {
+  const out = {} as OrbParams
+  for (const key of STRUCTURE) {
+    out[key] = a[key] + (b[key] - a[key]) * shape
+  }
+  for (const key of CHARACTER) {
+    out[key] = a[key] + (b[key] - a[key]) * character
+  }
+  return out
+}
+
+/** How far the character trails the silhouette, as a share of the run. */
+export const TRAIL = 0.2
 
 /** The state's numbers, or `thinking`'s where the name is not one we draw. */
 export const paramsFor = (state: string | undefined): OrbParams =>
@@ -182,6 +335,10 @@ export const evenSphere = (lanes: number, segs: number): [number, number, number
 /** How far the bands reach when `belt` is 1, in units of the sphere's radius. */
 const SPAN = 1.86
 
+/** The ring's hole and tube, which together come to the sphere's own radius. */
+const RING_HOLE = 0.64
+const RING_TUBE = 0.36
+
 /**
  * One dot, from its place in the grid and the state's numbers.
  *
@@ -202,6 +359,23 @@ export const orbPoint = (
   const y = Math.max(-0.995, Math.min(0.995, (u - 0.5) * SPAN * p.belt + wave))
   const r = Math.sqrt(Math.max(0, 1 - y * y))
   let point: [number, number, number] = [r * Math.cos(th), y * p.squash, r * Math.sin(th)]
+  /* **A ring, opened out before the lean is applied**, so it tips rather than
+     lying flat. Tube plus hole comes to the radius the sphere had, so the
+     silhouette changes and the footprint does not. */
+  if (p.ring > 0.001) {
+    const ph = u * TAU
+    const rr = RING_HOLE + RING_TUBE * Math.cos(ph)
+    const torus: [number, number, number] = [
+      rr * Math.cos(th),
+      RING_TUBE * Math.sin(ph),
+      rr * Math.sin(th),
+    ]
+    point = [
+      point[0] + (torus[0] - point[0]) * p.ring,
+      point[1] + (torus[1] - point[1]) * p.ring,
+      point[2] + (torus[2] - point[2]) * p.ring,
+    ]
+  }
   if (p.rot) {
     const c = Math.cos(p.rot)
     const s = Math.sin(p.rot)
@@ -214,8 +388,19 @@ export const orbPoint = (
       point[1] + (e[1] - point[1]) * p.jitter,
       point[2] + (e[2] - point[2]) * p.jitter,
     ]
+    /* **Held off the unit sphere in proportion to the ring.** Normalizing a
+       half-formed torus rounds it back into the ball it is leaving, so the
+       morph collapses in the middle and reappears at the end. */
     const len = Math.hypot(point[0], point[1], point[2]) || 1
-    point = [point[0] / len, point[1] / len, point[2] / len]
+    const k = 1 + (1 / len - 1) * (1 - p.ring)
+    point = [point[0] * k, point[1] * k, point[2] * k]
+  }
+  /* **The ripple rides on the closed sphere.** `waveA` and `waveB` are applied
+     to the latitude before `jitter` blends them away, so a fully relaxed state
+     had nothing left that could move; this survives it. */
+  if (p.pulse > 0.001) {
+    const ripple = 1 + p.pulse * Math.sin(phase * 1.5 - point[1] * 3.2)
+    point = [point[0] * ripple, point[1] * ripple, point[2] * ripple]
   }
   return point
 }

@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { readColor } from './orb-color.js'
 import { styles } from './orb-root.css.js'
 import {
-  blendParams,
+  blendStaged,
   evenSphere,
   fibonacci,
   meshFor,
@@ -16,19 +16,28 @@ import {
   paramsFor,
   project,
   smoother,
+  stateDistance,
+  TRAIL,
 } from './orb-shapes.js'
 
-/** How long a change of state takes, in ms. */
-const MORPH = 700
+/** The shortest change of state, in ms, and what the longest adds to it. */
+const MORPH_NEAR = 380
+const MORPH_REACH = 580
+
+/** How far above the equator the traveling light sits. */
+const LIGHT_Y = 0.36
 
 /** The frame the still orb is drawn at: far enough in to have a shape. */
 const STILL_PHASE = 1.4
 
 /** What each state is called, for a reader who cannot see it. */
 const LABELS: Record<OrbState, string> = {
+  connecting: 'Connecting',
   done: 'Done',
   fetching: 'Fetching',
+  listening: 'Listening',
   thinking: 'Thinking',
+  waiting: 'Waiting',
   working: 'Working',
 }
 
@@ -46,19 +55,29 @@ interface Dot {
  * @summary Says what an agent is doing, as a shape rather than a word.
  *
  * @description
- * A cloud of dots on a sphere, drawn to a canvas, with one shape per state:
- * `thinking` is a narrow sash with a wave running through it, `fetching` spreads
- * into a globe with a highlight sweeping pole to pole, `working` flattens and
- * tilts with its bands shearing past each other, and `done` settles into an even
- * ball.
+ * A cloud of dots, drawn to a canvas, with one shape per state. `connecting`
+ * and `thinking` are the same leaning sash and differ in how agitated it is;
+ * `waiting` and `done` are the same settled ball at different tempos, which is
+ * the difference between not having started and having finished. `fetching` is
+ * a globe with a light going round it, `listening` a closed sphere with a
+ * ripple crossing it, and `working` a ring.
  *
- * **None of them is a separate drawing.** Each is the same banded sphere given
+ * **None of them is a separate drawing.** Each is the same banded grid given
  * different numbers, so changing state interpolates the numbers and every frame
  * in between is a whole shape. A loader that cuts between pictures says the
  * work restarted; one that carries a shape into the next says it moved on.
  *
- * **Nothing spins.** All the movement is inside the shape, which is what makes
- * it read as thought rather than as a thing being rotated.
+ * **A change is measured before it is played.** Two states differing in one
+ * small number are given less time than a sash becoming a ring, and the
+ * silhouette leads what the shape is doing, so a light is never seen orbiting
+ * something that has not finished becoming round.
+ *
+ * **Nothing spins.** The whole cloud holds still and everything that moves is
+ * moving inside it, which is what makes it read as thought rather than as a
+ * thing being rotated. The one exception is the light, which travels because a
+ * ring of evenly spaced dots is unchanged by rotation: without something fixed
+ * in space passing over them, a state that turns has nothing a reader can see
+ * turning.
  *
  * **The palette is read from the tokens**, not given as colors: a dot's ink is
  * mixed toward the ground by how far away it is, and both ends come from
@@ -143,6 +162,8 @@ export class HelixOrb extends HelixElement {
    */
   private from: OrbParams = paramsFor('thinking')
   private morphAt = 0
+  /** How far the current change travels, `0` to `1`. */
+  private reach = 0
 
   /**
    * The state's clock, accumulated rather than derived.
@@ -280,6 +301,7 @@ export class HelixOrb extends HelixElement {
   /** Begins a transition from whatever is on the screen right now. */
   private turn(): void {
     this.from = this.paramsNow()
+    this.reach = stateDistance(this.from, paramsFor(this.state))
     this.morphAt = performance.now()
     if (!this.running) {
       this.paint(0)
@@ -287,15 +309,30 @@ export class HelixOrb extends HelixElement {
     }
   }
 
+  /**
+   * How long this particular change is given.
+   *
+   * **Near states cross quickly and far ones are not hurried.** One length for
+   * every pair read as rushed going from `waiting` to `done`, which differ in
+   * two small numbers, and slack going from `thinking` to `working`, which is a
+   * sash becoming a ring.
+   */
+  private get span(): number {
+    return MORPH_NEAR + MORPH_REACH * this.reach
+  }
+
   /** How far through a transition, `1` when there is not one. */
   private get progress(): number {
-    return this.morphAt === 0 ? 1 : Math.min(1, (performance.now() - this.morphAt) / MORPH)
+    return this.morphAt === 0 ? 1 : Math.min(1, (performance.now() - this.morphAt) / this.span)
   }
 
   private paramsNow(): OrbParams {
     const to = paramsFor(this.state)
     const k = this.progress
-    return k >= 1 ? to : blendParams(this.from, to, smoother(k))
+    if (k >= 1) {
+      return to
+    }
+    return blendStaged(this.from, to, smoother(k), smoother(Math.max(0, k - TRAIL) / (1 - TRAIL)))
   }
 
   private play(): void {
@@ -372,9 +409,23 @@ export class HelixOrb extends HelixElement {
 
     const mesh = meshFor(size)
     const even = evenSphere(mesh.lanes, mesh.segs)
-    const scan = Math.sin(this.phase * 0.85) * 0.93
-    /* One swell at the midpoint, so a change of state is felt as well as seen. */
-    const shell = still ? 1 : 1 + 0.1 * Math.sin(Math.PI * this.progress)
+    /* **A light traveling around the ball**, rather than a band crossing it.
+       A ring of evenly spaced dots is unchanged by rotation, so a state that
+       turns has nothing a reader can see turning until something fixed in space
+       passes over it. */
+    const spin = this.phase * 0.9
+    const lx = Math.cos(spin) * 0.9
+    const lz = Math.sin(spin) * 0.9
+    const llen = Math.hypot(lx, LIGHT_Y, lz) || 1
+
+    /* One breath through the change, sized by how far it goes and peaked a
+       little past the middle, so it reads as an exhale into the new state
+       rather than a symmetric bump. */
+    const swell =
+      still || this.progress >= 1
+        ? 1
+        : 1 + (0.035 + 0.1 * this.reach) * Math.sin(Math.PI * this.progress ** 0.82)
+    const shell = swell * (1 + params.breathe * Math.sin(this.phase * 0.62))
     const dots: Dot[] = []
 
     for (let i = 0; i < mesh.ghostCount; i++) {
@@ -398,8 +449,9 @@ export class HelixOrb extends HelixElement {
         const [x, y, z] = orbPoint(u, s / mesh.segs, this.phase, params, index, even)
         const [px, py, pz] = project(size, x * shell, y * shell, z * shell)
         const depth = (pz + 1) / 2
+        const facing = (x * lx + y * LIGHT_Y + z * lz) / llen
         const boost =
-          params.scan * Math.exp(-((y - scan) ** 2) / 0.012) +
+          params.orbit * (facing > 0 ? facing ** 11 : 0) +
           params.jitter * (0.1 + 0.1 * Math.sin(this.phase * 0.6))
         dots.push({
           alpha: mesh.aMin + (1 - mesh.aMin) * depth,
