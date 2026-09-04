@@ -1,32 +1,22 @@
 <div align="center">
   <img src=".github/fusion-logo.svg" width="88" alt="Fusion" />
   <h1>Fusion Development Group</h1>
-</div>
-
-<div align="center">
-  <strong>Helix</strong>, a design system of web components that derives its own
-  accessible palette, and <strong>Cortex</strong>, a memory and provenance
-  substrate.
-  <br />
-  <a href="https://helix.fusion.dev">Documentation</a> ·
-  <a href="https://helix.fusion.dev/components">Components</a> ·
-  <a href="https://helix.fusion.dev/theme">Theme builder</a> ·
-  <a href="https://fusion.dev">fusion.dev</a>
-</div>
-
-<div align="center">
-  <a href="https://github.com/project-fusion/fusion/actions/workflows/verify.yml">
-    <img
-      src="https://github.com/project-fusion/fusion/actions/workflows/verify.yml/badge.svg?branch=main"
-      alt="verify workflow status on main"
-    />
-  </a>
-  <a href="https://github.com/project-fusion/fusion/actions/workflows/release.yml">
-    <img
-      src="https://github.com/project-fusion/fusion/actions/workflows/release.yml/badge.svg?branch=main"
-      alt="release workflow status on main"
-    />
-  </a>
+  <p>
+    <strong>Helix</strong>, a design system of web components that derives its
+    own accessible palette, and <strong>Cortex</strong>, a memory and provenance
+    substrate.
+  </p>
+  <p>
+    <a href="https://fusion.dev/helix/docs">Documentation</a> ·
+    <a href="https://fusion.dev/helix/components">Components</a> ·
+    <a href="https://fusion.dev/helix/sandbox">Sandbox</a> ·
+    <a href="https://fusion.dev/helix/theme">Theme builder</a> ·
+    <a href="https://fusion.dev">fusion.dev</a>
+  </p>
+  <p>
+    <a href="https://github.com/project-fusion/fusion/actions/workflows/verify.yml"><img src="https://github.com/project-fusion/fusion/actions/workflows/verify.yml/badge.svg?branch=main" alt="verify workflow status on main" /></a>
+    <a href="https://github.com/project-fusion/fusion/actions/workflows/release.yml"><img src="https://github.com/project-fusion/fusion/actions/workflows/release.yml/badge.svg?branch=main" alt="release workflow status on main" /></a>
+  </p>
 </div>
 
 ## Helix
@@ -78,7 +68,7 @@ at analysis time rather than left to review.
 | `@fusion.dev/helix-icons` | The icon set on its own |
 | `@fusion.dev/helix-diagnostics` | You want the Helix mistakes that are valid CSS found for you |
 
-[Installation](https://helix.fusion.dev/docs/installation) has the stylesheet
+[Installation](https://fusion.dev/helix/docs/installation) has the stylesheet
 order, why it is load-bearing and fails silently, and a page for each framework.
 
 ## Working in this repository
