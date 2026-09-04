@@ -53,7 +53,9 @@ resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate --slurp \
   | jq -j '.[][].commit.message + "\u0000"' \
   | node /tmp/bump.mjs --stdin)
 
-{
+majors=$(jq -r '[.[] | select(.level == "major") | .domain] | join("`, `")' <<<"$resolved")
+
+report=$(
   echo "### What merging this would release"
   echo
   if [ "$resolved" = '[]' ]; then
@@ -61,4 +63,39 @@ resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate --slurp \
   else
     jq -r '.[] | "- `\(.domain)`: **\(.level)**"' <<<"$resolved"
   fi
-} >> "$GITHUB_STEP_SUMMARY"
+  if [ -n "$majors" ]; then
+    echo
+    echo "> [!WARNING]"
+    echo "> **Breaking.** Merging releases a new major of \`$majors\`, so every"
+    echo "> consumer takes the break on its next upgrade. A \`!\` in a subject or a"
+    echo "> \`BREAKING CHANGE:\` trailer is what asks for this; drop it if that is not"
+    echo "> the intent."
+  fi
+)
+
+printf '%s\n' "$report" >> "$GITHUB_STEP_SUMMARY"
+
+# **A label, because the summary is a page nobody opens.** It reads at a glance
+# in the pull request list and in the merge queue, which a step summary does not.
+if [ -n "$majors" ]; then
+  gh label create breaking --repo "$REPO" --color b60205 \
+    --description 'Merging releases a new major' --force >/dev/null 2>&1 || true
+  gh pr edit "$NUMBER" --repo "$REPO" --add-label breaking >/dev/null
+else
+  gh pr edit "$NUMBER" --repo "$REPO" --remove-label breaking >/dev/null 2>&1 || true
+fi
+
+# **Upserted on a marker rather than appended**, so a force-push rewrites the
+# one comment instead of stacking another beneath it. Created only when
+# something releases, so a docs-only pull request stays quiet, and updated
+# whenever one already exists so it can go back to saying nothing.
+marker='<!-- release-intent -->'
+existing=$(gh api "repos/$REPO/issues/$NUMBER/comments" --paginate --slurp \
+  --jq "[.[][] | select(.body | startswith(\"$marker\")) | .id] | first // empty")
+body=$(printf '%s\n\n%s\n' "$marker" "$report")
+
+if [ -n "$existing" ]; then
+  gh api -X PATCH "repos/$REPO/issues/comments/$existing" -f body="$body" >/dev/null
+elif [ "$resolved" != '[]' ]; then
+  gh api -X POST "repos/$REPO/issues/$NUMBER/comments" -f body="$body" >/dev/null
+fi

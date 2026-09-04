@@ -16,7 +16,10 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
+  # Write, for the sticky comment and the `breaking` label. Safe under
+  # `pull_request_target` only because the checkout below takes the base and
+  # never the head, so no contributor code runs against this token.
+  pull-requests: write
 
 jobs:
   resolve:
