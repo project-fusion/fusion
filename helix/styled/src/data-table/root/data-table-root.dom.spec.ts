@@ -104,6 +104,7 @@ describe('a windowed table, where there is layout to window', () => {
   const windowed = async () => {
     const element = (await mount(windowedMarkup)) as HTMLElement & {
       rows: readonly Record<string, unknown>[]
+      sort: string
       updateComplete: Promise<unknown>
     }
     element.rows = Array.from({ length: 5000 }, (_, index) => ({
@@ -148,6 +149,33 @@ describe('a windowed table, where there is layout to window', () => {
     const at = Number(row?.getAttribute('aria-rowindex'))
     expect(at).toBeGreaterThan(2)
     expect(row?.textContent).toContain(String(at - 1).padStart(4, '0'))
+  })
+
+  geometry('re-sorting a scrolled window leaves the rows where it says they are', async () => {
+    /* Heights are recorded against a position in the drawn set, so a sort makes
+       every one of them a measurement of a row that has moved. Kept, the window
+       places rows by what its neighbors used to be; forgotten, it falls back to
+       the estimate and re-measures. Either way it self-heals within a frame or
+       two -- what this asserts is that it lands somewhere honest, with the row's
+       own number matching the index the grid gives it. */
+    const element = await windowed()
+    const box = part(element, 'table') as HTMLElement
+
+    box.scrollTop = Math.floor(box.scrollHeight / 3)
+    box.dispatchEvent(new Event('scroll'))
+    await settle(element)
+
+    /* `name:desc` and not `size:asc`: `size` ascends with the index in this
+       fixture, so sorting by it returns the order the rows already had and the
+       spec would assert nothing. Descending name genuinely moves every row. */
+    element.sort = 'name:desc'
+    await settle(element)
+
+    const row = first(element)
+    const at = Number(row?.getAttribute('aria-rowindex'))
+    expect(at).toBeGreaterThan(2)
+    // Row n of a reversed set is asset 5000 - n, and n is `aria-rowindex` - 2.
+    expect(row?.textContent).toContain(String(5002 - at).padStart(4, '0'))
   })
 
   geometry('holds the headings in place while the rows pass under them', async () => {

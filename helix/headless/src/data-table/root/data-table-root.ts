@@ -689,10 +689,20 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
-    if (changed.has('rows')) {
-      /* A new result makes every recorded height a measurement of a row that is
-         no longer at that index. Keeping them is worse than having none: the
-         estimate is at least honest about not knowing. */
+    /* **Anything that changes which row sits at which index**, and not just a
+       new array. Heights are recorded against a position in the drawn set, so a
+       sort, a filter, a page or a switch to `server` all leave measurements
+       describing rows that have moved out from under them -- and keeping those
+       is worse than having none, because the estimate is at least honest about
+       not knowing. A sort was the one that made this obvious: same `rows`, every
+       index a different row.
+
+       Compared as a signature rather than asked of `changed`, because `filter`,
+       `sort`, `page` and `pageSize` are accessors over `@state` backing fields
+       and what lands in `changed` depends on which of the two was written. */
+    const placement = this.placement
+    if (changed.has('rows') || placement !== this.measuredAgainst) {
+      this.measuredAgainst = placement
       this.virtualize.forget()
     }
   }
@@ -827,6 +837,20 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const page = size > 0 ? (this.page - 1) * size : 0
     return page + this.windowStart + within + 2
   }
+
+  /**
+   * What decides which row is at which index, as one comparable value.
+   *
+   * Not the rows themselves: those are compared by identity beside this, and a
+   * consumer handing back an equal array is handing back the same rows in the
+   * same order whatever object it is.
+   */
+  private get placement(): string {
+    return [this.mode, this.filter, this.sort, this.page, this.pageSize].join('\u0000')
+  }
+
+  /** The signature the recorded heights were measured against. */
+  private measuredAgainst = ''
 
   /** Where the window begins in the page, which is the top when there is none. */
   private get windowStart(): number {

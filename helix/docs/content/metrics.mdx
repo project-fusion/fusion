@@ -59,10 +59,10 @@ repository does that. The per-component tables are what a page pays.
 | Package | Raw | Gzip | Brotli | |
 |---|---|---|---|---|
 | `@fusion.dev/helix-core` | 136,650 | 44,897 | 38,468 | Element base class, mixins, decorators, floating positioning. |
-| `@fusion.dev/helix-headless` | 523,532 | 133,011 | 104,224 | Every headless family, which is what the barrel means. |
+| `@fusion.dev/helix-headless` | 523,719 | 133,055 | 104,253 | Every headless family, which is what the barrel means. |
 | `@fusion.dev/helix-icons` | 47,484 | 14,907 | 12,553 | The whole glyph set. |
 | `@fusion.dev/helix-theme` | 3,288 | 1,571 | 1,355 | The derivation engine. Build time for most consumers, runtime for a theme switcher. |
-| `@fusion.dev/helix` | 961,583 | 218,357 | 160,125 | Every styled family. |
+| `@fusion.dev/helix` | 961,770 | 218,408 | 160,100 | Every styled family. |
 | `lit` | 15,394 | 6,118 | 5,460 | Not ours. Here so it can be subtracted from every row above it. |
 
 ## The stylesheets
@@ -85,9 +85,9 @@ is the whole cost of adopting the base layer on its own.
 
 **Most of a first component is the runtime under it.** The median styled family is 13,974 bytes gzipped alone and adds 2,403 to a page that already has Helix on it, so 83 percent of the first one is shared and 17 percent is the component. Ten typical components are one plus nine additions rather than ten of the first number, and the pair of columns below is what lets that be worked out rather than guessed.
 
-Across the tier: the cheapest is `code` at 9,065 gzipped alone, the dearest `data-table` at 51,676, over 93 components. Every family at once is 218,357.
+Across the tier: the cheapest is `code` at 9,065 gzipped alone, the dearest `data-table` at 51,725, over 93 components. Every family at once is 218,408.
 
-**No family imports a barrel, and the `barrels` rule in `fusion workspace` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 133,011 bytes gzipped whatever else the page does, which is 10 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
+**No family imports a barrel, and the `barrels` rule in `fusion workspace` is what keeps it that way.** `@fusion.dev/helix-headless` is `sideEffects` over every module in `dist`, which is true of a file that calls `customElements.define` and which means a bundler may drop none of it: one `import { HelixHeadlessButton } from '@fusion.dev/helix-headless'` costs 133,055 bytes gzipped whatever else the page does, which is 10 times the median family measured above. The styled tier imports the family it extends instead, all 93 of them, and the check refuses the shape rather than the package name, so the rule follows `sideEffects` wherever it goes.
 
 The headless tier never had the problem, and it is the control: `@fusion.dev/helix-core` is `sideEffects: false`, and a headless family is a median of 16,187 bytes gzipped alone.
 
@@ -205,7 +205,7 @@ Structure, accessibility, state and form participation. No presentation, and no 
 | `combobox` | 127,355 | 41,056 | 34,608 | 20,353 | 5,500 | 4,176 |
 | `command` | 100,696 | 32,041 | 26,374 | 17,343 | 4,915 | 3,760 |
 | `copy-button` | 112,372 | 37,654 | 31,723 | 11,469 | 3,384 | 2,465 |
-| `data-table` | 149,745 | 47,338 | 39,998 | 39,471 | 10,495 | 8,400 |
+| `data-table` | 149,932 | 47,383 | 39,965 | 39,658 | 10,542 | 8,469 |
 | `date-input` | 124,144 | 40,441 | 34,068 | 19,388 | 5,366 | 4,143 |
 | `date-picker` | 85,626 | 28,231 | 23,302 | 9,805 | 3,130 | 2,270 |
 | `dialog` | 30,484 | 10,235 | 9,019 | 2,717 | 1,106 | 620 |
@@ -301,7 +301,7 @@ The headless tier plus presentation. This is what `bun add @fusion.dev/helix` gi
 | `combobox` | 140,973 | 43,542 | 36,718 | 33,950 | 7,936 | 6,297 |
 | `command` | 111,005 | 34,045 | 28,055 | 27,637 | 6,894 | 5,413 |
 | `copy-button` | 122,914 | 39,510 | 33,293 | 21,993 | 5,137 | 3,964 |
-| `data-table` | 178,145 | 51,676 | 43,655 | 67,851 | 14,895 | 12,217 |
+| `data-table` | 178,332 | 51,725 | 43,768 | 68,038 | 14,944 | 12,167 |
 | `date-input` | 138,992 | 43,265 | 36,574 | 34,214 | 8,151 | 6,647 |
 | `date-picker` | 91,241 | 29,414 | 24,351 | 15,402 | 4,293 | 3,332 |
 | `dialog` | 34,819 | 11,243 | 9,909 | 7,037 | 2,127 | 1,642 |
@@ -382,11 +382,11 @@ column is what was removed rather than part of what remains.
 | Package | Unpacked | Files | Source maps stripped | Runtime dependencies |
 |---|---|---|---|---|
 | `@fusion.dev/helix-core` | 679,080 | 115 | 161,519 | `@floating-ui/dom`, `@fusion.dev/helix-icons` |
-| `@fusion.dev/helix-headless` | 8,395,085 | 422 | 703,509 | `@fusion.dev/helix-core`, `@fusion.dev/helix-icons`, `uqr` |
+| `@fusion.dev/helix-headless` | 8,396,649 | 422 | 703,895 | `@fusion.dev/helix-core`, `@fusion.dev/helix-icons`, `uqr` |
 | `@fusion.dev/helix-icons` | 65,943 | 11 | 20,928 | none |
 | `@fusion.dev/helix-styles` | 90,338 | 6 | 0 | none |
 | `@fusion.dev/helix-theme` | 461,551 | 8 | 4,699 | none |
-| `@fusion.dev/helix` | 9,313,527 | 716 | 278,117 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
+| `@fusion.dev/helix` | 9,314,715 | 716 | 278,117 | `@fusion.dev/helix-core`, `@fusion.dev/helix-headless`, `@fusion.dev/helix-styles` |
 
 ## Not measured yet
 
