@@ -49,9 +49,23 @@ gh api "repos/$REPO/contents/fusion/scripts/bump.mjs?ref=$BASE_SHA" \
 # NUL between whole messages rather than between lines. Split per line, a
 # `BREAKING CHANGE:` trailer becomes its own record, parses as no subject, and
 # the major it asks for is dropped.
+# **Which domains are still in their 0 phase**, where a breaking change is a
+# minor rather than a 1.0.0 this project has not decided to spend. Read off the
+# release tags, the same source `resolve-intent.sh` uses on merge, and by the
+# highest major rather than the last tag: refs come back in alphabetical order,
+# where `v9` sits after `v10`.
+zero=''
+for domain in helix cortex; do
+  major=$(gh api "repos/$REPO/git/matching-refs/tags/$domain-v" \
+    --jq "[.[].ref | sub(\"^refs/tags/$domain-v\"; \"\") | split(\".\")[0] | tonumber?] | max // 0")
+  if [ "$major" = '0' ]; then
+    zero="${zero:+$zero,}$domain"
+  fi
+done
+
 resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate --slurp \
   | jq -j '.[][].commit.message + "\u0000"' \
-  | node /tmp/bump.mjs --stdin)
+  | node /tmp/bump.mjs --stdin ${zero:+--zero "$zero"})
 
 majors=$(jq -r '[.[] | select(.level == "major") | .domain] | join("`, `")' <<<"$resolved")
 
@@ -66,13 +80,10 @@ report=$(
   if [ -n "$majors" ]; then
     echo
     echo "> [!WARNING]"
-    echo "> **A major is being asked for on \`$majors\`.** A \`!\` in a subject or a"
-    echo "> \`BREAKING CHANGE:\` trailer is what asks for it."
-    echo ">"
-    echo "> While the major is 0 this does not release: \`version.mjs\` refuses to"
-    echo "> allocate 1.0.0 without \`--allow-major\`, so the release job fails and"
-    echo "> keeps failing until the subject is reworded. A breaking change raises"
-    echo "> the minor at 0.x, which is what semver says about a zero major."
+    echo "> **Breaking.** Merging releases a new major of \`$majors\`, so every"
+    echo "> consumer takes the break on its next upgrade. A \`!\` in a subject or a"
+    echo "> \`BREAKING CHANGE:\` trailer is what asks for this; drop it if that is not"
+    echo "> the intent."
   fi
 )
 

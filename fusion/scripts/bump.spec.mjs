@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { resolve } from './bump.mjs'
+
+/* From this file rather than the working directory: `turbo run test` runs each
+   package in its own, and the repository root is what this reads from. */
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
 /* What releases is a policy nothing asserted, and it drifted: `docs` was absent
    from the level table while `@fusion.dev/helix-docs` published its `content`
@@ -80,10 +86,35 @@ describe("the release's own commit", () => {
      Read out of the workflow rather than copied here, so re-scoping the commit
      fails this rather than starting the loop again. */
   test('the stamp commit releases nothing', () => {
-    const workflow = readFileSync('.github/workflows/release.yml', 'utf8')
-    const [, subject] = workflow.match(/git commit -q -m "([^"]+)"/) ?? []
+    /* The stamp moved out of `release.yml` into this script and the assertion
+       stayed pointed at the workflow, where it matched nothing and read
+       `undefined`. Nothing ran it either: this package had no `test` script, so
+       `turbo run test` never reached the file. Both are fixed here. */
+    const script = readFileSync(join(ROOT, '.github/scripts/stamp-manifests.sh'), 'utf8')
+    const [, subject] = script.match(/git commit -q -m "([^"]+)"/) ?? []
     expect(subject).toBeDefined()
     const written = subject.replaceAll('$DOMAIN', 'helix').replaceAll('$VERSION', '1.2.3')
     expect(resolve([written])).toEqual([])
+  })
+})
+
+describe('a domain in its 0 phase', () => {
+  const breaking = 'feat(helix/button)!: a width floor is a hook, not an axis'
+
+  test('raises the minor for a breaking change', () => {
+    expect(resolve([breaking], new Set(['helix']))).toEqual([{ domain: 'helix', level: 'minor' }])
+  })
+
+  test('is named, and does not answer for another domain', () => {
+    expect(resolve([breaking], new Set(['cortex']))).toEqual([{ domain: 'helix', level: 'major' }])
+  })
+
+  test('leaves the major alone once the domain has one', () => {
+    expect(resolve([breaking])).toEqual([{ domain: 'helix', level: 'major' }])
+  })
+
+  test('does not lift anything that was below a major', () => {
+    const patch = 'fix(helix/orb): read the color the engine gives'
+    expect(resolve([patch], new Set(['helix']))).toEqual([{ domain: 'helix', level: 'patch' }])
   })
 })

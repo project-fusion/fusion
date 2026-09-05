@@ -17,10 +17,23 @@
  * **A `!` outranks the type**, and so does a `BREAKING CHANGE:` trailer, which
  * is why the body is read and not only the subject.
  *
+ * **A domain in its 0 phase raises the minor for a breaking change**, which is
+ * what semver says about a zero major and what `version.mjs` says when it
+ * refuses to allocate 1.0.0 without `--allow-major`. That refusal is a backstop
+ * and was doing the work: a `!` merged at 0.x failed the release job and went on
+ * failing it on every later merge, because the subject stays in the window until
+ * something releases. Deciding it here instead means the pull request comment,
+ * the experimental stamp and the release matrix all say the same number.
+ *
+ * The caller names those domains, because this file is given commit messages and
+ * nothing else: it runs from `/tmp` under `pull_request_target`, where reading a
+ * manifest or a tag is not available to it.
+ *
  * Usage:
  *
  *   node fusion/scripts/bump.mjs <range>     # `a..b`, as git takes it
  *   node fusion/scripts/bump.mjs --stdin     # messages, NUL separated
+ *   node fusion/scripts/bump.mjs <range> --zero helix,cortex
  *
  * **The stdin form exists for `release-intent`**, which runs as
  * `pull_request_target` with no checkout on purpose: it has a writable token
@@ -94,8 +107,14 @@ export function bumpOf(message) {
   return level ? { domain, level } : undefined
 }
 
-/** The highest bump each domain asks for across many commits. */
-export function resolve(messages) {
+/**
+ * The highest bump each domain asks for across many commits.
+ *
+ * `zero` names the domains whose major is still 0, where a breaking change is a
+ * minor. A subject still asks for what it asks for: `bumpOf` reports the major,
+ * and the project's phase decides what number that comes to.
+ */
+export function resolve(messages, zero = new Set()) {
   const highest = new Map()
   for (const message of messages) {
     const asked = bumpOf(message)
@@ -109,12 +128,19 @@ export function resolve(messages) {
   }
   return DOMAINS.filter((one) => highest.has(one)).map((domain) => ({
     domain,
-    level: highest.get(domain),
+    level: highest.get(domain) === 'major' && zero.has(domain) ? 'minor' : highest.get(domain),
   }))
 }
 
 if (import.meta.main) {
-  const argument = process.argv[2]
+  const argv = process.argv.slice(2)
+  const at = argv.indexOf('--zero')
+  /* Taken out before the range is read, so `--zero` can sit on either side. */
+  const zero = new Set(at === -1 ? [] : (argv[at + 1] ?? '').split(',').filter(Boolean))
+  if (at !== -1) {
+    argv.splice(at, 2)
+  }
+  const argument = argv[0]
   if (!argument) {
     console.error('bump: a git range is required, as `a..b`, or `--stdin`.')
     process.exit(1)
@@ -133,5 +159,5 @@ if (import.meta.main) {
     .split('\0')
     .map((one) => one.trim())
     .filter(Boolean)
-  console.log(JSON.stringify(resolve(messages)))
+  console.log(JSON.stringify(resolve(messages, zero)))
 }

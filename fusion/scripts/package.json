@@ -25,5 +25,8 @@
     "build-eval": "./build-eval.mjs",
     "build-metrics": "./build-metrics.mjs",
     "build-styles": "./build-styles.mjs"
+  },
+  "scripts": {
+    "test": "bun test"
   }
 }
