@@ -66,24 +66,17 @@ report=$(
   if [ -n "$majors" ]; then
     echo
     echo "> [!WARNING]"
-    echo "> **Breaking.** Merging releases a new major of \`$majors\`, so every"
-    echo "> consumer takes the break on its next upgrade. A \`!\` in a subject or a"
-    echo "> \`BREAKING CHANGE:\` trailer is what asks for this; drop it if that is not"
-    echo "> the intent."
+    echo "> **A major is being asked for on \`$majors\`.** A \`!\` in a subject or a"
+    echo "> \`BREAKING CHANGE:\` trailer is what asks for it."
+    echo ">"
+    echo "> While the major is 0 this does not release: \`version.mjs\` refuses to"
+    echo "> allocate 1.0.0 without \`--allow-major\`, so the release job fails and"
+    echo "> keeps failing until the subject is reworded. A breaking change raises"
+    echo "> the minor at 0.x, which is what semver says about a zero major."
   fi
 )
 
 printf '%s\n' "$report" >> "$GITHUB_STEP_SUMMARY"
-
-# **A label, because the summary is a page nobody opens.** It reads at a glance
-# in the pull request list and in the merge queue, which a step summary does not.
-if [ -n "$majors" ]; then
-  gh label create breaking --repo "$REPO" --color b60205 \
-    --description 'Merging releases a new major' --force >/dev/null 2>&1 || true
-  gh pr edit "$NUMBER" --repo "$REPO" --add-label breaking >/dev/null
-else
-  gh pr edit "$NUMBER" --repo "$REPO" --remove-label breaking >/dev/null 2>&1 || true
-fi
 
 # **Upserted on a marker rather than appended**, so a force-push rewrites the
 # one comment instead of stacking another beneath it. Created only when
