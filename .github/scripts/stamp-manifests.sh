@@ -9,9 +9,30 @@
 # the commit in the window for the next one. Unscoped, the domain is empty and
 # `bump.mjs` releases nothing. `bump.spec.mjs` reads this line and asserts it.
 #
-# **Rebased rather than forced.** Another merge may have landed while this
-# release was building, and a release must never be the thing that loses
-# somebody's commit.
+# **Re-derived on top of `main`, never rebased onto it.** Another merge may have
+# landed while this release was building, and a release must never be the thing
+# that loses somebody's commit. Rebasing a stamp does lose things: two releases
+# write different numbers to the same line of the same manifests, and there is no
+# reconciliation for that. Measured on 6 Sep 2026, three merges inside a minute
+# published `0.10.1` and `0.10.2`, and the second stamp died with `could not
+# apply ... chore: stamp helix 0.10.2`. Everything before it had succeeded, which
+# is the shape that teaches people to stop reading release runs.
+#
+# A stamp is idempotent: it says the manifests read `$VERSION`. So it starts from
+# whatever `main` holds now and says it again, rather than replaying a diff taken
+# against a base that predates somebody else's stamp. Replaying is also how a
+# rebase would carry an older lockfile over a dependency change that landed while
+# this was building.
+#
+# **`--allow-major` because the number is already spent.** `version.mjs` refuses
+# to allocate a `1.x` without it, which is the right guard when a version is being
+# chosen and nonsense here: this one is published, installed and promoted, and the
+# manifests are only being told about it.
+#
+# **The lockfile moves with the manifests.** `version.mjs` writes `package.json`
+# and nothing else; `bun.lock` carries the workspace versions too, and CI installs
+# `--frozen-lockfile`, so manifests stamped without it would fail every run after
+# this one.
 #
 # **The push has to be told to forget the runner's own credentials.**
 # `actions/checkout` runs with `persist-credentials: true`, and an
@@ -31,18 +52,33 @@ set -euo pipefail
 git config user.name "$APP_SLUG[bot]"
 git config user.email "$APP_ID+$APP_SLUG[bot]@users.noreply.github.com"
 
-git add -- '**/package.json' bun.lock
-if git diff --cached --quiet; then
-  echo "Nothing to stamp: the manifests already read $VERSION." >> "$GITHUB_STEP_SUMMARY"
-  exit 0
-fi
+git remote set-url origin "https://x-access-token:$APP_TOKEN@github.com/$REPOSITORY.git"
 
-git commit -q -m "chore: stamp $DOMAIN $VERSION into the manifests [skip ci]" -m \
-  "Written by \`release.yml\` after $DOMAIN-v$VERSION published, installed from the
+for attempt in 1 2 3; do
+  git fetch -q origin main
+  git reset -q --hard origin/main
+
+  bun fusion/scripts/version.mjs \
+    --domain "$DOMAIN" --set "$VERSION" --allow-major --write
+  bun install >/dev/null
+
+  git add -- '**/package.json' bun.lock
+  if git diff --cached --quiet; then
+    echo "Nothing to stamp: the manifests already read $VERSION." >> "$GITHUB_STEP_SUMMARY"
+    exit 0
+  fi
+
+  git commit -q -m "chore: stamp $DOMAIN $VERSION into the manifests [skip ci]" -m \
+    "Written by \`release.yml\` after $DOMAIN-v$VERSION published, installed from the
 registry and promoted to \`latest\`. The tag is still the record; this is the
 manifests agreeing with it."
 
-git remote set-url origin "https://x-access-token:$APP_TOKEN@github.com/$REPOSITORY.git"
-git fetch -q origin main
-git rebase -q origin/main
-git -c http.https://github.com/.extraheader= push origin HEAD:main
+  if git -c http.https://github.com/.extraheader= push -q origin HEAD:main; then
+    exit 0
+  fi
+
+  echo "\`main\` moved while stamping $VERSION; taking it again." >> "$GITHUB_STEP_SUMMARY"
+done
+
+echo "::error::Could not stamp $DOMAIN $VERSION onto main: three attempts, each overtaken."
+exit 1
