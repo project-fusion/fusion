@@ -200,8 +200,17 @@
       "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
     },
 
+    // **`^build`, because the site's `dev` runs `catalog` and that reads a
+    // generated module.** `catalog` imports `@fusion.dev/helix-docs`'s registry,
+    // which imports `pages.generated.js`; nothing in the dev chain writes it and
+    // nothing tracks it any more. It was committed until the generated files
+    // stopped being, so this got away with having no dependencies at all, and
+    // `bun dev` failed on a clean tree with `Cannot find module
+    // './pages.generated.js'`. `typecheck` runs the same `catalog` and never saw
+    // it, having carried `^build` the whole time.
     "dev": {
       "cache": false,
+      "dependsOn": ["^build"],
       "persistent": true
     },
 
