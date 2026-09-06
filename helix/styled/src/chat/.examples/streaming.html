@@ -1,0 +1,88 @@
+<!-- @summary An answer arriving a word at a time, from the wait to the last one. -->
+<!-- @min 420 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-chat
+    class="streaming"
+    id="stream"
+    label="Assistant"
+  >
+    <strong slot="header">Assistant</strong>
+    <helix-chat-message
+      author="me"
+      state="sent"
+    >What went out in the last deploy?</helix-chat-message>
+    <helix-chat-message
+      author="them"
+      id="answer"
+      separation="plain"
+      state="streaming"
+    ></helix-chat-message>
+  </helix-chat>
+
+  <helix-button id="replay">Replay</helix-button>
+</helix-flex>
+
+<script type="module">
+  const answer = document.getElementById('answer')
+  const replay = document.getElementById('replay')
+
+  const WORDS =
+    'Three things. Button lost its width axis, the small dialog footer fits again, and nothing generated is tracked any more.'.split(
+      ' ',
+    )
+
+  /* The wait before the first word, and the gap between the rest. */
+  const FIRST = 620
+  const EACH = 55
+
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+  let timer = 0
+
+  /* **The finished answer is the resting state, and that is what the cameras
+     get.** `check:spec:visual` and the parity check both photograph these pages
+     with reduced motion forced, so an example that is mid-stream when the
+     shutter opens is a different picture every run. Settling here means the two
+     syntaxes agree and a baseline means something. */
+  const settle = () => {
+    clearTimeout(timer)
+    answer.textContent = WORDS.join(' ')
+    answer.setAttribute('state', 'sent')
+  }
+
+  const run = () => {
+    clearTimeout(timer)
+    if (still.matches) {
+      settle()
+      return
+    }
+    /* Empty and `streaming` is the wait: the component draws the typing
+       indicator off `[data-empty]`, so nothing here starts it. */
+    answer.textContent = ''
+    answer.setAttribute('state', 'streaming')
+    let at = 0
+    const next = () => {
+      /* **The indicator stops because the text arrived, not because it was
+         told to.** Appending the first word is the whole of it. */
+      answer.textContent = WORDS.slice(0, at + 1).join(' ')
+      at += 1
+      if (at < WORDS.length) {
+        timer = setTimeout(next, EACH)
+        return
+      }
+      answer.setAttribute('state', 'sent')
+    }
+    timer = setTimeout(next, FIRST)
+  }
+
+  replay.addEventListener('click', run)
+  still.addEventListener('change', run)
+  run()
+</script>
