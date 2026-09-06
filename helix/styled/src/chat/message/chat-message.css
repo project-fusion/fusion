@@ -210,10 +210,24 @@
   justify-content: flex-end;
 }
 
-/* The bubble takes the width of what is in it, up to the measure the body sets. */
+/* The bubble takes the width of what is in it, up to the measure the body sets.
+
+   **`min-inline-size: 0`, because `max-inline-size: 100%` cannot hold a grid
+   item on its own.** A grid item's automatic minimum size is its min-content
+   size and `min-width: auto` outranks `max-width`, so anything with a floor of
+   its own sets the width of the turn and the max is ignored. A table is the
+   case: six columns in a 380px viewport measured 548px of content inside a
+   300px turn inside a 332px conversation, none of which scrolls, so the table
+   was drawn outside the bubble with nothing able to reach it.
+
+   `overflow-x: auto` is for what is left: content that cannot shrink to the
+   measure, a long unbroken line or a wide image, scrolls inside the turn rather
+   than escaping it. */
 [part="content"] {
   inline-size: fit-content;
   max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow-x: auto;
 }
 
 /* **The wait before the first token, the one moment a transcript has nothing to
