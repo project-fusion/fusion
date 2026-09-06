@@ -1,0 +1,130 @@
+<!-- @summary An agent saying what it is doing, then saying it. -->
+<!-- @min 420 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-chat
+    class="agent"
+    id="agent"
+    label="Assistant"
+  >
+    <strong slot="header">Assistant</strong>
+    <helix-chat-message
+      author="me"
+      state="sent"
+    >What went out in the last deploy?</helix-chat-message>
+    <helix-chat-message
+      author="them"
+      id="reply"
+      separation="plain"
+      state="streaming"
+    ></helix-chat-message>
+
+    <helix-flex
+      align="center"
+      gap="xs"
+      slot="status"
+    >
+      <helix-orb
+        id="orb"
+        size="sm"
+        state="connecting"
+      ></helix-orb>
+      <span id="doing">Connecting</span>
+    </helix-flex>
+  </helix-chat>
+
+  <helix-button id="replay">Replay</helix-button>
+</helix-flex>
+
+<script type="module">
+  const orb = document.getElementById('orb')
+  const doing = document.getElementById('doing')
+  const reply = document.getElementById('reply')
+  const replay = document.getElementById('replay')
+
+  const WORDS =
+    'Three things. Button lost its width axis, the small dialog footer fits again, and nothing generated is tracked any more.'.split(
+      ' ',
+    )
+
+  /* What the agent is doing, and how long each takes. The orb carries one into
+     the next rather than cutting between them, which is the whole reason to
+     spend a canvas on this instead of swapping an icon. */
+  const RUN = [
+    ['connecting', 'Connecting', 700],
+    ['fetching', 'Reading the release', 1100],
+    ['thinking', 'Working out what changed', 1100],
+  ]
+
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+  let timer = 0
+
+  const say = (state, said) => {
+    orb.state = state
+    doing.textContent = said
+  }
+
+  /* **The finished answer is the resting state.** These pages are photographed
+     with reduced motion forced, so an example still mid-sentence when the
+     shutter opens is a different picture every run and two syntaxes that never
+     agree. */
+  const settle = () => {
+    clearTimeout(timer)
+    say('done', 'Done')
+    reply.textContent = WORDS.join(' ')
+    reply.setAttribute('state', 'sent')
+  }
+
+  const stream = () => {
+    let at = 0
+    const next = () => {
+      reply.textContent = WORDS.slice(0, at + 1).join(' ')
+      at += 1
+      if (at < WORDS.length) {
+        timer = setTimeout(next, 55)
+        return
+      }
+      say('done', 'Done')
+      reply.setAttribute('state', 'sent')
+    }
+    next()
+  }
+
+  const run = () => {
+    clearTimeout(timer)
+    if (still.matches) {
+      settle()
+      return
+    }
+    reply.textContent = ''
+    reply.setAttribute('state', 'streaming')
+    let step = 0
+    const advance = () => {
+      if (step === RUN.length) {
+        /* The orb keeps working while the words land: the message's own
+           indicator stops the moment text arrives, and the orb is answering a
+           different question — what the agent is doing, not whether this turn
+           is still empty. */
+        say('working', 'Writing')
+        stream()
+        return
+      }
+      const [state, said, held] = RUN[step]
+      say(state, said)
+      step += 1
+      timer = setTimeout(advance, held)
+    }
+    advance()
+  }
+
+  replay.addEventListener('click', run)
+  still.addEventListener('change', run)
+  run()
+</script>
