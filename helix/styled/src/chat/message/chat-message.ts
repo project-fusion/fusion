@@ -24,8 +24,10 @@ import { styles } from './chat-message.css.js'
  * @slot - What was said.
  * @slot actions - What can be done with it.
  * @slot avatar - Who said it.
+ * @slot indicator - The wait before the first token, in place of the three dots.
  *
  * @csspart content - What was said.
+ * @csspart indicator - The three dots, when nothing is slotted over them.
  * @csspart meta - The time and the state together.
  *
  * @cssproperty --chat-message-background-color - Fill behind a turn.

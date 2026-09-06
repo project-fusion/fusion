@@ -241,7 +241,22 @@
    30.3%` against three dots the same size. A percentage positions a layer in the
    space left after its own size, so the dot hops, which is what a typing
    indicator has always looked like. */
-:host([state="streaming"]) [part="content"][data-empty]::after {
+/* **The wait is the only time an indicator belongs in the bubble**, and it is
+   the slot rather than what is in it that is hidden, so a consumer's own
+   indicator comes and goes on the same condition the dots do. */
+[part="content"] slot[name="indicator"] {
+  display: none;
+}
+
+:host([state="streaming"]) [part="content"][data-empty] slot[name="indicator"] {
+  display: block;
+}
+
+/* **The dots are the slot's fallback, which is what makes this additive.** A
+   consumer who slots an orb replaces them by the ordinary rule of slots: no
+   attribute to set, no `:has()` to write, and nothing to keep in step. A
+   consumer who slots nothing is where this component started. */
+[part="indicator"] {
   animation: helix-chat-typing 1.2s infinite ease-in-out;
   background-image:
     radial-gradient(circle closest-side, currentColor 90%, transparent),
@@ -257,7 +272,6 @@
     20% 30%,
     20% 30%;
   block-size: 1lh;
-  content: "";
   display: block;
   inline-size: 1.75em;
   opacity: 0.7;
@@ -297,7 +311,7 @@
 
 /* Still three dots, and they stop moving. */
 @media (prefers-reduced-motion: reduce) {
-  :host([state="streaming"]) [part="content"][data-empty]::after {
+  [part="indicator"] {
     animation: none;
   }
 }
@@ -385,7 +399,7 @@
 
   /* A turn that was still arriving when the page was printed arrives as an empty
      bubble, and three dots on paper are three dots forever. */
-  :host([state="streaming"]) [part="content"][data-empty]::after {
+  [part="content"] slot[name="indicator"] {
     display: none;
   }
 }

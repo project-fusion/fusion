@@ -1,0 +1,29 @@
+<!-- @summary The wait, as it comes and as a consumer can replace it. -->
+<!-- @min 420 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-chat
+  class="indicator"
+  label="Assistant"
+>
+  <strong slot="header">Assistant</strong>
+
+  <helix-chat-message
+    author="them"
+    state="streaming"
+  ></helix-chat-message>
+
+  <helix-chat-message
+    author="them"
+    state="streaming"
+  >
+    <helix-orb
+      size="sm"
+      slot="indicator"
+      state="fetching"
+    ></helix-orb>
+  </helix-chat-message>
+</helix-chat>

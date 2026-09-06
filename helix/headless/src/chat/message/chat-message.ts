@@ -35,6 +35,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot - What was said.
  * @slot actions - What can be done with it: copy, retry, react.
  * @slot avatar - Who said it.
+ * @slot indicator - The wait before the first token. Falls back to the typing
+ * indicator, so slotting nothing is what this has always done.
  * @slot sources - What it was said from: citations, documents, a retrieved page.
  *
  * @event {HelixSendEvent} helix-send - Fired when the reader asks to send a failed message again, and cancelable.
@@ -43,6 +45,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart avatar - The leading slot's box.
  * @csspart body - What was said, and the line under it.
  * @csspart content - The consumer's own markup.
+ * @csspart indicator - The default wait, drawn only when nothing is slotted over it.
  * @csspart mark - The status glyph beside a failure.
  * @csspart message - The whole turn.
  * @csspart meta - The line under a turn: its time, its state, and its controls.
@@ -181,6 +184,19 @@ export class HelixHeadlessChatMessage extends HelixElement {
   }
 
   /**
+   * The wait, for a consumer who slots nothing.
+   *
+   * **The slot and its fallback together, in a seam of its own**, because the
+   * two answer different people: the slot lets a consumer put their own
+   * indicator in the bubble, and the method lets the tier above replace what
+   * they get when they do not, without reimplementing the template around it.
+   * Headless draws a box and paints nothing on it.
+   */
+  protected renderIndicator(): TemplateResult | typeof nothing {
+    return html`<slot name="indicator"><span part="indicator"></span></slot>`
+  }
+
+  /**
    * What has happened to it, in words, and the way back from a failure.
    *
    * A seam of its own, because the styled tier draws a failure as an icon and a
@@ -258,7 +274,10 @@ export class HelixHeadlessChatMessage extends HelixElement {
     return html`<div part="message">
       <span part="avatar"><slot name="avatar"></slot></span>
       <div part="body">
-        <div part="content"><slot @slotchange=${this.handleFill}></slot></div>
+        <div part="content">
+          <slot @slotchange=${this.handleFill}></slot>
+          ${this.renderIndicator()}
+        </div>
         <div part="sources"><slot name="sources" @slotchange=${this.handleFill}></slot></div>
         <span part="meta"
           >${this.renderTime()} ${this.renderState()}
