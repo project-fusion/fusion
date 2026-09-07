@@ -3,6 +3,7 @@ import {
   customElement,
   type HelixBeforeChangeEvent,
   HelixCreateEvent,
+  HelixFilterEvent,
   HelixFormElement,
   MixinControllerOpen,
   MixinControllerValue,
@@ -82,6 +83,7 @@ const isInsertion = (event: Event): boolean =>
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCreateEvent} helix-create - Fired when the reader asks for something the list does not hold, and cancelable.
+ * @event {HelixFilterEvent} helix-filter - Fired as the reader types, carrying the text the list is being narrowed to. Cancelable: refusing it leaves the list whole, and is how a consumer takes the filtering for themselves.
  * @event {Event} input - Announced once the value has moved.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
@@ -411,10 +413,26 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     event.stopPropagation()
     const typed = (event.target as HTMLInputElement).value
     this.typed = typed
+    /* **Announced from here rather than left to escape from the listbox
+       inside.** The narrowing was always reaching consumers, because
+       `requestFilter` dispatches a composed `helix-filter` and nothing stopped
+       it at this boundary the way `change` and `input` are stopped. It worked,
+       and it was wrong in the two ways an accident is: the element that fired
+       it was an implementation detail rather than the one the consumer holds,
+       and nothing on this element's page said the event existed, so a refactor
+       could have taken it away without anyone noticing it was load-bearing.
+
+       Cancelable, and the refusal is honored the same way it already was: a
+       consumer that refuses it leaves the list unnarrowed. Everything after
+       this runs either way, because refusing a narrowing is not refusing to
+       open, and that is the behavior refusing the listbox's own event had. */
+    const narrowing = new HelixFilterEvent({ value: typed })
     /* The list is narrowed before the completion is looked for, because the
        completion is the first thing still showing and that is not known until
        the filter has run. */
-    this.listbox?.requestFilter(typed)
+    if (this.dispatchEvent(narrowing)) {
+      this.listbox?.requestFilter(typed)
+    }
     this.suggestion = this.suggest && isInsertion(event) ? this.completionFor(typed) : ''
     if (!this.open) {
       this.requestOpen(true)
@@ -673,6 +691,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       .value=${this.value}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}
+      @helix-filter=${this.stopInner}
       @input=${this.stopInner}
     >
       <!-- The field's words are read off the options, and on the first

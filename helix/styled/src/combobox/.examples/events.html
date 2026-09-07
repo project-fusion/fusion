@@ -62,6 +62,9 @@
   language.addEventListener('toggle', (event) => {
     say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
   })
+  language.addEventListener('helix-filter', (event) => {
+    say('helix-filter', `narrowing to "${event.detail.value}" as the reader types, refusable`)
+  })
   language.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `proposing "${event.detail.value}", refusable`)
   })

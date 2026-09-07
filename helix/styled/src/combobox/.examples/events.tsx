@@ -29,6 +29,10 @@ export function Example() {
     say('toggle', `${event.oldState} to ${event.newState}, after the panel moved`)
   }
 
+  const narrowing = (event: CustomEvent<{ value: string }>) => {
+    say('helix-filter', `narrowing to "${event.detail.value}" as the reader types, refusable`)
+  }
+
   const proposed = (event: CustomEvent<{ value: string }>) => {
     say('helix-before-change', `proposing "${event.detail.value}", refusable`)
   }
@@ -59,6 +63,7 @@ export function Example() {
         onhelix-before-close={hiding}
         onhelix-before-open={showing}
         onhelix-create={made}
+        onhelix-filter={narrowing}
         onInput={moved}
         onToggle={panelMoved}
         placeholder="Search languages"
