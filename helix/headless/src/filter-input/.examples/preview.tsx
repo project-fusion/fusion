@@ -18,6 +18,20 @@ export function Example() {
         <span slot="prefix">Env</span>
         Staging
       </helix-headless-tag>
+      <helix-headless-tag
+        dismissible
+        slot="tags"
+      >
+        <span slot="prefix">Status</span>
+        Open
+      </helix-headless-tag>
+      <helix-headless-tag
+        dismissible
+        slot="tags"
+      >
+        <span slot="prefix">Area</span>
+        Billing
+      </helix-headless-tag>
     </helix-headless-filter-input>
   )
 }

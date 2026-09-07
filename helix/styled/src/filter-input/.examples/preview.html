@@ -1,4 +1,4 @@
-<!-- @summary A filter field, beside what it has already been narrowed by. -->
+<!-- @summary A filter field, grown to hold what has already narrowed the rows. -->
 <helix-filter-input
   label="Filter rows"
   placeholder="Add a filter"
@@ -16,5 +16,19 @@
   >
     <span slot="prefix">Env</span>
     Staging
+  </helix-tag>
+  <helix-tag
+    dismissible
+    slot="tags"
+  >
+    <span slot="prefix">Status</span>
+    Open
+  </helix-tag>
+  <helix-tag
+    dismissible
+    slot="tags"
+  >
+    <span slot="prefix">Area</span>
+    Billing
   </helix-tag>
 </helix-filter-input>
