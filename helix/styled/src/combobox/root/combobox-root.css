@@ -63,35 +63,9 @@
   translate: 0 -50%;
 }
 
-/* Not a box of its own: `display: contents` puts the tags directly into the
-   field's flex line, so they wrap among themselves and the input wraps with
-   them. A wrapper that laid them out itself would be a second flex context
-   that wraps internally and then sits beside the input as one unbreakable
-   block, which is how a row of eight tags ends up scrolling sideways out of a
-   field it was supposed to grow. */
-[part="tags"] {
-  display: contents;
-}
-
 [part="tag"] {
   flex: 0 0 auto;
   max-inline-size: 100%;
-}
-
-/* Beside the tags it counts, not at the far end of the row.
- *
- * A summary separated from what it summarizes by a text field is one the reader
- * has to work out. Pushed right it also sits against the caret and reads as
- * chrome, and the distance between the tags and their own count then changes as
- * the field is typed into. */
-[part="rest"] {
-  align-self: center;
-  color: var(--helix-color-foreground-subtle);
-  flex: 0 0 auto;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-medium);
-  white-space: nowrap;
 }
 
 /* Stripped rather than replaced, so the caret, the selection and the keyboard a

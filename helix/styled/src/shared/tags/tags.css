@@ -1,0 +1,47 @@
+/* The row a field draws around its tokens, styled once for the two fields that
+   have one. Compose with the component's own sheet, never instead of it.
+ *
+ * **This is the paint half of `MixinTokens`**, which shares the row's markup and
+ * its behavior and could share none of its look. Combobox and Filter Input are
+ * its only two hosts and can only ever be: the mixin's whole subject is a row of
+ * tokens inside a field, and a component without one does not take it.
+ *
+ * **What is here is what is genuinely the row, which is less than it looks.**
+ * Measured across the two sheets, eleven selectors were written in both and nine
+ * of them are the *field frame* — the border, the hover and focus rings, the
+ * invalid state, the disabled treatment, the control reset. Input and nine other
+ * families duplicate those too, so they are a separate question about a separate
+ * shared sheet and not this one. Two selectors are the row.
+ *
+ * **What stays with each component is what actually differs**, and pulling it in
+ * here would mean a mode: Combobox grows its field under `:has([part="tags"])`
+ * and Filter Input cannot, a slot not in the tree assigning nothing so the guard
+ * would never match; the tokens are `[part="tag"]` on one and the consumer's own
+ * slotted elements on the other; and each publishes its own name for the
+ * control's flex basis. */
+
+/* Not a box of its own: `display: contents` puts the tokens straight into the
+   field's flex line, so they wrap among themselves and the text field wraps with
+   them. A wrapper laying them out itself would be a second flex context that
+   wraps internally and then sits beside the input as one unbreakable block,
+   which is how a row of eight tokens ends up scrolling sideways out of a field
+   it was supposed to grow. */
+[part="tags"] {
+  display: contents;
+}
+
+/* Beside the tokens it counts, not at the far end of the row.
+ *
+ * A summary separated from what it summarizes by a text field is one the reader
+ * has to work out. Pushed right it also sits against whatever mark the field
+ * carries and reads as chrome, and the distance between the tokens and their own
+ * count then changes as the field is typed into. */
+[part="rest"] {
+  align-self: center;
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  white-space: nowrap;
+}
