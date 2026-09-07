@@ -24,20 +24,19 @@
       id="reply"
       separation="plain"
       state="streaming"
-    ></helix-chat-message>
-
-    <helix-flex
-      align="center"
-      gap="xs"
-      slot="status"
     >
       <helix-orb
         id="orb"
         size="sm"
+        slot="indicator"
         state="connecting"
       ></helix-orb>
-      <span id="doing">Connecting</span>
-    </helix-flex>
+    </helix-chat-message>
+
+    <span
+      id="doing"
+      slot="status"
+    >Connecting</span>
   </helix-chat>
 
   <helix-button id="replay">Replay</helix-button>
@@ -73,19 +72,25 @@
 
   /* **The finished answer is the resting state.** These pages are photographed
      with reduced motion forced, so an example still mid-sentence when the
-     shutter opens is a different picture every run and two syntaxes that never
-     agree. */
+     shutter opens is a different picture every run. */
   const settle = () => {
     clearTimeout(timer)
     say('done', 'Done')
     reply.textContent = WORDS.join(' ')
+    reply.append(orb)
     reply.setAttribute('state', 'sent')
   }
 
   const stream = () => {
     let at = 0
     const next = () => {
+      /* **The orb goes out as the first word lands, and the component is what
+         decides that.** It sits in the turn's `indicator` slot, which is shown
+         while the turn is streaming and empty and hidden the moment it is not,
+         so nothing here has to hide it: the text arriving is the signal, and it
+         is the same signal that used to stop the three dots. */
       reply.textContent = WORDS.slice(0, at + 1).join(' ')
+      reply.append(orb)
       at += 1
       if (at < WORDS.length) {
         timer = setTimeout(next, 55)
@@ -104,14 +109,11 @@
       return
     }
     reply.textContent = ''
+    reply.append(orb)
     reply.setAttribute('state', 'streaming')
     let step = 0
     const advance = () => {
       if (step === RUN.length) {
-        /* The orb keeps working while the words land: the message's own
-           indicator stops the moment text arrives, and the orb is answering a
-           different question — what the agent is doing, not whether this turn
-           is still empty. */
         say('working', 'Writing')
         stream()
         return

@@ -36,8 +36,7 @@ export function Example() {
 
     /* **The finished answer is the resting state.** These pages are
        photographed with reduced motion forced, so an example still mid-sentence
-       when the shutter opens is a different picture every run and two syntaxes
-       that never agree. */
+       when the shutter opens is a different picture every run. */
     const settle = () => {
       say('done', 'Done')
       setSaid(FINISHED)
@@ -47,6 +46,11 @@ export function Example() {
     const stream = () => {
       let at = 0
       const next = () => {
+        /* **The orb goes out as the first word lands, and the component is what
+           decides that.** It sits in the turn's `indicator` slot, which is shown
+           while the turn is streaming and empty and hidden the moment it is not,
+           so nothing here has to hide it: the text arriving is the signal, and
+           it is the same signal that used to stop the three dots. */
         at += 1
         setSaid(WORDS.slice(0, at).join(' '))
         if (at < WORDS.length) {
@@ -70,10 +74,6 @@ export function Example() {
       let step = 0
       const advance = () => {
         if (step === RUN.length) {
-          /* The orb keeps working while the words land: the message's own
-             indicator stops the moment text arrives, and the orb is answering a
-             different question — what the agent is doing, not whether this turn
-             is still empty. */
           say('working', 'Writing')
           stream()
           return
@@ -115,20 +115,15 @@ export function Example() {
           separation="plain"
           state={done ? 'sent' : 'streaming'}
         >
+          <helix-orb
+            size="sm"
+            slot="indicator"
+            state={state}
+          ></helix-orb>
           {said}
         </helix-chat-message>
 
-        <helix-flex
-          align="center"
-          gap="xs"
-          slot="status"
-        >
-          <helix-orb
-            size="sm"
-            state={state}
-          ></helix-orb>
-          <span>{doing}</span>
-        </helix-flex>
+        <span slot="status">{doing}</span>
       </helix-chat>
 
       <helix-button onClick={replay}>Replay</helix-button>
