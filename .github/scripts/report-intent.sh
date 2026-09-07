@@ -4,8 +4,50 @@
 # **The title is one of the subjects.** A squash merge of more than one commit
 # lands under the title, and that is the subject `main` then keeps.
 #
-# Reads: GH_TOKEN, NUMBER, REPO, BASE_SHA.
+# Reads: GH_TOKEN, NUMBER, REPO, BASE_SHA, HEAD_SHA.
 set -euo pipefail
+
+# **A head commit that suppresses its own checks, caught here because here is
+# the one place that survives it.** GitHub honors the skip markers anywhere in
+# the head commit's message, body included, for `push` and `pull_request`; this
+# workflow is `pull_request_target`, which it does not honor, so this is the
+# only check immune to the thing it is checking for. Hosting it in `verify`
+# would mean it never ran in exactly the case it exists for.
+#
+# **It is checked first because nothing after it means anything.** On 2 Sep 2026
+# a commit whose body explained that the marker is a hazard suppressed every
+# `verify` run on its own pull request: no run, no error, a required check that
+# never reported, and BLOCKED. Four re-triggers carried the same message and
+# failed identically, which reads as broken infrastructure rather than as the
+# diff, and cost an hour and two wrong hypotheses.
+head_message=$(gh api "repos/$REPO/commits/$HEAD_SHA" --jq '.commit.message')
+
+# The five GitHub honors, and the trailer beside them. The markers match
+# anywhere in the message, which is what makes a body dangerous; the trailer is
+# anchored to its own line, which is where git trailers live.
+skip_markers='\[skip ci\]|\[ci skip\]|\[no ci\]|\[skip actions\]|\[actions skip\]'
+if grep -qiE "$skip_markers" <<<"$head_message" ||
+  grep -qiE '^[[:space:]]*skip-checks:[[:space:]]*true[[:space:]]*$' <<<"$head_message"; then
+  found=$(grep -oiE "$skip_markers" <<<"$head_message" | head -1)
+  echo "::error::The head commit's message suppresses this pull request's own checks: ${found:-skip-checks trailer}"
+  {
+    echo "### This pull request's checks are being skipped by its own commit message"
+    echo
+    echo 'The head commit carries a marker GitHub reads as "skip this run", so'
+    echo '`verify` never started. A required check that never reports is not a'
+    echo 'failure anyone can see: the pull request simply sits at BLOCKED, which'
+    echo 'reads as broken infrastructure rather than as the diff.'
+    echo
+    echo 'Reword the head commit and force-push. **Writing about the marker is'
+    echo 'writing the marker**, so describe it rather than quoting it: that is'
+    echo 'exactly how this happened the first time.'
+    echo
+    echo 'This check lives in `release-intent` because that workflow runs on'
+    echo '`pull_request_target`, which the markers do not suppress. It is the'
+    echo 'only place the check can survive the thing it detects.'
+  } >> "$GITHUB_STEP_SUMMARY"
+  exit 1
+fi
 
 title=$(gh api "repos/$REPO/pulls/$NUMBER" --jq '.title')
 subjects=$(

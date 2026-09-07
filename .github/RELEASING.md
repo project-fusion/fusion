@@ -154,6 +154,22 @@ otherwise start `verify` on a commit whose entire content is nineteen version
 fields and a lockfile the runner just produced. This is the one commit on `main`
 that `verify` does not judge.
 
+**The same marker on a pull request is a hazard, and `release-intent` now fails
+on it.** The difference is who is writing and what is being suppressed: here it
+is one bot push whose content is known, and there it is a contributor's head
+commit suppressing the checks that were going to judge their own diff. GitHub
+honors the markers anywhere in the head commit's message, body included, so on
+2 Sep 2026 a commit whose body *explained* the hazard suppressed every `verify`
+run on its own pull request — no run, no error, a required check that never
+reported, and BLOCKED. Four re-triggers carried the same message and failed the
+same way, which reads as broken infrastructure rather than as the diff.
+
+The check has to live in `release-intent` and can live nowhere else: that
+workflow runs on `pull_request_target`, which the markers do not suppress, so it
+is the only one that survives the thing it detects. Writing about the marker is
+writing the marker, which is how this happened the first time, so describe it
+rather than quoting it.
+
 ## Tokens, and which step gets one
 
 **`analyze` is on the critical path of packing**, and only since the manifests

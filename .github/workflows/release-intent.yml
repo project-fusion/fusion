@@ -3,6 +3,13 @@
 # Fails on a subject that is not conventional, and checks the title as one
 # because a squash merge makes it one. The incident that produced this check is
 # in [RELEASING.md](../RELEASING.md).
+#
+# **It also carries the one check that cannot live in `verify`**, and the reason
+# is this workflow's event. GitHub reads the skip markers off the head commit
+# for `push` and `pull_request` and not for `pull_request_target`, so a check
+# hosted anywhere else is suppressed by the very message it exists to catch.
+# That is not hypothetical: it happened on 2 Sep 2026 and looked like broken
+# infrastructure for an hour.
 
 name: release-intent
 
@@ -49,4 +56,7 @@ jobs:
       - name: Read the bump off the commits
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          # The commit GitHub reads the skip markers off, which is what the
+          # first check in the script looks at.
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: .github/scripts/report-intent.sh
