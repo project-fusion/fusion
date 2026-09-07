@@ -25,18 +25,19 @@
       separation="plain"
       state="streaming"
     >
-      <helix-orb
-        id="orb"
-        size="sm"
+      <helix-flex
+        align="center"
+        gap="xs"
         slot="indicator"
-        state="connecting"
-      ></helix-orb>
+      >
+        <helix-orb
+          id="orb"
+          size="sm"
+          state="connecting"
+        ></helix-orb>
+        <span id="doing">Connecting</span>
+      </helix-flex>
     </helix-chat-message>
-
-    <span
-      id="doing"
-      slot="status"
-    >Connecting</span>
   </helix-chat>
 
   <helix-button id="replay">Replay</helix-button>
@@ -45,6 +46,9 @@
 <script type="module">
   const orb = document.getElementById('orb')
   const doing = document.getElementById('doing')
+  /* The whole indicator, because `textContent` below wipes the turn's children
+     and the orb is inside it. */
+  const waiting = orb.closest('[slot="indicator"]')
   const reply = document.getElementById('reply')
   const replay = document.getElementById('replay')
 
@@ -77,7 +81,7 @@
     clearTimeout(timer)
     say('done', 'Done')
     reply.textContent = WORDS.join(' ')
-    reply.append(orb)
+    reply.append(waiting)
     reply.setAttribute('state', 'sent')
   }
 
@@ -90,7 +94,7 @@
          so nothing here has to hide it: the text arriving is the signal, and it
          is the same signal that used to stop the three dots. */
       reply.textContent = WORDS.slice(0, at + 1).join(' ')
-      reply.append(orb)
+      reply.append(waiting)
       at += 1
       if (at < WORDS.length) {
         timer = setTimeout(next, 55)
@@ -109,7 +113,7 @@
       return
     }
     reply.textContent = ''
-    reply.append(orb)
+    reply.append(waiting)
     reply.setAttribute('state', 'streaming')
     let step = 0
     const advance = () => {

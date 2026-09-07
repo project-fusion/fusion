@@ -115,15 +115,19 @@ export function Example() {
           separation="plain"
           state={done ? 'sent' : 'streaming'}
         >
-          <helix-orb
-            size="sm"
+          <helix-flex
+            align="center"
+            gap="xs"
             slot="indicator"
-            state={state}
-          ></helix-orb>
+          >
+            <helix-orb
+              size="sm"
+              state={state}
+            ></helix-orb>
+            <span>{doing}</span>
+          </helix-flex>
           {said}
         </helix-chat-message>
-
-        <span slot="status">{doing}</span>
       </helix-chat>
 
       <helix-button onClick={replay}>Replay</helix-button>
