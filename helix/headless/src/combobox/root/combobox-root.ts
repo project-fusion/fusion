@@ -7,6 +7,7 @@ import {
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
+  MixinTokens,
   PopoverController,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
@@ -112,7 +113,7 @@ const isInsertion = (event: Event): boolean =>
  */
 @customElement('helix-headless-combobox')
 export class HelixHeadlessCombobox extends MixinControllerOpen(
-  MixinControllerValue(MixinField(HelixFormElement)),
+  MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -177,23 +178,6 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    */
   @property({ attribute: 'loading-text' })
   loadingText = 'Loading'
-
-  /**
-   * How many tags to draw before the rest become a count. `multiple` only.
-   *
-   * `0` is all of them, and is the default: a cap that guesses is worse than no
-   * cap, because the number that fits depends on the width of the field and the
-   * length of what is in it, neither of which this element knows. What a cap is
-   * genuinely for is a field in a row or a table cell, where a set of twelve
-   * choices would push everything below it down a line at a time.
-   *
-   * The remainder is counted rather than hidden. `+3` is a fact a reader can act
-   * on, where a row that silently stops is a field that appears to have lost
-   * what was put in it. Date Input and Time Input carry the same property and
-   * the same reasoning.
-   */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
 
   /**
    * Whether more than one option can be chosen.
@@ -486,20 +470,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       }
       return
     }
-    /* Backspace on an empty field takes the last tag off.
-     *
-     * Only when empty, so it never competes with deleting a character, and
-     * only the last, because that is the one the caret is against. This is the
-     * keyboard's version of pressing a tag's remove control, and without it a
-     * reader who chose four things with the keyboard has to reach for a pointer
-     * to undo one.
-     */
-    if (event.key === 'Backspace' && this.multiple && this.typed === '') {
-      const last = this.values.at(-1)
-      if (last !== undefined) {
-        event.preventDefault()
-        this.drop(last)
-      }
+    /* Backspace on an empty field takes the last tag off, which is the
+       keyboard's version of pressing a tag's remove control. The policy lives in
+       `MixinTokens` because a filter field wants the same one; what happens to
+       the token is this element's, through `removeLastToken` below. */
+    if (this.multiple && this.tokenKeydown(event, this.typed)) {
       return
     }
     /* Enter with nothing left in the list creates, where there is anything to
@@ -582,6 +557,20 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     this.renderRoot.querySelector<HTMLElement>('[part="control"]')?.focus()
     if (!this.open) {
       this.requestOpen(true)
+    }
+  }
+
+  /**
+   * The last chosen one goes, which is what Backspace on an empty field means.
+   *
+   * `MixinTokens` owns when this is asked for and this owns what it does: a
+   * token here is a chosen option, so it leaves by the same door a dismissed
+   * tag does.
+   */
+  protected override removeLastToken(): void {
+    const last = this.values.at(-1)
+    if (last !== undefined) {
+      this.drop(last)
     }
   }
 
@@ -739,14 +728,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         <slot name="start"></slot>
         ${
           this.multiple && this.chosen.length > 0
-            ? html`<span part="tags">
-                ${this.shown.map((option) => this.renderTag(option))}
-                ${
-                  this.restCount > 0
-                    ? html`<span part="rest">${`+${this.restCount}`}</span>`
-                    : nothing
-                }
-              </span>`
+            ? this.renderTokenRow(
+                this.shown.map((option) => this.renderTag(option)),
+                this.restCount,
+              )
             : nothing
         }
         <input

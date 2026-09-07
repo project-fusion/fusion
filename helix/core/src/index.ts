@@ -148,6 +148,7 @@ export {
   MixinDismissible,
 } from './mixins/mixin-dismissible/mixin-dismissible.js'
 export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin-field.js'
+export { MixinTokens, type MixinTokensInterface } from './mixins/mixin-tokens/mixin-tokens.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export { closeMarkdown } from './utils/close-markdown/close-markdown.js'
