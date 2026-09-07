@@ -1,7 +1,7 @@
 # The drawing system
 
 Bodies only: the `<svg>`, its shared shadow filter and the `aria-hidden` live
-in `index.tsx`, so they are stated once rather than ninety-four times.
+in `index.tsx`, so they are stated once rather than ninety-six times.
 
 One drawing per file under `art/`, named for the family it depicts.
 
@@ -25,7 +25,7 @@ The system, which every entry in every one of these files obeys:
 -*Every card sits on the same dot lattice**, drawn once in `index.tsx` at
   16 units, which is `space-md`. It shows through the sparse drawings and is
   covered by the dense ones, so the gallery reads as one measured field
-  rather than ninety-four unrelated pictures.
+  rather than ninety-six unrelated pictures.
 -*An edge has to earn its place.** `artEdge` is for a border the component
   actually has (a field, a key cap, a group's shared outline, an unchecked
   box) or for a plane that would otherwise have no silhouette at all. It is
@@ -37,6 +37,6 @@ The system, which every entry in every one of these files obeys:
   A node graph is not a Tree, and browser chrome is not an App Header.
 -*One motion archetype per card**, opted into by class, and **nothing moves
   at rest**. Skeleton and Spinner are the tempting exception, their motion
- being* the component; in a grid of ninety-four still cards two that move
+ being* the component; in a grid of ninety-six still cards two that move
   on their own read as the only two that are broken. Both are recognizable
   frozen, so both wait for hover like everything else.

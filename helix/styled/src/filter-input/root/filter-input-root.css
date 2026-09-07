@@ -1,0 +1,160 @@
+/* A column, so the label, the field and whatever is under it stack without any
+   of them needing a margin. Flex rather than grid, for the reason `Input`'s
+   sheet measures: a grid's auto column is floored at the min-content of a real
+   `<input>`, which is its default twenty-character width. */
+:host {
+  --_filter-input-size: var(--filter-input-size, var(--helix-size-control));
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+/* The box is the field, not the input.
+ *
+ * **It wraps unconditionally, where Combobox wraps only under
+ * `:has([part="tags"])`, and the difference is where the tokens come from.**
+ * Combobox renders its own, so it knows whether there are any; these are
+ * slotted, and a slot that is not in the tree is assigned nothing, so the row
+ * is always rendered and the guard would always match. There is nothing to
+ * guard anyway: a wrapping box with one line in it and `min-block-size` in
+ * place of a fixed one is the same box, and tokens are this field's resting
+ * state rather than an event in its life.
+ */
+[part="field"] {
+  align-items: center;
+  background-color: var(--filter-input-background-color, var(--helix-color-well));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-2xs);
+  min-block-size: var(--_filter-input-size);
+  /* Room above and below a token, which a fixed-height field does not need. */
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  transition:
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* `:host(:disabled)`, not `:host([disabled])`. */
+:host(:not(:disabled)) [part="field"]:hover {
+  border-color: var(--helix-color-primary);
+}
+
+/* On the box, because `delegatesFocus` puts focus on the input inside it and a
+   ring around that would sit within the frame rather than around it. */
+:host(:focus-within) [part="field"],
+:host(:focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-primary);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: 0;
+}
+
+/* Named, so hovering a field with an error in it does not put the gray border
+   back: unnamed this was (0,3,0) against hover's (0,4,0). */
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}
+
+/* Not a box of its own: `display: contents` puts the tokens straight into the
+   field's flex line, so they wrap among themselves and the text field wraps
+   with them. A wrapper laying them out itself would be a second flex context
+   that wraps internally and then sits beside the input as one unbreakable
+   block, which is how a row of eight tokens scrolls sideways out of a field it
+   was supposed to grow. */
+[part="tags"] {
+  display: contents;
+}
+
+/* The consumer's own elements, so this is all they are told: keep your size,
+   and do not run past the field. Anything else about them is theirs. */
+::slotted([slot="tags"]) {
+  flex: 0 0 auto;
+  max-inline-size: 100%;
+}
+
+/* Beside the tokens it counts, not at the far end of the row: a summary
+   separated from what it summarizes by a text field is one the reader has to
+   work out. */
+[part="rest"] {
+  align-self: center;
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  white-space: nowrap;
+}
+
+/* Stripped rather than replaced, so the caret, the selection and the keyboard a
+   phone chooses are all the platform's. `all: unset` takes `box-sizing` with
+   it, back to `content-box`, and the `border-box` every shadow root is given
+   comes from a rule this one outranks, so it is restored here.
+
+   The basis keeps the text usable once tokens share the line, and wraps it to
+   its own line rather than shrinking it to nothing when they fill one. */
+[part="control"] {
+  all: unset;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 var(--filter-input-control-size, 6ch);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+}
+
+/* Whatever is at either end keeps its size, so the text is what gives way when
+   the field is narrow. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  color: var(--helix-color-foreground-subtle);
+  flex: 0 0 auto;
+}
+
+[part="clear"] {
+  --icon-size: var(--helix-size-icon-tight);
+  all: unset;
+
+  align-items: center;
+  align-self: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="clear"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="clear"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host(:disabled) [part="field"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Print: a control prints the value it holds, and a state carried by a fill has
+   to survive, or the paper says the opposite of the truth. */
+@media print {
+  :host {
+    box-shadow: none;
+    print-color-adjust: exact;
+  }
+}

@@ -1,0 +1,18 @@
+export function Example() {
+  return (
+    <helix-filter-input
+      clearable
+      hint="The tokens stay: they are the consumer’s markup, and the button is the text’s"
+      label="Filter rows"
+      value="deploy"
+    >
+      <helix-tag
+        dismissible
+        slot="tags"
+      >
+        <span slot="prefix">Env</span>
+        Staging
+      </helix-tag>
+    </helix-filter-input>
+  )
+}

@@ -1,0 +1,56 @@
+<!-- @summary Backspace on an empty field asks the same way the close control does. -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-filter-input
+    hint="Type to narrow, or press Backspace on an empty field to take the last one off"
+    id="filter"
+    label="Filter rows"
+    placeholder="Add a filter"
+  >
+    <helix-tag
+      dismissible
+      slot="tags"
+    >design</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >infra</helix-tag>
+    <helix-tag
+      dismissible
+      slot="tags"
+    >docs</helix-tag>
+  </helix-filter-input>
+
+  <helix-button id="replay">Replay</helix-button>
+</helix-flex>
+
+<script type="module">
+  const filter = document.getElementById('filter')
+  const replay = document.getElementById('replay')
+
+  const START = ['design', 'infra', 'docs']
+
+  /* **The consumer removes the tag, because the consumer owns it.** The field
+     asks, whether the reader pressed the close control or Backspace, and both
+     arrive here as one `helix-dismiss`: nothing below knows which of the two it
+     was, which is the point of asking rather than taking. */
+  filter.addEventListener('helix-dismiss', (event) => {
+    event.target.remove()
+  })
+
+  const run = () => {
+    filter.replaceChildren(
+      ...START.map((label) => {
+        const tag = document.createElement('helix-tag')
+        tag.slot = 'tags'
+        tag.dismissible = true
+        tag.textContent = label
+        return tag
+      }),
+    )
+  }
+
+  replay.addEventListener('click', run)
+</script>
