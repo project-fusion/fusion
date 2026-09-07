@@ -30,6 +30,19 @@
   display: contents;
 }
 
+/* **Zeroed before the look below, not after it.** With `expandable` the count is
+   a `<button>` and arrives carrying the UA's border, background and font, and
+   those have to go before anything here is legible. `:where()` holds this at the
+   same weight as the rule under it, `(0,1,0)` rather than `(0,1,1)`, so source
+   order decides between them: written the obvious way, `all: unset` would
+   outrank every declaration that follows and the control would paint as nothing.
+   `box-sizing` is restored for the reason it is everywhere else here, `all`
+   having taken it back to `content-box`. */
+:where(button)[part="rest"] {
+  all: unset;
+  box-sizing: border-box;
+}
+
 /* Beside the tokens it counts, not at the far end of the row.
  *
  * A summary separated from what it summarizes by a text field is one the reader
@@ -44,4 +57,26 @@
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   white-space: nowrap;
+}
+
+/* A control says so, and says it the way the field's other marks do: the clear
+   button on Input and Filter Input carry the same pointer, the same hover and
+   the same ring, so a reader meets one affordance rather than three.
+
+   Only where it is a control. Without `expandable` the count is a `<span>`,
+   nothing here matches it, and a reader is not invited to press a word that
+   answers nothing. */
+button[part="rest"] {
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+button[part="rest"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+button[part="rest"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
 }

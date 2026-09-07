@@ -1,5 +1,5 @@
 import { html, nothing, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -28,6 +28,43 @@ export declare class MixinTokensInterface {
    * theirs rather than a fourth word for one idea.
    */
   maxTags: number
+
+  /**
+   * Whether the count is a control that shows the rest.
+   *
+   * **Off by default, and that is about focus rather than caution.** The count
+   * becomes a real button when this is set, which is a new stop in the tab
+   * order inside the field. Combobox's whole arrangement is that focus stays in
+   * the text while the arrows work the list, so a button appearing between the
+   * tags and the caret is a change to its keyboard model and not a detail. A
+   * host that wants it asks.
+   *
+   * Left off, the count stays the `<span>` it has always been: no tab stop, no
+   * behavior, and nothing a consumer is holding changes.
+   */
+  expandable: boolean
+
+  /**
+   * What the collapsed count is called, since `+3` names nothing.
+   */
+  expandLabel: string
+
+  /**
+   * What the control says once everything is showing.
+   *
+   * A word rather than a count, because there is no longer a number to give:
+   * expanded, nothing is hidden. It is the visible text and the accessible name
+   * together, which is why it is a phrase and not a glyph.
+   */
+  collapseLabel: string
+
+  /**
+   * The cap in force right now, which is none while the reader has expanded it.
+   *
+   * Hosts that slice their own tokens read this rather than `maxTags`, or
+   * expanding would hide the very tokens it was asked to show.
+   */
+  protected readonly shownLimit: number
 
   /**
    * The row, given what goes in it and how many did not fit.
@@ -95,18 +132,87 @@ export declare class MixinTokensInterface {
 export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
   class TokensElement extends Base {
     /**
+     * What the control says once everything is showing.
+     */
+    @property({ attribute: 'collapse-label' })
+    collapseLabel = 'Show fewer'
+
+    /**
+     * Whether the count is a control that shows the rest.
+     */
+    @property({ type: Boolean })
+    expandable = false
+
+    /**
+     * What the collapsed count is called, since `+3` names nothing.
+     */
+    @property({ attribute: 'expand-label' })
+    expandLabel = 'Show all'
+
+    /**
      * How many tokens to show before the rest become a count.
      */
     @property({ attribute: 'max-tags', type: Number })
     maxTags = 0
+
+    /**
+     * Whether the reader has asked for all of them.
+     *
+     * State and private, the way `Input`'s `revealed` is: it is a reader's
+     * momentary choice about what is on their own screen, it must not survive
+     * anything, and a consumer who wants the field opened is asking for
+     * `max-tags="0"` rather than for a second way to say it.
+     */
+    @state()
+    private expanded = false
+
+    protected get shownLimit(): number {
+      return this.expanded ? 0 : this.maxTags
+    }
+
+    /** Turns the cap off and on, which is all expanding is. */
+    private readonly toggleExpanded = (): void => {
+      this.expanded = !this.expanded
+    }
 
     protected renderTokenRow(content: unknown, over: number): TemplateResult | typeof nothing {
       /* `tags` and `rest`, which is what Combobox already published and what a
          consumer already styles through `::part`. A row that renamed them to
          match this mixin's own word would break every one of those for nothing:
          the vocabulary is the components', not this file's. */
-      return html`<span part="tags"
-        >${content}${over > 0 ? html`<span part="rest">${`+${over}`}</span>` : nothing}</span
+      return html`<span part="tags">${content}${this.renderRest(over)}</span>`
+    }
+
+    /**
+     * The count, as a control where the host asked for one and a word otherwise.
+     *
+     * **`part="rest"` either way**, so a consumer's `::part(rest)` keeps working
+     * across the change. The element under it is different, which is the point:
+     * a `<span>` that looks like an affordance and answers nothing is the fault
+     * this exists to fix, and the way to fix it is a real button rather than a
+     * click handler on text.
+     *
+     * **Expanded, it renders on no count.** `shownLimit` is zero while expanded,
+     * so `over` is zero too, and gating the control on the number would take
+     * away the only way back.
+     */
+    private renderRest(over: number): TemplateResult | typeof nothing {
+      if (!this.expandable) {
+        return over > 0 ? html`<span part="rest">${`+${over}`}</span>` : nothing
+      }
+      if (over < 1 && !this.expanded) {
+        return nothing
+      }
+      /* Named by a phrase rather than by `+3`, which says a number and not what
+         pressing it does. Expanded the visible words are the name, so nothing is
+         added over them. */
+      return html`<button
+        part="rest"
+        type="button"
+        aria-expanded=${this.expanded ? 'true' : 'false'}
+        aria-label=${this.expanded ? nothing : this.expandLabel}
+        @click=${this.toggleExpanded}
+        >${this.expanded ? this.collapseLabel : `+${over}`}</button
       >`
     }
 
@@ -115,10 +221,13 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
         return 0
       }
       const tokens = slot.assignedElements({ flatten: true })
+      /* The limit in force, not the property: expanded, the cap is off and every
+         token has to come back. */
+      const limit = this.shownLimit
       for (const [at, token] of tokens.entries()) {
-        token.toggleAttribute('hidden', this.maxTags > 0 && at >= this.maxTags)
+        token.toggleAttribute('hidden', limit > 0 && at >= limit)
       }
-      return this.maxTags > 0 ? Math.max(0, tokens.length - this.maxTags) : 0
+      return limit > 0 ? Math.max(0, tokens.length - limit) : 0
     }
 
     protected tokenKeydown(event: KeyboardEvent, typed: string): boolean {

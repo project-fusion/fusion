@@ -2,6 +2,7 @@ export function Example() {
   return (
     <helix-combobox
       default-value="apple,pear,plum,fig"
+      expandable
       label="Fruit"
       max-tags="2"
       multiple

@@ -105,7 +105,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-loading - Shown while the options are still on their way.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
- * @csspart rest - The count of choices held beyond `max-tags`.
+ * @csspart rest - The count of choices held beyond `max-tags`. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel.
  * @csspart tag - One chosen option.
  * @csspart tag-dismiss - The remove button, when `dismissible`.
@@ -375,7 +375,12 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /** The choices that get a tag, which is all of them until `maxTags` says not. */
   private get shown(): { text: string; value: string }[] {
     const held = this.chosen
-    return this.maxTags > 0 ? held.slice(0, this.maxTags) : held
+    /* `shownLimit` and not `maxTags`, which is the difference expanding makes:
+       the property is what the consumer asked for and the limit is what is in
+       force, and reading the first here would slice away the tags the reader
+       just pressed the count to see. */
+    const limit = this.shownLimit
+    return limit > 0 ? held.slice(0, limit) : held
   }
 
   /** How many are held beyond the ones shown. */

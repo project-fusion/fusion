@@ -61,7 +61,7 @@ const asksToGo = (node: Element | undefined): node is DismissibleToken =>
  * @csspart field - The box holding everything.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart label - The question, over the field.
- * @csspart rest - How many tokens did not fit.
+ * @csspart rest - How many tokens did not fit. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart tags - The row the tokens sit in.
  */
 @customElement('helix-headless-filter-input')
