@@ -118,7 +118,7 @@ const TIERS = [
 ]
 
 /**
- * The widths every family is pictured at, and why there are two.
+ * Every picture taken of a family: a width, and the mode it is taken in.
  *
  * **640 alone is neither a phone nor a desktop**, which makes a responsiveness
  * pass something done once rather than something that stays done. A library with
@@ -129,10 +129,24 @@ const TIERS = [
  * 390 is an iPhone's, and it is where the splitter keeps a horizontal
  * orientation and cuts its source pane to 237px. The suffix is empty at 640 so
  * those baselines keep the names they were committed under.
+ *
+ * **Dark is a third picture, and it exists because a whole mode was unwatched.**
+ * Every baseline here was light, so a component could be correct in the theme it
+ * was authored in and invisible in the other one with nothing to say so. Orb
+ * shipped exactly that: its palette is read off the canvas, the computed value
+ * comes back as `lab()` for tokens built through `oklab`, and the reader took
+ * the first three numbers for red, green and blue. In light the near dots are
+ * `lab(0 0 0)`, which scrapes to black and looks right; in dark it was a very
+ * dark red mixed toward black on a near-black ground. Nothing here could see it.
+ *
+ * One width rather than two, because the mode is the axis being covered and a
+ * fourth picture per family is a fourth thing to review for what the second
+ * width already says about layout.
  */
-const WIDTHS = [
-  { suffix: '', width: 640 },
-  { suffix: '.narrow', width: 390 },
+const SHOTS = [
+  { mode: 'light', suffix: '', width: 640 },
+  { mode: 'light', suffix: '.narrow', width: 390 },
+  { mode: 'dark', suffix: '.dark', width: 640 },
 ]
 
 /* Both halves of what `turbo run frame` writes, and both are required.
@@ -209,7 +223,7 @@ for (const tier of tiers) {
    the example links `styles.css` relatively, so both want a real origin. The
    page is assembled here rather than read from a file so nothing has to be
    written into the tree to take a picture of it. */
-const page = (tier, family, width) => {
+const page = (tier, family, width, mode) => {
   const html = readFileSync(join(tier.source, family, '.examples/preview.html'), 'utf8')
   return (
     '<!doctype html><meta charset="utf-8"><title>preview</title>' +
@@ -222,8 +236,26 @@ const page = (tier, family, width) => {
        test. `color-scheme` is declared because the base sheets resolve their
        grays through `light-dark()`, and the token layer resolves everything
        else through it. */
-    '<style>:root{color-scheme:light}' +
-    `body{margin:0;padding:24px;background:#fff;width:${width}px;box-sizing:border-box}</style>` +
+    /* **The mode is declared here and not emulated, because this declaration is
+       what wins.** `emulateMedia` sets the preference the page then overrides at
+       the same specificity, so asking the browser for dark and serving
+       `color-scheme: light` produced 182 pictures with a white ground, each one
+       the light rendering under a dark name. The ground is fixed in both modes
+       for the reason it was fixed in one: the page's own color is never the
+       thing under test, and `#000` is what `--helix-color-background` resolves
+       to in dark, measured as `oklch(0 0 0)`. */
+    `<style>:root{color-scheme:${mode}}` +
+    `body{margin:0;padding:24px;background:${mode === 'dark' ? '#000' : '#fff'};` +
+    /* **The ink is declared as well as the ground, because the headless tier
+       has no color of its own.** That tier links no stylesheet, so its text took
+       whatever the user agent defaults to, and `color-scheme: dark` changing
+       that default is a browser behavior rather than a guarantee: headless
+       Chromium on Linux kept it black, so the first dark retake wrote 8 pictures
+       that were a single color and 21 that had lost most of their ink. Black on
+       black is not a component being invisible in dark, it is the harness
+       failing to say what ink is. */
+    `color:${mode === 'dark' ? '#fff' : '#000'};` +
+    `width:${width}px;box-sizing:border-box}</style>` +
     /* `defer`, which is what `frame.html` ships and is not a detail.
 
        Loaded eagerly the bundle runs mid-parse, so an element upgrades the
@@ -288,9 +320,10 @@ const server = createServer((request, response) => {
   /* The width rides in the query rather than in a module variable the loop
      sets, so a request is answered by what it asked for and two widths could
      be fetched in any order without the page depending on when it was asked. */
-  const width =
-    Number(new URL(request.url ?? '/', 'http://x').searchParams.get('w')) || WIDTHS[0].width
-  response.end(page(tier, family, width))
+  const asked = new URL(request.url ?? '/', 'http://x').searchParams
+  const width = Number(asked.get('w')) || SHOTS[0].width
+  const mode = asked.get('m') === 'dark' ? 'dark' : 'light'
+  response.end(page(tier, family, width, mode))
 })
 
 await new Promise((done) => server.listen(0, '127.0.0.1', done))
@@ -320,7 +353,7 @@ const browser = await chromium.launch()
    run. */
 const tab = await browser.newPage({
   reducedMotion: 'reduce',
-  viewport: { height: 800, width: WIDTHS[0].width },
+  viewport: { height: 800, width: SHOTS[0].width },
 })
 
 /* Nothing leaves this machine, and that is a correctness rule rather than a
@@ -353,12 +386,14 @@ const written = []
 const held = []
 const compared = new Map(TIERS.map((tier) => [tier.name, 0]))
 
-for (const { suffix, width } of WIDTHS) {
+for (const { mode, suffix, width } of SHOTS) {
   await tab.setViewportSize({ height: 800, width })
 
   for (const tier of tiers) {
     for (const family of tier.families) {
-      await tab.goto(`${origin}/${tier.name}/${family}/?w=${width}`, { waitUntil: 'load' })
+      await tab.goto(`${origin}/${tier.name}/${family}/?w=${width}&m=${mode}`, {
+        waitUntil: 'load',
+      })
       /* The tags upgrade when the bundle runs, and a component may render again
          after that: Lit batches, so the first paint can be the pre-update one.
          Waiting on the definition and then on the frame after it is what the spec

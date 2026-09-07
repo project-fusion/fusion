@@ -548,13 +548,15 @@ jobs:
       # pixel count and no way to see what moved. `if-no-files-found: ignore`
       # because only the visual shard ever writes one.
       #
-      # **Four globs, and it was one for longer than it was correct.** A diff
-      # lands beside the baseline it belongs to, so the tier decides the package
-      # and the width decides the name: `preview.diff.png` at 640 and
-      # `preview.narrow.diff.png` at 390. Naming only the wide headless one
-      # collected a quarter of what a failing run can write, and silently, since
-      # `if-no-files-found: ignore` is exactly the setting that cannot say a
-      # glob matched nothing.
+      # **One glob per tier rather than one per picture, because the enumeration
+      # rotted twice.** A diff lands beside the baseline it belongs to, so the
+      # tier decides the package and the shot decides the name: `preview.diff.png`
+      # at 640, `preview.narrow.diff.png` at 390, `preview.dark.diff.png` in the
+      # other mode. Naming only the wide headless one collected a quarter of what
+      # a failing run can write; naming four of them collected two thirds the day
+      # a third shot was added. Silently both times, since `if-no-files-found:
+      # ignore` is exactly the setting that cannot say a glob matched nothing.
+      # `preview*.diff.png` is every one of them, including the next.
       - name: Upload the visual diffs
         if: failure()
         uses: actions/upload-artifact@v7
@@ -562,10 +564,8 @@ jobs:
           if-no-files-found: ignore
           name: visual-diffs-${{ matrix.task }}
           path: |
-            helix/headless/src/*/.examples/preview.diff.png
-            helix/headless/src/*/.examples/preview.narrow.diff.png
-            helix/styled/src/*/.examples/preview.diff.png
-            helix/styled/src/*/.examples/preview.narrow.diff.png
+            helix/headless/src/*/.examples/preview*.diff.png
+            helix/styled/src/*/.examples/preview*.diff.png
             helix/headless/src/*/.examples/*.parity.png
             helix/styled/src/*/.examples/*.parity.png
 
