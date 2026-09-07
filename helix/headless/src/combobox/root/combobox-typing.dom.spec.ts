@@ -52,7 +52,12 @@ describe('combobox typing, as a consumer sees it', () => {
 
     await type(combobox, 'ru')
 
-    expect(targets).toEqual([combobox])
+    /* Counted, then compared by identity. `toEqual` on a list holding a DOM node
+       walks a graph with cycles in it the moment it stops matching, which is the
+       `hazards` rule and is not theoretical: an earlier version of this
+       assertion printed 1.3MB before failing. */
+    expect(targets).toHaveLength(1)
+    expect(targets[0]).toBe(combobox)
   })
 
   test('once per keystroke, the inner one stopped at the boundary', async () => {
