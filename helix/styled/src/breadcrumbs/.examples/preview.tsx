@@ -4,7 +4,7 @@ export function Example() {
       <helix-breadcrumb>
         <a
           data-link="quiet"
-          href="/"
+          href="#home"
         >
           Home
         </a>
@@ -12,7 +12,7 @@ export function Example() {
       <helix-breadcrumb>
         <a
           data-link="quiet"
-          href="/section"
+          href="#section"
         >
           Section
         </a>

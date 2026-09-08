@@ -8,13 +8,13 @@ export function Example() {
         Open
       </helix-button>
       <helix-menu-item
-        href="/design/components/button"
+        href="#button"
         value="button"
       >
         Button
       </helix-menu-item>
       <helix-menu-item
-        href="/design/components/menu"
+        href="#menu"
         value="menu"
       >
         Menu

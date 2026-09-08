@@ -17,7 +17,7 @@ export function Example() {
       </helix-flex>
 
       <helix-flex
-        className="width-floor"
+        className="standard"
         gap="sm"
       >
         <helix-button
@@ -30,7 +30,7 @@ export function Example() {
       </helix-flex>
 
       <helix-flex
-        className="width-floor"
+        className="standard"
         gap="sm"
       >
         <helix-button

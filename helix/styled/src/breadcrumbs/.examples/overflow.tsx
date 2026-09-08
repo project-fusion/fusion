@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-breadcrumbs aria-label="Breadcrumb">
-      <helix-breadcrumb href="/">Home</helix-breadcrumb>
+      <helix-breadcrumb href="#home">Home</helix-breadcrumb>
 
       <helix-breadcrumb>
         <helix-menu label="Hidden steps">
@@ -12,9 +12,9 @@ export function Example() {
           >
             <helix-icon name="dots-three"></helix-icon>
           </helix-icon-button>
-          <helix-menu-item href="/design">Design</helix-menu-item>
-          <helix-menu-item href="/design/components">Components</helix-menu-item>
-          <helix-menu-item href="/design/components/navigation">Navigation</helix-menu-item>
+          <helix-menu-item href="#design">Design</helix-menu-item>
+          <helix-menu-item href="#components">Components</helix-menu-item>
+          <helix-menu-item href="#navigation">Navigation</helix-menu-item>
         </helix-menu>
       </helix-breadcrumb>
 

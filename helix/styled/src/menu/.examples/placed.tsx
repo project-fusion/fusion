@@ -7,13 +7,13 @@ export function Example() {
       <helix-button slot="trigger">Export</helix-button>
       <helix-menu-item
         download="report.csv"
-        href="/media/report.csv"
+        href="#report.csv"
       >
         Comma separated
       </helix-menu-item>
       <helix-menu-item
         download="report.json"
-        href="/media/report.json"
+        href="#report.json"
       >
         JSON
       </helix-menu-item>
