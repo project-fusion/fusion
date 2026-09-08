@@ -3,19 +3,37 @@
   display: block;
 }
 
-/* Framed, for an accordion with nothing around it. */
+/* **Framed per item, not around the stack.**
+ *
+ * One frame around the whole list says the items are one set, which is the thing
+ * the seams between them were already saying: a reader looking at a framed stack
+ * of hairline-separated rows learns nothing from the frame that the rows had not
+ * told them. Framed individually, each item is a thing that opens, and the set
+ * is said by their alignment rather than by a box drawn around it.
+ *
+ * It is also the answer the console needed for its own `separation`, and this is
+ * the one place to give it: an axis that means "around the group" on one
+ * component and "around each member" on another is two axes wearing one name.
+ */
 :host([separation="outlined"]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--accordion-gap, var(--helix-space-xs));
+}
+
+:host([separation="outlined"]) ::slotted(*) {
   border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
   /* The house radius. */
   border-radius: var(--accordion-radius, var(--helix-radii-sm));
-  /* Clips each item's square corners to the stack's radius, so no item needs to
-     know whether it is first or last. */
+  /* Clips the trigger's own hover fill to the item's corners, which is what the
+     stack's frame used to do for all of them at once. */
   overflow: hidden;
 }
 
 /* One rule between neighbors rather than one per item, so the seam is a single
-   pixel. */
-::slotted(* + *) {
+   pixel. **Not while each item carries its own frame**, where a seam would be a
+   third line between two borders that a gap has already separated. */
+:host(:not([separation="outlined"])) ::slotted(* + *) {
   border-block-start: var(--helix-border-thin) solid
     var(--accordion-border-color, var(--helix-color-border));
 }

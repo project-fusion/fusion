@@ -21,8 +21,9 @@ import { styles } from './accordion-root.css.js'
  *
  * @slot - The accordion's items.
  *
- * @cssproperty --accordion-border-color - Color of the seams, and of the frame when outlined.
- * @cssproperty --accordion-radius - Corner radius of the stack, when outlined.
+ * @cssproperty --accordion-border-color - Color of the seams, and of each item's frame when outlined.
+ * @cssproperty --accordion-gap - Space between items, when outlined. Nothing separates them otherwise: a seam is a shared edge.
+ * @cssproperty --accordion-radius - Corner radius of each item, when outlined.
  */
 @customElement('helix-accordion')
 export class HelixAccordion extends HelixHeadlessAccordion {
@@ -37,9 +38,12 @@ export class HelixAccordion extends HelixHeadlessAccordion {
    *   seams between items already say the items are one set, so a frame is a
    *   second statement of the same thing. Inside a card, a panel, a dialog or a
    *   sidebar, it is a line and no meaning.
-   * - `outlined` frames the stack, for an accordion sitting directly on the
-   *   page where nothing else says where it starts and stops. A marketing
-   *   page's FAQ is the case it is for.
+   * - `outlined` frames **each item**, for an accordion sitting directly on the
+   *   page where nothing else says where the rows begin and end. A marketing
+   *   page's FAQ is the case it is for. Per item rather than around the stack,
+   *   because a frame around a set of hairline-separated rows repeats what the
+   *   hairlines already said, where a frame around each one makes every item a
+   *   thing that opens and leaves the set to be said by their alignment.
    *
    * Both are writable, so a generated page can say which it means rather than
    * relying on the absence of an attribute.
