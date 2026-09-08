@@ -14,14 +14,20 @@
       id="dial"
       label="Actions"
     >
-      <helix-icon-button
-        label="New file"
-        value="new"
-      ></helix-icon-button>
-      <helix-icon-button
-        label="Upload"
-        value="upload"
-      ></helix-icon-button>
+      <helix-speed-dial-item value="new">
+        New file
+        <helix-icon
+          name="plus"
+          slot="icon"
+        ></helix-icon>
+      </helix-speed-dial-item>
+      <helix-speed-dial-item value="upload">
+        Upload
+        <helix-icon
+          name="upload-simple"
+          slot="icon"
+        ></helix-icon>
+      </helix-speed-dial-item>
     </helix-speed-dial>
   </div>
 

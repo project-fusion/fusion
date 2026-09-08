@@ -90,8 +90,14 @@
   grid-template-columns: auto 1fr auto;
 }
 
-/* Brand and actions are bare slots, so an omitted one generates no flex item and
-   takes none of the bar's gap. */
+/* The leading and trailing regions are bare slots, so an omitted one generates
+   no flex item and takes none of the bar's gap.
+
+   Named `start` and `end` for the region rather than `brand` and `actions` for
+   what is usually in them, which is what the class note argues and what this
+   comment was still calling them. An example was calling them that too, and
+   since a slot nobody declares assigns nothing, its wordmark and its button
+   rendered nowhere at all. */
 slot[name="start"]::slotted(*) {
   align-items: center;
   color: var(--helix-color-foreground);

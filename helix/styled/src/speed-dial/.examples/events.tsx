@@ -51,14 +51,20 @@ export function Example() {
           onhelix-select={chosen}
           onToggle={moved}
         >
-          <helix-icon-button
-            label="New file"
-            value="new"
-          />
-          <helix-icon-button
-            label="Upload"
-            value="upload"
-          />
+          <helix-speed-dial-item value="new">
+            New file
+            <helix-icon
+              name="plus"
+              slot="icon"
+            />
+          </helix-speed-dial-item>
+          <helix-speed-dial-item value="upload">
+            Upload
+            <helix-icon
+              name="upload-simple"
+              slot="icon"
+            />
+          </helix-speed-dial-item>
         </helix-speed-dial>
       </div>
 

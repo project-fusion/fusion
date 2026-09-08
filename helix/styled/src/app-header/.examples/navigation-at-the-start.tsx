@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-app-header content-align="start">
       <helix-text
-        slot="brand"
+        slot="start"
         variant="label"
       >
         Fusion
@@ -14,7 +14,7 @@ export function Example() {
       </helix-navigation>
       <helix-button
         emphasis="solid"
-        slot="actions"
+        slot="end"
         tone="primary"
       >
         Sign in

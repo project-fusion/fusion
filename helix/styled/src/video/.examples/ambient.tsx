@@ -5,9 +5,9 @@ export function Example() {
       loop
       muted
       playsinline
-      poster="/media/reel-poster.jpg"
+      poster="/media/sintel-short.jpg"
       preload="metadata"
-      src="/media/reel.mp4"
+      src="https://mdn.github.io/shared-assets/videos/sintel-short.mp4"
     ></helix-video>
   )
 }
