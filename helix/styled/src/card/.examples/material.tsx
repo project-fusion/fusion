@@ -4,23 +4,42 @@ export function Example() {
   return (
     <div className="band">
       <helix-card
-        aria-labelledby="material-title"
+        aria-labelledby="glass-title"
         material="glass"
       >
         <h3
-          id="material-title"
+          id="glass-title"
           slot="header"
         >
           Glass
         </h3>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-        labore.
-        <helix-button
-          emphasis="ghost"
-          slot="footer"
+        A light ground and a middling blur, so what is behind it still reads.
+      </helix-card>
+
+      <helix-card
+        aria-labelledby="frosted-title"
+        material="frosted"
+      >
+        <h3
+          id="frosted-title"
+          slot="header"
         >
-          Action
-        </helix-button>
+          Frosted
+        </h3>
+        Nearly opaque and blurred twice as hard, so what is behind it is light and not shape.
+      </helix-card>
+
+      <helix-card
+        aria-labelledby="transparent-title"
+        material="transparent"
+      >
+        <h3
+          id="transparent-title"
+          slot="header"
+        >
+          Transparent
+        </h3>
+        No ground and no filter: structure and spacing over whatever it is on.
       </helix-card>
 
       <helix-card
@@ -33,14 +52,7 @@ export function Example() {
         >
           Opaque
         </h3>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-        labore.
-        <helix-button
-          emphasis="ghost"
-          slot="footer"
-        >
-          Action
-        </helix-button>
+        The same card with no material at all, which is what the others are being compared against.
       </helix-card>
     </div>
   )

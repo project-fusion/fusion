@@ -3,39 +3,57 @@
    tint. The attribute draws both, which is why it is one attribute rather than a
    custom property a consumer sets on its own.
 
-   Beside it, the same card opaque, because the comparison is the point. A page
-   whose header is glass and whose cards are not reads as two designs sharing a
-   window, which is the thing a material policy exists to stop.
+   All three materials, beside the same card opaque, because the comparison is
+   the point: `glass` is `blur(16px) saturate(1.5)` at 30% ground, `frosted` is
+   `blur(32px)` at 88%, and a page whose header is glass and whose cards are not
+   reads as two designs sharing a window.
 
-   **Detailed rather than saturated, and both halves of that were measured.**
-   Blur is only visible on detail: a smooth fill blurs to itself and shows the
-   translucency alone, so the ground behind these is ruled, densely enough that
-   the rules survive being blurred.
+   **The ground has to have detail at a scale the blur cannot erase, and that is
+   arithmetic rather than taste.** A blur of radius r destroys detail finer than
+   about r. The rules here used to run on a 16px period under a 16px blur, so the
+   filter averaged them to a flat wash and the glass card came out looking like a
+   plain tint: the effect was real and had nothing left to work on. The rules are
+   coarser now, and the washes behind them are hundreds of pixels across, which
+   is what a 32px blur can still smear.
 
    Neutral, though, and that is the material's own constraint showing. A
    translucent ground composites whatever is behind it, so a glass card's
    contrast stops being the card's. Over a saturated blue this same pair measured
    3.83:1: the body ink is `foreground-muted`, and the ground it was solved
-   against had become a pale blue. A neutral near the page's own lightness
-   composites to something the ink was solved for; glass carries whatever ground
-   it is given, and giving it one that keeps the ink legible is the consumer's
-   half of the bargain. */
+   against had become a pale blue. The washes below are kept faint for exactly
+   that reason: enough for the blur to have a subject, not enough to move the ink
+   off the ground it was solved for. */
 .band {
   background-color: var(--helix-color-surface-sunken);
   background-image:
+    /* Two soft washes, large enough that a 32px blur still leaves a gradient
+       rather than a flat field. These are what make the difference between the
+       two materials visible. */
+    radial-gradient(
+      60% 80% at 20% 15%,
+      color-mix(in oklab, var(--helix-color-primary) 22%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 75% at 85% 85%,
+      color-mix(in oklab, var(--helix-color-accent) 18%, transparent),
+      transparent 70%
+    ),
+    /* And the rules, on a 40px period so `glass` at 16px still shows them
+       bending rather than dissolving. */
     repeating-linear-gradient(
       to right,
-      transparent 0 1rem,
-      color-mix(in oklab, var(--helix-color-foreground) 22%, transparent) 1rem 1.125rem
+      transparent 0 2.5rem,
+      color-mix(in oklab, var(--helix-color-foreground) 26%, transparent) 2.5rem 2.625rem
     ),
     repeating-linear-gradient(
       to bottom,
-      transparent 0 1rem,
-      color-mix(in oklab, var(--helix-color-foreground) 22%, transparent) 1rem 1.125rem
+      transparent 0 2.5rem,
+      color-mix(in oklab, var(--helix-color-foreground) 26%, transparent) 2.5rem 2.625rem
     );
   border-radius: var(--helix-radii-lg);
   display: grid;
   gap: var(--helix-space-lg);
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
   padding: var(--helix-space-lg);
 }
