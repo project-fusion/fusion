@@ -1,0 +1,91 @@
+<!-- @summary Keys before the colon, values after it, in one panel. -->
+<!-- @min 420 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-filter-input
+    hint="Type a letter, or press Down. Choosing a key offers its values next."
+    id="filter"
+    label="Filter rows"
+    placeholder="owner:ada status:open"
+  ></helix-filter-input>
+
+  <helix-code-block
+    id="query"
+    label="Query"
+  ></helix-code-block>
+</helix-flex>
+
+<script type="module">
+  const filter = document.getElementById('filter')
+  const query = document.getElementById('query')
+
+  /* **The grammar is this page's, and the field never learns it.** Keys, and
+     what each one accepts. A real console reads the values from its own data;
+     what matters here is that the element is handed a list and asked to show
+     it, never asked what a key is. */
+  const VOCABULARY = {
+    area: ['billing', 'infra', 'docs'],
+    owner: ['ada', 'grace', 'linus'],
+    status: ['open', 'closed', 'draft'],
+  }
+
+  /* Everything after the last space is what is being typed now. A term with no
+     colon in it is a key being named; one with a colon is a value being chosen
+     for the key before it. */
+  const termAt = (text) => {
+    const term = text.slice(0, filter.selectionStart).split(/\s+/).at(-1) ?? ''
+    const colon = term.indexOf(':')
+    return colon === -1
+      ? { key: null, text: term }
+      : { key: term.slice(0, colon), text: term.slice(colon + 1) }
+  }
+
+  const suggestionsFor = (text) => {
+    const term = termAt(text)
+    if (term.key === null) {
+      return Object.keys(VOCABULARY).filter((key) => key.startsWith(term.text))
+    }
+    return (VOCABULARY[term.key] ?? []).filter((value) => value.startsWith(term.text))
+  }
+
+  /* The panel is whatever is slotted, so offering something is rendering it and
+     offering nothing is rendering nothing. The field opens and closes itself
+     around that. */
+  const offer = () => {
+    const values = suggestionsFor(filter.value)
+    filter.replaceChildren(
+      ...values.map((value) => {
+        const option = document.createElement('helix-option')
+        option.slot = 'suggestions'
+        option.value = value
+        option.textContent = value
+        return option
+      }),
+    )
+    query.textContent = filter.value === '' ? 'Everything' : filter.value
+  }
+
+  filter.addEventListener('input', offer)
+
+  /* **One handler for both ways of choosing**, since the option announces its
+     own `helix-select` whether it was pressed or reached with Enter. */
+  filter.addEventListener('helix-select', (event) => {
+    const term = termAt(filter.value)
+    /* A key completes to `owner:` and the panel carries straight on into its
+       values. A value completes to `owner:ada ` and the panel closes, because
+       the next term is empty and every key still matches. */
+    const insert = term.key === null ? `${event.detail.value}:` : `${event.detail.value} `
+    const head = filter.value.slice(0, filter.selectionStart)
+    const kept = head.slice(0, head.length - (term.key === null ? term.text.length : term.text.length + term.key.length + 1))
+    filter.value = kept + insert + filter.value.slice(filter.selectionStart)
+    /* The caret goes after what was written, or the next parse reads the term
+       the reader has already finished with. */
+    const at = kept.length + insert.length
+    filter.setSelectionRange(at, at)
+    offer()
+  })
+
+  offer()
+</script>

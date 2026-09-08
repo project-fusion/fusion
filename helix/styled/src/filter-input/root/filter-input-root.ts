@@ -5,6 +5,10 @@ import type { CSSResultGroup } from 'lit'
    consumer importing this family alone would otherwise get an inert unknown
    element where the mark should be. */
 import '../../icon/index.js'
+/* The suggestions are `helix-option` elements a consumer slots in, and a custom
+   element registers on import: a consumer importing this family alone would
+   otherwise get inert unknown elements in the panel. */
+import '../../option/index.js'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
@@ -24,6 +28,13 @@ import { styles } from './filter-input-root.css.js'
  * them here is to keep their size and not run past the field. A `Tag` slotted
  * into `tags` already looks like one; anything else looks like whatever it is.
  *
+ * **The suggestion panel is this element's own box, not a listbox's.** Combobox
+ * puts a `helix-listbox` in its panel because the options there are a selection
+ * it owns; these are the consumer's suggestions, so the panel is a plain
+ * `role="listbox"` region and the options pass their own `helix-select`
+ * straight through it. That is why this surface scrolls where Combobox's does
+ * not: there is no list inside to do it.
+ *
  * Height comes from the region, like every other control: `data-density` on
  * whatever holds it, not a `size` here.
  *
@@ -34,7 +45,12 @@ import { styles } from './filter-input-root.css.js'
  * @documentation https://helix.fusion.dev/components/filter-input
  *
  * @cssproperty --filter-input-background-color - Fill behind the field.
+ * @cssproperty --filter-input-border-color - Color of the suggestion panel's edge.
+ * @cssproperty --filter-input-border-width - Width of that edge. Follows `--helix-border-floating`.
  * @cssproperty --filter-input-control-size - Smallest the text keeps as tokens fill the line, before it wraps to its own.
+ * @cssproperty --filter-input-panel-size - Width of the suggestion panel. Follows the field by default.
+ * @cssproperty --filter-input-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
+ *   floating surface sits over content nobody can predict, so it keeps a lift by default.
  * @cssproperty --filter-input-size - Height of the field with nothing in it, which it grows from.
  */
 @customElement('helix-filter-input')

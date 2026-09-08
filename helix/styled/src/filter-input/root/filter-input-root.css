@@ -135,3 +135,82 @@ slot[name="end"]::slotted(*) {
     print-color-adjust: exact;
   }
 }
+
+/* The panel, which is the same floating surface Select, Menu, Popover and
+   Combobox draw, with one difference that matters: the options are its own
+   children rather than a listbox's, so this is the box that scrolls. */
+[part="surface"] {
+  background-color: var(--helix-color-surface-overlay);
+  border: var(--filter-input-border-width, var(--helix-border-floating)) solid
+    var(--filter-input-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--filter-input-shadow, var(--helix-shadow-floating));
+  box-sizing: border-box;
+  inline-size: var(--filter-input-panel-size, var(--floating-anchor-inline-size, 100%));
+  inset: auto;
+  margin: var(--helix-space-none);
+  /* What the floating controller measured, and a ceiling of its own where it has
+     not: a panel that took the whole viewport would cover the field it belongs
+     to, which is the one thing the reader is still typing in. */
+  max-block-size: var(--floating-available-block-size, 20rem);
+  min-inline-size: max-content;
+  overflow-y: auto;
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-none);
+  position: absolute;
+}
+
+/* The entrance the other floating surfaces share. `transform` rather than
+   `translate`, which the floating controller owns: the two compose in the order
+   translate, scale, transform, so this moves the panel relative to wherever it
+   was placed. */
+[part="surface"] {
+  --_travel: calc(var(--helix-space-2xs) * -1);
+
+  opacity: 0;
+  scale: 0.96;
+  transform: translateY(var(--_travel));
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
+}
+
+[part="surface"][data-placement^="top"] {
+  --_travel: var(--helix-space-2xs);
+
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
+}
+
+[part="surface"][data-placement^="bottom"] {
+  transform-origin: var(--floating-arrow-x, 50%) 0;
+}
+
+[part="surface"][data-placed] {
+  opacity: 1;
+  scale: 1;
+  transform: none;
+}
+
+/* The UA hides a closed popover with `[popover]:not(:popover-open)`, and every
+   author declaration above outranks it whatever its specificity. Restated here,
+   the same way Select, Menu, Popover and Combobox restate theirs. `[hidden]`
+   stays alongside it: the attribute is what the server renders, and it is the
+   only thing holding the panel closed before the element upgrades. */
+[part="surface"][hidden],
+[part="surface"]:not(:popover-open) {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The panel still has to arrive, so what goes is the movement rather than the
+     appearance: no travel and no scale, and it is simply there. */
+  [part="surface"],
+  [part="surface"][data-placed] {
+    scale: 1;
+    transform: none;
+    transition: none;
+  }
+}
