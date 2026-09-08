@@ -18,6 +18,17 @@
   align-items: start;
   border-block-end: var(--helix-border-thin) solid
     var(--notifications-rule, var(--helix-color-border));
+  /* **One cursor across the row, because the row answers the pointer.** Nothing
+     declared one, so `auto` was in force edge to edge: measured across a 520px
+     row, an I-beam over the label and the caption and an arrow over everything
+     between them. A row that swaps its time for a pair of controls as the
+     pointer crosses it, while reporting itself as a paragraph of text.
+
+     `default` and not `pointer`, because the row is not a target: no `href`, no
+     role, no handler. A hand over content that does nothing when pressed is the
+     worse of the two lies. The controls inside declare `pointer` for
+     themselves, so what the cursor reports is now exactly what can be pressed. */
+  cursor: default;
   display: grid;
   grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr) auto;
   padding-block: var(--notifications-padding-block, var(--helix-space-sm));
@@ -105,9 +116,21 @@ slot[name="caption"]::slotted(*) {
   margin-inline-start: var(--helix-space-sm);
 }
 
+/* **The swap is a crossfade with a step in it, not a light being switched.** At
+   `duration-fast` on opacity alone the time did not fade so much as vanish and
+   the controls did not arrive so much as appear, which on a feed is a row that
+   flickers as the pointer travels down it.
+
+   `duration-normal` gives the eye something to follow, and the small inline
+   movement is what makes it a swap rather than two unrelated fades: the time
+   leaves towards the edge it sits against and the controls come in from the same
+   side, so the pair read as one thing turning over. `translate` and not
+   `margin`, because it must not move anything else in the row while it runs. */
 [part="trailing"] > * {
   grid-area: swap;
-  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    translate var(--helix-duration-normal) var(--helix-easing-decelerate);
 }
 
 /* Which of the two is showing, as one number the host sets and both children
@@ -126,12 +149,20 @@ slot[name="caption"]::slotted(*) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   opacity: calc(1 - var(--_notifications-swap));
+  /* Leaves towards the edge the controls come in from, so the two move the same
+     way and the swap has a direction. */
+  translate: calc(var(--helix-space-2xs) * var(--_notifications-swap)) 0;
 }
 
+/* Held just outside its resting place, so it arrives rather than appears. The
+   offset is spent on the way in and given back on the way out, which is what
+   makes the pair read as one thing turning over instead of two fades that
+   happen to overlap. */
 [part="controls"] {
   align-items: center;
   display: flex;
   opacity: var(--_notifications-swap);
+  translate: calc(var(--helix-space-2xs) * (1 - var(--_notifications-swap))) 0;
 }
 
 /* Only where there is something to swap to. */
@@ -159,13 +190,27 @@ slot[name="caption"]::slotted(*) {
     grid-template-areas: none;
   }
 
+  /* And the offset goes with the stacking. It is the distance one of them
+     travels on its way into the other's place, and side by side neither is going
+     anywhere. */
   [part="trailing"] > * {
     grid-area: auto;
     opacity: 1;
+    translate: none;
   }
 
   [part="controls"] {
     pointer-events: auto;
+  }
+}
+
+/* The movement goes and the crossfade stays, which is the distinction the
+   preference draws: a thing sliding into place is what it is about, and one
+   appearing is not. */
+@media (prefers-reduced-motion: reduce) {
+  [part="trailing"] > * {
+    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+    translate: none;
   }
 }
 
@@ -183,12 +228,18 @@ slot[name="caption"]::slotted(*) {
 /* A square the size of the row's controls, not a glyph with padding around it,
    which measured 15 by 22: under any target anybody recommends and under half
    the area of the button sitting next to it. */
+/* **`danger`, because this is the only copy of the thing it removes.** The row
+   is a record of something that happened and dismissing it is the end of it,
+   which is not what the muted ink on a tag's cross means. The control is drawn
+   only while the row is hovered or focused, so a feed of twenty is never a
+   column of red: the color arrives with the control, at the moment there is
+   something to be careful about. */
 [part="dismiss"] {
   background: none;
   border: 0;
   border-radius: var(--helix-radii-sm);
   block-size: var(--helix-size-control);
-  color: var(--helix-color-foreground-muted);
+  color: var(--notifications-dismiss-color, var(--helix-color-danger));
   cursor: pointer;
   display: grid;
   inline-size: var(--helix-size-control);
@@ -204,9 +255,10 @@ slot[name="caption"]::slotted(*) {
   inline-size: var(--icon-size, var(--helix-size-icon));
 }
 
+/* The well is mixed from the ink the control is already drawn in, so the hover
+   deepens what is there rather than turning it a second color. */
 [part="dismiss"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
-  color: var(--helix-color-foreground);
+  background-color: color-mix(in oklab, currentcolor 12%, transparent);
 }
 
 /* The reveal is `:focus-within` on the host rather than `:focus` here, and the

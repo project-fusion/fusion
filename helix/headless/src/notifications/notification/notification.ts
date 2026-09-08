@@ -7,7 +7,7 @@ import {
   requestChange,
   slotFilled,
 } from '@fusion.dev/helix-core'
-import { x } from '@fusion.dev/helix-icons'
+import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -215,8 +215,15 @@ export class HelixHeadlessNotification extends HelixElement {
    * boxes whose own centers agreed to a tenth of a pixel. No stylesheet can
    * correct that, because the offset is inside the glyph. An `<svg>` is centered
    * on its own viewBox, so it lands where the box says and takes the icon step
-   * the row is already set in. It is the `x` the Tag's dismiss draws, so two
-   * controls that mean "take this away" are one mark.
+   * the row is already set in.
+   *
+   * **A trash and not the `x` the Tag draws, because the two do not mean the
+   * same thing.** A tag's cross takes a token off a field the reader is still
+   * filling in, and putting it back is retyping a word. A notification is the
+   * only copy of something that happened, and this removes it from the feed for
+   * good, so the mark is the one every other interface uses for that and the
+   * ink is `danger`. It is only ever on screen while the row is hovered or
+   * focused, so a feed of twenty is not a column of red.
    */
   protected renderDismiss(): TemplateResult | typeof nothing {
     if (!this.dismissible) {
@@ -234,9 +241,9 @@ export class HelixHeadlessNotification extends HelixElement {
           data-glyph
           fill="currentColor"
           part="dismiss-mark"
-          viewBox=${x.viewBox}
+          viewBox=${trash.viewBox}
         >
-          ${unsafeSVG(x.content)}
+          ${unsafeSVG(trash.content)}
         </svg>
       </slot>
     </button>`

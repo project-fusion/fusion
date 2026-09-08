@@ -47,6 +47,7 @@ import { styles } from './notification.css.js'
  * @csspart trailing - The column holding the time and the controls.
  *
  * @cssproperty --notifications-color - Ink in an item that has been read.
+ * @cssproperty --notifications-dismiss-color - Ink on the control that removes an item, which is `danger` because removing one is the end of it.
  * @cssproperty --notifications-padding-block - Space above and below an item.
  * @cssproperty --notifications-padding-inline - Space either side of an item.
  * @cssproperty --notifications-rule - The hairline between items.
