@@ -80,3 +80,15 @@ button[part="rest"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* **The mark on the way back, sized here rather than left to the glyph sheet.**
+   Filter Input carries `glyph.css` because it draws a clear button; Combobox
+   does not carry it at all, and an `<svg>` with no dimensions fills the box it
+   is given — the failure Select's caret note measured at 247 pixels wide. This
+   sheet is what both hosts share, so it is the one place the size can be stated
+   once and be true of both. */
+button[part="rest"] svg {
+  block-size: var(--helix-size-icon-tight);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-tight);
+}

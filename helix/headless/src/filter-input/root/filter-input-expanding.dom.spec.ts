@@ -67,7 +67,9 @@ describe('the count as a control', () => {
     const rest = part(filter, 'rest')
     expect(rest).not.toBeNull()
     expect(rest?.getAttribute('aria-expanded')).toBe('true')
-    expect(rest?.textContent?.trim()).toBe('Show fewer')
+    /* The name rather than the words on it: expanded the control draws a caret,
+       which needs no translating and does not change width as it is pressed. */
+    expect(rest?.getAttribute('aria-label')).toBe('Show fewer')
   })
 
   test('pressing it again collapses back to the cap', async () => {
@@ -90,7 +92,7 @@ describe('the count as a control', () => {
     ;(part(filter, 'rest') as HTMLElement).click()
     await settle(filter)
 
-    expect(part(filter, 'rest')?.textContent?.trim()).toBe('Fewer')
+    expect(part(filter, 'rest')?.getAttribute('aria-label')).toBe('Fewer')
   })
 
   test('nothing to expand means no control', async () => {

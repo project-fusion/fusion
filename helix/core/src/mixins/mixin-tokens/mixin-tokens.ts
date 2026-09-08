@@ -1,6 +1,8 @@
+import { caretUp } from '@fusion.dev/helix-icons'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import { drawIcon } from '../../utils/draw-icon/draw-icon.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -50,11 +52,12 @@ export declare class MixinTokensInterface {
   expandLabel: string
 
   /**
-   * What the control says once everything is showing.
+   * What the control is called once everything is showing.
    *
-   * A word rather than a count, because there is no longer a number to give:
-   * expanded, nothing is hidden. It is the visible text and the accessible name
-   * together, which is why it is a phrase and not a glyph.
+   * **The name and not the words on it**, which are a caret: expanded there is
+   * no longer a number to show, and a phrase in its place would translate badly
+   * and change the control's width as it was pressed. The mark is the same size
+   * either way and this is what says what pressing it does.
    */
   collapseLabel: string
 
@@ -132,7 +135,7 @@ export declare class MixinTokensInterface {
 export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
   class TokensElement extends Base {
     /**
-     * What the control says once everything is showing.
+     * What the control is called once everything is showing.
      */
     @property({ attribute: 'collapse-label' })
     collapseLabel = 'Show fewer'
@@ -203,16 +206,23 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
       if (over < 1 && !this.expanded) {
         return nothing
       }
-      /* Named by a phrase rather than by `+3`, which says a number and not what
-         pressing it does. Expanded the visible words are the name, so nothing is
-         added over them. */
+      /* **A mark rather than words on the way back, and the words become its
+         name.** `+3` is a number in every language and needs no translating;
+         "Show fewer" is a sentence, and a control that is a count going one way
+         and a phrase coming back also changes width as it is pressed, which
+         moves the row of tokens beside it. A caret is the same size either way.
+
+         `collapseLabel` did not go: it is the accessible name now, so what a
+         screen reader hears is still a phrase and still the consumer's to
+         translate. Both states carry a name for the same reason — `+3` says a
+         number and not what pressing it does. */
       return html`<button
         part="rest"
         type="button"
         aria-expanded=${this.expanded ? 'true' : 'false'}
-        aria-label=${this.expanded ? nothing : this.expandLabel}
+        aria-label=${this.expanded ? this.collapseLabel : this.expandLabel}
         @click=${this.toggleExpanded}
-        >${this.expanded ? this.collapseLabel : `+${over}`}</button
+        >${this.expanded ? drawIcon(caretUp) : `+${over}`}</button
       >`
     }
 
