@@ -10,9 +10,8 @@ export function Example() {
         label="Seats"
       ></helix-number-input>
       <helix-number-input
-        default-value="8"
+        disabled
         label="Seats"
-        readonly
       ></helix-number-input>
     </helix-flex>
   )

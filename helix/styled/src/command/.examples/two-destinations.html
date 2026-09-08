@@ -23,12 +23,33 @@
   </helix-option>
 
   <!-- The footer is the consumer's, because only they know what the second
-       destination is called on their own site. -->
-  <helix-text
+       destination is called on their own site. The keys are drawn rather than
+       named: "hold the modifier" is a sentence about a key whose glyph differs
+       per reader, and `keys` is what knows which. -->
+  <helix-flex
+    align="center"
+    gap="sm"
     slot="footer"
-    tone="subtle"
-    variant="caption"
   >
-    Enter opens the reference. Hold the modifier to open the sandbox.
-  </helix-text>
+    <helix-flex
+      align="center"
+      gap="2xs"
+    >
+      <helix-kbd keys="enter"></helix-kbd>
+      <helix-text
+        tone="subtle"
+        variant="caption"
+      >Reference</helix-text>
+    </helix-flex>
+    <helix-flex
+      align="center"
+      gap="2xs"
+    >
+      <helix-kbd keys="mod+enter"></helix-kbd>
+      <helix-text
+        tone="subtle"
+        variant="caption"
+      >Sandbox</helix-text>
+    </helix-flex>
+  </helix-flex>
 </helix-command>

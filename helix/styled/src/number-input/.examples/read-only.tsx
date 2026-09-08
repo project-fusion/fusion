@@ -1,0 +1,14 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-number-input
+        default-value="8"
+        label="Seats"
+        readonly
+      ></helix-number-input>
+    </helix-flex>
+  )
+}

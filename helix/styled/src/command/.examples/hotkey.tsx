@@ -7,7 +7,13 @@ export function Example() {
     >
       <helix-option value="reload">Reload the window</helix-option>
       <helix-option value="reset">Reset the workspace</helix-option>
-      <helix-text slot="footer">Command Shift P</helix-text>
+      {/* The chord written plainly rather than as glyphs: a literal Command
+          symbol tells a reader on Windows to press a key their keyboard has not
+          got, which is the fault `keys` exists to stop. */}
+      <helix-kbd
+        keys="mod+shift+p"
+        slot="footer"
+      ></helix-kbd>
     </helix-command>
   )
 }
