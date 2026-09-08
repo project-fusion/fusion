@@ -37,6 +37,7 @@ export function Example() {
         onhelix-select={pressed}
       >
         <helix-video
+          extra-controls="previous next"
           label="One of several"
           slot="player"
         />

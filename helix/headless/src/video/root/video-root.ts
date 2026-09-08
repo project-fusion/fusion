@@ -251,7 +251,16 @@ export class HelixHeadlessVideo extends HelixElement {
    * assumed: it is absent on iPhone and behind a flag in Firefox, and a button
    * that cannot work is worse than one that is not there.
    *
-   * The names are `speed`, `pip`, `remote` and `download`.
+   * The names are `speed`, `pip`, `remote`, `download`, `rewind`, `forward`,
+   * `previous` and `next`.
+   *
+   * **`previous` and `next` do nothing to the video, and are offered anyway.**
+   * They announce `helix-previous` and `helix-next` and stop there, so what
+   * they move is whatever holds the set, which is what `VideoPlaylist` listens
+   * for. A player standing alone therefore draws a pair of controls that change
+   * nothing, and that is deliberate: a player cannot know whether it is inside
+   * a set, and one that hid them until it could prove there was one would be a
+   * player that never offers them. Name them where something is listening.
    *
    * **`download` is named and never assumed.** Offering the file is a decision
    * about the content rather than about the player, and plenty of consumers

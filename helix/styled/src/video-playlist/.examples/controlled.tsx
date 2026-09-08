@@ -10,6 +10,7 @@ export function Example() {
       onhelix-before-activate={(event) => setActive(event.detail.value)}
     >
       <helix-video
+        extra-controls="previous next"
         label="One of several"
         slot="player"
       />

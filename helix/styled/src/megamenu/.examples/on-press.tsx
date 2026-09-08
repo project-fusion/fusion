@@ -3,9 +3,8 @@ export function Example() {
     <helix-navigation label="Main">
       <a href="#overview">Overview</a>
       <helix-megamenu
-        full-below
         label="Products"
-        open-on="hover"
+        open-on="click"
       >
         <div data-megamenu-group>
           <h3 data-megamenu-heading>Build</h3>

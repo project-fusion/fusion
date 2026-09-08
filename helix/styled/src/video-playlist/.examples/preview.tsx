@@ -5,6 +5,7 @@ export function Example() {
       label="Episodes"
     >
       <helix-video
+        extra-controls="previous next"
         label="One of several"
         slot="player"
       ></helix-video>
