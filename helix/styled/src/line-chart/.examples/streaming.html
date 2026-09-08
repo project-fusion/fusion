@@ -1,0 +1,90 @@
+<!-- @summary A window that slides: a reading arrives, the oldest leaves, and the line marches. -->
+<!-- @min 420 -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <!-- **The table is the chart, and this is the whole of what streaming means
+       here.** A reading arriving is a row appended and the oldest removed;
+       nothing calls a method on the chart, because a chart that took data
+       through an API would be a second copy of the numbers the page already
+       has. It is the same contract the other examples use, driven by a clock. -->
+  <table
+    data-hidden-visually
+    id="feed"
+  >
+    <caption>Requests a second</caption>
+    <thead>
+      <tr>
+        <th scope="col">Second</th>
+        <th scope="col">Requests</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <helix-line-chart
+    curve="smooth"
+    for="feed"
+  ></helix-line-chart>
+
+  <helix-button id="restart">Restart</helix-button>
+</helix-flex>
+
+<script>
+  const body = document.querySelector('#feed tbody')
+  const restart = document.getElementById('restart')
+
+  /* How many readings are on screen at once, which is what makes it a window
+     rather than a line that grows until it is unreadable. */
+  const WINDOW = 24
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+  let at = 0
+  let timer = 0
+
+  const reading = () => {
+    at += 1
+    const row = document.createElement('tr')
+    const when = document.createElement('th')
+    when.scope = 'row'
+    when.textContent = `${at}s`
+    /* **Two sines rather than a random walk**, so the two syntaxes of this
+       example draw the same line. A photographed pair is compared pixel for
+       pixel, and `Math.random()` guarantees they never match. */
+    const value = 220 + Math.round(Math.sin(at / 3) * 60 + Math.sin(at / 1.7) * 22)
+    const cell = document.createElement('td')
+    cell.dataset.value = String(value)
+    cell.textContent = value.toLocaleString()
+    row.append(when, cell)
+    body.append(row)
+    while (body.children.length > WINDOW) {
+      body.firstElementChild.remove()
+    }
+  }
+
+  const fill = () => {
+    body.replaceChildren()
+    at = 0
+    for (let i = 0; i < WINDOW; i += 1) {
+      reading()
+    }
+  }
+
+  const run = () => {
+    clearInterval(timer)
+    fill()
+    /* **A full window and then still**, because these pages are photographed
+       with reduced motion forced and a chart mid-tick is a different picture
+       every run. The shape is the same either way; only the marching stops. */
+    if (still.matches) {
+      return
+    }
+    timer = setInterval(reading, 600)
+  }
+
+  restart.addEventListener('click', run)
+  still.addEventListener('change', run)
+  run()
+</script>
