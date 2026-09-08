@@ -28,10 +28,13 @@
   display: block;
 }
 
-/* The ring is drawn on the field, because the input it belongs to is invisible. */
+/* The ring is drawn on the field, because the input it belongs to is invisible.
+   No offset, like every other bordered field: the dropzone already has an edge,
+   and a ring standing off it is a second line around the first rather than that
+   line thickening. */
 [part="field"]:has([part="control"]:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: 0;
 }
 
 /* Something is over it. */

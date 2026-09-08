@@ -46,10 +46,15 @@
    character at a time and the whole point of the boxes is to say which one is
    next, so a ring around all six would answer the question the component exists
    to answer. */
+/* No offset, for the reason `Input` and the rest of the fields keep none: the
+   cell's own border turns `primary` here and the ring is `focus-ring`, so an
+   offset draws the same color twice with a gap between. It matters more on this
+   component than on any other, because the cells sit a few pixels apart and a
+   ring standing off one of them reaches toward its neighbors. */
 [part="cell"]:focus-visible {
   border-color: var(--helix-color-primary);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: 0;
 }
 
 /* `:state(invalid)` rather than `:user-invalid`, which cannot match: it tracks

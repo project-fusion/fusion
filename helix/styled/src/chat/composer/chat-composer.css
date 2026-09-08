@@ -17,9 +17,11 @@
   padding: var(--helix-space-xs);
 }
 
+/* No offset, like every other bordered field: this box already draws an edge,
+   and a ring standing off it is a second line around the first. */
 [part="composer"]:focus-within {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: 0;
 }
 
 /* The field owns no edge and no ground of its own: it is the inside of the box

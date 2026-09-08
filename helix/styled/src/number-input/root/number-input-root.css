@@ -35,10 +35,20 @@
    reader sees as the control: focus landing on a field whose own edge stays
    quiet reads as nothing having happened. `:focus-within`, since focus is
    delegated and lands on the input inside. */
+/* **No offset, so the ring thickens the edge instead of drawing a second one.**
+   The border here turns `primary` on focus and the ring is `focus-ring`, which
+   are the same color: at an offset the pair read as two blue lines with a gap
+   of page between them, which is a double-struck border rather than a focused
+   field. Against the edge they are one 3px edge in one color.
+
+   This is what `Input`, `Textarea`, `Combobox`, `Date Input`, `Time Input`,
+   `Color Input` and `Filter Input` already do. The offset belongs to a ring
+   drawn around something whose own edge is not moving, which is why `Checkbox`,
+   `Switch` and `Slider` keep theirs. */
 :host(:not(:disabled)) [part="field"]:focus-within {
   border-color: var(--helix-color-primary);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: 0;
 }
 
 /*
