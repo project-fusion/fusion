@@ -440,18 +440,29 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
       return
     }
     /* Checked here rather than left to the input, which is `text` and has no
-       idea what a time is. String comparison is enough because a 24 hour `HH:mm`
-       sorts lexically, which is the whole reason the value is that shape. */
-    const value = this.value
+       idea what a time is.
+
+       **Every time in the value, not the value itself**, which is what Date
+       Input's own note says and what this was missing. A range holds two and a
+       multiple holds any number, joined by commas, so `isTime` on the whole
+       string answered false for every range that had been filled in: two times
+       chosen from the picker reported "Enter a time as HH:mm" and the field went
+       invalid on being used correctly. */
+    const held = this.held
+    const floor = toMinutes(this.min) ?? 0
+    const ceiling = toMinutes(this.max) ?? 1439
     let message = ''
-    if (value !== '' && !isTime(value)) {
-      message = 'Enter a time as HH:mm.'
-      // biome-ignore lint/style/noNonNullAssertion: guarded by the `value !== ''` beside it, and an optional chain here would compare `undefined` and take the branch.
-    } else if (value !== '' && toMinutes(value)! < (toMinutes(this.min) ?? 0)) {
+    if (held.length > 0 && !held.every(isTime)) {
+      message =
+        this.mode === undefined
+          ? 'Enter a time as HH:mm.'
+          : 'Enter times as HH:mm, separated by commas.'
+    } else if (held.some((one) => (toMinutes(one) ?? 0) < floor)) {
       message = `Choose a time at or after ${writeTime(this.min, this.locale)}.`
-      // biome-ignore lint/style/noNonNullAssertion: guarded by the `value !== ''` beside it, and an optional chain here would compare `undefined` and take the branch.
-    } else if (value !== '' && toMinutes(value)! > (toMinutes(this.max) ?? 1439)) {
+    } else if (held.some((one) => (toMinutes(one) ?? 0) > ceiling)) {
       message = `Choose a time at or before ${writeTime(this.max, this.locale)}.`
+    } else if (this.mode === 'range' && held.length > 2) {
+      message = 'A range is two times.'
     }
     if (message === '') {
       this.internals.setValidity(control.validity, control.validationMessage, control)
