@@ -19,7 +19,18 @@ export interface DisabledCascadeOptions {
  * `slotchange`, which stops at the root that owns the slot.
  */
 type DisableableHost = ReactiveControllerHost &
-  HTMLElement & { disabled: boolean; renderRoot: DocumentFragment | HTMLElement }
+  HTMLElement & {
+    disabled: boolean
+    /**
+     * The form-associated reading, where the host has one.
+     *
+     * Optional because not every group that cascades is form-associated: Toggle
+     * Group is a plain element with a `disabled` of its own and nothing to
+     * inherit from a fieldset.
+     */
+    isDisabled?: boolean
+    renderRoot: DocumentFragment | HTMLElement
+  }
 
 /**
  * Pushes a group's `disabled` onto its members, on every update, unasked.
@@ -73,7 +84,17 @@ export class DisabledCascadeController implements ReactiveController {
   }
 
   private readonly cascade = (): void => {
-    inheritDisabled(this.host.disabled, this.items())
+    /* **`isDisabled` before `disabled`, and the difference is a fieldset.**
+       `disabled` is only what the group was given directly; `isDisabled` is that
+       or'd with `formDisabled`, which is how a `<fieldset disabled>` reaches a
+       form-associated element. Reading the first alone, a listbox inside a
+       disabled fieldset reported `disabled === false`, cascaded that to its
+       options, and every one of them stayed selectable: the group was dimmed and
+       its members still took a click.
+
+       Falling back rather than requiring it, because Toggle Group is not
+       form-associated and has nothing but its own `disabled`. */
+    inheritDisabled(this.host.isDisabled ?? this.host.disabled, this.items())
   }
 
   hostConnected(): void {

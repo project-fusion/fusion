@@ -1,103 +1,109 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
-
-/**
- * A group handing its own disabled state down to its members.
- *
- * The cascade itself is `inheritDisabled`, tested beside it. What this adds is
- * *when* it runs, and that is the part with a bug in it worth guarding: members
- * arrive through a slot, so a group disabled before its children are assigned
- * has nothing to write to, and a group whose children change afterwards has to
- * write again. `slotchange` on the render root is the signal, and it is bound
- * there rather than on the host because `slotchange` bubbles and is *not*
- * composed, so a listener on the host never hears it.
- */
-type Item = HTMLElement & { disabled: boolean }
-
-let Controller: new (
-  host: unknown,
-  options: { items: () => Item[] },
-) => {
-  hostConnected(): void
-  hostUpdated(): void
-}
+import { registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
-  Controller = (await import('./disabled-cascade-controller.js'))
-    .DisabledCascadeController as unknown as typeof Controller
+  await import('@fusion.dev/helix-headless/listbox')
+  await import('@fusion.dev/helix-headless/option')
+  await import('@fusion.dev/helix-headless/toggle')
 })
 
-/** A host that records nothing and answers everything a controller asks of it. */
-const group = (disabled: boolean, items: Item[]) => {
-  const root = document.createElement('div')
-  const host = {
-    addController: () => {},
-    addEventListener: () => {},
-    disabled,
-    removeController: () => {},
-    removeEventListener: () => {},
-    renderRoot: root,
-    requestUpdate: () => {},
-    updateComplete: Promise.resolve(true),
-  }
-  const controller = new Controller(host, { items: () => items })
-  return { controller, host, root }
+type Option = HTMLElement & { disabled: boolean; value: string }
+
+const options = (host: Element): Option[] => [
+  ...host.querySelectorAll<Option>('helix-headless-option'),
+]
+
+const listbox = async (markup: string): Promise<Updatable> => {
+  document.body.innerHTML = markup
+  const host = document.body.querySelector('helix-headless-listbox') as Updatable
+  await settle(host)
+  return host
 }
 
-const items = (...disabled: boolean[]): Item[] =>
-  disabled.map((state) => {
-    const el = document.createElement('div') as unknown as Item
-    el.disabled = state
-    return el
+/**
+ * The signal a `<fieldset disabled>` sends, delivered by hand.
+ *
+ * **Driven rather than nested, because the harness does not implement it.**
+ * happy-dom does not call `formDisabledCallback` for a form-associated custom
+ * element inside a disabled fieldset, so a test that wrote the markup would
+ * assert nothing: the element would report itself enabled and pass for the wrong
+ * reason. What is ours to get right is the answer to the platform's signal, and
+ * this is that signal.
+ */
+const formDisable = async (host: Updatable, disabled: boolean): Promise<void> => {
+  ;(host as unknown as { formDisabledCallback: (value: boolean) => void }).formDisabledCallback(
+    disabled,
+  )
+  await settle(host)
+}
+
+const OPTIONS = `<helix-headless-option value="rs">Rust</helix-headless-option>
+  <helix-headless-option value="rb">Ruby</helix-headless-option>`
+
+describe('a group disabled by the form around it', () => {
+  test('cascades a fieldset onto its members, not only its own attribute', async () => {
+    /* **The bug this exists for.** The cascade read `disabled`, which is only
+       what the group was given directly. A `<fieldset disabled>` reaches a
+       form-associated element through `formDisabled` instead, so the listbox
+       reported `disabled === false`, passed that on, and every option stayed
+       selectable inside a group that was already dimmed. */
+    const host = await listbox(
+      `<helix-headless-listbox label="Language">${OPTIONS}</helix-headless-listbox>`,
+    )
+    expect(options(host).map((option) => option.disabled)).toEqual([false, false])
+
+    await formDisable(host, true)
+
+    expect((host as unknown as { isDisabled: boolean }).isDisabled).toBe(true)
+    expect(options(host).map((option) => option.disabled)).toEqual([true, true])
   })
 
-describe('a group that is disabled', () => {
-  test('writes its state onto its members when it updates', () => {
-    const all = items(false, false)
-    const { controller } = group(true, all)
-    controller.hostUpdated()
-    expect(all.map((one) => one.disabled)).toEqual([true, true])
+  test('and a chosen option is refused while it is', async () => {
+    const host = await listbox(
+      `<helix-headless-listbox label="Language">${OPTIONS}</helix-headless-listbox>`,
+    )
+    await formDisable(host, true)
+    const first = options(host)[0] as Option & { select: () => void }
+
+    first.select()
+    await settle(host)
+
+    // `select` refuses on a disabled option, so nothing was ever announced.
+    expect((host as unknown as { value: string }).value).toBe('')
   })
 
-  test('and releasing them returns each to what it was', () => {
-    const all = items(false, true)
-    const held = group(true, all)
-    held.controller.hostUpdated()
-    const released = group(false, all)
-    released.controller.hostUpdated()
-    expect(all.map((one) => one.disabled)).toEqual([false, true])
-  })
-})
+  test('its own attribute still cascades, which is the case that already worked', async () => {
+    const host = await listbox(
+      `<helix-headless-listbox disabled label="Language">${OPTIONS}</helix-headless-listbox>`,
+    )
 
-describe('members that arrive later', () => {
-  /* The case a group cannot see coming: it is disabled before anything is
-     slotted, so the first cascade writes to an empty list and the members that
-     turn up afterwards would be enabled inside a disabled group. */
-  test('are caught by `slotchange` rather than left enabled', () => {
-    const all: Item[] = []
-    const { controller, root } = group(true, all)
-    controller.hostConnected()
-    controller.hostUpdated()
-
-    all.push(...items(false, false))
-    root.dispatchEvent(new Event('slotchange', { bubbles: true }))
-    expect(all.map((one) => one.disabled)).toEqual([true, true])
+    expect(options(host).map((option) => option.disabled)).toEqual([true, true])
   })
 
-  /* Bound to the render root and not to the host, because `slotchange` bubbles
-     and is not composed: it reaches the shadow root that owns the slot and stops
-     there, so a handler on the host simply never runs. */
-  test('and the host hears nothing, which is why the render root is the target', () => {
-    const all: Item[] = []
-    const { controller, root, host } = group(true, all)
-    controller.hostConnected()
-    let onHost = 0
-    ;(host as unknown as HTMLElement & { addEventListener: unknown }).addEventListener = () => {
-      onHost += 1
-    }
-    all.push(...items(false))
-    root.dispatchEvent(new Event('slotchange', { bubbles: true }))
-    expect([all[0]?.disabled, onHost]).toEqual([true, 0])
+  test('and an enabled group leaves its members alone', async () => {
+    const host = await listbox(
+      `<helix-headless-listbox label="Language">${OPTIONS}</helix-headless-listbox>`,
+    )
+
+    expect(options(host).map((option) => option.disabled)).toEqual([false, false])
+  })
+
+  test('a group with no form reading falls back to its own', async () => {
+    /* Toggle Group is not form-associated: it has `disabled` and nothing to
+       inherit, so the fallback is what it uses and must keep working. */
+    document.body.innerHTML = `<helix-headless-toggle-group disabled>
+      <helix-headless-toggle value="a">A</helix-headless-toggle>
+      <helix-headless-toggle value="b">B</helix-headless-toggle>
+    </helix-headless-toggle-group>`
+    const group = document.body.firstElementChild as Updatable
+    await settle(group)
+
+    const toggles = [
+      ...(group as HTMLElement).querySelectorAll<HTMLElement & { disabled: boolean }>(
+        'helix-headless-toggle',
+      ),
+    ]
+    expect(toggles.map((toggle) => toggle.disabled)).toEqual([true, true])
   })
 })

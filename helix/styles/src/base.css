@@ -592,7 +592,11 @@ helix-toggle::part(item) {
   white-space: nowrap;
 }
 
-helix-toggle::part(item):hover {
+/* **Guarded, because a disabled control that lights up under the pointer is one
+   that says it can be pressed.** The rule below dims it and gives it the refusing
+   cursor, and without this the hover still washed the ground and took the label
+   to full strength: two of the three signals said no and the loudest said yes. */
+helix-toggle:not([disabled])::part(item):hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
   color: var(--helix-color-foreground);
 }
