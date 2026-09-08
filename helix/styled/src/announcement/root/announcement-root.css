@@ -24,6 +24,23 @@
      every control, is unaffected. */
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;
+  /* **One height whether or not anything is slotted into it**, because this band
+     sits above an app header and everything on the page hangs off its bottom
+     edge. A strip that is 37 pixels of text and 48 with a control in it moves
+     the whole document down by eleven the moment somebody adds a button, and
+     moves it back when the message changes.
+
+     The floor is the control step plus this padding, which is what a band
+     holding a control already measures, so adding one now changes nothing.
+
+     **A floor and not a fixed `block-size`**, which would be the literal reading
+     and the wrong one: a message long enough to wrap on a phone has to be able
+     to, and a fixed height clips it. Nothing shorter can shrink the band, which
+     is the whole complaint; something taller was always going to need the room. */
+  min-block-size: var(
+    --announcement-block-size,
+    calc(var(--helix-size-control) + var(--helix-space-xs) * 2)
+  );
   padding-block: var(--helix-space-xs);
   padding-inline: var(--announcement-inset, var(--helix-space-lg));
   /* The containing block for the dismiss, which is out of flow. */
