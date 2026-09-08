@@ -1,16 +1,40 @@
 export function Example() {
   return (
-    <helix-toggle-group
-      disabled
-      label="View"
+    <helix-flex
+      direction="column"
+      gap="md"
     >
-      <helix-toggle
-        selected
-        value="list"
+      <helix-toggle-group
+        disabled
+        label="View"
       >
-        List
-      </helix-toggle>
-      <helix-toggle value="grid">Grid</helix-toggle>
-    </helix-toggle-group>
+        <helix-toggle
+          selected
+          value="list"
+        >
+          List
+        </helix-toggle>
+        <helix-toggle value="grid">Grid</helix-toggle>
+      </helix-toggle-group>
+
+      {/* The second half the summary promises: the group is live and one member
+          refuses on its own, which is the case that shows a disabled toggle
+          beside a working one rather than a whole row that is out. */}
+      <helix-toggle-group label="Density">
+        <helix-toggle
+          selected
+          value="comfortable"
+        >
+          Comfortable
+        </helix-toggle>
+        <helix-toggle value="compact">Compact</helix-toggle>
+        <helix-toggle
+          disabled
+          value="dense"
+        >
+          Dense
+        </helix-toggle>
+      </helix-toggle-group>
+    </helix-flex>
   )
 }
