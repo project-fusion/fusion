@@ -408,6 +408,58 @@
   scale: -1 1;
 }
 
+/* ================================================ vertical, by default ==
+ * **A vertical carousel's chrome runs down its side, and nothing had to be
+ * said for that to be true of a horizontal one.**
+ *
+ * The answer to "does an orientation exist for them" is yes and it is
+ * `*-placement`: an inline edge already turns both runs into columns, stacks
+ * the arrows, and stretches the current dot along the block axis instead of
+ * across it. What was missing is that a carousel turned on its side kept the
+ * resting placement of one that was not, so the dots ran left to right under a
+ * track traveling up and down, across the axis of travel rather than with it.
+ *
+ * This is the same arrangement rotated, not a second one: indicators at the
+ * start of the run and controls at its end, which is exactly what they do when
+ * they share a block edge. They share a column here instead.
+ *
+ * `:not([*-placement])` on every selector, so a consumer who names an edge
+ * still gets it. The two axes are guarded separately because they are set
+ * separately: a vertical carousel with `indicator-placement="block-end"` and no
+ * `controls-placement` is a real thing to ask for.
+ */
+:host([orientation="vertical"]:not([indicator-placement])) [part="indicators"] {
+  align-self: var(--_carousel-indicators-along);
+  flex-direction: column;
+  grid-area: 2 / 3;
+  justify-self: center;
+  padding-block-start: var(--helix-space-none);
+  padding-inline: var(--helix-space-none);
+  padding-inline-start: var(--helix-space-sm);
+}
+
+:host([orientation="vertical"]:not([controls-placement])) [part="controls"] {
+  align-self: var(--_carousel-controls-along);
+  flex-direction: column;
+  grid-area: 2 / 3;
+  justify-self: center;
+  padding-block-start: var(--helix-space-none);
+  padding-inline: var(--helix-space-none);
+  padding-inline-start: var(--helix-space-sm);
+}
+
+/* The current dot stretches along the run, and the run now goes down. */
+:host([orientation="vertical"]:not([indicator-placement])) [part="indicator"] {
+  transition:
+    background-color var(--_carousel-indicator-motion),
+    block-size var(--_carousel-indicator-motion);
+}
+
+:host([orientation="vertical"]:not([indicator-placement])) [part="indicator"][data-current] {
+  block-size: var(--helix-space-lg);
+  inline-size: var(--helix-space-xs);
+}
+
 /* Print: the slide that is showing, without the controls that would change it. */
 @media print {
   :host {
