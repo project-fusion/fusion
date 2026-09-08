@@ -8,6 +8,7 @@ import {
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
+  MixinTokens,
   PopoverController,
 } from '@fusion.dev/helix-core'
 import { calendarBlank } from '@fusion.dev/helix-icons'
@@ -94,14 +95,15 @@ const dates = (value: string): string[] =>
  * @csspart picker-previous-mark - The glyph on the previous month control.
  * @csspart picker-week - One row of days.
  * @csspart picker-weekday - A column header naming a day of the week.
- * @csspart rest - How many dates are held beyond the ones shown.
+ * @csspart rest - How many dates are held beyond the ones shown. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel.
+ * @csspart tags - The row the dates sit in.
  * @csspart trigger - The control that opens the calendar.
  * @csspart trigger-icon - The mark on the button that opens the calendar.
  */
 @customElement('helix-headless-date-input')
 export class HelixHeadlessDateInput extends MixinControllerOpen(
-  MixinControllerValue(MixinField(HelixFormElement)),
+  MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -178,22 +180,6 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    */
   @property()
   max = ''
-
-  /**
-   * How many dates are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default: a cap that guesses is worse than no
-   * cap, because the number that fits depends on the width of the field and the
-   * length of what is in it, neither of which this element knows. What a cap is
-   * genuinely for is a field in a row or a table cell, where a set of twelve
-   * dates would push everything below it down a line at a time.
-   *
-   * The remainder is counted rather than hidden. `+3` is a fact a reader can
-   * act on, where a row that silently stops is a field that appears to have lost
-   * what was put in it, and the count is what tells them there is more to see.
-   */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
 
   /**
    * Earliest date that can be chosen, as `YYYY-MM-DD`.
@@ -411,10 +397,13 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     }
   }
 
-  /** The dates that get a tag, which is all of them until `maxTags` says not. */
+  /** The dates that get a tag, which is all of them until the cap says not. */
   private get shownDates(): string[] {
     const held = dates(this.value)
-    return this.maxTags > 0 ? held.slice(0, this.maxTags) : held
+    /* `shownLimit` rather than `maxTags`, which is the whole of what
+       expanding does: the mixin returns zero while expanded, so the cap
+       lifts and every date gets a tag. */
+    return this.shownLimit > 0 ? held.slice(0, this.shownLimit) : held
   }
 
   /** How many are held beyond the ones shown. */
@@ -711,8 +700,14 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
-        ${this.mode === 'multiple' ? this.shownDates.map((date) => this.renderTag(date)) : nothing}
-        ${this.restCount > 0 ? html`<span part="rest">${`+${this.restCount}`}</span>` : nothing}
+        ${
+          this.mode === 'multiple'
+            ? this.renderTokenRow(
+                this.shownDates.map((date) => this.renderTag(date)),
+                this.restCount,
+              )
+            : nothing
+        }
         <input
           part="control"
           id="control"

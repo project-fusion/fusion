@@ -202,25 +202,10 @@
   min-inline-size: var(--helix-size-icon-loose);
 }
 
-/* The count of what is not shown. Reads as a note rather than as another tag,
-   which it must: a reader who cannot tell them apart has been told there are
-   fourteen dates and shown thirteen. */
-[part="rest"] {
-  color: var(--helix-color-foreground-subtle);
-  flex: none;
-  align-self: center;
-  /* Beside the tags it counts, never pushed to the far end of the row with
-   * `margin-inline-start: auto`. Pushed right, the count lands against the
-   * trigger with the whole width of the field between it and the tags, so it
-   * reads as part of the trigger cluster and what it counts has to be worked
-   * out. Beside them it reads as "and two more of these" with nothing to work
-   * out, and the caret still follows the set, which is the tags and their count
-   * together. */
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-medium);
-  white-space: nowrap;
-}
+/* The count and the row it sits in are the shared tag sheet's, composed in
+   beside this one: `MixinTokens` renders both and `shared/tags` paints them,
+   so the count reads the same here as it does in Combobox and Filter Input
+   and gains the same control when `expandable` is asked for. */
 
 /*
  *  Wrong, and the field says so.

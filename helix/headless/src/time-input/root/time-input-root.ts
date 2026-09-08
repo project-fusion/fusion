@@ -8,6 +8,7 @@ import {
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
+  MixinTokens,
   PopoverController,
 } from '@fusion.dev/helix-core'
 import { clock } from '@fusion.dev/helix-icons'
@@ -94,8 +95,9 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart picker-option-item - The row.
  * @csspart picker-option-label - The words.
  * @csspart picker-option-text - The words and the caption, as one column.
- * @csspart rest - How many times are held beyond the ones shown.
+ * @csspart rest - How many times are held beyond the ones shown. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel.
+ * @csspart tags - The row the times sit in.
  * @csspart time - One held time, as a tag, in `multiple`.
  * @csspart time-dismiss - The remove button, when `dismissible`.
  * @csspart time-dismiss-mark - The glyph on the dismiss control, where none is slotted.
@@ -105,7 +107,7 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  */
 @customElement('helix-headless-time-input')
 export class HelixHeadlessTimeInput extends MixinControllerOpen(
-  MixinControllerValue(MixinField(HelixFormElement)),
+  MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -138,16 +140,6 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
    */
   @property()
   max = '23:59'
-
-  /**
-   * How many times are shown as tags before the rest are counted, in `multiple`.
-   *
-   * `0` is all of them, and is the default, for the reason Date Input gives: how
-   * many fit depends on the width of the field and the length of what is in it,
-   * and this element knows neither.
-   */
-  @property({ attribute: 'max-tags', type: Number })
-  maxTags = 0
 
   /**
    * Earliest time that can be chosen, as `HH:mm`.
@@ -286,10 +278,13 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   @state()
   private draft = ''
 
-  /** The times that get a tag, which is all of them until `maxTags` says not. */
+  /** The times that get a tag, which is all of them until the cap says not. */
   private get shownTimes(): string[] {
     const held = this.held
-    return this.maxTags > 0 ? held.slice(0, this.maxTags) : held
+    /* `shownLimit` rather than `maxTags`, which is the whole of what
+       expanding does: the mixin returns zero while expanded, so the cap
+       lifts and every time gets a tag. */
+    return this.shownLimit > 0 ? held.slice(0, this.shownLimit) : held
   }
 
   /** How many are held beyond the ones shown. */
@@ -628,8 +623,14 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
       <div part="field" @keydown=${this.handleKeydown}>
-        ${this.mode === 'multiple' ? this.shownTimes.map((at) => this.renderTag(at)) : nothing}
-        ${this.restCount > 0 ? html`<span part="rest">${`+${this.restCount}`}</span>` : nothing}
+        ${
+          this.mode === 'multiple'
+            ? this.renderTokenRow(
+                this.shownTimes.map((at) => this.renderTag(at)),
+                this.restCount,
+              )
+            : nothing
+        }
         <input
           part="control"
           id="control"

@@ -2,9 +2,15 @@
    have one. Compose with the component's own sheet, never instead of it.
  *
  * **This is the paint half of `MixinTokens`**, which shares the row's markup and
- * its behavior and could share none of its look. Combobox and Filter Input are
- * its only two hosts and can only ever be: the mixin's whole subject is a row of
- * tokens inside a field, and a component without one does not take it.
+ * its behavior and could share none of its look. Its hosts are every field with
+ * a row of tokens in it: Combobox, Filter Input, Date Input and Time Input. The
+ * last two carried `max-tags` and their own count for months without taking the
+ * mixin, so the `expandable` control reached neither and each kept a third copy
+ * of the same paragraph.
+ *
+ * The bar is the mixin's own: a row of tokens inside a field. A component
+ * without one does not take it, which is why this is four sheets and not
+ * ninety.
  *
  * **What is here is what is genuinely the row, which is less than it looks.**
  * Measured across the two sheets, eleven selectors were written in both and nine

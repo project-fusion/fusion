@@ -9,6 +9,7 @@ import '../../date-picker/index.js'
 import '../../tag/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
+import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
 import { styles } from './date-input-root.css.js'
 
 /**
@@ -46,7 +47,7 @@ import { styles } from './date-input-root.css.js'
 export class HelixDateInput extends HelixHeadlessDateInput {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, tagRowStyles, styles]
 }
 
 declare global {
