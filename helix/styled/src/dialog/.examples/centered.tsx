@@ -29,9 +29,10 @@ export function Example() {
           Discard changes?
         </helix-text>
         <helix-text>Nine edits have not been saved. Closing now leaves them behind.</helix-text>
-        <helix-flex
-          gap="sm"
+        <helix-button-group
+          label="Dialog actions"
           slot="footer"
+          variant="spaced"
         >
           <helix-button
             emphasis="solid"
@@ -45,7 +46,7 @@ export function Example() {
           >
             Keep editing
           </helix-button>
-        </helix-flex>
+        </helix-button-group>
       </helix-dialog>
     </>
   )

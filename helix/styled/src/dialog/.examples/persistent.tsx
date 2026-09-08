@@ -6,9 +6,10 @@ export function Example() {
       persistent
     >
       <p>Two edits have not been saved. Closing now discards them.</p>
-      <helix-flex
-        gap="sm"
+      <helix-button-group
+        label="Dialog actions"
         slot="footer"
+        variant="spaced"
       >
         <helix-button>Discard</helix-button>
         <helix-button
@@ -17,7 +18,7 @@ export function Example() {
         >
           Save
         </helix-button>
-      </helix-flex>
+      </helix-button-group>
     </helix-dialog>
   )
 }

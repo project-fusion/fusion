@@ -27,9 +27,10 @@ export function Example() {
           Delete project
         </helix-text>
         <helix-text>This removes the project and everything in it. It cannot be undone.</helix-text>
-        <helix-flex
-          gap="sm"
+        <helix-button-group
+          label="Dialog actions"
           slot="footer"
+          variant="spaced"
         >
           <helix-button
             command="--close"
@@ -45,7 +46,7 @@ export function Example() {
           >
             Cancel
           </helix-button>
-        </helix-flex>
+        </helix-button-group>
       </helix-dialog>
     </>
   )

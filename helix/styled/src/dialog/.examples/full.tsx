@@ -25,9 +25,10 @@ export function Example() {
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
           ut labore et dolore magna aliqua.
         </helix-text>
-        <helix-flex
-          gap="sm"
+        <helix-button-group
+          label="Dialog actions"
           slot="footer"
+          variant="spaced"
         >
           <helix-button
             command="--close"
@@ -43,7 +44,7 @@ export function Example() {
           >
             Cancel
           </helix-button>
-        </helix-flex>
+        </helix-button-group>
       </helix-dialog>
     </>
   )

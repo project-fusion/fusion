@@ -22,9 +22,10 @@
     slot="header"
   >Delete project</helix-text>
   <helix-text>This removes the project and everything in it. It cannot be undone.</helix-text>
-  <helix-flex
-    gap="sm"
+  <helix-button-group
+    label="Dialog actions"
     slot="footer"
+    variant="spaced"
   >
     <helix-button
       command="--close"
@@ -36,5 +37,5 @@
       command="--close"
       commandfor="confirm"
     >Cancel</helix-button>
-  </helix-flex>
+  </helix-button-group>
 </helix-dialog>
