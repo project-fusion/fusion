@@ -8,14 +8,14 @@ export function Example() {
       <helix-radio
         hide-control
         value="monthly"
-        variant="chip"
+        variant="card"
       >
         Monthly
       </helix-radio>
       <helix-radio
         hide-control
         value="yearly"
-        variant="chip"
+        variant="card"
       >
         Yearly
       </helix-radio>

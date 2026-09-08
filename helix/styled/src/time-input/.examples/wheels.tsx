@@ -1,6 +1,7 @@
 export function Example() {
   return (
     <helix-time-input
+      default-open
       default-value="22:00"
       hint="An hour and a minute, rather than a day of rows"
       label="Starts"
