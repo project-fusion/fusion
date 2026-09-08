@@ -64,7 +64,7 @@ export function Example() {
     <>
       <helix-badge
         label={`${unread} unread`}
-        value={unread}
+        value={String(unread)}
       >
         <helix-icon-button
           command="--show"
