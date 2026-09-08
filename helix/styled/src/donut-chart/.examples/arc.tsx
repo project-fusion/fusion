@@ -39,7 +39,7 @@ export function Example() {
         <helix-stat>
           850
           <span slot="unit">GB</span>
-          <span slot="label">of 1 TB used</span>
+          <span slot="label">Used of 1 TB</span>
         </helix-stat>
       </helix-donut-chart>
     </>
