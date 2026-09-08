@@ -343,6 +343,24 @@ helix-drawer[material="glass"] {
 [data-substrate],
 [data-closing],
 [data-card-edge] {
+  /* **How far out the ring sits, which is the card's own border width.**
+   *
+   * An absolutely positioned child is laid out against its parent's *padding*
+   * box, not its border box, so a ring at `inset: 0` is drawn a border's width
+   * inside the edge it is meant to be. That much is a one pixel offset down the
+   * straight sides and invisible. What gives it away is the corners:
+   * `border-radius: inherit` hands the ring the border box's 12px arc, and an arc
+   * that wide on a box inset by a pixel bends away from the edge it is tracking.
+   * Measured on the landing page, the card's border box is 1126.4 wide and the
+   * ring's was 1124.4, both curving at 12px.
+   *
+   * A property rather than the token inline, because it is an assumption about
+   * the host: these cards take their edge from `data-material`, which is
+   * `--helix-border-thin`. A card with no border sets this to zero, and one with
+   * a thicker edge says so, rather than either of them silently drawing a ring
+   * that misses. */
+  --card-edge-offset: var(--helix-border-thin);
+
   position: relative;
 }
 
@@ -360,9 +378,13 @@ helix-drawer[material="glass"] {
       color-mix(in oklab, var(--helix-color-primary) 28%, transparent) 66%,
       transparent 82%
     );
+    /* Correct once the box below is the border box, and wrong before it: the
+       radius a card declares is the one its border is drawn with. */
     border-radius: inherit;
     content: "";
-    inset: 0;
+    /* Out onto the card's border box, which is not where `inset: 0` puts it.
+       See `--card-edge-offset`. */
+    inset: calc(var(--card-edge-offset) * -1);
     /* The ring's own thickness: the mask keeps this band and drops the rest. */
     padding: var(--helix-border-thin);
     pointer-events: none;
