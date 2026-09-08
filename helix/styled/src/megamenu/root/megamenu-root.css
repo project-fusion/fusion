@@ -110,6 +110,40 @@
   }
 }
 
+/* **A panel narrower than the page grows from the corner it hangs off.**
+ *
+ * The reveal above is a curtain: the bottom inset runs from 100% to nothing, so
+ * the panel appears top to bottom across its whole width. That is right for
+ * `full`, which spans the page and has no corner to belong to. A narrow panel
+ * does have one — the trigger it is anchored under — and sweeping its whole
+ * width down reads as a band unrelated to the thing that opened it.
+ *
+ * So the right inset starts at 100% as well, and the panel opens rightwards and
+ * downwards out of its top-left corner.
+ *
+ * **All three rules, and the closed one is why.** Written as the closed state
+ * alone this selector is `(0,3,0)` against the shared open rule's `(0,2,0)`, so
+ * it would outrank the thing it is supposed to be opening into and the panel
+ * would never appear at all. The open state is restated at a weight that beats
+ * it, and the starting style is what actually names where the growth begins.
+ */
+:host(:not([variant="full"])) [part="surface"] {
+  clip-path: inset(0 100% 100% calc(var(--helix-space-xl) * -1));
+}
+
+:host(:not([variant="full"])) [part="surface"]:popover-open {
+  clip-path: inset(
+    0 calc(var(--helix-space-xl) * -1) calc(var(--helix-space-xl) * -1)
+      calc(var(--helix-space-xl) * -1)
+  );
+}
+
+@starting-style {
+  :host(:not([variant="full"])) [part="surface"]:popover-open {
+    clip-path: inset(0 100% 100% calc(var(--helix-space-xl) * -1));
+  }
+}
+
 /* A band from edge to edge. Both insets rather than a width, or it overflows:
    `100vw` counts the scrollbar's gutter and `100dvw` is the same measurement
    with browser chrome out of the way, so it fixed nothing. */

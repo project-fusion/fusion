@@ -34,7 +34,9 @@
   min-block-size: var(--helix-size-control);
   /* Room kept at the end for the caret, which is no longer in the flow. */
   padding-block: var(--helix-space-2xs);
-  padding-inline-end: calc(var(--helix-space-xs) + var(--helix-size-icon));
+  /* Off the same token the caret is, so the room follows it rather than being a
+     second opinion about how wide it is. */
+  padding-inline-end: calc(var(--helix-space-xs) + var(--helix-size-icon-tight));
   position: relative;
 }
 
@@ -125,11 +127,16 @@
   opacity: 0.5;
 }
 
+/* **The tight size, which is what Select's caret already is**, and the two were
+   a step apart: this drew at the full icon size and Select's at 0.8 of it, so
+   the same mark in the same kind of field came out visibly bigger here. A caret
+   is not content, it is a hint about what the control does, and Select's own
+   note is the one that measured the case. */
 [part="indicator"] {
-  block-size: var(--helix-size-icon);
+  block-size: var(--helix-size-icon-tight);
   color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 :host(:state(open)) [part="indicator"],
