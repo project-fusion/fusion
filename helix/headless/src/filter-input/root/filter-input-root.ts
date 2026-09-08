@@ -342,12 +342,22 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * would only be a copy of that one going stale.
    */
   private settleOpen(): void {
-    this.requestOpen(
-      this.suggesting &&
-        !this.dismissed &&
-        !this.isDisabled &&
-        this.contains(document.activeElement),
-    )
+    /* **`:focus-within` and not `document.activeElement`.** That property is
+       retargeted to the outermost host, so it names this element only while this
+       element is in the document tree: put the field inside anybody else's
+       shadow root — a sandbox, a preview frame, a consumer's own component — and
+       it names *their* host instead, `contains` answers false, and the panel
+       never opens anywhere it is nested. The selector is evaluated on this
+       element, so it is true whenever focus is inside it and stays true however
+       deeply the element itself is buried.
+
+       Both, because neither is available everywhere: the selector is what a
+       browser answers and happy-dom does not implement it, `activeElement` is
+       what the harness answers and is wrong under nesting. Either being true
+       means the same thing, and a light-DOM child holding focus — a token's own
+       remove control — is inside this element on both readings. */
+    const focused = this.matches(':focus-within') || this.contains(document.activeElement)
+    this.requestOpen(this.suggesting && !this.dismissed && !this.isDisabled && focused)
   }
 
   /** Moves the highlight, wrapping, and opens the panel if it was closed. */
@@ -541,6 +551,17 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     this.releaseCaret = undefined
     this.internals.setFormValue(this.value)
     this.markActive()
+    /* **The panel is a manual popover, so `open` alone shows nothing.** The
+       attribute puts it in the top layer only once the platform is asked, and
+       until then the UA's own `[popover]:not(:popover-open)` keeps it
+       `display: none` however this element feels about being open. Combobox
+       drives the same controller from the same place and for the same reason.
+       Both calls are safe when the panel is already in that state. */
+    if (this.open) {
+      this.panel.show()
+    } else {
+      this.panel.hide()
+    }
     /* **After the render, because opening is an announcement.** `requestOpen`
        fires `helix-before-open` and `toggle`, and an element that dispatched
        those from inside its own render would hand a consumer a half-drawn

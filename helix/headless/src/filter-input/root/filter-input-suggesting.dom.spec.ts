@@ -125,6 +125,33 @@ describe('a filter field that suggests', () => {
     expect(toggles).toEqual(['open'])
   })
 
+  test('the platform is asked to show the panel, not just told it is open', async () => {
+    /* **`open` alone shows nothing.** The surface is a manual popover, so until
+       `showPopover` is called the UA's own `[popover]:not(:popover-open)` keeps
+       it `display: none` however open this element believes it is. Shipped
+       without this the panel could never appear, and every other test here
+       passed anyway, because they all read the property and the ARIA rather than
+       whether anything was shown. */
+    const host = await mount(['absent', 'stale'])
+    const panel = surface(host) as HTMLElement & {
+      showPopover: () => void
+      hidePopover: () => void
+    }
+    const asked: string[] = []
+    panel.showPopover = () => {
+      asked.push('show')
+    }
+    panel.hidePopover = () => {
+      asked.push('hide')
+    }
+
+    await enter(host)
+    expect(asked).toContain('show')
+
+    await press(host, 'Escape')
+    expect(asked).toContain('hide')
+  })
+
   test('the arrows move a highlight without moving focus', async () => {
     const host = await mount(['absent', 'stale', 'thin'])
     await enter(host)
