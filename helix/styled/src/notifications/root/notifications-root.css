@@ -67,20 +67,35 @@
   --notifications-rule: transparent;
 }
 
+/* **Muted, because the accent is spoken for.** This was drawn in
+   `--helix-color-accent`, which is the same color the unread mark is: measured,
+   both `oklch(0.659 0.19 78)`. So one hue in one panel meant both "this is new,
+   look at it" and "press me to make nothing new" — the state a reader scans for
+   and the control that ends it, wearing the same coat.
+
+   The mark keeps the accent, being the thing the panel exists to show. This is
+   chrome: a bulk action nobody opened the panel to take, sitting beside a title,
+   which is what `foreground-muted` is for. It is the same weight the footer's
+   link now carries, so the two pieces of chrome in this component agree with
+   each other and neither competes with a row. */
 [part="mark-all"] {
   background: none;
   border: 0;
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-accent);
+  color: var(--helix-color-foreground-muted);
   cursor: pointer;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-2xs);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* Ink rather than a line, which is how every other quiet control in this
+   library answers a pointer. An underline appearing under a word in a header is
+   the one thing here that moves the text's own box. */
 [part="mark-all"]:hover {
-  text-decoration: underline;
+  color: var(--helix-color-foreground);
 }
 
 [part="mark-all"]:focus-visible {

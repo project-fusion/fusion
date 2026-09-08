@@ -53,7 +53,7 @@ export function Example() {
         Your invitation to the <strong>Platform</strong> team was accepted.
       </helix-notification>
       <a
-        data-link
+        data-link="quiet"
         href="#all"
         slot="footer"
       >
