@@ -45,6 +45,33 @@ export function Example() {
     setSuggestions(suggestionsFor(element.value, element.selectionStart))
   }
 
+  /**
+   * A key completes to `owner:` and the panel carries straight on into its
+   * values; a value completes to `owner:ada ` and the panel closes, because the
+   * next term is empty and every key matches again.
+   *
+   * Awaited, because the caret cannot be put into text that is not there yet:
+   * setting `value` schedules a render, and a `setSelectionRange` before it
+   * lands clamps to the old length and is then moved again by the render.
+   */
+  const choose = async (event: CustomEvent<{ value: string }>) => {
+    const element = filter.current
+    if (!element) {
+      return
+    }
+    const caret = element.selectionStart
+    const term = termAt(element.value, caret)
+    const insert = term.key === null ? `${event.detail.value}:` : `${event.detail.value} `
+    const head = element.value.slice(0, caret)
+    const typed = term.key === null ? term.text.length : term.text.length + term.key.length + 1
+    const kept = head.slice(0, head.length - typed)
+    element.value = kept + insert + element.value.slice(caret)
+    await element.updateComplete
+    const at = kept.length + insert.length
+    element.setSelectionRange(at, at)
+    offer()
+  }
+
   return (
     <helix-flex
       direction="column"
@@ -55,6 +82,7 @@ export function Example() {
       <helix-filter-input
         hint="Type a letter, or press Down. Choosing a key offers its values next."
         label="Filter rows"
+        onhelix-select={choose}
         onInput={offer}
         placeholder="owner:ada status:open"
         ref={filter}

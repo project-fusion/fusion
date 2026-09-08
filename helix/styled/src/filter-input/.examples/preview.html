@@ -32,3 +32,17 @@
     Billing
   </helix-tag>
 </helix-filter-input>
+
+<script type="module">
+  /* **A token asks to go and does not go on its own**, so a page that renders
+     `dismissible` tokens and binds nothing has drawn a control that answers
+     nothing. The consumer owns the markup the tokens are in, which is the whole
+     reason the field asks rather than takes: here that owner is this page.
+
+     Bound on the field rather than on each token, since `helix-dismiss` bubbles
+     and this is also the event Backspace on an empty field sends. One handler,
+     both ways of asking. */
+  document.querySelector('helix-filter-input').addEventListener('helix-dismiss', (event) => {
+    event.target.remove()
+  })
+</script>

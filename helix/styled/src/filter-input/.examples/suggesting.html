@@ -71,7 +71,7 @@
 
   /* **One handler for both ways of choosing**, since the option announces its
      own `helix-select` whether it was pressed or reached with Enter. */
-  filter.addEventListener('helix-select', (event) => {
+  filter.addEventListener('helix-select', async (event) => {
     const term = termAt(filter.value)
     /* A key completes to `owner:` and the panel carries straight on into its
        values. A value completes to `owner:ada ` and the panel closes, because
@@ -79,9 +79,15 @@
     const insert = term.key === null ? `${event.detail.value}:` : `${event.detail.value} `
     const head = filter.value.slice(0, filter.selectionStart)
     const kept = head.slice(0, head.length - (term.key === null ? term.text.length : term.text.length + term.key.length + 1))
-    filter.value = kept + insert + filter.value.slice(filter.selectionStart)
-    /* The caret goes after what was written, or the next parse reads the term
-       the reader has already finished with. */
+    const tail = filter.value.slice(filter.selectionStart)
+    filter.value = kept + insert + tail
+    /* **Awaited, because the caret cannot be put into text that is not there
+       yet.** Setting `value` schedules a render; the `<input>` still holds the
+       old string until it lands, so a `setSelectionRange` before it clamps to
+       the old length and the render then moves the caret again. That is what
+       stopped the second level appearing: the next parse read the term the
+       reader had already finished with. */
+    await filter.updateComplete
     const at = kept.length + insert.length
     filter.setSelectionRange(at, at)
     offer()
