@@ -53,22 +53,37 @@ export class HelixHeadlessBadge extends HelixElement {
    * The count or short text to show.
    *
    * Absent shows a dot, zero shows nothing.
+   *
+   * **A string, and a number is taken anyway.** What this shows is usually a
+   * count, so `value={unread}` is the first thing a React consumer writes, and
+   * a property assignment does not go through the attribute converter that
+   * would have made it a string. Read raw it went straight into
+   * `this.value.trim()`, which threw inside `render` and left the mark showing
+   * whatever it had last: measured, a badge set to the number 2 stayed an 8px
+   * dot with no digit in it, and the console carried
+   * `TypeError: this.value.trim is not a function`. A component whose whole job
+   * is showing a count must not lose the count for being handed one.
    */
   @property()
-  value = ''
+  value: number | string = ''
+
+  /** The value as text, whatever it was set to. */
+  private get given(): string {
+    return String(this.value ?? '')
+  }
 
   /** Whether the value counts nothing, in which case there is no mark. */
   private get blank(): boolean {
-    return this.value.trim() !== '' && Number(this.value) === 0
+    return this.given.trim() !== '' && Number(this.given) === 0
   }
 
   /** What the indicator reads, once the cap has been applied. */
   private get text(): string {
-    const count = Number(this.value)
+    const count = Number(this.given)
     if (this.max !== undefined && Number.isFinite(count) && count > this.max) {
       return `${this.max}+`
     }
-    return this.value
+    return this.given
   }
 
   protected override render(): TemplateResult {

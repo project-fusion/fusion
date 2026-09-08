@@ -103,4 +103,40 @@ describe('badge', () => {
     const bare = await mount('<helix-headless-badge><span>x</span></helix-headless-badge>')
     expect(part(bare, 'indicator')?.getAttribute('aria-hidden')).toBe('true')
   })
+
+  test('a count set as a number shows the number', async () => {
+    // The property path, which is the one a framework takes and the one that
+    // skips the attribute converter. Read raw it reached `this.value.trim()`
+    // and threw inside `render`, so the mark kept whatever it had: measured in
+    // a browser, a badge set to 2 stayed an 8px dot with no digit in it.
+    const badge = await mount('<helix-headless-badge><span>x</span></helix-headless-badge>')
+    const counted = badge as unknown as { updateComplete: Promise<unknown>; value: number }
+    counted.value = 2
+    await counted.updateComplete
+
+    const indicator = part(badge, 'indicator')
+    expect(indicator?.textContent?.trim()).toBe('2')
+    // And the rest of the reading is made from the same text, so a number gets
+    // the circle and the cap exactly as a string does.
+    expect(indicator?.hasAttribute('data-single')).toBe(true)
+    expect(indicator?.hasAttribute('data-blank')).toBe(false)
+  })
+
+  test('a numeric zero counts nothing, the same as the string does', async () => {
+    const badge = await mount('<helix-headless-badge><span>x</span></helix-headless-badge>')
+    const counted = badge as unknown as { updateComplete: Promise<unknown>; value: number }
+    counted.value = 0
+    await counted.updateComplete
+
+    expect(part(badge, 'indicator')?.hasAttribute('data-blank')).toBe(true)
+  })
+
+  test('a number past the cap reads as the ceiling', async () => {
+    const badge = await mount('<helix-headless-badge max="9"><span>x</span></helix-headless-badge>')
+    const counted = badge as unknown as { updateComplete: Promise<unknown>; value: number }
+    counted.value = 42
+    await counted.updateComplete
+
+    expect(part(badge, 'indicator')?.textContent?.trim()).toBe('9+')
+  })
 })
