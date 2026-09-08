@@ -252,6 +252,36 @@
   display: block;
 }
 
+/* **A chip, and only around what a consumer slotted.**
+ *
+ * An orb standing in this slot beside a word is a status: "connecting", "reading
+ * the release". Bare on the bubble's ground it is a mark floating next to text
+ * with nothing holding the two together, and at 24px against 13px type it is the
+ * loudest thing in a turn that has not started yet.
+ *
+ * **The ground belongs here rather than to `Orb`**, which is the seam worth
+ * naming. A chip is a fact about sitting in this slot next to words, not a fact
+ * about the orb: the same element used as a launcher or a hero wants no ground
+ * at all, and giving it one there to suit this would be a component carrying a
+ * container's decision. So the rule is `::slotted()` and the orb stays what it
+ * is.
+ *
+ * **And the fallback keeps nothing**, which falls out of writing it this way
+ * rather than being a second rule: `[part="indicator"]` is the three dots this
+ * component draws itself, they are not slotted, and a chip around a typing
+ * indicator would be a pill containing three dots and no words. */
+slot[name="indicator"]::slotted(*) {
+  background-color: var(--chat-indicator-background-color, var(--helix-color-surface-sunken));
+  border-radius: var(--helix-radii-full);
+  /* Small, because it qualifies the turn rather than being it. */
+  font-size: var(--helix-text-xs);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  /* The mark comes down with the words it sits beside: a 24px orb against a
+     12px line is a badge with a sentence stuck to it. */
+  --orb-size: var(--helix-size-icon-sm);
+}
+
 /* **The dots are the slot's fallback, which is what makes this additive.** A
    consumer who slots an orb replaces them by the ordinary rule of slots: no
    attribute to set, no `:has()` to write, and nothing to keep in step. A

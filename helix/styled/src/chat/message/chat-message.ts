@@ -30,6 +30,7 @@ import { styles } from './chat-message.css.js'
  * @csspart indicator - The three dots, when nothing is slotted over them.
  * @csspart meta - The time and the state together.
  *
+ * @cssproperty --chat-indicator-background-color - Ground behind a slotted waiting indicator, which is a chip so the mark and its word read as one thing.
  * @cssproperty --chat-message-background-color - Fill behind a turn.
  * @cssproperty --chat-message-background-color-me - Fill behind the reader's own turns.
  * @cssproperty --chat-message-color - Ink in a turn.

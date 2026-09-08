@@ -998,6 +998,115 @@ helix-toast:not([data-color-mode]) {
   font-family: var(--helix-font-mono);
 }
 
+/* ================================================================== prose ==
+ * **What the recipe was missing, which is everything a document is made of
+ * besides headings, links and code.**
+ *
+ * The resets above take `margin` and `padding` off `ul` and `ol` and nothing
+ * puts them back, so a list rendered inside a bounded surface had its markers
+ * hanging in the container's own padding: measured in a chat bubble, a `ul` at
+ * `padding: 0` with `list-style-position: outside` put its bullets in the 12px
+ * the bubble reserved for breathing room. A `table` fared worse, since there was
+ * never a rule for one at all: no borders, and cells at the UA's 1px, so two
+ * columns ran into each other.
+ *
+ * `:where()` throughout, like the rest of the recipe, so a consumer's own class
+ * beats any of it without a specificity fight.
+ */
+
+/* The rhythm between blocks. One value, spent on the gap after each, so a
+   paragraph followed by a list and a list followed by a table are all the same
+   distance apart and the document does not change pace at each change of
+   element. */
+:where([data-prose] p),
+:where([data-prose] ul, [data-prose] ol),
+:where([data-prose] pre),
+:where([data-prose] table),
+:where([data-prose] blockquote) {
+  margin-block: var(--helix-space-none) var(--helix-space-sm);
+}
+
+/* And nothing hanging off either end, so the surface's own padding is the only
+   space at the edges of the passage. */
+:where([data-prose] > :last-child) {
+  margin-block-end: var(--helix-space-none);
+}
+
+/* The markers go back inside. `padding-inline-start` rather than
+   `list-style-position: inside`, which pulls the marker into the text flow and
+   wraps the second line under the bullet instead of under the words. */
+:where([data-prose] ul, [data-prose] ol) {
+  padding-inline-start: var(--helix-space-lg);
+}
+
+:where([data-prose] li) {
+  margin-block: var(--helix-space-2xs);
+}
+
+/* A nested list is inside its parent's rhythm, not on top of it. */
+:where([data-prose] li > ul, [data-prose] li > ol) {
+  margin-block: var(--helix-space-2xs) var(--helix-space-none);
+}
+
+/* **Collapsed borders and one hairline, which is the same rule `DataTable`
+   follows**: a column reads as a column because every cell shares one edge, and
+   a grid of boxed cells reads as a spreadsheet. */
+:where([data-prose] table) {
+  border-collapse: collapse;
+  /* It scrolls inside its own box rather than widening the passage, which is the
+     document rule this file states for wide content. */
+  display: block;
+  overflow-x: auto;
+  max-inline-size: 100%;
+}
+
+:where([data-prose] th, [data-prose] td) {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  text-align: start;
+}
+
+/* The heading row is weight and a rule, never a fill. */
+:where([data-prose] th) {
+  color: var(--helix-color-foreground-subtle);
+  font-weight: var(--helix-weight-medium);
+}
+
+:where([data-prose] tbody tr:last-child th),
+:where([data-prose] tbody tr:last-child td) {
+  border-block-end-color: transparent;
+}
+
+/* A ground for a block of code, which the font alone does not give it. Inline
+   `code` keeps none: a word in a sentence wearing a box breaks the line's
+   rhythm, and the mono face is enough to say what it is. */
+:where([data-prose] pre) {
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-sm);
+  overflow-x: auto;
+  padding: var(--helix-space-sm);
+}
+
+:where([data-prose] pre code) {
+  background-color: transparent;
+  font-size: inherit;
+  padding: var(--helix-space-none);
+}
+
+/* Quoted, by a rule on the edge it is indented from. */
+:where([data-prose] blockquote) {
+  border-inline-start: var(--helix-border-thick) solid var(--helix-color-border);
+  color: var(--helix-color-foreground-muted);
+  padding-inline-start: var(--helix-space-sm);
+}
+
+:where([data-prose] hr) {
+  border: 0;
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  margin-block: var(--helix-space-md);
+}
+
 :where(:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);

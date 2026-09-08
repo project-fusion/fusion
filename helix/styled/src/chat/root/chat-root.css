@@ -175,9 +175,29 @@
    the pair reads as one badly drawn border. The header
    keeps its rule because a header is a band of chrome with nothing else to bound
    it; a composer is a control and a control's own edge is its boundary. */
+/* **The composer's frame is inset less than everything else, so the words inside
+   it line up with the words above it.**
+
+   Every other region here pads by `--chat-padding-inline`, and their content
+   starts on that line: measured, the header's text and a plain answer's text
+   both at 16. The composer is a framed control, so its own edge and its own
+   padding sit between that line and the first character, which put the caret at
+   29 while everything above it started at 16. Thirteen pixels is not a near miss,
+   and no amount of tuning inside a box fixes it: a frame with padding cannot put
+   its text where an unframed paragraph puts its text unless the frame moves out.
+
+   So the frame moves out by exactly what it spends inside itself: its border and
+   its own inline padding, subtracted from the line. Written as that subtraction
+   rather than as the 7px it comes to, so a consumer moving
+   `--chat-padding-inline` moves the caret and the frame together and the three
+   still add up. */
 [part="composer"] {
   padding-block: var(--helix-space-sm);
-  padding-inline: var(--chat-padding-inline, var(--helix-space-md));
+  padding-inline: calc(
+    var(--chat-padding-inline, var(--helix-space-md)) -
+    var(--helix-space-xs) -
+    var(--helix-border-thin)
+  );
 }
 
 [part="empty"],
