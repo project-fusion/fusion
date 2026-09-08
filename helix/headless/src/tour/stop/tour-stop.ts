@@ -183,7 +183,7 @@ export class HelixHeadlessTourStop extends HelixElement {
     return html`<slot name="actions">
       <${this.tag('button')}
         part="skip"
-      exportparts="button: skip-button" appearance="ghost" @click=${() => this.ask('skip')}>
+      exportparts="button: skip-button" emphasis="ghost" @click=${() => this.ask('skip')}>
         ${this.skipLabel}
       </${this.tag('button')}>
       ${
@@ -192,7 +192,7 @@ export class HelixHeadlessTourStop extends HelixElement {
           : html`<${this.tag('button')}
               part="back"
       exportparts="button: back-button"
-              appearance="outlined"
+              emphasis="outlined"
               @click=${() => this.ask('back')}
             >
               ${this.backLabel}
@@ -201,7 +201,7 @@ export class HelixHeadlessTourStop extends HelixElement {
       <${this.tag('button')}
         part="next"
       exportparts="button: next-button"
-        appearance="solid"
+        emphasis="solid"
         tone="primary"
         @click=${() => this.ask('next')}
       >

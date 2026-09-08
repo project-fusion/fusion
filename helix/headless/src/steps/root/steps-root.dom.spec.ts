@@ -119,7 +119,16 @@ describe('a step is pressable, and only its name is', () => {
     const step = await one('value="pay"')
     const label = part(step, 'label') as HTMLElement
     expect(label.tagName).toBe('HELIX-HEADLESS-BUTTON')
-    expect(label.getAttribute('appearance')).toBe('ghost')
+    /* **`emphasis`, which is the name the button actually has.** This asserted
+       `appearance` for as long as the step wrote it, and neither tier has ever
+       had such a property: the test passed on markup that landed nowhere, and
+       every step drew at the default emphasis while this said it was a ghost.
+
+       The attribute rather than the property is right here even so, because a
+       visual axis belongs to the styled tier and the base button deliberately
+       has none: what this tier owes is the correct name written down for the
+       subclass to read. */
+    expect(label.getAttribute('emphasis')).toBe('ghost')
     expect(step.shadowRoot?.querySelector('[part="marker"]')?.tagName).toBe('SPAN')
   })
 

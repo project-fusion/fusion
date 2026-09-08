@@ -569,7 +569,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
         option-label: picker-option-label, option-text: picker-option-text"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
-      appearance=${this.variant ?? nothing}
+      variant=${this.variant ?? nothing}
       label=${this.label || 'Time'}
       locale=${this.locale || nothing}
       max=${this.max}

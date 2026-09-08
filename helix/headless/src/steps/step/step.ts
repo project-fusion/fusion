@@ -133,7 +133,7 @@ export class HelixHeadlessStep extends HelixElement {
     return html`<${this.tag('button')}
       part="label"
       exportparts="button: label-button"
-      appearance="ghost"
+      emphasis="ghost"
       ?disabled=${this.disabled}
       @click=${this.select}
     >

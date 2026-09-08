@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The words naming this choice.
  * @slot icon - A mark shown beside them, or instead of them under
- * `appearance="chip"`, where the words become the accessible name and the mark
+ * `variant="chip"`, where the words become the accessible name and the mark
  * is what a reader picks between. Separate from the default slot because the
  * chip has to hide one and show the other, and they are both in the same place
  * otherwise.

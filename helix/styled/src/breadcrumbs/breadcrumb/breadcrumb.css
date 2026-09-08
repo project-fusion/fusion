@@ -96,13 +96,19 @@
   scale: -1 1;
 }
 
-/* The crumb itself, whether it is a link or the current page. */
+/* The crumb itself, whether it is a link or the current page.
+ *
+ * **The gap is what sits between a mark and the word beside it**, and it only
+ * ever shows where there is a mark: a crumb holding text alone is one flex item
+ * and a gap between one thing and nothing is nothing. So this is `xs` rather
+ * than `2xs` — at the smaller step an icon sat close enough to the first letter
+ * to read as part of the word. */
 [part="link"] {
   align-items: center;
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
-  gap: var(--helix-space-2xs);
+  gap: var(--helix-space-xs);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   text-decoration: none;
 }

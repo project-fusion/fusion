@@ -1,0 +1,12 @@
+/* **A badge sits on the thing it counts, and an icon button is mostly padding.**
+   The default offset is a quarter of the badge's own size, which puts it just
+   inside the corner of whatever it wraps. That is right for a face or a picture,
+   where the content reaches the corner; an icon button is a 40px target around a
+   20px glyph, so the corner is empty and the badge floated in that emptiness
+   rather than sitting on the bell.
+
+   Set here rather than changed at the source, because which of the two is
+   typical is a question about consumers and not about this example. */
+helix-badge {
+  --badge-offset: 8px;
+}
