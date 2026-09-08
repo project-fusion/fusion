@@ -364,7 +364,18 @@
   /* `flex-start` with the forward arrow pushed over, not `space-between`. */
   justify-content: flex-start;
   padding-block-start: var(--helix-space-none);
-  padding-inline: var(--helix-space-md);
+  /* **The bleed and then a gap, because the bar is wider than the picture it is
+     drawn on.** This bar stretches across the whole frame while the track is
+     inset by `--_carousel-bleed`, so padding measured from the frame's edge is
+     spent reaching the slide before it insets anything. At a flat `space-md` the
+     two were the same 16px by coincidence and canceled exactly: measured on the
+     hero example, the back arrow's left edge and the forward arrow's right edge
+     each landed on the picture's edge, inset by zero.
+
+     Naming the bleed rather than doubling the token also keeps it true for a
+     consumer who sets `--carousel-bleed`, where a hard second 16px would drift
+     the other way. */
+  padding-inline: calc(var(--_carousel-bleed) + var(--helix-space-md));
   pointer-events: none;
   z-index: var(--helix-layer-raised);
 }

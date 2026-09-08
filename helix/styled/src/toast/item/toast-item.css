@@ -24,11 +24,16 @@
   /* The stack's spacing, held here rather than as the region's flex gap, so it
      goes when the message goes. */
   margin-block-start: var(--_toast-gap, var(--helix-space-xs));
+  /* The way back, which only a consumer controlling `open` ever takes, and it
+     is the arrival's curve for the same reason the arrival has it: something
+     coming into view comes to rest. The opacity is the movement's length here
+     too — a message that reappeared in 120ms while sliding for 200ms was
+     already solid before it had arrived. */
   transition:
-    grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard),
-    margin-block-start var(--helix-duration-normal) var(--helix-easing-standard),
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    translate var(--helix-duration-normal) var(--helix-easing-standard);
+    grid-template-rows var(--helix-duration-normal) var(--helix-easing-decelerate),
+    margin-block-start var(--helix-duration-normal) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-decelerate),
+    translate var(--helix-duration-normal) var(--helix-easing-decelerate);
   /* The width is the message's, not the region's: the region spans an edge so a
      stack can align along it, and a message as wide as the window is a banner. */
   inline-size: var(--toast-inline-size, 22rem);
@@ -239,7 +244,7 @@ slot[name="icon"]::slotted(*) {
 :host([data-closed]) [part="item"] {
   /* The last thing holding the box open. */
   padding-block: 0;
-  transition: padding-block var(--helix-duration-normal) var(--helix-easing-standard);
+  transition: padding-block var(--helix-duration-normal) var(--helix-easing-accelerate);
 }
 
 /* Hidden and still laid out, which is the one case `HelixElement`'s prepended
@@ -256,11 +261,22 @@ slot[name="icon"]::slotted(*) {
   opacity: 0;
   translate: 0 var(--_toast-enter, var(--helix-space-lg));
   visibility: hidden;
+  /* **The fade is the movement's length and not the fast step, which is what
+     made the exit look like there was not one.** Measured: five transitions do
+     start, so the departure was never missing. But opacity ran for 120ms while
+     the collapse, the slide and the margin ran for 200ms, so the message was
+     already fully transparent a third of the way through moving, and what is
+     left to watch is an invisible box closing a gap. The eye reports that as a
+     disappearance.
+
+     And it accelerates out, having decelerated in. `easing-decelerate` on the
+     arrival is a thing coming to rest; leaving on `easing-standard`, which is
+     also a settling curve, is a message easing gently into nowhere. */
   transition:
-    grid-template-rows var(--helix-duration-normal) var(--helix-easing-standard),
-    margin-block-start var(--helix-duration-normal) var(--helix-easing-standard),
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    translate var(--helix-duration-normal) var(--helix-easing-standard),
+    grid-template-rows var(--helix-duration-normal) var(--helix-easing-accelerate),
+    margin-block-start var(--helix-duration-normal) var(--helix-easing-accelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-accelerate),
+    translate var(--helix-duration-normal) var(--helix-easing-accelerate),
     visibility var(--helix-duration-normal) step-end;
 }
 
