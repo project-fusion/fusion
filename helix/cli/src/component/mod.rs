@@ -67,6 +67,7 @@ pub mod seams;
 pub mod seeds;
 pub mod selectors;
 pub mod separation;
+pub mod slots;
 pub mod ssr;
 pub mod stable;
 pub mod tier;
@@ -646,6 +647,12 @@ pub fn all() -> Vec<Rule> {
             name: "separation",
             run: Runner::Source(separation::run),
             summary: "a surface hooks both its edge and its lift",
+        },
+        Rule {
+            fix: None,
+            name: "slots",
+            run: Runner::Source(slots::run),
+            summary: "every slot a component documents is one its family renders",
         },
         Rule {
             fix: None,

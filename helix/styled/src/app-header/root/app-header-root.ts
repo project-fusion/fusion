@@ -26,8 +26,8 @@ import { styles } from './app-header-root.css.js'
  * @documentation https://helix.fusion.dev/components/app-header
  *
  * @slot - Primary navigation.
- * @slot actions - Trailing actions, such as a call to action.
- * @slot brand - Wordmark or logo, at the inline start.
+ * @slot end - Trailing content, usually a call to action.
+ * @slot start - Leading content, usually a wordmark.
  *
  * @csspart content - The centered row inside the banner.
  *
