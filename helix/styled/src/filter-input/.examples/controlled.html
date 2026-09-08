@@ -1,0 +1,63 @@
+<!-- @summary Owning the text, which is done by refusing the change rather than by writing the value. -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <!-- **Uppercased as it is typed**, which is the smallest thing that shows who
+       won: if the element still owned the text, the reader's own case would
+       survive a keystroke. -->
+  <helix-filter-input
+    hint="Typed text arrives here in upper case, because the page decided so"
+    id="owned"
+    label="Filter rows"
+  ></helix-filter-input>
+
+  <helix-list
+    divided
+    id="log"
+    label="What arrived"
+  >
+    <helix-list-item>
+      Nothing yet
+      <span slot="supporting">Type into the field</span>
+    </helix-list-item>
+  </helix-list>
+</helix-flex>
+
+<script type="module">
+  const field = document.getElementById('owned')
+  const log = document.getElementById('log')
+  let empty = true
+
+  const KEEP = 5
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'supporting'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  /* **This is the whole of it: refuse, then write.**
+     Writing `value` on its own would not have taken ownership. The property
+     applies whatever it is given and goes on applying whatever the reader
+     types, so a page that only wrote it would be corrected on the next
+     keystroke. Refusing is what stops the element applying the edit, and
+     leaves the page to say what the value is. */
+  field.addEventListener('helix-before-change', (event) => {
+    event.preventDefault()
+    field.value = event.detail.value.toUpperCase()
+    say('helix-before-change', `refused "${event.detail.value}", wrote "${field.value}"`)
+  })
+</script>
