@@ -19,7 +19,7 @@ export function Example() {
         size="sm"
       >
         <helix-icon
-          name="warning-fill"
+          name="x-circle-fill"
           slot="icon"
         ></helix-icon>
         <helix-text
