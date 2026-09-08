@@ -95,8 +95,32 @@
   padding-block-end: var(--helix-space-sm);
 }
 
+/* **A row across the table's width, not a block the controls sit at the left
+   of.** The grid above spans the whole component, so a run of five page buttons
+   in the bottom-left corner is a control with nothing under its far half and no
+   edge to be measured against. Everything a consumer slots here goes at the
+   start and the pagination goes at the end, which is the arrangement
+   `Pagination`'s own footer example already shows: a summary on one side and the
+   run on the other.
+
+   It wraps, because the same footer at 360px is a summary, a page-size control
+   and a run of numbers on one line, and the run is the part that has to stay
+   whole. */
 [part="footer"] {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-md);
   padding-block-start: var(--helix-space-sm);
+}
+
+/* **The end, whether or not anything is slotted beside it**, which is what makes
+   the bare table read as measured against its own edge rather than adrift in the
+   corner. `margin-inline-start: auto` and not `justify-content: space-between`:
+   with one item those two disagree, and the one that puts a lone pagination at
+   the start is the one that leaves it where it was. */
+[part="pagination"] {
+  margin-inline-start: auto;
 }
 
 /* What a collection says instead of rows: the same two lines everywhere, in the

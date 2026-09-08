@@ -1,0 +1,67 @@
+<!-- @summary A reading of the range and a choice of page size, either side of the pagination the table draws. -->
+<!-- @min 520 -->
+
+<helix-data-table
+  id="files"
+  label="Files"
+  page-size="8"
+>
+  <helix-pagination-summary
+    id="range"
+    page="1"
+    page-size="8"
+    slot="footer"
+    total="40"
+  ></helix-pagination-summary>
+  <helix-pagination-size
+    default-value="8"
+    id="size"
+    sizes="8,16,40"
+    slot="footer"
+  ></helix-pagination-size>
+
+  <helix-table-column
+    field="name"
+    sortable
+    width="14rem"
+  >File</helix-table-column>
+  <helix-table-column
+    align="end"
+    field="size"
+    sortable
+  >Size</helix-table-column>
+  <helix-table-column field="kind">Kind</helix-table-column>
+</helix-data-table>
+
+<script type="module">
+  const table = document.getElementById('files')
+  const range = document.getElementById('range')
+  const size = document.getElementById('size')
+
+  const TOTAL = 40
+  table.rows = Array.from({ length: TOTAL }, (_, index) => ({
+    kind: index % 4 === 0 ? 'font' : 'image',
+    name: `asset-${String(index + 1).padStart(3, '0')}.webp`,
+    size: 12000 + index * 837,
+  }))
+
+  /* The summary takes its own `page`, `page-size` and `total` rather than
+     reading them off the table, which the component says of itself: three
+     numbers from the consumer's query, used twice. Keeping them in step is what
+     this listener is, and it is the whole cost of that decision. */
+  const sync = () => {
+    range.page = table.page
+    range.pageSize = table.pageSize
+  }
+
+  table.addEventListener('helix-navigate', () => {
+    /* After the table has applied the move, since the event announces it ahead
+       of time and is refusable. */
+    queueMicrotask(sync)
+  })
+
+  size.addEventListener('helix-before-change', (event) => {
+    table.pageSize = Number(event.detail.value)
+    queueMicrotask(sync)
+  })
+</script>
