@@ -485,3 +485,76 @@ if (hasLayout()) {
     })
   })
 }
+
+describe('pressing the picture', () => {
+  const media = async (markup?: string): Promise<{ host: Player; video: HTMLVideoElement }> => {
+    const host = await player(markup)
+    const video = host.shadowRoot?.querySelector('video') as HTMLVideoElement
+    return { host, video }
+  }
+
+  /* `play` and `pause` are stubbed rather than driven, because whether a browser
+     decodes a file is not what is under test: whether a press on the picture
+     reaches the element's own toggle is. */
+  const stub = (video: HTMLVideoElement) => {
+    const calls: string[] = []
+    Object.defineProperty(video, 'paused', { configurable: true, value: true })
+    video.play = (() => {
+      calls.push('play')
+      return Promise.resolve()
+    }) as HTMLVideoElement['play']
+    video.pause = () => {
+      calls.push('pause')
+    }
+    return calls
+  }
+
+  const press = (video: HTMLVideoElement) => {
+    video.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+  }
+
+  test('a press on the picture starts it, which is the target a reader aims at', async () => {
+    const { host, video } = await media()
+    const calls = stub(video)
+
+    press(video)
+    await host.updateComplete
+
+    expect(calls).toEqual(['play'])
+  })
+
+  test('a press does nothing while the browser is drawing its own bar', async () => {
+    // Acting here would toggle twice, once in this element and once in the UA,
+    // which cancels out and reads as a player that ignores the press.
+    const { host, video } = await media(
+      '<helix-headless-video controls label="A clip" src="/clip.mp4"></helix-headless-video>',
+    )
+    const calls = stub(video)
+
+    press(video)
+    await host.updateComplete
+
+    expect(calls).toEqual([])
+  })
+
+  test('a press on a player whose chrome has gone asks for it back, and nothing else', async () => {
+    // Which is what every touch player does: the first tap is for the controls,
+    // and the second means what it says.
+    const { host, video } = await media()
+    const calls = stub(video)
+    const idled = host as unknown as { idle: boolean }
+    idled.idle = true
+    await host.updateComplete
+
+    press(video)
+    await host.updateComplete
+
+    expect(calls).toEqual([])
+    expect(idled.idle).toBe(false)
+
+    press(video)
+    await host.updateComplete
+
+    expect(calls).toEqual(['play'])
+  })
+})

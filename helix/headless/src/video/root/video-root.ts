@@ -1224,6 +1224,37 @@ export class HelixHeadlessVideo extends HelixElement {
     }
   }
 
+  /**
+   * A press on the picture plays or pauses it.
+   *
+   * **The picture is the biggest target a player has**, and on every other
+   * player a reader has used it is the one that stops the thing. A component
+   * that spends the whole frame on a video and then asks for a 32 pixel button
+   * is one that works only for people who know where the button is.
+   *
+   * **Two cases where it must not.** The first is `controls`, where the browser
+   * draws its own bar over the picture and owns what a press on it means: acting
+   * as well would toggle twice, once here and once in the UA, which cancels out
+   * and looks broken.
+   *
+   * The second is a player whose chrome has gone idle. There, the first press is
+   * asking for the controls back rather than asking to pause, which is what
+   * every touch player does: `stir` brings them, and the press is spent. A
+   * second press, with the bar showing, means what it says. This is also why the
+   * check is `idle` rather than a pointer-type test: it is the same answer for a
+   * mouse left resting until the bar faded.
+   */
+  private readonly handlePicture = (): void => {
+    if (this.controls) {
+      return
+    }
+    if (this.idle) {
+      this.stir()
+      return
+    }
+    this.toggle()
+  }
+
   private readonly handleFullscreenChange = (): void => {
     this.full = document.fullscreenElement === this
   }
@@ -1756,6 +1787,7 @@ export class HelixHeadlessVideo extends HelixElement {
         ?loop=${this.loop}
         ?muted=${this.defaultMuted}
         ?playsinline=${this.playsInline}
+        @click=${this.handlePicture}
         @loadedmetadata=${this.handleLoaded}
         @timeupdate=${this.handleTime}
         @volumechange=${this.handleVolume}
