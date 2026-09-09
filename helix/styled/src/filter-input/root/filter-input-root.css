@@ -87,6 +87,30 @@
   min-inline-size: 0;
 }
 
+/* A control at either end is a token-sized target, not a field-sized one.
+ *
+ * The tokens beside it are `sm`, 32, and the field is a wrapping box with `2xs`
+ * above and below them. A `Button` slotted in takes the control size, 40, which
+ * is 8 taller than everything it sits with and carries `space-control` either
+ * side against a token's `xs`: measured, the trigger stood 40 against chips of
+ * 32 and was twice as wide-padded, so the row read as a control with tokens
+ * stuck to it rather than one row of peers. `Breadcrumb` writes these three for
+ * the same reason, and the note on `Button`'s `block-size` is where the hook is
+ * documented.
+ *
+ * **On the slots rather than on `[part="field"]`.** Slotted content inherits
+ * through the `<slot>` it lands in, so this reaches a `Button` nested inside a
+ * `FilterMenu` that `::slotted()` cannot match; written on the field it would
+ * also reach the picker's own popover and the suggestions panel, which are
+ * neither of them this row.
+ */
+slot[name="start"],
+slot[name="end"] {
+  --button-size: var(--filter-input-action-size, var(--helix-size-control-sm));
+  --icon-button-size: var(--filter-input-action-size, var(--helix-size-control-sm));
+  --button-padding-inline: var(--filter-input-action-padding-inline, var(--helix-space-xs));
+}
+
 /* Whatever is at either end keeps its size, so the text is what gives way when
    the field is narrow. */
 slot[name="start"]::slotted(*),
