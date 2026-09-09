@@ -18,11 +18,8 @@ export function Example() {
         const { arity, field, label, operatorLabel, values } = event.detail
         setChips((held) => {
           const rest = held.filter((chip) => chip.field !== field)
-          /* `arity` is what tells an empty filter from no filter. Every other
-             comparison with nothing chosen means the field is no longer
-             narrowing anything; one that takes no values means it is, and always
-             will have none to show. Without reading this the two arrive
-             identical and "is empty" could never be drawn. */
+          /* `arity` is what tells an empty filter from no filter: a comparison
+           that takes none is filtering, and will never have values to show. */
           return values.length === 0 && arity !== 'none'
             ? rest
             : [...rest, { field, label, operatorLabel, values }]
@@ -45,7 +42,6 @@ export function Example() {
           Filter
         </helix-button>
 
-        {/* The default pair, both `many`: tick as many as you like. */}
         <helix-filter-field
           label="Disposition"
           name="disposition"
@@ -55,9 +51,7 @@ export function Example() {
           <helix-option value="settled">Settled</helix-option>
         </helix-filter-field>
 
-        {/* `one`, so the values are a single choice: pressing another replaces
-            it rather than adding, and the rows announce as radios. A date is
-            after one date or it is after another; it is not after both. */}
+        {/* `one`: pressing another value replaces it rather than adding. */}
         <helix-filter-field
           label="Created"
           name="created"
@@ -72,10 +66,7 @@ export function Example() {
           <helix-option value="month">This month</helix-option>
         </helix-filter-field>
 
-        {/* `none` beside `many`. Choosing "is empty" is the whole filter, so the
-            picker stops offering names under it and the chip carries the word
-            with no values after it. Choosing "is any of" again brings them
-            back. */}
+        {/* `none`: the comparison is the whole filter, so no values are offered. */}
         <helix-filter-field
           label="Assignee"
           name="assignee"

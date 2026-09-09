@@ -134,7 +134,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @slot end - After the text, for a count or a control.
  * @slot start - Before the text, for a search icon.
  * @slot suggestions - What could be typed next, as `Option`s, and `Option.Group`s of them.
- * @slot tags - What is already narrowing the results, as `Tag`s.
+ * @slot tags - What is already narrowing the results, as `FilterChip`s or `Tag`s.
  *
  * @event {Event} change - Relayed from the input once the reader has finished.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
@@ -150,6 +150,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @csspart field - The box holding everything.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart label - The question, over the field.
+ * @csspart lead - The box before the text, holding whatever is slotted into `start`.
  * @csspart rest - How many tokens did not fit. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
  * @csspart tags - The row the tokens sit in.
@@ -218,6 +219,19 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    */
   @state()
   private suggesting = false
+
+  /**
+   * Whether anything is slotted before the text.
+   *
+   * The leading box is drawn only where there is something to put in it, and it
+   * is a box rather than a bare slot because it carries the seam between what a
+   * consumer put at the head of the field and the field itself. `Menu.Item`
+   * reads its own leading slot the same way and for the same reason: the light
+   * DOM answer is not reactive, so a control added after the first render would
+   * never get the box.
+   */
+  @state()
+  private leading = false
 
   /**
    * Whether Escape has closed the panel over text that still has suggestions.
@@ -687,6 +701,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     this.requestOpen(false)
   }
 
+  /** The leading box again, whenever what is in front of the text changes. */
+  private readonly handleLeading = (event: Event): void => {
+    this.leading = (event.target as HTMLSlotElement).assignedNodes({ flatten: true }).length > 0
+  }
+
   /** The row again, whenever what is in it changes. */
   private readonly handleTokens = (): void => {
     this.over = this.hideOverflow(this.tokens)
@@ -818,7 +837,9 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        `display: contents` with an empty slot inside it. */
     return html`${this.renderLabel()}
     <div part="field" @focusin=${this.handleFocusIn} @focusout=${this.handleFocusOut}>
-      <slot name="start"></slot>
+      <div part="lead" ?data-empty=${!this.leading}>
+        <slot name="start" @slotchange=${this.handleLeading}></slot>
+      </div>
       ${this.renderTokenRow(
         html`<slot name="tags" @slotchange=${this.handleTokens}></slot>`,
         this.over,

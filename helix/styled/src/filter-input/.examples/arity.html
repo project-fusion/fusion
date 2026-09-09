@@ -22,7 +22,6 @@
       Filter
     </helix-button>
 
-    <!-- The default pair, both `many`: tick as many as you like. -->
     <helix-filter-field
       label="Disposition"
       name="disposition"
@@ -32,9 +31,7 @@
       <helix-option value="settled">Settled</helix-option>
     </helix-filter-field>
 
-    <!-- `one`, so the values are a single choice: pressing another replaces it
-         rather than adding, and the rows announce as radios. A date is after one
-         date or it is after another; it is not after both. -->
+    <!-- `one`: pressing another value replaces it rather than adding. -->
     <helix-filter-field
       label="Created"
       name="created"
@@ -49,9 +46,7 @@
       <helix-option value="month">This month</helix-option>
     </helix-filter-field>
 
-    <!-- `none` beside `many`. Choosing "is empty" is the whole filter, so the
-         picker stops offering names under it and the chip carries the word with
-         no values after it. Choosing "is any of" again brings them back. -->
+    <!-- `none`: the comparison is the whole filter, so no values are offered. -->
     <helix-filter-field
       label="Assignee"
       name="assignee"
@@ -79,11 +74,8 @@
     const { arity, field, label, operatorLabel, values } = event.detail
     const held = filter.querySelector(`helix-filter-chip[name="${field}"]`)
 
-    /* **`arity` is what tells an empty filter from no filter.** Every other
-       comparison with nothing chosen means the field is no longer narrowing
-       anything; one that takes no values means it is, and always will have none
-       to show. Without reading this the two arrive identical and "is empty"
-       could never be drawn. */
+    /* `arity` is what tells an empty filter from no filter: a comparison that
+       takes none is filtering, and will never have values to show. */
     if (values.length === 0 && arity !== 'none') {
       held?.remove()
       return
@@ -94,12 +86,8 @@
     chip.dismissible = true
     chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
     chip.label = label
-    /* **The attribute, not the property.** `name` is what the lookup above keys
-       on, and a reflected property is written on the element's next update
-       rather than now: two facets for one field in the same frame both found
-       nothing, both built a chip, and the row ended up with two. Worse, the
-       lookup then removed whichever came first, so dismissing one chip took the
-       other away. Setting it here makes it true before the next facet asks. */
+    /* The attribute, not the property: a reflected property lands on the next
+       update, so the lookup above would miss a chip built moments earlier. */
     chip.setAttribute('name', field)
     chip.operatorLabel = operatorLabel
     chip.textContent = values.join(', ')

@@ -26,12 +26,11 @@ const box = (element: Element | null): DOMRect => (element as HTMLElement).getBo
 
 /* Only a browser can say this. The trigger is a `Button`, whose height is the
    control size unless a container that has already sized its own row says
-   otherwise, and the field is such a container: a wrapping box of tokens at
-   `sm`. Left alone the trigger measured 40 against chips of 32 and carried
-   `space-control` either side against their `xs`, so the row read as a control
-   with tokens stuck to it. Nothing in the manifest or the markup says that, and
-   this family's only photograph is `preview`, which slots nothing at either
-   end. */
+   otherwise, and the field is such a container: a wrapping box of tokens. Left
+   alone the trigger measured 40 against tokens of 28 and carried `space-control`
+   either side against their `xs`, so the row read as a control with tokens stuck
+   to it. Nothing in the manifest or the markup says that, and this family's only
+   photograph is `preview`, which slots nothing at either end. */
 describe('what sits at either end of the field', () => {
   geometry('a slotted control is the height of the tokens beside it', async () => {
     const filter = await mount(row)
@@ -47,13 +46,23 @@ describe('what sits at either end of the field', () => {
     )
   })
 
-  geometry('the control does not make the field taller than its tokens do', async () => {
-    const filter = await mount(row)
-    const field = box(part(filter, 'field'))
-    const chip = box(filter.querySelector('helix-filter-chip'))
-    /* The field is the tokens plus `2xs` above and below plus its own hairline,
-       and a control at either end has to fit inside that rather than set it. */
-    expect(field.height).toBeLessThan(chip.height + 12)
+  geometry('the control does not make the field any taller than it already is', async () => {
+    /* Said as a comparison rather than against a number, which is what it means:
+       a control at either end has to fit inside the box the field already keeps
+       for its tokens rather than set the height itself. Written as `chip + 12`
+       it was really a bound on the token size, and it went red the day the
+       tokens changed while the thing it guards was still true. */
+    const withControl = box(part(await mount(row), 'field')).height
+    const withoutControl = box(
+      part(
+        await mount(`
+          <helix-filter-input label="Filter rows" placeholder="Add a filter">
+            <helix-filter-chip label="Disposition" name="disposition" slot="tags">refunded</helix-filter-chip>
+          </helix-filter-input>`),
+        'field',
+      ),
+    ).height
+    expect(withControl).toBe(withoutControl)
   })
 
   /* Reached through the `<slot>` rather than by `::slotted()`, which matches an

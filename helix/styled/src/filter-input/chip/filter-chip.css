@@ -19,7 +19,11 @@
   gap: var(--helix-space-none);
   line-height: var(--helix-leading-normal);
   max-inline-size: 100%;
-  min-block-size: var(--helix-size-control-sm);
+  /* **`Tag`'s height, not a control's.** Both are slotted into the same row and
+     a consumer mixes them freely, so a chip at `control-sm` stood 32 against
+     tags of 28 and the row stepped wherever the two met. What the row is made
+     of is tokens, and this is one of them. */
+  min-block-size: var(--helix-size-tag);
   padding-inline: var(--helix-space-xs);
 }
 
@@ -80,9 +84,21 @@
   place-items: center;
 }
 
+/* **`Tag`'s own arithmetic, because they share a row.** A chip and a tag are
+   both slotted into `tags` and a consumer mixes them, so an X drawn to a
+   different rule in each is two marks that should be one.
+ *
+   It was `--helix-size-icon-tight`, and that token cannot do this job here. It
+   is declared once at the root as `icon * 0.8`, and a custom property is
+   substituted where it is *declared*, so it carries the root's icon size
+   wherever it is later read: inside this chip, which sets its own
+   `--helix-size-icon` to `sm`, it still answered 16. That is the size of the
+   button holding it, so the glyph filled its own hit box edge to edge and read
+   as an X far too big for the chip. `Breadcrumb` records the same trap with
+   `1lh`, which is the same mistake in the other unit. */
 [part="dismiss-mark"] {
-  block-size: var(--icon-size, var(--helix-size-icon-tight));
-  inline-size: var(--icon-size, var(--helix-size-icon-tight));
+  block-size: var(--icon-size, 0.85em);
+  inline-size: var(--icon-size, 0.85em);
 }
 
 /* The well is mixed from the ink the control is already drawn in, so the hover

@@ -45,11 +45,12 @@ import { styles } from './filter-input-root.css.js'
  * @documentation https://helix.fusion.dev/components/filter-input
  *
  * @cssproperty --filter-input-action-padding-inline - Space either side of a slotted control's label. Follows `--helix-space-xs`, which is what a token uses.
- * @cssproperty --filter-input-action-size - Height of a control slotted at either end. Follows `--helix-size-control-sm`, so it matches the tokens beside it rather than the field around them.
+ * @cssproperty --filter-input-action-size - Height of a control slotted at either end. Follows `--helix-size-tag`, so it matches the tokens beside it rather than the field around them.
  * @cssproperty --filter-input-background-color - Fill behind the field.
  * @cssproperty --filter-input-border-color - Color of the suggestion panel's edge.
  * @cssproperty --filter-input-border-width - Width of that edge. Follows `--helix-border-floating`.
  * @cssproperty --filter-input-control-size - Smallest the text keeps as tokens fill the line, before it wraps to its own.
+ * @cssproperty --filter-input-lead-border-color - The seam between the leading box and the text.
  * @cssproperty --filter-input-panel-size - Width of the suggestion panel. Follows the field by default.
  * @cssproperty --filter-input-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
  *   floating surface sits over content nobody can predict, so it keeps a lift by default.

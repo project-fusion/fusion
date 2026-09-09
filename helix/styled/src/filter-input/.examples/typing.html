@@ -7,16 +7,10 @@
   label="Filter the queue"
   placeholder="Search, or type a filter"
 >
-  <!-- The same declarations the picker reads, and the only ones. Neither field
-       declares a comparison, so both are filtered by "is any of" and negated
-       with a leading minus, which is what the punctuation can say. -->
   <helix-filter-menu
     label="Filter"
     slot="start"
   >
-    <!-- The trigger is the consumer's, so the icon is too. `funnel-simple` is
-         the three rules a reader already reads as "filter", and it sits in the
-         button's own start slot rather than beside it. -->
     <helix-button
       emphasis="ghost"
       slot="trigger"
@@ -39,10 +33,8 @@
 
   </helix-filter-menu>
 
-  <!-- Declared on the field rather than in the picker, which is what a field
-       with no values wants: `assignee:ada` is a filter and nobody had to list
-       every name in the company, but there is also nothing for a menu to
-       offer. Written here it can be typed and is not a dead page to open. -->
+  <!-- A field with no values to list belongs here rather than in the picker,
+       where its page would have nothing on it to press. -->
   <helix-filter-field
     label="Assignee"
     name="assignee"
@@ -52,12 +44,9 @@
 <script type="module">
   const filter = document.getElementById('filter')
 
-  /* **One handler for every way a filter can change.** Enter over typed text, a
-     tick in the menu and the X on a chip all arrive as `helix-facet` carrying
-     the same detail, so nothing below knows or cares which of them the reader
-     used. That is the whole reason the grammar produces the event the picker
-     produces rather than one of its own, and it is why typing a filter also
-     ticks it in the menu: there is one store, and the field writes to it. */
+  /* Typed text, a tick in the menu and the X on a chip all arrive as one
+     `helix-facet`, so nothing below knows which the reader used. Typing also
+     ticks the value in the menu: there is one store, and the field writes it. */
   filter.addEventListener('helix-facet', (event) => {
     const { field, label, operatorLabel, values } = event.detail
     const held = filter.querySelector(`helix-filter-chip[name="${field}"]`)
@@ -72,12 +61,8 @@
     chip.dismissible = true
     chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
     chip.label = label
-    /* **The attribute, not the property.** `name` is what the lookup above keys
-       on, and a reflected property is written on the element's next update
-       rather than now: two facets for one field in the same frame both found
-       nothing, both built a chip, and the row ended up with two. Worse, the
-       lookup then removed whichever came first, so dismissing one chip took the
-       other away. Setting it here makes it true before the next facet asks. */
+    /* The attribute, not the property: a reflected property lands on the next
+       update, so the lookup above would miss a chip built moments earlier. */
     chip.setAttribute('name', field)
     chip.operatorLabel = operatorLabel
     chip.textContent = values.join(', ')

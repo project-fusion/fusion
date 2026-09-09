@@ -87,14 +87,43 @@
   min-inline-size: 0;
 }
 
+/* The seam between what a consumer put at the head of the field and the field.
+ *
+ * **A box of its own, pulled back onto the field's own padding.** A trigger
+ * sitting inside that padding read as a control floating in the box rather than
+ * a part of it, and there was nothing between it and the text: measured, the
+ * label started 17 pixels in with no edge anywhere. Pulling the box out by the
+ * padding it sits in puts the control against the field's own border, and the
+ * negative block margin takes the rule to the field's full height, which is what
+ * makes it a seam rather than a short line floating in a row.
+ *
+ * Hidden rather than absent when nothing is slotted, because a second template
+ * branch would rebuild the slot inside it, and a rebuilt slot fires `slotchange`
+ * on its way out with nothing assigned. `Menu.Item` records that trap.
+ */
+[part="lead"] {
+  align-items: center;
+  align-self: stretch;
+  border-inline-end: var(--helix-border-thin) solid
+    var(--filter-input-lead-border-color, var(--helix-color-border));
+  display: flex;
+  margin-block: calc(var(--helix-space-2xs) * -1);
+  margin-inline-start: calc(var(--helix-space-xs) * -1);
+  padding-inline: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+[part="lead"][data-empty] {
+  display: none;
+}
+
 /* A control at either end is a token-sized target, not a field-sized one.
  *
- * The tokens beside it are `sm`, 32, and the field is a wrapping box with `2xs`
- * above and below them. A `Button` slotted in takes the control size, 40, which
- * is 8 taller than everything it sits with and carries `space-control` either
- * side against a token's `xs`: measured, the trigger stood 40 against chips of
- * 32 and was twice as wide-padded, so the row read as a control with tokens
- * stuck to it rather than one row of peers. `Breadcrumb` writes these three for
+ * The tokens beside it are `Tag`-sized, 28, and the field is a wrapping box with
+ * `2xs` above and below them. A `Button` slotted in takes the control size, 40,
+ * which is taller than everything it sits with and carries `space-control`
+ * either side against a token's `xs`: measured, the trigger stood 40 against
+ * tokens of 28 and was twice as wide-padded, so the row read as a control with
+ * tokens stuck to it rather than one row of peers. `Breadcrumb` writes these three for
  * the same reason, and the note on `Button`'s `block-size` is where the hook is
  * documented.
  *
@@ -104,10 +133,10 @@
  * also reach the picker's own popover and the suggestions panel, which are
  * neither of them this row.
  */
-slot[name="start"],
+[part="lead"],
 slot[name="end"] {
-  --button-size: var(--filter-input-action-size, var(--helix-size-control-sm));
-  --icon-button-size: var(--filter-input-action-size, var(--helix-size-control-sm));
+  --button-size: var(--filter-input-action-size, var(--helix-size-tag));
+  --icon-button-size: var(--filter-input-action-size, var(--helix-size-tag));
   --button-padding-inline: var(--filter-input-action-padding-inline, var(--helix-space-xs));
 }
 

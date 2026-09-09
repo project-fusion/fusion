@@ -14,32 +14,22 @@ export function Example() {
     <helix-filter-input
       hint="Open the picker, tick a value, and change the comparison under the field"
       label="Filter the queue"
-      /* The chips are the consumer's own markup, which is why the picker
-         announces rather than applies. Everything that can change a filter
-         arrives here as one `helix-facet`: a tick, a comparison, and the X on a
-         chip, which the field turns into this field being filtered by nothing.
-         There is no `onhelix-dismiss` below for that reason. */
+      /* Every way a filter can change arrives here as one `helix-facet`: a
+         tick, a comparison, and the X on a chip. That is why there is no
+         `onhelix-dismiss` below. */
       onhelix-facet={(event) => {
         const { field, label, operatorLabel, values } = event.detail
         setChips((held) => {
           const rest = held.filter((chip) => chip.field !== field)
-          // An empty set is the filter going, which is what unticking the last
-          // value means by it, and what the X on a chip is answered with.
           return values.length === 0 ? rest : [...rest, { field, label, operatorLabel, values }]
         })
       }}
       placeholder="Search, or pick a filter"
     >
-      {/* The picker goes before the text, which is where the reference puts it:
-          a reader either types or reaches for the list, and both narrow the same
-          set. */}
       <helix-filter-menu
         label="Filter"
         slot="start"
       >
-        {/* The trigger is the consumer's, so the icon is too. `funnel-simple`
-            is the three rules a reader already reads as "filter", and it sits in
-            the button's own start slot rather than beside it. */}
         <helix-button
           emphasis="ghost"
           slot="trigger"
@@ -51,10 +41,6 @@ export function Example() {
           Filter
         </helix-button>
 
-        {/* No comparisons declared, so it is offered "is any of" and "is none
-            of": the two the typed grammar can say, and the two nearly every set
-            filter wants. They sit on a page of their own under the field,
-            because a comparison is one choice and the values are several. */}
         <helix-filter-field
           label="Disposition"
           name="disposition"
@@ -64,10 +50,6 @@ export function Example() {
           <helix-option value="settled">Settled</helix-option>
         </helix-filter-field>
 
-        {/* One comparison and no default, which is the scalar shape: there is
-            nothing for a default to distinguish it from, so a chip built from
-            this always says "after" and the field offers no comparison to
-            change. */}
         <helix-filter-field
           label="Created"
           name="created"
