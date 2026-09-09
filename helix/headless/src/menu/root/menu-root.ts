@@ -394,8 +394,16 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * children are its label and its icons.
    */
   private mark(item: HelixHeadlessMenuItem, onPage: boolean): void {
+    const page = this.drilldown.page
     item.onPage = onPage
-    item.showingSubmenu = item === this.drilldown.page
+    /* **Holding the page counts, not just being it.** `item === page` was right
+       for two levels and silently wrong for three: on the third page the row at
+       the top is neither on a page nor the page, so it rendered `nothing`, and
+       rendering nothing takes its `slot[name="submenu"]` with it. The rows below
+       had nowhere to be assigned and the reader got a header over an empty
+       panel — the exact failure `showingSubmenu` was added to prevent, one level
+       further down. Every row on the way to the open page has to keep its slot. */
+    item.showingSubmenu = page !== null && item.contains(page)
     for (const child of item.children) {
       const nested = child as HelixHeadlessMenuItem
       if (nested.isMenuItem === true && child.slot === 'submenu') {

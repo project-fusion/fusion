@@ -141,6 +141,47 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   }
 
   /**
+   * Filters a field by these values, announcing it the way a tick does.
+   *
+   * **The one way this element's state changes**, whether the move came from a
+   * row here, from a filter typed into the field around it, or from a chip
+   * somebody dismissed. Before this existed the ticks were only ever written by
+   * a press, so a chip removed anywhere else left the menu still showing it
+   * ticked, and the reader's next press on that value read as *unticking* it:
+   * they pressed `Refunded`, an empty set was announced, and nothing appeared.
+   *
+   * Refusing the `helix-facet` puts everything back, so a consumer who declines
+   * a filter is never left looking at a menu that says it took.
+   */
+  apply(field: string, values: readonly string[], operator?: string): boolean {
+    const declared = this.fields.find((one) => (one.name ?? '') === field)
+    if (!declared) {
+      return false
+    }
+    const heldValues = this.picked.get(field)
+    const heldOperator = this.comparisons.get(field)
+    this.picked.set(field, new Set(values))
+    if (operator !== undefined) {
+      this.comparisons.set(field, operator)
+    }
+    const stood = this.announce(declared)
+    if (!stood) {
+      if (heldValues === undefined) {
+        this.picked.delete(field)
+      } else {
+        this.picked.set(field, heldValues)
+      }
+      if (heldOperator === undefined) {
+        this.comparisons.delete(field)
+      } else {
+        this.comparisons.set(field, heldOperator)
+      }
+    }
+    this.requestUpdate()
+    return stood
+  }
+
+  /**
    * A row was chosen: a value to tick, or a comparison to use.
    *
    * **Read off the row rather than encoded into its `value`.** Packing the three
@@ -153,7 +194,9 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    *
    * Stopped here rather than let past, because a consumer listening for
    * `helix-select` on their own page should not receive one for a row inside a
-   * control they did not write.
+   * control they did not write. Every row this renders carries `data-facet`,
+   * including the two that only open a page, and all of them are this element's
+   * business rather than theirs.
    */
   private readonly handleSelect = (event: Event): void => {
     const row = event.composedPath()[0]
@@ -161,50 +204,26 @@ export class HelixHeadlessFilterMenu extends HelixElement {
       return
     }
     const kind = row.dataset.facet
-    const field = row.dataset.field ?? ''
-    const value = row.dataset.value ?? ''
-    if (kind !== 'value' && kind !== 'operator') {
+    if (kind === undefined) {
       return
     }
     event.stopPropagation()
-    const declared = this.fields.find((one) => (one.name ?? '') === field)
-    if (!declared) {
-      return
-    }
-
+    const field = row.dataset.field ?? ''
+    const value = row.dataset.value ?? ''
     if (kind === 'operator') {
-      const previous = this.comparisons.get(field)
-      this.comparisons.set(field, value)
-      if (!this.announce(declared)) {
-        /* Refused, so nothing moved: put the comparison back rather than leaving
-           this holding a choice the consumer declined. */
-        if (previous === undefined) {
-          this.comparisons.delete(field)
-        } else {
-          this.comparisons.set(field, previous)
-        }
-      }
-      this.requestUpdate()
+      this.apply(field, this.valuesFor(field), value)
       return
     }
-
-    const ticked = this.picked.get(field) ?? new Set<string>()
-    const was = ticked.has(value)
-    if (was) {
+    if (kind !== 'value') {
+      return
+    }
+    const ticked = new Set(this.picked.get(field) ?? [])
+    if (ticked.has(value)) {
       ticked.delete(value)
     } else {
       ticked.add(value)
     }
-    this.picked.set(field, ticked)
-    if (!this.announce(declared)) {
-      // Refused: the tick goes back, so the menu keeps showing the truth.
-      if (was) {
-        ticked.add(value)
-      } else {
-        ticked.delete(value)
-      }
-    }
-    this.requestUpdate()
+    this.apply(field, [...ticked])
   }
 
   protected override render(): TemplateResult {
@@ -219,17 +238,28 @@ export class HelixHeadlessFilterMenu extends HelixElement {
         return html`<${item} data-facet="field" data-field=${name}>
           ${label}
           ${
+            /* **A page of its own rather than a run of rows above the values.**
+               Flat, the comparison and the values were five rows drawn the same
+               way, and a reader had nothing to tell them apart by: `is any of`
+               and `Refunded` both took a tick, though one is a single choice and
+               the other is not. Nested, the row shows the comparison in force,
+               carries a caret rather than a tick, and the choosing happens
+               somewhere a tick means one thing. A field with one comparison has
+               nothing to choose and shows no row at all. */
             operators.length > 1
-              ? operators.map(
-                  (operator) => html`<${item}
-                    slot="submenu"
-                    checkable
-                    ?checked=${operator.name === using?.name}
-                    data-facet="operator"
-                    data-field=${name}
-                    data-value=${operator.name}
-                  >${operator.label}</${item}>`,
-                )
+              ? html`<${item} slot="submenu" data-facet="comparison" data-field=${name}>
+                  ${using?.label ?? ''}
+                  ${operators.map(
+                    (operator) => html`<${item}
+                      slot="submenu"
+                      checkable
+                      ?checked=${operator.name === using?.name}
+                      data-facet="operator"
+                      data-field=${name}
+                      data-value=${operator.name}
+                    >${operator.label}</${item}>`,
+                  )}
+                </${item}>`
               : nothing
           }
           ${values.map(

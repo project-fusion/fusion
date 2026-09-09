@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   drawIcon,
+  type FacetDetail,
   HelixFacetEvent,
   HelixFormElement,
   holdCaret,
@@ -17,6 +18,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessFilterField } from '../field/filter-field.js'
 import { readFilterText } from '../grammar.js'
+import type { HelixHeadlessFilterMenu } from '../menu/filter-menu.js'
 
 /** A token that answers a request to go, which is what `Tag` is. */
 type DismissibleToken = Element & { dismiss(): boolean }
@@ -76,6 +78,13 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * every word in it. A field with no `FilterField` in it parses nothing, which is
  * the behavior this had before it could.
  *
+ * **A field whose values cannot be listed belongs here rather than in the
+ * picker.** `assignee:ada` is a filter and nobody wants to enumerate every name
+ * in the company, but a menu page for it would have nothing on it to press.
+ * Written directly inside this element it is read by the grammar and never
+ * offered as a page: unslotted, so nothing draws it, which is the same trick
+ * `FilterField` already plays on its own children.
+ *
  * **It can suggest what to type next, and deciding what to suggest is still the
  * consumer's.** Slot `helix-option` elements into `suggestions` and the field
  * shows them, moves through them with the arrows, and lets Enter press one; the
@@ -109,7 +118,12 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * The tokens are neither, because they are not state. They are the consumer's
  * own elements in a slot, so there is nothing for this to own and nothing to
  * report back: a token goes when the consumer removes it from their markup,
- * having been asked by `helix-dismiss`.
+ * having been asked by `helix-dismiss`. **A `FilterChip` naming a declared field
+ * is asked differently**, and it has to be: the picker holds what is ticked, so
+ * a chip that removed itself without telling it left the value ticked in a list
+ * nobody could see was wrong. That dismissal is answered as the field being
+ * filtered by nothing, so it arrives as `helix-facet` like every other change
+ * and the chip goes because the filter went.
  *
  * @since 0.1.0
  * @status experimental
@@ -126,7 +140,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the suggestions go, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions show, and cancelable.
- * @event {HelixFacetEvent} helix-facet - Fired when Enter reads a filter out of the text. Cancelable: refusing it leaves that much of the text alone.
+ * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether read out of the text, picked, or dismissed. Cancelable: refusing it leaves the text and the chip where they were.
  * @event {Event} input - Announced once the text has moved.
  * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  *
@@ -362,6 +376,71 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   }
 
   /**
+   * The picker holding a field, where the consumer wrote one.
+   *
+   * The picker keeps what is ticked, so anything that changes a filter has to
+   * go through it or the two surfaces start disagreeing: a filter typed here
+   * that the menu never heard about leaves the value unticked in a list the
+   * reader is about to open.
+   */
+  private menuFor(field: string): HelixHeadlessFilterMenu | null {
+    for (const menu of this.querySelectorAll<HelixHeadlessFilterMenu>(
+      'helix-headless-filter-menu, helix-filter-menu',
+    )) {
+      if (menu.fields.some((declared) => (declared.name ?? '') === field)) {
+        return menu
+      }
+    }
+    return null
+  }
+
+  /**
+   * Says a field is now filtered by these values, through the picker where
+   * there is one, and reports whether it stood.
+   *
+   * Announced by the menu rather than relayed by this element, so the ticks and
+   * the event never come from two places. A consumer who wrote `FilterField`s
+   * without a picker gets it from here, which is the only case where nothing
+   * else could have said it.
+   */
+  private announceFacet(facet: FacetDetail): boolean {
+    const menu = this.menuFor(facet.field)
+    return menu
+      ? menu.apply(facet.field, facet.values, facet.operator)
+      : this.dispatchEvent(new HelixFacetEvent(facet))
+  }
+
+  /**
+   * A chip asking to go, answered as the filter going.
+   *
+   * **Taken rather than passed on, and only for a chip naming a declared
+   * field.** Left alone, a dismissed chip removed itself and told the picker
+   * nothing, so the menu went on showing the value ticked and the reader's next
+   * press on it read as *unticking*: they pressed `Refunded` and nothing came
+   * back. Turning the request into `apply(field, [])` puts it down the one road
+   * every other filter takes, so the chip goes because the filter went. A
+   * consumer refusing that `helix-facet` keeps both, which is the answer a
+   * refusal should give.
+   *
+   * Everything else in the row is untouched: a plain `Tag`, or a chip for
+   * something no `FilterField` declares, is the consumer's to answer.
+   */
+  private readonly handleDismiss = (event: Event): void => {
+    const chip = event.composedPath()[0]
+    if (!(chip instanceof HTMLElement) || chip.slot !== 'tags') {
+      return
+    }
+    const field = chip.getAttribute('name') ?? ''
+    const menu = field === '' ? null : this.menuFor(field)
+    if (!menu) {
+      return
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    menu.apply(field, [])
+  }
+
+  /**
    * Reads what has been typed, announces whatever of it was a filter, and takes
    * that much of the text away.
    *
@@ -390,7 +469,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     let taken = 0
     const refused: string[] = []
     for (const term of reading.terms) {
-      if (this.dispatchEvent(new HelixFacetEvent(term.facet))) {
+      if (this.announceFacet(term.facet)) {
         taken += 1
       } else {
         refused.push(...term.written)
@@ -628,6 +707,16 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     if (asksToGo(last)) {
       last.dismiss()
     }
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('helix-dismiss', this.handleDismiss)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('helix-dismiss', this.handleDismiss)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

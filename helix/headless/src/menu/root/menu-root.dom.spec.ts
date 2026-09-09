@@ -295,6 +295,72 @@ describe('menu submenus, coming and going', () => {
      fixed one, measured both ways, because happy-dom neither rebuilds the slot
      nor fires the departing `slotchange`. Bind the listener in the template,
      and check the behavior in a browser. */
+
+  /* Which row holds which page is not that. It is properties the menu sets on
+     every update, so it reads the same here as in a browser, and the failure it
+     covers was invisible until something wanted three levels: the top row was
+     neither on a page nor the page, rendered nothing, and took the slot the
+     middle row lived in. The reader got a header over an empty panel. */
+  const deep = async (): Promise<Menu> =>
+    (await mount(
+      `<helix-headless-menu label="Filter"><button slot="trigger">Open</button>
+        <helix-headless-menu-item value="field">Disposition
+          <helix-headless-menu-item slot="submenu" value="comparison">is any of
+            <helix-headless-menu-item slot="submenu" value="any">is any of</helix-headless-menu-item>
+            <helix-headless-menu-item slot="submenu" value="none">is none of</helix-headless-menu-item>
+          </helix-headless-menu-item>
+          <helix-headless-menu-item slot="submenu" value="refunded">Refunded</helix-headless-menu-item>
+        </helix-headless-menu-item>
+      </helix-headless-menu>`,
+    )) as Menu
+
+  interface Row extends HTMLElement {
+    hasSubmenu: boolean
+    onPage: boolean
+    select: () => void
+    showingSubmenu: boolean
+    updateComplete: Promise<unknown>
+  }
+
+  const at = (host: Menu, value: string): Row => host.querySelector(`[value="${value}"]`) as Row
+
+  /**
+   * The `slotchange` a browser fires and this harness does not.
+   *
+   * A row that is not on the page renders nothing, so a nested one has no slot
+   * until the reader drills in, and it learns it has a submenu from that slot's
+   * first `slotchange`. happy-dom never fires it, so the row goes on believing
+   * it has no submenu and choosing it closes the menu rather than opening a
+   * page. Handing it the event puts the harness where a browser already is, and
+   * leaves the thing under test, which is the marking, untouched.
+   */
+  const settleSubmenu = async (row: Row): Promise<void> => {
+    row.shadowRoot?.querySelector('slot[name="submenu"]')?.dispatchEvent(new Event('slotchange'))
+    await row.updateComplete
+  }
+
+  test('every row on the way to the open page keeps its own slot', async () => {
+    const host = await deep()
+    host.show()
+    await host.updateComplete
+
+    at(host, 'field').select()
+    await host.updateComplete
+    expect(at(host, 'field').showingSubmenu).toBe(true)
+    expect(at(host, 'comparison').onPage).toBe(true)
+    expect(at(host, 'refunded').onPage).toBe(true)
+    expect(at(host, 'any').onPage).toBe(false)
+
+    await settleSubmenu(at(host, 'comparison'))
+    at(host, 'comparison').select()
+    await host.updateComplete
+    // The one the fix is about: two levels up, and still holding a slot.
+    expect(at(host, 'field').showingSubmenu).toBe(true)
+    expect(at(host, 'comparison').showingSubmenu).toBe(true)
+    expect(at(host, 'any').onPage).toBe(true)
+    expect(at(host, 'none').onPage).toBe(true)
+    expect(at(host, 'refunded').onPage).toBe(false)
+  })
 })
 
 /* Which columns a page reserves is the menu's to answer, because no row can: a

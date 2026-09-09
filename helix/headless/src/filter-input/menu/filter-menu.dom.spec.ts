@@ -9,6 +9,9 @@ beforeAll(async () => {
 })
 
 type Menu = HTMLElement & {
+  apply: (field: string, values: readonly string[], operator?: string) => boolean
+  fields: HTMLElement[]
+  operatorFor: (field: HTMLElement) => { default: boolean; label: string; name: string } | null
   updateComplete: Promise<unknown>
   valuesFor: (field: string) => readonly string[]
 }
@@ -163,6 +166,81 @@ describe('which comparison it says is in force', () => {
     press(element, 'operator', 'disposition', 'none')
     expect(seen[1]?.operator).toBe('none')
     expect(seen[1]?.operatorLabel).toBe('is none of')
+  })
+
+  /* Flat, the comparison and the values were rows drawn the same way, and a
+     reader had nothing to tell a single choice from a several. What separates
+     them is structure rather than styling, so it is checkable here. */
+  test('the comparisons sit under a row of their own, not beside the values', async () => {
+    const element = await picker()
+    const rows = element.shadowRoot?.querySelectorAll('[data-facet]')
+    const comparison = element.shadowRoot?.querySelector('[data-facet="comparison"]')
+    expect(comparison).not.toBeNull()
+    // A way in rather than a choice: it opens a page and never takes a tick.
+    expect(comparison?.hasAttribute('checkable')).toBe(false)
+    for (const operator of element.shadowRoot?.querySelectorAll('[data-facet="operator"]') ?? []) {
+      expect(operator.parentElement).toBe(comparison as Element)
+    }
+    // And the values stay where they were, one level up beside nothing else.
+    for (const value of element.shadowRoot?.querySelectorAll('[data-facet="value"]') ?? []) {
+      expect(value.getAttribute('data-facet')).toBe('value')
+      expect(value.parentElement?.getAttribute('data-facet')).toBe('field')
+    }
+    expect(rows?.length).toBeGreaterThan(0)
+  })
+
+  test('a field with one comparison offers no way in at all', async () => {
+    const element = await picker(`
+      <helix-headless-filter-field name="created" label="Created">
+        <helix-headless-filter-operator name="after" label="after"></helix-headless-filter-operator>
+        <helix-headless-option value="today">Today</helix-headless-option>
+      </helix-headless-filter-field>`)
+    expect(element.shadowRoot?.querySelector('[data-facet="comparison"]')).toBeNull()
+  })
+})
+
+describe('applying a filter from somewhere else', () => {
+  test('announces it and holds the ticks, so the menu shows what is in force', async () => {
+    const element = await picker()
+    const seen = heard(element)
+    expect(element.apply('disposition', ['refunded', 'chargeback'])).toBe(true)
+    expect(seen[0]?.values).toEqual(['refunded', 'chargeback'])
+    expect(element.valuesFor('disposition')).toEqual(['refunded', 'chargeback'])
+  })
+
+  test('an empty set is the filter going, and the ticks go with it', async () => {
+    const element = await picker()
+    element.apply('disposition', ['refunded'])
+    const seen = heard(element)
+    expect(element.apply('disposition', [])).toBe(true)
+    expect(seen[0]?.values).toEqual([])
+    expect(element.valuesFor('disposition')).toEqual([])
+  })
+
+  test('it can name the comparison too, which is what a typed minus does', async () => {
+    const element = await picker()
+    const seen = heard(element)
+    element.apply('disposition', ['refunded'], 'none')
+    expect(seen[0]?.operator).toBe('none')
+    expect(seen[0]?.operatorLabel).toBe('is none of')
+  })
+
+  test('refused, and everything goes back rather than the menu saying it took', async () => {
+    const element = await picker()
+    element.apply('disposition', ['refunded'])
+    element.addEventListener('helix-facet', (event) => {
+      event.preventDefault()
+    })
+    expect(element.apply('disposition', ['settled'], 'none')).toBe(false)
+    expect(element.valuesFor('disposition')).toEqual(['refunded'])
+    expect(element.operatorFor(element.fields[0] as never)?.name).toBe('any')
+  })
+
+  test('a field nobody declared is not one this can filter by', async () => {
+    const element = await picker()
+    const seen = heard(element)
+    expect(element.apply('assignee', ['ada'])).toBe(false)
+    expect(seen).toHaveLength(0)
   })
 })
 

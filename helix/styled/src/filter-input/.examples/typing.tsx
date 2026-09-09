@@ -15,16 +15,14 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      {/* One handler for two surfaces. Enter over typed text and a tick in the
-          menu both arrive as `helix-facet` carrying the same detail, so nothing
-          here knows or cares which of them the reader used. */}
       <helix-filter-input
-        hint="Try disposition:refunded, -disposition:settled, or refund disposition:chargeback"
+        hint="Try disposition:refunded, -disposition:settled, or refund assignee:ada tuesday"
         label="Filter the queue"
-        onhelix-dismiss={(event) => {
-          const name = (event.target as HTMLElement).getAttribute('name')
-          setChips((held) => held.filter((chip) => chip.field !== name))
-        }}
+        /* One handler for every way a filter can change. Enter over typed text,
+           a tick in the menu and the X on a chip all arrive as `helix-facet`
+           carrying the same detail, so nothing here knows or cares which of them
+           the reader used — and typing a filter also ticks it in the menu,
+           because there is one store and the field writes to it. */
         onhelix-facet={(event) => {
           const { field, label, operatorLabel, values } = event.detail
           setChips((held) => {
@@ -59,15 +57,17 @@ export function Example() {
             <helix-option value="chargeback">Chargeback</helix-option>
             <helix-option value="settled">Settled</helix-option>
           </helix-filter-field>
-
-          {/* No values, so this one takes whatever is typed: `assignee:ada` is a
-              filter and the field never had to list every name in the
-              company. */}
-          <helix-filter-field
-            label="Assignee"
-            name="assignee"
-          ></helix-filter-field>
         </helix-filter-menu>
+
+        {/* Declared on the field rather than in the picker, which is what a
+            field with no values wants: `assignee:ada` is a filter and nobody had
+            to list every name in the company, but there is also nothing for a
+            menu to offer. Written here it can be typed and is not a dead page to
+            open. */}
+        <helix-filter-field
+          label="Assignee"
+          name="assignee"
+        ></helix-filter-field>
 
         {chips.map((chip) => (
           <helix-filter-chip

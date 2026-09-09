@@ -1,7 +1,33 @@
+import { useState } from 'react'
+
+interface Chip {
+  field: string
+  label: string
+  operatorLabel: string
+  values: readonly string[]
+}
+
 export function Example() {
+  const [chips, setChips] = useState<Chip[]>([])
+
   return (
     <helix-filter-input
+      hint="Open the picker, tick a value, and change the comparison under the field"
       label="Filter the queue"
+      /* The chips are the consumer's own markup, which is why the picker
+         announces rather than applies. Everything that can change a filter
+         arrives here as one `helix-facet`: a tick, a comparison, and the X on a
+         chip, which the field turns into this field being filtered by nothing.
+         There is no `onhelix-dismiss` below for that reason. */
+      onhelix-facet={(event) => {
+        const { field, label, operatorLabel, values } = event.detail
+        setChips((held) => {
+          const rest = held.filter((chip) => chip.field !== field)
+          // An empty set is the filter going, which is what unticking the last
+          // value means by it, and what the X on a chip is answered with.
+          return values.length === 0 ? rest : [...rest, { field, label, operatorLabel, values }]
+        })
+      }}
       placeholder="Search, or pick a filter"
     >
       {/* The picker goes before the text, which is where the reference puts it:
@@ -20,7 +46,8 @@ export function Example() {
 
         {/* No comparisons declared, so it is offered "is any of" and "is none
             of": the two the typed grammar can say, and the two nearly every set
-            filter wants. Declaring one replaces both. */}
+            filter wants. They sit on a page of their own under the field,
+            because a comparison is one choice and the values are several. */}
         <helix-filter-field
           label="Disposition"
           name="disposition"
@@ -32,9 +59,8 @@ export function Example() {
 
         {/* One comparison and no default, which is the scalar shape: there is
             nothing for a default to distinguish it from, so a chip built from
-            this always says "after". Declaring it also means there is no `none`
-            for a leading minus to ask for, so this field is built here and not
-            typed. */}
+            this always says "after" and the field offers no comparison to
+            change. */}
         <helix-filter-field
           label="Created"
           name="created"
@@ -48,32 +74,19 @@ export function Example() {
         </helix-filter-field>
       </helix-filter-menu>
 
-      {/* The chips are the consumer's own markup, which is why the picker
-          announces rather than applies. These two are what the picker would have
-          produced: the first drawn with the field's usual comparison, so it is
-          unwritten, and the second with one somebody chose, so it shows. */}
-      <helix-filter-chip
-        dismiss-label="Remove the disposition filter"
-        dismissible
-        label="Disposition"
-        name="disposition"
-        operator="any"
-        slot="tags"
-      >
-        refunded, chargeback
-      </helix-filter-chip>
-
-      <helix-filter-chip
-        dismiss-label="Remove the created filter"
-        dismissible
-        label="Created"
-        name="created"
-        operator="after"
-        operator-label="after"
-        slot="tags"
-      >
-        Today
-      </helix-filter-chip>
+      {chips.map((chip) => (
+        <helix-filter-chip
+          dismiss-label={`Remove the ${chip.label.toLowerCase()} filter`}
+          dismissible
+          key={chip.field}
+          label={chip.label}
+          name={chip.field}
+          operator-label={chip.operatorLabel}
+          slot="tags"
+        >
+          {chip.values.join(', ')}
+        </helix-filter-chip>
+      ))}
     </helix-filter-input>
   )
 }

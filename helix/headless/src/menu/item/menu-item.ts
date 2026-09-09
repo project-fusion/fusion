@@ -117,13 +117,14 @@ export class HelixHeadlessMenuItem extends HelixElement {
   rel = ''
 
   /**
-   * Whether this row's submenu is the page showing.
+   * Whether the page showing is this row's submenu, or one below it.
    *
    * Separate from `onPage`, and it has to be. A row that opened a page is not
    * itself on that page, so both are false for it, and rendering nothing on
    * that basis takes its `slot[name="submenu"]` with it: the rows inside have
-   * nowhere to be assigned and are never laid out. The element that holds the
-   * page has to keep the slot even when it shows no row of its own.
+   * nowhere to be assigned and are never laid out. Every row on the way down to
+   * the open page has to keep its slot, not only the one directly above it.
+   * Three levels deep, the topmost row holds the slot the middle one lives in.
    */
   @property({ attribute: false })
   showingSubmenu = false
