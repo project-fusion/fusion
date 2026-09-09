@@ -175,9 +175,39 @@ export class HelixHeadlessMenuItem extends HelixElement {
   @state()
   private submenu = false
 
+  /**
+   * Whether anything is slotted before the label.
+   *
+   * The leading box is drawn only where there is something to put in it, the
+   * same way the trailing mark is. What keeps the labels on one edge is the
+   * track the menu reserves for the page, not a box on every row, so a row with
+   * nothing here takes no box and still lines up with its neighbors.
+   *
+   * Read from the slot rather than from the light DOM, because the light DOM
+   * answer is not reactive: a consumer who adds an icon to one row after first
+   * render changes nothing this element is told about, and `slotchange` is
+   * exactly the thing that is.
+   */
+  @state()
+  private start = false
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.readSubmenu()
+    this.readStart()
+  }
+
+  /**
+   * Re-reads whether anything is before the label.
+   *
+   * The slot itself is always rendered and it is the box around it that comes
+   * and goes, which is what makes this safe where `readSubmenu` needed the note
+   * it carries: there is one `slot[name="start"]` in one template branch, so it
+   * is never rebuilt and never fires on its way out.
+   */
+  private readonly readStart = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="start"]')
+    this.start = (slot?.assignedNodes().length ?? 0) > 0
   }
 
   /**
@@ -316,7 +346,9 @@ export class HelixHeadlessMenuItem extends HelixElement {
     const role = this.checkable || this.checked ? 'menuitemcheckbox' : 'menuitem'
     const checkedState =
       this.checkable || this.checked ? (this.checked ? 'true' : 'false') : nothing
-    const inside = html`<span part="start"><slot name="start"></slot></span>
+    const inside = html`<span part="start" ?data-empty=${!this.start}
+          ><slot name="start" @slotchange=${this.readStart}></slot
+        ></span>
         <slot></slot>
         ${
           // One trailing column, and a row is never both: a way into a page has

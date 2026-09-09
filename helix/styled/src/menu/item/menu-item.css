@@ -81,6 +81,48 @@
   min-block-size: var(--helix-size-icon);
 }
 
+/* **Placed rather than flowed, so an absent box moves nothing.** Auto placement
+   fills the first free cell, so a row that draws no leading box would put its
+   label in the leading track and its trailing mark in the label's: the whole row
+   slides one column left the moment it has nothing to put before its words.
+   Naming a column for each of the three costs three declarations and makes any
+   of them optional. */
+[part="start"] {
+  grid-column: 1;
+}
+
+/* **And the label's slot needs a box before it can be placed in one.** A `slot`
+   is `display: contents` by the UA's own rule, so it generates no box at all and
+   what lands in the grid is an anonymous box around the assigned text. Anonymous
+   boxes cannot be addressed, so `grid-column` on the slot did nothing and the
+   label auto-placed into whichever cell was free: measured on a page where one
+   row had a leading mark and one did not, their labels started 36 and 12 pixels
+   in. Giving the slot a box of its own is what makes the column stick. */
+[part="item"] > slot:not([name]) {
+  display: block;
+  grid-column: 2;
+  /* The track is `minmax(0, 1fr)` so it may shrink, and a block box in it has to
+     be allowed to shrink with it rather than hold it open at its text's width. */
+  min-inline-size: 0;
+}
+
+[part="mark"] {
+  grid-column: 3;
+}
+
+/* Nothing before the label, so no box before the label. The slot inside it stays
+   rendered and keeps listening, which is what makes an icon added to a row after
+   first render still arrive; it is the box that goes. The track the menu reserved
+   for the page stays either way, so this row's label lands where its neighbors'
+   do.
+
+   After `[part="start"]`'s own block rather than before it, which is the rule the
+   whole file follows: a higher specificity written above the one it overrides
+   reads as a rule whose order says nothing. */
+[part="start"][data-empty] {
+  display: none;
+}
+
 /* Drawn only where there is something to draw. What keeps a tick from shifting
    its neighbors is the reserved track, not an empty box on every row: the menu
    holds the column open for the whole page as soon as one row on it can be

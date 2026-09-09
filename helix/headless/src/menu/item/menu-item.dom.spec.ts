@@ -66,3 +66,54 @@ describe('one menu row', () => {
     expect(part(command, 'item')?.hasAttribute('aria-checked')).toBe(false)
   })
 })
+
+/* The two boxes either side of a label are drawn only where there is something
+   to put in them. What keeps the labels on one edge is the track the menu
+   reserves for the page, not a box on every row, so these say the box is absent
+   and the alignment is somebody else's job. */
+describe('a row draws no box it has nothing to put in', () => {
+  const filled = async (inner: string): Promise<HTMLElement> =>
+    (await mount(
+      `<helix-headless-menu-item value="a">${inner}</helix-headless-menu-item>`,
+    )) as HTMLElement
+
+  test('no leading mark, so the leading box takes no space', async () => {
+    const el = await filled('Copy')
+    expect(part(el, 'start')?.hasAttribute('data-empty')).toBe(true)
+  })
+
+  test('a leading mark, so it does', async () => {
+    const el = await filled('<span slot="start">C</span>Copy')
+    expect(part(el, 'start')?.hasAttribute('data-empty')).toBe(false)
+  })
+
+  /* The slot stays rendered even while its box does not, which is what makes a
+     mark added after first render still arrive. */
+  test('the slot is there either way, so a mark arriving later is noticed', async () => {
+    const el = await filled('Copy')
+    expect(el.shadowRoot?.querySelector('slot[name="start"]')).not.toBeNull()
+  })
+
+  test('nothing to tick and no page to open, so no trailing mark is drawn', async () => {
+    const el = await filled('Copy')
+    expect(part(el, 'mark')).toBeNull()
+  })
+
+  /* **A row that can be ticked and is not draws nothing either**, which is the
+     case an empty box used to cover. Nothing is lost by it: `aria-checked` is on
+     the row and says the state, and the column stays open because the menu
+     reserved it for the page the moment one row on it became checkable. */
+  test('a row that can be ticked and is not draws nothing', async () => {
+    const el = (await mount(
+      '<helix-headless-menu-item checkable value="a">Copy</helix-headless-menu-item>',
+    )) as HTMLElement
+    expect(part(el, 'mark')).toBeNull()
+  })
+
+  test('and ticking it draws the tick', async () => {
+    const el = (await mount(
+      '<helix-headless-menu-item checkable checked value="a">Copy</helix-headless-menu-item>',
+    )) as HTMLElement
+    expect(part(el, 'mark')).not.toBeNull()
+  })
+})
