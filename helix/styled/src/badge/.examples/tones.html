@@ -1,0 +1,67 @@
+<!-- @summary What the count means, across the vocabulary a tag already speaks. -->
+<!-- @min 520 -->
+
+<helix-flex
+  align="center"
+  gap="lg"
+  wrap
+>
+  <!-- The resting one, named rather than left off, which is the whole reason
+       `primary` is sayable: this row would otherwise have a gap in it that only
+       an absent attribute could fill. -->
+  <helix-badge
+    label="8 waiting"
+    tone="primary"
+    value="8"
+  >
+    <helix-button>Queue</helix-button>
+  </helix-badge>
+
+  <helix-badge
+    label="8 drafts"
+    tone="accent"
+    value="8"
+  >
+    <helix-button>Drafts</helix-button>
+  </helix-badge>
+
+  <helix-badge
+    label="4 notices"
+    tone="info"
+    value="4"
+  >
+    <helix-button>Notices</helix-button>
+  </helix-badge>
+
+  <helix-badge
+    label="12 passed"
+    tone="success"
+    value="12"
+  >
+    <helix-button>Passed</helix-button>
+  </helix-badge>
+
+  <helix-badge
+    label="2 flaky"
+    tone="warning"
+    value="2"
+  >
+    <helix-button>Flaky</helix-button>
+  </helix-badge>
+
+  <helix-badge
+    label="3 failures"
+    tone="danger"
+    value="3"
+  >
+    <helix-button>Failures</helix-button>
+  </helix-badge>
+
+  <helix-badge
+    label="8 archived"
+    tone="neutral"
+    value="8"
+  >
+    <helix-button>Archived</helix-button>
+  </helix-badge>
+</helix-flex>

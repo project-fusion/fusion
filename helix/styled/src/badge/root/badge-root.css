@@ -94,6 +94,42 @@
     scale var(--helix-duration-fast) var(--helix-easing-accelerate);
 }
 
+/* **The fills, which are `Tag`'s.** A badge and a tag are the same kind of
+   thing, a small mark carrying a meaning beside something else, and they had
+   different vocabularies for no reason anybody decided. Every one of these is a
+   `*-surface` token, and the token file says what that means: "fills that carry
+   `foreground-on-accent`", so the ink above is already solved for all of them
+   and none of these rules touches it.
+
+   `neutral` is the exception and says so by setting its own ink: it is a rung on
+   the surface ladder rather than a status fill, so the ink is the page's
+   foreground. */
+
+/* The brand, said as well as defaulted. `Announcement` gives the reason for
+   spelling out a value that is also the resting one: a generated page should be
+   able to say what it means rather than express it by leaving an attribute off. */
+:host([tone="primary"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-primary-surface));
+}
+
+/* The second emphasis, a rotation off the brand seed rather than a color of its
+   own, so it stays in relation when somebody rethemes. */
+:host([tone="accent"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-accent-surface));
+}
+
+:host([tone="info"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-info-surface));
+}
+
+:host([tone="success"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-success-surface));
+}
+
+:host([tone="warning"]) [part="indicator"] {
+  background-color: var(--badge-background-color, var(--helix-color-warning-surface));
+}
+
 /* The alarming one, which is the exception rather than the default. A badge is
    usually a count of things waiting, and a count is news rather than a warning:
    red on everything that has unread anything is a page that is always

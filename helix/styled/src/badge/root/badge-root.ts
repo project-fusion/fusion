@@ -27,9 +27,21 @@ export class HelixBadge extends HelixHeadlessBadge {
   /**
    * What the mark means, not how loudly it is drawn: the stylesheet picks a fill
    * from what the count *is*.
+   *
+   * **`Tag`'s vocabulary, because a badge is the same kind of thing.** Both are
+   * a small mark carrying a meaning beside something else, and the two had
+   * different sets for no reason anybody decided: a tag could say `success` and
+   * a badge could not, so a page marking a build green wrote one word on the
+   * chip and had no word for the count beside it. Every fill these name already
+   * exists and every one carries `foreground-on-accent`, so this costs a rule
+   * apiece and no new color.
+   *
+   * **`primary` is sayable as well as the default**, which is the reason
+   * `Announcement` gives for its own neutral: a generated page should be able to
+   * say what it means rather than express it by leaving an attribute off.
    */
   @property({ reflect: true })
-  tone?: 'danger' | 'neutral'
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   static override styles: CSSResultGroup = styles
 }
