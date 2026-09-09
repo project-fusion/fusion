@@ -1,0 +1,79 @@
+<!-- @summary Typing a filter and pressing Enter builds the chip the picker would have. -->
+<!-- @min 520 -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-filter-input
+    hint="Try disposition:refunded, -disposition:settled, or refund disposition:chargeback"
+    id="filter"
+    label="Filter the queue"
+    placeholder="Search, or type a filter"
+  >
+    <!-- The same declarations the picker reads, and the only ones. Neither field
+         declares a comparison, so both are filtered by "is any of" and negated
+         with a leading minus, which is what the punctuation can say. -->
+    <helix-filter-menu
+      label="Filter"
+      slot="start"
+    >
+      <helix-button
+        emphasis="ghost"
+        slot="trigger"
+      >Filter</helix-button>
+
+      <helix-filter-field
+        label="Disposition"
+        name="disposition"
+      >
+        <helix-option value="refunded">Refunded</helix-option>
+        <helix-option value="chargeback">Chargeback</helix-option>
+        <helix-option value="settled">Settled</helix-option>
+      </helix-filter-field>
+
+      <!-- No values, so this one takes whatever is typed: `assignee:ada` is a
+           filter and the field never had to list every name in the company. -->
+      <helix-filter-field
+        label="Assignee"
+        name="assignee"
+      ></helix-filter-field>
+    </helix-filter-menu>
+  </helix-filter-input>
+</helix-flex>
+
+<script type="module">
+  const filter = document.getElementById('filter')
+
+  /* **One handler for two surfaces.** Enter over typed text and a tick in the
+     menu both arrive as `helix-facet` carrying the same detail, so nothing below
+     knows or cares which of them the reader used. That is the whole reason the
+     grammar produces the event the picker produces rather than one of its own. */
+  filter.addEventListener('helix-facet', (event) => {
+    const { field, label, operatorLabel, values } = event.detail
+    const held = filter.querySelector(`helix-filter-chip[name="${field}"]`)
+
+    // An empty set is the filter going, which is what unticking the last value
+    // in the menu means by it.
+    if (values.length === 0) {
+      held?.remove()
+      return
+    }
+
+    const chip = held ?? document.createElement('helix-filter-chip')
+    chip.slot = 'tags'
+    chip.dismissible = true
+    chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
+    chip.label = label
+    chip.name = field
+    chip.operatorLabel = operatorLabel
+    chip.textContent = values.join(', ')
+    if (!held) {
+      filter.append(chip)
+    }
+  })
+
+  filter.addEventListener('helix-dismiss', (event) => {
+    event.target.remove()
+  })
+</script>

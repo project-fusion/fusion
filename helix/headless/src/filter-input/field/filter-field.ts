@@ -2,6 +2,7 @@ import { customElement, HelixElement } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessOption } from '../../option/index.js'
+import { DEFAULT_FILTER_OPERATORS, type FilterGrammarField } from '../grammar.js'
 import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js'
 
 /**
@@ -28,6 +29,14 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * chooser at all. A global list would offer every field every word and leave the
  * component deciding which of them made sense, which is the domain question it
  * declines to answer.
+ *
+ * **A field that declares none gets two, and they are the ones the punctuation
+ * can say.** `is any of` and `is none of` are what `field:a,b` and `-field:a,b`
+ * mean, so declaring them was ceremony for the case every product has; the
+ * example above is what a consumer writes when the words matter, not the price
+ * of admission. Declaring one comparison replaces both rather than joining
+ * them — see `vocabulary`, which is where that is decided once for the menu and
+ * the grammar together.
  *
  * **Values are `Option`s, which is the element a consumer already has.** They
  * carry a value, a label and a disabled state, and a picker built on `Menu` or
@@ -69,6 +78,10 @@ export class HelixHeadlessFilterField extends HelixElement {
    * Read from the light DOM rather than from a slot, because there is no slot:
    * this element renders nothing, so nothing is ever assigned. Order is the
    * consumer's, which is the order a chooser should offer them in.
+   *
+   * **As declared, so empty where nothing was.** The defaults are applied by
+   * `vocabulary` and not here: this getter answers what the consumer wrote, and
+   * a caller that wants what the field *supports* wants the other one.
    */
   get operators(): HelixHeadlessFilterOperator[] {
     return [
@@ -112,6 +125,41 @@ export class HelixHeadlessFilterField extends HelixElement {
         ':scope > helix-headless-option, :scope > helix-option',
       ),
     ]
+  }
+
+  /**
+   * This field flattened into what the menu renders and the grammar reads.
+   *
+   * **The one place the defaults are applied.** A field that declares no
+   * comparisons supports `is any of` and `is none of`, which is what the typed
+   * grammar can say and so what the picker offers; declaring one replaces both,
+   * because a set half inherited and half written is one nobody can read off the
+   * markup. Two things need this answer and neither should be resolving it
+   * itself.
+   *
+   * Data rather than elements, so the grammar stays a module with no DOM in it
+   * and the menu renders rows from the same shape whether the consumer wrote the
+   * operators or not.
+   */
+  get vocabulary(): FilterGrammarField {
+    const declared = this.operators
+    const unwritten = this.defaultOperator
+    return {
+      label: this.label,
+      name: this.name ?? '',
+      operators:
+        declared.length > 0
+          ? declared.map((operator) => ({
+              default: operator === unwritten,
+              label: operator.label,
+              name: operator.name ?? '',
+            }))
+          : DEFAULT_FILTER_OPERATORS,
+      values: this.values.map((option) => ({
+        label: option.textContent?.trim() || option.value,
+        value: option.value,
+      })),
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {

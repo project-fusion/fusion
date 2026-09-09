@@ -142,6 +142,28 @@ describe('which comparison it says is in force', () => {
     press(element, 'value', 'created', 'today')
     expect(seen[0]?.operatorLabel).toBe('after')
   })
+
+  test('a field that declares none is offered the two the grammar can type', async () => {
+    const element = await picker(`
+      <helix-headless-filter-field name="disposition" label="Disposition">
+        <helix-headless-option value="refunded">Refunded</helix-headless-option>
+      </helix-headless-filter-field>`)
+    const rows = [
+      ...(element.shadowRoot?.querySelectorAll<HTMLElement>(
+        '[data-facet="operator"][data-field="disposition"]',
+      ) ?? []),
+    ]
+    expect(rows.map((row) => row.dataset.value)).toEqual(['any', 'none'])
+
+    const seen = heard(element)
+    press(element, 'value', 'disposition', 'refunded')
+    expect(seen[0]?.operator).toBe('any')
+    expect(seen[0]?.operatorLabel).toBe('')
+
+    press(element, 'operator', 'disposition', 'none')
+    expect(seen[1]?.operator).toBe('none')
+    expect(seen[1]?.operatorLabel).toBe('is none of')
+  })
 })
 
 describe('refusing', () => {

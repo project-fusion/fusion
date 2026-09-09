@@ -18,19 +18,13 @@ export function Example() {
           Filter
         </helix-button>
 
+        {/* No comparisons declared, so it is offered "is any of" and "is none
+            of": the two the typed grammar can say, and the two nearly every set
+            filter wants. Declaring one replaces both. */}
         <helix-filter-field
           label="Disposition"
           name="disposition"
         >
-          <helix-filter-operator
-            default
-            label="is any of"
-            name="any"
-          ></helix-filter-operator>
-          <helix-filter-operator
-            label="is none of"
-            name="none"
-          ></helix-filter-operator>
           <helix-option value="refunded">Refunded</helix-option>
           <helix-option value="chargeback">Chargeback</helix-option>
           <helix-option value="settled">Settled</helix-option>
@@ -38,7 +32,9 @@ export function Example() {
 
         {/* One comparison and no default, which is the scalar shape: there is
             nothing for a default to distinguish it from, so a chip built from
-            this always says "after". */}
+            this always says "after". Declaring it also means there is no `none`
+            for a leading minus to ask for, so this field is built here and not
+            typed. */}
         <helix-filter-field
           label="Created"
           name="created"

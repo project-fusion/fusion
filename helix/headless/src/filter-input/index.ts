@@ -1,5 +1,6 @@
 export * from './chip/filter-chip.js'
 export * from './field/filter-field.js'
+export * from './grammar.js'
 export * from './menu/filter-menu.js'
 export * from './operator/filter-operator.js'
 export * from './root/filter-input-root.js'

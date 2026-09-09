@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   drawIcon,
+  HelixFacetEvent,
   HelixFormElement,
   holdCaret,
   MixinControllerOpen,
@@ -14,6 +15,8 @@ import {
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import type { HelixHeadlessFilterField } from '../field/filter-field.js'
+import { readFilterText } from '../grammar.js'
 
 /** A token that answers a request to go, which is what `Tag` is. */
 type DismissibleToken = Element & { dismiss(): boolean }
@@ -61,13 +64,25 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * `helix-dismiss` its own remove control fires, so a consumer who handled the
  * pointer has already handled the keyboard.
  *
- * **It can suggest what to type next, and it never learns the grammar.** Slot
- * `helix-option` elements into `suggestions` and the field shows them, moves
- * through them with the arrows, and lets Enter press one; the option fires its
- * own `helix-select` and the consumer decides what choosing meant. Deciding
- * *what* to suggest is theirs too: keys before a colon and values after it are
- * the same panel with different contents, which is all a two-level filter is,
- * and the parse that tells them apart belongs where the domain does.
+ * **It reads what was declared, and nothing that was not.** Write
+ * `FilterField`s — usually inside the `FilterMenu` slotted into `start`, so the
+ * picker and the text work off one set — and Enter reads the box against them:
+ * `disposition:refunded,settled` and `-disposition:refunded` announce
+ * `helix-facet`, exactly as ticking those values in the picker would, and the
+ * text they were read from goes. Everything else stays where it was typed, so
+ * `refund tuesday disposition:settled` is a filter and a search at once.
+ * `grammar.ts` carries the whole rule and is worth reading before relying on it;
+ * the short version is that Helix owns the punctuation and the consumer owns
+ * every word in it. A field with no `FilterField` in it parses nothing, which is
+ * the behavior this had before it could.
+ *
+ * **It can suggest what to type next, and deciding what to suggest is still the
+ * consumer's.** Slot `helix-option` elements into `suggestions` and the field
+ * shows them, moves through them with the arrows, and lets Enter press one; the
+ * option fires its own `helix-select` and the consumer decides what choosing
+ * meant. Keys before a colon and values after it are the same panel with
+ * different contents, and `readFilterText` is exported for a consumer narrowing
+ * that panel against what a reader has half typed.
  *
  * **The panel opens when there is something in it and closes when there is
  * not**, rather than on a choice. A reader who picks a key wants its values
@@ -111,6 +126,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the suggestions go, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions show, and cancelable.
+ * @event {HelixFacetEvent} helix-facet - Fired when Enter reads a filter out of the text. Cancelable: refusing it leaves that much of the text alone.
  * @event {Event} input - Announced once the text has moved.
  * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  *
@@ -330,6 +346,71 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   }
 
   /**
+   * The fields this can be filtered by, wherever they were written.
+   *
+   * Descendants rather than children, because the usual place to write them is
+   * inside the `FilterMenu` slotted into `start`: the picker and the text are
+   * two ways at one set of declarations, and asking a consumer to write them
+   * twice would be asking which of the two surfaces is the real one.
+   */
+  get fields(): HelixHeadlessFilterField[] {
+    return [
+      ...this.querySelectorAll<HelixHeadlessFilterField>(
+        'helix-headless-filter-field, helix-filter-field',
+      ),
+    ]
+  }
+
+  /**
+   * Reads what has been typed, announces whatever of it was a filter, and takes
+   * that much of the text away.
+   *
+   * **Nothing at all without declarations**, which is what keeps this from
+   * changing under a consumer who never asked for it: a field with no
+   * `FilterField` in it has no vocabulary to read against, so Enter stays the
+   * form's and every keystroke is still just text.
+   *
+   * Refusing a `helix-facet` leaves that term's text where the reader wrote it,
+   * so a consumer who declines one is not left with a box that has silently
+   * emptied itself of a filter they did not take.
+   */
+  private readFilters(): number {
+    const fields = this.fields
+    if (fields.length === 0) {
+      return 0
+    }
+    const reading = readFilterText(
+      this.value,
+      fields.map((field) => field.vocabulary),
+    )
+    if (reading.terms.length === 0) {
+      return 0
+    }
+
+    let taken = 0
+    const refused: string[] = []
+    for (const term of reading.terms) {
+      if (this.dispatchEvent(new HelixFacetEvent(term.facet))) {
+        taken += 1
+      } else {
+        refused.push(...term.written)
+      }
+    }
+    if (taken === 0) {
+      return 0
+    }
+
+    this.requestValue([...refused, reading.text].filter(Boolean).join(' '))
+    const control = this.control
+    if (control) {
+      restoreValue(control, this.value)
+    }
+    this.dismissed = false
+    this.settleOpen()
+    return taken
+  }
+
+  /**
    * Empties the text and gives the caret back.
    *
    * Focus returns to the input rather than staying on a button that is about to
@@ -403,6 +484,18 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
      meant keeps it true if that ever stops being so. */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     if (this.tokenKeydown(event, this.value)) {
+      return
+    }
+
+    /* Enter over a highlighted suggestion is that suggestion's, and falls
+       through to the case below. Anywhere else it is the reader saying they have
+       finished writing, which is when what they wrote gets read: a filter
+       becomes a chip, and text that was not one stays text and reaches the form
+       as it always did. */
+    if (event.key === 'Enter' && !(this.open && this.suggestions[this.activeAt])) {
+      if (this.readFilters() > 0) {
+        event.preventDefault()
+      }
       return
     }
 

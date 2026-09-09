@@ -6,7 +6,7 @@ import { property } from 'lit/decorators.js'
    it by one. `Notification` records the same trap. */
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessFilterField } from '../field/filter-field.js'
-import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js'
+import type { FilterGrammarOperator } from '../grammar.js'
 
 /**
  * @summary The control that builds a filter: pick a field, tick its values.
@@ -20,12 +20,15 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * ```html
  * <helix-headless-filter-menu label="Filter">
  *   <helix-headless-filter-field name="disposition" label="Disposition">
- *     <helix-headless-filter-operator name="any" label="is any of" default>
- *     </helix-headless-filter-operator>
  *     <helix-headless-option value="refunded">Refunded</helix-headless-option>
  *   </helix-headless-filter-field>
  * </helix-headless-filter-menu>
  * ```
+ *
+ * That field declares no comparisons and so is offered `is any of` and `is none
+ * of`, which are the two the typed grammar can say. The menu and the text end up
+ * offering the same filters because both read `FilterField.vocabulary`, and a
+ * consumer whose field needs other words declares them there.
  *
  * **A tick is a filter, immediately.** There is no Apply: ticking a value
  * announces the field's whole set as it now stands, so a queue narrows as the
@@ -90,7 +93,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
 
   /**
    * Which comparison a field is using: the reader's choice, then the one the
-   * field marked, then the first one it declared.
+   * field marked, then the first one it supports.
    *
    * **The last of those is not a fallback for nothing, it is the scalar case.**
    * A date supports `after` and nothing else and marks no default, because there
@@ -98,14 +101,19 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    * a chip built from it with no comparison at all: `Created` and a date, with
    * the word that made it mean anything missing. It is not marked `default`, so
    * it is not the unwritten one and the chip says it, which is right.
+   *
+   * Read off `vocabulary` rather than off the operator elements, so a field that
+   * declared none is offered the defaults here and parses them in the text, from
+   * one answer rather than two that can drift.
    */
-  operatorFor(field: HelixHeadlessFilterField): HelixHeadlessFilterOperator | null {
+  operatorFor(field: HelixHeadlessFilterField): FilterGrammarOperator | null {
+    const { operators } = field.vocabulary
     const chosen = this.comparisons.get(field.name ?? '')
-    const declared = field.defaultOperator ?? field.operators[0] ?? null
+    const declared = operators.find((operator) => operator.default) ?? operators[0] ?? null
     if (chosen === undefined) {
       return declared
     }
-    return field.operators.find((operator) => operator.name === chosen) ?? declared
+    return operators.find((operator) => operator.name === chosen) ?? declared
   }
 
   /**
@@ -118,7 +126,6 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    */
   private announce(field: HelixHeadlessFilterField): boolean {
     const operator = this.operatorFor(field)
-    const isDefault = operator !== null && operator.default
     return this.dispatchEvent(
       new HelixFacetEvent({
         field: field.name ?? '',
@@ -126,8 +133,8 @@ export class HelixHeadlessFilterMenu extends HelixElement {
         operator: operator?.name ?? '',
         /* Empty where it is the field's usual comparison, which is what makes a
            chip drawn from this read as a field and its values and nothing
-           between them. */
-        operatorLabel: isDefault ? '' : (operator?.label ?? ''),
+           between them. The grammar decides it the same way. */
+        operatorLabel: operator?.default ? '' : (operator?.label ?? ''),
         values: this.valuesFor(field.name ?? ''),
       }),
     )
@@ -206,27 +213,26 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     return html`<${menu} label=${this.label} @helix-select=${this.handleSelect}>
       <slot name="trigger" slot="trigger"></slot>
       ${this.fields.map((field) => {
-        const name = field.name ?? ''
+        const { label, name, operators, values } = field.vocabulary
         const ticked = this.picked.get(name) ?? new Set<string>()
-        const operators = field.operators
         const using = this.operatorFor(field)
         return html`<${item} data-facet="field" data-field=${name}>
-          ${field.label}
+          ${label}
           ${
             operators.length > 1
               ? operators.map(
                   (operator) => html`<${item}
                     slot="submenu"
                     checkable
-                    ?checked=${operator === using}
+                    ?checked=${operator.name === using?.name}
                     data-facet="operator"
                     data-field=${name}
-                    data-value=${operator.name ?? ''}
+                    data-value=${operator.name}
                   >${operator.label}</${item}>`,
                 )
               : nothing
           }
-          ${field.values.map(
+          ${values.map(
             (option) => html`<${item}
               slot="submenu"
               checkable
@@ -234,7 +240,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
               data-facet="value"
               data-field=${name}
               data-value=${option.value}
-            >${option.textContent?.trim() || option.value}</${item}>`,
+            >${option.label}</${item}>`,
           )}
         </${item}>`
       })}
