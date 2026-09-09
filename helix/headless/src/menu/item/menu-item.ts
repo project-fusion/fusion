@@ -16,8 +16,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * **The role follows the shape.** A row that can be ticked is
  * `menuitemcheckbox` and carries `aria-checked`, because a reader is told "one
- * of these is on" rather than "here is a button". A row that opens a page keeps
- * `menuitem` and says `aria-haspopup`, since the page it opens is a menu.
+ * of these is on" rather than "here is a button"; `exclusive` makes it
+ * `menuitemradio`, for a set where only one can be. A row that opens a page
+ * keeps `menuitem` and says `aria-haspopup`, since the page it opens is a menu.
  *
  * Whether it is on the page showing is set by the menu as a property, never as
  * an attribute: an attribute written onto a consumer's element after it
@@ -76,6 +77,21 @@ export class HelixHeadlessMenuItem extends HelixElement {
    */
   @property({ type: Boolean })
   download = false
+
+  /**
+   * Whether only one row of the set it belongs to can be on.
+   *
+   * Announcement and nothing else, the way `checkable` is: this element applies
+   * no choice and polices no group, so what it does is tell a reader which kind
+   * of set they are in. `menuitemcheckbox` says every row here is independent,
+   * which for a run of comparisons, or the values of a filter that compares
+   * against one, is the opposite of true.
+   *
+   * Meaningless without `checkable`, since a row that cannot be ticked is not
+   * one of a set of anything.
+   */
+  @property({ reflect: true, type: Boolean })
+  exclusive = false
 
   /**
    * Where the row goes, which makes it a real link.
@@ -354,9 +370,9 @@ export class HelixHeadlessMenuItem extends HelixElement {
        A disabled row renders no `href`. A disabled anchor is not a thing the
        platform has, and `aria-disabled` alone still navigates. */
     const linked = this.href !== '' && !this.disabled
-    const role = this.checkable || this.checked ? 'menuitemcheckbox' : 'menuitem'
-    const checkedState =
-      this.checkable || this.checked ? (this.checked ? 'true' : 'false') : nothing
+    const ticks = this.checkable || this.checked
+    const role = ticks ? (this.exclusive ? 'menuitemradio' : 'menuitemcheckbox') : 'menuitem'
+    const checkedState = ticks ? (this.checked ? 'true' : 'false') : nothing
     const inside = html`<span part="start" ?data-empty=${!this.start}
           ><slot name="start" @slotchange=${this.readStart}></slot
         ></span>

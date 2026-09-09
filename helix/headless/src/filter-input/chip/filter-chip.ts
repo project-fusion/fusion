@@ -118,13 +118,25 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
        property is what decides on the server and the slot corrects it after. */
     const operator = this.operatorLabel !== '' || this.querySelector('[slot="operator"]') !== null
 
+    /* And the values box only where there are values.
+     *
+     * A comparison of arity `none`, `is empty` or `is set`, is a filter that
+     * carries none and never will, so the chip for one is a field and a word.
+     * Drawn unconditionally it left an empty box in the row, which the gap
+     * either side of it turned into a visible step of dead space after the
+     * word. Default slot only, for the reason `MixinDismissible` gives: a node
+     * assigned to `field` or `operator` belongs to another region. */
+    const values = [...this.childNodes].some((node) =>
+      node instanceof Element ? node.slot === '' : (node.textContent ?? '').trim() !== '',
+    )
+
     return html`<span part="field"><slot name="field">${this.label}</slot></span>
       ${
         operator
           ? html`<span part="operator"><slot name="operator">${this.operatorLabel}</slot></span>`
           : nothing
       }
-      <span part="values"><slot></slot></span>
+      ${values ? html`<span part="values"><slot></slot></span>` : nothing}
       ${
         this.dismissible
           ? html`<button

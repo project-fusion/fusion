@@ -129,6 +129,33 @@ describe('moving through a menu with the keyboard', () => {
   })
 })
 
+describe('what a row tells a reader it is', () => {
+  const roleOf = async (attrs: string): Promise<string | null> => {
+    const host = await menu(`<helix-headless-menu-item ${attrs}>Row</helix-headless-menu-item>`)
+    host.open = true
+    await host.updateComplete
+    const item = host.querySelector('helix-headless-menu-item') as unknown as {
+      renderRoot: ShadowRoot
+      updateComplete: Promise<boolean>
+    }
+    await item.updateComplete
+    return item.renderRoot.querySelector('[part="item"]')?.getAttribute('role') ?? null
+  }
+
+  test('a command, a choice, and one of a set are three different things', async () => {
+    expect(await roleOf('value="go"')).toBe('menuitem')
+    expect(await roleOf('checkable value="go"')).toBe('menuitemcheckbox')
+    /* `menuitemcheckbox` on a run of comparisons tells a reader every one of
+       them is independent, which for a set where only one can be on is the
+       opposite of true. */
+    expect(await roleOf('checkable exclusive value="go"')).toBe('menuitemradio')
+  })
+
+  test('and exclusive on its own is not a choice at all', async () => {
+    expect(await roleOf('exclusive value="go"')).toBe('menuitem')
+  })
+})
+
 describe('a menu row that navigates', () => {
   const row = async (attrs: string) => {
     const host = await menu(`<helix-headless-menu-item ${attrs}>Docs</helix-headless-menu-item>`)

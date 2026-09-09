@@ -17,6 +17,7 @@ type Menu = HTMLElement & {
 }
 
 interface Facet {
+  arity: 'many' | 'none' | 'one'
   field: string
   label: string
   operator: string
@@ -234,6 +235,95 @@ describe('which comparison it says is in force', () => {
   })
 })
 
+/**
+ * How many values a comparison takes, and what the picker does about it.
+ *
+ * `FilterOperator` calls `arity` "a fact the picker uses to decide what to
+ * offer", and for two releases it decided nothing: `is empty` was offered a page
+ * of names to tick and a scalar comparison let a reader pick three dates.
+ */
+describe('a comparison that takes no values', () => {
+  const EMPTY = `
+    <helix-headless-filter-field name="assignee" label="Assignee">
+      <helix-headless-filter-operator name="any" label="is any of" default></helix-headless-filter-operator>
+      <helix-headless-filter-operator name="empty" label="is empty" arity="none"></helix-headless-filter-operator>
+      <helix-headless-option value="ada">Ada</helix-headless-option>
+      <helix-headless-option value="grace">Grace</helix-headless-option>
+    </helix-headless-filter-field>`
+
+  test('offers none, because ticking one could not mean anything', async () => {
+    const element = await picker(EMPTY)
+    expect(element.shadowRoot?.querySelectorAll('[data-facet="value"]')).toHaveLength(2)
+    press(element, 'operator', 'assignee', 'empty')
+    await element.updateComplete
+    expect(element.shadowRoot?.querySelectorAll('[data-facet="value"]')).toHaveLength(0)
+  })
+
+  test('and takes back anything already ticked, which is now untrue', async () => {
+    const element = await picker(EMPTY)
+    press(element, 'value', 'assignee', 'ada')
+    const seen = heard(element)
+    press(element, 'operator', 'assignee', 'empty')
+    expect(seen[0]?.values).toEqual([])
+    expect(element.valuesFor('assignee')).toEqual([])
+  })
+
+  /* The whole reason `arity` is in the detail: this facet and a cleared one are
+     otherwise the same event, and a consumer would drop the chip for both. */
+  test('says so in the facet, so an empty filter is not read as no filter', async () => {
+    const element = await picker(EMPTY)
+    const seen = heard(element)
+    press(element, 'operator', 'assignee', 'empty')
+    expect(seen[0]?.arity).toBe('none')
+    expect(seen[0]?.operatorLabel).toBe('is empty')
+    expect(seen[0]?.values).toEqual([])
+  })
+
+  test('and the values come back when a comparison that takes them does', async () => {
+    const element = await picker(EMPTY)
+    press(element, 'operator', 'assignee', 'empty')
+    await element.updateComplete
+    const seen = heard(element)
+    press(element, 'operator', 'assignee', 'any')
+    await element.updateComplete
+    expect(element.shadowRoot?.querySelectorAll('[data-facet="value"]')).toHaveLength(2)
+    expect(seen[0]?.arity).toBe('many')
+  })
+})
+
+describe('a comparison that takes one value', () => {
+  const SCALAR = `
+    <helix-headless-filter-field name="created" label="Created">
+      <helix-headless-filter-operator name="after" label="is after" arity="one"></helix-headless-filter-operator>
+      <helix-headless-option value="today">Today</helix-headless-option>
+      <helix-headless-option value="week">This week</helix-headless-option>
+    </helix-headless-filter-field>`
+
+  test('pressing another replaces it, since after two dates is not a filter', async () => {
+    const element = await picker(SCALAR)
+    press(element, 'value', 'created', 'today')
+    const seen = heard(element)
+    press(element, 'value', 'created', 'week')
+    expect(seen[0]?.values).toEqual(['week'])
+    expect(element.valuesFor('created')).toEqual(['week'])
+  })
+
+  test('and pressing the one already on takes it off, which is how it clears', async () => {
+    const element = await picker(SCALAR)
+    press(element, 'value', 'created', 'today')
+    const seen = heard(element)
+    press(element, 'value', 'created', 'today')
+    expect(seen[0]?.values).toEqual([])
+  })
+
+  test('its rows are one of a set, and say so', async () => {
+    const element = await picker(SCALAR)
+    for (const row of element.shadowRoot?.querySelectorAll('[data-facet="value"]') ?? []) {
+      expect(row.hasAttribute('exclusive')).toBe(true)
+    }
+  })
+})
+
 describe('applying a filter from somewhere else', () => {
   test('announces it and holds the ticks, so the menu shows what is in force', async () => {
     const element = await picker()
@@ -269,6 +359,30 @@ describe('applying a filter from somewhere else', () => {
     expect(element.apply('disposition', ['settled'], 'none')).toBe(false)
     expect(element.valuesFor('disposition')).toEqual(['refunded'])
     expect(element.operatorFor(element.fields[0] as never)?.name).toBe('any')
+  })
+
+  /* Held, the comparison was invisible: the chip was gone and the reader's next
+     tick quietly came back `is none of`. Naming one is the other case, a reader
+     choosing a comparison before ticking anything, and that stands. */
+  test('an empty set with no comparison named puts the field back to its usual one', async () => {
+    const element = await picker()
+    element.apply('disposition', ['refunded'], 'none')
+    expect(element.operatorFor(element.fields[0] as never)?.name).toBe('none')
+    element.apply('disposition', [])
+    expect(element.operatorFor(element.fields[0] as never)?.name).toBe('any')
+  })
+
+  test('but naming one holds it, for a reader who picks before they tick', async () => {
+    const element = await picker()
+    element.apply('disposition', [], 'none')
+    expect(element.operatorFor(element.fields[0] as never)?.name).toBe('none')
+  })
+
+  test('the comparisons are one of a set, and say so', async () => {
+    const element = await picker()
+    for (const row of element.shadowRoot?.querySelectorAll('[data-facet="operator"]') ?? []) {
+      expect(row.hasAttribute('exclusive')).toBe(true)
+    }
   })
 
   test('a field nobody declared is not one this can filter by', async () => {

@@ -41,6 +41,14 @@ import type { FilterGrammarOperator } from '../grammar.js'
  * somebody picked something worth noticing. Deciding it here is the point, since
  * this is the only thing that has read both the field and its operators.
  *
+ * **How many values a comparison takes decides what is under it.** A field
+ * whose comparison is `arity="none"`, `is empty` or `is set`, is offered no
+ * values at all and gives back any that were ticked: the comparison is the whole
+ * filter. One at `arity="one"` offers its values as a single choice, so pressing
+ * another replaces it and pressing the one already on clears it. Both announce
+ * `arity` in the facet, which is what lets a consumer tell an empty filter from
+ * no filter at all.
+ *
  * **It applies nothing.** The chips are the consumer's markup and the rows are
  * their data, so this announces and stops, the way `Notification` reports a read
  * rather than inventing one. Refusing `helix-facet` refuses the change.
@@ -128,6 +136,10 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     const operator = this.operatorFor(field)
     return this.dispatchEvent(
       new HelixFacetEvent({
+        /* What tells a consumer an empty filter from no filter: `is empty` is a
+           filter with no values and never will have any, and every other
+           comparison with none is a field nobody is narrowing by. */
+        arity: operator?.arity ?? 'many',
         field: field.name ?? '',
         label: field.label,
         operator: operator?.name ?? '',
@@ -160,10 +172,21 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     }
     const heldValues = this.picked.get(field)
     const heldOperator = this.comparisons.get(field)
-    this.picked.set(field, new Set(values))
     if (operator !== undefined) {
       this.comparisons.set(field, operator)
+    } else if (values.length === 0) {
+      /* Nothing left and nobody named a comparison, so the field is not being
+         filtered at all and the comparison goes back to the field's usual one.
+         Held, it was invisible: the chip was gone and the reader's next tick
+         quietly came back `is none of`, which is not what pressing a value in a
+         fresh menu should mean. Naming one is the other case, a reader picking
+         a comparison before they have ticked anything, and that stands. */
+      this.comparisons.delete(field)
     }
+    /* A comparison that takes no values is the whole filter, so anything ticked
+       under the last one is not just unused, it is untrue. */
+    const arity = this.operatorFor(declared)?.arity ?? 'many'
+    this.picked.set(field, new Set(arity === 'none' ? [] : values))
     const stood = this.announce(declared)
     if (!stood) {
       if (heldValues === undefined) {
@@ -215,7 +238,17 @@ export class HelixHeadlessFilterMenu extends HelixElement {
       this.apply(field, this.valuesFor(field), value)
       return
     }
-    const ticked = new Set(this.picked.get(field) ?? [])
+    const declared = this.fields.find((one) => (one.name ?? '') === field)
+    const held = this.picked.get(field) ?? new Set<string>()
+    /* A scalar comparison takes one value, so pressing another replaces rather
+       than adds: `is after` two dates is not a filter anybody can run. Pressing
+       the one already on still takes it off, which is how a reader clears it
+       without a second control to do it with. */
+    if (declared && this.operatorFor(declared)?.arity === 'one') {
+      this.apply(field, held.has(value) && held.size === 1 ? [] : [value])
+      return
+    }
+    const ticked = new Set(held)
     if (ticked.has(value)) {
       ticked.delete(value)
     } else {
@@ -234,6 +267,11 @@ export class HelixHeadlessFilterMenu extends HelixElement {
         const { label, name, operators, values } = field.vocabulary
         const ticked = this.picked.get(name) ?? new Set<string>()
         const using = this.operatorFor(field)
+        /* Nothing to offer under a comparison that takes no values. `is empty`
+           is the whole filter, so a page of values beneath it would be a page of
+           choices that change nothing, and ticking one would say something the
+           comparison cannot mean. */
+        const offered = using?.arity === 'none' ? [] : values
         return html`<${item} data-facet="field" data-field=${name}>
           ${label}
           ${
@@ -252,6 +290,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                     (operator) => html`<${item}
                       slot="submenu"
                       checkable
+                      exclusive
                       ?checked=${operator.name === using?.name}
                       data-facet="operator"
                       data-field=${name}
@@ -268,14 +307,15 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                and the rule is what makes them two groups rather than one list
                that happens to change halfway down. Only where there is a
                comparison to separate. */
-            operators.length > 1 && values.length > 0
+            operators.length > 1 && offered.length > 0
               ? html`<${divider} slot="submenu" announced></${divider}>`
               : nothing
           }
-          ${values.map(
+          ${offered.map(
             (option) => html`<${item}
               slot="submenu"
               checkable
+              ?exclusive=${using?.arity === 'one'}
               ?checked=${ticked.has(option.value)}
               data-facet="value"
               data-field=${name}

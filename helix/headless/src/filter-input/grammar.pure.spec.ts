@@ -20,15 +20,37 @@ const DISPOSITION: FilterGrammarField = {
   ],
 }
 
+/** A comparison that is complete on its own, beside one that takes a set. */
+const STATE: FilterGrammarField = {
+  label: 'State',
+  name: 'state',
+  operators: [
+    { arity: 'many', default: true, label: 'is any of', name: 'any' },
+    { arity: 'none', default: false, label: 'is empty', name: 'empty' },
+  ],
+  values: [{ label: 'Open', value: 'open' }],
+}
+
+/** A consumer whose own `none` takes no values, which the minus must not reach. */
+const OWNER: FilterGrammarField = {
+  label: 'Owner',
+  name: 'owner',
+  operators: [
+    { arity: 'many', default: true, label: 'is any of', name: 'any' },
+    { arity: 'none', default: false, label: 'is nobody', name: 'none' },
+  ],
+  values: [],
+}
+
 /** The scalar shape: one comparison, no default, and no negation to type. */
 const CREATED: FilterGrammarField = {
   label: 'Created',
   name: 'created',
-  operators: [{ default: false, label: 'is after', name: 'after' }],
+  operators: [{ arity: 'one', default: false, label: 'is after', name: 'after' }],
   values: [],
 }
 
-const FIELDS = [DISPOSITION, CREATED]
+const FIELDS = [DISPOSITION, CREATED, STATE, OWNER]
 
 const read = (text: string) => readFilterText(text, FIELDS)
 
@@ -101,6 +123,36 @@ describe('the comparison', () => {
     const facet = read('created:today').terms[0]?.facet
     expect(facet?.operator).toBe('after')
     expect(facet?.operatorLabel).toBe('is after')
+  })
+})
+
+describe('how many values a comparison takes', () => {
+  test('it comes back in the facet, because nothing else could say', () => {
+    expect(read('disposition:refunded').terms[0]?.facet.arity).toBe('many')
+    expect(read('created:today').terms[0]?.facet.arity).toBe('one')
+  })
+
+  /* Taking the first would drop the rest of something typed and spelled
+     correctly. Left in the box, the reader can see it was not read. */
+  test('a scalar comparison refuses a list rather than taking the first of it', () => {
+    expect(read('created:today').terms).toHaveLength(1)
+    const { terms, text } = read('created:today,week')
+    expect(terms).toHaveLength(0)
+    expect(text).toBe('created:today,week')
+  })
+
+  test('one that takes none cannot be written, because there is nothing to write', () => {
+    // `state:open` is the default comparison and parses; `is empty` is unreachable.
+    expect(read('state:open').terms[0]?.facet.operator).toBe('any')
+    expect(read('state:empty').terms).toHaveLength(0)
+  })
+
+  /* The name is not the arity, though both spell `none`. A consumer's `none`
+     that holds no values would read `-owner:ada` as "owner is nobody, ada". */
+  test('the minus skips a `none` that cannot hold what follows the colon', () => {
+    const { terms, text } = read('-owner:ada')
+    expect(terms).toHaveLength(0)
+    expect(text).toBe('-owner:ada')
   })
 })
 

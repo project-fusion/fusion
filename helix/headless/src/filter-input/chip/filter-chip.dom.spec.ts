@@ -94,3 +94,31 @@ describe('asking for a filter to go', () => {
     expect(part(el, 'dismiss')?.getAttribute('aria-label')).toBe('Remove disposition')
   })
 })
+
+/* `is empty` is a filter that carries no values and never will, so the chip for
+   one is a field and a word. Drawn unconditionally the box was still there, and
+   the gap either side of it read as a step of dead space after the word. */
+describe('a chip with nothing to compare against', () => {
+  test('draws no values box, where one with values does', async () => {
+    const withValues = (await mount(
+      `<helix-headless-filter-chip label="Disposition">refunded</helix-headless-filter-chip>`,
+    )) as HTMLElement
+    expect(withValues.shadowRoot?.querySelector('[part="values"]')).not.toBeNull()
+
+    const without = (await mount(
+      `<helix-headless-filter-chip label="Assignee" operator-label="is empty"></helix-headless-filter-chip>`,
+    )) as HTMLElement
+    expect(without.shadowRoot?.querySelector('[part="values"]')).toBeNull()
+    // The word it does carry is still there, which is the whole chip.
+    expect(without.shadowRoot?.querySelector('[part="operator"]')?.textContent?.trim()).toBe(
+      'is empty',
+    )
+  })
+
+  test('and something slotted with no text of its own still counts as a value', async () => {
+    const marked = (await mount(
+      `<helix-headless-filter-chip label="Owner"><span></span></helix-headless-filter-chip>`,
+    )) as HTMLElement
+    expect(marked.shadowRoot?.querySelector('[part="values"]')).not.toBeNull()
+  })
+})

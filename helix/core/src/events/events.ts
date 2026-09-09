@@ -167,6 +167,16 @@ export interface FilterDetail {
  * because only the thing that read the declarations knows both.
  */
 export interface FacetDetail {
+  /**
+   * How many values the comparison in force takes.
+   *
+   * **What tells an empty filter from no filter.** `values` empty usually means
+   * the field is not being filtered any more, and a consumer drops the chip; a
+   * comparison of arity `none`, `is empty` or `is set`, is a filter that has no
+   * values to carry and never will. Without this the two arrive identical, and
+   * the thing that read the declaration is the only thing that could say which.
+   */
+  arity: 'many' | 'none' | 'one'
   /** What the consumer's model calls the field. */
   field: string
   /** What a reader is shown for the field. */

@@ -45,7 +45,16 @@ export class HelixHeadlessFilterOperator extends HelixElement {
    * for.
    *
    * Read rather than enforced. This element applies nothing, so the arity is a
-   * fact the picker uses to decide what to offer, not a rule it polices.
+   * fact the picker uses to decide what to offer, not a rule it polices. What
+   * the picker does with it: `none` offers no values at all and takes back any
+   * that were ticked, since the comparison is the whole filter; `one` replaces
+   * rather than adds, and its rows announce as one of a set. The typed grammar
+   * reads it too, refusing a list where a scalar was declared and never writing
+   * a comparison that takes nothing.
+   *
+   * The arity reaches a consumer in `helix-facet`, which is what tells an empty
+   * filter from no filter: `values` empty means the field is no longer narrowing
+   * anything, unless the comparison is one that never had values to give.
    *
    * **Undefined reads as `many`, and takes no default**, which is the rule every
    * reflected property here answers to: a default writes an attribute on upgrade

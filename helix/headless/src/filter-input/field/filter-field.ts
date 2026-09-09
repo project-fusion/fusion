@@ -150,6 +150,8 @@ export class HelixHeadlessFilterField extends HelixElement {
       operators:
         declared.length > 0
           ? declared.map((operator) => ({
+              // Undeclared reads as `many`, which is this property's own rule.
+              arity: operator.arity ?? 'many',
               default: operator === unwritten,
               label: operator.label,
               name: operator.name ?? '',

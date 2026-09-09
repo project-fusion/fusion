@@ -31,6 +31,11 @@ import type { FacetDetail } from '@fusion.dev/helix-core'
 
 /** One comparison a field supports, as the grammar needs it. */
 export interface FilterGrammarOperator {
+  /**
+   * How many values it takes: `none` is complete on its own, `one` is a scalar,
+   * `many` is a set. Undeclared reads as `many`, which `FilterOperator` records.
+   */
+  arity: 'many' | 'none' | 'one'
   /** Whether this is the one a chip leaves unwritten. */
   default: boolean
   /** What a reader is shown. */
@@ -86,8 +91,8 @@ export interface FilterGrammarReading {
  * the markup.
  */
 export const DEFAULT_FILTER_OPERATORS: readonly FilterGrammarOperator[] = [
-  { default: true, label: 'is any of', name: 'any' },
-  { default: false, label: 'is none of', name: 'none' },
+  { arity: 'many', default: true, label: 'is any of', name: 'any' },
+  { arity: 'many', default: false, label: 'is none of', name: 'none' },
 ]
 
 /**
@@ -96,6 +101,12 @@ export const DEFAULT_FILTER_OPERATORS: readonly FilterGrammarOperator[] = [
  * By name rather than by position, so a consumer who declares their own `none`
  * with their own words keeps the shorthand, and one who declares neither loses
  * it cleanly.
+ *
+ * **The name is not the arity, though both spell `none`.** A consumer is free to
+ * declare an operator called `none` that takes no values at all, and binding a
+ * leading minus to that would read `-status:open` as "status is empty", which is
+ * not what anybody typing it meant. So the negation asks for a comparison that
+ * can hold what follows the colon, and finds nothing otherwise.
  */
 const NEGATION = 'none'
 
@@ -174,7 +185,17 @@ function readPiece(
   const operator = negated
     ? field.operators.find((one) => one.name === NEGATION)
     : (field.operators.find((one) => one.default) ?? field.operators[0])
-  if (!operator) {
+  /* A comparison that takes no values cannot be written, because the grammar has
+     nothing to write: every term here is a key and at least one value, and one
+     that is complete on its own has none to put after the colon. Those are built
+     in the picker.
+   *
+     This is also what keeps the minus honest, and no second guard is needed for
+     it: a consumer is free to declare an operator called `none` that holds
+     nothing, and `-owner:ada` finds it by name and is turned away here. Adding
+     the arity to the lookup as well read as the stricter rule and was measured
+     to change nothing. */
+  if (!operator || operator.arity === 'none') {
     return null
   }
 
@@ -197,7 +218,16 @@ function readPiece(
     }
     values.push(found.value)
   }
-  return values.length > 0 ? { field, operator, values } : null
+  if (values.length === 0) {
+    return null
+  }
+  /* More than a scalar comparison can hold. Taking the first would drop the rest
+     of what somebody typed and spelled correctly, so the term stays in the box
+     where they can see it was not read. */
+  if (operator.arity === 'one' && values.length > 1) {
+    return null
+  }
+  return { field, operator, values }
 }
 
 /** A term while it is still being added to, before the detail is handed out. */
@@ -258,6 +288,7 @@ export function readFilterText(
   return {
     terms: order.map((term) => ({
       facet: {
+        arity: term.operator.arity,
         field: term.field.name,
         label: term.field.label,
         operator: term.operator.name,

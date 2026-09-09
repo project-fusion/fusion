@@ -26,6 +26,7 @@ beforeAll(async () => {
  */
 
 interface Facet {
+  arity: 'many' | 'none' | 'one'
   field: string
   label: string
   operator: string
@@ -94,6 +95,7 @@ describe('reading the box', () => {
     await press(host)
     expect(heard).toEqual([
       {
+        arity: 'many',
         field: 'disposition',
         label: 'Disposition',
         operator: 'any',
