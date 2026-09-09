@@ -1,0 +1,18 @@
+/* The quoted comment, dressed by the consumer.
+ *
+ * This is what `detail` is for and why it sets nothing: a block in a
+ * notification is somebody else's content, and the row has no idea whether it is
+ * a quote, a diff, a preview or a chart. `caption` takes the opposite position
+ * and dresses what lands in it, which is right for a line and wrong for a block.
+ *
+ * Everything here is a token, so a rethemed page carries it. */
+.quote {
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  font-style: italic;
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-sm);
+}

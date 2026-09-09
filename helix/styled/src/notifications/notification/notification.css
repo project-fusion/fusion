@@ -64,6 +64,45 @@
   position: absolute;
 }
 
+/* **A row as its own box, where the feed wants boxes rather than a list.**
+ *
+ * The resting row is a hairline and nothing else, which is what `plain` names.
+ * These two give it an edge, a corner and a gap, and take the hairline away:
+ * a box that separates itself does not also need a line under it, and two
+ * separations at once read as a seam rather than as a card.
+ *
+ * The gap is a margin on the host rather than a `gap` on the list, because the
+ * list holds a mixture: a feed of `plain` rows wants no gap at all, and a `gap`
+ * there would be charged to every row whatever it is. */
+:host([separation="filled"]),
+:host([separation="outlined"]) {
+  --notifications-rule: transparent;
+
+  margin-block-end: var(--notifications-item-gap, var(--helix-space-xs));
+}
+
+:host([separation="filled"]) [part="item"],
+:host([separation="outlined"]) [part="item"] {
+  border: var(--helix-border-thin) solid var(--notifications-item-edge, var(--helix-color-border));
+  border-radius: var(--notifications-item-radius, var(--helix-radii-md));
+}
+
+/* A fill as well as an edge. `surface-raised` rather than `surface`, because the
+   feed itself usually sits on a surface already and a row has to be the rung
+   above whatever it is on rather than the same one. */
+:host([separation="filled"]) [part="item"] {
+  background-color: var(--notifications-item-fill, var(--helix-color-surface-raised));
+}
+
+/* **The unread mark moves inside the box.** It is placed against the row's
+   padding box, which for a carded row is inside a border and a corner: left at
+   the resting inset it sat on the border itself and, at the first and last rows,
+   inside the corner's arc. */
+:host([separation="filled"]) [part="item"]::before,
+:host([separation="outlined"]) [part="item"]::before {
+  inset-inline-start: var(--notifications-unread-inset, var(--helix-space-xs));
+}
+
 /* The box fills its track and the mark sits at the start of it, so the space the
    reservation buys is trailing space rather than an indent. */
 [part="media"] {
@@ -94,6 +133,27 @@ slot[name="caption"]::slotted(*) {
   font-size: var(--helix-text-xs);
   line-height: var(--helix-leading-normal);
   margin: var(--helix-space-none);
+}
+
+/* **A block, and the rule here is that there is almost no rule.**
+ *
+ * `caption` is a line about the row and is dressed like one: a size, an ink, a
+ * leading. That is exactly wrong for what goes here, which is a quoted comment,
+ * a status moving from one value to another, a preview. Measured with a
+ * `Blockquote` slotted into `caption`, the quote came out at the caption's
+ * `text-xs` fighting its own scale and won at a size that dwarfed the title it
+ * was under.
+ *
+ * So this sets spacing and nothing else. Whatever fills it brings its own type,
+ * which is the point of it being a block rather than a line.
+ *
+ * Margin rather than the body's `gap`, so a row with no detail pays nothing for
+ * the space one would have taken: `gap` is charged between tracks whether or not
+ * a track has anything in it. */
+slot[name="detail"]::slotted(*) {
+  display: block;
+  margin-block: var(--helix-space-2xs) var(--helix-space-none);
+  margin-inline: var(--helix-space-none);
 }
 
 /* **A linked title is the row's title, drawn in the row's ink.**

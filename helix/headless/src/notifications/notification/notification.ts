@@ -58,6 +58,9 @@ import '../../format-date/index.js'
  * @slot caption - A second line qualifying it, quieter than the first. A bare
  * slot rather than a box, so an item without one pays nothing for it; style it
  * through `::slotted()`.
+ * @slot detail - A block belonging to the row rather than a line about it: a quoted
+ * comment, a status moving from one value to another, a preview. Unlike `caption` nothing
+ * here sets a size or an ink, because whatever fills it usually brings its own.
  * @slot media - An avatar or icon identifying who or what it came from.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when a reader asks to remove it, and cancelable.
@@ -299,6 +302,7 @@ export class HelixHeadlessNotification extends HelixElement {
       <div part="body">
         <div part="label"><slot></slot></div>
         <slot name="caption"></slot>
+        <slot name="detail"></slot>
         <span part="actions"><slot name="actions" @slotchange=${this.handleActions}></slot></span>
       </div>
       <div part="trailing">

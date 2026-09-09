@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNotification } from '@fusion.dev/helix-headless/notifications'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './notification.css.js'
 
@@ -48,6 +49,10 @@ import { styles } from './notification.css.js'
  *
  * @cssproperty --notifications-color - Ink in an item that has been read.
  * @cssproperty --notifications-dismiss-color - Ink on the control that removes an item, which is `danger` because removing one is the end of it.
+ * @cssproperty --notifications-item-edge - Color of a carded row's border.
+ * @cssproperty --notifications-item-fill - Fill behind a `filled` row.
+ * @cssproperty --notifications-item-gap - Space between carded rows, which replaces the hairline.
+ * @cssproperty --notifications-item-radius - Corner radius of a carded row.
  * @cssproperty --notifications-padding-block - Space above and below an item.
  * @cssproperty --notifications-padding-inline - Space either side of an item.
  * @cssproperty --notifications-rule - The hairline between items.
@@ -61,6 +66,28 @@ import { styles } from './notification.css.js'
 @customElement('helix-notification')
 export class HelixNotification extends HelixHeadlessNotification {
   static override tier = 'helix-'
+
+  /**
+   * How a row is told apart from the one above it.
+   *
+   * `plain` is the resting one and is a hairline and nothing else: the row has
+   * no box of its own, and what separates it is a line the list draws between
+   * them. It is sayable rather than only reachable by leaving the attribute off,
+   * which is the reason `Announcement` gives for spelling out its own neutral.
+   *
+   * `outlined` and `filled` make each row a box: an edge, a corner, and a gap
+   * where the hairline was. A feed of boxes is a different reading of the same
+   * content, and which one is right depends on whether the rows are a list to
+   * scan or a set of things to act on. The reference this came from draws cards
+   * because every row in it has a control.
+   *
+   * **On the row and not on the feed, because the row is the box being
+   * separated.** A consumer wanting the whole feed carded says so once, in a
+   * document rule on the element, rather than on every item: this is a styled
+   * axis and a stylesheet is where it is set.
+   */
+  @property({ reflect: true })
+  separation?: 'filled' | 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = [glyphStyles, styles]
 }
