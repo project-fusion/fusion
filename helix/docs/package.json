@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-docs",
   "description": "Versioned documentation content and registry for Helix.",
-  "version": "0.17.2",
+  "version": "0.18.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
