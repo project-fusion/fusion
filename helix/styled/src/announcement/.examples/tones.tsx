@@ -4,6 +4,10 @@ export function Example() {
       direction="column"
       gap="sm"
     >
+      {/* `accent` renders as `primary` here, and that is the default rather than
+          a mistake: a palette that has not named a second color does not have
+          one. `button/accent` is where a theme names one and the pair
+          separate. */}
       <helix-announcement tone="neutral">
         Scheduled maintenance on Sunday, from 02:00 to 04:00 UTC.
       </helix-announcement>
