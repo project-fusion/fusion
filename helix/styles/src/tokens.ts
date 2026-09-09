@@ -157,9 +157,12 @@ export const TOKENS: Token[] = [
   /* Lines. The light pair sits a step out from the `neutral-200`
      `surface-sunken` takes: a track drawn in the same neutral as its own
      border has no border. The first resolved to `var(--_helix-brand-500)`,
-     which is what `--helix-color-primary` and `--helix-color-focus-ring` both
-     resolve to, measured identical: a name in front of a name is not a token,
-     it is a place for two components to disagree about which one to reach for.
+     which is what `--helix-color-primary` resolved to at the time and what
+     `--helix-color-focus-ring` was written as: a name in front of a name is not
+     a token, it is a place for two components to disagree about which one to
+     reach for. They did disagree, once `primary` went `light-dark()` and the
+     ring did not, which is why the ring is now an alias of it rather than a
+     second spelling.
      The second was a hairline moving from 0.91 to 0.71 on hover, a twenty
      point jump in gray that reads as the control getting heavier rather than
      as the control being pointed at. */
@@ -212,7 +215,23 @@ export const TOKENS: Token[] = [
   ['color-accent-surface-hover', 'var(--_helix-accent-700)'],
   ['color-primary-surface', 'var(--_helix-brand-600)'],
   ['color-primary-surface-hover', 'var(--_helix-brand-700)'],
-  ['color-focus-ring', 'var(--_helix-brand-500)'],
+  /* **The ring is the border's color, said as an alias so the two cannot drift
+     again.** Both were a bare `--_helix-brand-500`, and the note above records
+     them as having resolved identically. That was true in light and had stopped
+     being true in dark: `color-primary` became `light-dark(500, 400)` and this
+     stayed a flat 500. A focused field draws its border in one and its ring in
+     the other at `outline-offset: 0`, deliberately, so the two read as a single
+     stroke. Measured in dark before this: border `oklch(0.669 0.19 258)`
+     against outline `oklch(0.539 0.19 258)`, a tenth of a step of lightness
+     apart with nothing between them. The seam came apart into two blues, and
+     only in dark, which is why the examples never showed it.
+
+     The note above also says why an alias is the fix rather than a repeated
+     `light-dark()`: "a name in front of a name is not a token, it is a place
+     for two components to disagree about which one to reach for." Two names
+     holding the same *value* is that place. One name pointing at the other is
+     not, and cannot become one. */
+  ['color-focus-ring', 'var(--helix-color-primary)'],
   /* The brand as a mark, which is the one place it appears as itself.
      Everywhere else it is solved for a word: `primary` has to clear 4.5:1 as
      text and `primary-surface` further still to carry white on a fill. A mark
