@@ -296,3 +296,42 @@ describe('menu submenus, coming and going', () => {
      nor fires the departing `slotchange`. Bind the listener in the template,
      and check the behavior in a browser. */
 })
+
+/* Which columns a page reserves is the menu's to answer, because no row can: a
+   row knows about its own slots and nothing about its neighbors. The styled tier
+   turns these two states into widths; this tier ships no stylesheet and only has
+   to get the fact right. */
+describe('the columns either side of a label', () => {
+  test('a page of plain rows reserves neither', async () => {
+    const el = await menu(`
+      <helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>
+      <helix-headless-menu-item value="cut">Cut</helix-headless-menu-item>`)
+    expect(hasState(el, 'start')).toBe(false)
+    expect(hasState(el, 'mark')).toBe(false)
+  })
+
+  test('one row with a mark before its label holds the column open for all of them', async () => {
+    const el = await menu(`
+      <helix-headless-menu-item value="copy"><span slot="start">C</span>Copy</helix-headless-menu-item>
+      <helix-headless-menu-item value="cut">Cut</helix-headless-menu-item>`)
+    expect(hasState(el, 'start')).toBe(true)
+  })
+
+  /* Checkable and not checked, which is the case an empty box used to cover: a
+     filter page whose labels step sideways as the reader ticks their way down it
+     is the whole reason the column is reserved rather than drawn per row. */
+  test('a row that can be ticked reserves the trailing column while it is not', async () => {
+    const el = await menu(
+      '<helix-headless-menu-item value="wrap" checkable>Wrap</helix-headless-menu-item>',
+    )
+    expect(hasState(el, 'mark')).toBe(true)
+  })
+
+  test('and so does a row that opens a page', async () => {
+    const el = await menu(`
+      <helix-headless-menu-item value="more">More
+        <helix-headless-menu-item slot="submenu" value="deep">Deep</helix-headless-menu-item>
+      </helix-headless-menu-item>`)
+    expect(hasState(el, 'mark')).toBe(true)
+  })
+})

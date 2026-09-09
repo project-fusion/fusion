@@ -19,13 +19,21 @@
   font-size: var(--helix-text-xs);
   /* A shade heavier than body text. */
   font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-xs);
-  /* A column each side of the label, and both are there on every row whether or
-     not anything fills them. */
+  /* **No `column-gap`, and the seams are inside the tracks instead.** A zero
+     width track still has a gap beside it, so a page that reserves nothing would
+     keep the eight pixels that used to separate a column from the label and the
+     collapse would stop one seam short on each side. `Notifications` makes the
+     same trade for the same reason, with margins where these are padding.
+
+     A column each side of the label, and each is there only when some row on
+     this page fills one. The menu decides that and publishes the two widths,
+     because a row knows about its own slots and nothing about its neighbors: the
+     alternative is a page whose labels start at two different edges. Zero here
+     rather than an icon, so a row outside a menu is as wide as what is in it. */
   grid-template-columns:
-    var(--menu-item-start, var(--helix-size-icon))
+    var(--menu-item-start, 0px)
     minmax(0, 1fr)
-    var(--helix-size-icon);
+    var(--menu-item-end, 0px);
   min-block-size: var(--helix-size-control-tight);
   /* The inset is padding on the row and nothing else. */
   padding-inline: var(--helix-space-sm);
@@ -57,10 +65,15 @@
   --icon-size: var(--helix-size-icon-tight);
 
   align-items: center;
+  /* The seam, which the track's width already accounts for: the box stretches
+     to fill the track and gives the last of it back to the label. Stated as
+     padding rather than as an `inline-size`, so a row with nothing here still
+     lands its label where its neighbors do. */
+  box-sizing: border-box;
   color: var(--helix-color-foreground-subtle);
   display: flex;
-  inline-size: var(--menu-item-start, var(--helix-size-icon));
   justify-content: center;
+  padding-inline-end: var(--helix-space-xs);
   /* `min-block-size` rather than `block-size`, so the column is at least as tall
      as a mark on every row and taller where the content is. Fixed, a 16:9 still
      slotted here overflowed a sixteen pixel box and ran under the label, the
@@ -68,11 +81,17 @@
   min-block-size: var(--helix-size-icon);
 }
 
-/* The column exists on every row, filled or not, so nothing shifts when a tick
-   appears or moves to a sibling. */
+/* Drawn only where there is something to draw. What keeps a tick from shifting
+   its neighbors is the reserved track, not an empty box on every row: the menu
+   holds the column open for the whole page as soon as one row on it can be
+   ticked, so a row with no tick renders nothing and its label still lines up.
+
+   `justify-self: end` puts it against the trailing edge of that track, leaving
+   the seam on the side the label is on. */
 [part="mark"] {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);
+  justify-self: end;
 }
 
 /* The mark is monotone, and checked is a step in strength rather than a change

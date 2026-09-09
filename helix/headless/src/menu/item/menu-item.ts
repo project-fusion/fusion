@@ -351,7 +351,11 @@ export class HelixHeadlessMenuItem extends HelixElement {
                 >
                   ${unsafeSVG(check.content)}
                 </svg>`
-              : html`<span part="mark" aria-hidden="true"></span>`
+              : /* Nothing to mark, so nothing is drawn. The column this would
+                   have sat in is reserved by the menu when some row on the page
+                   needs one, so the labels still line up without every row
+                   carrying an empty box to line them up with. */
+                nothing
         }`
     return html`${
       linked

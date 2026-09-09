@@ -9,6 +9,24 @@
      the size the rows are rather than the size a page is. */
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
+  /* Nothing reserved either side of a label until some row on the page needs
+     it. The headless tier decides that, per page, and says so as a state; this
+     turns the state into a width, which is the tier that owns widths.
+
+     **The seam is inside the value rather than a `column-gap`.** A zero width
+     track still has a gap beside it, so a `column-gap` would leave a page that
+     reserves nothing holding the eight pixels that used to separate the column
+     from the label, and the collapse would stop one seam short on each side.
+     Folding the seam into the track means an unreserved column takes no room at
+     all, and the two sides stay independent, which one `column-gap` could never
+     be: a page that reserves a tick and no leading mark wants the seam on one
+     side only.
+
+     Set on the surface rather than on `:host`, because the icon step is: `:host`
+     is `display: contents` and the rows inherit through the slot they are
+     assigned to, so a value here is a value they read. */
+  --menu-item-start: 0px;
+  --menu-item-end: 0px;
   /* A menu taller than the window has to scroll. Without a `max-block-size` and
    * an `overflow` the rows below the fold are reachable by arrow and invisible,
    * and the keyboard path that walks them has nothing to scroll.
@@ -41,6 +59,19 @@
      margin of unlit surface down both sides. */
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-none);
+}
+
+/* Something on the page has a mark to put before its label, so every row on it
+   holds the column open whether or not it has one of its own. */
+:host(:state(start)) [part="surface"] {
+  --menu-item-start: calc(var(--helix-size-icon) + var(--helix-space-xs));
+}
+
+/* Something on the page opens a page or can be ticked, which is the trailing
+   column. A row is never both: a way in has nothing to tick and a choice opens
+   nothing, so one width covers the two. */
+:host(:state(mark)) [part="surface"] {
+  --menu-item-end: calc(var(--helix-size-icon) + var(--helix-space-xs));
 }
 
 [part="surface"][hidden] {

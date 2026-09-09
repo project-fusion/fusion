@@ -342,6 +342,44 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       }
       this.mark(item, this.drilldown.atRoot)
     }
+    this.markColumns()
+  }
+
+  /**
+   * Says whether the page showing reserves a column either side of its labels.
+   *
+   * **A fact no row can answer for itself**, which is why the columns were
+   * unconditional. A row knows about its own start slot and nothing about its
+   * neighbors, so a page where one row has an icon and the rest do not draws two
+   * different left edges for its text. Reserving on every row instead charged
+   * every menu for a column nothing in it was ever going to fill: measured on a
+   * page of two plain rows, the text started 36 pixels into the row, of which 12
+   * was the row's own padding and 24 a leading column and its seam. The same
+   * page now starts at 12, and a page where one row does have a mark still
+   * starts both of its rows at 36.
+   *
+   * **Per page rather than per menu**, because a submenu is a different set of
+   * rows: a page of checkable filters under a page of plain ones reserves on one
+   * and not on the other, and asking the whole tree would hand the plain page
+   * the filters' column. `Notifications` answers the same question for its media
+   * column the same way, and for the same reason.
+   *
+   * Read off the light DOM rather than off the rows, so it does not depend on
+   * which children have upgraded by the time this runs.
+   */
+  private markColumns(): void {
+    const rows = this.drilldown.rows
+    this.toggleState(
+      'start',
+      rows.some((row) => row.querySelector(':scope > [slot="start"]') !== null),
+    )
+    /* Checkable and checked both, not just checked. A row that can be ticked
+       holds the column open while it is not, or the labels on a filter page step
+       sideways as the reader ticks their way down it. */
+    this.toggleState(
+      'mark',
+      rows.some((row) => row.checkable || row.checked || this.drilldown.hasPage(row)),
+    )
   }
 
   /**
