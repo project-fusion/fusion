@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* The feed, after hydration.
  *
@@ -200,5 +200,103 @@ describe('the media column', () => {
   test('a feed where nothing does reserves nothing', async () => {
     const element = await feed()
     expect(hasState(element, 'media')).toBe(false)
+  })
+})
+
+/* Folding is the group's state and the feed's command. These say the feed asks
+   rather than writes, which is what keeps one answer to the question. */
+describe('folding every group', () => {
+  const grouped = `
+    <helix-headless-notifications label="Activity">
+      <helix-headless-notification-group collapsible label="Today" open>
+        <helix-headless-notification>One</helix-headless-notification>
+        <helix-headless-notification>Two</helix-headless-notification>
+      </helix-headless-notification-group>
+      <helix-headless-notification-group collapsible label="Yesterday" open>
+        <helix-headless-notification>Three</helix-headless-notification>
+        <helix-headless-notification>Four</helix-headless-notification>
+      </helix-headless-notification-group>
+      <helix-headless-notification-group label="Older">
+        <helix-headless-notification>Five</helix-headless-notification>
+      </helix-headless-notification-group>
+    </helix-headless-notifications>`
+
+  type Group = HTMLElement & { open: boolean; updateComplete: Promise<unknown> }
+
+  type Folding = HTMLElement & {
+    foldEveryGroup: (folded?: boolean) => number
+    groups: Group[]
+    updateComplete: Promise<unknown>
+  }
+
+  /* Each group renders on its own schedule, so the feed's own `updateComplete`
+     says nothing about whether they have re-assigned their slots yet. */
+  const settled = async (element: Folding): Promise<void> => {
+    await element.updateComplete
+    await Promise.all(element.groups.map((group) => group.updateComplete))
+  }
+
+  const withGroups = async (): Promise<Folding> => {
+    const element = (await mount(grouped)) as Folding
+    await element.updateComplete
+    return element
+  }
+
+  test('every group is reachable, collapsible or not', async () => {
+    expect((await withGroups()).groups.length).toBe(3)
+  })
+
+  /* A group that cannot fold was never asked, so it is left alone rather than
+     counted as having refused. Its own `open` is not asserted, because `open` is
+     inert for a group that is not collapsible: `assign` shows every row whatever
+     it says, so reading it would be testing a value nothing acts on. */
+  const rendered = (group: HTMLElement): number =>
+    group.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')?.assignedElements()
+      .length ?? -1
+
+  /* **What the rows do is behind `hasLayout`, and the reason is happy-dom.**
+   * `slot.assign()` there will grow an assignment and will not shrink one: a
+   * group folded from open keeps every row assigned, so an assertion that folding
+   * hides rows passes in Chromium and fails under `bun test` for a reason that has
+   * nothing to do with this component. Measured both ways on the same code, three
+   * rows and two: Chromium goes [3,2] to [1,1] and back to [3,2]; happy-dom stays
+   * at [3,2] throughout while reporting `open` false and two groups moved.
+   *
+   * So the state and the count are asserted everywhere, and what is drawn is
+   * asserted where there is a renderer that can draw it. */
+  test('folding moves the ones that can and leaves the one that cannot', async () => {
+    const element = await withGroups()
+    expect(element.foldEveryGroup()).toBe(2)
+    expect(element.groups.slice(0, 2).map((group) => group.open)).toEqual([false, false])
+    if (hasLayout()) {
+      await settled(element)
+      expect(element.groups.map(rendered)).toEqual([1, 1, 1])
+    }
+  })
+
+  test('and unfolding takes them back', async () => {
+    const element = await withGroups()
+    element.foldEveryGroup()
+    expect(element.foldEveryGroup(false)).toBe(2)
+    expect(element.groups.slice(0, 2).map((group) => group.open)).toEqual([true, true])
+    if (hasLayout()) {
+      await settled(element)
+      expect(element.groups.map(rendered)).toEqual([2, 2, 1])
+    }
+  })
+
+  test('asking twice moves nothing the second time', async () => {
+    const element = await withGroups()
+    expect(element.foldEveryGroup()).toBe(2)
+    expect(element.foldEveryGroup()).toBe(0)
+  })
+
+  /* The reason this goes through each group's own request rather than writing
+     `open`: one refusal refuses one group and the rest still move. */
+  test('a group that refuses stays put, and the others do not', async () => {
+    const element = await withGroups()
+    element.groups[0]?.addEventListener('helix-before-close', (event) => event.preventDefault())
+    expect(element.foldEveryGroup()).toBe(1)
+    expect(element.groups.slice(0, 2).map((group) => group.open)).toEqual([true, false])
   })
 })

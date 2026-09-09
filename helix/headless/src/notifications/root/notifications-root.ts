@@ -8,6 +8,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import type { HelixHeadlessNotificationGroup } from '../group/notification-group.js'
 import type { HelixHeadlessNotification } from '../notification/notification.js'
 
 /**
@@ -142,6 +143,54 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
         ('isNotification' in child && child.isNotification === true) ||
         'isNotificationGroup' in child,
     )
+  }
+
+  /**
+   * The groups written into the feed, in the order they are written.
+   *
+   * Only the ones that can fold answer to `foldEveryGroup`, but this is every
+   * group: a consumer counting their sections should not have to know which of
+   * them happen to be collapsible.
+   */
+  get groups(): HelixHeadlessNotificationGroup[] {
+    return [...(this.children ?? [])].filter(
+      (child): child is HelixHeadlessNotificationGroup => 'isNotificationGroup' in child,
+    )
+  }
+
+  /**
+   * Folds every group that can fold, and reports how many actually moved.
+   *
+   * **A command, not a second place the state lives.** A group owns whether it
+   * is folded; this asks all of them at once. The alternative, a property on the
+   * feed that groups read, gives two answers to one question the moment a reader
+   * unfolds one of them, and then neither is wrong and neither is right.
+   *
+   * **Through each group's own request**, so one refusal refuses one group: a
+   * `helix-before-open` or `helix-before-close` prevented on a group leaves that
+   * group where it was and the rest still move. `markEveryoneRead` takes the
+   * same route for the same reason.
+   *
+   * **And unlike that one, this announces nothing of its own.** Marking read is
+   * usually a round trip, so a feed-level `helix-read` lets a consumer refuse the
+   * whole operation before any of it starts. Folding is not: it is where the
+   * reader is looking, it reaches no server, and an event nobody can meaningfully
+   * refuse is a channel that exists to be ignored.
+   *
+   * A group that is not `collapsible` is left alone rather than counted as
+   * refusing, because it was never asked.
+   */
+  foldEveryGroup(folded = true): number {
+    let moved = 0
+    for (const group of this.groups) {
+      if (!group.collapsible || group.open !== folded) {
+        continue
+      }
+      if (group.requestOpen(!folded)) {
+        moved += 1
+      }
+    }
+    return moved
   }
 
   /**
