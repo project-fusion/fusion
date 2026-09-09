@@ -96,6 +96,44 @@ slot[name="caption"]::slotted(*) {
   margin: var(--helix-space-none);
 }
 
+/* **A linked title is the row's title, drawn in the row's ink.**
+ *
+ * A notification is usually a link: the row exists to be pressed. Slotted plain,
+ * an `<a>` is painted by the user agent and by nothing else, because `base.css`
+ * dresses `[data-link]` and never the bare element. Measured on a feed of four:
+ * the title came back `rgb(0, 0, 238)` in light and `rgb(158, 158, 255)` in
+ * dark, against a label asking for `oklch(0.5 0 258)` and `oklch(0.71 0 258)`.
+ * Not a token, not themed, and the same blue whatever the page is.
+ *
+ * `color: inherit` puts it back on the label, which is what carries read and
+ * unread apart. **The weight was never the problem and is not touched here**:
+ * `font-weight` is not something the user agent sets on a link, so it was
+ * already inheriting, and an unread linked row already drew at 500 against a
+ * read one at 400. What went was the ink, and with it half the signal.
+ *
+ * The underline goes to hover, which is `[data-link-underline="hover"]`'s whole
+ * argument applied where it is most needed: a feed is a column of titles, and a
+ * rule under every one of them is a page of rules.
+ *
+ * **A consumer who says otherwise wins, and that is the right way round.** A
+ * document rule outranks `::slotted()`, so writing `data-link` on the anchor
+ * takes it back to the house link style, deliberately.
+ *
+ * `::slotted()` reaches an anchor a consumer assigned and never one they wrapped
+ * in something else. A title inside a `<span>` is the consumer's box to style,
+ * and `data-link="quiet"` is the recipe for it. */
+[part="body"] slot:not([name])::slotted(a) {
+  color: inherit;
+  text-decoration: none;
+}
+
+[part="body"] slot:not([name])::slotted(a:hover) {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, currentcolor 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
 /* After the base rule rather than before it, which is not a preference: a
    selector of (0, 3, 0) written above one of (0, 1, 0) that it overrides is a
    rule whose specificity says it wins and whose order says nothing, and
@@ -293,11 +331,17 @@ slot[name="caption"]::slotted(*) {
     grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr);
   }
 
+  /* **Under the body and against the far edge, not under its first letter.**
+     Dropped to the start, the time became a third line beginning where the label
+     and the caption begin, in the caption's own size and the caption's own ink:
+     three left edges of gray text, the last of which is not content. Against the
+     trailing edge it reads as what it is, and the row is a block of words with a
+     stamp beside it rather than a list of three things. */
   [part="trailing"] {
     align-self: start;
     grid-column: 2;
     grid-row: 2;
-    justify-items: start;
+    justify-items: end;
     margin-block-start: var(--helix-space-2xs);
     margin-inline-start: var(--helix-space-none);
   }

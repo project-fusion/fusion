@@ -68,9 +68,31 @@ static CALLS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\b(draw[A-Z]\w*)\s*\(").expect("a literal pattern compiles"));
 
 static DEFAULT_SLOT: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(?s)slot:not\(\[name\]\)::slotted\([^)]*\)[^{]*\{([^}]*)\}")
+    Regex::new(r"(?s)slot:not\(\[name\]\)::slotted\(([^)]*)\)[^{]*\{([^}]*)\}")
         .expect("a literal pattern compiles")
 });
+
+/// Whether a `::slotted()` argument can match a bare text node.
+///
+/// **It cannot when the argument names an element**, and that is the whole of
+/// this rule's premise: the complaint is that a consumer who writes a value as
+/// text gets none of the inherited properties, because a text node has no box
+/// for them to land on. A selector reading `::slotted(a)` was never aimed at
+/// text. It is aimed at the one thing a consumer slots that arrives carrying
+/// paint of its own, which is an anchor the user agent has already colored, and
+/// putting the declaration on the slot instead is exactly the move that does not
+/// work there: the slot's color is what the anchor is overriding.
+///
+/// `*` and a bare pseudo-class still match everything an element can be, so
+/// those are the ones the rule keeps.
+fn names_an_element(argument: &str) -> bool {
+    let trimmed = argument.trim();
+    !trimmed.is_empty()
+        && trimmed
+            .chars()
+            .next()
+            .is_some_and(|first| first.is_ascii_alphabetic())
+}
 
 static DECLARED_PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"@property\(([^)]*)\)\s*(?:override\s+)?(?:(?:get|set)\s+)?(\w+)")
@@ -369,8 +391,11 @@ fn judge_sheet(
 ) -> usize {
     /* The default slot's `::slotted()` reaching a value written as bare text. */
     for rule in DEFAULT_SLOT.captures_iter(css) {
+        if names_an_element(&rule[1]) {
+            continue;
+        }
         let mut missed: Vec<String> = PROPERTY_NAME
-            .captures_iter(&rule[1])
+            .captures_iter(&rule[2])
             .map(|one| one[1].to_owned())
             .filter(|one| INHERITED.contains(&one.as_str()))
             .collect();
