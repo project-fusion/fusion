@@ -1,0 +1,109 @@
+/* A chip is a row of segments and a control, not a box with words in it. The
+   segments are the three parts a filter has, and each is drawn to say which of
+   the three it is: the field is the quietest, the operator quieter still, and
+   the values carry the weight, because the values are what a reader scans a bar
+   of these for. */
+:host {
+  align-items: center;
+  background-color: var(--filter-input-chip-background-color, var(--helix-color-surface-sunken));
+  border: var(--helix-border-thin) solid
+    var(--filter-input-chip-border-color, var(--helix-color-border));
+  border-radius: var(--filter-input-chip-radius, var(--helix-radii-sm));
+  color: var(--helix-color-foreground);
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  /* The seams are inside the segments rather than a `gap`, so a chip with no
+     operator closes up rather than keeping the space one would have taken.
+     `Menu.Item` makes the same trade for the same reason. */
+  gap: var(--helix-space-none);
+  line-height: var(--helix-leading-normal);
+  max-inline-size: 100%;
+  min-block-size: var(--helix-size-control-sm);
+  padding-inline: var(--helix-space-xs);
+}
+
+/* **`sm` and not `md`, said here rather than inherited.** A chip holds controls:
+   the operator segment is a menu trigger wherever one is slotted, and a trigger
+   sized for a page inside a chip sized for a bar is a control taller than the
+   thing it sits in. `Notifications` says the same once for its rows. */
+:host {
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+}
+
+/* The name of what is filtered, which a reader already knows: they picked it.
+   So it is the quietest of the three and never the widest. */
+[part="field"] {
+  color: var(--helix-color-foreground-muted);
+  padding-inline-end: var(--helix-space-2xs);
+  white-space: nowrap;
+}
+
+/* **Drawn only where there is one to draw**, which the template decides, so
+   there is no empty segment to collapse here and nothing about a chip without an
+   operator to undo. The inline padding is its own, so the chip closes up around
+   the gap it leaves. */
+[part="operator"] {
+  align-items: center;
+  color: var(--helix-color-foreground-subtle);
+  display: inline-flex;
+  padding-inline-end: var(--helix-space-2xs);
+  white-space: nowrap;
+}
+
+/* What the filter is actually set to, which is the thing being read. Weight
+   rather than color: a bar of chips is chrome and a row of colored words in it
+   reads as several meanings rather than one list. */
+[part="values"] {
+  font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A square the size of the chip's own controls, not a glyph with padding around
+   it, which is the mistake `Notifications` records measuring at 15 by 22: under
+   any target anybody recommends. */
+[part="dismiss"] {
+  background: none;
+  block-size: var(--helix-size-icon);
+  border: 0;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-subtle);
+  cursor: pointer;
+  display: grid;
+  inline-size: var(--helix-size-icon);
+  margin-inline-start: var(--helix-space-2xs);
+  padding: var(--helix-space-none);
+  place-items: center;
+}
+
+[part="dismiss-mark"] {
+  block-size: var(--icon-size, var(--helix-size-icon-tight));
+  inline-size: var(--icon-size, var(--helix-size-icon-tight));
+}
+
+/* The well is mixed from the ink the control is already drawn in, so the hover
+   deepens what is there rather than turning it a second color. */
+[part="dismiss"]:hover {
+  background-color: color-mix(in oklab, currentcolor 12%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+[part="dismiss"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Print: a filter is part of what the page was showing, so it stays, and the
+   control that would remove it is not a thing on paper.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. */
+@media print {
+  [part="dismiss"] {
+    display: none;
+  }
+}

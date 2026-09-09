@@ -1,0 +1,61 @@
+export function Example() {
+  return (
+    <helix-flex
+      align="start"
+      direction="column"
+      gap="sm"
+    >
+      {/* The field's usual comparison, so nothing is written between the name
+          and the values. A reader who ticked two things in a menu gets this, and
+          there is no jargon on it to read past. */}
+      <helix-filter-chip
+        dismiss-label="Remove the disposition filter"
+        dismissible
+        label="Disposition"
+        name="disposition"
+        operator="any"
+      >
+        refunded, chargeback
+      </helix-filter-chip>
+
+      {/* A comparison somebody chose, so it appears. This is the whole of what
+          negation costs: one more operator on the same chip. */}
+      <helix-filter-chip
+        dismiss-label="Remove the category filter"
+        dismissible
+        label="Category"
+        name="category"
+        operator="none"
+        operator-label="is none of"
+      >
+        Services
+      </helix-filter-chip>
+
+      {/* A scalar has no usual comparison, so its operator is always written:
+          there is nothing a date is filtered by often enough to leave unsaid. */}
+      <helix-filter-chip
+        dismiss-label="Remove the created filter"
+        dismissible
+        label="Created"
+        name="created"
+        operator="after"
+        operator-label="after"
+      >
+        1 Aug
+      </helix-filter-chip>
+
+      {/* Same field twice, which is what the model buys: two chips on one field
+          are two filters, and how they combine is the consumer's to decide. */}
+      <helix-filter-chip
+        dismiss-label="Remove the lower amount filter"
+        dismissible
+        label="Amount"
+        name="amount"
+        operator="above"
+        operator-label="above"
+      >
+        100
+      </helix-filter-chip>
+    </helix-flex>
+  )
+}

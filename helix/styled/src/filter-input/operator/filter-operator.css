@@ -1,0 +1,5 @@
+/* A declaration takes no room. The class note says why one rule is the whole
+   stylesheet. */
+:host {
+  display: none;
+}
