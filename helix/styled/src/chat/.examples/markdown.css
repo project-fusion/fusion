@@ -1,7 +1,16 @@
-/* A conversation has to be given a height and a ground by whatever holds it,
-   which is the page's job here and not the component's. */
+/* A conversation has to be given a ground by whatever holds it, which is the
+   page's job here and not the component's.
+
+   **And no ceiling, which the other examples do give it.** A capped transcript
+   scrolls, and this one is a single turn holding a whole document: at `24rem`
+   the log overflowed by 80 pixels and sat at `scrollTop: 80`, so the heading
+   this example exists to show was above the fold and what was visible depended
+   on when the shot was taken. The parity check caught exactly that, the two
+   syntaxes settling at different offsets on the same content.
+
+   Scrolling belongs in `fullscreen` and `sidebar`, where the subject is a
+   conversation that outgrows its box. Here it hides the subject. */
 .markdown {
-  --chat-max-block-size: 24rem;
   background-color: var(--helix-color-surface);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-lg);
