@@ -41,7 +41,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot - The step's label. Without an `href` this may be the consumer's own
  * anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the
  * outer tree and cannot be reached from this component's styles.
- * @slot end - After it, for a count or a mark.
+ * @slot end - After the label and outside the link, so it may be a control: this is where a
+ * switcher's menu trigger goes. A count or a mark is equally at home here and is no longer
+ * read into the link's accessible name.
  * @slot separator - Replaces the chevron shown before this item.
  * @slot start - Before the label, for an icon.
  *
@@ -118,9 +120,21 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    /* The label and whatever flanks it, which is the same content whether or
-       not it is a link. Built once so the two branches below cannot drift. */
-    const label = html`<slot name="start"></slot><slot></slot><slot name="end"></slot>`
+    /* The label and what belongs to it, which is the same content whether or not
+       it is a link. Built once so the two branches below cannot drift.
+
+       **`end` is not in here, and that is the whole of what makes a switcher
+       possible.** It used to be, so anything slotted after the label rendered
+       inside the `<a>`. A count or a mark survives that; a control does not.
+       Nesting a button in an anchor is invalid markup, the browser hands the
+       press to the link, and the reader gets a target that navigates whichever
+       half of it they aimed at.
+
+       Outside, the two halves are two targets: the word goes to its own page and
+       whatever sits after it does its own job. It also stops `end` being read
+       into the link's accessible name, so a crumb with a count beside it is
+       announced as its own name rather than as the name and the number. */
+    const label = html`<slot name="start"></slot><slot></slot>`
 
     /* The current page is text, not a link, whatever it was given, so `current`
        wins over `href` rather than the two contradicting each other in the
@@ -139,7 +153,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
               >${label}</a
             >`
           : html`<span part="link">${label}</span>`
-      }`
+      }<slot name="end"></slot>`
   }
 }
 

@@ -42,3 +42,33 @@ describe('breadcrumb', () => {
     expect([link(el).hasAttribute('target'), link(el).hasAttribute('rel')]).toEqual([false, false])
   })
 })
+
+/* A switcher is a crumb that is two targets: the word navigates and whatever
+   sits after it does its own job. That is only possible while `end` renders
+   outside the anchor, so these say where it is rather than what it holds. */
+describe('the end slot, and why it is where it is', () => {
+  test('it is outside the link, so a control there is not nested in an anchor', async () => {
+    const el = await mount(
+      '<helix-headless-breadcrumb href="/a">Home<button slot="end">Switch</button></helix-headless-breadcrumb>',
+    )
+    const link = el.shadowRoot?.querySelector('a[part="link"]')
+    expect(link).not.toBeNull()
+    expect(link?.querySelector('slot[name="end"]')).toBeNull()
+    expect(el.shadowRoot?.querySelector('slot[name="end"]')).not.toBeNull()
+  })
+
+  /* `start` is part of what the link is called: an icon before the word belongs
+     to the word. So the two slots are not symmetric, and this says so. */
+  test('start stays inside it, because an icon before the label names the link', async () => {
+    const el = await mount('<helix-headless-breadcrumb href="/a">Home</helix-headless-breadcrumb>')
+    const link = el.shadowRoot?.querySelector('a[part="link"]')
+    expect(link?.querySelector('slot[name="start"]')).not.toBeNull()
+  })
+
+  test('and it is outside on a crumb that is not a link either', async () => {
+    const el = await mount('<helix-headless-breadcrumb current>Home</helix-headless-breadcrumb>')
+    const box = el.shadowRoot?.querySelector('[part="link"]')
+    expect(box?.querySelector('slot[name="end"]')).toBeNull()
+    expect(el.shadowRoot?.querySelector('slot[name="end"]')).not.toBeNull()
+  })
+})
