@@ -85,14 +85,64 @@ buggy writer can produce.
 
 ## Replay
 
-Given a trace, re-run it against a different model or prompt version and diff
-the result. This is how you regression-test a system whose outputs are not
-deterministic: you hold the inputs fixed and compare, rather than asserting on
-text.
+Given a trace, re-run it against a different model and diff the result. This is
+how you regression-test a system whose outputs are not deterministic: you hold
+the inputs fixed and compare, rather than asserting on text.
 
-The graph holds the inputs a replay needs and the order to feed them in. The
-runner that re-executes them, and the scorer that decides what counts as the
-same answer, are not built.
+[//]: # (rust:fusion-cortex-trace::replay::Graph::replay)
+
+```rust
+// The candidate model answers differently.
+let candidate = MockProvider { reply: "It shipped in September.".into() };
+
+let replay = graph.replay(output, &candidate, &Exact).await.unwrap();
+
+assert_eq!(replay.regressions().count(), 1);
+assert_eq!(replay.scorer, "exact/1");   // the result names its judge
+assert_eq!(replay.graph.len(), 3);      // a replay is itself a trace
+```
+
+[//]: # (/rust)
+
+### What varies, and what is held
+
+A replay recomputes the `Output` nodes in a trace and carries everything else
+forward. Each of the three holds is a decision rather than a limitation:
+
+- **Inputs are the question.** Re-running a `Source` or a `Memory` would change
+  it rather than answer it again.
+- **Context is held by design.** The point of a model-drift replay is to isolate
+  the model as the variable. Recomputing retrieval in the same run confounds the
+  two, and you could no longer say whether an answer moved because the model
+  changed or because it was handed different memories. Varying retrieval instead
+  is a different experiment, and it needs Recall.
+- **Tool calls are held out of necessity.** Re-executing a tool re-performs its
+  side effects: a replay of a trace that sent an email would send the email
+  again. Running tools needs a sandbox and an explicit opt-in, and until it has
+  both, not running them is the only safe default.
+
+Prompt substitution is absent rather than stubbed. Resolving a version to the
+prompt it names needs a registry that does not exist, and a field that only
+relabelled the output would be a lie about what ran.
+
+### The judge has to be pinned
+
+Deciding whether two outputs are the same answer is the hard half, and judging
+model output with a model is circular: if the judge moves between runs, you
+cannot tell which of the two things moved. So a `Scorer` reports a versioned
+`id()`, every result records it, and a judge that cannot be pinned to a version
+has no business implementing the trait.
+
+`Exact` is the floor — byte equality, useless for prose, and the only scorer
+that introduces no instrument of its own. Numbers from it carry full confidence;
+model-judged claims layer on top as weaker ones. A pinned local judge is what
+the local-first requirement buys: a hosted model can be updated behind a stable
+name, which is the phenomenon a drift measurement is trying to detect.
+
+A replay is itself a trace, so `why()` and cascading deletion both work on the
+result. A replay of a memory the user later deletes goes with it.
+
+### Order
 
 [//]: # (rust:fusion-cortex-trace::Graph::plan)
 

@@ -49,6 +49,21 @@ spine, not a module.
   disagree. `ToolCall`'s arguments stay untyped and that is the one place it is
   correct, because tool arguments are arbitrary JSON by the wire format's
   definition.
+- **A replay never executes tool calls.** Re-running a tool re-performs its
+  side effects, so a replay of a trace that sent an email would send it again.
+  Tool replay needs a sandbox and an explicit opt-in; until it has both, the
+  runner carries `ToolCall` nodes forward untouched, and a test asserts the call
+  count rather than inferring it from the diff.
+- **A replay holds context fixed, and that is the experiment.** Recomputing
+  retrieval alongside the model confounds the two variables, and the answer to
+  "did this move because the model changed" stops being available. Varying
+  retrieval is a different run, and it needs Recall.
+- **A scorer reports a pinned, versioned id, and every result records it.**
+  Judging model output with a model is circular: an instrument that drifts
+  between runs cannot tell you which of the two things moved. This is what the
+  local provider requirement buys, beyond privacy — a hosted model can be
+  updated behind a stable name, which is precisely the phenomenon a drift
+  measurement exists to detect.
 - **Vectors are deferred, the seam is not.** A memory record must carry a
   nullable embedding field and relevance scoring must be a strategy, so enabling
   vectors is swapping a scorer rather than migrating a schema. Neither exists

@@ -17,6 +17,8 @@
 //! messages from a shape nothing guarantees. [`Detail`] is what makes a trace
 //! executable, and [`Graph::plan`] is the order to execute it in.
 
+pub mod replay;
+
 use std::collections::{HashMap, HashSet, VecDeque};
 
 use chrono::{DateTime, Utc};

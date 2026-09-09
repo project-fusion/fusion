@@ -572,11 +572,13 @@ name = "fusion-cortex-trace"
 version = "0.0.0-dev"
 dependencies = [
  "anyhow",
+ "async-trait",
  "chrono",
  "fusion-cortex-core",
  "serde",
  "serde_json",
  "thiserror 2.0.20",
+ "tokio",
  "uuid",
 ]
 
