@@ -53,6 +53,16 @@ export class HelixTag extends HelixHeadlessTag {
    *
    * `tone` is semantic color, which is what these are and what `helix-text`
    * already calls them. `helix component`'s `axes` holds the vocabulary.
+   *
+   * **Not all seven are statuses, and `accent` is the one worth saying out
+   * loud**: it is the second emphasis, a rotation off the brand seed rather than
+   * a color of its own, so it stays in relation when somebody rethemes.
+   * `primary` is the seed itself. The four that are statuses are the four
+   * `HelixStatusTone` names, and those are the ones that would carry a glyph
+   * somewhere that draws one.
+   *
+   * `Badge` and `Announcement` take the same seven, all three being a mark that
+   * carries a meaning beside something else.
    */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'

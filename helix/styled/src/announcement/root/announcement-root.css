@@ -8,6 +8,12 @@
   --helix-size-control: var(--helix-size-control-sm);
 
   --_announcement-color: var(--helix-color-foreground-muted);
+  /* What a tint is mixed against, so `separation` can move the whole band
+     up a rung without the toned ones staying behind: the fill below is a
+     `background-color` and every tint is a `background-image` painted over
+     it, so a raised ground that only moved the color would be invisible
+     under any tone. */
+  --_announcement-ground: var(--helix-color-background);
 
   align-items: center;
   background-color: var(--helix-color-surface-sunken);
@@ -87,15 +93,6 @@
   border-block-end-color: var(--helix-color-border);
 }
 
-/*
- *  A step up off the page rather than a tint of anything.
- */
-:host([tone="surface"]) {
-  background-color: var(--helix-color-surface);
-  background-image: none;
-  border-block-end-color: var(--helix-color-border);
-}
-
 /* The brand, for a band that is about the product rather than about a state.
    `info` and this are the same hue while the seed is blue and are not the same
    thing: `info` is a fixed semantic color and this follows whatever the theme
@@ -104,23 +101,53 @@
   --_announcement-color: var(--helix-color-primary);
 }
 
-:host([tone]:not([tone="neutral"], [tone="surface"])) {
+/* The second emphasis, a rotation off the brand seed rather than a color of its
+   own, so it stays in relation when somebody rethemes. `Tag` and `Badge` both
+   carry it and this band claimed to match them while not having it. */
+:host([tone="accent"]) {
+  --_announcement-color: var(--helix-color-accent);
+}
+
+:host([tone]:not([tone="neutral"])) {
   background-image: linear-gradient(
     to right,
     light-dark(
-      color-mix(in oklab, var(--_announcement-color) 18%, var(--helix-color-background)),
-      color-mix(in oklab, var(--_announcement-color) 32%, var(--helix-color-background))
+      color-mix(in oklab, var(--_announcement-color) 18%, var(--_announcement-ground)),
+      color-mix(in oklab, var(--_announcement-color) 32%, var(--_announcement-ground))
     ),
     light-dark(
-      color-mix(in oklab, var(--_announcement-color) 10%, var(--helix-color-background)),
-      color-mix(in oklab, var(--_announcement-color) 20%, var(--helix-color-background))
+      color-mix(in oklab, var(--_announcement-color) 10%, var(--_announcement-ground)),
+      color-mix(in oklab, var(--_announcement-color) 20%, var(--_announcement-ground))
     )
   );
   border-block-end-color: color-mix(
     in oklab,
     var(--_announcement-color) 40%,
-    var(--helix-color-background)
+    var(--_announcement-ground)
   );
+}
+
+/* Which rung the band rides, which is not what color it is: the two are set
+   independently and an elevated band still takes its tone's tint, now mixed
+   against the rung it is on.
+
+   Written after the tone rules on purpose. `:host([separation="elevated"])` and
+   `:host([tone="neutral"])` are the same specificity, so nothing but order
+   decides which ground a neutral elevated band gets, and the rung is the answer:
+   `neutral` says the band carries no meaning, not that it sits in a well. */
+
+/* The resting rung, said as well as defaulted, for the reason `neutral` is: a
+   generated page should be able to put a band back rather than delete an
+   attribute to get there. */
+:host([separation="filled"]) {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+/* A step up off the page rather than a tint of anything. */
+:host([separation="elevated"]) {
+  --_announcement-ground: var(--helix-color-surface);
+
+  background-color: var(--helix-color-surface);
 }
 
 /*

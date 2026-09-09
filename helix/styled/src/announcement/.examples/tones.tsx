@@ -7,7 +7,7 @@ export function Example() {
       <helix-announcement tone="neutral">
         Scheduled maintenance on Sunday, from 02:00 to 04:00 UTC.
       </helix-announcement>
-      <helix-announcement tone="surface">
+      <helix-announcement tone="accent">
         Read the changelog for everything that shipped this week.
       </helix-announcement>
       <helix-announcement tone="primary">

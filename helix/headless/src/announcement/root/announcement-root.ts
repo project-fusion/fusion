@@ -56,13 +56,27 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
    * Which color the band wears.
    *
    * Paint only: unlike `Callout`, no value here draws a mark, changes the label,
-   * or moves the live region off polite. The set matches `Tag`'s. `neutral` is
-   * the resting value, said out loud so a consumer can put a band back to it
-   * from markup, and `surface` is the one value that is not a color: it lifts
-   * the band onto the surface step instead of the sunken one.
+   * or moves the live region off polite. `neutral` is the resting value, said
+   * out loud so a consumer can put a band back to it from markup.
+   *
+   * **The set is `Tag`'s and `Badge`'s, and now actually is.** This doc claimed
+   * to match `Tag` while differing from it in both directions: it carried
+   * `surface`, which `Tag` does not, and lacked `accent`, which `Tag` has. Three
+   * components saying what a thing means, in three vocabularies, one of which
+   * described itself as a fourth.
+   *
+   * `accent` is the second emphasis, a rotation off the brand seed rather than a
+   * color of its own, so it stays in relation when somebody rethemes. `primary`
+   * is the seed itself.
+   *
+   * **`surface` was never a color and has moved to `separation`**, which is the
+   * axis that owns where a box sits relative to the page. It said the band rode
+   * the surface step instead of the sunken one, which is an elevation, and a
+   * band can be `info` and elevated at once: two values true together are two
+   * axes, which is the test the registry answers to.
    */
   @property({ reflect: true })
-  tone?: 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'surface' | 'warning'
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
