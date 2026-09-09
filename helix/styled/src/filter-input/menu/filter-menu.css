@@ -1,0 +1,8 @@
+/* No box of its own. What a reader sees is the trigger a consumer slotted and
+   the menu this renders, and both draw themselves: a box here would be a third
+   thing between them, and it would sit in the filter input's own row taking a
+   gap that belongs to the control. `Menu`'s root takes the same position for the
+   same reason. */
+:host {
+  display: contents;
+}
