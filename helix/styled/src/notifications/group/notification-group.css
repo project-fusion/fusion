@@ -1,0 +1,147 @@
+/* A group is a heading and the rows under it, and the heading is chrome: it says
+   which pile you are looking at and is never the thing you came to read. */
+:host {
+  display: block;
+}
+
+/* The label and its count together at one end, and whatever the consumer put
+   there at the other, which in a trimmed feed is a link to the rest.
+ *
+ * **`margin-inline-start: auto` on the action rather than `space-between` on the
+ * row.** The two are the same thing only while the row has two children, and
+ * this one has three where the group does not fold: the label, the count and the
+ * action spread evenly and the count ended up floating in the middle of the
+ * header, belonging to neither side. Folded, the first two are inside the
+ * trigger and the bug disappears, which is what made it look like a difference
+ * between the two branches rather than a layout mistake. */
+[part="header"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-xs);
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
+}
+
+/* **Quieter than a row's title, and it has to be.** A feed cut into five days
+   has five of these, and a heading drawn at the weight of the content turns a
+   list of notifications into a list of dates. `foreground-muted` is the same ink
+   a read row's title takes, which is the right neighbor for it. */
+[part="label"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* The number, as a mark rather than as more words. Drawn on the sunken step so
+   it reads as a count attached to the label rather than as a second label. */
+[part="count"] {
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-full);
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  min-inline-size: var(--helix-size-badge);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
+  text-align: center;
+}
+
+/* Where the group folds, the label and the count are the control. `all: unset`
+   first, so the UA's own button styling is gone before anything below lands. */
+[part="trigger"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+  display: inline-flex;
+  gap: var(--helix-space-xs);
+}
+
+[part="trigger"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="trigger"]:hover [part="label"] {
+  color: var(--helix-color-foreground);
+}
+
+[part="action"] {
+  align-items: center;
+  display: inline-flex;
+  margin-inline-start: auto;
+}
+
+/* **The stack, which is what a collapsed group looks like.**
+ *
+ * The rows behind the first are not rendered at all, so there is nothing to see
+ * through and nothing to lay out: the headless tier assigns them nowhere. What
+ * draws the pile is two lines under the one row that is showing, offset and
+ * inset so they read as the edges of cards behind it.
+ *
+ * A pseudo-element apiece rather than a shadow, because a shadow spreads on all
+ * four sides and the thing being suggested has a top edge and no bottom one. And
+ * because a shadow cannot be inset from the sides, which is the whole cue: a
+ * card behind is narrower than the card in front. */
+[part="items"] {
+  position: relative;
+}
+
+/* **Whole boxes behind the row, not slivers above it.** Two bars anchored to the
+   top edge was the first try and it reads as a pair of stray rules: they are the
+   same thickness as a border, they sit in a gap, and nothing about them says
+   they are the tops of anything. A box the size of the visible row, shifted up
+   and narrowed, is a card behind a card, and the row's own fill is what hides
+   the rest of it. */
+:host([collapsible]:not(:state(open))) [part="items"]::before,
+:host([collapsible]:not(:state(open))) [part="items"]::after {
+  /* **The same rung as the row in front, not the one below it.** Filled with
+     `surface` first, which is a step *darker* than the `surface-raised` a carded
+     row takes: against a near-black page the pile came out darker than the page
+     furniture and read as nothing at all. A card behind a card is the same kind
+     of card. */
+  background-color: var(--notifications-item-fill, var(--helix-color-surface-raised));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--notifications-item-radius, var(--helix-radii-md));
+  content: "";
+  inset: 0;
+  /* Behind the row, which paints its own opaque fill over the bottom of these.
+     The slotted row is in normal flow and so paints above a negative layer. */
+  z-index: var(--helix-layer-beneath);
+  position: absolute;
+}
+
+/* The nearer of the two: a little narrower and a little above. */
+:host([collapsible]:not(:state(open))) [part="items"]::before {
+  inset-block-start: calc(var(--helix-space-xs) * -1);
+  inset-inline: var(--helix-space-xs);
+}
+
+/* And the far one, narrower and higher again, which is what makes it a pile
+   rather than a pair. */
+:host([collapsible]:not(:state(open))) [part="items"]::after {
+  inset-block-start: calc(var(--helix-space-sm) * -1);
+  inset-inline: var(--helix-space-md);
+  opacity: 0.55;
+}
+
+/* Room for the pile to sit in, which the rows above would otherwise be drawn
+   over. Only where there is a pile: an expanded group needs none of it. */
+:host([collapsible]:not(:state(open))) [part="items"] {
+  margin-block-start: var(--helix-space-md);
+}
+
+/* Print: a folded group prints what it is showing, and the pile is a hint about
+   an interaction paper does not have.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. */
+@media print {
+  :host([collapsible]:not(:state(open))) [part="items"]::before,
+  :host([collapsible]:not(:state(open))) [part="items"]::after {
+    display: none;
+  }
+}

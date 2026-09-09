@@ -101,14 +101,46 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     return this.items.filter((item) => !item.read).length
   }
 
-  /** The notifications declared as children, in the order they are written. */
+  /**
+   * The notifications in the feed, in the order they are written.
+   *
+   * **Through a group as well as beside one**, because a feed may be cut into
+   * named piles and the rows inside them are still the feed's rows: `unread`
+   * counts them and `markEveryoneRead` moves them. A group that renders only its
+   * first row while folded is still holding the rest, and a badge that dropped
+   * to what was on screen would fall every time somebody folded something.
+   *
+   * One level, not a walk. A group inside a group is not a thing this family
+   * has, and a recursive read here would invent one.
+   *
+   * `?? []` is the server. Lit's element shim carries attributes and not a tree,
+   * so `children` is undefined there, and this getter is reached from `unread`
+   * during the first update.
+   */
   get items(): HelixHeadlessNotification[] {
-    /* `?? []` is the server. Lit's element shim carries attributes and not a
-       tree, so `children` is undefined there, and this getter is reached from
-       `unread` during the first update. */
+    const isItem = (child: Element): child is HelixHeadlessNotification =>
+      'isNotification' in child && (child as HelixHeadlessNotification).isNotification === true
+    return [...(this.children ?? [])].flatMap((child) => {
+      if (isItem(child)) {
+        return [child]
+      }
+      const grouped = 'isNotificationGroup' in child ? [...(child.children ?? [])] : []
+      return grouped.filter(isItem)
+    })
+  }
+
+  /**
+   * What the list slot is given: the rows and the groups, as written.
+   *
+   * Not `items`, which reaches through a group to the rows inside it. Assigning
+   * those would lift them out of the group that is arranging them and hand the
+   * feed a flat list again.
+   */
+  get rows(): Element[] {
     return [...(this.children ?? [])].filter(
-      (child): child is HelixHeadlessNotification =>
-        'isNotification' in child && child.isNotification === true,
+      (child) =>
+        ('isNotification' in child && child.isNotification === true) ||
+        'isNotificationGroup' in child,
     )
   }
 
@@ -160,8 +192,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     if (!list?.assign) {
       return
     }
-    const items = this.items
-    list.assign(...items)
+    list.assign(...this.rows)
     for (const name of ['header', 'footer']) {
       const slot = root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
       slot?.assign?.(...[...this.children].filter((child) => child.getAttribute('slot') === name))

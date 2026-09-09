@@ -1,0 +1,89 @@
+<!-- @summary A feed cut into named groups, one of them folded to its first row. -->
+<!-- @min 460 -->
+
+<helix-notifications label="Notifications">
+  <h2 slot="header">Notifications</h2>
+
+  <!-- Cut by day here. What groups with what is the consumer's: this element is
+       told what to call itself and never works it out. -->
+  <helix-notification-group
+    count="5"
+    label="Today"
+  >
+    <helix-button
+      emphasis="ghost"
+      slot="action"
+    >See all</helix-button>
+    <helix-notification
+      at="2026-09-09T03:00:00Z"
+      separation="filled"
+    >
+      <helix-avatar
+        name="Boyd Larkin"
+        slot="media"
+      ></helix-avatar>
+      <span><strong>Boyd Larkin</strong> has sent you a reminder</span>
+      <helix-button
+        emphasis="outlined"
+        slot="actions"
+      >Ignore</helix-button>
+      <helix-button
+        emphasis="solid"
+        slot="actions"
+        tone="primary"
+      >Respond</helix-button>
+    </helix-notification>
+  </helix-notification-group>
+
+  <!-- Folded, so the rows after the first are assigned nowhere and the pile
+       above the visible one says how many are behind it. Press the heading. -->
+  <helix-notification-group
+    collapsible
+    count="7"
+    label="Yesterday"
+  >
+    <helix-button
+      emphasis="ghost"
+      slot="action"
+    >See all</helix-button>
+    <helix-notification
+      at="2026-09-08T03:00:00Z"
+      separation="filled"
+    >
+      <helix-avatar
+        name="Josh Krajcik"
+        slot="media"
+      ></helix-avatar>
+      <span><strong>Josh Krajcik</strong> changed the status of <strong>Design Project</strong></span>
+      <helix-flex
+        align="center"
+        gap="xs"
+        slot="detail"
+      >
+        <helix-tag>In Progress</helix-tag>
+        <helix-icon name="arrow-right"></helix-icon>
+        <helix-tag tone="success">Completed</helix-tag>
+      </helix-flex>
+    </helix-notification>
+    <helix-notification
+      at="2026-09-08T01:00:00Z"
+      separation="filled"
+    >
+      <helix-avatar
+        name="Ada Reyes"
+        slot="media"
+      ></helix-avatar>
+      <span><strong>Ada Reyes</strong> approved <strong>Q3 Budget</strong></span>
+    </helix-notification>
+    <helix-notification
+      at="2026-09-08T00:20:00Z"
+      separation="filled"
+    >
+      <helix-avatar
+        name="Ken Ito"
+        slot="media"
+      ></helix-avatar>
+      <span><strong>Ken Ito</strong> mentioned you in <strong>Roadmap</strong></span>
+    </helix-notification>
+  </helix-notification-group>
+</helix-notifications>
