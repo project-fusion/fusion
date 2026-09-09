@@ -53,7 +53,8 @@ import '../../format-date/index.js'
  * @documentation https://helix.fusion.dev/components/notifications
  *
  * @slot - What happened, in the consumer's own markup.
- * @slot actions - What a reader can do about it.
+ * @slot actions - What a reader can do about it, under the words it is about. Drawn always
+ * rather than on hover, because an action is the point of the row and not chrome around it.
  * @slot caption - A second line qualifying it, quieter than the first. A bare
  * slot rather than a box, so an item without one pays nothing for it; style it
  * through `::slotted()`.
@@ -181,21 +182,41 @@ export class HelixHeadlessNotification extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markControls()
+    this.markActions()
   }
 
   /**
    * Says whether there is anything for the time to make way for.
    *
-   * The trailing column holds the time and the controls in one place and shows
+   * The trailing column holds the time and the dismiss in one place and shows
    * one of them, so a row with nothing to do about it would hide its timestamp
-   * on hover and put nothing there. `dismissible` this element knows on the
-   * server; whether a consumer filled the actions slot it can only find out from
-   * a DOM, so this runs after the render and the resting answer, no controls, is
-   * the one the server writes.
+   * on hover and put nothing there.
+   *
+   * **`dismissible` alone, where this once also counted a filled actions slot.**
+   * An action is not chrome. A row offering "Respond" is a row whose whole point
+   * is that button, and one nobody sees until a pointer arrives is one most
+   * readers never find: on a coarse pointer it was drawn and on a desktop it was
+   * not, so the two disagreed about whether the row had a button at all. Actions
+   * now sit in the body under the words they are about, and the swap is left to
+   * the one control that really is chrome.
+   *
+   * This element knows `dismissible` on the server, so unlike the answer it
+   * replaces this one needs no DOM and is right from the first render.
    */
   private markControls(): void {
+    this.toggleState('controls', this.dismissible)
+  }
+
+  /**
+   * Says whether a consumer put anything in the actions slot.
+   *
+   * Only so the stylesheet can space them from the words above: a row with no
+   * actions pays nothing for the room they would have taken. Answered from a
+   * DOM, so the resting answer is the one the server writes.
+   */
+  private markActions(): void {
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="actions"]')
-    this.toggleState('controls', this.dismissible || slotFilled(slot))
+    this.toggleState('actions', slotFilled(slot))
   }
 
   /**
@@ -278,13 +299,11 @@ export class HelixHeadlessNotification extends HelixElement {
       <div part="body">
         <div part="label"><slot></slot></div>
         <slot name="caption"></slot>
+        <span part="actions"><slot name="actions" @slotchange=${this.handleActions}></slot></span>
       </div>
       <div part="trailing">
         ${this.renderTime()}
-        <div part="controls">
-          <span part="actions"><slot name="actions" @slotchange=${this.handleActions}></slot></span>
-          ${this.renderDismiss()}
-        </div>
+        <div part="controls">${this.renderDismiss()}</div>
       </div>
     </div>`
   }

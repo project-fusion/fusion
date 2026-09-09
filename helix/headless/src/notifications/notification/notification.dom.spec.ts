@@ -137,20 +137,25 @@ describe('the timestamp', () => {
  * Whether there is anything for the time to make way for.
  *
  * The trailing column shows one of the two, so a row with nothing to do about it
- * would hide its timestamp on hover and put nothing in its place. `dismissible`
- * is known without a DOM; a filled actions slot is not, which is why this is a
- * state written after the render rather than a property.
+ * would hide its timestamp on hover and put nothing in its place.
+ *
+ * **Only the dismiss swaps, and an action never does.** A row offering "Respond"
+ * exists for that button, and a control nobody sees until a pointer arrives is
+ * one most readers never find. Actions live in the body now, under the words
+ * they answer, and are drawn whether or not anything is hovering.
  */
 describe('the trailing swap', () => {
-  test('a row with neither actions nor a dismiss has nothing to swap to', async () => {
+  test('a row with no dismiss has nothing to swap to', async () => {
     expect(hasState(await item(), 'controls')).toBe(false)
   })
 
-  test('a dismiss is enough on its own', async () => {
+  test('a dismiss is what makes the swap', async () => {
     expect(hasState(await item('dismissible'), 'controls')).toBe(true)
   })
 
-  test('so is an action a consumer slotted', async () => {
+  /* The case this replaces asserted the opposite: that a slotted action was
+     enough to arm the swap, which is what hid it. */
+  test('an action does not arm it, because an action is not chrome', async () => {
     const element = (await mount(
       `<helix-headless-notification>
         Something happened
@@ -158,7 +163,34 @@ describe('the trailing swap', () => {
       </helix-headless-notification>`,
     )) as Item
     await element.updateComplete
-    expect(hasState(element, 'controls')).toBe(true)
+    expect(hasState(element, 'controls')).toBe(false)
+  })
+
+  test('and it says so, so the row can space them from the words above', async () => {
+    const element = (await mount(
+      `<helix-headless-notification>
+        Something happened
+        <button slot="actions">View</button>
+      </helix-headless-notification>`,
+    )) as Item
+    await element.updateComplete
+    expect(hasState(element, 'actions')).toBe(true)
+  })
+
+  test('a row with none says that too', async () => {
+    expect(hasState(await item(), 'actions')).toBe(false)
+  })
+})
+
+/* Where the actions are is the whole of what makes them visible, so it is
+   asserted rather than left to the stylesheet. */
+describe('where an action lives', () => {
+  test('in the body, beside the words, not in the trailing column', async () => {
+    const element = await item('dismissible')
+    const body = element.shadowRoot?.querySelector('[part="body"]')
+    const trailing = element.shadowRoot?.querySelector('[part="trailing"]')
+    expect(body?.querySelector('[part="actions"]')).not.toBeNull()
+    expect(trailing?.querySelector('[part="actions"]')).toBeNull()
   })
 })
 

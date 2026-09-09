@@ -252,15 +252,35 @@ slot[name="caption"]::slotted(*) {
   }
 }
 
-/* The seams the grid no longer draws. `align-items: start` hangs a box from the
-   top of the content, so a 32 pixel button in a 20 pixel line sits with its
-   label between the first line of text and the timestamp, aligned to neither,
-   while the dismiss beside it sits at the top: two controls in one row on two
-   different centers. */
+/* **Under the words they are about, and always drawn.**
+ *
+ * These used to share the trailing column with the timestamp and appear only on
+ * hover, which is right for chrome and wrong for these: a row offering "Respond"
+ * exists for that button. Hidden, it was drawn on a coarse pointer and not on a
+ * desktop, so the two disagreed about whether the row had a button at all.
+ *
+ * In the body rather than beside it, because that is where the sentence they
+ * answer is, and because it is what lets the trailing column shrink to the width
+ * of a timestamp. `align-items: center` so a control and a glyph beside it sit
+ * on one center, which the note this replaces recorded getting wrong. */
 [part="actions"] {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--helix-space-2xs);
+}
+
+/* Nothing slotted, so no box and no gap paid for one. The body is a grid with a
+   `2xs` gap, which an empty box would still take. */
+:host(:not(:state(actions))) [part="actions"] {
+  display: none;
+}
+
+/* A little further from the words than the caption is from the label, because a
+   control is a different kind of thing from a line of prose and reads as part of
+   the sentence when it sits at the same distance. */
+:host(:state(actions)) [part="actions"] {
+  margin-block-start: var(--helix-space-2xs);
 }
 
 /* A square the size of the row's controls, not a glyph with padding around it,
@@ -319,14 +339,21 @@ slot[name="caption"]::slotted(*) {
   }
 }
 
-/* Narrow, the trailing column goes under the body rather than beside it. The
-   column takes the width of the wider of the two things it holds, which is the
-   controls, so a phone-width row spent a third of itself on a button that is not
-   even showing: measured at 390 before this, the body had 166 pixels of a 342
-   pixel row. 26rem is where the body drops under about 300 pixels, which is
-   where the wrapping starts to be the row's shape rather than the sentence's
-   length. */
-@container (inline-size < 26rem) {
+/* Narrow, the trailing column goes under the body rather than beside it.
+ *
+ * **18rem, where this was 26.** The column took the width of the wider of the
+ * two things it held, and that was the actions: a phone-width row spent a third
+ * of itself on a button that was not even showing, and the note here recorded
+ * 166 pixels of body in a 342 pixel row. With the actions moved into the body
+ * the column holds a timestamp and a dismiss glyph and nothing else, and
+ * measured after, it is 48 pixels. So the width at which the row has to give up
+ * a line has come down with it: at 380 the body now gets 208 of 300, which is
+ * two thirds rather than under a half, and a stamp costing 48 pixels is a better
+ * trade than a third line costing a whole one.
+ *
+ * Below this the row does give it up, because a body under about 200 pixels is
+ * wrapping on the row's shape rather than the sentence's length. */
+@container (inline-size < 18rem) {
   [part="item"] {
     grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr);
   }
