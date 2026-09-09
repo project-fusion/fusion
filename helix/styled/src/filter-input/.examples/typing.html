@@ -72,7 +72,13 @@
     chip.dismissible = true
     chip.dismissLabel = `Remove the ${label.toLowerCase()} filter`
     chip.label = label
-    chip.name = field
+    /* **The attribute, not the property.** `name` is what the lookup above keys
+       on, and a reflected property is written on the element's next update
+       rather than now: two facets for one field in the same frame both found
+       nothing, both built a chip, and the row ended up with two. Worse, the
+       lookup then removed whichever came first, so dismissing one chip took the
+       other away. Setting it here makes it true before the next facet asks. */
+    chip.setAttribute('name', field)
     chip.operatorLabel = operatorLabel
     chip.textContent = values.join(', ')
     if (!held) {
