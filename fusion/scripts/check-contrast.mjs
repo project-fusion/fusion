@@ -439,6 +439,42 @@ for (const mode of ['light', 'dark']) {
         }
 
         const host = document.getElementById('preview-root')
+
+        /* **A slotted label is painted by the box it lands in, not by the element
+         it is written inside**, and asking the wrong one of the two is the
+         difference between a number and a number that looks like one.
+
+         `<helix-button>Save</helix-button>` holds the text node, so the walk
+         below finds it on the host and reads the host's ink and the ground above
+         the host. The glyphs are drawn inside the button's shadow root, in that
+         box's `color` and on that box's fill. Measured on `emphasis="subtle"
+         tone="primary"`: the host answers `oklch(0 0 0)` on `#ffffff`, 21:1,
+         while the pixels on screen are `#1068da` on `#ddeafa`, 4.29:1. Under AA
+         and reported as clear.
+
+         The shadow box was not covering for it either: it holds a `<slot>` and
+         no text node of its own, so the guard below skipped it outright. So
+         every component whose label arrives through a slot had its label
+         measured against an ink nothing paints and a ground nothing sits on,
+         which is most of the library.
+
+         The walk up is a loop because a slot can be assigned to another slot:
+         a button inside a toolbar inside a header reaches its painter through
+         as many hops as there are shadow roots between them. */
+        const painterOf = (element) => {
+          let node = [...element.childNodes].find(
+            (child) =>
+              child.nodeType === 3 && child.textContent.trim().length > 0 && child.assignedSlot,
+          )
+          if (!node) {
+            return element
+          }
+          while (node.assignedSlot) {
+            node = node.assignedSlot
+          }
+          return node.parentElement ?? element
+        }
+
         const walk = (node, out) => {
           for (const element of node.querySelectorAll('*')) {
             if (element.shadowRoot) {
@@ -451,10 +487,40 @@ for (const mode of ['light', 'dark']) {
               continue
             }
             let box = element.getBoundingClientRect()
-            if (box.width === 0 || box.height === 0) {
+            /* **A hairline box is a label for a screen reader, not text on a
+               page.** The `clip-path: inset(50%)` pattern leaves a one pixel
+               square wherever it is used, and Radio's chip variant puts the name
+               of every choice in one: the words name the chip without taking
+               room in it. Nobody sees those glyphs, so the ratio they would
+               score is a number about nothing, and it is not a flattering one
+               either. Measured on `radio/chips`, the hidden label read 1.12:1
+               against the chip it is absolutely positioned inside.
+
+               One pixel rather than zero, because zero is the box that was never
+               laid out and one is the box that was laid out to be unreadable.
+               Neither is text anybody is asked to read.
+
+               Asked of the painter as well as of this element, and the painter is
+               the one that answers: `clip-path` and `overflow` are paint, not
+               layout, so a full sized word slotted into a one pixel box still
+               reports a full sized rectangle of its own. The box that was shrunk
+               is the one holding it. */
+            if (box.width <= 1 || box.height <= 1) {
               continue
             }
-            const style = getComputedStyle(element)
+            /* Geometry from the element, because that is where the glyphs are.
+               Everything about how they are painted from whatever paints them:
+               the ink, the ground under it, and the size and weight that decide
+               which target it answers to all belong to the box the text is
+               rendered in. */
+            const painter = text ? painterOf(element) : element
+            if (painter !== element) {
+              const paints = painter.getBoundingClientRect()
+              if (paints.width <= 1 || paints.height <= 1) {
+                continue
+              }
+            }
+            const style = getComputedStyle(painter)
             if (style.visibility === 'hidden' || style.opacity === '0') {
               continue
             }
@@ -475,8 +541,8 @@ for (const mode of ['light', 'dark']) {
               out.offscreen += 1
               continue
             }
-            const ground = groundOf(element, box)
-            if (!ground || contested(element, ground, box)) {
+            const ground = groundOf(painter, box)
+            if (!ground || contested(painter, ground, box)) {
               out.unresolved += 1
               continue
             }
@@ -494,7 +560,7 @@ for (const mode of ['light', 'dark']) {
               out.failures.push({
                 ground: hex(ground.color),
                 ink: hex(flat),
-                part: element.getAttribute('part') ?? element.tagName.toLowerCase(),
+                part: painter.getAttribute('part') ?? painter.tagName.toLowerCase(),
                 ratio: Number(measuredRatio.toFixed(2)),
                 target: wanted,
                 text: (element.textContent ?? '').trim().slice(0, 24),

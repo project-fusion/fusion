@@ -139,13 +139,21 @@
   background-color: var(--helix-color-surface-sunken);
 }
 
-/* And the answer is the calendar's solid mark: `foreground-muted` rather than
-   `foreground`, which is a slab of near-black among gray numbers, and
-   `foreground-on-accent` for the digits, which is the token for words on a
-   filled control. */
+/* And the answer is the calendar's solid mark, which this now actually is.
+ *
+ * **`foreground-muted` is an ink and this is a ground**, which is the note the
+ * calendar carries over its own mark and the reason it does not use one here:
+ * an ink follows the page and inverts with it, so a ground written as one goes
+ * pale exactly when the page goes dark. Measured on a selected wheel row,
+ * `foreground-on-accent` white on it read 2.58:1 in dark, which is the number
+ * the calendar's note records for the same mistake it had already made and
+ * fixed. This copied the mark from before that fix.
+ *
+ * `surface-inverse` is the ground that stays dark while the page goes light,
+ * and `foreground-inverse` is the ink solved against it. */
 [part="column"] [part="option"]:state(selected)::part(label) {
-  background-color: var(--time-picker-selected-color, var(--helix-color-foreground-muted));
-  color: var(--helix-color-foreground-on-accent);
+  background-color: var(--time-picker-selected-color, var(--helix-color-surface-inverse));
+  color: var(--helix-color-foreground-inverse);
 }
 
 /* No tick. */

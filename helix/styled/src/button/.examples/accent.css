@@ -3,6 +3,26 @@
    which is what makes the relationship visible: both the brand and the accent
    move, and they move together. */
 .rethemed {
-  --helix-seed-accent-hue: 140;
-  --helix-seed-brand: oklch(0.58 0.19 20);
+  /* **240 and not 140, and the reason is a trap worth knowing about.** Accent is
+     derived by rotating the brand's hue at fixed OKLCH lightness, and WCAG
+     luminance is not hue independent: the same L is a different contrast at
+     every angle. Swept in 5 degree steps at the shipping L and chroma, the ink
+     scores 5.65:1 on white at hue 333 and 4.08:1 at hue 183, so a band roughly
+     150 to 230 wide of cyan and teal cannot clear AA as text at all, however the
+     brand was solved.
+
+     140 put this accent at hue 160, inside that band: measured, white on the
+     fill read 4.45:1 and the ink read 3.41:1 on its own wash. 240 puts it at
+     260 and clears both. Nothing about the example wanted that particular green,
+     and an example demonstrating a relationship should demonstrate one that
+     works. */
+  --helix-seed-accent-hue: 240;
+  /* **0.539 and not 0.58, which is the lightness the solver would have
+     produced.** `primitives.css` records the case in full: a seed handed in at
+     0.58 reads 4.395:1 on white and 4.395:1 under the on-accent ink, under AA on
+     both sides of the pair the palette uses most, and `deriveTheme` solves it
+     down to 0.539 to clear. Setting `--helix-seed-brand` by hand walks straight
+     past that solve, which is what this example was doing: the accent it derived
+     came out at 4.09:1 as text on its own wash. */
+  --helix-seed-brand: oklch(0.539 0.19 20);
 }

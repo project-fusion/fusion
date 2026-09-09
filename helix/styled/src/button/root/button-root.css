@@ -155,14 +155,31 @@
 }
 
 /* A wash with no line, for a button that should read as colored without reading
-   as the one thing to press. */
+   as the one thing to press.
+ *
+ * **The ink is deepened, and this is the one emphasis that needs it.** `subtle`
+ * puts a wash of the tone *under* the same ink `outlined` and `ghost` set on the
+ * bare page, so it spends the headroom from both sides at once. Measured in
+ * light on `tone="primary"`, the label read `#1068da` on `#ddeafa`: 4.29:1,
+ * under AA, where the same ink on the same tone reads 4.82 outlined and 5.23
+ * ghost. `accent` came out at 4.24 for the same reason.
+ *
+ * Toward the foreground rather than to a darker step of the tone, because the
+ * foreground turns over with the mode and a fixed step does not: the ink has to
+ * move away from the page in light and away from it again in dark, and there is
+ * one token that always points that way. It also stays hue agnostic, so a
+ * rethemed tone gets the same treatment rather than the one its ramp happens to
+ * allow. */
 :host([emphasis="subtle"]) [part="button"] {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 14%, transparent)
   );
   border-color: transparent;
-  color: var(--button-foreground-color, var(--_button-tone));
+  color: var(
+    --button-foreground-color,
+    color-mix(in oklab, var(--_button-tone) 78%, var(--helix-color-foreground))
+  );
 }
 
 :host(:not(:disabled)[emphasis="subtle"]) [part="button"]:hover {
