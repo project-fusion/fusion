@@ -41,6 +41,14 @@ spine, not a module.
   in-memory reference stores, and they are the shape the backends must match
   behind a trait. An abstraction with one implementation is a guess, and SQLite
   assumptions leak into the domain model otherwise.
+- **A node's payload is typed, never a JSON blob.** `Detail` is what makes a
+  trace executable rather than merely readable: a replay reconstitutes the call
+  that produced a node, and `serde_json::Value` cannot promise the fields it
+  needs exist or are spelled the way last release spelled them. `NodeKind` is
+  derived from `Detail` rather than stored beside it, so the two cannot
+  disagree. `ToolCall`'s arguments stay untyped and that is the one place it is
+  correct, because tool arguments are arbitrary JSON by the wire format's
+  definition.
 - **Vectors are deferred, the seam is not.** A memory record must carry a
   nullable embedding field and relevance scoring must be a strategy, so enabling
   vectors is swapping a scorer rather than migrating a schema. Neither exists
@@ -69,6 +77,15 @@ behavioral claims (`trace.len() == 4`) that no signature check could.
 - **`why()` is breadth-first.** A "why did it say that" answer that walks one
   arbitrary ancestor chain to its root before mentioning the sibling that
   mattered is the wrong shape. Use `VecDeque::pop_front`, not `Vec::pop`.
+- **`why()` is a reading order and `plan()` is an execution order.** Never
+  execute a replay in `why()` reversed. Breadth-first from the output is
+  reachability, not dependency, and reversing it holds only while every node
+  sits at exactly one depth — which a chain and a plain diamond both satisfy, so
+  either one as a test passes against the wrong implementation. It breaks when a
+  node is reachable at two depths: breadth-first pins it at the shallowest, and
+  execution needs it before the deepest thing that reads it. The result is a
+  recomputation against an input that does not exist yet, and it still looks
+  like an answer.
 - **Walk to the head of a supersession chain.** Callers hold whichever fact id
   they read; pointing at an already-superseded fact forks the lineage and leaves
   two current facts where there should be one.

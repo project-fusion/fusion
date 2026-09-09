@@ -9,6 +9,52 @@ Every memory, context assembly, tool call, and output is a node with edges to
 whatever produced it. Provenance is the spine of Cortex rather than a module
 beside it, and three capabilities fall out of that which cannot be retrofitted.
 
+## What a node carries
+
+A node's payload is typed. This is what separates a trace from a log: a replay
+has to reconstitute the call that produced a node, and an untyped payload cannot
+promise the fields it needs are there, or spelled the same way they were last
+release.
+
+[//]: # (rust:fusion-cortex-trace::Detail)
+
+```rust
+use fusion_cortex_trace::{Detail, Node, NodeKind};
+
+let node = Node::new(
+    Detail::Output {
+        content: "0.11.0 shipped on the 8th.".into(),
+        input_tokens: 412,
+        model: "local/llama-3.3-70b".into(),
+        output_tokens: 9,
+        prompt_version: "answer/v3".into(),
+    },
+    vec![],
+);
+
+// The kind is read off the detail, so it cannot contradict it.
+assert_eq!(node.kind(), NodeKind::Output);
+```
+
+[//]: # (/rust)
+
+The kind is read off the detail rather than stored beside it, so a node tagged
+`Output` carrying a tool call's payload is a state the type makes
+unrepresentable rather than a case every caller has to check for.
+
+| Detail | Carries | Replay |
+| --- | --- | --- |
+| `Source` | Raw input from outside the system | Held fixed |
+| `Memory` | Fact ids, so the memory has one home in Engram | Held fixed |
+| `Context` | The assembled messages, and the strategy that chose them | Recomputed |
+| `ToolCall` | Tool name, arguments, and result | Recomputed |
+| `Output` | Content, model, prompt version, and what it cost | Recomputed |
+
+`ToolCall` keeps `serde_json::Value` for its arguments and result, and it is the
+one payload where that is the right type: tool arguments are arbitrary JSON by
+the wire format's definition, so a stricter type would be Cortex inventing a
+schema it cannot enforce.
+
 ## why()
 
 The query the product rests on.
@@ -16,13 +62,16 @@ The query the product rests on.
 [//]: # (rust:fusion-cortex-trace::Graph::why)
 
 ```rust
-use fusion_cortex_trace::{Graph, Node, NodeKind};
+use fusion_cortex_trace::{Detail, Graph, Node};
 
 let mut graph = Graph::new();
-let source = graph.insert(Node::new(NodeKind::Source, vec![]));
-let memory = graph.insert(Node::new(NodeKind::Memory, vec![source]));
-let context = graph.insert(Node::new(NodeKind::Context, vec![memory]));
-let output = graph.insert(Node::new(NodeKind::Output, vec![context]));
+let source = graph.insert(Node::new(
+    Detail::Source { content: "when did we ship 0.11?".into(), uri: None },
+    vec![],
+));
+let memory = graph.insert(Node::new(Detail::Memory { fact_ids: vec![] }, vec![source]));
+let context = graph.insert(Node::new(ctx(), vec![memory]));
+let output = graph.insert(Node::new(out(), vec![context]));
 
 // The full derivation: which memories, which context decisions, which model.
 let trace = graph.why(output);
@@ -39,8 +88,43 @@ buggy writer can produce.
 Given a trace, re-run it against a different model or prompt version and diff
 the result. This is how you regression-test a system whose outputs are not
 deterministic: you hold the inputs fixed and compare, rather than asserting on
-text. The graph holds the inputs a replay needs; the runner that re-executes
-them is not built.
+text.
+
+The graph holds the inputs a replay needs and the order to feed them in. The
+runner that re-executes them, and the scorer that decides what counts as the
+same answer, are not built.
+
+[//]: # (rust:fusion-cortex-trace::Graph::plan)
+
+```rust
+let mut graph = Graph::new();
+let source = graph.insert(Node::new(
+    Detail::Source { content: "…".into(), uri: None },
+    vec![],
+));
+// A diamond: one source, two memories, one context over both.
+let left = graph.insert(Node::new(mem(), vec![source]));
+let right = graph.insert(Node::new(mem(), vec![source]));
+let context = graph.insert(Node::new(ctx(), vec![left, right]));
+
+let plan = graph.plan(context);
+
+assert_eq!(plan[0], source, "the input comes first");
+assert_eq!(plan[3], context, "the target comes last");
+// Both memories are recomputed before the context that reads them.
+assert!(plan[1..3].contains(&left) && plan[1..3].contains(&right));
+```
+
+[//]: # (/rust)
+
+**`plan()` exists because `why()` is the wrong order to execute in.**
+Breadth-first from the output is reachability, not dependency. Reversing it
+happens to work wherever every node sits at exactly one depth, which is why a
+chain and a plain diamond both survive the mistake and hide it. It breaks as
+soon as a node is reachable at two different depths: breadth-first pins that
+node at its shallowest, and execution needs it before the deepest thing that
+reads it. What comes out is a recomputation run against an input that does not
+exist yet, and it still looks like an answer.
 
 ## Cascading deletion
 
@@ -66,16 +150,3 @@ stays consistent.
 This is what makes deletion mechanical rather than nominal. A user's right to delete is
 only real if the system can find everything that was derived from what they
 deleted, and provenance is what makes that tractable.
-
-## Node kinds
-
-| Kind | Represents |
-| --- | --- |
-| `Source` | Raw input from outside the system |
-| `Memory` | A stored memory, episodic or semantic |
-| `Context` | A context window assembled for a task |
-| `ToolCall` | A tool invocation and its result |
-| `Output` | Model output |
-
-Each node carries `metadata` for kind-specific detail: model id, prompt
-version, tool name, relevance scores.
