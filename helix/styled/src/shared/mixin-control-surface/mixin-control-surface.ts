@@ -59,8 +59,11 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
      * button performs an action: a success button and a warning button are not
      * things anybody writes, and offering them invites a page where the color
      * of a control means nothing in particular. `accent` is the second
-     * emphasis, a rotation off the brand seed rather than a color of its own,
-     * so it stays in relation when somebody rethemes.
+     * emphasis: the second color a theme names, and the brand itself until one
+     * is named. It used to be a rotation off the brand seed whether or not
+     * anybody asked for a second color, which handed every theme a complement
+     * it had not chosen, 3 degrees off `warning` and sometimes too pale to
+     * read.
      */
     @property({ reflect: true })
     tone?: 'accent' | 'danger' | 'neutral' | 'primary'

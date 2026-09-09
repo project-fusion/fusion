@@ -4,6 +4,10 @@ export function Example() {
       align="center"
       gap="md"
     >
+      {/* `accent` renders as `primary` here, and that is the default rather than
+          a mistake: a palette that has not named a second color does not have
+          one. `button/accent` is where a theme names one and the pair
+          separate. */}
       <helix-icon-button
         label="Download"
         tone="primary"

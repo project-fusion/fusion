@@ -7,6 +7,10 @@ export function Example() {
       gap="lg"
       wrap
     >
+      {/* `accent` renders as `primary` here, and that is the default rather than
+          a mistake: a palette that has not named a second color does not have
+          one. `button/accent` is where a theme names one and the pair
+          separate. */}
       {/* The resting one, named rather than left off, which is the whole reason
           `primary` is sayable: this row would otherwise have a gap in it that
           only an absent attribute could fill. */}

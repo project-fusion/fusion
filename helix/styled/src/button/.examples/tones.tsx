@@ -5,6 +5,10 @@ export function Example() {
         emphasis="solid"
         tone="primary"
       >
+        {/* `accent` renders as `primary` here, and that is the default rather than
+          a mistake: a palette that has not named a second color does not have
+          one. `button/accent` is where a theme names one and the pair
+          separate. */}
         Button
       </helix-button>
       <helix-button

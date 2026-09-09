@@ -20,14 +20,58 @@
      most. Handed the same color as a brand, `deriveTheme` solves the role down
      to 0.539 and clears it at 5.229:1 and 4.923:1. */
   --_helix-seed-brand: var(--helix-seed-brand, oklch(0.539 0.19 258));
-  /* The second color, said as a relationship rather than as a color.
-     `--helix-seed-accent-hue` is the angle, and 180 is the complement, which is
-     the relationship a second color usually means. 30 or so is analogous and
-     reads as a shade of the same idea; 120 is a triad. */
-  --helix-seed-accent-hue: 180;
+  /*
+   *  The second color, and by default there is not one.
+   *
+   * **The brand, unless somebody asks for something else**, which is the
+   * opposite of what this did. It shipped `--helix-seed-accent-hue: 180`, so
+   * every theme got a complement whether or not it had a second color to name.
+   * Two things were wrong with a derived default. It collided: measured against
+   * the hues the palette already fixes, 180 is the single worst angle available,
+   * putting the accent 3 degrees from `warning` on the shipping seed, so two
+   * amber marks in one view meant two different things. And it could not always
+   * be read: this keeps the brand's lightness and moves only the hue, while WCAG
+   * luminance is not hue independent, so a brand near hue 0 had its own
+   * complement land where nothing clears AA.
+   *
+   * A company with one brand color now gets one, and gets it exactly: at angle
+   * zero with the lightness left alone this is the seed itself, not a near miss
+   * of it. Measured in both schemes, `accent` and `accent-surface` come back
+   * identical to `primary` and `primary-surface`.
+   *
+   * A company with two says so, either as an angle off the brand or as the color
+   * their brand book actually names, which wins over the angle.
+   */
+  --helix-seed-accent-hue: 0;
+
+  /* **The lightness a rotated accent should take, which is not the brand's.**
+     `series.css` already works this way, pinning an L per slot so a magenta does
+     not shout down a cyan, and an accent needs it for the same reason: swept in
+     0.01 steps against every hue at 3 degree intervals, 0.51 is the largest
+     lightness whose worst hue still clears 4.5:1 as text and still carries white
+     on the `-600` fill. The worst hue is a cyan near 190 at every lightness, and
+     the brand's own 0.539 reads 4.05:1 there.
+
+     **It defaults to the brand's `l` rather than to 0.51, and that is a
+     tradeoff worth knowing about.** Defaulting to the safe value would make
+     every harmony legible and would also make an undefined accent a slightly
+     darker brand rather than the brand, which is the one thing this change
+     exists to avoid. Reading the angle to decide between them is the conditional
+     CSS does not have: a `var()` with no fallback is guaranteed-invalid and does
+     propagate, and it was built and measured working, but `check:css:hexes`
+     resolves tokens with its own substituter that throws on an undeclared name
+     rather than modeling that propagation, and the `tokens` audit refuses the
+     dangling read. Both are right about every other case.
+
+     So a consumer choosing a harmony in the cyan band sets this alongside the
+     angle. `--helix-seed-accent-lightness: 0.51` is safe at every angle. */
+  --_helix-accent-lightness: var(--helix-seed-accent-lightness, l);
   --_helix-seed-accent: var(
     --helix-seed-accent,
-    oklch(from var(--_helix-seed-brand) l c calc(h + var(--helix-seed-accent-hue)))
+    oklch(
+      from var(--_helix-seed-brand) var(--_helix-accent-lightness) c
+        calc(h + var(--helix-seed-accent-hue))
+    )
   );
 
   /* How saturated this palette is, as a fraction of what it would otherwise be. */
@@ -208,11 +252,23 @@
 
   /* ------------------------------------------------------- accent ------ */
   /* The same six steps the brand takes, from the accent seed, so `accent`
-     behaves everywhere `primary` does and a component needs no second recipe. */
+     behaves everywhere `primary` does and a component needs no second recipe.
+ *
+ * **And now actually the same six.** 400 was `+ 0.12` against the brand's
+ * `+ 0.13`, which the line above already claimed was the same step. The brand's
+ * is the measured one, walked in a browser until it cleared: the note there
+ * records 0.664 reading 4.48 and 0.669 reading 4.572. This was a hundredth off
+ * it for no reason anybody wrote down.
+ *
+ * It matters more now that an accent nobody has defined is the brand. Five of
+ * the six steps already agreed, so an undefined accent came out identical to
+ * primary in light and a hundredth of lightness away from it in dark: below
+ * anything an eye resolves, and a difference all the same, in the one place the
+ * whole point is that there is no difference. */
   --_helix-accent-500: var(--_helix-seed-accent);
   --_helix-accent-600: oklch(from var(--_helix-seed-accent) calc(l - 0.05) c h);
   --_helix-accent-700: oklch(from var(--_helix-seed-accent) calc(l - 0.1) c h);
-  --_helix-accent-400: oklch(from var(--_helix-seed-accent) calc(l + 0.12) c h);
+  --_helix-accent-400: oklch(from var(--_helix-seed-accent) calc(l + 0.13) c h);
   --_helix-accent-50: oklch(from var(--_helix-seed-accent) 0.95 calc(c * 0.25) h);
   --_helix-accent-900: oklch(from var(--_helix-seed-accent) 0.28 calc(c * 0.5) h);
 

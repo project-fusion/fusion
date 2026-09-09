@@ -112,8 +112,9 @@
   background-color: var(--badge-background-color, var(--helix-color-primary-surface));
 }
 
-/* The second emphasis, a rotation off the brand seed rather than a color of its
-   own, so it stays in relation when somebody rethemes. */
+/* The second emphasis: the second color a theme names, and the brand itself
+   until one is named. So this renders as `primary` on a palette with one brand
+   color, which is the honest answer rather than a complement nobody chose. */
 :host([tone="accent"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-accent-surface));
 }
