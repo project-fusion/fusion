@@ -225,6 +225,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   }
 
   protected override render(): TemplateResult {
+    const divider = this.tag('divider')
     const menu = this.tag('menu')
     const item = this.tag('menu-item')
     return html`<${menu} label=${this.label} @helix-select=${this.handleSelect}>
@@ -258,6 +259,17 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                     >${operator.label}</${item}>`,
                   )}
                 </${item}>`
+              : nothing
+          }
+          ${
+            /* And a rule under it, because the two runs are different questions:
+               one comparison and any number of values. The row above already
+               reads differently, carrying a caret where the values carry ticks,
+               and the rule is what makes them two groups rather than one list
+               that happens to change halfway down. Only where there is a
+               comparison to separate. */
+            operators.length > 1 && values.length > 0
+              ? html`<${divider} slot="submenu" announced></${divider}>`
               : nothing
           }
           ${values.map(

@@ -194,6 +194,36 @@ describe('which comparison it says is in force', () => {
     ])
   })
 
+  /* The rule is what makes the page two groups rather than one list that
+     changes halfway down: one comparison above it, any number of values below.
+     `Menu` paints a slotted divider on a submenu page only since the fix in
+     `MenuItem`, which is where the leak this would have shown is covered. */
+  test('a rule separates the comparison from the values', async () => {
+    const element = await picker()
+    const rows = [
+      ...(element.shadowRoot?.querySelectorAll(
+        '[data-facet="comparison"], helix-headless-divider, [data-facet="value"]',
+      ) ?? []),
+    ].map((row) => (row as HTMLElement).dataset.facet ?? row.localName)
+    expect(rows).toEqual(['comparison', 'helix-headless-divider', 'value', 'value'])
+  })
+
+  test('and no rule where there is no comparison to separate', async () => {
+    const element = await picker(`
+      <helix-headless-filter-field name="created" label="Created">
+        <helix-headless-filter-operator name="after" label="after"></helix-headless-filter-operator>
+        <helix-headless-option value="today">Today</helix-headless-option>
+      </helix-headless-filter-field>`)
+    expect(element.shadowRoot?.querySelector('helix-headless-divider')).toBeNull()
+  })
+
+  test('nor where the field lists no values for one to sit above', async () => {
+    const element = await picker(`
+      <helix-headless-filter-field name="assignee" label="Assignee"></helix-headless-filter-field>`)
+    expect(element.shadowRoot?.querySelector('[data-facet="comparison"]')).not.toBeNull()
+    expect(element.shadowRoot?.querySelector('helix-headless-divider')).toBeNull()
+  })
+
   test('a field with one comparison offers no way in at all', async () => {
     const element = await picker(`
       <helix-headless-filter-field name="created" label="Created">

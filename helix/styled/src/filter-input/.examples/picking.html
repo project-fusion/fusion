@@ -13,10 +13,19 @@
     label="Filter"
     slot="start"
   >
+    <!-- The trigger is the consumer's, so the icon is too. `funnel-simple` is
+         the three rules a reader already reads as "filter", and it sits in the
+         button's own start slot rather than beside it. -->
     <helix-button
       emphasis="ghost"
       slot="trigger"
-    >Filter</helix-button>
+    >
+      <helix-icon
+        name="funnel-simple"
+        slot="start"
+      ></helix-icon>
+      Filter
+    </helix-button>
 
     <!-- No comparisons declared, so it is offered "is any of" and "is none of":
          the two the typed grammar can say, and the two nearly every set filter

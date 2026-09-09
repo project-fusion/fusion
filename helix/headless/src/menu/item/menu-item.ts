@@ -328,10 +328,20 @@ export class HelixHeadlessMenuItem extends HelixElement {
     if (this.showingSubmenu) {
       return html`<slot name="submenu" @slotchange=${this.readSubmenu}></slot>`
     }
-    // Not on the page showing, so there is nothing to draw. Rendering nothing
-    // rather than hiding it with an attribute, because the attribute would be
-    // one this element wrote onto itself, and there is no state to keep: the
-    // rows are in the light DOM and come back as they were.
+    /* Not on the page showing, so there is nothing to draw. Rendering nothing
+       rather than hiding it with an attribute, because the attribute would be
+       one this element wrote onto itself, and there is no state to keep: the
+       rows are in the light DOM and come back as they were.
+
+       That is also why the slot at the end of this render is inside a hidden
+       box. A row keeps its submenu slot while its own page is showing, so the
+       rows in there are assigned and can be marked; each of them answers `onPage`
+       by drawing nothing, so they need no help. Anything that is *not* a row has
+       no such idea and painted on the page above: a `Divider` slotted into a
+       submenu drew its rule between two rows of the parent menu, which is the
+       same fault `Menu`'s sheet fixes for its own slot and could not reach into
+       here. Hidden rather than absent, because the slot has to stay for the
+       assignment to hold and for `readSubmenu` to hear it. */
     if (!this.onPage) {
       return nothing
     }
@@ -416,7 +426,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
             @keydown=${this.handleKeydown}
           >${inside}</div>`
     }
-      <slot name="submenu" @slotchange=${this.readSubmenu}></slot>`
+      <div hidden><slot name="submenu" @slotchange=${this.readSubmenu}></slot></div>`
   }
 }
 

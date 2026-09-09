@@ -152,6 +152,16 @@ slot[name="submenu"] {
   display: contents;
 }
 
+/* A rule between two runs of rows on a submenu page.
+ *
+ * `Menu` writes the same margin for a divider on its top page and cannot reach
+ * this one: that rule is `::slotted()` on the menu's own slot, and a divider a
+ * consumer put inside a submenu is assigned here instead, one shadow root
+ * further in. Without this it sat flush against the rows either side of it. */
+slot[name="submenu"]::slotted(helix-divider) {
+  margin-block: var(--helix-space-2xs);
+}
+
 /* A caret is physical and the thing it points at is not. */
 :host(:dir(rtl)) [part="mark"][data-submenu] {
   scale: -1 1;

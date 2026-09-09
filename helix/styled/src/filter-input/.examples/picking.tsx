@@ -37,10 +37,17 @@ export function Example() {
         label="Filter"
         slot="start"
       >
+        {/* The trigger is the consumer's, so the icon is too. `funnel-simple`
+            is the three rules a reader already reads as "filter", and it sits in
+            the button's own start slot rather than beside it. */}
         <helix-button
           emphasis="ghost"
           slot="trigger"
         >
+          <helix-icon
+            name="funnel-simple"
+            slot="start"
+          ></helix-icon>
           Filter
         </helix-button>
 

@@ -362,6 +362,31 @@ describe('menu submenus, coming and going', () => {
     expect(at(host, 'none').onPage).toBe(true)
     expect(at(host, 'refunded').onPage).toBe(false)
   })
+
+  /* A row takes itself off a page it is not on; anything else slotted into a
+     submenu has no such idea, and painted on the page above. Measured before the
+     fix: a `Divider` inside a submenu drew its rule between two rows of the
+     parent menu, which is `Menu`'s own `::slotted` rule one shadow root out of
+     reach. Structural rather than measured, so it reads the same here as in a
+     browser: the slot a row keeps while its own page is showing is inside a
+     hidden box, and the one it renders *as* the page is not. */
+  test('a submenu keeps its slot on the page above, and paints nothing there', async () => {
+    const host = await deep()
+    host.open = true
+    await host.updateComplete
+    const top = at(host, 'field')
+    await top.updateComplete
+
+    const held = top.shadowRoot?.querySelector('[hidden] slot[name="submenu"]')
+    expect(held).not.toBeNull()
+
+    top.select()
+    await host.updateComplete
+    await top.updateComplete
+    // Showing its own page now, so the slot is what it draws rather than a store.
+    expect(top.shadowRoot?.querySelector('[hidden] slot[name="submenu"]')).toBeNull()
+    expect(top.shadowRoot?.querySelector('slot[name="submenu"]')).not.toBeNull()
+  })
 })
 
 /* Which columns a page reserves is the menu's to answer, because no row can: a
