@@ -5,7 +5,6 @@ beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../button/index.js')
-  await import('../../tag/index.js')
 })
 
 /**

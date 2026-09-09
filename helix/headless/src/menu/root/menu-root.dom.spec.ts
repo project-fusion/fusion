@@ -341,7 +341,8 @@ describe('menu submenus, coming and going', () => {
 
   test('every row on the way to the open page keeps its own slot', async () => {
     const host = await deep()
-    host.show()
+    // `open`, which is how every other block here opens a menu.
+    host.open = true
     await host.updateComplete
 
     at(host, 'field').select()

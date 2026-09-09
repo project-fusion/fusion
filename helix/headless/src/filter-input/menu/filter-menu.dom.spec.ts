@@ -173,20 +173,25 @@ describe('which comparison it says is in force', () => {
      them is structure rather than styling, so it is checkable here. */
   test('the comparisons sit under a row of their own, not beside the values', async () => {
     const element = await picker()
-    const rows = element.shadowRoot?.querySelectorAll('[data-facet]')
-    const comparison = element.shadowRoot?.querySelector('[data-facet="comparison"]')
+    const at = (selector: string): HTMLElement[] => [
+      ...(element.shadowRoot?.querySelectorAll<HTMLElement>(selector) ?? []),
+    ]
+    const comparison = at('[data-facet="comparison"]')[0] ?? null
     expect(comparison).not.toBeNull()
     // A way in rather than a choice: it opens a page and never takes a tick.
     expect(comparison?.hasAttribute('checkable')).toBe(false)
-    for (const operator of element.shadowRoot?.querySelectorAll('[data-facet="operator"]') ?? []) {
-      expect(operator.parentElement).toBe(comparison as Element)
-    }
-    // And the values stay where they were, one level up beside nothing else.
-    for (const value of element.shadowRoot?.querySelectorAll('[data-facet="value"]') ?? []) {
-      expect(value.getAttribute('data-facet')).toBe('value')
-      expect(value.parentElement?.getAttribute('data-facet')).toBe('field')
-    }
-    expect(rows?.length).toBeGreaterThan(0)
+
+    const operators = at('[data-facet="operator"]')
+    expect(operators).toHaveLength(2)
+    expect(operators.map((row) => row.parentElement)).toEqual([comparison, comparison])
+
+    // And the values stay a level up, under the field and beside nothing else.
+    const values = at('[data-facet="value"]')
+    expect(values).toHaveLength(2)
+    expect(values.map((row) => row.parentElement?.getAttribute('data-facet'))).toEqual([
+      'field',
+      'field',
+    ])
   })
 
   test('a field with one comparison offers no way in at all', async () => {

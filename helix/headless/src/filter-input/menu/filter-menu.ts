@@ -194,9 +194,10 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    *
    * Stopped here rather than let past, because a consumer listening for
    * `helix-select` on their own page should not receive one for a row inside a
-   * control they did not write. Every row this renders carries `data-facet`,
-   * including the two that only open a page, and all of them are this element's
-   * business rather than theirs.
+   * control they did not write. Only the two rows that choose something need it:
+   * a row that opens a page is stopped by `Menu` itself, in a capture-phase
+   * handler, on the ground that looking into a submenu is not a choice. Measured
+   * both ways, and widening this to every `data-facet` row changed nothing.
    */
   private readonly handleSelect = (event: Event): void => {
     const row = event.composedPath()[0]
@@ -204,7 +205,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
       return
     }
     const kind = row.dataset.facet
-    if (kind === undefined) {
+    if (kind !== 'value' && kind !== 'operator') {
       return
     }
     event.stopPropagation()
@@ -212,9 +213,6 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     const value = row.dataset.value ?? ''
     if (kind === 'operator') {
       this.apply(field, this.valuesFor(field), value)
-      return
-    }
-    if (kind !== 'value') {
       return
     }
     const ticked = new Set(this.picked.get(field) ?? [])
