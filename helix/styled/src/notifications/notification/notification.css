@@ -121,13 +121,12 @@
   background-color: var(--notifications-item-fill, var(--helix-color-surface-raised));
 }
 
-/* **The unread mark moves inside the box.** It is placed against the row's
-   padding box, which for a carded row is inside a border and a corner: left at
-   the resting inset it sat on the border itself and, at the first and last rows,
-   inside the corner's arc. */
-:host([separation="filled"]) [part="item"]::before,
-:host([separation="outlined"]) [part="item"]::before {
-  inset-inline-start: var(--notifications-unread-inset, var(--helix-space-xs));
+/* **An avatar on a filled row takes its disc from the row.** Its own fill is
+   `surface-raised`, which is the row's too, so the disc vanished and the
+   initials floated in both schemes. Mixed from the foreground, the way a hover
+   well is, it sits one step off whatever the row is filled with. */
+:host([separation="filled"]) {
+  --avatar-background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
 }
 
 /* The box fills its track and the mark sits at the start of it, so the space the

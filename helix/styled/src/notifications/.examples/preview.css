@@ -13,12 +13,12 @@
 }
 
 /* **The column is a column, whatever is standing in it.** An avatar draws itself
-   at the row's control size and an icon draws itself at the row's icon size, so
-   a feed that mixes them steps: measured here, 32 against 20 in the same lane.
-   The row reserves the column and does not say what fills it, which is right, so
-   the page that mixes two kinds of mark is the one that has to agree on a size. */
+   at the feed's avatar step and an icon at its icon step, so a feed that mixes
+   them steps down the lane. The row reserves the column and does not say what
+   fills it, which is right, so the page that mixes two kinds of mark is the one
+   that has to agree on a size: here the icon takes the avatar's. */
 .feed helix-icon[slot="media"] {
-  --icon-size: var(--helix-size-control-sm);
+  --icon-size: var(--helix-size-avatar);
 
   color: var(--helix-color-foreground-muted);
 }
