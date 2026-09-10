@@ -190,6 +190,17 @@ export const mount = async (markup: string): Promise<HTMLElement> => {
 }
 
 /**
+ * An example, scripts and all: the browser harness's, and only there.
+ *
+ * happy-dom does not run a module script inserted this way, and an example
+ * without its script is the markup `mount` already renders. So this refuses
+ * rather than handing back a quiet half of an example, and a spec reading one
+ * registers only where `hasLayout()` says a browser is running it.
+ */
+export const example = (_file: unknown): Promise<HTMLElement> =>
+  Promise.reject(new Error('An example runs its scripts only in the browser harness.'))
+
+/**
  * The role a screen reader sees on the host.
  *
  * Components set their semantics through `ElementInternals`, which writes no

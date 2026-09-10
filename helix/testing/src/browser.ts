@@ -557,6 +557,57 @@ export const mount = async (markup: string): Promise<HTMLElement> => {
   return root
 }
 
+/** What the last script an example inserts calls, once every one before it has run. */
+const RAN = '__helixExampleRan'
+
+/**
+ * Renders an example the way the sandbox frame does, scripts and all, and waits
+ * for them to have run.
+ *
+ * **`mount` cannot, because `innerHTML` parses a script and refuses to run it.**
+ * An example whose behavior lives in its script mounts as markup that answers
+ * nothing, which is how a filter example shipped adding two chips for one pick:
+ * every spec passed, and nothing that ran ever ran that script. The frame makes
+ * a script run by replacing it with a fresh element, and this does the same,
+ * as a module when it names no type, for the frame's reason.
+ *
+ * **Then it waits, which the frame never has to.** A script inserted by script
+ * is async unless told otherwise, and an async module runs whenever it is ready.
+ * With `async` off they run in the order they went in, so one more appended
+ * after them resolves only once they all have.
+ *
+ * Takes the imported file as it arrives. `with { type: 'text' }` hands over a
+ * string, and `bun-types` declares every `.html` import an `HTMLBundle`,
+ * whatever the attribute says: the type is wrong and the value is right.
+ */
+export const example = async (file: unknown): Promise<HTMLElement> => {
+  document.body.innerHTML = String(file)
+  for (const original of [...document.body.querySelectorAll('script')]) {
+    const script = document.createElement('script')
+    for (const { name, value } of original.attributes) {
+      script.setAttribute(name, value)
+    }
+    if (!script.type) {
+      script.type = 'module'
+    }
+    script.async = false
+    script.text = original.text
+    original.replaceWith(script)
+  }
+  await new Promise<void>((done) => {
+    const last = document.createElement('script')
+    ;(window as unknown as Record<string, () => void>)[RAN] = done
+    last.type = 'module'
+    last.async = false
+    last.text = `window.${RAN}()`
+    document.body.append(last)
+  })
+  await Promise.all(
+    [...document.body.querySelectorAll('*')].map((one) => (one as Updatable).updateComplete),
+  )
+  return document.body.firstElementChild as HTMLElement
+}
+
 /** The role a screen reader sees on the host. */
 export const role = (host: HTMLElement): string | null =>
   host.getAttribute('role') ??

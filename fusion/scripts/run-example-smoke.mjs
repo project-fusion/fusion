@@ -111,7 +111,13 @@ const NETWORK = /Failed to load resource/
  * autoplaying carousel first moves at five seconds and this waits fifty
  * milliseconds. It is here so the trap is already covered the day something
  * does interact. Do not read a green smoke run as saying the examples are all
- * correctly wired: that is what `helix component`'s `examples` and a reader's console say. */
+ * correctly wired: that is what `helix component`'s `examples` and a reader's console say.
+ *
+ * **An example whose script is the point gets a spec that runs it.** Rendering
+ * cannot tell one chip from two, and nothing here knows which is right. The
+ * browser harness's `example` mounts the file with its scripts running, and the
+ * spec beside the family presses what a reader would and says what should
+ * follow: `filter-input-examples.dom.spec.ts` is the first. */
 const AUDIT = /is controlled: `/
 
 page.on('console', (message) => {
