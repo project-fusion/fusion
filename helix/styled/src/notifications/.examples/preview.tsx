@@ -25,6 +25,10 @@ export function Example() {
         at={at[0]}
         dismissible
       >
+        <helix-avatar
+          name="Ada Okonjo"
+          slot="media"
+        ></helix-avatar>
         <strong>Ada Okonjo</strong> approved your deploy to production.
         <helix-button
           emphasis="subtle"
@@ -37,6 +41,10 @@ export function Example() {
         at={at[1]}
         dismissible
       >
+        <helix-icon
+          name="warning"
+          slot="media"
+        ></helix-icon>
         Build <strong>#4821</strong> failed on <code>main</code>
         <helix-button
           emphasis="subtle"
@@ -50,6 +58,10 @@ export function Example() {
         default-read
         dismissible
       >
+        <helix-avatar
+          name="Platform Team"
+          slot="media"
+        ></helix-avatar>
         Your invitation to the <strong>Platform</strong> team was accepted.
       </helix-notification>
       <a

@@ -7,7 +7,7 @@ import {
   requestChange,
   slotFilled,
 } from '@fusion.dev/helix-core'
-import { trash } from '@fusion.dev/helix-icons'
+import { x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -241,13 +241,19 @@ export class HelixHeadlessNotification extends HelixElement {
    * on its own viewBox, so it lands where the box says and takes the icon step
    * the row is already set in.
    *
-   * **A trash and not the `x` the Tag draws, because the two do not mean the
-   * same thing.** A tag's cross takes a token off a field the reader is still
-   * filling in, and putting it back is retyping a word. A notification is the
-   * only copy of something that happened, and this removes it from the feed for
-   * good, so the mark is the one every other interface uses for that and the
-   * ink is `danger`. It is only ever on screen while the row is hovered or
-   * focused, so a feed of twenty is not a column of red.
+   * **A cross, and not the trash this used to draw.** The argument for the trash
+   * was that a notification is the only copy of something that happened, so
+   * removing it is destruction and should be marked as such. That reads the row
+   * as the event. It is not: the deploy still deployed and the build still
+   * failed, and the feed this sits in has `See everything` under it, which says
+   * plainly that the row is a view of a longer list. What dismissing ends is the
+   * notice.
+   *
+   * The component cannot know better than that either. `helix-dismiss` is a
+   * request the consumer answers, so whether anything is destroyed is theirs to
+   * decide, and a default that shouts danger asserts a permanence this element
+   * does not control. `--notifications-dismiss-color` is still there for a
+   * consumer whose control really does destroy something.
    */
   protected renderDismiss(): TemplateResult | typeof nothing {
     if (!this.dismissible) {
@@ -265,9 +271,9 @@ export class HelixHeadlessNotification extends HelixElement {
           data-glyph
           fill="currentColor"
           part="dismiss-mark"
-          viewBox=${trash.viewBox}
+          viewBox=${x.viewBox}
         >
-          ${unsafeSVG(trash.content)}
+          ${unsafeSVG(x.content)}
         </svg>
       </slot>
     </button>`

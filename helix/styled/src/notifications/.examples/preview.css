@@ -11,3 +11,14 @@
 .feed {
   max-inline-size: 28rem;
 }
+
+/* **The column is a column, whatever is standing in it.** An avatar draws itself
+   at the row's control size and an icon draws itself at the row's icon size, so
+   a feed that mixes them steps: measured here, 32 against 20 in the same lane.
+   The row reserves the column and does not say what fills it, which is right, so
+   the page that mixes two kinds of mark is the one that has to agree on a size. */
+.feed helix-icon[slot="media"] {
+  --icon-size: var(--helix-size-control-sm);
+
+  color: var(--helix-color-foreground-muted);
+}

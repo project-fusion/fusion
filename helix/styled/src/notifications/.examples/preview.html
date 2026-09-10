@@ -14,6 +14,10 @@
   <h2 slot="header">Notifications</h2>
 
   <helix-notification dismissible>
+    <helix-avatar
+      name="Ada Okonjo"
+      slot="media"
+    ></helix-avatar>
     <strong>Ada Okonjo</strong> approved your deploy to production.
     <helix-button
       emphasis="subtle"
@@ -21,7 +25,13 @@
     >View</helix-button>
   </helix-notification>
 
+  <!-- Not everything in a feed is a person, and the column takes either: the
+       row asks only that something is there to sit in it. -->
   <helix-notification dismissible>
+    <helix-icon
+      name="warning"
+      slot="media"
+    ></helix-icon>
     Build <strong>#4821</strong> failed on <code>main</code>
     <helix-button
       emphasis="subtle"
@@ -33,6 +43,10 @@
     default-read
     dismissible
   >
+    <helix-avatar
+      name="Platform Team"
+      slot="media"
+    ></helix-avatar>
     Your invitation to the <strong>Platform</strong> team was accepted.
   </helix-notification>
 

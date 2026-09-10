@@ -420,18 +420,18 @@ slot[name="detail"]::slotted(*) {
 /* A square the size of the row's controls, not a glyph with padding around it,
    which measured 15 by 22: under any target anybody recommends and under half
    the area of the button sitting next to it. */
-/* **`danger`, because this is the only copy of the thing it removes.** The row
-   is a record of something that happened and dismissing it is the end of it,
-   which is not what the muted ink on a tag's cross means. The control is drawn
-   only while the row is hovered or focused, so a feed of twenty is never a
-   column of red: the color arrives with the control, at the moment there is
-   something to be careful about. */
+/* **Muted, not danger.** Dismissing clears a notice; it does not undo the
+   deploy or unfail the build, and the feed under this carries `See everything`.
+   Red said otherwise on every dismissible row in the library, and the element
+   cannot know: `helix-dismiss` is a request the consumer answers, so whether
+   anything is destroyed is theirs. The hook is still here for the consumer whose
+   control really does destroy something. */
 [part="dismiss"] {
   background: none;
   border: 0;
   border-radius: var(--helix-radii-sm);
   block-size: var(--helix-size-control);
-  color: var(--notifications-dismiss-color, var(--helix-color-danger));
+  color: var(--notifications-dismiss-color, var(--helix-color-foreground-subtle));
   cursor: pointer;
   display: grid;
   inline-size: var(--helix-size-control);
