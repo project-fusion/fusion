@@ -1,0 +1,13 @@
+/* A feed is a column, not a sheet the width of the window.
+ *
+ * The component does not pick a width, for the reason `Menu` and `Drilldown` do
+ * not: it is put in a drawer, a popover, a page column and a phone-width screen,
+ * and only one of those is knowable from here. So the example picks one, and
+ * every example in this family picks the same one.
+ *
+ * Uncapped it read badly rather than wrongly: measured at 1000px the row ran 952
+ * across, and a timestamp correctly pinned to the first line still sat half a
+ * screen from the words it stamps. */
+.feed {
+  max-inline-size: 28rem;
+}

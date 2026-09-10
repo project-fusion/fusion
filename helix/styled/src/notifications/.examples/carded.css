@@ -1,3 +1,9 @@
+/* A feed is a column, not a sheet the width of the window. `preview.css` has
+   the reasoning; the width is the same in every example of this family. */
+.feed {
+  max-inline-size: 28rem;
+}
+
 /* The quoted comment, dressed by the consumer.
  *
  * This is what `detail` is for and why it sets nothing: a block in a

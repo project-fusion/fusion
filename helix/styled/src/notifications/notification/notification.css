@@ -204,13 +204,31 @@ slot[name="detail"]::slotted(*) {
   font-weight: var(--helix-weight-medium);
 }
 
-/* One column, holding two things in one place. */
+/* One column, holding two things in one place.
+ *
+ * **One line tall and pinned to the top, because the time is a stamp on the
+ * first line.** Centered on the row it drifted the moment anything made the row
+ * taller than one line: measured on the preview, the label's first line ran 92.5
+ * to 112 and the time's box centered at 122.3, ten pixels below the words it
+ * belongs to, with a caption or an action underneath pushing it further. The
+ * unread mark already answers to `--_notifications-line` for exactly this
+ * reason, and the two marks on a row should agree about which line they mark.
+ *
+ * The contents still center, inside that one line rather than inside the row, so
+ * the controls that swap in sit on the same line the time left. */
 [part="trailing"] {
   align-items: center;
-  align-self: center;
+  align-self: start;
   display: grid;
   grid-template-areas: "swap";
   justify-items: end;
+  /* The *row* is the line, not just the box around it. Fixing the box alone left
+     the grid row sized by the 32px control, so both children centered in 32 and
+     the time came to rest 6.25px below the words it stamps while the container
+     was the right height all along. With the row pinned, the time sits on the
+     line and the control overflows it evenly, which is what a 32px target on a
+     19.5px line has to do. */
+  grid-template-rows: var(--_notifications-line);
   margin-inline-start: var(--helix-space-sm);
 }
 
@@ -244,8 +262,14 @@ slot[name="detail"]::slotted(*) {
    in the row darker than the content it belongs to. */
 [part="trailing"] > :not([part="controls"]) {
   color: var(--helix-color-foreground-subtle);
+  /* The label's own line box, so the two sit on one line rather than on two
+     baselines that happen to be near each other. Inline, `align-items` cannot
+     place it: an inline box is laid out on a baseline, and the time measured
+     6.25px below the words it stamps even once the region above it was pinned. */
+  display: block;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
+  line-height: var(--_notifications-line);
   opacity: calc(1 - var(--_notifications-swap));
   /* Leaves towards the edge the controls come in from, so the two move the same
      way and the swap has a direction. */

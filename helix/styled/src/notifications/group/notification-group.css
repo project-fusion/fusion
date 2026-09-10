@@ -104,7 +104,16 @@
      furniture and read as nothing at all. A card behind a card is the same kind
      of card. */
   background-color: var(--notifications-item-fill, var(--helix-color-surface-raised));
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  /* **A brighter edge than the row's, because the fill cannot separate them.**
+     The cards behind are deliberately the same rung as the card in front, for
+     the reason above, which leaves the edge as the only thing that can say there
+     is more than one box here. Measured on the dark ladder the pile's border sat
+     at 0.246 against a 0.21 fill, a ratio of 1.17, and three identical rounded
+     boxes four pixels apart read as one smear above the row rather than a pile
+     behind it. Mixed toward the ink it lifts to about twice that and the stack
+     becomes countable. */
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--helix-color-border) 55%, var(--helix-color-foreground));
   border-radius: var(--notifications-item-radius, var(--helix-radii-md));
   content: "";
   inset: 0;
