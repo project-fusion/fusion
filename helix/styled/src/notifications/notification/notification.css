@@ -3,6 +3,7 @@
   /* One line of body text, which is what the body is set in and what the unread
      mark is drawn to, so the mark cannot drift off the line it belongs to. */
   --_notifications-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
+  --_notifications-unread: var(--notifications-unread-block-size, var(--helix-space-xs));
 
   /* The row reflows on how much room the row was given, which is a fact about
      this box and about nothing else: a feed in a 320 pixel side panel is narrow
@@ -50,15 +51,35 @@
    --notifications-unread-block-size: 8px; --notifications-unread-inline-size:
    8px; --notifications-unread-inset: 6px; --notifications-unread-offset: 16px;
    --notifications-unread-radius: var(--helix-radii-full); } ``` */
+/* **A dot, and not the rule it used to be.**
+ *
+ * A 2px bar the height of a line is the mark a list uses for the row you are
+ * *on*, and this row is not selected, it is unread. On a carded feed it also had
+ * nowhere to sit: squeezed into the gutter between the card's own rounded edge
+ * and the avatar, it read as a stray tick rather than as a state.
+ *
+ * The signal itself is load-bearing and stays. Unread also bolds the label, and
+ * that cannot carry it alone: a message like "**Boyd Larkin** has sent you a
+ * reminder" is already half bold when it is read, so weight says nothing on its
+ * own. A dot says one thing and says it at a glance.
+ *
+ * Every dimension is still a hook, so a consumer who wants the bar back writes
+ * two of them. */
 :host(:not(:state(read))) [part="item"]::before {
   background-color: var(--notifications-unread-mark, var(--helix-color-accent));
-  block-size: var(--notifications-unread-block-size, var(--_notifications-line));
+  block-size: var(--_notifications-unread);
   border-radius: var(--notifications-unread-radius, var(--helix-radii-full));
   content: "";
-  inline-size: var(--notifications-unread-inline-size, var(--helix-border-thick));
+  inline-size: var(--notifications-unread-inline-size, var(--_notifications-unread));
+  /* Centered on the first line, which is where the avatar, the time and the
+     controls all sit. A mark on a row marks the line the row opens with. */
   inset-block-start: var(
     --notifications-unread-offset,
-    var(--notifications-padding-block, var(--helix-space-sm))
+    calc(
+      var(--notifications-padding-block, var(--helix-space-sm)) +
+      (var(--_notifications-line) - var(--_notifications-unread)) /
+      2
+    )
   );
   inset-inline-start: var(--notifications-unread-inset, var(--helix-space-2xs));
   position: absolute;
@@ -105,8 +126,20 @@
 
 /* The box fills its track and the mark sits at the start of it, so the space the
    reservation buys is trailing space rather than an indent. */
+/* **On the first line, like everything else on this row that is not the body.**
+   The avatar is taller than a line, so top-aligning its box put its middle 6.25px
+   below the middle of the words beside it: measured, a 32px avatar starting at
+   93.5 against a 19.5px line starting at the same place. Centered on the line it
+   reads as belonging to the sentence, and the overhang sits in the row's own
+   padding. The unread mark and the time answer to `--_notifications-line` for
+   the same reason. */
 [part="media"] {
   display: grid;
+  /* The row is the line, not the box around it. Fixing the box alone leaves the
+     grid row sized by whatever was slotted, so a 32px avatar still lands where
+     it likes inside a container that is the right height: the same trap the
+     trailing region is pinned against, two regions apart. */
+  grid-template-rows: var(--_notifications-line);
   place-items: center start;
 }
 
@@ -202,6 +235,23 @@ slot[name="detail"]::slotted(*) {
 :host(:not(:state(read))) [part="label"] {
   color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-medium);
+}
+
+/* **The control's glyph lines up with the time, not its hit box.**
+ *
+ * An icon button is a square target with the mark centered in it, so aligning the
+ * square against the row's padding leaves the mark short of where the text
+ * beside it ends: measured, the time's text stopped at 455 and the trash stopped
+ * at 451, and the swap that is meant to read as one thing turning over put the
+ * two marks in different places.
+ *
+ * Pulled out by half the difference between the target and the glyph, which is
+ * what optical alignment of an icon against text costs. The target keeps its
+ * size and only overhangs the padding, which is nothing a reader can see and is
+ * the point.
+ */
+[part="controls"] {
+  margin-inline-end: calc((var(--helix-size-control) - var(--helix-size-icon)) / -2);
 }
 
 /* One column, holding two things in one place.

@@ -27,7 +27,7 @@ export function Example() {
       >
         <strong>Ada Okonjo</strong> approved your deploy to production.
         <helix-button
-          emphasis="ghost"
+          emphasis="subtle"
           slot="actions"
         >
           View
@@ -39,7 +39,7 @@ export function Example() {
       >
         Build <strong>#4821</strong> failed on <code>main</code>
         <helix-button
-          emphasis="ghost"
+          emphasis="subtle"
           slot="actions"
         >
           Logs
