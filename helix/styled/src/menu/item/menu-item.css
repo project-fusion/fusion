@@ -34,7 +34,14 @@
     var(--menu-item-start, 0px)
     minmax(0, 1fr)
     var(--menu-item-end, 0px);
-  min-block-size: var(--helix-size-control-tight);
+  /* **The menu's own step, not a step inside it.** The surface already moves
+     `--helix-size-control` to `sm` so that "a control slotted into a row is the
+     size the rows are"; that only held while `-tight` here was substituted at
+     the root, where it happened to equal `sm` too. Re-derived where the surface
+     moves it, `-tight` is a step below `sm` and rows came out at 25.6 while a
+     slotted control stayed at 32. Reading the step the surface set says what
+     the surface's note means. */
+  min-block-size: var(--helix-size-control);
   /* The inset is padding on the row and nothing else. */
   padding-inline: var(--helix-space-sm);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -62,7 +69,10 @@
 /* The leading column, holding whatever the consumer put in it at the size every
    other mark on the row is drawn. */
 [part="start"] {
-  --icon-size: var(--helix-size-icon-tight);
+  /* The mark's own step, for the same reason as the row's height: the tick in
+     `[part="mark"]` is drawn at `--helix-size-icon`, and a leading mark at
+     `-tight` matched it only while `-tight` was the root's. */
+  --icon-size: var(--helix-size-icon);
 
   align-items: center;
   /* The seam, which the track's width already accounts for: the box stretches

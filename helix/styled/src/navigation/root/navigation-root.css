@@ -4,7 +4,11 @@
 
 [part="nav"] {
   align-items: center;
-  block-size: var(--helix-size-control-tight);
+  /* The fixed step, because it is the floor the items take in `base.css`, and
+     the bar and its items have to agree. Relative, they parted wherever the step
+     moved: inside App Header, already at `sm`, the bar came out 25.6 around 32
+     pixel items, and `overflow-x` scrolled them in their own bar. */
+  block-size: var(--helix-size-control-sm);
   display: flex;
   gap: var(--navigation-gap, var(--helix-space-2xs));
   /* Long navigation scrolls inside the bar instead of widening the page. */

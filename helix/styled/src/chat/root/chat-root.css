@@ -110,7 +110,11 @@
    with the control step. */
 [part="header"] > [part="actions"] {
   --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
 
   align-items: center;
   display: flex;

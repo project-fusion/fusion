@@ -4,8 +4,14 @@
      fact the next consumer has to know to repeat. App Header sets the same four
      for the same reason. */
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   --helix-size-tag: var(--helix-size-tag-sm);
 
   align-items: center;
@@ -16,7 +22,9 @@
  *      beside it holding something else stands at a different height. Stated once,
  *      two bars either side of a split line up and stay lined up.
  */
-  block-size: var(--sandbox-toolbar-size, var(--helix-size-control-loose));
+  /* The fixed `lg` step, as it was before the relative pair existed: it moved
+     to `-loose` in a rename, and read 48 only while `-loose` was the root's. */
+  block-size: var(--sandbox-toolbar-size, var(--helix-size-control-lg));
   /* The line under the bar, and the only line at that boundary: the panes below
      draw none of their own. */
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);

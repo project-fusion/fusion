@@ -6,7 +6,11 @@
      there draws an icon in the message at the `md` step inside `sm` controls: 20
      pixels in a 32 pixel row. */
   --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   /* The height of one line of the message, which is what everything in the row
      is aligned against. */
   --_toast-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
@@ -69,7 +73,7 @@
      slack under it for a control sitting beside it. */
   padding-inline-end: calc(
     var(--helix-space-sm) +
-    var(--helix-size-control-tight) +
+    var(--helix-size-control) +
     var(--helix-space-2xs)
   );
   /* Both needed for `0fr` to bite: a grid item refuses to go below its own
@@ -160,19 +164,23 @@ slot[name="icon"]::slotted(*) {
   /* In the corner and out of the flow, so it cannot set the height of the row
      the message is on. */
   position: absolute;
+  /* **The control step and not `-tight`.** The toast already took `sm` above,
+     so the close is the same 32px as an action beside it. It read `-tight` for
+     years and came out 32 only because that was the root's step, substituted at
+     the root; once the step is derived here, `-tight` is 25.6. */
   inset-block-start: calc(
     var(--toast-item-padding, var(--helix-space-sm)) +
-    (var(--_toast-line) - var(--helix-size-control-tight)) /
+    (var(--_toast-line) - var(--helix-size-control)) /
     2
   );
   inset-inline-end: var(--helix-space-sm);
-  block-size: var(--helix-size-control-tight);
+  block-size: var(--helix-size-control);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
-  inline-size: var(--helix-size-control-tight);
+  inline-size: var(--helix-size-control);
   place-content: center;
   place-items: center;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);

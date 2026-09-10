@@ -109,7 +109,11 @@
      property, so the relative form would be a circular reference and the whole
      declaration guaranteed-invalid. */
   --helix-size-control: calc(var(--helix-size-control-sm) - var(--helix-space-2xs));
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
   --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
 
   align-items: center;
   display: inline-flex;
@@ -127,6 +131,8 @@
   --helix-size-avatar: var(--helix-size-avatar-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
 
   align-items: center;
   color: var(--helix-color-foreground-muted);

@@ -36,6 +36,7 @@ pub mod categories;
 pub mod composed;
 pub mod compositions;
 pub mod corners;
+pub mod derived_steps;
 pub mod disabled;
 pub mod events;
 pub mod example_values;
@@ -431,6 +432,12 @@ pub fn all() -> Vec<Rule> {
             name: "attribute-names",
             run: Runner::Source(attribute_names::run),
             summary: "a property mirroring a platform attribute uses the platform's spelling",
+        },
+        Rule {
+            fix: None,
+            name: "derived-steps",
+            run: Runner::Source(derived_steps::run),
+            summary: "a scope that moves a base step moves the steps derived from it",
         },
         Rule {
             fix: None,
