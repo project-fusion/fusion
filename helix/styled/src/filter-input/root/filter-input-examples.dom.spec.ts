@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 import arity from '../.examples/arity.html' with { type: 'text' }
 import picking from '../.examples/picking.html' with { type: 'text' }
+import preview from '../.examples/preview.html' with { type: 'text' }
 import typing from '../.examples/typing.html' with { type: 'text' }
 
 beforeAll(async () => {
@@ -127,5 +128,35 @@ describe('the typing example', () => {
     await settled()
     expect(chips('disposition')).toHaveLength(1)
     expect(menu().valuesFor('disposition')).toEqual(['refunded'])
+  })
+})
+
+/* No picker here: the chips are the page's own markup, and the page's script
+   takes whichever one asks to go. Both ways of asking have to reach it. */
+describe('the preview example', () => {
+  const field = (): HTMLElement => document.querySelector('helix-filter-input') as HTMLElement
+  const names = (): Array<string | null> =>
+    [...field().querySelectorAll('helix-filter-chip')].map((one) => one.getAttribute('name'))
+
+  run('the close on a chip takes that chip', async () => {
+    await example(preview)
+    const env = field().querySelector('helix-filter-chip[name="env"]') as HTMLElement
+    ;(part(env, 'dismiss') as HTMLElement).click()
+    await settle(field())
+    expect(names()).toEqual(['owner', 'status', 'area'])
+  })
+
+  run('Backspace on the empty field takes the last', async () => {
+    await example(preview)
+    part(field(), 'control')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Backspace',
+      }),
+    )
+    await settle(field())
+    expect(names()).toEqual(['owner', 'env', 'status'])
   })
 })

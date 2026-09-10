@@ -112,7 +112,8 @@
   padding-inline: var(--helix-space-2xs) var(--helix-space-xs);
 }
 
-[part="lead"][data-empty] {
+/* Restated, because the rule above sets `display` and outranks the UA's. */
+[part="lead"][hidden] {
   display: none;
 }
 

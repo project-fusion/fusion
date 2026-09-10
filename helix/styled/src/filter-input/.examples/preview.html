@@ -3,34 +3,34 @@
   label="Filter rows"
   placeholder="Add a filter"
 >
-  <helix-tag
+  <helix-filter-chip
+    dismiss-label="Remove the owner filter"
     dismissible
+    label="Owner"
+    name="owner"
     slot="tags"
-  >
-    <span slot="prefix">Owner</span>
-    Ada
-  </helix-tag>
-  <helix-tag
+  >Ada</helix-filter-chip>
+  <helix-filter-chip
+    dismiss-label="Remove the env filter"
     dismissible
+    label="Env"
+    name="env"
     slot="tags"
-  >
-    <span slot="prefix">Env</span>
-    Staging
-  </helix-tag>
-  <helix-tag
+  >Staging</helix-filter-chip>
+  <helix-filter-chip
+    dismiss-label="Remove the status filter"
     dismissible
+    label="Status"
+    name="status"
     slot="tags"
-  >
-    <span slot="prefix">Status</span>
-    Open
-  </helix-tag>
-  <helix-tag
+  >Open</helix-filter-chip>
+  <helix-filter-chip
+    dismiss-label="Remove the area filter"
     dismissible
+    label="Area"
+    name="area"
     slot="tags"
-  >
-    <span slot="prefix">Area</span>
-    Billing
-  </helix-tag>
+  >Billing</helix-filter-chip>
 </helix-filter-input>
 
 <script type="module">

@@ -229,6 +229,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * reads its own leading slot the same way and for the same reason: the light
    * DOM answer is not reactive, so a control added after the first render would
    * never get the box.
+   *
+   * **Empty, the box is `hidden`, not flagged**, for `Checkbox`'s reason: this
+   * tier has no sheet, and `::part(lead)` cannot be qualified by an attribute,
+   * so a `data-` flag left a headless field an empty flex item it had no way to
+   * remove, and the first chip sat one gap further in than the rest.
    */
   @state()
   private leading = false
@@ -837,7 +842,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        `display: contents` with an empty slot inside it. */
     return html`${this.renderLabel()}
     <div part="field" @focusin=${this.handleFocusIn} @focusout=${this.handleFocusOut}>
-      <div part="lead" ?data-empty=${!this.leading}>
+      <div part="lead" ?hidden=${!this.leading}>
         <slot name="start" @slotchange=${this.handleLeading}></slot>
       </div>
       ${this.renderTokenRow(

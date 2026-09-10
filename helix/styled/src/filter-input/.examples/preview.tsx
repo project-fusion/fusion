@@ -1,14 +1,14 @@
 import { useState } from 'react'
 
-const TAGS = [
-  { label: 'Ada', prefix: 'Owner' },
-  { label: 'Staging', prefix: 'Env' },
-  { label: 'Open', prefix: 'Status' },
-  { label: 'Billing', prefix: 'Area' },
+const FILTERS = [
+  { label: 'Owner', name: 'owner', value: 'Ada' },
+  { label: 'Env', name: 'env', value: 'Staging' },
+  { label: 'Status', name: 'status', value: 'Open' },
+  { label: 'Area', name: 'area', value: 'Billing' },
 ]
 
 export function Example() {
-  const [tags, setTags] = useState(TAGS)
+  const [filters, setFilters] = useState(FILTERS)
 
   return (
     /* A token asks to go and does not go on its own, so a page that renders
@@ -19,20 +19,23 @@ export function Example() {
        both ways of asking. */
     <helix-filter-input
       label="Filter rows"
-      onhelix-dismiss={(event: CustomEvent<{ label: string }>) => {
-        setTags((held) => held.filter((tag) => !event.detail.label.endsWith(tag.label)))
+      onhelix-dismiss={(event: CustomEvent) => {
+        const name = (event.target as Element).getAttribute('name')
+        setFilters((held) => held.filter((filter) => filter.name !== name))
       }}
       placeholder="Add a filter"
     >
-      {tags.map((tag) => (
-        <helix-tag
+      {filters.map((filter) => (
+        <helix-filter-chip
+          dismiss-label={`Remove the ${filter.label.toLowerCase()} filter`}
           dismissible
-          key={tag.label}
+          key={filter.name}
+          label={filter.label}
+          name={filter.name}
           slot="tags"
         >
-          <span slot="prefix">{tag.prefix}</span>
-          {tag.label}
-        </helix-tag>
+          {filter.value}
+        </helix-filter-chip>
       ))}
     </helix-filter-input>
   )

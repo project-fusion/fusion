@@ -6,13 +6,15 @@ export function Example() {
       label="Filter rows"
       value="deploy"
     >
-      <helix-tag
+      <helix-filter-chip
+        dismiss-label="Remove the env filter"
         dismissible
+        label="Env"
+        name="env"
         slot="tags"
       >
-        <span slot="prefix">Env</span>
         Staging
-      </helix-tag>
+      </helix-filter-chip>
     </helix-filter-input>
   )
 }

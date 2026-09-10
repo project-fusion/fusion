@@ -4,34 +4,42 @@ export function Example() {
       label="Filter rows"
       placeholder="Add a filter"
     >
-      <helix-headless-tag
+      <helix-headless-filter-chip
+        dismiss-label="Remove the owner filter"
         dismissible
+        label="Owner"
+        name="owner"
         slot="tags"
       >
-        <span slot="prefix">Owner</span>
         Ada
-      </helix-headless-tag>
-      <helix-headless-tag
+      </helix-headless-filter-chip>
+      <helix-headless-filter-chip
+        dismiss-label="Remove the env filter"
         dismissible
+        label="Env"
+        name="env"
         slot="tags"
       >
-        <span slot="prefix">Env</span>
         Staging
-      </helix-headless-tag>
-      <helix-headless-tag
+      </helix-headless-filter-chip>
+      <helix-headless-filter-chip
+        dismiss-label="Remove the status filter"
         dismissible
+        label="Status"
+        name="status"
         slot="tags"
       >
-        <span slot="prefix">Status</span>
         Open
-      </helix-headless-tag>
-      <helix-headless-tag
+      </helix-headless-filter-chip>
+      <helix-headless-filter-chip
+        dismiss-label="Remove the area filter"
         dismissible
+        label="Area"
+        name="area"
         slot="tags"
       >
-        <span slot="prefix">Area</span>
         Billing
-      </helix-headless-tag>
+      </helix-headless-filter-chip>
     </helix-headless-filter-input>
   )
 }
