@@ -617,6 +617,15 @@ It works through custom properties (`--helix-size-control`,
 any API and crosses every shadow boundary on its own. The `-sm` / `-md` / `-lg`
 tokens are the scale and never move; the unsuffixed ones are the current step.
 
+**`-tight` and `-loose` are a step either side of the current one, and they are
+derived at the root.** A custom property is substituted where it is declared, so
+a scope that moves a base step has to move the steps derived from it in the same
+block, as `[data-density]` does. Leave them out and everything under the scope
+reads the root's `-tight` rather than its own. `helix component --only
+derived-steps` holds every such scope to the layer's formulas. A reader that
+means a fixed size writes the fixed step: the pair agreed with `-sm` and `-lg`
+only where the root's step was the current one.
+
 `data-link-size` stays. A text link has no control height: its size is
 typography, and it follows the text around it.
 
