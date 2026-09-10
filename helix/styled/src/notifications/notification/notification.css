@@ -3,6 +3,12 @@
   /* One line of body text, which is what the body is set in and what the unread
      mark is drawn to, so the mark cannot drift off the line it belongs to. */
   --_notifications-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
+  /* **`xs`, which is a feed rather than a list of settings.** At `sm` a row with
+     an action measured 85 pixels to carry one 19.5 pixel line: the message was
+     under a quarter of its own row. Declared once, because the unread dot is
+     placed against this padding too and a second copy of the default is how the
+     two come apart. */
+  --_notifications-pad-block: var(--notifications-padding-block, var(--helix-space-xs));
   --_notifications-unread: var(--notifications-unread-block-size, var(--helix-space-xs));
 
   /* The row reflows on how much room the row was given, which is a fact about
@@ -32,7 +38,7 @@
   cursor: default;
   display: grid;
   grid-template-columns: minmax(var(--notifications-media-column, 0px), auto) minmax(0, 1fr) auto;
-  padding-block: var(--notifications-padding-block, var(--helix-space-sm));
+  padding-block: var(--_notifications-pad-block);
   padding-inline: var(--notifications-padding-inline, var(--helix-space-md));
   /* The containing block for the unread mark, which is placed against the row
      rather than flowing in it. */
@@ -76,7 +82,7 @@
   inset-block-start: var(
     --notifications-unread-offset,
     calc(
-      var(--notifications-padding-block, var(--helix-space-sm)) +
+      var(--_notifications-pad-block) +
       (var(--_notifications-line) - var(--_notifications-unread)) /
       2
     )
