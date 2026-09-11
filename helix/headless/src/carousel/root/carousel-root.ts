@@ -620,6 +620,12 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (!this.hasUpdated) {
       this.rotating = this.autoplay
     }
+    /* A move of the index is somewhere the reader arrived, so a drag still
+       coasting has nothing left to show. Its `scrollend` would have cleared
+       this, but the scroll that follows a press is ours, and ours is not read. */
+    if (changed.has('index')) {
+      this.showing = undefined
+    }
     hostAria(this.internals, { label: this.label, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
     // what the controls beside it are for.

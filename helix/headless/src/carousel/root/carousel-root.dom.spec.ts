@@ -389,6 +389,29 @@ describe('carousel settling', () => {
     }).toEqual({ index: 3, marker: 3 })
   })
 
+  test('a dot pressed while a drag is still coasting takes the marker with it', async () => {
+    /* The reader's press is a choice and the drag is not one yet, so the marker
+       goes where the index went. The only `scrollend` after the press is our own
+       scroll's, and that one is not read, so the marker kept the coasting
+       drag's slide while the index and the track moved on. */
+    const { host, track } = await scrolling('default-index="0"')
+    track.scrollLeft = 200
+    track.dispatchEvent(new Event('scroll'))
+    await frame()
+    await host.updateComplete
+    host.goTo(3)
+    await host.updateComplete
+    track.dispatchEvent(new Event('scrollend'))
+    await host.updateComplete
+    const dots = [
+      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part="indicator"]'),
+    ]
+    expect({
+      index: host.index,
+      marker: dots.findIndex((dot) => dot.hasAttribute('data-current')),
+    }).toEqual({ index: 3, marker: 3 })
+  })
+
   test('a stray scrollend after a move of ours does not drag the index back', async () => {
     // The flip-back. Our own smooth scroll ends with a `scrollend` too, and
     // reading it as a reader's drag lets whichever slide happens to be nearest
