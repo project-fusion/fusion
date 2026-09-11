@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import type { ReactiveElement } from 'lit'
 
 beforeAll(async () => {
   registerDom()
@@ -50,11 +51,13 @@ describe('a scroll area', () => {
  * Chromium either way. What breaks without it is the headless consumer, and
  * until #175 nothing exercised one.
  *
- * Asserted through the adopted stylesheet rather than through a computed style,
- * because happy-dom has no layout and answers the empty string for a property
- * that came from an adopted sheet. What is being checked is that the rule is
- * there and that the component marked its box, which is the whole of the
- * contract; that a marked box with a bounded height actually scrolls was
+ * Asserted through the styles the class declares rather than through a
+ * computed style, because happy-dom has no layout and answers the empty string
+ * for a property that came from an adopted sheet. Not through the shadow root's
+ * sheets either: how Lit delivers them depends on what else loaded into the
+ * process first, and in a run that mixes the server specs in, the root holds
+ * none. What is being checked is that the rule is there and that the component
+ * marked its box, which is the whole of the contract; that a marked box with a bounded height actually scrolls was
  * measured in Chromium and is written up on `SCROLLER`.
  */
 describe('the box a headless consumer gets', () => {
@@ -65,8 +68,10 @@ describe('the box a headless consumer gets', () => {
 
   test('and `core` ships the rule that makes it one, with no token in it', async () => {
     const host = await area()
-    const rules = (host.shadowRoot?.adoptedStyleSheets ?? []).flatMap((sheet) =>
-      [...(sheet.cssRules ?? [])].map((rule) => rule.cssText),
+    const rules = (host.constructor as typeof ReactiveElement).elementStyles.map((style) =>
+      style instanceof CSSStyleSheet
+        ? [...style.cssRules].map((rule) => rule.cssText).join('\n')
+        : style.cssText,
     )
     const scroller = rules.find((text) => text.includes('data-scroller'))
     expect(scroller).toContain('overflow')
