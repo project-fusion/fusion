@@ -22966,7 +22966,7 @@
   "themes": [
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #2067d9;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.54;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "default",
       "pairings": [
         {
@@ -23458,9 +23458,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -23889,7 +23894,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #121212;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #a5a5a5;\n  --helix-color-foreground-muted: #818181;\n  --helix-color-surface-raised: #181818;\n  --helix-color-surface-overlay: #181818;\n  --helix-color-surface-sunken: #0b0b0b;\n  --helix-color-primary: #3b83f7;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #5394ff;\n  --helix-color-primary-active: #6fa6ff;\n  --helix-color-primary-subtle: #0d1f3c;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #3b83f7;\n  --helix-color-accent-hover: #5394ff;\n  --helix-color-accent-active: #6fa6ff;\n  --helix-color-accent-subtle: #0d1f3c;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #eb403a;\n  --helix-color-info: #0088c7;\n  --helix-color-success: #009454;\n  --helix-color-warning: #ae7500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b3;\n  --helix-color-info-surface-hover: #006a9e;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #155fcf;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #3b83f7;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #121212;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #a5a5a5;\n  --helix-color-foreground-muted: #818181;\n  --helix-color-surface-raised: #181818;\n  --helix-color-surface-overlay: #181818;\n  --helix-color-surface-sunken: #0b0b0b;\n  --helix-color-primary: #3b83f7;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #5394ff;\n  --helix-color-primary-active: #6fa6ff;\n  --helix-color-primary-subtle: #0d1f3c;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #3b83f7;\n  --helix-color-accent-hover: #5394ff;\n  --helix-color-accent-active: #6fa6ff;\n  --helix-color-accent-subtle: #0d1f3c;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #eb403a;\n  --helix-color-info: #0088c7;\n  --helix-color-success: #009454;\n  --helix-color-warning: #ae7500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b3;\n  --helix-color-info-surface-hover: #006a9e;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #155fcf;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #3b83f7;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.625;\n  --helix-seed-brand: #3b83f7;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "dark",
       "pairings": [
         {
@@ -24381,9 +24386,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#3b83f7",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.625",
         "seed-brand": "#3b83f7",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -24812,7 +24822,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #f6f6f6;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #4a4a4a;\n  --helix-color-foreground-muted: #686868;\n  --helix-color-surface-raised: #eeeeee;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #e8e8e8;\n  --helix-color-primary: #1b63d5;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0554c4;\n  --helix-color-primary-active: #0046ab;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #1b63d5;\n  --helix-color-accent-hover: #0554c4;\n  --helix-color-accent-active: #0046ab;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #ce1b20;\n  --helix-color-info: #006ea8;\n  --helix-color-success: #007843;\n  --helix-color-warning: #8f5f00;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0078b7;\n  --helix-color-info-surface-hover: #0069a1;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #3b82f6;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #1b63d5;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #f6f6f6;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #4a4a4a;\n  --helix-color-foreground-muted: #686868;\n  --helix-color-surface-raised: #eeeeee;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #e8e8e8;\n  --helix-color-primary: #1b63d5;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0554c4;\n  --helix-color-primary-active: #0046ab;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #1b63d5;\n  --helix-color-accent-hover: #0554c4;\n  --helix-color-accent-active: #0046ab;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #ce1b20;\n  --helix-color-info: #006ea8;\n  --helix-color-success: #007843;\n  --helix-color-warning: #8f5f00;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0078b7;\n  --helix-color-info-surface-hover: #0069a1;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #3b82f6;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #1b63d5;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.527;\n  --helix-seed-brand: #1b63d5;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
       "label": "fill",
       "pairings": [
         {
@@ -25304,9 +25314,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#1b63d5",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.527",
         "seed-brand": "#1b63d5",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -25735,7 +25750,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #ffffff;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #575757;\n  --helix-color-foreground-muted: #767676;\n  --helix-color-surface-raised: #ffffff;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #ffffff;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #df3330;\n  --helix-color-info: #007dbb;\n  --helix-color-success: #00884d;\n  --helix-color-warning: #a16c00;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #5293ff;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #ffffff;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #575757;\n  --helix-color-foreground-muted: #767676;\n  --helix-color-surface-raised: #ffffff;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #ffffff;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #df3330;\n  --helix-color-info: #007dbb;\n  --helix-color-success: #00884d;\n  --helix-color-warning: #a16c00;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #5293ff;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #2067d9;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.54;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
       "label": "space",
       "pairings": [
         {
@@ -26227,9 +26242,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -26658,7 +26678,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #303030;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #d1d1d1;\n  --helix-color-foreground-muted: #a6a6a6;\n  --helix-color-surface-raised: #3c3c3c;\n  --helix-color-surface-overlay: #3c3c3c;\n  --helix-color-surface-sunken: #232323;\n  --helix-color-primary: #6fa6ff;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #8ab6ff;\n  --helix-color-primary-active: #a4c7ff;\n  --helix-color-primary-subtle: #0d1f3c;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #6fa6ff;\n  --helix-color-accent-hover: #8ab6ff;\n  --helix-color-accent-active: #a4c7ff;\n  --helix-color-accent-subtle: #0d1f3c;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #ff8074;\n  --helix-color-info: #00b3e5;\n  --helix-color-success: #3ebb76;\n  --helix-color-warning: #e09700;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #007ca0;\n  --helix-color-info-surface-hover: #006d8d;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #3b82f7;\n  --helix-color-brand-mark: #3e85f9;\n  --helix-seed-brand: #6fa6ff;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
+      "css": ":root {\n  --helix-color-background: #000000;\n  --helix-color-surface: #303030;\n  --helix-color-border: #272727;\n  --helix-color-foreground: #d1d1d1;\n  --helix-color-foreground-muted: #a6a6a6;\n  --helix-color-surface-raised: #3c3c3c;\n  --helix-color-surface-overlay: #3c3c3c;\n  --helix-color-surface-sunken: #232323;\n  --helix-color-primary: #6fa6ff;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #8ab6ff;\n  --helix-color-primary-active: #a4c7ff;\n  --helix-color-primary-subtle: #0d1f3c;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #6fa6ff;\n  --helix-color-accent-hover: #8ab6ff;\n  --helix-color-accent-active: #a4c7ff;\n  --helix-color-accent-subtle: #0d1f3c;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #ff8074;\n  --helix-color-info: #00b3e5;\n  --helix-color-success: #3ebb76;\n  --helix-color-warning: #e09700;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #007ca0;\n  --helix-color-info-surface-hover: #006d8d;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #eeeeee;\n  --helix-color-foreground-inverse: #4d4d4d;\n  --helix-color-focus-ring: #3b82f7;\n  --helix-color-brand-mark: #3e85f9;\n  --helix-seed-accent: #6fa6ff;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.724;\n  --helix-seed-brand: #6fa6ff;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-surface: 0;\n  --helix-shadow-surface: none;\n}\n",
       "label": "dark-fill",
       "pairings": [
         {
@@ -27150,9 +27170,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#6fa6ff",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.724",
         "seed-brand": "#6fa6ff",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -27592,7 +27617,7 @@
         "info and warning are 0.000 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart",
         "success and warning are 0.000 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart"
       ],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #6c6c6c;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #5e5e5e;\n  --helix-color-primary-active: #505050;\n  --helix-color-primary-subtle: #eeeeee;\n  --helix-color-primary-surface: #727272;\n  --helix-color-accent: #6c6c6c;\n  --helix-color-accent-hover: #5e5e5e;\n  --helix-color-accent-active: #505050;\n  --helix-color-accent-subtle: #eeeeee;\n  --helix-color-accent-surface: #727272;\n  --helix-color-danger: #6e6e6e;\n  --helix-color-info: #6e6e6e;\n  --helix-color-success: #6e6e6e;\n  --helix-color-warning: #6e6e6e;\n  --helix-color-primary-surface-hover: #646464;\n  --helix-color-accent-surface-hover: #646464;\n  --helix-color-danger-surface: #727272;\n  --helix-color-danger-surface-hover: #646464;\n  --helix-color-info-surface: #727272;\n  --helix-color-info-surface-hover: #646464;\n  --helix-color-success-surface: #727272;\n  --helix-color-success-surface-hover: #646464;\n  --helix-color-warning-surface: #727272;\n  --helix-color-warning-surface-hover: #646464;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #8c8c8c;\n  --helix-color-brand-mark: #878787;\n  --helix-seed-brand: #6c6c6c;\n  --helix-seed-chroma-scale: 0;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #6c6c6c;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #5e5e5e;\n  --helix-color-primary-active: #505050;\n  --helix-color-primary-subtle: #eeeeee;\n  --helix-color-primary-surface: #727272;\n  --helix-color-accent: #6c6c6c;\n  --helix-color-accent-hover: #5e5e5e;\n  --helix-color-accent-active: #505050;\n  --helix-color-accent-subtle: #eeeeee;\n  --helix-color-accent-surface: #727272;\n  --helix-color-danger: #6e6e6e;\n  --helix-color-info: #6e6e6e;\n  --helix-color-success: #6e6e6e;\n  --helix-color-warning: #6e6e6e;\n  --helix-color-primary-surface-hover: #646464;\n  --helix-color-accent-surface-hover: #646464;\n  --helix-color-danger-surface: #727272;\n  --helix-color-danger-surface-hover: #646464;\n  --helix-color-info-surface: #727272;\n  --helix-color-info-surface-hover: #646464;\n  --helix-color-success-surface: #727272;\n  --helix-color-success-surface-hover: #646464;\n  --helix-color-warning-surface: #727272;\n  --helix-color-warning-surface-hover: #646464;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #8c8c8c;\n  --helix-color-brand-mark: #878787;\n  --helix-seed-accent: #6c6c6c;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.533;\n  --helix-seed-brand: #6c6c6c;\n  --helix-seed-chroma-scale: 0;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "monotone",
       "pairings": [
         {
@@ -28084,9 +28109,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#6c6c6c",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.533",
         "seed-brand": "#6c6c6c",
         "seed-chroma-scale": "0",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -28515,7 +28545,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #333333;\n  --helix-color-foreground-muted: #515151;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #0049b1;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #003d97;\n  --helix-color-primary-active: #00317d;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #004ebd;\n  --helix-color-accent: #0049b1;\n  --helix-color-accent-hover: #003d97;\n  --helix-color-accent-active: #00317d;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #004ebd;\n  --helix-color-danger: #a8000f;\n  --helix-color-info: #005587;\n  --helix-color-success: #005e34;\n  --helix-color-warning: #704a00;\n  --helix-color-primary-surface-hover: #0042a2;\n  --helix-color-accent-surface-hover: #0042a2;\n  --helix-color-danger-surface: #ae0010;\n  --helix-color-danger-surface-hover: #96000c;\n  --helix-color-info-surface: #00598d;\n  --helix-color-info-surface-hover: #004b78;\n  --helix-color-success-surface: #006236;\n  --helix-color-success-surface-hover: #00532c;\n  --helix-color-warning-surface: #754d00;\n  --helix-color-warning-surface-hover: #644100;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #cccccc;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #0049b1;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #333333;\n  --helix-color-foreground-muted: #515151;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #0049b1;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #003d97;\n  --helix-color-primary-active: #00317d;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #004ebd;\n  --helix-color-accent: #0049b1;\n  --helix-color-accent-hover: #003d97;\n  --helix-color-accent-active: #00317d;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #004ebd;\n  --helix-color-danger: #a8000f;\n  --helix-color-info: #005587;\n  --helix-color-success: #005e34;\n  --helix-color-warning: #704a00;\n  --helix-color-primary-surface-hover: #0042a2;\n  --helix-color-accent-surface-hover: #0042a2;\n  --helix-color-danger-surface: #ae0010;\n  --helix-color-danger-surface-hover: #96000c;\n  --helix-color-info-surface: #00598d;\n  --helix-color-info-surface-hover: #004b78;\n  --helix-color-success-surface: #006236;\n  --helix-color-success-surface-hover: #00532c;\n  --helix-color-warning-surface: #754d00;\n  --helix-color-warning-surface-hover: #644100;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #cccccc;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #0049b1;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.439;\n  --helix-seed-brand: #0049b1;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "aaa",
       "pairings": [
         {
@@ -29007,9 +29037,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#0049b1",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.439",
         "seed-brand": "#0049b1",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -29440,7 +29475,7 @@
       "collisions": [
         "primary and danger are 0.025 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart"
       ],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #ca3135;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #b81c26;\n  --helix-color-primary-active: #a50018;\n  --helix-color-primary-subtle: #ffe9e6;\n  --helix-color-primary-surface: #d2393b;\n  --helix-color-accent: #ca3135;\n  --helix-color-accent-hover: #b81c26;\n  --helix-color-accent-active: #a50018;\n  --helix-color-accent-subtle: #ffe9e6;\n  --helix-color-accent-surface: #d2393b;\n  --helix-color-danger: #d62627;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #c0262c;\n  --helix-color-accent-surface-hover: #c0262c;\n  --helix-color-danger-surface: #da2c2b;\n  --helix-color-danger-surface-hover: #c80f1a;\n  --helix-color-info-surface: #0077bd;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #f15754;\n  --helix-color-brand-mark: #c1272d;\n  --helix-seed-brand: #ca3135;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #ca3135;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #b81c26;\n  --helix-color-primary-active: #a50018;\n  --helix-color-primary-subtle: #ffe9e6;\n  --helix-color-primary-surface: #d2393b;\n  --helix-color-accent: #ca3135;\n  --helix-color-accent-hover: #b81c26;\n  --helix-color-accent-active: #a50018;\n  --helix-color-accent-subtle: #ffe9e6;\n  --helix-color-accent-surface: #d2393b;\n  --helix-color-danger: #d62627;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #c0262c;\n  --helix-color-accent-surface-hover: #c0262c;\n  --helix-color-danger-surface: #da2c2b;\n  --helix-color-danger-surface-hover: #c80f1a;\n  --helix-color-info-surface: #0077bd;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #f15754;\n  --helix-color-brand-mark: #c1272d;\n  --helix-seed-accent: #ca3135;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.555;\n  --helix-seed-brand: #ca3135;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 25;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "red",
       "pairings": [
         {
@@ -29932,9 +29967,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#ca3135",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.555",
         "seed-brand": "#ca3135",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "25",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -30365,7 +30405,7 @@
       "collisions": [
         "primary and warning are 0.012 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart"
       ],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #986000;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #855300;\n  --helix-color-primary-active: #734700;\n  --helix-color-primary-subtle: #ffebd5;\n  --helix-color-primary-surface: #a16500;\n  --helix-color-accent: #986000;\n  --helix-color-accent-hover: #855300;\n  --helix-color-accent-active: #734700;\n  --helix-color-accent-subtle: #ffebd5;\n  --helix-color-accent-surface: #a16500;\n  --helix-color-danger: #d0312e;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #8d5900;\n  --helix-color-accent-surface-hover: #8d5900;\n  --helix-color-danger-surface: #d43632;\n  --helix-color-danger-surface-hover: #c32122;\n  --helix-color-info-surface: #0077bd;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #c47c00;\n  --helix-color-brand-mark: #c07a00;\n  --helix-seed-brand: #986000;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #986000;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #855300;\n  --helix-color-primary-active: #734700;\n  --helix-color-primary-subtle: #ffebd5;\n  --helix-color-primary-surface: #a16500;\n  --helix-color-accent: #986000;\n  --helix-color-accent-hover: #855300;\n  --helix-color-accent-active: #734700;\n  --helix-color-accent-subtle: #ffebd5;\n  --helix-color-accent-surface: #a16500;\n  --helix-color-danger: #d0312e;\n  --helix-color-info: #0073b7;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #8d5900;\n  --helix-color-accent-surface-hover: #8d5900;\n  --helix-color-danger-surface: #d43632;\n  --helix-color-danger-surface-hover: #c32122;\n  --helix-color-info-surface: #0077bd;\n  --helix-color-info-surface-hover: #0069a6;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #c47c00;\n  --helix-color-brand-mark: #c07a00;\n  --helix-seed-accent: #986000;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.539;\n  --helix-seed-brand: #986000;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 70.1;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "amber",
       "pairings": [
         {
@@ -30857,9 +30897,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#986000",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.539",
         "seed-brand": "#986000",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "70.1",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -31299,7 +31344,7 @@
         "info and warning are 0.010 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart",
         "success and warning are 0.006 apart in OKLab, below 0.08, so a reader cannot reliably tell them apart"
       ],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #696c72;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #5b5e64;\n  --helix-color-primary-active: #4d5056;\n  --helix-color-primary-subtle: #edeef0;\n  --helix-color-primary-surface: #6f7278;\n  --helix-color-accent: #696c72;\n  --helix-color-accent-hover: #5b5e64;\n  --helix-color-accent-active: #4d5056;\n  --helix-color-accent-subtle: #edeef0;\n  --helix-color-accent-surface: #6f7278;\n  --helix-color-danger: #726e6d;\n  --helix-color-info: #6d6f72;\n  --helix-color-success: #6d6f6e;\n  --helix-color-warning: #716e6c;\n  --helix-color-primary-surface-hover: #616469;\n  --helix-color-accent-surface-hover: #616469;\n  --helix-color-danger-surface: #767171;\n  --helix-color-danger-surface-hover: #686363;\n  --helix-color-info-surface: #707275;\n  --helix-color-info-surface-hover: #626466;\n  --helix-color-success-surface: #717371;\n  --helix-color-success-surface-hover: #626563;\n  --helix-color-warning-surface: #747270;\n  --helix-color-warning-surface-hover: #666461;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #898c92;\n  --helix-color-brand-mark: #84878d;\n  --helix-seed-brand: #696c72;\n  --helix-seed-chroma-scale: 0.05;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #696c72;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #5b5e64;\n  --helix-color-primary-active: #4d5056;\n  --helix-color-primary-subtle: #edeef0;\n  --helix-color-primary-surface: #6f7278;\n  --helix-color-accent: #696c72;\n  --helix-color-accent-hover: #5b5e64;\n  --helix-color-accent-active: #4d5056;\n  --helix-color-accent-subtle: #edeef0;\n  --helix-color-accent-surface: #6f7278;\n  --helix-color-danger: #726e6d;\n  --helix-color-info: #6d6f72;\n  --helix-color-success: #6d6f6e;\n  --helix-color-warning: #716e6c;\n  --helix-color-primary-surface-hover: #616469;\n  --helix-color-accent-surface-hover: #616469;\n  --helix-color-danger-surface: #767171;\n  --helix-color-danger-surface-hover: #686363;\n  --helix-color-info-surface: #707275;\n  --helix-color-info-surface-hover: #626466;\n  --helix-color-success-surface: #717371;\n  --helix-color-success-surface-hover: #626563;\n  --helix-color-warning-surface: #747270;\n  --helix-color-warning-surface-hover: #666461;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #898c92;\n  --helix-color-brand-mark: #84878d;\n  --helix-seed-accent: #696c72;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.532;\n  --helix-seed-brand: #696c72;\n  --helix-seed-chroma-scale: 0.05;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "quiet",
       "pairings": [
         {
@@ -31791,9 +31836,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#696c72",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.532",
         "seed-brand": "#696c72",
         "seed-chroma-scale": "0.05",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -32222,7 +32272,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #f6fbff;\n  --helix-color-border: #d5dae0;\n  --helix-color-foreground: #4c5055;\n  --helix-color-foreground-muted: #6a6f74;\n  --helix-color-surface-raised: #f0f6fc;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #edf2f8;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52627;\n  --helix-color-info: #0074ae;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966400;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #13161a;\n  --helix-color-foreground-inverse: #9ea4a9;\n  --helix-color-focus-ring: #4188fd;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #f6fbff;\n  --helix-color-border: #d5dae0;\n  --helix-color-foreground: #4c5055;\n  --helix-color-foreground-muted: #6a6f74;\n  --helix-color-surface-raised: #f0f6fc;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #edf2f8;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52627;\n  --helix-color-info: #0074ae;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966400;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #13161a;\n  --helix-color-foreground-inverse: #9ea4a9;\n  --helix-color-focus-ring: #4188fd;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #2067d9;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.54;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0.01;\n  --helix-seed-neutral-hue: 250;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "cast",
       "pairings": [
         {
@@ -32714,9 +32764,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0.01",
+        "seed-neutral-hue": "250",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -33145,7 +33200,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #7c3aed;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-color-house-teal: #0f766e;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #7c3aed;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-color-house-teal: #0f766e;\n  --helix-seed-accent: #2067d9;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.54;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "pinned",
       "pairings": [
         {
@@ -33637,9 +33692,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -34078,7 +34138,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #7a6e00;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #6b6000;\n  --helix-color-primary-active: #5b5200;\n  --helix-color-primary-subtle: #f6f1c2;\n  --helix-color-primary-surface: #817300;\n  --helix-color-accent: #7a6e00;\n  --helix-color-accent-hover: #6b6000;\n  --helix-color-accent-active: #5b5200;\n  --helix-color-accent-subtle: #f6f1c2;\n  --helix-color-accent-surface: #817300;\n  --helix-color-danger: #c63e38;\n  --helix-color-info: #0a73b5;\n  --helix-color-success: #147f4a;\n  --helix-color-warning: #a35e00;\n  --helix-color-primary-surface-hover: #716500;\n  --helix-color-accent-surface-hover: #716500;\n  --helix-color-danger-surface: #cb423b;\n  --helix-color-danger-surface-hover: #b9312d;\n  --helix-color-info-surface: #1377b9;\n  --helix-color-info-surface-hover: #0068a6;\n  --helix-color-success-surface: #19824d;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #a86100;\n  --helix-color-warning-surface-hover: #945500;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #9c8d1e;\n  --helix-color-brand-mark: #9b8c1c;\n  --helix-seed-brand: #7a6e00;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #7a6e00;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #6b6000;\n  --helix-color-primary-active: #5b5200;\n  --helix-color-primary-subtle: #f6f1c2;\n  --helix-color-primary-surface: #817300;\n  --helix-color-accent: #7a6e00;\n  --helix-color-accent-hover: #6b6000;\n  --helix-color-accent-active: #5b5200;\n  --helix-color-accent-subtle: #f6f1c2;\n  --helix-color-accent-surface: #817300;\n  --helix-color-danger: #c63e38;\n  --helix-color-info: #0a73b5;\n  --helix-color-success: #147f4a;\n  --helix-color-warning: #a35e00;\n  --helix-color-primary-surface-hover: #716500;\n  --helix-color-accent-surface-hover: #716500;\n  --helix-color-danger-surface: #cb423b;\n  --helix-color-danger-surface-hover: #b9312d;\n  --helix-color-info-surface: #1377b9;\n  --helix-color-info-surface-hover: #0068a6;\n  --helix-color-success-surface: #19824d;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #a86100;\n  --helix-color-warning-surface-hover: #945500;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #9c8d1e;\n  --helix-color-brand-mark: #9b8c1c;\n  --helix-seed-accent: #7a6e00;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.533;\n  --helix-seed-brand: #7a6e00;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 101.5;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "pale",
       "pairings": [
         {
@@ -34570,9 +34630,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#7a6e00",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.533",
         "seed-brand": "#7a6e00",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "101.5",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -35001,7 +35066,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --acme-color-background: #ffffff;\n  --acme-color-surface: #fafafa;\n  --acme-color-border: #d9d9d9;\n  --acme-color-foreground: #505050;\n  --acme-color-foreground-muted: #6e6e6e;\n  --acme-color-surface-raised: #f5f5f5;\n  --acme-color-surface-overlay: #ffffff;\n  --acme-color-surface-sunken: #f2f2f2;\n  --acme-color-primary: #2067d9;\n  --acme-color-foreground-on-accent: #f8f8f8;\n  --acme-color-primary-hover: #0c58c8;\n  --acme-color-primary-active: #004ab2;\n  --acme-color-primary-subtle: #e5efff;\n  --acme-color-primary-surface: #276ee0;\n  --acme-color-accent: #2067d9;\n  --acme-color-accent-hover: #0c58c8;\n  --acme-color-accent-active: #004ab2;\n  --acme-color-accent-subtle: #e5efff;\n  --acme-color-accent-surface: #276ee0;\n  --acme-color-danger: #d52727;\n  --acme-color-info: #0075af;\n  --acme-color-success: #007f47;\n  --acme-color-warning: #966500;\n  --acme-color-primary-surface-hover: #155ecf;\n  --acme-color-accent-surface-hover: #155ecf;\n  --acme-color-danger-surface: #da2d2c;\n  --acme-color-danger-surface-hover: #c8111a;\n  --acme-color-info-surface: #0079b4;\n  --acme-color-info-surface-hover: #006a9f;\n  --acme-color-success-surface: #00834a;\n  --acme-color-success-surface-hover: #007340;\n  --acme-color-warning-surface: #9c6800;\n  --acme-color-warning-surface-hover: #895b00;\n  --acme-color-surface-inverse: #161616;\n  --acme-color-foreground-inverse: #a4a4a4;\n  --acme-color-focus-ring: #4289fe;\n  --acme-color-brand-mark: #3b82f6;\n  --acme-seed-brand: #2067d9;\n  --acme-seed-chroma-scale: 1;\n  --acme-seed-density: 1;\n  --acme-seed-radii: 0.5rem;\n  --acme-border-surface: 0;\n  --acme-shadow-surface: 0 4px 12px color-mix(in oklab, oklch(0.13 0 0) 10%, transparent);\n  --acme-border-floating: 0;\n  --acme-shadow-floating: 0 12px 32px color-mix(in oklab, oklch(0.13 0 0) 14%, transparent);\n  /* Assumes these faces are already loaded. */\n  --acme-font-sans: Inter;\n  --acme-font-display: Inter;\n  --acme-font-mono: Berkeley Mono;\n  --acme-duration-fast: 158ms;\n  --acme-duration-normal: 264ms;\n  --acme-duration-slow: 422ms;\n  --acme-easing-standard: var(--acme-easing-spring);\n  --acme-easing-emphasized: var(--acme-easing-spring);\n  --acme-easing-decelerate: var(--acme-easing-spring);\n  --acme-text-2xl: 1.9375rem;\n  --acme-text-3xl: 2.4375rem;\n  --acme-text-lg: 1.25rem;\n  --acme-text-md: 1rem;\n  --acme-text-sm: 0.9375rem;\n  --acme-text-xl: 1.5625rem;\n  --acme-text-xs: 0.875rem;\n  --acme-weight-medium: 600;\n  --acme-weight-regular: 500;\n  --acme-weight-semibold: 700;\n  --acme-material-backdrop: blur(12px);\n  --acme-material-translucent: color-mix(in oklab, var(--acme-color-surface) 72%, transparent);\n  --acme-material-opacity: 0.72;\n}\n",
+      "css": ":root {\n  --acme-color-background: #ffffff;\n  --acme-color-surface: #fafafa;\n  --acme-color-border: #d9d9d9;\n  --acme-color-foreground: #505050;\n  --acme-color-foreground-muted: #6e6e6e;\n  --acme-color-surface-raised: #f5f5f5;\n  --acme-color-surface-overlay: #ffffff;\n  --acme-color-surface-sunken: #f2f2f2;\n  --acme-color-primary: #2067d9;\n  --acme-color-foreground-on-accent: #f8f8f8;\n  --acme-color-primary-hover: #0c58c8;\n  --acme-color-primary-active: #004ab2;\n  --acme-color-primary-subtle: #e5efff;\n  --acme-color-primary-surface: #276ee0;\n  --acme-color-accent: #2067d9;\n  --acme-color-accent-hover: #0c58c8;\n  --acme-color-accent-active: #004ab2;\n  --acme-color-accent-subtle: #e5efff;\n  --acme-color-accent-surface: #276ee0;\n  --acme-color-danger: #d52727;\n  --acme-color-info: #0075af;\n  --acme-color-success: #007f47;\n  --acme-color-warning: #966500;\n  --acme-color-primary-surface-hover: #155ecf;\n  --acme-color-accent-surface-hover: #155ecf;\n  --acme-color-danger-surface: #da2d2c;\n  --acme-color-danger-surface-hover: #c8111a;\n  --acme-color-info-surface: #0079b4;\n  --acme-color-info-surface-hover: #006a9f;\n  --acme-color-success-surface: #00834a;\n  --acme-color-success-surface-hover: #007340;\n  --acme-color-warning-surface: #9c6800;\n  --acme-color-warning-surface-hover: #895b00;\n  --acme-color-surface-inverse: #161616;\n  --acme-color-foreground-inverse: #a4a4a4;\n  --acme-color-focus-ring: #4289fe;\n  --acme-color-brand-mark: #3b82f6;\n  --acme-seed-accent: #2067d9;\n  --acme-seed-accent-hue: 0;\n  --acme-seed-accent-lightness: 0.54;\n  --acme-seed-brand: #2067d9;\n  --acme-seed-chroma-scale: 1;\n  --acme-seed-density: 1;\n  --acme-seed-neutral-chroma: 0;\n  --acme-seed-neutral-hue: 259.8;\n  --acme-seed-radii: 0.5rem;\n  --acme-border-surface: 0;\n  --acme-shadow-surface: 0 4px 12px color-mix(in oklab, oklch(0.13 0 0) 10%, transparent);\n  --acme-border-floating: 0;\n  --acme-shadow-floating: 0 12px 32px color-mix(in oklab, oklch(0.13 0 0) 14%, transparent);\n  /* Assumes these faces are already loaded. */\n  --acme-font-sans: Inter;\n  --acme-font-display: Inter;\n  --acme-font-mono: Berkeley Mono;\n  --acme-duration-fast: 158ms;\n  --acme-duration-normal: 264ms;\n  --acme-duration-slow: 422ms;\n  --acme-easing-standard: var(--acme-easing-spring);\n  --acme-easing-emphasized: var(--acme-easing-spring);\n  --acme-easing-decelerate: var(--acme-easing-spring);\n  --acme-text-2xl: 1.9375rem;\n  --acme-text-3xl: 2.4375rem;\n  --acme-text-lg: 1.25rem;\n  --acme-text-md: 1rem;\n  --acme-text-sm: 0.9375rem;\n  --acme-text-xl: 1.5625rem;\n  --acme-text-xs: 0.875rem;\n  --acme-weight-medium: 600;\n  --acme-weight-regular: 500;\n  --acme-weight-semibold: 700;\n  --acme-material-backdrop: blur(12px);\n  --acme-material-translucent: color-mix(in oklab, var(--acme-color-surface) 72%, transparent);\n  --acme-material-opacity: 0.72;\n}\n",
       "label": "expressive",
       "pairings": [
         {
@@ -35493,9 +35558,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -35924,7 +35994,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-duration-fast: 0ms;\n  --helix-duration-normal: 0ms;\n  --helix-duration-slow: 0ms;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #2067d9;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.54;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n  --helix-duration-fast: 0ms;\n  --helix-duration-normal: 0ms;\n  --helix-duration-slow: 0ms;\n}\n",
       "label": "instant",
       "pairings": [
         {
@@ -36416,9 +36486,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -36847,7 +36922,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-text-2xl: 1.75rem;\n  --helix-text-3xl: 2.3125rem;\n  --helix-text-lg: 1rem;\n  --helix-text-md: 0.75rem;\n  --helix-text-sm: 0.6875rem;\n  --helix-text-xl: 1.3125rem;\n  --helix-text-xs: 0.6875rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #2067d9;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.54;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n  --helix-text-2xl: 1.75rem;\n  --helix-text-3xl: 2.3125rem;\n  --helix-text-lg: 1rem;\n  --helix-text-md: 0.75rem;\n  --helix-text-sm: 0.6875rem;\n  --helix-text-xl: 1.3125rem;\n  --helix-text-xs: 0.6875rem;\n}\n",
       "label": "tiny",
       "pairings": [
         {
@@ -37339,9 +37414,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -37770,7 +37850,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-floating: 1px;\n  --helix-shadow-floating: none;\n  /* Assumes these faces are already loaded. */\n  --helix-font-display: Playfair Display;\n  --helix-duration-fast: 60ms;\n  --helix-duration-normal: 100ms;\n  --helix-duration-slow: 160ms;\n  --helix-weight-medium: 400;\n  --helix-weight-regular: 300;\n  --helix-weight-semibold: 500;\n  --helix-material-backdrop: none;\n  --helix-material-translucent: color-mix(in oklab, var(--helix-color-surface) 100%, transparent);\n  --helix-material-opacity: 1;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #2067d9;\n  --helix-color-accent-hover: #0c58c8;\n  --helix-color-accent-active: #004ab2;\n  --helix-color-accent-subtle: #e5efff;\n  --helix-color-accent-surface: #276ee0;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #155ecf;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #2067d9;\n  --helix-seed-accent-hue: 0;\n  --helix-seed-accent-lightness: 0.54;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n  --helix-border-floating: 1px;\n  --helix-shadow-floating: none;\n  /* Assumes these faces are already loaded. */\n  --helix-font-display: Playfair Display;\n  --helix-duration-fast: 60ms;\n  --helix-duration-normal: 100ms;\n  --helix-duration-slow: 160ms;\n  --helix-weight-medium: 400;\n  --helix-weight-regular: 300;\n  --helix-weight-semibold: 500;\n  --helix-material-backdrop: none;\n  --helix-material-translucent: color-mix(in oklab, var(--helix-color-surface) 100%, transparent);\n  --helix-material-opacity: 1;\n}\n",
       "label": "paced",
       "pairings": [
         {
@@ -38262,9 +38342,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#2067d9",
+        "seed-accent-hue": "0",
+        "seed-accent-lightness": "0.54",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -38693,7 +38778,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #6b7300;\n  --helix-color-accent-hover: #5d6400;\n  --helix-color-accent-active: #4f5600;\n  --helix-color-accent-subtle: #edf4c6;\n  --helix-color-accent-surface: #707800;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #616900;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #6b7300;\n  --helix-color-accent-hover: #5d6400;\n  --helix-color-accent-active: #4f5600;\n  --helix-color-accent-subtle: #edf4c6;\n  --helix-color-accent-surface: #707800;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #616900;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #6b7300;\n  --helix-seed-accent-hue: 215;\n  --helix-seed-accent-lightness: 0.532;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "complement",
       "pairings": [
         {
@@ -39185,9 +39270,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#6b7300",
+        "seed-accent-hue": "215",
+        "seed-accent-lightness": "0.532",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [
@@ -39616,7 +39706,7 @@
     },
     {
       "collisions": [],
-      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #cf146e;\n  --helix-color-accent-hover: #ba0060;\n  --helix-color-accent-active: #a10052;\n  --helix-color-accent-subtle: #ffe7ed;\n  --helix-color-accent-surface: #d72274;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #c50066;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-radii: 0.5rem;\n}\n",
+      "css": ":root {\n  --helix-color-background: #ffffff;\n  --helix-color-surface: #fafafa;\n  --helix-color-border: #d9d9d9;\n  --helix-color-foreground: #505050;\n  --helix-color-foreground-muted: #6e6e6e;\n  --helix-color-surface-raised: #f5f5f5;\n  --helix-color-surface-overlay: #ffffff;\n  --helix-color-surface-sunken: #f2f2f2;\n  --helix-color-primary: #2067d9;\n  --helix-color-foreground-on-accent: #f8f8f8;\n  --helix-color-primary-hover: #0c58c8;\n  --helix-color-primary-active: #004ab2;\n  --helix-color-primary-subtle: #e5efff;\n  --helix-color-primary-surface: #276ee0;\n  --helix-color-accent: #cf146e;\n  --helix-color-accent-hover: #ba0060;\n  --helix-color-accent-active: #a10052;\n  --helix-color-accent-subtle: #ffe7ed;\n  --helix-color-accent-surface: #d72274;\n  --helix-color-danger: #d52727;\n  --helix-color-info: #0075af;\n  --helix-color-success: #007f47;\n  --helix-color-warning: #966500;\n  --helix-color-primary-surface-hover: #155ecf;\n  --helix-color-accent-surface-hover: #c50066;\n  --helix-color-danger-surface: #da2d2c;\n  --helix-color-danger-surface-hover: #c8111a;\n  --helix-color-info-surface: #0079b4;\n  --helix-color-info-surface-hover: #006a9f;\n  --helix-color-success-surface: #00834a;\n  --helix-color-success-surface-hover: #007340;\n  --helix-color-warning-surface: #9c6800;\n  --helix-color-warning-surface-hover: #895b00;\n  --helix-color-surface-inverse: #161616;\n  --helix-color-foreground-inverse: #a4a4a4;\n  --helix-color-focus-ring: #4289fe;\n  --helix-color-brand-mark: #3b82f6;\n  --helix-seed-accent: #cf146e;\n  --helix-seed-accent-hue: 100.8;\n  --helix-seed-accent-lightness: 0.56;\n  --helix-seed-brand: #2067d9;\n  --helix-seed-chroma-scale: 1;\n  --helix-seed-density: 1;\n  --helix-seed-neutral-chroma: 0;\n  --helix-seed-neutral-hue: 259.8;\n  --helix-seed-radii: 0.5rem;\n}\n",
       "label": "pinned-accent",
       "pairings": [
         {
@@ -40108,9 +40198,14 @@
         }
       ],
       "seeds": {
+        "seed-accent": "#cf146e",
+        "seed-accent-hue": "100.8",
+        "seed-accent-lightness": "0.56",
         "seed-brand": "#2067d9",
         "seed-chroma-scale": "1",
         "seed-density": "1",
+        "seed-neutral-chroma": "0",
+        "seed-neutral-hue": "259.8",
         "seed-radii": "0.5rem"
       },
       "tokens": [

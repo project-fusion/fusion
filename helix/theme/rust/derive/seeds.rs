@@ -5,9 +5,17 @@
 //! colors a chart reads, and nothing in this engine reaches those. Emitting the
 //! tokens alone moved the buttons, the tags and the surfaces and left every
 //! chart on the page the original blue.
+//!
+//! **Every seed the stylesheet reads, and not only the four it began with.**
+//! The accent and the neutral cast were solved here and never handed over, so
+//! the stylesheet derived its own from their defaults: a theme with a neutral
+//! cast tinted every surface it emitted and left the six tokens that read the
+//! ramp directly gray, `foreground-subtle`, the two media colors, the overlay
+//! and two material ones. Handed the answers, the ramp builds from them.
 
 use crate::derive::emphasis::Emphasis;
 use crate::derive::resolve::Resolved;
+use crate::derive::Cast;
 use crate::oklch::{fit_to_gamut, oklch_to_hex, GAMUT_STEPS};
 
 /// The chroma of the loudest series color the stylesheet's ramp holds.
@@ -20,7 +28,7 @@ use crate::oklch::{fit_to_gamut, oklch_to_hex, GAMUT_STEPS};
 /// charts.
 const LOUDEST_SERIES: f64 = 0.277;
 
-/// The four seeds, as the strings they are written as.
+/// Every seed, as the strings they are written as.
 ///
 /// **The brand seed is the solved primary, not the color handed in**, and that
 /// is what makes the two derivations agree: the stylesheet builds its ramp from
@@ -34,21 +42,43 @@ const LOUDEST_SERIES: f64 = 0.277;
 ///
 /// A `Vec` of pairs rather than a map, because the emitted order is the order
 /// they are written in and a map would sort them.
+///
+/// **The accent is the solved one, for the brand's reason**, and the angle and
+/// lightness beside it are what it came out as rather than what was asked. The
+/// literal beats both in the stylesheet, so they change nothing there; they are
+/// written so every seed it reads has an answer and a page reading them back
+/// reads this theme's relationship, not the stylesheet's default one.
 #[must_use]
-pub fn seeds(resolved: &Resolved, primary: &Emphasis) -> Vec<(String, String)> {
+pub fn seeds(
+    resolved: &Resolved,
+    primary: &Emphasis,
+    accent: &Emphasis,
+    neutral: Cast,
+) -> Vec<(String, String)> {
     let scale = resolved.chroma.scale.unwrap_or(1.0);
     let series = resolved
         .chroma
         .ceiling
         .map_or(scale, |ceiling| scale.min(ceiling / LOUDEST_SERIES));
+    let brand = fit_to_gamut(primary.raw, GAMUT_STEPS);
+    let second = fit_to_gamut(accent.raw, GAMUT_STEPS);
+    /* An angle at chroma zero is not a direction, so a gray accent or a gray
+    brand has no rotation between them to report. */
+    let angle = if brand.chroma == 0.0 || second.chroma == 0.0 {
+        0.0
+    } else {
+        (second.hue - brand.hue).rem_euclid(360.0)
+    };
 
     vec![
-        (
-            "seed-brand".to_owned(),
-            oklch_to_hex(fit_to_gamut(primary.raw, GAMUT_STEPS)),
-        ),
+        ("seed-accent".to_owned(), oklch_to_hex(second)),
+        ("seed-accent-hue".to_owned(), trimmed(angle, 1)),
+        ("seed-accent-lightness".to_owned(), trimmed(second.lightness, 3)),
+        ("seed-brand".to_owned(), oklch_to_hex(brand)),
         ("seed-chroma-scale".to_owned(), trimmed(series, 3)),
         ("seed-density".to_owned(), number(resolved.density)),
+        ("seed-neutral-chroma".to_owned(), trimmed(neutral.chroma, 4)),
+        ("seed-neutral-hue".to_owned(), trimmed(neutral.hue, 1)),
         (
             "seed-radii".to_owned(),
             format!("{}rem", number(resolved.radius)),

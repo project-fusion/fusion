@@ -124,13 +124,7 @@
     "platform": "helix/cli/platform-fidelity.json",
     "seeds": {
       "pinned": ["color-house-teal", "color-primary"],
-      "planned": {
-        "accent": "#210: the engine derives an accent and emits its tokens, but the CSS ramp takes a seed rather than the solved steps, so seeding it would hand the stylesheet a second opinion on colors the engine already computed",
-        "accent-hue": "#210: same, and the relationship is the stylesheet's to apply",
-        "accent-lightness": "#210: the ramp reads it so a rotated accent can be pinned to a lightness that clears at any hue, measured at 0.51. The engine already solves this and solves it better: handed a rotation to hue 183, the cyan the ramp cannot clear, it returns lightness 0.525 and chroma 0.093 against the brand's 0.540 and 0.191, so it drops the chroma rather than only darkening. What is missing is not the solve but the delivery: the ramp derives its own accent from a seed instead of consuming the steps the engine computed, which is the whole of #210. Remove this once it does",
-        "neutral-chroma": "#210: the engine takes the cast and derives from it directly",
-        "neutral-hue": "#210: same"
-      },
+      "planned": {},
       "sheets": ["helix/styles/src/primitives.css", "helix/styles/src/tokens.css"]
     },
     "shared": ["chart"],

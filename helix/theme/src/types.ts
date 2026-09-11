@@ -393,7 +393,9 @@ export interface DerivedTheme {
   /**
    * The seed values a consumer must write for `helix/styles` to re-derive the
    * halves this engine does not compute: the twenty-four series colors, the
-   * spacing scale and the corner radii.
+   * spacing scale, the corner radii, and the ramp steps the tokens do not
+   * cover. Every seed the stylesheet reads has one, the accent and the neutral
+   * cast included, so nothing it derives falls back to its own defaults.
    *
    * **Data rather than only a line of CSS**, because the two consumers apply it
    * differently. `toCss` renders a block; a page theming one panel writes the
