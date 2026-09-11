@@ -7,16 +7,17 @@
  * that disagreed with it would be right only for readers of the rendered site.
  * Adding a page is now one file.
  *
- * The output is committed and `--check` fails when it and the content disagree,
- * the same arrangement `build-catalog.mjs` already
- * use. A content package must not read the filesystem at runtime: a site
- * importing one that did would trace the whole package into its server bundle,
- * which is a warning `fusion/site` has today for exactly this reason.
+ * The output is a build product, written by `docs` ahead of the package's
+ * `build`, and `--check` fails when it and the content disagree, the same
+ * arrangement `build-catalog.mjs` already uses. A content package must not read
+ * the filesystem at runtime: a site importing one that did would trace the whole
+ * package into its server bundle, which is a warning `fusion/site` has today for
+ * exactly this reason.
  *
  * **Validation lives here rather than in a separate check**, because an invalid
  * registry should be impossible to generate rather than possible to generate
  * and then caught. A bad `parent`, a duplicate `order`, two pinned pages in one
- * section: all of them fail the build, so the committed file is only ever a
+ * section: all of them fail the build, so the generated file is only ever a
  * valid one.
  *
  * Run with `turbo run docs`, or `turbo run docs -- --check` for the check.
