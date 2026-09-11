@@ -49,6 +49,7 @@ const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
  * @slot status - Beside the composer: somebody typing, connection lost.
  *
  * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+ * @event {HelixSendEvent} helix-send - A turn offered from the composer, or a failed one asked to go again, dispatched inside and heard here because the conversation is what a consumer holds. Cancelable: refusing it takes the decision and nothing is sent.
  *
  * @csspart actions - The controls for the conversation, at the header's trailing edge.
  * @csspart composer - The region the composer sits in.

@@ -140,7 +140,9 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the suggestions go, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions show, and cancelable.
+ * @event {HelixDismissEvent} helix-dismiss - A token asking to go, from its close control or from Backspace on an empty field. A `FilterChip` naming a declared field is answered as `helix-facet` instead. Cancelable: refusing it takes the decision and the token stays.
  * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether read out of the text, picked, or dismissed. Cancelable: refusing it leaves the text and the chip where they were.
+ * @event {HelixSelectEvent} helix-select - A suggestion was chosen: the option's own, heard here because it bubbles out of `suggestions`. Cancelable: refusing it takes the decision from any other listener, and this field never acts on a choice itself, since what it means is the page's.
  * @event {Event} input - Announced once the text has moved.
  * @event {Event} toggle - Says the panel moved, carrying `newState` and `oldState`.
  *

@@ -41,9 +41,14 @@ static DEFINED: LazyLock<Regex> = LazyLock::new(|| {
 static SIDE_EFFECT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?m)^import\s+'([^']+)'").expect("a literal pattern compiles"));
 
-static RENDERS: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"<\$\{this\.tag\('([a-z-]+)'\)\}").expect("a literal pattern compiles")
-});
+/* Any call, not only the one written inline in a template. `const picker =
+this.tag('date-picker')` and then `<${picker}>` is the form CONVENTIONS itself
+shows, and a tag handed to a drawing helper is rendered all the same; matching
+only `<${this.tag(...)}` read neither, so Notifications rendered
+`<helix-format-date>` without the styled tier importing it and the rule
+passed. */
+static RENDERS: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"this\.tag\('([a-z-]+)'\)").expect("a literal pattern compiles"));
 
 static OVERRIDE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"static override tier = '([^']*)'").expect("a literal pattern compiles")

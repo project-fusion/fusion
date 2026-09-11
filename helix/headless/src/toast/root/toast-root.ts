@@ -38,6 +38,8 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The messages, as `helix-toast-item` elements.
  *
+ * @event {HelixDismissEvent} helix-dismiss - A message asking to go, by its control or by its timer, dispatched by the message and heard here because the stack is what a consumer holds. Cancelable: refusing it takes the decision and the message stays.
+ *
  * @csspart region - The stack the messages are in.
  */
 @customElement('helix-headless-toast')

@@ -46,6 +46,7 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  *
  * @event {Event} change - Announced once the value has moved.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the answer changes, and cancelable.
+ * @event {HelixSelectEvent} helix-select - Fired when an answer is chosen. Dispatched by the radio and listened for here, because the group is what a consumer holds. Cancelable: refusing it takes the decision and nothing moves.
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart feedback - What is wrong with it.

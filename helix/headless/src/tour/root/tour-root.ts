@@ -41,6 +41,7 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the reader leaves early. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
+ * @event {HelixTourAskEvent} helix-tour-ask - A stop's own controls asking the tour to move, dispatched by the stop and heard here because the tour is what moves.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart spotlight - The box over the current target, which paints the scrim.

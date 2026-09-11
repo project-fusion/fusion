@@ -61,8 +61,12 @@ const PANEL_MAX = 0.8
  * @slot status - A status bar, spanning both panes at the bottom.
  * @slot toolbar - A bar across the top, spanning both panes.
  *
+ * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited, by the source pane and heard here. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixBeforePanelResizeEvent} helix-before-panel-resize - Fired before the panel's divider is let go, with its height in pixels. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixBeforeSplitEvent} helix-before-split - Fired before the panes' divider is let go, with the lead pane's share. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves in the source, by the source pane and heard here.
+ * @event {HelixConsoleEvent} helix-console - Relayed from the frame by the preview pane, one per console call.
+ * @event {HelixResizeEvent} helix-resize - How tall the frame's content is, from the preview pane, whenever it changes.
  *
  * @csspart body - The splitter holding the panes above the panel.
  * @csspart corner - The handle where the two dividers cross.

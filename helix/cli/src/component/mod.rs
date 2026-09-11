@@ -39,6 +39,8 @@ pub mod corners;
 pub mod derived_steps;
 pub mod disabled;
 pub mod events;
+pub mod example_events;
+pub mod example_specs;
 pub mod example_values;
 pub mod examples;
 pub mod examples_paired;
@@ -438,6 +440,18 @@ pub fn all() -> Vec<Rule> {
             name: "derived-steps",
             run: Runner::Source(derived_steps::run),
             summary: "a scope that moves a base step moves the steps derived from it",
+        },
+        Rule {
+            fix: None,
+            name: "example-events",
+            run: Runner::Source(example_events::run),
+            summary: "an example listens on an element only for events it declares",
+        },
+        Rule {
+            fix: None,
+            name: "example-specs",
+            run: Runner::Source(example_specs::run),
+            summary: "an example with a script is run by a spec that says what pressing it does",
         },
         Rule {
             fix: None,

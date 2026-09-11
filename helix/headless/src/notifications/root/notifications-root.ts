@@ -42,6 +42,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  *
+ * @event {HelixDismissEvent} helix-dismiss - A row asking to be removed, dispatched by the row and heard here because the feed is what a consumer holds. Cancelable: refusing it takes the decision and the row stays.
  * @event {HelixReadEvent} helix-read - Fired by an item, and by this element when everything is marked read. Cancelable.
  *
  * @csspart empty - Shown when there is nothing in the feed.
