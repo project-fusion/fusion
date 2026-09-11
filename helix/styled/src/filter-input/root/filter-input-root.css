@@ -149,15 +149,21 @@ slot[name="end"]::slotted(*) {
   flex: 0 0 auto;
 }
 
+/* **The same X as the chips beside it**, which is `FilterChip`'s arithmetic:
+   `0.85em` of the same type, in the subtle ink. At `icon-tight` in the muted ink
+   it drew 16 pixels against their 12 and a step brighter, so the one control
+   in the row that clears only the text read as the loudest thing in it. The
+   target stays at `icon-loose`, since the glyph shrinking is not the button
+   shrinking. */
 [part="clear"] {
-  --icon-size: var(--helix-size-icon-tight);
+  --icon-size: 0.85em;
   all: unset;
 
   align-items: center;
   align-self: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
+  color: var(--helix-color-foreground-subtle);
   cursor: pointer;
   display: flex;
   flex: 0 0 auto;
@@ -168,6 +174,7 @@ slot[name="end"]::slotted(*) {
 }
 
 [part="clear"]:hover {
+  background-color: color-mix(in oklab, currentcolor 12%, transparent);
   color: var(--helix-color-foreground);
 }
 
