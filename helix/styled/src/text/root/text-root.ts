@@ -85,7 +85,7 @@ export class HelixText extends HelixElement {
    * out is blocked on the palette rather than on the rename: there is a quiet
    * step for the neutral ink and none for any other tone, so a muted danger has
    * nothing to be made of. `primary-subtle` is a tinted *ground* and not a
-   * quiet ink. That is #141's to derive, and until it does, folding the two
+   * quiet ink. That is #210's to derive, and until it does, folding the two
    * halves apart would leave three of the four combinations unsayable.
    */
   @property({ reflect: true })
