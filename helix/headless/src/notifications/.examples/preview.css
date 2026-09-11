@@ -1,0 +1,120 @@
+/* What the headless tier asks a consumer to write for Notifications.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles`, and no
+ * corner radius, because rounding says how a thing should feel and that is not
+ * this tier's to say.
+ *
+ * **Grays, and only grays.** An unread item is told apart by a fill rather than
+ * a colored dot, since a hue here would read as an opinion this tier does not
+ * hold. The values are named by role and underscored because they never leave
+ * this file, and written through `light-dark()` so the sandbox's dark mode
+ * inverts rather than showing a pale feed on a dark page. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-notifications {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  display: block;
+  max-inline-size: 28rem;
+}
+
+helix-headless-notifications::part(header) {
+  align-items: center;
+  border-block-end: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+}
+
+helix-headless-notifications h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+helix-headless-notifications::part(list) {
+  display: flex;
+  flex-direction: column;
+}
+
+helix-headless-notifications::part(footer) {
+  border-block-start: 1px solid var(--_gray-line);
+  padding: 0.5rem 0.75rem;
+}
+
+helix-headless-notifications::part(mark-all),
+helix-headless-notification::part(dismiss) {
+  all: unset;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+}
+
+/* The keyboard reaches both, so the ring goes on both. Taking the UA outline
+   off without putting one back is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-notifications::part(mark-all):focus-visible,
+helix-headless-notification::part(dismiss):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-notification::part(item) {
+  align-items: start;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+}
+
+helix-headless-notification:not(:state(read))::part(item) {
+  background-color: var(--_gray-subtle);
+}
+
+helix-headless-notification + helix-headless-notification::part(item) {
+  border-block-start: 1px solid var(--_gray-line);
+}
+
+/* An empty media slot still takes a gap in the row, and only the feed knows
+   whether any item filled one. */
+helix-headless-notifications:not(:state(media)) helix-headless-notification::part(media) {
+  display: none;
+}
+
+helix-headless-notification::part(body) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-inline-size: 0;
+}
+
+helix-headless-notification::part(actions) {
+  display: flex;
+  gap: 0.5rem;
+}
+
+helix-headless-notification::part(trailing) {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: flex;
+  flex: none;
+  font-size: 0.875em;
+  gap: 0.5rem;
+}
+
+helix-headless-notification::part(dismiss-mark) {
+  block-size: 1em;
+  display: block;
+  inline-size: 1em;
+}

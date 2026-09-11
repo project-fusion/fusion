@@ -1,3 +1,4 @@
+import './preview.css'
 import { useEffect, useState } from 'react'
 
 const ago = (minutes: number): string => new Date(Date.now() - minutes * 60000).toISOString()
