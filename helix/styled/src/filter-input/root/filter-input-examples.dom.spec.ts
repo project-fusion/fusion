@@ -1,12 +1,17 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 import arity from '../.examples/arity.html' with { type: 'text' }
+import controlled from '../.examples/controlled.html' with { type: 'text' }
+import dismissing from '../.examples/dismissing.html' with { type: 'text' }
 import picking from '../.examples/picking.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
+import suggesting from '../.examples/suggesting.html' with { type: 'text' }
 import typing from '../.examples/typing.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
+  await import('../../tag/index.js')
+  await import('../../code-block/index.js')
   await import('../index.js')
   await import('../../button/index.js')
   await import('../../icon/index.js')
@@ -158,5 +163,68 @@ describe('the preview example', () => {
     )
     await settle(field())
     expect(names()).toEqual(['owner', 'env', 'status'])
+  })
+})
+
+describe('the controlled example', () => {
+  run("the page refuses the reader's text and writes it back in upper case", async () => {
+    await example(controlled)
+    const owned = document.getElementById('owned') as HTMLElement & { value: string }
+    const control = part(owned, 'control') as HTMLInputElement
+    control.value = 'ada'
+    control.dispatchEvent(
+      new InputEvent('input', { bubbles: true, composed: true, inputType: 'insertText' }),
+    )
+    await settle(owned)
+    expect(owned.value).toBe('ADA')
+  })
+})
+
+describe('the dismissing example', () => {
+  run('Backspace on the empty field takes the last tag, and replay puts them back', async () => {
+    await example(dismissing)
+    const field = filter()
+    const control = part(field, 'control') as HTMLInputElement
+    control.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Backspace',
+      }),
+    )
+    await settle(field)
+    const labels = (): string[] =>
+      [...field.querySelectorAll('helix-tag')].map((one) => one.textContent?.trim() ?? '')
+    expect(labels()).toEqual(['design', 'infra'])
+    const replay = document.getElementById('replay') as HTMLElement
+    ;((replay.shadowRoot?.querySelector('button') ?? replay) as HTMLElement).click()
+    await settle(field)
+    expect(labels()).toEqual(['design', 'infra', 'docs'])
+  })
+})
+
+describe('the suggesting example', () => {
+  run('a letter offers the keys it begins, and choosing one writes it', async () => {
+    await example(suggesting)
+    const field = filter() as HTMLElement & { value: string }
+    const control = part(field, 'control') as HTMLInputElement
+    control.focus()
+    control.value = 'o'
+    control.setSelectionRange(1, 1)
+    control.dispatchEvent(
+      new InputEvent('input', { bubbles: true, composed: true, inputType: 'insertText' }),
+    )
+    await settle(field)
+    await new Promise((done) => setTimeout(done, 50))
+    /* By property: the page builds each option and gives it a `value`, which
+       an option reflects on its next update rather than at once. */
+    const options = [...field.querySelectorAll<HTMLElement & { value: string }>('helix-option')]
+    const offered = options.map((one) => one.value)
+    expect(offered).toContain('owner')
+    const owner = options.find((one) => one.value === 'owner')
+    ;(owner?.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null)?.click()
+    await settle(field)
+    expect(field.value.startsWith('owner:')).toBe(true)
   })
 })
