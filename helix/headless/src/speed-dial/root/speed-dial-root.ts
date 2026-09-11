@@ -51,6 +51,7 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before it closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before it opens, and cancelable.
+ * @event {HelixSelectEvent} helix-select - Fired when an action is chosen. Dispatched by the action and listened for here, and the dial closes behind it once it has been heard. Cancelable: refusing it takes the decision and the dial stays open.
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart actions - The region the actions are drawn in.
@@ -128,9 +129,18 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   }
 
   /* Chosen, so the dial shuts behind it. An action that leaves the fan standing
-     open is one a reader has to dismiss after asking for it. */
-  private readonly handleSelect = (): void => {
-    this.close()
+     open is one a reader has to dismiss after asking for it.
+
+     **Once the choice has been heard, and only if it stood**, for `Menu`'s
+     reason: registered at connection, this listener ran before the page's own,
+     so the dial closed before anybody could refuse a choice documented as
+     cancelable. */
+  private readonly handleSelect = (event: Event): void => {
+    queueMicrotask(() => {
+      if (!event.defaultPrevented) {
+        this.close()
+      }
+    })
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {

@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles } from './notification.css.js'
+import '../../format-date/index.js'
 
 /**
  * @summary One thing that happened, which a reader may not have seen yet.

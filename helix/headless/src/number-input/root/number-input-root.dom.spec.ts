@@ -166,6 +166,36 @@ describe('input number keyboard', () => {
     expect(host.value).toBe('29')
   })
 
+  /* A step is written by script, so the field's own `change`, which comes on
+     blur for what was typed, never arrives for one. Found running the events
+     example: three presses of the plus reached a `change` listener as nothing. */
+  test('a step commits, however it was taken', async () => {
+    const host = await field('default-value="5" max="99"')
+    let committed = 0
+    host.addEventListener('change', () => {
+      committed += 1
+    })
+    await press(host, 'ArrowUp')
+    ;(part(host, 'increment') as HTMLElement).click()
+    await host.updateComplete
+    await press(host, 'End')
+    expect(host.value).toBe('99')
+    expect(committed).toBe(3)
+  })
+
+  test('and one that moved nothing, or was refused, commits nothing', async () => {
+    const host = await field('default-value="99" max="99"')
+    let committed = 0
+    host.addEventListener('change', () => {
+      committed += 1
+    })
+    await press(host, 'ArrowUp')
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    await press(host, 'ArrowDown')
+    expect(host.value).toBe('99')
+    expect(committed).toBe(0)
+  })
+
   test('Home and End go to the bounds', async () => {
     const host = await field('default-value="5" max="99" min="1"')
     await press(host, 'End')

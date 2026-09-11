@@ -2,6 +2,8 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterMenu } from '@fusion.dev/helix-headless/filter-input'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './filter-menu.css.js'
+import '../../divider/index.js'
+import '../../menu/index.js'
 
 /**
  * @summary The control that builds a filter: pick a field, tick its values.

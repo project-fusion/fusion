@@ -434,7 +434,14 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * to do, the pointer having opened the bubble already if a pointer is involved.
    */
   private readonly showNow = (event: Event): void => {
-    const focused = event.target
+    /* **The element that took focus, not the one the event names.** A
+       `focusin` from inside a shadow root arrives retargeted to its host, and a
+       host whose button has keyboard focus matches `:focus` but not
+       `:focus-visible`: measured with a real Tab onto a `Button`, the button
+       inside matched and its host did not. So a tooltip for any Helix control
+       never opened for a keyboard reader, the one reader it opens at once for.
+       `composedPath` reaches through an open root to what was focused. */
+    const focused = event.composedPath()[0] ?? event.target
     if (focused instanceof Element && !focused.matches(':focus-visible')) {
       return
     }

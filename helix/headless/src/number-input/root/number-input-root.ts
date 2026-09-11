@@ -238,10 +238,29 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     const step = Math.abs(this.step) || 1
     const from = this.numeric ?? this.min ?? 0
     const next = this.clamp(this.numeric === null ? from : from + steps * step)
-    this.requestValue(String(next))
+    this.land(String(next))
+  }
+
+  /**
+   * A value the reader moved to in one gesture, applied and committed.
+   *
+   * **A step is finished when it lands, so it commits.** The field sends
+   * `change` on blur for what the reader typed, and a step is written by
+   * script, so the browser never sends one for it: three presses of the plus
+   * and a move elsewhere reached a form listening on `change` as nothing at
+   * all. A native number field commits on every step, and so does this, for
+   * the arrows, the buttons, and `Home` and `End`. Only when the value moved: a
+   * refused step, or one pinned at a bound, finished nothing.
+   */
+  private land(next: string): void {
+    const before = this.value
+    const applied = this.requestValue(next)
     const control = this.control
     if (control) {
       restoreValue(control, this.value)
+    }
+    if (applied && this.value !== before) {
+      this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
     }
   }
 
@@ -301,6 +320,8 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /** Where the pointer went down, and what the value was there. */
   private scrubFrom = 0
   private scrubValue = 0
+  /** The value when the press began, which is what a release is compared to. */
+  private scrubStart = ''
 
   /**
    * Press, and the value follows the pointer.
@@ -318,6 +339,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
     this.scrubFrom = event.clientX
     this.scrubValue = this.numeric ?? this.min ?? 0
+    this.scrubStart = this.value
     event.preventDefault()
   }
 
@@ -354,11 +376,21 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
   }
 
-  /** Let go, and the capture goes with it. */
+  /**
+   * Let go, and the capture goes with it, and the drag commits.
+   *
+   * The same reason a step does: every frame of the drag was written by script,
+   * so the browser sends no `change` for any of it, and a drag that moved the
+   * value is finished when the pointer lets go.
+   */
   private readonly handleScrubEnd = (event: PointerEvent): void => {
     const grip = event.currentTarget as HTMLElement
-    if (grip.hasPointerCapture(event.pointerId)) {
-      grip.releasePointerCapture(event.pointerId)
+    if (!grip.hasPointerCapture(event.pointerId)) {
+      return
+    }
+    grip.releasePointerCapture(event.pointerId)
+    if (this.value !== this.scrubStart) {
+      this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
     }
   }
 
@@ -434,14 +466,14 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       !this.isDisabled &&
       !this.readOnly
     ) {
-      this.requestValue(String(this.min))
+      this.land(String(this.min))
     } else if (
       event.key === 'End' &&
       this.max !== undefined &&
       !this.isDisabled &&
       !this.readOnly
     ) {
-      this.requestValue(String(this.max))
+      this.land(String(this.max))
     } else {
       return
     }

@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessHeatmap } from '@fusion.dev/helix-headless/heatmap'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './heatmap-root.css.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary A strip of cells colored by how each one went: uptime, contributions, activity.

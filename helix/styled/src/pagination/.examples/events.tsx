@@ -17,12 +17,11 @@ export function Example() {
     })
   }
 
-  const proposed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-change', `proposing page ${event.detail.value}, refusable`)
-  }
-
+  /* One event, and it is the request: refusing it is the only way to keep the
+     page where it is. There is no `helix-before-change` here, because the page
+     is not a value a form holds. */
   const moved = (event: CustomEvent<{ value: string }>) => {
-    say('helix-navigate', `page ${event.detail.value}, which is a move and not a choice`)
+    say('helix-navigate', `page ${event.detail.value}, a move and not a choice, and refusable`)
   }
 
   return (
@@ -32,7 +31,6 @@ export function Example() {
     >
       <helix-pagination
         default-page="4"
-        onhelix-before-change={proposed}
         onhelix-navigate={moved}
         pages={12}
       />

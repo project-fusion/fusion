@@ -39,6 +39,33 @@ const press = (host: Dial, key: string) => {
 const focused = (one: Action) => one.ownerDocument.activeElement
 
 describe('a speed dial', () => {
+  /* Its close ran on a listener registered at connection, ahead of the page's,
+     so a refused choice shut the dial anyway. */
+  test('a choice is heard before the dial closes, and a refused one leaves it open', async () => {
+    const { actions, host } = await dial()
+    const heard: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      const value = (event as CustomEvent<{ value: string }>).detail.value
+      heard.push(`select ${value}`)
+      if (value === 'delete') {
+        event.preventDefault()
+      }
+    })
+    host.addEventListener('helix-before-close', () => heard.push('before-close'))
+    const choose = async (one: Action): Promise<void> => {
+      host.open = true
+      await host.updateComplete
+      one.shadowRoot?.querySelector<HTMLElement>('button, [part="item"]')?.click()
+      await host.updateComplete
+    }
+    await choose(at(actions, 2))
+    expect(host.open).toBe(true)
+    heard.length = 0
+    await choose(at(actions, 0))
+    expect(heard).toEqual(['select share', 'before-close'])
+    expect(host.open).toBe(false)
+  })
+
   test('is a menu, because its rows are commands and not destinations', async () => {
     /* The opposite call from `Megamenu`, and for the reason that decides it:
        that one holds links, so a menu role would have announced navigation as an

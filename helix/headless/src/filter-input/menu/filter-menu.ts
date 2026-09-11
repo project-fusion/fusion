@@ -7,6 +7,8 @@ import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessFilterField } from '../field/filter-field.js'
 import type { FilterGrammarOperator } from '../grammar.js'
+import '../../divider/index.js'
+import '../../menu/index.js'
 
 /**
  * @summary The control that builds a filter: pick a field, tick its values.

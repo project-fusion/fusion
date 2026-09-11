@@ -48,10 +48,10 @@
     }
   }
 
-  pages.addEventListener('helix-before-change', (event) => {
-    say('helix-before-change', `proposing page ${event.detail.value}, refusable`)
-  })
+  /* One event, and it is the request: refusing it is the only way to keep
+     the page where it is. There is no `helix-before-change` here, because the
+     page is not a value a form holds. */
   pages.addEventListener('helix-navigate', (event) => {
-    say('helix-navigate', `page ${event.detail.value}, which is a move and not a choice`)
+    say('helix-navigate', `page ${event.detail.value}, a move and not a choice, and refusable`)
   })
 </script>

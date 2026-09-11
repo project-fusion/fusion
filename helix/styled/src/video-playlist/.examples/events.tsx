@@ -21,8 +21,10 @@ export function Example() {
     say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
   }
 
-  const pressed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was pressed, which is the item speaking`)
+  /* Not the entry's `helix-select`, which the playlist stops: a page hearing
+     both would hear one press twice under two names. */
+  const moved = (event: CustomEvent<{ value: string }>) => {
+    say('helix-activate', `"${event.detail.value}" is playing, and the playlist already holds it`)
   }
 
   return (
@@ -33,8 +35,8 @@ export function Example() {
       <helix-video-playlist
         default-active="one"
         label="Episodes"
+        onhelix-activate={moved}
         onhelix-before-activate={proposed}
-        onhelix-select={pressed}
       >
         <helix-video
           extra-controls="previous next"

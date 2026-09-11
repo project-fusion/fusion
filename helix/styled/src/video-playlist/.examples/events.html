@@ -58,7 +58,9 @@
   episodes.addEventListener('helix-before-activate', (event) => {
     say('helix-before-activate', `proposing "${event.detail.value}", refusable`)
   })
-  episodes.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was pressed, which is the item speaking`)
+  /* Not the entry's `helix-select`, which the playlist stops: a page hearing
+     both would hear one press twice under two names. */
+  episodes.addEventListener('helix-activate', (event) => {
+    say('helix-activate', `"${event.detail.value}" is playing, and the playlist already holds it`)
   })
 </script>

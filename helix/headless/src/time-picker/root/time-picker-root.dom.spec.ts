@@ -49,6 +49,19 @@ describe('time', () => {
     expect(us.shadowRoot?.textContent).toContain('1:00')
   })
 
+  /* The list inside announces its own `input`, composed, so it crossed out of
+     the picker beside the picker's: two for one choice, found running the
+     events example. */
+  test('one choice is one `input`, however many lists it passed through', async () => {
+    const host = await picker('min="09:00" max="10:00" step="30"')
+    const heard: string[] = []
+    host.addEventListener('input', () => heard.push('input'))
+    ;(options(host)[1]?.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null)?.click()
+    await host.updateComplete
+    expect(host.value).toBe('09:30')
+    expect(heard).toEqual(['input'])
+  })
+
   test('bounds are inclusive at both ends', async () => {
     const host = await picker('min="09:00" max="09:30" step="15"')
     expect(options(host).map((one) => one.getAttribute('value'))).toEqual([

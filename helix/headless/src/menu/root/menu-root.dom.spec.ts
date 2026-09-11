@@ -248,6 +248,39 @@ describe('menu', () => {
     expect(hasState(el, 'open')).toBe(true)
   })
 
+  /* The menu closes on a choice from a capture listener on itself, which ran
+     ahead of the consumer's: it shut before anybody could refuse the choice,
+     and the page heard the close before the choice that caused it. */
+  test('a choice is heard before the menu closes, and a refused one leaves it open', async () => {
+    const el = await menu(`
+      <helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>
+      <helix-headless-menu-item value="keep">Keep</helix-headless-menu-item>`)
+    const heard: string[] = []
+    el.addEventListener('helix-select', (event) => {
+      heard.push(`select ${(event as CustomEvent<{ value: string }>).detail.value}`)
+      if ((event as CustomEvent<{ value: string }>).detail.value === 'keep') {
+        event.preventDefault()
+      }
+    })
+    el.addEventListener('helix-before-close', () => heard.push('before-close'))
+    const press = async (value: string): Promise<void> => {
+      el.toggleOpen()
+      await el.updateComplete
+      el.querySelector(`[value="${value}"]`)
+        ?.shadowRoot?.querySelector<HTMLElement>('[part="item"]')
+        ?.click()
+      await el.updateComplete
+    }
+    await press('keep')
+    expect(el.open).toBe(true)
+    el.toggleOpen()
+    await el.updateComplete
+    heard.length = 0
+    await press('copy')
+    expect(heard).toEqual(['select copy', 'before-close'])
+    expect(el.open).toBe(false)
+  })
+
   test('a row announces its choice rather than acting on it', async () => {
     // The row dispatches and the consumer decides. A row that closed the menu
     // itself would be a second source of truth for whether it is open.

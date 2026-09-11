@@ -57,8 +57,18 @@ export function Example() {
           value="helix"
         >
           helix
-          <helix-tree-item value="core">core</helix-tree-item>
-          <helix-tree-item value="styled">styled</helix-tree-item>
+          <helix-tree-item
+            slot="children"
+            value="core"
+          >
+            core
+          </helix-tree-item>
+          <helix-tree-item
+            slot="children"
+            value="styled"
+          >
+            styled
+          </helix-tree-item>
         </helix-tree-item>
         <helix-tree-item value="cortex">cortex</helix-tree-item>
       </helix-tree>

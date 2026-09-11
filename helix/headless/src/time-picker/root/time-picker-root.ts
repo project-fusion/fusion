@@ -298,6 +298,18 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
+   * The list's own `input`, stopped at the boundary.
+   *
+   * It is composed, so it crosses out of this shadow root on its own, and this
+   * element announces the time itself: a page listening here heard two `input`s
+   * for one choice, the second from the list inside, after the `change` that
+   * should have been the last word. Found running the events example.
+   */
+  private readonly handleListInput = (event: Event): void => {
+    event.stopPropagation()
+  }
+
+  /**
    * Takes what the list announced and constrains it to what the mode allows.
    *
    * The listbox is put in `multiple` for both modes, because that is what marks
@@ -631,6 +643,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
         event.stopPropagation()
         this.moveColumn(part, (event as HelixBeforeChangeEvent).detail.value)
       }}
+      @input=${this.handleListInput}
     >
       ${values.map(
         (one) =>
@@ -708,6 +721,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
       ?multiple=${this.mode !== undefined}
       .value=${this.value}
       @helix-before-change=${this.handleChange}
+      @input=${this.handleListInput}
     >
       ${this.times.map((minutes) => {
         const at = fromMinutes(minutes)

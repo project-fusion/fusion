@@ -235,7 +235,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       this.enter(chosen)
       return
     }
-    this.hide()
+    /* **Closed once the choice has been heard, and only if it stood.** This
+       listener runs in capture, ahead of the consumer's on this same host, and
+       closing here closed the menu before anybody could refuse the choice: a
+       `helix-select` documented as cancelable, whose refusal left the menu shut
+       anyway, and a page that heard `helix-before-close` and `toggle` before
+       the choice that caused them. Found running the events example. The
+       dispatch is synchronous, so a microtask is after all of it. */
+    queueMicrotask(() => {
+      if (!event.defaultPrevented) {
+        this.hide()
+      }
+    })
   }
 
   /**

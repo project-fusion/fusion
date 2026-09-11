@@ -77,7 +77,8 @@ export class HelixHeadlessOutline extends HelixElement {
   label = 'On this page'
 
   /**
-   * How far below the top of the window a heading counts as reached, in pixels.
+   * How far below the top of what scrolls a heading counts as reached, in
+   * pixels: the window, or the panel the sections scroll in.
    *
    * The reading line. A page with a sticky masthead sets this to its height, or
    * a little more: without it the current section changes as a heading slides
@@ -160,8 +161,14 @@ export class HelixHeadlessOutline extends HelixElement {
     if (sections.length === 0) {
       return
     }
+    /* From the top of what the sections scroll in, so a contents rail beside a
+       scrolling panel reads the panel rather than the window, which in that
+       layout never moves. */
+    const scroller = this.scroller
+    const page = scroller === this.page
+    const origin = page ? 0 : scroller.getBoundingClientRect().top
     const passed = sections.filter(
-      ({ target }) => target.getBoundingClientRect().top - this.offset <= 1,
+      ({ target }) => target.getBoundingClientRect().top - origin - this.offset <= 1,
     )
     /* At the end of the page the last section is what is being read, whether or
        not its top ever reached the reading line.
@@ -234,11 +241,41 @@ export class HelixHeadlessOutline extends HelixElement {
    * measured against.
    */
   private get atEnd(): boolean {
-    const doc = globalThis.document?.scrollingElement ?? globalThis.document?.documentElement
-    if (!doc) {
-      return false
-    }
+    const doc = this.scroller
     return Math.ceil(doc.scrollTop + doc.clientHeight) >= doc.scrollHeight - 1
+  }
+
+  /** The element the page itself scrolls with, which `atEnd` explains. */
+  private get page(): Element {
+    const doc = globalThis.document
+    return (doc.scrollingElement ?? doc.documentElement) as Element
+  }
+
+  /**
+   * What the sections scroll in: the nearest ancestor of the first one that
+   * scrolls, or the page when none does.
+   *
+   * **The window is not always what moves.** A contents rail beside a panel
+   * with its own scrollbar, which is a docs layout and every sandbox preview,
+   * measured the window. The window never scrolled, so it was always at its end
+   * and the last section was always current: the events example named `api`
+   * at rest with `install` on screen, a wheel over the panel changed nothing,
+   * and a press on `install` marked it for a moment and snapped back.
+   */
+  private get scroller(): Element {
+    const doc = globalThis.document
+    const first = this.sections[0]?.target
+    for (
+      let node = first?.parentElement;
+      node && node !== doc.body && node !== doc.documentElement;
+      node = node.parentElement
+    ) {
+      const { overflowY } = getComputedStyle(node)
+      if (/auto|scroll|overlay/.test(overflowY) && node.scrollHeight > node.clientHeight) {
+        return node
+      }
+    }
+    return this.page
   }
 
   /** The frame a mark is already scheduled for, so a scroll asks for one. */
@@ -355,10 +392,12 @@ export class HelixHeadlessOutline extends HelixElement {
     const arrive = (): void => {
       clearTimeout(this.landed)
       this.landing = undefined
-      globalThis.removeEventListener?.('scrollend', arrive)
+      globalThis.document?.removeEventListener('scrollend', arrive, true)
       this.mark()
     }
-    globalThis.addEventListener?.('scrollend', arrive, { once: true })
+    /* On the document in capture, like the scroll listener, so a panel's
+       scroll ending lands here as the window's does. */
+    globalThis.document?.addEventListener('scrollend', arrive, { capture: true, once: true })
     this.landed = setTimeout(arrive, 1200)
 
     if (this.behavior === 'auto') {
@@ -430,7 +469,7 @@ export class HelixHeadlessOutline extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleClick)
-    globalThis.removeEventListener?.('scroll', this.handleScroll)
+    globalThis.document?.removeEventListener('scroll', this.handleScroll, true)
     if (this.frame !== 0) {
       globalThis.cancelAnimationFrame(this.frame)
       this.frame = 0
@@ -449,7 +488,13 @@ export class HelixHeadlessOutline extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('click', this.handleClick)
-    globalThis.addEventListener?.('scroll', this.handleScroll, { passive: true })
+    /* The document in capture rather than the window: an element's `scroll`
+       does not bubble, so a panel scrolling never reached a window listener,
+       and capture on the document hears every scroller and the page alike. */
+    globalThis.document?.addEventListener('scroll', this.handleScroll, {
+      capture: true,
+      passive: true,
+    })
     /* Both observers are rebuilt on reconnection. `firstUpdated` runs once for
      * the life of the element and `disconnectedCallback` runs every time it
      * moves, so without this an outline moved in the DOM, which a framework does

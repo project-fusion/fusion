@@ -6,6 +6,7 @@ export function Example() {
   return (
     <helix-listbox
       filter={filter}
+      filterable
       label="Time zone"
       onhelix-filter={(event) => setFilter(event.detail.value)}
     >
