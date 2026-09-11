@@ -38,7 +38,7 @@ export interface Settings {
 }
 
 export const INITIAL: Settings = {
-  accentHue: 180,
+  accentHue: 0,
   allowance: 20,
   blur: 16,
   bodyFace: '',
@@ -63,6 +63,17 @@ export const INITIAL: Settings = {
 const stack = (family: string, fallback: string): string =>
   family ? `"${family}", ${fallback}` : ''
 
+/**
+ * The accent an angle asks for, where none at all is the brand.
+ *
+ * **Not a relation at 0 degrees**, which the engine rotates out of the brand's
+ * way and hands back as a near miss of it. The engine's own default is the
+ * brand itself, reached by naming no accent, so a slider at rest names none.
+ */
+export function accentFrom(hue: number): ThemeIntent['accent'] {
+  return hue % 360 === 0 ? undefined : { from: 'brand', rotate: hue }
+}
+
 /** The intent these settings describe. */
 export function intentFrom(settings: Settings): ThemeIntent {
   const {
@@ -86,9 +97,10 @@ export function intentFrom(settings: Settings): ThemeIntent {
     textScale,
     translucency,
   } = settings
+  const accent = accentFrom(accentHue)
 
   return {
-    accent: { from: 'brand', rotate: accentHue },
+    ...(accent ? { accent } : {}),
     brand,
     chroma: { scale: chromaScale / 100 },
     contrastTarget,

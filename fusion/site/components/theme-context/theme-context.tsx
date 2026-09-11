@@ -18,7 +18,7 @@ import {
   THEME_RESET_EVENT,
   writeSiteTheme,
 } from '@/utils/site-theme/site-theme'
-import { INITIAL } from '@/utils/theme-defaults/theme-defaults'
+import { accentFrom, INITIAL } from '@/utils/theme-defaults/theme-defaults'
 import { THEME_ENGINE } from '@/utils/theme-engine/theme-engine'
 import styles from './theme-context.module.css'
 
@@ -93,8 +93,9 @@ const derive = (
   /**
    * **Every field the builder passes, not the six this control moves.**
    */
+  const accent = accentFrom(settings.accentHue)
   const theme = engine.derive({
-    accent: { from: 'brand', rotate: settings.accentHue },
+    ...(accent ? { accent } : {}),
     brand: settings.brand,
     chroma: { scale: settings.chromaScale / 100 },
     contrastTarget: INITIAL.contrastTarget,

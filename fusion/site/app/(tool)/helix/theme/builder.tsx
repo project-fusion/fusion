@@ -814,7 +814,7 @@ export function ThemeBuilder({
             <helix-slider
               {...BOUNDS.accentHue}
               className="themeChannel"
-              hint="How far around the wheel the accent sits from the brand, in degrees."
+              hint="How far around the wheel the accent sits from the brand, in degrees. At 0 it is the brand."
               label="Accent angle"
               name="accent"
               onInput={(event) => setAccentHue(Number(event.currentTarget.value))}
