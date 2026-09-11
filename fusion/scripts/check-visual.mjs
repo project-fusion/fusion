@@ -52,9 +52,16 @@
  * painted in a token, which hands the color mode to whatever the runner's
  * `prefers-color-scheme` answers and puts the page's own ground under test;
  * link first reports `color-scheme: light` and `rgb(255, 255, 255)`, which is
- * what this file declares. There is no Playwright `colorScheme` option here for
- * the same reason the declaration exists: the mode is a property of the
- * document, so it is written into the document and holds for both tiers.
+ * what this file declares.
+ *
+ * **The mode is declared and emulated both**, because each covers what the other
+ * misses. The declaration beats `frame.css`, but a headless example links its
+ * own sheet after it, and every one of those declares `color-scheme: light
+ * dark`, which then asks the preference. The preference alone loses to a
+ * declaration, and `frame.css` keys the toast's inverted scheme to the media
+ * query rather than to `color-scheme`. Declared only, every headless dark
+ * picture was the light rendering on a black ground, and the styled toast was
+ * dark over a dark page when it is meant to be the page's opposite.
  *
  * **The three brand faces are served, because `frame.css` asks for them.** It
  * carries `@font-face` rules naming `/fonts/*.woff2`, real files under
@@ -236,11 +243,11 @@ const page = (tier, family, width, mode) => {
        test. `color-scheme` is declared because the base sheets resolve their
        grays through `light-dark()`, and the token layer resolves everything
        else through it. */
-    /* **The mode is declared here and not emulated, because this declaration is
-       what wins.** `emulateMedia` sets the preference the page then overrides at
-       the same specificity, so asking the browser for dark and serving
-       `color-scheme: light` produced 182 pictures with a white ground, each one
-       the light rendering under a dark name. The ground is fixed in both modes
+    /* **The mode is declared here as well as emulated, because a declaration
+       beats a preference.** Emulated alone, the page overrode it at the same
+       specificity: asking the browser for dark and serving `color-scheme:
+       light` produced 182 pictures with a white ground, each one the light
+       rendering under a dark name. The ground is fixed in both modes
        for the reason it was fixed in one: the page's own color is never the
        thing under test, and `#000` is what `--helix-color-background` resolves
        to in dark, measured as `oklch(0 0 0)`. */
@@ -388,6 +395,7 @@ const compared = new Map(TIERS.map((tier) => [tier.name, 0]))
 
 for (const { mode, suffix, width } of SHOTS) {
   await tab.setViewportSize({ height: 800, width })
+  await tab.emulateMedia({ colorScheme: mode })
 
   for (const tier of tiers) {
     for (const family of tier.families) {
