@@ -197,8 +197,17 @@ export const mount = async (markup: string): Promise<HTMLElement> => {
  * rather than handing back a quiet half of an example, and a spec reading one
  * registers only where `hasLayout()` says a browser is running it.
  */
-export const example = (_file: unknown): Promise<HTMLElement> =>
+export const example = (_file: unknown, _styles?: unknown): Promise<HTMLElement> =>
   Promise.reject(new Error('An example runs its scripts only in the browser harness.'))
+
+/** The browser harness's wait for a running example, which happens nowhere here. */
+export const idle = (): Promise<void> =>
+  Promise.reject(new Error('An example runs only in the browser harness.'))
+
+/** An `events` example's log, which only a running example can have written. */
+export const logged = (): string[] => {
+  throw new Error('An example logs only in the browser harness.')
+}
 
 /**
  * The role a screen reader sees on the host.

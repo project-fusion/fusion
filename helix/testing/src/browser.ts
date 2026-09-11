@@ -579,9 +579,19 @@ const RAN = '__helixExampleRan'
  * Takes the imported file as it arrives. `with { type: 'text' }` hands over a
  * string, and `bun-types` declares every `.html` import an `HTMLBundle`,
  * whatever the attribute says: the type is wrong and the value is right.
+ *
+ * **And its stylesheet, where it has one**, because the sandbox hands the
+ * frame the example's `.css` beside its markup. An example whose behavior
+ * depends on layout, an outline tracking which section a scroll container is
+ * showing, behaves differently without it, and silently.
  */
-export const example = async (file: unknown): Promise<HTMLElement> => {
+export const example = async (file: unknown, styles: unknown = ''): Promise<HTMLElement> => {
   document.body.innerHTML = String(file)
+  if (String(styles) !== '') {
+    const sheet = document.createElement('style')
+    sheet.textContent = String(styles)
+    document.body.prepend(sheet)
+  }
   for (const original of [...document.body.querySelectorAll('script')]) {
     const script = document.createElement('script')
     for (const { name, value } of original.attributes) {
@@ -605,7 +615,36 @@ export const example = async (file: unknown): Promise<HTMLElement> => {
   await Promise.all(
     [...document.body.querySelectorAll('*')].map((one) => (one as Updatable).updateComplete),
   )
-  return document.body.firstElementChild as HTMLElement
+  return [...document.body.children].find((one) => one.localName !== 'style') as HTMLElement
+}
+
+/**
+ * Waits until nothing in the document has an update pending, and a frame has
+ * been drawn: what a reader's press sets moving, a spec reads after this.
+ */
+export const idle = async (): Promise<void> => {
+  for (let turn = 0; turn < 3; turn += 1) {
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+    await Promise.all(
+      [...document.querySelectorAll('*')].map((one) => (one as Updatable).updateComplete),
+    )
+  }
+}
+
+/**
+ * What an `events` example has logged, as the event name each row opens with.
+ *
+ * Every one of them keeps the same log, a `#log` list whose rows are the event
+ * that arrived with what it carried underneath, so a spec reads the names off
+ * the rows and says which should be there. Empty until the first event: the
+ * placeholder row is replaced rather than kept.
+ */
+export const logged = (): string[] => {
+  const log = document.getElementById('log')
+  if (!log || log.textContent?.includes('Nothing yet')) {
+    return []
+  }
+  return [...log.children].map((row) => row.firstChild?.textContent?.trim() ?? '')
 }
 
 /** The role a screen reader sees on the host. */
