@@ -42,7 +42,7 @@ export default function Page() {
                 </helix-text>
                 <helix-tag tone={stageAppearance(module.stage)}>{module.stage}</helix-tag>
               </helix-flex>
-              <helix-text tone="muted">{module.body}</helix-text>
+              <helix-text emphasis="muted">{module.body}</helix-text>
             </helix-card>
           ))}
         </helix-grid>

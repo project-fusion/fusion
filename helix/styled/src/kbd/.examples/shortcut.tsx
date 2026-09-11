@@ -30,7 +30,7 @@ export function Example() {
       </helix-input>
 
       <helix-text
-        tone="subtle"
+        emphasis="subtle"
         variant="caption"
       >
         {said}

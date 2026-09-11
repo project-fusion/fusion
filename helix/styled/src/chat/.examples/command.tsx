@@ -47,8 +47,8 @@ export function Example() {
             slot="composer"
           >
             <helix-text
+              emphasis="subtle"
               slot="start"
-              tone="subtle"
               variant="caption"
             >
               <helix-kbd>Esc</helix-kbd> to dismiss

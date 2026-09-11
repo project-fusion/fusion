@@ -137,7 +137,7 @@ export function AuraLab(): React.ReactElement {
 
       <helix-flex class={`auraShell`} data-shell direction="column" gap="xl">
         <helix-flex direction="column" gap="sm">
-          <helix-text tone="subtle" variant="label">
+          <helix-text emphasis="subtle" variant="label">
             Helix. Aura
           </helix-text>
           <HeroCopy lede={current?.body} title={current?.name} />

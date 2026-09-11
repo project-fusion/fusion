@@ -14,7 +14,7 @@ export function Example() {
           show-value
           value-text="4.2 out of 5, from 318 reviews"
         ></helix-rating>
-        <helix-text tone="muted">318 reviews</helix-text>
+        <helix-text emphasis="muted">318 reviews</helix-text>
       </helix-flex>
 
       <helix-meter

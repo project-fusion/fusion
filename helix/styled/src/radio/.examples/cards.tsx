@@ -22,7 +22,7 @@ export function Example() {
           </helix-text>
           <helix-text
             as="span"
-            tone="subtle"
+            emphasis="subtle"
             variant="caption"
           >
             One seat, and everything on it.
@@ -45,7 +45,7 @@ export function Example() {
           </helix-text>
           <helix-text
             as="span"
-            tone="subtle"
+            emphasis="subtle"
             variant="caption"
           >
             Up to ten seats, shared billing.

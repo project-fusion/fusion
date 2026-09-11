@@ -78,7 +78,7 @@ export function SiteFooter() {
               caption's 400 and one pixel smaller, so that pairing reads as the
               company being the caption of its own slogan. */}
           <helix-text variant="body-strong">Fusion Development Group</helix-text>
-          <helix-text tone="subtle" variant="caption">
+          <helix-text emphasis="subtle" variant="caption">
             Developing for humanity.
           </helix-text>
 
@@ -109,7 +109,7 @@ export function SiteFooter() {
         <nav aria-label="Footer" className={styles.footerNav}>
           {FOOTER_GROUPS.map((group) => (
             <div className={styles.footerGroup} key={group.heading}>
-              <helix-text tone="muted" variant="label">
+              <helix-text emphasis="muted" variant="label">
                 {group.heading}
               </helix-text>
               {group.items.map((item) => (

@@ -47,8 +47,9 @@ const TAGS: Record<string, StaticValue> = {
  * the ramp is named, and a page built from it is consistent because there was
  * nothing else to choose.
  *
- * `tone` stays separate, because color carries state rather than typography.
- * Folding it in would mean `caption-danger` and `label-primary` and the rest of
+ * `tone` and `emphasis` stay separate, because color carries state rather than
+ * typography, and what a line means is not how loudly it says it. Folding
+ * either in would mean `caption-danger` and `label-muted` and the rest of the
  * cross product, which is the explosion a named ramp exists to prevent.
  *
  * @since 0.1.0
@@ -72,24 +73,38 @@ export class HelixText extends HelixElement {
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code' | 'label'
 
   /**
-   * Color role. A separate axis from the type ramp, because color carries
-   * state: folding it in would mean `caption-danger` and the rest of the cross
-   * product.
+   * How loud the text is, beside what it means.
+   *
+   * `muted` is the quiet ink that still has to be read, and `subtle` the
+   * quieter one below it. Two axes because the test says so: a line can be a
+   * danger *and* quiet at once, and a muted danger is what a validation hint
+   * under a field is.
+   *
+   * **With a `tone`, both are that tone's one quiet ink**: the tone's hue at half
+   * its chroma, as readable as the tone. The readable range holds one quiet step
+   * and not two, measured in #124 for the neutral ink, and a tone has less room
+   * there rather than more, so `subtle` on a tone is the same ink as `muted`
+   * rather than a second one that could not be read.
+   *
+   * The resting case is the absent attribute, full strength.
+   */
+  @property({ reflect: true })
+  emphasis?: 'muted' | 'subtle'
+
+  /**
+   * What the text means. A separate axis from the type ramp, because color
+   * carries state: folding it in would mean `caption-danger` and the rest of the
+   * cross product.
    *
    * **There is no `default` value**, and one must not be added: it would match
    * no rule and fall through to the inherited ink, reading as working while
    * saying nothing. The resting case is the absent attribute.
    *
-   * **`muted` and `subtle` are weight rather than meaning and belong on
-   * `emphasis`, which is why this is still off the registry.** Splitting them
-   * out is blocked on the palette rather than on the rename: there is a quiet
-   * step for the neutral ink and none for any other tone, so a muted danger has
-   * nothing to be made of. `primary-subtle` is a tinted *ground* and not a
-   * quiet ink. That is #210's to derive, and until it does, folding the two
-   * halves apart would leave three of the four combinations unsayable.
+   * Weight is not a tone. How loud the text is belongs on `emphasis`, which is
+   * why `muted` and `subtle` moved there.
    */
   @property({ reflect: true })
-  tone?: 'muted' | 'subtle' | 'primary' | 'danger'
+  tone?: 'accent' | 'danger' | 'info' | 'primary' | 'success' | 'warning'
 
   /**
    * Type treatment.

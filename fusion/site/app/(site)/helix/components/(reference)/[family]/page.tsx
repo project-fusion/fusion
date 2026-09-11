@@ -317,7 +317,7 @@ function Described({
 }) {
   return (
     <helix-table-cell>
-      <helix-text tone="muted" variant="caption">
+      <helix-text emphasis="muted" variant="caption">
         {first(description)}
       </helix-text>
       {references.map((reference) => (
@@ -392,7 +392,7 @@ function ElementApi({ element }: { element: Element }) {
       </helix-flex>
 
       {element.summary && (
-        <helix-text as="p" class={api.description} tone="muted" variant="caption">
+        <helix-text as="p" class={api.description} emphasis="muted" variant="caption">
           {element.summary}
         </helix-text>
       )}
@@ -553,7 +553,7 @@ export default async function FamilyDocs({
               </helix-flex>
             </helix-flex>
 
-            <helix-text as="p" class={api.description} tone="muted" variant="caption">
+            <helix-text as="p" class={api.description} emphasis="muted" variant="caption">
               {first(prose)}
             </helix-text>
 
@@ -628,7 +628,7 @@ export default async function FamilyDocs({
               ))
             ) : (
               <helix-empty>
-                <helix-text tone="muted" variant="caption">
+                <helix-text emphasis="muted" variant="caption">
                   No example yet.
                 </helix-text>
               </helix-empty>
@@ -691,7 +691,7 @@ export default async function FamilyDocs({
                         reads as data that failed to load; a dash reads as a
                         blank someone still has to fill. */}
                     <helix-table-cell>
-                      <helix-text tone="muted" variant="caption">
+                      <helix-text emphasis="muted" variant="caption">
                         {example.description || '-'}
                       </helix-text>
                     </helix-table-cell>
@@ -710,7 +710,7 @@ export default async function FamilyDocs({
          *             these anchors, so the rail says where you are and not only where you
          *             could go.
          */}
-        <helix-text class={docsShell.docsRailTitle} tone="subtle" variant="label">
+        <helix-text class={docsShell.docsRailTitle} emphasis="subtle" variant="label">
           On this page
         </helix-text>
         <helix-outline label="On this page">

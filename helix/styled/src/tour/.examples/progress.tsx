@@ -62,7 +62,7 @@ export function Example() {
           placement="bottom-start"
         >
           <helix-text as="h3">Start something</helix-text>
-          <helix-text tone="muted">The only control here that makes anything new.</helix-text>
+          <helix-text emphasis="muted">The only control here that makes anything new.</helix-text>
           <helix-flex
             align="center"
             gap="xs"
@@ -70,7 +70,7 @@ export function Example() {
           >
             <helix-text
               className="count"
-              tone="subtle"
+              emphasis="subtle"
               variant="caption"
             >
               {count}
@@ -90,7 +90,7 @@ export function Example() {
           placement="bottom"
         >
           <helix-text as="h3">Narrow it down</helix-text>
-          <helix-text tone="muted">Filters stack, and the set says how many are on.</helix-text>
+          <helix-text emphasis="muted">Filters stack, and the set says how many are on.</helix-text>
           <helix-flex
             align="center"
             gap="xs"
@@ -98,7 +98,7 @@ export function Example() {
           >
             <helix-text
               className="count"
-              tone="subtle"
+              emphasis="subtle"
               variant="caption"
             >
               {count}
@@ -124,7 +124,9 @@ export function Example() {
           placement="bottom-end"
         >
           <helix-text as="h3">And when you want it now</helix-text>
-          <helix-text tone="muted">It refreshes itself, but not while you are reading.</helix-text>
+          <helix-text emphasis="muted">
+            It refreshes itself, but not while you are reading.
+          </helix-text>
           <helix-flex
             align="center"
             gap="xs"
@@ -132,7 +134,7 @@ export function Example() {
           >
             <helix-text
               className="count"
-              tone="subtle"
+              emphasis="subtle"
               variant="caption"
             >
               {count}

@@ -12,7 +12,7 @@ export function Example() {
       </helix-text>
       <helix-text
         as="p"
-        tone="muted"
+        emphasis="muted"
         variant="subheading"
       >
         Subheading

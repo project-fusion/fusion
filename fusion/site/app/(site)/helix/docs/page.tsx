@@ -29,7 +29,7 @@ export default function DocsIndex() {
           <helix-tag>Helix</helix-tag>
         </helix-flex>
         <helix-text as="h1">Docs</helix-text>
-        <helix-text as="p" class={styles.lede} tone="muted">
+        <helix-text as="p" class={styles.lede} emphasis="muted">
           Install it, theme it, and the ideas underneath. Every family's own API lives on its page
           under Components; these are the guides that cross families.
         </helix-text>

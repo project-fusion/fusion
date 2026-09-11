@@ -12,7 +12,7 @@ export function Example() {
         <span slot="time">09:12</span>
         <helix-text variant="body-strong">Deployed to production</helix-text>
         <helix-text
-          tone="muted"
+          emphasis="muted"
           variant="caption"
         >
           Version 4.2.0, by the release job.
@@ -29,7 +29,7 @@ export function Example() {
         <span slot="time">08:47</span>
         <helix-text variant="body-strong">Rolled back</helix-text>
         <helix-text
-          tone="muted"
+          emphasis="muted"
           variant="caption"
         >
           Error rate above the threshold for four minutes.
@@ -42,7 +42,7 @@ export function Example() {
         <span slot="time">08:30</span>
         <helix-text variant="body-strong">Build passed</helix-text>
         <helix-text
-          tone="muted"
+          emphasis="muted"
           variant="caption"
         >
           1,089 specs across 75 families.
@@ -52,7 +52,7 @@ export function Example() {
         <span slot="time">08:04</span>
         <helix-text variant="body-strong">Opened</helix-text>
         <helix-text
-          tone="muted"
+          emphasis="muted"
           variant="caption"
         >
           A branch, and the first commit on it.

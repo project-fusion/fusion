@@ -85,7 +85,7 @@ export default async function Page() {
           because the section had padding, not because anything filled it. */}
         <PageHero className={styles.servicesHero} shell="plain">
           <helix-flex class={styles.servicesHeroInner} data-shell direction="column" gap="lg">
-            <helix-text tone="subtle" variant="label">
+            <helix-text emphasis="subtle" variant="label">
               {page?.kicker}
             </helix-text>
             <helix-text as="h1" data-measure data-section-title>
@@ -119,13 +119,13 @@ export default async function Page() {
            *                 table rather than as a panel making a point.
            */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <helix-text tone="subtle" variant="label">
+            <helix-text emphasis="subtle" variant="label">
               What we take on
             </helix-text>
             <helix-text as="h2" data-section-title>
               Three offers, in the order they usually happen
             </helix-text>
-            <helix-text as="p" data-measure tone="muted">
+            <helix-text as="p" data-measure emphasis="muted">
               {page?.lede}
             </helix-text>
           </helix-flex>
@@ -148,14 +148,14 @@ export default async function Page() {
                       and on a page with no number on it that is the commitment
                       being described. */}
                 <helix-flex direction="column" gap="2xs">
-                  <helix-text tone="subtle" variant="label">
+                  <helix-text emphasis="subtle" variant="label">
                     How long it runs
                   </helix-text>
                   <helix-text as="p">{service.duration}</helix-text>
                 </helix-flex>
 
                 <helix-flex direction="column" gap="sm">
-                  <helix-text tone="subtle" variant="label">
+                  <helix-text emphasis="subtle" variant="label">
                     What is in it
                   </helix-text>
                   {/* `unordered`, because these are a set and the order does
@@ -174,10 +174,10 @@ export default async function Page() {
                       reader should leave with. The shared row is what lands the
                       three labels on one line. */}
                 <helix-flex direction="column" gap="2xs">
-                  <helix-text tone="subtle" variant="label">
+                  <helix-text emphasis="subtle" variant="label">
                     What you keep
                   </helix-text>
-                  <helix-text as="p" tone="muted" variant="caption">
+                  <helix-text as="p" emphasis="muted" variant="caption">
                     {service.outcome}
                   </helix-text>
                 </helix-flex>

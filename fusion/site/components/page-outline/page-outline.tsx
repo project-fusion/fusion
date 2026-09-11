@@ -22,7 +22,7 @@ export function PageOutline({
       {/* Named for a reader as well as for a screen reader: `label` on the
           component paints nothing, so without this the rail is a column of
           links with no word saying what they are. */}
-      <helix-text class={className} tone="subtle" variant="label">
+      <helix-text class={className} emphasis="subtle" variant="label">
         {label}
       </helix-text>
       <helix-outline label={label}>

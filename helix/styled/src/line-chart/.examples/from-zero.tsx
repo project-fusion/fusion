@@ -51,7 +51,7 @@ export function Example() {
       >
         <helix-text
           as="p"
-          tone="muted"
+          emphasis="muted"
         >
           Its own range, 8 to 15. June looks like zero and March like a crisis.
         </helix-text>
@@ -64,7 +64,7 @@ export function Example() {
       >
         <helix-text
           as="p"
-          tone="muted"
+          emphasis="muted"
         >
           From zero. Eight is most of fifteen, and neither month was quiet.
         </helix-text>

@@ -18,7 +18,7 @@ export const ProofBand = () => (
       <helix-text as="h2" data-measure data-section-title>
         What Helix costs a page
       </helix-text>
-      <helix-text as="p" data-measure tone="muted">
+      <helix-text as="p" data-measure emphasis="muted">
         Generated from the built packages on every release. Brotli, which is what a CDN serves.
       </helix-text>
     </helix-flex>
@@ -32,7 +32,7 @@ export const ProofBand = () => (
           <helix-text as="p" variant="label">
             {claim.label}
           </helix-text>
-          <helix-text as="p" tone="muted" variant="caption">
+          <helix-text as="p" emphasis="muted" variant="caption">
             {claim.note}
           </helix-text>
         </helix-flex>
@@ -48,7 +48,7 @@ export const ProofBand = () => (
             appears where it wins is an advertisement, and an engineer reading
             this will check. Printing the row we lose is what makes the other
             three worth believing. */}
-        <helix-text as="p" tone="muted" variant="caption">
+        <helix-text as="p" emphasis="muted" variant="caption">
           Brotli bytes for one button with its runtime, measured the same way on the same day.
         </helix-text>
       </helix-flex>

@@ -15,13 +15,13 @@ export default function Page() {
     <>
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-text tone="subtle" variant="label">
+          <helix-text emphasis="subtle" variant="label">
             Contact
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
             {CONTACT.title}
           </helix-text>
-          <helix-text as="p" data-measure tone="muted">
+          <helix-text as="p" data-measure emphasis="muted">
             One address, read by the people who would do the work. What follows is what to put in
             the first message and what happens after you send it, so neither is a thing you have to
             guess at.
@@ -69,7 +69,7 @@ export default function Page() {
                 <helix-text as="h3" data-substrate-name>
                   {item.name}
                 </helix-text>
-                <helix-text as="p" tone="muted">
+                <helix-text as="p" emphasis="muted">
                   {item.body}
                 </helix-text>
               </helix-flex>
@@ -86,7 +86,7 @@ export default function Page() {
           <helix-flex direction="column">
             {NEXT.map((item, index) => (
               <helix-flex align="start" data-row gap="lg" key={item.name} wrap>
-                <helix-text tone="subtle" variant="label">
+                <helix-text emphasis="subtle" variant="label">
                   {String(index + 1).padStart(2, '0')}
                 </helix-text>
                 {/* The name and the body side by side, not stacked.
@@ -102,7 +102,7 @@ export default function Page() {
                   <helix-text as="h3" data-substrate-name>
                     {item.name}
                   </helix-text>
-                  <helix-text as="p" tone="muted">
+                  <helix-text as="p" emphasis="muted">
                     {item.body}
                   </helix-text>
                 </helix-grid>

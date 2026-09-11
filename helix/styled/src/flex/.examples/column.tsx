@@ -6,7 +6,7 @@ export function Example() {
     >
       <helix-text variant="subheading">Item One</helix-text>
       <helix-text
-        tone="muted"
+        emphasis="muted"
         variant="body"
       >
         Item Two

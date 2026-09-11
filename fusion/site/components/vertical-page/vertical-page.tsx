@@ -31,7 +31,7 @@ export function VerticalPage({
             <helix-tag tone={stageAppearance(vertical.stage)}>{vertical.stage}</helix-tag>
           )}
         </helix-flex>
-        <helix-text as="p" class={styles.lede} tone="muted">
+        <helix-text as="p" class={styles.lede} emphasis="muted">
           {product ? product.body : vertical.body}
         </helix-text>
       </helix-flex>

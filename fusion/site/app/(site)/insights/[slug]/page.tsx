@@ -110,12 +110,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                   <helix-flex direction="column" gap="2xs">
                     <helix-flex align="center" data-density="sm" gap="xs">
                       <helix-tag>{other.topic}</helix-tag>
-                      <helix-text tone="subtle" variant="caption">
+                      <helix-text emphasis="subtle" variant="caption">
                         {other.minutes} min
                       </helix-text>
                     </helix-flex>
                     <helix-text variant="title">{other.title}</helix-text>
-                    <helix-text data-measure tone="muted" variant="caption">
+                    <helix-text data-measure emphasis="muted" variant="caption">
                       {other.summary}
                     </helix-text>
                   </helix-flex>
@@ -148,7 +148,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
             <helix-tag tone="primary">{insight.topic}</helix-tag>
           </Link>
-          <helix-text tone="muted" variant="caption">
+          <helix-text emphasis="muted" variant="caption">
             <PublishedOn date={insight.date}>{formatDate(insight.date)}</PublishedOn>
           </helix-text>
         </helix-flex>

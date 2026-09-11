@@ -31,7 +31,7 @@ export default function Page() {
       {product.install && (
         <helix-flex direction="column" gap="sm">
           <helix-code-block label={`Install ${product.name}`}>{product.install}</helix-code-block>
-          <helix-text tone="subtle" variant="caption">
+          <helix-text emphasis="subtle" variant="caption">
             {product.license}, and {families} families ship today.
           </helix-text>
         </helix-flex>
@@ -57,7 +57,7 @@ export default function Page() {
                 <helix-text as="h3" slot="header" variant="title">
                   {destination.title}
                 </helix-text>
-                <helix-text tone="muted">{destination.summary}</helix-text>
+                <helix-text emphasis="muted">{destination.summary}</helix-text>
               </helix-card>
             </Link>
           ))}

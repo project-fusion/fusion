@@ -1,23 +1,83 @@
-<!-- @summary The text tones, from the resting ink down to the most muted. -->
+<!-- @summary What the text means at full strength, and the one quiet step each tone has. -->
 <helix-flex
   direction="column"
   gap="sm"
 >
-  <helix-text as="p">Resting</helix-text>
-  <helix-text
-    as="p"
-    tone="muted"
-  >Muted</helix-text>
-  <helix-text
-    as="p"
-    tone="subtle"
-  >Subtle</helix-text>
-  <helix-text
-    as="p"
-    tone="primary"
-  >Primary</helix-text>
-  <helix-text
-    as="p"
-    tone="danger"
-  >Danger</helix-text>
+  <helix-flex gap="lg">
+    <helix-text as="p">Resting</helix-text>
+    <helix-text
+      as="p"
+      emphasis="muted"
+    >Muted</helix-text>
+    <helix-text
+      as="p"
+      emphasis="subtle"
+    >Subtle</helix-text>
+  </helix-flex>
+  <helix-flex gap="lg">
+    <helix-text
+      as="p"
+      tone="primary"
+    >Primary</helix-text>
+    <helix-text
+      as="p"
+      emphasis="muted"
+      tone="primary"
+    >Quiet primary</helix-text>
+  </helix-flex>
+  <helix-flex gap="lg">
+    <helix-text
+      as="p"
+      tone="accent"
+    >Accent</helix-text>
+    <helix-text
+      as="p"
+      emphasis="muted"
+      tone="accent"
+    >Quiet accent</helix-text>
+  </helix-flex>
+  <helix-flex gap="lg">
+    <helix-text
+      as="p"
+      tone="info"
+    >Info</helix-text>
+    <helix-text
+      as="p"
+      emphasis="muted"
+      tone="info"
+    >Quiet info</helix-text>
+  </helix-flex>
+  <helix-flex gap="lg">
+    <helix-text
+      as="p"
+      tone="success"
+    >Success</helix-text>
+    <helix-text
+      as="p"
+      emphasis="muted"
+      tone="success"
+    >Quiet success</helix-text>
+  </helix-flex>
+  <helix-flex gap="lg">
+    <helix-text
+      as="p"
+      tone="warning"
+    >Warning</helix-text>
+    <helix-text
+      as="p"
+      emphasis="muted"
+      tone="warning"
+    >Quiet warning</helix-text>
+  </helix-flex>
+  <helix-flex gap="lg">
+    <helix-text
+      as="p"
+      tone="danger"
+    >Danger</helix-text>
+    <helix-text
+      as="p"
+      emphasis="muted"
+      tone="danger"
+    >Quiet danger</helix-text>
+  </helix-flex>
 </helix-flex>

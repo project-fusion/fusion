@@ -102,7 +102,7 @@ export function Example() {
         >
           <helix-card separation="plain">
             <helix-text as="h3">Everything you can do to a file</helix-text>
-            <helix-text tone="muted">Behind one control, so the bar stays short.</helix-text>
+            <helix-text emphasis="muted">Behind one control, so the bar stays short.</helix-text>
           </helix-card>
         </helix-tour-stop>
 
@@ -112,7 +112,7 @@ export function Example() {
         >
           <helix-card separation="plain">
             <helix-text as="h3">Export lives in here</helix-text>
-            <helix-text tone="muted">
+            <helix-text emphasis="muted">
               The tour opened the menu to show you. It closes again on the way out.
             </helix-text>
           </helix-card>
@@ -124,7 +124,7 @@ export function Example() {
         >
           <helix-card separation="plain">
             <helix-text as="h3">And this is on by default</helix-text>
-            <helix-text tone="muted">
+            <helix-text emphasis="muted">
               Inside a drawer the tour opened, over a page it did not have to know about.
             </helix-text>
           </helix-card>

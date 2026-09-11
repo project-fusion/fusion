@@ -254,15 +254,32 @@ helix-card > [slot="media"] {
   line-height: var(--helix-leading-normal);
 }
 
-/* Color carries state, so it stays a separate axis from the ramp. */
-[data-tone="muted"],
-helix-text[tone="muted"] {
+/* Color carries state, so it stays a separate axis from the ramp, and it is
+   two axes rather than one: `tone` is what the text means and `emphasis` how
+   loud it is, and a line can be a danger and quiet at once. */
+[data-emphasis="muted"],
+helix-text[emphasis="muted"] {
   color: var(--helix-color-foreground-muted);
 }
 
-[data-tone="subtle"],
-helix-text[tone="subtle"] {
+[data-emphasis="subtle"],
+helix-text[emphasis="subtle"] {
   color: var(--helix-color-foreground-subtle);
+}
+
+[data-tone="accent"],
+helix-text[tone="accent"] {
+  color: var(--helix-color-accent);
+}
+
+[data-tone="danger"],
+helix-text[tone="danger"] {
+  color: var(--helix-color-danger);
+}
+
+[data-tone="info"],
+helix-text[tone="info"] {
+  color: var(--helix-color-info);
 }
 
 [data-tone="primary"],
@@ -270,9 +287,49 @@ helix-text[tone="primary"] {
   color: var(--helix-color-primary);
 }
 
-[data-tone="danger"],
-helix-text[tone="danger"] {
-  color: var(--helix-color-danger);
+[data-tone="success"],
+helix-text[tone="success"] {
+  color: var(--helix-color-success);
+}
+
+[data-tone="warning"],
+helix-text[tone="warning"] {
+  color: var(--helix-color-warning);
+}
+
+/* **A tone that goes quiet keeps its meaning**, in its own quiet ink, and
+   `subtle` lands there too: the readable range holds one quiet step (#124), so
+   a tone has one. One class more than either axis alone, so the pair wins
+   wherever both are written. */
+
+[data-tone="accent"]:is([data-emphasis="muted"], [data-emphasis="subtle"]),
+helix-text[tone="accent"]:is([emphasis="muted"], [emphasis="subtle"]) {
+  color: var(--helix-color-accent-muted);
+}
+
+[data-tone="danger"]:is([data-emphasis="muted"], [data-emphasis="subtle"]),
+helix-text[tone="danger"]:is([emphasis="muted"], [emphasis="subtle"]) {
+  color: var(--helix-color-danger-muted);
+}
+
+[data-tone="info"]:is([data-emphasis="muted"], [data-emphasis="subtle"]),
+helix-text[tone="info"]:is([emphasis="muted"], [emphasis="subtle"]) {
+  color: var(--helix-color-info-muted);
+}
+
+[data-tone="primary"]:is([data-emphasis="muted"], [data-emphasis="subtle"]),
+helix-text[tone="primary"]:is([emphasis="muted"], [emphasis="subtle"]) {
+  color: var(--helix-color-primary-muted);
+}
+
+[data-tone="success"]:is([data-emphasis="muted"], [data-emphasis="subtle"]),
+helix-text[tone="success"]:is([emphasis="muted"], [emphasis="subtle"]) {
+  color: var(--helix-color-success-muted);
+}
+
+[data-tone="warning"]:is([data-emphasis="muted"], [data-emphasis="subtle"]),
+helix-text[tone="warning"]:is([emphasis="muted"], [emphasis="subtle"]) {
+  color: var(--helix-color-warning-muted);
 }
 
 /* The button recipe, for elements this library does not render. **Never fold the

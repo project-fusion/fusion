@@ -208,7 +208,7 @@ export default function Home() {
             {SERVICES.map((service) => (
               <helix-flex class={band.bandCell} direction="column" gap="sm" key={service.name}>
                 <Claim>{service.name}</Claim>
-                <helix-text as="p" tone="muted">
+                <helix-text as="p" emphasis="muted">
                   {service.summary}
                 </helix-text>
               </helix-flex>
@@ -239,7 +239,7 @@ export default function Home() {
             {ENGAGEMENT.map((one) => (
               <helix-flex class={band.bandCell} direction="column" gap="sm" key={one.name}>
                 <Claim>{one.name}</Claim>
-                <helix-text as="p" tone="muted">
+                <helix-text as="p" emphasis="muted">
                   {one.body}
                 </helix-text>
               </helix-flex>
@@ -291,7 +291,7 @@ export default function Home() {
                 <helix-text as="h3" variant="title">
                   {insight.title}
                 </helix-text>
-                <helix-text tone="muted" variant="caption">
+                <helix-text emphasis="muted" variant="caption">
                   {insight.summary}
                 </helix-text>
               </Link>

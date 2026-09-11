@@ -531,13 +531,18 @@ that passes against code doing nothing.
 **Five axes, fixed vocabularies, and a component takes a subset of one.** They
 are declared in `helix/cli/src/component/axes.rs`, which is the registry:
 
-| Axis | Values | Families |
-|---|---|---|
-| `emphasis` | `ghost` `outlined` `solid` `subtle` | 9 |
-| `material` | `frosted` `glass` `transparent` | 8 |
-| `separation` | `elevated` `filled` `outlined` `plain` | 5 |
-| `tone` | `accent` `danger` `info` `muted` `neutral` `primary` `subtle` `success` `surface` `warning` | 9 |
-| `width` | `auto` `full` `standard` | 4 |
+| Axis | Values |
+|---|---|
+| `emphasis` | `ghost` `muted` `outlined` `solid` `subtle` |
+| `material` | `frosted` `glass` `transparent` |
+| `separation` | `elevated` `filled` `outlined` `plain` |
+| `tone` | `accent` `danger` `info` `neutral` `primary` `success` `surface` `warning` |
+| `width` | `auto` `full` `standard` |
+
+**Weight is emphasis and meaning is tone**, and `Text` was the last to mix them:
+`muted` and `subtle` were tones there, which made a quiet danger unsayable. On
+text, `emphasis` picks the quiet ink, and a tone with an emphasis is that tone's
+own quiet ink, the one step the readable range holds.
 
 `variant` is the escape hatch and takes no registry, being component-specific by
 definition: `segmented` against `underlined`, `list` against `wheels`, `dots`

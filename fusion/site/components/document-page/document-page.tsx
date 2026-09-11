@@ -58,7 +58,7 @@ export function DocumentPage({
   const head = (
     <helix-flex align="start" direction="column" gap="md">
       {kicker && (
-        <helix-text class={styles.documentKicker} tone="subtle" variant="label">
+        <helix-text class={styles.documentKicker} emphasis="subtle" variant="label">
           {kicker}
         </helix-text>
       )}
@@ -78,7 +78,7 @@ export function DocumentPage({
            and by weight, and the tone was doing the same job a second time. On
            the plain head there is no band, the ground is the page, and muted is
            what separates the standfirst from the body under it. */
-        <helix-text as="p" class={styles.documentLede} tone={hero ? undefined : 'muted'}>
+        <helix-text as="p" class={styles.documentLede} emphasis={hero ? undefined : 'muted'}>
           {lede}
         </helix-text>
       )}

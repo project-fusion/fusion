@@ -21,7 +21,7 @@ export function Example() {
           </helix-text>
           <helix-text
             as="span"
-            tone="subtle"
+            emphasis="subtle"
             variant="caption"
           >
             Nightly, kept for thirty days.
@@ -44,7 +44,7 @@ export function Example() {
           </helix-text>
           <helix-text
             as="span"
-            tone="subtle"
+            emphasis="subtle"
             variant="caption"
           >
             Every action, with who and when.

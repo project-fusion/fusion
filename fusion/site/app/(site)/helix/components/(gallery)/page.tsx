@@ -130,7 +130,7 @@ export default async function Page({
                   </helix-tooltip>
                 )}
               </helix-flex>
-              <helix-text tone="muted" variant="caption">
+              <helix-text emphasis="muted" variant="caption">
                 {family.summary}
               </helix-text>
             </helix-card>
