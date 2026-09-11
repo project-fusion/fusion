@@ -2,8 +2,8 @@
  * The browser distribution answers what the engine answers.
  *
  * **The oracle is the reference for both halves, which is what makes this
- * cheap.** `oracle.json` holds seventeen whole themes as the TypeScript derives
- * them, and `cargo test` asserts the crate against it on the host. So what is
+ * cheap.** `oracle.json` holds a whole theme per recorded intent, as the engine
+ * derives them, and `cargo test` asserts the crate against it on the host. So what is
  * left to prove here is that nothing is lost crossing the boundary, and that
  * `wasm32` computes what the host computes.
  *

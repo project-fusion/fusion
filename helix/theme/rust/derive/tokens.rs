@@ -99,15 +99,28 @@ impl Phases {
         let primary = emphasis(brand, ctx);
         let statuses = statuses(&resolved.status, brand.chroma, primary.raw, ctx);
 
-        let (seed, pinned) = seeded(&resolved.accent, raw_brand, ctx.policy);
-        let bound = match &resolved.accent {
-            Seed::Color(_) => 0.0,
-            Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
+        /* An accent nobody named is the brand's own five colors, so it is the
+        primary by construction rather than a solve that lands near it. */
+        let (accent, accent_origin) = match &resolved.accent {
+            None => (primary, Origin::Derived),
+            Some(named) => {
+                let (seed, pinned) = seeded(named, raw_brand, ctx.policy);
+                let bound = match named {
+                    Seed::Color(_) => 0.0,
+                    Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
+                };
+                let accent = emphasis(
+                    settle(seed, pinned, bound, primary.raw, &statuses, ctx),
+                    ctx,
+                );
+                let origin = if pinned {
+                    Origin::Pinned
+                } else {
+                    Origin::Related
+                };
+                (accent, origin)
+            }
         };
-        let accent = emphasis(
-            settle(seed, pinned, bound, primary.raw, &statuses, ctx),
-            ctx,
-        );
 
         let fills = status_fills(&statuses, ctx);
         let grounds = filled_grounds(primary.filled, accent.filled, &fills);
@@ -116,11 +129,7 @@ impl Phases {
 
         Self {
             accent,
-            accent_origin: if pinned {
-                Origin::Pinned
-            } else {
-                Origin::Related
-            },
+            accent_origin,
             fills,
             foreground_inverse,
             inks: neutral_inks(ctx.surfaces, neutral, resolved.contrast_target),

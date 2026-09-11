@@ -138,11 +138,17 @@ pub fn violations(pairings: &[Pairing]) -> Vec<String> {
 
 /// Roles against each other rather than against a ground.
 ///
-/// Every pair once, which is what the index comparison is for.
+/// Every pair once, which is what the index comparison is for. An accent nobody
+/// named is the brand and not a role of its own, so it is `None` here: compared,
+/// it would report the brand colliding with itself on every default theme.
 #[must_use]
-pub fn collisions(primary: &Emphasis, accent: &Emphasis, statuses: &[StatusColor]) -> Vec<String> {
+pub fn collisions(
+    primary: &Emphasis,
+    accent: Option<&Emphasis>,
+    statuses: &[StatusColor],
+) -> Vec<String> {
     let roles: Vec<(&str, Oklch)> = std::iter::once(("primary", primary.raw))
-        .chain(std::iter::once(("accent", accent.raw)))
+        .chain(accent.map(|accent| ("accent", accent.raw)))
         .chain(statuses.iter().map(|status| (status.name, status.color)))
         .collect();
 

@@ -12,7 +12,7 @@
  *
  * The alternative was serializing the resolved intent into the oracle so this
  * file could be deleted, which needs a `Serialize` on every shape in the
- * vocabulary including three unions with hand-written readers. Seventeen small
+ * vocabulary including three unions with hand-written readers. A list of small
  * literals held to each other by a check is the cheaper honest answer.
  *
  * Chosen so each one changes a different phase: the scheme flips the whole
@@ -98,4 +98,9 @@ export const INTENTS = [
     },
     label: 'paced',
   },
+  /* An accent named both ways. Unnamed, an accent is the brand and never
+     rotates or pins, so without these the oracle would hold no accent that
+     does. `complement` is what every intent above defaulted to before. */
+  { intent: { accent: { from: 'brand', rotate: 180 }, brand: '#3b82f6' }, label: 'complement' },
+  { intent: { accent: '#db2777', brand: '#3b82f6' }, label: 'pinned-accent' },
 ]

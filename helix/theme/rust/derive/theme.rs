@@ -47,7 +47,11 @@ pub fn derive_theme(intent: &ThemeIntent) -> Result<Theme, IntentError> {
     let pairings = pairings(&resolved.pairings, &derived.tokens);
 
     Ok(Theme {
-        collisions: collisions(&derived.primary, &derived.accent, &derived.statuses),
+        collisions: collisions(
+            &derived.primary,
+            resolved.accent.as_ref().map(|_| &derived.accent),
+            &derived.statuses,
+        ),
         pairings: pairings.clone(),
         seeds: seeds(&resolved, &derived.primary),
         tokens: derived.tokens,

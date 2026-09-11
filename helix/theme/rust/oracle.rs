@@ -849,6 +849,8 @@ pub fn labels() -> Vec<&'static str> {
         "instant",
         "tiny",
         "paced",
+        "complement",
+        "pinned-accent",
     ]
 }
 
@@ -980,6 +982,19 @@ pub fn intent_for(label: &str) -> ThemeIntent {
                 surface: None,
             });
         }
+        /* An accent named both ways. Unnamed, an accent is the brand and never
+        reaches `settle`, so without these the oracle would hold no accent that
+        rotates or pins at all. `complement` is what every intent above
+        defaulted to before, and lands exactly where they did. */
+        "complement" => {
+            intent.accent = Some(Seed::Relation(Relation {
+                allowance: None,
+                chroma: None,
+                from: From::Brand,
+                rotate: 180.0,
+            }));
+        }
+        "pinned-accent" => intent.accent = Some(Seed::Color(Color::Hex("#db2777".to_owned()))),
         other => panic!("no intent is recorded for `{other}`"),
     }
     intent
@@ -1258,12 +1273,13 @@ fn the_hue_repair_widens_outward_and_gives_up_rather_than_settling() {
 }
 
 /// The accent, which settles after the statuses and reports `related` unless the
-/// consumer pinned a color.
+/// consumer pinned a color, and is the brand's own emphasis when nobody named
+/// one.
 ///
-/// The default intent is the complement, `rotate: 180`, and on the shipped blue
-/// that lands at 80 degrees against an amber `warning` at 75. This is the phase
-/// that was reported as an unrepairable collision on every derivation before the
-/// accent was made the role that yields.
+/// A named complement, `rotate: 180`, lands at 80 degrees on the shipped blue
+/// against an amber `warning` at 75. This is the phase that was reported as an
+/// unrepairable collision on every derivation before the accent was made the
+/// role that yields.
 #[test]
 fn the_accent_lands_where_the_typescript_lands() {
     let data = oracle();
@@ -1274,17 +1290,22 @@ fn the_accent_lands_where_the_typescript_lands() {
         let primary = emphasis(brand, &ctx);
         let statuses_resolved = statuses(&resolved.status, brand.chroma, primary.raw, &ctx);
 
-        let (accent, pinned) = seeded(&resolved.accent, raw_brand, Policy::new(resolved.chroma));
-        let bound = match &resolved.accent {
-            Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
-            Seed::Color(_) => 0.0,
-        };
-        let settled = settle(accent, pinned, bound, primary.raw, &statuses_resolved, &ctx);
-        let steps = emphasis(settled, &ctx);
-        let origin = if pinned {
-            Origin::Pinned
-        } else {
-            Origin::Related
+        let (steps, origin) = match &resolved.accent {
+            None => (primary, Origin::Derived),
+            Some(named) => {
+                let (accent, pinned) = seeded(named, raw_brand, Policy::new(resolved.chroma));
+                let bound = match named {
+                    Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
+                    Seed::Color(_) => 0.0,
+                };
+                let settled = settle(accent, pinned, bound, primary.raw, &statuses_resolved, &ctx);
+                let origin = if pinned {
+                    Origin::Pinned
+                } else {
+                    Origin::Related
+                };
+                (emphasis(settled, &ctx), origin)
+            }
         };
 
         assert_token(

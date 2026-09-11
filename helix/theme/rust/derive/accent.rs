@@ -6,7 +6,7 @@
 //! supplied. An accent is a *relationship*, and a relationship whose exact angle
 //! nobody specified has room to move where neither of the others does.
 //!
-//! Measured on the shipped blue, where the complement lands at 80 degrees and
+//! Measured on the shipped blue, where a complement lands at 80 degrees and
 //! `warning` is amber at 75: before this, the two were reported as
 //! indistinguishable on every single derivation and no allowance could repair
 //! it, because `danger` at 27 and `success` at 155 box in every hue `warning`

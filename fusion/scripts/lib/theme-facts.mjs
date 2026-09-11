@@ -4,7 +4,7 @@
  * **Read from what the engine emits, never from the engine's source.** Every
  * check built on this is about the emitted names, and a regular expression over
  * the templates only approximates them: it can see a family and never a leaf.
- * `oracle.json` is the emitted answer for seventeen intents, and `cargo test`
+ * `oracle.json` is the emitted answer for every recorded intent, and `cargo test`
  * asserts the engine against it, so it cannot go stale without the Rust suite
  * failing.
  *

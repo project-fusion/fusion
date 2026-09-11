@@ -328,7 +328,7 @@ pub struct Status {
     serde(deny_unknown_fields, rename_all = "camelCase")
 )]
 pub struct ThemeIntent {
-    /// The second emphasis. Defaults to the complement of the brand.
+    /// The second emphasis. Unnamed, it is the brand.
     pub accent: Option<Seed>,
     /// The one color most consumers care about, and the only required input.
     pub brand: Color,

@@ -6,8 +6,8 @@
 
 use crate::derive::Cast;
 use crate::intent::{
-    to_oklch, Chroma, Color, Font, From, Material, Motion, Neutral, PairingRequest, Relation,
-    Scheme, Seed, Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
+    to_oklch, Chroma, Color, Font, Material, Motion, Neutral, PairingRequest, Scheme, Seed,
+    Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
 };
 use crate::model::{Contrast, INKS};
 use crate::oklch::Oklch;
@@ -88,7 +88,9 @@ impl Policy {
 /// An intent with every default filled in.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Resolved {
-    pub accent: Seed,
+    /// `None` when nobody named one, and that is not a missing default: an
+    /// accent nobody named is the brand, so there is no seed to fill in.
+    pub accent: Option<Seed>,
     pub brand: Color,
     pub chroma: Chroma,
     pub contrast_target: f64,
@@ -146,12 +148,16 @@ pub fn default_pairings(contrast_target: f64) -> Vec<PairingRequest> {
 pub fn defaults(intent: &ThemeIntent) -> Resolved {
     let contrast_target = intent.contrast_target.unwrap_or(4.5);
     Resolved {
-        accent: intent.accent.clone().unwrap_or(Seed::Relation(Relation {
-            allowance: None,
-            chroma: None,
-            from: From::Brand,
-            rotate: 180.0,
-        })),
+        /* **Unnamed, the accent is the brand, not a rotation off it.** The
+        complement shipped here and in the stylesheet, and the stylesheet
+        dropped it for reasons measured there: 180 degrees is the worst angle
+        on the shipping seed, three from `warning`, and near hue 0 a complement
+        at the brand's lightness cannot clear AA. The engine kept it, so
+        `derive({ brand })` drew `tone="accent"` in a color the same page
+        without a theme did not. A relation to the brand at 0 degrees is not
+        the same thing either, since `settle` would rotate it out of the
+        brand's way and hand back a near miss. */
+        accent: intent.accent.clone(),
         brand: intent.brand.clone(),
         chroma: intent.chroma.unwrap_or_default(),
         contrast_target,
@@ -267,7 +273,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     and the theme reports clean. Three seeds can be handed a color and all three
     are checked here, which is what makes the `expect` in each phase downstream a
     statement about this function rather than an assumption about its caller. */
-    if let Seed::Color(color) = &resolved.accent {
+    if let Some(Seed::Color(color)) = &resolved.accent {
         if to_oklch(color).is_none() {
             return Err(IntentError::Unreadable {
                 label: "accent".to_owned(),

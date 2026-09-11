@@ -88,7 +88,9 @@ export interface PairingRequest {
 export interface ThemeIntent {
   /**
    * The second emphasis. A color pins it and the relationship stands aside.
-   * Defaults to the complement, `{ from: 'brand', rotate: 180 }`.
+   * Unnamed, it is the brand: a palette with one color has one, and
+   * `tone="accent"` draws in it. `{ from: 'brand', rotate: 180 }` asks for the
+   * complement.
    */
   accent?: Seed
   /**

@@ -43,7 +43,7 @@
 //! pattern over the templates only approximates the names: it can see a family
 //! and never a leaf, stopping at the first interpolation, and it cannot see the
 //! color tokens at all, those being written by a loop. The oracle is the emitted
-//! answer for seventeen intents and the Rust suite asserts the engine against
+//! answer for every recorded intent and the Rust suite asserts the engine against
 //! it, so it cannot go stale quietly. The one thing lost is a branch no intent
 //! reaches, which is why four of those intents exist purely to turn on the tail
 //! of the emission.
