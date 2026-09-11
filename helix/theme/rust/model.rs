@@ -202,6 +202,18 @@ pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
         grounds: pages.clone(),
         name: format!("color-{status}"),
     }));
+    /* The quiet ink of each tone, on the page ladder alone, like the neutral
+    quiet ink: a muted line is running text, not a badge on a tint. */
+    inks.extend(
+        ["primary", "accent"]
+            .iter()
+            .chain(STATUSES.iter())
+            .map(|tone| Ink {
+                contrast: Contrast::Text,
+                grounds: pages.clone(),
+                name: format!("color-{tone}-muted"),
+            }),
+    );
     /* A ring has to be seen rather than read, so 3:1 under WCAG 1.4.11 and not
     the text target. It is in the model at all because it is the one mark whose
     absence makes a keyboard unusable. */

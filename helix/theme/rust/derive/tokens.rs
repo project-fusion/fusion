@@ -11,6 +11,7 @@ use crate::derive::emphasis::{emphasis, Emphasis};
 use crate::derive::fills::{filled_grounds, hover_of, on_accent, status_fills, Fill};
 use crate::derive::inks::{neutral_inks, NeutralInks};
 use crate::derive::marks::{brand_mark, focus_ring, inverse};
+use crate::derive::quiet::quiet;
 use crate::derive::resolve::{Policy, Resolved};
 use crate::derive::status::{statuses, StatusColor};
 use crate::derive::surfaces::{ladder, surfaces};
@@ -141,6 +142,33 @@ impl Phases {
     }
 }
 
+/// Each tone's quiet ink, after the tones themselves.
+///
+/// Derived from the tone as it came out rather than as it was asked for, so a
+/// pinned status quietens the color the consumer pinned, and `Derived` whatever
+/// the tone's own origin, since nobody supplied this one.
+fn quiet_inks(
+    primary: &Emphasis,
+    accent: &Emphasis,
+    statuses: &[StatusColor],
+    ctx: &Deriving,
+) -> Vec<DerivedToken> {
+    let ground = Some(ctx.surfaces.background());
+    let named = [("primary", primary.raw), ("accent", accent.raw)]
+        .into_iter()
+        .chain(statuses.iter().map(|status| (status.name, status.color)));
+    named
+        .map(|(name, ink)| {
+            token(
+                &format!("color-{name}-muted"),
+                quiet(ink, ctx),
+                Origin::Derived,
+                ground,
+            )
+        })
+        .collect()
+}
+
 /// Names the colors, in the order the emitted file carries them.
 fn assemble(
     resolved: &Resolved,
@@ -208,6 +236,8 @@ fn assemble(
             ground,
         ));
     }
+
+    tokens.extend(quiet_inks(primary, accent, statuses, ctx));
 
     /* **The grounds the model says exist.** A filled danger button, a hovered
     filled anything, the inverse pair a toast uses and the ring a keyboard

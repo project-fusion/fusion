@@ -14,6 +14,7 @@ pub mod emphasis;
 pub mod fills;
 pub mod inks;
 pub mod marks;
+pub mod quiet;
 pub mod report;
 pub mod resolve;
 pub mod seeds;

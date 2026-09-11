@@ -53,7 +53,12 @@ pub fn derive_theme(intent: &ThemeIntent) -> Result<Theme, IntentError> {
             &derived.statuses,
         ),
         pairings: pairings.clone(),
-        seeds: seeds(&resolved, &derived.primary, &derived.accent, derived.neutral),
+        seeds: seeds(
+            &resolved,
+            &derived.primary,
+            &derived.accent,
+            derived.neutral,
+        ),
         tokens: derived.tokens,
         violations: violations(&pairings),
         intent: resolved,

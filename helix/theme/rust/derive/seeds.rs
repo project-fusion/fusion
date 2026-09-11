@@ -73,7 +73,10 @@ pub fn seeds(
     vec![
         ("seed-accent".to_owned(), oklch_to_hex(second)),
         ("seed-accent-hue".to_owned(), trimmed(angle, 1)),
-        ("seed-accent-lightness".to_owned(), trimmed(second.lightness, 3)),
+        (
+            "seed-accent-lightness".to_owned(),
+            trimmed(second.lightness, 3),
+        ),
         ("seed-brand".to_owned(), oklch_to_hex(brand)),
         ("seed-chroma-scale".to_owned(), trimmed(series, 3)),
         ("seed-density".to_owned(), number(resolved.density)),

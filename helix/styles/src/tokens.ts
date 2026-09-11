@@ -429,6 +429,38 @@ export const TOKENS: Token[] = [
   /* The one severity whose two arms are two steps apart rather than one: `600`
      on a page, `400` on a dark surface. */
   ['color-danger', 'light-dark(var(--_helix-danger-600), var(--_helix-danger-400))'],
+  /* **Each tone's quiet ink, one step and not two.** A tone's own ink is
+     already at the contrast floor, so it cannot go quieter the way
+     `foreground-muted` does, by giving up contrast; it gives up color instead:
+     the same step at half the chroma. The engine solves the lightness back to
+     the floor exactly, and these take the tone's step as it stands, which is
+     the approximation a stylesheet can make. One and not two because #124
+     measured the readable range as holding one quiet step, and a tone has less
+     room there than the neutral ink, not more. */
+  [
+    'color-primary-muted',
+    'light-dark(oklch(from var(--_helix-brand-500) l calc(c * 0.5) h), oklch(from var(--_helix-brand-400) l calc(c * 0.5) h))',
+  ],
+  [
+    'color-accent-muted',
+    'light-dark(oklch(from var(--_helix-accent-500) l calc(c * 0.5) h), oklch(from var(--_helix-accent-400) l calc(c * 0.5) h))',
+  ],
+  [
+    'color-danger-muted',
+    'light-dark(oklch(from var(--_helix-danger-600) l calc(c * 0.5) h), oklch(from var(--_helix-danger-400) l calc(c * 0.5) h))',
+  ],
+  [
+    'color-info-muted',
+    'light-dark(oklch(from var(--_helix-info-600) l calc(c * 0.5) h), oklch(from var(--_helix-info-400) l calc(c * 0.5) h))',
+  ],
+  [
+    'color-success-muted',
+    'light-dark(oklch(from var(--_helix-success-600) l calc(c * 0.5) h), oklch(from var(--_helix-success-400) l calc(c * 0.5) h))',
+  ],
+  [
+    'color-warning-muted',
+    'light-dark(oklch(from var(--_helix-warning-600) l calc(c * 0.5) h), oklch(from var(--_helix-warning-400) l calc(c * 0.5) h))',
+  ],
   /* Fills that carry `foreground-on-accent`. */
   ['color-danger-surface', 'var(--_helix-danger-600)'],
   ['color-danger-surface-hover', 'var(--_helix-danger-700)'],
