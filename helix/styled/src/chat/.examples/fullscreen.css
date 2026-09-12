@@ -1,27 +1,14 @@
-/* The dialog gives up its own padding, because the conversation pads each of its
-   regions already and two sets of it hold the composer's rule short of the edge. */
-/* The panel takes the height as well as the width. `size="full"` sets the inline
-   axis alone, deliberately, so that a full dialog is still a panel over the page
-   rather than a second page; a conversation is the case that wants both, because
-   a transcript with no ceiling is one that never scrolls. */
-.fullscreen::part(dialog) {
-  --dialog-padding: var(--helix-space-none);
-  block-size: calc(100dvh - var(--helix-space-xl));
-}
+/* **The page, not a panel over it.** No dialog, no ground and no edge: the
+   conversation is the whole of what is on screen, as it is in an assistant that
+   has a page of its own, and it takes the height it is given.
 
-.fullscreen helix-flex[slot="header"] {
-  padding-block: var(--helix-space-md);
-  padding-inline: var(--helix-space-md);
-}
-
-/* **The conversation takes the room, rather than being given a ceiling.** A
-   dialog's panel is a flex column and its default slot is `display: contents`,
-   so the chat is a flex item of the panel: `flex: 1` is what makes the
-   transcript the part that grows and leaves the composer against the bottom
-   edge. `--chat-max-block-size` is the other half, for a chat that is *not* being
-   filled by its container, and setting it here instead put the composer under
-   the last turn with seven hundred pixels of nothing below it. */
-.fullscreen-chat {
-  flex: 1;
-  min-block-size: 0;
+   **A column by padding, not by width.** Capping the chat at `80ch` would move
+   the transcript's scrollbar and the header's rule in to the column's edge,
+   leaving two gutters of dead page either side. Every region pads by
+   `--chat-padding-inline`, so the column is that padding grown to whatever
+   centers `80ch` of turns, and never less than the resting inset: the rule and
+   the scrollbar stay at the page's edges and the words sit in the middle. */
+.fullscreen {
+  --chat-padding-inline: max(var(--helix-space-md), calc((100% - 80ch) / 2));
+  block-size: 100dvh;
 }

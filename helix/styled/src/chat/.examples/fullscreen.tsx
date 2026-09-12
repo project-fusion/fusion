@@ -2,73 +2,67 @@ import './fullscreen.css'
 
 export function Example() {
   return (
-    <>
-      <helix-button
-        command="--show"
-        commandfor="fullscreen-chat"
-        emphasis="solid"
-        tone="primary"
+    <helix-chat
+      className="fullscreen"
+      label="Support"
+    >
+      <helix-text
+        as="h2"
+        slot="header"
+        variant="title"
       >
-        Open the conversation
-      </helix-button>
+        Support
+      </helix-text>
 
-      <helix-dialog
-        className="fullscreen"
-        id="fullscreen-chat"
-        label="Support"
-        size="full"
+      <helix-chat-message
+        author="them"
+        state="sent"
       >
-        <helix-flex
-          align="center"
-          gap="sm"
-          justify="between"
-          slot="header"
-        >
-          <helix-text
-            as="h2"
-            variant="title"
-          >
-            Support
-          </helix-text>
-          <helix-icon-button
-            command="--close"
-            commandfor="fullscreen-chat"
-            emphasis="ghost"
-            label="Close"
-          >
-            <helix-icon name="x"></helix-icon>
-          </helix-icon-button>
-        </helix-flex>
+        How can I help?
+      </helix-chat-message>
+      <helix-chat-message
+        author="me"
+        state="sent"
+      >
+        The deploy is stuck on the migration step.
+      </helix-chat-message>
+      <helix-chat-message
+        author="them"
+        state="sent"
+      >
+        The migration is queued behind a lock that another connection is holding.
+      </helix-chat-message>
+      <helix-chat-message
+        author="me"
+        state="sent"
+      >
+        Which connection?
+      </helix-chat-message>
+      <helix-chat-message
+        author="them"
+        state="sent"
+      >
+        A long-running backfill from this morning. It has held the lock on the jobs table since
+        09:12.
+      </helix-chat-message>
+      <helix-chat-message
+        author="me"
+        state="sent"
+      >
+        Can I stop it without losing the rows it already wrote?
+      </helix-chat-message>
+      <helix-chat-message
+        author="them"
+        state="sent"
+      >
+        Yes. It commits every thousand rows, so canceling it loses at most the batch in flight. The
+        migration will start as soon as the lock is released.
+      </helix-chat-message>
 
-        <helix-chat
-          className="fullscreen-chat"
-          label="Support"
-        >
-          <helix-chat-message
-            author="them"
-            state="sent"
-          >
-            How can I help?
-          </helix-chat-message>
-          <helix-chat-message
-            author="me"
-            state="sent"
-          >
-            The deploy is stuck on the migration step.
-          </helix-chat-message>
-          <helix-chat-message
-            author="them"
-            state="sent"
-          >
-            The migration is queued behind a lock that another connection is holding.
-          </helix-chat-message>
-
-          <helix-chat-composer
-            placeholder="Write a message"
-            slot="composer"
-          ></helix-chat-composer>
-        </helix-chat>
-      </helix-dialog>
-    </>
+      <helix-chat-composer
+        placeholder="Write a message"
+        slot="composer"
+      ></helix-chat-composer>
+    </helix-chat>
   )
 }

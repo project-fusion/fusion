@@ -1,71 +1,52 @@
-<!-- @summary The whole screen: a dialog at full size with the conversation filling it. -->
-<!-- @min 420 -->
+<!-- @summary A conversation that is the page: flat, the full height of it, and its turns in a readable column. -->
+<!-- @layout fullscreen -->
+<!-- @min 520 -->
 <link
   href="styles.css"
   rel="stylesheet"
 >
 
-<helix-button
-  command="--show"
-  commandfor="fullscreen-chat"
-  emphasis="solid"
-  tone="primary"
->
-  Open the conversation
-</helix-button>
-
-<helix-dialog
+<helix-chat
   class="fullscreen"
-  id="fullscreen-chat"
   label="Support"
-  size="full"
 >
-  <helix-flex
-    align="center"
-    gap="sm"
-    justify="between"
+  <helix-text
+    as="h2"
     slot="header"
-  >
-    <helix-text
-      as="h2"
-      variant="title"
-    >Support</helix-text>
-    <helix-icon-button
-      command="--close"
-      commandfor="fullscreen-chat"
-      emphasis="ghost"
-      label="Close"
-    >
-      <helix-icon name="x"></helix-icon>
-    </helix-icon-button>
-  </helix-flex>
+    variant="title"
+  >Support</helix-text>
 
-  <helix-chat
-    class="fullscreen-chat"
-    label="Support"
-  >
-    <helix-chat-message
-      author="them"
-      state="sent"
-    >
-      How can I help?
-    </helix-chat-message>
-    <helix-chat-message
-      author="me"
-      state="sent"
-    >
-      The deploy is stuck on the migration step.
-    </helix-chat-message>
-    <helix-chat-message
-      author="them"
-      state="sent"
-    >
-      The migration is queued behind a lock that another connection is holding.
-    </helix-chat-message>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >How can I help?</helix-chat-message>
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >The deploy is stuck on the migration step.</helix-chat-message>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >The migration is queued behind a lock that another connection is holding.</helix-chat-message>
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >Which connection?</helix-chat-message>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >A long-running backfill from this morning. It has held the lock on the jobs table since 09:12.</helix-chat-message>
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >Can I stop it without losing the rows it already wrote?</helix-chat-message>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >Yes. It commits every thousand rows, so canceling it loses at most the batch in flight. The migration will start as soon as the lock is released.</helix-chat-message>
 
-    <helix-chat-composer
-      placeholder="Write a message"
-      slot="composer"
-    ></helix-chat-composer>
-  </helix-chat>
-</helix-dialog>
+  <helix-chat-composer
+    placeholder="Write a message"
+    slot="composer"
+  ></helix-chat-composer>
+</helix-chat>
