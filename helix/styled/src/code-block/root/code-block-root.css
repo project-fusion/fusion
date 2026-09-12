@@ -98,10 +98,161 @@
   line-height: var(--helix-leading-normal);
 }
 
+/* ================================================================ diff === */
+
+/* A diff is drawn as a block of code per file, so each file takes the frame
+   above: its own header, ground, edge and corner, through the same hooks. */
+:host([diff]) {
+  gap: var(--helix-space-md);
+}
+
+/* The container a split measures itself against, on the file rather than the
+   host: containment on the host would give a block in a flex row no width. */
+:host([diff]) [part="file"] {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The lines carry their own inset, so a changed line's wash runs from edge to
+   edge rather than stopping at the block's padding. */
+:host([diff]) [part="block"],
+[part="old"],
+[part="new"] {
+  backdrop-filter: var(--code-block-backdrop, none);
+  background-color: var(--code-block-background-color, var(--helix-color-background));
+  border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
+  border-radius: var(--code-block-radius, var(--helix-radii-lg));
+  margin: var(--helix-space-none);
+  min-inline-size: 0;
+  overflow-x: auto;
+  /* None above, because the first row is always a hunk's band. */
+  padding-block: var(--helix-space-none) var(--helix-space-sm);
+  padding-inline: var(--helix-space-none);
+}
+
+[part="header"] + [part="frame"] [part="split"] > * {
+  border-block-start-width: var(--helix-space-none);
+  border-start-end-radius: var(--helix-radii-none);
+  border-start-start-radius: var(--helix-radii-none);
+}
+
+/* Old beside new, each scrolling on its own, since the two sides' longest
+   lines are rarely the same line. The rows stay level because every row is one
+   line tall on both sides, the filler included. */
+[part="split"] {
+  display: grid;
+  gap: var(--helix-space-xs);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* A narrow block has no room for two versions side by side, so split falls
+   back to one above the other, measured on the file rather than the viewport. */
+@container (inline-size < 40rem) {
+  [part="split"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* **As wide as the longest line and never narrower than the block**, so a
+   wash runs the whole width a reader scrolls through. */
+:host([diff]) [part="code"] {
+  display: inline-block;
+  min-inline-size: 100%;
+}
+
+[part="hunk"],
+[part="context"],
+[part="added"],
+[part="removed"],
+[part="filler"] {
+  display: flex;
+  padding-inline: var(--helix-space-md);
+  text-decoration: none;
+}
+
+/* The copy button's gutter, on the lines rather than on the block, so the
+   washes still reach the edge under it. */
+:host(:not([no-copy])) :is([part="hunk"], [part="context"], [part="added"], [part="removed"]) {
+  padding-inline-end: calc(var(--helix-size-control) + var(--helix-space-sm));
+}
+
+[part="hunk"] {
+  background-color: var(--helix-color-surface-sunken);
+  color: var(--helix-color-foreground-muted);
+}
+
+/* *A wash, not the tone's surface.** `success-surface` is the solid fill a
+   button stands on, and code on it read as an alarm with the `+` vanishing into
+   it. This is Tag's resting fill, the tone at 14% over the ground. */
+[part="added"] {
+  background-color: color-mix(
+    in srgb,
+    var(--helix-color-success) 14%,
+    var(--code-block-background-color, var(--helix-color-background))
+  );
+}
+
+[part="removed"] {
+  background-color: color-mix(
+    in srgb,
+    var(--helix-color-danger) 14%,
+    var(--code-block-background-color, var(--helix-color-background))
+  );
+}
+
+[part="marker"] {
+  padding-inline-end: var(--helix-space-xs);
+  user-select: none;
+}
+
+/* *Tag's label ink, for the reason Tag gives it.** A tone's own ink clears the
+   page and no further, so on its own wash the `+` measured 4.5:1 against a 4.5
+   target; mixed toward the foreground it stays the tone and clears the floor. */
+[part="added"] [part="marker"] {
+  color: color-mix(in oklab, var(--helix-color-success) 55%, var(--helix-color-foreground));
+}
+
+[part="removed"] [part="marker"] {
+  color: color-mix(in oklab, var(--helix-color-danger) 55%, var(--helix-color-foreground));
+}
+
+/* *One line tall, which its content cannot make it.** A filler holds only the
+   newline that ends it, and a newline at the end of a box starts no line, so
+   without this the row collapsed and every row under it rose out of step. */
+[part="filler"] {
+  background-color: var(--helix-color-surface-sunken);
+  min-block-size: 1lh;
+}
+
+/* Muted rather than subtle, being read to find a line, and tabular so a column
+   of them is a column. */
+[part="number"] {
+  color: var(--helix-color-foreground-muted);
+  font-variant-numeric: tabular-nums;
+  padding-inline-end: var(--helix-space-sm);
+  user-select: none;
+}
+
 /* Print: a fill that is a slab of gray on paper; the border frames it instead. */
 @media print {
   :host {
     background-color: transparent;
     box-shadow: none;
+  }
+
+  /* A diff prints every line, and its washes, which are the meaning. */
+  :host([diff]) [part="block"],
+  [part="old"],
+  [part="new"] {
+    overflow: visible;
+    white-space: pre-wrap;
+  }
+
+  [part="added"],
+  [part="removed"],
+  [part="hunk"],
+  [part="filler"] {
+    print-color-adjust: exact;
   }
 }

@@ -14,6 +14,8 @@ const RESPONSE = {
 export function Example() {
   return (
     <>
+      {/* JSON in the page rather than `value={RESPONSE}`: React's hydration drops
+          object properties on custom elements, and this text survives server rendering. */}
       <script
         id="response"
         type="application/json"

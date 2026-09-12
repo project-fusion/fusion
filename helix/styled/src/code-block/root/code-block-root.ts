@@ -12,6 +12,11 @@ import '../../copy-button/index.js'
  * the usual build, the copy button covers the first line, which is the one line
  * of a snippet a reader is most likely to be reading.
  *
+ * A diff is drawn a block per file in the same frame, each changed line washed
+ * in its tone at Tag's resting strength with its `+` or `-` in the tone's ink,
+ * so the change does not rest on telling two pale grounds apart. A split diff
+ * stacks its two versions below about 40rem of the file's own width.
+ *
  * @since 0.1.0
  * @status stable
  * @category typography

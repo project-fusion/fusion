@@ -75,6 +75,15 @@ describe('reading a patch', () => {
     ])
   })
 
+  test('reads a patch a formatter indented, every line by the same amount', () => {
+    const indented = GIT.split('\n')
+      .map((line) => (line === '' ? line : `    ${line}`))
+      .join('\n')
+    expect(parsePatch(indented)[0]?.hunks[0]?.lines.map((line) => line.kind)).toEqual(
+      parsePatch(GIT)[0]?.hunks[0]?.lines.map((line) => line.kind),
+    )
+  })
+
   test('takes a bare hunk with no file headers as one nameless file', () => {
     const files = parsePatch(`@@ -1 +1 @@\n-a\n+b\n`)
     expect(files.map((file) => [file.name, file.hunks.length])).toEqual([['', 1]])

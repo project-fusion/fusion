@@ -9,3 +9,20 @@ describe('code-block server output', () => {
     expect(hasPart(markup, 'code')).toBe(true)
   })
 })
+
+/* A diff is slotted text, and a server has no children to read, so what it
+   sends is the slot as ordinary code: the patch itself in a `<pre>`, which is a
+   legible diff and the same first render the client makes. */
+describe('code-block diff server output', () => {
+  test('sends the patch as code, and draws no line it cannot have read', () => {
+    const markup = withoutStyles(
+      ssr(html`<helix-code-block diff>@@ -1 +1 @@
+-old
++new
+</helix-code-block>`),
+    )
+    expect(hasPart(markup, 'code')).toBe(true)
+    expect(hasPart(markup, 'added')).toBe(false)
+    expect(markup).toContain('+new')
+  })
+})

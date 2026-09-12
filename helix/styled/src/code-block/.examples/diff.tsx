@@ -1,5 +1,3 @@
-import './preview.css'
-
 const PATCH = `diff --git a/src/config.ts b/src/config.ts
 --- a/src/config.ts
 +++ b/src/config.ts
@@ -13,5 +11,5 @@ const PATCH = `diff --git a/src/config.ts b/src/config.ts
 `
 
 export function Example() {
-  return <helix-headless-code-diff patch={PATCH}></helix-headless-code-diff>
+  return <helix-code-block diff>{PATCH}</helix-code-block>
 }

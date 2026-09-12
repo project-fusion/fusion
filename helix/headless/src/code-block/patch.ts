@@ -52,6 +52,24 @@ const path = (line: string): string => {
 }
 
 /**
+ * The text with the indentation every line shares taken off.
+ *
+ * A diff written between two tags is text a formatter may indent, and an
+ * indented `+` is not a mark at the start of its line. Only what every line
+ * shares goes: a real patch's `---` and `@@` sit at the first column, so one
+ * that nobody indented loses nothing, and a context line keeps the space that
+ * marks it.
+ */
+const dedent = (text: string): string => {
+  const lines = text.split('\n')
+  const indents = lines
+    .filter((line) => line.trim() !== '')
+    .map((line) => /^[ \t]*/.exec(line)?.[0].length ?? 0)
+  const common = indents.length === 0 ? 0 : Math.min(...indents)
+  return common === 0 ? text : lines.map((line) => line.slice(common)).join('\n')
+}
+
+/**
  * The files in a unified diff, each with its hunks.
  *
  * **A hunk is read to the counts its header states**, `@@ -12,7 +12,8 @@` being
@@ -72,7 +90,7 @@ export const parsePatch = (patch: string): DiffFile[] => {
   let owed = { new: 0, old: 0 }
   let from = ''
 
-  for (const line of patch.replace(/\r\n?/g, '\n').split('\n')) {
+  for (const line of dedent(patch.replace(/\r\n?/g, '\n')).split('\n')) {
     if (hunk && (owed.old > 0 || owed.new > 0)) {
       const mark = line[0]
       const text = line.slice(1)
