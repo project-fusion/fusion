@@ -57,6 +57,7 @@ import { meterArt } from './art/meter'
 import { navigationArt } from './art/navigation'
 import { notificationsArt } from './art/notifications'
 import { numberInputArt } from './art/number-input'
+import { objectInspectorArt } from './art/object-inspector'
 import { optionArt } from './art/option'
 import { orbArt } from './art/orb'
 import { outlineArt } from './art/outline'
@@ -199,6 +200,7 @@ const art: Record<string, ReactNode> = {
   navigation: navigationArt,
   notifications: notificationsArt,
   'number-input': numberInputArt,
+  'object-inspector': objectInspectorArt,
   option: optionArt,
   orb: orbArt,
   outline: outlineArt,

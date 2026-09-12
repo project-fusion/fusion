@@ -1,0 +1,14 @@
+<!-- @summary Ten thousand entries, drawn a box at a time, each still telling a reader where it is in the whole. -->
+<helix-object-inspector
+  id="events"
+  label="events.json"
+  windowed
+></helix-object-inspector>
+
+<script>
+  document.getElementById('events').value = Array.from({ length: 10000 }, (_, at) => ({
+    id: at + 1,
+    ok: at % 7 !== 0,
+    type: at % 3 === 0 ? 'deploy' : 'build',
+  }))
+</script>

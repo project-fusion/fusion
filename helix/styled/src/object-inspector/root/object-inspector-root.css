@@ -1,0 +1,173 @@
+/* Code Block's frame, because a value is code a reader happens to be able to
+   fold: the same ground, edge and corner, the name in a bar over it, and the
+   copy button in the corner of the code. */
+:host {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--helix-text-sm);
+}
+
+[part="header"] {
+  align-items: center;
+  background-color: var(
+    --object-inspector-header-background-color,
+    var(--helix-color-surface-raised)
+  );
+  border: var(--helix-border-thin) solid
+    var(--object-inspector-border-color, var(--helix-color-border));
+  border-block-end: none;
+  border-start-end-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  border-start-start-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  display: flex;
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-md);
+}
+
+/* The name is a name, not code, so it is not in the mono face. */
+[part="label"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="frame"] {
+  position: relative;
+}
+
+[part="tree"] {
+  background-color: var(--object-inspector-background-color, var(--helix-color-background));
+  border: var(--helix-border-thin) solid
+    var(--object-inspector-border-color, var(--helix-color-border));
+  border-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  font-family: var(--helix-font-mono);
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-xs);
+}
+
+[part="header"] + [part="frame"] [part="tree"] {
+  border-start-end-radius: var(--helix-radii-none);
+  border-start-start-radius: var(--helix-radii-none);
+}
+
+/* **A definite height, because windowing is measured against it.** A maximum
+   would leave the height a function of the rows drawn while the rows drawn are a
+   function of the height, the loop `DataTable` documents on its own box. */
+:host([windowed]) [part="tree"] {
+  block-size: var(--object-inspector-block-size, 24em);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The ring moves to the row the keys are on, since the tree is what holds focus
+   and a ring around the whole value says nothing about where a reader is. */
+[part="tree"]:focus-visible {
+  outline: none;
+}
+
+/* **One line per entry, and a long string ends in an ellipsis** rather than
+   wrapping, so every row is the same height: that is what lets a windowed tree
+   place ten thousand of them without measuring each. The whole value is one
+   copy away. The inset is the row's depth, which the base tier writes. */
+[part="row"] {
+  cursor: default;
+  overflow: hidden;
+  padding-inline-end: var(--helix-space-2xl);
+  padding-inline-start: calc(
+    var(--object-inspector-level) *
+    var(--helix-space-lg) +
+    var(--helix-space-sm) +
+    1em +
+    var(--helix-space-2xs)
+  );
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A branch spends its caret's width on the caret, where a leaf spends it on an
+   indent, so every key at one depth starts on one line. */
+[part="row"][aria-expanded] {
+  cursor: pointer;
+  padding-inline-start: calc(
+    var(--object-inspector-level) *
+    var(--helix-space-lg) +
+    var(--helix-space-sm)
+  );
+}
+
+[part="tree"]:focus [part="row"][data-active] {
+  background-color: var(--helix-color-surface-sunken);
+}
+
+[part="tree"]:focus-visible [part="row"][data-active] {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="toggle"] {
+  block-size: 1em;
+  color: var(--helix-color-foreground-muted);
+  inline-size: 1em;
+  margin-inline-end: var(--helix-space-2xs);
+  vertical-align: -0.125em;
+}
+
+/* **Two glyphs rather than one turned**, so the base tier draws the right one
+   with no stylesheet at all: a headless consumer cannot reach a row's
+   `aria-expanded` from outside, `::part()` taking no attribute after it. The
+   closed one points along the line, which on a right-to-left page is the other
+   way. */
+:host(:dir(rtl)) [part="row"][aria-expanded="false"] > [part="toggle"] {
+  scale: -1 1;
+}
+
+/* Each type in its own ink, from the syntax set the code blocks use, so a
+   string, a number and a null read as three different things at a glance. The
+   text itself says the same thing for a reader who cannot see the color: a
+   string keeps its quotes and a null is spelled. */
+[part="key"] {
+  color: var(--helix-color-syntax-name);
+}
+
+[part="string"] {
+  color: var(--helix-color-syntax-string);
+}
+
+[part="number"] {
+  color: var(--helix-color-syntax-constant);
+}
+
+[part="boolean"],
+[part="null"] {
+  color: var(--helix-color-syntax-keyword);
+}
+
+[part="summary"],
+[part="count"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="count"] {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  margin-inline-start: var(--helix-space-xs);
+}
+
+[part="copy"] {
+  inset-block-start: var(--helix-space-2xs);
+  inset-inline-end: var(--helix-space-2xs);
+  position: absolute;
+}
+
+/* Print: what is open, all of it. A clipped tail and a control are neither of
+   them on paper. */
+@media print {
+  [part="tree"] {
+    block-size: auto;
+    overflow: visible;
+  }
+
+  [part="copy"] {
+    display: none;
+  }
+}

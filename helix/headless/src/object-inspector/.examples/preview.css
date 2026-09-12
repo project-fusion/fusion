@@ -1,0 +1,85 @@
+/* What the headless tier asks a consumer to write for Object Inspector.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles`, and
+ * grays only, because color here would read as an opinion this tier does not
+ * hold: the types are told apart by weight and slant here, and by their own
+ * text everywhere, since a string keeps its quotes and a null is spelled.
+ *
+ * **The indent is the one rule that is not optional.** Every row is a sibling
+ * in one tree, so nesting is not in the markup; the base tier writes each row's
+ * depth into `--object-inspector-level`, and without a rule reading it the
+ * whole value is one flat column. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-object-inspector::part(tree) {
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  font-family: monospace;
+}
+
+helix-headless-object-inspector::part(tree):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-object-inspector::part(row) {
+  padding-inline-start: calc(var(--object-inspector-level) * 1.25rem + 1.25rem);
+  white-space: nowrap;
+}
+
+helix-headless-object-inspector::part(toggle) {
+  block-size: 1em;
+  inline-size: 1em;
+  margin-inline-start: -1.25rem;
+  margin-inline-end: 0.25rem;
+}
+
+helix-headless-object-inspector::part(key) {
+  font-weight: bold;
+}
+
+helix-headless-object-inspector::part(string) {
+  font-style: italic;
+}
+
+helix-headless-object-inspector::part(count),
+helix-headless-object-inspector::part(summary) {
+  color: var(--_gray-muted);
+}
+
+helix-headless-object-inspector::part(frame) {
+  position: relative;
+}
+
+helix-headless-object-inspector::part(copy) {
+  inset-block-start: 0.25rem;
+  inset-inline-end: 0.25rem;
+  position: absolute;
+}
+
+helix-headless-object-inspector::part(copy-button) {
+  all: unset;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+}
+
+helix-headless-object-inspector::part(copy-button):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-object-inspector::part(copy-mark) {
+  block-size: 1em;
+  display: block;
+  inline-size: 1em;
+}
