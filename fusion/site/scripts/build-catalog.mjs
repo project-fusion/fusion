@@ -19,9 +19,10 @@
  * of the examples that can go stale. `fusion/site` runs this before `next build`
  * and before `next dev`, the same way it already runs the frame and the specs.
  *
- * **The cost is dev freshness.** Editing an example means re-running this,
- * which `bun run watch` does. That is the trade the warning asks for, and it is
- * worth naming rather than discovering.
+ * **The cost is dev freshness.** Editing an example means re-running this, and
+ * the dev server does it on its own: `scripts/dev.mjs` runs `bun run watch`
+ * beside `next dev`. That is the trade the warning asks for, and it is worth
+ * naming rather than discovering.
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

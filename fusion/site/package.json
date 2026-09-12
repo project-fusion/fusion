@@ -8,7 +8,7 @@
   "scripts": {
     "build": "bun run faces && bun run themed-page && bun run catalog && bun run frame && bun run specs && next build",
     "catalog": "bun scripts/build-catalog.mjs",
-    "dev": "bun run faces && bun run themed-page && bun run catalog && bun run frame && bun run specs && next dev",
+    "dev": "bun run faces && bun run themed-page && bun run catalog && bun run frame && bun run specs && bun scripts/dev.mjs",
     "faces": "bun scripts/build-faces.mjs",
     "frame": "bun scripts/build-frame.mjs",
     "specs": "bun scripts/build-specs.mjs",
