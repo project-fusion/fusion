@@ -28,9 +28,9 @@ import { property } from 'lit/decorators.js'
  * @aliases Data list, Key-value list, Details, Properties
  * @documentation https://helix.fusion.dev/components/description-list
  *
- * @csspart list - The `<dl>` holding the items.
- *
  * @slot - The items.
+ *
+ * @csspart list - The `<dl>` holding the items.
  */
 @customElement('helix-headless-description-list')
 export class HelixHeadlessDescriptionList extends HelixElement {

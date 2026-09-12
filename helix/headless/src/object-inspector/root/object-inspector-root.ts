@@ -79,6 +79,8 @@ const child = (path: string, key: string): string =>
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
  * @documentation https://helix.fusion.dev/components/object-inspector
  *
+ * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
+ *
  * @csspart after - The room the rows after the window would take, when windowed.
  * @csspart before - The room the rows before the window would take, when windowed.
  * @csspart boolean - A `true` or `false`.
@@ -99,8 +101,6 @@ const child = (path: string, key: string): string =>
  * @csspart summary - The brackets standing for a branch's contents.
  * @csspart toggle - The caret on a branch: down when open, across when closed.
  * @csspart tree - The tree, the one thing focus lands on.
- *
- * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
  *
  * @cssproperty --object-inspector-level - How deep a row is, from 0 at the root, for indenting it.
  */

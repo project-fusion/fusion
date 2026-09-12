@@ -57,9 +57,9 @@ describe('a description list item', () => {
   test('takes its label as text, or as content that replaces it', async () => {
     const host = await list()
     const [plain, rich] = host.querySelectorAll('helix-headless-description-list-item')
-    const labelled = (item: Element | undefined): HTMLSlotElement =>
+    const labeled = (item: Element | undefined): HTMLSlotElement =>
       part(item as HTMLElement, 'label')?.querySelector('slot') as HTMLSlotElement
-    expect(labelled(plain).textContent).toBe('Owner')
-    expect(labelled(rich).assignedElements()[0]?.textContent).toBe('Region')
+    expect(labeled(plain).textContent).toBe('Owner')
+    expect(labeled(rich).assignedElements()[0]?.textContent).toBe('Region')
   })
 })

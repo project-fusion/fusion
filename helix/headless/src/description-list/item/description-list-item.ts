@@ -18,11 +18,11 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @documentation https://helix.fusion.dev/components/description-list
  *
- * @csspart label - The `<dt>`, holding the label.
- * @csspart value - The `<dd>`, holding the value.
- *
  * @slot - The value.
  * @slot label - The label, when it is more than text. Falls back to `label`.
+ *
+ * @csspart label - The `<dt>`, holding the label.
+ * @csspart value - The `<dd>`, holding the value.
  */
 @customElement('helix-headless-description-list-item')
 export class HelixHeadlessDescriptionListItem extends HelixElement {

@@ -39,9 +39,9 @@ import { property } from 'lit/decorators.js'
  * @aliases Skip navigation, Skip to content
  * @documentation https://helix.fusion.dev/components/skip-link
  *
- * @csspart link - The anchor, which is what takes focus.
- *
  * @slot - The link's words. Falls back to `label`.
+ *
+ * @csspart link - The anchor, which is what takes focus.
  */
 @customElement('helix-headless-skip-link')
 export class HelixHeadlessSkipLink extends HelixElement {
