@@ -128,8 +128,12 @@
   color: var(--helix-color-syntax-callable);
 }
 
-/* A component's prose, which comes from its class comment and can run long. */
+/* A component's summary, and each element's.
+ *
+ * No measure of its own: `.docsMain` already holds the column to `80ch`. A
+ * second cap here was counted in this text's own caption type, so its 68
+ * characters stopped well short of a column 80 characters of body type wide,
+ * and the summary sat as a short line beside a title row that spanned it. */
 .description {
-  max-inline-size: 68ch;
   white-space: pre-line;
 }
