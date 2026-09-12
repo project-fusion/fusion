@@ -1,17 +1,14 @@
-/* A conversation has to be given a ground by whatever holds it, which is the
-   page's job here and not the component's.
+/* **The page, as `fullscreen` is: flat, and its turns in an `80ch` column.** An
+   answer that is a document reads as one when nothing frames it, and a box
+   around the transcript is a panel this example is not about. The column is
+   padding rather than width, for the reason `fullscreen` gives: the header's
+   rule stays at the page's edges and the words sit in the middle.
 
-   **And no ceiling, which the other examples do give it.** A capped transcript
-   scrolls, and this one is a single turn holding a whole document: at `24rem`
-   the log overflowed by 80 pixels and sat at `scrollTop: 80`, so the heading
-   this example exists to show was above the fold and what was visible depended
-   on when the shot was taken. The parity check caught exactly that, the two
-   syntaxes settling at different offsets on the same content.
-
-   Scrolling belongs in `fullscreen` and `sidebar`, where the subject is a
-   conversation that outgrows its box. Here it hides the subject. */
+   **No height, where `fullscreen` takes the page's.** A transcript pins its
+   turns to the end, which is right above a composer and wrong here, with none:
+   at the page's height the answer sat low with empty page above the question,
+   and at a fixed one shorter than the answer the log opened scrolled past the
+   heading this example exists to show. As tall as the answer, it is neither. */
 .markdown {
-  background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
+  --chat-padding-inline: max(var(--helix-space-md), calc((100% - 80ch) / 2));
 }
