@@ -28,10 +28,12 @@ export function Example() {
           that can hold the result. The recipe lives in the base layer, because
           `::slotted()` reaches the turn's children and never their cells.
 
-          **Except the fence, which the renderer maps to `Code Block`.** A
-          `<pre>` cannot carry a label or a copy button, and those are what a
-          reader of an answer does with a command. It is one override in any
-          markdown library, and the fence's language is the label. */}
+          **Except the fence and the alert, which the renderer maps to `Code
+          Block` and `Callout`.** A `<pre>` cannot carry a label or a copy
+          button, and a `<blockquote>` cannot carry a tone, and those are what a
+          reader of an answer acts on. Each is one override in any markdown
+          library: the fence's language is the label, and `> [!WARNING]` is the
+          tone. */}
       <helix-chat-message
         author="them"
         data-prose
@@ -81,12 +83,9 @@ export function Example() {
           </tbody>
         </table>
 
-        <blockquote>
-          <p>
-            Restore the snapshot only if the rollback fails. It drops every order written since
-            09:00.
-          </p>
-        </blockquote>
+        <helix-callout tone="warning">
+          Restore the snapshot only if the rollback fails. It drops every order written since 09:00.
+        </helix-callout>
 
         <p>
           The <a href="/runbooks/migrations">migration runbook</a> has the full checklist.

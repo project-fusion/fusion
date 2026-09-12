@@ -1074,13 +1074,14 @@ helix-toast:not([data-color-mode]) {
 /* The rhythm between blocks. One value, spent on the gap after each, so a
    paragraph followed by a list and a list followed by a table are all the same
    distance apart and the document does not change pace at each change of
-   element. A `Code Block` is spaced as the `pre` it stands in for, since a
-   renderer that maps fences to one puts it exactly there. */
+   element. A `Code Block` or a `Callout` is spaced as the `pre` or the
+   `blockquote` it stands in for, since a renderer that maps fences and alerts
+   to them puts them exactly there. */
 :where([data-prose] p),
 :where([data-prose] ul, [data-prose] ol),
 :where([data-prose] pre, [data-prose] helix-code-block),
 :where([data-prose] table),
-:where([data-prose] blockquote) {
+:where([data-prose] blockquote, [data-prose] helix-callout) {
   margin-block: var(--helix-space-none) var(--helix-space-sm);
 }
 
@@ -1289,8 +1290,8 @@ helix-toast:not([data-color-mode]) {
    for a docs page and the two answers looked like two libraries, so a turn
    takes each component's own values for the element it stands in for. What
    markup cannot carry, a code block's label and copy button or a callout's
-   tone, stays the component's: map fenced code to `Code Block` in the renderer
-   to get them. */
+   tone, stays the component's: map fenced code to `Code Block` and alerts to
+   `Callout` in the renderer to get them. */
 
 /* Inline code gets `Code`'s chip. The recipe gives it the mono face alone, which
    next to the component's wash read as a different kind of word. */
