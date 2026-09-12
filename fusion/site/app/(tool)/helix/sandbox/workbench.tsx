@@ -30,7 +30,7 @@ import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import shell from '../tool-shell.module.css'
 import { readHashState, writeHashState } from './hash-state'
-import { DEFAULTS, readUrlState, type Section, writeUrlState } from './url-state'
+import { DEFAULTS, type Layout, readUrlState, type Section, writeUrlState } from './url-state'
 import styles from './workbench.module.css'
 
 /**
@@ -134,7 +134,13 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const sandbox = useRef<HelixSandbox>(null)
   const panelTabs = useRef<HelixTabs>(null)
   const _settings = useRef<HelixMenu>(null)
-  const [layout, setLayout] = useState<'padded' | 'centered' | 'fullscreen' | 'hug'>('padded')
+  const [layout, setLayout] = useState<Layout>('padded')
+  /* Whether the address named a layout, which is the one thing that outranks
+     the example's own. Read once, with the rest of the address. */
+  const layoutAddressed = useRef(false)
+  /* The example whose declared layout was last applied, so a render that did
+     not change the example does not undo a layout the reader picked. */
+  const layoutFor = useRef<string | null>(null)
   const [direction, setDirection] = useState<'ltr' | 'rtl'>('ltr')
   const [showEditor, setShowEditor] = useState(true)
   const [showPanel, setShowPanel] = useState(true)
@@ -298,6 +304,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     setFamilySlug(url.family)
     setExampleSlug(url.example)
     setLayout(url.layout)
+    layoutAddressed.current = new URLSearchParams(window.location.search).has('l')
     setDirection(url.direction)
     setSyntax(url.syntax)
     setPreviewTheme(url.colorMode)
@@ -435,6 +442,31 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   }, [families, wanted])
 
   const { example, family, withExamples } = resolve(inTier, familySlug, exampleSlug)
+
+  /* **An example opens in the layout it declares.** `@layout` is authored
+     knowledge about the example, the same annotation the reference page's
+     preview reads, and the sandbox ignored it: every example opened `padded`,
+     so a chat meant to be the whole page opened as a card in the middle of a
+     gray stage. Applied when the example changes and at no other time, so a
+     layout the reader picks from the menu stays until they open another one,
+     and not on the first example of a load whose address named a layout, which
+     is a link saying how it should be seen. */
+  useEffect(() => {
+    if (!read || !example) {
+      return
+    }
+    const key = `${family.slug}/${example.slug}`
+    if (layoutFor.current === key) {
+      return
+    }
+    const first = layoutFor.current === null
+    layoutFor.current = key
+    if (first && layoutAddressed.current) {
+      return
+    }
+    const declared = LAYOUTS.find((one) => one.value === example.layout)
+    setLayout(declared?.value ?? DEFAULTS.layout)
+  }, [read, family.slug, example])
   const current = SYNTAXES.find((entry) => entry.value === syntax) ?? SYNTAXES[0]
 
   const select = useCallback((value: string) => {
@@ -512,7 +544,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       }
       applySyntax(next)
     } else if (setting === 'layout' && option) {
-      setLayout(option as 'padded' | 'centered' | 'fullscreen' | 'hug')
+      setLayout(option as Layout)
     } else if (setting === 'direction' && option) {
       setDirection(option as 'ltr' | 'rtl')
     } else if (setting === 'color' && option) {
