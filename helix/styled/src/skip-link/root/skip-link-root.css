@@ -1,0 +1,39 @@
+/* Only the revealed state is written here. While the host is not focused the
+   base layer's visually hidden recipe holds it, and a document rule beats every
+   declaration below, so there is nothing for this sheet to undo. */
+:host {
+  display: block;
+  inset-block-start: var(--helix-space-sm);
+  inset-inline-start: var(--helix-space-sm);
+  position: fixed;
+  z-index: var(--helix-layer-overlay);
+}
+
+[part="link"] {
+  background-color: var(--helix-color-surface-inverse);
+  border: var(--skip-link-border-width, var(--helix-border-floating)) solid
+    var(--skip-link-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--skip-link-shadow, var(--helix-shadow-floating));
+  color: var(--helix-color-foreground-inverse);
+  display: inline-block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-sm);
+  padding-inline: var(--helix-space-md);
+  text-decoration: none;
+}
+
+[part="link"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Print: not at all. Paper cannot be tabbed through. */
+@media print {
+  :host {
+    display: none;
+  }
+}

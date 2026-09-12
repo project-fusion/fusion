@@ -1,0 +1,55 @@
+/* What the headless tier asks a consumer to write for Skip Link.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles`, and
+ * grays only, because color here would read as an opinion this tier does not
+ * hold. Written through `light-dark()` so the sandbox's dark mode inverts.
+ *
+ * **The one rule that is not optional is the first.** Hidden until focused,
+ * and hidden by clipping rather than by `display: none` or `visibility:
+ * hidden`, both of which take the link out of the tab order. A skip link that
+ * the keyboard cannot reach is the commonest way one is broken. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-skip-link:not(:focus-within) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-skip-link:focus-within {
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  position: fixed;
+}
+
+helix-headless-skip-link::part(link) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+}
+
+/* The keyboard is the only thing that ever reaches this, so the ring is the
+   point of it. */
+helix-headless-skip-link::part(link):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+header,
+nav {
+  display: flex;
+  gap: 1rem;
+}

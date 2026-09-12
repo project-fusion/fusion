@@ -70,6 +70,7 @@ import { sandboxArt } from './art/sandbox'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
 import { skeletonArt } from './art/skeleton'
+import { skipLinkArt } from './art/skip-link'
 import { sliderArt } from './art/slider'
 import { sparklineArt } from './art/sparkline'
 import { speedDialArt } from './art/speed-dial'
@@ -209,6 +210,7 @@ const art: Record<string, ReactNode> = {
   'scroll-area': scrollAreaArt,
   select: selectArt,
   skeleton: skeletonArt,
+  'skip-link': skipLinkArt,
   slider: sliderArt,
   sparkline: sparklineArt,
   'speed-dial': speedDialArt,

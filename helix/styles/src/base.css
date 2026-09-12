@@ -1250,8 +1250,13 @@ helix-toast:not([data-color-mode]) {
    by 40, a CSS table's used width being its min-content width. **Do not add
    `display: block` to make the number match**: a table forced to a block box
    loses its table semantics in the accessibility tree, which is the one thing
-   this rule exists to keep. */
-[data-hidden-visually] {
+   this rule exists to keep.
+
+   **The skip link is hidden by this same rule until focus reaches it.** It has
+   to stay in the tab order while nobody can see it, which is exactly what this
+   rule preserves and what `display: none` would not. */
+[data-hidden-visually],
+helix-skip-link:not(:focus-within) {
   block-size: 1px;
   border: var(--helix-space-none);
   clip-path: inset(50%);
