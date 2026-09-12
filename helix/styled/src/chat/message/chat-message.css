@@ -288,6 +288,18 @@ slot[name="indicator"]::slotted(*) {
   --orb-size: var(--helix-size-icon-sm);
 }
 
+/* **An orb on its own is the wait, not a status, and takes no chip.** It stands
+   where the three dots stand, on the bubble's ground as they are, for the same
+   reason the fallback keeps nothing: a chip with no words in it is a pill around
+   a mark. Chipped, it was worse than that. The orb's box is fixed and a page's
+   `border-box` reset outranks anything said here, so the padding came out of
+   it: measured, the canvas was 0 by 8 pixels, and what showed was the chip's
+   own pale disc with nothing drawn in it. */
+slot[name="indicator"]::slotted(helix-orb) {
+  background-color: transparent;
+  padding: var(--helix-space-none);
+}
+
 /* **The dots are the slot's fallback, which is what makes this additive.** A
    consumer who slots an orb replaces them by the ordinary rule of slots: no
    attribute to set, no `:has()` to write, and nothing to keep in step. A
