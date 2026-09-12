@@ -1,0 +1,87 @@
+/* What the headless tier asks a consumer to write for Area Chart.
+ *
+ * Deliberately skeletal, and gray for Line Chart's reason: color in a diagram
+ * reads as meaning, and this tier holds none. The bands are opaque grays from
+ * dark at the bottom to light at the top, since each band covers the part of
+ * the one above it that sits below its own edge. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_gray-surface: light-dark(#fafafa, #18181b);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+helix-headless-area-chart {
+  --chart-series-1: light-dark(#4a4a50, #c9c9ce);
+  --chart-series-2: light-dark(#6b6b73, #a1a1aa);
+  --chart-series-3: light-dark(#8e8e96, #86868f);
+  --chart-series-4: light-dark(#b1b1b8, #63636b);
+}
+
+helix-headless-area-chart::part(plot) {
+  block-size: 10rem;
+  position: relative;
+}
+
+helix-headless-area-chart::part(svg) {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+}
+
+helix-headless-area-chart::part(area) {
+  fill: var(--chart-series);
+}
+
+helix-headless-area-chart::part(line) {
+  stroke: var(--_gray-surface);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+helix-headless-area-chart::part(baseline) {
+  stroke: var(--_gray-line);
+  vector-effect: non-scaling-stroke;
+}
+
+helix-headless-area-chart::part(guide) {
+  stroke: var(--_gray-strong);
+  vector-effect: non-scaling-stroke;
+}
+
+helix-headless-area-chart::part(labels) {
+  color: var(--_gray-muted);
+  display: grid;
+  font-size: 0.75rem;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  text-align: center;
+}
+
+helix-headless-area-chart::part(summary) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+helix-headless-area-chart::part(mark) {
+  block-size: 1px;
+  inline-size: 1px;
+  position: absolute;
+}
+
+helix-headless-area-chart::part(tooltip) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  padding: 0.5rem;
+}

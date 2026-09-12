@@ -1,0 +1,155 @@
+/* Both axes are measured, so both carry numbers: the levels up beside the plot,
+   the levels across under it, and what each axis measures at its far end. */
+:host {
+  column-gap: var(--helix-space-xs);
+  container-type: inline-size;
+  display: grid;
+  grid-template-areas:
+    "y-name ."
+    "y-axis plot"
+    ". x-axis"
+    ". x-name";
+  grid-template-columns: auto minmax(0, 1fr);
+  position: relative;
+  row-gap: var(--scatter-chart-gap, var(--helix-space-2xs));
+}
+
+[part="plot"] {
+  block-size: var(--scatter-chart-block-size, 14em);
+  cursor: crosshair;
+  grid-area: plot;
+  position: relative;
+}
+
+[part="plot"] svg {
+  block-size: 100%;
+  inline-size: 100%;
+  overflow: visible;
+}
+
+[part="gridline"] {
+  stroke: var(--scatter-chart-gridline-color, var(--helix-color-border));
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* A dot in its series' color with a ring of the page around it, so where two
+   points overlap each keeps its own edge rather than merging into a blot. The
+   fill stops short of opaque for the same reason: a cluster reads darker
+   where it is denser, which is what a reader is looking at a scatter for. */
+[part="point"] {
+  background-color: var(--chart-series);
+  block-size: var(--scatter-chart-point-size, 8px);
+  border-radius: var(--helix-radii-full);
+  box-shadow: 0 0 0 var(--helix-border-thin)
+    var(--scatter-chart-point-ring-color, var(--helix-color-background));
+  inline-size: var(--scatter-chart-point-size, 8px);
+  inset-block-start: var(--chart-point-y);
+  inset-inline-start: var(--chart-point-x);
+  opacity: var(--scatter-chart-point-opacity, 0.8);
+  pointer-events: none;
+  position: absolute;
+  transition:
+    inset-block-start var(--helix-duration-normal) var(--helix-easing-decelerate),
+    inset-inline-start var(--helix-duration-normal) var(--helix-easing-decelerate),
+    scale var(--helix-duration-fast) var(--helix-easing-decelerate);
+  translate: -50% -50%;
+}
+
+/* The row a pointer is asking about, which may be more than one point when the
+   table has more than one series. */
+[part="point"][data-active] {
+  opacity: 1;
+  scale: 1.5;
+}
+
+/* **Every tick in one grid cell, each moved to its level.** The cell is as wide
+   as the widest label, which is what the column beside the plot needs to be,
+   and a percentage offset on a grid item resolves against its area: the plot's
+   height for the levels up, its width for the levels across. */
+[part="x-axis"],
+[part="y-axis"] {
+  display: grid;
+}
+
+[part="x-axis"] {
+  grid-area: x-axis;
+}
+
+[part="y-axis"] {
+  grid-area: y-axis;
+}
+
+[part="x-tick"],
+[part="y-tick"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  grid-area: 1 / 1;
+  line-height: 1;
+  position: relative;
+  white-space: nowrap;
+}
+
+[part="x-tick"] {
+  inset-inline-start: var(--chart-tick);
+  justify-self: start;
+  translate: -50% 0;
+}
+
+[part="y-tick"] {
+  align-self: start;
+  inset-block-start: var(--chart-tick);
+  justify-self: end;
+  translate: 0 -50%;
+}
+
+/* Every other level across once the chart is narrow, counted from the far end
+   so the edge of the plot keeps its number. Measured at 380 pixels wide, the
+   labels from 1,000 to 1,600 ran into one another. The rules all stay: a rule
+   without a number is still a level, and a number without room is not. */
+@container (inline-size < 30rem) {
+  [part="x-tick"]:nth-last-child(even) {
+    visibility: hidden;
+  }
+}
+
+[part="x-name"],
+[part="y-name"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* What is measured across, at the far end of the axis it names. */
+[part="x-name"] {
+  grid-area: x-name;
+  justify-self: end;
+}
+
+[part="y-name"] {
+  grid-area: y-name;
+}
+
+/* Said and not shown: the points are the picture of it. */
+[part="summary"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+@starting-style {
+  [part="point"] {
+    opacity: 0;
+  }
+}
+
+@media print {
+  :host {
+    print-color-adjust: exact;
+  }
+}

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { accordionArt } from './art/accordion'
 import { announcementArt } from './art/announcement'
 import { appHeaderArt } from './art/app-header'
+import { areaChartArt } from './art/area-chart'
 import { auraArt } from './art/aura'
 import { avatarArt } from './art/avatar'
 import { badgeArt } from './art/badge'
@@ -69,6 +70,7 @@ import { quoteArt } from './art/quote'
 import { radioArt } from './art/radio'
 import { ratingArt } from './art/rating'
 import { sandboxArt } from './art/sandbox'
+import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
 import { skeletonArt } from './art/skeleton'
@@ -144,6 +146,7 @@ const art: Record<string, ReactNode> = {
   accordion: accordionArt,
   announcement: announcementArt,
   'app-header': appHeaderArt,
+  'area-chart': areaChartArt,
   aura: auraArt,
   avatar: avatarArt,
   badge: badgeArt,
@@ -211,6 +214,7 @@ const art: Record<string, ReactNode> = {
   radio: radioArt,
   rating: ratingArt,
   sandbox: sandboxArt,
+  'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
   select: selectArt,
   skeleton: skeletonArt,

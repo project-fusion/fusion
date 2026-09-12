@@ -1,0 +1,103 @@
+export function Example() {
+  return (
+    <div className="stack">
+      <table
+        data-hidden-visually
+        id="pages"
+      >
+        <caption>Page weight and load time</caption>
+        <thead>
+          <tr>
+            <th scope="col">Page</th>
+            <th scope="col">Weight (KB)</th>
+            <th scope="col">Load time (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Home</th>
+            <td data-value="820">820</td>
+            <td data-value="1240">1,240</td>
+          </tr>
+          <tr>
+            <th scope="row">Pricing</th>
+            <td data-value="640">640</td>
+            <td data-value="980">980</td>
+          </tr>
+          <tr>
+            <th scope="row">Docs</th>
+            <td data-value="1180">1,180</td>
+            <td data-value="1710">1,710</td>
+          </tr>
+          <tr>
+            <th scope="row">Blog</th>
+            <td data-value="1450">1,450</td>
+            <td data-value="2050">2,050</td>
+          </tr>
+          <tr>
+            <th scope="row">Changelog</th>
+            <td data-value="530">530</td>
+            <td data-value="860">860</td>
+          </tr>
+          <tr>
+            <th scope="row">Careers</th>
+            <td data-value="910">910</td>
+            <td data-value="1380">1,380</td>
+          </tr>
+          <tr>
+            <th scope="row">About</th>
+            <td data-value="470">470</td>
+            <td data-value="790">790</td>
+          </tr>
+          <tr>
+            <th scope="row">Contact</th>
+            <td data-value="380">380</td>
+            <td data-value="690">690</td>
+          </tr>
+          <tr>
+            <th scope="row">Status</th>
+            <td data-value="290">290</td>
+            <td data-value="520">520</td>
+          </tr>
+          <tr>
+            <th scope="row">Search</th>
+            <td data-value="760">760</td>
+            <td data-value="1310">1,310</td>
+          </tr>
+          <tr>
+            <th scope="row">Account</th>
+            <td data-value="1020">1,020</td>
+            <td data-value="1490">1,490</td>
+          </tr>
+          <tr>
+            <th scope="row">Checkout</th>
+            <td data-value="1320">1,320</td>
+            <td data-value="1880">1,880</td>
+          </tr>
+          <tr>
+            <th scope="row">Support</th>
+            <td data-value="700">700</td>
+            <td data-value="1150">1,150</td>
+          </tr>
+          <tr>
+            <th scope="row">Legal</th>
+            <td data-value="350">350</td>
+            <td data-value="610">610</td>
+          </tr>
+          <tr>
+            <th scope="row">Press</th>
+            <td data-value="980">980</td>
+            <td data-value="1600">1,600</td>
+          </tr>
+          <tr>
+            <th scope="row">Events</th>
+            <td data-value="1260">1,260</td>
+            <td data-value="1740">1,740</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <helix-headless-scatter-chart for="pages"></helix-headless-scatter-chart>
+    </div>
+  )
+}

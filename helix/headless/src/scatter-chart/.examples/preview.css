@@ -1,0 +1,115 @@
+/* What the headless tier asks a consumer to write for Scatter Chart.
+ *
+ * Deliberately skeletal, and gray for Line Chart's reason. The one thing a
+ * consumer cannot skip is placing the points: the component writes where each
+ * one goes as `--chart-point-x` and `--chart-point-y`, and the stylesheet is
+ * what puts it there. The axes are laid out the same way, from `--chart-tick`. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_gray-surface: light-dark(#fafafa, #18181b);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+helix-headless-scatter-chart {
+  --chart-series-1: light-dark(#2a2a2e, #e9e9ec);
+  --chart-series-2: light-dark(#8e8e96, #86868f);
+
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: auto 1fr;
+}
+
+helix-headless-scatter-chart::part(plot) {
+  block-size: 10rem;
+  border-block-end: 1px solid var(--_gray-line);
+  border-inline-start: 1px solid var(--_gray-line);
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+}
+
+helix-headless-scatter-chart::part(svg) {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+}
+
+helix-headless-scatter-chart::part(point) {
+  background-color: var(--chart-series);
+  block-size: 6px;
+  border-radius: 50%;
+  inline-size: 6px;
+  inset-block-start: var(--chart-point-y);
+  inset-inline-start: var(--chart-point-x);
+  position: absolute;
+  translate: -50% -50%;
+}
+
+helix-headless-scatter-chart::part(y-axis),
+helix-headless-scatter-chart::part(x-axis) {
+  color: var(--_gray-muted);
+  display: grid;
+  font-size: 0.75rem;
+}
+
+helix-headless-scatter-chart::part(y-axis) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+helix-headless-scatter-chart::part(x-axis) {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+helix-headless-scatter-chart::part(x-tick),
+helix-headless-scatter-chart::part(y-tick) {
+  grid-area: 1 / 1;
+  line-height: 1;
+  position: relative;
+}
+
+helix-headless-scatter-chart::part(x-tick) {
+  inset-inline-start: var(--chart-tick);
+  justify-self: start;
+  translate: -50% 0;
+}
+
+helix-headless-scatter-chart::part(y-tick) {
+  align-self: start;
+  inset-block-start: var(--chart-tick);
+  justify-self: end;
+  translate: 0 -50%;
+}
+
+helix-headless-scatter-chart::part(x-name),
+helix-headless-scatter-chart::part(y-name),
+helix-headless-scatter-chart::part(summary) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  grid-column: 2;
+  margin: 0;
+}
+
+helix-headless-scatter-chart::part(mark) {
+  block-size: 1px;
+  inline-size: 1px;
+  position: absolute;
+}
+
+helix-headless-scatter-chart::part(tooltip) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  padding: 0.5rem;
+}

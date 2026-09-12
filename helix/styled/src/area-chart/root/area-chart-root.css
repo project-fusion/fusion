@@ -1,0 +1,112 @@
+/* The drawing and the words under it, in two rows, as `LineChart` lays them out. */
+:host {
+  display: grid;
+  gap: var(--area-chart-gap, var(--helix-space-2xs));
+  position: relative;
+}
+
+/* The tooltip's containing block, for the reason `LineChart` records: the
+   reading's position is a percentage of the plot, not of the plot and its
+   labels together. */
+[part="plot"] {
+  block-size: var(--area-chart-block-size, 12em);
+  cursor: crosshair;
+  position: relative;
+}
+
+[part="plot"] svg {
+  block-size: 100%;
+  inline-size: 100%;
+  overflow: visible;
+}
+
+/* **The bands are opaque, and have to be.** Each is drawn as everything under
+   its top edge and the next one down covers the rest, so a translucent band
+   would show the bands behind it through itself and read as a third color.
+   The strength comes from mixing toward the page instead, which keeps a band
+   light without letting anything through it. */
+[part="area"] {
+  fill: color-mix(
+    in oklab,
+    var(--chart-series) var(--area-chart-fill-strength, 55%),
+    var(--helix-color-background)
+  );
+  stroke: none;
+}
+
+/* The top edge of each band at the series' full color, so where one part ends
+   and the next begins is drawn rather than left to two pale fills meeting. */
+[part="line"] {
+  stroke: var(--chart-series);
+  stroke-linejoin: round;
+  stroke-width: var(--area-chart-width, 1.5px);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="baseline"] {
+  stroke: var(--helix-color-border);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* Over the bands, so they have to read on a fill as well as on the page. */
+[part="gridline"] {
+  stroke: var(--area-chart-gridline-color, var(--helix-color-border));
+  stroke-opacity: 0.7;
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="guide"] {
+  stroke: var(--helix-color-foreground-muted);
+  stroke-dasharray: 3 3;
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="labels"] {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Said and not shown: the bands are the picture of it. Out of sight and in the
+   accessibility tree, the recipe Pagination uses for its own words. */
+[part="summary"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Monotonic easing, for `LineChart`'s reason: a chart never animates through a
+   value it does not have. */
+[part="area"],
+[part="line"] {
+  transition: d var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+@starting-style {
+  [part="area"],
+  [part="line"] {
+    opacity: 0;
+  }
+}
+
+@media print {
+  :host {
+    print-color-adjust: exact;
+  }
+}
