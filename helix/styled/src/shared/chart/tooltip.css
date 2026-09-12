@@ -1,25 +1,24 @@
 /* The reading bubble every chart draws through `drawTooltip`, in one sheet.
 
-   `BarChart`, `DonutChart` and `LineChart` each carry a copy of this; the charts
-   that came after them take it from here instead. The dots read the
-   `--chart-series-*` hooks rather than the palette tokens, so a consumer who
-   repaints a series repaints its dot in the bubble with it. */
+   Bar Chart's, which had been corrected where the others' had not: the other
+   charts painted a column's name in `foreground-muted`, a page color, on a
+   bubble whose ground is `surface-inverse`. Measured in Chromium, Line Chart's
+   names came to 3.12:1 in light and 2.37:1 in dark, against Bar Chart's 9.55:1
+   and 7.22:1. The contrast check never saw it, because a tooltip is drawn only
+   while a pointer rests on a reading and the check photographs pages at rest.
 
-/* The mark the bubble is anchored to, and the bubble's own content.
- *
- * The mark is invisible: it exists so `Tooltip` has an element to point `for`
- * at, since a reading is a position and not a thing. Placement, flipping, the
- * arrow and the top layer are all `Tooltip`'s, which is the whole reason a chart
- * no longer draws its own. */
+   The dots read the `--chart-series-*` hooks rather than the palette tokens, so
+   a consumer who repaints a series repaints its dot in the bubble with it. */
+
 /*
- * *A pixel rather than nothing, because a rect of no area is not trackable.**
- *    `autoUpdate` tracks a reference by observing it, and the move observer derives
- *    its root margin from the reference's own rect. A 0 by 0 rect makes that margin
- *    degenerate, so the updates that should follow a scroll or a resize do not
- *    necessarily fire, and the bubble keeps whatever position it was last given:
- *    `Tooltip` names this in its own source as what "took the bubble to the corner
- *    of the window". Its descent guard runs only on the slotted path, and reached
- *    through `for`, as a chart reaches it, the element is taken as given.
+ * **A pixel rather than nothing, because a rect of no area is not trackable.**
+ * `Tooltip`'s descent guard against an element that draws nothing runs only on
+ * the slotted path; reached through `for`, as a chart reaches it, the element is
+ * taken as given. `autoUpdate` derives the move observer's root margin from the
+ * reference's own rect, and a 0 by 0 rect makes that margin degenerate, so the
+ * updates that should follow a scroll or a resize do not necessarily fire and
+ * the bubble keeps whatever position it was last given. One pixel is enough to
+ * be observable and is still nothing to look at.
  */
 [part="mark"] {
   block-size: 1px;
@@ -34,36 +33,56 @@
   position: absolute;
 }
 
+/*
+ * **The bubble is a `Tooltip` and is set like one.**
+ *
+ * These parts are slotted into `Tooltip`, so what surrounds them is that
+ * component's own surface: `surface-inverse` with `foreground-inverse` on it,
+ * `text-xs`, regular weight, and `2xs xs` of padding. Everything below either
+ * inherits that or says why it differs, and nothing names a page color, which
+ * is the fault the note above records.
+ *
+ * **And no rule under the label.** A hairline separator, generous block padding
+ * and a semibold title are the vocabulary of a card, and what this carries is
+ * still a tooltip. Weight and a single `2xs` gap say "this names the rest"
+ * without borrowing a panel's furniture.
+ */
 [part="tooltip-label"] {
-  color: var(--helix-color-foreground-muted);
   display: block;
   font-weight: var(--helix-weight-medium);
+  margin-block-end: var(--helix-space-2xs);
 }
 
-/* Name and value on one line, the value pushed to the end so a column of them
-   lines up whatever the names are. */
+/* Three columns, where this was a flex row pushed apart. */
 [part="tooltip-cell"] {
   align-items: baseline;
-  display: flex;
-  gap: var(--helix-space-sm);
-  justify-content: space-between;
+  column-gap: var(--helix-space-sm);
+  display: grid;
+  grid-template-columns: 0.5em minmax(0, 1fr) auto;
 }
 
+/* Placed rather than flowed, because the dot is drawn only where a series was
+   plotted: an unplotted row keeps the same columns as the rows around it
+   instead of sliding one to the left. */
 [part="tooltip-name"] {
-  color: var(--helix-color-foreground-muted);
+  grid-column: 2;
+  /* Quieter than the number beside it, from the bubble's own ink rather than
+     from the page's. */
+  opacity: 0.72;
 }
 
 [part="tooltip-value"] {
   font-variant-numeric: tabular-nums;
-  font-weight: var(--helix-weight-medium);
+  grid-column: 3;
 }
 
-/* A dot in the series color, so a row of the bubble and a line in the drawing
+/* A dot in the series color, so a row of the bubble and a mark in the drawing
    are visibly the same thing, and only where something was plotted. */
 [part="tooltip-cell"][data-series]::before {
   block-size: 0.5em;
   border-radius: var(--helix-radii-full);
   content: "";
+  grid-column: 1;
   inline-size: 0.5em;
 }
 

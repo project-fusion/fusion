@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
+import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './line-chart-root.css.js'
 import '../../tooltip/index.js'
 
@@ -106,7 +107,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
 
-  static override styles: CSSResultGroup = [seriesStyles, terminusStyles, styles]
+  static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, terminusStyles, styles]
 }
 
 declare global {
