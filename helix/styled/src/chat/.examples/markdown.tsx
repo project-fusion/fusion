@@ -101,6 +101,11 @@ export function Example() {
           </helix-text>
         </helix-flex>
       </helix-chat-message>
+
+      <helix-chat-composer
+        placeholder="Ask a follow up"
+        slot="composer"
+      />
     </helix-chat>
   )
 }

@@ -91,6 +91,11 @@ export function Example() {
           The <a href="/runbooks/migrations">migration runbook</a> has the full checklist.
         </p>
       </helix-chat-message>
+
+      <helix-chat-composer
+        placeholder="Ask a follow up"
+        slot="composer"
+      />
     </helix-chat>
   )
 }

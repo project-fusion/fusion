@@ -4,11 +4,12 @@
    padding rather than width, for the reason `fullscreen` gives: the header's
    rule stays at the page's edges and the words sit in the middle.
 
-   **No height, where `fullscreen` takes the page's.** A transcript pins its
-   turns to the end, which is right above a composer and wrong here, with none:
-   at the page's height the answer sat low with empty page above the question,
-   and at a fixed one shorter than the answer the log opened scrolled past the
-   heading this example exists to show. As tall as the answer, it is neither. */
+   **At least the page's height, not exactly it.** The composer sits at the foot
+   of the page and the turns stand on it, as in any conversation. A fixed height
+   would scroll this one: it is a single turn holding a whole document, and a
+   transcript pinned to its end opens past the heading this example exists to
+   show. So it fills the page and grows past it rather than scrolling. */
 .markdown {
   --chat-padding-inline: max(var(--helix-space-md), calc((100% - 80ch) / 2));
+  min-block-size: 100dvh;
 }

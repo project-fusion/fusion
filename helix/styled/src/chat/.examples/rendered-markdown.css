@@ -1,6 +1,8 @@
-/* The page, flat, with its turns in an `80ch` column and as tall as the answer,
-   for the reasons the `markdown` example gives: this is the same answer, and a
-   transcript sized to the page would pin it low or scroll it past its heading. */
+/* The page, flat, with its turns in an `80ch` column, and at least the page's
+   height rather than exactly it, for the reasons the `markdown` example gives:
+   this is the same answer, and a transcript that scrolled would open past its
+   heading. */
 .rendered-markdown {
   --chat-padding-inline: max(var(--helix-space-md), calc((100% - 80ch) / 2));
+  min-block-size: 100dvh;
 }
