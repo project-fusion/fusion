@@ -29,6 +29,14 @@
 # chosen and nonsense here: this one is published, installed and promoted, and the
 # manifests are only being told about it.
 #
+# **A refused token is waited out, not reported as `main` moving.** On 2 Sep 2026
+# `helix 0.4.2` published, promoted and tagged, and then this push answered
+# `Repository not found` 1.3 seconds after the App's token was minted. The
+# `cortex` leg minted its own a few minutes later and pushed. That is the answer
+# git gives for a token the server does not accept yet, so the push is tried
+# again after a pause, and the reason is said, since "overtaken" was the only
+# reason this loop knew and it was the wrong one.
+#
 # **The lockfile moves with the manifests.** `version.mjs` writes `package.json`
 # and nothing else; `bun.lock` carries the workspace versions too, and CI installs
 # `--frozen-lockfile`, so manifests stamped without it would fail every run after
@@ -54,7 +62,7 @@ git config user.email "$APP_ID+$APP_SLUG[bot]@users.noreply.github.com"
 
 git remote set-url origin "https://x-access-token:$APP_TOKEN@github.com/$REPOSITORY.git"
 
-for attempt in 1 2 3; do
+for attempt in 1 2 3 4; do
   git fetch -q origin main
   git reset -q --hard origin/main
 
@@ -73,12 +81,26 @@ for attempt in 1 2 3; do
 registry and promoted to \`latest\`. The tag is still the record; this is the
 manifests agreeing with it."
 
-  if git -c http.https://github.com/.extraheader= push -q origin HEAD:main; then
+  if pushed=$(git -c http.https://github.com/.extraheader= push -q origin HEAD:main 2>&1); then
     exit 0
   fi
+  echo "$pushed" >&2
 
-  echo "\`main\` moved while stamping $VERSION; taking it again." >> "$GITHUB_STEP_SUMMARY"
+  case "$pushed" in
+    *'Repository not found'* | *'Authentication failed'* | *'Permission to'* | *'returned error: 40'[13]*)
+      refused="the App's token was refused"
+      ;;
+    *)
+      refused=''
+      ;;
+  esac
+  if [ "$attempt" -lt 4 ]; then
+    echo "${refused:-\`main\` moved} while stamping $VERSION; trying again." >> "$GITHUB_STEP_SUMMARY"
+    if [ -n "$refused" ]; then
+      sleep $((attempt * 10))
+    fi
+  fi
 done
 
-echo "::error::Could not stamp $DOMAIN $VERSION onto main: three attempts, each overtaken."
+echo "::error::Could not stamp $DOMAIN $VERSION onto main after four attempts${refused:+, the last because $refused}. $DOMAIN-v$VERSION is published, promoted and tagged; only the manifests are behind it, and the next release stamps over them."
 exit 1
