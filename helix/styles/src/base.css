@@ -1189,6 +1189,57 @@ helix-toast:not([data-color-mode]) {
   inline-size: fit-content;
 }
 
+/* **Headings sized for a turn, not for a page.** The recipe's steps are a
+   document's: an `h3` at `text-xl` over a turn set at `text-sm` is a headline
+   over a paragraph, and in an answer it read as the loudest thing on screen.
+   A turn's headings step down to the ramp just above its text, and `h4` and
+   below are the text's own size, carried by weight. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(h1) {
+  font-size: var(--helix-text-xl);
+}
+
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(h2) {
+  font-size: var(--helix-text-lg);
+}
+
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(h3) {
+  font-size: var(--helix-text-md);
+}
+
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(h4, h5, h6) {
+  font-size: var(--helix-text-sm);
+}
+
+/* Room above a heading and a small gap below, so a heading belongs to what
+   follows it. The recipe spaces blocks by the gap after each and headings take
+   none, so a heading sat on its paragraph with no space between them. Nothing
+   above the first, where the turn's own padding is the space. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose])
+:where(h1, h2, h3, h4, h5, h6) {
+  margin-block: var(--helix-space-md) var(--helix-space-2xs);
+}
+
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose])
+  :where(h1, h2, h3, h4, h5, h6):first-child {
+  margin-block-start: var(--helix-space-none);
+}
+
+/* **A `Table` in a turn takes the small control step.** Its rows are a control
+   height tall, which is right for a table a pointer works in and loose for one
+   an answer is showing: three rows of a comparison took the height of a
+   paragraph each. */
+:where(helix-chat-message) :where(helix-table) {
+  --helix-size-control: var(--helix-size-control-sm);
+}
+
+/* **And a `Code Block` in a turn stands on the same ground as the table beside
+   it.** Its body is the page's color and the boxes above are sunken, so one
+   answer drew its code white and its table gray. The hook is the component's
+   own, so this is the turn choosing a ground rather than overriding a rule. */
+:where(helix-chat-message) :where(helix-code-block) {
+  --code-block-background-color: var(--helix-color-surface-sunken);
+}
+
 /* The box's border is the last rule, so the last row draws none of its own:
    two hairlines a few pixels apart read as one badly drawn edge. */
 :where(helix-chat-message) :where(helix-table-row:last-of-type > helix-table-cell) {

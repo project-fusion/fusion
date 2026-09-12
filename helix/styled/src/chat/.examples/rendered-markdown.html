@@ -1,5 +1,5 @@
-<!-- @summary An answer rendered from markdown to plain HTML, set in the turn by data-prose. -->
-<!-- @min 480 -->
+<!-- @summary The same answer rendered from markdown to plain HTML, set in the turn by data-prose. -->
+<!-- @min 560 -->
 <link
   href="styles.css"
   rel="stylesheet"
@@ -18,54 +18,67 @@
   <helix-chat-message
     author="me"
     state="sent"
-  >What changed in 0.16?</helix-chat-message>
+  >How do I roll back the migration that failed this morning?</helix-chat-message>
 
   <!-- **`data-prose` is what styles this, and the markup is the page's own.**
-       Chat renders no markdown and takes no dependency on one: a turn is
-       whatever the consumer slotted, so turning `### What changed` into an
-       `<h3>` is their job and their markdown library's. What the component owes
-       them is a turn that can hold the result, which is what this shows.
-
-       The recipe lives in the base layer rather than in this component's shadow
-       root, because a shadow root cannot reach here: `::slotted()` matches the
-       assigned node and never its descendants, so a rule for a table's cells has
-       to be written where the cells are. -->
+       Chat renders no markdown and takes no dependency on one: turning
+       `### Roll back` into an `<h3>` is the consumer's markdown library's job,
+       and this is what one emits. What the component owes them is a turn that
+       can hold the result. The recipe lives in the base layer, because
+       `::slotted()` reaches the turn's children and never their cells. -->
   <helix-chat-message
     author="them"
     data-prose
     separation="plain"
     state="sent"
   >
-    <h3>What changed</h3>
-    <p>Three things landed, and one of them moves a default.</p>
+    <h3>Roll back 0042_add_order_status</h3>
+    <p>
+      It stopped halfway, so <code>orders</code> has the new column and no index yet. Rolling back
+      is safe: nothing has written to the column.
+    </p>
+
+    <ol>
+      <li>Pause the workers that write to <code>orders</code>.</li>
+      <li>Run the down migration.</li>
+      <li>Check the column is gone, then start the workers again.</li>
+    </ol>
+
+    <pre><code>bun run migrate:down 0042_add_order_status</code></pre>
 
     <table>
       <thead>
         <tr>
-          <th>Package</th>
-          <th>Version</th>
+          <th>Option</th>
+          <th>Downtime</th>
+          <th>Keeps data</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>helix</td>
-          <td>0.16.3</td>
+          <td>Roll back</td>
+          <td>About a minute</td>
+          <td>Yes</td>
         </tr>
         <tr>
-          <td>helix-core</td>
-          <td>0.16.3</td>
+          <td>Fix forward</td>
+          <td>None</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>Restore the snapshot</td>
+          <td>Twenty minutes</td>
+          <td>No</td>
         </tr>
       </tbody>
     </table>
 
-    <ul>
-      <li><code>Button</code> lost its width axis</li>
-      <li>The small dialog footer fits again</li>
-      <li>Nothing generated is tracked any more</li>
-    </ul>
+    <blockquote>
+      <p>
+        Restore the snapshot only if the rollback fails. It drops every order written since 09:00.
+      </p>
+    </blockquote>
 
-    <p>Upgrade with:</p>
-
-    <pre><code>bun add @fusion.dev/helix</code></pre>
+    <p>The <a href="/runbooks/migrations">migration runbook</a> has the full checklist.</p>
   </helix-chat-message>
 </helix-chat>

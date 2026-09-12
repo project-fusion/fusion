@@ -18,13 +18,14 @@ export function Example() {
         author="me"
         state="sent"
       >
-        What changed in 0.16?
+        How do I roll back the migration that failed this morning?
       </helix-chat-message>
 
       {/* A turn holds whatever it is given, so an answer can be built from the
           library's own parts. Markdown rendered to plain HTML is the other way
-          in, which `rendered-markdown` shows: mark the turn `data-prose` and the
-          base layer sets its headings, lists, tables and code. */}
+          in, which `rendered-markdown` shows with the same answer: mark the turn
+          `data-prose` and the base layer sets its headings, lists, tables and
+          code. */}
       <helix-chat-message
         author="them"
         separation="plain"
@@ -36,38 +37,68 @@ export function Example() {
         >
           <helix-text
             as="h3"
-            variant="title"
+            variant="body-strong"
           >
-            What changed
+            Roll back 0042_add_order_status
           </helix-text>
-          <helix-text as="p">Three things landed, and one of them moves a default.</helix-text>
+          <helix-text as="p">
+            It stopped halfway, so <helix-code>orders</helix-code> has the new column and no index
+            yet. Rolling back is safe: nothing has written to the column.
+          </helix-text>
 
-          <helix-table label="Versions">
-            <helix-table-column>Package</helix-table-column>
-            <helix-table-column>Version</helix-table-column>
+          <helix-list
+            kind="ordered"
+            label="Steps"
+          >
+            <helix-list-item>
+              Pause the workers that write to <helix-code>orders</helix-code>.
+            </helix-list-item>
+            <helix-list-item>Run the down migration.</helix-list-item>
+            <helix-list-item>
+              Check the column is gone, then start the workers again.
+            </helix-list-item>
+          </helix-list>
+
+          <helix-code-block label="Terminal">
+            bun run migrate:down 0042_add_order_status
+          </helix-code-block>
+
+          <helix-table label="Ways back">
+            <helix-table-column>Option</helix-table-column>
+            <helix-table-column>Downtime</helix-table-column>
+            <helix-table-column>Keeps data</helix-table-column>
             <helix-table-row>
-              <helix-table-cell header>helix</helix-table-cell>
-              <helix-table-cell>0.16.3</helix-table-cell>
+              <helix-table-cell header>Roll back</helix-table-cell>
+              <helix-table-cell>About a minute</helix-table-cell>
+              <helix-table-cell>Yes</helix-table-cell>
             </helix-table-row>
             <helix-table-row>
-              <helix-table-cell header>helix-core</helix-table-cell>
-              <helix-table-cell>0.16.3</helix-table-cell>
+              <helix-table-cell header>Fix forward</helix-table-cell>
+              <helix-table-cell>None</helix-table-cell>
+              <helix-table-cell>Yes</helix-table-cell>
+            </helix-table-row>
+            <helix-table-row>
+              <helix-table-cell header>Restore the snapshot</helix-table-cell>
+              <helix-table-cell>Twenty minutes</helix-table-cell>
+              <helix-table-cell>No</helix-table-cell>
             </helix-table-row>
           </helix-table>
 
-          <helix-list
-            kind="unordered"
-            label="Changes"
-          >
-            <helix-list-item>
-              <helix-code>Button</helix-code> lost its width axis
-            </helix-list-item>
-            <helix-list-item>The small dialog footer fits again</helix-list-item>
-            <helix-list-item>Nothing generated is tracked any more</helix-list-item>
-          </helix-list>
+          <helix-callout tone="warning">
+            Restore the snapshot only if the rollback fails. It drops every order written since
+            09:00.
+          </helix-callout>
 
-          <helix-text as="p">Upgrade with:</helix-text>
-          <helix-code-block label="Terminal">bun add @fusion.dev/helix</helix-code-block>
+          <helix-text as="p">
+            The{' '}
+            <a
+              data-link
+              href="/runbooks/migrations"
+            >
+              migration runbook
+            </a>{' '}
+            has the full checklist.
+          </helix-text>
         </helix-flex>
       </helix-chat-message>
     </helix-chat>
