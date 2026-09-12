@@ -85,3 +85,17 @@
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   padding-block-start: 0;
 }
+
+/* **With the chevron at the start, the content lines up with the heading's
+   words, not with the chevron.** The chevron is a control the heading carries,
+   and the body belongs to the heading's text, so the two share one edge and the
+   chevron sits in a gutter of its own, the way a disclosure list reads. Without
+   it the body started under the arrow, a chevron's width short of its title.
+
+   A margin on top of the padding rather than a second padding, so a consumer's
+   `--accordion-item-padding` still moves the heading and the body together. The
+   gutter is the chevron and the gap beside it, in the heading's own size: the
+   chevron is `1em` of the trigger, whose type is `text-md`. */
+:host([chevron-placement="start"]) [part="content-inner"] > slot {
+  margin-inline-start: calc(var(--helix-text-md) + var(--helix-space-xs));
+}
