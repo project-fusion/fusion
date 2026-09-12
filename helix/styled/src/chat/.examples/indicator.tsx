@@ -18,7 +18,7 @@ export function Example() {
         <helix-orb
           size="sm"
           slot="indicator"
-          state="fetching"
+          state="thinking"
         ></helix-orb>
       </helix-chat-message>
     </helix-chat>
