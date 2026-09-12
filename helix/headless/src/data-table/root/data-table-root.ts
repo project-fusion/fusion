@@ -1,8 +1,11 @@
 import {
   customElement,
+  type HelixBeforeToggleEvent,
   HelixElement,
   HelixFilterEvent,
   HelixNavigateEvent,
+  HelixReorderEvent,
+  HelixSelectEvent,
   HelixSortEvent,
   hostAria,
   MixinCollection,
@@ -19,7 +22,8 @@ import { repeat } from 'lit/directives/repeat.js'
    text, which renders an element called `lit$…$` that lays out as nothing.
    Measured: the styled spec read `localName` as `lit$640177303$`. */
 import { html } from 'lit/static-html.js'
-import type { HelixHeadlessTableColumn } from '../../table/column/table-column.js'
+import { at, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
+import '../../checkbox/index.js'
 import '../../pagination/index.js'
 import {
   type Arranged,
@@ -61,6 +65,25 @@ import {
  * right shape with nothing in it. That is the cost of the first paragraph: use
  * `helix-table` where the served HTML has to carry the values.
  *
+ * **`selectable` adds a column of checkboxes, keyed on `row-key`.** A row is
+ * selected by its identity rather than its position, so a selection survives a
+ * sort, a filter and a page. `selected` is the chosen keys, comma separated, the
+ * shape Listbox uses for a multiple choice, and like `sort` it is controlled
+ * when set and seeded by `default-selected`. The box in the heading selects every
+ * row in the result, across pages, and shows a dash while only some are chosen.
+ * Choosing one of many, rather than several, is opening a row, and that is a
+ * link or a button in a cell rather than a selection.
+ *
+ * **A reader can size and order the columns.** `resizable` on a column puts a
+ * separator on its edge; `reorderable` on the table puts a grip on each heading
+ * that has a `field`, moved by dragging or with the arrow keys. The order lands
+ * in `order` as fields, and the consumer's own markup is never rewritten: the
+ * table assigns the headings to its header in that order instead.
+ *
+ * **`csv()` hands back the result as text**: every row the filter lets through,
+ * in the order on screen, in the columns on screen. Saving it is the page's
+ * business, the same as any other file.
+ *
  * @since 0.1.0
  * @status experimental
  * @category data
@@ -73,17 +96,29 @@ import {
  *
  * @event {HelixFilterEvent} helix-filter - Fired when the query changes, and cancelable.
  * @event {HelixNavigateEvent} helix-navigate - Fired when a reader asks for another page, and cancelable.
+ * @event {HelixReorderEvent} helix-reorder - Fired when a reader asks for the columns in another order, with every field in the new one, and cancelable.
+ * @event {HelixSelectEvent} helix-select - Fired when a reader changes which rows are selected, with every selected key comma separated, and cancelable.
  * @event {HelixSortEvent} helix-sort - Fired when a reader asks for a different order, and cancelable.
  *
  * @csspart after - The room the rows below the window would have taken. Windowed only.
  * @csspart before - The room the rows above the window would have taken. Windowed only.
  * @csspart cell - One cell.
+ * @csspart checkbox - A row's checkbox, or the one in the heading that selects them all.
+ * @csspart checkbox-box - The frame the checkbox's input is painted as.
+ * @csspart checkbox-control - The checkbox's input.
+ * @csspart checkbox-feedback - Forwarded from the checkbox, and never drawn here.
+ * @csspart checkbox-field - The row the checkbox's box sits in.
+ * @csspart checkbox-hint - Forwarded from the checkbox, and never drawn here.
+ * @csspart checkbox-label - Forwarded from the checkbox; the label is spoken, not shown.
+ * @csspart checkbox-mark - The tick, or the dash while some rows are selected.
  * @csspart empty - Shown when no rows match.
  * @csspart footer - The region below the grid.
  * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
  * @csspart loading - Shown while the rows are still on their way.
  * @csspart pagination - The pagination, where this draws one.
  * @csspart row - One row of data.
+ * @csspart select - The cell holding a row's checkbox.
+ * @csspart select-all - The heading holding the checkbox that selects every row.
  * @csspart table - The grid.
  * @csspart toolbar - The region above the grid.
  *
@@ -112,6 +147,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   defaultFilter = ''
 
   /**
+   * Column order to open with, where nothing declared one.
+   */
+  @property({ attribute: 'default-order' })
+  defaultOrder = ''
+
+  /**
    * Page to open on, where nothing declared one.
    */
   @property({ attribute: 'default-page', type: Number })
@@ -122,6 +163,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'default-page-size', type: Number })
   defaultPageSize = 0
+
+  /**
+   * Keys to open with selected, comma separated, where nothing declared any.
+   */
+  @property({ attribute: 'default-selected' })
+  defaultSelected = ''
 
   /**
    * Order to open on, where nothing declared one.
@@ -160,17 +207,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The field naming a row's stable identity.
-   *
-   * **Needed before selection exists, not after.** Lit keys the rendered rows by
-   * it, so a sort moves a row's element rather than rewriting every cell in
-   * place, which is what keeps focus inside a cell and keeps a CSS transition
-   * attached to the row it belongs to. Left unset the index is the key, which is
-   * correct only while nothing reorders: it is why this defaults to something
-   * that works and is worth setting anyway.
+   * Accessible name for the grid.
    */
   @property()
-  key = ''
+  label = ''
 
   /**
    * What the rows are narrowed to, as one query across every column.
@@ -191,10 +231,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Accessible name for the grid.
+   * Whether this element does the work or asks the consumer to.
+   *
+   * `client` filters, sorts and pages `rows` itself. `server` applies none of
+   * them: `rows` is the page, `total` is the size of the whole result, and the
+   * three events are requests the consumer answers by fetching. Past some size
+   * the client cannot hold the data, so this is not an optimization, it is the
+   * only mode that works, and it is here from the start because adding it later
+   * inverts the data flow.
    */
   @property()
-  label = ''
+  mode: 'client' | 'server' = 'client'
 
   /**
    * The page on show, from 1.
@@ -216,17 +263,50 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Whether this element does the work or asks the consumer to.
+   * Whether a reader may move the columns.
    *
-   * `client` filters, sorts and pages `rows` itself. `server` applies none of
-   * them: `rows` is the page, `total` is the size of the whole result, and the
-   * three events are requests the consumer answers by fetching. Past some size
-   * the client cannot hold the data, so this is not an optimization, it is the
-   * only mode that works, and it is here from the start because adding it later
-   * inverts the data flow.
+   * Each heading with a `field` gets a grip, dragged along the header or moved a
+   * place at a time with the arrow keys once it has focus.
+   */
+  @property({ type: Boolean })
+  reorderable = false
+
+  /**
+   * The columns' order, as their fields separated by spaces.
+   *
+   * A reader's move fires `helix-reorder` first, and refusing it leaves the
+   * columns where they were, which is how a consumer who stores the order takes
+   * the decision. `default-order` seeds an order this element then owns. A field not named
+   * keeps its place after the named ones, and a column with no field never
+   * moves.
    */
   @property()
-  mode: 'client' | 'server' = 'client'
+  get order(): string {
+    return this.orderState ?? this.defaultOrder
+  }
+
+  set order(next: string) {
+    const previous = this.order
+    this.orderState = next
+    this.requestUpdate('order', previous)
+  }
+
+  /**
+   * The field naming a row's stable identity.
+   *
+   * **Needed before selection exists, not after.** Lit keys the rendered rows by
+   * it, so a sort moves a row's element rather than rewriting every cell in
+   * place, which is what keeps focus inside a cell and keeps a CSS transition
+   * attached to the row it belongs to. Left unset the index is the key, which is
+   * correct only while nothing reorders: it is why this defaults to something
+   * that works and is worth setting anyway.
+   *
+   * **`row-key` and not `key`**, which is what it was called until selection
+   * needed it from React: `key` is reserved there, and a JSX `key` never reaches
+   * the element, so a React page could not tell the table which field a row is.
+   */
+  @property({ attribute: 'row-key' })
+  rowKey = ''
 
   /**
    * The whole result, in the order it arrived.
@@ -241,6 +321,35 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: false })
   rows: readonly DataRow[] = []
+
+  /**
+   * Whether a reader may select rows, with a column of checkboxes.
+   *
+   * Wants `row-key`: a selection is a set of identities, and without one the rows
+   * are known by their place in the result, which a sort changes.
+   */
+  @property({ type: Boolean })
+  selectable = false
+
+  /**
+   * The keys of the selected rows, comma separated.
+   *
+   * A string rather than an array, so it is an attribute a server writes and a
+   * framework's hydration keeps, and the shape a multiple Listbox already uses.
+   * A key holding a comma cannot be told apart from two keys, which is the
+   * price of the shape. A reader's choice fires `helix-select` first, and
+   * refusing it leaves the selection as it was.
+   */
+  @property()
+  get selected(): string {
+    return this.selectedState ?? this.defaultSelected
+  }
+
+  set selected(next: string) {
+    const previous = this.selected
+    this.selectedState = next
+    this.requestUpdate('selected', previous)
+  }
 
   /**
    * How many rows a page holds. Zero is every row, which is what "no paging" means.
@@ -328,6 +437,22 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   @state()
   private paginatedState: boolean | undefined = undefined
+
+  @state()
+  private orderState: string | undefined = undefined
+
+  @state()
+  private selectedState: string | undefined = undefined
+
+  /** The order while a grip is being dragged, before anybody has been asked. */
+  @state()
+  private dragOrder: string[] | undefined = undefined
+
+  /** The column a grip is dragging, and the pointer doing it. */
+  private dragging: { field: string; pointer: number } | undefined
+
+  /** Said once, so a table that re-renders does not repeat it. */
+  private warnedAboutKey = false
 
   /* No `overscan`. The controller's four is a frame of fast scrolling at a 32
      pixel row, which is a fact about the platform rather than a preference. */
@@ -430,6 +555,36 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     )
   }
 
+  /**
+   * The columns in the order a reader arranged them.
+   *
+   * The ones with a field are put in `order`'s order, those it does not name
+   * after them in the order they were written, and a column with no field stays
+   * where it was written: it has nothing to be named by.
+   */
+  get orderedColumns(): HelixHeadlessTableColumn[] {
+    const columns = this.tableColumns
+    const wanted = this.dragOrder ?? this.order.split(/[\s,]+/).filter(Boolean)
+    if (wanted.length === 0) {
+      return columns
+    }
+    const rank = new Map(wanted.map((field, place) => [field, place]))
+    const moving = columns
+      .filter((column) => column.field !== '')
+      .sort(
+        (a, b) =>
+          (rank.get(a.field) ?? Number.POSITIVE_INFINITY) -
+          (rank.get(b.field) ?? Number.POSITIVE_INFINITY),
+      )
+    let next = 0
+    return columns.map((column) => (column.field === '' ? column : (moving[next++] ?? column)))
+  }
+
+  /** The fields in the order on screen. */
+  private get fields(): string[] {
+    return this.orderedColumns.filter((column) => column.field !== '').map((column) => column.field)
+  }
+
   /** The columns reduced to what the ordering needs. */
   private get axes(): Axis[] {
     return this.tableColumns
@@ -439,8 +594,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** The track list, from the columns if there are any. */
   private get template(): string {
-    const declared = this.tableColumns
-    return declared.length > 0 ? declared.map((column) => column.track).join(' ') : ''
+    const declared = this.orderedColumns
+    if (declared.length === 0) {
+      return ''
+    }
+    const tracks = declared.map((column) => column.track).join(' ')
+    /* The checkboxes take what they need and no more, ahead of everything. */
+    return this.selectable ? `max-content ${tracks}` : tracks
   }
 
   /**
@@ -606,6 +766,148 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     })
   }
 
+  /** Asks for the columns in a different order, as every field in the new one. */
+  private requestOrder(fields: readonly string[]): boolean {
+    return requestChange({
+      apply: (value) => {
+        const previous = this.order
+        this.orderState = value
+        this.requestUpdate('order', previous)
+      },
+      event: (value) => new HelixReorderEvent({ value }),
+      host: this,
+      next: fields.join(' '),
+    })
+  }
+
+  /** Asks for a different set of selected rows. */
+  private requestSelected(keys: ReadonlySet<string>): boolean {
+    return requestChange({
+      apply: (value) => {
+        const previous = this.selected
+        this.selectedState = value
+        this.requestUpdate('selected', previous)
+      },
+      event: (value) => new HelixSelectEvent({ value }),
+      host: this,
+      next: [...keys].join(','),
+    })
+  }
+
+  /** The keys selected now. */
+  private get chosen(): Set<string> {
+    return new Set(
+      this.selected
+        .split(',')
+        .map((key) => key.trim())
+        .filter(Boolean),
+    )
+  }
+
+  /**
+   * A row's identity: its `row-key` field, or its place in the whole result.
+   *
+   * The place is a fallback that is right only while nothing reorders, and a
+   * selection outlives an order, so `selectable` without a `row-key` says so once.
+   */
+  private keyOf(row: DataRow, place: number): string {
+    if (this.rowKey) {
+      const value = at(row, this.rowKey)
+      return value === undefined || value === null ? String(place) : String(value)
+    }
+    if (this.selectable && !this.warnedAboutKey && typeof window !== 'undefined') {
+      this.warnedAboutKey = true
+      console.warn(
+        `<${this.localName} selectable> has no \`row-key\`, so it knows each row by its place in the result, and a sort, a filter or new data selects a different row than the one that was chosen. Set \`row-key\` to the field that identifies a row.`,
+      )
+    }
+    return String(place)
+  }
+
+  /**
+   * Every key the box in the heading answers for: the whole result in `client`
+   * mode, across every page, and the page it was handed in `server` mode, which
+   * is all it holds.
+   */
+  private get everyKey(): string[] {
+    const rows = this.mode === 'server' ? this.rows : this.arrange().rows
+    return rows.map((row, place) => this.keyOf(row, place))
+  }
+
+  /** Ticks or clears one row, which the checkbox asked for and was refused. */
+  private readonly toggleRow = (key: string, event: HelixBeforeToggleEvent): void => {
+    event.preventDefault()
+    const keys = this.chosen
+    if (event.detail.checked) {
+      keys.add(key)
+    } else {
+      keys.delete(key)
+    }
+    this.requestSelected(keys)
+  }
+
+  /** Selects every row, or clears them all where every one already was. */
+  private readonly toggleAll = (event: HelixBeforeToggleEvent): void => {
+    event.preventDefault()
+    const every = this.everyKey
+    const keys = this.chosen
+    if (every.length > 0 && every.every((key) => keys.has(key))) {
+      for (const key of every) {
+        keys.delete(key)
+      }
+    } else {
+      for (const key of every) {
+        keys.add(key)
+      }
+    }
+    this.requestSelected(keys)
+  }
+
+  /** Moves a column by some places among the ones that move. */
+  private moveColumn(field: string, by: number): boolean {
+    const fields = this.fields
+    const from = fields.indexOf(field)
+    const to = from + by
+    if (from < 0 || to < 0 || to >= fields.length) {
+      return false
+    }
+    fields.splice(to, 0, ...fields.splice(from, 1))
+    return this.requestOrder(fields)
+  }
+
+  /**
+   * The result as CSV: every row the filter lets through, in the order on
+   * screen, in the columns on screen, headed by their headings.
+   *
+   * **Values, not cells.** A cell may be a template, a badge or a link, so each
+   * column gives its field's value, which is what a spreadsheet wants anyway.
+   * A column with no field has no value and is left out. In `server` mode this
+   * is the page it holds, which is all it can know.
+   *
+   * **A text value that a spreadsheet would run is quoted as text.** A cell
+   * opening with `=`, `+`, `-` or `@` is a formula to a spreadsheet, and a
+   * result is often something a reader did not write: those values gain a
+   * leading apostrophe, the mark spreadsheets read as "this is text". Numbers are
+   * left alone, so a negative one stays a number.
+   */
+  csv(): string {
+    const columns = this.orderedColumns.filter((column) => column.field !== '')
+    const rows = this.mode === 'server' ? this.rows : this.arrange().rows
+    const quote = (value: unknown): string => {
+      if (value === undefined || value === null) {
+        return ''
+      }
+      let text = String(value)
+      if (typeof value === 'string' && /^[=+\-@\t\r]/.test(text)) {
+        text = `'${text}`
+      }
+      return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+    }
+    const head = columns.map((column) => quote(column.textContent?.trim() || column.field))
+    const body = rows.map((row) => columns.map((column) => quote(at(row, column.field))))
+    return [head, ...body].map((line) => line.join(',')).join('\r\n')
+  }
+
   /** Asks for a different query. */
   private requestFilter(next: string): boolean {
     return requestChange({
@@ -672,7 +974,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!head?.assign) {
       return
     }
-    const columns = this.tableColumns
+    /* In the order on screen: a manual slot draws what it was given in the order
+       it was given, so this moves the headings without touching the markup. */
+    const columns = this.orderedColumns
     head.assign(...columns)
     const rest = [...this.children].filter((child) => !columns.includes(child as never))
     for (const [name, wanted] of [
@@ -689,6 +993,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Table', role: 'grid' })
+    this.internals.ariaMultiSelectable = this.selectable ? 'true' : null
     /* **Anything that changes which row sits at which index**, and not just a
        new array. Heights are recorded against a position in the drawn set, so a
        sort, a filter, a page or a switch to `server` all leave measurements
@@ -772,6 +1077,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private announceSort(): void {
     const current = parse(this.sort)
     for (const column of this.tableColumns) {
+      /* Whether a reader may move it, pushed down for the same reason: the order
+         is the table's, and the grip is drawn by the column. */
+      column.movable = this.reorderable && column.field !== ''
       column.sorted =
         current && column.canSort && column.field === current.field
           ? current.direction === 'asc'
@@ -795,29 +1103,69 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     >`
   }
 
+  /**
+   * A checkbox, named for what it chooses, whose change the table takes.
+   *
+   * Refused and re-asked rather than left to tick itself: the selection is the
+   * table's, so the box only ever shows what `selected` says.
+   */
+  private renderCheckbox(
+    name: string,
+    checked: boolean,
+    indeterminate: boolean,
+    toggle: (event: HelixBeforeToggleEvent) => void,
+  ): TemplateResult {
+    const checkbox = this.tag('checkbox')
+    return html`<${checkbox}
+      part="checkbox"
+      exportparts="box: checkbox-box, control: checkbox-control, feedback: checkbox-feedback,
+        field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark"
+      aria-label=${name}
+      .checked=${checked}
+      .indeterminate=${indeterminate}
+      @helix-before-toggle=${toggle}
+    ></${checkbox}>`
+  }
+
   private renderRows(rows: readonly DataRow[]): TemplateResult {
-    const columns = this.tableColumns
-    const field = this.key
+    const columns = this.orderedColumns
+    const field = this.rowKey
     /* Keyed, so a sort moves a row's element rather than rewriting every cell
        in place: focus inside a cell survives and a transition stays attached to
        the row it belongs to. The index is the fallback and is correct only
-       while nothing reorders, which is why `key` is worth setting.
+       while nothing reorders, which is why `row-key` is worth setting.
 
        Counted from the window's start rather than from the row's place in it,
        or every window would key its first row `0` and hand a scroll the element
        belonging to a row it has just left. */
     const start = this.windowStart
+    const chosen = this.selectable ? this.chosen : undefined
+    const named = columns.find((column) => column.field !== '')
     return html`${repeat(
       rows,
       (row, index) => (field ? String(row[field] ?? start + index) : start + index),
-      (row, index) => html`<div
-        part="row"
-        role="row"
-        aria-rowindex=${this.rowIndex(index)}
-        data-index=${this.windowed ? start + index : nothing}
-      >
-        ${columns.map((column) => this.renderCell(column, row))}
-      </div>`,
+      (row, index) => {
+        const key = chosen ? this.keyOf(row, this.rowIndex(index) - 2) : ''
+        const picked = chosen?.has(key) ?? false
+        return html`<div
+          part="row"
+          role="row"
+          aria-rowindex=${this.rowIndex(index)}
+          aria-selected=${chosen ? String(picked) : nothing}
+          data-index=${this.windowed ? start + index : nothing}
+        >
+          ${
+            chosen
+              ? html`<span part="select" role="gridcell">${this.renderCheckbox(
+                  `Select ${named ? String(named.order(row) ?? key) : key}`,
+                  picked,
+                  false,
+                  (event) => this.toggleRow(key, event),
+                )}</span>`
+              : nothing
+          }${columns.map((column) => this.renderCell(column, row))}
+        </div>`
+      },
     )}`
   }
 
@@ -887,6 +1235,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     }
   }
 
+  /** The heading of the checkbox column, which selects the whole result. */
+  private renderSelectAll(): TemplateResult {
+    const every = this.everyKey
+    const keys = this.chosen
+    const count = every.filter((key) => keys.has(key)).length
+    return html`<span part="select-all" role="columnheader">${this.renderCheckbox(
+      'Select every row',
+      every.length > 0 && count === every.length,
+      count > 0 && count < every.length,
+      this.toggleAll,
+    )}</span>`
+  }
+
   protected override render(): TemplateResult {
     const { available, matched, rows } = this.view
     const template = this.template
@@ -898,12 +1259,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         role="rowgroup"
         aria-busy=${this.loading ? 'true' : nothing}
         aria-rowcount=${this.mode === 'server' ? Math.max(this.total, available) + 1 : matched + 1}
-        aria-colcount=${columns.length || nothing}
+        aria-colcount=${columns.length ? columns.length + (this.selectable ? 1 : 0) : nothing}
         style=${template ? `--data-table-template: ${template}` : nothing}
         @scroll=${this.handleScroll}
       >
         <div part="head" role="row">
-          <slot name="columns" @slotchange=${this.handleSlotChange}></slot>
+          ${this.selectable ? this.renderSelectAll() : nothing}<slot
+            name="columns"
+            @slotchange=${this.handleSlotChange}
+          ></slot>
         </div>
         ${this.renderSpacer('before')}${this.renderRows(rows)}${this.renderSpacer('after')}
         ${this.renderStatus(available > 0)}
@@ -942,33 +1306,131 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('click', this.handleHeadClick)
-    this.addEventListener('keydown', this.handleHeadKey)
+    this.addEventListener('keydown', this.handleGripKey)
+    this.addEventListener('pointerdown', this.handleGripDown)
+    this.addEventListener('helix-before-resize', this.handleResize)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleHeadClick)
-    this.removeEventListener('keydown', this.handleHeadKey)
+    this.removeEventListener('keydown', this.handleGripKey)
+    this.removeEventListener('pointerdown', this.handleGripDown)
+    this.removeEventListener('helix-before-resize', this.handleResize)
+    this.stopDrag()
   }
 
-  /** A click on a sortable heading. */
+  /**
+   * A click on a sortable heading, anywhere but its grip or its edge.
+   *
+   * Enter and Space arrive here too, as the click the heading's sort button
+   * makes of them, so a keyboard needs nothing of its own.
+   */
   private readonly handleHeadClick = (event: Event): void => {
-    const column = this.columnFrom(event)
-    if (column?.canSort) {
-      this.toggleSort(column.field)
-    }
-  }
-
-  /** The same on Enter and Space, since a heading that sorts is a control. */
-  private readonly handleHeadKey = (event: KeyboardEvent): void => {
-    if (event.key !== 'Enter' && event.key !== ' ') {
+    if (this.partIn(event, 'grip') || this.partIn(event, 'resizer')) {
       return
     }
     const column = this.columnFrom(event)
     if (column?.canSort) {
-      event.preventDefault()
       this.toggleSort(column.field)
     }
+  }
+
+  /** Whether the event passed through a part of that name on its way here. */
+  private partIn(event: Event, name: string): boolean {
+    return event
+      .composedPath()
+      .some((node) => node instanceof Element && node.getAttribute('part') === name)
+  }
+
+  /** The arrow keys on a grip move its column a place, along the writing direction. */
+  private readonly handleGripKey = (event: KeyboardEvent): void => {
+    if (!this.partIn(event, 'grip')) {
+      return
+    }
+    const column = this.columnFrom(event)
+    const forward = getComputedStyle(this).direction === 'rtl' ? -1 : 1
+    const by = event.key === 'ArrowRight' ? forward : event.key === 'ArrowLeft' ? -forward : 0
+    if (column && by !== 0) {
+      event.preventDefault()
+      this.moveColumn(column.field, by)
+    }
+  }
+
+  /**
+   * A grip taken hold of: the headings follow the pointer and the order is asked
+   * for once it lets go.
+   *
+   * Previewed without an event, because a drag passes through a dozen orders on
+   * its way to the one the reader meant, and a consumer should hear the one.
+   */
+  private readonly handleGripDown = (event: PointerEvent): void => {
+    if (event.button !== 0 || !this.partIn(event, 'grip')) {
+      return
+    }
+    const column = this.columnFrom(event)
+    if (!column?.field) {
+      return
+    }
+    this.dragging = { field: column.field, pointer: event.pointerId }
+    this.dragOrder = this.fields
+    window.addEventListener('pointermove', this.handleGripMove)
+    window.addEventListener('pointerup', this.handleGripUp)
+    window.addEventListener('pointercancel', this.handleGripCancel)
+  }
+
+  private readonly handleGripMove = (event: PointerEvent): void => {
+    const dragging = this.dragging
+    if (!dragging || event.pointerId !== dragging.pointer || !this.dragOrder) {
+      return
+    }
+    const rtl = getComputedStyle(this).direction === 'rtl'
+    const others = this.orderedColumns.filter(
+      (column) => column.field !== '' && column.field !== dragging.field,
+    )
+    /* How many of the other headings the pointer has passed, reading in the
+       writing direction: that is the place the dragged one goes. */
+    const place = others.filter((column) => {
+      const box = column.shadowRoot?.querySelector('[part="column"]')?.getBoundingClientRect()
+      if (!box) {
+        return false
+      }
+      const middle = box.left + box.width / 2
+      return rtl ? event.clientX < middle : event.clientX > middle
+    }).length
+    const next = others.map((column) => column.field)
+    next.splice(place, 0, dragging.field)
+    if (next.join(' ') !== this.dragOrder.join(' ')) {
+      this.dragOrder = next
+    }
+  }
+
+  private readonly handleGripUp = (): void => {
+    const wanted = this.dragOrder
+    this.stopDrag()
+    if (wanted && wanted.join(' ') !== this.fields.join(' ')) {
+      this.requestOrder(wanted)
+    }
+  }
+
+  private readonly handleGripCancel = (): void => {
+    this.stopDrag()
+  }
+
+  private stopDrag(): void {
+    this.dragging = undefined
+    this.dragOrder = undefined
+    window.removeEventListener('pointermove', this.handleGripMove)
+    window.removeEventListener('pointerup', this.handleGripUp)
+    window.removeEventListener('pointercancel', this.handleGripCancel)
+  }
+
+  /**
+   * A column asked for a width. The column keeps its own, so all this does is
+   * draw the grid again once it has, a microtask on, when the width has landed.
+   */
+  private readonly handleResize = (): void => {
+    queueMicrotask(() => this.requestUpdate())
   }
 
   private columnFrom(event: Event): HelixHeadlessTableColumn | undefined {

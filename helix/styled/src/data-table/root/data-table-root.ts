@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDataTable } from '@fusion.dev/helix-headless/data-table'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './data-table-root.css.js'
+import '../../checkbox/index.js'
 import '../../pagination/index.js'
 import '../../table/index.js'
 

@@ -30,3 +30,82 @@
   min-inline-size: 0;
   padding-inline-end: var(--helix-space-md);
 }
+
+/* The positioning context for the separator on the heading's end edge. */
+[part="column"] {
+  position: relative;
+}
+
+/* **The heading's words are the button**, so a sortable heading looks exactly
+   like one that is not until a pointer or a keyboard reaches it. Unset rather
+   than restyled: a button's own padding, border and font would make a sortable
+   heading a different height from the plain one beside it. */
+[part="sort"] {
+  all: unset;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 1;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 0;
+}
+
+[part="sort"]:focus-visible,
+[part="grip"]:focus-visible,
+[part="resizer"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Quiet until held: a grip on every heading is furniture, and at the heading's
+   own ink it would read as part of the heading's words. */
+[part="grip"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: grab;
+  display: inline-flex;
+  flex: none;
+  margin-inline-end: var(--helix-space-2xs);
+  touch-action: none;
+}
+
+[part="grip"]:active {
+  cursor: grabbing;
+}
+
+[part="grip-mark"] {
+  block-size: 1em;
+  inline-size: 1em;
+}
+
+/* **A strip on the edge, wider than the line it draws**, because a one pixel
+   target is one nobody can grab. `touch-action: none` so a drag on a phone
+   moves the edge rather than scrolling the table. */
+/* Inside the heading's end padding rather than across the boundary: straddling
+   it, the outer half covered the next heading's grip and pushed the last column
+   out past the table's scroll box. */
+[part="resizer"] {
+  cursor: col-resize;
+  inline-size: var(--helix-space-sm);
+  inset-block: 0;
+  inset-inline-end: 0;
+  position: absolute;
+  touch-action: none;
+}
+
+[part="resizer"]::after {
+  border-inline-end: var(--helix-border-thin) solid transparent;
+  content: "";
+  inset-block: var(--helix-space-xs);
+  inset-inline-end: 0;
+  position: absolute;
+}
+
+[part="resizer"]:hover::after,
+[part="resizer"]:focus-visible::after {
+  border-inline-end-color: var(--helix-color-foreground-muted);
+}

@@ -1,6 +1,14 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import {
+  customElement,
+  HelixBeforeResizeEvent,
+  HelixElement,
+  hostAria,
+  requestChange,
+} from '@fusion.dev/helix-core'
+import { dotsThreeVertical } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * How a column is read out of a row, once the row is data rather than markup.
@@ -22,7 +30,7 @@ export type CellReader = (row: Readonly<Record<string, unknown>>) => unknown
  * as an empty cell: a missing key is a hole in the data and drawing `undefined`
  * into a table tells a reader the software is broken rather than the row is.
  */
-const at = (row: Readonly<Record<string, unknown>>, path: string): unknown => {
+export const at = (row: Readonly<Record<string, unknown>>, path: string): unknown => {
   if (path === '') {
     return undefined
   }
@@ -66,6 +74,14 @@ const at = (row: Readonly<Record<string, unknown>>, path: string): unknown => {
  * item of the table, so it lines up with the cells under it rather than sitting
  * in a wrapper that has to be kept the same width.
  *
+ * **A heading that does something holds a control that does it.** The host is
+ * the column header, and a header is not focusable, so a sortable heading is a
+ * `<button>` inside it: the pattern for a sortable table, and the only way a
+ * reader on a keyboard reaches the sort at all. A column a reader may resize
+ * carries a `separator` on its end edge, moved by dragging it or with the arrow
+ * keys, and a column in a table that lets a reader reorder its columns carries
+ * a grip the table moves.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Column header, Th
@@ -73,7 +89,13 @@ const at = (row: Readonly<Record<string, unknown>>, path: string): unknown => {
  *
  * @slot - The heading.
  *
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired as a reader resizes the column, with the width asked for, and cancelable.
+ *
  * @csspart column - The heading cell.
+ * @csspart grip - The handle a reader moves the column by, where the table allows it.
+ * @csspart grip-mark - The glyph on it.
+ * @csspart resizer - The edge a reader drags to change the width, where the column allows it.
+ * @csspart sort - The button a sortable heading is.
  */
 @customElement('helix-headless-table-column')
 export class HelixHeadlessTableColumn extends HelixElement {
@@ -129,6 +151,17 @@ export class HelixHeadlessTableColumn extends HelixElement {
   field = ''
 
   /**
+   * Whether a reader may change this column's width.
+   *
+   * By dragging the edge at the end of the heading, or with the arrow keys once
+   * it has focus, a step at a time and four with Shift. The width lands in
+   * `width` as pixels, and `helix-before-resize` asks first, so a consumer who
+   * stores the widths can take the decision.
+   */
+  @property({ type: Boolean })
+  resizable = false
+
+  /**
    * Whether a reader may reorder the set by this column.
    *
    * Ignored without a `field`, and silently: a column with nothing to sort by
@@ -179,6 +212,36 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @state()
   sorted: 'ascending' | 'descending' | undefined = undefined
+
+  /**
+   * @internal Whether the table this sits in lets a reader move it, written by
+   * that table. Not a consumer's to set: the order is the table's, and a grip
+   * on a column the table will not move is a control that does nothing.
+   */
+  @state()
+  movable = false
+
+  /** How wide the heading drew, for the separator to report. */
+  @state()
+  private drawn = 0
+
+  /** Where a drag of the separator started, while one is running. */
+  private resizing: { from: number; start: number } | undefined
+
+  /** Watches the heading's width, which changes with the table as well as with a drag. */
+  private watcher: ResizeObserver | undefined
+
+  /**
+   * The narrowest a reader can drag a column, in pixels.
+   *
+   * Three characters and the inset around them. Narrower and the heading has
+   * nothing left to be read by, and the separator is a grab target with no
+   * column beside it.
+   */
+  static readonly NARROWEST = 48
+
+  /** The step the arrow keys move the separator by, in pixels. */
+  static readonly STEP = 16
 
   /** The track this column contributes, resolved. */
   get track(): string {
@@ -243,8 +306,145 @@ export class HelixHeadlessTableColumn extends HelixElement {
     }
   }
 
+  /** The words of the heading, for naming the controls on it. */
+  private get name(): string {
+    /* `?? ''` is the server, where the element shim has no text to read. */
+    return this.textContent?.trim() ?? ''
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (typeof ResizeObserver !== 'undefined') {
+      this.watcher = new ResizeObserver(([entry]) => {
+        this.drawn = Math.round(entry?.borderBoxSize?.[0]?.inlineSize ?? 0)
+      })
+      /* On a reconnect the heading is already drawn and `firstUpdated` will not
+         run again, so the new observer is given it here. */
+      this.observeHeading()
+    }
+  }
+
+  private observeHeading(): void {
+    const heading = this.renderRoot?.querySelector('[part="column"]')
+    if (heading) {
+      this.watcher?.observe(heading)
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.watcher?.disconnect()
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated?.(changed)
+    this.observeHeading()
+  }
+
+  /**
+   * Asks for a width, in pixels, no narrower than a column can be read at.
+   *
+   * Through the same request every controlled value here uses: announced, and
+   * applied only where nobody refused it.
+   */
+  private resizeTo(px: number): void {
+    const next = `${Math.max(HelixHeadlessTableColumn.NARROWEST, Math.round(px))}px`
+    if (next === this.width) {
+      return
+    }
+    requestChange({
+      apply: (value) => {
+        this.width = value
+      },
+      event: (value) => new HelixBeforeResizeEvent({ value }),
+      host: this,
+      next,
+    })
+  }
+
+  /** Which way a drag or an arrow key grows the column, in this writing direction. */
+  private get forward(): number {
+    return getComputedStyle(this).direction === 'rtl' ? -1 : 1
+  }
+
+  private readonly handleResizeStart = (event: PointerEvent): void => {
+    if (event.button !== 0) {
+      return
+    }
+    event.preventDefault()
+    /* Captured so the drag keeps coming here once the pointer leaves the strip,
+       and allowed to fail: a pointer the browser no longer counts as active
+       throws, and losing the capture costs a drag that stops at the edge. */
+    try {
+      ;(event.currentTarget as Element).setPointerCapture(event.pointerId)
+    } catch {
+      /* The drag still works while the pointer stays over the strip. */
+    }
+    this.resizing = { from: event.clientX, start: this.drawn }
+  }
+
+  private readonly handleResizeMove = (event: PointerEvent): void => {
+    if (this.resizing) {
+      this.resizeTo(this.resizing.start + (event.clientX - this.resizing.from) * this.forward)
+    }
+  }
+
+  private readonly handleResizeEnd = (): void => {
+    this.resizing = undefined
+  }
+
+  /**
+   * The separator's keys: a step each way, four with Shift, and Home for the
+   * narrowest. Arrows follow the writing direction, so the one pointing away
+   * from the heading's start always widens it.
+   */
+  private readonly handleResizeKey = (event: KeyboardEvent): void => {
+    const step = HelixHeadlessTableColumn.STEP * (event.shiftKey ? 4 : 1)
+    const grow =
+      event.key === 'ArrowRight' ? this.forward : event.key === 'ArrowLeft' ? -this.forward : 0
+    if (grow !== 0) {
+      event.preventDefault()
+      this.resizeTo(this.drawn + grow * step)
+    } else if (event.key === 'Home') {
+      event.preventDefault()
+      this.resizeTo(HelixHeadlessTableColumn.NARROWEST)
+    }
+  }
+
   protected override render(): TemplateResult {
-    return html`<span part="column"><slot></slot></span>`
+    const name = this.name
+    return html`<span part="column">${
+      this.movable
+        ? html`<button part="grip" type="button" aria-label=${name ? `Move ${name}` : 'Move column'}>
+            <svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsThreeVertical.viewBox}>
+              ${unsafeSVG(dotsThreeVertical.content)}
+            </svg>
+          </button>`
+        : nothing
+    }${
+      this.canSort
+        ? html`<button part="sort" type="button"><slot></slot></button>`
+        : html`<slot></slot>`
+    }${
+      this.resizable
+        ? html`<span
+            part="resizer"
+            role="separator"
+            tabindex="0"
+            aria-label=${name ? `Resize ${name}` : 'Resize column'}
+            aria-orientation="vertical"
+            aria-valuemin=${HelixHeadlessTableColumn.NARROWEST}
+            aria-valuemax="4096"
+            aria-valuenow=${Math.max(HelixHeadlessTableColumn.NARROWEST, this.drawn)}
+            aria-valuetext=${`${this.drawn} pixels`}
+            @keydown=${this.handleResizeKey}
+            @pointerdown=${this.handleResizeStart}
+            @pointermove=${this.handleResizeMove}
+            @pointerup=${this.handleResizeEnd}
+            @pointercancel=${this.handleResizeEnd}
+          ></span>`
+        : nothing
+    }</span>`
   }
 }
 

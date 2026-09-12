@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
+import arranging from '../.examples/arranging.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 import paging from '../.examples/paging.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
@@ -15,6 +16,7 @@ beforeAll(async () => {
   await import('../../list/index.js')
   await import('../../input/index.js')
   await import('../../pagination/index.js')
+  await import('../../text/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */
@@ -36,6 +38,33 @@ const next = (table: HTMLElement): void => {
   const pagination = table.shadowRoot?.querySelector('[part~="pagination"]') as HTMLElement | null
   ;(pagination?.shadowRoot?.querySelector('[part~="next"]') as HTMLElement | null)?.click()
 }
+
+describe('the arranging example', () => {
+  run(
+    'one row starts chosen, a click on another counts two, and the grips move columns',
+    async () => {
+      await example(arranging)
+      const assets = document.getElementById('assets') as HTMLElement & { order: string }
+      await idle()
+      const chosen = rows(assets).filter((row) => row.getAttribute('aria-selected') === 'true')
+      expect(chosen.map((row) => row.querySelector('[part~="cell"]')?.textContent?.trim())).toEqual(
+        ['asset-002.webp'],
+      )
+      const box = rows(assets)[0]?.querySelector('[part~="checkbox"]') as HTMLElement
+      box.shadowRoot?.querySelector('input')?.click()
+      await idle()
+      expect(document.getElementById('chosen')?.textContent).toBe('2 selected')
+      const grip = document
+        .querySelector('helix-table-column[field="name"]')
+        ?.shadowRoot?.querySelector('[part="grip"]') as HTMLElement
+      grip.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowRight' }),
+      )
+      await idle()
+      expect(assets.order).toBe('size name kind')
+    },
+  )
+})
 
 describe('the paging example', () => {
   run('forty rows are five pages of eight, and the next page starts at the ninth', async () => {

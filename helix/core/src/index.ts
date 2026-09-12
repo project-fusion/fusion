@@ -96,6 +96,7 @@ export {
   HelixNextEvent,
   HelixPreviousEvent,
   HelixReadEvent,
+  HelixReorderEvent,
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,

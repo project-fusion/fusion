@@ -70,15 +70,38 @@
 
 /* A sortable heading is a control, and looking like one is not optional: a
    reader who cannot tell which headings respond will click the ones that do not.
-   The cursor is the cheap half and the focus ring is the half that matters,
-   since the keyboard path is the one nobody tries. */
+   The whole heading takes the click, so the whole heading takes the cursor; the
+   focus ring is the column's own, on the button a keyboard reaches. */
 ::slotted(helix-table-column[sortable]) {
   cursor: pointer;
 }
 
-::slotted(helix-table-column[sortable]:focus-visible) {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+/* The checkbox column: the same box as a cell, the box centered in it. */
+[part="select"],
+[part="select-all"] {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid
+    var(--data-table-rule-color, var(--helix-color-border));
+  display: flex;
+  justify-content: center;
+  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
+}
+
+[part="row"]:last-of-type [part="select"] {
+  border-block-end-color: transparent;
+}
+
+/* **A chosen row is washed across every cell**, the checkbox's included, since
+   the row has no box of its own to fill. A wash rather than the tone's surface,
+   which is the solid fill a button stands on and would make a column of chosen
+   rows read as an alarm; this is the primary at the strength Tag rests at. */
+[part="row"][aria-selected="true"] > * {
+  background-color: color-mix(
+    in srgb,
+    var(--helix-color-primary) 10%,
+    var(--helix-color-background)
+  );
 }
 
 /*
