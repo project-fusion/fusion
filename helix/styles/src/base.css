@@ -1074,10 +1074,11 @@ helix-toast:not([data-color-mode]) {
 /* The rhythm between blocks. One value, spent on the gap after each, so a
    paragraph followed by a list and a list followed by a table are all the same
    distance apart and the document does not change pace at each change of
-   element. */
+   element. A `Code Block` is spaced as the `pre` it stands in for, since a
+   renderer that maps fences to one puts it exactly there. */
 :where([data-prose] p),
 :where([data-prose] ul, [data-prose] ol),
-:where([data-prose] pre),
+:where([data-prose] pre, [data-prose] helix-code-block),
 :where([data-prose] table),
 :where([data-prose] blockquote) {
   margin-block: var(--helix-space-none) var(--helix-space-sm);

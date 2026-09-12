@@ -100,6 +100,10 @@ scroll pays continuously. Where the effect is about depth rather than texture,
 Headings take the type scale, paragraphs take the measure and leading, lists and
 links and inline code all follow. See [Typography](./typography).
 
+If you own the markdown renderer, map fenced code to `helix-code-block`, with the
+fence's language as its `label`. A `<pre>` can't carry a label or a copy button.
+Prose spaces the Code Block the same as the `<pre>` it replaces.
+
 ## Region axes
 
 These two are API rather than styling, and they are the reason the base layer is

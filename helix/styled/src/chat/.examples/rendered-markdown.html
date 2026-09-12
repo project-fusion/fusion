@@ -25,7 +25,12 @@
        `### Roll back` into an `<h3>` is the consumer's markdown library's job,
        and this is what one emits. What the component owes them is a turn that
        can hold the result. The recipe lives in the base layer, because
-       `::slotted()` reaches the turn's children and never their cells. -->
+       `::slotted()` reaches the turn's children and never their cells.
+
+       **Except the fence, which the renderer maps to `Code Block`.** A `<pre>`
+       cannot carry a label or a copy button, and those are what a reader of an
+       answer does with a command. It is one override in any markdown library,
+       and the fence's language is the label. -->
   <helix-chat-message
     author="them"
     data-prose
@@ -44,7 +49,7 @@
       <li>Check the column is gone, then start the workers again.</li>
     </ol>
 
-    <pre><code>bun run migrate:down 0042_add_order_status</code></pre>
+    <helix-code-block label="sh">bun run migrate:down 0042_add_order_status</helix-code-block>
 
     <table>
       <thead>
