@@ -31,3 +31,20 @@
     row-gap: var(--description-list-gap, var(--helix-space-md));
   }
 }
+
+/* **As wide as the widest pair, and no longer a container.** Inline-size
+   containment sizes an element as though it were empty, so a list that both
+   measured itself and sized itself to its content would come out zero wide.
+   Capped at its container, which is where a narrow one wraps instead. */
+:host([width="auto"]) {
+  container-type: normal;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+
+/* Values on the end edge. The item cannot see this attribute from its own
+   shadow root, so the list hands the alignment down as a property it reads. */
+:host([direction="row"][justify="between"]) {
+  --_description-list-value-align: end;
+  --_description-list-value-figures: tabular-nums;
+}

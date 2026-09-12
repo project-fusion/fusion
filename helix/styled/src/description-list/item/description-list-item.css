@@ -22,9 +22,12 @@
    overflowing: an id, a hash or an address has no spaces to wrap at. */
 [part="value"] {
   color: var(--helix-color-foreground);
+  font-variant-numeric: var(--_description-list-value-figures, normal);
+  justify-self: var(--_description-list-value-align, stretch);
   margin: 0;
   min-inline-size: 0;
   overflow-wrap: anywhere;
+  text-align: var(--_description-list-value-align, start);
 }
 
 /* Print: a label never ends one page with its value starting the next, which

@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import preview from '../.examples/preview.html' with { type: 'text' }
 import stacked from '../.examples/stacked.html' with { type: 'text' }
+import totals from '../.examples/totals.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -60,5 +61,59 @@ describe('the stacked example', () => {
       expect(value.top).toBeGreaterThanOrEqual(label.bottom)
       expect(Math.round(value.left)).toBe(Math.round(label.left))
     }
+  })
+})
+
+/**
+ * Where a value's text ends, rather than its box.
+ *
+ * The box is the wrong thing to measure: without `justify` the value stretches to
+ * the end of its column, so every box ends on the list's edge whether the text
+ * does or not, and an assertion on boxes passes either way.
+ */
+const ink = (item: Element): DOMRect => {
+  const range = document.createRange()
+  const nodes = [...item.childNodes].filter(
+    (node) => !(node instanceof Element && node.slot === 'label'),
+  )
+  range.setStartBefore(nodes[0] as Node)
+  range.setEndAfter(nodes.at(-1) as Node)
+  return range.getBoundingClientRect()
+}
+
+const items = (): Element[] => [...document.querySelectorAll('helix-description-list-item')]
+
+describe('the totals example', () => {
+  run('is as wide as its widest pair, not the row it sits in', async () => {
+    await example(totals)
+    await idle()
+    const host = document.querySelector('helix-description-list') as HTMLElement
+    const room = (host.parentElement as HTMLElement).getBoundingClientRect().width
+    expect(host.getBoundingClientRect().width).toBeLessThan(room / 2)
+  })
+
+  run('every figure ends on the list’s end edge, every label starts on its start', async () => {
+    await example(totals)
+    await idle()
+    const host = document.querySelector('helix-description-list') as HTMLElement
+    const edge = Math.round(host.getBoundingClientRect().right)
+    expect(new Set(boxes().map(({ label }) => Math.round(label.left))).size).toBe(1)
+    expect(new Set(items().map((item) => Math.round(ink(item).right)))).toEqual(new Set([edge]))
+  })
+
+  run('in figures of one width, so the digits line up', async () => {
+    await example(totals)
+    await idle()
+    const [first] = items()
+    const value = part(first as HTMLElement, 'value') as HTMLElement
+    expect(getComputedStyle(value).fontVariantNumeric).toBe('tabular-nums')
+  })
+})
+
+describe('the stacked example, as a control', () => {
+  run('without `justify`, text of different lengths ends in different places', async () => {
+    await example(stacked)
+    await idle()
+    expect(new Set(items().map((item) => Math.round(ink(item).right))).size).toBeGreaterThan(1)
   })
 })
