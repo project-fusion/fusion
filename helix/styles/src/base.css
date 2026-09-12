@@ -1151,6 +1151,35 @@ helix-toast:not([data-color-mode]) {
   padding: var(--helix-space-none);
 }
 
+/* **In a conversation, a table and a block of code are held in a box of their
+   own.** A turn is running prose that changes register mid-answer, and a table
+   ruled only by its row lines, or code on a ground with no edge, reads as more
+   of the passage rather than as a thing the passage is showing. So each is
+   sunken, bordered and rounded, one container shape for both. Scoped to turns:
+   the same recipe on a docs page sits in a column that is already a document,
+   where boxing every table would be furniture.
+
+   Written here rather than in `Chat`'s own sheet for the reason the example
+   gives: `::slotted()` reaches the turn's children and never their cells. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(table, pre) {
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+}
+
+/* As wide as its columns, not the turn: the table is `display: block` so it can
+   scroll, and a block box would otherwise draw its border the full width of the
+   turn around a grid that stops halfway across. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(table) {
+  inline-size: fit-content;
+}
+
+/* The box's own inset at its edges, so the first and last column's words are
+   not against the border. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(th, td) {
+  padding-inline: var(--helix-space-sm);
+}
+
 /* Quoted, by a rule on the edge it is indented from. */
 :where([data-prose] blockquote) {
   border-inline-start: var(--helix-border-thick) solid var(--helix-color-border);
