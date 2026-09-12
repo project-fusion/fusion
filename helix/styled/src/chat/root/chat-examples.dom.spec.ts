@@ -2,8 +2,12 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import agent from '../.examples/agent.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
+import historySheet from '../.examples/history.css' with { type: 'text' }
+import history from '../.examples/history.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import streaming from '../.examples/streaming.html' with { type: 'text' }
+import transcriptSheet from '../.examples/transcript.css' with { type: 'text' }
+import transcript from '../.examples/transcript.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -99,5 +103,32 @@ describe('the agent example', () => {
     } finally {
       window.matchMedia = real
     }
+  })
+})
+
+describe('the history example', () => {
+  run('reaching the top loads the turns before it, and the reader stays on theirs', async () => {
+    await example(history, historySheet)
+    const thread = document.getElementById('thread') as HTMLElement & { history: string }
+    const reading = thread.querySelector('helix-chat-message') as HTMLElement
+    ;(part(thread, 'log') as HTMLElement).scrollTop = 0
+    await until(() => thread.history === 'loading')
+    const before = reading.getBoundingClientRect().top
+    await until(() => thread.querySelectorAll('helix-chat-message').length === 12)
+    await idle()
+    expect(Math.abs(reading.getBoundingClientRect().top - before)).toBeLessThan(2)
+    expect(thread.history).toBe('more')
+  })
+})
+
+describe('the transcript example', () => {
+  run('two thousand turns open at the latest, drawn a window at a time', async () => {
+    await example(transcript, transcriptSheet)
+    const build = document.getElementById('run') as HTMLElement
+    const drawn = (): Element[] => [...(build.shadowRoot?.querySelectorAll('[part="turn"]') ?? [])]
+    await until(() => drawn().length > 0)
+    await idle()
+    expect(drawn().length).toBeLessThan(60)
+    expect(drawn().at(-1)?.textContent?.trim()).toBe('Continue from step 2000.')
   })
 })

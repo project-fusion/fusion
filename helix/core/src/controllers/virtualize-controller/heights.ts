@@ -107,6 +107,28 @@ export class Heights {
   }
 
   /**
+   * Moves every height along by `by` places, for a set that grew at its start.
+   *
+   * A transcript loading its history prepends, and every item already measured
+   * is now `by` further down the set. Moved rather than forgotten, because the
+   * measurements are still true of the same items: forgetting would put every
+   * one of them back at the estimate at the moment the reader is looking at them.
+   */
+  shift(by: number): void {
+    if (by === 0) {
+      return
+    }
+    const moved = [...this.seen].map(([index, size]) => [index + by, size] as const)
+    this.seen.clear()
+    for (const [index, size] of moved) {
+      if (index >= 0) {
+        this.seen.set(index, size)
+      }
+    }
+    this.dirty = 0
+  }
+
+  /**
    * Drops everything, for a set that is no longer the same set.
    *
    * A host that swaps its data has heights recorded against indices that now

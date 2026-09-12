@@ -12,6 +12,14 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
+ * What a turn that did not send is called, where nobody said otherwise.
+ *
+ * Exported because the transcript says it too: a failure is announced in the
+ * words the turn shows, and two defaults for one phrase are two phrases.
+ */
+export const FAILED_LABEL = 'Not sent'
+
+/**
  * @summary One turn in a conversation, and what has happened to it.
  *
  * @description
@@ -83,7 +91,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
    * Label for a message that did not send.
    */
   @property({ attribute: 'failed-label' })
-  failedLabel = 'Not sent'
+  failedLabel = FAILED_LABEL
 
   /**
    * Locale for the timestamp.

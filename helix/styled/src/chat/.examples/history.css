@@ -1,0 +1,7 @@
+/* Shorter than its turns, so it opens at the latest and there is a top to reach. */
+.history {
+  --chat-max-block-size: 20rem;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+}

@@ -97,3 +97,26 @@ describe('placing items that are not the same height', () => {
     expect(h.total(1000)).toBe(10_020)
   })
 })
+
+describe('a set that grew at its start', () => {
+  test('keeps each measurement with its item, which is now further down', () => {
+    const h = heights(10)
+    h.record(0, 40)
+    h.record(3, 25)
+    h.shift(5)
+    expect(h.at(5)).toBe(40)
+    expect(h.at(8)).toBe(25)
+    expect(h.at(0)).toBe(10)
+    // Five new items at the estimate, then the 40 that used to be first.
+    expect(h.before(6, 100)).toBe(90)
+  })
+
+  test('drops what a shift back takes past the start', () => {
+    const h = heights(10)
+    h.record(1, 40)
+    h.record(4, 25)
+    h.shift(-2)
+    expect(h.at(2)).toBe(25)
+    expect(h.total(10)).toBe(115)
+  })
+})

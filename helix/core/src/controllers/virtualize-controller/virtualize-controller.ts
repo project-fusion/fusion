@@ -171,6 +171,9 @@ export class VirtualizeController implements ReactiveController {
   /** Where each item starts, once any of them has been seen. */
   private readonly heights: Heights
 
+  /** Room `shift` added above the window, owed to the scroll offset once drawn. */
+  private owed = 0
+
   constructor(host: ReactiveControllerHost, options: VirtualizeOptions) {
     this.host = host
     this.options = options
@@ -335,6 +338,15 @@ export class VirtualizeController implements ReactiveController {
    * Skipped at the very top, where there is nothing above to have moved.
    */
   hostUpdated(): void {
+    /* After the render rather than when `shift` is called, because the room is
+       not there yet: a scroll offset past the old height is clamped to it. */
+    if (this.owed !== 0) {
+      const box = this.options.container()
+      if (box) {
+        box.scrollTop += this.owed
+      }
+      this.owed = 0
+    }
     if (!this.measuring()) {
       return
     }
@@ -362,6 +374,34 @@ export class VirtualizeController implements ReactiveController {
       box.scrollTop += now - was
     }
     this.measure()
+  }
+
+  /**
+   * Tells the controller the set grew by `by` items at its start.
+   *
+   * For a host that prepends, which is what a transcript loading its history
+   * does. Every index the controller knew now names the item `by` places later,
+   * so the heights and the window move with them, and the scroll offset is moved
+   * by the room the new items take once they have been drawn. The reader stays
+   * on the turn they were reading rather than on whatever now sits at their old
+   * offset, which is what loading history upward has to look like.
+   *
+   * Call it from `willUpdate`, before the render that draws the grown set.
+   */
+  shift(by: number): void {
+    if (by <= 0) {
+      return
+    }
+    const count = Math.max(0, this.options.count())
+    this.heights.shift(by)
+    const room = this.heights.before(by, count)
+    this.window = {
+      ...this.window,
+      before: this.window.before + room,
+      first: this.window.first + by,
+      last: this.window.last + by,
+    }
+    this.owed += room
   }
 
   /**

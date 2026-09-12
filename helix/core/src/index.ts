@@ -92,6 +92,7 @@ export {
   HelixDismissEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixHistoryEvent,
   HelixNavigateEvent,
   HelixNextEvent,
   HelixPreviousEvent,

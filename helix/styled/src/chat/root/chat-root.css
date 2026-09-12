@@ -205,6 +205,7 @@
 }
 
 [part="empty"],
+[part="history"],
 [part="loading"] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
@@ -212,6 +213,36 @@
   margin: var(--helix-space-none);
   padding-block: var(--helix-space-lg);
   text-align: center;
+}
+
+/* Where each settled turn is said: out of sight and still in the tree, which is
+   the one thing it is here to stay in. `display: none` would take the region out
+   of the accessibility tree with it. The recipe Pagination uses for its own. */
+[part="live"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* **Turns fed as data carry the space between them inside themselves.** They
+   are drawn a window at a time and placed by the height each one measured, and
+   a flex `gap` is room no turn measures: every turn above the window would put
+   it one gap further from where the placement expects. So the gap moves into
+   the turn, above every one but the first of the whole set, where it is
+   measured with it. */
+[part="log"][data-windowed] {
+  gap: var(--helix-space-none);
+}
+
+[part="turn"] {
+  flex: none;
+}
+
+[part="turn"]:not([data-index="0"]) {
+  padding-block-start: var(--chat-gap, var(--helix-space-md));
 }
 
 @media print {

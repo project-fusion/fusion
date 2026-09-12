@@ -2,13 +2,21 @@ import {
   customElement,
   HelixBeforePinEvent,
   HelixElement,
+  HelixHistoryEvent,
   hostAria,
   MixinCollection,
+  type Rendered,
   requestChange,
+  VirtualizeController,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
+import { keyed } from 'lit/directives/keyed.js'
+import { repeat } from 'lit/directives/repeat.js'
+/* `static-html`'s `html`, because a turn fed as data is drawn with the tier's
+   own message tag, and an interpolated tag is a static value. */
+import { html } from 'lit/static-html.js'
+import { FAILED_LABEL, type HelixHeadlessChatMessage } from '../message/chat-message.js'
 
 /**
  * The regions a consumer fills, in the order they are rendered.
@@ -18,6 +26,56 @@ import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
  * hidden on. Written out twice they go out of step.
  */
 const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
+
+/** One turn handed over as data, which is what `turns` holds. */
+export interface ChatTurn {
+  /** When it was said, as anything `Date` parses. */
+  at?: string
+  /** Who said it: `me`, `them`, or a name the consumer styles. */
+  author?: string
+  /**
+   * What identifies it across changes to the set.
+   *
+   * Without one a turn is known by the object it is, which holds while the
+   * consumer keeps its objects and fails the moment it maps a fresh set from a
+   * response: history then loads under the reader rather than above them.
+   */
+  key?: string
+  /** What has happened to it, as on `helix-chat-message`. */
+  state?: 'failed' | 'sending' | 'sent' | 'streaming'
+  /** What was said, as text. */
+  text: string
+}
+
+/** A turn as the announcer reads it, whichever way it was handed over. */
+interface Heard {
+  author: string | undefined
+  failed: string
+  id: unknown
+  state: string | undefined
+  text: string
+}
+
+/** Whether a turn has finished arriving, which is when it is worth saying. */
+const settled = (turn: Heard): boolean => turn.state !== 'sending' && turn.state !== 'streaming'
+
+/**
+ * Whether a turn is news to the reader.
+ *
+ * Their own words are not, since they have just written them, unless those
+ * words did not send: a failure is the one thing about their own turn a reader
+ * has to be told.
+ */
+const newsworthy = (turn: Heard): boolean => turn.author !== 'me' || turn.state === 'failed'
+
+/** What a turn says, without the controls and sources slotted beside it. */
+const spoken = (message: Element): string =>
+  [...message.childNodes]
+    .filter((node) => !(node.nodeType === 1 && (node as Element).hasAttribute('slot')))
+    .map((node) => node.textContent ?? '')
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim()
 
 /**
  * @summary A conversation: the turns, and where the reader is in them.
@@ -33,7 +91,29 @@ const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
  * **Scroll ownership is the behavior everything else depends on.** A transcript
  * that grows wants to stay at the bottom, except when the reader has scrolled
  * up to read, where pinning is hostile. The rule: pin while the reader is
- * within `threshold` of the bottom, and let go the moment they leave it.
+ * within `threshold` of the bottom, and let go the moment they leave it. A turn
+ * growing under a pinned reader is not the reader leaving, so a streamed answer
+ * is followed to its last line.
+ *
+ * **History loads upward, under a reader who does not move.** With `history`
+ * set to `more`, reaching the top fires `helix-history`; the consumer sets
+ * `loading` while it fetches and prepends the older turns, and the turn the
+ * reader was looking at stays where it was on screen while the room above it
+ * grows.
+ *
+ * **A turn is announced once, when it settles**, and not by the log. A log
+ * that is a live region reads what enters it, which is every token of a stream
+ * where `aria-busy` is not honored, every page of history as it loads, and
+ * every window of a long transcript as the reader scrolls through it. So the
+ * log is `aria-live="off"`, and a status region of its own says each new turn
+ * when it has finished arriving: never the reader's own words unless they
+ * failed to send, never a turn loaded above the ones already there, and never
+ * what was in the transcript when it opened.
+ *
+ * **Turns are markup children or data, not both.** Children serve whole from a
+ * server and are what most conversations want. `turns` is for the transcript
+ * too long to hold as elements: it is drawn a window at a time, measured as it
+ * goes, and the log needs a block size of its own for that to mean anything.
  *
  * @since 0.1.0
  * @status experimental
@@ -49,16 +129,22 @@ const REGIONS = ['header', 'actions', 'resume', 'status', 'composer'] as const
  * @slot status - Beside the composer: somebody typing, connection lost.
  *
  * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader pins or unpins the transcript by scrolling. Cancelable.
+ * @event {HelixHistoryEvent} helix-history - Fired when the reader reaches the oldest turn while `history` is `more`, reporting where they are rather than asking.
  * @event {HelixSendEvent} helix-send - A turn offered from the composer, or a failed one asked to go again, dispatched inside and heard here because the conversation is what a consumer holds. Cancelable: refusing it takes the decision and nothing is sent.
  *
  * @csspart actions - The controls for the conversation, at the header's trailing edge.
+ * @csspart after - The room the turns below the window would take. Data only.
+ * @csspart before - The room the turns above the window would take. Data only.
  * @csspart composer - The region the composer sits in.
  * @csspart empty - Shown when the conversation has no turns.
  * @csspart header - The region above the transcript.
+ * @csspart history - Shown at the top of the transcript while older turns are on their way.
+ * @csspart live - Where each settled turn is said, for a reader who cannot see it arrive.
  * @csspart loading - Shown while the history is still on its way.
  * @csspart log - The transcript, which is the thing that scrolls.
  * @csspart resume - The affordance offered while the reader is away from the bottom.
  * @csspart status - The status region, which is not part of the log.
+ * @csspart turn - One turn fed as data, around the message drawn for it.
  */
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
@@ -76,11 +162,31 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     slotAssignment: 'manual',
   }
 
+  /** How tall a turn is assumed to be before it has been drawn, in pixels. */
+  static readonly ESTIMATE = 72
+
   /**
    * Whether to open pinned, where nothing declared it.
    */
   @property({ attribute: 'default-pinned', type: Boolean })
   defaultPinned = true
+
+  /**
+   * Whether there are older turns than the ones here, and whether they are coming.
+   *
+   * `more` makes reaching the top fire `helix-history`, once per arrival;
+   * `loading` draws `history-text` above the oldest turn and fires nothing; empty
+   * says this is the start of the conversation. The consumer owns it, because
+   * only the consumer knows whether the server has anything older.
+   */
+  @property()
+  history: '' | 'loading' | 'more' = ''
+
+  /**
+   * What to say while older turns are on their way.
+   */
+  @property({ attribute: 'history-text' })
+  historyText = 'Loading earlier messages'
 
   /**
    * Accessible name for the conversation.
@@ -123,16 +229,74 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * A hook rather than a constant, because the right number depends on how tall
    * a turn is: a transcript of one-line replies wants a smaller threshold than
    * one of paragraphs, and a reader who has scrolled up by half a message has
-   * not left.
+   * not left. The same distance from the top is what counts as reaching the
+   * history.
    */
   @property({ type: Number })
   threshold = 48
 
+  /**
+   * The turns as data, for a transcript too long to hold as elements.
+   *
+   * Drawn a window at a time, so the log needs a block size. Set it or declare
+   * children, not both: while it holds anything the children are not drawn.
+   *
+   * **Read, never written**, and replaced rather than mutated: a streamed turn
+   * is a new array with the last turn's text longer, which is what tells this
+   * element to look again.
+   */
+  @property({ attribute: false })
+  turns: readonly ChatTurn[] = []
+
   @state()
   private pinnedState: boolean | undefined = undefined
 
+  /** The last thing said, and how many times something has been. */
+  @state()
+  private announcement = ''
+
+  @state()
+  private said = 0
+
   /** Watches for turns arriving, since a manual slot hears nothing about them. */
   private watcher: MutationObserver | undefined = undefined
+
+  /** Watches the turns' own `state`, which is when one of them settles. */
+  private settling: MutationObserver | undefined = undefined
+
+  /** Watches the turns and the log for size, which scrolling does not report. */
+  private grower: ResizeObserver | undefined = undefined
+
+  /** What `grower` is watching, so a render that changed nothing re-observes nothing. */
+  private watched: readonly Element[] = []
+
+  /** The scroll offset this element last set, which the reader has not moved from. */
+  private stuckAt = -1
+
+  /** The turn at the top of the reader's view, and how far below the top it sat. */
+  private anchor: { id: unknown; offset: number } | undefined = undefined
+
+  /** Whether `helix-history` has been fired for this arrival at the top. */
+  private asked = false
+
+  /**
+   * Until the first frame, what is in the transcript is what it opened with, and
+   * its box is not yet the box it will have.
+   */
+  private opening = true
+
+  /** The newest turn already accounted for, and the turns still arriving. */
+  private newest: unknown = undefined
+  private pending = new Set<unknown>()
+
+  /* No `overscan`: the controller's four is a frame of fast scrolling, and a
+     turn is taller than the row that number was chosen for. */
+  private readonly virtualize = new VirtualizeController(this, {
+    container: () => (this.fed ? this.log : null),
+    count: () => this.turns.length,
+    estimate: () => HelixHeadlessChat.ESTIMATE,
+    rows: () => (this.fed ? this.drawn() : []),
+  })
 
   /**
    * Which regions were given something, or undefined where nobody has counted.
@@ -160,6 +324,11 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     return this.filled?.has(name) ?? true
   }
 
+  /** Whether the turns are data rather than children. */
+  private get fed(): boolean {
+    return this.turns.length > 0
+  }
+
   /** The turns declared as children, in the order they are written. */
   get messages(): HelixHeadlessChatMessage[] {
     /* `?? []` is the server: Lit's element shim carries attributes and not a
@@ -184,6 +353,54 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     return log.scrollHeight - log.scrollTop - log.clientHeight <= Math.max(0, this.threshold)
   }
 
+  /** What identifies a turn fed as data: its key, or the object it is. */
+  private identity(turn: ChatTurn | undefined): unknown {
+    return turn?.key ?? turn
+  }
+
+  /**
+   * The turns fed as data that are drawn, each with its place in the whole set.
+   *
+   * Read off `data-index` rather than counted, for the reason the table gives:
+   * the controller asks before `updated`, while the previous window is drawn.
+   */
+  private drawn(): Rendered[] {
+    return [...(this.renderRoot?.querySelectorAll?.<HTMLElement>('[part="turn"]') ?? [])].map(
+      (element) => ({ element, index: Number(element.dataset.index) }),
+    )
+  }
+
+  /** The turns on screen, in order, each with what identifies it. */
+  private rendered(): { element: Element; id: unknown }[] {
+    if (this.fed) {
+      return this.drawn().map(({ element, index }) => ({
+        element,
+        id: this.identity(this.turns[index]),
+      }))
+    }
+    return this.messages.map((element) => ({ element, id: element }))
+  }
+
+  /** Every turn as the announcer reads it. */
+  private heard(): Heard[] {
+    if (this.fed) {
+      return this.turns.map((turn) => ({
+        author: turn.author,
+        failed: FAILED_LABEL,
+        id: this.identity(turn),
+        state: turn.state,
+        text: turn.text,
+      }))
+    }
+    return this.messages.map((message) => ({
+      author: message.author,
+      failed: message.failedLabel,
+      id: message,
+      state: message.state,
+      text: spoken(message),
+    }))
+  }
+
   /**
    * Puts the transcript back at its most recent turn.
    *
@@ -192,11 +409,17 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * a reader asking to go to the bottom means.
    */
   resume(): void {
+    this.stick()
+    this.requestPinned(true)
+  }
+
+  /** Scrolls to the bottom, and remembers where that was. */
+  private stick(): void {
     const log = this.log
     if (log) {
       log.scrollTop = log.scrollHeight
+      this.stuckAt = log.scrollTop
     }
-    this.requestPinned(true)
   }
 
   /**
@@ -229,8 +452,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     if (!log?.assign) {
       return
     }
-    const messages = this.messages
-    log.assign(...messages)
+    log.assign(...(this.fed ? [] : this.messages))
     const filled = new Set<string>()
     for (const name of REGIONS) {
       const given = [...this.children].filter((child) => child.getAttribute('slot') === name)
@@ -249,6 +471,176 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     ) {
       this.filled = filled
     }
+  }
+
+  /**
+   * Notes which turn is at the top of the reader's view, and where.
+   *
+   * A binary search, because the turns are in order down the log: a transcript
+   * of five hundred scrolled to its end costs nine measurements, not five
+   * hundred, and this runs on every scroll.
+   */
+  private remember(): void {
+    const log = this.log
+    const turns = this.rendered()
+    if (!log || turns.length === 0) {
+      this.anchor = undefined
+      return
+    }
+    const top = log.getBoundingClientRect().top
+    let low = 0
+    let high = turns.length - 1
+    while (low < high) {
+      const middle = (low + high) >> 1
+      if ((turns[middle]?.element.getBoundingClientRect().bottom ?? 0) > top) {
+        high = middle
+      } else {
+        low = middle + 1
+      }
+    }
+    const found = turns[low]
+    this.anchor = found
+      ? { id: found.id, offset: found.element.getBoundingClientRect().top - top }
+      : undefined
+  }
+
+  /**
+   * Puts the turn the reader was looking at back where they saw it.
+   *
+   * **By the turn, not by the offset.** History arriving above adds room the
+   * reader never scrolled through, so the offset they were at is now an older
+   * turn; what they were reading is the one fixed point. It is also idempotent,
+   * which is what lets it run beside the browser's own scroll anchoring where
+   * there is some: a turn the browser already put back has not moved.
+   */
+  private restore(): void {
+    const log = this.log
+    const anchor = this.anchor
+    if (!log || !anchor) {
+      return
+    }
+    const found = this.rendered().find((turn) => turn.id === anchor.id)
+    if (!found) {
+      return
+    }
+    const moved =
+      found.element.getBoundingClientRect().top - log.getBoundingClientRect().top - anchor.offset
+    if (Math.abs(moved) >= 1) {
+      log.scrollTop += moved
+    }
+  }
+
+  /** Fires `helix-history` once for each time the reader reaches the top. */
+  private reachHistory(): void {
+    const log = this.log
+    if (this.opening || this.history !== 'more' || !log) {
+      return
+    }
+    if (log.scrollTop > Math.max(0, this.threshold)) {
+      this.asked = false
+      return
+    }
+    if (!this.asked) {
+      this.asked = true
+      this.dispatchEvent(new HelixHistoryEvent())
+    }
+  }
+
+  /**
+   * Says the turns that have settled since the last time it looked.
+   *
+   * **New means after the newest turn already accounted for.** Turns loaded
+   * above it are history and are not said; if the newest turn is gone, the set
+   * was replaced rather than added to, and nothing is said either. A single turn
+   * arriving in an empty transcript is a conversation starting and is said;
+   * several at once is a transcript loading and is not.
+   *
+   * A turn still `sending` or `streaming` waits, and is said when it settles.
+   */
+  private announce(): void {
+    const turns = this.heard()
+    if (this.opening) {
+      this.newest = turns.at(-1)?.id
+      this.pending = new Set(turns.filter((turn) => !settled(turn)).map((turn) => turn.id))
+      return
+    }
+    const fresh = this.arrived(turns)
+    const words: string[] = []
+    for (const turn of turns) {
+      if (this.pending.has(turn.id) && settled(turn) && !fresh.includes(turn)) {
+        this.pending.delete(turn.id)
+        if (newsworthy(turn)) {
+          words.push(this.phrase(turn))
+        }
+      }
+    }
+    for (const turn of fresh) {
+      if (!settled(turn)) {
+        this.pending.add(turn.id)
+      } else if (newsworthy(turn)) {
+        words.push(this.phrase(turn))
+      }
+    }
+    if (this.pending.size > 0) {
+      const present = new Set(turns.map((turn) => turn.id))
+      this.pending = new Set([...this.pending].filter((id) => present.has(id)))
+    }
+    this.newest = turns.at(-1)?.id
+    if (words.length > 0) {
+      this.announcement = words.join(' ')
+      this.said += 1
+    }
+  }
+
+  /** The turns after the newest one already accounted for, by the rules above. */
+  private arrived(turns: Heard[]): Heard[] {
+    if (this.newest === undefined) {
+      return turns.length === 1 ? turns : []
+    }
+    const at = turns.findIndex((turn) => turn.id === this.newest)
+    return at < 0 ? [] : turns.slice(at + 1)
+  }
+
+  private phrase(turn: Heard): string {
+    return turn.state === 'failed' ? `${turn.failed}: ${turn.text}` : turn.text
+  }
+
+  /** Watches what is drawn for size, re-observing only when that changed. */
+  private watchSizes(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return
+    }
+    const log = this.log
+    const targets = [...(log ? [log] : []), ...this.rendered().map((turn) => turn.element)]
+    if (
+      targets.length === this.watched.length &&
+      targets.every((target, index) => target === this.watched[index])
+    ) {
+      return
+    }
+    this.grower ??= new ResizeObserver(this.handleResize)
+    this.grower.disconnect()
+    for (const target of targets) {
+      this.grower.observe(target)
+    }
+    this.watched = targets
+  }
+
+  /**
+   * A turn or the log changed size, which moves nothing on its own.
+   *
+   * Pinned, the bottom is followed: this is a streamed answer growing a line at
+   * a time, and it is the only notice of it, since growing content fires no
+   * scroll. Unpinned, the reader's turn is put back, which is an image loading
+   * above them in a browser without scroll anchoring.
+   */
+  private readonly handleResize = (): void => {
+    if (this.pinned) {
+      this.stick()
+    } else {
+      this.restore()
+    }
+    this.remember()
   }
 
   /**
@@ -280,17 +672,66 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
        transcript each time for a change inside a child that owns it. */
     this.watcher = new MutationObserver(this.handleSlotChange)
     this.watcher.observe(this, { childList: true })
+    /* The one thing inside a turn worth hearing about, and `attributeFilter`
+       keeps it to that: a subtree watch of `state` alone never sees a token. */
+    this.settling = new MutationObserver(this.handleSettle)
+    this.settling.observe(this, { attributeFilter: ['state'], subtree: true })
+    /* Children a parser is still adding when this upgrades are the transcript
+       it opened with, not turns arriving, and a frame is when parsing yields.
+
+       **The top is not judged before then either.** Before the first frame the
+       page's stylesheet may not have given the box its height, and a box with no
+       height is a transcript that does not fill it: every turn fits, the reader
+       is at the top, and the history is asked for at load. Measured on the
+       history example, whose React side asked at mount while its HTML side, a
+       frame later and styled, did not. */
+    this.opening = true
+    requestAnimationFrame(() => {
+      this.opening = false
+      this.reachHistory()
+    })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.watcher?.disconnect()
     this.watcher = undefined
+    this.settling?.disconnect()
+    this.settling = undefined
+    this.grower?.disconnect()
+    this.watched = []
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Conversation', role: 'region' })
+    if (changed.has('history')) {
+      this.asked = false
+    }
+    if (changed.has('turns')) {
+      this.follow(changed.get('turns') as readonly ChatTurn[] | undefined)
+    }
+  }
+
+  /**
+   * Keeps the window on the same turns when the set changes around them.
+   *
+   * Turns added before the first one are history, and the controller is told
+   * how many so every measurement moves with its turn. A first turn that is gone
+   * means the set was trimmed or replaced, and a measurement that now names a
+   * different turn is worse than the estimate.
+   */
+  private follow(previous: readonly ChatTurn[] | undefined): void {
+    if (!previous?.length || this.turns.length === 0) {
+      return
+    }
+    const first = this.identity(previous[0])
+    const at = this.turns.findIndex((turn) => this.identity(turn) === first)
+    if (at > 0) {
+      this.virtualize.shift(at)
+    } else if (at < 0) {
+      this.virtualize.forget()
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -299,15 +740,25 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     /* After the render that added the turn, because the scroll height it is
        being sent to does not exist until then. */
     if (this.pinned) {
-      const log = this.log
-      if (log) {
-        log.scrollTop = log.scrollHeight
-      }
+      this.stick()
+    } else {
+      this.restore()
     }
+    if (this.fed) {
+      this.virtualize.measure()
+    }
+    this.watchSizes()
+    this.remember()
+    this.reachHistory()
+    this.announce()
   }
 
   private readonly handleSlotChange = (): void => {
     this.assign()
+    this.requestUpdate()
+  }
+
+  private readonly handleSettle = (): void => {
     this.requestUpdate()
   }
 
@@ -329,19 +780,56 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * wheel does. Reading the position rather than counting events is what makes
    * that harmless, since after a programmatic scroll the position is the bottom
    * and the answer is the one that was already true.
+   *
+   * **Nor does the transcript growing under a reader who has not moved.** A
+   * pinned reader who is suddenly far from the bottom while still at the offset
+   * this element put them at has been left behind by a turn, not gone anywhere,
+   * and is followed. Leaving is moving up from there.
    */
   private readonly handleScroll = (): void => {
-    const wanted = this.atBottom
-    if (wanted !== this.pinned) {
-      this.requestPinned(wanted)
+    const log = this.log
+    if (this.pinned && log && log.scrollTop >= this.stuckAt - 1 && !this.atBottom) {
+      this.stick()
+    } else {
+      const wanted = this.atBottom
+      if (wanted !== this.pinned) {
+        this.requestPinned(wanted)
+      }
     }
+    this.remember()
+    this.reachHistory()
+  }
+
+  /** The turns fed as data, a window of them, between the room the rest would take. */
+  private renderTurns(): TemplateResult {
+    const { after, before, first, last } = this.virtualize.window
+    const message = this.tag('chat-message')
+    /* `flex: none` inline, because the room is only room if it keeps its size:
+       an empty flex item in a log that is a flex column shrinks to nothing, and
+       with the spacers gone the window grew until it had drawn every turn. */
+    return html`<div part="before" role="presentation" style="block-size: ${before}px; flex: none"></div>
+      ${repeat(
+        this.turns.slice(first, last),
+        (turn, offset) => turn.key ?? first + offset,
+        (turn, offset) =>
+          html`<div part="turn" data-index=${first + offset}>
+            <${message}
+              author=${turn.author ?? nothing}
+              at=${turn.at ?? nothing}
+              state=${turn.state ?? nothing}
+            >${turn.text}</${message}>
+          </div>`,
+      )}
+      <div part="after" role="presentation" style="block-size: ${after}px; flex: none"></div>`
   }
 
   protected override render(): TemplateResult {
     const away = !this.pinned
+    const fed = this.fed
     /* The header stands while either half of it is filled: a conversation with
        no title and a single control still needs the row that control sits in. */
     const titled = this.has('header') || this.has('actions')
+    const busy = this.loading || this.history === 'loading'
     return html`<div part="header" ?hidden=${!titled}>
         <slot name="header"></slot>
         <span part="actions" ?hidden=${!this.has('actions')}>
@@ -351,14 +839,22 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       <div
         part="log"
         role="log"
-        aria-live="polite"
+        aria-live="off"
         aria-label=${this.label || 'Conversation'}
-        aria-busy=${this.loading ? 'true' : nothing}
+        aria-busy=${busy ? 'true' : nothing}
+        ?data-windowed=${fed}
         @scroll=${this.handleScroll}
       >
+        ${
+          this.history === 'loading'
+            ? html`<p part="history" role="status">${this.historyText}</p>`
+            : nothing
+        }
+        ${fed ? this.renderTurns() : nothing}
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
-        ${this.renderStatus(this.messages.length > 0)}
+        ${this.renderStatus(fed || this.messages.length > 0)}
       </div>
+      <span part="live" role="status">${keyed(this.said, this.announcement)}</span>
       <div part="resume" ?hidden=${!away || !this.has('resume')} @click=${this.handleResume}>
         <slot name="resume"></slot>
       </div>

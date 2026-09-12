@@ -49,12 +49,16 @@ const chat = async (attributes = '') => {
 }
 
 describe('the transcript', () => {
-  test('the host is a named region and the log is a live log', async () => {
+  test('the host is a named region, and the log is a log that says nothing itself', async () => {
     const element = await chat()
     expect(role(element)).toBe('region')
     const log = part(element, 'log')
     expect(log?.getAttribute('role')).toBe('log')
-    expect(log?.getAttribute('aria-live')).toBe('polite')
+    /* Off, because what enters a log is not what is new: history, a window
+       moving and every token of a stream all enter it. The live part says the
+       turns that are, and `chat-transcript.dom.spec.ts` holds it to that. */
+    expect(log?.getAttribute('aria-live')).toBe('off')
+    expect(part(element, 'live')?.getAttribute('role')).toBe('status')
   })
 
   test('the turns declared as children are the transcript', async () => {

@@ -27,9 +27,12 @@ const markup = ssr(html`<helix-headless-chat label="Support">
 </helix-headless-chat>`)
 
 describe('chat server output', () => {
-  test('the log is served as a live region', () => {
+  test('the log is served as a log, and the region that speaks is served empty', () => {
     expect(partTag(markup, 'log')).toContain('role="log"')
-    expect(partTag(markup, 'log')).toContain('aria-live="polite"')
+    expect(partTag(markup, 'log')).toContain('aria-live="off"')
+    /* Empty on arrival, or it announces itself on every page load. */
+    expect(partTag(markup, 'live')).toContain('role="status"')
+    expect(withoutStyles(markup)).toMatch(/part="live" role="status">(<!--[^>]*-->)*<\/span>/)
   })
 
   test('the turns are in the markup, which is what markup children buy', () => {

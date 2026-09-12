@@ -1,0 +1,7 @@
+/* A transcript drawn a window at a time needs a box to window, and this is it. */
+.transcript {
+  --chat-max-block-size: 22rem;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+}

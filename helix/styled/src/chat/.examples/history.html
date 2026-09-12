@@ -1,0 +1,89 @@
+<!-- @summary Older turns loaded as the reader reaches the top, without moving what they were reading. -->
+<!-- @min 420 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-chat
+  class="history"
+  history="more"
+  id="thread"
+  label="Incident channel"
+>
+  <strong slot="header">#incident-2231</strong>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >Deploy 4127 is rolling back. Error rate on checkout crossed 2% at 14:02.</helix-chat-message>
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >Is it the new payment client?</helix-chat-message>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >Looks like it. The retries are hitting the old endpoint.</helix-chat-message>
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >Pinning the client to 3.8 and redeploying.</helix-chat-message>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >Rollback finished. Error rate is back under 0.1%.</helix-chat-message>
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >Leaving the incident open until the fix lands.</helix-chat-message>
+  <helix-chat-message
+    author="them"
+    state="sent"
+  >Opened PAY-2231 for the retry path.</helix-chat-message>
+  <helix-chat-message
+    author="me"
+    state="sent"
+  >Thanks. I will post a summary in the morning.</helix-chat-message>
+</helix-chat>
+
+<script type="module">
+  const thread = document.getElementById('thread')
+
+  /* Each load reaches further back, and the last one is the start. */
+  const LOADS = [
+    [
+      ['them', 'Checkout alarms paged at 13:58.'],
+      ['me', 'Acknowledged. Looking at the dashboards.'],
+      ['them', 'p99 on payments doubled in ten minutes.'],
+      ['me', 'Opening the incident channel.'],
+    ],
+    [
+      ['them', 'Deploy 4127 went out at 13:51 with the new payment client.'],
+      ['me', 'Anything in the canary?'],
+      ['them', 'Canary was green. The retry path only runs under load.'],
+      ['me', 'Keep an eye on it.'],
+    ],
+    [
+      ['them', 'Payments is on the release train for 13:50.'],
+      ['me', 'Noted. I am on call this afternoon.'],
+    ],
+  ]
+  let loaded = 0
+
+  thread.addEventListener('helix-history', () => {
+    thread.history = 'loading'
+    /* A fetch, standing in for one. */
+    setTimeout(() => {
+      const older = LOADS[loaded].map(([author, text]) => {
+        const turn = document.createElement('helix-chat-message')
+        turn.setAttribute('author', author)
+        turn.setAttribute('state', 'sent')
+        turn.textContent = text
+        return turn
+      })
+      thread.querySelector('helix-chat-message').before(...older)
+      loaded += 1
+      thread.history = loaded < LOADS.length ? 'more' : ''
+    }, 600)
+  })
+</script>
