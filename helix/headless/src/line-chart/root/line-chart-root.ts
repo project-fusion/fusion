@@ -39,6 +39,11 @@ const HEIGHT = 100
  * **One scale across every series**, the same as the bar chart, because two
  * series drawn to different scales are two charts sharing a picture.
  *
+ * **Not the chart for a total made of parts.** `area` washes each series from
+ * the floor on its own, so they overlap; `Area Chart` stacks them, so the top
+ * edge is the total and each band is a share. A line chart answers how each
+ * series moved, an area chart how the whole is made up.
+ *
  * **The labels are HTML beside the drawing rather than `<text>` inside it**, for
  * the reason `BarChart` records: an `<svg>` that fills its box scales its type
  * with everything else, the same `font-size` arriving at 10px in a narrow chart
@@ -76,10 +81,12 @@ const HEIGHT = 100
 @customElement('helix-headless-line-chart')
 export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
   /**
-   * Whether a wash is drawn under each line.
+   * Whether a wash is drawn under each line, each from the floor on its own.
+   * The washes overlap rather than add up: for parts that make a total, use
+   * `Area Chart`, which stacks them.
    *
    * Absent is lines alone, which is what suits more than one series: washes
-   * stack and the lower ones are read through the upper. One series over a
+   * overlap and the lower ones are read through the upper. One series over a
    * ground it should feel like a quantity against is the case for this.
    */
   @property({ reflect: true, type: Boolean })

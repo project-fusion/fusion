@@ -45,6 +45,11 @@ export interface AreaStack {
  * chart of the same table cannot show is the share, which here is the
  * thickness of a band.
  *
+ * **Not `Line Chart` with `area`.** That washes each series from the floor on
+ * its own, so the series overlap; this adds them. Reach for `Line Chart` when
+ * the question is how each series moved, and for this when it is how the whole
+ * is made up.
+ *
  * **It measures from zero, always**, which is `BarChart`'s rule and for the same
  * reason: a band's thickness *is* its value, so a range that starts anywhere
  * else draws every part in proportion to nothing. `LineChart` measures from its

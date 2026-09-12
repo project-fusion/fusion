@@ -6,9 +6,30 @@ title: Charting
 
 # Charting
 
-Six chart families: `Bar Chart`, `Line Chart`, `Donut Chart`, `Sparkline`,
-`Trend` and the shared `Legend`. Each has its own API page. Here is how the data
-gets in, which is the same for all of them.
+The chart families are `Bar Chart`, `Line Chart`, `Area Chart`,
+`Scatter Chart`, `Donut Chart`, `Heatmap`, `Sparkline`, `Trend` and the shared
+`Legend`. Each has its own API page. Here is which one answers which question,
+and how the data gets in, which is the same for all of them.
+
+## Which chart
+
+Pick by the question, not by the picture.
+
+- **How much, compared.** `Bar Chart`. A bar's length is its value, so it always
+  starts at zero.
+- **How something moved over time.** `Line Chart`. It measures from the data's
+  own range, so a small change still shows. Its `area` puts a light wash under
+  each line, each drawn from the floor on its own and overlapping the others.
+- **How a total is made up over time.** `Area Chart`. Each column is stacked on
+  the one below, so the top edge is the total and a band's thickness is its
+  share. This is the one to reach for when the parts add up to something, and
+  `Line Chart` with `area` is not a substitute: that overlaps the series, this
+  adds them.
+- **Parts of one whole, at one moment.** `Donut Chart`.
+- **Whether two measures relate.** `Scatter Chart`, one point per row.
+- **How each day or check went.** `Heatmap`: uptime, contributions, activity.
+- **The shape of a series beside its number.** `Sparkline`, with no axes. And
+  `Trend` for which way one measurement moved and whether that is good news.
 
 ## The data is a table in the document
 
@@ -84,6 +105,6 @@ Charts animate on entry and on data change, and every one of them answers
 ## What these are not
 
 **Not a charting library.** There is no axis configuration language, no plugin
-system, and no chart type you build by composing scales. Six drawings that read
-a table, styled by the token system, with an accessible representation by
+system, and no chart type you build by composing scales. Drawings that read a
+table, styled by the token system, with an accessible representation by
 construction. When you need a grammar of graphics, use one.
