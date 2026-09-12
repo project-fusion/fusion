@@ -1155,16 +1155,31 @@ helix-toast:not([data-color-mode]) {
    own.** A turn is running prose that changes register mid-answer, and a table
    ruled only by its row lines, or code on a ground with no edge, reads as more
    of the passage rather than as a thing the passage is showing. So each is
-   sunken, bordered and rounded, one container shape for both. Scoped to turns:
-   the same recipe on a docs page sits in a column that is already a document,
-   where boxing every table would be furniture.
+   sunken, bordered and rounded, one container shape for both, and the same
+   corner as a `Code Block` beside them. Scoped to turns: the same recipe on a
+   docs page sits in a column that is already a document, where boxing every
+   table would be furniture.
+
+   **One rule for the markup and for the component.** A table rendered from
+   markdown and a `Table` in an answer built from Helix parts are the same thing
+   to a reader, so they get the same box from the same declarations rather than
+   two rules that could drift.
 
    Written here rather than in `Chat`'s own sheet for the reason the example
    gives: `::slotted()` reaches the turn's children and never their cells. */
-:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(table, pre) {
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(table, pre),
+:where(helix-chat-message) :where(helix-table) {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
+  border-radius: var(--helix-radii-lg);
+}
+
+/* The box's own inset at its edges, so the first column's words are not
+   against the border. On the table rather than its cells, because a `Table`'s
+   cells start flush and have no hook to move them. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(table),
+:where(helix-chat-message) :where(helix-table) {
+  padding-inline: var(--helix-space-sm);
 }
 
 /* As wide as its columns, not the turn: the table is `display: block` so it can
@@ -1174,10 +1189,17 @@ helix-toast:not([data-color-mode]) {
   inline-size: fit-content;
 }
 
-/* The box's own inset at its edges, so the first and last column's words are
-   not against the border. */
-:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(th, td) {
-  padding-inline: var(--helix-space-sm);
+/* The box's border is the last rule, so the last row draws none of its own:
+   two hairlines a few pixels apart read as one badly drawn edge. */
+:where(helix-chat-message) :where(helix-table-row:last-of-type > helix-table-cell) {
+  border-block-end-color: transparent;
+}
+
+/* **A list in an answer is prose, not a menu.** `List`'s rows are spaced for a
+   pointer to land on; bullets in a paragraph's rhythm want the gap between
+   lines, with the marker hanging in the gutter the list already keeps for it. */
+:where(helix-chat-message) :where(helix-list[kind="ordered"], helix-list[kind="unordered"]) {
+  --list-item-padding: var(--helix-space-2xs) var(--helix-space-none);
 }
 
 /* Quoted, by a rule on the edge it is indented from. */

@@ -1,4 +1,4 @@
-<!-- @summary An answer that is a document: a heading, a table, a list and a block of code in one turn. -->
+<!-- @summary An answer that is a document: a heading, a table, a list and a block of code, each the Helix component for it. -->
 <!-- @min 480 -->
 <link
   href="styles.css"
@@ -20,52 +20,49 @@
     state="sent"
   >What changed in 0.16?</helix-chat-message>
 
-  <!-- **`data-prose` is what styles this, and the markup is the page's own.**
-       Chat renders no markdown and takes no dependency on one: a turn is
-       whatever the consumer slotted, so turning `### What changed` into an
-       `<h3>` is their job and their markdown library's. What the component owes
-       them is a turn that can hold the result, which is what this shows.
-
-       The recipe lives in the base layer rather than in this component's shadow
-       root, because a shadow root cannot reach here: `::slotted()` matches the
-       assigned node and never its descendants, so a rule for a table's cells has
-       to be written where the cells are. -->
+  <!-- A turn holds whatever it is given, so an answer can be built from the
+       library's own parts. Markdown rendered to plain HTML is the other way in:
+       mark the turn `data-prose` and the base layer sets its headings, lists,
+       tables and code. -->
   <helix-chat-message
     author="them"
-    data-prose
     separation="plain"
     state="sent"
   >
-    <h3>What changed</h3>
-    <p>Three things landed, and one of them moves a default.</p>
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
+      <helix-text
+        as="h3"
+        variant="title"
+      >What changed</helix-text>
+      <helix-text as="p">Three things landed, and one of them moves a default.</helix-text>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Package</th>
-          <th>Version</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>helix</td>
-          <td>0.16.3</td>
-        </tr>
-        <tr>
-          <td>helix-core</td>
-          <td>0.16.3</td>
-        </tr>
-      </tbody>
-    </table>
+      <helix-table label="Versions">
+        <helix-table-column>Package</helix-table-column>
+        <helix-table-column>Version</helix-table-column>
+        <helix-table-row>
+          <helix-table-cell header>helix</helix-table-cell>
+          <helix-table-cell>0.16.3</helix-table-cell>
+        </helix-table-row>
+        <helix-table-row>
+          <helix-table-cell header>helix-core</helix-table-cell>
+          <helix-table-cell>0.16.3</helix-table-cell>
+        </helix-table-row>
+      </helix-table>
 
-    <ul>
-      <li><code>Button</code> lost its width axis</li>
-      <li>The small dialog footer fits again</li>
-      <li>Nothing generated is tracked any more</li>
-    </ul>
+      <helix-list
+        kind="unordered"
+        label="Changes"
+      >
+        <helix-list-item><helix-code>Button</helix-code> lost its width axis</helix-list-item>
+        <helix-list-item>The small dialog footer fits again</helix-list-item>
+        <helix-list-item>Nothing generated is tracked any more</helix-list-item>
+      </helix-list>
 
-    <p>Upgrade with:</p>
-
-    <pre><code>bun add @fusion.dev/helix</code></pre>
+      <helix-text as="p">Upgrade with:</helix-text>
+      <helix-code-block label="Terminal">bun add @fusion.dev/helix</helix-code-block>
+    </helix-flex>
   </helix-chat-message>
 </helix-chat>
