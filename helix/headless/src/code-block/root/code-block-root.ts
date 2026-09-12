@@ -1,5 +1,5 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { nothing, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
@@ -157,9 +157,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * Client only, and it has to be: the server has no children to read. The
    * copy button is a client-side affordance anyway, so nothing is lost, and
    * taking the text from a property instead would be a second copy of the code
-   * that goes stale the moment the slot changes.
+   * that goes stale the moment the slot changes. Empty while hydrating what a
+   * server sent, which rendered it empty.
    */
   private get text(): string {
+    if (this.hydrating) {
+      return ''
+    }
     return [...(this.childNodes ?? [])]
       .filter(
         (node) =>
@@ -168,6 +172,11 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       )
       .map((node) => node.textContent ?? '')
       .join('')
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override render(): TemplateResult {

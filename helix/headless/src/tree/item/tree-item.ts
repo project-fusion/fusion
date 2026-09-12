@@ -123,15 +123,17 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /**
    * Whether anything is slotted into `children`.
    *
-   * Read from the children before the first render, so it draws the twisty,
-   * and from the slot after it, which is what hears a child arrive later. Not
-   * on the server, where `children` is undefined.
+   * Read from the children before each render, so the first one draws the
+   * twisty, and from the slot, which is what hears a child arrive later. Not on
+   * the server, where `children` is undefined, nor while hydrating what one
+   * sent.
    */
   @state()
   private branch = false
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    this.finishHydration()
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="children"]')
     slot?.addEventListener('slotchange', () => {
       this.branch = slot.assignedElements().length > 0
@@ -300,7 +302,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
-    if (!this.hasUpdated && this.children !== undefined) {
+    if (this.children !== undefined && !this.hydrating) {
       this.branch = [...this.children].some((child) => child.slot === 'children')
     }
   }

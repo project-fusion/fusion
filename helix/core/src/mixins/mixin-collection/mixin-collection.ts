@@ -1,5 +1,6 @@
-import { html, type LitElement, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import type { HelixElement } from '../../helix-element/helix-element.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -61,7 +62,7 @@ export declare class CollectionElement {
  * apply this, rather than here.** See `MixinField` for why a class-level tag on
  * a mixin reaches no manifest.
  */
-export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
+export const MixinCollection = <T extends Constructor<HelixElement>>(Base: T) => {
   class Collection extends Base {
     /**
      * What is said where there are none, and none are coming.
@@ -153,11 +154,12 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
      * Not on the server, whose element shim carries attributes and no tree, so
      * `children` is undefined there and `slotCounted` stays false exactly when
      * the answer is unknown. Asked of the element rather than of `isServer`,
-     * which is true in any test runner that resolves Lit's `node` build.
+     * which is true in any test runner that resolves Lit's `node` build. And not
+     * while hydrating what a server sent, which has to render the same unknown.
      */
-    protected override willUpdate(changed: Map<PropertyKey, unknown>): void {
-      super.willUpdate?.(changed)
-      if (this.children === undefined) {
+    protected override willUpdate(changed: PropertyValues): void {
+      super.willUpdate(changed)
+      if (this.children === undefined || this.hydrating) {
         return
       }
       const rows = this.slotted.length
@@ -165,6 +167,11 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
       if (rows !== this.slotRows) {
         this.slotRows = rows
       }
+    }
+
+    protected override firstUpdated(changed: PropertyValues): void {
+      super.firstUpdated(changed)
+      this.finishHydration()
     }
 
     /**

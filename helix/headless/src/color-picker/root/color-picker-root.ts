@@ -202,9 +202,10 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   /**
    * Whether this browser can sample a color off the screen.
    *
-   * Settled after the first render rather than at construction, because there is
-   * no `window` on the server, and a button that ships in the markup and does
-   * nothing in Firefox is worse than one that is never offered.
+   * Settled before each render rather than at construction, because a server
+   * has no `EyeDropper` and a button that ships in the markup and does nothing
+   * in Firefox is worse than one that is never offered. Not while hydrating a
+   * server's markup, which was rendered without it.
    */
   @state()
   private sampling = false
@@ -365,7 +366,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
 
   protected override firstUpdated(changed: import('lit').PropertyValues): void {
     super.firstUpdated(changed)
-    this.sampling = 'EyeDropper' in globalThis
+    this.finishHydration()
   }
 
   protected override updated(changed: import('lit').PropertyValues): void {
@@ -465,6 +466,9 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.internals.ariaInvalid = this.invalid ? 'true' : null
+    if (!this.hydrating) {
+      this.sampling = 'EyeDropper' in globalThis
+    }
   }
 
   /**

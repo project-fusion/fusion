@@ -481,6 +481,14 @@ jobs:
               "${{ github.event_name == 'pull_request'
               && github.event.pull_request.base.sha
               || github.event.before }}"
+          # The components that read their children, loaded twice in Chromium:
+          # from a server's declarative shadow DOM with Lit's hydration support,
+          # and as markup a client renders. The site ships no DSD, so nothing
+          # else here would notice a component that stopped hydrating, and
+          # nothing else runs Lit's dev build to hear it render twice. Here
+          # rather than in `verify` because it wants a browser.
+          - task: dsd
+            run: bun run check:spec:dsd
           # The collector in `@fusion.dev/helix-diagnostics`, against real components.
           # Here and not in `verify` because the DOM `verify` runs under drops a
           # `::part()` rule on the floor: happy-dom parses

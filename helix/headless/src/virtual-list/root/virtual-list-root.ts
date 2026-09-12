@@ -77,6 +77,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
   @state()
   private rows: Row[] = []
 
+  /** The `for` that `rows` came from, so it is read again only when that changes. */
+  private readFor: string | undefined
+
   /* No `overscan` property. The controller's four is a frame of fast scrolling
      at a 32 pixel row, which is a fact about the platform rather than a
      preference. */
@@ -105,24 +108,34 @@ export class HelixHeadlessVirtualList extends HelixElement {
   }
 
   /**
-   * Reads the source named by `for`, once the document exists to read.
+   * Reads the source named by `for`, before the render that draws it.
    *
-   * `firstUpdated` rather than `connectedCallback`, per the server rules: the
-   * shim has attributes and no tree, so `getElementById` is undefined there.
-   * A source that is missing or not an array leaves the list empty rather than
-   * throwing, because a consumer whose data has not arrived yet is the ordinary
-   * case and an empty list says so by itself.
+   * Not on the server, per the server rules: the shim has attributes and no
+   * tree, so `getElementById` is undefined there. Nor while hydrating what a
+   * server sent, which it drew with nothing read. A source that is missing or
+   * not an array leaves the list empty rather than throwing, because a consumer
+   * whose data has not arrived yet is the ordinary case and an empty list says
+   * so by itself.
    */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (
+      this.readFor !== this.for &&
+      typeof this.ownerDocument?.getElementById === 'function' &&
+      !this.hydrating
+    ) {
+      this.readFor = this.for
+      this.read()
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
-    this.read()
+    this.finishHydration()
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
-    if (changed.has('for')) {
-      this.read()
-    }
     this.virtualize.measure()
     this.place()
   }

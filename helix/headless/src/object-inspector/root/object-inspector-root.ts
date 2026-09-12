@@ -164,6 +164,9 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   @state()
   private read: unknown = undefined
 
+  /** The `for` that `read` came from, so it is read again only when that changes. */
+  private loadedFor: string | undefined
+
   /** Which branches are open, by path. */
   @state()
   private opened = new Set<string>()
@@ -252,6 +255,17 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* First, so a value read from `for` is in the rows this update works out,
+       and so in the first render. Not on the server, whose shim has attributes
+       and no document to look an id up in, nor while hydrating what one sent. */
+    if (
+      this.loadedFor !== this.for &&
+      typeof this.ownerDocument?.getElementById === 'function' &&
+      !this.hydrating
+    ) {
+      this.loadedFor = this.for
+      this.load()
+    }
     if (changed.has('value') || changed.has('read') || changed.has('defaultDepth')) {
       this.seed()
     }
@@ -266,13 +280,13 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
   }
 
-  /* `updated` rather than `connectedCallback`, per the server rules: the shim
-     has attributes and no tree, so there is no document to look an id up in. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
-    if (changed.has('for')) {
-      this.load()
-    }
     /* The controller measures once rows it drew report their heights, and a
        window that has drawn nothing yet has none to report, so it is asked here
        as `VirtualList` asks it. */

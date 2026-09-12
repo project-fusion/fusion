@@ -469,10 +469,11 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    *
    * From the children rather than the slots, so the first render has the
    * answer: the slots exist only once a render has made them. Not on the
-   * server, where `children` is undefined, so `filled` stays unknown there.
+   * server, where `children` is undefined, so `filled` stays unknown there, and
+   * not while hydrating what a server sent, which renders the same unknown.
    */
   private countRegions(): void {
-    if (this.children === undefined) {
+    if (this.children === undefined || this.hydrating) {
       return
     }
     const filled = new Set<string>(REGIONS.filter((name) => this.given(name).length > 0))

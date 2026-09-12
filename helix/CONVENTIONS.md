@@ -256,17 +256,28 @@ styling**.
 1. **Never initialize state in `connectedCallback`.** SSR does not call it.
    Derive from properties, or seed in `willUpdate`, which SSR does call.
 2. **SSR has no DOM.** The element shim carries attributes but not tree
-   traversal: `querySelector` is undefined and any parent-to-child coordination
-   throws. Anything that inspects the tree runs in `firstUpdated` or later, and
-   is therefore a client-side enhancement.
-3. **Semantics on the host, presentation in the shadow root.** IDREFs do not
+   traversal: `querySelector` is undefined, `children` is undefined, and any
+   parent-to-child coordination throws. Anything that inspects the tree is a
+   client-side enhancement.
+3. **Read the children before the render, except while hydrating.** A value
+   read from the children after a render and written into state renders the
+   component twice, and Lit's dev build warns about it. So read them in
+   `willUpdate`, guarded by `this.children !== undefined` for the server and by
+   `!this.hydrating` for a page a server rendered, and call
+   `this.finishHydration()` from `firstUpdated`. Lit hydrates declarative shadow
+   DOM by assuming the markup already shows the first render, so that render has
+   to be the server's: a value that differs is never written, and a template
+   that differs throws. `bun run check:spec:dsd` loads a server's markup and a
+   client's in Chromium and holds each component to both. Measuring layout is
+   the exception, since it can only follow a render.
+4. **Semantics on the host, presentation in the shadow root.** IDREFs do not
    cross shadow boundaries, so `aria-labelledby` inside a shadow root can never
    resolve to a light-DOM id.
-4. **Guard generated ids** with `if (!this.id)`. The server writes the id into
+5. **Guard generated ids** with `if (!this.id)`. The server writes the id into
    the HTML; the client sees it present and skips generation, so both agree.
-5. **A child announces itself to its parent.** A parent cannot poll for a child
+6. **A child announces itself to its parent.** A parent cannot poll for a child
    that has not upgraded. Dispatch a bubbling ready event.
-6. **Every component needs a `*.ssr.spec.ts`** asserting the server output. A
+7. **Every component needs a `*.ssr.spec.ts`** asserting the server output. A
    DOM spec runs after hydration, when everything already looks correct.
 
 Specs split by environment: Lit SSR's shim and happy-dom both patch globals and

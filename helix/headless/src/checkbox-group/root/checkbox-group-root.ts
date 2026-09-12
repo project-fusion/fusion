@@ -100,6 +100,9 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     }
   }
 
+  /** Whether `seed` has had its one chance. */
+  private seeded = false
+
   /**
    * Reads the boxes' own state into `value`, once, before anything is pushed.
    *
@@ -223,15 +226,28 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        a label richer than a string. */
     hostAria(this.internals, { label: this.label, role: 'group' })
     this.internals.ariaRequired = this.required ? 'true' : null
+    /* Before the first `sync`, and only ever once: after this the group's value
+       is what the boxes follow. Before the render too, so the first one has it.
+       Client only, the server having no boxes to read, and not while hydrating
+       what a server rendered without them. */
+    if (!this.seeded && this.children !== undefined && !this.hydrating) {
+      this.seeded = true
+      if (this.value === '') {
+        this.seed()
+      }
+    }
   }
 
+  /* Where hydrating skipped the seed, it happens here: after the render, which
+     had to match the server's, and before `updated` pushes the empty value onto
+     the boxes and clears the very state this reads. */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    /* Before the first `sync`, and only ever once: after this the group's value
-       is what the boxes follow. Client only, the server having no boxes to
-       read. */
-    if (this.value === '') {
-      this.seed()
+    if (!this.seeded && this.children !== undefined) {
+      this.seeded = true
+      if (this.value === '') {
+        this.seed()
+      }
     }
   }
 

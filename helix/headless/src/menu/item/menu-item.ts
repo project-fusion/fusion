@@ -209,21 +209,27 @@ export class HelixHeadlessMenuItem extends HelixElement {
   private start = false
 
   /**
-   * The first answer to both, from the children, before the first render.
+   * Both answers, from the children, before each render.
    *
-   * The slots are what stay in step afterwards, and they exist only once a
-   * render has made them: read through them, the first render drew no caret and
-   * no leading box and a second render had to follow it. Not on the server,
-   * where `children` is undefined.
+   * The slots exist only once a render has made them: read through them, the
+   * first render drew no caret and no leading box and a second render had to
+   * follow it. `slotchange` still reads them, for a child that arrives later.
+   * Not on the server, where `children` is undefined, nor while hydrating what
+   * one sent.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    if (this.hasUpdated || this.children === undefined) {
+    if (this.children === undefined || this.hydrating) {
       return
     }
     const named = (name: string): boolean => [...this.children].some((child) => child.slot === name)
     this.submenu = named('submenu')
     this.start = named('start')
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   /**

@@ -605,6 +605,43 @@ export class HelixElement extends LitElement {
     })
   }
 
+  /** Whether the shadow root was a server's, parsed from declarative shadow DOM. */
+  private fromServer = false
+
+  protected override createRenderRoot(): HTMLElement | DocumentFragment {
+    this.fromServer = this.shadowRoot !== null
+    return super.createRenderRoot()
+  }
+
+  /**
+   * Whether this update is hydrating a server's markup, and so has to render
+   * exactly what the server rendered.
+   *
+   * **Lit hydrates by assuming the markup already shows the first render.** A
+   * value that differs is recorded and never written, so the page keeps the
+   * server's, and a template that differs throws. The server has no children,
+   * so anything a component reads from its children waits for the update after
+   * hydration, which `finishHydration` asks for. Without a server's markup the
+   * first render reads them and there is one render.
+   */
+  protected get hydrating(): boolean {
+    return this.fromServer && !this.hasUpdated
+  }
+
+  /**
+   * Asks for the update a hydration put off, so the reads it skipped happen.
+   *
+   * Called from `firstUpdated`, the end of the hydrating update. The render it
+   * schedules can only follow that one, which is the exception Lit's
+   * change-in-update warning names, and it happens only on a page a server
+   * rendered.
+   */
+  protected finishHydration(): void {
+    if (this.fromServer) {
+      this.requestUpdate()
+    }
+  }
+
   /**
    * Announces an event, having first bound whatever React is holding for it.
    *

@@ -637,8 +637,8 @@ export class HelixHeadlessListbox extends MixinCollection(
     this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
     /* Before the render, so the empty state and the matches it draws are this
        update's rather than the last one's. Not on the server, whose element
-       shim has no `children`. */
-    if (this.children !== undefined) {
+       shim has no `children`, nor while hydrating what one sent. */
+    if (this.children !== undefined && !this.hydrating) {
       this.place()
     }
   }

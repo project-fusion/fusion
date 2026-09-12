@@ -794,17 +794,21 @@ export class HelixHeadlessVideo extends HelixElement {
     video.muted = false
   }
 
+  /** Whether the first set of copies has been read from the children. */
+  private mediaRead = false
+
   /**
-   * Rebuilds the copies from whatever the consumer has slotted.
+   * The copies to make of what the default slot is given.
    *
    * The attribute list is explicit rather than a blind copy of every attribute:
    * these are two elements with a known and small surface, and copying anything
    * a consumer happened to put on one would carry their framework's own markers
    * into a shadow root that has no use for them.
    */
-  private readonly handleMedia = (event: Event): void => {
-    const assigned = (event.target as HTMLSlotElement).assignedElements()
-    this.media = assigned
+  private copiesOf(
+    elements: Element[],
+  ): { attrs: Record<string, string>; tag: 'source' | 'track' }[] {
+    return elements
       .filter(
         (node): node is HTMLSourceElement | HTMLTrackElement =>
           node instanceof HTMLSourceElement || node instanceof HTMLTrackElement,
@@ -824,6 +828,19 @@ export class HelixHeadlessVideo extends HelixElement {
         }
         return { attrs, tag }
       })
+  }
+
+  /**
+   * Rebuilds the copies when what is slotted changes after the first read.
+   *
+   * The same set again is not a change. A video reloads for every new list, and
+   * the first `slotchange` reports the children this element already read.
+   */
+  private readonly handleMedia = (event: Event): void => {
+    const next = this.copiesOf((event.target as HTMLSlotElement).assignedElements())
+    if (JSON.stringify(next) !== JSON.stringify(this.media)) {
+      this.media = next
+    }
   }
 
   private readonly handleLoaded = (): void => {
@@ -850,11 +867,7 @@ export class HelixHeadlessVideo extends HelixElement {
         `${video.videoWidth} / ${video.videoHeight}`,
       )
     }
-    /* Read once the video has its tracks, not from the slot. A `<track>` is
-       only a caption once the platform has parsed it, and a consumer can add
-       one later. */
-    this.captionCount = this.captionTracks.length
-    /* And what the first one is doing, which is not always nothing: a
+    /* What the first caption track is doing, which is not always nothing: a
        `<track default>` starts showing without anyone pressing anything, so a
        button that began at "off" reported the opposite of what was on screen. */
     const track = video.textTracks[0]
@@ -1366,8 +1379,47 @@ export class HelixHeadlessVideo extends HelixElement {
     }
   }
 
+  /** The caption tracks among the copies, named as the menu names them. */
+  private captions: { label: string; language: string }[] = []
+
+  /**
+   * Finds the caption tracks among the copies, before the render that draws
+   * them.
+   *
+   * By the platform's own reading of `kind`, which is what makes a `<track>` a
+   * caption at all: missing is `subtitles` and anything it does not know is
+   * `metadata`. Read from the video's tracks after the render instead, the count
+   * arrived a render late and asked for one more. Choosing one still goes
+   * through the video's tracks, which hold them in the same order.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* The first copies, from the children and before the first render, so the
+       video it draws already holds them. Not on the server, which has no
+       children, nor while hydrating a server's markup, which was drawn with
+       none: a declarative shadow root reports its slot's contents before any
+       listener is there to hear it, so the update after hydration reads them
+       here instead. `slotchange` keeps them in step after that. */
+    if (!this.mediaRead && this.children !== undefined && !this.hydrating) {
+      this.mediaRead = true
+      this.media = this.copiesOf([...this.children].filter((child) => child.slot === ''))
+    }
+    if (changed.has('media')) {
+      this.captions = this.media
+        .filter(
+          (one) =>
+            one.tag === 'track' &&
+            (one.attrs.kind === undefined ||
+              ['captions', 'subtitles'].includes(one.attrs.kind.toLowerCase())),
+        )
+        .map((one) => ({ label: one.attrs.label ?? '', language: one.attrs.srclang ?? '' }))
+      this.captionCount = this.captions.length
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
+    this.finishHydration()
     const video = this.video
     if (video) {
       this.silent = video.muted
@@ -1406,9 +1458,7 @@ export class HelixHeadlessVideo extends HelixElement {
        is told to look again. Copies that arrive after that are markup it has
        already walked past. */
     if (changed.has('media')) {
-      const video = this.video
-      video?.load()
-      this.captionCount = this.captionTracks.length
+      this.video?.load()
     }
   }
 
@@ -1539,11 +1589,10 @@ export class HelixHeadlessVideo extends HelixElement {
    * component's to paper over with "Track 2".
    */
   protected renderCaptions(): TemplateResult | typeof nothing {
-    /* Branched on the state rather than on the getter, so the render that draws
-       this is one the state scheduled. Reading the tracks for their labels is
-       fine either way: by the time this runs, the count that got us here was
-       taken from the same list. */
-    const tracks = this.captionTracks
+    /* Named from the copies rather than from the video's tracks, which this
+       same render is what puts there: the count and the names come from one
+       list, taken before it. */
+    const tracks = this.captions
     if (this.captionCount === 0) {
       return nothing
     }
