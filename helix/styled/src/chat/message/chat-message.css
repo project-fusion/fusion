@@ -190,6 +190,21 @@
   padding-inline: var(--helix-space-none);
 }
 
+/* **And the width goes with the bubble.** The 80% ceiling on a turn is there so
+   a bubble says whose turn it is by the edge it keeps clear of; a plain turn has
+   no bubble, and the reader's own turns still carry that signal. Held to it, an
+   answer leaned against one edge with a fifth of the column empty beside it, and
+   its tables and code stopped short of everything else. A reading measure on a
+   wide chat belongs to the column, which is where `fullscreen` sets one. */
+:host([separation="plain"]) [part="body"] {
+  justify-items: stretch;
+  max-inline-size: 100%;
+}
+
+:host([separation="plain"]) [part="content"] {
+  inline-size: auto;
+}
+
 :host([author="me"]) [part="content"] {
   background-color: var(
     --chat-message-background-color-me,

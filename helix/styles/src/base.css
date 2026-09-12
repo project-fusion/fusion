@@ -1182,11 +1182,24 @@ helix-toast:not([data-color-mode]) {
   padding-inline: var(--helix-space-sm);
 }
 
-/* As wide as its columns, not the turn: the table is `display: block` so it can
-   scroll, and a block box would otherwise draw its border the full width of the
-   turn around a grid that stops halfway across. */
+/* **As wide as the turn, as a `Table` is.** The recipe makes a table a block so
+   it can scroll, and a block box sized its grid to the columns: the border drew
+   a box half the width of the answer beside a code block that filled it. A
+   table again, the width of the turn, and a wide one scrolls with the turn's
+   own content, which already does. The separate model because a collapsed
+   table cannot round its corners. */
 :where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(table) {
-  inline-size: fit-content;
+  border-collapse: separate;
+  border-spacing: 0;
+  display: table;
+  inline-size: 100%;
+}
+
+/* A `Table`'s row: flush at the start, room at the end, and the small control
+   step tall, so a markdown table and a component one are the same table. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(th, td) {
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-none) var(--helix-space-md);
 }
 
 /* **Headings sized for a turn, not for a page.** The recipe's steps are a
@@ -1216,7 +1229,10 @@ helix-toast:not([data-color-mode]) {
    above the first, where the turn's own padding is the space. */
 :where(helix-chat-message[data-prose], helix-chat-message [data-prose])
 :where(h1, h2, h3, h4, h5, h6) {
-  margin-block: var(--helix-space-md) var(--helix-space-2xs);
+  /* The weight of `body-strong`, which is what an answer built from Helix sets
+     its headings in, so the two answers read at the same volume. */
+  font-weight: var(--helix-weight-medium);
+  margin-block: var(--helix-space-md) var(--helix-space-sm);
 }
 
 :where(helix-chat-message[data-prose], helix-chat-message [data-prose])
@@ -1264,6 +1280,73 @@ helix-toast:not([data-color-mode]) {
   border: 0;
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   margin-block: var(--helix-space-md);
+}
+
+/* **In a turn, the markup reads like the components it stands for.** A markdown
+   renderer emits `<code>`, `<ol>` and `<blockquote>`, and an answer built from
+   Helix has `Code`, `List` and `Callout` in those places. The recipe was drawn
+   for a docs page and the two answers looked like two libraries, so a turn
+   takes each component's own values for the element it stands in for. What
+   markup cannot carry, a code block's label and copy button or a callout's
+   tone, stays the component's: map fenced code to `Code Block` in the renderer
+   to get them. */
+
+/* Inline code gets `Code`'s chip. The recipe gives it the mono face alone, which
+   next to the component's wash read as a different kind of word. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(:not(pre) > code) {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  border-radius: var(--helix-radii-sm);
+  color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 30%,
+    var(--helix-color-foreground-muted)
+  );
+  font-size: calc(var(--helix-text-sm) / var(--helix-text-md) * 1em);
+  padding-inline: calc(var(--helix-space-2xs) * 0.5);
+}
+
+/* A list takes `List`'s gutter and its item spacing: padding rather than margin,
+   so the gap between two items is the gap `List` draws, and neither end of the
+   list collapses into the block around it. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(ul, ol) {
+  padding-inline-start: var(--helix-space-md);
+}
+
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(li) {
+  margin-block: var(--helix-space-none);
+  padding-block: var(--helix-space-2xs);
+}
+
+/* **A blockquote is a note, set in `Callout`'s shape without its tone.** In an
+   answer a quote is nearly always an aside the reader should not miss, and the
+   recipe's muted rule set it quieter than the paragraph around it. The bar is
+   drawn clipped rather than as a border, for the reason `Callout` records: a
+   thick border on one side of a rounded box thins to a crescent at each end. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(blockquote) {
+  background-color: var(--helix-color-surface-sunken);
+  border: none;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  overflow: hidden;
+  padding: var(--helix-space-md);
+  padding-inline-start: calc(var(--helix-space-md) + var(--helix-border-thick));
+  position: relative;
+}
+
+/* The note's own padding is its space, so what is inside it takes none after
+   its last block: the recipe's gap after a paragraph doubled the bottom inset. */
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose])
+:where(blockquote > :last-child) {
+  margin-block-end: var(--helix-space-none);
+}
+
+:where(helix-chat-message[data-prose], helix-chat-message [data-prose]) :where(blockquote)::before {
+  background-color: var(--helix-color-foreground-subtle);
+  content: "";
+  inline-size: var(--helix-border-thick);
+  inset-block: 0;
+  inset-inline-start: 0;
+  position: absolute;
 }
 
 :where(:focus-visible) {
