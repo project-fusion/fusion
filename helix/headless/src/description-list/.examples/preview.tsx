@@ -1,0 +1,29 @@
+import './preview.css'
+
+export function Example() {
+  return (
+    <helix-headless-description-list direction="row">
+      <helix-headless-description-list-item label="Owner">
+        Ada Okonjo
+      </helix-headless-description-list-item>
+      <helix-headless-description-list-item label="Status">
+        <helix-headless-tag>Running</helix-headless-tag>
+      </helix-headless-description-list-item>
+      <helix-headless-description-list-item label="Region">
+        us-east-1
+      </helix-headless-description-list-item>
+      <helix-headless-description-list-item label="Created">
+        <helix-headless-format-date
+          date="2026-03-14T15:09:00.000Z"
+          day="numeric"
+          month="short"
+          time-zone="UTC"
+          year="numeric"
+        ></helix-headless-format-date>
+      </helix-headless-description-list-item>
+      <helix-headless-description-list-item label="Commit">
+        4f2a9c1e8b7d6a5f4e3d2c1b0a9f8e7d6c5b4a3f
+      </helix-headless-description-list-item>
+    </helix-headless-description-list>
+  )
+}

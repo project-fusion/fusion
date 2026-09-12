@@ -1,0 +1,33 @@
+/* The list is a grid, and each item is a subgrid of it, so a label and its value
+   stay one element while every label still lines up with every other. Column
+   by default: one track, and the item stacks its label over its value. */
+:host {
+  container-type: inline-size;
+  display: block;
+}
+
+[part="list"] {
+  display: grid;
+  gap: var(--description-list-gap, var(--helix-space-md));
+  margin: 0;
+}
+
+/* Beside: the labels take the width of the longest one and the values the rest,
+   which is what makes the column of labels scannable. */
+:host([direction="row"]) [part="list"] {
+  column-gap: var(--helix-space-lg);
+  grid-template-columns: max-content minmax(0, 1fr);
+  row-gap: var(--description-list-gap, var(--helix-space-sm));
+}
+
+/* **Beside falls back to over when there is no room for it**, measured against
+   the list's own width rather than the viewport's, because a details panel is
+   as often a sidebar on a wide screen as it is the whole of a narrow one. Below
+   this a label column leaves the values a sliver, and a sliver of an id or an
+   address wraps a character at a time. */
+@container (inline-size < 22rem) {
+  :host([direction="row"]) [part="list"] {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--description-list-gap, var(--helix-space-md));
+  }
+}

@@ -26,6 +26,7 @@ import { copyButtonArt } from './art/copy-button'
 import { dataTableArt } from './art/data-table'
 import { dateInputArt } from './art/date-input'
 import { datePickerArt } from './art/date-picker'
+import { descriptionListArt } from './art/description-list'
 import { dialogArt } from './art/dialog'
 import { dividerArt } from './art/divider'
 import { donutChartArt } from './art/donut-chart'
@@ -166,6 +167,7 @@ const art: Record<string, ReactNode> = {
   'data-table': dataTableArt,
   'date-input': dateInputArt,
   'date-picker': datePickerArt,
+  'description-list': descriptionListArt,
   dialog: dialogArt,
   divider: dividerArt,
   'donut-chart': donutChartArt,

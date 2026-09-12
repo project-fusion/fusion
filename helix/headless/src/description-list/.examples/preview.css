@@ -1,0 +1,41 @@
+/* What the headless tier asks a consumer to write for Description List.
+ *
+ * Deliberately skeletal: a diagram of what has to be styled, not a theme to
+ * copy. No token, because `headless` does not depend on `helix/styles`, and
+ * grays only, because color here would read as an opinion this tier does not
+ * hold. Written through `light-dark()` so the sandbox's dark mode inverts.
+ *
+ * **The browser indents every `<dd>` by 40px**, which is the one rule nobody
+ * expects to have to write. The rest is the arrangement: a grid on the list and
+ * a subgrid on each item, so a label and its value stay one pair to a screen
+ * reader while every label lines up with every other. */
+
+:root {
+  color-scheme: light dark;
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-description-list::part(list) {
+  column-gap: 1.5rem;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  margin: 0;
+  row-gap: 0.5rem;
+}
+
+helix-headless-description-list-item {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+helix-headless-description-list-item::part(label) {
+  color: var(--_gray-muted);
+}
+
+helix-headless-description-list-item::part(value) {
+  color: var(--_gray-strong);
+  margin: 0;
+  overflow-wrap: anywhere;
+}

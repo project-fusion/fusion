@@ -1,0 +1,36 @@
+/* A subgrid of the list, across every track it has: one when the list stacks,
+   two when it sets labels beside values. The item reads the list's tracks rather
+   than its attribute, so the arrangement is decided in one place. */
+:host {
+  align-items: baseline;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  row-gap: var(--helix-space-2xs);
+}
+
+/* *`muted`, not `subtle`, because a label is content*, the reason `Stat` gives
+   for its own label: `subtle` falls under the contrast a small label needs. */
+[part="label"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  margin: 0;
+}
+
+/* The value takes the text around it, and breaks anywhere rather than
+   overflowing: an id, a hash or an address has no spaces to wrap at. */
+[part="value"] {
+  color: var(--helix-color-foreground);
+  margin: 0;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Print: a label never ends one page with its value starting the next, which
+   reads as two unrelated lines on paper, where a screen would have scrolled. */
+@media print {
+  :host {
+    break-inside: avoid;
+  }
+}
