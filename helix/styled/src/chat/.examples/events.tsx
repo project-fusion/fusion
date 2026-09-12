@@ -58,7 +58,10 @@ export function Example() {
             {turn.said}
           </helix-chat-message>
         ))}
-        <helix-chat-composer slot="composer" />
+        <helix-chat-composer
+          placeholder="Write a message"
+          slot="composer"
+        />
       </helix-chat>
 
       <helix-list

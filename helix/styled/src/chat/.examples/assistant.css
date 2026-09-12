@@ -33,17 +33,8 @@
   --helix-size-icon: var(--helix-size-icon-sm);
 }
 
-/* **The ring is the ground, and the group cannot know what that is.** Each
-   avatar is ringed so the one behind it stops at a clean edge, and the ring
-   defaults to the page color, which is right on a page and wrong on this panel:
-   the chat above sets its own surface, so the marks would be ringed in a color
-   nothing around them is wearing. `--avatar-group-ring-color` is the hook for
-   exactly that, and the example that chose the surface is the one that knows it.
-
-   The overlap comes down with the marks. The default is `sm` against a full
-   size avatar; these are the small step in a footnote, and at that width the
-   default hid most of each face. */
+/* The sources are a footnote to the answer, so their tags take the small step:
+   at the full size they stood as tall as the controls under the turn. */
 .assistant-sources {
-  --avatar-group-overlap: var(--helix-space-xs);
-  --avatar-group-ring-color: var(--helix-color-surface);
+  --helix-size-tag: var(--helix-size-tag-sm);
 }

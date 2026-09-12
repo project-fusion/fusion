@@ -98,37 +98,19 @@ export function Example() {
         The migration is waiting on a lock. Another connection has held{' '}
         <helix-code>ACCESS EXCLUSIVE</helix-code> on <helix-code>orders</helix-code> since 09:14, so
         the deploy is queued behind it rather than failing.
-        {/* What the answer was drawn from, set as a footnote: the marks stack the
-               way an avatar group does and the words stay small and quiet, because a
-               citation is a reference rather than a control. */}
+        {/* What the answer was drawn from, each named. A document or a log is not
+            a person, so they are tags rather than avatars: initials in a circle
+            read as people, and at the small step they came to one letter each. */}
         <helix-flex
           align="center"
+          className="assistant-sources"
           gap="2xs"
           slot="sources"
+          wrap
         >
-          {' '}
-          <helix-avatar-group
-            className="assistant-sources"
-            label="Three sources"
-          >
-            {' '}
-            <helix-avatar
-              name="RM"
-              shape="circle"
-              size="sm"
-            ></helix-avatar>{' '}
-            <helix-avatar
-              name="D4"
-              shape="circle"
-              size="sm"
-            ></helix-avatar>{' '}
-            <helix-avatar
-              name="PG"
-              shape="circle"
-              size="sm"
-            ></helix-avatar>{' '}
-          </helix-avatar-group>{' '}
-          <helix-text variant="caption">runbook/migrations.md and two more</helix-text>{' '}
+          <helix-tag>runbook/migrations.md</helix-tag>
+          <helix-tag>Deploy 4127 log</helix-tag>
+          <helix-tag>pg_locks</helix-tag>
         </helix-flex>{' '}
         <helix-flex
           gap="2xs"
