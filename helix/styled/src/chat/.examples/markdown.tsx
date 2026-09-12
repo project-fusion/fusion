@@ -23,8 +23,8 @@ export function Example() {
 
       {/* A turn holds whatever it is given, so an answer can be built from the
           library's own parts. Markdown rendered to plain HTML is the other way
-          in: mark the turn `data-prose` and the base layer sets its headings,
-          lists, tables and code. */}
+          in, which `rendered-markdown` shows: mark the turn `data-prose` and the
+          base layer sets its headings, lists, tables and code. */}
       <helix-chat-message
         author="them"
         separation="plain"
