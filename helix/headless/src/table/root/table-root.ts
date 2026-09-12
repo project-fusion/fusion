@@ -117,15 +117,20 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     slotAssignment: 'manual',
   }
 
+  /** The rows: every child that is not a column, which is what the body slot is assigned. */
+  protected override get slotted(): Element[] {
+    const columns = new Set<Element>(this.tableColumns)
+    return [...(this.children ?? [])].filter((child) => !columns.has(child))
+  }
+
   private assign(): void {
     const head = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="columns"]')
     const body = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
     if (!head || !body) {
       return
     }
-    const columns = new Set<Element>(this.tableColumns)
     head.assign(...this.tableColumns)
-    body.assign(...[...this.children].filter((child) => !columns.has(child)))
+    body.assign(...this.slotted)
   }
 
   protected override updated(changed: PropertyValues): void {

@@ -177,7 +177,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   }
 
   /**
-   * Whether anything is slotted into `submenu`. Read after first render.
+   * Whether anything is slotted into `submenu`.
    *
    * State rather than a getter over `children`. A getter is read during
    * `render()` with nothing to re-read it, so a submenu arriving after the
@@ -208,10 +208,22 @@ export class HelixHeadlessMenuItem extends HelixElement {
   @state()
   private start = false
 
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    this.readSubmenu()
-    this.readStart()
+  /**
+   * The first answer to both, from the children, before the first render.
+   *
+   * The slots are what stay in step afterwards, and they exist only once a
+   * render has made them: read through them, the first render drew no caret and
+   * no leading box and a second render had to follow it. Not on the server,
+   * where `children` is undefined.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (this.hasUpdated || this.children === undefined) {
+      return
+    }
+    const named = (name: string): boolean => [...this.children].some((child) => child.slot === name)
+    this.submenu = named('submenu')
+    this.start = named('start')
   }
 
   /**

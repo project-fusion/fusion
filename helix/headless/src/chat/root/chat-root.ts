@@ -312,7 +312,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    *
    * Undefined rather than empty on the way in, for `MixinCollection`'s reason:
    * the server has no children to count, and an unknown answer is not "empty".
-   * It serves every region and the first assignment on the client settles them,
+   * It serves every region and the first update on the client settles them,
    * which is a shadow-root attribute rather than a host one and so is nothing a
    * consumer's hydration compares.
    */
@@ -453,16 +453,31 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       return
     }
     log.assign(...(this.fed ? [] : this.messages))
-    const filled = new Set<string>()
     for (const name of REGIONS) {
-      const given = [...this.children].filter((child) => child.getAttribute('slot') === name)
-      root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)?.assign?.(...given)
-      if (given.length > 0) {
-        filled.add(name)
-      }
+      root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)?.assign?.(...this.given(name))
     }
-    /* Compared before it is set, because this runs from `updated` and a new Set
-       every render is a new value every render, which is a render loop. */
+  }
+
+  /** The children a region is assigned, by the `slot` each one names. */
+  private given(name: string): Element[] {
+    return [...(this.children ?? [])].filter((child) => child.getAttribute('slot') === name)
+  }
+
+  /**
+   * Notes which regions were given something, before the render that hides the
+   * rest.
+   *
+   * From the children rather than the slots, so the first render has the
+   * answer: the slots exist only once a render has made them. Not on the
+   * server, where `children` is undefined, so `filled` stays unknown there.
+   */
+  private countRegions(): void {
+    if (this.children === undefined) {
+      return
+    }
+    const filled = new Set<string>(REGIONS.filter((name) => this.given(name).length > 0))
+    /* Compared before it is set, or every update would report `filled` as
+       changed. */
     const previous = this.filled
     if (
       !previous ||
@@ -705,6 +720,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || 'Conversation', role: 'region' })
+    this.countRegions()
     if (changed.has('history')) {
       this.asked = false
     }

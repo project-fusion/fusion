@@ -260,11 +260,10 @@ export class HelixHeadlessListbox extends MixinCollection(
    * Whether anything survived the filter, kept as state rather than counted at
    * render time.
    *
-   * Counting during render reads the hiding from the *previous* pass, because
-   * hiding happens in `updated` against options that are the consumer's
-   * elements rather than this component's markup, so a filter matching nothing
-   * leaves an empty box with no message in it. Written to state instead, which
-   * schedules the one further render that shows it.
+   * The options are the consumer's elements rather than this component's
+   * markup, so the hiding is done to them in `willUpdate` and the render reads
+   * the answer it left here. Counted during render instead, a filter matching
+   * nothing left an empty box with no message in it.
    */
   @state()
   private hasMatches = true
@@ -275,8 +274,8 @@ export class HelixHeadlessListbox extends MixinCollection(
    * Emptiness is a fact about light DOM children, and the server has none to
    * count: without this the list shipped "Nothing to show" over markup that was
    * about to have options in it, which is the one thing an empty state must
-   * never do. `place` runs from `updated`, which the server never reaches, so
-   * this is false exactly when the answer is unknown.
+   * never do. `place` does not run on the server, so this is false exactly
+   * when the answer is unknown.
    */
   @state()
   private counted = false
@@ -598,8 +597,11 @@ export class HelixHeadlessListbox extends MixinCollection(
       this.hasMatches = anyShown
     }
     this.counted = true
+  }
 
-    const active = shown.find((option) => option.value === this.activeValue)
+  /** Scrolls the active option into view, which needs the rendered list to scroll. */
+  private followActive(): void {
+    const active = this.shown.find((option) => option.value === this.activeValue)
     if (active) {
       const items = this.renderRoot.querySelector<HTMLElement>('[part="items"]')
       scrollItemIntoView(active, { padding: 4, ...(items ? { scroller: items } : {}) })
@@ -633,6 +635,12 @@ export class HelixHeadlessListbox extends MixinCollection(
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'listbox' })
     this.internals.ariaMultiSelectable = this.multiple ? 'true' : null
+    /* Before the render, so the empty state and the matches it draws are this
+       update's rather than the last one's. Not on the server, whose element
+       shim has no `children`. */
+    if (this.children !== undefined) {
+      this.place()
+    }
   }
 
   /**
@@ -688,7 +696,7 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    this.place()
+    this.followActive()
     this.sync()
     this.linkHost()
     this.linkActive()

@@ -146,7 +146,13 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   }
 
   /**
-   * The code as text, read from the slot rather than stored.
+   * The code as text, read from what the default slot is given rather than
+   * stored.
+   *
+   * **The host's own children rather than the slot's assigned nodes**, which
+   * are the same nodes: text, and every element without a `slot`. A slot exists
+   * only once a render has made it, so reading through one left the first render
+   * with nothing to copy.
    *
    * Client only, and it has to be: the server has no children to read. The
    * copy button is a client-side affordance anyway, so nothing is lost, and
@@ -154,24 +160,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * that goes stale the moment the slot changes.
    */
   private get text(): string {
-    const slot = this.renderRoot?.querySelector('slot')
-    return (slot?.assignedNodes() ?? []).map((node) => node.textContent ?? '').join('')
-  }
-
-  /**
-   * One more render, once there is a slot to read.
-   *
-   * The first render has no shadow children yet, so `text` is empty and the
-   * copy button is bound to nothing. `slotchange` normally schedules the render
-   * that fixes it, and leaning on that alone was measured to leave the button
-   * empty through four update cycles: the event is not guaranteed to have
-   * arrived, and in one environment never arrives at all. A component should not
-   * need an event to show its own content, so it asks for the second render
-   * itself and `slotchange` is left to handle the case it is actually for, which
-   * is content changing later.
-   */
-  protected override firstUpdated(): void {
-    this.requestUpdate()
+    return [...(this.childNodes ?? [])]
+      .filter(
+        (node) =>
+          node.nodeType === Node.TEXT_NODE ||
+          (node.nodeType === Node.ELEMENT_NODE && (node as Element).slot === ''),
+      )
+      .map((node) => node.textContent ?? '')
+      .join('')
   }
 
   protected override render(): TemplateResult {

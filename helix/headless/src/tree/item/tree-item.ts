@@ -22,9 +22,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * An element rather than a slot, because it owns state: whether it is open,
  * selected, and whether it holds focus.
  *
- * A branch is any item with something slotted into `children`, detected in
- * `firstUpdated` because the server cannot inspect children. The server renders
- * the node as a leaf and the twisty appears on hydration, which is the harmless
+ * A branch is any item with something slotted into `children`, detected on the
+ * client because the server cannot inspect children. The server renders the
+ * node as a leaf and the twisty appears on hydration, which is the harmless
  * direction.
  *
  * **`href` makes the row itself the link.** With the anchor slotted into the
@@ -123,7 +123,9 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   /**
    * Whether anything is slotted into `children`.
    *
-   * Read after first render.
+   * Read from the children before the first render, so it draws the twisty,
+   * and from the slot after it, which is what hears a child arrive later. Not
+   * on the server, where `children` is undefined.
    */
   @state()
   private branch = false
@@ -131,7 +133,6 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="children"]')
-    this.branch = (slot?.assignedElements().length ?? 0) > 0
     slot?.addEventListener('slotchange', () => {
       this.branch = slot.assignedElements().length > 0
     })
@@ -299,6 +300,9 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('selected', this.selected)
+    if (!this.hasUpdated && this.children !== undefined) {
+      this.branch = [...this.children].some((child) => child.slot === 'children')
+    }
   }
 
   protected override render(): TemplateResult {

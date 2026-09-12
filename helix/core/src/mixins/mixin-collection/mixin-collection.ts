@@ -27,6 +27,9 @@ export declare class CollectionElement {
   /** Binds to a rows slot's `slotchange`, and answers `hasRows` from it. */
   protected countRows(event: Event): void
 
+  /** What the rows slot is given, read from the host so a first render has it. */
+  protected get slotted(): Element[]
+
   /**
    * Whether there is anything to show, as far as anything can tell.
    *
@@ -95,7 +98,7 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
      * claim and the runtime field is whatever it is named, so a subclass
      * declaring `@property() rows` for the data a consumer hands it would share
      * one field with this counter: the slot count would overwrite the
-     * consumer's array on every `updated`, and `hasRows` would read the array's
+     * consumer's array on every update, and `hasRows` would read the array's
      * length as a slot count. Nothing would throw. `helix-data-table` takes
      * exactly that property.
      */
@@ -121,7 +124,24 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
     }
 
     /**
-     * Counts the rows slot after every render.
+     * What the rows slot is given: every child without a `slot`.
+     *
+     * The default slot, because that is where every collection in this library
+     * puts its rows: Listbox its options, Tree its items, Table its rows, Menu
+     * and Drilldown their pages. A named slot is a header or a footer, and
+     * neither is content.
+     *
+     * **The host's children rather than the slot's assigned elements**, which
+     * are the same elements, because a slot exists only once a render has made
+     * it and the count is wanted by the first render. A collection that assigns
+     * its slots by hand says what it assigns.
+     */
+    protected get slotted(): Element[] {
+      return [...(this.children ?? [])].filter((child) => child.slot === '')
+    }
+
+    /**
+     * Counts the rows before every render.
      *
      * `slotchange` alone is not enough, and the gap is exactly the case this
      * mixin exists for: the event fires when an assignment *changes*, and a
@@ -130,21 +150,17 @@ export const MixinCollection = <T extends Constructor<LitElement>>(Base: T) => {
      * nothing at all, which is the blank box a reader cannot tell from a broken
      * one. Measured on Table, whose rows slot starts empty.
      *
-     * The default slot, by name, because that is where every collection in this
-     * library puts its rows: Listbox its options, Tree its items, Table its
-     * rows, Menu and Drilldown their pages. A named slot is a header or a
-     * footer, and neither is content.
-     *
-     * `updated` never runs on the server, which is what keeps `counted` false
-     * exactly when the answer is unknown.
+     * Not on the server, whose element shim carries attributes and no tree, so
+     * `children` is undefined there and `slotCounted` stays false exactly when
+     * the answer is unknown. Asked of the element rather than of `isServer`,
+     * which is true in any test runner that resolves Lit's `node` build.
      */
-    protected override updated(changed: Map<PropertyKey, unknown>): void {
-      super.updated?.(changed)
-      const slot = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot:not([name])')
-      if (!slot) {
+    protected override willUpdate(changed: Map<PropertyKey, unknown>): void {
+      super.willUpdate?.(changed)
+      if (this.children === undefined) {
         return
       }
-      const rows = slot.assignedElements().length
+      const rows = this.slotted.length
       this.slotCounted = true
       if (rows !== this.slotRows) {
         this.slotRows = rows
