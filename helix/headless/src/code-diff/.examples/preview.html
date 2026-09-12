@@ -1,0 +1,20 @@
+<!-- @summary A config change with every rule written by hand, and a numbered listing without any. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-headless-code-diff
+  patch="diff --git a/src/config.ts b/src/config.ts
+--- a/src/config.ts
++++ b/src/config.ts
+@@ -10,4 +10,5 @@ export const config = {
+   retries: 3,
+-  timeout: 1000,
++  timeout: 5000,
++  backoff: 'exponential',
+   region: 'us-east-1',
+ }
+"
+></helix-headless-code-diff>

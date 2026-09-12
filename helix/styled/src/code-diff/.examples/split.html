@@ -1,0 +1,19 @@
+<!-- @summary The old file beside the new one, each removed line opposite the line that replaced it. -->
+<helix-code-diff
+  patch="--- a/src/retry.ts
++++ b/src/retry.ts
+@@ -1,6 +1,8 @@
+ export async function retry(task, attempts) {
+-  for (let tried = 0; tried != attempts; tried++) {
+-    try { return await task() } catch {}
++  for (let tried = 0; tried !== attempts; tried += 1) {
++    try {
++      return await task()
++    } catch {}
+   }
+-  throw new Error('failed')
++  throw new Error(`failed after ${attempts} attempts`)
+ }
+"
+  variant="split"
+></helix-code-diff>

@@ -1,0 +1,14 @@
+<!-- @summary A config change, read as the lines it removed and the lines it added. -->
+<helix-code-diff
+  patch="diff --git a/src/config.ts b/src/config.ts
+--- a/src/config.ts
++++ b/src/config.ts
+@@ -10,4 +10,5 @@ export const config = {
+   retries: 3,
+-  timeout: 1000,
++  timeout: 5000,
++  backoff: 'exponential',
+   region: 'us-east-1',
+ }
+"
+></helix-code-diff>
