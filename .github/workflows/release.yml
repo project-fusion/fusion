@@ -61,13 +61,15 @@ jobs:
         target: ${{ fromJson(needs.intent.outputs.domains) }}
     environment: production
     permissions:
-      # `id-token` is the whole authentication story: npm trusted publishing
-      # exchanges a short-lived OIDC token for publish rights, so there is no
-      # npm credential in this repository at all. `contents` is for the tag and
-      # for the tag. The stamp-back does not use this token at all: `main`
-      # requires a pull request, so a direct push from `GITHUB_TOKEN` is
-      # declined, and the App installation token it uses instead is minted in
-      # the step above and named in the branch rule's bypass list.
+      # `id-token` is how the publish step authenticates: npm trusted
+      # publishing exchanges a short-lived OIDC token for publish rights. The
+      # one npm token is on the two steps trusted publishing cannot cover, the
+      # install proof and the promotion, and never on the job. `contents` is for
+      # the tag and the GitHub release that records it. The stamp-back does not
+      # use this token at all: `main` requires a pull request, so a direct push
+      # from `GITHUB_TOKEN` is declined, and the App installation token it uses
+      # instead is minted in the step above and named in the branch rule's
+      # bypass list.
       contents: write
       id-token: write
     env:

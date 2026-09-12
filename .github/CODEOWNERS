@@ -7,9 +7,9 @@
 # `require_code_owner_reviews` on, and this file names a team instead.
 #
 # The `main` ruleset requires the `verify` context, which is a *job* name and
-# not a workflow name. `verify.yml` shards into `checks (0..9)`, four `browser`
-# entries and the rest; `verify` is the aggregation job that needs them all, so
-# the required check survives the shard count changing under it.
+# not a workflow name. `verify.yml` fans out into a `checks` matrix, a `browser`
+# matrix and the rest; `verify` is the aggregation job that needs them all, so
+# the required check survives either matrix changing under it.
 
 * @irontitan76
 

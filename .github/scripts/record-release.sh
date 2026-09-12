@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Tags the release and writes its notes.
 #
-# **A merge commit's subject carries the number and its body is the pull request
-# title**, so the two become one line. Anything else keeps its subject. The
-# setting is the real invariant and it is not in this tree: flip the repository
-# to squash-only and every subject carries its own number; flip it back and this
-# reconstruction is what holds the notes together.
+# **Each subject is one line, as it was written.** The repository merges by
+# rebase only, so every commit on `main` is a contributor's own and carries its
+# own subject. The setting is the real invariant and it is not in this tree: the
+# `Merge pull request` case below is for history from before it, and for the day
+# merge commits are turned back on, where the subject carries the number and the
+# body the title, and the two have to be put back together.
 #
 # **The first release states its size rather than listing it.** With no previous
 # tag the range is the whole history: a release body nobody reads and close
@@ -16,7 +17,7 @@
 # **Empty notes warn and do not fail.** This runs last because the tag is the
 # record of a release that happened, so failing here would leave packages
 # promoted with nothing recording it: the worst state of the three. A release can
-# legitimately carry no commit under `$DOMAIN/` when the bump came from a label
+# legitimately carry no commit under `$DOMAIN/` when a subject named the domain
 # and the change was in `tooling/` or the root manifest, which belong to no
 # domain path.
 #

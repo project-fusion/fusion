@@ -405,7 +405,7 @@ jobs:
     # the list and runs, which is the direction this has to fail in. `== 'true'`
     # is the opposite. Rename the step, rename the output, or take a path out of
     # that shell block that never writes `browser=`, and the expression reads
-    # empty: `plan` succeeds, six browser jobs report skipped, the gate below
+    # empty: `plan` succeeds, every browser job reports skipped, the gate below
     # counts skipped as neither failure nor cancellation, and a pull request
     # touching `helix/styled/src` merges with contrast, specs, smoke, visual,
     # parity and diagnostics never having run. Nothing in the run says so.

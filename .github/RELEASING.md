@@ -84,8 +84,8 @@ Enterprise, and the API refuses to set them with a 422. This claimed for months
 that the job "waits for a reviewer", which described a gate that did not exist.
 `author_association` says the same thing where it is actually enforced.
 
-**The label stays, because npm is permanent.** Every run publishes ten packages,
-and a published version can be deprecated but never withdrawn. Authorship answers
+**The label stays, because npm is permanent.** Every run publishes every package
+in the domains the branch touches, and a published version can be deprecated but never withdrawn. Authorship answers
 who may publish a preview; the label answers whether this branch wants one.
 
 **This runs the pull request's code with a publish token**, so the label is a
@@ -150,7 +150,7 @@ protection. This is that access, narrowed as far as it goes: one App,
 version published, installed from the registry and promoted.
 
 **`[skip ci]` because there is nothing here for CI to learn.** The push would
-otherwise start `verify` on a commit whose entire content is nineteen version
+otherwise start `verify` on a commit whose entire content is version
 fields and a lockfile the runner just produced. This is the one commit on `main`
 that `verify` does not judge.
 
