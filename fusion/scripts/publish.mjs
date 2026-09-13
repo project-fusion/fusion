@@ -39,6 +39,8 @@
  *   node fusion/scripts/publish.mjs --domain helix --tag next --dry-run
  *   node fusion/scripts/publish.mjs --domain helix --tag exp-0 --otp 123456
  *   node fusion/scripts/publish.mjs --domain helix --promote latest --version 1.4.0
+ *   node fusion/scripts/publish.mjs --domain helix --preflight
+ *   node fusion/scripts/publish.mjs --domain helix --bootstrap
  */
 import { execFileSync } from 'node:child_process'
 import {
@@ -72,11 +74,13 @@ const promote = argument('promote')
 const pinned = argument('version')
 const dry = flag('dry-run')
 const otp = argument('otp')
+const preflight = flag('preflight')
+const bootstrap = flag('bootstrap')
 
 if (!Object.keys(DOMAINS).includes(domain)) {
   fail(`--domain must be one of ${Object.keys(DOMAINS).join(', ')}, not \`${domain}\`.`)
 }
-if (promote === undefined && tag === undefined) {
+if (promote === undefined && tag === undefined && !preflight && !bootstrap) {
   fail('--tag is required when publishing. `latest` is reached by --promote, never directly.')
 }
 if (tag === 'latest') {
@@ -162,6 +166,139 @@ function npm(args, doing) {
   }
 }
 
+/**
+ * A config file holding `NPM_TOKEN`, for a step that reads or moves a tag
+ * rather than publishing, or undefined where none is set.
+ *
+ * A file named on the command line and never the environment or `~/.npmrc`:
+ * the publish has to keep finding no credential, which the promotion below
+ * says why.
+ */
+const tokenConfig = () => {
+  if (!process.env.NPM_TOKEN) {
+    return undefined
+  }
+  const file = join(mkdtempSync(join(tmpdir(), 'npm-')), '.npmrc')
+  writeFileSync(file, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`, {
+    mode: 0o600,
+  })
+  return file
+}
+
+/**
+ * The domain's packages the registry has never seen.
+ *
+ * **Trusted publishing cannot publish a package for the first time**, npm
+ * attaching a publisher to a package rather than to a scope. A release that
+ * reaches a new one has published every package before it, and stops: the
+ * domain half out under `next` and a number spent. So it is asked before the
+ * number is allocated.
+ *
+ * **A restricted package answers 404 to a reader without access**, which is
+ * what a missing one answers too, so every package absent at once is a
+ * credential and not a domain nobody has published.
+ */
+const unpublished = () => {
+  const config = tokenConfig()
+  const absent = []
+  for (const [name] of packages) {
+    try {
+      run(
+        'npm',
+        ['view', name, 'name', ...(config === undefined ? [] : ['--userconfig', config])],
+        root,
+      )
+    } catch (error) {
+      const said = `${error.stderr ?? ''}${error.stdout ?? ''}`.trim()
+      if (!/E404|404 Not Found/.test(said)) {
+        fail(`Could not ask the registry about ${name}:\n\n  ${said.split('\n').join('\n  ')}`)
+      }
+      absent.push(name)
+    }
+  }
+  if (packages.length > 1 && absent.length === packages.length) {
+    fail(
+      `The registry shows none of the ${packages.length} ${domain} packages, which is a ` +
+        'credential rather than a domain nobody has published: a restricted package answers 404 ' +
+        'to a reader without access. Set `NPM_TOKEN`, or log in.',
+    )
+  }
+  return absent
+}
+
+if (preflight) {
+  const absent = unpublished()
+  if (absent.length > 0) {
+    fail(
+      `${domain}: never published, and trusted publishing cannot publish a package the first ` +
+        `time:\n\n${absent.map((name) => `  ${name}`).join('\n')}\n\n` +
+        '  Once, from a machine that is logged in, publish the placeholder and register the ' +
+        `workflows:\n\n    bun run build\n    node fusion/scripts/publish.mjs --domain ${domain} ` +
+        '--bootstrap\n    bun run trust --apply\n',
+    )
+  }
+  console.log(`${domain}: every one of ${packages.length} packages is on the registry`)
+  process.exit(0)
+}
+
+/**
+ * Publishes each package the registry has never seen, once, at `0.0.0-dev`
+ * under `exp-0`, so it exists for `bun run trust --apply` to register.
+ *
+ * The resting version `trust.mjs` describes: a pre-release sorts below every
+ * real version and version allocation ignores it, so it spends no number. It
+ * is a placeholder and ships as one, a platform package without its binary
+ * included, since nothing resolves to `0.0.0-dev` by asking for a range.
+ *
+ * Written into the manifest for the pack and put back after it, the manifests
+ * carrying the last release.
+ */
+if (bootstrap) {
+  const absent = new Set(unpublished())
+  const staging = mkdtempSync(join(tmpdir(), `${domain}-bootstrap-`))
+  const placeholder = tag ?? 'exp-0'
+  for (const [name, { directory, file }] of packages) {
+    if (!absent.has(name)) {
+      continue
+    }
+    const original = readFileSync(file, 'utf8')
+    const into = join(staging, name.replace('@', '').replace('/', '-'))
+    mkdirSync(into, { recursive: true })
+    try {
+      writeFileSync(
+        file,
+        `${JSON.stringify({ ...JSON.parse(original), version: '0.0.0-dev' }, null, 2)}\n`,
+      )
+      run('bun', ['pm', 'pack', '--destination', into], join(root, directory))
+    } finally {
+      writeFileSync(file, original)
+    }
+    const [tarball] = readdirSync(into)
+    console.log(`  ${name}@0.0.0-dev under \`${placeholder}\``)
+    if (!dry) {
+      npm(
+        [
+          'publish',
+          join(into, tarball),
+          '--tag',
+          placeholder,
+          '--access',
+          'restricted',
+          ...(otp === undefined ? [] : ['--otp', otp]),
+        ],
+        `publish the placeholder for ${name}`,
+      )
+    }
+  }
+  console.log(
+    absent.size === 0
+      ? `${domain}: nothing to bootstrap, every package is on the registry`
+      : `${domain}: ${absent.size} placeholders ${dry ? 'packed (dry run)' : 'published'}. ` +
+          'Now `bun run trust --apply`, which registers the workflows for each.',
+  )
+  process.exit(0)
+}
+
 /* Promotion: no build, no pack, no publish. A pointer moves. */
 if (promote !== undefined) {
   if (pinned === undefined) {
@@ -180,13 +317,8 @@ if (promote !== undefined) {
      `setup-node` once left an empty `_authToken` behind, npm read itself as
      configured, never exchanged the OIDC token, and the registry refused the
      write as a 404. */
-  let userconfig
-  if (process.env.NPM_TOKEN) {
-    userconfig = join(mkdtempSync(join(tmpdir(), 'promote-')), '.npmrc')
-    writeFileSync(userconfig, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`, {
-      mode: 0o600,
-    })
-  } else {
+  const userconfig = tokenConfig()
+  if (userconfig === undefined) {
     console.error(
       'promote: no `NPM_TOKEN`. Trusted publishing grants `npm publish` and not ' +
         '`dist-tag add`, so this step needs a token of its own and will fail without one.',

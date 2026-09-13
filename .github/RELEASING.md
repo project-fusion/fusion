@@ -134,6 +134,32 @@ built.
 depends on the command and the templates and runs `helix new` on them. It's
 scoped because `create-helix-app` on npm belongs to an unrelated project.
 
+## A new package
+
+**Trusted publishing cannot publish a package the first time.** npm attaches a
+publisher to a package rather than to a scope, and OIDC can't create one. A
+release that reached a new package would publish every package before it and
+stop, leaving the domain half out under `next` and a number spent. So the release
+asks the registry first, before allocating anything, and refuses with the names.
+
+The first publish is a person's, once, from a machine that is logged in:
+
+```sh
+bun run build
+node fusion/scripts/publish.mjs --domain helix --bootstrap
+bun run trust --apply
+```
+
+`--bootstrap` publishes only the packages the registry has never seen, at the
+resting `0.0.0-dev` under `exp-0`. A pre-release spends no number and nothing
+resolves to it by asking for a range, so a platform package can go out as a
+placeholder without its binary. `trust --apply` then registers both release
+workflows for every package. After that the release publishes them like any
+other.
+
+An experimental release has no token to ask with, so it doesn't preflight. A
+new package stops it at that package, which spends no number.
+
 ## The scripts
 
 Anything longer than a few lines lives in `scripts/` rather than inline, so it

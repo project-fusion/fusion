@@ -183,6 +183,16 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      # Before a number is allocated. Trusted publishing cannot publish a package
+      # the first time, so a release reaching a new one would publish everything
+      # before it and stop there, a number spent. The token is for reading: a
+      # restricted package answers 404 to a reader without access.
+      # [RELEASING.md](../RELEASING.md#a-new-package)
+      - name: Refuse a package the registry has never seen
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bun fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --preflight
+
       - name: Compute the version from the tags
         id: version
         run: |
