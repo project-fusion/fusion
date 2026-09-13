@@ -120,6 +120,8 @@ describe('the options among some elements', () => {
     group.append(grouped, document.createElement('div'))
 
     const found: Element[] = optionsAmong([loose, group, document.createElement('div')])
-    expect(found).toEqual([loose, grouped])
+    expect(found.length).toBe(2)
+    expect(found[0]).toBe(loose)
+    expect(found[1]).toBe(grouped)
   })
 })
