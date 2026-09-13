@@ -7,6 +7,12 @@ derives themes, scaffolds a project, and serves the derivation to an agent.
 npm install --save-dev @fusion.dev/helix-cli
 ```
 
+The command is a native binary, and npm installs the build for your machine
+beside this package: macOS and Linux on Arm and x86-64, and Windows on x86-64.
+An install that skips optional dependencies skips it too, and `helix` then names
+the package it's missing. To start a project rather than add Helix to one, use
+`npm create @fusion.dev/helix-app`.
+
 ```sh
 helix component check      # the CI shape: nothing printed on success
 helix component audit      # every rule and what it found

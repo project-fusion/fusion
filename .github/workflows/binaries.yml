@@ -1,0 +1,110 @@
+# The `helix` binary, built for every platform package.
+#
+# Called by `release.yml` and `release-experimental.yml` before they pack, and
+# never on its own: a binary reports a version, and only a release has one.
+# Each lands as an artifact named for its platform package, the release puts it
+# where that package's `files` says, and `publish.mjs` refuses a platform
+# package without it: [RELEASING.md](../RELEASING.md#the-binary).
+
+name: binaries
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: What the binary reports, which is the version being published.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build (${{ matrix.platform }})
+    strategy:
+      # A platform with no binary is a release that installs a command running
+      # nothing there, so the first failure is the answer.
+      fail-fast: true
+      matrix:
+        include:
+          - platform: darwin-arm64
+            runner: macos-14
+            target: aarch64-apple-darwin
+            runs: true
+          # Cross-compiled on Apple silicon, which builds it and cannot be
+          # relied on to run it.
+          - platform: darwin-x64
+            runner: macos-14
+            target: x86_64-apple-darwin
+            runs: false
+          - platform: linux-arm64
+            runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+            runs: true
+          - platform: linux-x64
+            runner: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            runs: true
+          - platform: win32-x64
+            runner: windows-latest
+            target: x86_64-pc-windows-msvc
+            runs: true
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      BINARY: target/${{ matrix.target }}/release/helix${{ startsWith(matrix.platform, 'win32') && '.exe' || '' }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      # Statically linked, so one binary runs on a glibc distribution and on
+      # Alpine alike, which is why the Linux packages declare no `libc`.
+      - name: Install musl
+        if: startsWith(matrix.platform, 'linux-')
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Restore the Cargo cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      # The crate's own line, which is what `--version` prints and what
+      # `publish.mjs` holds the binary to. `version.mjs` writes the same line on
+      # the release's runner; this one has no workspace installed to run it, and
+      # the first `version` at the start of a line is the package's.
+      - name: Stamp the version into the crate
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          perl -0pi.bak -e 's/^version = "[^"]*"$/version = "$ENV{VERSION}"/m' helix/cli/Cargo.toml
+          rm helix/cli/Cargo.toml.bak
+          grep -qx "version = \"$VERSION\"" helix/cli/Cargo.toml
+
+      # Not `--locked`: `Cargo.lock` still names the crate at the placeholder.
+      - name: Build
+        run: cargo build --release -p fusion-helix-cli --target ${{ matrix.target }}
+
+      - name: Prove it reports the version
+        if: matrix.runs
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          said=$("$BINARY" --version)
+          [ "$said" = "helix $VERSION" ] || { echo "::error::$BINARY says '$said', not 'helix $VERSION'"; exit 1; }
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: helix-cli-${{ matrix.platform }}
+          path: ${{ env.BINARY }}

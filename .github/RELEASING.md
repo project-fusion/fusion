@@ -18,7 +18,9 @@ because a version is permanent while a tag moves back.
 **The tag is the record and the npm manifests carry a copy.** The number is
 computed from the tag, stamped seconds before packing, and pushed back to `main`
 by a GitHub App, which is the one thing in the pipeline that writes to a branch.
-The crates are not stamped and rest at `0.0.0-dev`.
+The crates are stamped on the runner, so a binary reports the release it shipped
+in, and rest at `0.0.0-dev` in the repository: the stamp-back writes the npm
+manifests and nothing else.
 
 **Two tag prefixes, and they mean different things.** `helix-attempt-v1.4.0` is
 pushed before publishing and says a number was spent. `helix-v1.4.0` is pushed
@@ -94,6 +96,44 @@ it, which is why the author check is not decoration. `pull_request`, not
 `pull_request_target`: a fork gets no secrets on this event, so a fork's build
 cannot publish whatever it is labeled.
 
+## The binary
+
+`@fusion.dev/helix-cli` is a launcher, and the `helix` it runs is Rust, so it
+ships the way Biome and esbuild ship theirs. There's one package per platform,
+each declaring the `os` and `cpu` it runs on and carrying one file, and all of
+them are optional dependencies of the command. npm installs the one that matches
+and skips the rest.
+
+| Package | Built on | Target |
+|---|---|---|
+| `helix-cli-darwin-arm64` | `macos-14` | `aarch64-apple-darwin` |
+| `helix-cli-darwin-x64` | `macos-14` | `x86_64-apple-darwin`, cross-compiled |
+| `helix-cli-linux-arm64` | `ubuntu-24.04-arm` | `aarch64-unknown-linux-musl` |
+| `helix-cli-linux-x64` | `ubuntu-latest` | `x86_64-unknown-linux-musl` |
+| `helix-cli-win32-x64` | `windows-latest` | `x86_64-pc-windows-msvc` |
+
+**Built before the release computes its number, from the same tags.**
+`binaries.yml` takes the version a release is about to publish, stamps it into
+the crate and builds. The release computes the same number, `place-binaries.sh`
+puts each binary in its package, and `publish.mjs` refuses a platform package
+whose binary is missing, isn't executable, or reports another version. The
+version is checked on the runner's own platform and, before upload, on every
+platform that can run its build.
+
+**A Linux binary is static**, linked against musl, so one file runs on a glibc
+distribution and on Alpine alike, and the packages declare no `libc`.
+
+**A Helix release with no binaries refuses in its first step**, before a number
+is allocated. A Cortex release in the same run goes ahead.
+
+**Nothing in a checkout needs them.** The files are gitignored, and the shim runs
+the cargo target's build before a platform package's, so a checkout runs what it
+built.
+
+`npm create @fusion.dev/helix-app` is `@fusion.dev/create-helix-app`, which
+depends on the command and the templates and runs `helix new` on them. It's
+scoped because `create-helix-app` on npm belongs to an unrelated project.
+
 ## The scripts
 
 Anything longer than a few lines lives in `scripts/` rather than inline, so it
@@ -107,6 +147,7 @@ can be read, and so its reasoning sits with the code rather than above the step.
 | `stamp-manifests.sh` | Writes the published version back into the manifests |
 | `stamp-experimental.sh` | Stamps a preview version into every domain a branch touches |
 | `comment-install.sh` | Comments on the pull request with how to install it |
+| `place-binaries.sh` | Puts each built `helix` in its platform package, executable |
 | `touched.sh` | Whether a push can reach the browser, so `verify` can skip |
 
 ## Why the range runs from the tag

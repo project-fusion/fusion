@@ -26,13 +26,68 @@ env:
   NODE_VERSION: "22.20.0"
 
 jobs:
-  publish:
+  # The version each domain would publish at, worked out once for the binaries,
+  # which report it and are built before `publish` stamps the same numbers from
+  # the same tags. `publish.mjs` checks the two agree.
+  plan:
     if: >-
       contains(github.event.pull_request.labels.*.name, 'release:experimental')
       && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING)
       && !github.event.pull_request.head.repo.fork
       && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'),
                   github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      helix: ${{ steps.plan.outputs.helix }}
+    env:
+      NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Fetch the tags, which carry the version
+        run: git fetch --tags --force
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Cache the installed dependencies
+        uses: actions/cache@v6
+        with:
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          path: ~/.bun/install/cache
+          restore-keys: bun-${{ runner.os }}-
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Work out the versions
+        id: plan
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          .github/scripts/stamp-experimental.sh
+          echo "helix=$(awk '$1 == "helix" { print $2 }' /tmp/released)" >> "$GITHUB_OUTPUT"
+
+  binaries:
+    needs: plan
+    if: needs.plan.outputs.helix != ''
+    uses: ./.github/workflows/binaries.yml
+    with:
+      version: ${{ needs.plan.outputs.helix }}
+
+  # Written out, since the default skips a job whose dependency was skipped and
+  # `binaries` is whenever nothing touches Helix.
+  publish:
+    needs: [plan, binaries]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && (needs.plan.outputs.helix == '' || needs.binaries.result == 'success') }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: experimental
@@ -111,6 +166,17 @@ jobs:
       # own manifest promises.
       - name: Write the manifests and framework typings
         run: bun run analyze
+
+      - name: Fetch the binaries
+        if: needs.plan.outputs.helix != ''
+        uses: actions/download-artifact@v8
+        with:
+          pattern: helix-cli-*
+          path: ${{ runner.temp }}/binaries
+
+      - name: Put each binary in its platform package
+        if: needs.plan.outputs.helix != ''
+        run: .github/scripts/place-binaries.sh "$RUNNER_TEMP/binaries"
 
       # Against the tarballs, from outside the workspace, before anything is
       # published. A version can be deprecated but never taken back.
