@@ -25,10 +25,10 @@ const shimOnPath = () => {
 }
 
 /** An installed binary, which is the thing the `PATH` branch exists to find. */
-const installed = (says) => {
+const installed = (says, code = 0) => {
   const directory = scratch()
   const file = join(directory, 'helix')
-  writeFileSync(file, `#!/bin/sh\necho "${says}"\n`)
+  writeFileSync(file, `#!/bin/sh\necho "${says}"\nexit ${code}\n`)
   chmodSync(file, 0o755)
   return directory
 }
@@ -92,6 +92,21 @@ if (process.platform !== 'win32') {
       expect(ran.stdout).toContain('helix from PATH')
 
       rmSync(self, { force: true, recursive: true })
+      rmSync(real, { force: true, recursive: true })
+      rmSync(target, { force: true, recursive: true })
+    })
+
+    test('hands back the exit it was given, a finding being no failure to start', () => {
+      /* Under bun a child that exits 1 comes back with an `error` as well as the
+         status, so a shim reading the one reported a check's findings as a
+         binary it could not run, and CI saw 70. */
+      const real = installed('one finding', 1)
+      const target = scratch()
+      const ran = run([real], { CARGO_TARGET_DIR: target })
+
+      expect(ran.status).toBe(1)
+      expect(ran.stderr).not.toContain('could not run')
+
       rmSync(real, { force: true, recursive: true })
       rmSync(target, { force: true, recursive: true })
     })

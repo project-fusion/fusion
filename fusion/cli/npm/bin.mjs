@@ -109,7 +109,10 @@ const onPath = () => {
 
 const run = (binary) => {
   const { status, error } = spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' })
-  if (error) {
+  /* A status means it ran. Bun sets `error` on any exit but zero, to a
+     `SystemError` reading "null", so asking `error` alone reported every failed
+     check as a binary that would not start, and exited 70 for its 1. */
+  if (error && status === null) {
     console.error(`fusion: could not run \`${binary}\`: ${error.message}`)
     process.exit(70)
   }
