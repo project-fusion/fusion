@@ -643,6 +643,62 @@ export class HelixElement extends LitElement {
   }
 
   /**
+   * Whether this render can know the children.
+   *
+   * A server cannot: its element shim carries attributes and no tree, so
+   * `children` is undefined there. A render hydrating what a server sent must
+   * not, because it has to be the server's render. Anywhere else it can. A
+   * component whose render depends on its children reads them through
+   * `knownChildren`, and treats "not known" as its own answer rather than as
+   * "none": a list that renders its empty state because nobody has looked yet is
+   * the one thing an empty state must never do.
+   */
+  protected get childrenKnown(): boolean {
+    return this.children !== undefined && !this.hydrating
+  }
+
+  /** The children a render may read: all of them where they are known, and none otherwise. */
+  protected get knownChildren(): Element[] {
+    return this.childrenKnown ? [...this.children] : []
+  }
+
+  /**
+   * Whether this element's slots route by name although it asked to assign them
+   * by hand.
+   *
+   * **A declarative shadow root is always the by-name kind.** HTML has no way to
+   * ask for manual assignment, so a component that assigns by hand and hydrates
+   * a server's root gets one where `slot.assign()` does nothing, and its
+   * children land wherever their `slot` attribute sends them. The way through is
+   * to write that attribute, which is what `route` does. Only there: on a root
+   * this element made, assignment stays manual and the consumer's markup is
+   * never touched, which is what a React consumer's hydration requires.
+   */
+  protected get assignsByName(): boolean {
+    const asked = (this.constructor as typeof HelixElement).shadowRootOptions.slotAssignment
+    return (
+      asked === 'manual' &&
+      typeof ShadowRoot !== 'undefined' &&
+      this.renderRoot instanceof ShadowRoot &&
+      this.renderRoot.slotAssignment !== 'manual'
+    )
+  }
+
+  /**
+   * Sends a child to a slot by name, on a root that routes by name.
+   *
+   * `undefined` is the default slot. Written only when it differs, so routing
+   * the same child again on every update writes nothing.
+   */
+  protected route(child: Element, name: string | undefined): void {
+    if (name === undefined) {
+      child.removeAttribute('slot')
+    } else if (child.getAttribute('slot') !== name) {
+      child.setAttribute('slot', name)
+    }
+  }
+
+  /**
    * Announces an event, having first bound whatever React is holding for it.
    *
    * Every event this library sends passes through here, the concrete classes in

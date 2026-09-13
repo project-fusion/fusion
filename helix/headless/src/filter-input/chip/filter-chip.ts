@@ -1,6 +1,6 @@
 import { customElement, HelixElement, MixinDismissible } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -120,12 +120,19 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   @property({ attribute: 'operator-label' })
   operatorLabel = ''
 
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override render(): TemplateResult {
-    /* Asked of the slot as well as the property, so a consumer who slots a
+    /* Asked of the children as well as the property, so a consumer who slots a
        control into `operator` gets the segment drawn even with no label to put
-       in it. `assignedNodes` is not available before the first render, so the
-       property is what decides on the server and the slot corrects it after. */
-    const operator = this.operatorLabel !== '' || this.querySelector('[slot="operator"]') !== null
+       in it. The children are what a render may know of them: none on a server,
+       whose shim has no tree and threw here, and none while hydrating what one
+       sent, so the property decides there and the update after corrects it. */
+    const operator =
+      this.operatorLabel !== '' || this.knownChildren.some((child) => child.slot === 'operator')
 
     /* And the values box only where there are values.
      *
@@ -134,10 +141,16 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
      * Drawn unconditionally it left an empty box in the row, which the gap
      * either side of it turned into a visible step of dead space after the
      * word. Default slot only, for the reason `MixinDismissible` gives: a node
-     * assigned to `field` or `operator` belongs to another region. */
-    const values = [...this.childNodes].some((node) =>
-      node instanceof Element ? node.slot === '' : (node.textContent ?? '').trim() !== '',
-    )
+     * assigned to `field` or `operator` belongs to another region.
+     *
+     * Drawn where the children cannot be known, a server and the render that
+     * has to be its: without the slot, the values a server sends are not shown
+     * until hydration, and an empty box for a moment is the smaller fault. */
+    const values =
+      !this.childrenKnown ||
+      [...this.childNodes].some((node) =>
+        node instanceof Element ? node.slot === '' : (node.textContent ?? '').trim() !== '',
+      )
 
     return html`<span part="field"><slot name="field">${this.label}</slot></span>
       ${

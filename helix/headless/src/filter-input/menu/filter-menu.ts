@@ -1,5 +1,5 @@
 import { customElement, HelixElement, HelixFacetEvent } from '@fusion.dev/helix-core'
-import { nothing, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 /* `lit/static-html.js`, because this template interpolates tag names: it renders
    the placeholder as the element otherwise, which shifts every attribute after
@@ -87,13 +87,21 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   /** Which comparison each field is using, where the reader chose one. */
   private readonly comparisons = new Map<string, string>()
 
-  /** The fields declared inside this, in the order they were written. */
+  /**
+   * The fields declared inside this, in the order they were written.
+   *
+   * What a render may know of them: none on a server, whose shim has no tree
+   * and threw here, and none while hydrating what one sent.
+   */
   get fields(): HelixHeadlessFilterField[] {
-    return [
-      ...this.querySelectorAll<HelixHeadlessFilterField>(
-        ':scope > helix-headless-filter-field, :scope > helix-filter-field',
-      ),
-    ]
+    return this.knownChildren.filter((child): child is HelixHeadlessFilterField =>
+      ['helix-headless-filter-field', 'helix-filter-field'].includes(child.localName),
+    )
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   /** What is ticked for one field, as the consumer's own values. */

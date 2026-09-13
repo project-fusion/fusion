@@ -262,14 +262,21 @@ styling**.
 3. **Read the children before the render, except while hydrating.** A value
    read from the children after a render and written into state renders the
    component twice, and Lit's dev build warns about it. So read them in
-   `willUpdate`, guarded by `this.children !== undefined` for the server and by
-   `!this.hydrating` for a page a server rendered, and call
-   `this.finishHydration()` from `firstUpdated`. Lit hydrates declarative shadow
-   DOM by assuming the markup already shows the first render, so that render has
-   to be the server's: a value that differs is never written, and a template
-   that differs throws. `bun run check:spec:dsd` loads a server's markup and a
-   client's in Chromium and holds each component to both. Measuring layout is
-   the exception, since it can only follow a render.
+   `willUpdate`, or in a getter the render calls, through `this.knownChildren`,
+   which is every child where they can be known and none on a server or while
+   hydrating what one sent; and call `this.finishHydration()` from
+   `firstUpdated`. Lit hydrates declarative shadow DOM by assuming the markup
+   already shows the first render, so that render has to be the server's: a value
+   that differs is never written, and a template that differs throws. Not knowing
+   is not "none": `this.childrenKnown` false means an empty state is not
+   served. Measuring layout is the exception, since it can only follow a render.
+   A `slotchange` is no substitute for the first read either: a declarative
+   shadow root reports its slots as it is parsed, before any listener exists.
+   A component that assigns its slots by hand hydrates a root that can only
+   assign by name, so on one (`this.assignsByName`) it writes `slot` onto its
+   children with `this.route()` instead, and nowhere else. `bun run
+   check:spec:dsd` hydrates every example in Chromium against a client's render,
+   and `KNOWN` in it is the list of families that do not hydrate yet.
 4. **Semantics on the host, presentation in the shadow root.** IDREFs do not
    cross shadow boundaries, so `aria-labelledby` inside a shadow root can never
    resolve to a light-DOM id.

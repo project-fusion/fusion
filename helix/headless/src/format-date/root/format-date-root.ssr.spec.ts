@@ -15,6 +15,28 @@ import '../index.js'
 const at = '2020-01-01T00:00:00.000Z'
 
 describe('format-date server output', () => {
+  /**
+   * A relative reading asks the page's ticker to wake it when it goes stale,
+   * and a server has no page. Measured: a subscription there held the element
+   * for up to an hour after its markup was sent, and the process that rendered
+   * the notifications examples would not exit.
+   */
+  test('a relative reading starts no timer on the server', () => {
+    const real = globalThis.setTimeout
+    const started: number[] = []
+    globalThis.setTimeout = ((run: () => void, wait?: number) => {
+      started.push(wait ?? 0)
+      return real(run, wait)
+    }) as typeof setTimeout
+    try {
+      const recent = new Date(Date.now() - 5 * 60_000).toISOString()
+      ssr(html`<helix-headless-format-date date=${recent} elapsed></helix-headless-format-date>`)
+    } finally {
+      globalThis.setTimeout = real
+    }
+    expect(started).toEqual([])
+  })
+
   test('the exact instant is in `datetime`, whatever clock computed the reading', () => {
     const markup = ssr(html`<helix-headless-format-date date=${at}></helix-headless-format-date>`)
     expect(partTag(markup, 'time')).toContain(`datetime="${at}"`)

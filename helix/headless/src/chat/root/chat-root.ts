@@ -331,9 +331,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   /** The turns declared as children, in the order they are written. */
   get messages(): HelixHeadlessChatMessage[] {
-    /* `?? []` is the server: Lit's element shim carries attributes and not a
-       tree, so `children` is undefined there and spreading it throws. */
-    return [...(this.children ?? [])].filter(
+    /* What a render may know: nothing on a server, whose shim has no tree, and
+       nothing while hydrating what one sent. */
+    return this.knownChildren.filter(
       (child): child is HelixHeadlessChatMessage =>
         'isChatMessage' in child && child.isChatMessage === true,
     )
@@ -450,6 +450,15 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     const root = this.renderRoot
     const log = root?.querySelector?.<HTMLSlotElement>('slot[name="messages"]')
     if (!log?.assign) {
+      return
+    }
+    /* Hydrating a server's root, which routes by name: each turn is sent to
+       the log, and the regions need nothing, their children already naming
+       them. */
+    if (this.assignsByName) {
+      for (const turn of this.fed ? [] : this.messages) {
+        this.route(turn, 'messages')
+      }
       return
     }
     log.assign(...(this.fed ? [] : this.messages))
@@ -869,7 +878,11 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         }
         ${fed ? this.renderTurns() : nothing}
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
-        ${this.renderStatus(fed || this.messages.length > 0)}
+        ${
+          /* Not empty where nobody can know yet: a server, and the render that
+             has to be the server's. */
+          this.renderStatus(fed || this.messages.length > 0 || !this.childrenKnown)
+        }
       </div>
       <span part="live" role="status">${keyed(this.said, this.announcement)}</span>
       <div part="resume" ?hidden=${!away || !this.has('resume')} @click=${this.handleResume}>

@@ -284,7 +284,11 @@ export class HelixHeadlessFormatDate extends HelixElement {
     const now = new Date()
     this.clock = now.getTime()
     const { next } = elapsedTime(this.locale)(moment, now)
-    if (!Number.isFinite(next)) {
+    /* Only on a page. A server runs `willUpdate` and has nobody to update a
+       reading for, and a subscription there is a timer up to an hour long that
+       holds the element after its markup has been sent: measured, rendering the
+       notifications examples left a process that would not exit. */
+    if (!Number.isFinite(next) || !this.isConnected) {
       return
     }
     this.stopTicking = subscribe(next, () => this.tick())

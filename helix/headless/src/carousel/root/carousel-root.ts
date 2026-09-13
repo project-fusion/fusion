@@ -231,18 +231,16 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   /** The slides, in light-DOM order. Empty on the server, which has no tree. */
   get slides(): HTMLElement[] {
-    /* `?? []` is the server, and a note saying "client only" is not a guard:
-       `render` reads this to count the indicators, so an unhandled spread of
-       `undefined` kills every carousel SSR pass.
+    /* `knownChildren`, because `render` reads this to count the indicators: on
+       a server `children` is undefined and a spread of it kills every carousel
+       SSR pass, and while hydrating what one sent the render has to be its.
 
        Empty is also the honest answer rather than damage control. The
        indicators are one per position and a position is counted from the
        children, which the server cannot see, so they arrive with the upgrade.
        Nothing moves when they do: the tags are hidden until they are
-       defined. */
-    return [...(this.children ?? [])].filter(
-      (child): child is HTMLElement => child instanceof HTMLElement,
-    )
+       defined, and after hydration the update that follows counts them. */
+    return this.knownChildren.filter((child): child is HTMLElement => child instanceof HTMLElement)
   }
 
   /**
@@ -632,6 +630,11 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.internals.ariaRoleDescription = 'carousel'
   }
 
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     /* The track follows `index`, whoever moved it.
@@ -684,6 +687,14 @@ export class HelixHeadlessCarousel extends HelixElement {
    * link relabeled as a group.
    */
   private assign(): void {
+    /* Hydrating a server's root, which routes by name: each slide is sent to
+       the pane numbered for it, which the template names only on such a root. */
+    if (this.assignsByName) {
+      this.slides.forEach((slide, index) => {
+        this.route(slide, `slide-${index + 1}`)
+      })
+      return
+    }
     const panes = this.renderRoot?.querySelectorAll?.<HTMLSlotElement>('[part="slide"] slot')
     if (!panes) {
       return
@@ -764,7 +775,10 @@ export class HelixHeadlessCarousel extends HelixElement {
             aria-roledescription="slide"
             aria-label=${`${index + 1} of ${this.slides.length}`}
           >
-            <slot @slotchange=${() => this.requestUpdate()}></slot>
+            <slot
+              name=${this.assignsByName ? `slide-${index + 1}` : nothing}
+              @slotchange=${() => this.requestUpdate()}
+            ></slot>
           </div>`,
         )}
       </div>

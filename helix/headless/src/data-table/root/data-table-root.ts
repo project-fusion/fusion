@@ -546,10 +546,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** The columns declared as children, in the order they are written. */
   get tableColumns(): HelixHeadlessTableColumn[] {
-    /* `?? []` is the server. Lit's element shim carries attributes and not a
-       tree, so `children` is undefined there, and this getter is read during
-       `render`: spreading it throws and takes the whole SSR suite with it. */
-    return [...(this.children ?? [])].filter(
+    /* Read during `render`, so it answers what a render may know: nothing on a
+       server, whose shim has no tree, and nothing while hydrating what one
+       sent. */
+    return this.knownChildren.filter(
       (child): child is HelixHeadlessTableColumn =>
         'isTableColumn' in child && child.isTableColumn === true,
     )
@@ -970,6 +970,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!root?.querySelector) {
       return
     }
+    /* Hydrating a server's root, which routes by name and so cannot reorder by
+       assigning: each column is sent to a slot numbered for its place on
+       screen, which the header draws in that order once hydration is done, and
+       to the one slot the server drew until then. The toolbar and footer
+       already name theirs. */
+    if (this.assignsByName) {
+      const single = root.querySelector('slot[name="columns"]') !== null
+      this.orderedColumns.forEach((column, index) => {
+        this.route(column, single ? 'columns' : `column-${index + 1}`)
+      })
+      return
+    }
     const head = root.querySelector<HTMLSlotElement>('slot[name="columns"]')
     if (!head?.assign) {
       return
@@ -1264,10 +1276,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         @scroll=${this.handleScroll}
       >
         <div part="head" role="row">
-          ${this.selectable ? this.renderSelectAll() : nothing}<slot
-            name="columns"
-            @slotchange=${this.handleSlotChange}
-          ></slot>
+          ${this.selectable ? this.renderSelectAll() : nothing}${
+            this.assignsByName && !this.hydrating
+              ? this.orderedColumns.map(
+                  (_, index) =>
+                    html`<slot name=${`column-${index + 1}`} @slotchange=${this.handleSlotChange}></slot>`,
+                )
+              : html`<slot name="columns" @slotchange=${this.handleSlotChange}></slot>`
+          }
         </div>
         ${this.renderSpacer('before')}${this.renderRows(rows)}${this.renderSpacer('after')}
         ${this.renderStatus(available > 0)}

@@ -4,6 +4,24 @@ import { html } from 'lit'
 import '../index.js'
 
 describe('filter input server output', () => {
+  /**
+   * The chip and the menu read their children while rendering, and the shim has
+   * none to read: measured, `querySelector` and a spread of `childNodes` threw,
+   * and took the page they were on down with them.
+   */
+  test('a menu of fields and a chip with an operator render on a server', () => {
+    const markup = ssr(html`<helix-headless-filter-input label="Filter rows">
+      <helix-headless-filter-menu slot="start">
+        <helix-headless-filter-field field="status" label="Status"></helix-headless-filter-field>
+      </helix-headless-filter-menu>
+      <helix-headless-filter-chip label="Status" slot="tokens">
+        <span slot="operator">is</span>
+        Open
+      </helix-headless-filter-chip>
+    </helix-headless-filter-input>`)
+    expect(withoutStyles(markup)).toContain('Open')
+  })
+
   test('the field is usable before any script loads', () => {
     const markup = ssr(
       html`<helix-headless-filter-input

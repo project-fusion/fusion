@@ -122,7 +122,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   get items(): HelixHeadlessNotification[] {
     const isItem = (child: Element): child is HelixHeadlessNotification =>
       'isNotification' in child && (child as HelixHeadlessNotification).isNotification === true
-    return [...(this.children ?? [])].flatMap((child) => {
+    return this.knownChildren.flatMap((child) => {
       if (isItem(child)) {
         return [child]
       }
@@ -139,7 +139,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * feed a flat list again.
    */
   get rows(): Element[] {
-    return [...(this.children ?? [])].filter(
+    return this.knownChildren.filter(
       (child) =>
         ('isNotification' in child && child.isNotification === true) ||
         'isNotificationGroup' in child,
@@ -154,7 +154,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * them happen to be collapsible.
    */
   get groups(): HelixHeadlessNotificationGroup[] {
-    return [...(this.children ?? [])].filter(
+    return this.knownChildren.filter(
       (child): child is HelixHeadlessNotificationGroup => 'isNotificationGroup' in child,
     )
   }
@@ -240,6 +240,14 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     const root = this.renderRoot
     const list = root?.querySelector?.<HTMLSlotElement>('slot[name="items"]')
     if (!list?.assign) {
+      return
+    }
+    /* Hydrating a server's root, which routes by name: each row is sent to
+       the list, and the header and footer already name theirs. */
+    if (this.assignsByName) {
+      for (const row of this.rows) {
+        this.route(row, 'items')
+      }
       return
     }
     list.assign(...this.rows)
@@ -356,7 +364,9 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const hasItems = this.items.length > 0
+    /* Not empty where nobody can know yet: a server, and the render that has to
+       be the server's. */
+    const hasItems = this.items.length > 0 || !this.childrenKnown
     return html`<div part="header">
         <slot name="header"></slot>
         ${

@@ -240,6 +240,9 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   @state()
   private leading = false
 
+  /** Whether `leading` has had its first answer from the children. */
+  private leadRead = false
+
   /**
    * Whether Escape has closed the panel over text that still has suggestions.
    *
@@ -747,6 +750,14 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* The leading box's first answer, from the children and before the render
+       that draws it. `slotchange` alone left a hydrated field without its box:
+       a declarative shadow root reports its slots as it is parsed, before any
+       listener is there to hear it. `slotchange` keeps it in step after. */
+    if (!this.leadRead && this.childrenKnown) {
+      this.leadRead = true
+      this.leading = this.knownChildren.some((child) => child.slot === 'start')
+    }
     /* Never before the first update, which is the one the server does: there is
        no render root to query there. See `Input`. */
     if (!this.hasUpdated) {
@@ -768,6 +779,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    this.finishHydration()
     /* The first assignment, which `willUpdate` could not see: there was no
        render root to query until this render made one. */
     this.handleTokens()

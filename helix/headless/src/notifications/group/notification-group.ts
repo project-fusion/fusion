@@ -112,7 +112,10 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
 
   /** The notifications written into this group, in the order they were given. */
   get items(): HelixHeadlessNotification[] {
-    return [...this.children].filter(
+    /* What a render may know: nothing on a server, whose shim has no tree and
+       where spreading `children` threw, and nothing while hydrating what one
+       sent. */
+    return this.knownChildren.filter(
       (child) => (child as HelixHeadlessNotification).isNotification === true,
     ) as HelixHeadlessNotification[]
   }
@@ -131,6 +134,11 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
       this.internals,
       this.label === '' ? { role: 'group' } : { label: this.label, role: 'group' },
     )
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -159,6 +167,15 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
     }
     const items = this.items
     const showing = this.collapsible && !this.open ? items.slice(0, 1) : items
+    /* Hydrating a server's root, which routes by name: a row the group shows
+       takes the unnamed slot, and a folded one is sent to a name no slot has,
+       which renders it nowhere, the same as leaving it unassigned. */
+    if (this.assignsByName) {
+      for (const item of items) {
+        this.route(item, showing.includes(item) ? undefined : 'folded')
+      }
+      return
+    }
     slot.assign(...showing)
     const action = this.renderRoot?.querySelector?.<HTMLSlotElement>('slot[name="action"]')
     action?.assign?.(

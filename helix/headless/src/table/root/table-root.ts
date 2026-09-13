@@ -62,11 +62,10 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   /** The columns declared as children, in the order they are written. */
   get tableColumns(): HelixHeadlessTableColumn[] {
-    /* `?? []` is the server. Lit's element shim carries attributes and not a
-       tree, so `children` is undefined there, and this getter is reached from
-       `template`, which is read during `render`: spreading it throws and takes
-       the whole SSR render down with it. */
-    return [...(this.children ?? [])].filter(
+    /* Read during `render`, through `template`, so it answers what a render may
+       know: nothing on a server, whose shim has no tree, and nothing while
+       hydrating what one sent. */
+    return this.knownChildren.filter(
       (child): child is HelixHeadlessTableColumn =>
         'isTableColumn' in child && child.isTableColumn === true,
     )
@@ -124,6 +123,14 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   }
 
   private assign(): void {
+    /* Hydrating a server's root, which routes by name: the columns say where
+       they go and the rows need nothing, the unnamed slot being theirs. */
+    if (this.assignsByName) {
+      for (const column of this.tableColumns) {
+        this.route(column, 'columns')
+      }
+      return
+    }
     const head = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="columns"]')
     const body = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
     if (!head || !body) {

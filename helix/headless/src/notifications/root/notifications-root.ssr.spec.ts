@@ -27,6 +27,22 @@ const markup = ssr(html`<helix-headless-notifications label="Activity" mark-all>
 </helix-headless-notifications>`)
 
 describe('notifications server output', () => {
+  /** For the reason `Chat`'s spec gives: unknown is not empty. */
+  test('no empty state is served over items the server cannot count', () => {
+    expect(partTag(markup, 'empty')).toBe('')
+  })
+
+  /** Measured: a group read its rows by spreading `children`, which the shim does not have. */
+  test('a group renders on a server', () => {
+    const grouped = ssr(html`<helix-headless-notifications label="Activity">
+      <helix-headless-notification-group collapsible label="Earlier">
+        <helix-headless-notification>Build failed</helix-headless-notification>
+        <helix-headless-notification>Build passed</helix-headless-notification>
+      </helix-headless-notification-group>
+    </helix-headless-notifications>`)
+    expect(withoutStyles(grouped)).toContain('Build passed')
+  })
+
   test('the region and the list are both served', () => {
     expect(partTag(markup, 'list')).toContain('role="list"')
   })

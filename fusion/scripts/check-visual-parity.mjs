@@ -1,5 +1,4 @@
 #!/usr/bin/env bun
-import { execFileSync } from 'node:child_process'
 /**
  * Renders every example twice, from its HTML and from its TSX, and compares.
  *
@@ -43,6 +42,8 @@ import { SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
+import { scopeFor } from './lib/scope.mjs'
+import { awaitStill, awaitUpgrades } from './lib/settle.mjs'
 
 const root = resolve(import.meta.dirname, '../..')
 
@@ -80,130 +81,6 @@ const changedFrom = changedAt === -1 ? undefined : args[changedAt + 1]
 const only = args.find(
   (one, at) => !one.startsWith('--') && !(changedAt !== -1 && at === changedAt + 1),
 )
-
-/**
- * Paths that can move any picture in the corpus, so a change to one runs all of it.
- *
- * **Scoping by family is only safe because this list is not.** An example's
- * render is a function of far more than its own two files: the tokens it
- * resolves, the base element that upgrades it, the sheets under `shared/` that
- * seventeen families import, the icons it draws and the bundle both sides render
- * from. None of those live under a family, so none would be caught by a family
- * filter, and each of them changes every picture at once.
- *
- * `shared/` is checked before the family pattern deliberately: it sits at
- * `helix/styled/src/shared` and matches the shape of a family folder without
- * being one, which is the exception the repository's own layout rule names.
- */
-const GLOBAL = [
-  'helix/styles/',
-  'helix/core/',
-  'helix/styled/src/shared/',
-  'helix/headless/src/shared/',
-  'helix/icons/',
-  'helix/theme/',
-  'helix/testing/',
-  'fusion/scripts/check-visual-parity.mjs',
-  'fusion/site/scripts/build-frame.mjs',
-]
-
-const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//
-
-/**
- * The families a change reaches, or `null` for all of them.
- *
- * **Reverse composition, because the arrow points the wrong way for us.**
- * Fifteen families render another inside their own shadow root, named through
- * `this.tag()`, which `helix component`'s `seams` already reads. If `listbox` changes, the
- * picture that moves is `select`'s, so the set has to grow from the changed
- * family outward to everything that composes it, and keep growing: a family
- * composing a family that composes the change is just as affected.
- *
- * **Over-inclusion is the safe direction and is chosen on purpose.** The scan
- * does not strip comments the way `helix component`'s `seams` does, so a `this.tag()` inside
- * a comment pulls a family in that did not need to be there. That costs seconds
- * of comparison. The opposite mistake costs a picture nobody looked at, which is
- * the whole failure this check exists to prevent.
- */
-const scopeFor = (ref) => {
-  let changed
-  try {
-    changed = execFileSync('git', ['diff', '--name-only', `${ref}...HEAD`], {
-      cwd: root,
-      encoding: 'utf8',
-    })
-      .split('\n')
-      .filter(Boolean)
-  } catch {
-    /* A shallow clone, an unknown ref, a first commit: any of them means the
-       range cannot be resolved, and the honest answer to "what changed" is then
-       "assume everything". Silently comparing a subset off a broken range is
-       the one outcome worth refusing. */
-    console.log(`parity: cannot resolve ${ref}, comparing the whole corpus.`)
-    return null
-  }
-
-  const global = changed.find((one) => GLOBAL.some((prefix) => one.startsWith(prefix)))
-  if (global !== undefined) {
-    console.log(`parity: ${global} is read by every example, comparing the whole corpus.`)
-    return null
-  }
-
-  const seed = new Set()
-  for (const one of changed) {
-    const found = FAMILY_PATH.exec(one)
-    if (found !== null) {
-      seed.add(found[1])
-    }
-  }
-
-  /* Grow the set through whoever composes what is in it, until it stops
-     growing. `composes` is family -> the families it renders. */
-  const composes = new Map()
-  for (const tier of TIERS) {
-    for (const entry of readdirSync(tier.source, { withFileTypes: true })) {
-      if (!entry.isDirectory()) {
-        continue
-      }
-      /* Merged across tiers rather than replaced. A family is one name with a
-         folder in each tier, so a plain `composes.set` per tier lets the styled
-         pass overwrite the headless one, dropping every composition declared
-         only in the headless tier: a change to `button` then fails to reach
-         `color-picker`, `steps` or `tour`. */
-      const names = composes.get(entry.name) ?? new Set()
-      for (const file of readdirSync(join(tier.source, entry.name), { recursive: true })) {
-        if (typeof file !== 'string' || !file.endsWith('.ts')) {
-          continue
-        }
-        const source = readFileSync(join(tier.source, entry.name, file), 'utf8')
-        for (const [, name] of source.matchAll(/this\.tag\(\s*'([a-z-]+)'/g)) {
-          names.add(name)
-        }
-      }
-      composes.set(entry.name, names)
-    }
-  }
-
-  const reached = new Set(seed)
-  for (let grew = true; grew; ) {
-    grew = false
-    for (const [family, names] of composes) {
-      if (reached.has(family)) {
-        continue
-      }
-      if ([...names].some((name) => reached.has(name))) {
-        reached.add(family)
-        grew = true
-      }
-    }
-  }
-
-  const added = [...reached].filter((one) => !seed.has(one))
-  if (added.length > 0) {
-    console.log(`parity: ${added.sort().join(', ')} compose something that changed.`)
-  }
-  return reached
-}
 
 /* Gated on the same reasoning as the staleness check below: a dry run answers
    which families would be compared, which is a question about git and the source
@@ -289,7 +166,15 @@ const UNCOMPARED = new Map([
 ])
 
 /* `null` means everything, which is what a run with no `--changed` asks for. */
-const scope = changedFrom === undefined ? null : scopeFor(changedFrom)
+const scope =
+  changedFrom === undefined
+    ? null
+    : scopeFor(changedFrom, {
+        label: 'parity',
+        own: ['fusion/scripts/check-visual-parity.mjs'],
+        root,
+        tiers: TIERS,
+      })
 
 /** Every example that is authored in both syntaxes, which is what can be paired. */
 const corpus = []
@@ -628,84 +513,8 @@ tab.on('pageerror', (one) => said.push(String(one)))
 const picture = async (url) => {
   said.length = 0
   await tab.goto(url, { waitUntil: 'load' })
-  const undefinedTags = await tab.evaluate(async () => {
-    /* **Bounded, because `whenDefined` on a tag nothing registers never
-       settles.** Unbounded, an example naming an element the bundle does not
-       define hangs the run outright: no output, no failure, and no way to tell a
-       slow machine from a stuck one. This gives up and says which tags it was
-       waiting for. Five seconds is far past any real upgrade and far short of
-       noticing it by hand. */
-    const pending = [...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)
-    await Promise.race([
-      Promise.all([...new Set(pending)].map((tag) => customElements.whenDefined(tag))),
-      new Promise((done) => setTimeout(done, 5000)),
-    ])
-    return [...new Set(pending)].filter((tag) => customElements.get(tag) === undefined)
-  })
-  await tab.evaluate(async () => {
-    /* Three frames rather than the two `check:spec:visual` waits. React mounts in a
-       task of its own and an example that sets state in an effect, which the
-       timestamped ones do, needs the render that follows it. */
-    await new Promise((done) =>
-      requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(done))),
-    )
-    await document.fonts.ready
-
-    /* **Every Helix element's own settle signal, which is the one the library
-       publishes for exactly this.** `HelixElement` resolves `whenSettled` from
-       the frame after `firstUpdated`, once its first style resolution is done
-       and the transition suppression lifts; `@fusion.dev/helix-testing` already waits on
-       it for the same reason. Without it the comparison reads a stopwatch:
-       `pagination/footer` reported 419 pixels on one run and 842 on the next
-       from the same two files.
-
-       Bounded, because an element that never settles must not hang the sweep. */
-    await Promise.race([
-      Promise.all(
-        [...document.querySelectorAll('*')]
-          .map((one) => one.whenSettled)
-          .filter((one) => one instanceof Promise),
-      ),
-      new Promise((done) => setTimeout(done, 5000)),
-    ])
-
-    /* **And wait for scrolling to stop, which `animations: 'disabled'` does not
-       do.** Playwright cancels CSS animations and fast-forwards transitions; a
-       programmatic `scrollTo({ behavior: 'smooth' })` is neither, so a component
-       that scrolls itself on the first update is caught wherever it happened to
-       be. Measured on `carousel/controlled`, which scrolls to its opening slide:
-       three runs of the same page reported `scrollLeft` of 135, 184 and 239. The
-       comparison was reading a stopwatch, not a difference between two examples.
-
-       Polled rather than waited on `scrollend`, which does not fire for a scroll
-       that never started, and bounded so a component scrolling forever cannot
-       hang the run. */
-    /* **Geometry as well as scroll, because the page is still moving after
-       both.** A nested control that measures itself settles a frame or two after
-       everything this already waits for, and the flex row it sits in
-       redistributes when it does. Measured on `pagination/footer`, whose width
-       came out 272, 273 and 275 across three runs of the *same* file: both sides
-       were unstable, so the comparison was reading whichever frame it caught
-       rather than a difference between two examples.
-
-       One signal covering scroll offsets and boxes together, held for three
-       frames and bounded, so a component that never stops moving reports a
-       difference instead of hanging. */
-    const shape = () =>
-      [...document.querySelectorAll('*')]
-        .map((one) => {
-          const box = one.getBoundingClientRect()
-          return `${Math.round(box.x)},${Math.round(box.y)},${Math.round(box.width)},${Math.round(box.height)},${one.scrollLeft},${one.scrollTop}`
-        })
-        .join('|')
-    let last = shape()
-    for (let still = 0, spent = 0; still < 3 && spent < 120; spent += 1) {
-      await new Promise((done) => requestAnimationFrame(done))
-      const now = shape()
-      still = now === last ? still + 1 : 0
-      last = now
-    }
-  })
+  const undefinedTags = await awaitUpgrades(tab)
+  await awaitStill(tab)
   return { shot: await tab.screenshot({ animations: 'disabled', fullPage: true }), undefinedTags }
 }
 

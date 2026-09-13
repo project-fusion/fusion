@@ -27,6 +27,15 @@ const markup = ssr(html`<helix-headless-chat label="Support">
 </helix-headless-chat>`)
 
 describe('chat server output', () => {
+  /**
+   * A server cannot count the turns, and not knowing is not "none": served as
+   * empty, a conversation read "Nothing to show" over its own turns until the
+   * script arrived, and a client hydrating it drew a different template.
+   */
+  test('no empty state is served over turns the server cannot count', () => {
+    expect(partTag(markup, 'empty')).toBe('')
+  })
+
   test('the log is served as a log, and the region that speaks is served empty', () => {
     expect(partTag(markup, 'log')).toContain('role="log"')
     expect(partTag(markup, 'log')).toContain('aria-live="off"')
