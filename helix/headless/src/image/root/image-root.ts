@@ -211,10 +211,14 @@ export class HelixHeadlessImage extends HelixElement {
    * already fetched: finished with no pixels there is a failure, and its `error`
    * fired before anything could listen, so the placeholder stayed up over a
    * picture that was never coming.
+   *
+   * **Once per picture.** The first update asks from `firstUpdated` and from
+   * `updated`, and a picture already finished answered both, so a page heard
+   * every cached `load`, and every `error` a server's page had, twice.
    */
   private settle(): void {
     const image = this.renderRoot?.querySelector('img')
-    if (this.src === '' || !image?.complete) {
+    if (this.src === '' || this.status !== 'loading' || !image?.complete) {
       return
     }
     if (image.naturalWidth > 0) {

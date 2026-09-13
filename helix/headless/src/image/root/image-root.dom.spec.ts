@@ -108,6 +108,38 @@ describe('an image', () => {
     expect(heard).toEqual(['error:/gone.jpg'])
   })
 
+  test('hears a picture that was already there once', async () => {
+    /* A cached picture finished before anything listened, and the first update
+       asks from `firstUpdated` and from `updated`: answered both times, a page
+       heard its `load` twice. */
+    const proto = HTMLImageElement.prototype
+    const own = ['complete', 'naturalWidth'].map(
+      (name) => [name, Object.getOwnPropertyDescriptor(proto, name)] as const,
+    )
+    Object.defineProperty(proto, 'complete', { configurable: true, get: () => true })
+    Object.defineProperty(proto, 'naturalWidth', { configurable: true, get: () => 40 })
+    const host = document.createElement('helix-headless-image') as Picture
+    try {
+      host.setAttribute('alt', 'A pier')
+      host.setAttribute('src', '/pier.jpg')
+      const heard: string[] = []
+      host.addEventListener('load', () => heard.push('load'))
+      document.body.append(host)
+      await host.updateComplete
+      expect(host.status).toBe('loaded')
+      expect(heard).toEqual(['load'])
+    } finally {
+      host.remove()
+      for (const [name, descriptor] of own) {
+        if (descriptor) {
+          Object.defineProperty(proto, name, descriptor)
+        } else {
+          delete (proto as unknown as Record<string, unknown>)[name]
+        }
+      }
+    }
+  })
+
   test('and does not bubble, because a native `load` does not', async () => {
     /* A bubbling relay of `load` reaches nothing in React: it is in react-dom's
        `nonDelegatedEvents`, so no root listener exists, and `bindReactHandler`
