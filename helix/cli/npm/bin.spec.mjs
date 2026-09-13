@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import { spawnSync } from 'node:child_process'
-import { chmodSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import {
+  chmodSync,
+  copyFileSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -34,6 +42,29 @@ const installed = (says, code = 0) => {
 }
 
 /**
+ * The shim as a consumer has it: copied into a project's `node_modules`, away
+ * from any crate, with this machine's platform package beside it when `says`
+ * is given. The copy is the point, a shim run from this repository always
+ * having a crate to fall back to.
+ */
+const consumer = (says) => {
+  const project = scratch()
+  const scope = join(project, 'node_modules', '@fusion.dev')
+  const shim = join(scope, 'helix-cli', 'bin.mjs')
+  mkdirSync(dirname(shim), { recursive: true })
+  copyFileSync(SHIM, shim)
+  if (says !== undefined) {
+    const platform = join(scope, `helix-cli-${process.platform}-${process.arch}`)
+    mkdirSync(platform)
+    writeFileSync(join(platform, 'package.json'), '{"name": "platform"}\n')
+    const binary = join(platform, 'helix')
+    writeFileSync(binary, `#!/bin/sh\necho "${says}"\n`)
+    chmodSync(binary, 0o755)
+  }
+  return { project, shim }
+}
+
+/**
  * The shim, with `PATH` and the target directory under this test's control.
  *
  * **The timeout is an assertion and not a courtesy.** The fault guarded against
@@ -41,8 +72,8 @@ const installed = (says, code = 0) => {
  * blocks on the level below it, so the run hangs and takes the machine's
  * process table with it rather than returning anything to check.
  */
-const run = (directories, environment = {}) =>
-  spawnSync(process.execPath, [SHIM, '--version'], {
+const run = (directories, environment = {}, shim = SHIM) =>
+  spawnSync(process.execPath, [shim, '--version'], {
     encoding: 'utf8',
     env: {
       HOME: process.env.HOME ?? '',
@@ -109,6 +140,29 @@ if (process.platform !== 'win32') {
 
       rmSync(real, { force: true, recursive: true })
       rmSync(target, { force: true, recursive: true })
+    })
+
+    test('runs the binary npm installed for this machine', () => {
+      const { project, shim } = consumer('from the platform package')
+      const ran = run([], { CARGO_TARGET_DIR: join(project, 'target') }, shim)
+
+      expect(ran.stdout).toContain('from the platform package')
+
+      rmSync(project, { force: true, recursive: true })
+    })
+
+    test('and without one names the package, rather than building a crate that is not there', () => {
+      /* An install that skipped optional dependencies, or a machine there is no
+         build for. What it must not do is reach for cargo, which in a
+         consumer's project builds nothing of ours. */
+      const { project, shim } = consumer()
+      const ran = run([], { CARGO_TARGET_DIR: join(project, 'target') }, shim)
+
+      expect(ran.status).toBe(69)
+      expect(ran.stderr).toContain(`helix-cli-${process.platform}-${process.arch}`)
+      expect(ran.stderr).not.toContain('cargo build')
+
+      rmSync(project, { force: true, recursive: true })
     })
 
     test('and `HELIX_BIN` outranks both', () => {

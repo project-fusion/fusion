@@ -91,6 +91,33 @@
     "helix/cli/npm": {
       "name": "@fusion.dev/helix-cli",
       "version": "0.24.1",
+      "optionalDependencies": {
+        "@fusion.dev/helix-cli-darwin-arm64": "helix/cli/platforms/darwin-arm64",
+        "@fusion.dev/helix-cli-darwin-x64": "helix/cli/platforms/darwin-x64",
+        "@fusion.dev/helix-cli-linux-arm64": "helix/cli/platforms/linux-arm64",
+        "@fusion.dev/helix-cli-linux-x64": "helix/cli/platforms/linux-x64",
+        "@fusion.dev/helix-cli-win32-x64": "helix/cli/platforms/win32-x64",
+      },
+    },
+    "helix/cli/platforms/darwin-arm64": {
+      "name": "@fusion.dev/helix-cli-darwin-arm64",
+      "version": "0.24.1",
+    },
+    "helix/cli/platforms/darwin-x64": {
+      "name": "@fusion.dev/helix-cli-darwin-x64",
+      "version": "0.24.1",
+    },
+    "helix/cli/platforms/linux-arm64": {
+      "name": "@fusion.dev/helix-cli-linux-arm64",
+      "version": "0.24.1",
+    },
+    "helix/cli/platforms/linux-x64": {
+      "name": "@fusion.dev/helix-cli-linux-x64",
+      "version": "0.24.1",
+    },
+    "helix/cli/platforms/win32-x64": {
+      "name": "@fusion.dev/helix-cli-win32-x64",
+      "version": "0.24.1",
     },
     "helix/core": {
       "name": "@fusion.dev/helix-core",
@@ -314,7 +341,17 @@
 
     "@fusion.dev/helix-cem": ["@fusion.dev/helix-cem@workspace:helix/cem", { "dependencies": { "@wc-toolkit/jsx-types": "^1.7.1" }, "devDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0", "@wc-toolkit/vuejs-types": "^1.0.1" }, "peerDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0" } }],
 
-    "@fusion.dev/helix-cli": ["@fusion.dev/helix-cli@workspace:helix/cli/npm", { "bin": { "helix": "./bin.mjs" } }],
+    "@fusion.dev/helix-cli": ["@fusion.dev/helix-cli@workspace:helix/cli/npm", { "optionalDependencies": { "@fusion.dev/helix-cli-darwin-arm64": "helix/cli/platforms/darwin-arm64", "@fusion.dev/helix-cli-darwin-x64": "helix/cli/platforms/darwin-x64", "@fusion.dev/helix-cli-linux-arm64": "helix/cli/platforms/linux-arm64", "@fusion.dev/helix-cli-linux-x64": "helix/cli/platforms/linux-x64", "@fusion.dev/helix-cli-win32-x64": "helix/cli/platforms/win32-x64" }, "bin": { "helix": "./bin.mjs" } }],
+
+    "@fusion.dev/helix-cli-darwin-arm64": ["@fusion.dev/helix-cli-darwin-arm64@workspace:helix/cli/platforms/darwin-arm64", {}],
+
+    "@fusion.dev/helix-cli-darwin-x64": ["@fusion.dev/helix-cli-darwin-x64@workspace:helix/cli/platforms/darwin-x64", {}],
+
+    "@fusion.dev/helix-cli-linux-arm64": ["@fusion.dev/helix-cli-linux-arm64@workspace:helix/cli/platforms/linux-arm64", {}],
+
+    "@fusion.dev/helix-cli-linux-x64": ["@fusion.dev/helix-cli-linux-x64@workspace:helix/cli/platforms/linux-x64", {}],
+
+    "@fusion.dev/helix-cli-win32-x64": ["@fusion.dev/helix-cli-win32-x64@workspace:helix/cli/platforms/win32-x64", {}],
 
     "@fusion.dev/helix-core": ["@fusion.dev/helix-core@workspace:helix/core", { "dependencies": { "@floating-ui/dom": "^1.8.0", "@fusion.dev/helix-icons": "helix/icons" }, "devDependencies": { "@custom-elements-manifest/analyzer": "^0.11.0", "@fusion.dev/helix-cem": "helix/cem", "@fusion.dev/helix-testing": "helix/testing", "lit": "^3.2.1" }, "peerDependencies": { "lit": "^3.2.1" } }],
 

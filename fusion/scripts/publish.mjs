@@ -42,6 +42,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -275,6 +276,57 @@ const strip = (directory) => {
   return maps.length
 }
 
+/**
+ * Refuses a package whose `files` names something absent, before any of the
+ * domain is published.
+ *
+ * **npm packs what is there and says nothing about what is not**, so a missing
+ * entry publishes a package without it. For most packages the build is what
+ * makes the file and the build has run. For a platform package it is the
+ * release placing a binary built on another runner, and one that did not
+ * arrive published an empty package that installs cleanly and runs nothing.
+ *
+ * **A binary is also held to what it has to be to run**: executable, since an
+ * artifact download drops the mode, and reporting this release's version where
+ * this machine can run it, since the binary builds from the crate's own version
+ * line and that is stamped separately from the manifest.
+ */
+const incomplete = (directory, manifest) => {
+  const problems = []
+  for (const entry of manifest.files ?? []) {
+    if (!entry.includes('*') && !existsSync(join(root, directory, entry))) {
+      problems.push(`\`files\` names \`${entry}\` and there is none`)
+    }
+  }
+  if (manifest.os === undefined || problems.length > 0) {
+    return problems
+  }
+  for (const entry of manifest.files ?? []) {
+    const binary = join(root, directory, entry)
+    if (!manifest.os.includes('win32') && (statSync(binary).mode & 0o111) === 0) {
+      problems.push(`\`${entry}\` is not executable`)
+      continue
+    }
+    if (!manifest.os.includes(process.platform) || !manifest.cpu?.includes(process.arch)) {
+      continue
+    }
+    const said = run(binary, ['--version'], root).trim()
+    if (!said.endsWith(` ${manifest.version}`)) {
+      problems.push(`\`${entry} --version\` says \`${said}\`, not ${manifest.version}`)
+    }
+  }
+  return problems
+}
+
+const refusals = packages.flatMap(([, { directory, manifest }]) =>
+  incomplete(directory, manifest).map((problem) => `  ${directory}: ${problem}`),
+)
+if (refusals.length > 0) {
+  fail(
+    `Refusing to publish ${domain}, since npm would pack what is there:\n\n${refusals.join('\n')}`,
+  )
+}
+
 const version = packages[0][1].manifest.version
 const staging = mkdtempSync(join(tmpdir(), `${domain}-publish-`))
 const published = []
@@ -306,7 +358,10 @@ for (const [name, { directory, manifest }] of packages) {
   /* The stale-lockfile fault, refused before it reaches the registry rather
      than after, because a published version cannot be taken back. */
   const packed = JSON.parse(run('tar', ['-xzOf', join(into, file), 'package/package.json'], root))
-  for (const [dependency, range] of Object.entries(packed.dependencies ?? {})) {
+  for (const [dependency, range] of Object.entries({
+    ...packed.dependencies,
+    ...packed.optionalDependencies,
+  })) {
     if (domainOf(dependency) === domain && range !== version) {
       fail(
         `${name}@${version} would ship a dependency on \`${dependency}@${range}\`. Run ` +

@@ -15,9 +15,11 @@
  * **Resolution order, and each step is there for a reason.** `HELIX_BIN` first,
  * because a caller that knows better should not have to argue. Then the cargo
  * target directory, release before debug, honoring `CARGO_TARGET_DIR` because a
- * shared target is common and guessing `./target` would miss it. Then whatever
- * is on `PATH`, which is what an installed binary looks like. Only then a
- * build, and only when cargo is present.
+ * shared target is common and guessing `./target` would miss it. Then the
+ * binary npm installed beside this, which is what a consumer has: after the
+ * target, so a checkout runs what it built rather than a binary a release once
+ * placed. Then whatever is on `PATH`. Only then a build, and only in this
+ * repository, the one place there is a crate to build.
  *
  * **A build is a fallback and not the plan.** It happens once, prints that it
  * is happening, and a CI pipeline that has already run `cargo build` never
@@ -27,6 +29,7 @@
  */
 import { spawnSync } from 'node:child_process'
 import { existsSync, realpathSync, statSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { delimiter, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -56,6 +59,34 @@ const built = () =>
     .filter((path) => existsSync(path))
     .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)
     .at(0)
+
+/**
+ * The platform package npm installed for this machine, named as they are
+ * published: `@fusion.dev/helix-cli-darwin-arm64` and the rest.
+ */
+const PLATFORM = `@fusion.dev/helix-cli-${process.platform}-${process.arch}`
+
+/**
+ * The binary in this machine's platform package, or undefined.
+ *
+ * **One of several optional dependencies, and npm installs only the one whose
+ * `os` and `cpu` match**, which is how Biome and esbuild ship a native binary
+ * without a download of their own. Resolved as a module, so it is found
+ * wherever the package manager put it, hoisted or not.
+ */
+const packaged = () => {
+  let manifest
+  try {
+    manifest = createRequire(import.meta.url).resolve(`${PLATFORM}/package.json`)
+  } catch {
+    return undefined
+  }
+  const binary = join(dirname(manifest), NAME)
+  return existsSync(binary) ? binary : undefined
+}
+
+/** Whether this is the repository's own copy, where there is a crate to build. */
+const checkout = existsSync(join(CRATE, 'Cargo.toml'))
 
 /** Whether cargo is on the path, asked once and cheaply. */
 const hasCargo = () => spawnSync('cargo', ['--version'], { stdio: 'ignore' }).status === 0
@@ -124,7 +155,7 @@ const run = (binary) => {
   process.exit(status ?? 70)
 }
 
-const found = process.env.HELIX_BIN ?? built()
+const found = process.env.HELIX_BIN ?? built() ?? packaged()
 if (found && existsSync(found)) {
   run(found)
 }
@@ -134,6 +165,21 @@ if (found && existsSync(found)) {
 const installed = onPath()
 if (installed) {
   run(installed)
+}
+
+/* Installed from the registry, with no platform package for this machine. A
+   build would be `cargo build` in somebody else's project, for a crate that is
+   not in it. */
+if (!checkout) {
+  console.error(
+    `helix: no binary for ${process.platform} ${process.arch}.\n\n` +
+      `  It comes in \`${PLATFORM}\`, an optional dependency of\n` +
+      '  `@fusion.dev/helix-cli`, and it is not installed. Either this machine is not\n' +
+      '  one there is a build for, or the install skipped optional dependencies\n' +
+      '  (`--omit=optional`, `--no-optional`), in which case install again without it.\n' +
+      '  `HELIX_BIN` names a binary to run instead.',
+  )
+  process.exit(69)
 }
 
 if (!hasCargo()) {

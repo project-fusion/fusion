@@ -92,3 +92,8 @@ fusion/site/public/media/sovereignty.webm
 .claude/launch.json
 .claude/settings.json
 .claude/settings.local.json
+
+# The `helix` binary each platform package ships, placed by the release and never
+# committed: a checkout builds its own into `target/`.
+helix/cli/platforms/*/helix
+helix/cli/platforms/*/helix.exe

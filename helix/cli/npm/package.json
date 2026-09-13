@@ -28,6 +28,13 @@
     "scaffold",
     "theme"
   ],
+  "optionalDependencies": {
+    "@fusion.dev/helix-cli-darwin-arm64": "workspace:*",
+    "@fusion.dev/helix-cli-darwin-x64": "workspace:*",
+    "@fusion.dev/helix-cli-linux-arm64": "workspace:*",
+    "@fusion.dev/helix-cli-linux-x64": "workspace:*",
+    "@fusion.dev/helix-cli-win32-x64": "workspace:*"
+  },
   "publishConfig": {
     "access": "restricted"
   }
