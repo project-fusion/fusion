@@ -132,6 +132,17 @@ export class HelixHeadlessTour extends HelixElement {
   @state()
   private spot: { height: number; left: number; top: number; width: number } | undefined
 
+  /**
+   * Watches the lit target's own box, which moves the light without this
+   * element updating or the window changing: a label whose font arrives late,
+   * words a page rewrites. Measured on a server's page, the spotlight sat two
+   * pixels inside each side of a button that widened once its font loaded.
+   */
+  private sizer: ResizeObserver | undefined = undefined
+
+  /** What `sizer` is watching, so a render that changed nothing re-observes nothing. */
+  private sized: Element | undefined = undefined
+
   /** The stops, in the order they were written. */
   get stops(): HelixHeadlessTourStop[] {
     return (this.assigned ?? []).filter(
@@ -245,6 +256,8 @@ export class HelixHeadlessTour extends HelixElement {
     this.ownerDocument.removeEventListener('keydown', this.handleKeydown)
     globalThis.removeEventListener('resize', this.handleViewport)
     globalThis.removeEventListener('scroll', this.handleViewport, { capture: true })
+    this.sizer?.disconnect()
+    this.sized = undefined
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -297,6 +310,7 @@ export class HelixHeadlessTour extends HelixElement {
     const target = this.open
       ? stops[Math.max(0, Math.min(this.index, stops.length - 1))]?.target
       : undefined
+    this.watch(target)
     if (!target || typeof target.getBoundingClientRect !== 'function') {
       this.spot = undefined
       return
@@ -318,6 +332,20 @@ export class HelixHeadlessTour extends HelixElement {
     if (!same) {
       this.spot = next
     }
+  }
+
+  /** Keeps `sizer` on the lit target, and on nothing once there is none. */
+  private watch(target: Element | null | undefined): void {
+    const next = target ?? undefined
+    if (next === this.sized || typeof ResizeObserver === 'undefined') {
+      return
+    }
+    this.sizer ??= new ResizeObserver(() => this.light())
+    this.sizer.disconnect()
+    if (next) {
+      this.sizer.observe(next)
+    }
+    this.sized = next
   }
 
   protected override render(): TemplateResult {

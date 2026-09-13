@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, hasLayout, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -137,6 +137,25 @@ describe('moving through it', () => {
     expect(tour.index).toBe(1)
   })
 })
+
+if (hasLayout()) {
+  describe('the spotlight', () => {
+    test('follows its target when the target changes size', async () => {
+      /* Neither the window nor the tour changed, which were the only times it
+         measured: a label whose font arrived late left the light where the
+         narrower button had been. */
+      const tour = await run()
+      const target = tour.ownerDocument.getElementById('one') as HTMLElement
+      const width = (): number =>
+        (part(tour, 'spotlight') as HTMLElement).getBoundingClientRect().width
+      const before = width()
+      target.style.inlineSize = `${target.getBoundingClientRect().width + 40}px`
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      await tour.updateComplete
+      expect(width()).toBe(before + 40)
+    })
+  })
+}
 
 describe('a stop', () => {
   test('finds its target by id, the way a tooltip does', async () => {
