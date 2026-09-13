@@ -570,17 +570,25 @@ jobs:
       # a third shot was added. Silently both times, since `if-no-files-found:
       # ignore` is exactly the setting that cannot say a glob matched nothing.
       # `preview*.diff.png` is every one of them, including the next.
+      #
+      # **Every path here runs through a dot directory**, `.examples` and the
+      # hydration check's `.local`, and `upload-artifact` drops those unless
+      # hidden files are asked for. Nothing says so, `ignore` being the setting:
+      # on 13 Sep 2026 the repository held no `visual-diffs` artifact at all,
+      # and a Linux-only hydration finding arrived as a count with no picture.
       - name: Upload the visual diffs
         if: failure()
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: ignore
+          include-hidden-files: true
           name: visual-diffs-${{ matrix.task }}
           path: |
             helix/headless/src/*/.examples/preview*.diff.png
             helix/styled/src/*/.examples/preview*.diff.png
             helix/headless/src/*/.examples/*.parity.png
             helix/styled/src/*/.examples/*.parity.png
+            .local/dsd/diff/*.png
 
   # The one required context, because the shard count is an argument and the
   # job names move with it. `always()` is load-bearing:
