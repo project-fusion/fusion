@@ -52,12 +52,24 @@ export class SourceController implements ReactiveController {
    * a template Lit throws on. The update after it, which this asks for, draws.
    */
   get element(): Element | null {
-    const host = this.#host
-    if (host.for === '') {
+    if ((this.#host as unknown as { hydrating?: boolean }).hydrating === true) {
+      this.#deferred = this.#host.for !== ''
       return null
     }
-    if ((host as unknown as { hydrating?: boolean }).hydrating === true) {
-      this.#deferred = true
+    return this.#resolve()
+  }
+
+  /**
+   * The element `for` names, whatever the host is rendering.
+   *
+   * Apart from `element` because the watcher needs the table while a render
+   * cannot have it: attached on connect, which on a server's page is before
+   * the render that hydrates, it resolved nothing there and never watched, so a
+   * table a page filled afterwards drew no line.
+   */
+  #resolve(): Element | null {
+    const host = this.#host
+    if (host.for === '') {
       return null
     }
     const root = host.getRootNode() as Document | ShadowRoot
@@ -109,7 +121,7 @@ export class SourceController implements ReactiveController {
    */
   watch(): void {
     this.#observer?.disconnect()
-    const element = this.element
+    const element = this.#resolve()
     if (!element || typeof MutationObserver === 'undefined') {
       return
     }

@@ -36,8 +36,61 @@ Before those two guards, neither component could be server-rendered at all. Both
 looked correct in every browser, because the client always has a root and always
 has a tree.
 
-**Anything that inspects the tree runs in `firstUpdated` or later**, and is
-therefore a client-side enhancement by definition.
+**Anything that inspects the tree reads it through `this.knownChildren`**, in
+`willUpdate` or in a getter the render calls. It is every child on a client and
+none on a server, so the server renders "not known yet" and the client's first
+render already has the answer. Reading after the render instead means two
+renders on every client, which Lit's dev build warns about.
+
+Not known is not empty. `this.childrenKnown` is false on a server, and a list
+there doesn't render its "Nothing to show" over items it can't see.
+
+## Declarative shadow DOM
+
+If you render with Lit SSR, its declarative shadow DOM hydrates. Load Lit's
+hydration support before the components:
+
+```ts
+import '@lit-labs/ssr-client/lit-element-hydrate-support.js'
+import '@fusion.dev/helix'
+```
+
+Hydration assumes the markup already shows the client's first render. A value
+that differs is never written, so the page keeps the server's, and a template
+that differs throws. So while hydrating, a component renders exactly what the
+server did, and anything it could only learn in a browser waits for the update
+after:
+
+- `this.hydrating` is true for the render that hydrates.
+- `this.knownChildren` is empty during it, as on the server.
+- `this.finishHydration()`, called from `firstUpdated`, asks for the update that
+  reads what was skipped.
+
+Two things the platform does before any script can listen, and how components
+answer them:
+
+- **A declarative shadow root reports its slots as it is parsed.** A component
+  never learns what's slotted from `slotchange` alone. It reads its children
+  first and uses `slotchange` for later changes.
+- **The parser fetches images.** A `load` or `error` can fire before hydration,
+  so a component asks the image what happened (`this.serverRendered`) and relays
+  the event a task later.
+
+A component that assigns its slots by hand gets a root that can only assign by
+name, because HTML can't declare manual assignment. On such a root
+(`this.assignsByName`) it writes `slot` onto its children with `this.route()`,
+and only there.
+
+A page's own scripts should run after the definitions load. That's the order
+hydration expects: a property set before hydration is one the server never
+rendered with.
+
+`bun run check:spec:dsd` renders every example with Lit SSR, hydrates it in
+Chromium, and compares it with the same example rendered on a client.
+
+React server components don't use any of this. Their output is replayed through
+DOM APIs, and DSD doesn't activate for nodes a script inserts. See
+[React](./react).
 
 ## Never initialize state in `connectedCallback`
 

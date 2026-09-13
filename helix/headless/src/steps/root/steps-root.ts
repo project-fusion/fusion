@@ -3,6 +3,7 @@ import {
   HelixElement,
   hostAria,
   MixinControllerActive,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -103,17 +104,10 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
     const value = this.resolveActive(steps)?.value ?? ''
     for (const step of steps) {
       const current = step.value === value
-      /* Not into a step still hydrating what a server sent, whose render has to
-         be the server's: written now, its first render drew the mark for a
-         state the markup never showed, and Lit threw. It takes it once that
-         render is done. Everywhere else it takes it before its first. */
-      if ((step as unknown as { hydrating?: boolean }).hydrating === true) {
-        void step.updateComplete.then(() => {
-          step.current = current
-        })
-      } else {
+      /* Not into a step still hydrating what a server sent: see `whenHydrated`. */
+      whenHydrated(step, () => {
         step.current = current
-      }
+      })
     }
   }
 

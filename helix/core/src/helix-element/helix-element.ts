@@ -849,3 +849,23 @@ export class HelixElement extends LitElement {
     })
   }
 }
+
+/**
+ * Writes to a child element once it has hydrated, or now where it is not
+ * hydrating.
+ *
+ * **For a parent that sets state on the elements it holds.** On a page a server
+ * rendered, the parent's `updated` can run before a child's own first update,
+ * and a property written then is in the child's hydrating render, which has to
+ * be the server's: a mark the markup never showed, and Lit throws. Waiting for
+ * that render lets it match and the write land in the one after. Anywhere else
+ * the write is immediate, so a client's first render already has it.
+ */
+export const whenHydrated = (element: Element, write: () => void): void => {
+  const child = element as unknown as { hydrating?: boolean; updateComplete?: Promise<unknown> }
+  if (child.hydrating === true && child.updateComplete) {
+    void child.updateComplete.then(write)
+  } else {
+    write()
+  }
+}

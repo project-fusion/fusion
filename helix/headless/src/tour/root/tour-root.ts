@@ -6,6 +6,7 @@ import {
   HelixElement,
   hostAria,
   requestChange,
+  whenHydrated,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
@@ -268,22 +269,25 @@ export class HelixHeadlessTour extends HelixElement {
   private settle(): void {
     const stops = this.stops
     const at = Math.max(0, Math.min(this.index, stops.length - 1))
+    /* Not into a stop still hydrating what a server sent: see `whenHydrated`. */
     stops.forEach((stop, index) => {
-      stop.current = this.open && index === at
-      stop.first = index === 0
-      stop.last = index === stops.length - 1
-      if (this.backLabel !== '') {
-        stop.backLabel = this.backLabel
-      }
-      if (this.nextLabel !== '') {
-        stop.nextLabel = this.nextLabel
-      }
-      if (this.doneLabel !== '') {
-        stop.doneLabel = this.doneLabel
-      }
-      if (this.skipLabel !== '') {
-        stop.skipLabel = this.skipLabel
-      }
+      whenHydrated(stop, () => {
+        stop.current = this.open && index === at
+        stop.first = index === 0
+        stop.last = index === stops.length - 1
+        if (this.backLabel !== '') {
+          stop.backLabel = this.backLabel
+        }
+        if (this.nextLabel !== '') {
+          stop.nextLabel = this.nextLabel
+        }
+        if (this.doneLabel !== '') {
+          stop.doneLabel = this.doneLabel
+        }
+        if (this.skipLabel !== '') {
+          stop.skipLabel = this.skipLabel
+        }
+      })
     })
   }
 

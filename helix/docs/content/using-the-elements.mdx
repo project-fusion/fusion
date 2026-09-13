@@ -110,12 +110,12 @@ import '@fusion.dev/helix' // ❌ the barrel
 
 One family per module, so you are not shipping the library to use a button.
 
-## There is no declarative shadow DOM
+## Declarative shadow DOM is opt-in
 
-Components render on the server through Lit SSR in our own tests, but the app
-ships no DSD, and the shadow styles arrive with the definition rather than in
-the markup. You do not need to configure anything for this; it is here so the
-absence is not mistaken for something missing.
+The site ships no DSD, and the shadow styles arrive with the definition rather
+than in the markup. You don't need to configure anything for that. If you render
+with Lit SSR yourself, its declarative shadow DOM hydrates: see
+[Server rendering](./server-rendering).
 
 The short version of why: DSD cannot activate for script-inserted nodes, a
 server component's output is replayed from the flight payload through DOM APIs

@@ -13,10 +13,12 @@
   user-select: none;
 }
 
-/* The start slot is first, so whatever follows it opens the gap that separates
-   the two ends of the bar. Which element that is depends on what there was to
-   report, and this does not need to know. */
-slot:first-child + * {
+/* Whatever follows the start slot opens the gap that separates the two ends of
+   the bar. Which element that is depends on what there was to report, and this
+   does not need to know. The unnamed slot, not the first child: a server's
+   declarative shadow root puts the stylesheet first, and `:first-child` then
+   matched nothing and the readouts sat at the start. */
+slot:not([name]) + * {
   margin-inline-start: auto;
 }
 

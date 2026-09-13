@@ -119,7 +119,7 @@ export {
   type SortDetail,
   type ToggleDetail,
 } from './events/events.js'
-export { HelixElement } from './helix-element/helix-element.js'
+export { HelixElement, whenHydrated } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
 export {
   MixinChartSource,

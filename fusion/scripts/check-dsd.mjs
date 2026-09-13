@@ -185,10 +185,7 @@ const FIXTURES = [
  * whose examples all hydrate twice over is reported as spent, which fails the
  * run until the entry comes out: a list nobody is made to shorten only grows.
  */
-const KNOWN = new Map([
-  ['sandbox', "the site's editor, whose leading pane differs once hydrated; cause not traced"],
-  ['tour', 'places its stop against a target elsewhere in the page, which a server cannot see'],
-])
+const KNOWN = new Map([])
 
 /**
  * The examples not compared, each with what was measured, as parity keeps them.
