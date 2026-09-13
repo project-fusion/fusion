@@ -119,10 +119,27 @@ const run = (command, args, cwd) =>
 function npm(args, doing) {
   try {
     return run('npm', args, root)
-  } catch (error) {
+  } catch (first) {
+    let error = first
+    /* **A passkey is answered in a browser, and a pipe shows no browser.** The
+       call above pipes stdio to keep npm's message, so the challenge npm offers
+       on `EOTP` had nowhere to appear and a person at the keyboard could not
+       satisfy it: measured 13 Sep 2026, the first bootstrap stopped at its first
+       package. So it is asked once more on the terminal, which prints the link
+       and waits, as `trust.mjs` does. CI never gets here: OIDC is exempt. */
+    if (/EOTP|one-time password/i.test(`${first.stderr ?? ''}${first.stdout ?? ''}`)) {
+      console.error(`\nnpm wants a one-time password to ${doing}. Answer it here:\n`)
+      try {
+        execFileSync('npm', args, { cwd: root, stdio: 'inherit' })
+        return ''
+      } catch (again) {
+        error = again
+      }
+    }
     const output = `${error.stderr ?? ''}${error.stdout ?? ''}`.trim()
     console.error(`\nnpm could not ${doing}.\n`)
-    console.error(output === '' ? '  (npm said nothing)' : `  ${output.split('\n').join('\n  ')}`)
+    const empty = error === first ? '  (npm said nothing)' : '  (npm printed its reason above)'
+    console.error(output === '' ? empty : `  ${output.split('\n').join('\n  ')}`)
 
     if (/cannot publish over|EPUBLISHCONFLICT|previously published/i.test(output)) {
       console.error(
