@@ -154,6 +154,22 @@ if (hasLayout()) {
       await tour.updateComplete
       expect(width()).toBe(before + 40)
     })
+
+    test('and still does once the tour has been moved', async () => {
+      /* A move disconnects, which tears the watch down, and a tour that was
+         only reordered does not update to put it back. */
+      const tour = await run()
+      const parent = tour.parentElement as HTMLElement
+      parent.append(tour)
+      const target = tour.ownerDocument.getElementById('one') as HTMLElement
+      const width = (): number =>
+        (part(tour, 'spotlight') as HTMLElement).getBoundingClientRect().width
+      const before = width()
+      target.style.inlineSize = `${target.getBoundingClientRect().width + 40}px`
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+      await tour.updateComplete
+      expect(width()).toBe(before + 40)
+    })
   })
 }
 

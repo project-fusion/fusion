@@ -248,6 +248,12 @@ export class HelixHeadlessTour extends HelixElement {
     this.ownerDocument.addEventListener('keydown', this.handleKeydown)
     globalThis.addEventListener('resize', this.handleViewport, { passive: true })
     globalThis.addEventListener('scroll', this.handleViewport, { capture: true, passive: true })
+    /* Moved rather than new, so the watch torn down on disconnect comes back:
+       nothing else updates a tour that was only reordered. Never before the
+       first update, whose render on a server's page has to be the server's. */
+    if (this.hasUpdated) {
+      this.watch(this.lit)
+    }
   }
 
   override disconnectedCallback(): void {
@@ -304,12 +310,17 @@ export class HelixHeadlessTour extends HelixElement {
     })
   }
 
-  /** Reads the current target's box, which is where the light falls. */
-  private light(): void {
+  /** The current stop's target while the run is open, which is what the light falls on. */
+  private get lit(): HTMLElement | null | undefined {
     const stops = this.stops
-    const target = this.open
+    return this.open
       ? stops[Math.max(0, Math.min(this.index, stops.length - 1))]?.target
       : undefined
+  }
+
+  /** Reads the current target's box, which is where the light falls. */
+  private light(): void {
+    const target = this.lit
     this.watch(target)
     if (!target || typeof target.getBoundingClientRect !== 'function') {
       this.spot = undefined
