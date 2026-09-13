@@ -165,12 +165,16 @@ export function manifests() {
  * product. `@fusion.dev/helix` and `@fusion.dev/helix-core` both answer helix;
  * `@fusion.dev/site` answers nothing, and `fusion workspace`'s `publishable` is what then
  * requires it to be private.
+ *
+ * **A `create-` prefix is read past.** `npm create @fusion.dev/helix-app` runs
+ * `@fusion.dev/create-helix-app` and no other name, so a launcher's prefix is
+ * npm's and the product is the word after it.
  */
 export const domainOf = (name) => {
   if (!name.startsWith(SCOPE)) {
     return undefined
   }
-  const bare = name.slice(SCOPE.length)
+  const bare = name.slice(SCOPE.length).replace(/^create-/, '')
   return Object.keys(DOMAINS).find(
     (domain) => bare === DOMAINS[domain] || bare.startsWith(`${DOMAINS[domain]}-`),
   )

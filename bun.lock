@@ -136,6 +136,14 @@
         "lit": "^3.2.1",
       },
     },
+    "helix/create-app": {
+      "name": "@fusion.dev/create-helix-app",
+      "version": "0.24.1",
+      "dependencies": {
+        "@fusion.dev/helix-cli": "helix/cli/npm",
+        "@fusion.dev/helix-templates": "helix/templates",
+      },
+    },
     "helix/diagnostics": {
       "name": "@fusion.dev/helix-diagnostics",
       "version": "0.24.1",
@@ -334,6 +342,8 @@
     "@fusion.dev/cli": ["@fusion.dev/cli@workspace:fusion/cli/npm", { "bin": { "fusion": "./bin.mjs" } }],
 
     "@fusion.dev/cortex-docs": ["@fusion.dev/cortex-docs@workspace:cortex/docs", {}],
+
+    "@fusion.dev/create-helix-app": ["@fusion.dev/create-helix-app@workspace:helix/create-app", { "dependencies": { "@fusion.dev/helix-cli": "helix/cli/npm", "@fusion.dev/helix-templates": "helix/templates" }, "bin": { "create-helix-app": "./bin.mjs" } }],
 
     "@fusion.dev/docs": ["@fusion.dev/docs@workspace:fusion/docs", { "devDependencies": { "@fusion.dev/scripts": "fusion/scripts" } }],
 

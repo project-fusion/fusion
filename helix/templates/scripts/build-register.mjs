@@ -1,11 +1,12 @@
 /**
  * Writes `templates.json` from the register in `src/index.ts`.
  *
- * **Because the second door is Rust and cannot read TypeScript.** `helix new`
- * is a compiled binary and `npm create helix-app` is JavaScript, and the whole
- * argument for a templates *package* is that the list lives in one place. A
- * register only one of them can read is the drift this package exists to
- * prevent, arriving through the back door.
+ * **Because the reader is Rust and cannot read TypeScript.** `helix new` is a
+ * compiled binary, and it is both doors: `npm create @fusion.dev/helix-app` runs
+ * it too. The whole argument for a templates *package* is that the list lives in
+ * one place, and a register the binary cannot read would need a second list,
+ * which is the drift this package exists to prevent, arriving through the back
+ * door.
  *
  * **Generated rather than hand-kept, and checked rather than trusted.** A JSON
  * copy somebody edits beside the TypeScript is two sources of truth wearing one

@@ -1,18 +1,19 @@
 //! `helix new`: a project from a template.
 //!
 //! **The templates are a package and this reads it**, rather than carrying
-//! copies. `helix new` and `npm create helix-app` are one capability behind two
-//! doors, and the thing that would drift between them is the templates. Both
-//! read `@fusion.dev/helix-templates`, and this reads the `templates.json` that
-//! package generates from its own register, because the other door is TypeScript
-//! and this one is a compiled binary.
+//! copies. `helix new` and `npm create @fusion.dev/helix-app` are one capability
+//! behind two doors, and both are this: the second resolves
+//! `@fusion.dev/helix-templates` and runs `helix new` on it. What is read is the
+//! `templates.json` that package generates from its TypeScript register, which a
+//! compiled binary cannot read.
 //!
 //! **It resolves from `node_modules` and does not fetch.** Adding an HTTP client,
 //! a gzip reader and a tar reader to this binary to do what npm already does is
-//! the wrong half of the pair to put it in: `npm create helix-app` is the door
-//! for somebody with no workspace yet, and npm downloads the package for them on
-//! the way in. What is left for the binary is the case where the package is
-//! already resolvable, which is every workspace that has Helix in it.
+//! the wrong half of the pair to put it in: `npm create @fusion.dev/helix-app` is
+//! the door for somebody with no workspace yet, and npm downloads the package for
+//! them on the way in, then names it in `HELIX_TEMPLATES`. What is left for the
+//! walk is the case where the package is already resolvable, which is every
+//! workspace that has Helix in it.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -72,7 +73,7 @@ fn locate(from: &Path) -> Result<PathBuf, Failure> {
         format!("cannot find {PACKAGE}"),
         "it is resolved from node_modules, and nothing above this directory has it",
     )
-    .hint("npm create helix-app@latest <name>"))
+    .hint("npm create @fusion.dev/helix-app@latest <name>"))
 }
 
 /// Holds `name` to being usable as both of the things it is.

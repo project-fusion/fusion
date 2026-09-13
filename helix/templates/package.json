@@ -1,6 +1,6 @@
 {
   "name": "@fusion.dev/helix-templates",
-  "description": "Starter templates for Helix, as data. Read by `helix new` and by `npm create helix-app`.",
+  "description": "Starter templates for Helix, as data. Read by `helix new` and by `npm create @fusion.dev/helix-app`.",
   "version": "0.24.1",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",

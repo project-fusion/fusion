@@ -2,10 +2,10 @@
  * The starter templates, as data.
  *
  * **Templates are a package rather than a directory inside a scaffolder**, which
- * is the whole reason this exists. `helix new` and `npm create helix-app` are one
- * capability behind two doors, and the thing that would drift between them is the
- * templates rather than the twenty lines of copy-and-substitute around them. Both
- * doors read this.
+ * is the whole reason this exists. `helix new` and
+ * `npm create @fusion.dev/helix-app` are one capability behind two doors, and the
+ * thing that would drift between them is the templates rather than the twenty
+ * lines of copy-and-substitute around them. Both doors read this.
  *
  * **Versioned with Helix**, so a template scaffolds against the components it was
  * written for. A template pinned to nothing is a template that stops compiling on

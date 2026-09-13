@@ -578,7 +578,7 @@ fn it_says_so_when_the_templates_package_is_not_resolvable() {
     let output = command.output().expect("the binary runs");
     assert_eq!(code(&output), 3);
     assert!(err(&output).contains("@fusion.dev/helix-templates"));
-    assert!(err(&output).contains("npm create helix-app"));
+    assert!(err(&output).contains("npm create @fusion.dev/helix-app"));
 }
 
 fn walk_files(directory: &Path, found: &mut Vec<PathBuf>) {

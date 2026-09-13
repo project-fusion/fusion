@@ -1,0 +1,38 @@
+{
+  "name": "@fusion.dev/create-helix-app",
+  "description": "Starts a Helix project: `npm create @fusion.dev/helix-app`, which is `helix new` for somebody with no project yet.",
+  "version": "0.24.1",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "helix/create-app",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "files": [
+    "bin.mjs"
+  ],
+  "bin": {
+    "create-helix-app": "./bin.mjs"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "dependencies": {
+    "@fusion.dev/helix-cli": "workspace:*",
+    "@fusion.dev/helix-templates": "workspace:*"
+  },
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "helix",
+    "create",
+    "scaffold",
+    "template",
+    "design-system"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

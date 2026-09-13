@@ -72,9 +72,14 @@ static CARGO_PUBLISH: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"cargo\s+publish").expect("a literal pattern compiles"));
 
 /// Which product a package name belongs to, or none.
+///
+/// A `create-` prefix is read past: `npm create @fusion.dev/helix-app` runs
+/// `@fusion.dev/create-helix-app` and no other name, so the prefix is npm's and
+/// the product is the word after it.
 fn domain_of<'a>(name: &str, context: &'a Context) -> Option<&'a String> {
     let scope = context.settings.scope.as_ref()?;
-    let bare = name.strip_prefix(scope.as_str())?;
+    let scoped = name.strip_prefix(scope.as_str())?;
+    let bare = scoped.strip_prefix("create-").unwrap_or(scoped);
     context
         .settings
         .domains
