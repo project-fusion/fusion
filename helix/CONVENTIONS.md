@@ -274,9 +274,14 @@ styling**.
    shadow root reports its slots as it is parsed, before any listener exists.
    A component that assigns its slots by hand hydrates a root that can only
    assign by name, so on one (`this.assignsByName`) it writes `slot` onto its
-   children with `this.route()` instead, and nowhere else. `bun run
-   check:spec:dsd` hydrates every example in Chromium against a client's render,
-   and `KNOWN` in it is the list of families that do not hydrate yet.
+   children with `this.route()` instead, and nowhere else. A parent that writes
+   state onto its children writes through `whenHydrated`, since a child's
+   hydrating render has to be the server's too. The platform settles an image a
+   server sent before anything listens, so a component asks it what happened
+   when `this.serverRendered`, and relays the answer a task later. `bun run
+   check:spec:dsd` hydrates every example in Chromium against a client's render.
+   A family that fails it is fixed, not held in `KNOWN`, which is for a finding
+   the fix is still on its way to.
 4. **Semantics on the host, presentation in the shadow root.** IDREFs do not
    cross shadow boundaries, so `aria-labelledby` inside a shadow root can never
    resolve to a light-DOM id.
