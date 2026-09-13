@@ -70,9 +70,7 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
   get avatars(): HTMLElement[] {
     /* What a render may know, since `overflow` reads this in `render`: none on
        a server, whose shim has no tree, nor while hydrating what one sent. */
-    return this.knownChildren.filter(
-      (child): child is HTMLElement => child instanceof HTMLElement,
-    )
+    return this.knownChildren.filter((child): child is HTMLElement => child instanceof HTMLElement)
   }
 
   /**
