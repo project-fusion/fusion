@@ -82,6 +82,13 @@ const published = [...manifests()].filter(
     (only === undefined || domainOf(name) === only),
 )
 
+/** Whether a package carries a binary for one platform, which is what `os` says. */
+const platformed = (manifest) => manifest.os !== undefined
+
+/** Whether that platform is this machine. */
+const forHere = (manifest) =>
+  manifest.os.includes(process.platform) && (manifest.cpu ?? [process.arch]).includes(process.arch)
+
 /* Packed first, into the scratch tree, so nothing is written into the repo. */
 const scratch = mkdtempSync(join(tmpdir(), 'helix-template-'))
 const tarballs = join(scratch, 'tarballs')
@@ -138,7 +145,17 @@ if (problems.length > 0) {
 /* From the registry the dependency is the published range, and the tarballs are
    not built at all: the point is to ask for exactly what a consumer would get. */
 if (registryTag !== undefined) {
-  for (const [name] of published) {
+  for (const [name, { manifest }] of published) {
+    /* **Not asked for, which is the test.** A consumer installs the command
+       and the package manager picks the platform package matching their `os`
+       and `cpu` from its optional dependencies. So this one is checked once
+       installed, and the others, which a consumer never gets, not at all. */
+    if (platformed(manifest)) {
+      if (forHere(manifest)) {
+        packed.push(name)
+      }
+      continue
+    }
     dependencies[name] = registryTag
     packed.push(name)
   }
@@ -249,6 +266,10 @@ function exported(installed, exports) {
 }
 
 const imports = []
+/* Platform packages packed from a tree the release has not placed binaries in,
+   which is every tree but a release's. Named in the result rather than passed
+   over, and refused by `publish.mjs` if they ever reach it like this. */
+const unplaced = []
 for (const name of packed) {
   const installed = join(project, 'node_modules', name)
   if (!existsSync(installed)) {
@@ -281,6 +302,34 @@ for (const name of packed) {
         )
       }
     }
+  }
+
+  /* **A platform package promises a file**, and neither a module nor a command:
+     the command is the package that depends on it. So what is checked is the
+     file, and that it runs and says this version where this machine can run it. */
+  if (platformed(manifest)) {
+    const [file] = manifest.files ?? []
+    const binary = file === undefined ? undefined : join(installed, file)
+    if (binary === undefined || !existsSync(binary)) {
+      if (registryTag === undefined) {
+        unplaced.push(name)
+      } else {
+        problems.push(`${name}: installed from the registry with no \`${file}\` in it.`)
+      }
+      continue
+    }
+    if (forHere(manifest)) {
+      let said = ''
+      try {
+        said = run(binary, ['--version'], project).trim()
+      } catch (error) {
+        said = String(error.stderr ?? error.message).trim()
+      }
+      if (!said.endsWith(` ${manifest.version}`)) {
+        problems.push(`${name}: \`${file} --version\` says \`${said}\`, not ${manifest.version}.`)
+      }
+    }
+    continue
   }
 
   /* **A binary is not a module, and probing it as one invents a promise the
@@ -373,5 +422,9 @@ if (problems.length > 0) {
 console.log(
   `template: ${packed.length} packages installed from ` +
     (registryTag === undefined ? 'freshly packed tarballs' : `the registry at \`${registryTag}\``) +
-    `, outside the workspace, ${imports.length} exported subpaths resolve with types`,
+    `, outside the workspace, ${imports.length} exported subpaths resolve with types` +
+    (unplaced.length === 0
+      ? ''
+      : `. ${unplaced.length} platform packages hold no binary, which a release places: ` +
+        unplaced.join(', ')),
 )
