@@ -228,7 +228,10 @@ const KNOWN = new Map([
     'image',
     'a picture that fails fires `error` while the page is parsed, before anything listens, so the event it relays is heard on some runs and not others',
   ],
-  ['kbd', 'draws Command or Ctrl for the platform, which a server cannot know'],
+  [
+    'kbd',
+    'draws Command on a Mac and Ctrl elsewhere, and a server cannot know which, so it serves Ctrl',
+  ],
   [
     'legend',
     'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
@@ -267,6 +270,15 @@ const KNOWN = new Map([
     'reads its extra controls from its children while rendering, and its muted state from the video element',
   ],
 ])
+
+/**
+ * Known families whose fault only one platform can see, by `process.platform`.
+ *
+ * Held only there, and held to hydrating everywhere else. A server always
+ * serves Kbd's Ctrl, so a Linux browser agrees with it and CI saw every example
+ * hydrate, which read as the entry spent; a Mac draws Command and does not.
+ */
+const KNOWN_ONLY_ON = new Map([['kbd', 'darwin']])
 
 /**
  * The examples not compared, each with what was measured, as parity keeps them.
@@ -615,7 +627,11 @@ const examine = async (one) => {
 
 let clean = 0
 /* Findings against a known family are counted and held rather than failed on. */
-const held = new Map([...KNOWN.keys()].map((family) => [family, 0]))
+const held = new Map(
+  [...KNOWN.keys()]
+    .filter((family) => (KNOWN_ONLY_ON.get(family) ?? process.platform) === process.platform)
+    .map((family) => [family, 0]),
+)
 for (const one of corpus.filter((each) => !UNCOMPARED.has(each.id))) {
   const found = await examine(one)
   if (held.has(one.family)) {
