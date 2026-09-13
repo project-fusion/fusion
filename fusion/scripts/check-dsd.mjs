@@ -199,10 +199,19 @@ const UNCOMPARED = new Map([
 
 const args = process.argv.slice(2)
 const changedAt = args.indexOf('--changed')
-/* The slot after `--changed` is a ref, not a family: see parity. */
+/* The slot after `--changed` is a ref, not a family: see parity. Nor is a
+   number, which is the throttle's. */
 const only = args.find(
-  (one, at) => !one.startsWith('--') && !(changedAt !== -1 && at === changedAt + 1),
+  (one, at) =>
+    !one.startsWith('--') && !/^\d+$/.test(one) && !(changedAt !== -1 && at === changedAt + 1),
 )
+
+/* **A runner's speed on a desk**, for a finding CI makes and this machine does
+   not: `--throttle 4` divides the CPU by four through the switch DevTools uses,
+   as `run-browser-specs.mjs --throttle` does. Hydration races a page's own
+   script, so how fast the machine is decides which of them wins. */
+const rate = args[args.indexOf('--throttle') + 1]
+const THROTTLE = args.includes('--throttle') ? (/^\d+$/.test(rate ?? '') ? Number(rate) : 4) : 1
 const wantsFixtures = !args.includes('--corpus')
 const wantsCorpus = !args.includes('--fixtures')
 
@@ -406,6 +415,10 @@ const tab = await browser.newPage({
   reducedMotion: 'reduce',
   viewport: { height: 800, width: WIDTH },
 })
+if (THROTTLE > 1) {
+  const session = await tab.context().newCDPSession(tab)
+  await session.send('Emulation.setCPUThrottlingRate', { rate: THROTTLE })
+}
 await tab.route('**/*', (route) =>
   route.request().url().startsWith(origin) ? route.continue() : route.abort(),
 )
