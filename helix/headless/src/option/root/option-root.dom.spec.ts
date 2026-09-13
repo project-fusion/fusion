@@ -106,3 +106,20 @@ describe('option', () => {
     expect(host.text).not.toContain('lit$')
   })
 })
+
+describe('the options among some elements', () => {
+  test('are known by their shape, so a second copy of the class still finds them', async () => {
+    /* A tag is defined by whichever copy registered it first, and a copy
+       testing `instanceof` against its own class found no option on the page. */
+    const { optionsAmong } = await import('./option-root.js')
+    const option = (value: string): Element =>
+      Object.assign(document.createElement('div'), { selected: false, text: value, value })
+    const loose = option('one')
+    const grouped = option('two')
+    const group = document.createElement('div')
+    group.append(grouped, document.createElement('div'))
+
+    const found: Element[] = optionsAmong([loose, group, document.createElement('div')])
+    expect(found).toEqual([loose, grouped])
+  })
+})

@@ -10,15 +10,21 @@ import { property } from 'lit/decorators.js'
  * render has made it, so the listbox has none on a first render, and on a page a
  * server rendered the `slotchange` that would correct it fires before anything
  * listens.
+ *
+ * **An option by its shape, not by `instanceof`.** A tag is defined once, by
+ * whichever copy of this class registered it first, and a second copy in the
+ * same document tests against a class no element on the page has: every option
+ * failed it, and a select said "Choose" over its value. Two copies are a
+ * consumer with a duplicated dependency, or the browser specs, where each
+ * family's bundle carries its own and they share one page.
  */
-export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[] =>
-  elements.flatMap((element) =>
-    element instanceof HelixHeadlessOption
-      ? [element]
-      : [...element.children].filter(
-          (inner): inner is HelixHeadlessOption => inner instanceof HelixHeadlessOption,
-        ),
+export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[] => {
+  const isOption = (element: Element): element is HelixHeadlessOption =>
+    'text' in element && 'value' in element && 'selected' in element
+  return elements.flatMap((element) =>
+    isOption(element) ? [element] : [...element.children].filter(isOption),
   )
+}
 
 /**
  * @summary One choice in a listbox.
