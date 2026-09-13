@@ -1,5 +1,12 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
-import { html, nothing, type SVGTemplateResult, svg, type TemplateResult } from 'lit'
+import {
+  html,
+  nothing,
+  type PropertyValues,
+  type SVGTemplateResult,
+  svg,
+  type TemplateResult,
+} from 'lit'
 import { property } from 'lit/decorators.js'
 import { encode } from 'uqr'
 
@@ -177,6 +184,23 @@ export class HelixHeadlessQrCode extends HelixElement {
 
   /** Whether anything is slotted into the middle. */
   private logo = false
+
+  /* Read from the children before each render, so the first draws the code at
+     the level a logo needs and with the logo in it. Heard from the slot alone,
+     the first render drew it without and a second followed, and a hydrated code
+     kept a hole-free pattern and no logo: a declarative shadow root reports its
+     slots before anything listens. `slotchange` still answers a later change. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (this.childrenKnown) {
+      this.logo = this.knownChildren.some((child) => child.slot === 'logo')
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
 
   /** The level actually used, which the slot can raise. */
   private get level(): QrCorrection {

@@ -17,6 +17,7 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
+import { optionsAmong } from '../../option/root/option-root.js'
 /* Relative, so this registers the base listbox and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../listbox/index.js'
@@ -299,12 +300,14 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * so a tag does not move out from under the pointer about to remove it.
    */
   private get chosen(): { text: string; value: string }[] {
-    const options = this.listbox?.options ?? []
+    /* Off this element's own children, not the listbox's: see `optionsAmong`.
+       None on a server or while hydrating what one sent. */
+    const options = optionsAmong(this.knownChildren)
     /* Nothing at all is not the same as nothing matching.
      *
      * On the server there are no options to look in, because they are light DOM
-     * children the server cannot see, and before the slot is assigned there are
-     * none either. Falling back there would put the raw value on screen for one
+     * children the server cannot see, nor while hydrating what it sent. Falling
+     * back there would put the raw value on screen for one
      * paint and then swap it for the option's words, which reads as the field
      * correcting a mistake. With options present, a value none of them carries
      * is a created one, and showing it is the only way to show it at all. */
@@ -613,6 +616,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   private sync(): void {
     this.internals.setFormValue(this.value === '' ? null : this.value)
     this.reportRequired(this.value === '', 'Choose one to continue.', 'control')
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override willUpdate(changed: PropertyValues): void {

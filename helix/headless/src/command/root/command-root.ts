@@ -123,6 +123,11 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * child element, which is the slot, so `:not(:has(*))` on it is never true
    * and an empty footer would draw its rule and its padding over nothing. Steps
    * was caught by the same thing.
+   *
+   * Read from the children before each render, and heard from the slot when
+   * they change. The slot alone left the first render without its footer and a
+   * second to follow, and a hydrated palette without one for good: a
+   * declarative shadow root reports its slots before anything listens.
    */
   @state()
   private footed = false
@@ -270,6 +275,18 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('keydown', this.handleAlternate, { capture: true })
     this.removeEventListener('click', this.handleAlternate, { capture: true })
     document.removeEventListener('keydown', this.handleHotkey)
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (this.childrenKnown) {
+      this.footed = this.knownChildren.some((child) => child.slot === 'footer')
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override updated(changed: PropertyValues): void {

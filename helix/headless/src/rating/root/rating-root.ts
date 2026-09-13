@@ -146,6 +146,9 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   @state()
   private markSource: Element | undefined = undefined
 
+  /** Whether `markSource` has had its first answer from the children. */
+  private markRead = false
+
   /**
    * What the pointer is over, which is shown instead of the score while it is.
    */
@@ -377,8 +380,21 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     this.sync()
   }
 
+  /* The first shape from the children, before the render that clones it. The
+     slot alone left the first render with the stock mark and a second to
+     follow, and a hydrated row with it for good: a declarative shadow root
+     reports its slots before anything listens. `slotchange` answers after. */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (!this.markRead && this.childrenKnown) {
+      this.markRead = true
+      this.markSource = this.knownChildren.find((child) => child.slot === 'mark')
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
+    this.finishHydration()
     this.sync()
   }
 

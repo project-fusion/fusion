@@ -273,3 +273,21 @@ declare global {
     'helix-headless-option': HelixHeadlessOption
   }
 }
+
+/**
+ * The options among some elements, reaching one level into a group.
+ *
+ * What a control holding options reads its words from, off its own children
+ * rather than off the listbox they are slotted into: the slot exists only once a
+ * render has made it, so the listbox has none on a first render, and on a page a
+ * server rendered the `slotchange` that would correct it fires before anything
+ * listens.
+ */
+export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[] =>
+  elements.flatMap((element) =>
+    element instanceof HelixHeadlessOption
+      ? [element]
+      : [...element.children].filter(
+          (inner): inner is HelixHeadlessOption => inner instanceof HelixHeadlessOption,
+        ),
+  )

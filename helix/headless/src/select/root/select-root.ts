@@ -14,7 +14,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
-import { HelixHeadlessOption } from '../../option/root/option-root.js'
+import { optionsAmong } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
 
 /**
@@ -221,14 +221,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   private get display(): string {
     const chosen = new Set(this.value === '' ? [] : this.value.split(','))
-    const options = this.knownChildren.flatMap((child) =>
-      child instanceof HelixHeadlessOption
-        ? [child]
-        : [...child.children].filter(
-            (inner): inner is HelixHeadlessOption => inner instanceof HelixHeadlessOption,
-          ),
-    )
-    const words = options.filter((option) => chosen.has(option.value)).map((option) => option.text)
+    const words = optionsAmong(this.knownChildren)
+      .filter((option) => chosen.has(option.value))
+      .map((option) => option.text)
     return words.length > 0 ? words.join(', ') : this.placeholder
   }
 

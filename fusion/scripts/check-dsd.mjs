@@ -195,24 +195,10 @@ const KNOWN = new Map([
     '`controlled` names the slide at `index`, and a hydrating render has no slides to find it among',
   ],
   [
-    'combobox',
-    'draws its chosen tags from its options while rendering, which a server cannot read',
-  ],
-  ['command', 'its items lay out lower once hydrated than on a client; cause not traced'],
-  [
     'image',
     'a picture that fails fires `error` while the page is parsed, before anything listens, so the event it relays is heard on some runs and not others',
   ],
-  [
-    'qr-code',
-    'a slotted logo is found through `slotchange`, which a declarative shadow root fires before anything listens',
-  ],
-  [
-    'rating',
-    'a slotted icon is found through `slotchange`, which a declarative shadow root fires before anything listens',
-  ],
   ['sandbox', "the site's editor, whose leading pane differs once hydrated; cause not traced"],
-  ['steps', 'the current step is marked on a client and not once hydrated; cause not traced'],
   ['tour', 'places its stop against a target elsewhere in the page, which a server cannot see'],
   [
     'video',
