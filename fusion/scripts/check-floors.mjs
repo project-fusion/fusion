@@ -92,10 +92,12 @@ const bare = (command) => command.replace(/^(?:node|bun) /, '')
 const EXEMPT = [
   /* Itself. */
   'fusion/scripts/check-floors.mjs',
-  /* The four that `verify.yml` gives their own `browser` jobs. Running them
+  /* The five that `verify.yml` gives their own `browser` jobs. Running them
      here too makes one shard render the entire browser matrix a second time,
      single file, while the six jobs built for it sit idle, and that shard then
-     sets the critical path for the whole workflow.
+     sets the critical path for the whole workflow. `check-dsd` is the costliest
+     of them: its corpus hydrates every example, and run from here it took
+     `verify` from a few minutes to half an hour.
 
      The floor they lose is real and is the cheaper half of the trade: each
      already fails loudly on an empty corpus, because rendering nothing and
@@ -103,6 +105,7 @@ const EXEMPT = [
      empty directory reports a confident zero. */
   'fusion/scripts/check-contrast.mjs',
   'fusion/scripts/check-diagnostics.mjs',
+  'fusion/scripts/check-dsd.mjs',
   'fusion/scripts/check-visual.mjs',
   'fusion/scripts/check-visual-parity.mjs',
   /* The three that compare a committed file against a fresh derivation of the
