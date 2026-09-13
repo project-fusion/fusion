@@ -189,10 +189,19 @@ slot[name="caption"]::slotted(*) {
  * the space one would have taken: `gap` is charged between tracks whether or not
  * a track has anything in it. */
 slot[name="detail"]::slotted(*) {
-  display: block;
   margin-block: var(--helix-space-2xs) var(--helix-space-none);
   margin-inline: var(--helix-space-none);
 }
+
+/* **No `display` here, and there was one.** The slot is a child of the body's
+   grid, so what it is given is already a grid item and already block-level.
+   What `display: block` did add was an override: a `::slotted()` rule beats the
+   slotted element's own `:host` whatever its specificity, so a `Flex` in the
+   detail became a block and its `gap` nothing, and the markup twin kept its
+   spacing only through the whitespace between its tags, which JSX does not
+   write. Giving the slot a box instead is not the way out either: the body's
+   `gap` is then charged for a row with no detail, which is what the margin
+   above exists to avoid. */
 
 /* **A linked title is the row's title, drawn in the row's ink.**
  *

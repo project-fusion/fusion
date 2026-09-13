@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react'
+import './read-on-the-server.css'
 
 /** Stands in for the round trip a real page would make. */
 const acknowledge = async (): Promise<boolean> => Promise.resolve(true)
@@ -47,6 +48,7 @@ export function Example() {
 
   return (
     <helix-notifications
+      className="feed"
       label="Activity"
       mark-all
     >

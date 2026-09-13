@@ -1,6 +1,11 @@
+import './grouped.css'
+
 export function Example() {
   return (
-    <helix-notifications label="Notifications">
+    <helix-notifications
+      className="feed"
+      label="Notifications"
+    >
       <h2 slot="header">Notifications</h2>
 
       {/* Cut by day here. What groups with what is the consumer's: this element

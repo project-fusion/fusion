@@ -1,6 +1,11 @@
+import './carded.css'
+
 export function Example() {
   return (
-    <helix-notifications label="Notifications">
+    <helix-notifications
+      className="feed"
+      label="Notifications"
+    >
       <h2 slot="header">Notifications</h2>
 
       {/* A reminder, and the actions are the point of it, so they are drawn
