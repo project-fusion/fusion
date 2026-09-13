@@ -186,16 +186,8 @@ const FIXTURES = [
  * run until the entry comes out: a list nobody is made to shorten only grows.
  */
 const KNOWN = new Map([
-  [
-    'carousel',
-    '`controlled` names the slide at `index`, and a hydrating render has no slides to find it among',
-  ],
   ['sandbox', "the site's editor, whose leading pane differs once hydrated; cause not traced"],
   ['tour', 'places its stop against a target elsewhere in the page, which a server cannot see'],
-  [
-    'video',
-    'reads its extra controls from its children while rendering, and its muted state from the video element',
-  ],
 ])
 
 /**

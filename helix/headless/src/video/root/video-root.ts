@@ -521,8 +521,11 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /** Whether this platform can do a named control at all. */
   private offers(one: string): boolean {
+    /* As a server answers while hydrating what it sent: it has no document to
+       ask, so it offered none, and a render that differs is a template Lit
+       throws on. The update after hydration asks. */
     if (one === 'pip') {
-      return typeof document !== 'undefined' && document.pictureInPictureEnabled
+      return !this.hydrating && typeof document !== 'undefined' && document.pictureInPictureEnabled
     }
     /* Availability, not support. A device that can play this has to exist for
        the button to mean anything: an AirPlay control with nothing to send to
@@ -1422,6 +1425,16 @@ export class HelixHeadlessVideo extends HelixElement {
     this.finishHydration()
     const video = this.video
     if (video) {
+      /* **Silent as asked, which the attribute alone did not make it.** The
+         platform starts a video muted from its `muted` attribute only when the
+         parser creates it; one a template creates takes the attribute after, as
+         `defaultMuted`, and plays with sound, and a browser blocks the autoplay
+         a muted video is allowed. A `muted` set before the render, React's way
+         of writing it, reached no video at all. Measured: `muted` false under
+         the attribute on a client, true on a page a server sent. */
+      if (this.defaultMuted || this.silent) {
+        video.muted = true
+      }
       this.silent = video.muted
       this.loudness = video.volume
       video.remote?.addEventListener?.('connect', this.handleRemoteState)

@@ -145,6 +145,9 @@ export class HelixHeadlessCarousel extends HelixElement {
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
 
+  /** How many panes were drawn at the last update, to scroll when the first are. */
+  private scrolledFor = 0
+
   /**
    * Accessible name for the carousel.
    */
@@ -642,9 +645,17 @@ export class HelixHeadlessCarousel extends HelixElement {
      * Not from inside `goTo`'s apply callback: that returns early in controlled
      * mode, so the dots update and the slides sit still, and it is not the only
      * path in either, a plain `carousel.index = 2` reaching no apply at all. */
-    if (changed.has('index')) {
+    const count = this.slides.length
+    /* And the first time there are panes to follow it to: a carousel whose
+       slides arrived after its first render, which is every carousel that
+       hydrated a server's markup, had an `index` and nothing to scroll to, and
+       stayed on the first slide. Panes drawn, not slides known, because the
+       render that hydrated drew none while the slides were already there. */
+    const drawn = this.renderRoot.querySelectorAll('[part="slide"]').length
+    if (changed.has('index') || (this.scrolledFor === 0 && drawn > 0)) {
       this.scrollToIndex()
     }
+    this.scrolledFor = drawn
     this.runTimer()
     /* Back inside the set when the set shrinks.
      *
@@ -653,7 +664,6 @@ export class HelixHeadlessCarousel extends HelixElement {
      * dot and a focus restore pointing at nothing. In `updated` rather than
      * `willUpdate` because `slides` is empty on the server, and through `goTo`
      * so a controlled consumer is told rather than overwritten. */
-    const count = this.slides.length
     if (count > 0 && this.index > count - 1) {
       this.goTo(count - 1)
     }
