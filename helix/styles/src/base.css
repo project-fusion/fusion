@@ -1267,7 +1267,12 @@ helix-toast:not([data-color-mode]) {
 /* **A list in an answer is prose, not a menu.** `List`'s rows are spaced for a
    pointer to land on; bullets in a paragraph's rhythm want the gap between
    lines, with the marker hanging in the gutter the list already keeps for it. */
-:where(helix-chat-message) :where(helix-list[kind="ordered"], helix-list[kind="unordered"]) {
+/* On the item, which is what reads the hook: set on the list it reached the
+   rows by inheritance, which works and which the diagnostics collector cannot
+   credit, so it reported the rule as a hook nothing reads. */
+:where(helix-chat-message)
+  :where(helix-list[kind="ordered"], helix-list[kind="unordered"])
+  > :where(helix-list-item) {
   --list-item-padding: var(--helix-space-2xs) var(--helix-space-none);
 }
 
