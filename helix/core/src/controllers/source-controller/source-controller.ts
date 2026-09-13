@@ -32,6 +32,8 @@ export interface SourceHost extends ReactiveControllerHost, HTMLElement {
 export class SourceController implements ReactiveController {
   #host: SourceHost
   #observer: MutationObserver | undefined
+  /** Whether a hydrating render was told there was nothing, and needs the render after. */
+  #deferred = false
 
   constructor(host: SourceHost) {
     this.#host = host
@@ -44,10 +46,18 @@ export class SourceController implements ReactiveController {
    * Null on the server as well, since resolving an id wants a document. Every
    * chart inherits that: the table is served whole and the drawing arrives on
    * hydration.
+   *
+   * **And null while hydrating what a server sent**, which drew nothing, because
+   * the render that hydrates has to be the server's: a drawing that differs is
+   * a template Lit throws on. The update after it, which this asks for, draws.
    */
   get element(): Element | null {
     const host = this.#host
     if (host.for === '') {
+      return null
+    }
+    if ((host as unknown as { hydrating?: boolean }).hydrating === true) {
+      this.#deferred = true
       return null
     }
     const root = host.getRootNode() as Document | ShadowRoot
@@ -76,6 +86,14 @@ export class SourceController implements ReactiveController {
 
   hostConnected(): void {
     this.watch()
+  }
+
+  /* The drawing a hydrating render left out, asked for once it is done. */
+  hostUpdated(): void {
+    if (this.#deferred) {
+      this.#deferred = false
+      this.#host.requestUpdate()
+    }
   }
 
   hostDisconnected(): void {

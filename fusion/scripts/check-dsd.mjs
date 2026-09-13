@@ -187,16 +187,8 @@ const FIXTURES = [
  */
 const KNOWN = new Map([
   [
-    'area-chart',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
-  ],
-  [
     'avatar',
     'a failed image fires `error` while the page is parsed, before anything listens, so the fallback never shows; a group counts its avatars while rendering',
-  ],
-  [
-    'bar-chart',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
   ],
   [
     'carousel',
@@ -215,15 +207,7 @@ const KNOWN = new Map([
     'data-table',
     'its examples set rows from a script after the server rendered, and its page size is a Select',
   ],
-  [
-    'donut-chart',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
-  ],
   ['format-date', 'reads its date from its own text while rendering, which a server cannot see'],
-  [
-    'heatmap',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
-  ],
   [
     'image',
     'a picture that fails fires `error` while the page is parsed, before anything listens, so the event it relays is heard on some runs and not others',
@@ -231,14 +215,6 @@ const KNOWN = new Map([
   [
     'kbd',
     'draws Command on a Mac and Ctrl elsewhere, and a server cannot know which, so it serves Ctrl',
-  ],
-  [
-    'legend',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
-  ],
-  [
-    'line-chart',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
   ],
   ['notifications', 'its times are Format Date, which reads its date from its own text'],
   ['pagination', 'its page size is a Select'],
@@ -252,16 +228,8 @@ const KNOWN = new Map([
   ],
   ['sandbox', "the site's editor, whose leading pane differs once hydrated; cause not traced"],
   [
-    'scatter-chart',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
-  ],
-  [
     'select',
     "draws the chosen option's label from its options while rendering, which a server cannot read, and hydration keeps the placeholder",
-  ],
-  [
-    'sparkline',
-    'draws from the table `for` names, which `MixinChartSource` reads while rendering and a server cannot resolve',
   ],
   ['steps', 'the current step is marked on a client and not once hydrated; cause not traced'],
   ['tour', 'places its stop against a target elsewhere in the page, which a server cannot see'],
