@@ -41,11 +41,14 @@
  * separate tags and a release of one leaves the other alone. `fusion workspace`'s `publishable`
  * holds the manifests to a single string; this writes it.
  *
- * **`cortex` spans two package managers.** `@fusion.dev/cortex-docs` is npm and the
- * crates are Cargo, and the version they share lives in `[workspace.package]`.
- * Stamping writes both. Note that this leaves `Cargo.lock` naming the old
- * version of the workspace crates, so anything running afterwards must let
- * cargo update it rather than passing `--locked`.
+ * **A domain spans two package managers.** Its npm packages and its crates carry
+ * one version, and each crate holds its own line rather than inheriting one,
+ * which the root manifest says why. Stamping writes every crate the workspace
+ * lists under the domain's folder, and a binary built afterwards reports the
+ * release: `helix --version` read `0.0.0-dev` in every package that shipped it
+ * until this did. Note that this leaves `Cargo.lock` naming the old version of
+ * those crates, so anything running afterwards must let cargo update it rather
+ * than passing `--locked`.
  *
  * Pre-release versions are never tagged, so a tag scan ignores anything
  * carrying a `-`. An experimental build off a pull request is
@@ -203,18 +206,27 @@ if (flag('write')) {
     written.push(directory)
   }
 
-  /* The crates share the domain's version through `[workspace.package]`. */
-  if (domain === 'cortex') {
-    const file = join(root, 'Cargo.toml')
-    const toml = readFileSync(file, 'utf8')
-    const section = toml.indexOf('[workspace.package]')
-    if (section === -1) {
-      fail('Cargo.toml has no `[workspace.package]`, which is where the Cortex version lives.')
+  /* Each crate's own `version`, in its `[package]`. This wrote the root's
+     `[workspace.package]` once, which has had no `version` since the crates
+     stopped inheriting one, so the replace matched nothing and every crate
+     shipped the placeholder while this reported it stamped. */
+  const members = /members\s*=\s*\[([^\]]*)\]/.exec(readFileSync(join(root, 'Cargo.toml'), 'utf8'))
+  for (const [, crate] of (members?.[1] ?? '').matchAll(/"([^"]+)"/g)) {
+    if (!crate.startsWith(`${DOMAINS[domain]}/`)) {
+      continue
     }
-    const head = toml.slice(0, section)
-    const tail = toml.slice(section).replace(/^version = "[^"]*"$/m, `version = "${version}"`)
-    writeFileSync(file, head + tail)
-    written.push('Cargo.toml')
+    const file = join(root, crate, 'Cargo.toml')
+    const toml = readFileSync(file, 'utf8')
+    const section = toml.indexOf('[package]')
+    const next = toml.indexOf('\n[', section + 1)
+    const end = next === -1 ? toml.length : next
+    const own = toml.slice(section, end)
+    if (section === -1 || !/^version = "[^"]*"$/m.test(own)) {
+      fail(`${crate}/Cargo.toml has no \`version\` of its own under \`[package]\` to stamp.`)
+    }
+    const stamped = own.replace(/^version = "[^"]*"$/m, `version = "${version}"`)
+    writeFileSync(file, toml.slice(0, section) + stamped + toml.slice(end))
+    written.push(crate)
   }
 
   console.error(`${domain} ${version}: stamped ${written.length} manifests (${written.join(', ')})`)
