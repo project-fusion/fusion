@@ -108,6 +108,24 @@ export class HelixHeadlessAvatar extends HelixElement {
     })
   }
 
+  /* **An image a server sent was fetched while the page was parsed**, and its
+     `load` or `error` fired before anything here could listen: a broken one
+     never fell back to initials and nothing was relayed. So it is asked what
+     already happened, once: the fallback is now, and the relay a task later,
+     so a page's scripts, which run once the definitions have hydrated what the
+     server sent, are listening when it arrives, as they are for a real one. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    const image = this.serverRendered ? this.renderRoot.querySelector('img') : null
+    if (image?.complete) {
+      const broken = image.naturalWidth === 0
+      if (broken) {
+        this.failed = true
+      }
+      setTimeout(() => this.relayNativeEvent(new Event(broken ? 'error' : 'load')))
+    }
+  }
+
   protected override render(): TemplateResult {
     if (this.src !== '' && !this.failed) {
       return html`<img

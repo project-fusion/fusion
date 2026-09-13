@@ -68,9 +68,9 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
 
   /** The avatars, in light-DOM order. Empty on the server, which has no tree. */
   get avatars(): HTMLElement[] {
-    /* `?? []` is the server: Lit's element shim carries attributes and not a
-       tree, so `children` is undefined there and spreading it throws. */
-    return [...(this.children ?? [])].filter(
+    /* What a render may know, since `overflow` reads this in `render`: none on
+       a server, whose shim has no tree, nor while hydrating what one sent. */
+    return this.knownChildren.filter(
       (child): child is HTMLElement => child instanceof HTMLElement,
     )
   }
@@ -95,6 +95,11 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'group' })
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override updated(changed: PropertyValues): void {

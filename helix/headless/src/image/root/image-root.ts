@@ -168,8 +168,19 @@ export class HelixHeadlessImage extends HelixElement {
        complete when the listener attached, which is the cached case, and the
        platform fired its `load` before anyone was listening. The synthesized
        one carries the native propagation rather than defaults, so a consumer
-       cannot tell the two paths apart. */
-    this.dispatchEvent(new Event(name, { bubbles: false, cancelable: false, composed: false }))
+       cannot tell the two paths apart.
+
+       A task later where a server sent the picture, so a page's scripts, which
+       run once the definitions have hydrated what was sent, are listening when
+       it arrives, as they would be for the real one. */
+    const send = (): void => {
+      this.dispatchEvent(new Event(name, { bubbles: false, cancelable: false, composed: false }))
+    }
+    if (this.serverRendered) {
+      setTimeout(send)
+    } else {
+      send()
+    }
   }
 
   private readonly handleLoad = (event: Event): void => {
@@ -195,13 +206,22 @@ export class HelixHeadlessImage extends HelixElement {
    * image it has, so deciding `error` here calls every picture broken the moment
    * it renders. Failure has an event of its own and that event is reliable, so
    * this is only here to catch the success that happened too early to hear.
+   *
+   * **Except for a picture a server sent**, which a real browser's parser has
+   * already fetched: finished with no pixels there is a failure, and its `error`
+   * fired before anything could listen, so the placeholder stayed up over a
+   * picture that was never coming.
    */
   private settle(): void {
     const image = this.renderRoot?.querySelector('img')
-    if (this.src === '' || !image?.complete || image.naturalWidth === 0) {
+    if (this.src === '' || !image?.complete) {
       return
     }
-    this.announce('loaded')
+    if (image.naturalWidth > 0) {
+      this.announce('loaded')
+    } else if (this.serverRendered) {
+      this.announce('error')
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {

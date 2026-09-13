@@ -187,16 +187,8 @@ const FIXTURES = [
  */
 const KNOWN = new Map([
   [
-    'avatar',
-    'a failed image fires `error` while the page is parsed, before anything listens, so the fallback never shows; a group counts its avatars while rendering',
-  ],
-  [
     'carousel',
     '`controlled` names the slide at `index`, and a hydrating render has no slides to find it among',
-  ],
-  [
-    'image',
-    'a picture that fails fires `error` while the page is parsed, before anything listens, so the event it relays is heard on some runs and not others',
   ],
   ['sandbox', "the site's editor, whose leading pane differs once hydrated; cause not traced"],
   ['tour', 'places its stop against a target elsewhere in the page, which a server cannot see'],

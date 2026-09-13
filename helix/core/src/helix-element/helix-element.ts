@@ -629,6 +629,17 @@ export class HelixElement extends LitElement {
   }
 
   /**
+   * Whether this element hydrated a server's markup rather than rendering its own.
+   *
+   * For what happened before hydration and cannot be heard after it: an image
+   * the parser fetched fires `load` or `error` before any listener exists, so a
+   * component asks the image instead, once, when this is true.
+   */
+  protected get serverRendered(): boolean {
+    return this.fromServer
+  }
+
+  /**
    * Asks for the update a hydration put off, so the reads it skipped happen.
    *
    * Called from `firstUpdated`, the end of the hydrating update. The render it
