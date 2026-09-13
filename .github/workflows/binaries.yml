@@ -1,10 +1,14 @@
 # The `helix` binary, built for every platform package.
 #
-# Called by `release.yml` and `release-experimental.yml` before they pack, and
-# never on its own: a binary reports a version, and only a release has one.
-# Each lands as an artifact named for its platform package, the release puts it
-# where that package's `files` says, and `publish.mjs` refuses a platform
-# package without it: [RELEASING.md](../RELEASING.md#the-binary).
+# Called by `release.yml` and `release-experimental.yml` before they pack, with
+# the version they are about to publish. Each binary lands as an artifact named
+# for its platform package, the release puts it where that package's `files`
+# says, and `publish.mjs` refuses a platform package without it:
+# [RELEASING.md](../RELEASING.md#the-binary).
+#
+# **And on a pull request that could break one**, at the placeholder and
+# uploading nothing. A platform that stops compiling would otherwise be found
+# by the release, which then ships no Helix at all until somebody fixes it.
 
 name: binaries
 
@@ -15,6 +19,13 @@ on:
         description: What the binary reports, which is the version being published.
         required: true
         type: string
+  pull_request:
+    paths:
+      - .github/workflows/binaries.yml
+      - Cargo.lock
+      - Cargo.toml
+      - helix/cli/**
+      - helix/theme/**
 
 permissions:
   contents: read
@@ -54,6 +65,9 @@ jobs:
     timeout-minutes: 30
     env:
       BINARY: target/${{ matrix.target }}/release/helix${{ startsWith(matrix.platform, 'win32') && '.exe' || '' }}
+      # A pull request has no version to give it, and the placeholder is what
+      # the crate already says.
+      VERSION: ${{ inputs.version || '0.0.0-dev' }}
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -80,8 +94,6 @@ jobs:
       # the first `version` at the start of a line is the package's.
       - name: Stamp the version into the crate
         shell: bash
-        env:
-          VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
           perl -0pi.bak -e 's/^version = "[^"]*"$/version = "$ENV{VERSION}"/m' helix/cli/Cargo.toml
@@ -95,14 +107,13 @@ jobs:
       - name: Prove it reports the version
         if: matrix.runs
         shell: bash
-        env:
-          VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
           said=$("$BINARY" --version)
           [ "$said" = "helix $VERSION" ] || { echo "::error::$BINARY says '$said', not 'helix $VERSION'"; exit 1; }
 
       - name: Upload
+        if: inputs.version != ''
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: error
