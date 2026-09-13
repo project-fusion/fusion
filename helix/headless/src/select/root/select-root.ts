@@ -14,6 +14,7 @@ import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
+import { HelixHeadlessOption } from '../../option/root/option-root.js'
 import '../../listbox/index.js'
 
 /**
@@ -210,12 +211,24 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * Read off the options rather than stored, because the words are the
    * consumer's content and storing a copy is storing something that goes stale
    * the moment they change it.
+   *
+   * **Off this element's own children, not the listbox's**, which reach the
+   * listbox through a slot and so only after a render has made it: read there,
+   * the first render showed the placeholder over a chosen value and waited on a
+   * `slotchange`, which a declarative shadow root fires before anything listens,
+   * so a hydrated select kept "Choose" for good. Nothing on a server or while
+   * hydrating what one sent, which drew the placeholder too.
    */
   private get display(): string {
     const chosen = new Set(this.value === '' ? [] : this.value.split(','))
-    const words = (this.listbox?.options ?? [])
-      .filter((option) => chosen.has(option.value))
-      .map((option) => option.text)
+    const options = this.knownChildren.flatMap((child) =>
+      child instanceof HelixHeadlessOption
+        ? [child]
+        : [...child.children].filter(
+            (inner): inner is HelixHeadlessOption => inner instanceof HelixHeadlessOption,
+          ),
+    )
+    const words = options.filter((option) => chosen.has(option.value)).map((option) => option.text)
     return words.length > 0 ? words.join(', ') : this.placeholder
   }
 
@@ -290,6 +303,11 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     hostAria(this.internals, { label: this.label })
   }
 
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.sync()
@@ -349,11 +367,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       @change=${this.stopInner}
       @input=${this.stopInner}
     >
-      <!-- The trigger's words are read off the options, and on the first
-           render there are none: the slot has not been assigned yet, so a
-           select with a value came up showing its placeholder. Assignment
-           changes no property, so nothing else would schedule the update
-           that fixes it. -->
+      <!-- An option arriving or leaving changes no property, so this is what
+           schedules the update that rereads the trigger's words. -->
       <slot @slotchange=${() => this.requestUpdate()}></slot>
     </${this.tag('listbox')}>`
   }

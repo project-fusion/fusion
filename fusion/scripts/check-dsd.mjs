@@ -195,29 +195,14 @@ const KNOWN = new Map([
     '`controlled` names the slide at `index`, and a hydrating render has no slides to find it among',
   ],
   [
-    'chat',
-    'its preview writes turns from a script after the server rendered, and its model pickers are Select',
-  ],
-  [
     'combobox',
     'draws its chosen tags from its options while rendering, which a server cannot read',
   ],
   ['command', 'its items lay out lower once hydrated than on a client; cause not traced'],
   [
-    'data-table',
-    'its examples set rows from a script after the server rendered, and its page size is a Select',
-  ],
-  ['format-date', 'reads its date from its own text while rendering, which a server cannot see'],
-  [
     'image',
     'a picture that fails fires `error` while the page is parsed, before anything listens, so the event it relays is heard on some runs and not others',
   ],
-  [
-    'kbd',
-    'draws Command on a Mac and Ctrl elsewhere, and a server cannot know which, so it serves Ctrl',
-  ],
-  ['notifications', 'its times are Format Date, which reads its date from its own text'],
-  ['pagination', 'its page size is a Select'],
   [
     'qr-code',
     'a slotted logo is found through `slotchange`, which a declarative shadow root fires before anything listens',
@@ -227,10 +212,6 @@ const KNOWN = new Map([
     'a slotted icon is found through `slotchange`, which a declarative shadow root fires before anything listens',
   ],
   ['sandbox', "the site's editor, whose leading pane differs once hydrated; cause not traced"],
-  [
-    'select',
-    "draws the chosen option's label from its options while rendering, which a server cannot read, and hydration keeps the placeholder",
-  ],
   ['steps', 'the current step is marked on a client and not once hydrated; cause not traced'],
   ['tour', 'places its stop against a target elsewhere in the page, which a server cannot see'],
   [
@@ -238,15 +219,6 @@ const KNOWN = new Map([
     'reads its extra controls from its children while rendering, and its muted state from the video element',
   ],
 ])
-
-/**
- * Known families whose fault only one platform can see, by `process.platform`.
- *
- * Held only there, and held to hydrating everywhere else. A server always
- * serves Kbd's Ctrl, so a Linux browser agrees with it and CI saw every example
- * hydrate, which read as the entry spent; a Mac draws Command and does not.
- */
-const KNOWN_ONLY_ON = new Map([['kbd', 'darwin']])
 
 /**
  * The examples not compared, each with what was measured, as parity keeps them.
@@ -393,6 +365,21 @@ const fixturePage = (mode) => {
   return `<!doctype html><meta charset="utf-8"><title>dsd</title>${holders}${PARSED}<script src="/frame.js"></script>`
 }
 
+/**
+ * The example's own scripts, made to run after hydration rather than before it.
+ *
+ * **The order a server-rendered page runs in.** There the definitions load and
+ * hydrate what was sent, and the page's scripts then change it. An example's
+ * inline script runs mid-parse, before any definition, so on the server's page
+ * it set properties the server never rendered with, a `date`, a table's `rows`,
+ * and hydration met a value the markup did not show: a fault of the harness,
+ * not the component, and one Lit documents as the consumer's to avoid. A module
+ * script runs after parsing, in order after the deferred bundle, and each
+ * script's microtasks, where the hydrating updates are, run before the next.
+ * The client's page keeps the scripts where the example put them.
+ */
+const afterHydration = (markup) => markup.replaceAll('<script>', '<script type="module">')
+
 /* The page parity takes a picture of, so the two harnesses agree on what an
    example looks like: the tier's sheet, the example's own, and a fixed width.
    `defer`, for the reason parity records: an element that upgrades mid-parse
@@ -404,7 +391,7 @@ const corpusPage = (one, mode) =>
   '<style>:root{color-scheme:light}' +
   `body{margin:0;padding:24px;background:#fff;width:${WIDTH}px;box-sizing:border-box}</style>` +
   `<script defer src="/frame.js"></script>` +
-  (mode === 'server' ? server[one.id].server : one.markup) +
+  (mode === 'server' ? afterHydration(server[one.id].server) : one.markup) +
   (mode === 'server' ? PARSED : '')
 
 const listening = Bun.serve({
@@ -594,16 +581,18 @@ const examine = async (one) => {
 }
 
 let clean = 0
+const heldLines = []
 /* Findings against a known family are counted and held rather than failed on. */
-const held = new Map(
-  [...KNOWN.keys()]
-    .filter((family) => (KNOWN_ONLY_ON.get(family) ?? process.platform) === process.platform)
-    .map((family) => [family, 0]),
-)
+const held = new Map([...KNOWN.keys()].map((family) => [family, 0]))
 for (const one of corpus.filter((each) => !UNCOMPARED.has(each.id))) {
   const found = await examine(one)
   if (held.has(one.family)) {
     held.set(one.family, held.get(one.family) + found.length)
+    /* Named in full on a run narrowed to one family, which is the run somebody
+       fixing it makes. */
+    if (only !== undefined) {
+      heldLines.push(...found)
+    }
   } else if (found.length > 0) {
     failures.push(...found)
   } else {
@@ -676,4 +665,6 @@ if (heldBack > 0) {
 if (skipped.size > 0) {
   verdict.push(`${skipped.size} families the change does not reach were skipped`)
 }
-console.log(`dsd: ${verdict.join(', ')}.${notes}`)
+console.log(
+  `dsd: ${verdict.join(', ')}.${notes}${heldLines.map((line) => `\n    ${line}`).join('')}`,
+)

@@ -236,12 +236,19 @@ export class HelixHeadlessFormatDate extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    this.read()
+    this.finishHydration()
     this.watch()
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* The written text before the render, so the first one shows the date it
+       names: read after it, the first render drew nothing and a second had to
+       follow, and on a page a server rendered the value was never written. Not
+       on a server or while hydrating what one sent, which could not read it. */
+    if (this.childrenKnown) {
+      this.read()
+    }
     if (changed.has('date') || changed.has('elapsed') || changed.has('locale')) {
       this.tick()
     }

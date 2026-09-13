@@ -1,5 +1,5 @@
 import { customElement, HelixElement, HelixShortcutEvent } from '@fusion.dev/helix-core'
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -165,15 +165,22 @@ export class HelixHeadlessKbd extends HelixElement {
     }
   }
 
-  /** The chord as this reader's keyboard labels it. */
+  /**
+   * The chord as this reader's keyboard labels it.
+   *
+   * As a server labels it while hydrating what one sent: it has no keyboard to
+   * ask and serves the words, and a render that differs is a text Lit records
+   * and never writes, so a Mac kept Ctrl. The update after hydration asks.
+   */
   private get label(): string {
-    const names = onApple() ? APPLE : ELSEWHERE
+    const apple = !this.hydrating && onApple()
+    const names = apple ? APPLE : ELSEWHERE
     const parts = this.keys
       .split('+')
       .map((part) => part.trim())
       .filter((part) => part !== '')
       .map((part) => names[part.toLowerCase()] ?? (part.length === 1 ? part.toUpperCase() : part))
-    return parts.join(onApple() ? '' : '+')
+    return parts.join(apple ? '' : '+')
   }
 
   private listen(): void {
@@ -282,6 +289,11 @@ export class HelixHeadlessKbd extends HelixElement {
           ? true
           : !press.metaKey)
     )
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
   }
 
   protected override render(): TemplateResult {
