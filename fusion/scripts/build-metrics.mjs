@@ -68,8 +68,13 @@ const TIMINGS = 'helix/docs/timings.json'
  * entry says `import '@fusion.dev/helix/button'` and package resolution walks up
  * from the file: a module outside the workspace resolves nothing. `.local/` is
  * the declared per-machine scratch and is gitignored.
+ *
+ * **One directory per process, because a run empties its directory before and
+ * after measuring.** A shared one lets a second run in the same checkout, a
+ * hook's or another session's, delete entries this one is still bundling, and
+ * `Bun.build` fails on `File not found`.
  */
-const SCRATCH = join(ROOT, '.local/metrics')
+const SCRATCH = join(ROOT, '.local/metrics', String(process.pid))
 
 const check = process.argv.includes('--check')
 
@@ -358,6 +363,7 @@ for (const tier of TIERS) {
 
 rmSync(SCRATCH, { force: true, recursive: true })
 mkdirSync(SCRATCH, { recursive: true })
+process.on('exit', () => rmSync(SCRATCH, { force: true, recursive: true }))
 
 const floor = await measure('floor', RUNTIME)
 
@@ -413,8 +419,6 @@ for (const tier of TIERS) {
   })
   measured.push({ ...tier, rows })
 }
-
-rmSync(SCRATCH, { force: true, recursive: true })
 
 const timings = existsSync(join(ROOT, TIMINGS))
   ? JSON.parse(readFileSync(join(ROOT, TIMINGS), 'utf8'))
