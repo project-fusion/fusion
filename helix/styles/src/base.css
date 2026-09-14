@@ -79,6 +79,17 @@ body {
   padding: 0;
 }
 
+/* A fieldset is a group that carries `disabled` for everything in it, and the
+   UA draws it as a bordered box with an inset. The state is the subject and the
+   box is not, so the box goes the way a list's bullets do. Ten example sheets
+   reset it by hand, one apiece, before this: the frame every example renders in
+   loads this layer, which is where a reset of a bare element belongs. */
+:where(fieldset) {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
 :where(img, picture, video, canvas, svg) {
   display: block;
   max-inline-size: 100%;

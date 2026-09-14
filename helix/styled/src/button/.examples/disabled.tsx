@@ -1,5 +1,3 @@
-import './disabled.css'
-
 export function Example() {
   return (
     <helix-flex gap="sm">

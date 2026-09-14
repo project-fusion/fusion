@@ -1,8 +1,0 @@
-/* A bare `<fieldset>`, which is only here to carry `disabled`. The UA draws it
-   as a bordered group with an inset, and the state is the subject rather than
-   the box around it. */
-fieldset {
-  border: 0;
-  margin: 0;
-  padding: 0;
-}

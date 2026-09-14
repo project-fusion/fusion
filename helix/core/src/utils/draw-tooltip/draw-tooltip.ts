@@ -125,10 +125,18 @@ export const drawTooltip = (
              * a name. Given `data-series` anyway it takes a series color and the
              * stylesheet draws a dot, so a row reading `Note  Outage` arrived
              * wearing series three's green while the legend beside the chart said
-             * series three was something else. */
+             * series three was something else.
+             *
+             * The color travels as `--chart-series` beside the index, the way the
+             * legend and every mark write it: this tier knows which series a cell
+             * belongs to and CSS cannot count it, so the sheet's dot is one rule
+             * reading the property rather than twenty-four keyed on the index.
+             * A fact, not a decision: the name it points at is the styled tier's
+             * to resolve. */
             html`<span
               data-series=${cell.value === undefined ? nothing : seriesIndex(index)}
               part="tooltip-cell"
+              style=${cell.value === undefined ? nothing : `--chart-series: var(--chart-series-${seriesIndex(index)})`}
             >
               <span part="tooltip-name">${cell.name}</span>
               <span part="tooltip-value">${cell.text}</span>
