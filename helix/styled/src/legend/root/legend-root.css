@@ -112,8 +112,9 @@
    0.88 against glass's 0.62 is the same relationship the surface tokens carry,
    `material-translucent` at 60% against `material-translucent-strong` at 88%,
    so a chart and a card mean the same thing by the word. Absent is still fully
-   opaque, so the three points read glass, frosted, then no attribute at all. */
-[part="entry"][data-material="frosted"],
+   opaque, so the three points read glass, frosted, then no attribute at all.
+   On the host only: the per-entry mark is `glass` or nothing, so there is no
+   entry to write `frosted` on. */
 :host([material="frosted"]) [part="entry"]:not([data-material]) [part="swatch"] {
   --_legend-through: calc(0.88 * var(--helix-material-opacity));
 }
