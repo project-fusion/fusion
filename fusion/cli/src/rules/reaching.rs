@@ -21,13 +21,24 @@
 //!
 //! **The root manifest is exempt, and that is the whole point of a root.** It
 //! orchestrates, so naming what it orchestrates is its job.
+//!
+//! **A script file's imports are read for the same climb.** A manifest's
+//! `scripts` were the only text this read, and the site's catalog generator
+//! imported `helix/docs/src/catalog.ts` and `fusion/docs/insights/src/index.ts`
+//! by relative path for as long as that was true: a dependency on a package's
+//! layout rather than on what it exports, and one the manifest did declare, so
+//! nothing said that the import was the wrong door. Every `.mjs` in a package
+//! is read for an `import` or `from` naming a path that climbs into another
+//! package.
 
+use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::sync::LazyLock;
 
 use regex::Regex;
 
 use crate::rules::{Context, Finding, Report};
+use crate::workspace::crawl;
 
 /// A relative path that climbs out of where it is written.
 ///
@@ -36,6 +47,21 @@ use crate::rules::{Context, Finding, Report};
 static CLIMBS: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"(?:^|[\s'"=(])(\.\.(?:/[\w.@-]+)+)"#).expect("a literal pattern compiles")
 });
+
+/// An import specifier that climbs out of the file it is written in: static
+/// `from '../x'`, a bare `import '../x'`, or a dynamic `import('../x')`.
+static IMPORTS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"\b(?:from|import)\s*\(?\s*['"](\.\./[^'"\n]+)['"]"#)
+        .expect("a literal pattern compiles")
+});
+
+/// The package a path is inside, taking the deepest when packages nest.
+fn owner_of<'a>(packages: &'a [PathBuf], path: &Path) -> Option<&'a PathBuf> {
+    packages
+        .iter()
+        .filter(|one| path.starts_with(one))
+        .max_by_key(|one| one.components().count())
+}
 
 /// Where a climb lands, or nothing if it climbs past the workspace.
 fn lands(from: &Path, written: &str) -> Option<PathBuf> {
@@ -82,10 +108,7 @@ pub fn run(context: &Context) -> Report {
                 let Some(landed) = lands(&directory, &written) else {
                     continue;
                 };
-                let Some(owner) = packages
-                    .iter()
-                    .filter(|one| landed.starts_with(one) && **one != directory)
-                    .max_by_key(|one| one.components().count())
+                let Some(owner) = owner_of(&packages, &landed).filter(|one| **one != directory)
                 else {
                     continue;
                 };
@@ -100,12 +123,53 @@ pub fn run(context: &Context) -> Report {
                 });
             }
         }
+
+        /* The package's own script files, which a nested package's are not: a
+        file is read by the deepest package holding it, or the parent would
+        report the child's own imports as climbs out of itself. */
+        let mut files = Vec::new();
+        crawl(
+            &directory,
+            &|path| path.extension().is_some_and(|extension| extension == "mjs"),
+            &mut files,
+        );
+        for file in files {
+            if owner_of(&packages, &file) != Some(&directory) {
+                continue;
+            }
+            let Ok(text) = fs::read_to_string(&file) else {
+                continue;
+            };
+            checked += 1;
+            let from = file.parent().unwrap_or(&directory);
+            for caught in IMPORTS.captures_iter(&text) {
+                let written = caught[1].to_owned();
+                let Some(landed) = lands(from, &written) else {
+                    continue;
+                };
+                let Some(owner) = owner_of(&packages, &landed).filter(|one| **one != directory)
+                else {
+                    continue;
+                };
+                findings.push(Finding {
+                    detail: "Import the package by name. What it exports is the surface a \
+                             file can move behind; a relative path into its source pins a \
+                             layout this package never declared it depends on."
+                        .to_owned(),
+                    file: context.relative(&file),
+                    message: format!(
+                        "imports `{written}`, which is inside `{}`",
+                        context.relative(owner)
+                    ),
+                });
+            }
+        }
     }
 
     Report {
         checked,
         findings,
         notes: Vec::new(),
-        unit: "scripts read for a path out of their package",
+        unit: "scripts and script files read for a path out of their package",
     }
 }

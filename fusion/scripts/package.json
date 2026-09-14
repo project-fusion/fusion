@@ -26,5 +26,8 @@
   },
   "scripts": {
     "test": "bun test"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-testing": "workspace:*"
   }
 }
