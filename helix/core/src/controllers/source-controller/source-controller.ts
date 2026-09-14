@@ -1,5 +1,21 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { readSeries, type Series } from '../../utils/read-series/read-series.js'
+import { type Row, readRows, readSeries, type Series } from '../../utils/read-series/read-series.js'
+
+/** A parse, and the table and edit it was made from. */
+interface Parsed<T> {
+  /**
+   * The table it was read from, or null where there was none.
+   */
+  element: Element | null
+  /**
+   * What the read gave.
+   */
+  value: T
+  /**
+   * Which edit of the table it saw.
+   */
+  version: number
+}
 
 /** A host that names the element it reads from. */
 export interface SourceHost extends ReactiveControllerHost, HTMLElement {
@@ -34,6 +50,18 @@ export class SourceController implements ReactiveController {
   #observer: MutationObserver | undefined
   /** Whether a hydrating render was told there was nothing, and needs the render after. */
   #deferred = false
+
+  /**
+   * Which edit of the table the parses below belong to.
+   *
+   * Moved by the watcher and by `watch()`, which are the two things that can
+   * change what a chart reads without the chart doing anything: an edit to the
+   * table, and `for` naming another one.
+   */
+  #version = 0
+
+  #rows: Parsed<Row[]> | undefined
+  #series: Parsed<Series[]> | undefined
 
   constructor(host: SourceHost) {
     this.#host = host
@@ -90,10 +118,41 @@ export class SourceController implements ReactiveController {
       : null
   }
 
-  /** The series it holds, or none. */
+  /**
+   * The series it holds, or none.
+   *
+   * **Parsed once per edit, not once per read.** A chart's render asks for
+   * these several times over, and the pointer asks for the row count on every
+   * move, so parsing the whole table on each read was a table walk per
+   * pointermove. The parse is held against the table it came from and the
+   * edit it saw, and let go when either moves: `element` is compared by
+   * identity, so a table replaced under the same id parses again, and the
+   * watcher moves the version on every mutation it delivers.
+   *
+   * Which is a microtask after the edit, the observer being what it is. A
+   * read in the same run as the edit answers the parse before it, and every
+   * render that follows, which is what the watcher exists to ask for, answers
+   * the one after. The same array comes back until then, so a consumer may
+   * compare by identity.
+   */
   get series(): Series[] {
+    this.#series = this.#parsed(this.#series, (table) => (table ? readSeries(table) : []))
+    return this.#series.value
+  }
+
+  /** Every row it holds, text and number alike, or none. Held the way `series` is. */
+  get rows(): Row[] {
+    this.#rows = this.#parsed(this.#rows, (table) => (table ? readRows(table) : []))
+    return this.#rows.value
+  }
+
+  /** A held parse where it still describes the table, or a fresh one. */
+  #parsed<T>(held: Parsed<T> | undefined, read: (table: Element | null) => T): Parsed<T> {
     const element = this.element
-    return element ? readSeries(element) : []
+    if (held && held.element === element && held.version === this.#version) {
+      return held
+    }
+    return { element, value: read(element), version: this.#version }
   }
 
   hostConnected(): void {
@@ -121,11 +180,13 @@ export class SourceController implements ReactiveController {
    */
   watch(): void {
     this.#observer?.disconnect()
+    this.#version += 1
     const element = this.#resolve()
     if (!element || typeof MutationObserver === 'undefined') {
       return
     }
     this.#observer ??= new MutationObserver(() => {
+      this.#version += 1
       this.#host.requestUpdate()
     })
     this.#observer.observe(element, {

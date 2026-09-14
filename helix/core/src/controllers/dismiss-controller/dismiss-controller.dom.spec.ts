@@ -336,3 +336,95 @@ describe('opening an overlay that is already open', () => {
     expect(one.asked).toBe(1)
   })
 })
+
+describe('looking for frames', () => {
+  /* The walk is every element on the page through every shadow root, and it
+     ran on every activation, which is every tooltip hover. A page with no
+     frame in it is told so by a live collection whose count the engine keeps,
+     and skips the walk; one with a frame still walks, shadow roots included.
+     The walk is observed through `querySelectorAll`, which is what it is made
+     of, and the count is what it must not be made of. */
+  const walks = (): { calls: number; restore: () => void } => {
+    const real = document.querySelectorAll.bind(document)
+    const made = { calls: 0, restore: () => {} }
+    /* On the instance and put back by deleting the own property, so the
+       prototype's method, whichever class in happy-dom's chain owns it, is
+       untouched for every file after this one. */
+    Object.defineProperty(document, 'querySelectorAll', {
+      configurable: true,
+      value: (selectors: string) => {
+        made.calls += 1
+        return real(selectors)
+      },
+    })
+    made.restore = () => {
+      delete (document as unknown as Record<string, unknown>).querySelectorAll
+    }
+    return made
+  }
+
+  test('walks nothing on a page with no frame', () => {
+    document.body.innerHTML = ''
+    const one = overlay()
+    const walked = walks()
+    try {
+      one.dismiss.activate()
+      expect(walked.calls).toBe(0)
+    } finally {
+      walked.restore()
+    }
+  })
+
+  test('and walks once a frame is on the page', () => {
+    document.body.innerHTML = ''
+    const one = overlay()
+    document.body.append(document.createElement('iframe'))
+    const walked = walks()
+    try {
+      one.dismiss.activate()
+      expect(walked.calls).toBe(1)
+    } finally {
+      walked.restore()
+    }
+  })
+
+  /* Overlays that open together, a dialog opening a select from its own
+     update, share one walk, and each still releases its own listeners: the
+     answer is copied per overlay rather than held in common, or the first to
+     close would empty the second's list from under it. */
+  test('once for every overlay that activates in the same run', () => {
+    document.body.innerHTML = ''
+    const first = overlay()
+    const second = overlay()
+    const frame = document.createElement('iframe')
+    document.body.append(frame)
+    const walked = walks()
+    try {
+      first.dismiss.activate()
+      second.dismiss.activate()
+      expect(walked.calls).toBe(1)
+    } finally {
+      walked.restore()
+    }
+    first.dismiss.deactivate()
+    const inner = frame.contentDocument as Document
+    pointerAt(inner.body ?? inner)
+    expect([first.asked, second.asked]).toEqual([0, 1])
+  })
+
+  test('and again in the next run, when the page may have changed', async () => {
+    document.body.innerHTML = ''
+    const first = overlay()
+    const second = overlay()
+    document.body.append(document.createElement('iframe'))
+    const walked = walks()
+    try {
+      first.dismiss.activate()
+      await Promise.resolve()
+      second.dismiss.activate()
+      expect(walked.calls).toBe(2)
+    } finally {
+      walked.restore()
+    }
+  })
+})
