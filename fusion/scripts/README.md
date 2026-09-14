@@ -6,6 +6,7 @@ it is the workspace's own tooling.
 | Export | What it answers |
 |---|---|
 | `./workspace` | Where things are, so a generator does not hardcode a path |
+| `./emit` | Writes a generated file, or under `--check` says which lines are behind |
 | `./formatted` | Runs biome over generated text, so nothing lands unformatted |
 | `./format-open-tags` | The one-attribute-per-line shape examples are written in |
 | `./paint`, `./theme-facts`, `./theme-intents` | The theme engine's shared vocabulary |

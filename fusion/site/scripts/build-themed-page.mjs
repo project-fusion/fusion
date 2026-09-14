@@ -40,9 +40,10 @@
  * read a label would pull three unrendered pages into the browser bundle. What
  * crosses is two short lists and a record of strings.
  */
-import { existsSync, writeFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { CONTEXTS } from '../app/(tool)/helix/theme/themed-contexts.tsx'
@@ -84,43 +85,26 @@ export const THEMED_MARKUP: Readonly<Record<string, string>> = ${JSON.stringify(
 const pairs = Object.keys(markup)
 const size = pairs.reduce((total, key) => total + markup[key].length, 0)
 
-/* **Compared as values, written as a formatted file.**
- *
- * The check imports the module and compares the strings, rather than the file
- * byte for byte: a textual comparison would fail the moment the formatter
- * chose a different quote or wrapped the assignment, which says nothing about
- * whether the markup is current. And the writer formats what it wrote, because
+/* **Formatted on both sides.** The writer formats what it writes, because
  * `AGENTS.md` asks a generator to, or every run dirties a file `check` has just
- * cleaned. Through `formatted`, which pipes the source rather than naming the
- * path: this file is gitignored, and `biome` reads a gitignore, so formatting it
- * by path exits 1. */
+ * cleaned; the check compares against the same formatted text, so the
+ * formatter cannot make the two disagree. Through `formatted`, which pipes the
+ * source rather than naming the path: this file is gitignored, and `biome`
+ * reads a gitignore, so formatting it by path exits 1. */
 const say = (state) =>
   `themed page: ${LAYOUTS.length} layouts by ${CONTEXTS.length} contexts, ${size} characters, ${state}`
 
-if (process.argv.includes('--check')) {
-  /* **Absent is not stale**, the way `token-layer` reads its own outputs. This
-     is a build output rather than a tracked file, so a tree nobody has built has
-     nothing to compare and `await import` of a missing module throws rather than
-     reporting. A shard that runs this check and no writer is exactly that tree. */
-  if (!existsSync(OUT)) {
-    console.log(say('absent, so nothing to compare'))
-    process.exit(0)
-  }
-  const held = await import(OUT)
-  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
-  const stale =
-    !same(held.THEMED_CONTEXTS, list(CONTEXTS)) ||
-    !same(held.THEMED_LAYOUTS, list(LAYOUTS)) ||
-    !same(held.THEMED_MARKUP, markup)
-
-  if (stale) {
-    console.error(
-      'themed-page-markup.generated.ts is behind `themed-page.tsx` or `themed-contexts.tsx`. Run `turbo run themed-page` and commit the result.',
-    )
-    process.exit(1)
-  }
-  console.log(say('current'))
-} else {
-  writeFileSync(OUT, formatted(file, 'themed-page-markup.generated.ts'))
-  console.log(say('written'))
+const check = process.argv.includes('--check')
+/* **Absent is not stale**, the way `token-layer` reads its own outputs. This is
+   a build output rather than a tracked file, so a tree nobody has built has
+   nothing to compare. A shard that runs this check and no writer is exactly
+   that tree. */
+if (check && !existsSync(OUT)) {
+  console.log(say('absent, so nothing to compare'))
+  process.exit(0)
 }
+const hint = 'Run `turbo run themed-page`.'
+if (emit(OUT, formatted(file, 'themed-page-markup.generated.ts'), { check, hint }).stale) {
+  process.exit(1)
+}
+console.log(say(check ? 'current' : 'written'))

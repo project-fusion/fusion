@@ -42,6 +42,7 @@ import {
 import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { brotliCompress, constants, gzip } from 'node:zlib'
+import { emit } from '@fusion.dev/scripts/emit'
 import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 
 const OUTPUT = 'helix/docs/content/metrics.mdx'
@@ -844,53 +845,21 @@ const claimsSource = [
 
 const claimsPath = join(root, CLAIMS_OUT)
 
-if (check) {
-  let claimsExisting = ''
-  try {
-    claimsExisting = readFileSync(claimsPath, 'utf8')
-  } catch {
-    claimsExisting = ''
-  }
-  if (claimsExisting !== claimsSource) {
-    console.error(
-      `${CLAIMS_OUT} is behind the packages it measures. Run \`bun run gen:metrics\` and commit the result.`,
-    )
-    process.exit(1)
-  }
-
-  const existing = existsSync(output) ? readFileSync(output, 'utf8') : ''
-  if (existing !== written) {
-    /* **Which lines, not just that some line.** Reporting only staleness costs a
-       round trip to find out what moved, and on a runner that round trip is the
-       whole build again. A number that differs by platform and a number that
-       differs because somebody edited a component look identical until you see
-       them. */
-    const before = existing.split('\n')
-    const after = written.split('\n')
-    const moved = after
-      .map((line, index) => [before[index], line])
-      .filter(([was, now]) => was !== now)
-
-    console.error(
-      `${OUTPUT} is behind the packages it measures. Run \`bun run gen:metrics\` and commit the result.\n` +
-        `If the only difference is the numbers, check the bundler first: this run used Bun ${Bun.version}, ` +
-        'and the pinned version is the one in `packageManager`.\n\n' +
-        `${moved.length} line${moved.length === 1 ? '' : 's'} differ:\n` +
-        moved
-          .slice(0, 20)
-          .map(([was, now]) => `  - ${was ?? '(absent)'}\n  + ${now}`)
-          .join('\n') +
-        (moved.length > 20 ? `\n  ... and ${moved.length - 20} more` : ''),
-    )
-    process.exit(1)
-  }
-  console.log(
-    `metrics: ${styled.rows.length} styled and ${headless.rows.length} headless families measured, current`,
-  )
-} else {
-  writeFileSync(output, written)
-  writeFileSync(claimsPath, claimsSource)
-  console.log(
-    `metrics: ${styled.rows.length} styled and ${headless.rows.length} headless families written to ${OUTPUT}`,
-  )
+/* A number that differs by platform and a number that differs because
+   somebody edited a component look identical until the lines are seen, which
+   `emit` prints; the bundler is the first thing to suspect when only numbers
+   moved. */
+const hint =
+  'Run `bun run gen:metrics`. If the only difference is the numbers, check the bundler ' +
+  `first: this run used Bun ${Bun.version}, and the pinned version is the one in \`packageManager\`.`
+const stale = [
+  emit(claimsPath, claimsSource, { check, hint }),
+  emit(output, written, { check, hint }),
+].some((one) => one.stale)
+if (stale) {
+  process.exit(1)
 }
+console.log(
+  `metrics: ${styled.rows.length} styled and ${headless.rows.length} headless families ` +
+    (check ? 'measured, current' : `written to ${OUTPUT}`),
+)

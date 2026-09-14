@@ -26,8 +26,9 @@
  *
  * `--check` compares without writing, for `verify`.
  */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
 import { root } from '@fusion.dev/scripts/workspace'
 
@@ -79,24 +80,9 @@ for (const pkg of PACKAGES) {
   total += entries.length
   const path = join(root, 'helix', pkg, 'src', 'element-events.generated.ts')
   const next = formatted(render(entries), 'element-events.generated.ts')
-  const held = (() => {
-    try {
-      return readFileSync(path, 'utf8')
-    } catch {
-      return ''
-    }
-  })()
-  if (held === next) {
-    continue
-  }
-  if (checking) {
+  if (emit(path, next, { check: checking, hint: 'Run `bun run gen:element-events`.' }).stale) {
     stale += 1
-    console.error(
-      `helix/${pkg}/src/element-events.generated.ts is behind its manifest. Run \`bunx turbo run element-events\`.`,
-    )
-    continue
   }
-  writeFileSync(path, next)
 }
 
 if (stale > 0) {

@@ -24,9 +24,10 @@
  * `turbo run token-layer` writes, `turbo run token-layer -- --check` fails when the
  * outputs and the source disagree.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
@@ -94,7 +95,6 @@ const block = `/* Generated from src/tokens.ts by \`turbo run token-layer\`. Do 
 /* The whole file, hand-written half first. The generated block declares only
    `--helix-*` and the partial declares only `--_helix-*` and `color-scheme`, so
    nothing in one can be overridden by the other and appending is safe. */
-const existing = existsSync(CSS) ? readFileSync(CSS, 'utf8') : ''
 /* **The banner, because nothing else in the file says it is generated.**
    `elements.css` carries one and this did not, so the only tracked stylesheet a
    contributor is most likely to open and edit by hand was the one that gave no
@@ -135,22 +135,17 @@ const json = formatted(
   'tokens.json',
 )
 
-if (process.argv.includes('--check')) {
-  /* `tokens.json` is a build output now, so a tree that has not been built has
-     no file to compare. Absent is not stale. */
-  const held = existsSync(JSON_OUT) ? readFileSync(JSON_OUT, 'utf8') : json
-  const stale = [
-    existing !== css ? 'tokens.css' : undefined,
-    held !== json ? 'tokens.json' : undefined,
-  ].filter(Boolean)
-  if (stale.length > 0) {
-    console.error(`token layer: ${stale.join(' and ')} stale. Run \`turbo run token-layer\``)
-    process.exit(1)
-  }
-  console.log(`token layer: ${TOKENS.length} tokens in ${categories.length} categories, current`)
-} else {
-  mkdirSync(dirname(JSON_OUT), { recursive: true })
-  writeFileSync(CSS, css)
-  writeFileSync(JSON_OUT, json)
-  console.log(`token layer: ${TOKENS.length} tokens in ${categories.length} categories written`)
+const check = process.argv.includes('--check')
+const hint = 'Run `turbo run token-layer`.'
+/* `tokens.json` is a build output, so a tree that has not been built has no
+   file to compare. Absent is not stale. */
+const stale = [
+  emit(CSS, css, { check, hint }).stale,
+  check && !existsSync(JSON_OUT) ? false : emit(JSON_OUT, json, { check, hint }).stale,
+].some(Boolean)
+if (stale) {
+  process.exit(1)
 }
+console.log(
+  `token layer: ${TOKENS.length} tokens in ${categories.length} categories ${check ? 'current' : 'written'}`,
+)
