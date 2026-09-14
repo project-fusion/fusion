@@ -34,7 +34,7 @@
   "sideEffects": true,
   "scripts": {
     "analyze": "bun --bun cem analyze --config cem.config.ts",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "styles": "build-styles .",
     "test": "bun run test:dom && bun run test:ssr",
     "test:dom": "bun test dom.spec",

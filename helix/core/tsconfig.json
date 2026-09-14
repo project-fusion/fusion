@@ -1,13 +1,4 @@
 {
-  "compilerOptions": {
-    "declaration": false,
-    "declarationMap": false,
-    "outDir": "dist",
-    "removeComments": true,
-    "rootDir": "src",
-    "types": ["bun"]
-  },
-  "exclude": [],
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.package.json",
   "include": ["src/**/*"]
 }

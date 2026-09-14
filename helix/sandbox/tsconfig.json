@@ -1,10 +1,4 @@
 {
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "types": ["bun"]
-  },
-  "exclude": [],
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.package.json",
   "include": ["src/**/*"]
 }
