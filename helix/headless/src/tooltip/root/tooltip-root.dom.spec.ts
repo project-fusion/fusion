@@ -4,6 +4,8 @@ import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  // The popover too, for the specs about two overlays open at once.
+  await import('../../popover/index.js')
 })
 
 type Tooltip = HTMLElement & {
@@ -344,5 +346,58 @@ describe('tooltip for', () => {
     // And the same event from a control that really has focus still opens it.
     await focusTrigger(tip)
     expect(tip.open).toBe(true)
+  })
+})
+
+describe('Escape with more than one overlay open', () => {
+  /* The tooltip's Escape goes through the same arbitration as every other
+     overlay's, so a press closes the innermost open surface and only that.
+     Before, the tooltip answered every press with a listener of its own, on
+     the document for its whole connected life, so an Escape meant for a deeper
+     panel took the tooltip down beside it. */
+  type Popover = HTMLElement & { open: boolean; updateComplete: Promise<unknown> }
+
+  const press = (): void => {
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
+    )
+  }
+
+  test('closes a tooltip inside an open popover, and leaves the popover up', async () => {
+    const popover = (await mount(
+      `<helix-headless-popover label="Details" open>
+        <button slot="trigger">Details</button>
+        <helix-headless-tooltip content="Regenerates the manifests"><button>Analyze</button></helix-headless-tooltip>
+      </helix-headless-popover>`,
+    )) as Popover
+    const tip = popover.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    await tip.updateComplete
+    tip.show()
+    await tip.updateComplete
+    expect([popover.open, tip.open]).toEqual([true, true])
+
+    press()
+    await Promise.all([popover.updateComplete, tip.updateComplete])
+    expect([popover.open, tip.open]).toEqual([true, false])
+  })
+
+  test('and closes a deeper popover while a shallower tooltip stays', async () => {
+    document.body.innerHTML = `<helix-headless-tooltip content="Regenerates the manifests"><button>Analyze</button></helix-headless-tooltip>
+      <section><div>
+        <helix-headless-popover label="Details" open>
+          <button slot="trigger">Details</button>
+          <span>Body</span>
+        </helix-headless-popover>
+      </div></section>`
+    const tip = document.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    const popover = document.querySelector('helix-headless-popover') as Popover
+    await Promise.all([popover.updateComplete, tip.updateComplete])
+    tip.show()
+    await tip.updateComplete
+    expect([popover.open, tip.open]).toEqual([true, true])
+
+    press()
+    await Promise.all([popover.updateComplete, tip.updateComplete])
+    expect([popover.open, tip.open]).toEqual([false, true])
   })
 })

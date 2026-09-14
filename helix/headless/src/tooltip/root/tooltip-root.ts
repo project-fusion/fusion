@@ -268,7 +268,27 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       const point = this.renderRoot.querySelector<HTMLElement>('[part="arrow"]')
       return this.offset + (point?.offsetWidth ?? 0) / Math.SQRT2
     },
-    onDismiss: () => this.hide(),
+    /* Escape closes the bubble from wherever the reader is, and this is the
+       one listener that hears it.
+
+       On the document, through the controller, not on the host: a tooltip
+       opened by hover has focus somewhere else entirely, so a press never
+       reaches this element and Escape would work for everything except the
+       case the pattern is named for, a reader escaping a tooltip obscuring what
+       is under it. The controller listens only while the bubble is up, and it
+       is the same arbitration every overlay goes through, so a press with a
+       deeper surface open closes that one and leaves this alone rather than
+       taking both: a second listener of this element's own answered every
+       press for the element's whole connected life and skipped the vote.
+
+       Holds are cleared as well as hiding, for the reason `handleActivate`
+       gives: left set, the pointer is still recorded as being over the
+       trigger, and the bubble comes back on a `release` it should have been
+       dropped from. */
+    onDismiss: () => {
+      this.holds.clear()
+      this.hide()
+    },
     placement: () => this.placement,
     surface: () => this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]'),
     within: () => this.enclosure,
@@ -494,24 +514,6 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   /**
-   * Escape closes the bubble from wherever the reader is.
-   *
-   * On the document, not on the host: a tooltip opened by hover has focus
-   * somewhere else entirely, so a press never reaches this element and Escape
-   * would work for everything except the case the pattern is named for, a
-   * reader escaping a tooltip obscuring what is under it.
-   *
-   * Not stopped from propagating: a tooltip is not what the reader was trying
-   * to escape if it sits inside something else that also closes.
-   */
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.open) {
-      this.holds.clear()
-      this.hide()
-    }
-  }
-
-  /**
    * What the pointer and focus listeners are currently on.
    *
    * Held, rather than recomputed at removal time, because what `for` names can
@@ -631,15 +633,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     )
   }
 
-  override connectedCallback(): void {
-    super.connectedCallback()
-    document.addEventListener('keydown', this.handleKeydown)
-  }
-
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.unbind()
-    document.removeEventListener('keydown', this.handleKeydown)
     this.holds.clear()
     clearTimeout(this.timer)
   }

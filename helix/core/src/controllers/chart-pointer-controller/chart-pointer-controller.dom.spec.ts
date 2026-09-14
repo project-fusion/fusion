@@ -284,3 +284,39 @@ describe('a host that has left', () => {
     expect(one.point.at).toBe(-1)
   })
 })
+
+describe('a plot that was replaced', () => {
+  /* Every chart renders a different template for its empty state, so the plot
+     a pointer crossed before the table filled is a node Lit has since replaced.
+     Held forever, the controller measures a detached box for the life of the
+     page and the tooltip never appears. */
+  test('is looked up again, rather than measured where it used to be', () => {
+    const one = scene(4)
+    move(one, 121, 100)
+    expect(one.point.at).toBe(2)
+    const root = one.host.shadowRoot as ShadowRoot
+    root.querySelector('[part="plot"]')?.remove()
+    const plot = document.createElement('div')
+    plot.setAttribute('part', 'plot')
+    plot.getBoundingClientRect = (() => ({
+      bottom: 150,
+      height: 100,
+      left: 220,
+      right: 420,
+      top: 50,
+      width: 200,
+    })) as never
+    root.append(plot)
+    move(one, 221, 100)
+    expect(one.point.at).toBe(0)
+  })
+
+  test('and one that has not come back yet resolves nothing', () => {
+    const one = scene(4)
+    move(one, 121, 100)
+    one.host.shadowRoot?.querySelector('[part="plot"]')?.remove()
+    one.host.dispatchEvent(new Event('pointerleave', { bubbles: true }))
+    move(one, 121, 100)
+    expect(one.point.at).toBe(-1)
+  })
+})
