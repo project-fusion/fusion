@@ -25,7 +25,8 @@
  * prevents drift; this only catches the cases where a source stopped being
  * wired up at all.
  *
- * Run with `turbo run routes -- --check`, after `turbo run catalog`.
+ * Run with `turbo run routes`, which runs `turbo run catalog` first. It writes
+ * nothing, so `--check` is accepted and changes nothing.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
@@ -40,7 +41,7 @@ const FLOOR = 40
 
 const problems = []
 
-const { routes } = await import('../../../fusion/site/content/routes/routes.ts')
+const { routes } = await import('../content/routes/routes.ts')
 const all = routes()
 
 if (all.length === 0) {

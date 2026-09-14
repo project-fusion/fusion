@@ -241,7 +241,7 @@
       ]
     },
     "content": {
-      "inputs": ["insights/content/**", "$TURBO_ROOT$/fusion/docs/scripts/build-content.mjs"],
+      "inputs": ["content/**", "scripts/build-content.mjs"],
       "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
     },
 
@@ -347,7 +347,10 @@
     // JavaScript door imports. Not cached: it is one file from one file and the
     // check is cheaper than a cache lookup.
     "register": { "cache": false },
-    "routes": { "cache": false },
+    // `routes` reads the documents `catalog` writes under `public/`, so it
+    // waits for it: run alone from `check:gen` or the hook it judged whatever
+    // the last catalog had left, and on a clean tree that is nothing.
+    "routes": { "cache": false, "dependsOn": ["catalog"] },
     "samples": { "cache": false },
 
     "specs": {
