@@ -34,6 +34,9 @@ use ratatui::{Frame, Terminal};
 
 use crate::rules::{Report, Rule};
 
+/// The word in the corner of the screen, which is the one this binary answers to.
+const PRODUCT: &str = "fusion";
+
 /// One rule as the screen holds it: what it is, and what it found.
 pub struct Measured {
     pub checked: usize,
@@ -110,7 +113,7 @@ impl View {
 }
 
 /// Draws the audit and returns when the reader leaves.
-pub fn run(reports: &[(&Rule, Report)]) -> io::Result<()> {
+pub fn run(reports: &[(&Rule, &Report)]) -> io::Result<()> {
     let rules = reports
         .iter()
         .map(|(rule, report)| Measured {
@@ -206,7 +209,7 @@ fn render(frame: &mut Frame, view: &View) {
     let findings: usize = view.rules.iter().map(|one| one.findings.len()).sum();
     frame.render_widget(
         Paragraph::new(Line::from(vec![
-            Span::styled("fusion", Style::new().add_modifier(Modifier::BOLD)),
+            Span::styled(PRODUCT, Style::new().add_modifier(Modifier::BOLD)),
             Span::raw(format!(
                 "  {} rules, {} clean, {failed} with {findings} finding{}",
                 view.rules.len(),

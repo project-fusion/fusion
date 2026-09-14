@@ -38,8 +38,7 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
     }
 
     let root: PathBuf = args.root.clone().unwrap_or_else(|| from.to_path_buf());
-    let settings = Settings::read(&root)
-        .map_err(|why| Failure::input("component rules need to know where the source is", why))?;
+    let settings = Settings::read(&root)?;
 
     /* **Every tier missing is a configuration fault, not a clean run.** Rules
     would each read nothing and report nothing, and a command that says every
@@ -140,8 +139,8 @@ fn payload(reports: &[(Rule, Report)]) -> serde_json::Value {
         "rules": reports.iter().map(|(rule, report)| serde_json::json!({
             "checked": report.checked,
             "findings": report.findings,
-            "notes": report.notes,
             "name": rule.name,
+            "notes": report.notes,
             "unit": report.unit,
         })).collect::<Vec<_>>(),
     })
@@ -252,7 +251,14 @@ pub fn fix(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, 
             continue;
         };
         ran += 1;
-        for file in apply(&context) {
+        let written = apply(&context).map_err(|refused| {
+            Failure::new(
+                Code::Internal,
+                format!("cannot write {}", refused.file),
+                refused.why,
+            )
+        })?;
+        for file in written {
             wrote.push((rule.name, file));
         }
     }

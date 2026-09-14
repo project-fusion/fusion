@@ -13,22 +13,34 @@
 //! **Selection is a flag, never a verb.** A verb per rule multiplies with every
 //! rule added, and the set a caller wants is rarely the set anybody would have
 //! named.
+//!
+//! **The shape is `helix`'s, module for module**: exit codes in [`exit`], the
+//! error format in [`error`], color in [`style`], each a copy of that crate's
+//! with its reasoning kept. Two command lines from one company that disagree
+//! about what 3 means, or which stream an error lands on, are worse than either
+//! shape, and `fusion helix ...` returning its child's code untouched is only
+//! honest while the two tables agree.
 
+mod error;
+mod exit;
 mod prose;
 mod route;
 mod rules;
 mod spec;
+mod style;
 mod tui;
 mod workspace;
 
 use std::io::IsTerminal;
 use std::path::PathBuf;
-use std::process::ExitCode;
 use std::thread::{self, ScopedJoinHandle};
 
 use clap::{Args, Parser, Subcommand};
 
+use crate::error::{Failure, Outcome};
+use crate::exit::Code;
 use crate::rules::{all, Context, Settings};
+use crate::style::Paint;
 
 /* Every rule borrows the one context from its own thread, which is what this
 holds `Context` to. */
@@ -62,6 +74,10 @@ struct Cli {
     json: bool,
 
     /// Never color the output.
+    ///
+    /// Color is already off when stdout is not a terminal and when `NO_COLOR`
+    /// is set. This is the third way, for a terminal that reports itself capable
+    /// and is not.
     #[arg(long, global = true)]
     no_color: bool,
 }
@@ -130,6 +146,16 @@ impl Noun {
             Self::Helix { .. } => unreachable!("routed before a rule set is asked for"),
         }
     }
+
+    /// The word the reader typed, for a message that names it back.
+    fn name(&self) -> &'static str {
+        match self {
+            Self::Helix { .. } => "helix",
+            Self::Prose { .. } => "prose",
+            Self::Spec { .. } => "spec",
+            Self::Workspace { .. } => "workspace",
+        }
+    }
 }
 
 #[derive(Debug, Subcommand)]
@@ -172,20 +198,56 @@ impl Verb {
     }
 }
 
-fn main() -> ExitCode {
+fn main() {
     let cli = Cli::parse();
+    let paint = if cli.json {
+        Paint::never()
+    } else {
+        Paint::decide(cli.no_color)
+    };
 
+    std::process::exit(match run(&cli, paint) {
+        Ok(code) => code,
+        Err(failure) => report_failure(&failure, cli.json),
+    });
+}
+
+/// **Errors go to stderr in both modes.** A reader piping `--json` into another
+/// program gets a clean stream or nothing at all: an error object on stdout is a
+/// document the consumer has to inspect to find out whether it is an answer, and
+/// a half-written artifact followed by one is worse still.
+fn report_failure(failure: &Failure, json: bool) -> i32 {
+    if json {
+        eprintln!("{}", failure.as_json());
+    } else {
+        eprintln!("{failure}");
+    }
+    failure.code.as_i32()
+}
+
+/* `Code::Usage` and `Code::Internal` are not returned by name below, and that
+is not an oversight in either case. Clap owns usage: it prints its own message
+and exits 2 before `main` sees an argument, which is the number this enum
+records rather than one it chooses. Internal is what a failure to open the
+screen or to write a fix carries, and what a panic reaches the runtime with.
+Both are in the enum because the enum is the published set. */
+const _: () = {
+    assert!(Code::Usage as i32 == 2);
+    assert!(Code::Internal as i32 == 4);
+};
+
+/// The whole command, as the exit code it ends with.
+///
+/// **A routed noun returns the child's own code**, whatever it was, which is
+/// why this is an `i32` rather than a [`Code`]: `fusion helix theme check` is
+/// `helix theme check`, and a caller reading its exit reads `helix`'s table.
+/// The two tables are the same table, on purpose.
+fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     /* **Routed before anything else is read**, because a routed noun has no verb
     and no rule set: everything below belongs to the nouns this binary answers
     for itself, and asking a route for its rules is a question with no answer. */
     if let Noun::Helix { args } = &cli.noun {
-        return match route::to("helix", args) {
-            Ok(code) => ExitCode::from(u8::try_from(code).unwrap_or(70)),
-            Err(why) => {
-                eprintln!("fusion: {why}");
-                ExitCode::from(69)
-            }
-        };
+        return route::to("helix", args);
     }
 
     let verb = cli.noun.verb();
@@ -197,29 +259,26 @@ fn main() -> ExitCode {
         .iter()
         .filter(|name| !known.contains(&name.as_str()))
         .collect();
-    if !unknown.is_empty() {
-        eprintln!(
-            "fusion: no such rule {}. Known rules: {}.",
-            unknown
-                .iter()
-                .map(|one| format!("`{one}`"))
-                .collect::<Vec<String>>()
-                .join(", "),
-            known.join(", ")
-        );
-        return ExitCode::from(2);
+    if let Some(first) = unknown.first() {
+        return Err(Failure::input(
+            format!("no {} rule called `{first}`", cli.noun.name()),
+            format!("the rules are {}", known.join(", ")),
+        ));
     }
 
     let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     let Some(root) = common.root.clone().or_else(|| workspace::find_root(&cwd)) else {
-        eprintln!(
-            "fusion: no `package.json` at or above this directory, so there is no workspace to \
-             read."
-        );
-        return ExitCode::from(2);
+        return Err(Failure::input(
+            format!("no workspace at {}", cwd.display()),
+            "no `package.json` here or in any directory above it",
+        )
+        .hint(format!(
+            "fusion {} check --root <workspace>",
+            cli.noun.name()
+        )));
     };
 
-    let settings = Settings::read(&root);
+    let settings = Settings::read(&root)?;
     let context = Context::new(root, settings);
     let selected: Vec<rules::Rule> = cli
         .noun
@@ -228,11 +287,8 @@ fn main() -> ExitCode {
         .filter(|rule| common.only.is_empty() || common.only.iter().any(|one| one == rule.name))
         .collect();
 
-    let color =
-        !cli.no_color && std::io::stdout().is_terminal() && std::env::var_os("NO_COLOR").is_none();
-
-    match verb {
-        Verb::Fix(_) => fix(&selected, &context, cli.json),
+    let code = match verb {
+        Verb::Fix(_) => fix(&selected, &context, cli.json, paint)?,
         /* **The tty decides here, where the verb is known**, rather than inside
         the renderer: a screen written to a pipe is escape sequences in a log
         file, and `check` never draws whatever the terminal is. */
@@ -244,7 +300,7 @@ fn main() -> ExitCode {
             } else {
                 Form::Screen
             };
-            report(&selected, &context, &form, color)
+            report(&selected, &context, &form, cli.noun.name(), paint)?
         }
         Verb::Check(_) => {
             let form = if cli.json {
@@ -252,12 +308,18 @@ fn main() -> ExitCode {
             } else {
                 Form::Printed { loud: false }
             };
-            report(&selected, &context, &form, color)
+            report(&selected, &context, &form, cli.noun.name(), paint)?
         }
-    }
+    };
+    Ok(code.as_i32())
 }
 
-fn fix(selected: &[rules::Rule], context: &Context, json: bool) -> ExitCode {
+/// Runs the rules that can write, and says what they wrote.
+///
+/// **A write that fails is the command's failure, not a file left off the
+/// list.** The fix stops at the first refusal and names the file, with
+/// [`Code::Internal`], which is what a failed write is everywhere else here.
+fn fix(selected: &[rules::Rule], context: &Context, json: bool, paint: Paint) -> Outcome<Code> {
     let mut wrote: Vec<(&str, String)> = Vec::new();
     let mut ran = 0;
     for rule in selected {
@@ -265,7 +327,14 @@ fn fix(selected: &[rules::Rule], context: &Context, json: bool) -> ExitCode {
             continue;
         };
         ran += 1;
-        for file in apply(context) {
+        let written = apply(context).map_err(|refused| {
+            Failure::new(
+                Code::Internal,
+                format!("cannot write {}", refused.file),
+                refused.why,
+            )
+        })?;
+        for file in written {
             wrote.push((rule.name, file));
         }
     }
@@ -274,21 +343,18 @@ fn fix(selected: &[rules::Rule], context: &Context, json: bool) -> ExitCode {
             "ran": ran,
             "wrote": wrote.iter().map(|(rule, file)| serde_json::json!({ "file": file, "rule": rule })).collect::<Vec<_>>(),
         });
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&payload).unwrap_or_default()
-        );
+        println!("{payload:#}");
     } else if wrote.is_empty() {
         let plural = if ran == 1 { "" } else { "s" };
         println!("fusion: {ran} rule{plural} can write, and nothing needed it");
     } else {
         for (rule, file) in &wrote {
-            println!("  {rule}  {file}");
+            println!("  {}  {file}", paint.bold(rule));
         }
         let plural = if wrote.len() == 1 { "" } else { "s" };
         println!("fusion: {} file{plural} written", wrote.len());
     }
-    ExitCode::SUCCESS
+    Ok(Code::Ok)
 }
 
 /// Runs the source rules once, then the meta rules over what they counted.
@@ -371,7 +437,21 @@ enum Form {
     Screen,
 }
 
-fn report(selected: &[rules::Rule], context: &Context, form: &Form, color: bool) -> ExitCode {
+fn verdict(reports: &[(&rules::Rule, rules::Report)]) -> Code {
+    if reports.iter().all(|(_, report)| report.ok()) {
+        Code::Ok
+    } else {
+        Code::Failed
+    }
+}
+
+fn report(
+    selected: &[rules::Rule],
+    context: &Context,
+    form: &Form,
+    noun: &str,
+    paint: Paint,
+) -> Outcome<Code> {
     let reports = measure(selected, context);
     let failed: Vec<&(&rules::Rule, rules::Report)> =
         reports.iter().filter(|(_, report)| !report.ok()).collect();
@@ -387,50 +467,40 @@ fn report(selected: &[rules::Rule], context: &Context, form: &Form, color: bool)
                 "unit": report.unit,
             })).collect::<Vec<_>>(),
         });
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&payload).unwrap_or_default()
-        );
-        return if failed.is_empty() {
-            ExitCode::SUCCESS
-        } else {
-            ExitCode::FAILURE
-        };
+        println!("{payload:#}");
+        return Ok(verdict(&reports));
     }
 
     /* Both forms read the same measurement, so nothing here can disagree with
     what the other would have shown. */
     if matches!(form, Form::Screen) {
-        let code = if failed.is_empty() {
-            ExitCode::SUCCESS
-        } else {
-            ExitCode::FAILURE
-        };
-        let drawn: Vec<(&rules::Rule, rules::Report)> = reports;
-        if let Err(why) = tui::run(&drawn) {
-            eprintln!(
-                "fusion: cannot open the audit screen: {why}.\n  \
-                 Run the same command with `--plain` for the printed form."
-            );
-            return ExitCode::from(70);
-        }
-        return code;
+        let code = verdict(&reports);
+        let drawn: Vec<(&rules::Rule, &rules::Report)> = reports
+            .iter()
+            .map(|(rule, report)| (*rule, report))
+            .collect();
+        tui::run(&drawn).map_err(|why| {
+            Failure::new(
+                Code::Internal,
+                "cannot open the audit screen",
+                format!("{why}. Run `fusion {noun} audit --plain` for the report."),
+            )
+        })?;
+        return Ok(code);
     }
-
-    let paint = |code: &str, text: &str| {
-        if color {
-            format!("\u{1b}[{code}m{text}\u{1b}[0m")
-        } else {
-            text.to_owned()
-        }
-    };
 
     if matches!(form, Form::Printed { loud: true }) {
         for (rule, report) in &reports {
-            let mark = if report.ok() { " " } else { &paint("31", "x") };
+            /* Padded before painting: a width applies to bytes, and an escape
+            sequence is bytes that occupy no column. */
+            let mark = if report.ok() {
+                " ".to_owned()
+            } else {
+                paint.fail("x")
+            };
             println!(
-                "{mark} {:<15}{} {} checked",
-                paint("1", rule.name),
+                "{mark} {}{} {} checked",
+                paint.bold(&format!("{:<15}", rule.name)),
                 report.checked,
                 report.unit
             );
@@ -441,16 +511,16 @@ fn report(selected: &[rules::Rule], context: &Context, form: &Form, color: bool)
     for (rule, report) in &failed {
         /* The summary once per rule, because a finding says what is wrong and
         the summary says what was wanted, and a reader needs both. */
-        eprintln!("{} {}", paint("1", rule.name), paint("2", rule.summary));
+        eprintln!("{} {}", paint.bold(rule.name), paint.dim(rule.summary));
         for finding in &report.findings {
             eprintln!(
                 "{} {}  {}",
-                paint("31", "x"),
-                paint("1", rule.name),
+                paint.fail("x"),
+                paint.bold(rule.name),
                 finding.file
             );
             eprintln!("    {}", finding.message);
-            eprintln!("{}", paint("2", &format!("    {}", finding.detail)));
+            eprintln!("{}", paint.dim(&format!("    {}", finding.detail)));
         }
     }
 
@@ -461,11 +531,11 @@ fn report(selected: &[rules::Rule], context: &Context, form: &Form, color: bool)
             "\nfusion: {total} finding{plural} across {} rules",
             failed.len()
         );
-        return ExitCode::FAILURE;
+        return Ok(Code::Failed);
     }
 
     if matches!(form, Form::Printed { loud: true }) {
         println!("fusion: {} rules, every one clean", reports.len());
     }
-    ExitCode::SUCCESS
+    Ok(Code::Ok)
 }

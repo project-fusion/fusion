@@ -28,6 +28,8 @@ use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 
+use crate::error::{Failure, Outcome};
+use crate::exit::Code;
 use crate::workspace::find_root;
 
 /// The most recently built binary under a cargo target directory.
@@ -47,7 +49,14 @@ fn built(name: &str) -> Option<PathBuf> {
 }
 
 /// Runs another product's command line and returns its exit code.
-pub fn to(product: &str, args: &[String]) -> Result<i32, String> {
+///
+/// # Errors
+///
+/// [`Failure`] with [`Code::Input`] when there is no such binary to run, and
+/// with [`Code::Internal`] when there is one and it could not be started. A
+/// child that exits by signal has no code, and is reported as this tool's own
+/// failure rather than as a number the child never chose.
+pub fn to(product: &str, args: &[String]) -> Outcome<i32> {
     let variable = format!("{}_BIN", product.to_uppercase());
     let binary = env::var_os(&variable)
         .map(PathBuf::from)
@@ -55,14 +64,20 @@ pub fn to(product: &str, args: &[String]) -> Result<i32, String> {
         .unwrap_or_else(|| PathBuf::from(product));
 
     match Command::new(&binary).args(args).status() {
-        Ok(status) => Ok(status.code().unwrap_or(70)),
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(format!(
-            "no `{product}` on this machine.\n\n  \
-             `fusion {product}` hands the rest of the line to it and does not reimplement it, so \
-             it has to be installed:\n\n    cargo install --path {product}/cli\n\n  \
-             Or point `{variable}` at a binary. Looked at: ${variable}, the cargo target \
-             directory, and `{product}` on PATH."
+        Ok(status) => Ok(status.code().unwrap_or(Code::Internal.as_i32())),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Err(Failure::input(
+            format!("no `{product}` on this machine"),
+            format!(
+                "`fusion {product}` hands the rest of the line to it and does not reimplement \
+                 it, so it has to be installed. Looked at ${variable}, the cargo target \
+                 directory, and `{product}` on PATH"
+            ),
+        )
+        .hint(format!("cargo install --path {product}/cli"))),
+        Err(error) => Err(Failure::new(
+            Code::Internal,
+            format!("could not run `{}`", binary.display()),
+            error.to_string(),
         )),
-        Err(error) => Err(format!("could not run `{}`: {error}", binary.display())),
     }
 }

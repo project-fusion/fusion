@@ -31,6 +31,7 @@ use std::sync::OnceLock;
 
 use serde::{Deserialize, Serialize};
 
+use crate::error::{Failure, Outcome};
 use crate::workspace::{self, Manifest};
 
 /// The workspace under test.
@@ -75,9 +76,13 @@ impl Context {
 
 /// `fusion.json`, which is what a workspace says about itself.
 ///
-/// **Optional, every key of it.** A rule needing something this does not carry
-/// reports nothing rather than guessing, and `floors` is what makes that visible
-/// rather than silent: a rule counting zero is a rule that stopped checking.
+/// **Optional, every key of it, and the file is not.** A rule needing something
+/// this does not carry reports nothing rather than guessing, and `floors` is
+/// what makes that visible rather than silent: a rule counting zero is a rule
+/// that stopped checking. The file itself is required for the same reason
+/// `helix` requires its own: a file that is not there and a file that says
+/// nothing would be the same empty set, and a typo in the name would pass every
+/// allowlist rule against nothing and report a clean workspace.
 #[derive(Debug, Default, Deserialize)]
 #[serde(default)]
 pub struct Settings {
@@ -151,12 +156,31 @@ pub struct Spec {
 }
 
 impl Settings {
-    /// Reads the settings beside the workspace, or an empty set.
-    pub fn read(root: &Path) -> Self {
-        fs::read_to_string(root.join("fusion.json"))
-            .ok()
-            .and_then(|raw| serde_json::from_str(&raw).ok())
-            .unwrap_or_default()
+    /// Reads the settings beside the workspace.
+    ///
+    /// # Errors
+    ///
+    /// [`Failure`] when the file is not there or is not this shape. **The parse
+    /// error carries serde's own message**, which names the key and the line,
+    /// because the file is hand written and the reader's next action is to open
+    /// it at that line. Before this the file was read with `.ok()`, so a
+    /// malformed one was an empty set and every rule passed against it.
+    pub fn read(root: &Path) -> Outcome<Self> {
+        const WHAT: &str = "the rules need to know what the workspace says about itself";
+        let file = root.join("fusion.json");
+        let raw = fs::read_to_string(&file).map_err(|_| {
+            Failure::input(
+                WHAT,
+                format!(
+                    "no configuration at {}.\n  `fusion` reads `fusion.json` beside the root \
+                     manifest. Every key in it is optional and the file is not, so a workspace \
+                     with nothing to say writes an empty one:\n\n  {{}}",
+                    root.display()
+                ),
+            )
+        })?;
+        serde_json::from_str(&raw)
+            .map_err(|error| Failure::input(WHAT, format!("{}: {error}", file.display())))
     }
 }
 
@@ -202,6 +226,22 @@ impl Report {
     }
 }
 
+/// What a `fix` hands back: every file it wrote, relative to the root.
+pub type Written = Result<Vec<String>, Unwritten>;
+
+/// A write that did not happen, which stops the fix where it stood.
+///
+/// **A fix that cannot write says so, rather than reporting the files it
+/// managed.** A caller reading "3 files written" has no way to learn that a
+/// fourth was refused, and a read-only checkout ran every fix as a quiet
+/// no-op before this.
+pub struct Unwritten {
+    /// Relative to the root, the way a finding names one.
+    pub file: String,
+    /// What the filesystem said.
+    pub why: String,
+}
+
 /// What one rule counted, which is all a meta rule needs of it.
 pub struct Measured {
     pub checked: usize,
@@ -227,7 +267,7 @@ pub struct Rule {
     pub name: &'static str,
     pub summary: &'static str,
     /// `None` for a rule that judges and cannot write, which is most of them.
-    pub fix: Option<fn(&Context) -> Vec<String>>,
+    pub fix: Option<fn(&Context) -> Written>,
     pub run: Runner,
 }
 
