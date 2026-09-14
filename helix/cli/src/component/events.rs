@@ -33,7 +33,7 @@
 //! above by being absent from both, while the name still type-checks against
 //! `addEventListener` and the handler is never called.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::fs;
 use std::sync::LazyLock;
 
@@ -150,13 +150,17 @@ fn checked_lists(
     barrel: &str,
     findings: &mut Vec<Finding>,
 ) {
+    /* **Tokenized once and looked up, rather than a pattern per class.** A
+    `\b{class}\b` compiled inside the loop cost a compile per event class, and
+    reading its failure through `is_ok_and` reported a class whose name would
+    not compile as one the barrel had left out. A word is a word; the set is
+    the same answer for every class and can be wrong for none of them. */
+    let exported: HashSet<&str> = WORD.find_iter(barrel).map(|one| one.as_str()).collect();
     for (class, event) in names {
         if !WORD.is_match(class) {
             continue;
         }
-        let exported = Regex::new(&format!(r"\b{}\b", regex::escape(class)))
-            .is_ok_and(|one| one.is_match(barrel));
-        if !exported {
+        if !exported.contains(class.as_str()) {
             findings.push(Finding {
                 detail: "No other package can import it, and the one that dispatches it cannot \
                          name its type."
