@@ -7,7 +7,6 @@ it is the workspace's own tooling.
 |---|---|
 | `./workspace` | Where things are, so a generator does not hardcode a path |
 | `./formatted` | Runs biome over generated text, so nothing lands unformatted |
-| `./compositions` | Which families compose which, read from the manifests |
 | `./format-open-tags` | The one-attribute-per-line shape examples are written in |
 | `./paint`, `./theme-facts`, `./theme-intents` | The theme engine's shared vocabulary |
 

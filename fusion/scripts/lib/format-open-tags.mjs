@@ -18,7 +18,7 @@
  * space and parentheses in it, and a `style` value has semicolons. Only a quote
  * that is not inside another quote ends a value.
  */
-export const attributes = (body) => {
+const attributes = (body) => {
   const parts = []
   let current = ''
   let quote = ''
