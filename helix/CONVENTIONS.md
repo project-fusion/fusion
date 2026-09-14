@@ -1461,6 +1461,13 @@ The naming, which was never about wrappers:
 - **The generated props sit beside React's own**, so `onClick`, `className`,
   `style`, ARIA, `slot`, `part` and `data-*` typecheck on a Helix tag without
   being declared per component.
+- **A numeric attribute takes the string that spells one.** `default-page="1"`
+  reaches `setAttribute`, because React assigns a name the element has no
+  property for as an attribute, and Lit's converter reads the number back out;
+  the generator typed it `number` all the same. `jsxNumericAttributes` widens
+  the attribute entry to `` number | `${number}` `` and leaves the property
+  entry, `defaultPage`, and every same-named attribute alone: those reach the
+  property verbatim, which is the `value={42}` rule above.
 
 ## Responsiveness
 
