@@ -37,9 +37,6 @@ helix/icons/src/generated.ts
 helix/*/src/element-events.generated.ts
 helix/*/.preview/.tsbuild
 helix/*/.tsbuild
-cortex/*/.tsbuild
-helix/theme/src/*.d.ts
-helix/theme/src/*.d.ts.map
 helix/styles/src/elements.css
 helix/styles/src/tokens.css
 fusion/site/content/catalog/catalog.generated.json
