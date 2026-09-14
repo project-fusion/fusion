@@ -177,11 +177,3 @@ slot[name="end"]::slotted(*) {
   padding-inline: var(--helix-space-none);
   position: absolute;
 }
-
-/* The UA hides a closed popover with `[popover]:not(:popover-open)`, and every
-   author declaration above outranks it whatever its specificity. Restated here,
-   the same way Select and Combobox restate theirs; `[hidden]` is the shared
-   panel sheet's, and the sheet records which families carry this line. */
-[part="surface"]:not(:popover-open) {
-  display: none;
-}
