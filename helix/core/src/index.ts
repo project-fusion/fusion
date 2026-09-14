@@ -155,7 +155,6 @@ export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin
 export { MixinTokens, type MixinTokensInterface } from './mixins/mixin-tokens/mixin-tokens.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
-export { closeMarkdown } from './utils/close-markdown/close-markdown.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {

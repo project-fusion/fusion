@@ -65,6 +65,27 @@ export interface PopoverOptions {
    */
   onDismiss: () => void
 
+  /**
+   * Whether the host wants the surface up, read after every update.
+   *
+   * **The open state is a property, and a consumer may set it directly**, so
+   * raising the surface from a `show()` method alone leaves a panel opened by
+   * declaring `open` visible, out of the top layer and unanchored: every
+   * imperative path works and every declarative one is half-open. Ten
+   * families wrote the same `if (this.open) show() else hide()` into their
+   * `updated()` for that reason, and this is that paragraph once.
+   *
+   * After the update and never before it, because the render has to have
+   * been written: until then the surface is still `display: none` and
+   * `showPopover` on it measures zeroes. A controller's `hostUpdated` runs
+   * after the commit and before the host's own `updated`, so a host that has
+   * to act on a surface that is up, focusing into it or centering a wheel,
+   * finds it up.
+   *
+   * Left unset, the host drives `show()` and `hide()` itself.
+   */
+  open?: () => boolean
+
   /** Preferred side. It moves if that side does not fit. */
   placement?: Placement | (() => Placement)
 
@@ -131,6 +152,19 @@ export class PopoverController implements ReactiveController {
   /** Whether the surface is showing. */
   get open(): boolean {
     return this.shown
+  }
+
+  /** Puts the surface where the host's `open` says, however it got there. */
+  hostUpdated(): void {
+    const wanted = this.options.open?.()
+    if (wanted === undefined) {
+      return
+    }
+    if (wanted) {
+      this.show()
+    } else {
+      this.hide()
+    }
   }
 
   /** Whether this one is placed by measurement, read fresh so it may change. */

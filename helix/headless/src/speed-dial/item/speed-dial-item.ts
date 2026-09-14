@@ -55,7 +55,7 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
 
   /** Puts focus on the control inside, which is what a reader can reach. */
   override focus(): void {
-    this.renderRoot?.querySelector<HTMLElement>('[part="item"]')?.focus()
+    this.partNamed('item')?.focus()
   }
 
   /** `NavigableItem`, so the arrow keys are the shared controller's business. */

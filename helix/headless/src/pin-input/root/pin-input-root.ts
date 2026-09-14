@@ -61,7 +61,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="cell"]') ?? null,
+    target: () => this.partNamed('cell'),
   })
 
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
@@ -430,7 +430,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
       return
     }
     this.committed = this.value
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+    this.announceChange()
   }
 
   /**

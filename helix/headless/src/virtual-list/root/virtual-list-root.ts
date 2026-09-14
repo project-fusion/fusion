@@ -84,7 +84,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
      at a 32 pixel row, which is a fact about the platform rather than a
      preference. */
   private readonly virtualize = new VirtualizeController(this, {
-    container: () => this.renderRoot.querySelector<HTMLElement>('[part="viewport"]'),
+    container: () => this.partNamed('viewport'),
     count: () => this.rows.length,
     estimate: () => this.estimate,
     measured: () => this.measured,

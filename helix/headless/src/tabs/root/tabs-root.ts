@@ -52,11 +52,15 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     selects: () => !this.manual,
   })
 
-  /* The mark. Same controller as the nav bar, the toggle group and the page nav. */
+  /* The mark. Same controller as the nav bar, the toggle group and the page nav.
+     The tabs are watched as well as the host, since a tab can change width
+     inside a strip that keeps its size; read again on every placement, because
+     they have not upgraded by the first one. */
   private readonly indicator = new IndicatorController(this, {
     active: () => this.tabs.find((tab) => tab.selected),
-    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="tabs"]'),
+    indicator: () => this.partNamed('indicator'),
+    observe: () => this.tabs,
+    surface: () => this.partNamed('tabs'),
   })
 
   /**
@@ -93,9 +97,6 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    */
   @property({ reflect: true })
   variant?: 'segmented' | 'underlined'
-
-  /** Watches for anything that moves a tab, since none of it is a property. */
-  private observer: ResizeObserver | undefined
 
   private get tabs(): HelixHeadlessTab[] {
     return [...this.children].filter(
@@ -139,25 +140,11 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
-    /* The observer is rebuilt here, because nothing else does it.
-     *
-     * `firstUpdated` runs once for the life of the element and
-     * `disconnectedCallback` runs every time it moves, so a framework
-     * reordering a list left this permanently dead: the observer gone, nothing
-     * to rebuild it, and the component still rendering as though it were
-     * watching. Guarded on `hasUpdated`, because the first connection happens
-     * before the first render and there is nothing to watch yet. */
-    if (this.hasUpdated) {
-      this.measure()
-      this.watch()
-    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
-    this.observer?.disconnect()
-    this.observer = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -174,37 +161,12 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
        the origin the moment the page was looked at. */
     this.indicator.place()
     requestAnimationFrame(() => this.indicator.place())
-    this.measure()
-    this.watch()
-  }
-
-  /** The host's own size, which moves every tab and therefore the mark. */
-  private measure(): void {
-    this.observer?.disconnect()
-    this.observer = new ResizeObserver(() => this.indicator.place())
-    this.observer.observe(this)
   }
 
   /**
-   * Watches every tab for a change of size.
+   * The set changed: pair it up and measure it.
    *
-   * Called again whenever the set changes, because `tabs` reads `this.children`
-   * and filters on `instanceof`, so it is empty until the tab elements upgrade.
-   * At `firstUpdated` it frequently is empty, and observing nothing is silent.
-   *
-   * `observe` is idempotent per element, so re-running this costs nothing and
-   * needs no bookkeeping about which tabs are already watched.
-   */
-  private watch(): void {
-    for (const tab of this.tabs) {
-      this.observer?.observe(tab)
-    }
-  }
-
-  /**
-   * The set changed: pair it up, watch it, and measure it.
-   *
-   * All three, and dropping `place()` leaves an indicator unplaced for the life
+   * Both, and dropping `place()` leaves an indicator unplaced for the life
    * of the page. The order of events is what does it: the host renders and
    * measures before its tabs have upgraded, so there is no selected tab to
    * measure and `place` refuses; the ResizeObserver's one initial callback
@@ -218,7 +180,6 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    */
   private readonly handleSlotChange = (): void => {
     this.sync()
-    this.watch()
     this.indicator.place()
   }
 

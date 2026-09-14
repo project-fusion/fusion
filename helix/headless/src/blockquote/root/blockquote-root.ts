@@ -46,7 +46,7 @@ export class HelixHeadlessBlockquote extends HelixElement {
    * rendered, which React reports on hydration.
    */
   private markEmpty(): void {
-    const footer = this.renderRoot?.querySelector<HTMLElement>('[part="attribution"]')
+    const footer = this.partNamed('attribution')
     const empty = !slotFilled(
       this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="attribution"]'),
     )

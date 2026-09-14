@@ -353,7 +353,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') {
       return
     }
-    const box = this.renderRoot.querySelector('[part="plot"]')?.getBoundingClientRect()
+    const box = this.partNamed('plot')?.getBoundingClientRect()
     if (!box || box.width === 0 || box.height === 0) {
       return
     }

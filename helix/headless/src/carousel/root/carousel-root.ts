@@ -349,7 +349,7 @@ export class HelixHeadlessCarousel extends HelixElement {
        scroller's offsets are about; the slide is its content and, before the
        assignment lands, is not in the track's layout at all. */
     const slide = this.panes[this.index]
-    const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
+    const track = this.partNamed('track')
     if (!slide || !track) {
       return
     }
@@ -452,7 +452,7 @@ export class HelixHeadlessCarousel extends HelixElement {
    * and the dots jumped to an indicator that no longer existed.
    */
   private nearest(): number | undefined {
-    const track = this.renderRoot.querySelector<HTMLElement>('[part="track"]')
+    const track = this.partNamed('track')
     if (!track) {
       return undefined
     }

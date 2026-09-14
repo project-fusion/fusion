@@ -245,9 +245,9 @@ export class HelixHeadlessTour extends HelixElement {
        for a reason that is not the component's. `Megamenu` moved its own
        listener to the host for exactly this. */
     this.addEventListener('helix-tour-ask', this.handleAsk)
-    this.ownerDocument.addEventListener('keydown', this.handleKeydown)
-    globalThis.addEventListener('resize', this.handleViewport, { passive: true })
-    globalThis.addEventListener('scroll', this.handleViewport, { capture: true, passive: true })
+    document.addEventListener('keydown', this.handleKeydown)
+    window.addEventListener('resize', this.handleViewport, { passive: true })
+    window.addEventListener('scroll', this.handleViewport, { capture: true, passive: true })
     /* Moved rather than new, so the watch torn down on disconnect comes back:
        nothing else updates a tour that was only reordered. Never before the
        first update, whose render on a server's page has to be the server's. */
@@ -259,9 +259,9 @@ export class HelixHeadlessTour extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-tour-ask', this.handleAsk)
-    this.ownerDocument.removeEventListener('keydown', this.handleKeydown)
-    globalThis.removeEventListener('resize', this.handleViewport)
-    globalThis.removeEventListener('scroll', this.handleViewport, { capture: true })
+    document.removeEventListener('keydown', this.handleKeydown)
+    window.removeEventListener('resize', this.handleViewport)
+    window.removeEventListener('scroll', this.handleViewport, { capture: true })
     this.sizer?.disconnect()
     this.sized = undefined
   }

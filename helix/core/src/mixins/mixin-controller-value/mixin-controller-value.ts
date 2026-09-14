@@ -139,10 +139,10 @@ export const MixinControllerValue = <T extends Constructor<HelixFormElement>>(Ba
      * is done, so the pair keeps the platform's timings rather than reporting a
      * commit on every keystroke.
      */
-    private announceNatively(): void {
-      this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    protected announceNatively(): void {
+      this.announceInput()
       if (!this.announcesInput) {
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+        this.announceChange()
       }
     }
 

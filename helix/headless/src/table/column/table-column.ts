@@ -325,7 +325,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
   }
 
   private observeHeading(): void {
-    const heading = this.renderRoot?.querySelector('[part="column"]')
+    const heading = this.partNamed('column')
     if (heading) {
       this.watcher?.observe(heading)
     }

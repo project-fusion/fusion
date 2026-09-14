@@ -460,8 +460,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     /* Null while `windowed` is off, which is what keeps the controller inert
        rather than conditionally constructed: a controller is built once and
        this property can change at runtime. */
-    container: () =>
-      this.windowed ? this.renderRoot.querySelector<HTMLElement>('[part="table"]') : null,
+    container: () => (this.windowed ? this.partNamed('table') : null),
     count: () => this.available,
     estimate: () => this.estimate,
     /* Always measured when windowing at all. The uniform path converts offset

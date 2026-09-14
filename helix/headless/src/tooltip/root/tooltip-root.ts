@@ -248,7 +248,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
      the press that opened it as a press outside. */
   private readonly bubbleLayer = new PopoverController(this, {
     anchor: () => this.trigger,
-    arrow: () => this.renderRoot.querySelector<HTMLElement>('[part="arrow"]'),
+    arrow: () => this.partNamed('arrow'),
     /* Annotated, because without it the array's element type is inferred from
        `this`, whose own type depends on this controller, and TypeScript stops
        at the cycle. */
@@ -265,7 +265,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
      * box and would count the reach twice. Zero while the bubble is closed and
      * unrendered, which is right: there is nothing to place then either. */
     offset: () => {
-      const point = this.renderRoot.querySelector<HTMLElement>('[part="arrow"]')
+      const point = this.partNamed('arrow')
       return this.offset + (point?.offsetWidth ?? 0) / Math.SQRT2
     },
     /* Escape closes the bubble from wherever the reader is, and this is the
@@ -290,7 +290,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       this.hide()
     },
     placement: () => this.placement,
-    surface: () => this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]'),
+    surface: () => this.partNamed('tooltip'),
     within: () => this.enclosure,
   })
 
@@ -312,7 +312,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   private get bubble(): HTMLElement | null {
-    return this.renderRoot.querySelector<HTMLElement>('[part="tooltip"]')
+    return this.partNamed('tooltip')
   }
 
   /**

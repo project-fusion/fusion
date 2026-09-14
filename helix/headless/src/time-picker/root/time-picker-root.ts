@@ -503,7 +503,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * browser points its bubble at.
    */
   private reportRequired(): void {
-    const anchor = this.renderRoot?.querySelector<HTMLElement>('[part="list"]') ?? undefined
+    const anchor = this.partNamed('list') ?? undefined
     if (this.required && this.value === '') {
       this.internals.setValidity({ valueMissing: true }, 'Choose a time.', anchor)
       return
@@ -606,7 +606,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
 
   /** Puts the keyboard on the list, which is the only control here. */
   override focus(options?: FocusOptions): void {
-    this.renderRoot?.querySelector<HTMLElement>('[part="list"]')?.focus(options)
+    this.partNamed('list')?.focus(options)
   }
 
   /**

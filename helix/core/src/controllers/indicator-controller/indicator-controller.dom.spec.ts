@@ -92,6 +92,55 @@ const at = (indicator: HTMLElement): Record<string, string> =>
     ]),
   )
 
+describe('what is watched for a change of size', () => {
+  /* The host is not enough on its own: an item can change width inside a
+     strip that keeps its size, and the host never fires for that. The items
+     are read again on every placement, because a tab strip's tabs have not
+     upgraded by its first update and a list read then is empty. Observed
+     through a stand-in, put back afterwards, that records what it was given. */
+  const observing = (): { observed: Element[]; restore: () => void } => {
+    const real = globalThis.ResizeObserver
+    const observed: Element[] = []
+    globalThis.ResizeObserver = class {
+      disconnect(): void {}
+      observe(element: Element): void {
+        observed.push(element)
+      }
+      unobserve(): void {}
+    } as unknown as typeof ResizeObserver
+    return {
+      observed,
+      restore: () => {
+        globalThis.ResizeObserver = real
+      },
+    }
+  }
+
+  test('is the host and whatever `observe` names, read again as the set grows', () => {
+    const watching = observing()
+    try {
+      document.body.innerHTML = '<div id="host"><b id="one"></b><b id="two"></b></div>'
+      const host = document.getElementById('host') as HTMLElement
+      Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
+      const items: Element[] = [document.getElementById('one') as Element]
+      const mark = new IndicatorController(host as never, {
+        active: () => null,
+        indicator: () => null,
+        observe: () => items,
+        surface: () => null,
+      })
+      live.push(mark)
+      mark.hostConnected()
+      expect(watching.observed.map((each) => each.id)).toEqual(['host', 'one'])
+      items.push(document.getElementById('two') as Element)
+      mark.place()
+      expect(watching.observed.map((each) => each.id)).toEqual(['host', 'one', 'one', 'two'])
+    } finally {
+      watching.restore()
+    }
+  })
+})
+
 describe('the geometry of the marked child', () => {
   test('is written as the four properties whoever draws the mark reads', () => {
     const one = scene()

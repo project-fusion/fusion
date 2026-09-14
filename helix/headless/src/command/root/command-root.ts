@@ -133,7 +133,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   private footed = false
 
   private get listbox(): HelixHeadlessListbox | null {
-    return this.renderRoot?.querySelector<HelixHeadlessListbox>('[part="listbox"]') ?? null
+    return this.partNamed<HelixHeadlessListbox>('listbox')
   }
 
   /**
@@ -303,8 +303,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
       /* The field takes focus as the palette arrives. A reader who pressed a
          key to summon a search expects to be typing in it, and the dialog would
          otherwise put focus on itself. */
-      this.renderRoot
-        .querySelector<HelixHeadlessListbox>('[part="listbox"]')
+      this.partNamed<HelixHeadlessListbox>('listbox')
         ?.renderRoot?.querySelector<HTMLInputElement>('[part="search-field"]')
         ?.focus()
     } else {

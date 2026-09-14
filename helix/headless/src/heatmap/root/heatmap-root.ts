@@ -282,7 +282,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * is worse than no number, because it is the one the count is published from.
    */
   private measure(): void {
-    const strip = this.renderRoot?.querySelector('[part="strip"]')
+    const strip = this.partNamed('strip')
     if (!strip || typeof getComputedStyle !== 'function') {
       return
     }

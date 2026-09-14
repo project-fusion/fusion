@@ -124,7 +124,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /**
@@ -264,22 +264,23 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   }
 
   private get listbox(): HelixHeadlessListbox | null {
-    return this.renderRoot?.querySelector<HelixHeadlessListbox>('[part="listbox"]') ?? null
+    return this.partNamed<HelixHeadlessListbox>('listbox')
   }
 
   protected readonly panel = new PopoverController(this, {
-    anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
+    anchor: () => this.partNamed('field'),
     /* The surface *and* the field. Scoped to the surface alone, a press on the
        field counts as outside, so `pointerdown` closes the panel and the
        field's own handler reopens it on the `click` that follows. */
     boundary: (): readonly (Element | null | undefined)[] => [
-      this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
-      this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
+      this.partNamed('surface'),
+      this.partNamed('field'),
     ],
     offset: () => 4,
     onDismiss: () => this.close(),
+    open: () => this.open,
     placement: 'bottom-start',
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    surface: () => this.partNamed('surface'),
   })
 
   /** The values chosen, in the order they were chosen. */
@@ -412,7 +413,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       return
     }
     this.requestOpen(false)
-    this.renderRoot.querySelector<HTMLElement>('[part="control"]')?.focus()
+    this.partNamed('control')?.focus()
   }
 
   private readonly handleInput = (event: Event): void => {
@@ -580,7 +581,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     ) {
       return
     }
-    this.renderRoot.querySelector<HTMLElement>('[part="control"]')?.focus()
+    this.partNamed('control')?.focus()
     if (!this.open) {
       this.requestOpen(true)
     }
@@ -647,7 +648,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
      
        Reconciled against what the input actually holds, which is the only thing
        that knows. */
-    const control = this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    const control = this.partNamed<HTMLInputElement>('control')
     /* The same expression the template binds, because this has to agree with it
        in both directions. Writing only when there is a completion puts the
        field right while one is showing and leaves it stale afterwards: this
@@ -661,18 +662,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (control && this.suggestion !== '') {
       control.setSelectionRange(this.typed.length, this.suggestion.length)
     }
-    if (this.open) {
-      this.panel.show()
-    } else {
-      this.panel.hide()
-      /* And the filter goes with it, for the reason the class note records: a
-         control reopened still narrowed is one whose second use starts from the
-         first one's leftovers.
+    /* The panel follows `open` through the controller. The filter goes with a
+       close, for the reason the class note records: a control reopened still
+       narrowed is one whose second use starts from the first one's leftovers.
 
-         All three, not the listbox's copy alone. A surviving `typed` is
-         invisible on close, because a closed single-choice field shows the
-         chosen words instead, and comes back with the list behind it showing
-         everything the moment it reopens. */
+       All three, not the listbox's copy alone. A surviving `typed` is
+       invisible on close, because a closed single-choice field shows the
+       chosen words instead, and comes back with the list behind it showing
+       everything the moment it reopens. */
+    if (!this.open) {
       this.typed = ''
       this.suggestion = ''
       this.listbox?.requestFilter('')

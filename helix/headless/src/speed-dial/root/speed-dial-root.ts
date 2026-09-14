@@ -88,22 +88,26 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     selects: () => false,
   })
 
-  private readonly panel = new PopoverController(this, {
+  /* Registered rather than held, the way `ToggleGroup` holds its keys: the
+     controller follows `open` on its own, so nothing here talks to it after
+     construction, and a private field nothing reads is an unused one. */
+  protected readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
     /* The host, so a press on the trigger is not counted as a press outside.
        `Menu` and `Megamenu` both say the same about their own. */
     boundary: () => this,
     offset: () => this.offset,
     onDismiss: () => this.close(),
+    open: () => this.open,
     placement: () => this.placement,
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="actions"]'),
+    surface: () => this.partNamed('actions'),
   })
 
   /** Whatever the consumer slotted, or the button rendered in its place. */
   private get trigger(): HTMLElement {
     return anchorElement(
       this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]'),
-      this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]') ?? this,
+      this.partNamed('trigger') ?? this,
     )
   }
 
@@ -189,7 +193,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    */
   private announce(): void {
     const trigger = this.trigger
-    if (trigger === this.renderRoot?.querySelector('[part="trigger"]')) {
+    if (trigger === this.partNamed('trigger')) {
       return
     }
     tellDisclosure(trigger, this.open)
@@ -199,7 +203,6 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     super.updated?.(changed)
     this.announce()
     if (this.open) {
-      this.panel.show()
       /* On the first action, which is where a reader who opened this with the
          keyboard expects to be. The pointer does not mind either way.
 
@@ -219,8 +222,6 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
           this.items.find((one) => !one.disabled)?.focusItem()
         }
       })
-    } else {
-      this.panel.hide()
     }
   }
 

@@ -90,7 +90,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
 
   /** Moves focus onto the row itself. */
   focusItem(): void {
-    this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
+    this.partNamed('item')?.focus()
   }
 
   /** Announces that this row was chosen. */

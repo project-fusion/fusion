@@ -75,11 +75,15 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     // The same exact match `sync` makes: nothing chosen means nothing marked,
     // and the controller takes the mark away rather than parking it on item one.
     active: () => this.items.find((item) => item.value === this.value),
-    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="track"]'),
+    indicator: () => this.partNamed('indicator'),
+    /* Per item, not only the host, which the controller watches on its own. An
+       item can change width inside a track that keeps its size, and the host
+       never fires for that. Read again on every placement, so a group whose
+       options arrive with the data has each one watched from the placement
+       after it lands. */
+    observe: () => this.items,
+    surface: () => this.partNamed('track'),
   })
-
-  private observer: ResizeObserver | undefined
 
   /* Moving and choosing are one act, which is the radio group pattern this
      control also follows, and is what the controller exists to stop being
@@ -104,22 +108,6 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     )
   }
 
-  /**
-   * Watches the group and every item it currently holds.
-   *
-   * Called again on `slotchange`, because the set was read once at first paint:
-   * an item added later was measured by nothing, so a group whose options
-   * arrive with the data had a thumb that stopped following the moment one of
-   * them changed width. Observing the same element twice is a no-op, so there
-   * is nothing to unwind first.
-   */
-  private watch(): void {
-    this.observer?.observe(this)
-    for (const item of this.items) {
-      this.observer?.observe(item)
-    }
-  }
-
   private readonly handleSelection = (event: Event): void => {
     this.requestValue((event as CustomEvent<{ value: string }>).detail.value)
   }
@@ -127,52 +115,25 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('helix-select', this.handleSelection)
-    /* The observer is rebuilt here, because nothing else does it.
-     *
-     * `firstUpdated` runs once for the life of the element and
-     * `disconnectedCallback` runs every time it moves, so a framework
-     * reordering a list left this permanently dead: the observer gone, nothing
-     * to rebuild it, and the component still rendering as though it were
-     * watching. Guarded on `hasUpdated`, because the first connection happens
-     * before the first render and there is nothing to watch yet. */
-    if (this.hasUpdated) {
-      this.measure()
-      this.watch()
-    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-select', this.handleSelection)
-    this.observer?.disconnect()
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.sync()
     this.indicator.place()
-    /* Per item, not only the host, which is what the controller's own observer
-       covers. An item can change width inside a track that keeps its size, and
-       the host never fires for that. */
-    this.measure()
-    this.watch()
-  }
-
-  /** The observer the items are registered on, rebuilt with them. */
-  private measure(): void {
-    this.observer?.disconnect()
-    this.observer = new ResizeObserver(() => this.indicator.place())
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`. The placement stays gated, because the indicator
+    // `ColorInput.updated`. The mark is not placed from here: the indicator
     // controller already places on every update of its own host.
     this.sync()
-    if (changed.has('value')) {
-      this.indicator.place()
-    }
     this.validate()
     /* Every update, because the label and the message come and go with the
        properties behind them, and an element reference to a node that has been
@@ -265,7 +226,6 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
         <div part="indicator" aria-hidden="true"></div>
         <slot
           @slotchange=${() => {
-            this.watch()
             this.sync()
             this.indicator.place()
           }}

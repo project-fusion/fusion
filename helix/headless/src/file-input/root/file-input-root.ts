@@ -118,7 +118,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /**
@@ -191,10 +191,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * a reader and a server has never met one.
    */
   private get control(): HTMLInputElement | null {
-    if (typeof this.renderRoot?.querySelector !== 'function') {
-      return null
-    }
-    return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    return this.partNamed<HTMLInputElement>('control')
   }
 
   /**
@@ -256,8 +253,8 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        inner `<input type="file">`'s own, composed out of this shadow root, so
        the documented event does not exist and an undocumented one arrives in
        its place. */
-    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+    this.announceInput()
+    this.announceChange()
   }
 
   /**

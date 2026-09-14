@@ -11,6 +11,21 @@ export interface IndicatorOptions {
   indicator: () => HTMLElement | null | undefined
 
   /**
+   * Elements whose own size moves the mark, beyond the host.
+   *
+   * The host is always watched, and it is not enough on its own: an item can
+   * change width inside a strip that keeps its size, and the host never fires
+   * for that. So a component hands over its items, and they are watched too.
+   *
+   * Read again on every placement rather than once, because the set is not
+   * settled when the controller connects: a tab strip's tabs have not
+   * upgraded by its first update, so a list read then is empty, and watching
+   * nothing is silent. Observing the same element twice is a no-op, so the
+   * re-read costs nothing and needs no bookkeeping about who is watched.
+   */
+  observe?: () => readonly Element[]
+
+  /**
    * The box the mark is positioned against, which is its containing block.
    *
    * Not the host. An absolutely positioned element is placed against its
@@ -79,6 +94,14 @@ export class IndicatorController implements ReactiveController {
        rewrap changes its height. */
     this.resize = new ResizeObserver(() => this.place())
     this.resize.observe(this.host)
+    this.watch()
+  }
+
+  /** Watches whatever `observe` names now, which `place` asks for on every placement. */
+  private watch(): void {
+    for (const element of this.options.observe?.() ?? []) {
+      this.resize?.observe(element)
+    }
   }
 
   hostDisconnected(): void {
@@ -121,6 +144,9 @@ export class IndicatorController implements ReactiveController {
    * placed on its own updates left the mark unplaced for the life of the page.
    */
   place(): void {
+    // Before any of the early returns: the items are there to watch whether or
+    // not there is anything to measure yet.
+    this.watch()
     const indicator = this.options.indicator()
     const surface = this.options.surface()
     const active = this.options.active()

@@ -111,7 +111,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /**
@@ -249,7 +249,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    * reason, its trigger being the whole control.
    */
   protected readonly panel = new PopoverController(this, {
-    anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
+    anchor: () => this.partNamed('field'),
     /* The surface *and* the trigger.
      *
      * A control is not always one element: the button that opens this panel is
@@ -259,8 +259,8 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
      * panel can never be closed by the button that opened it.
      * `DismissController` documents this failure and takes a list for it. */
     boundary: (): readonly (Element | null | undefined)[] => [
-      this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
-      this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
+      this.partNamed('surface'),
+      this.partNamed('trigger'),
     ],
     /* Wider than the four every other panel here takes. Those sit against a
        control the same width as themselves and read as an extension of it; this
@@ -268,15 +268,13 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
        says the two are separate things rather than one control that grew. */
     offset: () => 8,
     onDismiss: () => this.requestOpen(false),
+    open: () => this.open,
     placement: 'bottom-start',
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    surface: () => this.partNamed('surface'),
   })
 
   private get control(): HTMLInputElement | null {
-    if (typeof this.renderRoot?.querySelector !== 'function') {
-      return null
-    }
-    return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    return this.partNamed<HTMLInputElement>('control')
   }
 
   /**
@@ -523,21 +521,11 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     // Every update, not only the ones that name `value`: see the note on
     // `ColorInput.updated`.
     this.sync()
-    /* Driven from here rather than from the toggle, because `open` is a property
-       a consumer may set directly and the panel has to follow either way. The
-       controller is idempotent, so arriving twice for the same open costs
-       nothing. Select drives it the same way, and without this the surface stays
-       `display: none`: a `popover` element is hidden until something shows it,
-       so the calendar rendered its forty-two cells into a box of nothing. */
-    if (this.open) {
-      this.panel.show()
-      // Only on the update that opened it, or every keystroke while it is up
-      // would steal focus back into the grid.
-      if (changed.has('open')) {
-        this.renderRoot?.querySelector<HTMLElement>('[part="picker"]')?.focus()
-      }
-    } else {
-      this.panel.hide()
+    /* The panel follows `open` through the controller, which has shown it by
+       the time this runs. Only on the update that opened it, or every keystroke
+       while it is up would steal focus back into the grid. */
+    if (this.open && changed.has('open')) {
+      this.partNamed('picker')?.focus()
     }
   }
 

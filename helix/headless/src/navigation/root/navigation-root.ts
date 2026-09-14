@@ -40,8 +40,9 @@ export class HelixHeadlessNavigation extends HelixElement {
      travels the wrong way in a right-to-left document. */
   private readonly indicator = new IndicatorController(this, {
     active: () => this.items.find((item) => item.getAttribute('aria-current') === 'page'),
-    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="nav"]'),
+    indicator: () => this.partNamed('indicator'),
+    observe: () => this.items,
+    surface: () => this.partNamed('nav'),
   })
 
   /**
@@ -50,7 +51,6 @@ export class HelixHeadlessNavigation extends HelixElement {
   @property()
   label = 'Main'
 
-  private observer: ResizeObserver | undefined
   private current: MutationObserver | undefined
 
   /** The destinations the consumer slotted. */
@@ -59,9 +59,8 @@ export class HelixHeadlessNavigation extends HelixElement {
     return (slot?.assignedElements() ?? []) as HTMLElement[]
   }
 
-  /** Re-measures when the links change, move, or hand over the current page. */
+  /** Re-measures when the links change or hand over the current page. */
   private watch(): void {
-    this.observer?.disconnect()
     this.current?.disconnect()
 
     /* Nothing is written onto the items, and `data-navigation-item` must not be
@@ -72,12 +71,6 @@ export class HelixHeadlessNavigation extends HelixElement {
      * layer selects `helix-navigation a`, so the styling is true the moment the
      * markup is parsed, on the server and on the client. */
     this.indicator.place()
-
-    this.observer = new ResizeObserver(() => this.indicator.place())
-    this.observer.observe(this)
-    for (const item of this.items) {
-      this.observer.observe(item)
-    }
 
     // Client-side routing changes `aria-current` in place rather than
     // reloading, so nothing else would tell the marker to move.
@@ -104,7 +97,6 @@ export class HelixHeadlessNavigation extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.observer?.disconnect()
     this.current?.disconnect()
   }
 

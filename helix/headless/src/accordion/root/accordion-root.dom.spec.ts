@@ -155,4 +155,44 @@ describe('accordion keyboard navigation', () => {
     ;(items(accordion)[0] as HTMLElement).dispatchEvent(event)
     expect(event.defaultPrevented).toBe(false)
   })
+
+  /* The shared controller's rule, which the hand-written copy did not follow:
+     a reader who guesses the wrong axis and gets nothing concludes the set does
+     not answer the keyboard. */
+  test('the other axis moves too, since a trigger has no use for it', async () => {
+    const accordion = await mount(three)
+    const list = items(accordion)
+    let focused: HTMLElement | null = null
+    for (const item of list) {
+      ;(item as unknown as { focusTrigger(): void }).focusTrigger = () => {
+        focused = item
+      }
+    }
+    press(list[0] as HTMLElement, 'ArrowRight')
+    expect<HTMLElement | null>(focused).toBe(at(list, 1) as HTMLElement)
+  })
+
+  /* An item holds its content as well as its trigger, and a control in an open
+     section owns its own arrow keys: a caret that stopped moving because the
+     accordion took the press would be the shared controller applied one level
+     too wide. Only a press that arrives as the item's own, which is what a
+     trigger's press retargets to, moves between triggers. */
+  test('a press from inside a section is the section’s, not the accordion’s', async () => {
+    const accordion = await mount(three.replace('>1<', '><input id="inside" />1<'))
+    const list = items(accordion)
+    let moved = false
+    for (const item of list) {
+      ;(item as unknown as { focusTrigger(): void }).focusTrigger = () => {
+        moved = true
+      }
+    }
+    const inside = accordion.querySelector('#inside') as HTMLElement
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'ArrowDown',
+    })
+    inside.dispatchEvent(event)
+    expect([moved, event.defaultPrevented]).toEqual([false, false])
+  })
 })

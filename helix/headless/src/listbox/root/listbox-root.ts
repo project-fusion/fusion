@@ -165,7 +165,7 @@ export class HelixHeadlessListbox extends MixinCollection(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="items"]') ?? null,
+    target: () => this.partNamed('items'),
   })
 
   /**
@@ -514,7 +514,7 @@ export class HelixHeadlessListbox extends MixinCollection(
    * rects and moving by the difference needs no such assumption.
    */
   reveal(): void {
-    const items = this.renderRoot?.querySelector<HTMLElement>('[part="items"]')
+    const items = this.partNamed('items')
     const chosen = this.options.find((option) => option.selected && !option.hidden)
     if (!items || !chosen) {
       return
@@ -603,7 +603,7 @@ export class HelixHeadlessListbox extends MixinCollection(
   private followActive(): void {
     const active = this.shown.find((option) => option.value === this.activeValue)
     if (active) {
-      const items = this.renderRoot.querySelector<HTMLElement>('[part="items"]')
+      const items = this.partNamed('items')
       scrollItemIntoView(active, { padding: 4, ...(items ? { scroller: items } : {}) })
     }
   }

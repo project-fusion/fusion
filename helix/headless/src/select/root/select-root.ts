@@ -84,7 +84,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]') ?? null,
+    target: () => this.partNamed('trigger'),
   })
 
   /**
@@ -167,7 +167,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * be reached from the server and are left plain.
    */
   private get listbox(): HelixHeadlessListbox | null {
-    return this.renderRoot?.querySelector<HelixHeadlessListbox>('[part="listbox"]') ?? null
+    return this.partNamed<HelixHeadlessListbox>('listbox')
   }
 
   /* The surface floats *and is in the top layer*.
@@ -184,7 +184,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * counted once in the placement and again in the layout, and the gap would
    * change as the panel flipped above the trigger for want of room. */
   protected readonly panel = new PopoverController(this, {
-    anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
+    anchor: () => this.partNamed('trigger'),
     /* The surface *and* the trigger.
      *
      * A control is not always one element: the button that opens this panel is
@@ -196,13 +196,14 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
      * `DismissController` documents this exact failure and takes a list for
      * it. */
     boundary: (): readonly (Element | null | undefined)[] => [
-      this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
-      this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
+      this.partNamed('surface'),
+      this.partNamed('trigger'),
     ],
     offset: () => 4,
     onDismiss: () => this.close(),
+    open: () => this.open,
     placement: 'bottom-start',
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    surface: () => this.partNamed('surface'),
   })
 
   /**
@@ -235,7 +236,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     this.requestOpen(false)
     // Back to the trigger, because focus is inside a panel that is going away
     // and a reader who loses it lands at the top of the document.
-    this.renderRoot.querySelector<HTMLElement>('[part="trigger"]')?.focus()
+    this.partNamed('trigger')?.focus()
   }
 
   private readonly handleChange = (event: Event): void => {
@@ -307,12 +308,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     super.updated(changed)
     this.sync()
     this.linkHost()
+    /* The panel follows `open` through the controller, which reads it after
+       every update. What is left here is what only this element knows. */
     if (this.open) {
-      /* Driven from `updated` rather than from a `show()` method, because the
-         open state is the property and a consumer may set it directly. The
-         controller is idempotent, so arriving here twice for the same open
-         costs nothing. */
-      this.panel.show()
       /* Into the list, which is where the keyboard has to be for the arrows to
          mean anything. The listbox delegates focus, so this lands on the list
          inside it rather than stopping at the listbox element, which is not
@@ -325,8 +323,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         this.listbox?.focus()
       }
     } else {
-      this.panel.hide()
-      /* And the filter goes with it. Without this a filterable select reopens
+      /* The filter goes with a close. Without this a filterable select reopens
          still narrowed by the old needle, with `hidden` still written on the
          options it ruled out, so the second use of the control starts from the
          first one's leftovers. Closing is where a search ends. */

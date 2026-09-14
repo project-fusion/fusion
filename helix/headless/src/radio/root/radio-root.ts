@@ -90,7 +90,7 @@ export class HelixHeadlessRadio extends HelixElement {
 
   /** Moves focus to this choice, for the group's arrow keys. */
   focusItem(): void {
-    this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
+    this.partNamed('item')?.focus()
   }
 
   /** Makes this choice and announces it. */
