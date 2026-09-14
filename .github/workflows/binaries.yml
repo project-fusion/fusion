@@ -24,6 +24,8 @@ on:
       - .github/workflows/binaries.yml
       - Cargo.lock
       - Cargo.toml
+      # The two crates the binary is built from, beside its own.
+      - fusion/rules/**
       - helix/cli/**
       - helix/theme/**
 

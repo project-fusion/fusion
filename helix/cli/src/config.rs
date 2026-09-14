@@ -22,8 +22,7 @@
 use std::path::{Path, PathBuf};
 
 use fusion_helix_theme::intent::ThemeIntent;
-
-use crate::error::{Failure, Outcome};
+use fusion_rules::error::{Failure, Outcome};
 
 /// The name a discovered intent is expected to have.
 pub const FILE: &str = "helix.theme.json";

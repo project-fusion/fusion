@@ -2,43 +2,44 @@
 //!
 //! **The contract this implements is deliberately larger than the one noun it
 //! has**, and writing it down is what makes the second one cheap: argument
-//! grammar in [`args`], exit codes in [`exit`], error format in [`error`],
-//! config discovery and precedence in [`config`]. Each of those is a module with
-//! its reasoning in it rather than a paragraph in a document nobody opens while
-//! writing a command.
+//! grammar in [`args`], config discovery and precedence in [`config`], and the
+//! exit codes and error format in `fusion-rules`, which is the crate both
+//! command lines read them from so that `fusion helix ...` can hand this
+//! binary's code back untouched. Each of those is a module with its reasoning
+//! in it rather than a paragraph in a document nobody opens while writing a
+//! command.
 //!
 //! **Every product CLI works standalone**: `helix theme build` needs nothing
-//! else installed, and a
-//! future `fusion` that routes to it is a convenience rather than a gate. A
-//! router that discovers `fusion-*` on `PATH` is a plugin protocol, and a
-//! protocol designed against one plugin is an abstraction validated against
-//! nothing, so it is deliberately not built yet.
+//! else installed, and `fusion`, which routes to it, is a convenience rather
+//! than a gate. A router that discovers `fusion-*` on `PATH` is a plugin
+//! protocol, and a protocol designed against one plugin is an abstraction
+//! validated against nothing, so it is deliberately not built.
 
 mod args;
 mod component;
 mod config;
-mod error;
-mod exit;
 mod mcp;
 mod new;
-mod style;
 mod theme;
 
 use std::path::PathBuf;
 
 use clap::Parser;
+use fusion_rules::error::Failure;
+use fusion_rules::exit::Code;
+use fusion_rules::style::Paint;
 
 use crate::args::{Cli, Component, Noun, Theme};
-use crate::error::Failure;
-use crate::exit::Code;
-use crate::style::Paint;
+
+/// The word every printed failure opens with, and the corner of every screen.
+const PRODUCT: &str = "helix";
 
 fn main() {
     let cli = Cli::parse();
     let paint = if cli.json {
         Paint::never()
     } else {
-        Paint::decide(cli.no_color)
+        Paint::decide(PRODUCT, cli.no_color)
     };
 
     let from = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
@@ -75,7 +76,7 @@ fn report(failure: &Failure, json: bool) -> i32 {
     if json {
         eprintln!("{}", failure.as_json());
     } else {
-        eprintln!("{failure}");
+        eprintln!("{}", failure.render(PRODUCT));
     }
     failure.code.as_i32()
 }

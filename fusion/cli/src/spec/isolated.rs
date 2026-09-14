@@ -34,10 +34,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::Regex;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 static RENDERS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"<HelixElements\b").expect("a literal pattern compiles"));

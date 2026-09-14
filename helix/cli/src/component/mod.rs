@@ -6,17 +6,19 @@
 //! parts, hooks, tiers and reflected properties because Helix does; the rules
 //! that hold Helix to its own conventions are the same rules that hold theirs.
 //!
-//! **`Rule` and `Report` are declared here rather than shared with
-//! `fusion-cli`, and they are not the whole of what is copied.** A crate holding
-//! them would be a dependency from the helix domain onto the fusion one:
-//! per-domain lockstep exists so a release of either does not wait on the
-//! other, and a shared crate is exactly the thing that makes it wait. What that
-//! decision costs is about eight hundred lines, measured 14 Sep 2026: the audit
-//! screen, the exit, error and color modules, these types, the runner that
-//! measures the rules, the `fix` verb, the `--only` check, the JSON payload and
-//! the walker. The screen is held identical by a test in `fusion-cli`; the rest
-//! is kept the same by hand, which is the trade. The day it stops being the
-//! cheaper one, a shared crate would carry exactly that list.
+//! **What a rule is comes from `fusion-rules`, and what a component rule reads
+//! is declared here.** `Rule`, `Report`, the runner that measures a set of
+//! rules on a thread each, the `fix` verb, the `--only` check, the JSON
+//! payload, the audit screen, the exit codes, the error format, color and the
+//! walker were about eight hundred lines this crate and `fusion-cli` held by
+//! copy, measured 14 Sep 2026, on the argument that a crate shared between
+//! them would tie the two release trains together. It would have, inside
+//! either product; `fusion-rules` is inside neither. It carries no product
+//! semantics, its context is a type parameter, and this [`Context`] and these
+//! [`Settings`] are the half that is Helix's: what the tiers are, where the
+//! manifests sit, and what a consumer is allowed to say about their own
+//! components. No product depends on the other, which is what the lockstep
+//! argument asked for.
 //!
 //! **Where the source is comes from configuration**, because a consumer's
 //! layout is not this repository's. A `helix` key in `fusion.json` names
@@ -84,7 +86,6 @@ pub mod text;
 pub mod tier;
 pub mod token_defaults;
 pub mod tokens;
-pub mod tui;
 pub mod vocabulary;
 
 use std::collections::BTreeMap;
@@ -92,10 +93,16 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use serde::{Deserialize, Serialize};
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::walk::{crawl, walk};
+pub use fusion_rules::{Finding, Measured, Report, Unwritten, Written};
+use serde::Deserialize;
 use serde_json::Value;
 
-use crate::error::{Failure, Outcome};
+/// A component rule, which is a rule that reads this crate's [`Context`].
+pub type Rule = fusion_rules::Rule<Context>;
+/// How a component rule is run. See [`fusion_rules::Runner`].
+pub type Runner = fusion_rules::Runner<Context>;
 
 /// What a rule is run against.
 pub struct Context {
@@ -150,15 +157,8 @@ impl Context {
     }
 
     /// A path as a finding names it: relative to the root, with forward slashes.
-    ///
-    /// Forward slashes on every platform, because a finding is read by a person
-    /// and compared by a test, and neither wants the path to change with the
-    /// machine that produced it.
     pub fn relative(&self, path: &Path) -> String {
-        path.strip_prefix(&self.root)
-            .unwrap_or(path)
-            .to_string_lossy()
-            .replace('\\', "/")
+        fusion_rules::relative(&self.root, path)
     }
 }
 
@@ -435,92 +435,6 @@ pub struct Layer {
     pub prefix: String,
     /// Where this layer's source is, relative to the root.
     pub source: String,
-}
-
-/// One thing wrong, in the place it is wrong.
-#[derive(Serialize)]
-pub struct Finding {
-    pub detail: String,
-    pub file: String,
-    pub message: String,
-}
-
-/// What a rule reports, whether or not it found anything.
-#[derive(Serialize)]
-pub struct Report {
-    /// What was tested, never what was walked past.
-    pub checked: usize,
-    pub findings: Vec<Finding>,
-    /// Work rather than fault: named, counted, and not part of the verdict.
-    ///
-    /// **The first rule to need this was the one about visual axes**, which
-    /// reports families in a group that disagree about declaring one. Whether a
-    /// component *should* have an axis needs a reading of what it is for, so
-    /// failing would pressure somebody into declaring one to silence a rule.
-    /// A count that does not fall is visible work; a finding is a defect.
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub notes: Vec<String>,
-    pub unit: &'static str,
-}
-
-impl Report {
-    pub fn ok(&self) -> bool {
-        self.findings.is_empty()
-    }
-}
-
-/// What a `fix` hands back: every file it wrote, relative to the root.
-pub type Written = Result<Vec<String>, Unwritten>;
-
-/// A write that did not happen, which stops the fix where it stood.
-///
-/// **A fix that cannot write says so, rather than reporting the files it
-/// managed.** A caller reading "3 files written" has no way to learn that a
-/// fourth was refused, and a read-only checkout ran every fix as a quiet
-/// no-op before this.
-pub struct Unwritten {
-    /// Relative to the root, the way a finding names one.
-    pub file: String,
-    /// What the filesystem said.
-    pub why: String,
-}
-
-pub struct Rule {
-    /// `None` for a rule that judges and cannot write, which is most of them.
-    ///
-    /// **A rule that can write still judges first.** The verb decides which half
-    /// runs, so a `fix` is never a second opinion about what is wrong: it is the
-    /// same reading, applied. Only an ordering rule has one here, because an
-    /// order is the one kind of finding whose repair is mechanical.
-    pub fix: Option<fn(&Context) -> Written>,
-    pub name: &'static str,
-    pub run: Runner,
-    pub summary: &'static str,
-}
-
-/// Where a rule gets what it judges.
-///
-/// **A meta rule reads the others' measurements rather than re-running them.**
-/// Re-running is the obvious shape and it doubles the walk of the whole source
-/// tree, which is most of what this command spends its time on.
-pub enum Runner {
-    /// Reads what the source rules counted.
-    Meta(fn(&[Measured]) -> Report),
-    /// Reads the source.
-    Source(fn(&Context) -> Report),
-}
-
-impl Rule {
-    pub fn meta(&self) -> bool {
-        matches!(self.run, Runner::Meta(_))
-    }
-}
-
-/// What one rule counted, which is all a meta rule needs of it.
-pub struct Measured {
-    pub checked: usize,
-    pub name: &'static str,
-    pub unit: &'static str,
 }
 
 /* A table rather than a function: four lines per rule, no branches, and it grows
@@ -834,49 +748,27 @@ pub fn all() -> Vec<Rule> {
 /// primitives by construction and reading it would report the library against
 /// itself.
 pub fn walk_outside(directory: &Path, found: &mut Vec<PathBuf>) {
-    let Ok(entries) = fs::read_dir(directory) else {
-        return;
-    };
-    let mut paths: Vec<PathBuf> = entries.flatten().map(|entry| entry.path()).collect();
-    paths.sort();
-    for path in paths {
-        let name = path
-            .file_name()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_string();
-        if path.is_dir() {
-            /* Build output, and a directory holding a `.git`, which is another
-            checkout: a worktree under `.claude` is a whole second copy of the
-            repository, and reading it reports every finding twice and names a
-            file on a branch nobody here is editing. */
-            let skip = matches!(
-                name.as_str(),
-                ".git"
-                    | ".local"
-                    | ".next"
-                    | ".next-dev"
-                    | ".turbo"
-                    | "dist"
-                    | "node_modules"
-                    | "public"
-                    | "target"
-            ) || path.join(".git").exists();
-            if !skip {
-                walk_outside(&path, found);
-            }
-            continue;
-        }
-        let readable = matches!(
-            path.extension()
-                .map(|one| one.to_string_lossy().to_string())
-                .as_deref(),
-            Some("css" | "md" | "mdx" | "ts" | "tsx")
-        );
-        if readable && !name.ends_with(".css.ts") {
-            found.push(path);
-        }
-    }
+    crawl(
+        directory,
+        &|path| {
+            let readable = matches!(
+                path.extension()
+                    .map(|one| one.to_string_lossy().to_string())
+                    .as_deref(),
+                Some("css" | "md" | "mdx" | "ts" | "tsx")
+            );
+            readable && !name_of(path).ends_with(".css.ts")
+        },
+        found,
+    );
+}
+
+/// The file's own name, for a predicate about how it is spelled.
+fn name_of(path: &Path) -> String {
+    path.file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .into_owned()
 }
 
 /// Every spec under `directory` whose name ends with `suffix`.
@@ -885,15 +777,19 @@ pub fn walk_outside(directory: &Path, found: &mut Vec<PathBuf>) {
 /// components reads what declares them; a rule about whether they are proven
 /// reads what asserts about them, and the two sets do not overlap.
 pub fn specs(directory: &Path, suffix: &'static str, found: &mut Vec<PathBuf>) {
-    collect(directory, found, &|_, name| name.ends_with(suffix));
+    walk(directory, &|path| name_of(path).ends_with(suffix), found);
 }
 
 /// Every stylesheet under `directory`.
 pub fn stylesheets(directory: &Path, found: &mut Vec<PathBuf>) {
-    collect(directory, found, &|path, _| {
-        path.extension()
-            .is_some_and(|one| one.eq_ignore_ascii_case("css"))
-    });
+    walk(
+        directory,
+        &|path| {
+            path.extension()
+                .is_some_and(|one| one.eq_ignore_ascii_case("css"))
+        },
+        found,
+    );
 }
 
 /// The family a file belongs to, which is its first segment under the tier.
@@ -910,25 +806,6 @@ pub fn family<'a>(file: &'a Path, tier: &Path) -> Option<&'a str> {
         .to_str()
 }
 
-/// Every file under `directory` the predicate accepts, in a stable order.
-fn collect(directory: &Path, found: &mut Vec<PathBuf>, keep: &dyn Fn(&Path, &str) -> bool) {
-    let Ok(entries) = fs::read_dir(directory) else {
-        return;
-    };
-    let mut paths: Vec<PathBuf> = entries.flatten().map(|entry| entry.path()).collect();
-    paths.sort();
-    for path in paths {
-        if path.is_dir() {
-            collect(&path, found, keep);
-            continue;
-        }
-        let name = path.file_name().unwrap_or_default().to_string_lossy();
-        if keep(&path, &name) {
-            found.push(path.clone());
-        }
-    }
-}
-
 /// Every component source file under `directory`, specs and generated
 /// stylesheets excluded.
 ///
@@ -936,10 +813,15 @@ fn collect(directory: &Path, found: &mut Vec<PathBuf>, keep: &dyn Fn(&Path, &str
 /// `.css.ts` is emitted from a stylesheet. Reading either would report faults in
 /// files nobody wrote by hand.
 pub fn sources(directory: &Path, found: &mut Vec<PathBuf>) {
-    collect(directory, found, &|path, name| {
-        path.extension()
-            .is_some_and(|one| one.eq_ignore_ascii_case("ts"))
-            && !name.contains(".spec.")
-            && !name.ends_with(".css.ts")
-    });
+    walk(
+        directory,
+        &|path| {
+            let name = name_of(path);
+            path.extension()
+                .is_some_and(|one| one.eq_ignore_ascii_case("ts"))
+                && !name.contains(".spec.")
+                && !name.ends_with(".css.ts")
+        },
+        found,
+    );
 }

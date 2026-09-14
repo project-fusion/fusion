@@ -533,7 +533,7 @@ name = "fusion-cli"
 version = "0.0.0-dev"
 dependencies = [
  "clap",
- "ratatui",
+ "fusion-rules",
  "regex",
  "serde",
  "serde_json",
@@ -585,6 +585,7 @@ version = "0.0.0-dev"
 dependencies = [
  "clap",
  "fusion-helix-theme",
+ "fusion-rules",
  "ratatui",
  "regex",
  "serde",
@@ -598,6 +599,15 @@ dependencies = [
  "serde",
  "serde_json",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "fusion-rules"
+version = "0.0.0-dev"
+dependencies = [
+ "ratatui",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

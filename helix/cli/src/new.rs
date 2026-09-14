@@ -18,12 +18,12 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
+use fusion_rules::style::Paint;
 use serde::Deserialize;
 
 use crate::args::New;
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
-use crate::style::Paint;
 
 const PACKAGE: &str = "@fusion.dev/helix-templates";
 const REGISTER: &str = "templates.json";

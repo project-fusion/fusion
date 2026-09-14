@@ -17,8 +17,9 @@
 
 use std::fs;
 
+use fusion_rules::walk::crawl;
+
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 /// What opens a shader, including the backtick that starts the literal.
 const OPENER: &str = "`#version 300 es";

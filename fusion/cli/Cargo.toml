@@ -15,9 +15,11 @@ name = "fusion"
 path = "src/main.rs"
 
 [dependencies]
+# **What a rule is, and the runner that measures a set of them.** Shared with
+# `fusion-helix-cli` and owned by neither product, so `helix` taking it is not a
+# dependency on this domain: the crate's `lib.rs` carries the argument.
+fusion-rules = { workspace = true }
 clap = { version = "4", features = ["derive"] }
-# Only `audit` draws, and only on a terminal. A rule computes and does not draw.
-ratatui = { workspace = true }
 regex = { workspace = true }
 # Every rule reads manifests, and `--json` is a contract on every verb.
 serde = { workspace = true }

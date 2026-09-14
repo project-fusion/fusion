@@ -11,6 +11,10 @@
 //! Numbered from 2 upward because 1 is the conventional "it did not work" that a
 //! shell already produces for an uncaught error, and because 0 and 1 are the two
 //! a caller who reads nothing else will still get right.
+//!
+//! **One table for both command lines.** `fusion helix ...` hands its child's
+//! code back untouched, which is only honest while the two agree about what 3
+//! means, and the way they agree is by reading it here.
 
 /// The complete set. Adding to it is a change to the interface.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

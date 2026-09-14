@@ -21,10 +21,10 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::Path;
 
+use fusion_rules::walk::walk;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::walk;
 
 fn shakeable(manifest: &Value) -> bool {
     manifest.get("sideEffects") == Some(&Value::Bool(false))

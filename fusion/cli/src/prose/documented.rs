@@ -50,11 +50,11 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::{Regex, RegexBuilder};
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 /// A mention that says the thing does not work is allowed to name it.
 ///

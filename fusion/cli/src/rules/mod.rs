@@ -1,10 +1,12 @@
-//! What a rule is, and the set of them.
+//! What a workspace rule reads, and the set of them.
 //!
-//! **A rule measures and returns; it never prints and never exits.** That split
-//! is what makes one command able to render the same measurement three ways:
-//! quiet for CI, printed for a person, and JSON for a script. It is also what
-//! lets `floors` read another rule's count rather than parsing integers out of
-//! its prose, which is how it was done before and could be fooled by a sentence.
+//! **What a rule is comes from `fusion-rules`, and what a workspace rule reads
+//! is declared here.** A rule measures and returns; it never prints and never
+//! exits, and that split, the runner that holds it, the `fix` verb and the
+//! JSON payload are the same for `helix component` and so live in the crate
+//! both command lines take. This [`Context`] and these [`Settings`] are the
+//! half that is Fusion's: which manifests a workspace has, what it says about
+//! itself, and what a prose or spec rule needs to know about its layout.
 
 pub mod barrels;
 pub mod floors;
@@ -29,10 +31,16 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use serde::{Deserialize, Serialize};
+use fusion_rules::error::{Failure, Outcome};
+pub use fusion_rules::{Finding, Measured, Report, Unwritten, Written};
+use serde::Deserialize;
 
-use crate::error::{Failure, Outcome};
 use crate::workspace::{self, Manifest};
+
+/// A workspace rule, which is a rule that reads this crate's [`Context`].
+pub type Rule = fusion_rules::Rule<Context>;
+/// How a workspace rule is run. See [`fusion_rules::Runner`].
+pub type Runner = fusion_rules::Runner<Context>;
 
 /// The workspace under test.
 pub struct Context {
@@ -62,15 +70,8 @@ impl Context {
     }
 
     /// A path as a finding names it: relative to the root, with forward slashes.
-    ///
-    /// Forward slashes on every platform, because a finding is read by a person
-    /// and compared by a test, and neither wants the path to change with the
-    /// machine that produced it.
     pub fn relative(&self, path: &Path) -> String {
-        path.strip_prefix(&self.root)
-            .unwrap_or(path)
-            .to_string_lossy()
-            .replace('\\', "/")
+        fusion_rules::relative(&self.root, path)
     }
 }
 
@@ -181,100 +182,6 @@ impl Settings {
         })?;
         serde_json::from_str(&raw)
             .map_err(|error| Failure::input(WHAT, format!("{}: {error}", file.display())))
-    }
-}
-
-/// One thing wrong, in the place it is wrong.
-#[derive(Serialize)]
-pub struct Finding {
-    /// What to do about it. Rendered dim, and omitted from nothing.
-    pub detail: String,
-    /// Repository-relative, with a line number where there is one.
-    pub file: String,
-    pub message: String,
-}
-
-/// What a rule reports, whether or not it found anything.
-#[derive(Serialize)]
-pub struct Report {
-    /// **What was tested, never what was walked past.** `floors` reads this,
-    /// and a corpus size here would make that rule agree with a check that had
-    /// silently stopped checking.
-    pub checked: usize,
-    pub findings: Vec<Finding>,
-
-    /// Work rather than fault: named, counted, and not part of the verdict.
-    ///
-    /// **Here so the two command lines say the same thing.** `helix component`
-    /// has carried notes since a rule needed to report something worth seeing
-    /// that must not fail, and `fusion` did not, so `--json`, which both
-    /// promise on every verb as the contract, meant two shapes. Anything reading
-    /// both had to know which it was holding, and `fusion helix` makes that a
-    /// question one caller asks of one command.
-    ///
-    /// Skipped when empty, so a rule that has no notes costs no key.
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub notes: Vec<String>,
-
-    /// What `checked` counts, for a sentence that reads.
-    pub unit: &'static str,
-}
-
-impl Report {
-    pub fn ok(&self) -> bool {
-        self.findings.is_empty()
-    }
-}
-
-/// What a `fix` hands back: every file it wrote, relative to the root.
-pub type Written = Result<Vec<String>, Unwritten>;
-
-/// A write that did not happen, which stops the fix where it stood.
-///
-/// **A fix that cannot write says so, rather than reporting the files it
-/// managed.** A caller reading "3 files written" has no way to learn that a
-/// fourth was refused, and a read-only checkout ran every fix as a quiet
-/// no-op before this.
-pub struct Unwritten {
-    /// Relative to the root, the way a finding names one.
-    pub file: String,
-    /// What the filesystem said.
-    pub why: String,
-}
-
-/// What one rule counted, which is all a meta rule needs of it.
-pub struct Measured {
-    pub checked: usize,
-    pub name: &'static str,
-    pub unit: &'static str,
-}
-
-/// How a rule is run, which is also what says whether it is a meta rule.
-///
-/// **A runner rather than a flag beside one.** A boolean and a function pointer
-/// are two statements about the same fact, and the failure when they disagree is
-/// a meta rule handed a workspace or a source rule handed a list of counts.
-/// Naming the shape once makes that unrepresentable.
-pub enum Runner {
-    /// Reads what the source rules counted, and never the workspace.
-    Meta(fn(&[Measured]) -> Report),
-    /// Reads the workspace.
-    Source(fn(&Context) -> Report),
-}
-
-/// What a rule can do, beyond judging.
-pub struct Rule {
-    pub name: &'static str,
-    pub summary: &'static str,
-    /// `None` for a rule that judges and cannot write, which is most of them.
-    pub fix: Option<fn(&Context) -> Written>,
-    pub run: Runner,
-}
-
-impl Rule {
-    /// Runs the others, so it is never part of the set it runs.
-    pub fn meta(&self) -> bool {
-        matches!(self.run, Runner::Meta(_))
     }
 }
 

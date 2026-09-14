@@ -27,10 +27,9 @@
 
 mod tools;
 
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
 use std::io::{BufRead, Write};
-
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
 
 /// The protocol revision this speaks.
 ///

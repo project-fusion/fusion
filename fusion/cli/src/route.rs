@@ -8,11 +8,13 @@
 //! **Exec rather than a library, which is the whole design.** Linking
 //! `fusion-helix-cli` in would be a dependency from the fusion domain onto the
 //! helix one, and per-domain lockstep exists so a release of either does not
-//! wait on the other: a shared crate is exactly the thing that makes it wait.
-//! Spawning costs a process and keeps the domains apart. What it costs instead
-//! is the copy: about eight hundred lines the two crates hold in common, listed
-//! in `helix`'s `component/mod.rs`, with the screen held identical by a test
-//! here and the rest kept the same by hand.
+//! wait on the other: a crate of one product inside the other is exactly the
+//! thing that makes it wait. Spawning costs a process and keeps the domains
+//! apart. What the two crates hold in common, the rule and report types, the
+//! runner, the verbs' shared halves, the exit table, the error format and the
+//! screen, is `fusion-rules`, which belongs to neither product and so breaks
+//! nothing the exec was keeping: `helix` depends on it, `fusion` depends on it,
+//! and neither depends on the other.
 //!
 //! **Every product CLI still works standalone**, which is the constraint this is
 //! built under rather than around: `helix component audit` needs nothing else
@@ -31,8 +33,9 @@ use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
+
 use crate::workspace::find_root;
 
 /// The most recently built binary under a cargo target directory.

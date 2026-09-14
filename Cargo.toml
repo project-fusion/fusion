@@ -5,6 +5,7 @@ members = [
 	"cortex/trace",
 	"cortex/engram",
 	"fusion/cli",
+	"fusion/rules",
 	"helix/cli",
 	"helix/theme",
 ]
@@ -40,6 +41,10 @@ fusion-cortex-core = { path = "cortex/core" }
 fusion-cortex-engram = { path = "cortex/engram" }
 fusion-cortex-trace = { path = "cortex/trace" }
 fusion-helix-theme = { path = "helix/theme" }
+# **The one crate both command lines take, and it belongs to neither product.**
+# It knows what a rule is and not what a component or a workspace is, which is
+# what keeps the helix and fusion domains free of each other: see its `lib.rs`.
+fusion-rules = { path = "fusion/rules" }
 
 # **No `version` here, and its absence is the point.**
 #

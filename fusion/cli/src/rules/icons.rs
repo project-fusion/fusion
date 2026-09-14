@@ -16,10 +16,10 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::Regex;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 /// `name` on an icon element, in either quoting, unbraced.
 static NAMED: LazyLock<Regex> = LazyLock::new(|| {

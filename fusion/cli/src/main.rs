@@ -14,33 +14,33 @@
 //! rule added, and the set a caller wants is rarely the set anybody would have
 //! named.
 //!
-//! **The shape is `helix`'s, module for module**: exit codes in [`exit`], the
-//! error format in [`error`], color in [`style`], each a copy of that crate's
-//! with its reasoning kept. Two command lines from one company that disagree
-//! about what 3 means, or which stream an error lands on, are worse than either
-//! shape, and `fusion helix ...` returning its child's code untouched is only
-//! honest while the two tables agree.
+//! **The shape is `helix`'s, because the two read it from one crate.** Exit
+//! codes, the error format, color, the runner and the audit screen are
+//! `fusion-rules`'s, which carries no product and is what lets both command
+//! lines take it. Two command lines from one company that disagree about what
+//! 3 means, or which stream an error lands on, are worse than either shape,
+//! and `fusion helix ...` returning its child's code untouched is only honest
+//! while the two tables are one table.
 
-mod error;
-mod exit;
 mod prose;
 mod route;
 mod rules;
 mod spec;
-mod style;
-mod tui;
 mod workspace;
 
 use std::io::IsTerminal;
 use std::path::PathBuf;
-use std::thread::{self, ScopedJoinHandle};
 
 use clap::{Args, Parser, Subcommand};
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
+use fusion_rules::style::Paint;
+use fusion_rules::{measure, only_known, payload, tui, verdict};
 
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
 use crate::rules::{all, Context, Settings};
-use crate::style::Paint;
+
+/// The word every printed failure opens with, and the corner of every screen.
+const PRODUCT: &str = "fusion";
 
 /* Every rule borrows the one context from its own thread, which is what this
 holds `Context` to. */
@@ -203,7 +203,7 @@ fn main() {
     let paint = if cli.json {
         Paint::never()
     } else {
-        Paint::decide(cli.no_color)
+        Paint::decide(PRODUCT, cli.no_color)
     };
 
     std::process::exit(match run(&cli, paint) {
@@ -220,7 +220,7 @@ fn report_failure(failure: &Failure, json: bool) -> i32 {
     if json {
         eprintln!("{}", failure.as_json());
     } else {
-        eprintln!("{failure}");
+        eprintln!("{}", failure.render(PRODUCT));
     }
     failure.code.as_i32()
 }
@@ -253,18 +253,8 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     let verb = cli.noun.verb();
     let common = verb.common();
 
-    let known: Vec<&str> = cli.noun.rules().iter().map(|rule| rule.name).collect();
-    let unknown: Vec<&String> = common
-        .only
-        .iter()
-        .filter(|name| !known.contains(&name.as_str()))
-        .collect();
-    if let Some(first) = unknown.first() {
-        return Err(Failure::input(
-            format!("no {} rule called `{first}`", cli.noun.name()),
-            format!("the rules are {}", known.join(", ")),
-        ));
-    }
+    let rules = cli.noun.rules();
+    only_known(cli.noun.name(), &rules, &common.only)?;
 
     let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
     let Some(root) = common.root.clone().or_else(|| workspace::find_root(&cwd)) else {
@@ -280,15 +270,13 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
 
     let settings = Settings::read(&root)?;
     let context = Context::new(root, settings);
-    let selected: Vec<rules::Rule> = cli
-        .noun
-        .rules()
+    let selected: Vec<rules::Rule> = rules
         .into_iter()
         .filter(|rule| common.only.is_empty() || common.only.iter().any(|one| one == rule.name))
         .collect();
 
     let code = match verb {
-        Verb::Fix(_) => fix(&selected, &context, cli.json, paint)?,
+        Verb::Fix(_) => fusion_rules::fix(&selected, &context, cli.json, paint, PRODUCT)?,
         /* **The tty decides here, where the verb is known**, rather than inside
         the renderer: a screen written to a pipe is escape sequences in a log
         file, and `check` never draws whatever the terminal is. */
@@ -314,113 +302,6 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     Ok(code.as_i32())
 }
 
-/// Runs the rules that can write, and says what they wrote.
-///
-/// **A write that fails is the command's failure, not a file left off the
-/// list.** The fix stops at the first refusal and names the file, with
-/// [`Code::Internal`], which is what a failed write is everywhere else here.
-fn fix(selected: &[rules::Rule], context: &Context, json: bool, paint: Paint) -> Outcome<Code> {
-    let mut wrote: Vec<(&str, String)> = Vec::new();
-    let mut ran = 0;
-    for rule in selected {
-        let Some(apply) = rule.fix else {
-            continue;
-        };
-        ran += 1;
-        let written = apply(context).map_err(|refused| {
-            Failure::new(
-                Code::Internal,
-                format!("cannot write {}", refused.file),
-                refused.why,
-            )
-        })?;
-        for file in written {
-            wrote.push((rule.name, file));
-        }
-    }
-    if json {
-        let payload = serde_json::json!({
-            "ran": ran,
-            "wrote": wrote.iter().map(|(rule, file)| serde_json::json!({ "file": file, "rule": rule })).collect::<Vec<_>>(),
-        });
-        println!("{payload:#}");
-    } else if wrote.is_empty() {
-        let plural = if ran == 1 { "" } else { "s" };
-        println!("fusion: {ran} rule{plural} can write, and nothing needed it");
-    } else {
-        for (rule, file) in &wrote {
-            println!("  {}  {file}", paint.bold(rule));
-        }
-        let plural = if wrote.len() == 1 { "" } else { "s" };
-        println!("fusion: {} file{plural} written", wrote.len());
-    }
-    Ok(Code::Ok)
-}
-
-/// Runs the source rules once, then the meta rules over what they counted.
-///
-/// **Once, which is the point of the split.** The meta rule wants the numbers,
-/// not the workspace, and a version of it that re-ran its siblings to find them
-/// cost the whole set a second time on every audit.
-///
-/// **One thread per source rule, joined in declaration order.** A rule is a
-/// `fn(&Context) -> Report` that reads files and returns, and none of them
-/// shares anything but the context, so they were serial only because nothing
-/// had made them otherwise. The reports come back in the order the rules were
-/// declared whatever order the threads finish in, and every form below reads
-/// the finished list, so nothing draws or prints while a rule is still running.
-fn measure<'a>(
-    selected: &'a [rules::Rule],
-    context: &Context,
-) -> Vec<(&'a rules::Rule, rules::Report)> {
-    let (meta, source): (Vec<&rules::Rule>, Vec<&rules::Rule>) =
-        selected.iter().partition(|rule| rule.meta());
-
-    let mut reports: Vec<(&rules::Rule, rules::Report)> = thread::scope(|scope| {
-        let running: Vec<(&rules::Rule, ScopedJoinHandle<rules::Report>)> = source
-            .into_iter()
-            .map(|rule| {
-                let run = match rule.run {
-                    rules::Runner::Source(run) => run,
-                    rules::Runner::Meta(_) => unreachable!("partitioned above"),
-                };
-                (rule, scope.spawn(move || run(context)))
-            })
-            .collect();
-        running
-            .into_iter()
-            .map(|(rule, handle)| {
-                /* A rule that panicked has printed why on its own thread; the
-                panic continues here so the process still ends the way it did
-                when the rule ran on this one. */
-                let report = handle
-                    .join()
-                    .unwrap_or_else(|panic| std::panic::resume_unwind(panic));
-                (rule, report)
-            })
-            .collect()
-    });
-
-    let measured: Vec<rules::Measured> = reports
-        .iter()
-        .map(|(rule, report)| rules::Measured {
-            checked: report.checked,
-            name: rule.name,
-            unit: report.unit,
-        })
-        .collect();
-    for rule in meta {
-        let report = match rule.run {
-            rules::Runner::Meta(run) => run(&measured),
-            rules::Runner::Source(_) => unreachable!("partitioned above"),
-        };
-        reports.push((rule, report));
-    }
-
-    reports.sort_by_key(|(rule, _)| rule.name);
-    reports
-}
-
 /// How a measurement comes out, which is one choice rather than four flags.
 ///
 /// **Named rather than four bools**, because they were never independent: JSON
@@ -437,14 +318,6 @@ enum Form {
     Screen,
 }
 
-fn verdict(reports: &[(&rules::Rule, rules::Report)]) -> Code {
-    if reports.iter().all(|(_, report)| report.ok()) {
-        Code::Ok
-    } else {
-        Code::Failed
-    }
-}
-
 fn report(
     selected: &[rules::Rule],
     context: &Context,
@@ -457,17 +330,7 @@ fn report(
         reports.iter().filter(|(_, report)| !report.ok()).collect();
 
     if matches!(form, Form::Json) {
-        let payload = serde_json::json!({
-            "ok": failed.is_empty(),
-            "rules": reports.iter().map(|(rule, report)| serde_json::json!({
-                "checked": report.checked,
-                "findings": report.findings,
-                "name": rule.name,
-                "notes": report.notes,
-                "unit": report.unit,
-            })).collect::<Vec<_>>(),
-        });
-        println!("{payload:#}");
+        println!("{:#}", payload(&reports));
         return Ok(verdict(&reports));
     }
 
@@ -479,7 +342,7 @@ fn report(
             .iter()
             .map(|(rule, report)| (*rule, report))
             .collect();
-        tui::run(&drawn).map_err(|why| {
+        tui::run(PRODUCT, &drawn).map_err(|why| {
             Failure::new(
                 Code::Internal,
                 "cannot open the audit screen",

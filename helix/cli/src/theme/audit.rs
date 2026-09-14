@@ -17,11 +17,11 @@ use std::path::Path;
 
 use fusion_helix_theme::derive::report::Outcome as Pair;
 use fusion_helix_theme::derive::theme::Theme;
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
+use fusion_rules::style::Paint;
 
 use crate::args::{Audit, Common};
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
-use crate::style::Paint;
 use crate::theme::load;
 use crate::theme::report::{measured, rows, widths, Counts, Filter, Order};
 use crate::theme::tui;

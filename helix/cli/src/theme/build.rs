@@ -3,10 +3,10 @@
 use std::path::Path;
 
 use fusion_helix_theme::css::to_css;
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
 
 use crate::args::Build;
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
 use crate::theme::load;
 
 /// # Errors

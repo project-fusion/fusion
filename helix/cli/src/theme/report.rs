@@ -14,7 +14,31 @@
 
 use fusion_helix_theme::derive::report::{Outcome, Pairing};
 
-use crate::style::glyph;
+/// The glyph that carries the state, color or no color.
+///
+/// ASCII, because a terminal that cannot render a box-drawing character renders
+/// a replacement glyph that looks like a third state.
+///
+/// **Padded here, to the width of the widest**, and that is not cosmetic. A
+/// terminal counts an escape sequence as characters, so `{:>2}` applied to an
+/// already-colored `x` sees a string of twelve and adds nothing, while the same
+/// format applied to an uncolored one adds a space. The column was therefore
+/// straight with `NO_COLOR` set and ragged by exactly one character without it,
+/// which is the shape of bug that survives every run in CI, CI not being a
+/// terminal.
+///
+/// The rule is general: pad before coloring, never after. Anything formatting to
+/// a width has to be looking at the text.
+#[must_use]
+pub fn glyph(outcome: Outcome) -> &'static str {
+    match outcome {
+        Outcome::Fail => " x",
+        Outcome::Pass => "ok",
+        /* **Its own glyph, not a blank.** An unmeasured pair is not a quiet pass,
+        and a column of `ok` with gaps in it reads as one. */
+        Outcome::Unverifiable => "--",
+    }
+}
 
 /// One measured pair, ready to draw.
 #[derive(Clone, Debug, PartialEq)]

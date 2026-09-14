@@ -31,10 +31,10 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use fusion_rules::walk::crawl;
 use regex::{Regex, RegexBuilder};
 
 use crate::rules::{Context, Finding, Report, Unwritten, Written};
-use crate::workspace::crawl;
 
 /// The regular inflections of a pair, on top of the ones written by hand.
 ///

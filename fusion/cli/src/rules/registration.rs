@@ -24,8 +24,9 @@ use std::fs;
 use std::path::Path;
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
+
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 use regex::Regex;
 
 static STATIC_IMPORT: LazyLock<Regex> = LazyLock::new(|| {
