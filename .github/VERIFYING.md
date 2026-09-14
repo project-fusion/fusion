@@ -72,7 +72,10 @@ them pay for it. A cold build is about 52 seconds.
 **Only `checks` and `browser` wait on it**, which is the whole of the trade.
 `lint` reads files and builds nothing. `types` and `tests` do pay a cold build,
 and at 1m19s and 2m14s they are inside the budget already, so gating them would
-buy a faster job nobody is waiting on and cost every run the stage.
+buy a faster job nobody is waiting on and cost every run the stage. `tests` is
+also the one job that installs Rust, and it installs the floor `Cargo.toml`
+declares rather than stable, so `rust-version` is a number something compiles
+against rather than a promise.
 
 **It costs a stage the wall clock did not have**, about 40 seconds on a run that
 restores and 85 on one that does not. The ceiling on any single job comes down
