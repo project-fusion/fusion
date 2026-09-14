@@ -65,9 +65,10 @@ jobs:
     timeout-minutes: 30
     env:
       BINARY: target/${{ matrix.target }}/release/helix${{ startsWith(matrix.platform, 'win32') && '.exe' || '' }}
-      # A pull request has no version to give it, and the placeholder is what
-      # the crate already says.
-      VERSION: ${{ inputs.version || '0.0.0-dev' }}
+      # A pull request has no version to give it, so it stamps one the crate
+      # does not carry. Stamping the placeholder the file already held passed
+      # while writing nothing, and the first release found that on Windows.
+      VERSION: ${{ inputs.version || '0.0.0-check' }}
     steps:
       - name: Check out
         uses: actions/checkout@v7
@@ -92,13 +93,18 @@ jobs:
       # `publish.mjs` holds the binary to. `version.mjs` writes the same line on
       # the release's runner; this one has no workspace installed to run it, and
       # the first `version` at the start of a line is the package's.
+      #
+      # **A carriage return is allowed before the end of the line**, because a
+      # Windows runner checks text out with CRLF: `$` sits before the `\n` and not
+      # before the `\r`, so the pattern matched nothing there and the check below
+      # refused the build, which was the release of 14 Sep 2026.
       - name: Stamp the version into the crate
         shell: bash
         run: |
           set -euo pipefail
-          perl -0pi.bak -e 's/^version = "[^"]*"$/version = "$ENV{VERSION}"/m' helix/cli/Cargo.toml
+          perl -0pi.bak -e 's/^version = "[^"]*"(\r?)$/version = "$ENV{VERSION}"$1/m' helix/cli/Cargo.toml
           rm helix/cli/Cargo.toml.bak
-          grep -qx "version = \"$VERSION\"" helix/cli/Cargo.toml
+          grep -q "^version = \"$VERSION\"" helix/cli/Cargo.toml
 
       # Not `--locked`: `Cargo.lock` still names the crate at the placeholder.
       - name: Build
