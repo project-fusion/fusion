@@ -60,7 +60,7 @@ describe('a glyph a component draws itself', () => {
   })
 
   /* `data-glyph` rather than a class, because the sizing lives in
-     `helix/styled/src/icon/glyph.css` and that rule is what reads a component's
+     `helix/styled/src/shared/glyph/glyph.css` and that rule is what reads a component's
      own `--icon-size`. Without the attribute every one of those declarations
      goes quietly dead and every mark in six families changes size. */
   test('and is marked for the sheet that sizes it', () => {

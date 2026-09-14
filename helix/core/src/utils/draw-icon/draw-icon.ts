@@ -32,7 +32,7 @@ export interface DrawIconOptions {
  * the thing static analysis has to read.
  *
  * `data-glyph` rather than a class, because the sizing lives in
- * `helix/styled/src/icon/glyph.css` and a component's own `--icon-size`
+ * `helix/styled/src/shared/glyph/glyph.css` and a component's own `--icon-size`
  * declarations have to keep working untouched: the variable was read by
  * `helix-icon`, and now it is read by the rule that sheet carries. Without it
  * every one of those declarations would go quietly dead and every mark in six

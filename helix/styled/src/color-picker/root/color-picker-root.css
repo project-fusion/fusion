@@ -290,7 +290,7 @@
  * A slotted dropper is sized here, because nothing else sizes it.
  *
  * The mark this component draws is an inlined `<svg data-glyph>` that
- * `icon/glyph.css` sizes. That sheet is in this shadow root, so it reaches the
+ * `shared/glyph/glyph.css` sizes. That sheet is in this shadow root, so it reaches the
  * fallback and not an assigned node: `::slotted()` and a shadow-tree rule are
  * two selectors for two trees, never one for both. Without this, a consumer's
  * dropper arrives at its intrinsic size, which for a bare `<svg>` with a
