@@ -53,7 +53,9 @@ commit named for something else.
 of them. The groups are `cli`, `css`, `gen`, `prose` and `spec`, and they sort by
 what a guard reads rather than by what kind of fault it catches, because the
 useful question after an edit is "what covers the thing I just touched" and never
-"run me every consistency check".
+"run me every consistency check". `check:withheld` stands beside the groups as
+a leaf of its own: it reads the whole tree and the commits on their way in, so
+no group is the thing it covers.
 
 **Do not write down how many there are.** A count is derivable and each command
 prints its own, so one written here is a second source of truth and always the
@@ -69,10 +71,10 @@ name is fine: `gen`, `rs`, `smoke`, `probe`, `specs` and `visual` have none,
 because a runner over them would be meaningless or wrong. What to avoid is a
 bare name that is not a runner.
 
-**Never add a bare `gen`.** Eleven generators have a `check:gen:` that judges
-them, and several read what an earlier one wrote: `turbo run reference` and
-`gen:element-events` read the manifests `analyze` produces, `turbo run tokens`
-reads what `turbo run token-layer` emits, `gen:metrics` measures the built packages,
+**Never add a bare `gen`.** Every generator has a check that judges it, and
+several read what an earlier one wrote: `gen:element-events` reads the
+manifests `analyze` produces, `turbo run docs` reads the registry
+`turbo run token-layer` emits, `gen:metrics` measures the built packages,
 `turbo run content` and `turbo run catalog` read the pages `turbo run docs` filled, and
 `turbo run catalog` reads what `turbo run content` writes on top of that. Run out of
 order they each succeed and disagree with each other, and the failure surfaces in
@@ -81,26 +83,27 @@ CI as *"the tree is unchanged by verifying it"*, which names none of them. So
 from its own members would run them in whatever order they sorted in, producing
 that exact failure under a name promising the opposite.
 
-**A writer and its judge share a name.** `turbo run reference` writes what
-`turbo run reference -- --check` reads. Add both, or the pair drifts silently: a check in
+**A writer and its judge share a name.** `turbo run docs` writes what
+`turbo run docs -- --check` reads. Add both, or the pair drifts silently: a check in
 `verify` whose writer is not in `regen` is a red build with no published way out
 of it.
 
 **`verify` is CI's job, not a local ritual.** `verify.yml` runs all of it on every
-push, sharded across `plan`, `warm`, `checks`, `lint`, `types`, `tests` and six
-`browser` jobs, on a clean checkout, and it is better at every part of that than
+push, sharded across `plan`, `warm`, `checks`, `lint`, `types`, `tests` and the
+`browser` matrix, on a clean checkout, and it is better at every part of that than
 a laptop is.
 
 **Deleting a documentation page wants `turbo run docs` before `regen`.** `regen`
-runs `analyze` at position 2 and `gen:docs` at 9, so for seven steps the registry
-still names a page the tree no longer has. `catalog` skips it and says so now
+runs `analyze` near its start and `turbo run docs` near its end, so for every
+step between the two the registry still names a page the tree no longer has. `catalog` skips it and says so now
 rather than dying on it, but the run still writes a site missing that page until
 the registry catches up, and the warning names the command.
 
 **What CI cannot do is regenerate**, which is the one thing worth checking before
 a push. `helix/docs/content/metrics.mdx is behind the built packages` is a red
-build that stays red until somebody runs `bun run gen:metrics` and pushes again, so `.githooks/pre-push` runs `biome ci`, `check:cli` and
-the generated-file checks and nothing else: seconds against four minutes.
+build that stays red until somebody runs `bun run gen:metrics` and pushes again,
+so `.githooks/pre-push` runs the withheld-name check, `biome ci`, `check:cli`
+and the generated-file checks and nothing else: seconds against minutes.
 It judges and never writes, because a hook that edits the tree during `git push`
 produces a push that does not contain the edits. `git push --no-verify` skips it.
 
@@ -141,19 +144,23 @@ Rust for backend and substrate cores. TypeScript for frontend.
   off the callback is what keeps `@fusion.dev/helix-cem` compiling under 7, and an
   import would pull 7's types onto 5.4's nodes.
 - Config files are TypeScript (`*.config.ts`), so they are type-checked rather
-  than failing at runtime on a typo. **Not all of them run under bun, and the
-  exception has a floor.** `cem analyze` is a Node CLI with its own shebang, so
-  `bun run analyze` hands it to whatever Node is on `PATH`. Below Node 22.18 it
-  cannot load a `.ts` config, falls back to a default one, and writes a manifest
-  with every Helix plugin missing while reporting success: measured on 18.16, a
-  manifest 69,081 lines shorter. `engines.node` states the floor,
-  `fusion workspace --only node` enforces it, and CI pins it.
+  than failing at runtime on a typo. **`cem analyze` runs as `bun --bun`, and
+  the reason is its config.** It is a Node CLI with its own shebang, and under
+  a Node below 22.18 it cannot load a `.ts` config, falls back to a default one,
+  and writes a manifest with every Helix plugin missing while reporting
+  success: measured on 18.16, a manifest 69,081 lines shorter. Run by bun it
+  loads the config every time, and the manifests came back byte for byte the
+  same. **Node still has a floor**, because what carries a Node shebang and is
+  not run with `--bun` runs under it: Next's `bin` in `build` and `dev`, and
+  npm in the release. `engines.node` states the floor,
+  `fusion workspace --only node` holds `@types/node` to it, and the release
+  workflows pin it.
 
 ## Layout
 
 ```
 helix/     styles core headless styled icons theme cem docs diagnostics
-           gallery sandbox testing cli
+           gallery sandbox testing cli templates create-app
 cortex/    core trace engram docs
 fusion/    cli docs scripts site: what belongs to the company rather than to a
            product. `docs/insights` is the published writing
@@ -175,8 +182,8 @@ fusion/    cli docs scripts site: what belongs to the company rather than to a
 
   **What is left over is `fusion/scripts`, and it is small on purpose.** A
   script goes there when it is genuinely cross-cutting and cannot be a rule: the
-  four that drive a browser, the two that build and run the eval corpus, and the
-  meta-check that floors the generators. Anything that could be a rule should be
+  ones that drive a browser, the pair that builds and runs the eval corpus, and
+  the meta-check that floors the generators. Anything that could be a rule should be
   one, because a rule returns a count that `floors` can read and a script returns
   a sentence somebody has to parse.
 

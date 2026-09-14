@@ -26,13 +26,14 @@ shard ends by asserting the tree is unchanged.
 
 ## Which jobs a diff can possibly fail
 
-The browser matrix is six jobs that each want a build, a browser and three
-minutes, and a change to a `docs/` page cannot move a pixel in any of them.
+The browser matrix is a set of jobs that each want a build, a browser and
+minutes, and a change to the writing under `fusion/docs/` cannot move a pixel in
+any of them.
 `.github/scripts/touched.sh` decides.
 
 **An allowlist of what is skippable, not a denylist of what is not.** The set is
-the paths that reach no component and no page: `docs/` is the repository's own
-writing, `cortex/` is Rust and MDX with nothing rendered, `.claude/` is tooling
+the paths that reach no component and no page: `fusion/docs/` is the
+repository's own writing, a `.md` anywhere is a document no browser job reads, `cortex/` is Rust and MDX with nothing rendered, `.claude/` is tooling
 for the agent. Everything else runs the browser jobs, `tooling/` included,
 because `build-frame.mjs` and `build-styles.mjs` live there and both are read by
 every example. A path nobody thought about lands outside the list and runs, which
@@ -59,14 +60,14 @@ action, `.github/actions/setup`, which reads the bun version off
 `packageManager` so the runtime CI runs on is the one the lockfile was written
 by, and there is no second copy of that number to bump.
 
-## One build, before the sixteen that would each do their own
+## One build, before the many that would each do their own
 
 Every check shard runs `build`, `analyze` and `catalog` as prerequisites and
 every browser job runs `build`, so with a warm remote cache they all cost a
 restore. The gap the `warm` job fills is that the cache is warm *across* runs and
-cold *within* one: sixteen jobs start at the same second on a commit that
-invalidates the build, none can restore what none has written yet, and all
-sixteen pay for it. A cold build is about 52 seconds.
+cold *within* one: every job starts at the same second on a commit that
+invalidates the build, none can restore what none has written yet, and all of
+them pay for it. A cold build is about 52 seconds.
 
 **Only `checks` and `browser` wait on it**, which is the whole of the trade.
 `lint` reads files and builds nothing. `types` and `tests` do pay a cold build,

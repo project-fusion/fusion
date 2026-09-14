@@ -7,8 +7,12 @@ styles     tokens, base layer. Pure CSS, zero dependencies
 core       HelixElement, mixins, event classes
 headless   structure, a11y, state, form participation. NO CSS
 styled     the styled tier. Extends headless, references tokens
-react      generated wrappers over styled and headless
 ```
+
+There is no `react` tier. The framework typings, `jsx.d.ts`, `vue.d.ts` and
+`svelte.d.ts`, are emitted by the analyzer from the two tiers above, and
+[Framework typings](#framework-typings-and-the-names-they-carry) says what they
+carry.
 
 **`headless` must never depend on `turbo run styles`.** That constraint is what makes the
 headless tier independently consumable. If styling leaks downward, we have

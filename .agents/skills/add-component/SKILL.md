@@ -1,6 +1,6 @@
 ---
 name: add-component
-description: Adds a component to the Helix design system, across the headless and styled tiers, with tokens, specs, manifest metadata, and generated React wrappers. Use when creating a new Helix component or part, adding a part to an existing component family, or when the user mentions Helix components, helix/headless, helix/styled, or a component name like Button, Tabs, or Dialog.
+description: Adds a component to the Helix design system, across the headless and styled tiers, with tokens, specs, manifest metadata, and the framework typings the analyzer emits. Use when creating a new Helix component or part, adding a part to an existing component family, or when the user mentions Helix components, helix/headless, helix/styled, or a component name like Button, Tabs, or Dialog.
 ---
 
 # Adding a Helix component
