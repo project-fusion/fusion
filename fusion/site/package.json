@@ -4,6 +4,11 @@
   "version": "0.0.0-dev",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "directory": "fusion/site",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
   "type": "module",
   "scripts": {
     "build": "next build",

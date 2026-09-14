@@ -4,6 +4,11 @@
   "version": "0.26.0",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "directory": "helix/testing",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
   "type": "module",
   "exports": {
     "./browser": {
