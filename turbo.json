@@ -38,10 +38,10 @@
     // produces it and `metrics.mdx` together; the site depends on this package,
     // so `^build` puts it on disk before anything reads it.
     // **`docs`, and through it `metrics`, before `tsc` reads what they write.**
-    // Both are uncached and always run, so what they leave on disk is there for
-    // a cache hit that restores only `dist`. `typecheck` and `test` below want
-    // the same ordering for the same reason: one reads the generated modules,
-    // the other imports them.
+    // `docs` is uncached and always runs, and `metrics` restores its outputs on
+    // a hit, so what they leave on disk is there for a cache hit that restores
+    // only `dist`. `typecheck` and `test` below want the same ordering for the
+    // same reason: one reads the generated modules, the other imports them.
     "@fusion.dev/helix-docs#build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles", "docs"],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
@@ -326,6 +326,16 @@
     // footprints. With only the script hashed, a cache hit answered from a
     // metrics page measured before any of those moved. `metrics.mdx` is the
     // output and is kept out of the pages read.
+    //
+    // **The judge does not run through turbo, and that is the one exception to
+    // `-- --check`.** Pass-through arguments go into the hash of every task in
+    // a run and reach only the task that was named, so `turbo run docs --
+    // --check` runs this as a writer under the judge's hash. Measured 14 Sep
+    // 2026: `turbo run metrics -- --check` after it replayed `build-metrics`
+    // and reported the page written, never having compared anything. The
+    // writer is `turbo run metrics` and the judge is
+    // `bun fusion/scripts/build-metrics.mjs --check`, which no cache can
+    // answer for.
     "metrics": {
       "dependsOn": [
         "@fusion.dev/helix#build",
