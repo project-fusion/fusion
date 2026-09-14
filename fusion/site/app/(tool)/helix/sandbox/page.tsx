@@ -1,6 +1,6 @@
 import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { getFamilies } from '../../../../content/catalog/catalog'
+import { listFamilies } from '../../../../content/catalog/catalog'
 import { INSIGHTS } from '../../../../content/insights'
 import { SandboxWorkbench } from './workbench'
 
@@ -19,12 +19,14 @@ export const metadata = pageMetadata({
  * share format.
  */
 export default function SandboxPage() {
-  const families = getFamilies()
+  const families = listFamilies()
   /* **Built here, on a server, and handed down**, which is the same thing
      `(site)/layout.tsx` does for `SiteNav` and for the same reason: the
      catalog reads the manifest off disk and the insight registry is the whole
      of the writing, so a palette that imported either would pull it into the
-     browser to display a list of names. What crosses is the list.
+     browser to display a list of names. What crosses is the list, and only the
+     list: the sources of a family's examples are fetched by the workbench when
+     that family is opened, which is what keeps the catalog out of the payload.
    *
      A component row carries the sandbox as its second destination, which is
      what `alternate` on `Option` is for. From inside the sandbox that is the
