@@ -155,6 +155,6 @@ slot[name="prefix"]::slotted(*) {
 /* Print: a label. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

@@ -96,7 +96,6 @@ slot[name="end"]::slotted(*) {
    to survive, or the paper says the opposite of the truth. */
 @media print {
   :host {
-    box-shadow: none;
     print-color-adjust: exact;
   }
 }

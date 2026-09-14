@@ -105,6 +105,5 @@ slot[name="title"]::slotted(*) {
 @media print {
   :host {
     background-color: transparent;
-    box-shadow: none;
   }
 }

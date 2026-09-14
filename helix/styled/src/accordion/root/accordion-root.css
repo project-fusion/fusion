@@ -41,7 +41,6 @@
 /* Print: a seam rather than a surface. */
 @media print {
   :host {
-    background-color: transparent;
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

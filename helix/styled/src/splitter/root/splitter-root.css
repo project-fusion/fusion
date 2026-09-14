@@ -243,8 +243,6 @@
 /* Print: two panes and no handle between them, there being nothing to drag. */
 @media print {
   :host {
-    box-shadow: none;
-    max-block-size: none;
     overflow: visible;
   }
 }

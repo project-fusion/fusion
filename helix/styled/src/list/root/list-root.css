@@ -103,6 +103,6 @@
 /* Print: a list. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

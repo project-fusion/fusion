@@ -238,7 +238,6 @@
 @media print {
   :host {
     background-color: transparent;
-    box-shadow: none;
   }
 
   /* A diff prints every line, and its washes, which are the meaning. */

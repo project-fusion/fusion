@@ -67,10 +67,3 @@
   position: absolute;
   white-space: nowrap;
 }
-
-/* Print: the shared field parts, so every control inherits the same answer. */
-@media print {
-  :host {
-    box-shadow: none;
-  }
-}

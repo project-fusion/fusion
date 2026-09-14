@@ -39,6 +39,9 @@
 [part="line"] {
   stroke: var(--chart-series);
   stroke-linejoin: round;
+  /* `1.5px`, where Line draws at `2px` and Bar's line at `2.5px`: three widths
+     for one idea, recorded in each and settled in none, since settling moves
+     pixels in two charts. */
   stroke-width: var(--area-chart-width, 1.5px);
   vector-effect: non-scaling-stroke;
 }

@@ -76,6 +76,6 @@
 /* Print: a picture, which prints. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

@@ -51,6 +51,9 @@
    the bubble, so what shows is a triangle in the bubble's own fill. */
 [part="arrow"] {
   background-color: var(--tooltip-background-color, var(--helix-color-surface-inverse));
+  /* `0.5rem`, where Tour's point is `0.625rem`: two sizes for one shape, and no
+     size token holds either. Recorded rather than settled, since settling moves
+     one of them. */
   block-size: var(--tooltip-arrow-size, 0.5rem);
   inline-size: var(--tooltip-arrow-size, 0.5rem);
   position: absolute;

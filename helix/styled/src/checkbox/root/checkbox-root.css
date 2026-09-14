@@ -159,7 +159,11 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-:host(:not([disabled])[variant="card"]) [part="field"]:hover {
+/* `:not(:disabled)`, not `:not([disabled])`, for the reason at the top of this
+   sheet read the other way round: a card inside a disabled fieldset carries no
+   attribute, so the attribute form let it light up under a pointer that could
+   not press it. */
+:host(:not(:disabled)[variant="card"]) [part="field"]:hover {
   border-color: var(--helix-color-foreground-muted);
 }
 

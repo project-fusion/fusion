@@ -54,8 +54,45 @@ use regex::Regex;
 use crate::component::text::{blanked, line_of, COMMENT};
 use crate::component::{walk_outside, Context, Finding, Report};
 
+/// How far a tokenized property is read, and what a hook's fallback may hold.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Reach {
+    /// Every sheet in the workspace, and a hook defaults to a token.
+    ///
+    /// The scale holds a rung for every value these take, so a hook whose
+    /// fallback is a literal is a decision a theme cannot reach.
+    Everywhere,
+    /// A component's own source, and a hook's fallback may be the literal.
+    ///
+    /// **Where the scale has no rung, the hook is the reach.** `--helix-size-*`
+    /// is a scale of controls, icons and marks, and a panel `264px` wide, a
+    /// stroke `2px` thick or a spinner turning in `0.8s` sits on none of it: the
+    /// consumer reaches the decision through `var(--family-x, 264px)`, which is
+    /// what the hook is for, and a token would only pin it to the wrong rung. So
+    /// what is refused here is a literal nothing can reach, `block-size: 4px`
+    /// with no hook in front of it.
+    ///
+    /// And a component's own source only, not a page's or an example's. A
+    /// column `46rem` wide on a site page, a splitter demo `12rem` tall and a
+    /// ring turning for `48s` behind a marketing hero are the page's decisions,
+    /// with no family to hook them and no rung to name them. Measured 14 Sep
+    /// 2026 at 201 of 223 findings when these groups were read everywhere.
+    Component,
+}
+
 /// Properties whose values must come from a token, and which category serves them.
-static TOKENIZED: LazyLock<[(&str, Regex); 7]> = LazyLock::new(|| {
+///
+/// **The shorthands are read as well as their longhands, and the sizes,
+/// strokes and translates with them**, because that is where the raw values
+/// had gone. Measured 14 Sep 2026 with the seven groups read at
+/// [`Reach::Everywhere`] alone: every `animation` in the library carried a
+/// literal second, three charts drew their line at three widths nothing named,
+/// and a rail was `4px` with a thumb of `12px` beside it. A duration inside
+/// `animation:` is exactly as much a design decision as one inside
+/// `animation-duration:`, and a rule that read one and not the other was
+/// teaching the shorthand. The bounds, `min-` and `max-`, are left alone: they
+/// are where a layout says how far a box may go, not what size it is.
+static TOKENIZED: LazyLock<[(&str, Regex, Reach); 11]> = LazyLock::new(|| {
     let one = |pattern: &str| Regex::new(pattern).expect("a literal pattern compiles");
     [
         (
@@ -63,21 +100,48 @@ static TOKENIZED: LazyLock<[(&str, Regex); 7]> = LazyLock::new(|| {
             one(
                 r"(?:^|[^-\w])(?:color|background-color|border-color|outline-color|fill|stroke|caret-color|text-decoration-color|border-(?:block|inline)(?:-(?:start|end))?-color)\s*:",
             ),
+            Reach::Everywhere,
         ),
         (
             "space",
             one(
                 r"(?:^|[^-\w])(?:padding|margin|gap|row-gap|column-gap)(?:-(?:block|inline|top|right|bottom|left)(?:-(?:start|end))?)?\s*:",
             ),
+            Reach::Everywhere,
         ),
-        ("radii", one(r"(?:^|[^-\w])border-radius\s*:")),
-        ("text", one(r"(?:^|[^-\w])font-size\s*:")),
-        ("weight", one(r"(?:^|[^-\w])font-weight\s*:")),
+        (
+            "radii",
+            one(r"(?:^|[^-\w])border-radius\s*:"),
+            Reach::Everywhere,
+        ),
+        ("text", one(r"(?:^|[^-\w])font-size\s*:"), Reach::Everywhere),
+        (
+            "weight",
+            one(r"(?:^|[^-\w])font-weight\s*:"),
+            Reach::Everywhere,
+        ),
         (
             "duration",
             one(r"(?:^|[^-\w])(?:transition-duration|animation-duration)\s*:"),
+            Reach::Everywhere,
         ),
-        ("layer", one(r"(?:^|[^-\w])z-index\s*:")),
+        ("layer", one(r"(?:^|[^-\w])z-index\s*:"), Reach::Everywhere),
+        (
+            "duration",
+            one(r"(?:^|[^-\w])(?:transition|animation)\s*:"),
+            Reach::Component,
+        ),
+        (
+            "size",
+            one(r"(?:^|[^-\w])(?:block-size|inline-size|width|height)\s*:"),
+            Reach::Component,
+        ),
+        ("space", one(r"(?:^|[^-\w])translate\s*:"), Reach::Component),
+        (
+            "border",
+            one(r"(?:^|[^-\w])stroke-width\s*:"),
+            Reach::Component,
+        ),
     ]
 });
 
@@ -99,6 +163,27 @@ static RAW_LENGTH: LazyLock<Regex> = LazyLock::new(|| {
 /// alone, because `calc(var(--x) + 4px)` really is a raw length.
 static CALC_FACTOR: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"[*/]\s*-?\d*\.?\d+|-?\d*\.?\d+\s*[*/]").expect("a literal pattern compiles")
+});
+
+/// A bare zero inside a longer value, which is structural wherever it sits.
+///
+/// `0` on its own is already allowed; `translate: 0 -50%` and `margin: 0 auto`
+/// carry the same zero beside something else, and a rule reading the shorthands
+/// has to see through it or every centering translate is a finding.
+static BARE_ZERO: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?:^|[\s:(,])0(?:px|rem|em|ms|s)?(?:[\s;,)]|$)")
+        .expect("a literal pattern compiles")
+});
+
+/// A length in `em`, read as a factor of the type rather than as a size.
+static EM_FACTOR: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"-?\d*\.?\d+em\b").expect("a literal pattern compiles"));
+
+/// A `var()` with a fallback holding at most one level of parens, and the name
+/// alone, which is what it is reduced to where the fallback is the reach.
+static FALLBACK: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"var\(\s*(--[\w-]+)\s*,\s*(?:[^()]|\([^()]*\))*\)")
+        .expect("a literal pattern compiles")
 });
 
 /// Values that are structural rather than design decisions.
@@ -239,6 +324,12 @@ pub fn run(context: &Context) -> Report {
         };
         let where_ = context.relative(&file);
         let owns_primitives = where_.starts_with(&owns.to_string_lossy().to_string());
+        let component = context
+            .settings
+            .tiers
+            .iter()
+            .any(|tier| where_.starts_with(&format!("{tier}/")))
+            && !where_.contains(".examples");
 
         /* An example showing the base layer writes raw values on purpose: a
         consumer taking that layer alone has no token to reach for, and an
@@ -267,6 +358,7 @@ pub fn run(context: &Context) -> Report {
             &blocks(&file, &source),
             &source,
             Against {
+                component,
                 defined: &defined,
                 owns_primitives,
                 privates: &privates,
@@ -289,6 +381,9 @@ pub fn run(context: &Context) -> Report {
 /// What one file is judged against.
 #[derive(Clone, Copy)]
 struct Against<'a> {
+    /// Whether the file is a component's own source rather than a page's or an
+    /// example's, which is the only place a [`Reach::Component`] group is read.
+    component: bool,
     defined: &'a BTreeSet<String>,
     owns_primitives: bool,
     privates: &'a BTreeSet<String>,
@@ -303,6 +398,7 @@ fn read(
     findings: &mut Vec<Finding>,
 ) -> usize {
     let Against {
+        component,
         defined,
         owns_primitives,
         privates,
@@ -312,7 +408,10 @@ fn read(
     {
         for (offset, block) in blocks {
             let offset = *offset;
-            let text = COMMENT.replace_all(block, "");
+            /* Blanked rather than removed, so a line number below is the line
+            in the file: a comment cut out took its newlines with it and every
+            finding after one named a line above the declaration it meant. */
+            let text = blanked(block);
             let mut in_face = false;
             let mut depth = 0i32;
             for (number, raw) in text.lines().enumerate() {
@@ -342,6 +441,7 @@ fn read(
                     line,
                     &at,
                     Against {
+                        component,
                         defined,
                         owns_primitives,
                         privates,
@@ -359,6 +459,7 @@ fn read(
 /// One line, against every rule that can speak about it.
 fn judge(line: &str, at: &str, against: Against, checked: &mut usize, findings: &mut Vec<Finding>) {
     let Against {
+        component,
         defined,
         owns_primitives,
         privates,
@@ -411,8 +512,11 @@ fn judge(line: &str, at: &str, against: Against, checked: &mut usize, findings: 
                     });
                 }
 
-                for (category, property) in TOKENIZED.iter() {
+                for (category, property, reach) in TOKENIZED.iter() {
                     if !property.is_match(line) || owns_primitives {
+                        continue;
+                    }
+                    if *reach == Reach::Component && !component {
                         continue;
                     }
                     let Some(colon) = line.find(':') else {
@@ -431,7 +535,29 @@ fn judge(line: &str, at: &str, against: Against, checked: &mut usize, findings: 
                         continue;
                     }
                     *checked += 1;
-                    let scalar = CALC_FACTOR.replace_all(&value, "");
+                    let mut scalar = CALC_FACTOR.replace_all(&value, "").into_owned();
+                    /* Twice, because `0 0` shares one separator between its two
+                    zeros and a single pass consumes it with the first. */
+                    for _ in 0..2 {
+                        scalar = BARE_ZERO.replace_all(&scalar, " ").into_owned();
+                    }
+                    if *reach == Reach::Component {
+                        /* A hook's fallback is the reach: see `Reach`. Innermost
+                        first, so `var(--a, var(--b, 2px))` empties in two
+                        passes rather than being missed for its parens. */
+                        loop {
+                            let stripped = FALLBACK.replace_all(&scalar, "var($1)").into_owned();
+                            if stripped == scalar {
+                                break;
+                            }
+                            scalar = stripped;
+                        }
+                        /* A size in `em` is a factor of the type beside it,
+                        which is the one size the scale cannot hold: a dot
+                        `0.5em` wide in a tooltip follows the tooltip's type,
+                        and a token would pin it to the page's. */
+                        scalar = EM_FACTOR.replace_all(&scalar, " ").into_owned();
+                    }
                     if !RAW_COLOR.is_match(&scalar) && !RAW_LENGTH.is_match(&scalar) {
                         continue;
                     }

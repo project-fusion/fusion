@@ -38,7 +38,6 @@
 /* Print: the shared chart parts, for the same reason. */
 @media print {
   :host {
-    box-shadow: none;
     print-color-adjust: exact;
   }
 }

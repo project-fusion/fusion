@@ -38,7 +38,6 @@ slot:not([name])::slotted(*) {
 /* Print: the same. */
 @media print {
   :host {
-    background-color: transparent;
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

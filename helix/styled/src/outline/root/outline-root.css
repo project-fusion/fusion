@@ -143,6 +143,6 @@
 /* Print: a table of contents, which is what paper invented. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

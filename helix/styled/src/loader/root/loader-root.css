@@ -3,6 +3,15 @@
      `--loader-size: 1em` for one that should match the text beside it, which
      is the case inside a button. */
   --_loader-size: var(--helix-size-loader-md);
+  /* The two rates and the stroke, named once. Neither rate is on the duration
+     scale, whose longest rung is 320ms and is for a control answering a hand:
+     a turn at 0.8s is the speed a spinner is read as busy at rather than
+     frantic, and `Video` turns its own at the same 0.8s so two spinners on one
+     page agree. The stroke is two user units of a 24-unit drawing, which is a
+     fact about the arc rather than a width in the border scale. */
+  --_loader-breathe: 2.4s;
+  --_loader-stroke: 2;
+  --_loader-turn: 0.8s;
   color: inherit;
   /* An inline grid rather than an inline flex, and one cell: both children take
      `grid-area: 1 / 1`, so a mark is centered over the circles with no offsets
@@ -23,7 +32,7 @@
 }
 
 [part="svg"] {
-  animation: helix-loader-turn 0.8s linear infinite;
+  animation: helix-loader-turn var(--_loader-turn) linear infinite;
   grid-area: 1 / 1;
   block-size: var(--loader-size, var(--_loader-size));
   inline-size: var(--loader-size, var(--_loader-size));
@@ -43,10 +52,10 @@
  * of the 0.18 it held: shallow enough that a still frame looks unchanged and
  * only the movement is new. */
 [part="track"] {
-  animation: helix-loader-breathe 2.4s ease-in-out infinite;
+  animation: helix-loader-breathe var(--_loader-breathe) ease-in-out infinite;
   opacity: 0.18;
   stroke: var(--loader-track-color, currentColor);
-  stroke-width: 2;
+  stroke-width: var(--_loader-stroke);
 }
 
 /*
@@ -56,7 +65,7 @@
  *    an empty box, which costs nothing.
  */
 [part="mark"] {
-  animation: helix-loader-breathe-mark 2.4s ease-in-out infinite;
+  animation: helix-loader-breathe-mark var(--_loader-breathe) ease-in-out infinite;
 }
 
 @keyframes helix-loader-breathe {
@@ -89,7 +98,7 @@
   stroke: var(--loader-color, currentColor);
   stroke-dasharray: 50, 100;
   stroke-linecap: round;
-  stroke-width: 2;
+  stroke-width: var(--_loader-stroke);
 }
 
 @keyframes helix-loader-turn {

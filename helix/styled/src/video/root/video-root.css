@@ -3,6 +3,15 @@
  */
 :host {
   color-scheme: dark;
+  /* The two bars, their thumbs and the spinner's turn, named once. A rail
+     `4px` thick with a `12px` thumb on it is a fact about a slider drawn over a
+     picture, and no rung of the size scale is that thin; the turn is `Loader`'s
+     own 0.8s, so two spinners on one page agree, and no rung of the duration
+     scale is that long. Privates rather than hooks, because none of the three
+     is a thing a consumer is invited to move. */
+  --_video-rail-size: 4px;
+  --_video-spin: 0.8s;
+  --_video-thumb-size: 12px;
 
   display: block;
   position: relative;
@@ -211,7 +220,7 @@
     var(--_video-fill) calc(var(--_video-at, 0) * 100%),
     transparent calc(var(--_video-at, 0) * 100%)
   );
-  block-size: 4px;
+  block-size: var(--_video-rail-size);
 }
 
 [part="scrubber"] {
@@ -266,7 +275,7 @@
      logical axes with the element, so `inline-size` is the tall one here and
      `block-size` is the thin one. Written the other way round the slider comes
      out seventy-two by four, lying down as before. */
-  block-size: 4px;
+  block-size: var(--_video-rail-size);
   bottom: var(--_video-level-lift);
   direction: rtl;
   inline-size: var(--_video-level-size);
@@ -329,19 +338,19 @@
 [part="volume"]::-webkit-slider-thumb {
   appearance: none;
   background-color: currentColor;
-  block-size: 12px;
+  block-size: var(--_video-thumb-size);
   border: none;
   border-radius: var(--helix-radii-full);
-  inline-size: 12px;
+  inline-size: var(--_video-thumb-size);
 }
 
 [part="scrubber"]::-moz-range-thumb,
 [part="volume"]::-moz-range-thumb {
   background-color: currentColor;
-  block-size: 12px;
+  block-size: var(--_video-thumb-size);
   border: none;
   border-radius: var(--helix-radii-full);
-  inline-size: 12px;
+  inline-size: var(--_video-thumb-size);
 }
 
 /*
@@ -522,8 +531,7 @@
    headless tier renders this and cannot reach for a styled element without
    depending on the tier above it. */
 [part="loading-mark"] {
-  /* The same 0.8s `Loader` turns at, so two spinners on one page agree. */
-  animation: video-spin 0.8s linear infinite;
+  animation: video-spin var(--_video-spin) linear infinite;
   block-size: var(--helix-size-icon-tight);
   border: var(--helix-border-thick) solid
     color-mix(in oklab, var(--helix-color-foreground-media) 30%, transparent);

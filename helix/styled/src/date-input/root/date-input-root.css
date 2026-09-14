@@ -138,7 +138,6 @@
  * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
-    box-shadow: none;
     print-color-adjust: exact;
   }
 }
