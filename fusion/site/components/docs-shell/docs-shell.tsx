@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { DocsNav } from '@/app/(site)/helix/docs-nav'
+import { DocsNav } from '@/components/docs-nav/docs-nav'
 import { helixNavigation } from '@/content/helix-nav/helix-nav'
 import styles from './docs-shell.module.css'
 
