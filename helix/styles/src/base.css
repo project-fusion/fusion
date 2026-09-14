@@ -452,12 +452,25 @@ helix-text[tone="warning"]:is([emphasis="muted"], [emphasis="subtle"]) {
   border-color: transparent;
 }
 
+/* A wash with no line, and the ink deepened, which is the one emphasis that
+   needs it: `subtle` puts a wash of the tone *under* the same ink `outlined`
+   and `ghost` set on the bare page, so it spends the headroom from both sides
+   at once. Measured on the element in light on `tone="primary"`, the label read
+   `#1068da` on `#ddeafa`: 4.29:1, under AA, where the same ink on the same tone
+   reads 4.82 outlined and 5.23 ghost. Toward the foreground rather than to a
+   darker step of the tone, because the foreground turns over with the mode and
+   a fixed step does not. `helix component`'s `recipes` holds this cell and the
+   others to the element's, which is where the line had landed alone. */
 [data-button="subtle"] {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 14%, transparent)
   );
   border-color: transparent;
+  color: var(
+    --button-foreground-color,
+    color-mix(in oklab, var(--_button-tone) 78%, var(--helix-color-foreground))
+  );
 }
 
 [data-button="subtle"]:not(:disabled):hover {
@@ -484,6 +497,10 @@ helix-button-group:not([variant="spaced"]) > [data-button]:not(:last-child) {
 [data-button="ghost"] {
   background-color: var(--button-background-color, transparent);
   border-color: transparent;
+  /* The base rule's own ink, restated because the element restates it: the
+     matrix is held cell for cell, and a cell that leaves a line to the base is
+     one the next edit to the base moves without meaning to. */
+  color: var(--button-foreground-color, var(--_button-tone));
 }
 
 /* A wash of the foreground, not a fixed surface. Measured on a ghost button

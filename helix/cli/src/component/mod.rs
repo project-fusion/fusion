@@ -67,6 +67,7 @@ pub mod platform_fidelity;
 pub mod print;
 pub mod properties;
 pub mod reachable;
+pub mod recipes;
 pub mod redeclared;
 pub mod reflected;
 pub mod reflected_defaults;
@@ -75,6 +76,7 @@ pub mod seams;
 pub mod seeds;
 pub mod selectors;
 pub mod separation;
+pub mod shared;
 pub mod slots;
 pub mod ssr;
 pub mod stable;
@@ -559,6 +561,12 @@ pub fn all() -> Vec<Rule> {
         },
         Rule {
             fix: None,
+            name: "recipes",
+            run: Runner::Source(recipes::run),
+            summary: "a base-layer recipe says what the element it pairs with says, axis by axis",
+        },
+        Rule {
+            fix: None,
             name: "redeclared",
             run: Runner::Source(redeclared::run),
             summary: "one selector is written once, or the blocks after it add rather than replace",
@@ -766,6 +774,12 @@ pub fn all() -> Vec<Rule> {
             name: "separation",
             run: Runner::Source(separation::run),
             summary: "a surface hooks both its edge and its lift",
+        },
+        Rule {
+            fix: None,
+            name: "shared",
+            run: Runner::Source(shared::run),
+            summary: "a module under `shared/` is composed by more than one family, and no family composes another's",
         },
         Rule {
             fix: None,

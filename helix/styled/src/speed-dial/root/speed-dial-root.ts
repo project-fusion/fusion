@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpeedDial } from '@fusion.dev/helix-headless/speed-dial'
 import type { CSSResultGroup } from 'lit'
-import { styles as glyphStyles } from '../../icon/glyph.css.js'
+import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './speed-dial-root.css.js'
 import '../../icon/index.js'
 
