@@ -77,107 +77,16 @@
 }
 
 /* A dot in the series color, so a row of the bubble and a mark in the drawing
-   are visibly the same thing, and only where something was plotted. */
+   are visibly the same thing, and only where something was plotted. One rule
+   rather than twenty-four keyed on the index: `drawTooltip` writes
+   `--chart-series` onto the cell beside `data-series`, the way the legend and
+   every mark carry theirs, and `series.css` says why a count belongs to the
+   tier that can count. */
 [part="tooltip-cell"][data-series]::before {
+  background-color: var(--chart-series);
   block-size: 0.5em;
   border-radius: var(--helix-radii-full);
   content: "";
   grid-column: 1;
   inline-size: 0.5em;
-}
-
-[part="tooltip-cell"][data-series="1"]::before {
-  background-color: var(--chart-series-1);
-}
-
-[part="tooltip-cell"][data-series="2"]::before {
-  background-color: var(--chart-series-2);
-}
-
-[part="tooltip-cell"][data-series="3"]::before {
-  background-color: var(--chart-series-3);
-}
-
-[part="tooltip-cell"][data-series="4"]::before {
-  background-color: var(--chart-series-4);
-}
-
-[part="tooltip-cell"][data-series="5"]::before {
-  background-color: var(--chart-series-5);
-}
-
-[part="tooltip-cell"][data-series="6"]::before {
-  background-color: var(--chart-series-6);
-}
-
-[part="tooltip-cell"][data-series="7"]::before {
-  background-color: var(--chart-series-7);
-}
-
-[part="tooltip-cell"][data-series="8"]::before {
-  background-color: var(--chart-series-8);
-}
-
-[part="tooltip-cell"][data-series="9"]::before {
-  background-color: var(--chart-series-9);
-}
-
-[part="tooltip-cell"][data-series="10"]::before {
-  background-color: var(--chart-series-10);
-}
-
-[part="tooltip-cell"][data-series="11"]::before {
-  background-color: var(--chart-series-11);
-}
-
-[part="tooltip-cell"][data-series="12"]::before {
-  background-color: var(--chart-series-12);
-}
-
-[part="tooltip-cell"][data-series="13"]::before {
-  background-color: var(--chart-series-13);
-}
-
-[part="tooltip-cell"][data-series="14"]::before {
-  background-color: var(--chart-series-14);
-}
-
-[part="tooltip-cell"][data-series="15"]::before {
-  background-color: var(--chart-series-15);
-}
-
-[part="tooltip-cell"][data-series="16"]::before {
-  background-color: var(--chart-series-16);
-}
-
-[part="tooltip-cell"][data-series="17"]::before {
-  background-color: var(--chart-series-17);
-}
-
-[part="tooltip-cell"][data-series="18"]::before {
-  background-color: var(--chart-series-18);
-}
-
-[part="tooltip-cell"][data-series="19"]::before {
-  background-color: var(--chart-series-19);
-}
-
-[part="tooltip-cell"][data-series="20"]::before {
-  background-color: var(--chart-series-20);
-}
-
-[part="tooltip-cell"][data-series="21"]::before {
-  background-color: var(--chart-series-21);
-}
-
-[part="tooltip-cell"][data-series="22"]::before {
-  background-color: var(--chart-series-22);
-}
-
-[part="tooltip-cell"][data-series="23"]::before {
-  background-color: var(--chart-series-23);
-}
-
-[part="tooltip-cell"][data-series="24"]::before {
-  background-color: var(--chart-series-24);
 }
