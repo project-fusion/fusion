@@ -12,7 +12,6 @@ members = [
 # Shared dependency versions live here once (lockstep policy). Crates reference
 # them with `dep.workspace = true` and layer per-crate feature sets on top.
 [workspace.dependencies]
-anyhow = "1"
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 # **One dependency, not two.** `ratatui` re-exports the `crossterm` it was built
@@ -26,10 +25,14 @@ ratatui = "0.30"
 regex = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+# **Referenced by no crate yet, and kept on purpose.** The Cortex stores are
+# in-memory references today, and `cortex/CONVENTIONS.md` commits to SQLite and
+# Postgres behind one trait as the two backends. Both will take this, and
+# neither database feature is chosen here because the crate that picks one is
+# the crate that has to justify it.
 sqlx = { version = "0.8", default-features = false, features = ["chrono", "json", "macros", "runtime-tokio", "uuid"] }
 thiserror = "2"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-tracing = "0.1"
 uuid = { version = "1", features = ["serde", "v4", "v7"] }
 
 # Internal crates. Path deps are relative: same-domain is `../<role>`.

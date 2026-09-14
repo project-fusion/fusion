@@ -26,8 +26,5 @@ serde = { workspace = true }
 # precise fault the `order` rule exists to prevent.
 serde_json = { workspace = true, features = ["preserve_order"] }
 
-[dev-dependencies]
-serde_json = { workspace = true }
-
 [lints]
 workspace = true
