@@ -72,6 +72,10 @@ fusion/site/public/probe-events/
 fusion/site/public/sandbox
 fusion/site/public/specs
 
+# The theme engine the site serves, copied from `helix/theme/wasm` by
+# `turbo run wasm-copy`. The tracked binary is the one in the package.
+fusion/site/public/helix/theme.wasm
+
 # Recapture with `bun tooling/scripts/capture-scale-film.mjs`.
 fusion/site/public/media/sovereignty.jpg
 fusion/site/public/media/sovereignty.webm

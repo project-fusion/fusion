@@ -91,19 +91,65 @@
       "dependsOn": ["^build"],
       "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
     },
-    // `faces` runs at the head of this build and the font list is gitignored, so
-    // it is an output like `public/sandbox` beside it.
+    // **The generators are tasks this depends on, not a chain the script runs.**
+    // `build` was `faces && themed-page && catalog && frame && specs && next
+    // build`, which ran all five on every build and every typecheck whether or
+    // not their inputs had moved, and put a fetch of Google's font list in
+    // front of `tsc`. Declared here, each answers from its own cache, `faces`
+    // still runs every time because it says so, and `next build` waits for all
+    // of them.
+    //
+    // **What they write is theirs to declare, not this task's.** The frame, the
+    // specs and the font list were in these `outputs` while the script wrote
+    // them; left here, a cache hit on the build would restore its own snapshot
+    // of them over what the task that just ran had written.
+    //
+    // **The font list is an input, named, because `$TURBO_DEFAULT$` reads git
+    // and the file is ignored.** `faces` is uncached so that a cache hit cannot
+    // pin what Google answered once, and this is the other half of that: a
+    // build that did not read the list would hit on a `.next` prerendered from
+    // the previous answer.
     "@fusion.dev/site#build": {
-      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
-      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**",
-        "public/sandbox/**",
-        "public/specs/**",
-        "content/faces/faces.generated.ts"
-      ]
+      "dependsOn": [
+        "^build",
+        "^analyze",
+        "analyze",
+        "icons",
+        "styles",
+        "faces",
+        "themed-page",
+        "catalog",
+        "frame",
+        "specs",
+        "wasm-copy"
+      ],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "content/faces/faces.generated.ts"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    // `next dev` reads the same generated files the build does, and `dev.mjs`
+    // keeps the catalog and the frame current beside it. Uncached and
+    // persistent as the shared `dev` is; what is added is the order.
+    "@fusion.dev/site#dev": {
+      "cache": false,
+      "dependsOn": ["^build", "faces", "themed-page", "catalog", "frame", "specs", "wasm-copy"],
+      "persistent": true
+    },
+    // `tsc` imports the catalog, the font list and the themed page's markup,
+    // all generated, so the same five run first. Not `wasm-copy`: nothing
+    // typed reads the binary.
+    "@fusion.dev/site#typecheck": {
+      "dependsOn": [
+        "^build",
+        "^analyze",
+        "analyze",
+        "faces",
+        "themed-page",
+        "catalog",
+        "frame",
+        "specs"
+      ],
+      "inputs": ["$TURBO_DEFAULT$", "content/faces/faces.generated.ts"],
+      "outputs": []
     },
     // `cem analyze` writes four files and this used to claim one, then three.
     // The manifest is the obvious output; `jsx.d.ts`, `vue.d.ts` and
@@ -142,19 +188,15 @@
       // A tracked source is never a task output. `files` still publishes
       // `wasm`, `turbo run wasm-check` still measures it, and nothing builds it here.
       //
-      // **`public/sandbox` and `public/specs` are outputs and were not declared,
-      // which is the mirror of the `wasm` fault and cost four CI jobs.** The
-      // site's build is `catalog && frame && specs && next build`, so a cache hit
-      // skips all four and restores only what is listed: `.next` came back,
-      // `frame.html` did not, and both directories are gitignored so nothing else
-      // could put them there. Every browser job then failed one second in with
-      // `Cannot read properties of null (reading 'querySelectorAll')`, because
-      // `preview-root` lives in the frame that was never written. Red since the
-      // remote cache started hitting, and never for a reason in the code.
-      //
-      // The `wasm` lesson was that a tracked file must not be declared. This is
-      // the other half: a generated file that nothing tracks must be.
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**", "public/sandbox/**", "public/specs/**"]
+      // **The other half: a generated file that nothing tracks must be
+      // declared, by the task that writes it.** `public/sandbox` and
+      // `public/specs` were written by the site's build script and declared by
+      // nothing, so a cache hit restored `.next` and not `frame.html`, and every
+      // browser job failed one second in with `Cannot read properties of null
+      // (reading 'querySelectorAll')`. They are `frame`'s and `specs`' outputs
+      // now, and the site's own entry above names only what `next build`
+      // writes.
+      "outputs": ["dist/**"]
     },
     // Reads the manifests and every `.examples` file, so it depends on the
     // analyzer having run: `analyze` writes `custom-elements.json`, and a
@@ -408,7 +450,18 @@
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
-    "wasm-check": { "cache": false }
+    "wasm-check": { "cache": false },
+    // The site serves the theme engine as a static file, and the file is a copy
+    // of the tracked binary in `helix/theme/wasm`. It was tracked twice, byte
+    // for byte, with `build-wasm.mjs` writing both; now the copy is build output
+    // like the frame, and the tracked one is the only source.
+    "wasm-copy": {
+      "inputs": [
+        "$TURBO_ROOT$/helix/theme/wasm/fusion_helix_theme_bg.wasm",
+        "$TURBO_ROOT$/fusion/site/scripts/copy-wasm.mjs"
+      ],
+      "outputs": ["public/helix/theme.wasm"]
+    }
   },
   "ui": "stream"
 }
