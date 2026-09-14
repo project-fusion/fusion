@@ -58,7 +58,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
  * a fact about this repository rather than about the component.
  */
 const SOURCES = TIERS.map((tier) => join(root, tier))
-const harness = join(root, 'helix/testing/src/browser.ts')
+/* The package's own export, which is what the specs themselves would reach.
+   Bundled from `dist`, so `^build` has to have run, and it has: the task
+   depends on it. */
+const harness = fileURLToPath(import.meta.resolve('@fusion.dev/helix-testing/browser'))
 const entries = join(root, '.local/spec-entries')
 const out = join(root, 'fusion/site/public/specs')
 

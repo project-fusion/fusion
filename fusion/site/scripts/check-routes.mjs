@@ -49,39 +49,6 @@ if (all.length === 0) {
   process.exit(1)
 }
 
-/* **The two halves read the registry from different places, and a stale build
-   makes that look like a content problem.**
-   
-   `routes()` is app code, so it imports `@fusion.dev/helix-docs` and gets `dist`.
-   `build-catalog.mjs` is tooling, so it reads `src` directly, the way every
-   generator here reads source. Both are right, and between a content edit and
-   the next build they disagree: the catalog writes a document for a page the
-   route registry has never heard of, and the message for that is "a document no
-   route points at", which sends a reader looking through content for a file
-   that is not the problem.
-   
-   Cheaper to say so. The content directory is the truth either way. */
-const authored = new Set(
-  readdirSync(join(ROOT, 'helix/docs/content'))
-    .filter((entry) => entry.endsWith('.mdx'))
-    .map((entry) => entry.replace(/\.mdx$/, '')),
-)
-const built = new Set(
-  all.filter((route) => route.path.startsWith('/helix/docs/')).map((route) => route.path.slice(12)),
-)
-const drifted = [
-  ...[...authored].filter((slug) => !built.has(slug)).map((slug) => `+${slug}`),
-  ...[...built].filter((slug) => !authored.has(slug)).map((slug) => `-${slug}`),
-]
-if (drifted.length > 0) {
-  console.error(
-    `routes: helix/docs/dist is stale against its content (${drifted.join(' ')}).\n` +
-      '  The route registry reads the built package and the catalog reads source.\n' +
-      '  Run `bun run build`, then `turbo run catalog`.',
-  )
-  process.exit(1)
-}
-
 /** Where a route's document is, relative to `public`. */
 const documentOf = (path) => (path === '/' ? 'index.md' : `${path.slice(1)}.md`)
 
