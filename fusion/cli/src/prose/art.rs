@@ -114,7 +114,10 @@ fn pattern() -> Regex {
     .expect("a pattern built from two literal tables compiles")
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "a rule is one reading of its corpus, and splitting it puts half the reading somewhere else"
+)]
 pub fn run(context: &Context) -> Report {
     let gallery = &context.settings.gallery;
     let mut findings = Vec::new();

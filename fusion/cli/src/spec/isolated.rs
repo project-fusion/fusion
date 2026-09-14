@@ -42,7 +42,10 @@ use crate::workspace::crawl;
 static RENDERS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"<HelixElements\b").expect("a literal pattern compiles"));
 
-#[allow(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "a rule is one reading of its corpus, and splitting it puts half the reading somewhere else"
+)]
 pub fn run(context: &Context) -> Report {
     let settings = &context.settings.spec;
     let app = context.root.join(&settings.app);

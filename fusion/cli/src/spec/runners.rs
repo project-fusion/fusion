@@ -33,7 +33,6 @@ use crate::workspace::crawl;
 static WHOLESALE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\bbun test src\b").expect("a literal pattern compiles"));
 
-#[allow(clippy::too_many_lines)]
 pub fn run(context: &Context) -> Report {
     let runners = &context.settings.spec.runners;
     let mut findings = Vec::new();

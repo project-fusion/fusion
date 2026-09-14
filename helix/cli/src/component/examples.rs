@@ -243,7 +243,6 @@ pub fn run(context: &Context) -> Report {
 }
 
 /// One example: its annotations, its stylesheet, and what it asks of a component.
-#[allow(clippy::too_many_arguments)]
 fn judge(
     html: &str,
     family: &str,
