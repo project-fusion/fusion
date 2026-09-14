@@ -34,7 +34,7 @@ use std::sync::LazyLock;
 
 use regex::{Captures, Regex};
 
-use crate::rules::{Context, Finding, Report};
+use crate::rules::{Context, Finding, Report, Unwritten, Written};
 use crate::workspace::crawl;
 
 /// The tag order, one row per section, and a blank line between sections.
@@ -311,13 +311,15 @@ pub fn run(context: &Context) -> Report {
     }
 }
 
-pub fn fix(context: &Context) -> Vec<String> {
+pub fn fix(context: &Context) -> Written {
     let (_, changed) = survey(context);
     let mut written = Vec::new();
     for (file, _, after, _) in changed {
-        if fs::write(&file, after).is_ok() {
-            written.push(context.relative(&file));
-        }
+        fs::write(&file, after).map_err(|error| Unwritten {
+            file: context.relative(&file),
+            why: error.to_string(),
+        })?;
+        written.push(context.relative(&file));
     }
-    written
+    Ok(written)
 }

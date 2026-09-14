@@ -88,6 +88,8 @@ use std::sync::OnceLock;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::error::{Failure, Outcome};
+
 /// What a rule is run against.
 pub struct Context {
     pub root: PathBuf,
@@ -339,7 +341,7 @@ impl Settings {
     ///
     /// 1. `fusion.json`, under a `helix` key. Helix is a plugin of that
     ///    product, and a product's configuration is where its plugins are
-    ///    configured — one file to find, one file to review.
+    ///    configured: one file to find, one file to review.
     /// 2. `helix.json`, for a consumer who has this tool and not that
     ///    product. Standalone is the constraint every product CLI is built
     ///    under, and it would be broken by *requiring* a file named for
@@ -350,14 +352,24 @@ impl Settings {
     /// **Which file it came from travels with the settings**, because four
     /// rules report findings against the configuration itself and a finding
     /// naming a file the reader does not have is worse than no finding at all.
-    pub fn read(root: &Path) -> Result<Self, String> {
+    ///
+    /// # Errors
+    ///
+    /// [`Failure`] when neither file is there or the one found is not this
+    /// shape. **The parse error carries serde's own message**, which names the
+    /// key and the line, the way [`crate::config::read`] does: the file is hand
+    /// written and the reader's next action is to open it at that line.
+    pub fn read(root: &Path) -> Outcome<Self> {
+        const WHAT: &str = "component rules need to know where the source is";
         let product = root.join("fusion.json");
         if let Ok(raw) = fs::read_to_string(&product) {
-            let held = serde_json::from_str::<serde_json::Value>(&raw)
-                .map_err(|error| format!("{}: {error}", product.display()))?;
+            let held = serde_json::from_str::<Value>(&raw)
+                .map_err(|error| Failure::input(WHAT, format!("{}: {error}", product.display())))?;
             if let Some(section) = held.get("helix") {
-                let mut settings: Self = serde_json::from_value(section.clone())
-                    .map_err(|error| format!("{}: `helix`: {error}", product.display()))?;
+                let mut settings: Self =
+                    serde_json::from_value(section.clone()).map_err(|error| {
+                        Failure::input(WHAT, format!("{}: `helix`: {error}", product.display()))
+                    })?;
                 "fusion.json".clone_into(&mut settings.source);
                 return Ok(settings);
             }
@@ -365,16 +377,19 @@ impl Settings {
 
         let file = root.join("helix.json");
         let raw = fs::read_to_string(&file).map_err(|_| {
-            format!(
-                "no configuration at {}.\n  Helix reads a `helix` key in `fusion.json`, or \
-                 `helix.json` when that product is not in use. Either names the directories \
-                 holding component source, without which there is nothing to read:\n\n  \
-                 {{ \"tiers\": [\"src/components\"] }}",
-                root.display()
+            Failure::input(
+                WHAT,
+                format!(
+                    "no configuration at {}.\n  Helix reads a `helix` key in `fusion.json`, or \
+                     `helix.json` when that product is not in use. Either names the \
+                     directories holding component source, without which there is nothing to \
+                     read:\n\n  {{ \"tiers\": [\"src/components\"] }}",
+                    root.display()
+                ),
             )
         })?;
-        let mut settings: Self =
-            serde_json::from_str(&raw).map_err(|error| format!("{}: {error}", file.display()))?;
+        let mut settings: Self = serde_json::from_str(&raw)
+            .map_err(|error| Failure::input(WHAT, format!("{}: {error}", file.display())))?;
         "helix.json".clone_into(&mut settings.source);
         Ok(settings)
     }
@@ -447,6 +462,22 @@ impl Report {
     }
 }
 
+/// What a `fix` hands back: every file it wrote, relative to the root.
+pub type Written = Result<Vec<String>, Unwritten>;
+
+/// A write that did not happen, which stops the fix where it stood.
+///
+/// **A fix that cannot write says so, rather than reporting the files it
+/// managed.** A caller reading "3 files written" has no way to learn that a
+/// fourth was refused, and a read-only checkout ran every fix as a quiet
+/// no-op before this.
+pub struct Unwritten {
+    /// Relative to the root, the way a finding names one.
+    pub file: String,
+    /// What the filesystem said.
+    pub why: String,
+}
+
 pub struct Rule {
     /// `None` for a rule that judges and cannot write, which is most of them.
     ///
@@ -454,7 +485,7 @@ pub struct Rule {
     /// runs, so a `fix` is never a second opinion about what is wrong: it is the
     /// same reading, applied. Only an ordering rule has one here, because an
     /// order is the one kind of finding whose repair is mechanical.
-    pub fix: Option<fn(&Context) -> Vec<String>>,
+    pub fix: Option<fn(&Context) -> Written>,
     pub name: &'static str,
     pub run: Runner,
     pub summary: &'static str,

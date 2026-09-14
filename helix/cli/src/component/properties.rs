@@ -38,7 +38,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::{sources, Context, Finding, Report};
+use crate::component::{sources, Context, Finding, Report, Unwritten, Written};
 
 /// The member a decorator sits on, past any further decorators.
 static MEMBER: LazyLock<Regex> = LazyLock::new(|| {
@@ -230,15 +230,17 @@ pub fn run(context: &Context) -> Report {
     }
 }
 
-pub fn fix(context: &Context) -> Vec<String> {
+pub fn fix(context: &Context) -> Written {
     let (_, changed) = survey(context);
     let mut written = Vec::new();
     for (file, after) in changed {
-        if fs::write(&file, after).is_ok() {
-            written.push(context.relative(&file));
-        }
+        fs::write(&file, after).map_err(|error| Unwritten {
+            file: context.relative(&file),
+            why: error.to_string(),
+        })?;
+        written.push(context.relative(&file));
     }
-    written
+    Ok(written)
 }
 
 #[cfg(test)]

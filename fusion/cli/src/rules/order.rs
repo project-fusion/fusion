@@ -29,7 +29,7 @@ use std::process::{Command, Stdio};
 
 use serde_json::{Map, Value};
 
-use crate::rules::{Context, Finding, Report};
+use crate::rules::{Context, Finding, Report, Unwritten, Written};
 
 /// Keys pinned to the top, in this order. Everything else sorts after them.
 const PRIORITY: [&str; 17] = [
@@ -268,13 +268,15 @@ pub fn run(context: &Context) -> Report {
     }
 }
 
-pub fn fix(context: &Context) -> Vec<String> {
+pub fn fix(context: &Context) -> Written {
     let (_, changed) = survey(&context.root);
     let mut written = Vec::new();
     for (file, after) in changed {
-        if fs::write(&file, after).is_ok() {
-            written.push(context.relative(&file));
-        }
+        fs::write(&file, after).map_err(|error| Unwritten {
+            file: context.relative(&file),
+            why: error.to_string(),
+        })?;
+        written.push(context.relative(&file));
     }
-    written
+    Ok(written)
 }
