@@ -28,12 +28,14 @@ the graph, which wants the packages public first.
 ## Reading it yourself
 
 ```js
-import { findTemplate, PROJECT_NAME, templates } from '@fusion.dev/helix-templates'
+import { findTemplate, HELIX_VERSION, PROJECT_NAME, templates } from '@fusion.dev/helix-templates'
 ```
 
 `templates` is the register, in the order a chooser should offer them. Each entry
-names the files whose contents carry `PROJECT_NAME`, which a scaffolder replaces
-with the project's own. The payloads sit under `templates/<id>/` in this package.
+names the files a scaffolder substitutes in: `PROJECT_NAME` becomes the project's
+own name, and `HELIX_VERSION` becomes this package's version, which is the Helix
+the templates were published with. The payloads sit under `templates/<id>/` in
+this package.
 
 **The named files are named rather than discovered.** Scanning every file for the
 placeholder would rewrite a template that merely mentions it in prose, and a

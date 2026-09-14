@@ -20,13 +20,17 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { PROJECT_NAME, templates } from '../src/index.ts'
+import { HELIX_VERSION, PROJECT_NAME, templates } from '../src/index.ts'
 
 const OUTPUT = join(import.meta.dirname, '..', 'templates.json')
 
 /* Ordered as the register is, not sorted: the order is a decision that file
    explains, and a chooser reads this one. */
-const written = `${JSON.stringify({ placeholder: PROJECT_NAME, templates }, undefined, 2)}\n`
+const written = `${JSON.stringify(
+  { placeholder: PROJECT_NAME, templates, version: HELIX_VERSION },
+  undefined,
+  2,
+)}\n`
 
 if (process.argv.includes('--check')) {
   let found

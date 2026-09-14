@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { findTemplate, PROJECT_NAME, templates } from './index.js'
+import { findTemplate, HELIX_VERSION, PROJECT_NAME, templates } from './index.js'
 
 /* The payloads are data rather than code, so nothing type-checks them and
    nothing imports them. This is what holds the register to the directories. */
 const ROOT = join(import.meta.dirname, '..')
 
-/** Where a template's files live, which is `template-<id>` beside the manifest. */
-const directoryOf = (id: string) => join(ROOT, `template-${id}`)
+/** Where a template's files live, which is `templates/<id>`. */
+const directoryOf = (id: string) => join(ROOT, 'templates', id)
 
 const walk = (dir: string, base = ''): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -26,9 +26,9 @@ describe('the register and the directories', () => {
   /* The other direction, which is the one that rots: a template added on disk
      and not registered ships in the package and is offered by nobody. */
   test('every directory is registered', () => {
-    const onDisk = readdirSync(ROOT, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory() && entry.name.startsWith('template-'))
-      .map((entry) => entry.name.slice('template-'.length))
+    const onDisk = readdirSync(join(ROOT, 'templates'), { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
     expect(onDisk.toSorted()).toEqual(templates.map((one) => one.id).toSorted())
   })
 
@@ -68,4 +68,34 @@ describe('the project name placeholder', () => {
       expect(one.named).toContain('package.json')
     }
   })
+})
+
+describe('the version placeholder', () => {
+  /* **Every `@fusion.dev` dependency asks for the placeholder**, so a template
+     cannot pin a Helix again. Both did, at `^0.0.9` and `^0.4.1`, and nothing
+     read them: this spec pointed at a layout the package had left, and no
+     script ran it. */
+  for (const one of templates) {
+    test(`${one.id} asks for the Helix it was published with`, () => {
+      const manifest = JSON.parse(readFileSync(join(directoryOf(one.id), 'package.json'), 'utf8'))
+      const ranges = Object.entries({ ...manifest.dependencies, ...manifest.devDependencies })
+        .filter(([name]) => name.startsWith('@fusion.dev/'))
+        .map(([, range]) => range)
+      expect(ranges.length).toBeGreaterThan(0)
+      for (const range of ranges) {
+        expect(range).toBe(`^${HELIX_VERSION}`)
+      }
+    })
+
+    /* Substitution happens only in named files, so one carrying the placeholder
+       outside the list would reach a project with it still in. */
+    test(`${one.id} carries it only in files it names`, () => {
+      const carrying = walk(directoryOf(one.id)).filter((file) =>
+        readFileSync(join(directoryOf(one.id), file), 'utf8').includes(HELIX_VERSION),
+      )
+      for (const file of carrying) {
+        expect(one.named).toContain(file)
+      }
+    })
+  }
 })

@@ -33,6 +33,15 @@ const REGISTER: &str = "templates.json";
 struct Register {
     placeholder: String,
     templates: Vec<Template>,
+    /// Replaced with the templates package's own version, which is the Helix
+    /// every package in it was published at.
+    version: String,
+}
+
+/// The one field of the templates package's manifest this reads.
+#[derive(Debug, Deserialize)]
+struct Manifest {
+    version: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -167,6 +176,22 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         return Ok(offer(&register, json, paint, Some(wanted)));
     };
 
+    /* **The Helix a project asks for is the one these templates shipped with.**
+    Lockstep makes this package's version every Helix package's, so a template
+    carries a placeholder rather than a range somebody has to keep current: two
+    kept by hand said `^0.0.9` while `0.25.0` was out. */
+    let manifest = package.join("package.json");
+    let helix: Manifest = fs::read_to_string(&manifest)
+        .map_err(|failure| failure.to_string())
+        .and_then(|raw| serde_json::from_str(&raw).map_err(|failure| failure.to_string()))
+        .map_err(|failure| {
+            Failure::new(
+                Code::Input,
+                format!("cannot read the version in {}", manifest.display()),
+                failure,
+            )
+        })?;
+
     let target = args.into.clone().unwrap_or_else(|| from.join(&args.name));
 
     /* **An empty directory or none at all.** Writing into a directory that holds
@@ -204,8 +229,10 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         &target,
         &files,
         template,
-        &register.placeholder,
-        &args.name,
+        &[
+            (register.placeholder.as_str(), args.name.as_str()),
+            (register.version.as_str(), helix.version.as_str()),
+        ],
     )?;
 
     if json {
@@ -280,7 +307,8 @@ fn offer(register: &Register, json: bool, paint: Paint, unknown: Option<&str>) -
     }
 }
 
-/// Copies one template into `target`, substituting only where the register says.
+/// Copies one template into `target`, substituting each placeholder with its
+/// value only where the register says.
 ///
 /// # Errors
 ///
@@ -292,8 +320,7 @@ fn lay_down(
     target: &Path,
     files: &[PathBuf],
     template: &Template,
-    placeholder: &str,
-    name: &str,
+    substitutions: &[(&str, &str)],
 ) -> Outcome<()> {
     for relative in files {
         let to = target.join(relative);
@@ -322,8 +349,12 @@ fn lay_down(
             .iter()
             .any(|one| Path::new(one) == relative.as_path());
         let written = if named {
-            String::from_utf8_lossy(&read)
-                .replace(placeholder, name)
+            substitutions
+                .iter()
+                .fold(
+                    String::from_utf8_lossy(&read).into_owned(),
+                    |text, (from, to)| text.replace(from, to),
+                )
                 .into_bytes()
         } else {
             read

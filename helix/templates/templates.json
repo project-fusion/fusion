@@ -21,5 +21,6 @@
       ],
       "title": "React (Next.js)"
     }
-  ]
+  ],
+  "version": "__HELIX_VERSION__"
 }

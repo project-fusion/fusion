@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fusion.dev/helix": "^0.0.9",
-    "@fusion.dev/helix-styles": "^0.4.1",
+    "@fusion.dev/helix": "^__HELIX_VERSION__",
+    "@fusion.dev/helix-styles": "^__HELIX_VERSION__",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

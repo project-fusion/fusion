@@ -503,6 +503,17 @@ fn it_writes_the_template_and_substitutes_only_the_named_files() {
     let manifest = std::fs::read_to_string(project.join("package.json")).expect("a manifest");
     assert!(manifest.contains("\"name\": \"my-app\""));
 
+    /* The Helix it asks for is the one the templates were published with. */
+    let own: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(templates().join("package.json")).expect("the templates manifest"),
+    )
+    .expect("a manifest that parses");
+    let version = own["version"].as_str().expect("a version");
+    assert!(
+        manifest.contains(&format!("\"@fusion.dev/helix\": \"^{version}\"")),
+        "{manifest}"
+    );
+
     /* The placeholder is gone from the whole tree, which is the assertion that
     catches a `named` list missing a file: the register says which files carry it
     and this says none of them still do. */
@@ -511,11 +522,13 @@ fn it_writes_the_template_and_substitutes_only_the_named_files() {
     assert!(!found.is_empty(), "it wrote something");
     for file in &found {
         let read = std::fs::read_to_string(file).unwrap_or_default();
-        assert!(
-            !read.contains("__PROJECT_NAME__"),
-            "{} still holds the placeholder",
-            file.display()
-        );
+        for placeholder in ["__PROJECT_NAME__", "__HELIX_VERSION__"] {
+            assert!(
+                !read.contains(placeholder),
+                "{} still holds {placeholder}",
+                file.display()
+            );
+        }
     }
 
     /* A file the register does not name still travels, unchanged. */

@@ -68,6 +68,17 @@ export const templates: readonly Template[] = [
 /** The placeholder a scaffolder replaces with the project's name. */
 export const PROJECT_NAME = '__PROJECT_NAME__'
 
+/**
+ * The placeholder a scaffolder replaces with this package's own version.
+ *
+ * **Which is the Helix a template was published with**, every Helix package
+ * sharing one version, so a template asks for the components it shipped beside
+ * and no release has to remember to update it. Written by hand, both templates
+ * asked for `^0.0.9`, which under a zero major admits `0.0.9` alone, and a new
+ * project installed that release while 0.25.0 was current.
+ */
+export const HELIX_VERSION = '__HELIX_VERSION__'
+
 /** The one template with this id, or `undefined` where there is none. */
 export const findTemplate = (id: string): Template | undefined =>
   templates.find((one) => one.id === id)
