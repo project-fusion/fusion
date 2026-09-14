@@ -28,11 +28,10 @@
   opacity: 0.5;
 }
 
-/* Print: zebra striping is a fill printers drop unevenly, which is worse than
-   none. */
+/* Print: rows of text, which print. The striping an earlier answer flattened is
+   Data Table's, and nothing here draws a fill. */
 @media print {
   :host {
-    background-color: transparent;
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

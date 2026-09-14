@@ -320,7 +320,11 @@ slot[name="indicator"]::slotted(helix-orb) {
    attribute to set, no `:has()` to write, and nothing to keep in step. A
    consumer who slots nothing is where this component started. */
 [part="indicator"] {
-  animation: helix-chat-typing 1.2s infinite ease-in-out;
+  /* Off the duration scale on purpose: its longest rung is a control answering
+     a hand, and this is three dots taking turns at the pace somebody types. */
+  --_chat-typing-cycle: 1.2s;
+
+  animation: helix-chat-typing var(--_chat-typing-cycle) infinite ease-in-out;
   background-image:
     radial-gradient(circle closest-side, currentColor 90%, transparent),
     radial-gradient(circle closest-side, currentColor 90%, transparent),

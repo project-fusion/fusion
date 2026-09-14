@@ -180,7 +180,6 @@
 /* Print: a control prints the value it holds, and the state has to survive. */
 @media print {
   :host {
-    box-shadow: none;
     print-color-adjust: exact;
   }
 }

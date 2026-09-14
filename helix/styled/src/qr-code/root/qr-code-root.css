@@ -60,6 +60,6 @@
 /* Print: the one thing on this list that is more useful on paper than on screen. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

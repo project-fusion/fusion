@@ -192,6 +192,10 @@
 }
 
 :host([variant="chip"]) [part="item"] {
+  /* How far a chosen chip comes forward, and a hovered one half of it. Two
+     pixels, which the space scale cannot say: its first rung is four. */
+  --_radio-chip-lift: 2px;
+
   align-items: center;
   background-color: var(--helix-color-surface-sunken);
   block-size: var(--radio-chip-size, var(--helix-size-control));
@@ -218,11 +222,11 @@
   background-color: var(--helix-color-surface-inverse);
   box-shadow: var(--helix-shadow-md);
   color: var(--helix-color-foreground-inverse);
-  translate: 0 -2px;
+  translate: 0 calc(var(--_radio-chip-lift) * -1);
 }
 
 :host(:not([disabled])[variant="chip"]) [part="item"]:hover {
-  translate: 0 -1px;
+  translate: 0 calc(var(--_radio-chip-lift) / -2);
 }
 
 :host([variant="chip"]) [part="item"]:focus-visible {

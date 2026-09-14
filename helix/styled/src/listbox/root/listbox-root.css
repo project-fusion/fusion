@@ -145,14 +145,13 @@ slot[name="filter-icon"]::slotted(*) {
   opacity: 0.5;
 }
 
-/* Print: the list prints the options it holds, without the lift that says it is
- * a live surface.
+/* Print: the list prints the options it holds, and a chosen row is a fill that
+ * has to survive, or the paper says the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
  * on a component's behalf and every family says it for itself. */
 @media print {
   :host {
-    box-shadow: none;
     print-color-adjust: exact;
   }
 }

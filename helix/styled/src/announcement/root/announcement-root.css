@@ -245,6 +245,5 @@
 @media print {
   :host {
     background-color: transparent;
-    box-shadow: none;
   }
 }

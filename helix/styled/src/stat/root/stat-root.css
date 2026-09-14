@@ -73,6 +73,6 @@ slot[name="unit"]::slotted(*) {
 /* Print: a figure and its label, which need no ground. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

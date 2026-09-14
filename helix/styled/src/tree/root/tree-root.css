@@ -38,6 +38,6 @@
 /* Print: a structure, and printing it flat loses the structure. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }

@@ -63,6 +63,9 @@
  */
 [part="arrow"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
+  /* `0.625rem`, where Tooltip's point is `0.5rem`: two sizes for one shape,
+     and no size token holds either. Recorded rather than settled, since
+     settling moves one of them. */
   block-size: var(--tour-arrow-size, 0.625rem);
   inline-size: var(--tour-arrow-size, 0.625rem);
   position: absolute;

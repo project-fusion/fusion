@@ -20,6 +20,14 @@
 //! plain attribute; keying on the family reports it as a bug. A part qualifies
 //! if the source at the same relative path reaches the form base class.
 //!
+//! **The negated form is the same fault, and it hid for a year.** `:host(:not(
+//! [disabled]))` gates a hover on the attribute's absence, so a control inside a
+//! disabled fieldset carries no attribute, passes the gate, and lights up under a
+//! pointer that cannot press it. The first version of this rule read only
+//! `:host([disabled]…)` and let the checkbox's card hover through; the argument
+//! is one selector, so the scan reads the whole of every `:host()` argument for
+//! the attribute rather than the one shape it was first written against.
+//!
 //! **The base classes are Helix's and travel with the rule**, the way the
 //! platform attribute table does: a consumer extending Helix extends
 //! `HelixFormElement`, and a library with its own form base has its own version
@@ -40,10 +48,41 @@ static FORM_BASE: LazyLock<Regex> = LazyLock::new(|| {
         .expect("a literal pattern compiles")
 });
 
-/// `:host([disabled])`, which is the half of the truth that is written down.
-static ON_ATTRIBUTE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r":host\(\[disabled\][^)]*\)").expect("a literal pattern compiles")
-});
+/// Every `:host(…)` whose argument names the attribute, in any position.
+///
+/// Paren-counted rather than matched: `:host()` takes a compound selector that
+/// can hold parens of its own, `:not([disabled])` being the case that matters
+/// here, so a pattern stopping at the first `)` sees half the argument.
+fn on_attribute(css: &str) -> Vec<String> {
+    let bytes = css.as_bytes();
+    let mut found = Vec::new();
+    let mut at = 0;
+    while let Some(start) = css[at..].find(":host(").map(|one| one + at) {
+        let mut depth = 0;
+        let mut scan = start + ":host".len();
+        while scan < bytes.len() {
+            match bytes[scan] {
+                b'(' => depth += 1,
+                b')' => {
+                    depth -= 1;
+                    if depth == 0 {
+                        let whole = &css[start..=scan];
+                        if whole.contains("[disabled]") {
+                            found.push(whole.to_owned());
+                        }
+                        break;
+                    }
+                }
+                /* An unbalanced `:host(` cannot be a selector. */
+                b'{' => break,
+                _ => {}
+            }
+            scan += 1;
+        }
+        at = start + 1;
+    }
+    found
+}
 
 pub fn run(context: &Context) -> Report {
     let tiers = context.settings.roots(&context.root);
@@ -92,17 +131,18 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             let code = COMMENT.replace_all(&raw, "");
-            let where_ = context.relative(&sheet);
-            for found in ON_ATTRIBUTE.find_iter(&code) {
+            let where_ = sheet
+                .strip_prefix(&context.root)
+                .unwrap_or(&sheet)
+                .to_string_lossy()
+                .replace('\\', "/");
+            for found in on_attribute(&code) {
                 findings.push(Finding {
-                    detail: "Use `:host(:disabled)`, which is true for the attribute and for an \
-                             ancestor `<fieldset disabled>` alike."
+                    detail: "Use `:host(:disabled)`, or `:host(:not(:disabled))`, which is true \
+                             for the attribute and for an ancestor `<fieldset disabled>` alike."
                         .to_owned(),
                     file: where_.clone(),
-                    message: format!(
-                        "{} misses an ancestor `<fieldset disabled>`",
-                        found.as_str()
-                    ),
+                    message: format!("{found} misses an ancestor `<fieldset disabled>`"),
                 });
             }
         }

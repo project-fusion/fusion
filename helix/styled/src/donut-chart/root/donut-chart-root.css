@@ -92,11 +92,13 @@
      its own container's units, that being circular, so `cqi` written on the
      container resolves against whatever container is further up and the total
      comes out four times the width of the ring. The ring is drawn at r=40 in a
-     100 box with the stroke astride it, so the hole's diameter is
-     `80 - thickness`. */
+     100 box with the stroke astride it, so the hole's diameter is the ring's
+     less the thickness, in the box's own units. */
+  --_donut-chart-ring: 80;
+
   container-type: inline-size;
   display: grid;
-  inline-size: calc(100% * (80 - var(--donut-chart-stroke, 16)) / 100);
+  inline-size: calc(100% * (var(--_donut-chart-ring) - var(--donut-chart-stroke, 16)) / 100);
   place-items: center;
   text-align: center;
 }
@@ -199,7 +201,6 @@
 /* Print: the same, and a donut with no fill is a ring of nothing. */
 @media print {
   :host {
-    box-shadow: none;
     print-color-adjust: exact;
   }
 }

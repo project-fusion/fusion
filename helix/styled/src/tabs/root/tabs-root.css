@@ -157,7 +157,6 @@
 @media print {
   :host {
     box-shadow: none;
-    max-block-size: none;
     overflow: visible;
   }
 }

@@ -1525,6 +1525,40 @@ tiers, so a change to the narrow rendering is visible. That is the half of this
 that stays fixed without anybody remembering to look. A baseline is what makes a
 change visible, not a claim that what it pictures is good.
 
+## Print
+
+**Every family with a stylesheet says what it does on paper, and the answer is
+one of five.** `@media print` does not cross a shadow boundary any more than a
+reduced-motion rule does, so a consumer who wants a clean printout cannot write
+one from the page: the rule has to be in the sheet the component adopts, and
+`helix component`'s `print` holds every family to having one. What it says is
+one of these, and the sheet carries the reason beside it:
+
+| Answer | Spelling |
+|---|---|
+| Hides | `display: none`, for chrome: a printed page has no elsewhere to go |
+| Flattens | A reset of a property the family draws, `box-shadow: none` on a surface that lifts |
+| Unclips | `overflow: visible` on a box that scrolls, `white-space: pre-wrap` on a `<pre>` |
+| Forces its fill | `print-color-adjust: exact`, where the fill is the information |
+| Prints as it is | `print-color-adjust: economy` |
+
+**The fifth is a spelling for "nothing to flatten", and it exists because the
+alternative was a lie.** Fifty sheets carried `box-shadow: none` on paper and
+named `box-shadow` nowhere else, measured 14 Sep 2026: a text run, a divider, a
+list, each answering the question with a reset of a shadow it never drew, and
+each reading as a family that had thought about paper. `economy` is the
+browser's own answer restated, so it changes nothing on the page or on paper,
+and it is a sentence: nothing here lifts, scrolls or carries its state in a fill.
+It is the fourth spelling the focus-ring registry holds under `none`, for the
+same reason.
+
+**So a flatten or an unclip has to reset a property the family sets**, on any of
+its sheets, as the longhand or the shorthand: `overflow-x: visible` answers for
+`overflow: auto`, and `background-color: transparent` for a `background`. A
+reset of a property nothing sets is reported. What a printer is told directly,
+where a page may break and what a pseudo-element adds beside a link once there
+is no hover to reveal it, answers for itself.
+
 
 ## The sandbox
 

@@ -76,6 +76,6 @@
 /* Print: layout only, and it keeps its own. */
 @media print {
   :host {
-    box-shadow: none;
+    print-color-adjust: economy;
   }
 }
