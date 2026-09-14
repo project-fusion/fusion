@@ -73,6 +73,7 @@ pub mod separation;
 pub mod slots;
 pub mod ssr;
 pub mod stable;
+pub mod text;
 pub mod tier;
 pub mod token_defaults;
 pub mod tokens;
@@ -89,6 +90,20 @@ use serde::{Deserialize, Serialize};
 pub struct Context {
     pub root: PathBuf,
     pub settings: Settings,
+}
+
+impl Context {
+    /// A path as a finding names it: relative to the root, with forward slashes.
+    ///
+    /// Forward slashes on every platform, because a finding is read by a person
+    /// and compared by a test, and neither wants the path to change with the
+    /// machine that produced it.
+    pub fn relative(&self, path: &Path) -> String {
+        path.strip_prefix(&self.root)
+            .unwrap_or(path)
+            .to_string_lossy()
+            .replace('\\', "/")
+    }
 }
 
 /// What Helix is told about a workspace, from whichever file carries it.

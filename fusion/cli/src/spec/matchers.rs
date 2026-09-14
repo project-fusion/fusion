@@ -145,11 +145,7 @@ pub fn run(context: &Context) -> Report {
         let Ok(text) = fs::read_to_string(&file) else {
             continue;
         };
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(&file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&file);
         /* One report per name per file: a matcher the harness lacks is reached
         for the same reason everywhere it appears, and naming it once is what a
         reader acts on. */

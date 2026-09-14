@@ -43,6 +43,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, Context, Finding, Report};
 
 /// The lift that means "over the page rather than on it".
@@ -55,13 +56,6 @@ const SQUARE: &str = "--helix-radii-none";
 /// One rule: its selector, and the declarations inside it.
 static RULE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"([^{}]*)\{([^{}]*)\}").expect("a literal pattern compiles"));
-
-/// A comment, blanked before anything is read.
-///
-/// The prose above these rules quotes the tokens it is explaining, so a scan
-/// that reads comments reports the reasoning as a second declaration.
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 /// The part a selector styles, which is the last one it names.
 ///
@@ -95,12 +89,11 @@ pub fn run(context: &Context) -> Report {
             let Ok(raw) = fs::read_to_string(&sheet) else {
                 continue;
             };
+            /* Blanked before anything is read: the prose above these rules
+            quotes the tokens it is explaining, so a scan that reads comments
+            reports the reasoning as a second declaration. */
             let source = COMMENT.replace_all(&raw, " ");
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
 
             /* One entry per part in this file, since a part's corner and its
             lift are routinely declared in different rules. A file is the right

@@ -28,10 +28,8 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::Value;
 
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, Context, Finding, Report};
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 static RULE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\{([^{}]*)\}").expect("a literal pattern compiles"));
@@ -95,11 +93,7 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             let source = COMMENT.replace_all(&raw, " ");
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
             for rule in RULE.captures_iter(&source) {
                 let body = &rule[1];
                 /* The *first accepted* match, not the first match. Taking

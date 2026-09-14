@@ -79,11 +79,7 @@ pub fn run(context: &Context) -> Report {
         let text = GLOBAL
             .replace_all(&COMMENT.replace_all(&raw, " "), " ")
             .into_owned();
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(file);
         for found in DECLARES.captures_iter(&text) {
             owned
                 .entry((package_of(&where_), found[1].to_owned()))
@@ -99,11 +95,7 @@ pub fn run(context: &Context) -> Report {
         let Ok(text) = fs::read_to_string(file) else {
             continue;
         };
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(file);
         for (number, line) in text.lines().enumerate() {
             for found in WRITTEN.captures_iter(line) {
                 let value = found

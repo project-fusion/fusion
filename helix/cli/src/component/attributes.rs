@@ -46,7 +46,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::Value;
 
-use crate::component::compositions::uncommented;
+use crate::component::text::uncommented;
 use crate::component::{walk_outside, Context, Finding, Report};
 
 /// Attributes the platform reflects itself, whoever writes them.
@@ -145,11 +145,7 @@ fn sides(context: &Context, declared: &BTreeMap<String, BTreeMap<String, bool>>)
             let Ok(raw) = fs::read_to_string(&file) else {
                 continue;
             };
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             let extension = file
                 .extension()
                 .map(|one| one.to_string_lossy().to_string())

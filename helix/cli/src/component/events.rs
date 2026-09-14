@@ -39,7 +39,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::compositions::uncommented;
+use crate::component::text::uncommented;
 use crate::component::{sources, Context, Finding, Report};
 
 static EVENT_CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -212,7 +212,7 @@ pub fn run(context: &Context) -> Report {
     ))
     .expect("a prefix escapes to a literal");
 
-    let (components, every_dispatch) = survey(&context.root, &tiers, &names, &raw);
+    let (components, every_dispatch) = survey(context, &tiers, &names, &raw);
     judge(&components, &names, &every_dispatch, &mut findings);
 
     Report {
@@ -229,7 +229,7 @@ pub fn run(context: &Context) -> Report {
 
 /// Every class and mixin, what it declares, and what anything constructs.
 fn survey(
-    root: &std::path::Path,
+    context: &Context,
     tiers: &[std::path::PathBuf],
     names: &BTreeMap<String, String>,
     raw: &Regex,
@@ -280,11 +280,7 @@ fn survey(
                         .collect(),
                     dispatched,
                     element: DEFINED.is_match(&text),
-                    path: file
-                        .strip_prefix(root)
-                        .unwrap_or(&file)
-                        .to_string_lossy()
-                        .replace('\\', "/"),
+                    path: context.relative(&file),
                 },
             );
         }

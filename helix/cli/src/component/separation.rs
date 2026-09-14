@@ -30,6 +30,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, Context, Finding, Report};
 
 /// The two policies, each an edge and a lift that answer for one another.
@@ -53,14 +54,6 @@ const PAIRS: [(&str, &str, &str); 2] = [
 static RULE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"([^{}]*)\{([^{}]*)\}").expect("a literal pattern compiles"));
 
-/// A comment, blanked before anything is read.
-///
-/// **Every converted stylesheet explains the policy above the rule**, naming
-/// both tokens, so a scan that does not blank comments reports the
-/// documentation as a half-converted surface.
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
 /// A width behind any hook, whatever the default sits inside it.
 static HOOKED_EDGE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"border:\s*var\(--[a-z-]+-border-width,").expect("a literal pattern compiles")
@@ -81,12 +74,11 @@ pub fn run(context: &Context) -> Report {
             let Ok(raw) = fs::read_to_string(&sheet) else {
                 continue;
             };
+            /* **Every converted stylesheet explains the policy above the
+            rule**, naming both tokens, so a scan that does not blank comments
+            reports the documentation as a half-converted surface. */
             let source = COMMENT.replace_all(&raw, " ");
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
 
             for rule in RULE.captures_iter(&source) {
                 let body = rule.get(2).map_or("", |one| one.as_str());

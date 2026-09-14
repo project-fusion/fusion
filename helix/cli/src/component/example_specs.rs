@@ -89,11 +89,7 @@ pub fn run(context: &Context) -> Report {
                          mount it with `example`, and press what a reader would.",
                         stem.replace('-', "_"),
                     ),
-                    file: path
-                        .strip_prefix(&context.root)
-                        .unwrap_or(&path)
-                        .to_string_lossy()
-                        .replace('\\', "/"),
+                    file: context.relative(&path),
                     message: "carries a script and no spec runs it".to_owned(),
                 });
             }

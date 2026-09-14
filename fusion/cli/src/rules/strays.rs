@@ -127,11 +127,7 @@ pub fn run(context: &Context) -> Report {
             healthy state, so counting those would make a clean tree look to
             `floors` exactly like a rule that had stopped walking. */
             checked += 1;
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             let name = file
                 .file_name()
                 .unwrap_or_default()

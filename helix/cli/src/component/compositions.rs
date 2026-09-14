@@ -17,6 +17,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::uncommented;
 use crate::component::{sources, Context};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -46,29 +47,6 @@ static ROLE: LazyLock<Regex> = LazyLock::new(|| {
 
 static FORWARDS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"exportparts="([^"]*)""#).expect("a literal pattern compiles"));
-
-static BLOCK_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
-static LINE_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"//[^\n]*").expect("a literal pattern compiles"));
-
-/// Comments blanked, newlines kept so an offset still names its line.
-pub fn uncommented(text: &str) -> String {
-    let blank = |found: &regex::Captures| -> String {
-        found[0]
-            .chars()
-            .map(|one| if one == '\n' { '\n' } else { ' ' })
-            .collect()
-    };
-    let once = BLOCK_COMMENT.replace_all(text, &blank);
-    LINE_COMMENT.replace_all(&once, &blank).into_owned()
-}
-
-/// The line a byte offset falls on, counting from one.
-pub fn line_of(text: &str, at: usize) -> usize {
-    text[..at].matches('\n').count() + 1
-}
 
 /// The attributes of the open tag beginning at `from`.
 ///

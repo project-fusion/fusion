@@ -31,7 +31,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::compositions::uncommented;
+use crate::component::text::uncommented;
 use crate::component::{family, sources, Context, Finding, Layer, Report};
 
 static DEFINED: LazyLock<Regex> = LazyLock::new(|| {
@@ -162,11 +162,7 @@ fn unlayered(
                         "Take the tag as an argument and let the caller pass `this.tag('{}')`.",
                         bare(&tag, prefixes)
                     ),
-                    file: file
-                        .strip_prefix(&context.root)
-                        .unwrap_or(&file)
-                        .to_string_lossy()
-                        .replace('\\', "/"),
+                    file: context.relative(&file),
                     message: format!(
                         "writes `<{tag}>` into a template and is on no layer, so it picks one for                          every caller"
                     ),
@@ -244,11 +240,7 @@ fn judge(
             .and_then(|one| one.file_name())
             .and_then(|one| one.to_str())
             .unwrap_or("");
-        let where_ = path
-            .strip_prefix(&context.root)
-            .unwrap_or(path)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(path);
 
         /* A component above inherits its base's template, so it inherits every
         tag in it. Matched by the path the two layers share. */

@@ -39,6 +39,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::blanked;
 use crate::component::{family, stylesheets, Context, Finding, Report};
 
 const TOKEN: &str = "--helix-color-background";
@@ -64,25 +65,6 @@ static PAINTS: LazyLock<Regex> = LazyLock::new(|| {
 static HOOK: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"var\(\s*(--[\w-]+)\s*,").expect("a literal pattern compiles"));
 
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
-/// Comments blanked to spaces, newlines kept.
-///
-/// Replacing a comment with spaces of its own length keeps the character count
-/// and loses the line count, and every report past the first comment then points
-/// into the middle of one.
-fn uncommented(text: &str) -> String {
-    COMMENT
-        .replace_all(text, |found: &regex::Captures| {
-            found[0]
-                .chars()
-                .map(|one| if one == '\n' { '\n' } else { ' ' })
-                .collect::<String>()
-        })
-        .into_owned()
-}
-
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
@@ -100,12 +82,8 @@ pub fn run(context: &Context) -> Report {
             let Ok(raw) = fs::read_to_string(&sheet) else {
                 continue;
             };
-            let text = uncommented(&raw);
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let text = blanked(&raw);
+            let where_ = context.relative(&sheet);
 
             for found in DECLARATION.find_iter(&text) {
                 let declaration = found.as_str();

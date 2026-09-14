@@ -34,10 +34,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, Context, Finding, Report};
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 static DECLARATION: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*(--helix-[\w-]+)\s*:").expect("a literal pattern compiles"));
@@ -110,11 +108,7 @@ pub fn run(context: &Context) -> Report {
             let Ok(raw) = fs::read_to_string(&sheet) else {
                 continue;
             };
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
             for found in READS.captures_iter(&COMMENT.replace_all(&raw, "")) {
                 read.entry(found[1].to_owned())
                     .or_insert_with(|| where_.clone());

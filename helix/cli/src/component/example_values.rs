@@ -132,11 +132,7 @@ pub fn run(context: &Context) -> Report {
                 let Ok(markup) = fs::read_to_string(&file) else {
                     continue;
                 };
-                let where_ = file
-                    .strip_prefix(&context.root)
-                    .unwrap_or(&file)
-                    .to_string_lossy()
-                    .replace('\\', "/");
+                let where_ = context.relative(&file);
                 /* Opening tags only: a closing tag carries nothing to check. */
                 for tag in OPENING.captures_iter(&markup) {
                     let Some(attributes) = allowed.get(&tag[1]) else {

@@ -90,11 +90,7 @@ pub fn run(context: &Context) -> Report {
                 else {
                     continue;
                 };
-                let owner = owner
-                    .strip_prefix(&context.root)
-                    .unwrap_or(owner)
-                    .to_string_lossy()
-                    .replace('\\', "/");
+                let owner = context.relative(owner);
                 findings.push(Finding {
                     detail: "Ask the package rather than the file: `bun run --filter <name> \
                              <script>` for a build a sibling owns, or a `bin` it declares and \

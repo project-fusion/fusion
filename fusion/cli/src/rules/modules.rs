@@ -86,11 +86,7 @@ pub fn run(context: &Context) -> Report {
         let Ok(text) = fs::read_to_string(sheet) else {
             continue;
         };
-        let where_ = sheet
-            .strip_prefix(&context.root)
-            .unwrap_or(sheet)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(sheet);
         for name in declares(&text) {
             rewritten.entry(name).or_insert_with(|| where_.clone());
         }
@@ -136,11 +132,7 @@ pub fn run(context: &Context) -> Report {
         let Ok(text) = fs::read_to_string(sheet) else {
             continue;
         };
-        let where_ = sheet
-            .strip_prefix(&context.root)
-            .unwrap_or(sheet)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(sheet);
         for name in declares(&text) {
             checked += 1;
             if literal.contains(&name) {

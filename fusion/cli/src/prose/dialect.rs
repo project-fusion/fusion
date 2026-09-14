@@ -252,11 +252,7 @@ pub fn run(context: &Context) -> Report {
 
     let mut findings = Vec::new();
     for (file, before, _) in changed {
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(&file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&file);
         for (number, line) in before.split('\n').enumerate() {
             if line.contains(QUOTED) {
                 continue;
@@ -296,12 +292,7 @@ pub fn fix(context: &Context) -> Vec<String> {
     let mut written = Vec::new();
     for (file, _, after) in changed {
         if fs::write(&file, after).is_ok() {
-            written.push(
-                file.strip_prefix(&context.root)
-                    .unwrap_or(&file)
-                    .to_string_lossy()
-                    .replace('\\', "/"),
-            );
+            written.push(context.relative(&file));
         }
     }
     written

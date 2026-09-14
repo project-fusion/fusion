@@ -38,6 +38,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{specs, Context, Finding, Report};
 
 /// The helpers that narrow a rendered document to something structural.
@@ -52,9 +53,6 @@ const HELPERS: [&str; 6] = [
     "styles",
     "withoutStyles",
 ];
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 /// A binding, up to and including its `=`.
 static BOUND: LazyLock<Regex> =
@@ -131,11 +129,7 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             let text = COMMENT.replace_all(&raw, "");
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
 
             for (number, line) in text.lines().enumerate() {
                 if !LOOSE.is_match(line) {

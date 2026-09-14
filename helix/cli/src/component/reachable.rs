@@ -33,6 +33,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{family, sources, stylesheets, Context, Finding, Report};
 
 /// Written by the component itself or by the platform, not by a property.
@@ -42,9 +43,6 @@ static NOT_A_PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
     )
     .expect("a literal pattern compiles")
 });
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 /// A `:host(...)` selector, tolerating one level of nested parens inside it.
 static HOST: LazyLock<Regex> = LazyLock::new(|| {
@@ -113,11 +111,7 @@ pub fn run(context: &Context) -> Report {
             let (Some(family), Ok(text)) = (family(&file, tier), fs::read_to_string(&file)) else {
                 continue;
             };
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             for capture in DECLARATION.captures_iter(&text) {
                 let options = capture.get(1).map_or("", |one| one.as_str());
                 let name = capture.get(2).map_or("", |one| one.as_str());

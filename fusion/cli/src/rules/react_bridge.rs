@@ -133,11 +133,7 @@ pub fn run(context: &Context) -> Report {
                      a dependency does. Re-run the probes on this version and write the new \
                      number in, or pin the framework back."
                 .to_owned(),
-            file: file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/"),
+            file: context.relative(&file),
             message: format!(
                 "reports measurements against React {} and react-dom is {version}",
                 stale.join(", ")

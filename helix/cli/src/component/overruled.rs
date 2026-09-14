@@ -32,10 +32,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, walk_outside, Context, Finding, Report};
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 static RULE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"([^{}]+)\{([^{}]*)\}").expect("a literal pattern compiles"));
@@ -117,11 +115,7 @@ fn reaching(context: &Context, prefix: &str) -> Vec<Document> {
             let Ok(css) = fs::read_to_string(&sheet) else {
                 continue;
             };
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
             for rule in rules(&css) {
                 let Some((rest, tag)) = reaches(&rule.selector, prefix) else {
                     continue;
@@ -189,11 +183,7 @@ pub fn run(context: &Context) -> Report {
             into.extend(declared(&rule.body));
         }
 
-        let where_ = sheet
-            .strip_prefix(&context.root)
-            .unwrap_or(&sheet)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&sheet);
         for rule in documents.iter().filter(|one| one.tag == tag) {
             let owned = if rule.rest.is_empty() {
                 &host

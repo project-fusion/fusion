@@ -55,10 +55,9 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::Value;
 
+use crate::component::text::COMMENT;
 use crate::component::{Context, Finding, Report};
 
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 static SLASHED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?m)^\s*//.*$").expect("a literal pattern compiles"));
 static READ: LazyLock<Regex> = LazyLock::new(|| {

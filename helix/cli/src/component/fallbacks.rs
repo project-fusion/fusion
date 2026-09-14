@@ -36,13 +36,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::{line_of, uncommented};
 use crate::component::{sources, Context, Finding, Report};
-
-static BLOCK_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
-static LINE_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"//[^\n]*").expect("a literal pattern compiles"));
 
 /// A method declaration at class-body indentation.
 static METHOD: LazyLock<Regex> = LazyLock::new(|| {
@@ -63,18 +58,6 @@ static ONLY_PROPERTIES: LazyLock<Regex> =
 /// A `${this.name}` inside a fallback, whose name might be a getter.
 static REFERENCED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\$\{\s*this\.(\w+)").expect("a literal pattern compiles"));
-
-/// Comments blanked to spaces, newlines kept so every offset names its line.
-fn uncommented(text: &str) -> String {
-    let blank = |found: &regex::Captures| -> String {
-        found[0]
-            .chars()
-            .map(|one| if one == '\n' { '\n' } else { ' ' })
-            .collect()
-    };
-    let once = BLOCK_COMMENT.replace_all(text, &blank);
-    LINE_COMMENT.replace_all(&once, &blank).into_owned()
-}
 
 /// The index just past the `>` closing the tag that starts at `at`.
 ///
@@ -100,11 +83,6 @@ fn tag_end(text: &str, at: usize) -> Option<usize> {
     None
 }
 
-/// The line a byte offset sits on, counting from one.
-fn line_of(text: &str, at: usize) -> usize {
-    text[..at].matches('\n').count() + 1
-}
-
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
@@ -117,11 +95,7 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             let text = uncommented(&raw);
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
 
             let methods: Vec<(usize, String, String)> = METHOD
                 .captures_iter(&text)

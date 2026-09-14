@@ -33,6 +33,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, Context, Finding, Report};
 
 /// Where the ring sits, and the one spelling each situation is written with.
@@ -59,9 +60,6 @@ const OUTLINES: [&str; 3] = [
     "none",
 ];
 
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
 static RULE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"([^{}]+)\{([^{}]*)\}").expect("a literal pattern compiles"));
 
@@ -86,11 +84,7 @@ pub fn run(context: &Context) -> Report {
             let Ok(css) = fs::read_to_string(&sheet) else {
                 continue;
             };
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
             /* The examples are hand-written demonstration CSS and spell the
             offset as a literal throughout. They are a population of their own,
             and sweeping them is filed rather than done. */

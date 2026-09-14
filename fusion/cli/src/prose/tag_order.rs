@@ -289,11 +289,7 @@ pub fn run(context: &Context) -> Report {
     let (blocks, changed) = survey(context);
     let mut findings = Vec::new();
     for (file, _, _, said) in changed {
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(&file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&file);
         for (line, named) in said {
             for one in named {
                 findings.push(Finding {
@@ -320,12 +316,7 @@ pub fn fix(context: &Context) -> Vec<String> {
     let mut written = Vec::new();
     for (file, _, after, _) in changed {
         if fs::write(&file, after).is_ok() {
-            written.push(
-                file.strip_prefix(&context.root)
-                    .unwrap_or(&file)
-                    .to_string_lossy()
-                    .replace('\\', "/"),
-            );
+            written.push(context.relative(&file));
         }
     }
     written

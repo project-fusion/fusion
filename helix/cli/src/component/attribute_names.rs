@@ -79,11 +79,7 @@ pub fn run(context: &Context) -> Report {
             let Ok(source) = fs::read_to_string(&file) else {
                 continue;
             };
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
 
             for capture in DECLARATION.captures_iter(&source) {
                 let member = capture.get(2).map_or("", |one| one.as_str());

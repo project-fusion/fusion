@@ -196,11 +196,7 @@ pub fn run(context: &Context) -> Report {
                              say it passes it on, which a parent is asked to. Listen for what the \
                              element declares, or declare the relay where it is real."
                         ),
-                        file: path
-                            .strip_prefix(&context.root)
-                            .unwrap_or(&path)
-                            .to_string_lossy()
-                            .replace('\\', "/"),
+                        file: context.relative(&path),
                         message: format!(
                             "listens on `<{tag}>` for `{event}`, which it does not declare"
                         ),

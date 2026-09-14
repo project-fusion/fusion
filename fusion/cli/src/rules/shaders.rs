@@ -44,11 +44,7 @@ pub fn run(context: &Context) -> Report {
         let Ok(source) = fs::read_to_string(&file) else {
             continue;
         };
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(&file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&file);
 
         let mut at = source.find(OPENER);
         while let Some(start) = at {
