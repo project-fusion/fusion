@@ -5,7 +5,11 @@ import type { ReactNode } from 'react'
    `:not(:defined)` rules that keep a tag from arriving unstyled. */
 import '@fusion.dev/helix-styles/helix.css'
 
-import { HelixElements } from './helix-elements.js'
+/* Extensionless, unlike the libraries this imports. Turbopack does not map a
+   `.js` specifier back to the `.tsx` beside it, which is webpack's
+   `extensionAlias` and has no equivalent there, so `./helix-elements.js` fails
+   the first `next build` with "Module not found". */
+import { HelixElements } from './helix-elements'
 
 export const metadata: Metadata = { title: '__PROJECT_NAME__' }
 export const viewport: Viewport = { initialScale: 1, width: 'device-width' }
