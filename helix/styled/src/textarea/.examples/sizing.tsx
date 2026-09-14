@@ -7,7 +7,7 @@ export function Example() {
       <helix-textarea
         hint="Two hundred at most"
         label="Summary"
-        maxLength="200"
+        maxlength="200"
         rows={2}
       ></helix-textarea>
 

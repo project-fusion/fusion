@@ -25,10 +25,10 @@ export function Example() {
           </tr>
         </thead>
         <tbody>
-          {MONTHS.map((month, index) => (
-            <tr key={month}>
-              <th scope="row">{month}</th>
-              <td data-value={sessions[index]}>{sessions[index].toLocaleString()}</td>
+          {sessions.map((count, index) => (
+            <tr key={MONTHS[index]}>
+              <th scope="row">{MONTHS[index]}</th>
+              <td data-value={count}>{count.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>

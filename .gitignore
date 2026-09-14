@@ -35,7 +35,6 @@ npm-debug.log*
 # Generated sources, each written by its own package's `build`.
 helix/icons/src/generated.ts
 helix/*/src/element-events.generated.ts
-helix/*/.preview/.tsbuild
 helix/*/.tsbuild
 helix/styles/src/elements.css
 helix/styles/src/tokens.css

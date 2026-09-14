@@ -41,7 +41,8 @@
     "test:dom": "bun test dom.spec",
     "test:pure": "bun test pure.spec",
     "test:ssr": "bun test ssr.spec",
-    "typecheck": "bun run element-events && tsc -p tsconfig.json --noEmit"
+    "typecheck": "bun run element-events && tsc -p tsconfig.json --noEmit && bun run typecheck:examples",
+    "typecheck:examples": "tsc -p tsconfig.examples.json"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {

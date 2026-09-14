@@ -4,25 +4,34 @@
   // **`tsconfig.json` excludes `.examples` because `build` must not emit them**,
   // and a file in no project is compiled alone with no `jsx` setting and no
   // typings: every example opens on an error about its own JSX and another about
-  // the element it renders. That is what this config is for.
+  // the element it renders. This project claims them, and `typecheck` runs it.
   //
-  // **`preserve` rather than `react-jsx`, and `react` is not in `types`.** This
-  // package has no React dependency by design, and `react` resolves here only
-  // out of the workspace root's hoisted tree, so naming it would be the
-  // transitive reach AGENTS.md refuses. `types/jsx.d.ts` carries
-  // `declare global { namespace JSX }`, so `preserve` resolves every tag with
-  // no framework at all.
+  // **A plain project, not a reference.** A referenced project has to be
+  // `composite`, and that forbids `noEmit`: the earlier answer emitted
+  // declarations nobody read into a gitignored `.tsbuild` to satisfy the flag,
+  // and a composite project that `include`s these files claims them, which
+  // `tsconfig.build.json` records the cost of. This one runs with `tsc -p` and
+  // writes nothing.
   //
-  // **Not referenced by `tsconfig.json` and not in `typecheck`.** A referenced
-  // composite project that `include`s these files would claim them, and
-  // `tsconfig.build.json` records what that costs: the parent stops emitting and
-  // `tsc` exits 0 having written nothing.
+  // **`preserve`, and `react` is not in `types`.** This package has no React
+  // dependency by design, and nothing here needs the runtime: `preserve` asks
+  // for no `react/jsx-runtime`. The tags are still typed beside React's own,
+  // because that is what the typings do. `types/jsx.d.ts` names `react` itself,
+  // for the `import('react').Ref` that `jsxReactRef` writes into it and the
+  // augmentation it declares, which is what puts `@types/react` from the
+  // workspace root in scope. So `<time dateTime>` and `className` are checked
+  // here the way a consumer's build checks them, and an example is written the
+  // way a consumer writes one.
+  //
+  // The typings come in by path, since `analyze` writes them here; the site
+  // takes the styled tier's the same way, as `@fusion.dev/helix/jsx`.
+  // `example-sheets.d.ts` is the `*.css` an example imports for its side
+  // effect, and says why it lives under `src`.
   "compilerOptions": {
     "jsx": "preserve",
-    "noEmit": true,
-    "types": ["bun"]
+    "noEmit": true
   },
   "exclude": [],
   "extends": "./tsconfig.json",
-  "include": ["src/*/.examples/**/*.tsx", "types/jsx.d.ts", ".examples-types/css.d.ts"]
+  "include": ["src/*/.examples/**/*.tsx", "src/example-sheets.d.ts", "types/jsx.d.ts"]
 }

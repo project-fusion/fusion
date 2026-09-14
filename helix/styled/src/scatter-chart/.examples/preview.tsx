@@ -102,7 +102,7 @@ export function Example() {
 
       <helix-scatter-chart
         for="pages"
-        gridlines
+        gridlines="both"
       ></helix-scatter-chart>
     </helix-flex>
   )

@@ -19,7 +19,7 @@ export function Example() {
         <tbody>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-28">28 Jul 2026</time>
+              <time dateTime="2026-07-28">28 Jul 2026</time>
             </th>
             <td
               data-tone="success"
@@ -31,7 +31,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-29">29 Jul 2026</time>
+              <time dateTime="2026-07-29">29 Jul 2026</time>
             </th>
             <td
               data-tone="success"
@@ -43,7 +43,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-30">30 Jul 2026</time>
+              <time dateTime="2026-07-30">30 Jul 2026</time>
             </th>
             <td
               data-tone="success"
@@ -55,7 +55,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-31">31 Jul 2026</time>
+              <time dateTime="2026-07-31">31 Jul 2026</time>
             </th>
             <td
               data-tone="success"
@@ -67,7 +67,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-01">1 Aug 2026</time>
+              <time dateTime="2026-08-01">1 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -79,7 +79,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-02">2 Aug 2026</time>
+              <time dateTime="2026-08-02">2 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -91,7 +91,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-03">3 Aug 2026</time>
+              <time dateTime="2026-08-03">3 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -103,7 +103,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-04">4 Aug 2026</time>
+              <time dateTime="2026-08-04">4 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -115,7 +115,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-05">5 Aug 2026</time>
+              <time dateTime="2026-08-05">5 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -127,7 +127,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-06">6 Aug 2026</time>
+              <time dateTime="2026-08-06">6 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -139,7 +139,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-07">7 Aug 2026</time>
+              <time dateTime="2026-08-07">7 Aug 2026</time>
             </th>
             <td
               data-tone="danger"
@@ -151,7 +151,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-08">8 Aug 2026</time>
+              <time dateTime="2026-08-08">8 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -163,7 +163,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-09">9 Aug 2026</time>
+              <time dateTime="2026-08-09">9 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -175,7 +175,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-10">10 Aug 2026</time>
+              <time dateTime="2026-08-10">10 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -187,7 +187,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-11">11 Aug 2026</time>
+              <time dateTime="2026-08-11">11 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -199,7 +199,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-12">12 Aug 2026</time>
+              <time dateTime="2026-08-12">12 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -211,7 +211,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-13">13 Aug 2026</time>
+              <time dateTime="2026-08-13">13 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -223,7 +223,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-14">14 Aug 2026</time>
+              <time dateTime="2026-08-14">14 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -235,7 +235,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-15">15 Aug 2026</time>
+              <time dateTime="2026-08-15">15 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -247,7 +247,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-16">16 Aug 2026</time>
+              <time dateTime="2026-08-16">16 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -259,7 +259,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-17">17 Aug 2026</time>
+              <time dateTime="2026-08-17">17 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -271,7 +271,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-18">18 Aug 2026</time>
+              <time dateTime="2026-08-18">18 Aug 2026</time>
             </th>
             <td
               data-tone="warning"
@@ -283,7 +283,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-19">19 Aug 2026</time>
+              <time dateTime="2026-08-19">19 Aug 2026</time>
             </th>
             <td
               data-tone="warning"
@@ -295,7 +295,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-20">20 Aug 2026</time>
+              <time dateTime="2026-08-20">20 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -307,7 +307,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-21">21 Aug 2026</time>
+              <time dateTime="2026-08-21">21 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -319,7 +319,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-22">22 Aug 2026</time>
+              <time dateTime="2026-08-22">22 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -331,7 +331,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-23">23 Aug 2026</time>
+              <time dateTime="2026-08-23">23 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -343,7 +343,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-24">24 Aug 2026</time>
+              <time dateTime="2026-08-24">24 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -355,7 +355,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-25">25 Aug 2026</time>
+              <time dateTime="2026-08-25">25 Aug 2026</time>
             </th>
             <td
               data-tone="success"
@@ -367,7 +367,7 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-26">26 Aug 2026</time>
+              <time dateTime="2026-08-26">26 Aug 2026</time>
             </th>
             <td
               data-tone="success"

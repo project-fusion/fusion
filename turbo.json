@@ -64,6 +64,20 @@
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
       "outputs": ["dist/**", "src/element-events.generated.ts"]
     },
+    // **The tiers' `typecheck` waits for their own `build`, because the examples
+    // are consumers.** `typecheck` runs `tsconfig.examples.json` after the
+    // sources, and an example reaches the package it sits beside by name:
+    // `import type { HelixVideo } from '@fusion.dev/helix'`, the way the
+    // typings it is checked against reach every element class. That resolves
+    // through `exports` to `dist`, which the shared `typecheck` never asked
+    // for: on a clean checkout every such import is TS2307, and under
+    // `skipLibCheck` the typings' own import degrades to `any` first, so the
+    // examples would pass against nothing before failing on their imports.
+    "@fusion.dev/helix-headless#typecheck": {
+      "dependsOn": ["^build", "^analyze", "analyze", "build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": []
+    },
     // `token-layer` writes `src/tokens.css` from `src/_modes.css` and the
     // registry, and `elements-css` writes `src/elements.css` from the tags in
     // `@fusion.dev/helix`, so both stylesheets are build outputs and have to be
@@ -81,6 +95,12 @@
     "@fusion.dev/helix#build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
       "outputs": ["dist/**", "src/element-events.generated.ts"]
+    },
+    // The same wait as the headless tier's, above, for the same examples.
+    "@fusion.dev/helix#typecheck": {
+      "dependsOn": ["^build", "^analyze", "analyze", "build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": []
     },
     // **`pages.generated.ts` is written here, not read here**, and declaring it
     // as an input was the same mistake `docs` carried: a file a task writes and

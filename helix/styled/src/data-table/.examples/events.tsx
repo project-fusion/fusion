@@ -1,3 +1,4 @@
+import type { HelixDataTable } from '@fusion.dev/helix'
 import { useRef, useState } from 'react'
 
 type Arrival = { carried: string; name: string }

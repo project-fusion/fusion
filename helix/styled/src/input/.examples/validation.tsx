@@ -19,7 +19,7 @@ export function Example() {
           <helix-input
             hint="Up to 140"
             label="Headline"
-            maxLength="140"
+            maxlength="140"
             name="headline"
           ></helix-input>
 

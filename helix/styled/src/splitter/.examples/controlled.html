@@ -1,7 +1,7 @@
-<!-- @summary A divider the page owns, answering the event and assigning `position` and `collapsed`. -->
+<!-- @summary A divider the page owns, answering the events and assigning `position` and `collapsed`. -->
 
 <helix-splitter
-  collapsed
+  collapsed="start"
   id="panes"
   position="35"
 >
@@ -13,7 +13,9 @@
   const panes = document.getElementById('panes')
 
   panes.addEventListener('helix-before-resize', (event) => {
-    panes.position = event.detail.position
-    panes.collapsed = event.detail.collapsed
+    panes.position = Number(event.detail.value)
+  })
+  panes.addEventListener('helix-before-collapse', (event) => {
+    panes.collapsed = event.detail.value || undefined
   })
 </script>

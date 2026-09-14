@@ -61,7 +61,7 @@
   }
 
   feed.addEventListener('helix-read', (event) => {
-    say('helix-read', `${event.detail.value}, which is a request the feed answers`)
+    say('helix-read', `mark ${event.detail.read ? 'read' : 'unread'}, which is a request the feed answers`)
   })
   feed.addEventListener('helix-dismiss', (event) => {
     say('helix-dismiss', `"${event.detail.label}" asked to go`)

@@ -7,7 +7,7 @@ export function Example() {
     <helix-carousel
       index={index}
       label="Screens"
-      onhelix-select={(event) => setIndex(event.detail.index)}
+      onhelix-select={(event) => setIndex(Number(event.detail.value))}
     >
       <div>First</div>
       <div>Second</div>
