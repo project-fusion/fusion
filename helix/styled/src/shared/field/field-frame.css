@@ -1,0 +1,94 @@
+/* The frame a text-like field wears, in one sheet, and never copied into a
+   family's own: the stack, the hover edge, the focus ring, the invalid state and
+   the stripped control. Compose with `field.css` and the family's own sheet,
+   never instead of either. Seven families take it: Input, Textarea, Combobox,
+   Date Input, Time Input, Color Input and Filter Input. Number Input and File
+   Input wear a frame that differs in three of these five rules and keep their
+   own, and each says so where it does.
+
+   **What is here is what was byte-identical, and what differed is a hook.** The
+   families disagree about the control's type size and nothing recorded why, so
+   each writes its own into `--_field-control-size` and this sheet keeps every
+   one where it was. Settling that is a decision, and it is not this sheet's. */
+
+/* A column, so the label, the field and whatever is under it stack without any
+   of them needing a margin. **Flex rather than grid, and the inline axis is
+   why.** A grid's single auto column is floored at the min-content of what is in
+   it, and what is in it is a real `<input>`, whose min-content is its default
+   twenty-character width. Measured on Input at 208px inside a 203px host, which
+   ate the gap after it and overlapped the control beside it by a pixel.
+   `minmax(0, 1fr)` fixes that and breaks the other end, because an `fr` track
+   contributes nothing intrinsically, so the host collapsed to zero the moment
+   its width came from its content.
+
+   **Three of the seven restate `display` in their own sheets**, which wins on
+   source order: Color Input and Time Input are `block`, and Date Input is the
+   UA's `inline`, which it never set and now says out loud. Whether the three
+   should stack like the other four is a drift this sheet records rather than
+   settles; `flex-direction` and `gap` do nothing on a box that is not flex. */
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+/* `:host(:disabled)`, not `:host([disabled])`: the pseudo-class matches the
+   element's own attribute and an ancestor `<fieldset disabled>` alike, where the
+   attribute selector only ever sees the first. */
+:host(:not(:disabled)) [part="field"]:hover {
+  border-color: var(--helix-color-primary);
+}
+
+/* On the box, because `delegatesFocus` puts focus on the input inside it and a
+   ring around that would sit within the frame rather than around it. Named with
+   `:hover` as well, or a focused field under the pointer takes the hover border
+   back and reads as a gray edge inside a blue ring: being focused outranks being
+   pointed at, so it has to say so.
+
+   No offset, so the ring thickens the edge instead of drawing a second one. The
+   border turns `primary` and the ring is `focus-ring`, which are the same color:
+   at an offset the pair read as two blue lines with a gap of page between them,
+   a double-struck border rather than a focused field. Against the edge they are
+   one 3px edge in one color. */
+:host(:focus-within) [part="field"],
+:host(:focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-primary);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: 0;
+}
+
+/* Wrong, and the field says so. `:state(invalid)` is the platform's verdict,
+   which the host copies from the input, so this follows whatever the browser
+   decided rather than a second opinion.
+
+   Four selectors, because the focus rule owns the `outline`: changing the border
+   alone gives a focused field with an error a red border inside a blue ring.
+   And named with `:hover`, because unnamed this was (0,3,0) against hover's
+   (0,4,0), so running a pointer over a field with an error in it put the gray
+   border back. */
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}
+
+/* Stripped rather than replaced, so the caret, the selection and the keyboard a
+   phone chooses are all the platform's. `all: unset` takes `box-sizing` with it,
+   back to `content-box`, and the `border-box` every shadow root is given comes
+   from a rule this one outranks, so it is restored here.
+
+   The type size is the hook the sheet's note explains: Input, Textarea and
+   Filter Input write `text-sm` into it, Combobox, Date Input, Time Input and
+   Color Input write `text-md`. */
+[part="control"] {
+  all: unset;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--_field-control-size, var(--helix-text-sm));
+  font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+}

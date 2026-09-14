@@ -5,7 +5,10 @@ import type { CSSResultGroup } from 'lit'
    `<helix-color-picker>` in it to remind anyone. */
 import '../../color-picker/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
+import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
+import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles } from './color-input-root.css.js'
 
 /**
@@ -50,7 +53,14 @@ import { styles } from './color-input-root.css.js'
 export class HelixColorInput extends HelixHeadlessColorInput {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = [
+    fieldStyles,
+    fieldFrameStyles,
+    fieldStackedStyles,
+    floatingPanelStyles,
+    floatingEntranceStyles,
+    styles,
+  ]
 }
 
 declare global {

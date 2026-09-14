@@ -1,6 +1,9 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMenu } from '@fusion.dev/helix-headless/menu'
 import type { CSSResultGroup } from 'lit'
+import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
+import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
+import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles } from './menu-root.css.js'
 
 /**
@@ -31,7 +34,12 @@ import { styles } from './menu-root.css.js'
  */
 @customElement('helix-menu')
 export class HelixMenu extends HelixHeadlessMenu {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [
+    collectionStateStyles,
+    floatingPanelStyles,
+    floatingEntranceStyles,
+    styles,
+  ]
 }
 
 declare global {

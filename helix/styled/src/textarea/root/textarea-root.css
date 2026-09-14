@@ -1,14 +1,7 @@
-/* The stack, laid out the way every other field is. See the input's note for
-   why this is column flex rather than a grid. */
-:host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
-}
-
-/* The same frame as an input, so a form of mixed fields reads as one set. The
-   box is the field rather than the control, so the focus ring is drawn once
-   around the whole thing. */
+/* The stack, the hover edge, the focus ring, the invalid state and the stripped
+   control are `shared/field/field-frame`'s. The same frame as an input, so a
+   form of mixed fields reads as one set: the box is the field rather than the
+   control, so the focus ring is drawn once around the whole thing. */
 [part="field"] {
   background-color: var(--textarea-background-color, var(--helix-color-well));
   border: var(--helix-border-thin) solid var(--helix-color-border);
@@ -20,50 +13,26 @@
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* `:host(:disabled)`, not `:host([disabled])`.
- *
- * The pseudo-class matches on the element's own attribute *and* on an ancestor
- * `<fieldset disabled>`, where the attribute selector only ever sees the first.
- * Measured: a control inside a disabled fieldset matched `:disabled` from
- * inside its own shadow root while carrying no attribute at all, so this needs
- * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
- */
-:host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
-}
+/* What the control adds to the shared reset.
 
-/* One edge rather than two rings, the same as the input: the border turns and
-   the ring is drawn against it. Named with `:hover` for the same reason too. */
-:host(:focus-within) [part="field"],
-:host(:focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: 0;
-}
+   The shared `all: unset` takes the wrapping the UA gives every `<textarea>`
+   with it. Without `overflow-wrap`, an unbreakable string, a URL or a token,
+   runs past the frame instead of wrapping, and under `auto-grow` it is clipped
+   by the `overflow: hidden` the growing depends on with no way to scroll to it.
 
-:host(:state(invalid)) [part="field"],
-:host(:state(invalid)) [part="field"]:hover,
-:host(:state(invalid):focus-within) [part="field"],
-:host(:state(invalid):focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-danger);
-  outline-color: var(--helix-color-danger);
-}
-
+   **`flex` and the floor are the initial values, restated.** This control was
+   never a flex item asked to grow: it fills the field by its own `inline-size`,
+   and the shared frame's `flex: 1 1 auto` and `min-inline-size: 0` never reached
+   it. Whether it should take them is a drift recorded here rather than
+   settled. */
 [part="control"] {
-  all: unset;
-  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and takes
-     the wrapping the UA gives every `<textarea>` with it too. Without that, an
-     unbreakable string, a URL or a token, runs past the frame instead of
-     wrapping, and under `auto-grow` it is clipped by the `overflow: hidden` the
-     growing depends on with no way to scroll to it. */
-  box-sizing: border-box;
-  overflow-wrap: break-word;
-  color: var(--helix-color-foreground);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
+  --_field-control-size: var(--helix-text-sm);
+
+  flex: 0 1 auto;
   inline-size: 100%;
   line-height: var(--helix-leading-normal);
+  min-inline-size: auto;
+  overflow-wrap: break-word;
   /* Down only. A field the reader can drag wider than the form holding it is a
      field that breaks the layout, and the block axis is the one they actually
      want: more room for what they are writing. */

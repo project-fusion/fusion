@@ -21,20 +21,7 @@
   display: contents;
 }
 
-/* What a collection says instead of rows: the same two lines everywhere, in the
-   same voice, because a reader meeting "Loading" in a menu and a different
-   arrangement of the same idea in a table is a reader learning the same thing
-   twice. */
-[part="empty"],
-[part="loading"] {
-  color: var(--helix-color-foreground-subtle);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  margin: var(--helix-space-none);
-  padding-block: var(--helix-space-md);
-  padding-inline: var(--helix-space-sm);
-  text-align: center;
-}
+/* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. */
 :host([loading]) [part="table"] {

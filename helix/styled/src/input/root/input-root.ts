@@ -7,6 +7,7 @@ import type { CSSResultGroup } from 'lit'
 import '../../icon/index.js'
 import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './input-root.css.js'
 
@@ -37,7 +38,13 @@ import { styles } from './input-root.css.js'
  */
 @customElement('helix-input')
 export class HelixInput extends HelixHeadlessInput {
-  static override styles: CSSResultGroup = [glyphStyles, fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = [
+    glyphStyles,
+    fieldStyles,
+    fieldFrameStyles,
+    fieldStackedStyles,
+    styles,
+  ]
 }
 
 declare global {

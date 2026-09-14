@@ -1,18 +1,8 @@
-/* A column, so the label, the field, and whatever is under it stack without any
-   of them needing a margin. **Flex rather than grid, and the inline axis is
-   why.** A grid's single auto column is floored at the min-content of what is in
-   it, and what is in it is a real `<input>`, whose min-content is its default
-   twenty-character width. So the track came out wider than the host and the
-   field hung past its own element: measured at 208px inside a 203px host, which
-   ate the gap after it and overlapped the control beside it by a pixel.
-   `minmax(0, 1fr)` fixes that and breaks the other end, because an `fr` track
-   contributes nothing intrinsically, so the host collapsed to zero the moment
-   its width came from its content. */
+/* The stack, the hover edge, the focus ring, the invalid state and the stripped
+   control are `shared/field/field-frame`'s, with the measurement that chose flex
+   over grid. What is here is what is particular to an input. */
 :host {
   --_input-size: var(--input-size, var(--helix-size-control));
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
 }
 
 /* The box is the field, not the input. */
@@ -31,44 +21,12 @@
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* `:host(:disabled)`, not `:host([disabled])`. */
-:host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
-}
-
-/* On the box, because `delegatesFocus` puts focus on the input inside it and a
-   ring around that would sit within the frame rather than around it. */
-:host(:focus-within) [part="field"],
-:host(:focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: 0;
-}
-
-/* The platform's verdict, which the host copies from the input, so this follows
-   whatever the browser decided rather than a second opinion. Unnamed, this was
-   (0,3,0) against hover's (0,4,0), so running a pointer over a field with an
-   error in it put the gray border back. */
-:host(:state(invalid)) [part="field"],
-:host(:state(invalid)) [part="field"]:hover,
-:host(:state(invalid):focus-within) [part="field"],
-:host(:state(invalid):focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-danger);
-  outline-color: var(--helix-color-danger);
-}
-
+/* The type size the shared frame reads, and the one thing the control adds to
+   the shared reset: the field's full height. */
 [part="control"] {
-  all: unset;
-  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
-     `border-box` every shadow root is given comes from a rule this one outranks. */
-  box-sizing: border-box;
+  --_field-control-size: var(--helix-text-sm);
+
   block-size: 100%;
-  color: var(--helix-color-foreground);
-  flex: 1 1 auto;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
-  min-inline-size: 0;
 }
 
 /* The clear affordance a search field draws itself, which is a different shape

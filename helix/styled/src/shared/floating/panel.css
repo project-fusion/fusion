@@ -1,0 +1,39 @@
+/* The house shape every floating surface takes, in one sheet. Compose with the
+   family's own sheet, never instead of it: the family says how wide its panel
+   is, what it holds and where it scrolls, and this says what a panel over the
+   page looks like.
+
+   **The hooks are private, and each family points them at its own.** A public
+   name cannot be shared, so `--menu-shadow` and `--select-shadow` stay each
+   family's API, and each writes its own into `--_floating-shadow` for this rule
+   to read. One rule, seven names, and a consumer who learned the family's hook
+   is never asked to learn a second one.
+
+   `border`, `inset` and `margin` said rather than left out: the UA stylesheet
+   gives `[popover]` `border: solid`, an inset that centers it in the window and
+   a margin that offsets it from wherever the positioning put it, so dropping any
+   of the three leaves the UA's answer standing. */
+[part="surface"] {
+  background-color: var(--_floating-background-color, var(--helix-color-surface-overlay));
+  border: var(--_floating-border-width, var(--helix-border-floating)) solid
+    var(--_floating-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--_floating-shadow, var(--helix-shadow-floating));
+  inset: auto;
+  margin: var(--helix-space-none);
+}
+
+/* `[hidden]` is what the server renders, and it is the only thing holding the
+   panel closed before the element upgrades. Restated because the UA's own
+   `[hidden]` loses to any author `display`, and the entrance sheet transitions
+   one.
+
+   **Three of the seven families also restate the UA's `:not(:popover-open)`, in
+   their own sheets, and four do not.** Select, Combobox and Filter Input carry
+   the extra line; Menu, Date Input, Time Input and Color Input never did. The
+   two sets render the same today, so the drift is recorded here rather than
+   settled: settling it either way is a decision about what holds a closed
+   popover shut, and it is not this sheet's to take. */
+[part="surface"][hidden] {
+  display: none;
+}

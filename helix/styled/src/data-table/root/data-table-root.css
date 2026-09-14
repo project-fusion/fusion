@@ -146,19 +146,12 @@
   margin-inline-start: auto;
 }
 
-/* What a collection says instead of rows: the same two lines everywhere, in the
-   same voice. Spanning every column, because a status sitting in the first
-   column of a five-column grid reads as a value in that column. */
+/* What a collection says instead of rows is `shared/collection/state`'s. This
+   one spans every column, because a status sitting in the first column of a
+   five-column grid reads as a value in that column. */
 [part="empty"],
 [part="loading"] {
-  color: var(--helix-color-foreground-subtle);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
   grid-column: 1 / -1;
-  margin: var(--helix-space-none);
-  padding-block: var(--helix-space-md);
-  padding-inline: var(--helix-space-sm);
-  text-align: center;
 }
 
 /*

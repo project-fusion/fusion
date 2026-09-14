@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTree } from '@fusion.dev/helix-headless/tree'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles } from './tree-root.css.js'
 
 /**
@@ -59,7 +60,7 @@ export class HelixTree extends HelixHeadlessTree {
   @property({ attribute: 'chevron-placement', reflect: true })
   chevronPlacement?: 'start' | 'end'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [collectionStateStyles, styles]
 }
 
 declare global {
