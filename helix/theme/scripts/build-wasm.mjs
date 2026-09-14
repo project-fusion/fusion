@@ -12,33 +12,25 @@
  * package already has a `package.json` with an argued-over `exports` map in it.
  */
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { existsSync, mkdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { root } from '@fusion.dev/scripts/workspace'
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const ARTIFACT = 'target/wasm32-unknown-unknown/release/fusion_helix_theme.wasm'
-export const OUT = join(ROOT, 'helix/theme/wasm')
+const OUT = join(root, 'helix/theme/wasm')
 
-/**
- * The site's copy, served as a static file.
- *
- * **A bundler cannot be asked to find this, which was measured rather than
- * assumed.** The generated loader resolves its module with
- * `new URL('fusion_helix_theme_bg.wasm', import.meta.url)`, and Turbopack treats that
- * as a module specifier and fails the build outright: "Can't resolve
- * 'fusion_helix_theme_bg.wasm'". Node cannot use that default either, its `fetch`
- * refusing a `file:` URL. So `initTheme` takes the source as a required
- * argument, and the site says where it put it.
- *
- * The same shape `frame.js` already uses, and for a related reason: a static
- * file under `public/` is served on terms this repository controls rather than
- * on whatever a bundler decides about an asset import this year.
- */
-const SERVED = join(ROOT, 'fusion/site/public/helix/theme.wasm')
+/* **A bundler cannot be asked to find the binary, which was measured rather
+   than assumed.** The generated loader resolves its module with
+   `new URL('fusion_helix_theme_bg.wasm', import.meta.url)`, and Turbopack treats
+   that as a module specifier and fails the build outright: "Can't resolve
+   'fusion_helix_theme_bg.wasm'". Node cannot use that default either, its
+   `fetch` refusing a `file:` URL. So `initTheme` takes the source as a required
+   argument, and a consumer serves the file itself: the site copies it under
+   `public/` with `turbo run wasm-copy`, on terms this repository controls
+   rather than whatever a bundler decides about an asset import this year. */
 
 const run = (command, args) => {
-  execFileSync(command, args, { cwd: ROOT, stdio: 'inherit' })
+  execFileSync(command, args, { cwd: root, stdio: 'inherit' })
 }
 
 /* `--target web`, not `bundler`. The bundler target emits an ES module with a
@@ -57,7 +49,7 @@ run('cargo', [
   '--release',
 ])
 
-if (!existsSync(join(ROOT, ARTIFACT))) {
+if (!existsSync(join(root, ARTIFACT))) {
   console.error(`wasm: cargo reported success and wrote no ${ARTIFACT}`)
   process.exit(1)
 }
@@ -65,10 +57,4 @@ if (!existsSync(join(ROOT, ARTIFACT))) {
 mkdirSync(OUT, { recursive: true })
 run('wasm-bindgen', ['--target', 'web', '--out-dir', OUT, ARTIFACT])
 
-mkdirSync(dirname(SERVED), { recursive: true })
-copyFileSync(join(OUT, 'fusion_helix_theme_bg.wasm'), SERVED)
-
-console.log(
-  `wasm: fusion-helix-theme built for the browser into ${OUT.replace(`${ROOT}/`, '')}, ` +
-    `and served from ${SERVED.replace(`${ROOT}/`, '')}`,
-)
+console.log(`wasm: fusion-helix-theme built for the browser into ${OUT.replace(`${root}/`, '')}`)

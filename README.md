@@ -109,9 +109,10 @@ Next on its default port. The landing page is at `/`, the Helix documentation at
 `/helix/docs`, the component gallery at `/helix/components`, and the sandbox and
 theme builder at `/helix/sandbox` and `/helix/theme`.
 
-The theme wasm is tracked, so neither the dev server nor CI builds it, which is
-what keeps a wasm toolchain off every job. Changing the Rust under `helix/theme`
-wants `bun run gen:wasm`, and that needs:
+The theme engine's browser build is tracked in `helix/theme/wasm`, so neither the
+dev server nor CI builds it, and the site copies it under `public/` as a build
+step. Rebuilding it after a change to the crate is `bun run gen:wasm`, which
+wants:
 
 ```bash
 rustup target add wasm32-unknown-unknown
@@ -145,7 +146,7 @@ reads, so the useful question after an edit is answered by a group name.
 | `bun run regen` | Every generated file, in the one order that works |
 | `bun run build` | Compiles TypeScript. Runs `turbo run styles` and `analyze` first |
 | `bun run analyze` | Writes the manifests and framework typings. Untracked, so a fresh clone needs it |
-| `bun run dev` | The site. Rebuilds the theme wasm first |
+| `bun run dev` | The site, with its generators run first |
 | `bun run test` | The specs. Partly Rust, since the theme package tests the crate. `bun run specs:browser` for the browser ones |
 | `cargo test --workspace` | Rust |
 
