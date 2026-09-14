@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNumberInput } from '@fusion.dev/helix-headless/number-input'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './number-input-root.css.js'
 
@@ -35,10 +36,17 @@ import { styles } from './number-input-root.css.js'
  * @csspart decrement - The control that steps down.
  * @csspart field - The box holding everything.
  * @csspart increment - The control that steps up.
+ *
+ * @cssproperty --number-input-background-color - Fill behind the number.
  */
 @customElement('helix-number-input')
 export class HelixNumberInput extends HelixHeadlessNumberInput {
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = [
+    fieldStyles,
+    fieldFrameStyles,
+    fieldStackedStyles,
+    styles,
+  ]
 }
 
 declare global {

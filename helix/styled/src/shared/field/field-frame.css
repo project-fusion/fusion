@@ -1,10 +1,9 @@
 /* The frame a text-like field wears, in one sheet, and never copied into a
    family's own: the stack, the hover edge, the focus ring, the invalid state and
    the stripped control. Compose with `field.css` and the family's own sheet,
-   never instead of either. Seven families take it: Input, Textarea, Combobox,
-   Date Input, Time Input, Color Input and Filter Input. Number Input and File
-   Input wear a frame that differs in three of these five rules and keep their
-   own, and each says so where it does. */
+   never instead of either. Nine families take it: Input, Textarea, Number
+   Input, File Input, Combobox, Date Input, Time Input, Color Input and Filter
+   Input. */
 
 /* A column, so the label, the field and whatever is under it stack without any
    of them needing a margin. **Flex rather than grid, and the inline axis is
