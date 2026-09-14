@@ -10,6 +10,7 @@ import { helixTier } from './plugins/helix-tier.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxNativeEvents } from './plugins/jsx-native-events.js'
+import { jsxNumericAttributes } from './plugins/jsx-numeric-attributes.js'
 import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { metadata } from './plugins/metadata.js'
@@ -150,6 +151,10 @@ export const createHelixCemConfig = ({
                 }),
               ]
             : []),
+          /* After both generators, which type an attribute as its property,
+             and before `jsxOptionalUndefined`, so the string form it admits
+             is wrapped in the same `| undefined`. */
+          jsxNumericAttributes({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
           /* Last of the generators, because it rewrites what two of them wrote.
              `?: T` is not the same type as `?: T | undefined` under
              `exactOptionalPropertyTypes`, and it is the one a consumer cannot
@@ -217,6 +222,7 @@ export {
   jsxDeclaredEvents,
   jsxImports,
   jsxNativeEvents,
+  jsxNumericAttributes,
   jsxOptionalUndefined,
   metadata,
   reactEvents,
