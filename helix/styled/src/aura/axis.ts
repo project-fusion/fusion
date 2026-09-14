@@ -16,7 +16,7 @@
  * form**, which is deliberate and is what makes the round trip worth running.
  * A closed form checked against its own algebra proves only that the algebra
  * was inverted correctly. Written as the same three operations `main()`
- * performs, in the same order, it is a claim about `aura-shader.ts`, and the
+ * performs, in the same order, it is a claim about `shader.ts`, and the
  * day someone changes how that file handles the aspect this stops agreeing.
  */
 
@@ -26,7 +26,7 @@ const RADIANS = Math.PI / 180
 /**
  * Where the shader's axis crosses the top edge, as a fraction of the width.
  *
- * Follows `main()` in `aura-shader.ts`:
+ * Follows `main()` in `shader.ts`:
  *
  * 1. `p.x *= aspect` stretches the frame before anything rotates, so the tilt
  *    the rotation takes is a slope in the stretched frame rather than on

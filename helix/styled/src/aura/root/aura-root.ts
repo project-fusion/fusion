@@ -7,9 +7,9 @@ import {
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
-import { tiltFor } from './aura-axis.js'
+import { tiltFor } from '../axis.js'
+import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from '../shader.js'
 import { styles } from './aura-root.css.js'
-import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from './aura-shader.js'
 
 /**
  * The widest either edge of the drawing buffer may get, in device pixels.
@@ -62,6 +62,10 @@ const OPENING_PATIENCE = 500
  * **It stops when nobody is looking**, off screen and in a background tab, and
  * `prefers-reduced-motion` gets one still frame rather than an empty box.
  *
+ * Styled only, and with behavior, which the tier split does not otherwise
+ * allow: the behavior is drawing to a canvas, so there is no structure a
+ * consumer could restyle and nothing for a headless twin to hold.
+ *
  * @since 0.1.0
  * @status experimental
  * @category media
@@ -72,7 +76,7 @@ const OPENING_PATIENCE = 500
  */
 @customElement('helix-aura')
 export class HelixAura extends HelixElement {
-  static override styles: CSSResultGroup = [styles]
+  static override styles: CSSResultGroup = styles
 
   /**
    * How soft the falloff is, `0` tight and `1` diffuse.
@@ -977,7 +981,7 @@ export class HelixAura extends HelixElement {
    * business knowing when: it is read once per frame from numbers already
    * there.
    *
-   * The solve is `tiltFor` in `aura-axis.ts` rather than an expression here, so
+   * The solve is `tiltFor` in `axis.ts` rather than an expression here, so
    * it is callable and `aura-root.dom.spec.ts` runs it against a model of the
    * shader in both directions.
    */

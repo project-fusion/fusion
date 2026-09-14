@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { at, label, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
-import { readColor } from './orb-color.js'
+import { readColor } from '../color.js'
 import {
   blendParams,
   blendStaged,
@@ -11,7 +11,7 @@ import {
   paramsFor,
   project,
   stateDistance,
-} from './orb-shapes.js'
+} from '../shapes.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
    exactly that reason: `@customElement` runs at evaluation, and a static import

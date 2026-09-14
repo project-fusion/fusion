@@ -2,8 +2,7 @@ import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
-import { readColor } from './orb-color.js'
-import { styles } from './orb-root.css.js'
+import { readColor } from '../color.js'
 import {
   blendStaged,
   evenSphere,
@@ -18,7 +17,8 @@ import {
   smoother,
   stateDistance,
   TRAIL,
-} from './orb-shapes.js'
+} from '../shapes.js'
+import { styles } from './orb-root.css.js'
 
 /** The shortest change of state, in ms, and what the longest adds to it. */
 const MORPH_NEAR = 380
@@ -87,6 +87,10 @@ interface Dot {
  * **It stops when nobody is looking**, off screen and in a background tab, and
  * `prefers-reduced-motion` gets one still frame rather than an empty box.
  *
+ * Styled only, and with behavior, which the tier split does not otherwise
+ * allow: the behavior is drawing dots to a canvas, so there is no structure a
+ * consumer could restyle and nothing for a headless twin to hold.
+ *
  * @since 0.8.0
  * @status experimental
  * @category feedback
@@ -101,7 +105,7 @@ interface Dot {
  */
 @customElement('helix-orb')
 export class HelixOrb extends HelixElement {
-  static override styles: CSSResultGroup = [styles]
+  static override styles: CSSResultGroup = styles
 
   /**
    * Accessible name, where the state's own word is not the right one.

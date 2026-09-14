@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
-import { exitOf, tiltFor } from './aura-axis.js'
+import { exitOf, tiltFor } from '../axis.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
    exactly that reason: `@customElement` runs at evaluation, and a static import
@@ -161,7 +161,7 @@ describe('aura', () => {
  * `terminus` exists so nobody has to reason about an angle, so a fixture on the
  * angle would guard the wrong number: an angle can be right-looking and wrong
  * while the docstring promises a position. These go through `exitOf`, which
- * models what `aura-shader.ts` does with the tilt, so what is being checked is
+ * models what `shader.ts` does with the tilt, so what is being checked is
  * that the property keeps its promise about the picture.
  *
  * In this file rather than a lane of its own because this is the lane that runs
