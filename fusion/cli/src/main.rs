@@ -368,6 +368,23 @@ fn report(
                 report.unit
             );
         }
+        /* Notes after the table, as `helix component` prints them: work rather
+        than fault, so they are not a mark in the margin, and not only in
+        `--json`, or a note is registered where nobody running the audit reads. */
+        for (rule, report) in reports
+            .iter()
+            .filter(|(_, report)| !report.notes.is_empty())
+        {
+            println!();
+            println!(
+                "{} {}",
+                paint("1", rule.name),
+                paint("2", &format!("{} noted, not failing", report.notes.len()))
+            );
+            for note in &report.notes {
+                println!("  {note}");
+            }
+        }
         println!();
     }
 

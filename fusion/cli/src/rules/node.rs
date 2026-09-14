@@ -32,7 +32,19 @@
 //! **What it deliberately does not do** is check the Node that CI uses: a
 //! different problem with a different fix, which a workflow pins the way it
 //! already pins everything else.
+//!
+//! **The bun types are held to `packageManager` by the same argument**, and
+//! that one notes rather than fails. `packageManager` is the bun the lockfile
+//! was written by and the one `.github/actions/setup` installs, so it is the
+//! runtime every spec runs on; `@types/bun` a line ahead of it type-checks the
+//! specs against a `bun:test` the runner does not have. The tree cannot go the
+//! other way: under `@types/bun` 1.1.18, the newest on the runtime's line, six
+//! specs fail on `expect`'s typings (measured 14 Sep 2026). A finding would be
+//! red until the runtime moved, which is a decision about what CI runs and not
+//! about a manifest, so the mismatch is reported where it can be seen and the
+//! runtime is what moves.
 
+use std::cmp::Ordering;
 use std::process::Command;
 use std::sync::LazyLock;
 
@@ -40,12 +52,32 @@ use regex::Regex;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
+use crate::workspace::Manifest;
 
 static VERSION: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(\d+)\.(\d+)").expect("a literal pattern compiles"));
 
 static MAJOR: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(\d+)\.").expect("a literal pattern compiles"));
+
+static BUN: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^bun@(\d+)\.(\d+)").expect("a literal pattern compiles"));
+
+/// The range a manifest declares for a dependency, wherever it declares it.
+fn dependency(manifest: &Value, name: &str) -> Option<String> {
+    ["devDependencies", "dependencies"]
+        .into_iter()
+        .find_map(|where_| manifest.get(where_)?.get(name)?.as_str().map(str::to_owned))
+}
+
+/// The first `major.minor` in a range, which is the line it names.
+fn line(range: &str) -> Option<(u32, u32)> {
+    let found = VERSION.captures(range)?;
+    Some((
+        found[1].parse::<u32>().unwrap_or(0),
+        found[2].parse::<u32>().unwrap_or(0),
+    ))
+}
 
 pub fn run(context: &Context) -> Report {
     let nothing = |findings| Report {
@@ -54,8 +86,8 @@ pub fn run(context: &Context) -> Report {
         notes: Vec::new(),
         unit: "declared floors",
     };
-    let Some(root) = context
-        .manifests()
+    let all = context.manifests();
+    let Some(root) = all
         .iter()
         .find(|one| one.directory.is_empty() || one.directory == ".")
     else {
@@ -115,16 +147,7 @@ pub fn run(context: &Context) -> Report {
 
     /* The types describe a standard library, so they describe the oldest one
     this repository supports rather than the newest one that exists. */
-    let types = ["devDependencies", "dependencies"]
-        .into_iter()
-        .find_map(|where_| {
-            root.value
-                .get(where_)?
-                .get("@types/node")?
-                .as_str()
-                .map(str::to_owned)
-        })
-        .unwrap_or_default();
+    let types = dependency(&root.value, "@types/node").unwrap_or_default();
     if let Some(found) = MAJOR.captures(&types) {
         checked += 1;
         let major = found[1].parse::<u32>().unwrap_or(0);
@@ -143,10 +166,72 @@ pub fn run(context: &Context) -> Report {
         }
     }
 
+    let (bun, notes) = bun_types(all, &root.value);
+    checked += bun;
+
     Report {
         checked,
         findings,
-        notes: Vec::new(),
+        notes,
         unit: "declared floors",
     }
+}
+
+/// The bun types, held to the bun the lockfile was written by.
+///
+/// Every manifest that declares them, because each package's specs type-check
+/// against its own copy. Returns how many floors were checked and what was
+/// noted: this one notes rather than fails, for the reason the module doc
+/// gives.
+fn bun_types(all: &[Manifest], root: &Value) -> (usize, Vec<String>) {
+    let mut notes = Vec::new();
+    let manager = root
+        .get("packageManager")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    let Some(bun) = BUN.captures(manager) else {
+        return (0, Vec::new());
+    };
+    let runtime = (
+        bun[1].parse::<u32>().unwrap_or(0),
+        bun[2].parse::<u32>().unwrap_or(0),
+    );
+    let mut ahead = Vec::new();
+    let mut behind = Vec::new();
+    for manifest in all {
+        let Some(range) = dependency(&manifest.value, "@types/bun") else {
+            continue;
+        };
+        let Some(types) = line(&range) else {
+            continue;
+        };
+        let file = if manifest.directory.is_empty() || manifest.directory == "." {
+            "package.json".to_owned()
+        } else {
+            format!("{}/package.json", manifest.directory)
+        };
+        match types.cmp(&runtime) {
+            Ordering::Greater => ahead.push(format!("{file} ({range})")),
+            Ordering::Less => behind.push(format!("{file} ({range})")),
+            Ordering::Equal => {}
+        }
+    }
+    let (major, minor) = runtime;
+    if !ahead.is_empty() {
+        notes.push(format!(
+            "`@types/bun` is ahead of `packageManager`'s bun@{major}.{minor} in {}, so the \
+             specs type-check against a `bun:test` the runtime does not have. The runtime \
+             moves up rather than the types back: on the runtime's line the tree does not \
+             type-check.",
+            ahead.join(", ")
+        ));
+    }
+    if !behind.is_empty() {
+        notes.push(format!(
+            "`@types/bun` is behind `packageManager`'s bun@{major}.{minor} in {}, so a call \
+             the runtime has is refused by the types. Raise them to ^{major}.{minor}.",
+            behind.join(", ")
+        ));
+    }
+    (1, notes)
 }
