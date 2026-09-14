@@ -53,8 +53,25 @@ export interface DismissOptions {
  * what it holds. Membership is exactly `activate`/`deactivate`, and
  * `hostDisconnected` calls the second, so an overlay torn down rather than
  * closed leaves too.
+ *
+ * **Held on `globalThis` rather than in this module**, because a page can carry
+ * two copies of this module and one press has to be settled across both.
+ * Measured 14 Sep 2026 in the browser spec run, where each family's bundle
+ * inlines the core modules the shared runtime does not carry: with another
+ * family's bundle loaded first, a tooltip inside an open popover had its
+ * dismisser registered in one copy of this set and the popover's in another.
+ * The first handler to run marks the event taken on the event itself, which
+ * every copy reads, so the copy that never saw the deeper overlay closed its
+ * own and the deeper one stayed up. A consumer with two versions of this
+ * package installed is the same page. A `Symbol.for` key is what lets the
+ * copies agree on the one set.
  */
-const listening = new Set<DismissController>()
+const REGISTRY = Symbol.for('fusion.helix.dismiss.listening')
+const globals = globalThis as unknown as Record<symbol, Set<DismissController> | undefined>
+if (globals[REGISTRY] === undefined) {
+  globals[REGISTRY] = new Set<DismissController>()
+}
+const listening = globals[REGISTRY]
 
 /**
  * Closes an overlay on Escape or on a pointer press outside it.
