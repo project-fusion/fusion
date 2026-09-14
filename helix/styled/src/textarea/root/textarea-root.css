@@ -26,8 +26,6 @@
    it. Whether it should take them is a drift recorded here rather than
    settled. */
 [part="control"] {
-  --_field-control-size: var(--helix-text-sm);
-
   flex: 0 1 auto;
   inline-size: 100%;
   line-height: var(--helix-leading-normal);

@@ -21,11 +21,8 @@
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The type size the shared frame reads, and the one thing the control adds to
-   the shared reset: the field's full height. */
+/* The one thing the control adds to the shared reset: the field's full height. */
 [part="control"] {
-  --_field-control-size: var(--helix-text-sm);
-
   block-size: 100%;
 }
 

@@ -41,13 +41,10 @@
   max-inline-size: 100%;
 }
 
-/* The type size the shared frame reads, and the one thing the control adds to
-   the shared reset: a basis that keeps the text usable once tokens share the
-   line, and wraps it to its own line rather than shrinking it to nothing when
-   they fill one. */
+/* The one thing the control adds to the shared reset: a basis that keeps the
+   text usable once tokens share the line, and wraps it to its own line rather
+   than shrinking it to nothing when they fill one. */
 [part="control"] {
-  --_field-control-size: var(--helix-text-sm);
-
   flex: 1 1 var(--filter-input-control-size, 6ch);
 }
 

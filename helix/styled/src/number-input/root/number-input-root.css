@@ -106,7 +106,7 @@
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   min-inline-size: 0;
