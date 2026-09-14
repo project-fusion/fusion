@@ -42,7 +42,7 @@ describe('icon', () => {
     /* Imported here rather than at the top of the file: the sheet pulls in
        `@fusion.dev/helix-core`, and a module that touches the DOM globals before
        `registerDom` has installed them takes happy-dom's parser down with it. */
-    const { styles } = await import('../glyph.css.js')
+    const { styles } = await import('../../shared/glyph/glyph.css.js')
     const glyph = String((styles as { cssText?: string }).cssText ?? styles)
     expect(glyph).toContain('[data-glyph]')
     expect(glyph).toContain('block-size: var(--icon-size, var(--helix-size-icon))')
