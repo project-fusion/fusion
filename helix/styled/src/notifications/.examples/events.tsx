@@ -17,8 +17,11 @@ export function Example() {
     })
   }
 
-  const read = (event: CustomEvent<{ value: string }>) => {
-    say('helix-read', `${event.detail.value}, which is a request the feed answers`)
+  const read = (event: CustomEvent<{ read: boolean }>) => {
+    say(
+      'helix-read',
+      `mark ${event.detail.read ? 'read' : 'unread'}, which is a request the feed answers`,
+    )
   }
 
   const dismissed = (event: CustomEvent<{ label: string }>) => {

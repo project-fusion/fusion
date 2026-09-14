@@ -14,6 +14,6 @@
   const reel = document.getElementById('reel')
 
   reel.addEventListener('helix-select', (event) => {
-    reel.index = event.detail.index
+    reel.index = Number(event.detail.value)
   })
 </script>

@@ -21,8 +21,8 @@ export function Example() {
      drawer has ever been opened. */
   const unread = items.filter((one) => !one.read).length
 
-  const readAt = (id: string) => (event: CustomEvent<{ value: string }>) => {
-    const next = event.detail.value !== 'false'
+  const readAt = (id: string) => (event: CustomEvent<{ read: boolean }>) => {
+    const next = event.detail.read
     setItems((before) => before.map((one) => (one.id === id ? { ...one, read: next } : one)))
   }
 

@@ -14,43 +14,43 @@ export function Example() {
         <tbody>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-15">Sat</time>
+              <time dateTime="2026-08-15">Sat</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-16">Sun</time>
+              <time dateTime="2026-08-16">Sun</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-17">Mon</time>
+              <time dateTime="2026-08-17">Mon</time>
             </th>
             <td>12</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-18">Tue</time>
+              <time dateTime="2026-08-18">Tue</time>
             </th>
             <td>9</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-19">Wed</time>
+              <time dateTime="2026-08-19">Wed</time>
             </th>
             <td>14</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-20">Thu</time>
+              <time dateTime="2026-08-20">Thu</time>
             </th>
             <td>11</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-21">Fri</time>
+              <time dateTime="2026-08-21">Fri</time>
             </th>
             <td>17</td>
           </tr>

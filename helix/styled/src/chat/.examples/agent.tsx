@@ -1,3 +1,4 @@
+import type { OrbState } from '@fusion.dev/helix'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const WORDS =
@@ -17,7 +18,7 @@ const RUN = [
 const FINISHED = WORDS.join(' ')
 
 export function Example() {
-  const [state, setState] = useState<string>('connecting')
+  const [state, setState] = useState<OrbState>('connecting')
   const [doing, setDoing] = useState('Connecting')
   const [said, setSaid] = useState('')
   const [done, setDone] = useState(false)
@@ -29,7 +30,7 @@ export function Example() {
   useEffect(() => {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)')
 
-    const say = (next: string, what: string) => {
+    const say = (next: OrbState, what: string) => {
       setState(next)
       setDoing(what)
     }
@@ -73,12 +74,13 @@ export function Example() {
       setDone(false)
       let step = 0
       const advance = () => {
-        if (step === RUN.length) {
+        const stage = RUN[step]
+        if (stage === undefined) {
           say('working', 'Writing')
           stream()
           return
         }
-        const [next, what, held] = RUN[step]
+        const [next, what, held] = stage
         say(next, what)
         step += 1
         timer.current = setTimeout(advance, held)

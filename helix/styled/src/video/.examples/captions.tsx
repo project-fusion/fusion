@@ -9,7 +9,7 @@ export function Example() {
         kind="captions"
         label="English"
         src="data:text/vtt,WEBVTT%0A%0A00%3A00%3A00.000%20--%3E%2000%3A00%3A00.999%0AHildy%21%0A%0A00%3A00%3A01.000%20--%3E%2000%3A00%3A01.499%0AHow%20are%20you%3F%0A%0A00%3A00%3A01.500%20--%3E%2000%3A00%3A02.999%0ATell%20me%2C%20is%20the%20%3Cu%3Elord%20of%20the%20universe%3C%2Fu%3E%20in%3F%0A%0A00%3A00%3A03.000%20--%3E%2000%3A00%3A04.299%0AYes%2C%20he%27s%20in%20-%20in%20a%20bad%20humor%0A%0A00%3A00%3A04.300%20--%3E%2000%3A00%3A06.000%0ASomebody%20must%27ve%20stolen%20the%20crown%20jewels%0A"
-        srclang="en"
+        srcLang="en"
       />
     </helix-video>
   )

@@ -6,7 +6,7 @@ export function Example() {
   return (
     <helix-date-picker
       month={month}
-      onhelix-navigate={(event) => setMonth(event.detail.month)}
+      onhelix-navigate={(event) => setMonth(event.detail.value)}
     />
   )
 }

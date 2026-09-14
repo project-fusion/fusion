@@ -1,3 +1,4 @@
+import type { HelixImage } from '@fusion.dev/helix'
 import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }

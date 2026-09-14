@@ -15,421 +15,421 @@ export function Example() {
         <tbody>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-01">1 Jun</time>
+              <time dateTime="2026-06-01">1 Jun</time>
             </th>
             <td>0</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-02">2 Jun</time>
+              <time dateTime="2026-06-02">2 Jun</time>
             </th>
             <td>8</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-03">3 Jun</time>
+              <time dateTime="2026-06-03">3 Jun</time>
             </th>
             <td>5</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-04">4 Jun</time>
+              <time dateTime="2026-06-04">4 Jun</time>
             </th>
             <td>2</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-05">5 Jun</time>
+              <time dateTime="2026-06-05">5 Jun</time>
             </th>
             <td>10</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-06">6 Jun</time>
+              <time dateTime="2026-06-06">6 Jun</time>
             </th>
             <td>2</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-07">7 Jun</time>
+              <time dateTime="2026-06-07">7 Jun</time>
             </th>
             <td>10</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-08">8 Jun</time>
+              <time dateTime="2026-06-08">8 Jun</time>
             </th>
             <td>7</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-09">9 Jun</time>
+              <time dateTime="2026-06-09">9 Jun</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-10">10 Jun</time>
+              <time dateTime="2026-06-10">10 Jun</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-11">11 Jun</time>
+              <time dateTime="2026-06-11">11 Jun</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-12">12 Jun</time>
+              <time dateTime="2026-06-12">12 Jun</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-13">13 Jun</time>
+              <time dateTime="2026-06-13">13 Jun</time>
             </th>
             <td>9</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-14">14 Jun</time>
+              <time dateTime="2026-06-14">14 Jun</time>
             </th>
             <td>6</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-15">15 Jun</time>
+              <time dateTime="2026-06-15">15 Jun</time>
             </th>
             <td>3</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-16">16 Jun</time>
+              <time dateTime="2026-06-16">16 Jun</time>
             </th>
             <td>6</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-17">17 Jun</time>
+              <time dateTime="2026-06-17">17 Jun</time>
             </th>
             <td>3</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-18">18 Jun</time>
+              <time dateTime="2026-06-18">18 Jun</time>
             </th>
             <td>0</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-19">19 Jun</time>
+              <time dateTime="2026-06-19">19 Jun</time>
             </th>
             <td>8</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-20">20 Jun</time>
+              <time dateTime="2026-06-20">20 Jun</time>
             </th>
             <td>5</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-21">21 Jun</time>
+              <time dateTime="2026-06-21">21 Jun</time>
             </th>
             <td>8</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-22">22 Jun</time>
+              <time dateTime="2026-06-22">22 Jun</time>
             </th>
             <td>5</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-23">23 Jun</time>
+              <time dateTime="2026-06-23">23 Jun</time>
             </th>
             <td>2</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-24">24 Jun</time>
+              <time dateTime="2026-06-24">24 Jun</time>
             </th>
             <td>10</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-25">25 Jun</time>
+              <time dateTime="2026-06-25">25 Jun</time>
             </th>
             <td>7</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-26">26 Jun</time>
+              <time dateTime="2026-06-26">26 Jun</time>
             </th>
             <td>10</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-27">27 Jun</time>
+              <time dateTime="2026-06-27">27 Jun</time>
             </th>
             <td>7</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-28">28 Jun</time>
+              <time dateTime="2026-06-28">28 Jun</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-29">29 Jun</time>
+              <time dateTime="2026-06-29">29 Jun</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-06-30">30 Jun</time>
+              <time dateTime="2026-06-30">30 Jun</time>
             </th>
             <td>9</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-01">1 Jul</time>
+              <time dateTime="2026-07-01">1 Jul</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-02">2 Jul</time>
+              <time dateTime="2026-07-02">2 Jul</time>
             </th>
             <td>9</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-03">3 Jul</time>
+              <time dateTime="2026-07-03">3 Jul</time>
             </th>
             <td>6</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-04">4 Jul</time>
+              <time dateTime="2026-07-04">4 Jul</time>
             </th>
             <td>3</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-05">5 Jul</time>
+              <time dateTime="2026-07-05">5 Jul</time>
             </th>
             <td>0</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-06">6 Jul</time>
+              <time dateTime="2026-07-06">6 Jul</time>
             </th>
             <td>3</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-07">7 Jul</time>
+              <time dateTime="2026-07-07">7 Jul</time>
             </th>
             <td>0</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-08">8 Jul</time>
+              <time dateTime="2026-07-08">8 Jul</time>
             </th>
             <td>8</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-09">9 Jul</time>
+              <time dateTime="2026-07-09">9 Jul</time>
             </th>
             <td>5</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-10">10 Jul</time>
+              <time dateTime="2026-07-10">10 Jul</time>
             </th>
             <td>2</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-11">11 Jul</time>
+              <time dateTime="2026-07-11">11 Jul</time>
             </th>
             <td>5</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-12">12 Jul</time>
+              <time dateTime="2026-07-12">12 Jul</time>
             </th>
             <td>2</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-13">13 Jul</time>
+              <time dateTime="2026-07-13">13 Jul</time>
             </th>
             <td>10</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-14">14 Jul</time>
+              <time dateTime="2026-07-14">14 Jul</time>
             </th>
             <td>7</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-15">15 Jul</time>
+              <time dateTime="2026-07-15">15 Jul</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-16">16 Jul</time>
+              <time dateTime="2026-07-16">16 Jul</time>
             </th>
             <td>7</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-17">17 Jul</time>
+              <time dateTime="2026-07-17">17 Jul</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-18">18 Jul</time>
+              <time dateTime="2026-07-18">18 Jul</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-19">19 Jul</time>
+              <time dateTime="2026-07-19">19 Jul</time>
             </th>
             <td>9</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-20">20 Jul</time>
+              <time dateTime="2026-07-20">20 Jul</time>
             </th>
             <td>6</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-21">21 Jul</time>
+              <time dateTime="2026-07-21">21 Jul</time>
             </th>
             <td>9</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-22">22 Jul</time>
+              <time dateTime="2026-07-22">22 Jul</time>
             </th>
             <td>6</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-23">23 Jul</time>
+              <time dateTime="2026-07-23">23 Jul</time>
             </th>
             <td>3</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-24">24 Jul</time>
+              <time dateTime="2026-07-24">24 Jul</time>
             </th>
             <td>0</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-25">25 Jul</time>
+              <time dateTime="2026-07-25">25 Jul</time>
             </th>
             <td>8</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-26">26 Jul</time>
+              <time dateTime="2026-07-26">26 Jul</time>
             </th>
             <td>0</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-27">27 Jul</time>
+              <time dateTime="2026-07-27">27 Jul</time>
             </th>
             <td>8</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-28">28 Jul</time>
+              <time dateTime="2026-07-28">28 Jul</time>
             </th>
             <td>5</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-29">29 Jul</time>
+              <time dateTime="2026-07-29">29 Jul</time>
             </th>
             <td>2</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-30">30 Jul</time>
+              <time dateTime="2026-07-30">30 Jul</time>
             </th>
             <td>10</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-07-31">31 Jul</time>
+              <time dateTime="2026-07-31">31 Jul</time>
             </th>
             <td>2</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-01">1 Aug</time>
+              <time dateTime="2026-08-01">1 Aug</time>
             </th>
             <td>10</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-02">2 Aug</time>
+              <time dateTime="2026-08-02">2 Aug</time>
             </th>
             <td>7</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-03">3 Aug</time>
+              <time dateTime="2026-08-03">3 Aug</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-04">4 Aug</time>
+              <time dateTime="2026-08-04">4 Aug</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-05">5 Aug</time>
+              <time dateTime="2026-08-05">5 Aug</time>
             </th>
             <td>4</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-06">6 Aug</time>
+              <time dateTime="2026-08-06">6 Aug</time>
             </th>
             <td>1</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-07">7 Aug</time>
+              <time dateTime="2026-08-07">7 Aug</time>
             </th>
             <td>9</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-08">8 Aug</time>
+              <time dateTime="2026-08-08">8 Aug</time>
             </th>
             <td>6</td>
           </tr>
           <tr>
             <th scope="row">
-              <time datetime="2026-08-09">9 Aug</time>
+              <time dateTime="2026-08-09">9 Aug</time>
             </th>
             <td>3</td>
           </tr>

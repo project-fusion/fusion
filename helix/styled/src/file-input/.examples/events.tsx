@@ -1,3 +1,4 @@
+import type { HelixFileInput } from '@fusion.dev/helix'
 import { useState } from 'react'
 
 type Arrival = { carried: string; name: string }
@@ -21,12 +22,15 @@ export function Example() {
     say('helix-before-change', `proposing "${event.detail.value}", refusable`)
   }
 
+  const chosen = (field: HelixFileInput) =>
+    field.files.map((file) => file.name).join(', ') || 'nothing'
+
   const moved = (event: Event & { currentTarget: HelixFileInput }) => {
-    say('input', `"${event.currentTarget.value}" chosen so far`)
+    say('input', `${chosen(event.currentTarget)} chosen so far`)
   }
 
   const settled = (event: Event & { currentTarget: HelixFileInput }) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `${chosen(event.currentTarget)}, the reader is done`)
   }
 
   return (

@@ -9,10 +9,5 @@
   },
   "exclude": ["src/*/.examples/**"],
   "extends": "../../tsconfig.base.json",
-  "include": ["src/**/*"],
-  "references": [
-    {
-      "path": "./.preview"
-    }
-  ]
+  "include": ["src/**/*"]
 }

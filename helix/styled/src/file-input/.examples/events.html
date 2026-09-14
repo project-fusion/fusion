@@ -49,13 +49,15 @@
     }
   }
 
+  const chosen = (field) => field.files.map((file) => file.name).join(', ') || 'nothing'
+
   files.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `proposing "${event.detail.value}", refusable`)
   })
   files.addEventListener('input', (event) => {
-    say('input', `"${event.currentTarget.value}" chosen so far`)
+    say('input', `${chosen(event.currentTarget)} chosen so far`)
   })
   files.addEventListener('change', (event) => {
-    say('change', `"${event.currentTarget.value}", the reader is done`)
+    say('change', `${chosen(event.currentTarget)}, the reader is done`)
   })
 </script>
