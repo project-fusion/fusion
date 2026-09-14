@@ -53,10 +53,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, Context, Finding, Report};
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 /// `transition` and `animation` both: a transition on `opacity` moves a reader
 /// exactly as much as an animation does, and both are capped by the rule that
@@ -222,11 +220,7 @@ pub fn run(context: &Context) -> Report {
             };
             let css = COMMENT.replace_all(&raw, "");
             let parsed = rules(&css);
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
 
             /* What the sheet has already answered for, compared as normalized
             selector text: a reduce rule naming the same selector carries the

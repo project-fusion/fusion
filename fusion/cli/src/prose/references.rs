@@ -183,11 +183,7 @@ pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut seen = BTreeSet::new();
     let mut fault = |file: &Path, message: String, detail: &str| {
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(file);
         if seen.insert(format!("{where_}{message}")) {
             findings.push(Finding {
                 detail: detail.to_owned(),

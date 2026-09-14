@@ -36,13 +36,11 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{family, stylesheets, Context, Finding, Report};
 
 static PRINT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"@media\s+print").expect("a literal pattern compiles"));
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 pub fn run(context: &Context) -> Report {
     /* A family answers once, however many sheets it has, so the sheets are

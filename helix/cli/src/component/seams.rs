@@ -38,13 +38,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::uncommented;
 use crate::component::{sources, Context, Finding, Report};
-
-static BLOCK_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
-static LINE_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"//[^\n]*").expect("a literal pattern compiles"));
 
 static DEFINED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"@customElement\(['"]([a-z0-9-]+)['"]\)"#).expect("a literal pattern compiles")
@@ -58,20 +53,6 @@ static SEAM: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"\bprotected\s+(?:override\s+)?render[A-Z]\w*\s*\(")
         .expect("a literal pattern compiles")
 });
-
-/// Comments blanked to spaces, for the reason every rule here records: a class
-/// doc is full of usage examples naming tags the file has no business rendering,
-/// and those are prose.
-fn uncommented(text: &str) -> String {
-    let blank = |found: &regex::Captures| -> String {
-        found[0]
-            .chars()
-            .map(|one| if one == '\n' { '\n' } else { ' ' })
-            .collect()
-    };
-    let once = BLOCK_COMMENT.replace_all(text, &blank);
-    LINE_COMMENT.replace_all(&once, &blank).into_owned()
-}
 
 /// The family a component file belongs to: its folder's parent's name.
 ///
@@ -166,11 +147,7 @@ pub fn run(context: &Context) -> Report {
         let text = uncommented(&raw);
         let ranges = seams(&text);
         let mut reported: BTreeSet<&str> = BTreeSet::new();
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(file);
 
         for found in COMPOSED.captures_iter(&text) {
             let tag = found.get(1).expect("the name always matches").as_str();

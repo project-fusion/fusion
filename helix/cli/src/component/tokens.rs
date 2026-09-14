@@ -51,6 +51,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::{blanked, line_of, COMMENT};
 use crate::component::{walk_outside, Context, Finding, Report};
 
 /// Properties whose values must come from a token, and which category serves them.
@@ -120,9 +121,6 @@ const ALLOWED: [&str; 16] = [
     "unset",
 ];
 
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
 static TEMPLATE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"css`((?:[^`\\]|\\(?s:.))*)`").expect("a literal pattern compiles")
 });
@@ -147,18 +145,6 @@ static READS: LazyLock<Regex> =
 
 static FONT_FACE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^@font-face\b").expect("a literal pattern compiles"));
-
-/// Blanks block comments, keeping every byte and every newline where it was.
-fn blanked(source: &str) -> String {
-    COMMENT
-        .replace_all(source, |found: &regex::Captures| {
-            found[0]
-                .chars()
-                .map(|one| if one == '\n' { '\n' } else { ' ' })
-                .collect::<String>()
-        })
-        .into_owned()
-}
 
 /// The whole file for a stylesheet, or each tagged template inside a module.
 fn blocks(path: &Path, source: &str) -> Vec<(usize, String)> {
@@ -185,10 +171,6 @@ fn blocks(path: &Path, source: &str) -> Vec<(usize, String)> {
             )
         })
         .collect()
-}
-
-fn line_of(text: &str, at: usize) -> usize {
-    text[..at].matches('\n').count() + 1
 }
 
 /// Every file a rule about authored CSS could read, across the workspace.
@@ -255,11 +237,7 @@ pub fn run(context: &Context) -> Report {
         let Ok(source) = fs::read_to_string(&file) else {
             continue;
         };
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(&file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&file);
         let owns_primitives = where_.starts_with(&owns.to_string_lossy().to_string());
 
         /* An example showing the base layer writes raw values on purpose: a

@@ -28,9 +28,8 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::compositions::{
-    compositions, exposed_as, line_of, part_docs_by_tag, uncommented,
-};
+use crate::component::compositions::{compositions, exposed_as, part_docs_by_tag};
+use crate::component::text::{line_of, uncommented};
 use crate::component::{sources, walk_outside, Context, Finding, Report};
 
 /// Every tag's parts and their descriptions, keyed by tag suffix.
@@ -88,11 +87,7 @@ fn composed(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> 
         };
         let where_ = format!(
             "{}:{}",
-            site.path
-                .strip_prefix(&context.root)
-                .unwrap_or(&site.path)
-                .to_string_lossy()
-                .replace('\\', "/"),
+            context.relative(&site.path),
             line_of(&text, site.at)
         );
 
@@ -186,11 +181,7 @@ fn outside(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> u
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             for found in REACHES.captures_iter(&text) {
                 let tag = &found[1];
                 let part = &found[2];

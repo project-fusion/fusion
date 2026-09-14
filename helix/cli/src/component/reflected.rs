@@ -69,13 +69,7 @@ pub fn run(context: &Context) -> Report {
                              attribute's absence, which is what the stylesheet should be asking \
                              about anyway."
                         .to_owned(),
-                    file: format!(
-                        "{}:{line}",
-                        file.strip_prefix(&context.root)
-                            .unwrap_or(&file)
-                            .to_string_lossy()
-                            .replace('\\', "/")
-                    ),
+                    file: format!("{}:{line}", context.relative(&file)),
                     message: format!(
                         "`{name}` reflects and defaults to {value}, so every host gains an \
                          attribute nobody wrote"

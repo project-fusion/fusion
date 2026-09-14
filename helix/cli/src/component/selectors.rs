@@ -42,7 +42,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::compositions::{line_of, uncommented};
+use crate::component::text::{line_of, uncommented};
 use crate::component::{sources, stylesheets, Context, Finding, Report};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -232,11 +232,7 @@ fn survey(context: &Context) -> Survey {
                 continue;
             };
             let text = uncommented(&raw);
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
 
             /* Every name in the clause, not just the innermost: a control
             extends a stack of mixins and each renders part of the markup, so
@@ -362,11 +358,7 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             let css = uncommented(&raw);
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
             checked += judge_sheet(&survey, &css, &where_, &sheet, &mut findings);
         }
     }
@@ -568,11 +560,7 @@ fn lookups(context: &Context, survey: &Survey, findings: &mut Vec<Finding>) {
             };
             /* Blanked to the same length, so the offset is a real line number. */
             let code = uncommented(&text);
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             for found in OWN_ROOT.captures_iter(&code) {
                 let part = found[1].to_owned();
                 let rendered = survey

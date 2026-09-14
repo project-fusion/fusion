@@ -404,11 +404,7 @@ fn fenced(context: &Context, findings: &mut Vec<Finding>) {
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             for fence in FENCE.captures_iter(&text) {
                 for found in INLINE_STYLE.captures_iter(&fence[1]) {
                     findings.push(Finding {

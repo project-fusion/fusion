@@ -186,14 +186,7 @@ pub fn run(context: &Context) -> Report {
                     };
                     findings.push(Finding {
                         detail: advice,
-                        file: format!(
-                            "{}:{}",
-                            file.strip_prefix(root)
-                                .unwrap_or(&file)
-                                .to_string_lossy()
-                                .replace('\\', "/"),
-                            number + 1
-                        ),
+                        file: format!("{}:{}", context.relative(&file), number + 1),
                         message: format!(
                             "barrel import of `{dependency}`, which is side-effectful and cannot \
                              be shaken (in {})",

@@ -60,11 +60,7 @@ pub fn run(context: &Context) -> Report {
     let mut manifests = 0;
 
     for file in files {
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(&file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&file);
         let Ok(source) = fs::read_to_string(&file) else {
             continue;
         };

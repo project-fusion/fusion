@@ -256,11 +256,7 @@ pub fn run(context: &Context) -> Report {
         .map(|(file, _)| Finding {
             detail: "Identity first, then consumption, then alphabetical; scripts sorted inside."
                 .to_owned(),
-            file: file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/"),
+            file: context.relative(&file),
             message: "keys are out of order".to_owned(),
         })
         .collect();
@@ -277,12 +273,7 @@ pub fn fix(context: &Context) -> Vec<String> {
     let mut written = Vec::new();
     for (file, after) in changed {
         if fs::write(&file, after).is_ok() {
-            written.push(
-                file.strip_prefix(&context.root)
-                    .unwrap_or(&file)
-                    .to_string_lossy()
-                    .replace('\\', "/"),
-            );
+            written.push(context.relative(&file));
         }
     }
     written

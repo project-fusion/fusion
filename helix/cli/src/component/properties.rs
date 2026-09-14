@@ -212,11 +212,7 @@ pub fn run(context: &Context) -> Report {
     let findings = changed
         .iter()
         .map(|(file, _)| {
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(file);
             Finding {
                 detail: "A reader looking for one scans, and a reader adding one puts it wherever \
                          the cursor was. Run `helix component fix --only properties`."
@@ -239,12 +235,7 @@ pub fn fix(context: &Context) -> Vec<String> {
     let mut written = Vec::new();
     for (file, after) in changed {
         if fs::write(&file, after).is_ok() {
-            written.push(
-                file.strip_prefix(&context.root)
-                    .unwrap_or(&file)
-                    .to_string_lossy()
-                    .replace('\\', "/"),
-            );
+            written.push(context.relative(&file));
         }
     }
     written

@@ -26,7 +26,7 @@ use std::fs;
 
 use regex::Regex;
 
-use crate::component::compositions::uncommented;
+use crate::component::text::uncommented;
 use crate::component::{sources, Context, Finding, Report};
 
 pub fn run(context: &Context) -> Report {
@@ -71,11 +71,7 @@ pub fn run(context: &Context) -> Report {
         let mut files = Vec::new();
         sources(&root, &mut files);
         for file in files {
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             if where_.contains("/icon/") || where_.contains("/.examples/") {
                 continue;
             }

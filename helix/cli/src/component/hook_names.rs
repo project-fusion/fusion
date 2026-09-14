@@ -72,11 +72,7 @@ fn survey(context: &Context) -> BTreeMap<String, Feeds> {
             let Ok(text) = fs::read_to_string(&sheet) else {
                 continue;
             };
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
 
             for line in text.lines() {
                 let Some(declaration) = DECLARATION.captures(line) else {

@@ -142,11 +142,7 @@ pub fn run(context: &Context) -> Report {
             &mut files,
         );
         for file in files {
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             if context
                 .settings
                 .standalone

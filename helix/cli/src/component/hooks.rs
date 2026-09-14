@@ -64,6 +64,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{walk_outside, Context, Finding, Report};
 
 static DOCUMENTED: LazyLock<Regex> = LazyLock::new(|| {
@@ -104,9 +105,6 @@ static INTERPOLATED: LazyLock<Regex> = LazyLock::new(|| {
 
 static WHOLE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"var\(\s*(--[a-z0-9-]+)\)").expect("a literal pattern compiles"));
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 /// Whether a name is a component hook rather than a private or a design token.
 fn ours(name: &str) -> bool {
@@ -182,11 +180,7 @@ fn survey(context: &Context) -> Survey {
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             let typescript = file.extension().is_some_and(|one| one == "ts");
             let stylesheet = file.extension().is_some_and(|one| one == "css");
 

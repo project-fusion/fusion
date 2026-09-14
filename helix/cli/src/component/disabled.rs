@@ -31,6 +31,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::COMMENT;
 use crate::component::{sources, stylesheets, Context, Finding, Report};
 
 /// Reaching either of these makes a part form-associated.
@@ -43,11 +44,6 @@ static FORM_BASE: LazyLock<Regex> = LazyLock::new(|| {
 static ON_ATTRIBUTE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r":host\(\[disabled\][^)]*\)").expect("a literal pattern compiles")
 });
-
-/// Comments quote selectors while explaining them, including this rule's own
-/// note in a stylesheet that names the wrong form in order to reject it.
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 pub fn run(context: &Context) -> Report {
     let tiers = context.settings.roots(&context.root);
@@ -96,11 +92,7 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             let code = COMMENT.replace_all(&raw, "");
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
             for found in ON_ATTRIBUTE.find_iter(&code) {
                 findings.push(Finding {
                     detail: "Use `:host(:disabled)`, which is true for the attribute and for an \

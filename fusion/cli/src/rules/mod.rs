@@ -36,6 +36,20 @@ pub struct Context {
     pub settings: Settings,
 }
 
+impl Context {
+    /// A path as a finding names it: relative to the root, with forward slashes.
+    ///
+    /// Forward slashes on every platform, because a finding is read by a person
+    /// and compared by a test, and neither wants the path to change with the
+    /// machine that produced it.
+    pub fn relative(&self, path: &Path) -> String {
+        path.strip_prefix(&self.root)
+            .unwrap_or(path)
+            .to_string_lossy()
+            .replace('\\', "/")
+    }
+}
+
 /// `fusion.json`, which is what a workspace says about itself.
 ///
 /// **Optional, every key of it.** A rule needing something this does not carry

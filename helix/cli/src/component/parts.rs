@@ -36,7 +36,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::compositions::uncommented;
+use crate::component::text::uncommented;
 use crate::component::{sources, Context, Finding, Report};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -212,12 +212,7 @@ pub fn run(context: &Context) -> Report {
             continue;
         }
         checked += entry.documented.len();
-        let where_ = entry
-            .path
-            .strip_prefix(&context.root)
-            .unwrap_or(&entry.path)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&entry.path);
 
         for part in &entry.documented {
             if rendered.contains(part) {

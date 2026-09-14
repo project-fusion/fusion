@@ -104,11 +104,7 @@ pub fn run(context: &Context) -> Report {
                 continue;
             };
             read += 1;
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             let lines: Vec<&str> = text.split('\n').collect();
 
             /* Arrays of nodes, and whether a deep matcher is handed one.

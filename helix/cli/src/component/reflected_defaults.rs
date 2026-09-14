@@ -28,6 +28,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::line_of;
 use crate::component::{sources, Context, Finding, Report};
 
 /// The decorator, then the field or getter that follows it.
@@ -57,10 +58,6 @@ fn silent(initializer: Option<&str>) -> bool {
     }
 }
 
-fn line_of(text: &str, at: usize) -> usize {
-    text[..at].matches('\n').count() + 1
-}
-
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
@@ -72,11 +69,7 @@ pub fn run(context: &Context) -> Report {
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
 
             for found in REFLECTED.captures_iter(&text) {
                 let name = found.get(3).map_or("", |one| one.as_str());

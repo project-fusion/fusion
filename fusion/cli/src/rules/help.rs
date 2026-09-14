@@ -77,11 +77,7 @@ pub fn run(context: &Context) -> Report {
         if !DECLARES.is_match(&source) {
             continue;
         }
-        let where_ = file
-            .strip_prefix(&context.root)
-            .unwrap_or(&file)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(&file);
 
         /* Inside a clap type, by brace depth from the line that opens it. */
         let mut armed = false;

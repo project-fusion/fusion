@@ -51,14 +51,9 @@
 
 use std::collections::BTreeMap;
 use std::fs;
-use std::sync::LazyLock;
 
-use regex::Regex;
-
+use crate::component::text::COMMENT;
 use crate::component::{stylesheets, Context, Finding, Report};
-
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
 /// One block: every selector path that reaches it, and what it declares.
 struct Block {
@@ -172,11 +167,7 @@ pub fn run(context: &Context) -> Report {
             let Ok(css) = fs::read_to_string(&sheet) else {
                 continue;
             };
-            let where_ = sheet
-                .strip_prefix(&context.root)
-                .unwrap_or(&sheet)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&sheet);
             checked += 1;
 
             /* Path to the blocks written at it, in source order, which is the

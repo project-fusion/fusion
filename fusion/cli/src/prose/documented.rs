@@ -414,11 +414,7 @@ pub fn run(context: &Context) -> Report {
         let Ok(text) = fs::read_to_string(page) else {
             continue;
         };
-        let where_ = page
-            .strip_prefix(&context.root)
-            .unwrap_or(page)
-            .to_string_lossy()
-            .replace('\\', "/");
+        let where_ = context.relative(page);
 
         /* Whether a mention here is prose explaining that the thing is not real:
         the sentence it sits in says so, or the words immediately before it do. */

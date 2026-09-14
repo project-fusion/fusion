@@ -31,6 +31,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::uncommented;
 use crate::component::{sources, Context, Finding, Report};
 
 static OBSERVER: LazyLock<Regex> = LazyLock::new(|| {
@@ -38,27 +39,9 @@ static OBSERVER: LazyLock<Regex> = LazyLock::new(|| {
         .expect("a literal pattern compiles")
 });
 
-static BLOCK_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
-
-static LINE_COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"//[^\n]*").expect("a literal pattern compiles"));
-
 /// A call on `this`, which is how a lifecycle hook reaches its builder.
 static CALLED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"this\.(\w+)\s*\(").expect("a literal pattern compiles"));
-
-/// Comments blanked to spaces, keeping every later offset where it was.
-fn uncommented(text: &str) -> String {
-    let blank = |found: &regex::Captures| -> String {
-        found[0]
-            .chars()
-            .map(|one| if one == '\n' { '\n' } else { ' ' })
-            .collect()
-    };
-    let once = BLOCK_COMMENT.replace_all(text, &blank);
-    LINE_COMMENT.replace_all(&once, &blank).into_owned()
-}
 
 /// The body of a named method, by brace matching from its signature.
 ///
@@ -167,11 +150,7 @@ pub fn run(context: &Context) -> Report {
                 detail: "Rebuilding the observer is not enough on its own: it has to be \
                          registered on something."
                     .to_owned(),
-                file: file
-                    .strip_prefix(&context.root)
-                    .unwrap_or(&file)
-                    .to_string_lossy()
-                    .replace('\\', "/"),
+                file: context.relative(&file),
                 message: "disconnects an observer and never observes again, so it watches \
                           nothing after a reorder"
                     .to_owned(),

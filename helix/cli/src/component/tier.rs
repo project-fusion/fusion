@@ -81,11 +81,7 @@ pub fn run(context: &Context) -> Report {
                  from the prefix it inherited.",
                 over.prefix
             ),
-            file: twin
-                .strip_prefix(&context.root)
-                .unwrap_or(&twin)
-                .to_string_lossy()
-                .replace('\\', "/"),
+            file: context.relative(&twin),
             message: "inherits a `this.tag()` call and does not override `tier`, so it renders \
                       base children into its own shadow root"
                 .to_owned(),

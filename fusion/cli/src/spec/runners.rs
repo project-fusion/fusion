@@ -91,11 +91,7 @@ pub fn run(context: &Context) -> Report {
         }
 
         for file in specs {
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let where_ = context.relative(&file);
             let Some((_, runner)) = runners
                 .iter()
                 .find(|(suffix, _)| where_.ends_with(suffix.as_str()))

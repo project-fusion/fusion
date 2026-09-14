@@ -27,6 +27,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::text::uncommented;
 use crate::component::{sources, Context, Finding, Report};
 
 /// The registered words, each with the one question it answers.
@@ -55,9 +56,6 @@ const REFUSED: [(&str, &str); 1] = [("wrapper", "container")];
 static PART: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"part="([a-z0-9 -]+)""#).expect("a literal pattern compiles"));
 
-static COMMENT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/|//[^\n]*").expect("a literal pattern compiles"));
-
 pub fn run(context: &Context) -> Report {
     let roles: BTreeMap<&str, &str> = ROLES.into_iter().collect();
     let refused: BTreeMap<&str, &str> = REFUSED.into_iter().collect();
@@ -71,17 +69,8 @@ pub fn run(context: &Context) -> Report {
             let Ok(raw) = fs::read_to_string(&file) else {
                 continue;
             };
-            let code = COMMENT.replace_all(&raw, |found: &regex::Captures| {
-                found[0]
-                    .chars()
-                    .map(|one| if one == '\n' { '\n' } else { ' ' })
-                    .collect::<String>()
-            });
-            let where_ = file
-                .strip_prefix(&context.root)
-                .unwrap_or(&file)
-                .to_string_lossy()
-                .replace('\\', "/");
+            let code = uncommented(&raw);
+            let where_ = context.relative(&file);
 
             for found in PART.captures_iter(&code) {
                 let whole = found.get(0).expect("group zero always matches");
