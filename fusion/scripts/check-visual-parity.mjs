@@ -129,24 +129,16 @@ if (sources > bundled) {
 }
 
 /**
- * The three that are not compared, each with what was measured rather than a name.
+ * What is not compared, each with what was measured rather than a name.
  *
  * **An exception here is a recorded fact, not a silenced failure**, which is why
  * each carries its numbers: a reader can re-run the measurement and take the
- * entry out. Two are the harness meeting something it cannot hold still even across a
- * retry, and one is a real difference between the two idioms.
+ * entry out. The user agent's video controls were listed here, measured at 22,
+ * 34 and 122 differing pixels across retries; on 14 Sep 2026 they matched twice
+ * on ubuntu-latest and the entry was spent, which is the rule this check keeps.
+ * What remains is a real difference between the two idioms.
  */
 const UNCOMPARED = new Map([
-  [
-    'styled/video/native',
-    /* The native control strip is the user agent's own shadow DOM, and nothing
-       here reaches it: `animations: 'disabled'` covers author animations, the
-       settle loop covers author layout, and `reducedMotion` covers a canvas that
-       offers a still frame. This offers none: it differs every time by a
-       different amount and survives the retry, measured at 22, 34 and 122
-       pixels, all of it inside the controls. */
-    "the user agent's own video controls, which no wait or retry here can settle",
-  ],
   [
     'styled/outline/events',
     /* A real difference between the idioms, and the React side is the honest
