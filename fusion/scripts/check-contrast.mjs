@@ -309,7 +309,7 @@ for (const mode of ['light', 'dark']) {
             const paint = masked ? null : parse(style.backgroundColor)
             /* **A modal's scrim is a `::backdrop` and has no node**, so a walk
              that steps past it measures a glass drawer over the page rather than
-             over the scrimmed page — wrong in the optimistic direction, since
+             over the scrimmed page, wrong in the optimistic direction, since
              the scrim pulls the ground toward the middle and a translucent panel
              carries that through to its own inks.
              `getComputedStyle` reads a pseudo-element by name, and an element

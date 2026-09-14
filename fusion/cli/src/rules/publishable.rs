@@ -38,7 +38,7 @@
 //! A product spanning two package managers carries a version in each, and a
 //! release pushes its tag whether or not a crate ever leaves: the day somebody
 //! turns publishing on is the day the tag starts claiming a release no workflow
-//! performs. A crate may not inherit its version from the workspace either —
+//! performs. A crate may not inherit its version from the workspace either:
 //! one value cannot be two products, and whichever stamped last would win.
 
 use std::collections::BTreeSet;

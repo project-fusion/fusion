@@ -189,7 +189,7 @@ describe('conventionLint', () => {
   })
 
   test('rejects an em dash', () => {
-    expect(lintOf({ description: 'Does a thing — nicely.' })).toThrow(/no-em-dash/)
+    expect(lintOf({ description: 'Does a thing \u2014 nicely.' })).toThrow(/no-em-dash/)
   })
 
   test('rejects a missing class description', () => {

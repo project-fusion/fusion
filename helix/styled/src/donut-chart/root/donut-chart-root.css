@@ -57,7 +57,7 @@
 }
 
 /* The hole tells its contents how big it is, twice, because one number cannot
-   say it to everything. **`font-size` is what plain content comes out at** —
+   say it to everything. **`font-size` is what plain content comes out at**:
    anything slotted that does not resize itself. **`--stat-value-size` is what a
    `Stat` comes out at**, said separately because a `Stat` multiplies what it
    inherits by a little over three: a single base tuned to that multiplier sizes

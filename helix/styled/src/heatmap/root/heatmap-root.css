@@ -109,8 +109,8 @@
    no pointer events, so it can never eat the hover that summoned it. */
 /* **A pixel rather than nothing, because a rect of no area is not trackable.**
    This is the point the bubble hangs off, and it was written with no size at
-   all. `Tooltip` names the failure in its own source — an element that draws
-   nothing "took the bubble to the corner of the window" — and the descent that
+   all. `Tooltip` names the failure in its own source (an element that draws
+   nothing "took the bubble to the corner of the window"), and the descent that
    guards against it runs only on the slotted path, where reaching it through
    `for`, as a chart does, takes the element as given.
 

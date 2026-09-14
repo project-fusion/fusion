@@ -128,8 +128,8 @@
 
 /* **The mark keeps its ink when the field is wrong.** The box's edge is what
    says so, above, and it says it whether the box is ticked or not. Coloring
-   the tick as well asks one shape to carry two facts — that this is chosen, and
-   that something about the set is invalid — and the second is not a property of
+   the tick as well asks one shape to carry two facts (that this is chosen, and
+   that something about the set is invalid), and the second is not a property of
    the choice: a required group with nothing ticked is the invalid case, and
    there the reader is being told about the group rather than about the tick. */
 

@@ -79,7 +79,7 @@ describe('across a range', () => {
 describe("the release's own commit", () => {
   /* `release.yml` writes a commit after publishing, and that commit lands
      inside the window the next run reads from the tag. Spelled `chore(helix)`
-     it releases, so every release becomes the cause of the next one — release,
+     it releases, so every release becomes the cause of the next one: release,
      stamp, release, forever, whatever the merge contained. It was spelled that
      way for one merge and both domains re-released on the following push.
 

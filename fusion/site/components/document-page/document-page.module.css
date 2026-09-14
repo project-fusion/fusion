@@ -62,7 +62,7 @@
   /* **The measure plus the gutter, rather than a number in `ch`.** A `ch` on the
      shell resolves against the *shell's* font size rather than the body's, so it
      never counts the characters it looks like it counts, and the cap is a border
-     box whose padding came from `[data-shell]` — a gutter meant to hold full
+     box whose padding came from `[data-shell]`, a gutter meant to hold full
      width layouts off the viewport edge. Measured, the line got *shorter* as the
      screen got wider: 80 characters at 1440 and 85 at 1024, both past the point
      where the eye loses the line. */
@@ -79,7 +79,7 @@
    sets the kicker at `text-xs` with `tracking-wide`, right for a form label and
    too quiet for the line above a document's title: it reads as a stray word
    rather than as the class of thing the page is. **Sentence case, not
-   capitals** — an eyebrow reading `ACCEPTABLE USE` shouts a filing label at
+   capitals**: an eyebrow reading `ACCEPTABLE USE` shouts a filing label at
    somebody who came to read a policy, and would be the only place on the site
    that shouts. */
 .documentKicker {

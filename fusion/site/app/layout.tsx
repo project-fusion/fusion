@@ -91,8 +91,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
          * *What the reader chose, applied before the first pixel.**
          *
          * Two things: the color mode, and the palette they derived on the
-         * landing page. One script, because they are one concern — appearance
-         * restored from storage — and because the second of two
+         * landing page. One script, because they are one concern (appearance
+         * restored from storage), and because the second of two
          * `beforeInteractive` scripts is not emitted, measured: only the first
          * reached the document, so the palette silently never restored.
          *

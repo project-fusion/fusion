@@ -207,7 +207,7 @@ rejected by two rules rather than one: *"Changes must be made through a pull
 request"* and *"Required status check `verify` is expected"*. That list exempts
 an actor from the pull request requirement and from nothing else, so `[skip ci]`
 made the rejection certain. `main` is governed by a ruleset now, where a bypass
-actor skips every rule in it — so moving `main` back to classic protection would
+actor skips every rule in it, so moving `main` back to classic protection would
 break the stamp step without touching any file here.
 
 **The bypass is the cost and it is worth naming.** `version.mjs` refused to write
@@ -227,7 +227,7 @@ is one bot push whose content is known, and there it is a contributor's head
 commit suppressing the checks that were going to judge their own diff. GitHub
 honors the markers anywhere in the head commit's message, body included, so on
 2 Sep 2026 a commit whose body *explained* the hazard suppressed every `verify`
-run on its own pull request — no run, no error, a required check that never
+run on its own pull request: no run, no error, a required check that never
 reported, and BLOCKED. Four re-triggers carried the same message and failed the
 same way, which reads as broken infrastructure rather than as the diff.
 

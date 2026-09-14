@@ -84,7 +84,7 @@ export const writeSiteTheme = (theme: Omit<StoredTheme, 'version'>): void => {
  * because it is not obvious: the caller registers this as an effect cleanup,
  * and React runs effects mount, cleanup, mount under StrictMode, which
  * `next.config.ts` turns on. So on load the attribute was set by the script,
- * stripped here, and set again — and in the frame between, `light-dark()` fell
+ * stripped here, and set again. In the frame between, `light-dark()` fell
  * back to `prefers-color-scheme`, `--helix-color-background` resolved light,
  * and the aura read that value once to decide which half of its palette to
  * draw: a full-viewport field at light-mode brightness under chrome that is

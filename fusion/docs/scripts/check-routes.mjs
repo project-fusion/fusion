@@ -104,7 +104,7 @@ for (const route of all) {
   } else if (!/^---\n[\s\S]*?\n---\n/.test(body)) {
     problems.push(`${route.path}: its frontmatter block is not closed`)
   }
-  if (body.includes('—')) {
+  if (body.includes('\u2014')) {
     problems.push(`${route.path}: its document contains an em dash`)
   }
 }

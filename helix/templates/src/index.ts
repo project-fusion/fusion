@@ -42,8 +42,8 @@ export interface Template {
  *
  * **There is no build-free HTML template, and that is a fact about the packages
  * rather than an omission.** `@fusion.dev/helix`'s published entry re-exports
- * bare specifiers — `@fusion.dev/helix-core`, ninety-odd
- * `@fusion.dev/helix-headless/*` subpaths, `lit` and its own graph — which a
+ * bare specifiers (`@fusion.dev/helix-core`, ninety-odd
+ * `@fusion.dev/helix-headless/*` subpaths, `lit` and its own graph), which a
  * browser cannot resolve without an import map covering all of it. An import map
  * that large is a build artifact wearing a template's clothes. The honest
  * build-free story is a CDN that rewrites the graph, which wants the packages

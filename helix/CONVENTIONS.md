@@ -736,7 +736,7 @@ enough.** Select's panel took `md` from the commit that created the file,
 against its own trigger's `sm`. Megamenu took `md` with a size argument
 available and never written down. Tour's bubble took `md` under a comment
 reading "which is `Popover`'s panel by another name and is deliberately the same
-shape" — and Popover is `sm`. The convention was recorded, in the right file,
+shape", and Popover is `sm`. The convention was recorded, in the right file,
 directly above the declaration that broke it, and it held for exactly as long as
 nobody had to act on it.
 
@@ -1731,7 +1731,7 @@ tell a reader it is about a swallowed submit. `@summary` rather than
 `src/<family>/.examples` and records slug and description on the family's root
 declaration. **The site must not walk that folder itself**: it is a consumer, and
 reading the library's source tree to find out what a component ships reaches past
-the published interface. The markup stays on disk — it is the sandbox's payload,
+the published interface. The markup stays on disk: it is the sandbox's payload,
 it is large, and every consumer parses this manifest whether or not it renders
 one.
 

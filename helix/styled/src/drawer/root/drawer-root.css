@@ -100,7 +100,7 @@
    `[part="panel"]::backdrop` paints behind the panel, so the `backdrop-filter`
    above reads the page with the scrim already over it. Measured on a white page:
    the scrim takes the ground to L 0.66, and 30 per cent white over that lands at
-   L 0.76 — a mid gray panel where `surface-overlay` white was meant.
+   L 0.76, a mid gray panel where `surface-overlay` white was meant.
    `translucent-strong` lands at 0.96. Dark has no such problem, a dim page under
    a dim scrim being what the blur is for, so it keeps the lighter mix.
 

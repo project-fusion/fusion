@@ -5,7 +5,7 @@
      through its value.** Written out as `space-2xl` this said "the same as the
      header" and meant "48px", which stops being the same thing below 48rem: the
      header takes its inset down to `space-md` there and this went on spending 48
-     a side. On a 375px phone that is 96px of padding around a 279px measure — a
+     a side. On a 375px phone that is 96px of padding around a 279px measure, a
      quarter of the screen held empty to match a header that had already stopped
      matching. */
   --site-inset: var(--site-chrome-inset);

@@ -1,8 +1,8 @@
 //! Nothing in this tree is a file a tool left behind.
 //!
 //! **A tool writes an entry module, measures it, and does not delete it.** The
-//! bundle-size measurement writes a one-line module — `import` the thing, bundle
-//! it, weigh the output — and it has to write it *inside* the workspace, because
+//! bundle-size measurement writes a one-line module (`import` the thing, bundle
+//! it, weigh the output), and it has to write it *inside* the workspace, because
 //! the module names a package by its scoped name and resolution walks up from
 //! the file. A module in the system temp directory resolves nothing.
 //!
@@ -17,23 +17,23 @@
 //! output belongs in `dist`, which is not read here. Measured on the day this
 //! was written: after those five were deleted, the three domains held zero `.js`
 //! files between them. So the rule needs no allowlist and no judgment about what
-//! a file is for — it asks the one question that separates what a person wrote
+//! a file is for: it asks the one question that separates what a person wrote
 //! from what a tool dropped.
 //!
 //! **What a package publishes as a directory is output, and is skipped.** The
 //! walk already skips `dist` and the rest by name, and one package builds its
-//! WebAssembly glue into a directory of its own — generated `.js`, and correctly
+//! WebAssembly glue into a directory of its own: generated `.js`, and correctly
 //! there. Rather than adding that name to the shared list, this reads each
 //! manifest's `files`: a directory a package declares as published output is
 //! output by the package's own account, which stays true for the next one.
 //!
 //! **The second half is the suffix, and it reaches the root.** A file ending in
 //! `.bak`, `.orig`, `.rej`, `.tmp` or a tilde is an editor's, a patch's or a
-//! hand's — nobody writes one on purpose and nothing imports one. Two were
+//! hand's: nobody writes one on purpose and nothing imports one. Two were
 //! tracked when this was widened: a copy of a generated stylesheet module at the
 //! repository root, and an empty `.css.tmp` beside the example whose stylesheet
 //! it was a draft of. The first had been in the tree for a day and was picked up
-//! by a comment sweep that rewrote it, which is what a stray costs — it is not
+//! by a comment sweep that rewrote it, which is what a stray costs: it is not
 //! inert, it is one more file every sweep has to touch.
 //!
 //! **The root is where things get dropped and nothing else looks.** The `.js`
@@ -43,7 +43,7 @@
 //!
 //! **What it does not catch, said plainly.** Scratch written as `.ts` or `.mjs`
 //! is indistinguishable from source to this rule, and it will pass. The general
-//! version — a tracked file nothing reaches — is the one worth wanting and is
+//! version (a tracked file nothing reaches) is the one worth wanting and is
 //! not writable without an allowlist: an ambient `.d.ts` is reached by the
 //! compiler's `include` and never by name, and a generated `.css.ts` is reached
 //! by a bundler convention, so both look exactly like the strays. A rule with a

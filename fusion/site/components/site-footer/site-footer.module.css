@@ -25,7 +25,7 @@
 }
 
 /* The lockup: a mark in its own column, both lines of type in the other. **Not a
-   row with a line beneath it**, which gives the block two left edges — the mark
+   row with a line beneath it**, which gives the block two left edges: the mark
    and the tagline start at the block's edge while the name begins past the mark,
    so a three-line lockup has a step in it. **The indent is derived**: whatever
    the mark's column turns out to be plus the gap, so a mark that changes size

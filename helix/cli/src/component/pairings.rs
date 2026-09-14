@@ -17,7 +17,7 @@
 //! **The pairs are read from what the engine emitted, never from its source.**
 //! Every status ink's grounds are built by a loop no pattern can see, so
 //! matching the model's source with a regular expression leaves twenty pairs
-//! unchecked — which is exactly the case a status fill painted by hand lands in.
+//! unchecked, which is exactly the case a status fill painted by hand lands in.
 //! The oracle is the emitted answer and the engine's own test suite asserts
 //! against it, so it cannot go stale without that suite going red.
 

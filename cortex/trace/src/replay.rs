@@ -210,7 +210,7 @@ impl Graph {
     ) -> Result<Replay> {
         // Without this, a target the graph does not hold produces an empty plan,
         // an empty divergence list, and a `target` id naming nothing in the
-        // graph returned — a clean-looking report of no drift, from a replay
+        // graph returned: a clean-looking report of no drift, from a replay
         // that ran nothing.
         if self.get(target).is_none() {
             return Err(Error::Missing(target));

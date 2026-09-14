@@ -1,5 +1,5 @@
 /* `1lh` is the line the orb sits on, so it matches the text beside it without
-   either being told the other's size — the same reason a loader inside a button
+   either being told the other's size, the same reason a loader inside a button
    is sized in `em`. The mesh is chosen from the rendered box rather than from
    the `size` attribute, so an orb this small is drawn with fewer, fatter dots
    and a narrower tonal range instead of the large mesh scaled down. */

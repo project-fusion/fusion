@@ -10,7 +10,7 @@
 //! derives. The convention that makes them checkable is that *in these two files
 //! a number written as a word is the family count or the folder count, and every
 //! other count is written as digits.* Matching on the noun beside the number
-//! cannot work — "stated once rather than fifty-seven times" carries no noun —
+//! cannot work ("stated once rather than fifty-seven times" carries no noun),
 //! and forbidding every number word flags a true sentence about how many cards
 //! move. Digits for anything else costs the prose nothing and makes the check
 //! total rather than heuristic.
@@ -197,7 +197,7 @@ pub fn run(context: &Context) -> Report {
     /* Folders that are *families*, which is the question the prose answers: how
     many more entries there are than there are components in the styled tier. A
     directory with an `index.ts` is what the barrel exports, and it is the
-    difference that matters — `field/` holds the shared field stylesheets,
+    difference that matters: `field/` holds the shared field stylesheets,
     exports nothing and has no element, and counting it makes this check
     disagree with correct prose. */
     let folders = fs::read_dir(context.root.join(&gallery.families))
@@ -255,7 +255,7 @@ pub fn run(context: &Context) -> Report {
     passes it whatever that entry draws, including nothing. A shape with
     `fill="none"` and a stroke width has no paint of its own, so it takes one
     from a class or it is invisible, and the fault is a name that looks like
-    paint and is not — one that only animates, or one never defined anywhere.
+    paint and is not: one that only animates, or one never defined anywhere.
     Read off the stylesheet rather than listed here, so a new paint class works
     the day it is written and a renamed one fails the same day. */
     let rule =

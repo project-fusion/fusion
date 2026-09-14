@@ -115,7 +115,7 @@
  * The reveal above is a curtain: the bottom inset runs from 100% to nothing, so
  * the panel appears top to bottom across its whole width. That is right for
  * `full`, which spans the page and has no corner to belong to. A narrow panel
- * does have one — the trigger it is anchored under — and sweeping its whole
+ * does have one (the trigger it is anchored under), and sweeping its whole
  * width down reads as a band unrelated to the thing that opened it.
  *
  * So the right inset starts at 100% as well, and the panel opens rightwards and

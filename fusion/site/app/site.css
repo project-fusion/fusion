@@ -254,7 +254,7 @@ helix-drawer {
    `backdrop-filter` therefore reads the page with the scrim already over it.
    Measured on a white page: the scrim is `oklch(0.15)` at 40 percent, taking the
    ground to L 0.66, and `--helix-material-translucent` at 30 percent white over
-   that lands at L 0.76 — a mid gray panel that should have read as a white
+   that lands at L 0.76, a mid gray panel that should have read as a white
    overlay. `translucent-strong` at 88 percent lands at 0.96.
 
    **Not a media query, which is how this was wrong before.** It was scoped to

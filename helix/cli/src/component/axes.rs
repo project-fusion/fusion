@@ -2,7 +2,7 @@
 //!
 //! **One word for one question, and nobody invents a value.** A vocabulary that
 //! drifts is one a consumer cannot predict: they learn `outlined` on a button
-//! and guess wrong at a card, and a wrong guess is not an error — the element
+//! and guess wrong at a card, and a wrong guess is not an error: the element
 //! keeps its default and the page looks deliberate.
 //!
 //! **`appearance` is refused outright.** It held four axes at once: where a
@@ -13,7 +13,7 @@
 //! **A visual axis belongs to the layer that paints.** `tone` and `shape` are
 //! the two exceptions and both are principled: `tone` says what a thing *means*,
 //! and meaning survives having no stylesheet, while `shape` says what gets
-//! *rendered* — a meter at `ring` emits an arc rather than a bar, so the markup
+//! *rendered*: a meter at `ring` emits an arc rather than a bar, so the markup
 //! differs before any rule is written. `emphasis`, `material` and `separation`
 //! say how a thing is painted, so on a base layer they are a promise nobody
 //! keeps.
@@ -30,7 +30,7 @@
 //! component *should* have an axis needs a reading of what it is for, and a rule
 //! that guessed would file work that is wrong more often than right. What a
 //! pattern can see is families that owe each other an answer and give different
-//! ones — a legend whose swatches are solid while the bars they key are outlined
+//! ones: a legend whose swatches are solid while the bars they key are outlined
 //! is a legend that does not match its own chart, and nothing else could see
 //! that. Failing would pressure someone into declaring an axis to silence it.
 

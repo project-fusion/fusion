@@ -31,7 +31,7 @@
   /* The way back, which only a consumer controlling `open` ever takes, and it
      is the arrival's curve for the same reason the arrival has it: something
      coming into view comes to rest. The opacity is the movement's length here
-     too — a message that reappeared in 120ms while sliding for 200ms was
+     too: a message that reappeared in 120ms while sliding for 200ms was
      already solid before it had arrived. */
   transition:
     grid-template-rows var(--helix-duration-normal) var(--helix-easing-decelerate),

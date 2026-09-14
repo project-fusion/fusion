@@ -19,7 +19,7 @@
 //! **And every `::part()` written from outside is held to naming one that
 //! exists.** Sheets, examples, documentation and a site alike: a selector naming
 //! a part nothing publishes is dead in all four and silent in all four. Nothing
-//! else looks there — the rules about parts read a component's own sheet and
+//! else looks there: the rules about parts read a component's own sheet and
 //! stop.
 
 use std::collections::{BTreeMap, BTreeSet};

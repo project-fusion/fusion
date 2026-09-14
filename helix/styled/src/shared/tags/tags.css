@@ -14,7 +14,7 @@
  *
  * **What is here is what is genuinely the row, which is less than it looks.**
  * Measured across the two sheets, eleven selectors were written in both and nine
- * of them are the *field frame* — the border, the hover and focus rings, the
+ * of them are the *field frame*: the border, the hover and focus rings, the
  * invalid state, the disabled treatment, the control reset. Input and nine other
  * families duplicate those too, so they are a separate question about a separate
  * shared sheet and not this one. Two selectors are the row.
@@ -90,7 +90,7 @@ button[part="rest"]:focus-visible {
 /* **The mark on the way back, sized here rather than left to the glyph sheet.**
    Filter Input carries `glyph.css` because it draws a clear button; Combobox
    does not carry it at all, and an `<svg>` with no dimensions fills the box it
-   is given — the failure Select's caret note measured at 247 pixels wide. This
+   is given: the failure Select's caret note measured at 247 pixels wide. This
    sheet is what both hosts share, so it is the one place the size can be stated
    once and be true of both. */
 button[part="rest"] svg {

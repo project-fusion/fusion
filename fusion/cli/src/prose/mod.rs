@@ -6,6 +6,7 @@
 //! is the subject, and a subject is what a noun is.
 
 pub mod art;
+pub mod dashes;
 pub mod dialect;
 pub mod documented;
 pub mod orphans;
@@ -23,6 +24,12 @@ pub fn all() -> Vec<Rule> {
             name: "art",
             run: Runner::Source(art::run),
             summary: "every family in the catalog has a gallery card, and the prose says how many",
+        },
+        Rule {
+            fix: None,
+            name: "dashes",
+            run: Runner::Source(dashes::run),
+            summary: "no prose or comment in this repository uses an em dash",
         },
         Rule {
             fix: Some(dialect::fix),

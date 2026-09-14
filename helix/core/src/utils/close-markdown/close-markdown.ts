@@ -15,7 +15,7 @@ const OPEN_TEXT = /!?\[[^\]]*$/
  * not been told it is code: a renderer handed that prefix draws paragraphs,
  * then redraws the whole block when the closing fence lands three seconds
  * later. The same holds for a backtick, a `**`, and a link whose target is
- * still being typed — each renders as punctuation until its partner arrives.
+ * still being typed: each renders as punctuation until its partner arrives.
  *
  * So this closes what is open. It does not parse markdown and does not render
  * it: it returns a string the caller's own renderer can be handed, in which

@@ -207,7 +207,7 @@ pub struct Report {
     ///
     /// **Here so the two command lines say the same thing.** `helix component`
     /// has carried notes since a rule needed to report something worth seeing
-    /// that must not fail, and `fusion` did not — so `--json`, which both
+    /// that must not fail, and `fusion` did not, so `--json`, which both
     /// promise on every verb as the contract, meant two shapes. Anything reading
     /// both had to know which it was holding, and `fusion helix` makes that a
     /// question one caller asks of one command.
@@ -282,7 +282,7 @@ impl Rule {
 ///
 /// **A function rather than a copy in each `all()`.** Three lists naming the
 /// same rule is three places for one of them to stop naming it, and a noun with
-/// no floor is a noun whose rules may quietly count nothing — which is the exact
+/// no floor is a noun whose rules may quietly count nothing, which is the exact
 /// failure the rule exists to catch, one level up.
 pub fn floor() -> Rule {
     Rule {

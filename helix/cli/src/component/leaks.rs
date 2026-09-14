@@ -13,7 +13,7 @@
 //! **What this deliberately cannot see.** Whether an add runs more often than
 //! its remove is a run-time argument that no count of source text can make, and
 //! a `removeEventListener` handed a different function object than the one added
-//! — which is every inline arrow — removes nothing while reading as if it does.
+//! (which is every inline arrow) removes nothing while reading as if it does.
 //! Both are why the fix is a field holding what is currently subscribed rather
 //! than a matching pair of calls.
 

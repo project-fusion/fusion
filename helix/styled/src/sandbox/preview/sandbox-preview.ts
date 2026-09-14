@@ -230,7 +230,7 @@ export class HelixSandboxPreview extends HelixElement {
      *
      * So the frame reports it and this element re-states it where the page can
      * hear it. A real `pointerdown` rather than a name of our own, because
-     * every light-dismiss in the library — and every one a consumer wrote —
+     * every light-dismiss in the library (and every one a consumer wrote)
      * already listens for exactly that, and what happened *was* a press. It
      * carries no coordinates for the reason the message does not: this element
      * is where it happened, as far as the page is concerned.

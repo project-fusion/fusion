@@ -217,8 +217,8 @@ export function ThemeBuilder({
    *
    * **The engine is WebAssembly and instantiates asynchronously**, so nothing
    * derives during server rendering unless it is arranged. Without this the
-   * first paint carries no palette and the slider ramps — drawn off the
-   * *derived* primary rather than the brand — appear 287ms after navigation,
+   * first paint carries no palette and the slider ramps (drawn off the
+   * *derived* primary rather than the brand) appear 287ms after navigation,
    * mostly hydration rather than transfer.
    */
   initialTheme: DerivedTheme

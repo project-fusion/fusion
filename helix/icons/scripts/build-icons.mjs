@@ -31,7 +31,7 @@ import { optimize } from 'svgo'
  * ids to single letters, which would take `fusion.svg`'s gradients with it: safe
  * today for the reason below, and not the day two icons carrying `#a` meet in
  * one tree. `removeViewBox` is the other one to watch and is *not* configured,
- * because it left `preset-default` — turning it off explicitly is a warning on
+ * because it left `preset-default`: turning it off explicitly is a warning on
  * every run about a plugin that is not there, and the box survives without it.
  * Asserted rather than assumed: every `viewBox` value is unchanged. The count
  * that was here went stale the first time an icon was added, which is what
@@ -81,8 +81,8 @@ const sourceFor = (slug) => {
      only decides silently: a name that exists in two of the three resolves to
      whichever sits higher, and the set builds, and the glyph on the page is not
      the one somebody added. Nothing about it looks wrong afterwards. There is no
-     collision today — `raw/` holds product and technology marks, and Phosphor
-     draws neither — so this costs nothing until the day it is the only thing
+     collision today (`raw/` holds product and technology marks, and Phosphor
+     draws neither), so this costs nothing until the day it is the only thing
      that says which one was meant. */
   const found = candidates.filter((file) => existsSync(file))
   if (found.length > 1) {

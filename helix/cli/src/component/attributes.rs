@@ -3,7 +3,7 @@
 //! **The reflection rule read from the consumer's side.** The library says
 //! reflect only what CSS selects on, which decides what a component publishes.
 //! Nothing says the reverse to whoever writes the CSS, so a document rule can
-//! reach for an attribute a component never promised — and it fails in exactly
+//! reach for an attribute a component never promised, and it fails in exactly
 //! one navigation mode.
 //!
 //! **The failure this exists for.** A theme builder routed two colored slider
@@ -20,7 +20,7 @@
 //! element and as an attribute when it does not, so there are three cases:
 //! declared and reflecting, where Lit writes the attribute back whichever way it
 //! was set; declared and not reflecting, where the attribute exists solely in
-//! server-rendered markup — **this is the bug**; and not declared at all, where
+//! server-rendered markup, **this is the bug**; and not declared at all, where
 //! React has nowhere to put it but an attribute.
 //!
 //! **The globals are exempt for the right reason.** Each *is* a property on
@@ -30,7 +30,7 @@
 //! `aria-` are exempt for the other reason: they are not properties at all.
 //!
 //! **Which components a rule reaches is read from the markup**, not guessed from
-//! the selector, because a rule may name a class rather than a tag — which is
+//! the selector, because a rule may name a class rather than a tag, which is
 //! exactly what the failing one did. A stylesheet reaches its own subtree, which
 //! is what a colocated layout means; a selector naming a tag outright is held to
 //! that tag instead, which is stricter and needs no guess about reach.

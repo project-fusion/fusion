@@ -51,7 +51,7 @@ static RELATIVE: LazyLock<Regex> = LazyLock::new(|| {
 ///
 /// **A generated module carries source as data.** One here holds a whole styled
 /// tier as documentation strings, decorators and all, and a bundler evaluates
-/// none of it — while the real definitions it was generated *from* are read by
+/// none of it, while the real definitions it was generated *from* are read by
 /// this walk in their own right, so nothing is lost by skipping it.
 ///
 /// Counting backticks was tried first, on the theory that an odd number before

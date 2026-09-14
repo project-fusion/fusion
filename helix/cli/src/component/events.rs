@@ -6,8 +6,8 @@
 //! tells anybody it exists.
 //!
 //! **The whole inheritance chain, not the class alone.** Half of what an element
-//! emits comes from a mixin — a controller mixin holding the cancelable change
-//! that is the only way to refuse one — and checking a class's own constructions
+//! emits comes from a mixin (a controller mixin holding the cancelable change
+//! that is the only way to refuse one), and checking a class's own constructions
 //! sees none of it.
 //!
 //! **Any construction, not only one inside a `dispatchEvent`.** Half of them are

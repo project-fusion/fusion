@@ -3,7 +3,7 @@
 //! **A bridge that finds a framework's own props by an internal prefix is a
 //! measurement, not a contract.** It is how every prefixed event handler
 //! survives hydration, and if the key is renamed or removed those handlers are
-//! silently dead again on any server-rendered page — no error, no warning, and
+//! silently dead again on any server-rendered page: no error, no warning, and
 //! the component works everywhere the page was not rendered on a server.
 //!
 //! **Both bundles**, because a key present in the development build and absent
@@ -14,7 +14,7 @@
 //! at all, and that binding at dispatch does not double up with the framework's
 //! own listener. Both are claims about one release's internals, and prose does
 //! not move when a dependency does. A note is true on a date, so a bump fails
-//! here until somebody re-runs the probe and moves the date — which is the only
+//! here until somebody re-runs the probe and moves the date, which is the only
 //! thing that makes the note worth trusting.
 
 use std::fs;

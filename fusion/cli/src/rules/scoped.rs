@@ -6,8 +6,8 @@
 //! loses a rule.
 //!
 //! **The bare name is easiest to miss inside a template literal**, and a
-//! descendant selector left behind in a global sheet — `.heroInstall code`,
-//! where `.heroInstall` has moved — is the same fault seen from the other side.
+//! descendant selector left behind in a global sheet (`.heroInstall code`,
+//! where `.heroInstall` has moved) is the same fault seen from the other side.
 //!
 //! **`:global()` names are exempt**, because that is exactly what the syntax is
 //! for: a rule reaching a name the module does not own.

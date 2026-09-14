@@ -31,8 +31,8 @@
 //! neither.
 //!
 //! **What is asked is which rung, not whether there is one.** A panel with no
-//! radius at all is a legitimate shape — a sheet that reaches the edge of the
-//! viewport has nothing to round against — and requiring one would fire on it.
+//! radius at all is a legitimate shape (a sheet that reaches the edge of the
+//! viewport has nothing to round against), and requiring one would fire on it.
 //! `radii-none` passes for the same reason: it is the vocabulary being used to
 //! say "square" out loud. What fails is a *different* rung, or a raw length,
 //! which is the drift actually observed.

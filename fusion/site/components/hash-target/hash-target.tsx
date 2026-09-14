@@ -25,7 +25,7 @@ const CAP = 10000
  * **What is watched is the heading's own place in the document**, which is the
  * thing that has to stop changing, and the two tidier signals both miss it. A
  * `requestAnimationFrame` loop never runs at all in a background tab, which is
- * exactly where a fragment link gets opened — middle-clicked out of a contents
+ * exactly where a fragment link gets opened: middle-clicked out of a contents
  * list. A `ResizeObserver` on the body sees the document's height and not its
  * contents: on `/helix/docs/metrics` a late reflow took 28 pixels out of the
  * page *above* the heading, which moved it without changing the height by a

@@ -273,7 +273,7 @@ for (const slug of slugs) {
   /* The rule is stated in AGENTS.md and nothing else enforces it in prose. It
      is checked here rather than in a sweep of its own because this is the one
      script that already reads every page. */
-  if (source.includes('—')) {
+  if (source.includes('\u2014')) {
     fail(slug, 'contains an em dash, which this repository does not use')
   }
 

@@ -318,7 +318,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      * for. The toggle in the settings menu still says otherwise.
      *
      * `panes` in the query is a statement about what to show, so a link that
-     * names its panes is honored at every width — the same reasoning the stored
+     * names its panes is honored at every width, the same reasoning the stored
      * syntax carries below. Only the default gives way. */
     const cramped = window.matchMedia('(max-width: 60rem)').matches
     const listed = new URLSearchParams(window.location.search).has('panes')

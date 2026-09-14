@@ -104,7 +104,7 @@ const dependencies = {}
 for (const [name, { directory }] of registryTag === undefined ? published : []) {
   /* **"Nothing to pack" is a build that did not run, so it can only be asked of
      a package that builds.** `@fusion.dev/helix-cli` ships a checked-in
-     `bin.mjs` and declares no `build` script, so `dist` is not missing — it was
+     `bin.mjs` and declares no `build` script, so `dist` is not missing: it was
      never going to exist, and the guard rejected the package before anything
      could look at it. */
   const own = JSON.parse(readFileSync(join(root, directory, 'package.json'), 'utf8'))
@@ -334,7 +334,7 @@ for (const name of packed) {
 
   /* **A binary is not a module, and probing it as one invents a promise the
      package never made.** `@fusion.dev/helix-cli` ships `bin.mjs` and nothing
-     else — no `exports`, no `main`, no `types` — so the probe wrote
+     else (no `exports`, no `main`, no `types`), so the probe wrote
      `import * as m from '@fusion.dev/helix-cli'` and TypeScript answered
      TS2307. That read as a packaging fault and was the manifest being correct.
      What such a package does promise is the binary, so that is what is checked. */

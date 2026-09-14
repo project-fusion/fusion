@@ -214,7 +214,7 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
 
          `collapseLabel` did not go: it is the accessible name now, so what a
          screen reader hears is still a phrase and still the consumer's to
-         translate. Both states carry a name for the same reason — `+3` says a
+         translate. Both states carry a name for the same reason: `+3` says a
          number and not what pressing it does. */
       return html`<button
         part="rest"

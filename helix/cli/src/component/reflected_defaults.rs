@@ -3,7 +3,7 @@
 //! **A reflected property with a default writes an attribute on upgrade that the
 //! server did not send**, which is a hydration mismatch a consumer reports and
 //! cannot patch up. The markup arrives without the attribute, the element
-//! upgrades, and the attribute appears — so the served HTML and the live DOM
+//! upgrades, and the attribute appears, so the served HTML and the live DOM
 //! disagree from the first frame, and nothing anywhere says so.
 //!
 //! **Three initializers are genuinely silent**: an absent one, an explicit

@@ -7,7 +7,7 @@
 //!
 //! **This is about the source and nothing else, and that is worth being exact
 //! about.** The published reference sorts by name before it renders, so a
-//! consumer never sees declaration order — which is the opposite of the doc
+//! consumer never sees declaration order, which is the opposite of the doc
 //! block, where the manifest carries the order straight onto the page and
 //! `tag-order` exists because of it. The argument here is only that a file with
 //! twelve properties in no order is hard to read, and that a mechanical order
@@ -28,7 +28,7 @@
 //! **Declaration order carries no meaning to sort away.** Measured before this
 //! was written: no `@property` field's initializer reads another field, so the
 //! order the class evaluates them in cannot change behavior. One component pairs
-//! a value with its default — `split` beside `defaultSplit` — and loses the
+//! a value with its default (`split` beside `defaultSplit`) and loses the
 //! adjacency; the reference page separates them anyway, and one pairing is not
 //! worth an exemption that has to be maintained.
 
@@ -78,7 +78,7 @@ fn declared(lines: &[&str]) -> Vec<Declared> {
         /* The block above it, in either shape it is written in: one line that
         opens and closes on itself, or a run whose last line is the closing
         delimiter alone. The single-line shape was the case this first missed,
-        and it fails the way that matters — the member sorts and its description
+        and it fails the way that matters: the member sorts and its description
         stays behind, attached to whatever landed there. */
         /* **Every comment above it, however many there are.**
         Three shapes are in this tree and only one is the obvious one: a block
@@ -162,7 +162,7 @@ fn sorted(source: &str) -> Option<String> {
     }
 
     /* Rebuilt rather than swapped, because the runs are different lengths and
-    everything between two of them — a method, a comment about the class — is
+    everything between two of them (a method, a comment about the class) is
     not a property and does not move. */
     let mut out: Vec<&str> = Vec::new();
     let mut cursor = 0;

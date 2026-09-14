@@ -208,7 +208,7 @@ const clearRoot = (): void => {
    *
    * A theme a reader asked to keep is theirs to leave on. Wiping it here makes
    * the palette survive a reload, because the pre-paint script restores it, and
-   * die on a click to the next page, because this runs on the way out — the
+   * die on a click to the next page, because this runs on the way out: the
    * worse of the two failures, since it looks like the feature works until you
    * navigate.
    *
@@ -340,7 +340,7 @@ export const ThemeScope = ({ children }: { children: ReactNode }) => {
       /* **Stored at the same moment it is painted, and storing the same
          thing.** The alternative was to save on a control's change handler,
          which would have written the settings a frame before the engine turned
-         them into a palette — and the palette is the half that has to be
+         them into a palette, and the palette is the half that has to be
          written, because it is what the pre-paint script restores. Saving here
          means what comes back is exactly what was on the screen.
          `touched` gates it, so a page that has painted nothing stores

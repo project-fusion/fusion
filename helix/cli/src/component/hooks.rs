@@ -7,7 +7,7 @@
 //!
 //! **A name a consumer cannot predict is one they never try**, and one they
 //! mistype resolves to nothing with no error to go on, so a hook is named after
-//! the family that owns it — the directory the component sits in, whichever of
+//! the family that owns it: the directory the component sits in, whichever of
 //! its elements declares the hook.
 //!
 //! **One public name, one owner.** Two layers of one family is inheritance; two
@@ -161,7 +161,7 @@ fn survey(context: &Context) -> Survey {
     **That package reads hooks without declaring any**, and that split is how one
     goes missing: the declaration stays in one place while the rule moves to
     another. It is derived from the sheets rather than named again, and an
-    application's own stylesheets are deliberately not here — a hook in one is
+    application's own stylesheets are deliberately not here: a hook in one is
     that application's, not a component's API. */
     let mut roots: Vec<std::path::PathBuf> = context.settings.roots(&context.root);
     for sheet in &context.settings.layer {
