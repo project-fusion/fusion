@@ -11,10 +11,15 @@
   },
   "type": "module",
   "exports": {
+    "./argv": "./lib/argv.mjs",
     "./emit": "./lib/emit.mjs",
     "./format-open-tags": "./lib/format-open-tags.mjs",
     "./formatted": "./lib/formatted.mjs",
+    "./frontmatter": "./lib/frontmatter.mjs",
+    "./literal": "./lib/literal.mjs",
     "./paint": "./lib/paint.mjs",
+    "./scope": "./lib/scope.mjs",
+    "./settle": "./lib/settle.mjs",
     "./theme-facts": "./lib/theme-facts.mjs",
     "./theme-intents": "./lib/theme-intents.mjs",
     "./workspace": "./lib/workspace.mjs"

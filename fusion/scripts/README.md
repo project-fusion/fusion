@@ -5,11 +5,16 @@ it is the workspace's own tooling.
 
 | Export | What it answers |
 |---|---|
-| `./workspace` | Where things are, so a generator does not hardcode a path |
+| `./argv` | `--name value` and `--name`, read the one way |
 | `./emit` | Writes a generated file, or under `--check` says which lines are behind |
-| `./formatted` | Runs biome over generated text, so nothing lands unformatted |
 | `./format-open-tags` | The one-attribute-per-line shape examples are written in |
+| `./formatted` | Runs biome over generated text, so nothing lands unformatted |
+| `./frontmatter` | The `key: value` block at the top of an MDX file, as strings |
+| `./literal` | Text as a quoted string or a template literal in a generated module |
 | `./paint`, `./theme-facts`, `./theme-intents` | The theme engine's shared vocabulary |
+| `./scope` | Which families a change reaches, for the checks that compare examples |
+| `./settle` | Waiting for an example to stop changing before it is photographed |
+| `./workspace` | Where things are, so a generator does not hardcode a path |
 
 The `.mjs` files beside them are the generators themselves, run as turbo tasks
 rather than imported: `build-elements-css.mjs`, `build-metrics.mjs`,

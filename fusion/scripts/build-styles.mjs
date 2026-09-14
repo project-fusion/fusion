@@ -18,7 +18,8 @@
  * Run with `turbo run styles` (part of `build`).
  */
 import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join, relative, sep } from 'node:path'
+import { template } from '@fusion.dev/scripts/literal'
 
 /* `.examples` holds the sandbox's own files, `<slug>.html` and `<slug>.css`.
    They are a consumer's stylesheet rather than a component's, read at runtime by
@@ -38,19 +39,13 @@ const IGNORED = new Set([
 /** The styles package ships raw CSS to consumers; it has no components. */
 const SKIP = /helix[/\\]styles[/\\]/
 
-const walk = function* (dir, suffix) {
-  for (const entry of readdirSync(dir)) {
-    if (IGNORED.has(entry)) {
-      continue
-    }
-    const full = join(dir, entry)
-    if (statSync(full).isDirectory()) {
-      yield* walk(full, suffix)
-    } else if (entry.endsWith(suffix)) {
-      yield full
-    }
-  }
-}
+const walk = (dir, suffix) =>
+  readdirSync(dir, { recursive: true })
+    .filter(
+      (entry) =>
+        entry.endsWith(suffix) && !entry.split(sep).some((segment) => IGNORED.has(segment)),
+    )
+    .map((entry) => join(dir, entry))
 
 /**
  * Removes comments and indentation from the CSS that ships. Nothing else.
@@ -121,16 +116,6 @@ const stripComments = (css) => {
     .trim()
 }
 
-/**
- * Escapes CSS for a template literal.
- *
- * Backticks and `${` would otherwise terminate the literal or start an
- * interpolation, turning a stylesheet into a syntax error or, worse, into an
- * expression that happens to parse.
- */
-const escapeForTemplate = (css) =>
-  css.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')
-
 const root = process.argv[2] ?? process.cwd()
 let written = 0
 
@@ -145,7 +130,7 @@ for (const file of walk(root, '.css')) {
   const source = `// Generated from ${rel} by \`turbo run styles\`. Do not edit.
 import { createSheet } from '@fusion.dev/helix-core'
 
-export const styles = createSheet(\`${escapeForTemplate(stripComments(css))}\`)
+export const styles = createSheet(\`${template(stripComments(css))}\`)
 `
 
   // Only write on change, so an unchanged run does not invalidate the cache.

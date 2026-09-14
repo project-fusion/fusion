@@ -301,16 +301,12 @@ const families = (dir) => {
 }
 
 /** Every file under a path, for the unpacked size of what `files` publishes. */
-const walk = (path, found = []) => {
-  if (statSync(path).isDirectory()) {
-    for (const entry of readdirSync(path)) {
-      walk(join(path, entry), found)
-    }
-  } else {
-    found.push(path)
-  }
-  return found
-}
+const walk = (path) =>
+  statSync(path).isDirectory()
+    ? readdirSync(path, { recursive: true })
+        .map((entry) => join(path, entry))
+        .filter((file) => statSync(file).isFile())
+    : [path]
 
 /** What one published package puts in `node_modules`, unpacked. */
 const footprint = (dir) => {
@@ -379,17 +375,10 @@ const stylesheets = await pooled(STYLESHEETS, async (sheet) => ({
 /* Which styled families reach for the headless barrel rather than the family
    they extend. Counted rather than claimed, because the paragraph that reads
    these numbers is the load-bearing one on the page. */
-const sources = (dir, found = []) => {
-  for (const entry of readdirSync(dir)) {
-    const path = join(dir, entry)
-    if (statSync(path).isDirectory()) {
-      sources(path, found)
-    } else if (path.endsWith('.ts') && !path.endsWith('.spec.ts')) {
-      found.push(path)
-    }
-  }
-  return found
-}
+const sources = (dir) =>
+  readdirSync(dir, { recursive: true })
+    .filter((entry) => entry.endsWith('.ts') && !entry.endsWith('.spec.ts'))
+    .map((entry) => join(dir, entry))
 
 const barrelled = new Set()
 for (const path of sources(join(root, 'helix/styled/src'))) {

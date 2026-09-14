@@ -38,12 +38,12 @@ import {
 } from 'node:fs'
 import { createServer } from 'node:http'
 import { join, relative } from 'node:path'
+import { scopeFor } from '@fusion.dev/scripts/scope'
+import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
-import { scopeFor } from './lib/scope.mjs'
-import { awaitStill, awaitUpgrades } from './lib/settle.mjs'
 
 /* The same two tiers `check:spec:visual` pictures, read the same way and for the
    same reason: a headless example is deliberately token-free and wants only its

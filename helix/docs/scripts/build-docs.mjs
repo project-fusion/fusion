@@ -27,6 +27,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
+import { frontmatter } from '@fusion.dev/scripts/frontmatter'
+import { quoted, template } from '@fusion.dev/scripts/literal'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const CONTENT = join(ROOT, 'helix/docs/content')
@@ -83,37 +85,6 @@ const check = process.argv.includes('--check')
 /** Every failure found, reported together rather than one run at a time. */
 const problems = []
 const fail = (slug, message) => problems.push(`${slug}: ${message}`)
-
-/**
- * The frontmatter of one page, as strings.
- *
- * Hand-parsed rather than pulled from a YAML library. The whole grammar here is
- * `key: value` at the top level, a dependency to parse nine of those is a
- * dependency a published content package would carry, and the parser refusing
- * anything it does not understand is what keeps the grammar that small.
- */
-const frontmatter = (slug, source) => {
-  const match = /^---\n([\s\S]*?)\n---\n/.exec(source)
-  if (!match) {
-    fail(slug, 'has no frontmatter block')
-    return undefined
-  }
-  const fields = {}
-  for (const line of match[1].split('\n')) {
-    const pair = /^([a-z]+): (.*)$/.exec(line)
-    if (!pair) {
-      fail(slug, `frontmatter line is not \`key: value\`: ${line}`)
-      continue
-    }
-    fields[pair[1]] = pair[2].replace(/^'(.*)'$/, '$1')
-  }
-  const keys = Object.keys(fields)
-  const sorted = [...keys].sort()
-  if (keys.join() !== sorted.join()) {
-    fail(slug, `frontmatter keys are ${keys.join(', ')}, want ${sorted.join(', ')}`)
-  }
-  return fields
-}
 
 /** The section titles `sections.ts` declares, and which of them are paths. */
 const declaredSections = () => {
@@ -317,7 +288,10 @@ for (const slug of slugs) {
     fail(slug, `renders <${tag} /> with no children, which is a hole in its \`.md\``)
   }
 
-  const fields = frontmatter(slug, source)
+  const { fields, problems: wrong } = frontmatter(source)
+  for (const problem of wrong) {
+    fail(slug, problem)
+  }
   if (!fields) {
     continue
   }
@@ -409,9 +383,6 @@ if (problems.length > 0) {
   process.exit(1)
 }
 
-/** A string literal. The formatter decides which quote it ends up in. */
-const quoted = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
-
 /** A page, as the source lines that reproduce it. */
 const literal = (page) =>
   [
@@ -466,10 +437,7 @@ const sources = `/**
 export const docSources: Record<string, string> = {
 ${slugs
   .map((slug) => {
-    const body = filled(readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8'))
-      .replace(/\\/g, '\\\\')
-      .replace(/`/g, '\\`')
-      .replace(/\$\{/g, '\\${')
+    const body = template(filled(readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')))
     const key = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(slug) ? slug : `'${slug}'`
     return `  ${key}: \`${body}\`,`
   })
