@@ -24,7 +24,7 @@ import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
-import type { Family } from '../../../../content/catalog/catalog'
+import type { Family, FamilyListing } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
 import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
@@ -42,7 +42,7 @@ import styles from './workbench.module.css'
  */
 
 interface Props {
-  families: Family[]
+  families: FamilyListing[]
   /** Where the palette can go, built on a server by the page above. */
   findable?: Findable[]
 }
@@ -108,10 +108,14 @@ const readArrangement = (): Arrangement => {
   }
 }
 
-const resolve = (families: Family[], familySlug: string | null, exampleSlug: string | null) => {
+const resolve = (
+  families: FamilyListing[],
+  familySlug: string | null,
+  exampleSlug: string | null,
+) => {
   const withExamples = families.filter((entry) => entry.examples.length > 0)
   const family =
-    withExamples.find((entry) => entry.slug === familySlug) ?? (withExamples[0] as Family)
+    withExamples.find((entry) => entry.slug === familySlug) ?? (withExamples[0] as FamilyListing)
   const example = family.examples.find((entry) => entry.slug === exampleSlug) ?? family.examples[0]
   return { example, family, withExamples }
 }
@@ -441,7 +445,60 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     return kept.some((entry) => entry.examples.length > 0) ? kept : families
   }, [families, wanted])
 
-  const { example, family, withExamples } = resolve(inTier, familySlug, exampleSlug)
+  const { example: listed, family, withExamples } = resolve(inTier, familySlug, exampleSlug)
+
+  /* **The sources arrive per family, when it is opened.** What the page hands
+     down is a listing, names and addresses, because the whole catalog crossing
+     as a prop put every example's three sources in the RSC payload to draw a
+     rail of names. The family's own JSON under `public/helix/components/` is
+     the catalog entry verbatim, written beside its markdown by the same
+     generator, so it is the one source and not a second shape of it.
+
+     Held per family rather than per example, since a family's file carries
+     all of its examples and switching between them is the common move.
+     Waits for the address to be read: the first render's family is the first
+     in the list, and fetching that one for a link that names another is a
+     file nobody asked for. */
+  const [sources, setSources] = useState<Record<string, Family>>({})
+  useEffect(() => {
+    const slug = family.slug
+    if (!read || sources[slug]) {
+      return
+    }
+    let canceled = false
+    const load = async (): Promise<void> => {
+      let loaded: Family
+      try {
+        const response = await fetch(`/helix/components/${slug}.json`)
+        if (!response.ok) {
+          throw new Error(`${response.status} ${response.statusText}`)
+        }
+        loaded = (await response.json()) as Family
+      } catch (cause) {
+        console.error(`sandbox: the examples of ${slug} could not be loaded`, cause)
+        return
+      }
+      if (!canceled) {
+        setSources((held) => ({ ...held, [slug]: loaded }))
+      }
+    }
+    void load()
+    return () => {
+      canceled = true
+    }
+  }, [family.slug, read, sources])
+
+  /* The listed example with its sources, or nothing until they have arrived.
+     Matched on the tier as well as the slug: both tiers call their headline
+     `preview`, and the family's file carries both. */
+  const example = useMemo(() => {
+    if (!listed) {
+      return undefined
+    }
+    return sources[family.slug]?.examples.find(
+      (one) => one.slug === listed.slug && one.tier === listed.tier,
+    )
+  }, [family.slug, listed, sources])
 
   /* **An example opens in the layout it declares.** `@layout` is authored
      knowledge about the example, the same annotation the reference page's
@@ -452,10 +509,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      and not on the first example of a load whose address named a layout, which
      is a link saying how it should be seen. */
   useEffect(() => {
-    if (!read || !example) {
+    if (!read || !listed) {
       return
     }
-    const key = `${family.slug}/${example.slug}`
+    const key = `${family.slug}/${listed.slug}`
     if (layoutFor.current === key) {
       return
     }
@@ -464,9 +521,9 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     if (first && layoutAddressed.current) {
       return
     }
-    const declared = LAYOUTS.find((one) => one.value === example.layout)
+    const declared = LAYOUTS.find((one) => one.value === listed.layout)
     setLayout(declared?.value ?? DEFAULTS.layout)
-  }, [read, family.slug, example])
+  }, [read, family.slug, listed])
   const current = SYNTAXES.find((entry) => entry.value === syntax) ?? SYNTAXES[0]
 
   const select = useCallback((value: string) => {
@@ -887,7 +944,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     }
   }, [branches, family.slug])
 
-  const chosen = example ? `${family.slug}/${example.slug}` : undefined
+  const chosen = listed ? `${family.slug}/${listed.slug}` : undefined
 
   /* And then show the reader where they are.
    *
@@ -979,7 +1036,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   /* Every hook is above this, and has to be: an early return past one changes
      how many run, which is the rule React has no way to recover from. The tree
      effect in particular reads nothing this branch decides. */
-  if (!example) {
+  if (!listed) {
     return (
       <helix-text as="p" emphasis="subtle">
         No examples are shipped yet.
@@ -987,7 +1044,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     )
   }
 
-  const activeValue = chosen ?? `${family.slug}/${example.slug}`
+  const activeValue = chosen ?? `${family.slug}/${listed.slug}`
 
   /* A family matching by name keeps all of its examples, because the reader
      asked for the component and not for a particular one of its pages. A family
