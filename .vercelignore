@@ -4,19 +4,11 @@
 # its dependencies are built from source. That would otherwise upload a great
 # deal the build has no use for.
 #
-# Leading slash matters: `docs/` is a gitignore-style pattern and would also
-# match `cortex/docs` and `helix/docs`, which are workspace members. Excluding
-# those breaks `bun install` before the build starts.
-#
-# `fusion/docs/insights` is `@fusion.dev/insights`, a workspace member the site
-# depends on, so the folder itself can never be excluded.
-#
-# So the pattern names the files rather than the folder. The two markdown
-# documents left at the top of `fusion/docs/` are generated references, neither
-# read by anything on the build path and both repository-internal, which
-# `fusion/site/app/helix/tokens.json/route.ts` says of the token reference in as
-# many words.
-/fusion/docs/*.md
+# No `docs/` pattern, and none with a leading slash either: `docs/` is a
+# gitignore-style pattern that would match `cortex/docs` and `helix/docs`,
+# which are workspace members, and `fusion/docs/insights` is
+# `@fusion.dev/insights`, which the site depends on. Excluding any of them
+# breaks `bun install` before the build starts.
 
 # Build output and scratch, rebuilt on Vercel anyway.
 #

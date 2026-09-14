@@ -11,7 +11,7 @@
 | `content/` | The registries the pages read: routes, products, verticals |
 | `utils/`, `hooks/` | Shared logic, one module per folder |
 | `preview/` | The sandbox frame's entry, bundled to `public/sandbox/` |
-| `scripts/` | The generators this app owns, all of them turbo tasks |
+| `scripts/` | The generators this app owns and the check that holds their documents to the routes, all of them turbo tasks |
 
 **A component owns its own markup and its own styles.** A stylesheet under
 `app/` is named for the route file beside it; anywhere else it lives in the

@@ -235,7 +235,7 @@ fusion/    cli docs scripts site: what belongs to the company rather than to a
 
   **The scope already said this.** `@fusion.dev/helix-*` and
   `@fusion.dev/cortex-*` name their domain; `@fusion.dev/*` bare names the
-  company, which is why `@fusion.dev/docs` and `@fusion.dev/cli` carry no
+  company, which is why `@fusion.dev/insights` and `@fusion.dev/cli` carry no
   domain prefix while `@fusion.dev/helix-core` does.
 
   The insights are rendered by the site and are not of it, which is the same
