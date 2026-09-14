@@ -49,7 +49,7 @@ use regex::Regex;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::{manifests, Manifest};
+use crate::workspace::Manifest;
 
 static MEMBERS: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?s)members\s*=\s*\[(.*?)\]").expect("a literal pattern compiles")
@@ -175,7 +175,7 @@ pub fn run(context: &Context) -> Report {
             unit: "packages",
         };
     }
-    let packages = manifests(&context.root);
+    let packages = context.manifests();
     let known: BTreeSet<&str> = packages.iter().map(|one| one.name.as_str()).collect();
     let shipping: BTreeSet<&str> = packages
         .iter()
@@ -188,7 +188,7 @@ pub fn run(context: &Context) -> Report {
     let mut versions: Vec<(&String, String, String)> = Vec::new();
     let mut access: BTreeSet<String> = BTreeSet::new();
 
-    for manifest in &packages {
+    for manifest in packages {
         let name = &manifest.name;
         let at = manifest.directory.clone();
         let Some(domain) = domain_of(name, context) else {

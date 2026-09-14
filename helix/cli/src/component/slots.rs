@@ -120,13 +120,7 @@ fn family_of(superclass: &Value) -> Option<String> {
 fn declared(context: &Context) -> BTreeMap<String, Declared> {
     let mut found = BTreeMap::new();
     for tier in context.settings.roots(&context.root) {
-        let Some(manifest) = tier.parent().map(|one| one.join("custom-elements.json")) else {
-            continue;
-        };
-        let Ok(raw) = fs::read_to_string(&manifest) else {
-            continue;
-        };
-        let Ok(value) = serde_json::from_str::<Value>(&raw) else {
+        let Some(value) = context.manifest(&tier) else {
             continue;
         };
         for module in value

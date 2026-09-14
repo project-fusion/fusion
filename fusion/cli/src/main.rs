@@ -212,7 +212,7 @@ fn main() -> ExitCode {
     };
 
     let settings = Settings::read(&root);
-    let context = Context { root, settings };
+    let context = Context::new(root, settings);
     let selected: Vec<rules::Rule> = cli
         .noun
         .rules()

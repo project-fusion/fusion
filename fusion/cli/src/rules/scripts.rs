@@ -23,7 +23,6 @@
 use std::collections::BTreeSet;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::manifests;
 
 /// `bun run <name>`, stopping before flags and shell operators.
 fn called(value: &str) -> Vec<&str> {
@@ -45,7 +44,7 @@ fn called(value: &str) -> Vec<&str> {
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
-    for manifest in manifests(&context.root) {
+    for manifest in context.manifests() {
         let scripts = manifest.scripts();
         let own: BTreeSet<&str> = scripts.keys().copied().collect();
         for (key, value) in &scripts {

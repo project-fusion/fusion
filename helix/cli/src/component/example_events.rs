@@ -29,7 +29,6 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::Path;
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -61,15 +60,9 @@ static HANDLER: LazyLock<Regex> =
 
 /// Every tag a layer declares, keyed to its family, and the events each tag
 /// declares.
-fn declared(manifest: &Path) -> (BTreeMap<String, String>, BTreeMap<String, BTreeSet<String>>) {
+fn declared(value: &Value) -> (BTreeMap<String, String>, BTreeMap<String, BTreeSet<String>>) {
     let mut families = BTreeMap::new();
     let mut events: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-    let Some(value) = fs::read_to_string(manifest)
-        .ok()
-        .and_then(|raw| serde_json::from_str::<Value>(&raw).ok())
-    else {
-        return (families, events);
-    };
     for module in value
         .get("modules")
         .and_then(Value::as_array)
@@ -156,10 +149,10 @@ pub fn run(context: &Context) -> Report {
 
     for layer in &context.settings.layers {
         let source = context.root.join(&layer.source);
-        let Some(manifest) = source.parent().map(|one| one.join("custom-elements.json")) else {
+        let Some(manifest) = context.manifest(&source) else {
             continue;
         };
-        let (families, events) = declared(&manifest);
+        let (families, events) = declared(manifest);
         let Ok(entries) = fs::read_dir(&source) else {
             continue;
         };

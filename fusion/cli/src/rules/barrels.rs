@@ -24,7 +24,7 @@ use std::path::Path;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::{manifests, walk};
+use crate::workspace::walk;
 
 fn shakeable(manifest: &Value) -> bool {
     manifest.get("sideEffects") == Some(&Value::Bool(false))
@@ -110,7 +110,7 @@ fn barrel_import<'a>(line: &'a str, package: &str) -> Option<Vec<&'a str>> {
 
 pub fn run(context: &Context) -> Report {
     let root = &context.root;
-    let packages = manifests(root);
+    let packages = context.manifests();
     let by_name: BTreeMap<&str, &crate::workspace::Manifest> = packages
         .iter()
         .map(|manifest| (manifest.name.as_str(), manifest))
@@ -119,7 +119,7 @@ pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
 
-    for manifest in &packages {
+    for manifest in packages {
         let dependencies = manifest
             .value
             .get("dependencies")

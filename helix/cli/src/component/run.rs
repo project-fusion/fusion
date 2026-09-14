@@ -66,7 +66,7 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
             }
         })
         .collect();
-    Ok((selected, Context { root, settings }))
+    Ok((selected, Context::new(root, settings)))
 }
 
 /// Runs the source rules once, then the meta rules over what they counted.

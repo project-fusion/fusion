@@ -248,8 +248,7 @@ type Manifest = (
 fn manifest(context: &Context) -> Option<Manifest> {
     let over = context.settings.layers.last()?;
     let source = context.root.join(&over.source);
-    let raw = fs::read_to_string(source.parent()?.join("custom-elements.json")).ok()?;
-    let value: Value = serde_json::from_str(&raw).ok()?;
+    let value = context.manifest(&source)?;
 
     let mut declared = BTreeMap::new();
     let mut dispatched = BTreeMap::new();
