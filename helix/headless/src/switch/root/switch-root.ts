@@ -57,7 +57,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /**
@@ -83,7 +83,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
     if (!taken) {
       return
     }
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+    this.announceChange()
   }
 
   /** Reports what the form would submit, and the verdict on it. */
@@ -118,7 +118,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
    * rendered, which React reports on hydration and does not patch up.
    */
   private markEmpty(): void {
-    const region = this.renderRoot?.querySelector<HTMLElement>('[part="label"]')
+    const region = this.partNamed('label')
     const empty = !slotFilled(
       this.renderRoot?.querySelector<HTMLSlotElement>('[part="label"] slot'),
     )

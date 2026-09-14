@@ -341,7 +341,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   /** The element that scrolls, once there is one. */
   private get log(): HTMLElement | null {
-    return this.renderRoot?.querySelector?.<HTMLElement>('[part="log"]') ?? null
+    return this.partNamed('log')
   }
 
   /** Whether the reader is within `threshold` of the bottom right now. */

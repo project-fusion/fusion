@@ -133,8 +133,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     boundary: () => this,
     offset: () => this.offset,
     onDismiss: () => this.hide(),
+    open: () => this.open,
     placement: () => this.placement,
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    surface: () => this.partNamed('surface'),
   })
 
   /**
@@ -268,7 +269,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        render finds null, and `scrollItemIntoView` then runs with no scroller and
        takes the page behind the menu with it, which is the one thing that method
        exists to prevent. */
-    const surface = this.renderRoot.querySelector<HTMLElement>('[part="surface"]')
+    const surface = this.partNamed('surface')
     scrollItemIntoView(item, { padding: 4, ...(surface ? { scroller: surface } : {}) })
   }
 
@@ -330,19 +331,6 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     super.updated(changed)
     // Every update, so a trigger slotted after the first render is told too.
     this.tellTrigger()
-    /* Put the panel where `open` says, however it got there. Raising it in
-       `show()` and lowering it in `hide()` alone leaves a menu opened by
-       declaring `open` visible, out of the top layer and unanchored: every
-       imperative path works and every declarative one is half-open. */
-    if (changed.has('open')) {
-      /* Here rather than a microtask later: `updated()` runs after the render,
-         so the panel is no longer `display: none` and `showPopover` is safe. */
-      if (this.open) {
-        this.panel.show()
-      } else {
-        this.panel.hide()
-      }
-    }
     // Every item shows or hides itself: which page is open is this element's
     // business, and where an item belongs is the item's. Set as a property, so
     // nothing is written onto a consumer's element.

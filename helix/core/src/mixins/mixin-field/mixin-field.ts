@@ -385,7 +385,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      * either way.
      */
     protected linkHost(): void {
-      const label = this.renderRoot.querySelector('[part="label"]')
+      const label = this.partNamed('label')
       hostAria(this.internals, {
         describedBy: [HINT_ID, FEEDBACK_ID]
           .map((id) => this.renderRoot.querySelector(`#${id}`))
@@ -436,7 +436,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
         this.internals.setValidity(
           { valueMissing: true },
           message,
-          this.renderRoot?.querySelector<HTMLElement>(`[part="${anchor}"]`) ?? undefined,
+          this.partNamed(anchor) ?? undefined,
         )
       } else {
         this.internals.setValidity({})

@@ -350,7 +350,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     if (event.type === 'pointerdown') {
       capturePointer(grid, event.pointerId)
       // So the keyboard carries on from where the pointer left off.
-      this.renderRoot?.querySelector<HTMLElement>('[part="grid-saturation"]')?.focus()
+      this.partNamed('grid-saturation')?.focus()
     } else if (!grid.hasPointerCapture(event.pointerId)) {
       return
     }
@@ -388,7 +388,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
 
   /** Puts the keyboard on the square, which is the control a reader wants. */
   override focus(options?: FocusOptions): void {
-    this.renderRoot?.querySelector<HTMLElement>('[part="grid-saturation"]')?.focus(options)
+    this.partNamed('grid-saturation')?.focus(options)
   }
 
   /**

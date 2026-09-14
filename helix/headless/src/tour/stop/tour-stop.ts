@@ -135,7 +135,7 @@ export class HelixHeadlessTourStop extends HelixElement {
 
   private readonly floating = new PopoverController(this, {
     anchor: () => this.target,
-    arrow: () => this.renderRoot?.querySelector<HTMLElement>('[part="arrow"]'),
+    arrow: () => this.partNamed('arrow'),
     /* A press outside does not end a tour, and this is the decision rather than
        a stub. Everywhere else a surface closes on an outside press because
        pressing elsewhere means the reader is finished with it. Here elsewhere
@@ -145,7 +145,7 @@ export class HelixHeadlessTourStop extends HelixElement {
        control and `Escape`, both of which say so. */
     onDismiss: () => {},
     placement: () => this.placement,
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="bubble"]'),
+    surface: () => this.partNamed('bubble'),
   })
 
   protected override willUpdate(changed: PropertyValues): void {

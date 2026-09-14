@@ -1,10 +1,35 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  KeyboardNavigationController,
+  type NavigableItem,
+} from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixHeadlessAccordionItem } from '../item/accordion-item.js'
 
-/** Keys that move focus between triggers, per the APG accordion pattern. */
-const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
+/**
+ * An item as the keyboard controller moves through it.
+ *
+ * **`contains` is the item itself and not `Node.contains`, and that is the
+ * reason this is an adapter rather than the item implementing the interface.**
+ * The controller asks each item whether the press came from inside it, and an
+ * accordion item holds its content as well as its trigger: a text field in an
+ * open section is inside the item, so `Node.contains` would hand its arrow
+ * keys to the accordion and the caret would stop moving. A press on the
+ * trigger is retargeted to the item at the accordion's boundary, so the item
+ * being the target is exactly "the press came from a trigger".
+ *
+ * Arriving chooses nothing, since a trigger is not a choice, and nothing here
+ * is disabled: `<details>` has no such state and neither does the item.
+ */
+const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
+  contains: (node) => node === item,
+  disabled: false,
+  focusItem: () => item.focusTrigger(),
+  select: () => {},
+  selected: false,
+})
 
 /**
  * @summary Groups collapsible sections, one open at a time by default.
@@ -25,8 +50,9 @@ const NAVIGATION = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])
  * Items are matched with `instanceof HelixHeadlessAccordionItem`, never by tag
  * name. Matching `helix-accordion-item` would tie this tier to the styled one.
  *
- * Every listener is attached on connect, so none of it runs on the server,
- * where there is no tree to walk and no events to hear.
+ * The keyboard listener is the controller's and is attached on connect, so
+ * none of it runs on the server, where there is no tree to walk and no events
+ * to hear.
  *
  * @since 0.1.0
  * @status experimental
@@ -58,42 +84,16 @@ export class HelixHeadlessAccordion extends HelixElement {
     )
   }
 
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (!NAVIGATION.has(event.key)) {
-      return
-    }
-    const items = this.items
-    const current = items.indexOf(event.target as HelixHeadlessAccordionItem)
-    if (current === -1) {
-      return
-    }
-
-    const last = items.length - 1
-    let next = current
-    if (event.key === 'ArrowDown') {
-      next = current === last ? 0 : current + 1
-    } else if (event.key === 'ArrowUp') {
-      next = current === 0 ? last : current - 1
-    } else if (event.key === 'Home') {
-      next = 0
-    } else {
-      next = last
-    }
-
-    // Only once a move is certain, so an unhandled key still scrolls the page.
-    event.preventDefault()
-    items[next]?.focusTrigger()
-  }
-
-  override connectedCallback(): void {
-    super.connectedCallback()
-    this.addEventListener('keydown', this.handleKeydown)
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.removeEventListener('keydown', this.handleKeydown)
-  }
+  /* Arrow keys, Home and End between the triggers, wrapping. Same controller
+     as the tabs and the toggle group: `origin: 'focus'` because the press says
+     which item it came from, and `selects` off because arriving on a trigger
+     opens nothing. Both axes, by the controller's own argument, where the
+     hand-written copy this replaces answered only up and down. */
+  protected readonly keys = new KeyboardNavigationController(this, {
+    items: () => this.items.map(navigable),
+    origin: 'focus',
+    selects: () => false,
+  })
 
   protected override render(): TemplateResult {
     return html`<slot></slot>`

@@ -58,7 +58,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /**
@@ -168,7 +168,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
        this tier has no sheet to turn one into the other, so a checkbox with no
        label would keep an empty label box beside it. The styled rule stays,
        since it hides through a descendant selector this cannot replace. */
-    this.renderRoot.querySelector<HTMLElement>('[part="label"]')?.toggleAttribute('hidden', !filled)
+    this.partNamed('label')?.toggleAttribute('hidden', !filled)
   }
 
   protected override render(): TemplateResult {

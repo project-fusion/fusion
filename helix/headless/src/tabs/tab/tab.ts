@@ -46,7 +46,7 @@ export class HelixHeadlessTab extends HelixElement {
 
   /** Moves focus to this tab, for the list's arrow keys. */
   focusItem(): void {
-    this.renderRoot.querySelector<HTMLElement>('[part="tab"]')?.focus()
+    this.partNamed('tab')?.focus()
   }
 
   /** Selects this tab and announces it. */

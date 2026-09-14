@@ -131,6 +131,31 @@ export class HelixFormElement extends HelixElement {
   }
 
   /**
+   * Announces `input` from the host, the way the control it stands for would.
+   *
+   * Composed, as the native one is: `input` crosses shadow boundaries by
+   * specification, so a consumer listening above a composition hears it.
+   */
+  protected announceInput(): void {
+    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+  }
+
+  /**
+   * Announces `change` from the host, the way the control it stands for would.
+   *
+   * **Not composed, and that is the shape of the native event rather than a
+   * choice made here.** `change` stops at a shadow boundary, so a composed
+   * control hears its inner control's and relays it under the same name from
+   * its own host, which is what `onChange` binds. Every control here that
+   * commits a value announces it through this, whether the commit came from an
+   * inner control's own `change`, a step, a scrub or a completed code, so the
+   * event is one shape in one place.
+   */
+  protected announceChange(): void {
+    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+  }
+
+  /**
    * Name submitted with the form.
    *
    * **Reflected, and it is the exception to "reflect only what CSS selects

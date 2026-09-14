@@ -51,7 +51,7 @@ export class HelixHeadlessButton extends HelixFormElement {
      the description and the accessibility tree exposed the inner control
      without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="button"]') ?? null,
+    target: () => this.partNamed('button'),
   })
 
   /**

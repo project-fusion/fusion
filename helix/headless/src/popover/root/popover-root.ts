@@ -93,8 +93,9 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     boundary: (): (HTMLElement | undefined)[] => [this, this.invoker],
     offset: () => this.offset,
     onDismiss: () => this.hide(),
+    open: () => this.open,
     placement: () => this.placement,
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="popover"]'),
+    surface: () => this.partNamed('popover'),
   })
 
   /**
@@ -200,19 +201,6 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        change. Idempotent, so saying it twice costs an assignment Lit compares
        and discards. */
     this.tellTrigger()
-    if (!changed.has('open')) {
-      return
-    }
-    /* Raised here rather than a microtask later, and `updated()` is what makes
-       that safe: the render has already been written, so the panel is no longer
-       `display: none` and `showPopover` will not throw on it. Anything raising
-       it before the render has to wait for `updateComplete`; from here there is
-       nothing left to wait for. */
-    if (this.open) {
-      this.panel.show()
-    } else {
-      this.panel.hide()
-    }
   }
 
   protected override render(): TemplateResult {

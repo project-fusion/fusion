@@ -177,8 +177,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        `input` beside it, because this is a discrete control and that is the
        pair a native `<select>` sends and the pair every other discrete control
        here sends through `MixinControllerValue`. */
-    this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+    this.announceInput()
+    this.announceChange()
   }
 
   /**

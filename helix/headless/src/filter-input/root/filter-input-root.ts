@@ -12,6 +12,7 @@ import {
   MixinTokens,
   PopoverController,
   restoreValue,
+  scrollItemIntoView,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -164,7 +165,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   /* The description names ids in the consumer's tree and the control is in this
      shadow root, so it is carried down as an element. See `Input`. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /** Typed, so every keystroke is announced. See `announcesInput`. */
@@ -257,15 +258,16 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
      counts as outside, so `pointerdown` closes the panel and the field reopens
      it on the `click` that follows. */
   protected readonly panel = new PopoverController(this, {
-    anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
+    anchor: () => this.partNamed('field'),
     boundary: (): readonly (Element | null | undefined)[] => [
-      this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
-      this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
+      this.partNamed('surface'),
+      this.partNamed('field'),
     ],
     offset: () => 4,
     onDismiss: () => this.requestOpen(false),
+    open: () => this.open,
     placement: 'bottom-start',
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    surface: () => this.partNamed('surface'),
   })
 
   /**
@@ -283,7 +285,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   }
 
   private get control(): HTMLInputElement | null {
-    return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    return this.partNamed<HTMLInputElement>('control')
   }
 
   private get tokens(): HTMLSlotElement | null {
@@ -380,7 +382,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+    this.announceChange()
   }
 
   /**
@@ -792,17 +794,6 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     this.releaseCaret = undefined
     this.internals.setFormValue(this.value)
     this.markActive()
-    /* **The panel is a manual popover, so `open` alone shows nothing.** The
-       attribute puts it in the top layer only once the platform is asked, and
-       until then the UA's own `[popover]:not(:popover-open)` keeps it
-       `display: none` however this element feels about being open. Combobox
-       drives the same controller from the same place and for the same reason.
-       Both calls are safe when the panel is already in that state. */
-    if (this.open) {
-      this.panel.show()
-    } else {
-      this.panel.hide()
-    }
     /* **After the render, because opening is an announcement.** `requestOpen`
        fires `helix-before-open` and `toggle`, and an element that dispatched
        those from inside its own render would hand a consumer a half-drawn
@@ -840,8 +831,11 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
       ).ariaActiveDescendantElement = active ?? null
     }
     /* Into view, since the highlight moves with a key and the panel scrolls.
-       `nearest` so a list already showing it does not jump. */
-    active?.scrollIntoView({ block: 'nearest' })
+       Inside the panel only: `Element.scrollIntoView` scrolls every ancestor
+       as well, so a key pressed in the field moved the page under it. */
+    if (active) {
+      scrollItemIntoView(active)
+    }
   }
 
   /** Puts the caret in the field, the way a label pointing at one would. */

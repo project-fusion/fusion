@@ -83,7 +83,7 @@ export class HelixHeadlessToggle extends HelixElement {
    * group out of the child's internals.
    */
   focusItem(): void {
-    this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
+    this.partNamed('item')?.focus()
   }
 
   /** Chooses this item and announces it. */

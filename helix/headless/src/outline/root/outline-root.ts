@@ -42,8 +42,8 @@ export class HelixHeadlessOutline extends HelixElement {
      all four values and the stylesheet uses the two it cares about. */
   private readonly indicator = new IndicatorController(this, {
     active: () => this.links.find((link) => link.hasAttribute('aria-current')),
-    indicator: () => this.renderRoot?.querySelector<HTMLElement>('[part="indicator"]'),
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="nav"]'),
+    indicator: () => this.partNamed('indicator'),
+    surface: () => this.partNamed('nav'),
   })
 
   /**
@@ -108,8 +108,6 @@ export class HelixHeadlessOutline extends HelixElement {
   private reading = ''
 
   private observer: IntersectionObserver | undefined
-
-  private resize: ResizeObserver | undefined
 
   /** The links, in document order. Empty on the server, which has no tree. */
   private get links(): HTMLAnchorElement[] {
@@ -392,12 +390,12 @@ export class HelixHeadlessOutline extends HelixElement {
     const arrive = (): void => {
       clearTimeout(this.landed)
       this.landing = undefined
-      globalThis.document?.removeEventListener('scrollend', arrive, true)
+      document.removeEventListener('scrollend', arrive, true)
       this.mark()
     }
     /* On the document in capture, like the scroll listener, so a panel's
        scroll ending lands here as the window's does. */
-    globalThis.document?.addEventListener('scrollend', arrive, { capture: true, once: true })
+    document.addEventListener('scrollend', arrive, { capture: true, once: true })
     this.landed = setTimeout(arrive, 1200)
 
     if (this.behavior === 'auto') {
@@ -469,15 +467,13 @@ export class HelixHeadlessOutline extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleClick)
-    globalThis.document?.removeEventListener('scroll', this.handleScroll, true)
+    document.removeEventListener('scroll', this.handleScroll, true)
     if (this.frame !== 0) {
       globalThis.cancelAnimationFrame(this.frame)
       this.frame = 0
     }
     this.observer?.disconnect()
     this.observer = undefined
-    this.resize?.disconnect()
-    this.resize = undefined
     /* The landing timer holds a closure over this element for 1.2 seconds after
        it leaves the document and then touches it, which on a route change is a
        write to a tree nobody is looking at. */
@@ -491,33 +487,25 @@ export class HelixHeadlessOutline extends HelixElement {
     /* The document in capture rather than the window: an element's `scroll`
        does not bubble, so a panel scrolling never reached a window listener,
        and capture on the document hears every scroller and the page alike. */
-    globalThis.document?.addEventListener('scroll', this.handleScroll, {
+    document.addEventListener('scroll', this.handleScroll, {
       capture: true,
       passive: true,
     })
-    /* Both observers are rebuilt on reconnection. `firstUpdated` runs once for
+    /* The observer is rebuilt on reconnection. `firstUpdated` runs once for
      * the life of the element and `disconnectedCallback` runs every time it
      * moves, so without this an outline moved in the DOM, which a framework does
-     * on any reorder, comes back permanently frozen: `aria-current`, `current`
-     * and the traveling mark all stop for the rest of the page's life with
-     * nothing to say why. Guarded on `hasUpdated`, because the first connection
-     * happens before the first render and there is nothing to watch yet. */
+     * on any reorder, comes back permanently frozen: `aria-current` and
+     * `current` stop for the rest of the page's life with nothing to say why.
+     * Guarded on `hasUpdated`, because the first connection happens before the
+     * first render and there is nothing to watch yet. */
     if (this.hasUpdated) {
       this.watch()
-      this.resize = new ResizeObserver(() => this.indicator.place())
-      this.resize.observe(this)
     }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.watch()
-    /* The links are text in a column, so anything that changes the column's
-       width rewraps them and moves every one below. Nothing else would notice:
-       the intersection observer watches the sections, and a resize moves the
-       links without moving the page. */
-    this.resize = new ResizeObserver(() => this.indicator.place())
-    this.resize.observe(this)
   }
 
   protected override updated(changed: PropertyValues): void {

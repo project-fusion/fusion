@@ -118,9 +118,14 @@ static FORWARDS: LazyLock<Regex> =
 /// A `[part=]` lookup on the component's own root, and only that.
 ///
 /// The receiver may sit on its own line, so the whitespace is not optional.
+///
+/// **`this.partNamed('x')` is the same lookup under one guard**, `HelixElement`'s,
+/// and is read the same way: a component that moved its lookups there would
+/// otherwise have moved them out of this check without anybody noticing, which
+/// is the silent shape of failure the check exists for.
 static OWN_ROOT: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
-        r#"(?s)this\.(?:renderRoot|shadowRoot)\??\s*\.\s*querySelector(?:All)?(?:<[^>(]*>)?\(\s*['"`]\[part=["']([a-z0-9-]+)["']\]"#,
+        r#"(?s)this\.(?:(?:renderRoot|shadowRoot)\??\s*\.\s*querySelector(?:All)?(?:<[^>(]*>)?\(\s*['"`]\[part=["']([a-z0-9-]+)["']\]|partNamed(?:<[^>(]*>)?\(\s*['"`]([a-z0-9-]+)['"`]\s*\))"#,
     )
     .expect("a literal pattern compiles")
 });
@@ -562,7 +567,12 @@ fn lookups(context: &Context, survey: &Survey, findings: &mut Vec<Finding>) {
             let code = uncommented(&text);
             let where_ = context.relative(&file);
             for found in OWN_ROOT.captures_iter(&code) {
-                let part = found[1].to_owned();
+                let part = found
+                    .get(1)
+                    .or_else(|| found.get(2))
+                    .expect("one of the two spellings captured the name")
+                    .as_str()
+                    .to_owned();
                 let rendered = survey
                     .in_family
                     .get(family)

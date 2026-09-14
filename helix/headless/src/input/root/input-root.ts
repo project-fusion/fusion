@@ -65,7 +65,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
@@ -241,7 +241,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   }
 
   private get control(): HTMLInputElement | null {
-    return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    return this.partNamed<HTMLInputElement>('control')
   }
 
   /**
@@ -296,7 +296,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+    this.announceChange()
   }
 
   /** Reports the value and the validity the host stands behind. */

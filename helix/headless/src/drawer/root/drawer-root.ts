@@ -148,7 +148,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
 
   /** The panel, which is a real `<dialog>`. */
   private get panel(): HTMLDialogElement | null {
-    return this.renderRoot?.querySelector<HTMLDialogElement>('[part="panel"]') ?? null
+    return this.partNamed<HTMLDialogElement>('panel')
   }
 
   /**

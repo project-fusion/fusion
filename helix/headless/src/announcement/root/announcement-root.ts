@@ -101,7 +101,7 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
    * rendered, which React reports on hydration and does not patch up.
    */
   private markEmpty(): void {
-    const region = this.renderRoot?.querySelector<HTMLElement>('[part="actions"]')
+    const region = this.partNamed('actions')
     const empty = !slotFilled(
       this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="actions"]'),
     )

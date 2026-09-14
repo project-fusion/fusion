@@ -77,7 +77,7 @@ export class HelixHeadlessScrollArea extends HelixElement {
    * want it already take one.
    */
   get scroller(): HTMLElement | null {
-    return this.renderRoot?.querySelector('[part="viewport"]') ?? null
+    return this.partNamed('viewport')
   }
 
   /**

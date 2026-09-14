@@ -725,7 +725,7 @@ export class HelixHeadlessVideo extends HelixElement {
   }
 
   private get video(): HTMLVideoElement | null {
-    return this.renderRoot?.querySelector<HTMLVideoElement>('[part="video"]') ?? null
+    return this.partNamed<HTMLVideoElement>('video')
   }
 
   /**

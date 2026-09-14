@@ -64,7 +64,7 @@ export class HelixHeadlessDivider extends HelixElement {
    * attribute written onto the host is a change to markup the consumer rendered.
    */
   private markEmpty(): void {
-    const region = this.renderRoot?.querySelector<HTMLElement>('[part="content"]')
+    const region = this.partNamed('content')
     const empty = !slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>('slot'))
     region?.toggleAttribute('data-empty', empty)
     /* `hidden` beside the mirror, because `data-empty` is a hook the styled

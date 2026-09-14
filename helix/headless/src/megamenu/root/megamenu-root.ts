@@ -147,16 +147,20 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.handleWidth(this.query)
   }
 
-  private readonly panel = new PopoverController(this, {
+  /* Registered rather than held, the way `ToggleGroup` holds its keys: the
+     controller follows `open` on its own, so nothing here talks to it after
+     construction, and a private field nothing reads is an unused one. */
+  protected readonly panel = new PopoverController(this, {
     anchor: () => this.trigger,
     /* The host, not the panel. A press on the trigger is a press on this
        element, and counting it as outside would close the panel on the way to
        the click that toggles it. `Menu` says the same about its own. */
     boundary: () => this,
     onDismiss: () => this.close(),
+    open: () => this.open,
     place: () => !this.banded,
     placement: () => 'bottom-start',
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    surface: () => this.partNamed('surface'),
   })
 
   /** Tells a slotted trigger the disclosure state, by property. See `tellDisclosure`. */
@@ -177,7 +181,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   private get trigger(): HTMLElement {
     return anchorElement(
       this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]'),
-      this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]') ?? this,
+      this.partNamed('trigger') ?? this,
     )
   }
 
@@ -402,7 +406,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     /* On the window and capturing, so a band over a scrolling panel hears that
        too rather than only the page's own scrolling. Passive: this measures and
        never prevents. */
-    addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
+    window.addEventListener('scroll', this.handleScroll, { capture: true, passive: true })
     this.addEventListener('pointerdown', this.handlePointerDown)
     this.addEventListener('click', this.handleContentClick)
     this.addEventListener('pointerenter', this.handlePointerEnter)
@@ -411,7 +415,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    removeEventListener('scroll', this.handleScroll, { capture: true })
+    window.removeEventListener('scroll', this.handleScroll, { capture: true })
     this.query?.removeEventListener('change', this.handleWidth)
     this.query = undefined
     this.removeEventListener('pointerdown', this.handlePointerDown)
@@ -420,6 +424,30 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.stop()
     if (showing === this) {
+      showing = undefined
+    }
+  }
+
+  /**
+   * Hands the bar's one open panel over before this one is shown.
+   *
+   * Before the render rather than after it, because the popover controller
+   * raises the panel from its own `hostUpdated`, which runs before `updated`:
+   * settled there, the two would be up together for a frame. The other closes
+   * through `requestOpen`, so a consumer holding it open is asked rather than
+   * overruled.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (!changed.has('open')) {
+      return
+    }
+    if (this.open) {
+      if (showing && showing !== this) {
+        showing.requestOpen(false)
+      }
+      showing = this
+    } else if (showing === this) {
       showing = undefined
     }
   }
@@ -471,20 +499,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        and a screen reader following it nowhere. */
     this.tellTrigger()
     if (this.open) {
-      /* Before showing this one, so the two are never both up for a frame. The
-         other closes through `requestOpen`, so a consumer holding it open is
-         asked rather than overruled. */
-      if (showing && showing !== this) {
-        showing.requestOpen(false)
-      }
-      showing = this
-      this.panel.show()
       this.band()
-    } else {
-      if (showing === this) {
-        showing = undefined
-      }
-      this.panel.hide()
     }
   }
 

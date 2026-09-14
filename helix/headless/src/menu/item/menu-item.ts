@@ -272,7 +272,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * root, and a menu moving between rows with the arrow keys has to reach it.
    */
   override focus(): void {
-    this.renderRoot.querySelector<HTMLElement>('[part="item"]')?.focus()
+    this.partNamed('item')?.focus()
   }
 
   /**

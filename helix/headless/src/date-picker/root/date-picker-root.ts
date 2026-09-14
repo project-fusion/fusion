@@ -468,7 +468,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
      * as "choose the focused day" and are then `preventDefault()`ed: the
      * button's own activation is canceled and the month never moves. */
     const path = event.composedPath()
-    const grid = this.renderRoot?.querySelector('[part="grid"]')
+    const grid = this.partNamed('grid')
     if (!grid || !path.includes(grid)) {
       return
     }
@@ -548,7 +548,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    * browser points its bubble at.
    */
   private reportRequired(): void {
-    const anchor = this.renderRoot?.querySelector<HTMLElement>('[part="grid"]') ?? undefined
+    const anchor = this.partNamed('grid') ?? undefined
     if (this.required && this.value === '') {
       this.internals.setValidity({ valueMissing: true }, 'Choose a date.', anchor)
       return

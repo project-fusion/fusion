@@ -96,7 +96,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /** Typed or dragged, so every edit is announced. See `announcesInput`. */
@@ -191,7 +191,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   }
 
   private get control(): HTMLInputElement | null {
-    return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    return this.partNamed<HTMLInputElement>('control')
   }
 
   /** The value as a number, or `null` where the field holds nothing usable. */
@@ -260,7 +260,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       restoreValue(control, this.value)
     }
     if (applied && this.value !== before) {
-      this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+      this.announceChange()
     }
   }
 
@@ -390,7 +390,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
     grip.releasePointerCapture(event.pointerId)
     if (this.value !== this.scrubStart) {
-      this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+      this.announceChange()
     }
   }
 
@@ -438,7 +438,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   /** Relayed, because `change` does not cross a shadow boundary on its own. */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    this.dispatchEvent(new Event('change', { bubbles: true, composed: false }))
+    this.announceChange()
   }
 
   /**

@@ -113,7 +113,7 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
      in Chrome's own tree, the host held the description and the control the
      reader is actually on was exposed without it. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.renderRoot?.querySelector<HTMLElement>('[part="control"]') ?? null,
+    target: () => this.partNamed('control'),
   })
 
   /**
@@ -193,7 +193,7 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
 
   /** The overlay, placed against the field for the reason Date Input gives. */
   protected readonly panel = new PopoverController(this, {
-    anchor: () => this.renderRoot?.querySelector<HTMLElement>('[part="field"]'),
+    anchor: () => this.partNamed('field'),
     /* The surface *and* the trigger.
      *
      * A control is not always one element: the button that opens this panel is
@@ -205,13 +205,14 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
      * `DismissController` documents this exact failure and takes a list for
      * it. */
     boundary: (): readonly (Element | null | undefined)[] => [
-      this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
-      this.renderRoot?.querySelector<HTMLElement>('[part="trigger"]'),
+      this.partNamed('surface'),
+      this.partNamed('trigger'),
     ],
     offset: () => 8,
     onDismiss: () => this.requestOpen(false),
+    open: () => this.open,
     placement: 'bottom-start',
-    surface: () => this.renderRoot?.querySelector<HTMLElement>('[part="surface"]'),
+    surface: () => this.partNamed('surface'),
   })
 
   /**
@@ -240,17 +241,11 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
    * field. It carries `id="control"` there for the same reason.
    */
   private get anchor(): HTMLElement | null {
-    if (typeof this.renderRoot?.querySelector !== 'function') {
-      return null
-    }
-    return this.control ?? this.renderRoot.querySelector<HTMLElement>('[part="trigger"]')
+    return this.control ?? this.partNamed('trigger')
   }
 
   private get control(): HTMLInputElement | null {
-    if (typeof this.renderRoot?.querySelector !== 'function') {
-      return null
-    }
-    return this.renderRoot.querySelector<HTMLInputElement>('[part="control"]')
+    return this.partNamed<HTMLInputElement>('control')
   }
 
   /** What the picker should show, which is only ever a color. */
@@ -367,17 +362,6 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
     this.sync()
     if (changed.has('value') && parseColor(this.value)) {
       this.settled = this.value
-    }
-    /* Driven from here rather than from the toggle, because `open` is a property
-       a consumer may set directly and the panel has to follow either way. The
-       controller is idempotent, so arriving twice for one open costs nothing.
-       Without this the surface stays `display: none`, a `popover` element being
-       hidden until something shows it, and the square inside measures zero,
-       which is the one measurement a drag cannot work without. */
-    if (this.open) {
-      this.panel.show()
-    } else {
-      this.panel.hide()
     }
   }
 

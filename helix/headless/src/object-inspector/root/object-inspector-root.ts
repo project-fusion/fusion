@@ -2,6 +2,7 @@ import {
   CopyController,
   customElement,
   HelixElement,
+  scrollItemIntoView,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretRight } from '@fusion.dev/helix-icons'
@@ -179,8 +180,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   private revealing = false
 
   private readonly virtualize = new VirtualizeController(this, {
-    container: () =>
-      this.windowed ? this.renderRoot?.querySelector<HTMLElement>('[part="tree"]') : null,
+    container: () => (this.windowed ? this.partNamed('tree') : null),
     count: () => this.rows.length,
     estimate: () => 24,
     measured: () => this.windowed,
@@ -322,10 +322,11 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    * up after a few rather than trusting that it always will.
    */
   private reveal(attempts = 8): void {
-    const tree = this.renderRoot?.querySelector<HTMLElement>('[part="tree"]')
+    const tree = this.partNamed('tree')
     const row = tree?.querySelector<HTMLElement>(`[data-index="${this.active}"]`)
     if (row) {
-      row.scrollIntoView({ block: 'nearest' })
+      // Inside the tree only: `Element.scrollIntoView` takes the page with it.
+      scrollItemIntoView(row)
       return
     }
     const drawn = [...(tree?.querySelectorAll<HTMLElement>('[part="row"]') ?? [])]
