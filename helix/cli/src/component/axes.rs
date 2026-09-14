@@ -161,7 +161,6 @@ struct Where<'a> {
 }
 
 /// Every axis one declaration names, judged against the registry.
-#[allow(clippy::too_many_arguments)]
 fn attribute_of(
     declaration: &Value,
     at: Where,

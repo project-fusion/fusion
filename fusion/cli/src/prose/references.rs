@@ -121,7 +121,6 @@ fn scripts_for(root: &Path, file: &Path) -> BTreeSet<String> {
     found
 }
 
-#[allow(clippy::too_many_lines)]
 /// Every task `turbo.json` declares, which is what a `turbo run` may name.
 fn tasks(root: &Path) -> BTreeSet<String> {
     /* Line comments, which the format does not have and this file uses. */
@@ -137,7 +136,10 @@ fn tasks(root: &Path) -> BTreeSet<String> {
         .unwrap_or_default()
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "a rule is one reading of its corpus, and splitting it puts half the reading somewhere else"
+)]
 pub fn run(context: &Context) -> Report {
     /* The trees a backticked path may be rooted at, read off the workspace
     rather than listed: a directory added or renamed at the top level is exactly

@@ -82,7 +82,10 @@ pub trait Scorer: Send + Sync {
 pub struct Exact;
 
 impl Scorer for Exact {
-    #[allow(clippy::unnecessary_literal_bound)]
+    #[expect(
+        clippy::unnecessary_literal_bound,
+        reason = "the trait returns `&str` so an id can be composed at runtime, and this one is a literal"
+    )]
     fn id(&self) -> &str {
         "exact/1"
     }
@@ -323,7 +326,10 @@ mod tests {
 
     #[async_trait]
     impl Provider for Counting {
-        #[allow(clippy::unnecessary_literal_bound)]
+        #[expect(
+            clippy::unnecessary_literal_bound,
+            reason = "the trait returns `&str` so an id can be composed at runtime, and this one is a literal"
+        )]
         fn id(&self) -> &str {
             "counting/1"
         }
@@ -347,7 +353,10 @@ mod tests {
     struct Lenient;
 
     impl Scorer for Lenient {
-        #[allow(clippy::unnecessary_literal_bound)]
+        #[expect(
+            clippy::unnecessary_literal_bound,
+            reason = "the trait returns `&str` so an id can be composed at runtime, and this one is a literal"
+        )]
         fn id(&self) -> &str {
             "lenient/1"
         }

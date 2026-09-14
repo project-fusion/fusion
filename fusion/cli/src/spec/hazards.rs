@@ -59,7 +59,10 @@ static UNBOUNDED: LazyLock<Regex> = LazyLock::new(|| {
         .expect("a literal pattern compiles")
 });
 
-#[allow(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "a rule is one reading of its corpus, and splitting it puts half the reading somewhere else"
+)]
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut read = 0;

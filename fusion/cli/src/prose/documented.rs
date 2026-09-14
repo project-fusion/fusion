@@ -346,7 +346,10 @@ fn answers(map: &Value, subpath: &str) -> Option<String> {
     None
 }
 
-#[allow(clippy::too_many_lines)]
+#[expect(
+    clippy::too_many_lines,
+    reason = "a rule is one reading of its corpus, and splitting it puts half the reading somewhere else"
+)]
 pub fn run(context: &Context) -> Report {
     static MARKUP: LazyLock<Regex> = LazyLock::new(|| {
         Regex::new(r"<(helix-[a-z][a-z0-9-]*)").expect("a literal pattern compiles")
