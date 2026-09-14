@@ -15,9 +15,9 @@
  * **What is here is what is genuinely the row, which is less than it looks.**
  * Measured across the two sheets, eleven selectors were written in both and nine
  * of them are the *field frame*: the border, the hover and focus rings, the
- * invalid state, the disabled treatment, the control reset. Input and nine other
- * families duplicate those too, so they are a separate question about a separate
- * shared sheet and not this one. Two selectors are the row.
+ * invalid state, the disabled treatment, the control reset. Those are
+ * `field-frame.css`'s question, which every text-like field composes, and not
+ * this sheet's. Two selectors are the row.
  *
  * **What stays with each component is what actually differs**, and pulling it in
  * here would mean a mode: Combobox grows its field under `:has([part="tags"])`

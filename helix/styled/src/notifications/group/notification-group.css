@@ -50,10 +50,13 @@
 }
 
 /* Where the group folds, the label and the count are the control. `all: unset`
-   first, so the UA's own button styling is gone before anything below lands. */
+   first, so the UA's own button styling is gone before anything below lands, and
+   `box-sizing` restored in the same rule, `all` having taken it back to
+   `content-box`. */
 [part="trigger"] {
   all: unset;
   align-items: center;
+  box-sizing: border-box;
   border-radius: var(--helix-radii-sm);
   cursor: pointer;
   display: inline-flex;

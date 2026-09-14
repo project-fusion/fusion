@@ -4,6 +4,8 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
+import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
+import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles } from './select-root.css.js'
 /* Without these, a consumer importing `@fusion.dev/helix/select` alone gets a
    select whose panel never upgrades. The suite hid it too, some other file
@@ -42,7 +44,13 @@ import '../../option/index.js'
 export class HelixSelect extends HelixHeadlessSelect {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = [
+    fieldStyles,
+    fieldStackedStyles,
+    floatingPanelStyles,
+    floatingEntranceStyles,
+    styles,
+  ]
 
   /**
    * How much ink the trigger claims.

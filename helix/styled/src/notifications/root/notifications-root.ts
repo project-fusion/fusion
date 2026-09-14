@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNotifications } from '@fusion.dev/helix-headless/notifications'
 import type { CSSResultGroup } from 'lit'
+import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles } from './notifications-root.css.js'
 import '../notification/notification.js'
 
@@ -39,7 +40,7 @@ import '../notification/notification.js'
 export class HelixNotifications extends HelixHeadlessNotifications {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [collectionStateStyles, styles]
 }
 
 declare global {

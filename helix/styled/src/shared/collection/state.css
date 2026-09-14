@@ -1,0 +1,24 @@
+/* What a collection says instead of rows: the same two lines everywhere, in the
+   same voice, because a reader meeting "Loading" in a menu and a different
+   arrangement of the same idea in a table is a reader learning the same thing
+   twice. Quiet and centered, since neither is content: they are the absence of
+   it, and an absence set like a heading reads as an error. Compose with the
+   family's own sheet, never instead of it.
+
+   **The inset is two hooks, because the families disagree and nothing recorded
+   why.** Menu, Table, Drilldown and Tree sit the line in `md` by `sm`, which is
+   the fallback; Listbox in `xs` by `xs`; Notifications in `lg` by `md`; Chat in
+   `lg` by nothing. Each of the last three writes its own into the hooks, so this
+   rule keeps every family where it was and the disagreement is one grep away
+   rather than eight. Video draws its own over a picture and does not take this.
+   Settling the inset is a decision, and it is not this sheet's. */
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding-block: var(--_collection-inset-block, var(--helix-space-md));
+  padding-inline: var(--_collection-inset-inline, var(--helix-space-sm));
+  text-align: center;
+}

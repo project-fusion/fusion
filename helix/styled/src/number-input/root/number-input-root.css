@@ -9,6 +9,13 @@
   gap: var(--helix-space-2xs);
 }
 
+/* Its own frame rather than `shared/field/field-frame`'s: the hover edge here
+   is the muted ink, the ring is gated on the control being live, and the invalid
+   state recolors the ring only once the field is focused, which is three of that
+   sheet's five rules. Taking it would move all three, so the copy stays and says
+   why. And the fill publishes no `--number-input-background-color` where every
+   other field publishes its own: an absence recorded here rather than filled,
+   since a hook is API and adding one is a decision. */
 [part="field"] {
   align-items: center;
   background-color: var(--helix-color-well);

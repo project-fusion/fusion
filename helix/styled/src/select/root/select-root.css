@@ -91,14 +91,16 @@
 }
 
 /* Over the page rather than on it, which is what `overlay` means and what its
-   shadow says: the panel is not a sunken part of the field it came out of. */
+   shadow says: the panel is not a sunken part of the field it came out of. The
+   house shape and the entrance are `shared/floating`'s, handed the family's own
+   hooks. */
 [part="surface"] {
+  --_floating-border-color: var(--select-border-color, var(--helix-color-border));
+  --_floating-border-width: var(--select-border-width, var(--helix-border-floating));
+  --_floating-shadow: var(--select-shadow, var(--helix-shadow-floating));
   /* Square rows, because they run the full width of the panel. */
   --option-radius: var(--helix-radii-none);
 
-  background-color: var(--helix-color-surface-overlay);
-  border-radius: var(--helix-radii-sm);
-  box-shadow: var(--select-shadow, var(--helix-shadow-floating));
   /* The trigger's width, with the content as the floor. From the controller
      rather than from a percentage: the panel is positioned `fixed`, so `100%`
      would be the viewport rather than the field. */
@@ -109,63 +111,6 @@
   max-block-size: var(--floating-available-block-size, none);
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-none);
-  /* No border, said rather than left out: the UA stylesheet gives `[popover]`
-     `border: solid`, so dropping the declaration leaves a three-pixel medium
-     border rather than none at all. */
-  border: var(--select-border-width, var(--helix-border-floating)) solid
-    var(--select-border-color, var(--helix-color-border));
-  inset: auto;
-  margin: var(--helix-space-none);
-}
-
-/* Shown and placed are two different moments, and this waits for the second.
-   `2xs` is enough to read as motion and short enough that a fast reader who
-   opens and picks in one gesture is not waiting on it. */
-[part="surface"] {
-  --_travel: calc(var(--helix-space-2xs) * -1);
-  opacity: 0;
-  transform: translateY(var(--_travel));
-  /* The panel was already waiting on placement; this makes the wait visible.
-     0.96 rather than 0: a list of options collapsed to nothing squashes its own
-     rows on the way out and reads as a toy at panel size, where a tooltip at the
-     same figure reads as a mark arriving. */
-  scale: 0.96;
-  /* Both directions. */
-  transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
-    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
-    display var(--helix-duration-fast) allow-discrete,
-    overlay var(--helix-duration-fast) allow-discrete;
-}
-
-/* Opening upward, it comes up from the control rather than down onto it. */
-[part="surface"][data-placement^="top"] {
-  --_travel: var(--helix-space-2xs);
-}
-
-[part="surface"][data-placed] {
-  opacity: 1;
-  scale: 1;
-  transform: none;
-}
-
-/* Out of the edge it opened against. */
-[part="surface"][data-placement^="top"] {
-  transform-origin: var(--floating-arrow-x, 50%) 100%;
-}
-
-[part="surface"][data-placement^="bottom"] {
-  transform-origin: var(--floating-arrow-x, 50%) 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="surface"],
-  [part="surface"][data-placed] {
-    scale: 1;
-    transform: none;
-    transition: none;
-  }
 }
 
 /* The indicator turns over as the panel opens. */
@@ -180,8 +125,9 @@
 }
 
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and every
-   author declaration above outranks it whatever its specificity. */
-[part="surface"][hidden],
+   author declaration above outranks it whatever its specificity. `[hidden]` is
+   the shared panel sheet's, and the sheet records which families carry this
+   line. */
 [part="surface"]:not(:popover-open) {
   display: none;
 }

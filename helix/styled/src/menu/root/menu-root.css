@@ -39,24 +39,14 @@
   max-block-size: var(--menu-max-block-size, var(--floating-available-block-size, none));
   overflow-y: auto;
 
-  background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
-  /*
- *  No border, said rather than left out: the UA stylesheet gives `[popover]`
- *      `border: solid`, so dropping the declaration leaves a three-pixel medium
- *      border rather than none at all.
- */
-  border: var(--menu-border-width, var(--helix-border-floating)) solid
-    var(--menu-border-color, var(--helix-color-border));
-  /* The house radius, shared with dialog, tooltip and toast so a menu and the
-     dialog it opens from do not draw two different corners. At anything larger
-     the corner is softer than the controls inside it, and a surface holding
-     controls should recede. */
-  border-radius: var(--helix-radii-sm);
-  box-shadow: var(--menu-shadow, var(--helix-shadow-floating));
-  /* The popover API puts it in the top layer, so the UA's own inset and border
-     have to be cleared or it sits in the middle of the window with a frame. */
-  inset: auto;
-  margin: var(--helix-space-none);
+  /* The house shape is `shared/floating`'s, handed the family's own hooks. The
+     fill is the one hook the other six families do not publish, so the shared
+     sheet reads it through a private the others leave at its fallback. */
+  --_floating-background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
+  --_floating-border-color: var(--menu-border-color, var(--helix-color-border));
+  --_floating-border-width: var(--menu-border-width, var(--helix-border-floating));
+  --_floating-shadow: var(--menu-shadow, var(--helix-shadow-floating));
+
   min-inline-size: var(--menu-min-inline-size, 12rem);
   /* Block only. The inset belongs to the rows, so a row's hover and focus reach
      the full width of the surface instead of stopping short of it and leaving a
@@ -78,79 +68,15 @@
   --menu-item-end: calc(var(--helix-size-icon) + var(--helix-space-xs));
 }
 
-[part="surface"][hidden] {
-  display: none;
-}
-
-/*
- *  It grows out of the edge it opened against, gated on `data-placed` so it never
- * moves before the controller has said where it goes. Same entrance as Popover,
- * Select and Tooltip: keying it to the open state runs a frame early, because
- * placement is a microtask later than the reveal.
- *
- * 0.96 rather than 0. A list of commands shrinking to a point squashes its own
- * rows; only Tooltip is small enough for the full collapse to read as arriving
- * rather than as a trick.
- *
- * The travel is on `transform`, never on `translate`: the floating controller
- * writes the panel's position onto `translate`, and animating that property took
- * the position over, so the panel traveled from the corner of the viewport
- * instead of from its anchor. Measured, the two compose in the order translate,
- * scale, transform, which means a `translateY` here is relative to wherever the
- * controller placed the panel and leaves x alone.
- *
- * Small on purpose. `2xs` is enough to read as motion and short enough that a
- * fast reader who opens and picks in one gesture is not waiting on it.
- */
-[part="surface"] {
-  --_travel: calc(var(--helix-space-2xs) * -1);
-  opacity: 0;
-  transform: translateY(var(--_travel));
-  scale: 0.96;
-  transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
-    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
-    display var(--helix-duration-fast) allow-discrete,
-    overlay var(--helix-duration-fast) allow-discrete;
-}
-
-/* Opening upward, it comes up from the control rather than down onto it. Only
-   the custom property moves, so this rule cannot race the settled one below on
-   equal specificity: source order would decide it, and this sits above. */
-[part="surface"][data-placement^="top"] {
-  --_travel: var(--helix-space-2xs);
-}
-
-[part="surface"][data-placed] {
-  opacity: 1;
-  scale: 1;
-  transform: none;
-}
-
-[part="surface"][data-placement^="top"] {
-  transform-origin: var(--floating-arrow-x, 50%) 100%;
-}
-
-[part="surface"][data-placement^="bottom"] {
-  transform-origin: var(--floating-arrow-x, 50%) 0;
-}
-
+/* The entrance is `shared/floating`'s. A submenu opens sideways, which none of
+   the other families do, so the two side placements are named here: out of the
+   edge it opened against, and out of the arrow where there is one. */
 [part="surface"][data-placement^="left"] {
   transform-origin: 100% var(--floating-arrow-y, 50%);
 }
 
 [part="surface"][data-placement^="right"] {
   transform-origin: 0 var(--floating-arrow-y, 50%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [part="surface"],
-  [part="surface"][data-placed] {
-    scale: 1;
-    transform: none;
-    transition: none;
-  }
 }
 
 /* A header, not a row in the list. The way back is not one of the things on
@@ -231,21 +157,7 @@
   scale: -1 1;
 }
 
-/* What a collection says instead of rows: the same two lines everywhere, in the
-   same voice, because a reader meeting "Loading" in a menu and a different
-   arrangement of the same idea in a table is a reader learning the same thing
-   twice. Quiet and centered, since neither is content: they are the absence of
-   it, and an absence set like a heading reads as an error. */
-[part="empty"],
-[part="loading"] {
-  color: var(--helix-color-foreground-subtle);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  margin: var(--helix-space-none);
-  padding-block: var(--helix-space-md);
-  padding-inline: var(--helix-space-sm);
-  text-align: center;
-}
+/* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. Removing
    them would collapse the box and throw the page around under the reader for

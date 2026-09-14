@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTextarea } from '@fusion.dev/helix-headless/textarea'
 import type { CSSResultGroup } from 'lit'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
+import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './textarea-root.css.js'
 
@@ -24,7 +25,12 @@ import { styles } from './textarea-root.css.js'
  */
 @customElement('helix-textarea')
 export class HelixTextarea extends HelixHeadlessTextarea {
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = [
+    fieldStyles,
+    fieldFrameStyles,
+    fieldStackedStyles,
+    styles,
+  ]
 }
 
 declare global {

@@ -1,5 +1,9 @@
 /* The field is the drop target, so it is a box with room in it rather than a
-   line. */
+   line. Its own frame rather than `shared/field/field-frame`'s: the control is
+   an invisible overlay rather than a stripped input, the ring waits for
+   `:focus-visible` and the hover edge is the muted ink, which is three of that
+   sheet's five rules. Taking it would move all three, so the copy stays and says
+   why. */
 [part="field"] {
   align-items: center;
   position: relative;

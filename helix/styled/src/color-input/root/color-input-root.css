@@ -1,3 +1,7 @@
+/* `block`, over the column stack `shared/field/field-frame` gives every other
+   field: whether a color field should stack like Input is a drift recorded here
+   rather than settled. The hover edge, the focus ring, the invalid state and the
+   stripped control are that sheet's too. */
 :host {
   display: block;
 }
@@ -21,33 +25,9 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/*
- *  Stripped rather than replaced, so the caret, the selection and the keyboard a
- *    phone chooses are all the platform's.
- */
+/* The type size the shared frame reads. */
 [part="control"] {
-  all: unset;
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  flex: 1 1 auto;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-medium);
-  min-inline-size: 0;
-}
-
-:host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
-}
-
-/* Named with `:hover` as well, or a focused field under the pointer takes the
-   hover border back and reads as a gray edge inside a blue ring. Being focused
-   outranks being pointed at, so it has to say so. Input records the same. */
-:host(:focus-within) [part="field"],
-:host(:focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: 0;
+  --_field-control-size: var(--helix-text-md);
 }
 
 :host(:disabled) [part="field"] {
@@ -104,23 +84,19 @@
 }
 
 /*
- *  The panel, in the house shape every floating surface here takes. `border: none`
- * said rather than left out, for the reason Popover, Menu and Select all record:
- * the UA stylesheet gives `[popover]` `border: solid`, so dropping the
- * declaration leaves three pixels of medium gray rather than none at all.
+ *  The panel, in the house shape every floating surface here takes, which is
+ * `shared/floating`'s: this sheet hands it the family's own hooks and says what
+ * is particular to a color input.
  *
  * Its own width, not the field's. A picker is not a longer text field, and a
  * square stretched to a 600 pixel field is a square no longer.
  */
 [part="surface"] {
-  background-color: var(--helix-color-surface-overlay);
-  border: var(--color-input-border-width, var(--helix-border-floating)) solid
-    var(--color-input-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
-  box-shadow: var(--color-input-shadow, var(--helix-shadow-floating));
+  --_floating-border-color: var(--color-input-border-color, var(--helix-color-border));
+  --_floating-border-width: var(--color-input-border-width, var(--helix-border-floating));
+  --_floating-shadow: var(--color-input-shadow, var(--helix-shadow-floating));
+
   inline-size: var(--color-input-panel-size, 264px);
-  inset: auto;
-  margin: var(--helix-space-none);
   overflow: hidden;
   padding: var(--helix-space-none);
   position: absolute;
@@ -135,54 +111,8 @@
   display: block;
 }
 
-/* And it travels, a little, out of the edge it opened against. On `transform`
-   rather than `translate`, which the floating controller owns: measured, the two
-   compose in the order translate, scale, transform, so this moves the panel
-   relative to wherever it was placed. The same entrance Select, Menu, Popover
-   and Date Input share. */
-[part="surface"] {
-  --_travel: calc(var(--helix-space-2xs) * -1);
-  opacity: 0;
-  scale: 0.96;
-  transform: translateY(var(--_travel));
-  transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
-    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
-    display var(--helix-duration-fast) allow-discrete,
-    overlay var(--helix-duration-fast) allow-discrete;
-}
-
-[part="surface"][data-placement^="top"] {
-  --_travel: var(--helix-space-2xs);
-  transform-origin: var(--floating-arrow-x, 50%) 100%;
-}
-
-[part="surface"][data-placement^="bottom"] {
-  transform-origin: var(--floating-arrow-x, 50%) 0;
-}
-
-[part="surface"][data-placed] {
-  opacity: 1;
-  scale: 1;
-  transform: none;
-}
-
-[part="surface"][hidden] {
-  display: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   [part="field"] {
-    transition: none;
-  }
-
-  /* The panel still has to arrive, so what goes is the movement, not the
-     appearance: no travel and no scale, and it is simply there. */
-  [part="surface"],
-  [part="surface"][data-placed] {
-    scale: 1;
-    transform: none;
     transition: none;
   }
 }
@@ -216,21 +146,6 @@
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--color-input-swatch-radius, var(--helix-radii-sm));
   inline-size: 100%;
-}
-
-/* Wrong, and the field says so.
- *
- * The same four selectors Input carries, and for the reason it records at
- * length: the focus rule owns the `outline`, so a field that does not change
- * its color here shows an error as a red border inside a blue ring. Hover is
- * named for the same reason from the other side. The border and the ring are
- * one edge, so when one turns they both do. */
-:host(:state(invalid)) [part="field"],
-:host(:state(invalid)) [part="field"]:hover,
-:host(:state(invalid):focus-within) [part="field"],
-:host(:state(invalid):focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-danger);
-  outline-color: var(--helix-color-danger);
 }
 
 /* Whatever is at either end keeps its size, so the text is what gives way when

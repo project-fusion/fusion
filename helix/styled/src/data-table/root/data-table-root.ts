@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDataTable } from '@fusion.dev/helix-headless/data-table'
 import type { CSSResultGroup } from 'lit'
+import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles } from './data-table-root.css.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
@@ -63,7 +64,7 @@ import '../../table/index.js'
 export class HelixDataTable extends HelixHeadlessDataTable {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [collectionStateStyles, styles]
 }
 
 declare global {

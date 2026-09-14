@@ -1,0 +1,67 @@
+/* The entrance every floating panel makes, in one sheet: it travels a little out
+   of the edge it opened against, gated on `data-placed` so it never moves before
+   the controller has said where it goes. Keyed to the open state it would run a
+   frame early, placement being a microtask later than the reveal. Compose with
+   the family's own sheet, never instead of it.
+
+   **On `transform`, never on `translate`.** The floating controller writes the
+   panel's position onto `translate`, and a keyframe animating that property took
+   the position over, so the panel traveled from the corner of the viewport
+   instead of from its anchor. Measured, the two compose in the order translate,
+   scale, transform, so a `translateY` here is relative to wherever the
+   controller placed the panel and leaves x alone.
+
+   0.96 rather than 0. A list of commands shrinking to a point squashes its own
+   rows; only Tooltip is small enough for the full collapse to read as arriving
+   rather than as a trick. And `2xs` is enough to read as motion and short enough
+   that a fast reader who opens and picks in one gesture is not waiting on it. */
+[part="surface"] {
+  --_travel: calc(var(--helix-space-2xs) * -1);
+
+  opacity: 0;
+  scale: 0.96;
+  transform: translateY(var(--_travel));
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
+}
+
+/* Opening upward, it comes up from the control rather than down onto it. Only
+   the custom property moves, so this rule cannot race the settled one below on
+   equal specificity: source order would decide it, and this sits above.
+
+   And it grows out of the edge it opened against, out of the arrow where there is
+   one: `--floating-arrow-x` is the pointer's center, which is the only thing that
+   knows where it landed once `shift` has slid the panel along to keep it on
+   screen. A panel with no arrow takes the fallback and grows from the middle of
+   the near edge. Menu adds the two side placements in its own sheet, being the
+   one family here that opens sideways. */
+[part="surface"][data-placement^="top"] {
+  --_travel: var(--helix-space-2xs);
+
+  transform-origin: var(--floating-arrow-x, 50%) 100%;
+}
+
+[part="surface"][data-placement^="bottom"] {
+  transform-origin: var(--floating-arrow-x, 50%) 0;
+}
+
+[part="surface"][data-placed] {
+  opacity: 1;
+  scale: 1;
+  transform: none;
+}
+
+/* The panel still has to arrive, so what goes is the movement, not the
+   appearance: no travel and no scale, and it is simply there. */
+@media (prefers-reduced-motion: reduce) {
+  [part="surface"],
+  [part="surface"][data-placed] {
+    scale: 1;
+    transform: none;
+    transition: none;
+  }
+}

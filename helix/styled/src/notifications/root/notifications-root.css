@@ -113,18 +113,13 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* What a collection says instead of items: the same two lines everywhere, in the
-   same voice. Quiet and centered, since neither is content: they are the absence
-   of it, and an absence set like a heading reads as an error. */
+/* What a collection says instead of items is `shared/collection/state`'s, with
+   a step more room than the other collections give it, which that sheet records
+   as a drift. */
 [part="empty"],
 [part="loading"] {
-  color: var(--helix-color-foreground-subtle);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  margin: var(--helix-space-none);
-  padding-block: var(--helix-space-lg);
-  padding-inline: var(--helix-space-md);
-  text-align: center;
+  --_collection-inset-block: var(--helix-space-lg);
+  --_collection-inset-inline: var(--helix-space-md);
 }
 
 @media print {

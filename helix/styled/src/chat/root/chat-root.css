@@ -204,9 +204,17 @@
   );
 }
 
+/* What a conversation says instead of turns is `shared/collection/state`'s,
+   with a taller inset and none on the inline axis, which that sheet records as a
+   drift. The line that says where the history starts is set the same way, being
+   the same kind of absence; it is not a collection state, so it is styled here. */
 [part="empty"],
-[part="history"],
 [part="loading"] {
+  --_collection-inset-block: var(--helix-space-lg);
+  --_collection-inset-inline: var(--helix-space-none);
+}
+
+[part="history"] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
