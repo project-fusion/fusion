@@ -8,11 +8,14 @@
     ],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "noEmit": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2023",
-    "verbatimModuleSyntax": true,
-    "noEmit": true
+    "types": [
+      "vite/client"
+    ],
+    "verbatimModuleSyntax": true
   },
   "include": [
     "src",
