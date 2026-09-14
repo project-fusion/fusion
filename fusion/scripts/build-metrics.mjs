@@ -39,13 +39,11 @@ import {
   writeFileSync,
 } from 'node:fs'
 
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { brotliCompress, constants, gzip } from 'node:zlib'
-import { ARTIFACT } from '@fusion.dev/scripts/workspace'
+import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const OUTPUT = 'helix/docs/content/metrics.mdx'
 
 /**
@@ -74,7 +72,7 @@ const TIMINGS = 'helix/docs/timings.json'
  * hook's or another session's, delete entries this one is still bundling, and
  * `Bun.build` fails on `File not found`.
  */
-const SCRATCH = join(ROOT, '.local/metrics', String(process.pid))
+const SCRATCH = join(root, '.local/metrics', String(process.pid))
 
 const check = process.argv.includes('--check')
 
@@ -89,7 +87,7 @@ const check = process.argv.includes('--check')
  * survive that insertion.
  */
 const lastInSection = () => {
-  const dir = join(ROOT, 'helix/docs/content')
+  const dir = join(root, 'helix/docs/content')
   let highest = 0
   for (const file of readdirSync(dir)) {
     if (!file.endsWith('.mdx') || file === 'metrics.mdx') {
@@ -170,7 +168,7 @@ const PACKAGES = [
  * Every other number on this page is measured, and a typed one is the one that
  * goes stale.
  */
-const TOKEN_COUNT = JSON.parse(readFileSync(join(ROOT, ARTIFACT.tokens), 'utf8')).tokens.length
+const TOKEN_COUNT = JSON.parse(readFileSync(join(root, ARTIFACT.tokens), 'utf8')).tokens.length
 
 /**
  * The stylesheets a consumer links, which no bundler is involved in.
@@ -289,7 +287,7 @@ const measure = async (name, source) => {
 
 /** Every family in a tier, from the manifest, which is the same list the docs use. */
 const families = (dir) => {
-  const manifest = JSON.parse(readFileSync(join(ROOT, dir, 'custom-elements.json'), 'utf8'))
+  const manifest = JSON.parse(readFileSync(join(root, dir, 'custom-elements.json'), 'utf8'))
   const found = new Set()
   for (const module of manifest.modules) {
     for (const declaration of module.declarations ?? []) {
@@ -315,12 +313,12 @@ const walk = (path, found = []) => {
 
 /** What one published package puts in `node_modules`, unpacked. */
 const footprint = (dir) => {
-  const manifest = JSON.parse(readFileSync(join(ROOT, dir, 'package.json'), 'utf8'))
+  const manifest = JSON.parse(readFileSync(join(root, dir, 'package.json'), 'utf8'))
   let bytes = 0
   let count = 0
   let maps = 0
   for (const entry of manifest.files ?? []) {
-    const path = join(ROOT, dir, entry)
+    const path = join(root, dir, entry)
     if (!existsSync(path)) {
       continue
     }
@@ -353,7 +351,7 @@ const footprint = (dir) => {
    guard is a resolution error naming one file, which reads as a broken script
    rather than as a missing step. */
 for (const tier of TIERS) {
-  if (!existsSync(join(ROOT, tier.dir, 'dist/index.js'))) {
+  if (!existsSync(join(root, tier.dir, 'dist/index.js'))) {
     console.error(
       `${tier.dir}/dist is missing. Metrics measure the published artifact, so run \`bun run build\` first.`,
     )
@@ -374,7 +372,7 @@ const packages = await pooled(PACKAGES, async (entry, index) => ({
 
 const stylesheets = await pooled(STYLESHEETS, async (sheet) => ({
   ...sheet,
-  ...(await sizes(readFileSync(join(ROOT, sheet.path)))),
+  ...(await sizes(readFileSync(join(root, sheet.path)))),
 }))
 
 /* Which styled families reach for the headless barrel rather than the family
@@ -393,9 +391,9 @@ const sources = (dir, found = []) => {
 }
 
 const barrelled = new Set()
-for (const path of sources(join(ROOT, 'helix/styled/src'))) {
+for (const path of sources(join(root, 'helix/styled/src'))) {
   if (readFileSync(path, 'utf8').includes("from '@fusion.dev/helix-headless'")) {
-    barrelled.add(path.slice(join(ROOT, 'helix/styled/src').length + 1).split('/')[0])
+    barrelled.add(path.slice(join(root, 'helix/styled/src').length + 1).split('/')[0])
   }
 }
 
@@ -420,12 +418,12 @@ for (const tier of TIERS) {
   measured.push({ ...tier, rows })
 }
 
-const timings = existsSync(join(ROOT, TIMINGS))
-  ? JSON.parse(readFileSync(join(ROOT, TIMINGS), 'utf8'))
+const timings = existsSync(join(root, TIMINGS))
+  ? JSON.parse(readFileSync(join(root, TIMINGS), 'utf8'))
   : undefined
 
-const peers = existsSync(join(ROOT, PEERS))
-  ? JSON.parse(readFileSync(join(ROOT, PEERS), 'utf8'))
+const peers = existsSync(join(root, PEERS))
+  ? JSON.parse(readFileSync(join(root, PEERS), 'utf8'))
   : undefined
 
 const median = (values) => {
@@ -742,7 +740,7 @@ const written = `${lines
   .join('\n')
   .replace(/\n{3,}/g, '\n\n')
   .trimEnd()}\n`
-const output = join(ROOT, OUTPUT)
+const output = join(root, OUTPUT)
 
 /**
  * The four claims the landing page prints, emitted rather than copied.
@@ -844,7 +842,7 @@ const claimsSource = [
   '',
 ].join('\n')
 
-const claimsPath = join(ROOT, CLAIMS_OUT)
+const claimsPath = join(root, CLAIMS_OUT)
 
 if (check) {
   let claimsExisting = ''

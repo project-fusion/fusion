@@ -27,14 +27,13 @@
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { SOURCE } from '@fusion.dev/scripts/workspace'
+import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 
 /* Resolved from this file rather than from the working directory, because
    turbo runs a package's `build` with the package as its cwd and a contributor
    runs `turbo run styles-dist` from the root. */
-const ROOT = join(import.meta.dirname, '../../..')
-const INPUT = join(ROOT, SOURCE.styles)
-const OUT = join(ROOT, 'helix/styles/dist')
+const INPUT = join(root, SOURCE.styles)
+const OUT = join(root, 'helix/styles/dist')
 
 /**
  * Removes CSS comments, and does not remove things that look like them.

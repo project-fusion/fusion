@@ -39,11 +39,9 @@
  */
 
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
-import { dirname, join, relative, resolve } from 'node:path'
+import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { TIERS } from '@fusion.dev/scripts/workspace'
-
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
+import { root, TIERS } from '@fusion.dev/scripts/workspace'
 
 /**
  * Both tiers, merged by family.

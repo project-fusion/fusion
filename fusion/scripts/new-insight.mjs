@@ -20,11 +20,10 @@
  * address.
  */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
+import { root } from '@fusion.dev/scripts/workspace'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const CONTENT = join(ROOT, 'fusion/docs/insights/content')
+const CONTENT = join(root, 'fusion/docs/insights/content')
 
 const args = process.argv.slice(2)
 const flags = new Map()

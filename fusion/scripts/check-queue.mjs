@@ -13,10 +13,9 @@
  * all in fact.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
+import { root } from '@fusion.dev/scripts/workspace'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 /* **`.local` is gitignored, and that is the point.** The queue holds the
    reasoning behind unfinished and declined decisions, which is worth keeping and
    is nobody else's to read.
@@ -25,11 +24,11 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
    `verify`, `check` or the pre-push hook, so nothing in CI reads the queue and a
    machine with no copy is the ordinary case rather than a fault. */
 const FILE = '.local/queue.md'
-if (!existsSync(join(ROOT, FILE))) {
+if (!existsSync(join(root, FILE))) {
   console.log(`queue: no ${FILE} on this machine, so there is nothing to check.`)
   process.exit(0)
 }
-const text = readFileSync(join(ROOT, FILE), 'utf8')
+const text = readFileSync(join(root, FILE), 'utf8')
 const lines = text.split('\n')
 
 const problems = []
@@ -47,7 +46,7 @@ const problems = []
  * fails here on the same day rather than the next time anybody greps.
  */
 const scripts = new Set(
-  Object.keys(JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).scripts ?? {}),
+  Object.keys(JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).scripts ?? {}),
 )
 
 /* And every rule name, from the two CLIs that own them. A rule is a file, so
@@ -56,7 +55,7 @@ const rules = new Set(
   ['helix/cli/src/component', 'fusion/cli/src/prose', 'fusion/cli/src/rules', 'fusion/cli/src/spec']
     .flatMap((where) => {
       try {
-        return readdirSync(join(ROOT, where))
+        return readdirSync(join(root, where))
       } catch {
         return []
       }

@@ -28,14 +28,11 @@
  * Run with `bun run eval`, or `bun run check:gen:eval` for the CI half.
  */
 import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { ARTIFACT } from '@fusion.dev/scripts/workspace'
-
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
+import { join } from 'node:path'
+import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 
 const corpus = JSON.parse(
-  readFileSync(join(ROOT, 'fusion', 'scripts', 'eval', 'questions.json'), 'utf8'),
+  readFileSync(join(root, 'fusion', 'scripts', 'eval', 'questions.json'), 'utf8'),
 )
 
 /**
@@ -48,10 +45,10 @@ const corpus = JSON.parse(
  */
 const reference = () => {
   const manifest = JSON.parse(
-    readFileSync(join(ROOT, 'helix', 'styled', 'custom-elements.json'), 'utf8'),
+    readFileSync(join(root, 'helix', 'styled', 'custom-elements.json'), 'utf8'),
   )
   const tokens = new Set(
-    JSON.parse(readFileSync(join(ROOT, ARTIFACT.tokens), 'utf8')).tokens.map((token) => token.name),
+    JSON.parse(readFileSync(join(root, ARTIFACT.tokens), 'utf8')).tokens.map((token) => token.name),
   )
   const byAlias = new Map()
   const byDescription = new Map()

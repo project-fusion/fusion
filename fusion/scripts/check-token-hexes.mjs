@@ -41,20 +41,18 @@
  * Run with `bun run check:css:hexes`, after `turbo run styles-dist`.
  */
 import { readFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { evaluate, layers, substitute, toHex, toSrgb } from '@fusion.dev/scripts/paint'
+import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
-
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
 /** Half a code point of eight-bit sRGB, in the 0-to-1 the serializer prints. */
 const TOLERANCE = 1 / 255
 
-const registry = JSON.parse(readFileSync(join(ROOT, 'helix/styles/dist/tokens.json'), 'utf8'))
+const registry = JSON.parse(readFileSync(join(root, 'helix/styles/dist/tokens.json'), 'utf8'))
 const colors = registry.tokens.filter((token) => token.category === 'color')
 const declared = layers(
-  readFileSync(join(ROOT, 'helix/styles/src/primitives.css'), 'utf8'),
+  readFileSync(join(root, 'helix/styles/src/primitives.css'), 'utf8'),
   registry.tokens,
 )
 
@@ -64,7 +62,7 @@ const declared = layers(
    resolver reads `src`, so a stripper that dropped a declaration shows up here
    as a token that resolves on one side and not the other. */
 const stylesheet = ['primitives', 'tokens']
-  .map((file) => readFileSync(join(ROOT, `helix/styles/dist/${file}.css`), 'utf8'))
+  .map((file) => readFileSync(join(root, `helix/styles/dist/${file}.css`), 'utf8'))
   .join('\n')
 
 /**

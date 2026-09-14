@@ -30,10 +30,10 @@ import { readFile } from 'node:fs/promises'
  * on anything to do with the tests.
  */
 import { createServer } from 'node:http'
-import { extname, join, resolve } from 'node:path'
+import { extname, join } from 'node:path'
+import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
-const root = resolve(import.meta.dirname, '../..')
 const specs = join(root, 'fusion/site/public/specs')
 /* The sandbox's stylesheet, which is the base layer and every token in it.
    Without it a component's own shadow styles still arrive, because those come

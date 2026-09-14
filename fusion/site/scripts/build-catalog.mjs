@@ -26,14 +26,12 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { catalog, pages as docPages, reference } from '@fusion.dev/helix-docs'
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
-import { ARTIFACT, SOURCE } from '@fusion.dev/scripts/workspace'
+import { ARTIFACT, root, SOURCE } from '@fusion.dev/scripts/workspace'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const OUT = join(ROOT, 'fusion/site/content/catalog/catalog.generated.json')
-const PUBLIC = join(ROOT, 'fusion/site/public')
+const OUT = join(root, 'fusion/site/content/catalog/catalog.generated.json')
+const PUBLIC = join(root, 'fusion/site/public')
 
 /**
  * The manifests the reference is built from: the two published packages.
@@ -64,10 +62,10 @@ const MANIFESTS = [ARTIFACT.styledManifest, ARTIFACT.headlessManifest]
  * headline and `catalog()` takes the first it is handed, so a reader with no
  * preference set sees the tier almost everyone consumes.
  */
-const EXAMPLES = [SOURCE.styled, SOURCE.headless].map((tier) => join(ROOT, tier))
+const EXAMPLES = [SOURCE.styled, SOURCE.headless].map((tier) => join(root, tier))
 
 const manifests = MANIFESTS.map((path) => {
-  const file = join(ROOT, path)
+  const file = join(root, path)
   return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : { modules: [] }
 })
 
@@ -210,7 +208,7 @@ for (const family of families) {
  * what it dropped. */
 let stale = 0
 for (const page of docPages) {
-  const file = join(ROOT, 'helix/docs/content', `${page.slug}.mdx`)
+  const file = join(root, 'helix/docs/content', `${page.slug}.mdx`)
   if (!existsSync(file)) {
     stale += 1
     console.warn(
