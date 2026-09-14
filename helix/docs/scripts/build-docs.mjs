@@ -25,6 +25,7 @@
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
@@ -476,24 +477,20 @@ ${slugs
 }
 `
 
-if (check) {
-  const existing = readFileSync(OUT, 'utf8')
-  if (refilled.length > 0) {
-    console.error(`docs: a token table is stale in ${refilled.join(', ')}. Run \`turbo run docs\``)
-    process.exit(1)
-  }
-  if (
-    existing !== formatted(generated, 'pages.generated.ts') ||
-    readFileSync(SOURCES, 'utf8') !== formatted(sources, 'sources.generated.ts')
-  ) {
-    console.error('docs: pages.generated.ts is stale. Run `turbo run docs`')
-    process.exit(1)
-  }
-  console.log(
-    `docs: ${pages.length} pages across ${sections.length} sections, every one derived from its own frontmatter`,
-  )
-} else {
-  writeFileSync(OUT, formatted(generated, 'pages.generated.ts'))
-  writeFileSync(SOURCES, formatted(sources, 'sources.generated.ts'))
-  console.log(`docs: wrote ${pages.length} pages across ${sections.length} sections`)
+if (check && refilled.length > 0) {
+  console.error(`docs: a token table is stale in ${refilled.join(', ')}. Run \`turbo run docs\``)
+  process.exit(1)
 }
+const hint = 'Run `turbo run docs`.'
+const stale = [
+  emit(OUT, formatted(generated, 'pages.generated.ts'), { check, hint }),
+  emit(SOURCES, formatted(sources, 'sources.generated.ts'), { check, hint }),
+].some((one) => one.stale)
+if (stale) {
+  process.exit(1)
+}
+console.log(
+  check
+    ? `docs: ${pages.length} pages across ${sections.length} sections, every one derived from its own frontmatter`
+    : `docs: wrote ${pages.length} pages across ${sections.length} sections`,
+)

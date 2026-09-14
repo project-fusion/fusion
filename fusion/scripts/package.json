@@ -11,6 +11,7 @@
   },
   "type": "module",
   "exports": {
+    "./emit": "./lib/emit.mjs",
     "./format-open-tags": "./lib/format-open-tags.mjs",
     "./formatted": "./lib/formatted.mjs",
     "./paint": "./lib/paint.mjs",

@@ -33,6 +33,9 @@
     "typecheck": "bun run register && tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
+  "devDependencies": {
+    "@fusion.dev/scripts": "workspace:*"
+  },
   "homepage": "https://fusion.dev",
   "keywords": [
     "helix",

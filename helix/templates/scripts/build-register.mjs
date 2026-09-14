@@ -17,9 +17,8 @@
  * The TypeScript stays the source because it is what the JavaScript door
  * imports, and because it is the copy that carries the reasoning.
  */
-import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-
+import { emit } from '@fusion.dev/scripts/emit'
 import { HELIX_VERSION, PROJECT_NAME, templates } from '../src/index.ts'
 
 const OUTPUT = join(import.meta.dirname, '..', 'templates.json')
@@ -32,20 +31,12 @@ const written = `${JSON.stringify(
   2,
 )}\n`
 
-if (process.argv.includes('--check')) {
-  let found
-  try {
-    found = readFileSync(OUTPUT, 'utf8')
-  } catch {
-    console.error('templates: templates.json is missing. Run `bun run register`.')
-    process.exit(1)
-  }
-  if (found !== written) {
-    console.error('templates: templates.json is behind src/index.ts. Run `bun run register`.')
-    process.exit(1)
-  }
-  console.log(`templates: ${templates.length} templates, register current`)
-} else {
-  writeFileSync(OUTPUT, written)
-  console.log(`templates: ${templates.length} templates written to templates.json`)
+const check = process.argv.includes('--check')
+if (emit(OUTPUT, written, { check, hint: 'Run `bun run register`.' }).stale) {
+  process.exit(1)
 }
+console.log(
+  check
+    ? `templates: ${templates.length} templates, register current`
+    : `templates: ${templates.length} templates written to templates.json`,
+)

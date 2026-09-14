@@ -30,9 +30,10 @@
  *
  * Run with `turbo run samples`, or `turbo run samples -- --check` for the check.
  */
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { emit } from '@fusion.dev/scripts/emit'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const CONTENT = join(ROOT, 'cortex/docs/content')
@@ -219,11 +220,12 @@ for (const slug of slugs) {
   }
 
   const next = filled(slug, onDisk)
-  if (next !== onDisk) {
+  const result = emit(join(CONTENT, `${slug}.mdx`), next, {
+    check,
+    hint: 'Run `turbo run samples`.',
+  })
+  if (result.stale || result.written) {
     stale.push(slug)
-    if (!check) {
-      writeFileSync(join(CONTENT, `${slug}.mdx`), next)
-    }
   }
 
   /* The point of the exercise is that no sample escapes the compiler, so a

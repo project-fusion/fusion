@@ -23,8 +23,9 @@
  *
  * Run with `bun run gen:eval`; `check:gen:eval` holds the result.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { emit } from '@fusion.dev/scripts/emit'
 import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 
 const OUT = join(root, 'fusion', 'scripts', 'eval', 'questions.json')
@@ -239,18 +240,13 @@ const corpus = {
 }
 
 const wanted = `${JSON.stringify(corpus, null, 2)}\n`
-if (process.argv.includes('--check')) {
-  const found = existsSync(OUT) ? readFileSync(OUT, 'utf8') : ''
-  if (found !== wanted) {
-    console.error(
-      'fusion/scripts/eval/questions.json is behind the artifacts it is generated from. Run `bun run gen:eval` and commit the result.',
-    )
-    process.exit(1)
-  }
+const check = process.argv.includes('--check')
+if (emit(OUT, wanted, { check, hint: 'Run `bun run gen:eval`.' }).stale) {
+  process.exit(1)
+}
+if (check) {
   console.log(`eval corpus: ${corpus.total} questions, current with ${sources.length} artifacts`)
 } else {
-  mkdirSync(dirname(OUT), { recursive: true })
-  writeFileSync(OUT, wanted)
   console.log(
     `eval corpus: ${corpus.total} questions (${Object.entries(corpus.counts)
       .map(([kind, count]) => `${count} ${kind}`)

@@ -23,6 +23,9 @@
     "cortex/docs": {
       "name": "@fusion.dev/cortex-docs",
       "version": "0.1.0",
+      "devDependencies": {
+        "@fusion.dev/scripts": "fusion/scripts",
+      },
     },
     "fusion/cli/npm": {
       "name": "@fusion.dev/cli",
@@ -254,6 +257,9 @@
     "helix/templates": {
       "name": "@fusion.dev/helix-templates",
       "version": "0.26.0",
+      "devDependencies": {
+        "@fusion.dev/scripts": "fusion/scripts",
+      },
     },
     "helix/testing": {
       "name": "@fusion.dev/helix-testing",
@@ -334,7 +340,7 @@
 
     "@fusion.dev/cli": ["@fusion.dev/cli@workspace:fusion/cli/npm", { "bin": { "fusion": "./bin.mjs" } }],
 
-    "@fusion.dev/cortex-docs": ["@fusion.dev/cortex-docs@workspace:cortex/docs", {}],
+    "@fusion.dev/cortex-docs": ["@fusion.dev/cortex-docs@workspace:cortex/docs", { "devDependencies": { "@fusion.dev/scripts": "fusion/scripts" } }],
 
     "@fusion.dev/create-helix-app": ["@fusion.dev/create-helix-app@workspace:helix/create-app", { "dependencies": { "@fusion.dev/helix-cli": "helix/cli/npm", "@fusion.dev/helix-templates": "helix/templates" }, "bin": { "create-helix-app": "./bin.mjs" } }],
 
@@ -370,7 +376,7 @@
 
     "@fusion.dev/helix-styles": ["@fusion.dev/helix-styles@workspace:helix/styles", { "devDependencies": { "@fusion.dev/scripts": "fusion/scripts" } }],
 
-    "@fusion.dev/helix-templates": ["@fusion.dev/helix-templates@workspace:helix/templates", {}],
+    "@fusion.dev/helix-templates": ["@fusion.dev/helix-templates@workspace:helix/templates", { "devDependencies": { "@fusion.dev/scripts": "fusion/scripts" } }],
 
     "@fusion.dev/helix-testing": ["@fusion.dev/helix-testing@workspace:helix/testing", { "devDependencies": { "@happy-dom/global-registrator": "^20.0.0", "@lit-labs/ssr": "^4.1.0", "@types/bun": "^1.3.0", "lit": "^3.2.1" } }],
 

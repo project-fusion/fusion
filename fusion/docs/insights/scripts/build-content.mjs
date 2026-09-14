@@ -15,9 +15,10 @@
  * package's own `build`, so a deploy produces them, and `--check` fails when
  * they and the content disagree.
  */
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..')
@@ -161,26 +162,22 @@ ${essays
 ]
 `
 
-if (process.argv.includes('--check')) {
-  /* Named rather than compared inline, so both sides are compared against their
-     formatted form. Comparing one against its raw form reports a staleness that
-     regenerating can never fix. */
-  const wantSources = formatted(generated, 'sources.generated.ts')
-  const wantPages = formatted(registries, 'pages.generated.ts')
-  const stale = [
-    readFileSync(OUT, 'utf8') !== wantSources ? 'sources' : undefined,
-    readFileSync(PAGES, 'utf8') !== wantPages ? 'pages' : undefined,
-  ].filter(Boolean)
-  if (stale.length > 0) {
-    console.error(`content: ${stale.join(' and ')} stale. Run \`turbo run content\``)
-    process.exit(1)
-  }
+/* Both sides formatted, so what is compared is what would be written. A raw
+   side reports a staleness that regenerating can never fix. */
+const check = process.argv.includes('--check')
+const hint = 'Run `turbo run content`.'
+const stale = [
+  emit(OUT, formatted(generated, 'sources.generated.ts'), { check, hint }),
+  emit(PAGES, formatted(registries, 'pages.generated.ts'), { check, hint }),
+].some((one) => one.stale)
+if (stale) {
+  process.exit(1)
+}
+if (check) {
   console.log(
     `content: ${slugs.length} files, ${pages.length} pages and ${essays.length} essays, all derived from their own frontmatter`,
   )
 } else {
-  writeFileSync(OUT, formatted(generated, 'sources.generated.ts'))
-  writeFileSync(PAGES, formatted(registries, 'pages.generated.ts'))
   console.log(
     `content: ${slugs.length} files inlined, ${pages.length} pages and ${essays.length} essays derived`,
   )
