@@ -23,17 +23,25 @@
   margin: var(--helix-space-none);
 }
 
-/* `[hidden]` is what the server renders, and it is the only thing holding the
-   panel closed before the element upgrades. Restated because the UA's own
-   `[hidden]` loses to any author `display`, and the entrance sheet transitions
-   one.
+/* Closed, and held closed by two things, each enough on its own. `[hidden]` is
+   what the server renders, and the only thing holding the panel shut before the
+   element upgrades; restated because the UA's own `[hidden]` loses to any
+   author `display`, and the entrance sheet transitions one. `:not(:popover-open)`
+   is the UA's own closed state for a popover, restated for the same reason: an
+   author `display` on the surface, from any sheet composed after this one,
+   would outrank it whatever its specificity and open the panel. Every family
+   takes both, settled 14 Sep 2026 from three restating the second and four
+   trusting the UA for it.
 
-   **Three of the seven families also restate the UA's `:not(:popover-open)`, in
-   their own sheets, and four do not.** Select, Combobox and Filter Input carry
-   the extra line; Menu, Date Input, Time Input and Color Input never did. The
-   two sets render the same today, so the drift is recorded here rather than
-   settled: settling it either way is a decision about what holds a closed
-   popover shut, and it is not this sheet's to take. */
+   Two rules rather than one selector list. A browser that does not know
+   `:popover-open` drops the whole list it appears in, and the popover API is
+   feature-detected on the controller precisely because such browsers exist:
+   listed together, the one line that holds the panel shut before upgrade would
+   go with it. */
 [part="surface"][hidden] {
+  display: none;
+}
+
+[part="surface"]:not(:popover-open) {
   display: none;
 }

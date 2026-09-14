@@ -124,14 +124,6 @@
   scale: 1 -1;
 }
 
-/* The UA hides a closed popover with `[popover]:not(:popover-open)`, and every
-   author declaration above outranks it whatever its specificity. `[hidden]` is
-   the shared panel sheet's, and the sheet records which families carry this
-   line. */
-[part="surface"]:not(:popover-open) {
-  display: none;
-}
-
 /* The list inside a panel brings no frame of its own: the panel is the frame,
    and two borders a pixel apart read as a mistake. */
 [part="listbox"]::part(items) {
