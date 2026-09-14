@@ -202,11 +202,12 @@ fusion/    cli docs scripts site: what belongs to the company rather than to a
   `helix/styled/src/shared/field` and `helix/styled/src/shared/chart` hold
   stylesheets several families import, and they are not families.
 
-  **The bar is a file more than one family imports**, and `helix component`'s `hooks` holds
-  it: a file in there with one reader belongs inside that reader, and every
-  folder under `shared/` is discovered rather than listed. It is not only
-  stylesheets: `shared/mixin-control-surface` is the API half of the same idea,
-  a pair of presentational properties three button families share.
+  **The bar is a file more than one family imports**, and `helix component`'s `shared` holds
+  it from both sides: a file in there with one reader belongs inside that
+  reader, a family's own sheet that another family composes belongs in there,
+  and every folder under `shared/` is discovered rather than listed. It is not
+  only stylesheets: `shared/mixin-control-surface` is the API half of the same
+  idea, a pair of presentational properties three button families share.
 
   **They cannot move to `@fusion.dev/helix-styles`**, which is the question they
   invite. That package ships document CSS; these are shadow styles, and

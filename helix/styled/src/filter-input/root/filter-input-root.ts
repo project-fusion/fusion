@@ -9,12 +9,12 @@ import '../../icon/index.js'
    element registers on import: a consumer importing this family alone would
    otherwise get inert unknown elements in the panel. */
 import '../../option/index.js'
-import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
 import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
+import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
 import { styles } from './filter-input-root.css.js'
 

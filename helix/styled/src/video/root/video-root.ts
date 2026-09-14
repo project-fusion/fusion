@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../icon/index.js'
 import '../../menu/index.js'
-import { styles as glyphStyles } from '../../icon/glyph.css.js'
+import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './video-root.css.js'
 
 /**

@@ -5,9 +5,9 @@ import type { CSSResultGroup } from 'lit'
    `<helix-icon>` for each file's remove control. */
 import '../../icon/index.js'
 import '../../tag/index.js'
-import { styles as glyphStyles } from '../../icon/glyph.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
+import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './file-input-root.css.js'
 
 /**
