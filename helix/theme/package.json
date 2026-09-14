@@ -17,7 +17,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./wasm/*": "./wasm/*"
+    "./wasm/fusion_helix_theme_bg.wasm": "./wasm/fusion_helix_theme_bg.wasm"
   },
   "files": [
     "dist",
