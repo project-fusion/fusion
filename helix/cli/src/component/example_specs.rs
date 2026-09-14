@@ -23,8 +23,7 @@ use regex::Regex;
 use crate::component::{Context, Finding, Report};
 
 static IMPORTED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"from\s+'\.\./\.examples/([a-z0-9-]+)\.html'")
-        .expect("a literal pattern compiles")
+    Regex::new(r"from\s+'\.\./\.examples/([a-z0-9-]+)\.html'").expect("a literal pattern compiles")
 });
 
 /// Every example a family's specs import, by name.

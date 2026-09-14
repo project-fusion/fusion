@@ -59,8 +59,8 @@ fn rendered(root: &Path) -> (BTreeSet<String>, bool) {
             let path = entry.path();
             if path.is_dir() {
                 /* `.examples` holds a consumer's markup rather than a
-                   component's template, so a `<slot name>` there is a consumer
-                   forwarding one and says nothing about what this renders. */
+                component's template, so a `<slot name>` there is a consumer
+                forwarding one and says nothing about what this renders. */
                 if path.file_name().is_some_and(|one| one == ".examples") {
                     continue;
                 }
@@ -139,7 +139,7 @@ fn declared(context: &Context) -> BTreeMap<String, Declared> {
                 continue;
             };
             /* `src/<family>/<part>/<file>.ts`, which is the shape every
-               component in this repository has. */
+            component in this repository has. */
             let Some(family) = path.split('/').nth(1) else {
                 continue;
             };
@@ -150,9 +150,9 @@ fn declared(context: &Context) -> BTreeMap<String, Declared> {
                 .flatten()
             {
                 /* Keyed by class name rather than by tag, because a superclass
-                   is referred to by the first and half of them have no second:
-                   a base class nothing registers still renders the slots its
-                   subclasses document. */
+                is referred to by the first and half of them have no second:
+                a base class nothing registers still renders the slots its
+                subclasses document. */
                 let Some(name) = declaration.get("name").and_then(Value::as_str) else {
                     continue;
                 };
@@ -191,12 +191,12 @@ pub fn run(context: &Context) -> Report {
     let mut checked = 0;
 
     /* Read once. Every field in the library shares `MixinField`'s `label`,
-       `hint` and `feedback`, and re-walking core for each of ninety-odd
-       components is the same answer ninety times. */
+    `hint` and `feedback`, and re-walking core for each of ninety-odd
+    components is the same answer ninety times. */
     let (shared, _) = rendered(&context.root.join("helix/core/src"));
 
     /* Read once per family, since both tiers of a family and every subclass of
-       it ask the same question. */
+    it ask the same question. */
     let mut per_family: BTreeMap<String, (BTreeSet<String>, bool)> = BTreeMap::new();
     let mut unreadable: BTreeSet<String> = BTreeSet::new();
 
@@ -205,9 +205,9 @@ pub fn run(context: &Context) -> Report {
             continue;
         }
         /* **Every family up the chain, not only this one.** `IconButton` and
-           `CopyButton` extend `Button` and render none of its template, so
-           `start` and `end` are written in the button family and documented
-           here. Reading one family reported both of them for slots that work. */
+        `CopyButton` extend `Button` and render none of its template, so
+        `start` and `end` are written in the button family and documented
+        here. Reading one family reported both of them for slots that work. */
         let mut families = vec![entry.family.clone()];
         /* Walked by reference, so a chain costs no copies of its own names. */
         let mut at: Option<&String> = Some(class);
@@ -248,19 +248,19 @@ pub fn run(context: &Context) -> Report {
         }
 
         /* **A name assembled at run time is one this cannot read**, so the
-           family is left alone and said out loud rather than reported. `Sandbox`
-           writes `<slot name=${first}>` to swap which pane leads, so `preview`
-           and `source` are real slots that no literal spells, and a rule
-           guessing here would be loudest exactly where it understands least.
-           `Carousel` records the same trade about `part=`: written out rather
-           than bound, so that a check can read it. */
+        family is left alone and said out loud rather than reported. `Sandbox`
+        writes `<slot name=${first}>` to swap which pane leads, so `preview`
+        and `source` are real slots that no literal spells, and a rule
+        guessing here would be loudest exactly where it understands least.
+        `Carousel` records the same trade about `part=`: written out rather
+        than bound, so that a check can read it. */
         if assembled {
             unreadable.insert(entry.family.clone());
             continue;
         }
 
         /* A family whose sources could not be read says nothing, rather than
-           reporting every slot it declares. */
+        reporting every slot it declares. */
         if available.is_empty() {
             continue;
         }

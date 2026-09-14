@@ -43,7 +43,10 @@ use crate::component::{Context, Finding, Report};
 
 /// The vocabulary. A component takes a subset; nobody invents a value.
 const AXES: [(&str, &[&str]); 6] = [
-    ("emphasis", &["ghost", "muted", "outlined", "solid", "subtle"]),
+    (
+        "emphasis",
+        &["ghost", "muted", "outlined", "solid", "subtle"],
+    ),
     ("material", &["frosted", "glass", "transparent"]),
     ("separation", &["elevated", "filled", "outlined", "plain"]),
     (
