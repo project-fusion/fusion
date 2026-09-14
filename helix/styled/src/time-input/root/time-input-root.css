@@ -1,10 +1,6 @@
-/* `block`, over the column stack `shared/field/field-frame` gives every other
-   field: whether a time field should stack like Input is a drift recorded here
-   rather than settled. The hover edge, the focus ring, the invalid state and the
-   stripped control are that sheet's too. */
-:host {
-  display: block;
-}
+/* The stack, the hover edge, the focus ring, the invalid state and the stripped
+   control are `shared/field/field-frame`'s. What is here is what is particular
+   to a time field. */
 
 /* The field carries the frame, not the input, so the trigger sits inside the
    same box as the text and the focus ring is drawn once around the whole control

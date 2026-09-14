@@ -1,3 +1,7 @@
+/* The stack, the hover edge, the focus ring, the invalid state and the stripped
+   control are `shared/field/field-frame`'s. What is here is what is particular
+   to a date field. */
+
 /* The field carries the frame, not the input, so the trigger sits inside the
    same box as the text and the focus ring is drawn once around the whole
    control rather than around a smaller box within it. The same arrangement
@@ -21,15 +25,6 @@
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-/* The hover edge, the focus ring, the invalid state and the stripped control are
-   `shared/field/field-frame`'s, and so is the column stack every other field
-   takes. **This host never set a `display` and is the UA's `inline`, restated
-   here so the shared stack does not change it.** Whether a date field should
-   stack like Input is a drift recorded rather than settled. */
-:host {
-  display: inline;
 }
 
 /* The trigger is a mark inside the field rather than a button beside it: it has

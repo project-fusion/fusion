@@ -20,16 +20,13 @@
    runs past the frame instead of wrapping, and under `auto-grow` it is clipped
    by the `overflow: hidden` the growing depends on with no way to scroll to it.
 
-   **`flex` and the floor are the initial values, restated.** This control was
-   never a flex item asked to grow: it fills the field by its own `inline-size`,
-   and the shared frame's `flex: 1 1 auto` and `min-inline-size: 0` never reached
-   it. Whether it should take them is a drift recorded here rather than
-   settled. */
+   No width of its own: the frame's `flex: 1 1 auto` fills the field and its
+   `min-inline-size: 0` lets the box shrink under a narrow host, where a
+   `<textarea>`'s own floor is its twenty-column default. Settled 14 Sep 2026,
+   having filled the field by `inline-size: 100%` with the frame's two never
+   reaching it. */
 [part="control"] {
-  flex: 0 1 auto;
-  inline-size: 100%;
   line-height: var(--helix-leading-normal);
-  min-inline-size: auto;
   overflow-wrap: break-word;
   /* Down only. A field the reader can drag wider than the form holding it is a
      field that breaks the layout, and the block axis is the one they actually
