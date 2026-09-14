@@ -111,9 +111,18 @@ export class ChartPointerController implements ReactiveController {
    * `axis` is for: on a horizontal bar chart the labels are beside the plot
    * rather than under it, and the host is wider than the drawing by exactly
    * their column.
+   *
+   * **Held only while it is still in the tree.** Every chart renders a
+   * different template for its empty state, so the plot a pointer crossed
+   * before the table filled is a node Lit has since replaced: held forever, it
+   * measures a detached box and the tooltip never appears. Looked up again
+   * whenever the held one has left, which is once per data arrival rather than
+   * once per move.
    */
   #box(): DOMRect | undefined {
-    this.#plot ??= this.#host.renderRoot.querySelector<HTMLElement>('[part="plot"]') ?? undefined
+    if (!this.#plot?.isConnected) {
+      this.#plot = this.#host.renderRoot.querySelector<HTMLElement>('[part="plot"]') ?? undefined
+    }
     return this.#plot?.getBoundingClientRect()
   }
 
