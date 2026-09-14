@@ -71,15 +71,10 @@
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { argument, flag } from '@fusion.dev/scripts/argv'
 import { DOMAINS, domainOf, manifests, root } from '@fusion.dev/scripts/workspace'
 
 const LEVELS = ['major', 'minor', 'patch']
-
-const argument = (name) => {
-  const at = process.argv.indexOf(`--${name}`)
-  return at === -1 ? undefined : process.argv[at + 1]
-}
-const flag = (name) => process.argv.includes(`--${name}`)
 
 const fail = (message) => {
   console.error(message)

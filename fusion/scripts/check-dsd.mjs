@@ -37,12 +37,12 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
+import { scopeFor } from '@fusion.dev/scripts/scope'
+import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
 import { PNG } from 'pngjs'
-import { scopeFor } from './lib/scope.mjs'
-import { awaitStill, awaitUpgrades } from './lib/settle.mjs'
 
 /**
  * What each fixture is, and what it must end as.

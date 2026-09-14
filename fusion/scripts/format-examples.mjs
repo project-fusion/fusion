@@ -45,7 +45,7 @@
  * `biome check --write` against `biome ci`, for the same reason: a step that
  * edits your files cannot tell you whether they were right.
  */
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const ROOTS = [...TIERS, SOURCE.sandbox]
@@ -56,17 +56,10 @@ const ROOTS = [...TIERS, SOURCE.sandbox]
    is the one place a six-attribute one-liner could otherwise survive. */
 const DOCS = ['helix/docs/content', 'cortex/docs/content']
 
-const walk = (dir, found = []) => {
-  for (const entry of readdirSync(dir)) {
-    const path = join(dir, entry)
-    if (statSync(path).isDirectory()) {
-      walk(path, found)
-    } else if (path.endsWith('.html') && path.includes('.examples')) {
-      found.push(path)
-    }
-  }
-  return found
-}
+const walk = (dir) =>
+  readdirSync(dir, { recursive: true })
+    .filter((entry) => entry.endsWith('.html') && entry.includes('.examples'))
+    .map((entry) => join(dir, entry))
 
 import { format } from '@fusion.dev/scripts/format-open-tags'
 import { SOURCE, TIERS } from '@fusion.dev/scripts/workspace'

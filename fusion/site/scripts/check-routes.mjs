@@ -28,8 +28,8 @@
  * Run with `turbo run routes`, which runs `turbo run catalog` first. It writes
  * nothing, so `--check` is accepted and changes nothing.
  */
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { dirname, join, relative } from 'node:path'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
@@ -78,20 +78,7 @@ for (const route of all) {
 }
 
 /** Every `.md` under `public`, which is the generator's whole output. */
-const written = []
-const walk = (dir) => {
-  for (const entry of readdirSync(dir)) {
-    const absolute = join(dir, entry)
-    if (statSync(absolute).isDirectory()) {
-      walk(absolute)
-      continue
-    }
-    if (entry.endsWith('.md')) {
-      written.push(relative(PUBLIC, absolute))
-    }
-  }
-}
-walk(PUBLIC)
+const written = readdirSync(PUBLIC, { recursive: true }).filter((entry) => entry.endsWith('.md'))
 
 for (const file of written) {
   if (!expected.has(file)) {

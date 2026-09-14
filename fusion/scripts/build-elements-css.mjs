@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { root } from '@fusion.dev/scripts/workspace'
 
@@ -21,14 +21,11 @@ import { root } from '@fusion.dev/scripts/workspace'
  */
 const TAG = /@customElement\(\s*['"]([a-z][a-z0-9]*(?:-[a-z0-9]+)+)['"]\s*\)/g
 
+/** Every element source under a directory, the specs left out. */
 const walk = (dir) =>
-  readdirSync(dir).flatMap((entry) => {
-    const path = join(dir, entry)
-    if (statSync(path).isDirectory()) {
-      return walk(path)
-    }
-    return path.endsWith('.ts') && !path.endsWith('.spec.ts') ? [path] : []
-  })
+  readdirSync(dir, { recursive: true })
+    .filter((entry) => entry.endsWith('.ts') && !entry.endsWith('.spec.ts'))
+    .map((entry) => join(dir, entry))
 
 /* Two packages, because the tags and the stylesheet no longer live together:
    the list is a fact about the element package, and the rule belongs with the

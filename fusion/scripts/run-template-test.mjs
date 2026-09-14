@@ -62,15 +62,11 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+import { argument } from '@fusion.dev/scripts/argv'
 import { domainOf, manifests, publishes, root } from '@fusion.dev/scripts/workspace'
 
 const run = (command, args, cwd) =>
   execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
-
-const argument = (name) => {
-  const at = process.argv.indexOf(`--${name}`)
-  return at === -1 ? undefined : process.argv[at + 1]
-}
 
 const only = argument('domain')
 const registryTag = argument('registry-tag')

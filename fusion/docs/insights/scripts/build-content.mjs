@@ -20,6 +20,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { emit } from '@fusion.dev/scripts/emit'
 import { formatted } from '@fusion.dev/scripts/formatted'
+import { frontmatter } from '@fusion.dev/scripts/frontmatter'
+import { quoted, template } from '@fusion.dev/scripts/literal'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..')
 const CONTENT = join(ROOT, 'fusion/docs/insights/content')
@@ -27,35 +29,9 @@ const OUT = join(ROOT, 'fusion/docs/insights/src/sources.generated.ts')
 const PAGES = join(ROOT, 'fusion/docs/insights/src/pages.generated.ts')
 
 /**
- * The frontmatter of one file, as strings.
- *
- * Hand-parsed for the reason `build-docs.mjs` gives: the whole grammar is
- * `key: value` at the top level, and a YAML dependency to read nine of those is
- * one a content package would carry for nothing.
- */
-const frontmatter = (slug, source) => {
-  const match = /^---\n([\s\S]*?)\n---\n/.exec(source)
-  if (!match) {
-    throw new Error(`${slug}: has no frontmatter block`)
-  }
-  const fields = {}
-  for (const line of match[1].split('\n')) {
-    const pair = /^([a-zA-Z]+): (.*)$/.exec(line)
-    if (!pair) {
-      throw new Error(`${slug}: frontmatter line is not \`key: value\`: ${line}`)
-    }
-    fields[pair[1]] = pair[2].replace(/^'(.*)'$/, '$1').replace(/''/g, "'")
-  }
-  return fields
-}
-
-/**
  * Reading time, counted rather than authored. 200 words a minute, floor of one.
  */
 const minutesOf = (body) => Math.max(1, Math.round(body.trim().split(/\s+/).length / 200))
-
-/** A string literal. The formatter decides which quote it ends up in. */
-const quoted = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 
 const slugs = readdirSync(CONTENT)
   .filter((file) => file.endsWith('.mdx'))
@@ -67,7 +43,7 @@ const entries = slugs.map((slug) => {
   /* A template literal rather than a quoted string: this is prose with
      newlines in it, and the alternative is one line of `\n` escapes nobody can
      read in a diff. Backticks and `${` are the only things to escape. */
-  const escaped = source.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${')
+  const escaped = template(source)
   /* Quoted only where it has to be. The formatter strips quotes from a key
      that is already a valid identifier, and a generated file it would rewrite
      is one that fails `biome ci` over bytes nobody typed. */
@@ -100,7 +76,10 @@ const pages = []
 const essays = []
 for (const slug of slugs) {
   const source = readFileSync(join(CONTENT, `${slug}.mdx`), 'utf8')
-  const meta = frontmatter(slug, source)
+  const { fields: meta, problems } = frontmatter(source)
+  if (problems.length > 0) {
+    throw new Error(`${slug}: ${problems[0]}`)
+  }
   const body = source.split('---\n').slice(2).join('---\n')
   const entry = { ...meta, slug }
   if (meta.topic !== undefined) {

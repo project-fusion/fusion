@@ -55,13 +55,8 @@ import {
 } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { argument, flag } from '@fusion.dev/scripts/argv'
 import { DOMAINS, domainOf, manifests, publishes, root } from '@fusion.dev/scripts/workspace'
-
-const argument = (name) => {
-  const at = process.argv.indexOf(`--${name}`)
-  return at === -1 ? undefined : process.argv[at + 1]
-}
-const flag = (name) => process.argv.includes(`--${name}`)
 
 const fail = (message) => {
   console.error(message)

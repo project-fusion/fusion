@@ -28,6 +28,7 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { argument } from '@fusion.dev/scripts/argv'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -109,11 +110,6 @@ for (const step of checks) {
     )
     process.exit(1)
   }
-}
-
-const argument = (name) => {
-  const index = process.argv.indexOf(`--${name}`)
-  return index === -1 ? undefined : process.argv[index + 1]
 }
 
 /**
