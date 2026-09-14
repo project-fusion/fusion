@@ -318,6 +318,14 @@
     // `helix-theme` for the same reason: it is a row in the package table and
     // nothing any tier depends on, so without it the theme's `dist` is whatever
     // is on disk, and on a clean tree nothing, which fails the bundle outright.
+    //
+    // **The inputs are what the script reads, and the script was the only one
+    // declared.** It also reads `peers.json` and `timings.json` for the two
+    // comparison sections, every other page's frontmatter to place its own
+    // page last in the section, and the six manifests' `files` for the unpacked
+    // footprints. With only the script hashed, a cache hit answered from a
+    // metrics page measured before any of those moved. `metrics.mdx` is the
+    // output and is kept out of the pages read.
     "metrics": {
       "dependsOn": [
         "@fusion.dev/helix#build",
@@ -325,7 +333,19 @@
         "@fusion.dev/helix-styles#build",
         "@fusion.dev/helix-theme#build"
       ],
-      "inputs": ["$TURBO_ROOT$/fusion/scripts/build-metrics.mjs"],
+      "inputs": [
+        "content/*.mdx",
+        "!content/metrics.mdx",
+        "peers.json",
+        "timings.json",
+        "$TURBO_ROOT$/fusion/scripts/build-metrics.mjs",
+        "$TURBO_ROOT$/helix/core/package.json",
+        "$TURBO_ROOT$/helix/headless/package.json",
+        "$TURBO_ROOT$/helix/icons/package.json",
+        "$TURBO_ROOT$/helix/styled/package.json",
+        "$TURBO_ROOT$/helix/styles/package.json",
+        "$TURBO_ROOT$/helix/theme/package.json"
+      ],
       "outputs": [
         "content/metrics.mdx",
         "$TURBO_ROOT$/fusion/site/content/landing/claims.generated.ts"
