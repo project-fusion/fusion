@@ -4,12 +4,7 @@
    never instead of either. Seven families take it: Input, Textarea, Combobox,
    Date Input, Time Input, Color Input and Filter Input. Number Input and File
    Input wear a frame that differs in three of these five rules and keep their
-   own, and each says so where it does.
-
-   **What is here is what was byte-identical, and what differed is a hook.** The
-   families disagree about the control's type size and nothing recorded why, so
-   each writes its own into `--_field-control-size` and this sheet keeps every
-   one where it was. Settling that is a decision, and it is not this sheet's. */
+   own, and each says so where it does. */
 
 /* A column, so the label, the field and whatever is under it stack without any
    of them needing a margin. **Flex rather than grid, and the inline axis is
@@ -79,16 +74,18 @@
    back to `content-box`, and the `border-box` every shadow root is given comes
    from a rule this one outranks, so it is restored here.
 
-   The type size is the hook the sheet's note explains: Input, Textarea and
-   Filter Input write `text-sm` into it, Combobox, Date Input, Time Input and
-   Color Input write `text-md`. */
+   `text-md`, and one size for every field. The value is content rather than a
+   caption: the label above it is `text-sm` in `field.css`, and a value set at
+   the label's size reads as a second caption in a box. Settled 14 Sep 2026
+   from a split nothing had recorded a reason for, Input, Textarea and Filter
+   Input at `sm` and the four pickers at `md`. */
 [part="control"] {
   all: unset;
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
-  font-size: var(--_field-control-size, var(--helix-text-sm));
+  font-size: var(--helix-text-md);
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
 }

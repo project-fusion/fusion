@@ -69,11 +69,6 @@
   max-inline-size: 100%;
 }
 
-/* The type size the shared frame reads. */
-[part="control"] {
-  --_field-control-size: var(--helix-text-md);
-}
-
 /* The text field keeps a usable width once tags share the line with it, and
    wraps to its own line rather than shrinking to nothing when they fill it. */
 [part="field"]:has([part="tags"]) [part="control"] {

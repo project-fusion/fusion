@@ -25,11 +25,6 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The type size the shared frame reads. */
-[part="control"] {
-  --_field-control-size: var(--helix-text-md);
-}
-
 :host(:disabled) [part="field"] {
   color: var(--helix-color-foreground-subtle);
 }
