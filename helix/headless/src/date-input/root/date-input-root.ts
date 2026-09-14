@@ -8,8 +8,9 @@ import {
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
+  MixinPickerEditing,
+  MixinPickerField,
   MixinTokens,
-  PopoverController,
 } from '@fusion.dev/helix-core'
 import { calendarBlank } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -102,8 +103,10 @@ const dates = (value: string): string[] =>
  * @csspart trigger-icon - The mark on the button that opens the calendar.
  */
 @customElement('helix-headless-date-input')
-export class HelixHeadlessDateInput extends MixinControllerOpen(
-  MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
+export class HelixHeadlessDateInput extends MixinPickerEditing(
+  MixinPickerField(
+    MixinControllerOpen(MixinTokens(MixinControllerValue(MixinField(HelixFormElement)))),
+  ),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -214,22 +217,6 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   placeholder = 'YYYY-MM-DD'
 
   /**
-   * Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
-   */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
-
-  /**
    * How far apart the selectable dates are, in days.
    *
    * `<input type="date" step>`'s own unit, handed to the calendar this renders
@@ -239,43 +226,6 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    */
   @property({ type: Number })
   step = 1
-
-  /**
-   * The overlay, placed against the field rather than the trigger.
-   *
-   * Against the field because that is the box a reader sees as the control: a
-   * calendar hung off a small button at one end of a wide field reads as
-   * belonging to the button. `Select` anchors to its trigger for the opposite
-   * reason, its trigger being the whole control.
-   */
-  protected readonly panel = new PopoverController(this, {
-    anchor: () => this.partNamed('field'),
-    /* The surface *and* the trigger.
-     *
-     * A control is not always one element: the button that opens this panel is
-     * part of it, and a press on it is not a press outside. Scoped to the
-     * surface alone, `pointerdown` on the trigger closes the panel and the
-     * trigger's own `toggleOpen` reopens it on the `click` that follows, so the
-     * panel can never be closed by the button that opened it.
-     * `DismissController` documents this failure and takes a list for it. */
-    boundary: (): readonly (Element | null | undefined)[] => [
-      this.partNamed('surface'),
-      this.partNamed('trigger'),
-    ],
-    /* Wider than the four every other panel here takes. Those sit against a
-       control the same width as themselves and read as an extension of it; this
-       one is a calendar of its own size hanging off a field, so the gap is what
-       says the two are separate things rather than one control that grew. */
-    offset: () => 8,
-    onDismiss: () => this.requestOpen(false),
-    open: () => this.open,
-    placement: 'bottom-start',
-    surface: () => this.partNamed('surface'),
-  })
-
-  private get control(): HTMLInputElement | null {
-    return this.partNamed<HTMLInputElement>('control')
-  }
 
   /**
    * What the calendar should show, which is only ever a whole date.
@@ -319,7 +269,7 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
    * `multiple` shows nothing here at all. Its dates are tags beside the input
    * and the input is a draft.
    */
-  private get display(): string {
+  protected override get display(): string {
     if (this.mode === 'multiple') {
       return this.draft
     }
@@ -333,12 +283,6 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     const written = held.map((one) => this.written(one))
     return this.mode === 'range' ? written.join(' – ') : written.join(', ')
   }
-
-  /**
-   * Whether the caret is in the field, which is when it holds the value.
-   */
-  @state()
-  private editing = false
 
   /**
    * What is being typed but not yet held, for `multiple` only.
@@ -433,30 +377,8 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     }
   }
 
-  /**
-   * Puts the field back where the answer differs from what was typed.
-   *
-   * `requestValue` is the mixin's, and it announces and decides; this is the
-   * other half, which `Input` needs for the same reason: the native control has
-   * already changed, so wherever the answer does not follow it, it has to be
-   * restored. A refusal and a consumer who owns `value` and has not given a new
-   * one are the same thing from here.
-   */
-  private restore(): void {
-    const control = this.control
-    if (control && control.value !== this.display) {
-      control.value = this.display
-    }
-    this.sync()
-  }
-
-  /** Reports the value and the validity the host stands behind. */
-  private sync(): void {
-    this.internals.setFormValue(this.value)
-    const control = this.control
-    if (!control) {
-      return
-    }
+  /** What is wrong with the dates, which the text input cannot say. */
+  protected override validate(): string {
     /* Bounds are checked here rather than left to the input, which is `text`
        and has no idea what a date is: `min` and `max` on a text input do
        nothing, and `type="date"` is what was given up to own the calendar.
@@ -466,34 +388,21 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
        a multiple is any number, so a string comparison against `min` would be
        comparing a bound to a list. */
     const held = dates(this.value)
-    let message = ''
     if (held.length > 0 && !held.every(isIso)) {
-      message =
-        this.mode === undefined
-          ? 'Enter a date as YYYY-MM-DD.'
-          : 'Enter dates as YYYY-MM-DD, separated by commas.'
-    } else if (this.min !== '' && held.some((one) => one < this.min)) {
-      message = `Choose a date on or after ${this.min}.`
-    } else if (this.max !== '' && held.some((one) => one > this.max)) {
-      message = `Choose a date on or before ${this.max}.`
-    } else if (this.mode === 'range' && held.length > 2) {
-      message = 'A range is two dates.'
+      return this.mode === undefined
+        ? 'Enter a date as YYYY-MM-DD.'
+        : 'Enter dates as YYYY-MM-DD, separated by commas.'
     }
-    if (message === '') {
-      this.internals.setValidity(control.validity, control.validationMessage, control)
-    } else {
-      this.internals.setValidity({ badInput: true }, message, control)
+    if (this.min !== '' && held.some((one) => one < this.min)) {
+      return `Choose a date on or after ${this.min}.`
     }
-    this.refreshFeedback()
-  }
-
-  /** Escape shuts the calendar without moving the date. */
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.open) {
-      event.stopPropagation()
-      this.requestOpen(false)
-      this.returnFocus()
+    if (this.max !== '' && held.some((one) => one > this.max)) {
+      return `Choose a date on or before ${this.max}.`
     }
+    if (this.mode === 'range' && held.length > 2) {
+      return 'A range is two dates.'
+    }
+    return ''
   }
 
   /**
@@ -502,109 +411,14 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a date'
 
-  /** Refuses every change while read-only. See `readOnly`. */
-  override requestValue(next: string): boolean {
-    if (this.readOnly) {
-      return false
-    }
-    return super.requestValue(next)
-  }
-
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    // Whatever the markup arrived with, so a form knows before anything is typed.
-    this.sync()
-  }
-
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`.
-    this.sync()
-    /* The panel follows `open` through the controller, which has shown it by
-       the time this runs. Only on the update that opened it, or every keystroke
-       while it is up would steal focus back into the grid. */
+    /* After the mixin has shown the panel, and only on the update that opened
+       it, or every keystroke while it is up would steal focus back into the
+       grid. */
     if (this.open && changed.has('open')) {
       this.partNamed('picker')?.focus()
     }
-  }
-
-  /**
-   * Puts the caret back in the field without the field reopening the calendar.
-   *
-   * Focus opens the calendar, so handing focus back after a pick reopens the
-   * thing that was just answered. `relatedTarget` was the guard and it is not
-   * enough on its own: it catches a hand-off from the trigger, and it does not
-   * catch this, because the cell that had focus is gone by the time the caret
-   * moves and the document has fallen back to something outside this element.
-   *
-   * **Reasoned rather than measured, and worth saying which.** In a focused
-   * document: the reader presses a day, the cell has focus, the panel is hidden,
-   * the browser moves focus off the removed cell to the body, and the caret is
-   * then put back here with `relatedTarget` pointing at the body, which is
-   * outside this element and reads as an arrival. Every step is ordinary browser
-   * behavior and none of it can be exercised here: `focus()` dispatches no
-   * event in an unfocused document, which is what both the test runtime and the
-   * available browser pane are. A spec for this passes with the guard removed,
-   * so there is no spec: it would cover nothing while looking like proof.
-   *
-   * A flag rather than a better guess, because this element is the one moving
-   * the focus and is the only thing that can know so. Cleared synchronously,
-   * since `focus()` dispatches before it returns.
-   */
-  private returning = false
-
-  private returnFocus(): void {
-    this.returning = true
-    this.control?.focus()
-    this.returning = false
-  }
-
-  private readonly handleBlur = (): void => {
-    this.editing = false
-  }
-
-  /*
-   * Focusing the field opens the calendar.
-   *
-   * A reader who reaches this control is choosing a date, and making them find
-   * the trigger afterwards is a second action for something they have already
-   * asked for. Typing still works with it up, because the calendar follows the
-   * field rather than the other way round.
-   *
-   * **Only where focus arrived from outside this element**, which is the whole
-   * of the difficulty: picking a date shuts the panel and puts the caret back in
-   * the field, so an unguarded version reopens the calendar the reader just
-   * answered. `relatedTarget` is where focus came from, so a hand-off from the
-   * calendar or the trigger is left alone and only a genuine arrival opens
-   * anything.
-   *
-   * On the input rather than on the field, too. Focus does not bubble, so a
-   * listener here covers the text and not the trigger, which is what keeps
-   * pressing the trigger from opening the panel on focus and then shutting it
-   * again on the click.
-   */
-  private readonly handleFocus = (event: FocusEvent): void => {
-    /* Not while the caret is being handed back. Picking a date returns focus to
-       the field, and treating that as editing puts the field into the shape it
-       takes for typing: a reader picks 4 August 2026 from the calendar and the
-       field answers `2026-08-04`. Focus is a good enough signal for editing
-       everywhere except the one moment this element moved the focus itself, and
-       it already knows when that is. */
-    this.editing = !this.returning
-    const from = event.relatedTarget
-    if (this.open || this.isDisabled || this.returning) {
-      return
-    }
-    if (from instanceof Node && this.renderRoot?.contains?.(from)) {
-      return
-    }
-    this.requestOpen(true)
-  }
-
-  /** Puts the caret in the field, the way a label pointing at one would. */
-  override focus(options?: FocusOptions): void {
-    this.control?.focus(options)
   }
 
   /**
@@ -640,6 +454,8 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
     ></${this.tag('date-picker')}>`
   }
 
+  /* Time Input's tag is this one under its own part name, with its own label
+     on the remove control, which is why neither is the mixin's. */
   /**
    * One chosen date, as a tag, behind a seam the styled tier can move.
    *
@@ -664,6 +480,9 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
                 >`
   }
 
+  /* Time Input has this seam with its own icon, and it is not the mixin's
+     because a part a mixin renders is credited to every host that applies it,
+     Color Input included, whose trigger is a swatch. */
   /**
    * The mark on the button that opens the calendar, behind a seam.
    *
@@ -738,6 +557,8 @@ export class HelixHeadlessDateInput extends MixinControllerOpen(
       ${this.renderHint()}${this.renderFeedback()}`
   }
 
+  /* Time Input has this pair over a different conversion, and each is
+     documented on its own page, so the pair stays with the family. */
   /**
    * The value as a `Date`, at midnight UTC, or `null` while there is no date.
    *

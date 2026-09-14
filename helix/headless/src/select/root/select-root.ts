@@ -182,7 +182,11 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * Held off the trigger by the controller rather than by a margin on the
    * panel. A margin is inside the box the controller measures, so it would be
    * counted once in the placement and again in the layout, and the gap would
-   * change as the panel flipped above the trigger for want of room. */
+   * change as the panel flipped above the trigger for want of room.
+   *
+   * Not `MixinPickerField`, which floats a picker off a text field and hands
+   * the caret back to it: there is no text here, the panel hangs off the
+   * trigger, and dismissal puts focus back on that. */
   protected readonly panel = new PopoverController(this, {
     anchor: () => this.partNamed('trigger'),
     /* The surface *and* the trigger.

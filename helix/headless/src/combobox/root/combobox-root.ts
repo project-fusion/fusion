@@ -267,6 +267,12 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     return this.partNamed<HelixHeadlessListbox>('listbox')
   }
 
+  /* Not `MixinPickerField`, though this is a text field with a panel over it.
+     The agreement differs at every point the mixin fixes: the whole field is
+     inside for a press, the gap is four rather than eight, Escape closes
+     through `close()` with no `returning` flag because nothing here opens on
+     arrival, and `updated` reconciles the control against a completion rather
+     than restoring it to a value. */
   protected readonly panel = new PopoverController(this, {
     anchor: () => this.partNamed('field'),
     /* The surface *and* the field. Scoped to the surface alone, a press on the

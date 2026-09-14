@@ -8,8 +8,9 @@ import {
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
+  MixinPickerEditing,
+  MixinPickerField,
   MixinTokens,
-  PopoverController,
 } from '@fusion.dev/helix-core'
 import { clock } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -106,8 +107,10 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart trigger-icon - The mark on the button that opens the clock.
  */
 @customElement('helix-headless-time-input')
-export class HelixHeadlessTimeInput extends MixinControllerOpen(
-  MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
+export class HelixHeadlessTimeInput extends MixinPickerEditing(
+  MixinPickerField(
+    MixinControllerOpen(MixinTokens(MixinControllerValue(MixinField(HelixFormElement)))),
+  ),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -165,22 +168,6 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   placeholder = 'HH:mm'
 
   /**
-   * Whether the control refuses changes while still submitting its value.
-   *
-   * **Enforced by refusing every request in one place**, which is the seam this
-   * component already has: `requestValue` is what every path here comes through,
-   * and gating it once is what stops the next call site from being written
-   * without the check.
-   *
-   * Not `disabled`, which is the confusion worth naming: a disabled control
-   * submits nothing and leaves the tab order, and a read-only one submits its
-   * value and stays reachable, which is what a form showing a value somebody
-   * else set needs.
-   */
-  @property({ attribute: 'readonly', reflect: true, type: Boolean })
-  readOnly = false
-
-  /**
    * How far apart the offered times are, in minutes.
    */
   @property({ type: Number })
@@ -203,38 +190,6 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   @property({ attribute: 'trigger-label' })
   triggerLabel = 'Choose a time'
 
-  /**
-   * Whether the caret is in the field, which is when it holds the value.
-   */
-  @state()
-  private editing = false
-
-  /** The overlay, placed against the field for the reason Date Input gives. */
-  protected readonly panel = new PopoverController(this, {
-    anchor: () => this.partNamed('field'),
-    /* The surface *and* the trigger.
-     *
-     * A control is not always one element: the button that opens this panel is
-     * part of it, and a press on it is not a press outside. Scoped to the
-     * surface alone, `pointerdown` on the trigger closed the panel and the
-     * trigger's own `toggleOpen` reopened it on the `click` that followed, so
-     * the panel could never be closed by the button that opened it.
-     * `DismissController` documents this failure and takes a list for it. */
-    boundary: (): readonly (Element | null | undefined)[] => [
-      this.partNamed('surface'),
-      this.partNamed('trigger'),
-    ],
-    offset: () => 8,
-    onDismiss: () => this.requestOpen(false),
-    open: () => this.open,
-    placement: 'bottom-start',
-    surface: () => this.partNamed('surface'),
-  })
-
-  private get control(): HTMLInputElement | null {
-    return this.partNamed<HTMLInputElement>('control')
-  }
-
   /** Every time in the value, which may hold more than one. */
   private get held(): string[] {
     /* The en dash and the spaced hyphen both mean "to", because a range is shown
@@ -254,7 +209,7 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   }
 
   /** What the field shows: the value while it is being edited, a reading when not. */
-  private get display(): string {
+  protected override get display(): string {
     if (this.mode === 'multiple') {
       return this.draft
     }
@@ -361,77 +316,8 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
     }
   }
 
-  /**
-   * Puts the caret back in the field without the field reopening the list.
-   *
-   * Focus opens the list, so handing focus back after a pick would reopen the
-   * thing that was just answered, and a reader could not get out of it. Input
-   * Date guards the same case by asking where focus came from, which is enough
-   * there and is not enough here: the option that had focus is gone by the time
-   * this runs, so `relatedTarget` is whatever the document fell back to, which
-   * is outside this element and reads as a genuine arrival.
-   *
-   * A flag rather than a better guess, because this element is the one moving
-   * the focus and it is the only thing that can know so. Cleared synchronously,
-   * since `focus()` dispatches before it returns.
-   *
-   * The path cannot be exercised from a spec: `focus()` dispatches no event in
-   * an unfocused document, which is what both the test runtime and the browser
-   * pane here are.
-   */
-  private returning = false
-
-  private returnFocus(): void {
-    this.returning = true
-    this.control?.focus()
-    this.returning = false
-  }
-
-  private readonly handleBlur = (): void => {
-    this.editing = false
-  }
-
-  /**
-   * Focusing the field opens the list, and only from outside the element.
-   *
-   * The guard is the one Date Input needed: picking a time shuts the panel and
-   * puts the caret back in the field, and without it the list came straight
-   * back and a reader could not get out of it.
-   */
-  private readonly handleFocus = (event: FocusEvent): void => {
-    /* Not while the caret is being handed back. Picking a time returns focus
-       to the field, and treating that as editing put the field into the shape it
-       takes for typing: a reader chose "10:00 PM" from a list and the field
-       answered "22:00". Focus is a good enough signal for editing everywhere
-       except the one moment this element moved the focus itself, and it already
-       knows when that is. */
-    this.editing = !this.returning
-    const from = event.relatedTarget
-    if (this.open || this.isDisabled || this.returning) {
-      return
-    }
-    if (from instanceof Node && this.renderRoot?.contains?.(from)) {
-      return
-    }
-    this.requestOpen(true)
-  }
-
-  /** Puts the field back where the answer differs from what was typed. */
-  private restore(): void {
-    const control = this.control
-    if (control && control.value !== this.display) {
-      control.value = this.display
-    }
-    this.sync()
-  }
-
-  /** Reports the value and the validity the host stands behind. */
-  private sync(): void {
-    this.internals.setFormValue(this.value)
-    const control = this.control
-    if (!control) {
-      return
-    }
+  /** What is wrong with the times, which the text input cannot say. */
+  protected override validate(): string {
     /* Checked here rather than left to the input, which is `text` and has no
        idea what a time is.
 
@@ -444,34 +330,21 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
     const held = this.held
     const floor = toMinutes(this.min) ?? 0
     const ceiling = toMinutes(this.max) ?? 1439
-    let message = ''
     if (held.length > 0 && !held.every(isTime)) {
-      message =
-        this.mode === undefined
-          ? 'Enter a time as HH:mm.'
-          : 'Enter times as HH:mm, separated by commas.'
-    } else if (held.some((one) => (toMinutes(one) ?? 0) < floor)) {
-      message = `Choose a time at or after ${writeTime(this.min, this.locale)}.`
-    } else if (held.some((one) => (toMinutes(one) ?? 0) > ceiling)) {
-      message = `Choose a time at or before ${writeTime(this.max, this.locale)}.`
-    } else if (this.mode === 'range' && held.length > 2) {
-      message = 'A range is two times.'
+      return this.mode === undefined
+        ? 'Enter a time as HH:mm.'
+        : 'Enter times as HH:mm, separated by commas.'
     }
-    if (message === '') {
-      this.internals.setValidity(control.validity, control.validationMessage, control)
-    } else {
-      this.internals.setValidity({ badInput: true }, message, control)
+    if (held.some((one) => (toMinutes(one) ?? 0) < floor)) {
+      return `Choose a time at or after ${writeTime(this.min, this.locale)}.`
     }
-    this.refreshFeedback()
-  }
-
-  /** Escape shuts the list without moving the time. */
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.open) {
-      event.stopPropagation()
-      this.requestOpen(false)
-      this.returnFocus()
+    if (held.some((one) => (toMinutes(one) ?? 0) > ceiling)) {
+      return `Choose a time at or before ${writeTime(this.max, this.locale)}.`
     }
+    if (this.mode === 'range' && held.length > 2) {
+      return 'A range is two times.'
+    }
+    return ''
   }
 
   /**
@@ -492,41 +365,16 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
   @property({ reflect: true })
   variant?: 'list' | 'wheels'
 
-  /** Refuses every change while read-only. See `readOnly`. */
-  override requestValue(next: string): boolean {
-    if (this.readOnly) {
-      return false
-    }
-    return super.requestValue(next)
-  }
-
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    // Whatever the markup arrived with, so a form knows before anything is typed.
-    this.sync()
-  }
-
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    // Every update, not only the ones that name `value`: see the note on
-    // `ColorInput.updated`.
-    this.sync()
-    /* After the panel is shown, not before, which the controller has done by
-       the time this runs. A set of wheels centers each on its own answer and
-       cannot do it against a box of zero height, which is what everything in a
-       `popover` measures until something shows it. The picker calls this on
-       its own updates too; that one lands too early and is harmless, and this
-       one is the call that works. */
+    /* After the mixin has shown the panel, not before. A set of wheels centers
+       each on its own answer and cannot do it against a box of zero height,
+       which is what everything in a `popover` measures until something shows
+       it. The picker calls this on its own updates too; that one lands too
+       early and is harmless, and this one is the call that works. */
     if (this.open) {
-      this.renderRoot
-        ?.querySelector<HTMLElement & { reveal?: () => void }>('[part="picker"]')
-        ?.reveal?.()
+      this.partNamed<HTMLElement & { reveal?: () => void }>('picker')?.reveal?.()
     }
-  }
-
-  /** Puts the caret in the field, the way a label pointing at one would. */
-  override focus(options?: FocusOptions): void {
-    this.control?.focus(options)
   }
 
   /**
@@ -567,6 +415,8 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
     ></${this.tag('time-picker')}>`
   }
 
+  /* Date Input's tag is this one under its own part name, with its own label
+     on the remove control, which is why neither is the mixin's. */
   /**
    * One chosen time, as a tag, behind a seam the styled tier can move.
    *
@@ -589,6 +439,9 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
                 >`
   }
 
+  /* Date Input has this seam with its own icon, and it is not the mixin's
+     because a part a mixin renders is credited to every host that applies it,
+     Color Input included, whose trigger is a swatch. */
   /**
    * The mark on the button that opens the clock, behind a seam.
    *
@@ -660,6 +513,8 @@ export class HelixHeadlessTimeInput extends MixinControllerOpen(
       ${this.renderHint()}${this.renderFeedback()}`
   }
 
+  /* Date Input has this pair over a different conversion, and each is
+     documented on its own page, so the pair stays with the family. */
   /**
    * The value as a `Date` on 1 January 1970 UTC, or `null` while there is no time.
    *
