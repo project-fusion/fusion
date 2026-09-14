@@ -42,12 +42,11 @@ import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
  * ```
  */
 import { createServer } from 'node:http'
-import { extname, join, relative, resolve } from 'node:path'
+import { extname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { TIERS } from '@fusion.dev/scripts/workspace'
+import { root, TIERS } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
-const root = resolve(import.meta.dirname, '../..')
 const harness = fileURLToPath(import.meta.resolve('@fusion.dev/helix-testing/browser'))
 const scratch = join(root, '.local/stuck-probe')
 const out = join(scratch, 'out')

@@ -26,11 +26,10 @@
  */
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
-import { extname, join, resolve } from 'node:path'
-import { ARTIFACT, SOURCE } from '@fusion.dev/scripts/workspace'
+import { extname, join } from 'node:path'
+import { ARTIFACT, root, SOURCE } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
-const root = resolve(import.meta.dirname, '../..')
 const specs = join(root, 'fusion/site/public/specs')
 
 /* One real family, chosen because it publishes parts on both tiers and so

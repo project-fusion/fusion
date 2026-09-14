@@ -70,10 +70,10 @@
  * list is the only way in.
  */
 import { mkdir } from 'node:fs/promises'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
+import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
-const root = resolve(import.meta.dirname, '../..')
 const out = join(root, '.local/shots')
 
 const args = process.argv.slice(2)

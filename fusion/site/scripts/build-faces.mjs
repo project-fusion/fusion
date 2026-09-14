@@ -41,7 +41,7 @@ import { dirname, join } from 'node:path'
    Hand-writing that marker into a row of the generated file is not the fix: a
    fix in generated output is undone by the next build. The name is the fix,
    because the exemption is what the name is for. */
-const OUT = join(import.meta.dirname, '../../../fusion/site/content/faces/faces.generated.ts')
+const OUT = join(import.meta.dirname, '../content/faces/faces.generated.ts')
 const SOURCE = 'https://fonts.google.com/metadata/fonts'
 
 /* What the token layer asks for. `--helix-weight-*` resolves to these three, so

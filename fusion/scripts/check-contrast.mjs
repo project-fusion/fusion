@@ -47,12 +47,11 @@
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
-import { extname, join, resolve } from 'node:path'
+import { extname, join } from 'node:path'
 import { pairs } from '@fusion.dev/scripts/theme-facts'
-import { SOURCE } from '@fusion.dev/scripts/workspace'
+import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
-const root = resolve(import.meta.dirname, '../..')
 const frame = join(root, 'fusion/site/public/sandbox')
 const source = join(root, SOURCE.styled)
 

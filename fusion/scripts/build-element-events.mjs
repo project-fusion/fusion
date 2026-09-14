@@ -27,11 +27,10 @@
  * `--check` compares without writing, for `verify`.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { formatted } from '@fusion.dev/scripts/formatted'
+import { root } from '@fusion.dev/scripts/workspace'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const checking = process.argv.includes('--check')
 /* One package when named, both when not. Each tier generates its own as a
    prebuild step, so the file is a build output rather than a tracked one. */
@@ -40,7 +39,7 @@ const PACKAGES = only === -1 ? ['headless', 'styled'] : [process.argv[only + 1]]
 
 const mapFor = (pkg) => {
   const manifest = JSON.parse(
-    readFileSync(join(ROOT, 'helix', pkg, 'custom-elements.json'), 'utf8'),
+    readFileSync(join(root, 'helix', pkg, 'custom-elements.json'), 'utf8'),
   )
   const entries = []
   for (const unit of manifest.modules ?? []) {
@@ -78,7 +77,7 @@ let total = 0
 for (const pkg of PACKAGES) {
   const entries = mapFor(pkg)
   total += entries.length
-  const path = join(ROOT, 'helix', pkg, 'src', 'element-events.generated.ts')
+  const path = join(root, 'helix', pkg, 'src', 'element-events.generated.ts')
   const next = formatted(render(entries), 'element-events.generated.ts')
   const held = (() => {
     try {

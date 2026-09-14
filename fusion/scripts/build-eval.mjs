@@ -25,11 +25,9 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { ARTIFACT } from '@fusion.dev/scripts/workspace'
+import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
-const OUT = join(ROOT, 'fusion', 'scripts', 'eval', 'questions.json')
+const OUT = join(root, 'fusion', 'scripts', 'eval', 'questions.json')
 
 /**
  * The family a declaration belongs to.
@@ -50,7 +48,7 @@ const familyOf = (declaration) => declaration.modulePath?.split('/').at(-3) ?? d
 /** Every tagged declaration in the styled manifest, with its Helix metadata. */
 const families = () => {
   const manifest = JSON.parse(
-    readFileSync(join(ROOT, 'helix', 'styled', 'custom-elements.json'), 'utf8'),
+    readFileSync(join(root, 'helix', 'styled', 'custom-elements.json'), 'utf8'),
   )
   const found = []
   for (const module of manifest.modules ?? []) {
@@ -75,7 +73,7 @@ const families = () => {
 }
 
 const tokens = () =>
-  JSON.parse(readFileSync(join(ROOT, ARTIFACT.tokens), 'utf8')).tokens.map((token) => token.name)
+  JSON.parse(readFileSync(join(root, ARTIFACT.tokens), 'utf8')).tokens.map((token) => token.name)
 
 /**
  * A name that is not a token but looks exactly like one.
@@ -194,7 +192,7 @@ for (const entry of all) {
    the list of what. Recorded so a reader can see the corpus has no hand-written
    ground truth in it at all. */
 const sources = ['helix/styled/custom-elements.json', 'helix/styles/dist/tokens.json'].filter(
-  (path) => existsSync(join(ROOT, path)),
+  (path) => existsSync(join(root, path)),
 )
 
 /* **The guard the corpus cannot supply for itself.** A family name is derived
@@ -202,11 +200,11 @@ const sources = ['helix/styled/custom-elements.json', 'helix/styles/dist/tokens.
    scores a perfect hundred while every answer is wrong. So the names are held
    against the directories, which is the same test `helix component`'s `examples` uses. */
 const directories = new Set(
-  readdirSync(join(ROOT, 'helix', 'styled', 'src'), { withFileTypes: true })
+  readdirSync(join(root, 'helix', 'styled', 'src'), { withFileTypes: true })
     .filter(
       (entry) =>
         entry.isDirectory() &&
-        existsSync(join(ROOT, 'helix', 'styled', 'src', entry.name, 'index.ts')),
+        existsSync(join(root, 'helix', 'styled', 'src', entry.name, 'index.ts')),
     )
     .map((entry) => entry.name),
 )

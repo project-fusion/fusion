@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { root } from '@fusion.dev/scripts/workspace'
 
 /**
  * Generates the light-DOM stylesheet that hides elements until they upgrade.
@@ -38,9 +39,8 @@ const walk = (dir) =>
    out of that package, which `fusion workspace`'s `reaching` rule reads and is
    right to; and the answer here is not a caller's to give, there being exactly
    one element package and one style package. */
-const ROOT = join(import.meta.dirname, '../..')
-const source = join(ROOT, 'helix/styled')
-const target = join(ROOT, 'helix/styles')
+const source = join(root, 'helix/styled')
+const target = join(root, 'helix/styles')
 const tags = new Set()
 
 for (const file of walk(join(source, 'src'))) {
