@@ -35,6 +35,18 @@
   --chart-series-24: var(--helix-color-series-24);
 }
 
+/* The width a chart draws a series with where it draws one as a line: Line's
+   line, Area's top edge and Bar's `lines` series. One width, because the three
+   are one idea, and they were drawn at 2px, 1.5px and 2.5px with nothing
+   recording why; settled 14 Sep 2026 at Line's, the family the idea is named
+   for. No border token holds it, the border scale being edges and a series not
+   one. Read through a private so a consumer's `--chart-stroke` inherits from
+   wherever it was set rather than being beaten by a declaration on the host,
+   and each family keeps its own hook in front of it. */
+:host {
+  --_chart-stroke: var(--chart-stroke, 2px);
+}
+
 /* Print: the shared chart parts, for the same reason. */
 @media print {
   :host {

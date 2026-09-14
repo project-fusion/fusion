@@ -31,12 +31,14 @@ import '../../tooltip/index.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://helix.fusion.dev/components/line-chart
  *
+ * @cssproperty --chart-stroke - Thickness of a series drawn as a line, here and on Area
+ *   Chart's top edge and Bar Chart's `lines`. Each family's own width hook overrides it.
  * @cssproperty --line-chart-area-opacity - How much of a line's color its wash takes.
  * @cssproperty --line-chart-band-color - The slot the pointer is resting in.
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.
  * @cssproperty --line-chart-gridline-color - One rule across the plot, under `gridlines`.
- * @cssproperty --line-chart-width - Thickness of a line.
+ * @cssproperty --line-chart-width - Thickness of a line, over `--chart-stroke`.
  */
 @customElement('helix-line-chart')
 export class HelixLineChart extends HelixHeadlessLineChart {

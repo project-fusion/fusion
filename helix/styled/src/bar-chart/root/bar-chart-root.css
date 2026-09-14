@@ -199,10 +199,9 @@
   stroke: var(--bar-chart-line-color, var(--_bar-chart-series, var(--helix-color-series-1)));
   stroke-linecap: round;
   stroke-linejoin: round;
-  /* `2.5px`, where Line draws at `2px` and Area's edge at `1.5px`: three widths
-     for one idea, recorded in each and settled in none, since settling moves
-     pixels in two charts. */
-  stroke-width: var(--bar-chart-line-width, 2.5px);
+  /* The width every chart's line is, from the shared series sheet, with the
+     family's own hook in front of it. */
+  stroke-width: var(--bar-chart-line-width, var(--_chart-stroke));
   vector-effect: non-scaling-stroke;
 }
 
