@@ -57,6 +57,7 @@
     "rs:test": "cargo test --workspace",
     "shot": "bun fusion/scripts/shot.mjs",
     "smoke:examples": "bun fusion/scripts/run-example-smoke.mjs",
+    "smoke:scaffold": "bun fusion/scripts/run-template-build.mjs",
     "smoke:template": "bun fusion/scripts/run-template-test.mjs",
     "specs:browser": "turbo run specs && bun fusion/scripts/run-browser-specs.mjs",
     "test": "turbo run test",

@@ -1,0 +1,58 @@
+# Scaffolds every template with `helix new`, installs it from packed tarballs,
+# and builds it: [run-template-build.mjs](../../fusion/scripts/run-template-build.mjs)
+# says why nothing else here does.
+#
+# **Only on the pull requests that can break one**, and not in `verify`, because
+# it installs a framework per template and most changes reach neither. A
+# template's own dependencies, which is what the dependency bot bumps, and the
+# scaffolder are the paths below. A change to the packages a template imports
+# is `smoke:template`'s question, and `verify` already asks it.
+
+name: templates
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/templates.yml
+      - fusion/scripts/run-template-build.mjs
+      - helix/cli/src/new.rs
+      - helix/create-app/**
+      - helix/templates/**
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+
+      # `helix new` is the scaffolder under test, so the binary is built here
+      # rather than taken from a release that predates the change.
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
+      - name: Restore the Cargo cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - name: Build helix
+        run: cargo build -p fusion-helix-cli
+
+      # The tarballs are packed from `dist`, and `files` names what `analyze`
+      # writes, so both run before anything is packed.
+      - name: Build
+        run: bun run build
+      - name: Analyze
+        run: bun run analyze
+
+      - name: Scaffold, install and build every template
+        run: bun run smoke:scaffold
