@@ -133,12 +133,30 @@ if (sources > bundled) {
  *
  * **An exception here is a recorded fact, not a silenced failure**, which is why
  * each carries its numbers: a reader can re-run the measurement and take the
- * entry out. The user agent's video controls were listed here, measured at 22,
- * 34 and 122 differing pixels across retries; on 14 Sep 2026 they matched twice
- * on ubuntu-latest and the entry was spent, which is the rule this check keeps.
- * What remains is a real difference between the two idioms.
+ * entry out.
+ *
+ * **Two kinds, because they age differently.** A `differs` entry is a real
+ * difference between the two idioms; the day it matches twice, it is spent and
+ * this reports it. An `unstable` entry is a surface the harness cannot hold
+ * still, so it can match or differ from run to run and neither reading means
+ * anything: the video controls matched twice on ubuntu-latest on 14 Sep 2026,
+ * were taken out as spent, and differed by 188 pixels on the next run. Such an
+ * entry is skipped rather than judged, and carries the numbers that put it here.
  */
 const UNCOMPARED = new Map([
+  [
+    'styled/video/native',
+    {
+      /* The native control strip is the user agent's own shadow DOM, and nothing
+         here reaches it: `animations: 'disabled'` covers author animations, the
+         settle loop covers author layout, and `reducedMotion` covers a canvas that
+         offers a still frame. This offers none: it differs every time by a
+         different amount and survives the retry, measured at 22, 34 and 122
+         pixels, then matched twice, then 188, all of it inside the controls. */
+      unstable: true,
+      why: "the user agent's own video controls, which no wait or retry here can settle",
+    },
+  ],
   [
     'styled/outline/events',
     /* A real difference between the idioms, and the React side is the honest
@@ -151,7 +169,7 @@ const UNCOMPARED = new Map([
        the truth about how they were written. Making them agree means crippling
        the React one or teaching the markup one to listen on `document` before
        anything upgrades, and the second is a worse example. */
-    'the markup twin binds too late to hear the opening announcement; React does not',
+    { why: 'the markup twin binds too late to hear the opening announcement; React does not' },
   ],
 ])
 
@@ -595,13 +613,16 @@ for (const entry of entries) {
      its reason. Skipping them would save two page loads and cost the only signal
      that one has been fixed. */
   const excused = UNCOMPARED.get(where)
+  if (excused?.unstable) {
+    continue
+  }
   if (excused !== undefined) {
     /* **Confirmed before it is called spent, the same way a difference is
-       confirmed before it is called real.** Two of these three are on the list
-       for being unstable, so one matching run is as likely to be luck as a fix:
-       `video/native` matched once and differed on the next run, which had this
-       reporting the entry as stale every other time. A second pass costs one
-       reload on three examples and turns a coin flip into a reading. */
+       confirmed before it is called real.** One matching run can be luck, so a
+       second pass costs one reload and turns a coin flip into a reading. What
+       two matches cannot settle is an unstable surface, which is why those are
+       skipped above rather than read here: `video/native` matched twice and
+       then differed by 188 pixels the next run. */
     if (moved === 0) {
       const again = await picture(
         `${origin}/html/${entry.tier.name}/${entry.family}/${entry.slug}/`,
@@ -611,7 +632,7 @@ for (const entry of entries) {
       )
       if (again.shot.equals(twin.shot)) {
         stale.push(
-          `${where}: matched twice, so the entry is spent. It was listed for "${excused}". ` +
+          `${where}: matched twice, so the entry is spent. It was listed for "${excused.why}". ` +
             'Take it out of UNCOMPARED.',
         )
       }
