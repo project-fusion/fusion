@@ -21,15 +21,17 @@
 //!
 //! **Written out rather than shared with `fusion-cli`'s.** A crate holding both
 //! would be a dependency from the helix domain onto the fusion one, and
-//! per-domain lockstep exists so a release of either does not wait on the other
-//! — which is the same trade [`super`] already takes for `Rule` and `Report`.
-//! The two screens are the same keys and the same shape on purpose: a reader who
-//! learns one has learned the other, and `fusion helix component audit` reaches
-//! this one.
+//! per-domain lockstep exists so a release of either does not wait on the
+//! other, which is the same trade [`super`] takes for everything the two crates
+//! hold in common and measures there. The two screens are the same keys and the
+//! same shape on purpose: a reader who learns one has learned the other, and
+//! `fusion helix component audit` reaches this one. A test in `fusion-cli`
+//! holds the two files identical but for this docblock, the import and the
+//! product's name, so they cannot drift quietly.
 //!
 //! **Notes are shown and are not failures.** A component rule may report work
-//! worth seeing that must not fail — families in a group that disagree about
-//! declaring an axis — and a screen that only listed findings would drop them.
+//! worth seeing that must not fail (families in a group that disagree about
+//! declaring an axis) and a screen that only listed findings would drop them.
 
 use std::io::{self, Stdout};
 

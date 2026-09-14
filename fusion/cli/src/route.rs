@@ -8,8 +8,11 @@
 //! **Exec rather than a library, which is the whole design.** Linking
 //! `fusion-helix-cli` in would be a dependency from the fusion domain onto the
 //! helix one, and per-domain lockstep exists so a release of either does not
-//! wait on the other — a shared crate is exactly the thing that makes it wait.
-//! Spawning costs a process and keeps the domains apart.
+//! wait on the other: a shared crate is exactly the thing that makes it wait.
+//! Spawning costs a process and keeps the domains apart. What it costs instead
+//! is the copy: about eight hundred lines the two crates hold in common, listed
+//! in `helix`'s `component/mod.rs`, with the screen held identical by a test
+//! here and the rest kept the same by hand.
 //!
 //! **Every product CLI still works standalone**, which is the constraint this is
 //! built under rather than around: `helix component audit` needs nothing else
