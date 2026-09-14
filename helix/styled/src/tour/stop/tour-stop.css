@@ -63,11 +63,11 @@
  */
 [part="arrow"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
-  /* `0.625rem`, where Tooltip's point is `0.5rem`: two sizes for one shape,
-     and no size token holds either. Recorded rather than settled, since
-     settling moves one of them. */
-  block-size: var(--tour-arrow-size, 0.625rem);
-  inline-size: var(--tour-arrow-size, 0.625rem);
+  /* `0.5rem`, which is Tooltip's point: one shape, one size. No size token
+     holds it, the size scale being controls, icons and marks. Settled 14 Sep
+     2026 from `0.625rem` here against `0.5rem` there. */
+  block-size: var(--tour-arrow-size, 0.5rem);
+  inline-size: var(--tour-arrow-size, 0.5rem);
   position: absolute;
   rotate: 45deg;
 }
@@ -78,23 +78,23 @@
 [part="bubble"][data-placement^="bottom"] [part="arrow"] {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-  inset-block-start: calc(var(--tour-arrow-size, 0.625rem) / -2);
+  inset-block-start: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }
 
 [part="bubble"][data-placement^="top"] [part="arrow"] {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
-  inset-block-end: calc(var(--tour-arrow-size, 0.625rem) / -2);
+  inset-block-end: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }
 
 [part="bubble"][data-placement^="right"] [part="arrow"] {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-  inset-inline-start: calc(var(--tour-arrow-size, 0.625rem) / -2);
+  inset-inline-start: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }
 
 [part="bubble"][data-placement^="left"] [part="arrow"] {
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
-  inset-inline-end: calc(var(--tour-arrow-size, 0.625rem) / -2);
+  inset-inline-end: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }
