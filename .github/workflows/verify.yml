@@ -259,6 +259,10 @@ jobs:
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
           components: clippy
+          # The floor rather than stable, so `rust-version` in `Cargo.toml` is
+          # exercised by the one job that compiles: a crate reaching past it
+          # fails here rather than on the first machine that is behind.
+          toolchain: 1.90
       - name: Restore the Cargo cache
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
       - name: Run the specs
