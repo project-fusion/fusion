@@ -4,11 +4,6 @@
   // is bun; anything that reads this package with Node would have got
   // TypeScript. `test` already depends on `^build`, so compiling it costs the
   // task graph nothing.
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "types": ["bun"]
-  },
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.package.json",
   "include": ["src/**/*"]
 }

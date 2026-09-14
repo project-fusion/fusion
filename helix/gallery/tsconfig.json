@@ -1,10 +1,10 @@
 {
+  // `react` rather than `bun`: the art is `.tsx` a site renders, and the
+  // package has no specs to type against `bun:test`.
   "compilerOptions": {
     "jsx": "react-jsx",
-    "outDir": "dist",
-    "rootDir": "src",
     "types": ["react"]
   },
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.package.json",
   "include": ["src/**/*"]
 }

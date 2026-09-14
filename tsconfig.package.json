@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  // What every package's `tsconfig.json` shares, so each one is `extends` plus
+  // what it includes, and the one that differs says why.
+  //
+  // A package compiles `src` into `dist`, and it emits twice: the JavaScript
+  // with the comments stripped, from `tsconfig.build.json`, and the
+  // declarations with them kept, from `tsconfig.types.json`. `declaration` is
+  // off here so the first pass writes no `.d.ts`; the root `tsconfig.types.json`
+  // turns it back on for the second.
+  //
+  // **`${configDir}` rather than a bare `dist`**, because a path in an extended
+  // config resolves against the file that wrote it: a bare `dist` here is the
+  // repository root's, for every package at once.
+  //
+  // **The build/spec split is this way round because the editor reads
+  // `tsconfig.json` and nothing else.** With the specs excluded there, a spec
+  // file falls into an inferred project with no `types`, and every one of them
+  // opens on `Cannot find module 'bun:test'`. Putting them in the main config
+  // fixes that and moves the emit to `tsconfig.build.json`, which extends the
+  // main config and excludes the specs.
+  //
+  // A referenced `tsconfig.spec.json` was the first answer and was worse: a
+  // composite project that `include`s `src/**/*` *claims* those files, so the
+  // parent stops emitting them and `tsc` exits 0 having written nothing. Every
+  // package built empty on a clean checkout for exactly as long as a stale
+  // `dist` was sitting there to hide it.
+  "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
+    "outDir": "${configDir}/dist",
+    "removeComments": true,
+    "rootDir": "${configDir}/src",
+    "types": ["bun"]
+  },
+  "extends": "./tsconfig.base.json"
+}

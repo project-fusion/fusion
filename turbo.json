@@ -1,5 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  // The compiler options every package extends live at the root, where a
+  // package's own inputs do not reach: an edit to one of these changed every
+  // `dist` and invalidated no cache.
+  "globalDependencies": ["tsconfig.base.json", "tsconfig.package.json", "tsconfig.types.json"],
   // **The platform is part of the hash, because turbo does not put it there and
   // the artifacts differ by it.** Measured 25 Aug 2026, the day the remote cache
   // started working: CI restored a build this laptop had written, and
