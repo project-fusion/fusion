@@ -16,11 +16,11 @@ short=$(git rev-parse --short=7 HEAD)
 : > /tmp/released
 
 base=$(git merge-base "$BASE_SHA" HEAD)
-resolved=$(node fusion/scripts/bump.mjs "$base..HEAD")
+resolved=$(bun fusion/scripts/bump.mjs "$base..HEAD")
 
 while IFS=$'\t' read -r domain level; do
   [ -n "$level" ] || continue
-  version=$(node fusion/scripts/version.mjs \
+  version=$(bun fusion/scripts/version.mjs \
     --domain "$domain" --bump "$level" --pre "exp.$NUMBER.g$short" --write | tail -1)
   printf '%s %s\n' "$domain" "$version" >> /tmp/released
 done < <(jq -r '.[] | "\(.domain)\t\(.level)"' <<<"$resolved")

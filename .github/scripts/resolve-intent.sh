@@ -21,7 +21,7 @@ for domain in helix cortex; do
   if [ -z "$last" ] || [ "${major%%.*}" = '0' ]; then
     zero=(--zero "$domain")
   fi
-  node fusion/scripts/bump.mjs "$range" "${zero[@]}" \
+  bun fusion/scripts/bump.mjs "$range" "${zero[@]}" \
     | jq -c --arg d "$domain" '.[] | select(.domain == $d)' >> /tmp/entries
 done
 

@@ -29,7 +29,6 @@ permissions:
 # reports "Insufficient permissions to write to remote cache", which reads like a
 # token problem and is not one.
 env:
-  BUN_VERSION: "1.1.43"
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_TEAMID: ${{ vars.TURBO_TEAMID }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -49,7 +48,7 @@ jobs:
       # depth-1 checkout has nothing to diff against. Same reason `browser`
       # already takes it for `parity`.
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -57,10 +56,10 @@ jobs:
       # It ran `node` until 2 Sep 2026, and a runner has node already; bun is
       # not on one. The step that reads the shard count died with
       # `bun: command not found` and took every job that needs `plan` with it.
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
+      - name: Set up bun
+        uses: ./.github/actions/setup
         with:
-          bun-version: ${{ env.BUN_VERSION }}
+          dependencies: false
 
       # **The count comes from the sharder, because it is a fact about the
       # list.** It was written here and defaulted separately in
@@ -94,22 +93,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out
-        uses: actions/checkout@v7
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
 
       # The three `PREREQUISITES` in `run-checks.mjs`, in its order. They are
       # named here rather than derived because this job exists to fill a cache
@@ -142,30 +128,12 @@ jobs:
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
     steps:
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Pinned to the version in `packageManager`. A lockfile pins every
       # dependency and nothing pinned the runtime resolving it.
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-
-
-      # `--frozen-lockfile` so a lockfile that does not match `package.json`
-      # fails here rather than being quietly updated in CI and not on the
-      # machine that pushed.
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
 
       - name: Checks, shard ${{ matrix.shard }}
         run: bun fusion/scripts/run-checks.mjs --shard ${{ matrix.shard }} --of ${{ needs.plan.outputs.of }}
@@ -189,25 +157,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-
-
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
 
       - name: Build
         run: bun run build
@@ -239,25 +192,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-
-
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
 
       - name: Build
         run: bun run build
@@ -278,24 +216,11 @@ jobs:
       # request's own commits. The repository is small enough that this costs
       # seconds.
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
       - name: Format and lint
         run: bunx biome ci .
       # **The messages and addresses of the commits a pull request brings**,
@@ -314,22 +239,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out
-        uses: actions/checkout@v7
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
       - name: Typecheck
         run: bun run typecheck
 
@@ -340,28 +252,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check out
-        uses: actions/checkout@v7
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
           components: clippy
       - name: Restore the Cargo cache
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
       - name: Run the specs
         run: bun run test
       # **`check:cli` is here rather than in the shard pool**, because it is the
@@ -527,34 +426,19 @@ jobs:
       # it had scoped. The other tasks in this matrix do not read history and
       # are not harmed by having it.
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-
-
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
 
       # The browser is a 130MB download that changes only when Playwright does,
       # so it is keyed on the lockfile. `--with-deps` still runs: the apt
       # packages are not in this cache, and a headless browser in CI fails on a
       # missing `libnss3` far more often than on anything to do with the tests.
       - name: Restore the spec bundle cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
           path: ~/.cache/ms-playwright
@@ -593,7 +477,7 @@ jobs:
       # and a Linux-only hydration finding arrived as a count with no picture.
       - name: Upload the visual diffs
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           if-no-files-found: ignore
           include-hidden-files: true
