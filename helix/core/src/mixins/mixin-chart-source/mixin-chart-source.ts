@@ -3,7 +3,7 @@ import { property } from 'lit/decorators.js'
 import { ChartPointerController } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
-import { type Row, readRows, readSeries, type Series } from '../../utils/read-series/read-series.js'
+import type { Row, Series } from '../../utils/read-series/read-series.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -187,10 +187,14 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
       }
     }
 
-    /** The columns of the table, one series each, or none if there is no table. */
+    /**
+     * The columns of the table, one series each, or none if there is no table.
+     *
+     * Held by the controller between edits, so a render reading this five
+     * times parses the table once. See `SourceController.series`.
+     */
     get series(): Series[] {
-      const element = this.source.element
-      return element ? readSeries(element) : []
+      return this.source.series
     }
 
     /**
@@ -220,8 +224,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * rather than for the shortest word available.
      */
     get sourceRows(): Row[] {
-      const element = this.source.element
-      return element ? readRows(element) : []
+      return this.source.rows
     }
 
     /** How many readings there are, which is what the pointer maps onto. */

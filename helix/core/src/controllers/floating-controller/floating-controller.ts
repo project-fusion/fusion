@@ -189,6 +189,20 @@ export class FloatingController implements ReactiveController {
   /** The placement in use after the last measurement. */
   placement: Placement = 'bottom-start'
 
+  /**
+   * How far the arrow keeps from the floating element's ends, measured once.
+   *
+   * `autoUpdate` runs `update` on every scroll frame of every ancestor, and
+   * `corner` is a `getComputedStyle` and four parses, which was a style read
+   * per frame for a number that does not change while the surface is up. So it
+   * is read as placing starts, when the surface has just been shown and has a
+   * computed style to read, and forgotten as placing stops, so a surface
+   * restyled between opens is measured again. `update` measures for itself
+   * where nothing started it, which is a `reposition` on a surface placed by
+   * its own stylesheet.
+   */
+  private padding: number | undefined
+
   /** Starts placing, and keeps placing until stopped. */
   start(): void {
     const anchor = this.options.anchor()
@@ -196,6 +210,7 @@ export class FloatingController implements ReactiveController {
     if (!anchor || !floating || this.cleanup) {
       return
     }
+    this.padding = this.options.arrow?.() ? corner(floating) : 0
     this.cleanup = autoUpdate(anchor, floating, this.update)
   }
 
@@ -206,6 +221,7 @@ export class FloatingController implements ReactiveController {
     this.run += 1
     this.cleanup?.()
     this.cleanup = undefined
+    this.padding = undefined
     this.options.floating()?.removeAttribute('data-placed')
   }
 
@@ -265,7 +281,7 @@ export class FloatingController implements ReactiveController {
       )
     }
     if (pointer) {
-      middleware.push(arrow({ element: pointer, padding: corner(floating) }))
+      middleware.push(arrow({ element: pointer, padding: this.padding ?? corner(floating) }))
     }
 
     computePosition(anchor, floating, {

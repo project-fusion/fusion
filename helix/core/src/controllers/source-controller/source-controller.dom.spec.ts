@@ -16,6 +16,7 @@ let Controller: new (
   host: unknown,
 ) => {
   element: Element | null
+  rows: { label: string }[]
   series: unknown[]
   hostConnected(): void
   hostDisconnected(): void
@@ -110,5 +111,61 @@ describe('a table that changes under it', () => {
     document.querySelector('tbody')?.append(document.createElement('tr'))
     await new Promise((done) => setTimeout(done, 0))
     expect(chartOne.updates()).toBe(before)
+  })
+})
+
+describe('what it parsed', () => {
+  /* A render reads `series` several times over and the pointer reads the row
+     count on every move, so a parse per read was a table walk per pointermove.
+     The parse is held against the table and the edit it saw, and the same
+     array comes back until one of them moves. */
+  const TABLE = (id: string, rows: string) =>
+    `<table id="${id}"><thead><tr><th>Month</th><th>Revenue</th></tr></thead><tbody>${rows}</tbody></table>`
+  const ROW = (label: string, value: number) => `<tr><th>${label}</th><td>${value}</td></tr>`
+
+  test('is the same array on every read until the table changes', () => {
+    document.body.innerHTML = TABLE('src', ROW('March', 1))
+    const one = chart('src')
+    one.controller.hostConnected()
+    expect(one.controller.series).toBe(one.controller.series)
+    expect(one.controller.rows).toBe(one.controller.rows)
+  })
+
+  test('and a fresh one once an edit has been delivered', async () => {
+    document.body.innerHTML = TABLE('src', ROW('March', 1))
+    const one = chart('src')
+    one.controller.hostConnected()
+    const series = one.controller.series
+    const rows = one.controller.rows
+    const row = document.createElement('tr')
+    row.innerHTML = '<th>April</th><td>2</td>'
+    document.querySelector('tbody')?.append(row)
+    await new Promise((done) => setTimeout(done, 0))
+    expect(one.controller.series).not.toBe(series)
+    expect(one.controller.rows).not.toBe(rows)
+    expect(one.controller.rows.map((each) => each.label)).toEqual(['March', 'April'])
+  })
+
+  test('or once `for` names another table', () => {
+    document.body.innerHTML = `${TABLE('src', ROW('March', 1))}${TABLE('other', ROW('May', 3))}`
+    const one = chart('src')
+    one.controller.hostConnected()
+    const rows = one.controller.rows
+    one.host.for = 'other'
+    one.controller.watch()
+    expect(one.controller.rows).not.toBe(rows)
+    expect(one.controller.rows.map((each) => each.label)).toEqual(['May'])
+  })
+
+  /* Compared by identity rather than by id, so a table replaced under the same
+     name, which a framework re-rendering a page does, is parsed again. */
+  test('or once the table is a different element under the same id', () => {
+    document.body.innerHTML = TABLE('src', ROW('March', 1))
+    const one = chart('src')
+    one.controller.hostConnected()
+    const rows = one.controller.rows
+    document.body.innerHTML = TABLE('src', ROW('June', 6))
+    expect(one.controller.rows).not.toBe(rows)
+    expect(one.controller.rows.map((each) => each.label)).toEqual(['June'])
   })
 })
