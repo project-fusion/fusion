@@ -67,13 +67,16 @@
   pointer-events: none;
 }
 
-/* The chosen files. */
+/* The chosen files. `2xs` above, on top of the stack's own gap, the way the
+   hint in `field.css` sits under the field: `xs` from whatever precedes it,
+   which is where it sat under the `block` host this family had before it took
+   the frame's column. */
 [part="list"] {
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
   list-style: none;
-  margin-block: var(--helix-space-xs) 0;
+  margin-block: var(--helix-space-2xs) 0;
   padding: var(--helix-space-none);
 }
 
