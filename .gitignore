@@ -76,10 +76,6 @@ fusion/site/public/specs
 # `turbo run wasm-copy`. The tracked binary is the one in the package.
 fusion/site/public/helix/theme.wasm
 
-# Recapture with `bun tooling/scripts/capture-scale-film.mjs`.
-fusion/site/public/media/sovereignty.jpg
-fusion/site/public/media/sovereignty.webm
-
 # The artifact a failed visual comparison leaves behind. What belongs in the
 # history is the baseline a reviewer approved, not the run that disagreed.
 *.diff.png

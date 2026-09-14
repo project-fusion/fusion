@@ -5,8 +5,8 @@
 
 | Here | What it is |
 |---|---|
-| `app/(site)/` | The public site. `page.tsx` and its `page.module.css` sit together |
-| `app/(tool)/` | The sandbox, the theme builder and the aura page |
+| `app/(site)/` | The public site, the aura page among it. `page.tsx` and its `page.module.css` sit together |
+| `app/(tool)/` | The sandbox and the theme builder, which own their whole window |
 | `components/` | One component per folder, with its own stylesheet |
 | `content/` | The registries the pages read: routes, products, verticals |
 | `utils/`, `hooks/` | Shared logic, one module per folder |
