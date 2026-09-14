@@ -1,0 +1,84 @@
+import { beforeAll, describe, expect, test } from 'bun:test'
+import { mount, registerDom, slotted, type Updatable } from '@fusion.dev/helix-testing/dom'
+
+beforeAll(async () => {
+  registerDom()
+  await import('../index.js')
+  await import('../../button/index.js')
+})
+
+/* The stylesheet the element adopts, as text. happy-dom resolves no cascade,
+   so what can be held here is that a rule exists rather than that it applied.
+   The group role and the name are the base tier's and are tested there. */
+const sheet = (): string => {
+  const declared = (customElements.get('helix-button-group') as unknown as { styles: unknown })
+    .styles
+  return (Array.isArray(declared) ? declared : [declared])
+    .flat(Number.POSITIVE_INFINITY)
+    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+    .join('\n')
+}
+
+/** The declarations of the first rule written for `selector`. */
+const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''
+
+const group = `<helix-button-group label="Export">
+  <helix-button>CSV</helix-button>
+  <helix-button>JSON</helix-button>
+  <helix-button>Copy</helix-button>
+</helix-button-group>`
+
+describe('button group', () => {
+  test("the buttons stay the consumer's own, through the one slot", async () => {
+    expect(slotted(await mount(group))).toHaveLength(3)
+  })
+
+  test('variant reflects, since joining is a rule keyed on it, and rests on nothing', async () => {
+    const host = (await mount(group)) as Updatable & { variant?: string }
+    expect(host.hasAttribute('variant')).toBe(false)
+    host.variant = 'spaced'
+    await host.updateComplete
+    expect(host.getAttribute('variant')).toBe('spaced')
+  })
+
+  test('joined by default: each button is pulled onto its neighbor and the inner corners go flat', () => {
+    /* Through the hooks the buttons publish, because the corner belongs to the
+       control inside each button's shadow root and a rule in here cannot reach
+       it. The same hooks serve a consumer's own anchor styled as a button. */
+    const joined = sheet()
+      .split(':host(:not([variant="spaced"])) ::slotted(*:not(:first-child))')
+      .slice(1)
+      .join('\n')
+    expect(joined).toContain('margin-inline-start: calc(var(--helix-border-thin) * -1)')
+    expect(joined).toContain('--button-radius-start: 0')
+    expect(rule(':host(:not([variant="spaced"])) ::slotted(*:not(:last-child))')).toContain(
+      '--button-radius-end: 0',
+    )
+  })
+
+  test('spaced puts air between them, and only then', () => {
+    expect(rule(':host([variant="spaced"])')).toContain('gap: var(--button-group-gap,')
+    expect(rule(':host')).not.toContain('gap:')
+  })
+
+  test('stacked, the pull and the flattened corners turn with it', () => {
+    /* Everything above joins along the inline axis, so a column needs its own
+       pair: the block-start pull, the block corners flattened, and the inline
+       pull cleared, or every button after the first sits a border to the left
+       of the one above it. */
+    const stacked = rule(
+      ':host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:first-child))',
+    )
+    expect(stacked).toContain('margin-block-start: calc(var(--helix-border-thin) * -1)')
+    expect(stacked).toContain('--button-radius-start-start: 0')
+    expect(stacked).toContain('margin-inline-start: 0')
+    expect(rule(':host([orientation="vertical"])')).toContain('flex-direction: column')
+  })
+
+  test('a hovered or focused button draws above its neighbors', () => {
+    // The border it lights up is otherwise half covered by the one overlapping it.
+    const raised = rule('::slotted(*:focus-within)')
+    expect(raised).toContain('position: relative')
+    expect(raised).toContain('z-index: var(--helix-layer-raised)')
+  })
+})
