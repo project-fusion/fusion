@@ -1,24 +1,18 @@
-/* The same frame an `Input` wears, because in a form this stands in a row with
-   them and a control that looks like anything else reads as something else. The
-   difference is inside it: a button at each end of the box rather than beside
-   it, so the whole thing is one field and not a field with two controls after
-   it. */
-:host {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-2xs);
-}
+/* The stack, the hover edge, the focus ring, the invalid state and the stripped
+   control are `shared/field/field-frame`'s: the same frame an `Input` wears,
+   because in a form this stands in a row with them and a control that looks
+   like anything else reads as something else. The difference is inside it: a
+   button at each end of the box rather than beside it, so the whole thing is
+   one field and not a field with two controls after it.
 
-/* Its own frame rather than `shared/field/field-frame`'s: the hover edge here
-   is the muted ink, the ring is gated on the control being live, and the invalid
-   state recolors the ring only once the field is focused, which is three of that
-   sheet's five rules. Taking it would move all three, so the copy stays and says
-   why. And the fill publishes no `--number-input-background-color` where every
-   other field publishes its own: an absence recorded here rather than filled,
-   since a hook is API and adding one is a decision. */
+   It wore a copy of that frame that differed in three of its five rules, a
+   muted hover edge, a ring gated on the control being live and an invalid ring
+   that waited for focus, with nothing recording why. Settled 14 Sep 2026: the
+   frame wins, so a number lights, rings and reddens exactly as the text field
+   beside it does. */
 [part="field"] {
   align-items: center;
-  background-color: var(--helix-color-well);
+  background-color: var(--number-input-background-color, var(--helix-color-well));
   block-size: var(--helix-size-control);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
@@ -29,52 +23,6 @@
  */
   overflow: hidden;
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-/* `:host(:not(:disabled))`, not `[disabled]`. The pseudo-class also matches an
-   ancestor `<fieldset disabled>`, where the attribute selector only ever sees
-   the element's own. Same call `Select` documents. */
-:host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-foreground-muted);
-}
-
-/* The ring is on the box rather than on the input, because the box is what a
-   reader sees as the control: focus landing on a field whose own edge stays
-   quiet reads as nothing having happened. `:focus-within`, since focus is
-   delegated and lands on the input inside. */
-/* **No offset, so the ring thickens the edge instead of drawing a second one.**
-   The border here turns `primary` on focus and the ring is `focus-ring`, which
-   are the same color: at an offset the pair read as two blue lines with a gap
-   of page between them, which is a double-struck border rather than a focused
-   field. Against the edge they are one 3px edge in one color.
-
-   This is what `Input`, `Textarea`, `Combobox`, `Date Input`, `Time Input`,
-   `Color Input` and `Filter Input` already do. The offset belongs to a ring
-   drawn around something whose own edge is not moving, which is why `Checkbox`,
-   `Switch` and `Slider` keep theirs. */
-:host(:not(:disabled)) [part="field"]:focus-within {
-  border-color: var(--helix-color-primary);
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: 0;
-}
-
-/*
- *  `:state(invalid)` rather than `:user-invalid`, and rather than an `invalid`
- *    property. `MixinField` mirrors "wrong, and the reader knows it" onto the host
- *    under that name, because `:user-invalid` tracks interaction with the element
- *    it is on and nobody interacts with this one: the reader types into an
- *    `<input>` in the shadow root, so the host's own flag is never set. `Input`
- *    carries the same rule and the full measurement.
- */
-:host(:state(invalid)) [part="field"],
-:host(:state(invalid)) [part="field"]:hover,
-:host(:state(invalid):focus-within) [part="field"],
-:host(:state(invalid):focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-danger);
-}
-
-:host(:state(invalid):focus-within) [part="field"] {
-  outline-color: var(--helix-color-danger);
 }
 
 :host(:disabled) [part="field"] {
@@ -98,20 +46,10 @@
   background-color: transparent;
 }
 
+/* What the number adds to the shared reset. Tabular, because the digits are
+   what changes when a step is pressed and proportional ones make the number
+   jump about under a repeated press. */
 [part="control"] {
-  all: unset;
-  /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
-     `border-box` every shadow root is given comes from a rule this one
-     outranks. */
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-md);
-  font-weight: var(--helix-weight-medium);
-  inline-size: 100%;
-  min-inline-size: 0;
-  /* Tabular, because the digits are what changes when a step is pressed and
-     proportional ones make the number jump about under a repeated press. */
   font-variant-numeric: tabular-nums;
   padding-inline: var(--helix-space-xs);
   text-align: center;

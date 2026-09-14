@@ -1,9 +1,13 @@
-/* The field is the drop target, so it is a box with room in it rather than a
-   line. Its own frame rather than `shared/field/field-frame`'s: the control is
-   an invisible overlay rather than a stripped input, the ring waits for
-   `:focus-visible` and the hover edge is the muted ink, which is three of that
-   sheet's five rules. Taking it would move all three, so the copy stays and says
-   why. */
+/* The stack, the hover edge, the focus ring, the invalid state and the stripped
+   control are `shared/field/field-frame`'s. The field is the drop target, so it
+   is a box with room in it rather than a line.
+
+   It wore a copy of that frame that differed in three of its five rules, a
+   muted hover edge, a ring that waited for `:focus-visible` and a control laid
+   over the field rather than stripped, with nothing recording why the first
+   two. Settled 14 Sep 2026: the frame wins, so the dropzone lights and rings as
+   the fields beside it do, with the one exception measured below. The overlay
+   is what the control is here rather than how it is dressed, and it stays. */
 [part="field"] {
   align-items: center;
   position: relative;
@@ -19,7 +23,9 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* The input is kept, not replaced. */
+/* The input is kept, not replaced, and laid over the field at zero opacity so
+   a click anywhere on the box lands on it. After the shared reset in the
+   cascade, which is what keeps these four. */
 [part="control"] {
   cursor: pointer;
   inset: 0;
@@ -27,18 +33,15 @@
   position: absolute;
 }
 
-/* The field is what the input is measured against, not the host. */
-:host {
-  display: block;
-}
-
-/* The ring is drawn on the field, because the input it belongs to is invisible.
-   No offset, like every other bordered field: the dropzone already has an edge,
-   and a ring standing off it is a second line around the first rather than that
-   line thickening. */
-[part="field"]:has([part="control"]:focus-visible) {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: 0;
+/* The frame rings the field while anything in the host has focus, which is
+   right where every focusable part sits inside the box. Here the list of chosen
+   files sits under the field and each remove button rings itself, so the
+   frame's rule alone rang the dropzone as well whenever one was tabbed to: two
+   rings for one focus. The ring waits for the field's own control; the edge
+   stays lit, because the reader is editing this field's files. One `:not()`
+   over the frame's own selector, so this beats its ring and nothing else. */
+:host(:focus-within) [part="field"]:not(:focus-within) {
+  outline: none;
 }
 
 /* Something is over it. */
@@ -187,12 +190,6 @@
   cursor: not-allowed;
 }
 
-/* Hover only where it can be acted on, so a disabled field does not light up
-   under a pointer that cannot open anything. */
-:host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-foreground-muted);
-}
-
 @media (prefers-reduced-motion: reduce) {
   [part="field"],
   [part="file"],
@@ -218,15 +215,6 @@
   --icon-size: var(--helix-size-icon-loose);
 
   color: var(--helix-color-foreground-muted);
-}
-
-/* Wrong, and the field says so. */
-:host(:state(invalid)) [part="field"],
-:host(:state(invalid)) [part="field"]:hover,
-:host(:state(invalid):focus-within) [part="field"],
-:host(:state(invalid):focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-danger);
-  outline-color: var(--helix-color-danger);
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a
