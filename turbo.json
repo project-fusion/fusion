@@ -269,11 +269,16 @@
     // on neither tier, while this measures `dist/index.js` for both and the
     // stylesheets `helix-styles` ships. Ordered only by `^build` the docs built
     // first and the generator exited on a missing `helix/headless/dist`.
+    //
+    // `helix-theme` for the same reason: it is a row in the package table and
+    // nothing any tier depends on, so without it the theme's `dist` is whatever
+    // is on disk, and on a clean tree nothing, which fails the bundle outright.
     "metrics": {
       "dependsOn": [
         "@fusion.dev/helix#build",
         "@fusion.dev/helix-headless#build",
-        "@fusion.dev/helix-styles#build"
+        "@fusion.dev/helix-styles#build",
+        "@fusion.dev/helix-theme#build"
       ],
       "inputs": ["$TURBO_ROOT$/fusion/scripts/build-metrics.mjs"],
       "outputs": [
