@@ -10,7 +10,7 @@
   "scripts": {
     "analyze": "turbo run analyze",
     "build": "turbo run build",
-    "check": "bun run check:cli && bun run check:css && bun run check:gen && bun run check:prose && bun run check:spec",
+    "check": "bun run check:cli && bun run check:css && bun run check:gen && bun run check:prose && bun run check:withheld && bun run check:spec",
     "check:cli": "bun run check:cli:component && bun run check:cli:workspace",
     "check:cli:component": "bun run helix component audit",
     "check:cli:workspace": "bun run fusion workspace audit",
@@ -30,6 +30,7 @@
     "check:spec:floors": "bun fusion/scripts/check-floors.mjs",
     "check:spec:visual": "bun fusion/scripts/check-visual.mjs",
     "check:spec:visual-parity": "bun fusion/scripts/check-visual-parity.mjs",
+    "check:withheld": "bun fusion/scripts/check-withheld.mjs",
     "clean": "rm -rf node_modules target **/dist **/node_modules .turbo",
     "dev": "turbo run dev",
     "eval": "bun fusion/scripts/run-eval.mjs",
@@ -61,7 +62,7 @@
     "test": "turbo run test",
     "trust": "bun fusion/scripts/trust.mjs",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && bun run check:cli && turbo run token-layer -- --check && bun run typecheck && bun run analyze && turbo run docs -- --check && turbo run samples -- --check && bun run check:gen:eval && turbo run content -- --check && turbo run catalog && turbo run routes -- --check && turbo run register -- --check && bun run check:gen:metrics && bun run check:css:seeds && turbo run wasm-check && bun run check:prose && turbo run themed-page -- --check && bun run check:gen:element-events && bun run fusion spec check && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
+    "verify": "biome ci . && bun run check:cli && turbo run token-layer -- --check && bun run typecheck && bun run analyze && turbo run docs -- --check && turbo run samples -- --check && bun run check:gen:eval && turbo run content -- --check && turbo run catalog && turbo run routes -- --check && turbo run register -- --check && bun run check:gen:metrics && bun run check:css:seeds && turbo run wasm-check && bun run check:prose && bun run check:withheld && turbo run themed-page -- --check && bun run check:gen:element-events && bun run fusion spec check && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
     "visual:update": "bun fusion/scripts/check-visual.mjs --update",
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },

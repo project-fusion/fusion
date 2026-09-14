@@ -23,7 +23,7 @@
 //! way and is quieter still: the specifier resolves in this repository, where
 //! the package is a directory, and there is no such file in the tarball. Nothing
 //! in a build says so, because every build here has the file. `helix.css` was
-//! exported and unpacked, and the console found it by installing.
+//! exported and unpacked, and a consuming app found it by installing.
 //!
 //! **One visibility for everything, because a release is all of it or none.** A
 //! product half public and half restricted installs for nobody, and the failure

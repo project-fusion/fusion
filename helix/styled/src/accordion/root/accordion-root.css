@@ -11,7 +11,7 @@
  * told them. Framed individually, each item is a thing that opens, and the set
  * is said by their alignment rather than by a box drawn around it.
  *
- * It is also the answer the console needed for its own `separation`, and this is
+ * It is also the answer a consuming app needed for its own `separation`, and this is
  * the one place to give it: an axis that means "around the group" on one
  * component and "around each member" on another is two axes wearing one name.
  */

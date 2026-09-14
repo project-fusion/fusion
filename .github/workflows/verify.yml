@@ -274,8 +274,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # The whole history, which the withheld step below needs to list a pull
+      # request's own commits. The repository is small enough that this costs
+      # seconds.
       - name: Check out
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Install bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -293,6 +298,16 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Format and lint
         run: bunx biome ci .
+      # **The messages and addresses of the commits a pull request brings**,
+      # which the check in the shards cannot see: it reads files, and a removal
+      # by path never reaches a commit message. From the base the pull request
+      # was opened against, so nothing already on `main` is judged again.
+      - name: Withheld names in the pull request's commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: bun fusion/scripts/check-withheld.mjs --commits "$BASE..$HEAD"
 
   types:
     runs-on: ubuntu-latest

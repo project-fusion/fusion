@@ -23,6 +23,20 @@ set -e
 PATH="$PWD/node_modules/.bin:$PATH"
 export PATH
 
+# **Read first, because it is stdin**: git hands the hook one line per ref it
+# is pushing, and those lines are the only way to know which commits a push
+# brings. A step above this that read stdin would leave it nothing.
+printf 'pre-push: withheld names\n'
+pushing=$(cat)
+printf '%s\n' "$pushing" | bun fusion/scripts/check-withheld.mjs --pushing >/tmp/pre-push-$$.log 2>&1 || {
+  printf '\n'
+  sed 's/^/  /' /tmp/pre-push-$$.log
+  printf '\n'
+  rm -f /tmp/pre-push-$$.log
+  exit 1
+}
+rm -f /tmp/pre-push-$$.log
+
 printf 'pre-push: formatting and lint\n'
 bunx biome ci . >/dev/null 2>&1 || {
   printf '\n  biome refuses this tree. Run `bun run fix` and commit the result.\n\n'
