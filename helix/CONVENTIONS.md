@@ -70,7 +70,13 @@ an `overflow` they had no way of knowing was missing.
   method a consumer uses, it is a mixin. If it only reacts to lifecycle, it is a
   controller.
 - **One folder per part**: `card/root/card-root.{ts,css,dom.spec.ts}`. The
-  folder is what the composition plugin reads.
+  folder is what the composition plugin reads. **A helper the family owns and
+  no one part does sits at family level**, beside `index.ts`, and is named for
+  what it is rather than for the family: `color-picker/color.ts`,
+  `code-block/patch.ts`, `filter-input/grammar.ts`, and in the styled tier
+  `aura/shader.ts` and `orb/shapes.ts`. A part's folder holds the part, so a
+  reader opening `root/` finds the element and its sheet and not the
+  arithmetic behind them.
 - **A region becomes an element only when it has behavior, state, or API.**
   Otherwise it is a slot. Card's header, body, and footer carried none of the
   three, so five elements became one and a title became a real `<h2>` the
