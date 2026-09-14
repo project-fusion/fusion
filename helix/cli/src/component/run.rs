@@ -7,12 +7,20 @@
 
 use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
+use std::thread::{self, ScopedJoinHandle};
 
 use crate::args::{ComponentAudit, Rules};
 use crate::component::{all, tui, Context, Measured, Report, Rule, Runner, Settings};
 use crate::error::Failure;
 use crate::exit::Code;
 use crate::style::Paint;
+
+/* Every rule borrows the one context from its own thread, which is what this
+holds `Context` to. */
+const _: fn() = || {
+    fn shared<T: Sync>() {}
+    shared::<Context>();
+};
 
 /// Resolves the rules asked for, the workspace, and its settings.
 fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
@@ -70,19 +78,40 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
 }
 
 /// Runs the source rules once, then the meta rules over what they counted.
+///
+/// **One thread per source rule, joined in declaration order.** A rule is a
+/// `fn(&Context) -> Report` that reads files and returns, and none of them
+/// shares anything but the context, so they were serial only because nothing
+/// had made them otherwise. The reports come back in the order the rules were
+/// declared whatever order the threads finish in, and every form below reads
+/// the finished list, so nothing draws or prints while a rule is still running.
 fn measure(selected: Vec<Rule>, context: &Context) -> Vec<(Rule, Report)> {
     let (meta, source): (Vec<Rule>, Vec<Rule>) = selected.into_iter().partition(Rule::meta);
 
-    let mut reports: Vec<(Rule, Report)> = source
-        .into_iter()
-        .map(|rule| {
-            let report = match rule.run {
-                Runner::Source(run) => run(context),
-                Runner::Meta(_) => unreachable!("partitioned above"),
-            };
-            (rule, report)
-        })
-        .collect();
+    let mut reports: Vec<(Rule, Report)> = thread::scope(|scope| {
+        let running: Vec<(Rule, ScopedJoinHandle<Report>)> = source
+            .into_iter()
+            .map(|rule| {
+                let run = match rule.run {
+                    Runner::Source(run) => run,
+                    Runner::Meta(_) => unreachable!("partitioned above"),
+                };
+                (rule, scope.spawn(move || run(context)))
+            })
+            .collect();
+        running
+            .into_iter()
+            .map(|(rule, handle)| {
+                /* A rule that panicked has printed why on its own thread; the
+                panic continues here so the process still ends the way it did
+                when the rule ran on this one. */
+                let report = handle
+                    .join()
+                    .unwrap_or_else(|panic| std::panic::resume_unwind(panic));
+                (rule, report)
+            })
+            .collect()
+    });
 
     let measured: Vec<Measured> = reports
         .iter()
