@@ -53,9 +53,11 @@ two counts asks nothing of `-v` and means the same thing to every grep.
 ## What every job pays
 
 `setup-bun` caches the binary and not what it installs, so each job used to pay a
-cold resolve of 518 packages. The cache is keyed on `bun.lock`, which is exactly
-what decides the answer, and the bun version is held once in a workflow-level
-`env` rather than in eight places.
+cold resolve of the whole tree. The cache is keyed on `bun.lock`, which is exactly
+what decides the answer. The four steps every job starts with are one local
+action, `.github/actions/setup`, which reads the bun version off
+`packageManager` so the runtime CI runs on is the one the lockfile was written
+by, and there is no second copy of that number to bump.
 
 ## One build, before the sixteen that would each do their own
 

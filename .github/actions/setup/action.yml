@@ -1,0 +1,52 @@
+# The four steps every job here starts with, held once.
+#
+# **The bun version comes from `packageManager`**, so the runtime CI runs on is
+# the one the lockfile was written by and the one `bun install` refuses to
+# disagree with. It was an `env` at the top of four workflow files, "held once"
+# in each of them, and the four were the one number a bump had to find.
+#
+# **Keyed on the lockfile, because that is what decides the answer.**
+# `setup-bun` caches the binary and not what it installs, so without the cache
+# every job pays a cold resolve of the whole tree. `--frozen-lockfile` so a
+# lockfile that does not match `package.json` fails here rather than being
+# quietly updated in CI and not on the machine that pushed.
+#
+# **`checkout` is not here and cannot be**: a local action is read from the
+# checkout, so the step that fetches it has to run first.
+name: Set up bun and the dependencies
+description: Installs the bun `packageManager` names, restores its cache, and installs the workspace.
+
+inputs:
+  dependencies:
+    description: Whether to run `bun install`. A job that only reads a script wants the runtime and nothing else.
+    default: 'true'
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Read the bun version off `packageManager`
+      id: bun
+      shell: bash
+      run: |
+        set -euo pipefail
+        version=$(jq -r '.packageManager' package.json | cut -d@ -f2)
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Install bun
+      uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      with:
+        bun-version: ${{ steps.bun.outputs.version }}
+
+    - name: Cache the installed dependencies
+      if: inputs.dependencies == 'true'
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        path: ~/.bun/install/cache
+        restore-keys: bun-${{ runner.os }}-
+
+    - name: Install dependencies
+      if: inputs.dependencies == 'true'
+      shell: bash
+      run: bun install --frozen-lockfile

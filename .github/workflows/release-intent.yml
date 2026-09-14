@@ -17,8 +17,12 @@ on:
   pull_request_target:
     types: [opened, synchronize, reopened, edited]
 
+# **The pull request number, not `github.ref`.** Under `pull_request_target`
+# the ref is the base branch, so every open pull request shared one group and
+# a new event on any of them canceled another's run: the subject check then
+# never reported for the one that lost.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 permissions:
@@ -48,10 +52,17 @@ jobs:
       # and `pull_request_target` takes the workflow file from the base branch,
       # so a fix to it only takes effect once merged.
       - name: Check out the base
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           ref: ${{ github.event.pull_request.base.sha }}
+
+      # The runtime and nothing else: `report-intent.sh` runs `bump.mjs`, which
+      # imports only what Node ships, so no install.
+      - name: Set up bun
+        uses: ./.github/actions/setup
+        with:
+          dependencies: false
 
       - name: Read the bump off the commits
         env:

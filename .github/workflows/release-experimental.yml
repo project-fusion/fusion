@@ -22,7 +22,6 @@ permissions:
 
 # Held once. `engines.node` is the consumer floor; this is what CI runs on.
 env:
-  BUN_VERSION: "1.1.43"
   NODE_VERSION: "22.20.0"
 
 jobs:
@@ -46,26 +45,15 @@ jobs:
       NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Fetch the tags, which carry the version
         run: git fetch --tags --force
 
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
 
       - name: Work out the versions
         id: plan
@@ -99,17 +87,15 @@ jobs:
       # them. A shallow clone reports no tags and every release looks like the
       # first one.
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Fetch the tags, which carry the version
         run: git fetch --tags --force
 
-      - name: Install bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
 
       # **Node is here for npm and for nothing else**, every script in this
       # workflow being invoked with `bun`. Trusted publishing needs npm 11.5.1+
@@ -124,7 +110,7 @@ jobs:
       # The default registry is already npmjs.org, so the line bought nothing
       # even when it worked.
       - name: Install Node, which npm runs on
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -132,18 +118,6 @@ jobs:
       # `setup-node` leaves behind. Same pin as `release.yml`, same reasoning.
       - name: Install an npm that can do trusted publishing
         run: npm install -g npm@11.18.0
-
-      # **Keyed on the lockfile, because that is what decides the answer.**
-      # `setup-bun` caches the binary and not what it installs, so without this
-      # every job pays a cold resolve of 518 packages.
-      - name: Cache the installed dependencies
-        uses: actions/cache@v6
-        with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.bun/install/cache
-          restore-keys: bun-${{ runner.os }}-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
 
       - name: Stamp the experimental version into every domain this touches
         env:
@@ -169,7 +143,7 @@ jobs:
 
       - name: Fetch the binaries
         if: needs.plan.outputs.helix != ''
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: helix-cli-*
           path: ${{ runner.temp }}/binaries

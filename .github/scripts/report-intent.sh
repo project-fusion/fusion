@@ -107,7 +107,7 @@ done
 
 resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate --slurp \
   | jq -j '.[][].commit.message + "\u0000"' \
-  | node /tmp/bump.mjs --stdin ${zero:+--zero "$zero"})
+  | bun /tmp/bump.mjs --stdin ${zero:+--zero "$zero"})
 
 majors=$(jq -r '[.[] | select(.level == "major") | .domain] | join("`, `")' <<<"$resolved")
 
