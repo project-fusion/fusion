@@ -114,8 +114,8 @@
 }
 
 /* What a collection says instead of items is `shared/collection/state`'s, with
-   a step more room than the other collections give it, which that sheet records
-   as a drift. */
+   a step more room than the other collections give it, which is this family's
+   call about its own box. */
 [part="empty"],
 [part="loading"] {
   --_collection-inset-block: var(--helix-space-lg);

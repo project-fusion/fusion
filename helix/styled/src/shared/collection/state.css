@@ -5,13 +5,14 @@
    it, and an absence set like a heading reads as an error. Compose with the
    family's own sheet, never instead of it.
 
-   **The inset is two hooks, because the families disagree and nothing recorded
-   why.** Menu, Table, Drilldown and Tree sit the line in `md` by `sm`, which is
-   the fallback; Listbox in `xs` by `xs`; Notifications in `lg` by `md`; Chat in
-   `lg` by nothing. Each of the last three writes its own into the hooks, so this
-   rule keeps every family where it was and the disagreement is one grep away
-   rather than eight. Video draws its own over a picture and does not take this.
-   Settling the inset is a decision, and it is not this sheet's. */
+   **The inset is two hooks, and it is each family's own.** The line is the
+   same everywhere; where it sits is a fact about the box it sits in, and the
+   box is the family's. Menu, Table, Drilldown and Tree take the fallback, `md`
+   by `sm`; Listbox writes `xs` by `xs`, Notifications `lg` by `md`, Chat `lg`
+   by nothing. Decided 14 Sep 2026: those are component decisions rather than
+   drift, so a family writing the hooks is saying what its box is and not
+   disagreeing with anyone. Video draws its own over a picture and does not
+   take this. */
 [part="empty"],
 [part="loading"] {
   color: var(--helix-color-foreground-subtle);
