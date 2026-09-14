@@ -16,7 +16,10 @@ fi
 
 changed=$(git diff --name-only "$BASE" "$HEAD")
 total=$(printf '%s\n' "$changed" | grep -c . || true)
-skippable=$(printf '%s\n' "$changed" | grep -cE '^(docs/|cortex/|\.claude/)' || true)
+# `fusion/docs/`, where the writing lives, and a `.md` anywhere: no browser job
+# reads one, and every document, README and convention file is `.md`. The
+# `.mdx` under the docs packages are not here, because the site renders them.
+skippable=$(printf '%s\n' "$changed" | grep -cE '^(fusion/docs/|cortex/|\.claude/|\.agents/)|\.md$' || true)
 
 if [ "$total" -gt 0 ] && [ "$total" -eq "$skippable" ]; then
   echo 'browser=false' >> "$GITHUB_OUTPUT"
