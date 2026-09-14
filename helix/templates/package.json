@@ -26,11 +26,11 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "bun run register && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
     "register": "bun scripts/build-register.mjs",
     "test": "bun run test:pure",
     "test:pure": "bun test pure.spec",
-    "typecheck": "bun run register && tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
