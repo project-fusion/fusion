@@ -7,11 +7,16 @@
 //! that hold Helix to its own conventions are the same rules that hold theirs.
 //!
 //! **`Rule` and `Report` are declared here rather than shared with
-//! `fusion-cli`.** They are forty lines, and a crate holding them would be a
-//! dependency from the helix domain onto the fusion one: per-domain lockstep
-//! exists so a release of either does not wait on the other, and a shared crate
-//! is exactly the thing that makes it wait. Forty duplicated lines is the
-//! cheaper of the two.
+//! `fusion-cli`, and they are not the whole of what is copied.** A crate holding
+//! them would be a dependency from the helix domain onto the fusion one:
+//! per-domain lockstep exists so a release of either does not wait on the
+//! other, and a shared crate is exactly the thing that makes it wait. What that
+//! decision costs is about eight hundred lines, measured 14 Sep 2026: the audit
+//! screen, the exit, error and color modules, these types, the runner that
+//! measures the rules, the `fix` verb, the `--only` check, the JSON payload and
+//! the walker. The screen is held identical by a test in `fusion-cli`; the rest
+//! is kept the same by hand, which is the trade. The day it stops being the
+//! cheaper one, a shared crate would carry exactly that list.
 //!
 //! **Where the source is comes from configuration**, because a consumer's
 //! layout is not this repository's. A `helix` key in `fusion.json` names
