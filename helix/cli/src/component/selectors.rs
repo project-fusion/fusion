@@ -123,6 +123,11 @@ static FORWARDS: LazyLock<Regex> =
 /// and is read the same way: a component that moved its lookups there would
 /// otherwise have moved them out of this check without anybody noticing, which
 /// is the silent shape of failure the check exists for.
+/// A mixin, which is a `const` returning a class.
+static MIXIN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"export const (Mixin\w+)\s*=").expect("a literal pattern compiles")
+});
+
 static OWN_ROOT: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
         r#"(?s)this\.(?:(?:renderRoot|shadowRoot)\??\s*\.\s*querySelector(?:All)?(?:<[^>(]*>)?\(\s*['"`]\[part=["']([a-z0-9-]+)["']\]|partNamed(?:<[^>(]*>)?\(\s*['"`]([a-z0-9-]+)['"`]\s*\))"#,
@@ -169,6 +174,9 @@ struct Survey {
     /// `--root` reported four shared stylesheets as owned by nothing.
     file_of: BTreeMap<String, String>,
     root: PathBuf,
+    /// The family each class was found in, so a mixin's lookups can be read
+    /// against what its hosts render.
+    family_of: BTreeMap<String, String>,
     in_family: BTreeMap<String, BTreeSet<String>>,
     renders: BTreeMap<String, BTreeSet<String>>,
 }
@@ -245,8 +253,10 @@ fn survey(context: &Context) -> Survey {
             dead. Newlines are allowed, because a chain long enough to wrap does
             not match a pattern excluding them and the scan then sees no bases at
             all. */
+            let mut declared_here = Vec::new();
             for found in CLASS.captures_iter(&text) {
                 let name = found[1].to_owned();
+                declared_here.push(name.clone());
                 for parent in WORD.find_iter(found.get(2).map_or("", |one| one.as_str())) {
                     if parent.as_str() != name {
                         survey
@@ -299,6 +309,9 @@ fn survey(context: &Context) -> Survey {
             let Some(family) = crate::component::family(&file, tier) else {
                 continue;
             };
+            for name in declared_here {
+                survey.family_of.insert(name, family.to_owned());
+            }
             let found = survey.in_family.entry(family.to_owned()).or_default();
             found.extend(written(&text));
             /* A forwarded name is reachable on the host too. */
@@ -566,6 +579,31 @@ fn lookups(context: &Context, survey: &Survey, findings: &mut Vec<Finding>) {
             /* Blanked to the same length, so the offset is a real line number. */
             let code = uncommented(&text);
             let where_ = context.relative(&file);
+            /* **A mixin reads a part out of whatever host applies it**, the way
+            `parts` credits what a mixin renders to every host in its chain. So
+            its lookups are read against the union of what its hosts render, and
+            reported only when no host renders the name. A family's own lookups
+            are read against the family, as before. */
+            let mixins: Vec<String> = MIXIN
+                .captures_iter(&text)
+                .map(|one| one[1].to_owned())
+                .collect();
+            let (scope, rendered) = if mixins.is_empty() {
+                (
+                    format!("`{family}`"),
+                    survey.in_family.get(family).cloned().unwrap_or_default(),
+                )
+            } else {
+                let mut union = BTreeSet::new();
+                for (class, bases) in &survey.bases {
+                    if bases.iter().any(|base| mixins.contains(base)) {
+                        if let Some(host) = survey.family_of.get(class) {
+                            union.extend(survey.in_family.get(host).cloned().unwrap_or_default());
+                        }
+                    }
+                }
+                (format!("any host of `{}`", mixins.join("`, `")), union)
+            };
             for found in OWN_ROOT.captures_iter(&code) {
                 let part = found
                     .get(1)
@@ -573,26 +611,18 @@ fn lookups(context: &Context, survey: &Survey, findings: &mut Vec<Finding>) {
                     .expect("one of the two spellings captured the name")
                     .as_str()
                     .to_owned();
-                let rendered = survey
-                    .in_family
-                    .get(family)
-                    .is_some_and(|one| one.contains(&part));
-                if rendered {
+                if rendered.contains(&part) {
                     continue;
                 }
                 let at = found.get(0).expect("group zero always matches").start();
                 findings.push(Finding {
                     detail: format!(
-                        "The family renders: {}.",
-                        survey
-                            .in_family
-                            .get(family)
-                            .map(|one| one.iter().cloned().collect::<Vec<String>>().join(", "))
-                            .unwrap_or_default()
+                        "Rendered there: {}.",
+                        rendered.iter().cloned().collect::<Vec<String>>().join(", ")
                     ),
                     file: format!("{where_}:{}", line_of(&code, at)),
                     message: format!(
-                        "looks up `[part=\"{part}\"]` and nothing in `{family}` renders it, so \
+                        "looks up `[part=\"{part}\"]` and nothing in {scope} renders it, so \
                          this returns null and whatever it was going to do silently does not \
                          happen"
                     ),
