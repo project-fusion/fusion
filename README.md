@@ -78,7 +78,7 @@ order, why it is load-bearing and fails silently, and a page for each framework.
 | | | |
 |---|---|---|
 | **bun** | `>=1.1.0`, pinned at `1.1.43` | The package manager. Not npm, pnpm, or yarn |
-| **Node** | `>=22.18` | Not bun's job, despite bun being the package manager. `cem` carries `#!/usr/bin/env node`, so the shebang hands it to whatever Node is on `PATH` and bun's own TypeScript support never applies. Its config is a `.ts` file, and native type stripping starts at 22.18: below the floor it loads a default config instead, writes a manifest with every Helix plugin missing, and reports success |
+| **Node** | `>=22.18` | Not bun's job, despite bun being the package manager. What carries a `#!/usr/bin/env node` shebang and is not run with `bun --bun` runs under whatever Node is on `PATH`: Next's `bin` in `build` and `dev`, and npm in the release. `cem analyze` is run with `--bun` for the reason [AGENTS.md](AGENTS.md#stack) gives |
 | **Rust** | `>=1.90` | The Cortex crates, both CLIs, and the theme derivation engine |
 
 ### Setup
@@ -109,16 +109,14 @@ Next on its default port. The landing page is at `/`, the Helix documentation at
 `/helix/docs`, the component gallery at `/helix/components`, and the sandbox and
 theme builder at `/helix/sandbox` and `/helix/theme`.
 
-The dev script rebuilds the theme wasm before starting, so a local dev server
-also wants:
+The theme wasm is tracked, so neither the dev server nor CI builds it, which is
+what keeps a wasm toolchain off every job. Changing the Rust under `helix/theme`
+wants `bun run gen:wasm`, and that needs:
 
 ```bash
 rustup target add wasm32-unknown-unknown
 cargo install wasm-bindgen-cli
 ```
-
-CI needs neither. The built artifact is committed and read as an input, which is
-what keeps a wasm toolchain off every job.
 
 ### Verify
 
@@ -132,7 +130,7 @@ files cannot tell you whether they were correct. `fix` writes, `check` and
 `verify` judge.
 
 `verify` is CI's job rather than a local ritual, sharded over `plan`, `warm`,
-`checks`, `lint`, `types`, `tests` and six `browser` jobs on every push. Locally,
+`checks`, `lint`, `types`, `tests` and the `browser` matrix on every push. Locally,
 `bun run check` is every guard and nothing else, and `check:<group>` is one
 group: `cli`, `css`, `gen`, `prose` or `spec`. The groups sort by what a guard
 reads, so the useful question after an edit is answered by a group name.
@@ -178,6 +176,7 @@ bare leaf names recur across domains.
 | | the mistakes that are valid CSS | [helix/diagnostics](helix/diagnostics/README.md) |
 | | the documentation, as content | [helix/docs](helix/docs/README.md) |
 | | project templates | [helix/templates](helix/templates/README.md) |
+| | `npm create @fusion.dev/helix-app` | [helix/create-app](helix/create-app/README.md) |
 | | the editor and spec runner | [helix/sandbox](helix/sandbox/README.md) |
 | | analyzer config, card art, spec helpers, the CLI | `cem` `gallery` `testing` `cli` |
 | **[Cortex](cortex/README.md)** | memory, provenance, context | |
@@ -210,8 +209,9 @@ because nothing stamps them.
    you, and it is the one class of failure a push will not resolve on its own.
    Several generators read what an earlier one wrote, so `regen` is a
    hand-written order rather than an alphabetical one.
-3. **`git push`.** The pre-push hook runs `biome ci`, `check:cli` and the
-   generated-file checks, and nothing else: seconds against minutes. It judges
+3. **`git push`.** The pre-push hook runs the withheld-name check, `biome ci`,
+   `check:cli` and the generated-file checks, and nothing else: seconds against
+   minutes. It judges
    and never writes, because a hook that edits the tree during `git push`
    produces a push that does not contain the edits. `git push --no-verify` skips
    it, and `verify.yml` does the rest.

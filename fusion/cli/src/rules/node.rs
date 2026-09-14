@@ -1,11 +1,12 @@
 //! The Node on this machine, and its types, satisfy the floor the repository sets.
 //!
-//! **A manifest analyzer runs under Node rather than under bun, and its config
-//! is TypeScript.** Below the floor it cannot load that config, falls back to a
-//! default one, writes a manifest with every plugin missing, and reports
-//! success: measured on 18.16, 69,081 lines shorter. A docs site, the framework
-//! wrappers and eight rules all read that file. The floor is where type
-//! stripping stopped needing a flag, which is the whole of the requirement.
+//! **What carries a Node shebang and is not run with `bun --bun` runs under
+//! Node**: Next's `bin` in `build` and `dev`, and npm in the release. The
+//! manifest analyzer was the reason the floor was first set, its `.ts` config
+//! loading only where type stripping needs no flag (measured on 18.16: a
+//! manifest with every plugin missing, 69,081 lines shorter, reported as
+//! success), and it runs as `bun --bun` now for exactly that reason. The floor
+//! stays at the oldest line the rest is supported on.
 //!
 //! **It also holds the type package to that floor**, which is a different
 //! failure with the same shape. The types declare what the standard library has,
