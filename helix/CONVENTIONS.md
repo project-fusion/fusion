@@ -1482,10 +1482,12 @@ viewport. Everything else in here is `@media print` or
 
 - **Its own width.** Anything depending on how much room a component was given
   belongs inside it, through `container-type: inline-size` and `@container`.
-  Two families declare `container-type` today and nothing uses an `@container`
-  rule, so this is unbuilt rather than settled. `data-density` is the precedent
-  to copy rather than a separate idea: the region tells its contents how tight
-  to be and the component obeys.
+  Measured 14 Sep 2026: five families declare `container-type` (Code Block,
+  Description List, Donut Chart, Notification, Scatter Chart) and four of them
+  carry an `@container` rule, each folding a row into a stack below a width of
+  its own. Built, then, where a family asked for it, and `data-density` is
+  still the precedent to copy rather than a separate idea: the region tells
+  its contents how tight to be and the component obeys.
 - **The device or the page.** Belongs to the consumer's stylesheet. A component
   that reaches for it is claiming knowledge it does not have.
 - **Orientation and behavior.** Not style at all. Turning a horizontal splitter
@@ -1516,9 +1518,10 @@ existed and the default simply asked for one slot more than a 272 pixel row
 holds.
 
 **The faults that sweep found were the site's, not the library's**, which is the
-result worth keeping. Category one stays unbuilt because almost nothing asks for
-it: three families declare `container-type`, Donut Chart, Table and Video, and
-no `@container` rule exists yet. That is a measurement rather than a plan.
+result worth keeping. Category one was unbuilt on that date, three families
+declaring `container-type` and none writing an `@container` rule; by 14 Sep
+2026 four had written one, as the list above says, so that measurement is
+dated rather than current, and it was a measurement rather than a plan.
 
 **`check:spec:visual` renders every family at two widths**, 640 and 390, on both
 tiers, so a change to the narrow rendering is visible. That is the half of this
@@ -1731,8 +1734,9 @@ Styled is expressed as the *absence* of the attribute, so the document's resting
 state is the common answer.
 
 Examples are `.examples/<slug>.html` and `.examples/<slug>.tsx` beside the
-component, plus a `<slug>.css` where one is needed. `default.html` is the
-headline preview and reads as "Preview"; every other slug is a named variant.
+component, plus a `<slug>.css` where one is needed. `preview.html` is the
+headline preview and reads as "Preview", the one example `helix component`'s
+`examples-paired` holds to both layers; every other slug is a named variant.
 
 **Both syntaxes are authored, and neither is derived from the other.** The
 **Do not derive one from the other.** A converted example is a function of its
