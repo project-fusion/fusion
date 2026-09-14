@@ -52,10 +52,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use fusion_rules::walk::crawl;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 /// Suffixes nobody writes on purpose.
 ///

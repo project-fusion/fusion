@@ -2,10 +2,11 @@
 
 use std::path::Path;
 
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
+
 use crate::args::Init;
 use crate::config::FILE;
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
 
 /// # Errors
 ///

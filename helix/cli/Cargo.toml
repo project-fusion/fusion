@@ -20,6 +20,10 @@ path = "src/main.rs"
 # and keeps its WASM wrapper buildable without dragging the command surface into
 # `@fusion.dev/helix-theme`.
 fusion-helix-theme = { path = "../theme", features = ["serde"] }
+# **What a rule is, and the runner that measures a set of them.** Shared with
+# `fusion-cli` and owned by neither product, so this is not a dependency on the
+# fusion domain: the crate's `lib.rs` carries the argument.
+fusion-rules = { workspace = true }
 clap = { version = "4", features = ["derive"] }
 regex = { workspace = true }
 # **Only the CLI takes this.** `fusion-helix-theme` computes and does not draw, and a

@@ -1,4 +1,4 @@
-//! `helix component audit` as a screen, for the case where there is somebody there.
+//! `audit` as a screen, for the case where there is somebody there.
 //!
 //! **An audit is a list of rules and a list of findings, and the terminal is
 //! where the second one is unreadable.** Printed, a run with forty findings
@@ -9,9 +9,9 @@
 //!
 //! **The printed form is not replaced by it.** A screen written to a pipe is
 //! escape sequences in a log file, so a tty decides and `--plain` overrides. The
-//! two read the same `Vec<(Rule, Report)>`, which is what stops either becoming
-//! the real one: nothing here measures anything, and a rule cannot tell whether
-//! it is being drawn or printed.
+//! two read the same measurement, which is what stops either becoming the real
+//! one: nothing here measures anything, and a rule cannot tell whether it is
+//! being drawn or printed.
 //!
 //! **A state is never carried by color alone.** The reader has themed their
 //! terminal and one of those themes makes any given hue unreadable, so the mark
@@ -19,18 +19,15 @@
 //! informs. There is no red-and-green pair, for the reason `style.rs` gives
 //! about the readers who cannot tell them apart.
 //!
-//! **Written out rather than shared with `fusion-cli`'s.** A crate holding both
-//! would be a dependency from the helix domain onto the fusion one, and
-//! per-domain lockstep exists so a release of either does not wait on the
-//! other, which is the same trade [`super`] takes for everything the two crates
-//! hold in common and measures there. The two screens are the same keys and the
-//! same shape on purpose: a reader who learns one has learned the other, and
-//! `fusion helix component audit` reaches this one. A test in `fusion-cli`
-//! holds the two files identical but for this docblock, the import and the
-//! product's name, so they cannot drift quietly.
+//! **One screen for both command lines, and the product's name is the one
+//! thing it takes from its caller.** The keys and the shape are the same on
+//! purpose: a reader who learns `helix component audit` has learned
+//! `fusion workspace audit`, and `fusion helix component audit` reaches the
+//! first through the second. The word in the corner says which binary is
+//! answering.
 //!
-//! **Notes are shown and are not failures.** A component rule may report work
-//! worth seeing that must not fail (families in a group that disagree about
+//! **Notes are shown and are not failures.** A rule may report work worth
+//! seeing that must not fail (families in a group that disagree about
 //! declaring an axis) and a screen that only listed findings would drop them.
 
 use std::io::{self, Stdout};
@@ -46,45 +43,45 @@ use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Row as TableRow, Table, TableState, Wrap};
 use ratatui::{Frame, Terminal};
 
-use crate::component::{Report, Rule};
-
-/// The word in the corner of the screen, which is the one this binary answers to.
-const PRODUCT: &str = "helix";
+use crate::{Report, Rule};
 
 /// One rule as the screen holds it: what it is, and what it found.
-pub struct Measured {
-    pub checked: usize,
-    pub findings: Vec<(String, String, String)>,
-    pub name: String,
-    pub notes: Vec<String>,
-    pub summary: String,
-    pub unit: String,
+struct Shown {
+    checked: usize,
+    findings: Vec<(String, String, String)>,
+    name: String,
+    notes: Vec<String>,
+    summary: String,
+    unit: String,
 }
 
-impl Measured {
+impl Shown {
     fn ok(&self) -> bool {
         self.findings.is_empty()
     }
 }
 
 /// Everything the screen is showing, which is all the state there is.
-struct View {
+struct View<'a> {
     /// Whether the pane on the right is the one taking keys.
     inside: bool,
     /// Which finding is selected, within the selected rule.
     at: usize,
-    rules: Vec<Measured>,
+    /// The word in the corner of the screen, which is the binary answering.
+    product: &'a str,
+    rules: Vec<Shown>,
     selected: usize,
     /// Failing rules only, which is what a reader wants after the first look.
     failing: bool,
 }
 
-impl View {
-    fn new(rules: Vec<Measured>) -> Self {
+impl<'a> View<'a> {
+    fn new(product: &'a str, rules: Vec<Shown>) -> Self {
         Self {
             at: 0,
             failing: false,
             inside: false,
+            product,
             rules,
             selected: 0,
         }
@@ -97,7 +94,7 @@ impl View {
             .collect()
     }
 
-    fn current(&self) -> Option<&Measured> {
+    fn current(&self) -> Option<&Shown> {
         self.shown().get(self.selected).map(|&at| &self.rules[at])
     }
 
@@ -127,10 +124,14 @@ impl View {
 }
 
 /// Draws the audit and returns when the reader leaves.
-pub fn run(reports: &[(&Rule, &Report)]) -> io::Result<()> {
+///
+/// # Errors
+///
+/// The terminal's own, when it cannot enter or leave the screen.
+pub fn run<C>(product: &str, reports: &[(&Rule<C>, &Report)]) -> io::Result<()> {
     let rules = reports
         .iter()
-        .map(|(rule, report)| Measured {
+        .map(|(rule, report)| Shown {
             checked: report.checked,
             findings: report
                 .findings
@@ -145,7 +146,7 @@ pub fn run(reports: &[(&Rule, &Report)]) -> io::Result<()> {
         .collect();
 
     let mut terminal = enter()?;
-    let mut view = View::new(rules);
+    let mut view = View::new(product, rules);
     let outcome = draw_loop(&mut terminal, &mut view);
     /* **Restored before the error is returned**, so a failure inside the loop
     does not leave the reader in a raw-mode alternate screen with no echo. That
@@ -223,7 +224,7 @@ fn render(frame: &mut Frame, view: &View) {
     let findings: usize = view.rules.iter().map(|one| one.findings.len()).sum();
     frame.render_widget(
         Paragraph::new(Line::from(vec![
-            Span::styled(PRODUCT, Style::new().add_modifier(Modifier::BOLD)),
+            Span::styled(view.product, Style::new().add_modifier(Modifier::BOLD)),
             Span::raw(format!(
                 "  {} rules, {} clean, {failed} with {findings} finding{}",
                 view.rules.len(),
@@ -293,7 +294,7 @@ fn render(frame: &mut Frame, view: &View) {
 }
 
 /// The selected rule, spelled out.
-fn detail(view: &View) -> Paragraph<'_> {
+fn detail<'a>(view: &'a View) -> Paragraph<'a> {
     let Some(rule) = view.current() else {
         return Paragraph::new("Nothing to show.").block(Block::default().title(" detail "));
     };

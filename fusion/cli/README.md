@@ -41,10 +41,11 @@ never what is judged.
 
 ## Exit codes
 
-`helix`'s, because `fusion helix ...` hands its child's code back untouched:
-0 clean, 1 a finding, 2 the command line does not parse, 3 the input is
-unusable (no workspace, a `fusion.json` that is not JSON, a rule that does not
-exist), 4 the tool broke. Errors go to stderr in both modes, as an object under
-`--json`, so stdout is an answer or empty.
+`helix`'s, read from the one crate both binaries take (`fusion/rules`), because
+`fusion helix ...` hands its child's code back untouched: 0 clean, 1 a finding,
+2 the command line does not parse, 3 the input is unusable (no workspace, a
+`fusion.json` that is not JSON, a rule that does not exist), 4 the tool broke.
+Errors go to stderr in both modes, as an object under `--json`, so stdout is an
+answer or empty.
 
 MIT

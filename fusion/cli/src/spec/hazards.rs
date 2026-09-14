@@ -33,11 +33,11 @@ use std::fs;
 use std::path::Path;
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::Regex;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 /// Array types whose members are DOM nodes, which no deep matcher may walk.
 const NODES: [&str; 5] = [

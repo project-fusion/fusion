@@ -32,10 +32,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::{Captures, Regex};
 
 use crate::rules::{Context, Finding, Report, Unwritten, Written};
-use crate::workspace::crawl;
 
 /// The tag order, one row per section, and a blank line between sections.
 ///

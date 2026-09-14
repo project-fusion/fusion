@@ -19,11 +19,11 @@
 use std::fs;
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::Regex;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"github\.com/([\w.-]+/[\w.-]+?)(?:\.git)?$").expect("a literal pattern compiles")

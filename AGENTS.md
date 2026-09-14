@@ -162,8 +162,10 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing cli templates create-app
 cortex/    core trace engram docs
-fusion/    cli docs scripts site: what belongs to the company rather than to a
-           product. `docs/insights` is the published writing
+fusion/    cli docs rules scripts site: what belongs to the company rather than
+           to a product. `docs/insights` is the published writing; `rules` is
+           the crate both command lines take, which is what a rule is and not
+           what either product's rules read
 .local/    per-machine scratch, gitignored
 ```
 

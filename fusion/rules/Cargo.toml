@@ -1,0 +1,18 @@
+[package]
+name = "fusion-rules"
+description = "What the Fusion and Helix command lines hold in common: a rule, its report, and the runner that measures a set of them."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`. See the note in the root manifest.
+version = "0.0.0-dev"
+
+[dependencies]
+# The audit screen, and nothing else here draws.
+ratatui = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

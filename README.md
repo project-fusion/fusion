@@ -188,7 +188,7 @@ bare leaf names recur across domains.
 | **[Fusion](fusion/README.md)** | what belongs to the company | |
 | | the published writing | `fusion/docs` |
 | | the site that renders all of it | `fusion/site` |
-| | the workspace CLI and cross-cutting scripts | `fusion/cli` `fusion/scripts` |
+| | the workspace CLI, what both CLIs share, and cross-cutting scripts | `fusion/cli` `fusion/rules` `fusion/scripts` |
 
 Conventions, commands and the full layout are in [`AGENTS.md`](AGENTS.md).
 Contributing is [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md).

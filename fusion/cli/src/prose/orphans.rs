@@ -41,10 +41,10 @@ use std::fs;
 use std::path::Path;
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::Regex;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 static OPENS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*/\*\*").expect("a literal pattern compiles"));

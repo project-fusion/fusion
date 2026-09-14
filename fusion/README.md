@@ -6,6 +6,7 @@ What belongs to the company rather than to a product.
 |---|---|
 | `cli` | `fusion`, the Rust command line: `prose`, `spec`, `workspace`, and `helix` which delegates |
 | `docs` | company strategy. `docs/insights` is the published writing |
+| `rules` | `fusion-rules`, the crate both command lines take: what a rule is, the runner, the screen, the exit table. No product semantics, so neither product depends on the other |
 | `scripts` | what is genuinely cross-cutting and cannot be a rule |
 | `site` | the public site and the documentation surface it renders |
 

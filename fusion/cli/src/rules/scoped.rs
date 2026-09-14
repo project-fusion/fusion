@@ -28,10 +28,10 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::sync::LazyLock;
 
+use fusion_rules::walk::crawl;
 use regex::Regex;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::crawl;
 
 /// The package a file belongs to, which is how far a scoped name travels.
 fn package_of(path: &str) -> String {

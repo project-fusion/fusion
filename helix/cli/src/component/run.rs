@@ -4,16 +4,26 @@
 //! measurement and the same exit code, differing only in volume, which is the
 //! pair `theme` already established here and the reason this reads like it
 //! belongs beside it rather than beneath it.
+//!
+//! **The measurement is `fusion-rules`'s and the printed form is this
+//! crate's.** What a set of rules does when run, how `--json` is shaped and
+//! what the screen looks like are the same for every command line, so they
+//! live there; which rules run by default, how a tier that is missing is
+//! refused, and what an audit prints on paper are Helix's, so they live here.
 
 use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
-use std::thread::{self, ScopedJoinHandle};
+
+use fusion_rules::error::Failure;
+use fusion_rules::exit::Code;
+use fusion_rules::style::Paint;
+use fusion_rules::{measure, only_known, payload, tui, verdict};
 
 use crate::args::{ComponentAudit, Rules};
-use crate::component::{all, tui, Context, Measured, Report, Rule, Runner, Settings};
-use crate::error::Failure;
-use crate::exit::Code;
-use crate::style::Paint;
+use crate::component::{all, Context, Report, Rule, Settings};
+
+/// The word the printed forms open with.
+const NOUN: &str = "component";
 
 /* Every rule borrows the one context from its own thread, which is what this
 holds `Context` to. */
@@ -24,18 +34,8 @@ const _: fn() = || {
 
 /// Resolves the rules asked for, the workspace, and its settings.
 fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
-    let known: Vec<&str> = all().iter().map(|rule| rule.name).collect();
-    let unknown: Vec<&String> = args
-        .only
-        .iter()
-        .filter(|name| !known.contains(&name.as_str()))
-        .collect();
-    if let Some(first) = unknown.first() {
-        return Err(Failure::input(
-            format!("no component rule called `{first}`"),
-            format!("the rules are {}", known.join(", ")),
-        ));
-    }
+    let rules = all();
+    only_known(NOUN, &rules, &args.only)?;
 
     let root: PathBuf = args.root.clone().unwrap_or_else(|| from.to_path_buf());
     let settings = Settings::read(&root)?;
@@ -62,7 +62,7 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
         ));
     }
 
-    let selected = all()
+    let selected = rules
         .into_iter()
         .filter(|rule| {
             if args.only.is_empty() {
@@ -76,76 +76,6 @@ fn prepare(args: &Rules, from: &Path) -> Result<(Vec<Rule>, Context), Failure> {
     Ok((selected, Context::new(root, settings)))
 }
 
-/// Runs the source rules once, then the meta rules over what they counted.
-///
-/// **One thread per source rule, joined in declaration order.** A rule is a
-/// `fn(&Context) -> Report` that reads files and returns, and none of them
-/// shares anything but the context, so they were serial only because nothing
-/// had made them otherwise. The reports come back in the order the rules were
-/// declared whatever order the threads finish in, and every form below reads
-/// the finished list, so nothing draws or prints while a rule is still running.
-fn measure(selected: Vec<Rule>, context: &Context) -> Vec<(Rule, Report)> {
-    let (meta, source): (Vec<Rule>, Vec<Rule>) = selected.into_iter().partition(Rule::meta);
-
-    let mut reports: Vec<(Rule, Report)> = thread::scope(|scope| {
-        let running: Vec<(Rule, ScopedJoinHandle<Report>)> = source
-            .into_iter()
-            .map(|rule| {
-                let run = match rule.run {
-                    Runner::Source(run) => run,
-                    Runner::Meta(_) => unreachable!("partitioned above"),
-                };
-                (rule, scope.spawn(move || run(context)))
-            })
-            .collect();
-        running
-            .into_iter()
-            .map(|(rule, handle)| {
-                /* A rule that panicked has printed why on its own thread; the
-                panic continues here so the process still ends the way it did
-                when the rule ran on this one. */
-                let report = handle
-                    .join()
-                    .unwrap_or_else(|panic| std::panic::resume_unwind(panic));
-                (rule, report)
-            })
-            .collect()
-    });
-
-    let measured: Vec<Measured> = reports
-        .iter()
-        .map(|(rule, report)| Measured {
-            checked: report.checked,
-            name: rule.name,
-            unit: report.unit,
-        })
-        .collect();
-    for rule in meta {
-        let report = match rule.run {
-            Runner::Meta(run) => run(&measured),
-            Runner::Source(_) => unreachable!("partitioned above"),
-        };
-        reports.push((rule, report));
-    }
-
-    reports.sort_by_key(|(rule, _)| rule.name);
-    reports
-}
-
-/// Every rule and what it found, as JSON for a caller that parses it.
-fn payload(reports: &[(Rule, Report)]) -> serde_json::Value {
-    serde_json::json!({
-        "ok": reports.iter().all(|(_, report)| report.ok()),
-        "rules": reports.iter().map(|(rule, report)| serde_json::json!({
-            "checked": report.checked,
-            "findings": report.findings,
-            "name": rule.name,
-            "notes": report.notes,
-            "unit": report.unit,
-        })).collect::<Vec<_>>(),
-    })
-}
-
 /// Prints every rule and what it found, then the findings.
 pub fn audit(
     args: &ComponentAudit,
@@ -154,7 +84,7 @@ pub fn audit(
     paint: Paint,
 ) -> Result<Code, Failure> {
     let (selected, context) = prepare(&args.rules, from)?;
-    let reports = measure(selected, &context);
+    let reports = measure(&selected, &context);
 
     if json {
         println!("{:#}", payload(&reports));
@@ -169,9 +99,9 @@ pub fn audit(
         let code = verdict(&reports);
         let drawn: Vec<(&Rule, &Report)> = reports
             .iter()
-            .map(|(rule, report)| (rule, report))
+            .map(|(rule, report)| (*rule, report))
             .collect();
-        if let Err(why) = tui::run(&drawn) {
+        if let Err(why) = tui::run("helix", &drawn) {
             return Err(Failure::new(
                 Code::Internal,
                 "cannot open the audit screen".to_owned(),
@@ -217,7 +147,7 @@ pub fn audit(
     let code = verdict(&reports);
     if code == Code::Ok {
         println!(
-            "component: {} rule{}, every one clean",
+            "{NOUN}: {} rule{}, every one clean",
             reports.len(),
             if reports.len() == 1 { "" } else { "s" }
         );
@@ -228,7 +158,7 @@ pub fn audit(
 /// The same measurement, silent unless something is wrong.
 pub fn check(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
     let (selected, context) = prepare(args, from)?;
-    let reports = measure(selected, &context);
+    let reports = measure(&selected, &context);
     if json {
         println!("{:#}", payload(&reports));
         return Ok(verdict(&reports));
@@ -238,67 +168,13 @@ pub fn check(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
 }
 
 /// Runs the rules that can write, and says what they wrote.
-///
-/// **The same selection as `check`, filtered to what has a `fix`.** A rule with
-/// none is not an error to have asked for: `--only` names a subject, and the
-/// answer to "fix the tokens rule" is that there is nothing mechanical to apply.
 pub fn fix(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, Failure> {
     let (selected, context) = prepare(args, from)?;
-    let mut wrote: Vec<(&str, String)> = Vec::new();
-    let mut ran = 0;
-    for rule in &selected {
-        let Some(apply) = rule.fix else {
-            continue;
-        };
-        ran += 1;
-        let written = apply(&context).map_err(|refused| {
-            Failure::new(
-                Code::Internal,
-                format!("cannot write {}", refused.file),
-                refused.why,
-            )
-        })?;
-        for file in written {
-            wrote.push((rule.name, file));
-        }
-    }
-
-    if json {
-        println!(
-            "{:#}",
-            serde_json::json!({
-                "ran": ran,
-                "wrote": wrote.iter().map(|(rule, file)| serde_json::json!({
-                    "file": file,
-                    "rule": rule,
-                })).collect::<Vec<_>>(),
-            })
-        );
-        return Ok(Code::Ok);
-    }
-    if wrote.is_empty() {
-        let plural = if ran == 1 { "" } else { "s" };
-        println!("component: {ran} rule{plural} can write, and nothing needed it");
-    } else {
-        for (rule, file) in &wrote {
-            println!("  {}  {file}", paint.bold(rule));
-        }
-        let plural = if wrote.len() == 1 { "" } else { "s" };
-        println!("component: {} file{plural} written", wrote.len());
-    }
-    Ok(Code::Ok)
-}
-
-fn verdict(reports: &[(Rule, Report)]) -> Code {
-    if reports.iter().all(|(_, report)| report.ok()) {
-        Code::Ok
-    } else {
-        Code::Failed
-    }
+    fusion_rules::fix(&selected, &context, json, paint, NOUN)
 }
 
 /// Findings to stderr, so a caller piping stdout keeps a clean stream.
-fn speak(reports: &[(Rule, Report)], paint: Paint) {
+fn speak(reports: &[(&Rule, Report)], paint: Paint) {
     for (rule, report) in reports.iter().filter(|(_, report)| !report.ok()) {
         eprintln!("{} {}", paint.bold(rule.name), paint.dim(rule.summary));
         for finding in &report.findings {

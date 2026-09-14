@@ -16,11 +16,14 @@
 //! is optional because inventing one is worse than omitting it: a suggestion
 //! that does not work is a second failure with the tool's name on it.
 //!
+//! **The product's name is the one thing the line takes from its caller.** A
+//! failure is built wherever it happens, deep in a rule or a reader, and none
+//! of those places should have to know which binary they were linked into; the
+//! `main` that prints it does, and says so once, in [`Failure::render`].
+//!
 //! Never to stdout. A reader piping `--json` into another program gets a clean
 //! stream or nothing, and an error that lands in the middle of that stream is a
 //! parse failure two programs away from its cause.
-
-use std::fmt::{Display, Formatter, Result as Fmt};
 
 use crate::exit::Code;
 
@@ -57,6 +60,16 @@ impl Failure {
         self
     }
 
+    /// The lines a person reads, under the name of the binary that failed.
+    #[must_use]
+    pub fn render(&self, product: &str) -> String {
+        let line = format!("{product}: {}: {}", self.what, self.why);
+        match &self.hint {
+            Some(hint) => format!("{line}\n  try: {hint}"),
+            None => line,
+        }
+    }
+
     /// The same failure as data, for `--json`.
     ///
     /// **Reported on stderr like the human form, not folded into the result on
@@ -71,18 +84,6 @@ impl Failure {
         })
     }
 }
-
-impl Display for Failure {
-    fn fmt(&self, out: &mut Formatter<'_>) -> Fmt {
-        write!(out, "helix: {}: {}", self.what, self.why)?;
-        if let Some(hint) = &self.hint {
-            write!(out, "\n  try: {hint}")?;
-        }
-        Ok(())
-    }
-}
-
-impl std::error::Error for Failure {}
 
 /// Every command returns this.
 pub type Outcome<T> = Result<T, Failure>;

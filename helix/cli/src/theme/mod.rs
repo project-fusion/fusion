@@ -9,10 +9,10 @@ pub mod tui;
 use std::path::Path;
 
 use fusion_helix_theme::derive::theme::{derive_theme, Theme};
+use fusion_rules::error::{Failure, Outcome};
+use fusion_rules::exit::Code;
 
 use crate::config;
-use crate::error::{Failure, Outcome};
-use crate::exit::Code;
 
 /// Locate, read and derive, which is the first half of three of the four verbs.
 ///
