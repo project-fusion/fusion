@@ -45,6 +45,22 @@ updates:
     package-ecosystem: npm
     schedule:
       interval: weekly
+  # The two consumer templates are not workspace members, so the root entry
+  # never sees them, and what they pin ships to every `helix new` project.
+  - directory: /helix/templates/templates/react-nextjs
+    groups:
+      template:
+        patterns: ['*']
+    package-ecosystem: npm
+    schedule:
+      interval: weekly
+  - directory: /helix/templates/templates/react-vite
+    groups:
+      template:
+        patterns: ['*']
+    package-ecosystem: npm
+    schedule:
+      interval: weekly
   - directory: /
     groups:
       cargo:
