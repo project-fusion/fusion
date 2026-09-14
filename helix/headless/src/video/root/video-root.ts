@@ -31,6 +31,19 @@ import { html } from 'lit/static-html.js'
    this tier writes the template and the styled tier inherits it without having
    a copy of its own to remind anyone. */
 import '../../menu/index.js'
+import {
+  activeCue,
+  adoptTrack,
+  type Caption,
+  CueController,
+  captionsAmong,
+  captionTracks,
+  showCaption,
+} from './captions.js'
+import { FullscreenController } from './fullscreen.js'
+import { IdleController } from './idle.js'
+import { MediaSessionController, SKIP_SECONDS } from './media-session.js'
+import { RemotePlaybackController } from './remote-playback.js'
 
 /**
  * Seconds as a clock, with an hour only when there is one.
@@ -52,31 +65,6 @@ const clock = (seconds: number): string => {
     ? `${hours}:${String(minutes).padStart(2, '0')}:${padded}`
     : `${minutes}:${padded}`
 }
-
-/**
- * Which player currently owns the page's one media session.
- *
- * There is exactly one `navigator.mediaSession` per page, and it decides what
- * the lock screen shows and where a headset's buttons land. Two players cannot
- * both have it, so the rule is written down rather than left to whichever
- * rendered last: **whoever played most recently owns it**, which is what a
- * reader means by "this one" when they press play on their headphones.
- *
- * Module scope, because the thing being shared is the page's and not any
- * element's. A player gives it up when it leaves the document, and only if it
- * still holds it: one that already lost the session to another must not clear
- * that other one's metadata on its way out.
- */
-let owner: HTMLElement | undefined
-
-/**
- * How far a skip control moves, in seconds.
- *
- * Ten, which is the number every player that has one uses, and the number the
- * platform names in `seekbackward` and `seekforward` when it hands over a
- * default. A different length here would be correct only on this player.
- */
-const SKIP_SECONDS = 10
 
 /**
  * @summary Plays a video, with controls this library draws rather than the
@@ -502,8 +490,6 @@ export class HelixHeadlessVideo extends HelixElement {
   @state()
   private idle = false
 
-  private idleTimer?: ReturnType<typeof setTimeout>
-
   /**
    * Whether anything on the network offers to play this.
    */
@@ -516,8 +502,35 @@ export class HelixHeadlessVideo extends HelixElement {
   @state()
   private remoteConnected = false
 
-  /** Cancels the availability watch, since it outlives a single render. */
-  private remoteWatch: number | undefined
+  /*
+   * The concerns that are not the picture, each in a module beside this one.
+   * They report into the states above rather than holding their own, because
+   * the render reads the states and the specs reach them.
+   */
+  private readonly cues = new CueController(this, () => this.handleCue())
+
+  private readonly fullscreen = new FullscreenController(this, (full) => {
+    this.full = full
+  })
+
+  private readonly idler = new IdleController(
+    this,
+    () => this.idleDelay,
+    (idle) => {
+      this.idle = idle
+    },
+  )
+
+  private readonly remote = new RemotePlaybackController(this, {
+    available: (available) => {
+      this.remoteAvailable = available
+    },
+    connected: (connected) => {
+      this.remoteConnected = connected
+    },
+  })
+
+  private readonly session = new MediaSessionController(this)
 
   /** Whether this platform can do a named control at all. */
   private offers(one: string): boolean {
@@ -875,20 +888,8 @@ export class HelixHeadlessVideo extends HelixElement {
        button that began at "off" reported the opposite of what was on screen. */
     const track = video.textTracks[0]
     if (track) {
-      /* A `<track default>` arrives `showing`, which is the browser drawing it.
-         Moved to `hidden` so the cues keep coming and we draw them instead. */
-      if (track.mode === 'showing') {
-        track.mode = 'hidden'
-      }
-      this.captioned = track.mode === 'hidden'
-      /* Taken off whatever it was on before adding it here. This runs from
-         `loadedmetadata`, which fires again for every source a reader moves to,
-         and a consumer adding a `<track>` later gets another. Added without
-         removing, a playlist of six left six listeners on tracks that between
-         them fire for every cue in the video. */
-      this.cued?.removeEventListener('cuechange', this.handleCue)
-      this.cued = track
-      track.addEventListener('cuechange', this.handleCue)
+      this.captioned = adoptTrack(track)
+      this.cues.follow(track)
       this.handleCue()
     }
   }
@@ -937,9 +938,7 @@ export class HelixHeadlessVideo extends HelixElement {
     if (event.type === 'play') {
       this.claimSession()
     }
-    if (owner === this && typeof navigator !== 'undefined' && navigator.mediaSession) {
-      navigator.mediaSession.playbackState = this.playing ? 'playing' : 'paused'
-    }
+    this.session.report(this.playing)
     /* Non-bubbling, which is what the platform sends and what makes these reach
        a React consumer at all.
      *
@@ -963,55 +962,21 @@ export class HelixHeadlessVideo extends HelixElement {
   }
 
   /**
-   * Takes the page's media session, and tells the platform what is playing.
-   *
-   * On play rather than on render, which is the ownership rule: a page with two
-   * players gives the session to whichever one the reader started, so a
-   * headset's buttons land on what they are listening to rather than on
-   * whichever came first in the markup.
-   *
-   * The handlers are what make a headset's play, pause and skip work at all.
-   * Without them a platform falls back to guessing which element was meant,
-   * which is right often enough to hide the fault and wrong exactly when there
-   * are two.
+   * Takes the page's media session, on play rather than on render: a page
+   * with two players gives it to whichever one the reader started. The skip
+   * keys are offered only where the consumer named something to skip to.
    */
   private claimSession(): void {
-    if (typeof navigator === 'undefined' || !navigator.mediaSession) {
-      return
-    }
-    owner = this
-    const session = navigator.mediaSession
-    session.metadata = new MediaMetadata({
-      artwork: this.poster === '' ? [] : [{ src: this.poster }],
-      title: this.label,
-    })
-    session.setActionHandler('play', () => this.toggle())
-    session.setActionHandler('pause', () => this.toggle())
-    session.setActionHandler('seekto', (details) => {
-      if (details.seekTime !== undefined && details.seekTime !== null) {
-        this.seek(details.seekTime)
-      }
-    })
-    /* The skip keys, and only where the consumer has said there is something to
-       skip to. A headset whose skip buttons do nothing is worse than one whose
-       skip buttons are not offered: the platform draws them from whether a
-       handler is set, so setting one unconditionally would put two dead keys on
-       every lock screen showing this video. */
     const skips = `${this.extraControls} ${this.overflowControls}`.split(/\s+/)
-    /* The platform asks for a length and we answer with ours, or with its
-       default where it did not say. A lock screen offering a skip that moves a
-       different distance than the button on the bar is one player with two
-       answers to the same gesture. */
-    session.setActionHandler('seekbackward', (details) => {
-      this.skipBy(-(details.seekOffset ?? SKIP_SECONDS))
-    })
-    session.setActionHandler('seekforward', (details) => {
-      this.skipBy(details.seekOffset ?? SKIP_SECONDS)
-    })
-    session.setActionHandler('nexttrack', skips.includes('next') ? () => this.skip(false) : null)
-    session.setActionHandler(
-      'previoustrack',
-      skips.includes('previous') ? () => this.skip(true) : null,
+    this.session.claim(
+      { artwork: this.poster, title: this.label },
+      {
+        next: skips.includes('next') ? () => this.skip(false) : null,
+        previous: skips.includes('previous') ? () => this.skip(true) : null,
+        seek: (seconds) => this.seek(seconds),
+        skipBy: (seconds) => this.skipBy(seconds),
+        toggle: () => this.toggle(),
+      },
     )
   }
 
@@ -1042,9 +1007,8 @@ export class HelixHeadlessVideo extends HelixElement {
     /* The track that is showing, not the first one. With one track those are
        the same and with two they are not, so a reader on the second language
        was shown the first one's words. */
-    const track = this.captionTracks[this.captionIndex] ?? this.video?.textTracks[0]
-    const active = track?.activeCues?.[0]
-    this.cue = active instanceof VTTCue ? active.getCueAsHTML() : undefined
+    const track = captionTracks(this.video)[this.captionIndex] ?? this.video?.textTracks[0]
+    this.cue = activeCue(track)
   }
 
   /**
@@ -1062,40 +1026,9 @@ export class HelixHeadlessVideo extends HelixElement {
     this.seek(video.currentTime + seconds)
   }
 
-  /**
-   * The tracks a reader could choose between, in the order they were written.
-   *
-   * Filtered by kind, because `textTracks` also carries `chapters`, `metadata`
-   * and `descriptions`, and a menu offering "Chapters" as a subtitle language
-   * would be offering something that draws no words. Read off the video rather
-   * than off the slot: a `<track>` added later is in one and not the other, and
-   * the video is the one that has resolved them.
-   */
-  private get captionTracks(): TextTrack[] {
-    const tracks = this.video?.textTracks
-    if (!tracks) {
-      return []
-    }
-    return [...tracks].filter((one) => one.kind === 'subtitles' || one.kind === 'captions')
-  }
-
-  /**
-   * Shows one track and disables every other, or shows none at `-1`.
-   *
-   * Every other, rather than only the one that was on. Two tracks in `hidden`
-   * both fire `cuechange`, so the rendered cue becomes whichever fired last and
-   * a reader who switched language gets the two interleaved. Measured as two
-   * subtitles alternating line by line.
-   *
-   * `hidden`, never `showing`. Hidden is the mode where a track still fires
-   * `cuechange` and still fills `activeCues`, and the browser draws nothing,
-   * which is exactly what is wanted when something else is doing the drawing.
-   */
+  /** Shows one track and disables every other, or shows none at `-1`. */
   private showCaption(index: number): void {
-    const tracks = this.captionTracks
-    tracks.forEach((track, at) => {
-      track.mode = at === index ? 'hidden' : 'disabled'
-    })
+    showCaption(captionTracks(this.video), index)
     this.captionIndex = index
     this.captioned = index >= 0
     this.cue = undefined
@@ -1103,7 +1036,7 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /** Turns captions on or off, which is what the button means with one track. */
   private toggleCaptions(): void {
-    if (this.captionTracks.length === 0) {
+    if (captionTracks(this.video).length === 0) {
       return
     }
     this.showCaption(this.captioned ? -1 : 0)
@@ -1141,43 +1074,6 @@ export class HelixHeadlessVideo extends HelixElement {
     this.rate = next
   }
 
-  /**
-   * Starts watching for something to play this on, and stops on the way out.
-   *
-   * The Remote Playback API is the standard one, and it is what Safari
-   * implements for AirPlay and Chrome for Cast: one call covers both, where the
-   * older `webkitShowPlaybackTargetPicker` covers only the first. Firefox has
-   * neither, and `remote` simply being absent is what turns the control off
-   * there.
-   *
-   * `watchAvailability` returns an id that has to be canceled, or the callback
-   * outlives the element that owns it.
-   */
-  private async watchRemote(): Promise<void> {
-    const remote = this.video?.remote
-    if (!remote?.watchAvailability) {
-      return
-    }
-    try {
-      this.remoteWatch = await remote.watchAvailability((available) => {
-        this.remoteAvailable = available
-      })
-    } catch {
-      /* Refused where the media is not remotable, which is a fact about the
-         source rather than an error to report: the control stays off. */
-    }
-  }
-
-  /** Opens the platform's own device picker. It has no list of its own. */
-  private async promptRemote(): Promise<void> {
-    try {
-      await this.video?.remote?.prompt()
-    } catch {
-      /* Dismissing the picker rejects, which is a reader saying no rather than
-         anything going wrong. */
-    }
-  }
-
   private async togglePip(): Promise<void> {
     const video = this.video
     if (!video) {
@@ -1188,56 +1084,6 @@ export class HelixHeadlessVideo extends HelixElement {
       return
     }
     await video.requestPictureInPicture()
-  }
-
-  /**
-   * Into fullscreen and back, and quiet about being refused.
-   *
-   * `requestFullscreen` rejects rather than returning false, and the two
-   * refusals a consumer will actually meet are a Permissions Policy that does
-   * not grant `fullscreen` to the frame the player is in, and a call without
-   * user activation. Both are `TypeError: Permissions check failed`, which is
-   * the same message for two different causes.
-   *
-   * Caught rather than `void`ed, or a refusal becomes an unhandled rejection
-   * naming neither the element nor the reason. The state stays honest either
-   * way, because `aria-pressed` follows `fullscreenchange` rather than this
-   * call, so a refused request leaves a button that correctly reports "not
-   * fullscreen".
-   */
-  private async toggleFullscreen(): Promise<void> {
-    try {
-      if (document.fullscreenElement === this) {
-        await document.exitFullscreen()
-        return
-      }
-      await this.requestFullscreen()
-    } catch (error) {
-      /* Reported rather than swallowed, and reported once. A player embedded in
-         a frame without the permission is the common case, and the fix is on
-         the frame rather than here, so the message has to say which. */
-      console.warn(
-        `<${this.localName}> could not enter fullscreen. If it is inside an iframe, that frame needs allow="fullscreen".`,
-        error,
-      )
-    }
-  }
-
-  /**
-   * Restarts the wait, on anything that counts as the reader being here.
-   *
-   * Pointer movement and focus both count, and both have to: a reader using the
-   * keyboard never moves a pointer, and a bar that only answered the mouse
-   * would leave them nothing to look at.
-   */
-  private readonly stir = (): void => {
-    this.idle = false
-    clearTimeout(this.idleTimer)
-    if (this.idleDelay > 0) {
-      this.idleTimer = setTimeout(() => {
-        this.idle = true
-      }, this.idleDelay)
-    }
   }
 
   /**
@@ -1265,14 +1111,10 @@ export class HelixHeadlessVideo extends HelixElement {
       return
     }
     if (this.idle) {
-      this.stir()
+      this.idler.stir()
       return
     }
     this.toggle()
-  }
-
-  private readonly handleFullscreenChange = (): void => {
-    this.full = document.fullscreenElement === this
   }
 
   /**
@@ -1337,7 +1179,7 @@ export class HelixHeadlessVideo extends HelixElement {
         break
       }
       case 'f': {
-        void this.toggleFullscreen()
+        void this.fullscreen.toggle()
         break
       }
       default: {
@@ -1347,53 +1189,12 @@ export class HelixHeadlessVideo extends HelixElement {
     event.preventDefault()
   }
 
-  /** The track currently being listened to, so the next one can take it off. */
-  private cued: TextTrack | undefined
-
-  private readonly handleRemoteState = (): void => {
-    this.remoteConnected = this.video?.remote?.state === 'connected'
-  }
-
-  override connectedCallback(): void {
-    super.connectedCallback()
-    document.addEventListener('fullscreenchange', this.handleFullscreenChange)
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    clearTimeout(this.idleTimer)
-    this.cued?.removeEventListener('cuechange', this.handleCue)
-    this.cued = undefined
-    document.removeEventListener('fullscreenchange', this.handleFullscreenChange)
-    /* The watch outlives the element unless it is canceled, and a callback
-       holding a removed element is a leak with a `@state` write on the end. */
-    if (this.remoteWatch !== undefined) {
-      void this.video?.remote?.cancelWatchAvailability?.(this.remoteWatch)
-      this.remoteWatch = undefined
-    }
-    /* And the page's one media session goes back to nobody, but only if this
-       element is the one holding it. */
-    if (owner === this) {
-      owner = undefined
-      if (typeof navigator !== 'undefined' && navigator.mediaSession) {
-        navigator.mediaSession.metadata = null
-        navigator.mediaSession.playbackState = 'none'
-      }
-    }
-  }
-
   /** The caption tracks among the copies, named as the menu names them. */
-  private captions: { label: string; language: string }[] = []
+  private captions: Caption[] = []
 
   /**
-   * Finds the caption tracks among the copies, before the render that draws
-   * them.
-   *
-   * By the platform's own reading of `kind`, which is what makes a `<track>` a
-   * caption at all: missing is `subtitles` and anything it does not know is
-   * `metadata`. Read from the video's tracks after the render instead, the count
-   * arrived a render late and asked for one more. Choosing one still goes
-   * through the video's tracks, which hold them in the same order.
+   * Reads the copies, and names the caption tracks among them before the
+   * render that draws them.
    */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -1408,14 +1209,7 @@ export class HelixHeadlessVideo extends HelixElement {
       this.media = this.copiesOf([...this.children].filter((child) => child.slot === ''))
     }
     if (changed.has('media')) {
-      this.captions = this.media
-        .filter(
-          (one) =>
-            one.tag === 'track' &&
-            (one.attrs.kind === undefined ||
-              ['captions', 'subtitles'].includes(one.attrs.kind.toLowerCase())),
-        )
-        .map((one) => ({ label: one.attrs.label ?? '', language: one.attrs.srclang ?? '' }))
+      this.captions = captionsAmong(this.media)
       this.captionCount = this.captions.length
     }
   }
@@ -1437,9 +1231,7 @@ export class HelixHeadlessVideo extends HelixElement {
       }
       this.silent = video.muted
       this.loudness = video.volume
-      video.remote?.addEventListener?.('connect', this.handleRemoteState)
-      video.remote?.addEventListener?.('disconnect', this.handleRemoteState)
-      void this.watchRemote()
+      void this.remote.attach(video)
     }
   }
 
@@ -1490,7 +1282,7 @@ export class HelixHeadlessVideo extends HelixElement {
         type="button"
         aria-label="Play on another device"
         aria-pressed=${this.remoteConnected ? 'true' : 'false'}
-        @click=${() => void this.promptRemote()}
+        @click=${() => void this.remote.prompt()}
       >
         ${drawIcon(airplay)}
       </button>`
@@ -1664,7 +1456,7 @@ export class HelixHeadlessVideo extends HelixElement {
       return html`<${this.tag('menu-item')} part="entry"
       exportparts="item: entry-item, mark: entry-mark, start: entry-start"
         value="remote"
-        @helix-select=${() => void this.promptRemote()}
+        @helix-select=${() => void this.remote.prompt()}
       >
         ${drawIcon(airplay, { slot: 'start' })}
         Play on another device
@@ -1807,7 +1599,7 @@ export class HelixHeadlessVideo extends HelixElement {
         type="button"
         aria-label=${this.full ? 'Exit fullscreen' : 'Fullscreen'}
         aria-pressed=${this.full ? 'true' : 'false'}
-        @click=${() => void this.toggleFullscreen()}
+        @click=${() => void this.fullscreen.toggle()}
       >
         ${drawIcon(this.full ? cornersIn : cornersOut)}
       </button>
@@ -1826,14 +1618,9 @@ export class HelixHeadlessVideo extends HelixElement {
         role=${this.controls ? nothing : 'group'}
         aria-label=${this.controls ? nothing : this.label || 'Video'}
         @keydown=${this.handleKeydown}
-        @pointermove=${this.stir}
-        @pointerleave=${() => {
-          /* Leaving is the one case that does not wait: the reader has gone
-             somewhere else, and there is nothing to reach for. */
-          clearTimeout(this.idleTimer)
-          this.idle = true
-        }}
-        @focusin=${this.stir}
+        @pointermove=${this.idler.stir}
+        @pointerleave=${this.idler.leave}
+        @focusin=${this.idler.stir}
       >
       <video
         part="video"
