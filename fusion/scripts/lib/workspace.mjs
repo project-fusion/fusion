@@ -34,20 +34,19 @@ export const SCOPE = '@fusion.dev/'
 export const DOMAINS = { cortex: 'cortex', helix: 'helix' }
 
 /**
- * What the design system prefixes its public names with.
+ * What the design system prefixes its element names with.
  *
- * **These are the parameters a consumer would have to change and this
- * repository never will.** A library built on Helix registers its own elements
- * and declares its own tokens, so a rule asking "is this one of ours" is asking
- * about a prefix rather than about the word `helix`. Named here so the rules
- * ask a question rather than assert an answer, which is the difference between
- * a rule that ships and a rule that only ever runs here.
+ * **This is the parameter a consumer would have to change and this repository
+ * never will.** A library built on Helix registers its own elements, so a rule
+ * asking "is this one of ours" is asking about a prefix rather than about the
+ * word `helix`. Named here so the rules ask a question rather than assert an
+ * answer, which is the difference between a rule that ships and a rule that
+ * only ever runs here.
  *
  * The rest of what looks like prefix coupling is either a specific element name,
  * which is vocabulary, or a package name, which is a dependency.
  */
 export const TAG_PREFIX = 'helix-'
-export const TOKEN_PREFIX = '--helix-'
 
 /**
  * Where source lives, named once so a folder rename has one copy to find.
@@ -112,9 +111,6 @@ export const ARTIFACT = {
 
 /** The two component tiers, which is the set six checks read on their own. */
 export const TIERS = [SOURCE.headless, SOURCE.styled]
-
-/** Every domain folder, for a check whose subject is the repository. */
-export const ROOTS = ['cortex', 'fusion', 'helix']
 
 /** Every workspace directory, with `dir/*` globs expanded. */
 export function directories() {
