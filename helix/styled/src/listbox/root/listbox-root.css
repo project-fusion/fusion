@@ -73,7 +73,7 @@
 /* Not an empty state component, which would be a picture and a heading in a box
    this size. A filter that matches nothing wants one line saying so, and the line
    is `shared/collection/state`'s. Its inset is a step tighter than the other
-   collections', which that sheet records as a drift. */
+   collections', which is this family's call about its own box. */
 [part="empty"],
 [part="loading"] {
   --_collection-inset-block: var(--helix-space-xs);
