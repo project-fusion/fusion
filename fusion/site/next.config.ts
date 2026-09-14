@@ -22,10 +22,12 @@ const config: NextConfig = {
   /**
    * Development builds into its own directory.
    *
-   * `.next` is a declared Turborepo output for the site's `build`, so a task
-   * that reaches it writes over the directory a running `next dev` is serving
-   * from, and every route 500s until it is deleted. Two processes, two
-   * directories, no shared state.
+   * Next 16 already keeps `next dev` apart from `next build` under one
+   * `distDir`, writing development output to `<distDir>/dev`. What that does
+   * not survive is the cache: `.next/**` is a declared Turborepo output for the
+   * site's `build`, and a cache hit replaces the directory with the cached
+   * set, `dev/` included, under a running dev server. Two directories keeps
+   * the restore away from the process that is serving.
    */
   distDir: process.env.NODE_ENV === 'production' ? '.next' : '.next-dev',
 

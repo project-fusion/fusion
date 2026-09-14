@@ -1,22 +1,9 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import type { SpecResult } from '@fusion.dev/helix-testing/browser'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { styles } from './sandbox-specs.css.js'
-
-/** One test, as the harness reported it. */
-export interface SpecResult {
-  /** How long it took, in milliseconds. */
-  duration: number
-  /** Why it failed, when it did. */
-  error?: string
-  /** What the test is called. */
-  name: string
-  /** Whether it passed. */
-  passed: boolean
-  /** The describe blocks it sits in, outermost first. */
-  suite: string[]
-}
 
 /** What the runner frame sends back. */
 interface ResultsMessage {
