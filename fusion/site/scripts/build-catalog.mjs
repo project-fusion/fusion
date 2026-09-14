@@ -14,10 +14,11 @@
  * file that is already inside it, so nothing is read at runtime at all and the
  * shaping happens once here instead of once per build of the site.
  *
- * **Generated rather than committed.** It is 2.4 MB derived entirely from files
- * that are already in the repository, so committing it would be a second copy
- * of the examples that can go stale. `fusion/site` runs this before `next build`
- * and before `next dev`, the same way it already runs the frame and the specs.
+ * **Generated rather than committed.** It is every example's three sources and
+ * every element's tables, derived entirely from files that are already in the
+ * repository, so committing it would be a second copy of the examples that can
+ * go stale. `turbo.json` runs this before `next build` and before `next dev`,
+ * the same way it runs the frame and the specs.
  *
  * **The cost is dev freshness.** Editing an example means re-running this, and
  * the dev server does it on its own: `scripts/dev.mjs` runs `bun run watch`
