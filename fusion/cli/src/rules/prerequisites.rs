@@ -11,7 +11,6 @@
 //! prerequisite by definition, because a build put it there.
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::manifests;
 
 /// What counts as compiling.
 ///
@@ -31,7 +30,7 @@ fn compiles(step: &str) -> bool {
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
-    for manifest in manifests(&context.root) {
+    for manifest in context.manifests() {
         let scripts = manifest.scripts();
         let (Some(build), Some(typecheck)) = (scripts.get("build"), scripts.get("typecheck"))
         else {

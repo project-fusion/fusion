@@ -56,13 +56,7 @@ fn literals(text: &str) -> Option<Vec<String>> {
 fn allowed(context: &Context) -> BTreeMap<String, BTreeMap<String, Vec<String>>> {
     let mut found: BTreeMap<String, BTreeMap<String, Vec<String>>> = BTreeMap::new();
     for tier in context.settings.roots(&context.root) {
-        let Some(manifest) = tier.parent().map(|one| one.join("custom-elements.json")) else {
-            continue;
-        };
-        let Ok(raw) = fs::read_to_string(&manifest) else {
-            continue;
-        };
-        let Ok(value) = serde_json::from_str::<Value>(&raw) else {
+        let Some(value) = context.manifest(&tier) else {
             continue;
         };
         let modules = value.get("modules").and_then(Value::as_array);

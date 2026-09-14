@@ -40,7 +40,6 @@ use regex::Regex;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::manifests;
 
 static VERSION: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(\d+)\.(\d+)").expect("a literal pattern compiles"));
@@ -55,8 +54,9 @@ pub fn run(context: &Context) -> Report {
         notes: Vec::new(),
         unit: "declared floors",
     };
-    let Some(root) = manifests(&context.root)
-        .into_iter()
+    let Some(root) = context
+        .manifests()
+        .iter()
         .find(|one| one.directory.is_empty() || one.directory == ".")
     else {
         return nothing(Vec::new());

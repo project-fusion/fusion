@@ -55,7 +55,7 @@ use std::path::{Path, PathBuf};
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::{crawl, manifests};
+use crate::workspace::crawl;
 
 /// Suffixes nobody writes on purpose.
 ///
@@ -97,7 +97,7 @@ pub fn run(context: &Context) -> Report {
         }
     }
 
-    for manifest in manifests(&context.root) {
+    for manifest in context.manifests() {
         /* The root is not a package's source tree; its own files are the
         workspace's, and `dist` is skipped by the walk rather than by name. */
         if manifest.directory.is_empty() {

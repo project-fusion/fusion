@@ -25,7 +25,7 @@ use std::path::Path;
 use std::sync::LazyLock;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::{crawl, manifests};
+use crate::workspace::crawl;
 use regex::Regex;
 
 static STATIC_IMPORT: LazyLock<Regex> = LazyLock::new(|| {
@@ -122,7 +122,7 @@ fn defines(directory: &Path) -> bool {
 pub fn run(context: &Context) -> Report {
     /* Every package that could register something, by published name. */
     let mut packages: BTreeMap<String, (String, bool)> = BTreeMap::new();
-    for manifest in manifests(&context.root) {
+    for manifest in context.manifests() {
         let entry = context.root.join(&manifest.directory).join("src/index.ts");
         let reaches = reaches(&entry, &mut BTreeSet::new());
         packages.insert(manifest.name.clone(), (manifest.directory.clone(), reaches));

@@ -27,16 +27,39 @@ pub mod strays;
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 use serde::{Deserialize, Serialize};
+
+use crate::workspace::{self, Manifest};
 
 /// The workspace under test.
 pub struct Context {
     pub root: PathBuf,
     pub settings: Settings,
+    /// Every manifest in the workspace, read once. See [`Context::manifests`].
+    manifests: OnceLock<Vec<Manifest>>,
 }
 
 impl Context {
+    pub fn new(root: PathBuf, settings: Settings) -> Self {
+        Self {
+            manifests: OnceLock::new(),
+            root,
+            settings,
+        }
+    }
+
+    /// Every manifest in the workspace, the root's included.
+    ///
+    /// **Read once and borrowed, because nine rules want the same list.** Each
+    /// of them walked the workspace and parsed every `package.json` for itself,
+    /// and a rule cannot know whether it is the first to ask.
+    pub fn manifests(&self) -> &[Manifest] {
+        self.manifests
+            .get_or_init(|| workspace::manifests(&self.root))
+    }
+
     /// A path as a finding names it: relative to the root, with forward slashes.
     ///
     /// Forward slashes on every platform, because a finding is read by a person

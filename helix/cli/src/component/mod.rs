@@ -83,16 +83,63 @@ pub mod vocabulary;
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 /// What a rule is run against.
 pub struct Context {
     pub root: PathBuf,
     pub settings: Settings,
+    /// Every `custom-elements.json` beside a tier or a layer, parsed once.
+    manifests: OnceLock<BTreeMap<PathBuf, Value>>,
 }
 
 impl Context {
+    pub fn new(root: PathBuf, settings: Settings) -> Self {
+        Self {
+            manifests: OnceLock::new(),
+            root,
+            settings,
+        }
+    }
+
+    /// The manifest of the package whose source is `source`, if analyzed.
+    ///
+    /// **Parsed once and borrowed, because seven rules read it.** Each of them
+    /// read and parsed every manifest for itself, which was seven parses of a
+    /// file that runs to seventy thousand lines. `None` where the package has
+    /// no manifest beside its source, which is what each rule answered on its
+    /// own before: a package nobody has analyzed declares nothing.
+    pub fn manifest(&self, source: &Path) -> Option<&Value> {
+        let manifests = self.manifests.get_or_init(|| {
+            let layers = self
+                .settings
+                .layers
+                .iter()
+                .map(|layer| self.root.join(&layer.source));
+            let mut found = BTreeMap::new();
+            for source in self.settings.roots(&self.root).into_iter().chain(layers) {
+                let Some(path) = source.parent().map(|one| one.join("custom-elements.json")) else {
+                    continue;
+                };
+                if found.contains_key(&path) {
+                    continue;
+                }
+                let Ok(raw) = fs::read_to_string(&path) else {
+                    continue;
+                };
+                let Ok(value) = serde_json::from_str::<Value>(&raw) else {
+                    continue;
+                };
+                found.insert(path, value);
+            }
+            found
+        });
+        manifests.get(&source.parent()?.join("custom-elements.json"))
+    }
+
     /// A path as a finding names it: relative to the root, with forward slashes.
     ///
     /// Forward slashes on every platform, because a finding is read by a person

@@ -84,14 +84,7 @@ struct At {
 fn declared(context: &Context) -> BTreeMap<String, BTreeMap<String, bool>> {
     let mut found: BTreeMap<String, BTreeMap<String, bool>> = BTreeMap::new();
     for tier in context.settings.roots(&context.root) {
-        let Some(manifest) = tier.parent().map(|one| one.join("custom-elements.json")) else {
-            continue;
-        };
-        let Ok(value) = fs::read_to_string(&manifest)
-            .ok()
-            .ok_or(())
-            .and_then(|raw| serde_json::from_str::<Value>(&raw).map_err(|_| ()))
-        else {
+        let Some(value) = context.manifest(&tier) else {
             continue;
         };
         for declaration in value

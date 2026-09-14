@@ -28,7 +28,6 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::manifests;
 
 /// A relative path that climbs out of where it is written.
 ///
@@ -54,7 +53,7 @@ fn lands(from: &Path, written: &str) -> Option<PathBuf> {
 }
 
 pub fn run(context: &Context) -> Report {
-    let all = manifests(&context.root);
+    let all = context.manifests();
     let packages: Vec<PathBuf> = all
         .iter()
         .filter(|one| !one.directory.is_empty())
@@ -64,7 +63,7 @@ pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
 
-    for manifest in &all {
+    for manifest in all {
         /* The root orchestrates, so naming what it orchestrates is its job. */
         if manifest.directory.is_empty() {
             continue;

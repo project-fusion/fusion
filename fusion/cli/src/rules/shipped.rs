@@ -24,7 +24,6 @@ use std::path::{Path, PathBuf};
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
-use crate::workspace::manifests;
 
 /// Everything under a directory, relative to it.
 fn walk(directory: &Path, base: &Path, found: &mut Vec<PathBuf>) {
@@ -49,7 +48,7 @@ pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
 
-    for manifest in manifests(&context.root) {
+    for manifest in context.manifests() {
         let builds_per_file = manifest
             .value
             .get("scripts")

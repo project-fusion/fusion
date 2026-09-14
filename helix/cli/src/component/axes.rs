@@ -35,7 +35,6 @@
 //! that. Failing would pressure someone into declaring an axis to silence it.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
 
 use serde_json::Value;
 
@@ -85,14 +84,7 @@ fn survey(context: &Context, findings: &mut Vec<Finding>) -> Survey {
 
     for layer in &context.settings.layers {
         let source = context.root.join(&layer.source);
-        let Some(manifest) = source.parent().map(|one| one.join("custom-elements.json")) else {
-            continue;
-        };
-        let Ok(value) = fs::read_to_string(&manifest)
-            .ok()
-            .ok_or(())
-            .and_then(|raw| serde_json::from_str::<Value>(&raw).map_err(|_| ()))
-        else {
+        let Some(value) = context.manifest(&source) else {
             continue;
         };
         /* The base layer paints nothing, so only what it may carry is allowed. */
