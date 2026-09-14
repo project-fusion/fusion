@@ -6,7 +6,7 @@ import {
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
-  PopoverController,
+  MixinPickerField,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -104,8 +104,8 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
  */
 @customElement('helix-headless-color-input')
-export class HelixHeadlessColorInput extends MixinControllerOpen(
-  MixinControllerValue(MixinField(HelixFormElement)),
+export class HelixHeadlessColorInput extends MixinPickerField(
+  MixinControllerOpen(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
   /* A consumer's `aria-describedby` names ids in their own tree and the control
      is in this shadow root, so the reference has to be carried down as an
@@ -191,30 +191,6 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
   @property({ reflect: true })
   variant?: 'swatch'
 
-  /** The overlay, placed against the field for the reason Date Input gives. */
-  protected readonly panel = new PopoverController(this, {
-    anchor: () => this.partNamed('field'),
-    /* The surface *and* the trigger.
-     *
-     * A control is not always one element: the button that opens this panel is
-     * part of it, and a press on it is not a press outside. Scoped to the
-     * surface alone, `pointerdown` on the trigger closes the panel and the
-     * trigger's own `toggleOpen` reopens it on the `click` that follows, so the
-     * panel can never be closed by the button that opened it.
-     *
-     * `DismissController` documents this exact failure and takes a list for
-     * it. */
-    boundary: (): readonly (Element | null | undefined)[] => [
-      this.partNamed('surface'),
-      this.partNamed('trigger'),
-    ],
-    offset: () => 8,
-    onDismiss: () => this.requestOpen(false),
-    open: () => this.open,
-    placement: 'bottom-start',
-    surface: () => this.partNamed('surface'),
-  })
-
   /**
    * The last value that was a color.
    *
@@ -240,12 +216,8 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
    * focusable to name, and in `swatch` the trigger is the only control in the
    * field. It carries `id="control"` there for the same reason.
    */
-  private get anchor(): HTMLElement | null {
+  protected override get anchor(): HTMLElement | null {
     return this.control ?? this.partNamed('trigger')
-  }
-
-  private get control(): HTMLInputElement | null {
-    return this.partNamed<HTMLInputElement>('control')
   }
 
   /** What the picker should show, which is only ever a color. */
@@ -288,23 +260,15 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
     this.requestOpen(true)
   }
 
-  /*
-   * Puts the field back where the answer differs from what was typed.
+  /**
+   * Reports the value and the validity the host stands behind.
    *
-   * `requestValue` announces and decides; this is the other half, which Input
-   * and Date Input both need for the same reason: the native control has already
-   * changed, so wherever the answer does not follow it, it has to be restored.
+   * The family's own rather than the mixin's, because in `swatch` there is no
+   * text control: the mixin stops where it finds none, and here the verdict
+   * hangs off the trigger instead and `required` is checked by hand, a block of
+   * color having no native validity to adopt.
    */
-  private restore(): void {
-    const control = this.control
-    if (control && control.value !== this.value) {
-      control.value = this.value
-    }
-    this.sync()
-  }
-
-  /** Reports the value and the validity the host stands behind. */
-  private sync(): void {
+  protected override sync(): void {
     this.internals.setFormValue(this.value)
     const anchor = this.anchor
     if (!anchor) {
@@ -336,38 +300,11 @@ export class HelixHeadlessColorInput extends MixinControllerOpen(
     this.refreshFeedback()
   }
 
-  /** Escape shuts the panel without moving the color. */
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape' && this.open) {
-      event.stopPropagation()
-      this.requestOpen(false)
-      this.control?.focus()
-    }
-  }
-
-  protected override firstUpdated(changed: PropertyValues): void {
-    super.firstUpdated(changed)
-    // Whatever the markup arrived with, so a form knows before anything is typed.
-    this.sync()
-  }
-
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    /* Every update, not only the ones that name `value`.
-       `value` is an accessor over `valueState ?? defaultValue`, so a consumer
-       moving `default-value` on an untouched control moves what the form
-       submits without ever putting `value` in the changed map, and the reported
-       entry goes stale. Native `<input>` updates in exactly that case, which is
-       the behavior the mixin's own notes take as the reference. */
-    this.sync()
     if (changed.has('value') && parseColor(this.value)) {
       this.settled = this.value
     }
-  }
-
-  /** Puts the caret in the field, the way a label pointing at one would. */
-  override focus(options?: FocusOptions): void {
-    this.anchor?.focus(options)
   }
 
   /*

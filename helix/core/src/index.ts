@@ -152,6 +152,14 @@ export {
   MixinDismissible,
 } from './mixins/mixin-dismissible/mixin-dismissible.js'
 export { MixinField, type MixinFieldInterface } from './mixins/mixin-field/mixin-field.js'
+export {
+  MixinPickerEditing,
+  type MixinPickerEditingInterface,
+} from './mixins/mixin-picker-editing/mixin-picker-editing.js'
+export {
+  MixinPickerField,
+  type MixinPickerFieldInterface,
+} from './mixins/mixin-picker-field/mixin-picker-field.js'
 export { MixinTokens, type MixinTokensInterface } from './mixins/mixin-tokens/mixin-tokens.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'

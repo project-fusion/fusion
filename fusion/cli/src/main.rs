@@ -378,8 +378,8 @@ fn report(
             println!();
             println!(
                 "{} {}",
-                paint("1", rule.name),
-                paint("2", &format!("{} noted, not failing", report.notes.len()))
+                paint.bold(rule.name),
+                paint.dim(&format!("{} noted, not failing", report.notes.len()))
             );
             for note in &report.notes {
                 println!("  {note}");
