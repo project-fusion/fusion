@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  * @cssproperty --area-chart-fill-strength - How much of its series' color a band takes, as a percentage mixed toward the page.
  * @cssproperty --area-chart-gap - Space between the drawing and its labels.
  * @cssproperty --area-chart-gridline-color - One rule across the plot, under `gridlines`.
- * @cssproperty --area-chart-width - Thickness of a band's top edge.
+ * @cssproperty --area-chart-width - Thickness of a band's top edge, over `--chart-stroke`.
  */
 @customElement('helix-area-chart')
 export class HelixAreaChart extends HelixHeadlessAreaChart {

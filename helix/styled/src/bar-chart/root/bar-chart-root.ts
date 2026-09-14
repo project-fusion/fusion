@@ -31,7 +31,7 @@ import '../../tooltip/index.js'
  * @cssproperty --bar-chart-gap - Space between the drawing and its labels.
  * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series color.
- * @cssproperty --bar-chart-line-width - Thickness of a `lines` series.
+ * @cssproperty --bar-chart-line-width - Thickness of a `lines` series, over `--chart-stroke`.
  */
 @customElement('helix-bar-chart')
 export class HelixBarChart extends HelixHeadlessBarChart {
