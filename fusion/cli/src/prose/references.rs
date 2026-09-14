@@ -53,7 +53,7 @@ static PATH: LazyLock<Regex> = LazyLock::new(|| {
 /// A script name, hyphens included.
 ///
 /// **The hyphen is not decoration in this workspace**: fifteen root scripts
-/// carry one. A pattern without it does not report those references as wrong —
+/// carry one. A pattern without it does not report those references as wrong:
 /// it stops matching before the closing backtick and skips them, which is the
 /// silent half of the failure and the one worth naming here.
 static RUN: LazyLock<Regex> =

@@ -61,7 +61,7 @@ spine, not a module.
 - **A scorer reports a pinned, versioned id, and every result records it.**
   Judging model output with a model is circular: an instrument that drifts
   between runs cannot tell you which of the two things moved. This is what the
-  local provider requirement buys, beyond privacy — a hosted model can be
+  local provider requirement buys, beyond privacy: a hosted model can be
   updated behind a stable name, which is precisely the phenomenon a drift
   measurement exists to detect.
 - **Vectors are deferred, the seam is not.** A memory record must carry a
@@ -95,7 +95,7 @@ behavioral claims (`trace.len() == 4`) that no signature check could.
 - **`why()` is a reading order and `plan()` is an execution order.** Never
   execute a replay in `why()` reversed. Breadth-first from the output is
   reachability, not dependency, and reversing it holds only while every node
-  sits at exactly one depth — which a chain and a plain diamond both satisfy, so
+  sits at exactly one depth, which a chain and a plain diamond both satisfy, so
   either one as a test passes against the wrong implementation. It breaks when a
   node is reachable at two depths: breadth-first pins it at the shallowest, and
   execution needs it before the deepest thing that reads it. The result is a

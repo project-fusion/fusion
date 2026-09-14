@@ -40,7 +40,7 @@ const rest = (host: Updatable): HTMLElement | null =>
  * **Not `default-value`, and that is the test environment rather than the
  * component.** The field reads its words off options the slot has assigned, and
  * `slotchange` does not fire under happy-dom, so a seeded value renders no tags
- * at all — which is why the one existing assertion on rendered tags in this
+ * at all, which is why the one existing assertion on rendered tags in this
  * family is a `toBe(0)`. Choosing goes through the listbox instead and does not
  * wait on the slot announcing itself.
  */

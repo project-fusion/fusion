@@ -454,7 +454,7 @@ const browser = await chromium.launch()
    `requestAnimationFrame`: `aura` paints a shader on every frame, so the two
    sides were photographed at whatever moment each reached, and the comparison
    was of two instants rather than of two examples. It failed on roughly two runs
-   in three, twelve of its examples at a time, and passed on the third — which is
+   in three, twelve of its examples at a time, and passed on the third, which is
    the worst shape a check can have, because it teaches people to re-run it.
    Retrying is what the corpus did about it before, and a retry is a coin flipped
    twice.
@@ -466,7 +466,7 @@ const browser = await chromium.launch()
    setting, so what is being compared is unchanged: this asks the same question
    of a page that has stopped moving.
 
-   What it gives up is comparing a moving state, which was never being compared —
+   What it gives up is comparing a moving state, which was never being compared,
    only sampled. */
 const tab = await browser.newPage({
   reducedMotion: 'reduce',

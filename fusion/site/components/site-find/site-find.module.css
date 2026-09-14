@@ -99,7 +99,7 @@
    keyboard finds out there is a faster way in than the button they just used.
    **On a wrapper of ours rather than on the key itself.** `Kbd` sets `display`
    on its own host, and a document rule setting it again wins whatever the
-   specificity — which is a component quietly overruled from outside, and `helix
+   specificity, which is a component quietly overruled from outside, and `helix
    component`'s `overruled` rule says so. */
 @media (max-width: 40rem) {
   .keysOnly,

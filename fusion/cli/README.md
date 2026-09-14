@@ -11,7 +11,7 @@ fusion workspace fix       # the rules that can write
 | Verb | What it holds | Rules |
 |---|---|---|
 | `workspace` | What a workspace says about itself | `barrels` `help` `icons` `modules` `node` `order` `prerequisites` `publishable` `reaching` `react-bridge` `registration` `scoped` `scripts` `shaders` `shipped` `strays` |
-| `prose` | The prose against what it describes | `art` `dialect` `documented` `orphans` `references` `repository` `tag-order` |
+| `prose` | The prose against what it describes | `art` `dashes` `dialect` `documented` `orphans` `references` `repository` `tag-order` |
 | `spec` | The specs against being specs | `hazards` `isolated` `matchers` `runners` |
 | `helix` | Runs the Helix command line, which owns its own nouns | |
 

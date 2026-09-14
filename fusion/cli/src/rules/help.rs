@@ -2,8 +2,8 @@
 //!
 //! **`--help` is rendered by a terminal, which has no idea what `**` means.** A
 //! doc comment on a clap item becomes the help text verbatim, so this
-//! repository's house style — bold openings that state the argument before the
-//! detail — arrived on screen as literal asterisks around a paragraph about
+//! repository's house style (bold openings that state the argument before the
+//! detail) arrived on screen as literal asterisks around a paragraph about
 //! contracts and the right to improve prose. Eleven of them, across both command
 //! lines, on the flags a first-time reader meets first.
 //!
@@ -18,7 +18,7 @@
 //! this repository, is one written for somebody reading the source.
 //!
 //! **Scoped to the types clap reads, not the files that hold them.** A doc
-//! comment anywhere else is documentation and markup in it is correct — the
+//! comment anywhere else is documentation and markup in it is correct: the
 //! first draft of this scoped by file and reported three comments on free
 //! functions in `main.rs`, which clap never sees. So it opens at a `derive` of
 //! one of clap's traits, runs to the end of the type that follows, and asks

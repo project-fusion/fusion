@@ -7,8 +7,8 @@
 //! is written and silently wrong from the day the repository moves.
 //!
 //! **The shape of the fault is the duplication**, so the root manifest declares
-//! the URL once — the conventional field for it, and declarative there rather
-//! than published, the root being private — and everything else agrees with it.
+//! the URL once (the conventional field for it, and declarative there rather
+//! than published, the root being private), and everything else agrees with it.
 //!
 //! **It checks agreement, not history.** This carried a list of the paths the
 //! repository used to live at and reported any file still naming one. That list

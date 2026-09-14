@@ -41,7 +41,7 @@ const RELAYED_NATIVE = new Set([
   'toggle',
 ])
 
-const EM_DASH = /[—–]/
+const EM_DASH = /[\u2014\u2013]/
 
 /**
  * Enforces the documented Helix conventions against the manifest.

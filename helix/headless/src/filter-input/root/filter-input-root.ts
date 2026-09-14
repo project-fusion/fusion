@@ -67,8 +67,8 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * pointer has already handled the keyboard.
  *
  * **It reads what was declared, and nothing that was not.** Write
- * `FilterField`s — usually inside the `FilterMenu` slotted into `start`, so the
- * picker and the text work off one set — and Enter reads the box against them:
+ * `FilterField`s (usually inside the `FilterMenu` slotted into `start`, so the
+ * picker and the text work off one set), and Enter reads the box against them:
  * `disposition:refunded,settled` and `-disposition:refunded` announce
  * `helix-facet`, exactly as ticking those values in the picker would, and the
  * text they were read from goes. Everything else stays where it was typed, so
@@ -550,7 +550,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     /* **`:focus-within` and not `document.activeElement`.** That property is
        retargeted to the outermost host, so it names this element only while this
        element is in the document tree: put the field inside anybody else's
-       shadow root — a sandbox, a preview frame, a consumer's own component — and
+       shadow root (a sandbox, a preview frame, a consumer's own component) and
        it names *their* host instead, `contains` answers false, and the panel
        never opens anywhere it is nested. The selector is evaluated on this
        element, so it is true whenever focus is inside it and stays true however
@@ -559,8 +559,8 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        Both, because neither is available everywhere: the selector is what a
        browser answers and happy-dom does not implement it, `activeElement` is
        what the harness answers and is wrong under nesting. Either being true
-       means the same thing, and a light-DOM child holding focus — a token's own
-       remove control — is inside this element on both readings. */
+       means the same thing, and a light-DOM child holding focus (a token's own
+       remove control) is inside this element on both readings. */
     const focused = this.matches(':focus-within') || this.contains(document.activeElement)
     this.requestOpen(this.suggesting && !this.dismissed && !this.isDisabled && focused)
   }

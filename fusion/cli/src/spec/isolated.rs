@@ -4,9 +4,9 @@
 //! family it tests. It has to: the same bundles run against a blank page in CI,
 //! where nothing else registers anything. So in the sandbox's iframe, anything
 //! that registers the library again is a second copy, and the registrar warns
-//! once per tag saying so. The frame states the intent in as many words — that
+//! once per tag saying so. The frame states the intent in as many words (that
 //! it imports no components, because loading every component would be loading
-//! ninety-two families to test one — and a root layout sits above that intent: a
+//! ninety-two families to test one), and a root layout sits above that intent: a
 //! child route cannot un-render a parent's component.
 //!
 //! **Two mechanisms satisfy this and the rule accepts either**, which is the

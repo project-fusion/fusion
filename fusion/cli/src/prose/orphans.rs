@@ -3,7 +3,7 @@
 //! **Two doc blocks in a row is the shape**: the first sits on the second rather
 //! than on a member, so nothing reads it. It reaches no manifest, prints on no
 //! reference page, and shows in no editor tooltip, while looking in the source
-//! exactly like documentation that works. That is the whole problem with it —
+//! exactly like documentation that works. That is the whole problem with it:
 //! the words are still there, so nobody deletes them and nobody notices they
 //! stopped being attached to anything. The fix is to demote the stranded block
 //! to a plain comment, which keeps every word where it is and stops it claiming

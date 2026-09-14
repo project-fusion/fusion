@@ -397,7 +397,7 @@
  * `--art-curve` is an ease-out: nine tenths of its travel in the first tenth of
  * the interval, right for a mark arriving and wrong for both halves of this one.
  * Measured at 80ms of 1100, the chart's two series had already pulled back to a
- * quarter of their length and then sat blank until the keyframe — the flash this
+ * quarter of their length and then sat blank until the keyframe: the flash this
  * file's motion section exists to forbid, held for three hundred milliseconds.
  *
  * An ease-in-out means the line leaves slowly, touches nothing at 38 percent for

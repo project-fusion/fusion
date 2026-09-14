@@ -115,7 +115,7 @@ fn inflected(pairs: &BTreeMap<String, String>) -> Dialect {
     /* **A written pair beats a manufactured one, and that ordering is the whole
     of why this is two passes.** Several stems are written down beside their own
     past tense, and a stem plus the `d` suffix manufactures that past tense as
-    well — as the American stem with a `d` on it, which is a word in neither
+    well, as the American stem with a `d` on it, which is a word in neither
     dialect. Whichever is reached first wins, so the one a person wrote has to be
     reached first. Ordering the source list is the other way to get this, and it
     is the way that decays: the list arrives sorted, and sorting puts every stem
@@ -190,15 +190,14 @@ fn sweep(line: &str, dialect: &Dialect) -> String {
         .into_owned()
 }
 
-/// Every file this rule is responsible for, and what a sweep would make of it.
+/// Every file of prose a rule about what people wrote can read.
 ///
-/// Line by line rather than whole-file, which is what makes the exemption
-/// expressible: a range of lines can be skipped and a substring of a file cannot
-/// be, not without losing the line numbers the report is made of.
-fn survey(context: &Context) -> (usize, Vec<(PathBuf, String, String)>) {
-    let dialect = inflected(&context.settings.dialect);
+/// **Shared with [`crate::prose::dashes`]**, which is about the same corpus:
+/// what a person wrote, as against what a build wrote from it. The settings
+/// file is left out for the reason the docblock gives, and the other rule
+/// inherits the exemption at no cost: the file is a list of words.
+pub fn corpus(context: &Context) -> Vec<PathBuf> {
     let generated = generated();
-
     let mut files = Vec::new();
     crawl(
         &context.root,
@@ -216,14 +215,22 @@ fn survey(context: &Context) -> (usize, Vec<(PathBuf, String, String)>) {
         },
         &mut files,
     );
+    /* The list is British by construction. See the docblock. */
+    files.retain(|file| context.relative(file) != "fusion.json");
+    files
+}
+
+/// Every file this rule is responsible for, and what a sweep would make of it.
+///
+/// Line by line rather than whole-file, which is what makes the exemption
+/// expressible: a range of lines can be skipped and a substring of a file cannot
+/// be, not without losing the line numbers the report is made of.
+fn survey(context: &Context) -> (usize, Vec<(PathBuf, String, String)>) {
+    let dialect = inflected(&context.settings.dialect);
 
     let mut changed = Vec::new();
     let mut checked = 0;
-    for file in files {
-        /* The list is British by construction. See the docblock. */
-        if file.strip_prefix(&context.root).unwrap_or(&file) == Path::new("fusion.json") {
-            continue;
-        }
+    for file in corpus(context) {
         let Ok(before) = fs::read_to_string(&file) else {
             continue;
         };

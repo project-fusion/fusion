@@ -80,7 +80,7 @@
 /* **Muted, because the accent is spoken for.** This was drawn in
    `--helix-color-accent`, which is the same color the unread mark is: measured,
    both `oklch(0.659 0.19 78)`. So one hue in one panel meant both "this is new,
-   look at it" and "press me to make nothing new" — the state a reader scans for
+   look at it" and "press me to make nothing new": the state a reader scans for
    and the control that ends it, wearing the same coat.
 
    The mark keeps the accent, being the thing the panel exists to show. This is

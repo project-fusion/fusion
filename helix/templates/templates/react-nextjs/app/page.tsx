@@ -3,7 +3,7 @@
  *
  * Helix events are props: `onhelix-before-change` reaches `helix-before-change`.
  * Anything needing a handler is a client component, the same as any other React
- * app — this page needs none.
+ * app: this page needs none.
  */
 export default function Page() {
   return (

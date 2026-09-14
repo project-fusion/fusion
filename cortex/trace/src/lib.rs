@@ -133,7 +133,7 @@ impl Detail {
     ///
     /// A replay copies inputs forward: re-running one would change the question
     /// rather than answer it again. The partition is stated this way round, and
-    /// not as "recomputable", because the inverse is not a promise — a
+    /// not as "recomputable", because the inverse is not a promise: a
     /// computation a replay *may* touch is not one any given runner does.
     #[must_use]
     pub fn is_input(&self) -> bool {

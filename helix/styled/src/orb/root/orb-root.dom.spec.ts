@@ -148,7 +148,7 @@ describe('orb shapes', () => {
        direction as the generator's longitude. Left at `atan2`'s own range the
        two orderings sit half a turn apart, every dot is handed a destination
        across the ball, and the blend into `done` carries the whole cloud
-       through its own axis — a near-empty frame halfway through a transition
+       through its own axis: a near-empty frame halfway through a transition
        that both endpoints render perfectly. */
     const lanes = 6
     const segs = 12
@@ -204,8 +204,8 @@ describe('orb shapes', () => {
     /* **The failure this catches is the one every still frame hides**: both
        ends render correctly and the middle falls into the axis.
        
-       Measured as coverage — how many cells of a grid over the canvas hold at
-       least one dot — and not as the cloud's mean radius, which was the first
+       Measured as coverage (how many cells of a grid over the canvas hold at
+       least one dot), and not as the cloud's mean radius, which was the first
        attempt and does not work. Dots piling onto a handful of points barely
        move the mean, so that version passed with the fault deliberately put
        back. Coverage halves. */

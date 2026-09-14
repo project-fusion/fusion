@@ -88,7 +88,7 @@
  * A fill at its maximum and one well past it are the same picture, so the words
  * carry it and this carries what a picture can: the trailing corner squares off,
  * the convention for a quantity continuing past its frame. Only the corner,
- * because "over" is not a judgment — a hundred and ten per cent of a stretch
+ * because "over" is not a judgment: a hundred and ten per cent of a stretch
  * goal is good news and of a disk is not, and the band says which. */
 [part="indicator"][data-beyond="over"] {
   border-end-end-radius: var(--helix-radii-none);
@@ -272,7 +272,7 @@
 /*
  * **Subtle, the quiet end of the axis: the reading keeps its area and stops
  * claiming to be the point.** A wash of its own color rather than a different
- * one, so what it means does not change with how loudly it is said — the bands
+ * one, so what it means does not change with how loudly it is said: the bands
  * are the other axis and this must not borrow from them. Written against
  * `--_meter-hue`, so one pair of rules quietens all four colors in all three
  * shapes.

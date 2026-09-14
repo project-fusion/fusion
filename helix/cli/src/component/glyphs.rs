@@ -2,7 +2,7 @@
 //!
 //! **The element indexes the whole set at run time**, which no bundler can
 //! shake: one component rendering one glyph puts every glyph into every consumer
-//! that imports it — about 15kB gzipped of path data for a mark that is one
+//! that imports it: about 15kB gzipped of path data for a mark that is one
 //! path. A named import through a draw helper ships the one.
 //!
 //! **Two smaller reasons, both real.** A named import is checked when the

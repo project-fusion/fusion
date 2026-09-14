@@ -35,7 +35,7 @@ import type { HelixHeadlessFilterOperator } from '../operator/filter-operator.js
  * mean, so declaring them was ceremony for the case every product has; the
  * example above is what a consumer writes when the words matter, not the price
  * of admission. Declaring one comparison replaces both rather than joining
- * them — see `vocabulary`, which is where that is decided once for the menu and
+ * them: see `vocabulary`, which is where that is decided once for the menu and
  * the grammar together.
  *
  * **Values are `Option`s, which is the element a consumer already has.** They

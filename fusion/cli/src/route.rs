@@ -22,7 +22,7 @@
 //!
 //! **Resolution order, and each step earns its place.** An environment variable
 //! first, because a caller who knows better should not have to argue. Then the
-//! cargo target directory, newest of release and debug by modification time —
+//! cargo target directory, newest of release and debug by modification time:
 //! preferring release outright is the trap a development machine sets, where one
 //! `--release` build shadows every debug build after it. Then `PATH`, which is
 //! what an installed binary looks like.

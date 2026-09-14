@@ -199,7 +199,7 @@ const { pages: docPages } = await import('../../../helix/docs/src/registry.ts')
  * `regen` runs `analyze` at position 2, which builds this package, and `gen:docs`
  * at position 9, which is what rewrites `pages.generated.ts`. Delete a page and
  * the registry still names it for those seven steps, so opening it threw
- * `ENOENT` and the whole chain stopped at position 2 — before the step that
+ * `ENOENT` and the whole chain stopped at position 2, before the step that
  * would have fixed it ever ran. The recovery was `turbo run docs` before
  * `regen`, which is one command and was written down nowhere.
  *

@@ -1398,7 +1398,7 @@ helix-toast:not([data-color-mode]) {
 
    **`0.01ms` rather than `0` or `none`**, because a transition that still runs
    still fires `transitionend`. **Animations are deliberately left out**: they
-   are not all written with these tokens, and seven sheets animate `infinite` —
+   are not all written with these tokens, and seven sheets animate `infinite`:
    a spinner handed a 0.01ms cycle does not stop, it runs flat out. */
 @media (prefers-reduced-motion: reduce) {
   :root,

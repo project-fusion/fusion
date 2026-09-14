@@ -13,7 +13,7 @@
    its columns: a `display: none` grid item leaves the grid entirely, so with
    implicit placement every region below a hidden one moves up a track and takes
    that track's sizing with it. Measured in the sidebar example, with no header
-   the log landed on the `auto` track and the composer on the `1fr` one at 741 —
+   the log landed on the `auto` track and the composer on the `1fr` one at 741:
    a text field seven hundred pixels tall under a transcript that had stopped
    scrolling. */
 [part="header"] {

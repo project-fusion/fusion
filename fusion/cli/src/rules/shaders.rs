@@ -11,7 +11,7 @@
 //!
 //! **The corpus is the whole workspace rather than a list of roots.** A folder
 //! that moves leaves a written-out pattern matching nothing under its new name,
-//! and the check goes on passing — which is exactly what happened here once: a
+//! and the check goes on passing, which is exactly what happened here once: a
 //! glob naming three roots by hand scanned 1,117 files where 1,343 existed,
 //! missed three quarters of its subject, and stayed green.
 

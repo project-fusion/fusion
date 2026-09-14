@@ -133,7 +133,7 @@ cannot tell which of the two things moved. So a `Scorer` reports a versioned
 `id()`, every result records it, and a judge that cannot be pinned to a version
 has no business implementing the trait.
 
-`Exact` is the floor — byte equality, useless for prose, and the only scorer
+`Exact` is the floor: byte equality, useless for prose, and the only scorer
 that introduces no instrument of its own. Numbers from it carry full confidence;
 model-judged claims layer on top as weaker ones. A pinned local judge is what
 the local-first requirement buys: a hosted model can be updated behind a stable

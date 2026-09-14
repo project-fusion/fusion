@@ -142,7 +142,7 @@ fn order(manifest: &Value) -> Value {
 /// actually decides**, and this rule shipped the drift: the walk skipped
 /// `.next` and Next 16 writes its dev server output to `.next-dev`, so a
 /// manifest nobody wrote and nobody commits failed the rule, but only while a
-/// dev server happened to be running. That is the worst shape for a guard —
+/// dev server happened to be running. That is the worst shape for a guard:
 /// green on the machine that added the directory, red on the next person's.
 ///
 /// `.gitignore` is the one file that has to be right for the repository to work

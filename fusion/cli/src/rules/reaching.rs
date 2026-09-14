@@ -4,7 +4,7 @@
 //! declare.** The site ran a sibling's WebAssembly build by walking three levels
 //! up to its file; two tiers ran a shared generator the same way. Each of those
 //! works until the file moves, and then it fails in a package that never said it
-//! needed the thing that moved — so the rename passes every check in the package
+//! needed the thing that moved, so the rename passes every check in the package
 //! that owns the file and breaks the one that does not.
 //!
 //! **The fix is the package boundary, and there are two shapes of it.** A build

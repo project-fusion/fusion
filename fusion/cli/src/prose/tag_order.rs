@@ -2,7 +2,7 @@
 //!
 //! **The order was real before it was written down, which is the state a
 //! convention decays from.** Measured across the 246 class doc blocks on 27 Aug
-//! 2026: the metadata prefix is unanimous — `@summary`, `@description`,
+//! 2026: the metadata prefix is unanimous: `@summary`, `@description`,
 //! `@since`, `@status`, `@category`, `@groups`, `@aliases`, `@documentation`, in
 //! that sequence, in every block that carries them. The API groups were not.
 //! `@slot` came before `@csspart` 115 times and after it 3, and `@cssproperty`

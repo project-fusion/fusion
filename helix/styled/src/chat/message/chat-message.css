@@ -151,7 +151,7 @@
 /* **A wash of the foreground, not a rung on the surface ladder**, which is the
    answer `Option` already wrote down: a rung is an absolute color, and a bubble
    has no idea what it is sitting on. Measured across six grounds, a rung ran
-   1.07 to 1.12 in five of them — a bubble nobody can see — and moved with the
+   1.07 to 1.12 in five of them (a bubble nobody can see) and moved with the
    ground, where the wash holds 1.35 to 1.57.
 
    **One percentage rather than `light-dark()` of two**, which is where this
