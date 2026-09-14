@@ -513,6 +513,11 @@ fn it_writes_the_template_and_substitutes_only_the_named_files() {
         manifest.contains(&format!("\"@fusion.dev/helix\": \"^{version}\"")),
         "{manifest}"
     );
+    assert!(
+        out(&output).contains(&format!("Helix {version}")),
+        "it says which Helix it wrote: {}",
+        out(&output)
+    );
 
     /* The placeholder is gone from the whole tree, which is the assertion that
     catches a `named` list missing a file: the register says which files carry it

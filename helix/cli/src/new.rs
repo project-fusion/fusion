@@ -240,17 +240,22 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
             "{}",
             serde_json::json!({
                 "files": files.len(),
+                "helix": helix.version,
                 "into": target.display().to_string(),
                 "name": args.name,
                 "template": template.id,
             })
         );
     } else {
+        /* **The Helix it asks for is said**, since nothing here asks the registry
+        whether it is the newest: a reader who expected another version sees it
+        before installing, and `npm create` is the door that checks. */
         println!(
-            "{} {} files from {} into {}",
+            "{} {} files from {}, Helix {}, into {}",
             paint.pass("wrote"),
             files.len(),
             template.title,
+            helix.version,
             target.display()
         );
         /* **The target rather than the name, and relative where it can be.**

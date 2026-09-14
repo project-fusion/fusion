@@ -24,6 +24,12 @@ This is `helix new` from
 reached from somewhere with no project yet. A project that already has Helix
 installed can run `npx helix new` instead, and gets the same templates.
 
+**It says when a newer Helix is out.** Without `@latest`, npm can run a copy it
+cached earlier, so this asks npm for the newest version while it writes the
+project and prints one line if it isn't this one. It waits three seconds at most
+and says nothing if npm doesn't answer. It doesn't ask in CI, from a
+pre-release, or when `HELIX_NO_UPDATE_CHECK` is set.
+
 **Scoped because the plain name is taken.** `create-helix-app` on npm belongs to
 an unrelated project, so `npm create helix-app` runs somebody else's code.
 `npm create @fusion.dev/helix-app` resolves to this package and no other.
