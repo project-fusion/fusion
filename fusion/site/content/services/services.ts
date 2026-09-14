@@ -50,19 +50,17 @@ export interface Service {
  *
  * **Every offer states the commitment and not only the elapsed time**, which is
  * the highest-value line in the set. Four weeks with no shape given invites a
- * full-time reading, and the price then reads as something it is not. Four weeks at
- * two days a week is what it is costed against, and that is what it is. The number was never the problem:
- * what it was divided by was.
+ * full-time reading, and the price then reads as something it is not. The
+ * number was never the problem: what it was divided by was.
  *
- * It is not a fact about the sprint alone. Every offer is costed
- * against the same part-time commitment, so every offer is scoped the same way. A buyer reading "six to eight
- * weeks" beside a sprint that says "two days a week" has been told the build is
- * something else, which is the one reading that is worse than saying nothing at
- * all.
+ * It is not a fact about the sprint alone. Every offer is costed against the
+ * same part-time commitment, so a buyer reading "six to eight weeks" beside a
+ * sprint that says "two days a week" has been told the build is something else,
+ * which is the one reading that is worse than saying nothing at all.
  *
- * **Finance is deliberately absent.** The old site sold it and the plan drops
- * it: advising on securities for compensation implicates investment-adviser
- * registration, which is not worth the regulatory surface for now, so this list stays three.
+ * **Finance is deliberately absent.** Advising on securities for compensation
+ * implicates investment-adviser registration, a regulatory surface this list
+ * does not take on, so it stays three.
  */
 export const SERVICES: Service[] = [
   {
