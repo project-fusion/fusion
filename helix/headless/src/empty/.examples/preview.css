@@ -45,13 +45,38 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A centered column with room all round. The explanation is a bare text
+   node in the default slot, so it takes its size and color from the host, and
+   the heading and the action say their own. */
 helix-headless-empty {
   align-items: center;
+  color: var(--_gray-muted);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.5rem;
+  font-size: 0.8125rem;
+  gap: 0.75rem;
+  line-height: 1.5;
+  padding: 3rem;
   text-align: center;
+}
+
+helix-headless-empty > helix-headless-icon[slot="icon"] {
+  block-size: 1.5rem;
+  color: var(--_gray-muted);
+  inline-size: 1.5rem;
+}
+
+helix-headless-empty > [slot="heading"] {
+  color: var(--_gray-strong);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Set a step further from the explanation than the rest are from each
+   other, and at a button's standing width rather than its label's. */
+helix-headless-empty > [slot="actions"] {
+  margin-block-start: 0.75rem;
 }
 
 helix-headless-icon::part(svg) {
@@ -60,10 +85,31 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
+helix-headless-empty > helix-headless-icon[slot="icon"]::part(svg) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+/* A button at control height, filled in the strongest gray where the styled
+   tier fills it with its primary tone. */
 helix-headless-button::part(button) {
-  all: unset;
+  align-items: center;
+  background-color: var(--_gray-strong);
+  block-size: 2.5rem;
+  border: 1px solid transparent;
   box-sizing: border-box;
+  color: var(--_gray-surface);
   cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  justify-content: center;
+  line-height: 1.2;
+  min-inline-size: 12.5rem;
+  padding-inline: 1rem;
+  white-space: nowrap;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

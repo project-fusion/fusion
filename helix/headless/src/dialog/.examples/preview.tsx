@@ -10,9 +10,11 @@ export function Example() {
         Delete project
       </helix-headless-button>
 
+      {/* Open, so the picture is of a dialog. */}
       <helix-headless-dialog
         id="base-confirm"
         label="Delete project"
+        open
       >
         <h2 slot="header">Delete project</h2>
         <p>This removes the project and everything in it. It cannot be undone.</p>

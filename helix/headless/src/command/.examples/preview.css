@@ -45,32 +45,154 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A wide panel set high on the page rather than centered, since the eye is
+   on the field and the list grows down from it. No padding of its own: the
+   search row, the list and the footer each carry their own inset, so the
+   rules between them run edge to edge. */
 helix-headless-command::part(dialog) {
+  align-self: start;
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
   color: var(--_gray-strong);
-  padding: 0.5rem;
+  flex-direction: column;
+  gap: 1rem;
+  inline-size: min(40rem, calc(100vw - 4rem));
+  margin-block-start: 20vh;
+  padding: 0;
+}
+
+/* Only while open: a closed `<dialog>` is hidden by the UA's `display: none`,
+   and a `display` written for every state would override it. */
+helix-headless-command::part(dialog):modal {
+  display: flex;
+}
+
+/* A shade rather than a gray from the ramp. It darkens the page in both
+   modes, where a ramp value would lighten it in dark. */
+helix-headless-command::part(dialog)::backdrop {
+  background-color: rgb(0 0 0 / 0.4);
 }
 
 helix-headless-command::part(listbox) {
+  background-color: transparent;
+  border: 0;
   color: var(--_gray-strong);
+  display: block;
+  padding: 0;
+}
+
+/* Named but not shown: the palette's name is for assistive technology, and
+   the field under it already says what it is for. The clip keeps it in the
+   tree, where `display: none` would take it out. */
+helix-headless-command::part(listbox-label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* The search row, ruled off from the list under it. */
+helix-headless-command::part(listbox-search) {
+  align-items: center;
+  border-block-end: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem;
+}
+
+helix-headless-command::part(listbox-filter-icon) {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  flex: none;
 }
 
 helix-headless-command::part(listbox-filter-mark) {
-  block-size: 1em;
+  block-size: 1rem;
   flex: none;
-  inline-size: 1em;
+  inline-size: 1rem;
 }
 
+helix-headless-command::part(listbox-search-field) {
+  appearance: none;
+  background-color: transparent;
+  block-size: 2rem;
+  border: 0;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-inline-size: 0;
+  padding-inline: 0.5rem;
+}
+
+helix-headless-command::part(listbox-search-field)::placeholder {
+  color: var(--_gray-muted);
+}
+
+helix-headless-command::part(listbox-items) {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  max-block-size: 22rem;
+  overflow-y: auto;
+  padding-block: 0.5rem;
+}
+
+/* Roomy rows, since a palette is read at a glance and chosen from by
+   pointer as often as by key. */
 helix-headless-option::part(item) {
+  align-items: center;
   background-color: transparent;
   border: 0;
-  padding: 0.25rem 0.5rem;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  line-height: 1.5;
+  min-block-size: 2rem;
+  padding: 0.75rem;
 }
 
 helix-headless-option::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+}
+
+/* The hint row, ruled off from the list above it. No `display` here: the
+   component hides the row with `hidden` when nothing is slotted into it, and a
+   `display` written for every state would bring it back as an empty band. */
+helix-headless-command::part(footer) {
+  border-block-start: 1px solid var(--_gray-line);
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+helix-headless-command p {
+  margin: 0;
+}
+
+helix-headless-kbd::part(kbd) {
+  align-items: center;
+  background-color: var(--_gray-fill);
+  block-size: 1.5em;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+  font-weight: 500;
+  justify-content: center;
+  line-height: 1;
+  min-inline-size: 1.5em;
+  padding-inline: 0.4em;
 }
 
 helix-headless-icon::part(svg) {
@@ -79,22 +201,14 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
+/* The field takes focus as the palette opens and needs no ring of its own:
+   the caret says where typing goes. The rows are reached with the arrows and
+   marked by the list, so the ring goes on a row a pointer or key lands on. */
+helix-headless-command::part(listbox-search-field):focus-visible {
+  outline: none;
+}
+
 helix-headless-option::part(item):focus-visible {
   outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
-}
-
-helix-headless-command::part(listbox-items) {
-  align-items: stretch;
-  flex-direction: column;
-}
-
-helix-headless-command::part(listbox) {
-  background-color: transparent;
-  border: 0;
-  display: block;
-  padding: 0;
+  outline-offset: -2px;
 }

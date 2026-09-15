@@ -1,9 +1,30 @@
 /* What the headless tier asks a consumer to write for Description List.
  *
- * Deliberately skeletal: a diagram of what has to be styled, not a theme to
- * copy. No token, because `headless` does not depend on `helix/styles`, and
- * grays only, because color here would read as an opinion this tier does not
- * hold. Written through `light-dark()` so the sandbox's dark mode inverts.
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
+ * says primary and a red one says danger, and this tier holds no such opinion.
+ * A neutral ramp says only where one surface ends and the next begins.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
+ *
+ * A part with no rule below is one the platform already renders acceptably, and
+ * a wrong rule is worse than none: paint a checkbox but leave the input at
+ * `appearance: auto` and the browser draws its own control over everything
+ * written for it.
  *
  * **The browser indents every `<dd>` by 40px**, which is the one rule nobody
  * expects to have to write. The rest is the arrangement: a grid on the list and
@@ -12,8 +33,22 @@
 
 :root {
   color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+/* A container, so the list can ask how wide it is rather than how wide the
+   window is. */
+helix-headless-description-list {
+  container-type: inline-size;
+  display: block;
+  line-height: 1.5;
 }
 
 helix-headless-description-list::part(list) {
@@ -21,21 +56,57 @@ helix-headless-description-list::part(list) {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   margin: 0;
-  row-gap: 0.5rem;
+  row-gap: 0.75rem;
 }
 
+/* Stacked where it is narrow: a label column there leaves the values a
+   sliver, and a sliver of an id wraps a character at a time. */
+@container (inline-size < 22rem) {
+  helix-headless-description-list::part(list) {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 1rem;
+  }
+}
+
+/* On the baseline, so a label beside a taller value, a tag here, reads on the
+   same line as the words in it. */
 helix-headless-description-list-item {
+  align-items: baseline;
   display: grid;
   grid-column: 1 / -1;
   grid-template-columns: subgrid;
+  row-gap: 0.25rem;
 }
 
 helix-headless-description-list-item::part(label) {
   color: var(--_gray-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin: 0;
 }
 
 helix-headless-description-list-item::part(value) {
   color: var(--_gray-strong);
+  font-size: 0.875rem;
   margin: 0;
+  min-inline-size: 0;
   overflow-wrap: anywhere;
+}
+
+/* A quiet chip at a tag's height, filled rather than colored: the styled tier
+   tints it with its tone, and a tone is the one thing a gray cannot say. */
+helix-headless-tag {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 1.75rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 500;
+  gap: 0.25rem;
+  line-height: 1.2;
+  padding-inline: 0.5rem;
+  white-space: nowrap;
 }

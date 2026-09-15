@@ -1,3 +1,5 @@
+import './preview.css'
+
 const rows = [
   { name: 'archive.tar.gz', region: 'us-east-1', size: 4823100 },
   { name: 'backup.sql', region: 'eu-central-1', size: 918400 },

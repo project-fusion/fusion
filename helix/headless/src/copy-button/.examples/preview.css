@@ -45,23 +45,38 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A square at control height with no fill and no edge of its own: the glyph
+   is the whole of what shows at rest. One cell for the glyph and the
+   confirmation that replaces it, so a press never changes the button's
+   size. */
 helix-headless-copy-button::part(button) {
   all: unset;
+  block-size: 2.5rem;
+  border: 1px solid transparent;
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-grid;
+  inline-size: 2.5rem;
+  place-items: center;
+}
+
+helix-headless-copy-button::part(button):hover {
+  color: var(--_gray-strong);
 }
 
 helix-headless-copy-button::part(mark) {
-  block-size: 1em;
+  block-size: 1rem;
   flex: none;
-  inline-size: 1em;
+  inline-size: 1rem;
 }
 
 helix-headless-copy-button::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+  background-color: var(--_gray-strong);
+  border: 0;
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
 }
 
 helix-headless-icon::part(svg) {
@@ -76,9 +91,4 @@ helix-headless-icon::part(svg) {
 helix-headless-copy-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
-}
-
-helix-headless-copy-button::part(button) {
-  border: 1px solid var(--_gray-line);
-  padding: 0.375rem;
 }

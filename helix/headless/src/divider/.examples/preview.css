@@ -45,17 +45,51 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* The prose either side, set flush against the rule: the rule is the whole of
+   the separation, with no margin above or below it. */
+p {
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* A row of two rules with the content between them. The component always
+   renders both halves, so a rule with nothing set into it is one line and a
+   second of no length. */
 helix-headless-divider {
+  align-items: center;
+  display: flex;
+}
+
+helix-headless-divider::part(line) {
   background-color: var(--_gray-line);
   block-size: 1px;
-  border: 0;
-  display: block;
+  flex: 1 1 0;
+}
+
+/* No inset of its own: the component marks an empty slot only inside its
+   shadow root, so a margin here would split an empty rule in two. Whatever is
+   set into it brings its own. */
+helix-headless-divider::part(content) {
+  color: var(--_gray-muted);
+  display: inline-flex;
+  flex: none;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 helix-headless-divider[orientation="vertical"] {
   align-self: stretch;
+  display: inline-flex;
+  flex-direction: column;
+}
+
+helix-headless-divider[orientation="vertical"]::part(line) {
   block-size: auto;
   inline-size: 1px;
+  min-block-size: 1em;
 }
 
 helix-headless-icon::part(svg) {

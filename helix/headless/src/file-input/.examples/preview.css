@@ -45,26 +45,116 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A column, so the label, the drop zone, the hint and the list stack at one
+   gap without any of them carrying a margin. */
+helix-headless-file-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* The drop zone: a dashed box, because it is a place to put something rather
+   than a control to type in, with the prompt centered in it. Positioned, so
+   the file input can cover the whole of it. */
 helix-headless-file-input::part(field) {
   align-items: center;
+  background-color: var(--_gray-subtle);
+  border: 1px dashed var(--_gray-line);
   display: flex;
   gap: 0.5rem;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
 }
 
+/* The native input stays, since it carries the label and the validity, and is
+   stretched invisibly over the zone, so a press anywhere in it opens the
+   picker. */
 helix-headless-file-input::part(control) {
-  font: inherit;
+  cursor: pointer;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
 }
 
+/* The icon over the prompt, and the pointer passed through to the input under
+   it. */
 helix-headless-file-input::part(trigger) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
+  align-items: center;
+  color: var(--_gray-strong);
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  font-weight: 500;
+  gap: 0.25rem;
+  pointer-events: none;
+  text-align: center;
+}
+
+helix-headless-file-input > helix-headless-icon[slot="trigger"] {
+  block-size: 1.5rem;
+  color: var(--_gray-muted);
+  inline-size: 1.5rem;
 }
 
 helix-headless-file-input::part(list) {
-  align-items: center;
   display: flex;
+  flex-direction: column;
   gap: 0.25rem;
+  list-style: none;
+  margin-block: 0.25rem 0;
+  padding: 0;
+}
+
+helix-headless-file-input::part(file) {
+  align-items: center;
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.75rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+}
+
+helix-headless-file-input::part(detail) {
+  align-items: center;
+  column-gap: 0.75rem;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+  row-gap: 0.25rem;
+}
+
+helix-headless-file-input::part(name) {
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.8125rem;
+  min-inline-size: min(100%, 16ch);
+  overflow-wrap: anywhere;
+}
+
+helix-headless-file-input::part(meta) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+helix-headless-file-input::part(size) {
+  font-variant-numeric: tabular-nums;
+}
+
+helix-headless-file-input::part(remove) {
+  all: unset;
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  justify-content: center;
+  min-block-size: 1.5rem;
+  min-inline-size: 1.5rem;
 }
 
 helix-headless-file-input::part(kind-dismiss-mark) {
@@ -81,17 +171,28 @@ helix-headless-file-input::part(size-dismiss-mark) {
 
 helix-headless-file-input::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+helix-headless-file-input::part(hint),
+helix-headless-file-input::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0;
+  margin-block-start: 0.25rem;
 }
 
 helix-headless-file-input::part(hint) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
 }
 
 helix-headless-file-input::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  color: var(--_gray-strong);
+  font-weight: 500;
 }
 
 helix-headless-icon::part(svg) {
@@ -100,10 +201,21 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-file-input::part(control):focus-visible {
+helix-headless-file-input > helix-headless-icon[slot="trigger"]::part(svg) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+/* The keyboard reaches the input, which is invisible, so the ring goes around
+   the zone it covers. Taking the UA outline off without putting one back is
+   the commonest way a headless control stops being operable without a
+   pointer. */
+helix-headless-file-input:focus-within::part(field) {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 0;
+}
+
+helix-headless-file-input::part(remove):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
