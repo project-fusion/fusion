@@ -11,9 +11,14 @@
 }
 
 /* Takes the rest of the row, so the lines are measured against the space left
-   after the avatar rather than against the viewport. */
+   after the avatar rather than against the viewport. The width is what the row
+   asks for when nothing else gives it one: the preview shrinks to its content,
+   a flex basis does not count toward that, and lines sized as a share of a box
+   with no width of its own drew nothing at all. */
 .lines {
-  flex: 1;
+  flex: auto;
+  inline-size: 16rem;
+  min-inline-size: 0;
 }
 
 .line-name {

@@ -122,8 +122,8 @@ helix-headless-sparkline[plot="area"]::part(wash-end) {
   stop-opacity: 0.05;
 }
 
-/* The last reading, a dot, which is round rather than softened. Placed from
-   `--chart-terminus-x` and `--chart-terminus-y`, which the component writes. */
+/* The last reading, a dot, placed from `--chart-terminus-x` and
+   `--chart-terminus-y`, which the component writes. */
 helix-headless-sparkline::part(terminus) {
   background-color: currentColor;
   block-size: 5px;

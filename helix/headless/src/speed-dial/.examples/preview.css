@@ -63,6 +63,7 @@ helix-headless-icon::part(svg) {
 .page {
   background-color: var(--_gray-subtle);
   block-size: 20rem;
+  border-radius: var(--_radius-surface);
   position: relative;
 }
 
@@ -80,9 +81,8 @@ helix-headless-icon-button {
   display: inline-flex;
 }
 
-/* The one action on the page that is always there: round, which a floating
-   action button is rather than softened, filled in the darkest gray at the
-   large control step. */
+/* The one action on the page that is always there: round, filled in the
+   darkest gray at the large control step. */
 helix-headless-icon-button[slot="trigger"]::part(button) {
   all: unset;
   align-items: center;
@@ -102,6 +102,13 @@ helix-headless-speed-dial::part(trigger) {
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
+}
+
+/* The plus turns into a cross while the dial is open, read off the dial's own
+   `open` state: an eighth of a turn, because a quarter ends where it started.
+   No transition, for the reason the switch sheet gives. */
+helix-headless-speed-dial:state(open) > [slot="trigger"] helix-headless-icon {
+  rotate: 45deg;
 }
 
 /* The keyboard reaches these, so the ring goes here. Taking the UA outline
@@ -148,7 +155,16 @@ helix-headless-speed-dial-item::part(item) {
   padding: 0;
 }
 
+/* The ring follows the round mark, which is what a reader presses, rather than
+   boxing the name and the mark together. A page cannot say "the icon of the
+   item that has keyboard focus" through `::part()`, so it asks the host, which
+   holds focus while its button does; pressing an action closes the dial, so a
+   pointer never leaves the ring standing. */
 helix-headless-speed-dial-item::part(item):focus-visible {
+  outline: none;
+}
+
+helix-headless-speed-dial-item:focus-within::part(icon) {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
@@ -158,7 +174,7 @@ helix-headless-speed-dial-item::part(icon) {
   align-items: center;
   aspect-ratio: 1;
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
   border-radius: 50%;
   box-sizing: border-box;
   color: var(--_gray-strong);
@@ -170,7 +186,8 @@ helix-headless-speed-dial-item::part(icon) {
 
 helix-headless-speed-dial-item::part(label) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   color: var(--_gray-strong);
   font-size: 0.8125rem;
   font-weight: 500;

@@ -98,7 +98,7 @@ helix-headless-icon::part(svg) {
 helix-headless-switch::part(track) {
   background-color: var(--_gray-subtle);
   block-size: 1.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
   border-radius: 9999px;
   box-sizing: border-box;
   display: inline-block;
@@ -123,11 +123,16 @@ helix-headless-switch::part(control) {
 /* No transition, and it is worth saying so: anything that
    moves owes a `prefers-reduced-motion` block repeating the same selector. An
    example sheet has nothing to gain from the animation and would be teaching
-   the omission along with it. */
+   the omission along with it.
+
+   Off, the knob is lighter than its track in both modes, as a raised thing is,
+   so it takes a different step of the ramp in each: in the dark the ramp's
+   lightest gray is darker than the track, and a knob drawn in it read as a
+   hole. */
 helix-headless-switch::part(thumb) {
-  background-color: var(--_gray-surface);
+  background-color: light-dark(var(--_gray-surface), var(--_gray-fill));
   block-size: 1.25rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
   border-radius: 50%;
   box-sizing: border-box;
   inline-size: 1.25rem;
@@ -153,7 +158,6 @@ helix-headless-switch:state(checked)::part(track) {
 }
 
 helix-headless-switch:state(checked)::part(thumb) {
-  background-color: var(--_gray-surface);
   border-color: transparent;
   translate: 1.125rem -50%;
 }

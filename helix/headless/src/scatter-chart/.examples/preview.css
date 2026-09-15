@@ -73,7 +73,14 @@
 }
 
 /* What each axis measures at its far end, the levels up beside the plot and
-   the levels across under it. */
+   the levels across under it.
+
+   The name up top spans both columns, or the column the levels sit in is as
+   wide as the name and the plot loses the difference: 83 pixels for four
+   digits, which at 390 wide ran the levels across into one another. The rows
+   stand half a rem apart because a level is centered on its rule, so the top
+   one reaches six pixels above the plot and the bottom one six below it, into
+   the name over it and the first level across. */
 helix-headless-scatter-chart {
   --chart-series-1: var(--_gray-strong);
   --chart-series-2: var(--_gray-mark);
@@ -81,13 +88,13 @@ helix-headless-scatter-chart {
   column-gap: 0.5rem;
   display: grid;
   grid-template-areas:
-    "y-name ."
+    "y-name y-name"
     "y-axis plot"
     ". x-axis"
     ". x-name";
   grid-template-columns: auto minmax(0, 1fr);
   position: relative;
-  row-gap: 0.25rem;
+  row-gap: 0.5rem;
 }
 
 helix-headless-scatter-chart::part(plot) {
@@ -200,6 +207,7 @@ helix-headless-scatter-chart::part(mark) {
 helix-headless-scatter-chart::part(tooltip) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
+  border-radius: var(--_radius-control);
   color: var(--_gray-strong);
   padding: 0.5rem;
 }

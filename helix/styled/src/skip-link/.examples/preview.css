@@ -1,0 +1,5 @@
+/* The content starts on the header's inset, so the page reads as one column
+   rather than a header and a paragraph a step to its left. */
+main {
+  padding-inline: var(--helix-space-lg);
+}

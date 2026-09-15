@@ -58,16 +58,25 @@ helix-headless-icon::part(svg) {
 }
 
 /* No parts at all, so the arrangement is the host and its children: the
-   figures in a row, wrapping on a narrow page, with a rule before every one but
-   the first. */
+   figures in a row, wrapping on a narrow page, with a rule between each two.
+
+   Every figure carries the rule and the group clips the one that starts a row,
+   rather than the first figure going without: a figure that wraps is first in
+   its row without being `:first-child`, and kept its rule and its inset, a bar
+   at the start of the second row. Each rule is pulled back past the group's
+   start by the inset and its own width, so the one leading a row lands outside
+   the box and the rest land halfway between two figures. */
 helix-headless-stat-group {
+  column-gap: 6rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 3rem;
+  overflow-x: clip;
+  row-gap: 3rem;
 }
 
-helix-headless-stat-group > helix-headless-stat:not(:first-child) {
+helix-headless-stat-group > * {
   border-inline-start: 1px solid var(--_gray-line);
+  margin-inline-start: calc(-3rem - 1px);
   padding-inline-start: 3rem;
 }
 
