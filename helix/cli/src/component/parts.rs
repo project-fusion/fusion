@@ -36,6 +36,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::compositions::forwards_in;
 use crate::component::text::{flattened, uncommented};
 use crate::component::{sources, Context, Finding, Report};
 
@@ -61,9 +62,6 @@ static DOCUMENTED: LazyLock<Regex> =
 static PART: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"part="([a-z0-9 -]+)""#).expect("a literal pattern compiles"));
 
-static FORWARDS: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"exportparts="([^"]+)""#).expect("a literal pattern compiles"));
-
 static WORD: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(\w+)").expect("a literal pattern compiles"));
 
@@ -82,14 +80,7 @@ fn written(code: &str) -> Vec<String> {
                 .collect::<Vec<String>>()
         })
         .collect();
-    for one in FORWARDS.captures_iter(code) {
-        for pair in one[1].split(',') {
-            let exposed = pair.split(':').next_back().unwrap_or("").trim();
-            if !exposed.is_empty() {
-                found.push(exposed.to_owned());
-            }
-        }
-    }
+    found.extend(forwards_in(code).into_iter().map(|(_, exposed)| exposed));
     found
 }
 

@@ -761,6 +761,68 @@ export class HelixPager extends LitElement {}
     );
 }
 
+/// A part forwarded a second time under a state, the way a chat fed as data
+/// names its reader's own turns: `<role>-<part>-<state>` beside the plain name
+/// passes, read out of the table the interpolation names. A second name under
+/// another prefix is refused, and so is one landing on a name already taken.
+#[test]
+fn exportparts_second_names() {
+    let chat = |mine: &str| {
+        format!(
+            r#"/**
+ * @csspart turn-body - One turn's body.
+ * @csspart turn-body-mine - The reader's own turn's body.
+ * @csspart turn-meta - One turn's line.
+ */
+const SECOND = {{
+  me: '{mine}',
+}}
+
+@customElement('helix-chat')
+export class HelixChat extends LitElement {{
+  render() {{
+    const turn = this.tag('turn')
+    return html`<${{turn}} exportparts="body: turn-body, meta: turn-meta${{pick(SECOND, this.author)}}"></${{turn}}>`
+  }}
+}}
+"#
+        )
+    };
+    let tree = Tree::new("exportparts-second-names");
+    tree.write(
+        "helix.json",
+        r#"{ "tiers": ["src"], "layers": [{ "prefix": "helix-", "source": "src" }] }"#,
+    )
+    .write(
+        "src/turn/turn.ts",
+        r"/**
+ * @csspart body - What was said.
+ * @csspart meta - The line under it.
+ */
+@customElement('helix-turn')
+export class HelixTurn extends LitElement {}
+",
+    )
+    .write("src/chat/chat.ts", &chat("body: turn-body-mine"));
+    assert_clean("exportparts", &judge(&tree, "exportparts", "exportparts"));
+
+    tree.write("src/chat/chat.ts", &chat("body: turn-meta-mine"));
+    assert_found(
+        "exportparts",
+        &judge(&tree, "exportparts", "exportparts"),
+        "forwards <turn>'s `body` as `turn-meta-mine`, and the role here is `turn`",
+        "src/chat/chat.ts",
+    );
+
+    tree.write("src/chat/chat.ts", &chat("meta: turn-body"));
+    assert_found(
+        "exportparts",
+        &judge(&tree, "exportparts", "exportparts"),
+        "forwards <turn>'s `body` and `meta` both as `turn-body`",
+        "src/chat/chat.ts",
+    );
+}
+
 /// The method pattern wants exactly two spaces of indentation, and a seam is a
 /// protected `render*` method that is not `render` itself.
 #[test]

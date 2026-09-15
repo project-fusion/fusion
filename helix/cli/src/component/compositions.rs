@@ -61,8 +61,158 @@ static ROLE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"(?:^|\s)part="([a-z0-9-]+)[\s"]"#).expect("a literal pattern compiles")
 });
 
-static FORWARDS: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"exportparts="([^"]*)""#).expect("a literal pattern compiles"));
+/// Where an `exportparts` value opens.
+const FORWARDS: &str = "exportparts=\"";
+
+/// A name an interpolation reads, where no `.` before it makes it a member.
+static NAMED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?:^|[^.\w$])([A-Za-z_$][\w$]*)").expect("a literal pattern compiles")
+});
+
+/// Every `inner: outer` pair a comma-separated list names, in order. A bare
+/// name forwards under itself.
+fn pairs(list: &str, into: &mut Vec<(String, String)>) {
+    for pair in list.split(',') {
+        let mut halves = pair.split(':').map(str::trim);
+        let Some(inner) = halves.next().filter(|one| !one.is_empty()) else {
+            continue;
+        };
+        let outer = halves.next().filter(|one| !one.is_empty()).unwrap_or(inner);
+        into.push((inner.to_owned(), outer.to_owned()));
+    }
+}
+
+/// Where the brace or quote opening at `open` closes, stepping over strings
+/// and nested braces. The end of the text where it never does.
+fn closing(bytes: &[u8], open: usize) -> usize {
+    let mut depth = 0usize;
+    let mut quote = 0u8;
+    let mut at = open;
+    while let Some(&character) = bytes.get(at) {
+        if quote != 0 {
+            if character == b'\\' {
+                at += 1;
+            } else if character == quote {
+                quote = 0;
+            }
+        } else {
+            match character {
+                b'\'' | b'"' | b'`' => quote = character,
+                b'{' => depth += 1,
+                b'}' => {
+                    depth = depth.saturating_sub(1);
+                    if depth == 0 {
+                        return at;
+                    }
+                }
+                _ => {}
+            }
+        }
+        at += 1;
+    }
+    bytes.len()
+}
+
+/// The single- and double-quoted strings in a stretch of code, and the code
+/// with every string, template ones too, blanked out of it.
+fn strings(code: &str) -> (Vec<String>, String) {
+    let bytes = code.as_bytes();
+    let mut found = Vec::new();
+    let mut rest = String::with_capacity(code.len());
+    let mut at = 0;
+    while let Some(&character) = bytes.get(at) {
+        if matches!(character, b'\'' | b'"' | b'`') {
+            let mut end = at + 1;
+            while let Some(&inside) = bytes.get(end) {
+                if inside == b'\\' {
+                    end += 1;
+                } else if inside == character {
+                    break;
+                }
+                end += 1;
+            }
+            let end = end.min(bytes.len());
+            if character != b'`' {
+                found.push(code[at + 1..end].to_owned());
+            }
+            rest.push(' ');
+            at = end + 1;
+            continue;
+        }
+        let next = code[at..].chars().next().map_or(1, char::len_utf8);
+        rest.push_str(&code[at..at + next]);
+        at += next;
+    }
+    (found, rest)
+}
+
+/// The object literal a module-level `const` of this name is initialized with.
+fn table<'a>(code: &'a str, name: &str) -> Option<&'a str> {
+    let declared = Regex::new(&format!(
+        r"\bconst\s+{}\s*(?::[^=]*)?=\s*\{{",
+        regex::escape(name)
+    ))
+    .ok()?;
+    let open = declared.find(code)?.end() - 1;
+    let close = closing(code.as_bytes(), open);
+    code.get(open..=close)
+}
+
+/// Every `inner: outer` pair the `exportparts` value starting at `from`
+/// forwards, in order.
+///
+/// **A value may add names that hold only while something is true**, as a chat
+/// fed as data does for the turn's author and its state, and they are literals
+/// all the same: the static text is the list, and an interpolation adds every
+/// quoted string inside it and inside the object literal of any `const` of
+/// this file it names, each read as a list of its own. So a quoted string there
+/// is forwards and nothing else, the promise a state part name makes, and a
+/// value built out of pieces reads as forwarding nothing rather than as
+/// forwarding whatever it happens to assemble.
+pub fn forwarded(code: &str, from: usize) -> Vec<(String, String)> {
+    let bytes = code.as_bytes();
+    let mut lists = vec![String::new()];
+    let mut run = from;
+    let mut at = from;
+    while let Some(&character) = bytes.get(at) {
+        if character == b'"' {
+            break;
+        }
+        if character == b'$' && bytes.get(at + 1) == Some(&b'{') {
+            lists[0].push_str(&code[run..at]);
+            lists[0].push(',');
+            let close = closing(bytes, at + 1);
+            let (quoted, rest) = strings(code.get(at + 2..close).unwrap_or(""));
+            lists.extend(quoted);
+            for name in NAMED.captures_iter(&rest) {
+                if let Some(found) = table(code, &name[1]) {
+                    lists.extend(strings(found).0);
+                }
+            }
+            at = close + 1;
+            run = at;
+            continue;
+        }
+        at += 1;
+    }
+    lists[0].push_str(code.get(run..at).unwrap_or(""));
+    let mut found = Vec::new();
+    for list in &lists {
+        pairs(list, &mut found);
+    }
+    /* Once each: a table named by two interpolations is read twice, and the
+    same pair written twice forwards one name, not two. */
+    let mut seen = BTreeSet::new();
+    found.retain(|one| seen.insert(one.clone()));
+    found
+}
+
+/// Every pair any `exportparts` in a file forwards.
+pub fn forwards_in(code: &str) -> Vec<(String, String)> {
+    code.match_indices(FORWARDS)
+        .flat_map(|(at, _)| forwarded(code, at + FORWARDS.len()))
+        .collect()
+}
 
 /// The attributes of the open tag beginning at `from`.
 ///
@@ -215,11 +365,31 @@ pub fn exposed_as(role: &str, part: &str) -> String {
     }
 }
 
+/// Whether `name` is a second name for a part forwarded as `exposed`.
+///
+/// **One word more, and only one**: `<exposed>-<state>`, the name a state drawn
+/// on a part takes, forwarded beside the plain name while the state holds. A
+/// second word would let `message: message-body-mine` pass as `message` in a
+/// state called `body-mine`, which is another part's name wearing this one's
+/// prefix.
+pub fn second_name_of(name: &str, exposed: &str) -> bool {
+    name.strip_prefix(exposed)
+        .and_then(|rest| rest.strip_prefix('-'))
+        .is_some_and(|state| {
+            !state.is_empty()
+                && state
+                    .bytes()
+                    .all(|one| one.is_ascii_lowercase() || one.is_ascii_digit())
+        })
+}
+
 /// One place a component renders another.
 pub struct Site {
     pub at: usize,
     pub child: String,
-    pub forwarded: BTreeMap<String, String>,
+    /// `inner: outer`, in the order written. A list and not a map, because one
+    /// part may be forwarded under a second name beside its first.
+    pub forwarded: Vec<(String, String)>,
     pub path: std::path::PathBuf,
     pub role: Option<String>,
 }
@@ -271,18 +441,9 @@ pub fn compositions(context: &Context) -> Vec<Site> {
             });
             for (end, child) in inline.chain(held).collect::<Vec<_>>() {
                 let attributes = open_tag(&code, end);
-                let mut forwarded = BTreeMap::new();
-                let raw = FORWARDS
-                    .captures(&attributes)
-                    .map_or(String::new(), |two| two[1].to_owned());
-                for pair in raw.split(',') {
-                    let mut halves = pair.split(':').map(str::trim);
-                    let Some(inner) = halves.next().filter(|one| !one.is_empty()) else {
-                        continue;
-                    };
-                    let outer = halves.next().filter(|one| !one.is_empty()).unwrap_or(inner);
-                    forwarded.insert(inner.to_owned(), outer.to_owned());
-                }
+                let forwarded = attributes
+                    .find(FORWARDS)
+                    .map_or_else(Vec::new, |at| forwarded(&code, end + at + FORWARDS.len()));
                 found.push(Site {
                     at: end,
                     child,
@@ -294,4 +455,59 @@ pub fn compositions(context: &Context) -> Vec<Site> {
         }
     }
     found
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{forwards_in, second_name_of};
+
+    fn names(code: &str) -> Vec<String> {
+        forwards_in(code)
+            .into_iter()
+            .map(|(inner, outer)| format!("{inner}:{outer}"))
+            .collect()
+    }
+
+    #[test]
+    fn a_plain_list_reads_as_it_is_written() {
+        assert_eq!(
+            names(r#"<x exportparts="body: message-body, message">"#),
+            ["body:message-body", "message:message"]
+        );
+    }
+
+    #[test]
+    fn a_second_name_is_read_from_the_interpolation_and_the_table_it_names() {
+        let code = r#"const NAMES = {
+  me: 'body: message-body-mine',
+  failed: 'meta: message-meta-failed',
+}
+html`<x exportparts="body: message-body${pick(NAMES, a)}${pick(NAMES, b)}${on ? ', meta: message-meta-on' : ''}">`"#;
+        assert_eq!(
+            names(code),
+            [
+                "body:message-body",
+                "body:message-body-mine",
+                "meta:message-meta-failed",
+                "meta:message-meta-on",
+            ]
+        );
+    }
+
+    #[test]
+    fn a_name_assembled_from_pieces_forwards_nothing() {
+        assert_eq!(
+            names(r#"<x exportparts="body: message-body${`, ${part}: message-${part}-mine`}">"#),
+            ["body:message-body"]
+        );
+    }
+
+    #[test]
+    fn a_second_name_is_the_first_and_one_word_more() {
+        assert!(second_name_of("message-body-mine", "message-body"));
+        assert!(second_name_of("message-mine", "message"));
+        assert!(!second_name_of("message-body", "message-body"));
+        assert!(!second_name_of("message-body-mine", "message"));
+        assert!(!second_name_of("message-bodyx", "message-body"));
+    }
 }
