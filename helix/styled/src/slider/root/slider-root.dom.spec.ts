@@ -1,5 +1,12 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import {
+  formValue,
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -223,5 +230,38 @@ describe('slider bounds', () => {
     expect(control.style.getPropertyValue('--slider-fraction')).toBe(
       String((1.05 - 0.2) / (2.5 - 0.2)),
     )
+  })
+})
+
+/* The native range puts its minimum on the right of a right-to-left page, and
+   the fill has to start there too. Painted `to right` it grew from the left
+   while the thumb ending it moved in from the right, so at 40 the fill stopped
+   at 40% from the left and the thumb stood at 60%.
+
+   A browser's: the side is a `:dir()` rule, and happy-dom matches none. */
+const browser = hasLayout() ? test : (): void => {}
+
+describe('slider fill on a right-to-left page', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  const along = async (): Promise<string> => {
+    const host = (await mount(
+      '<helix-slider default-value="40" label="A" max="100" min="0"></helix-slider>',
+    )) as Updatable
+    await host.updateComplete
+    return getComputedStyle(part(host, 'control') as Element)
+      .getPropertyValue('--_slider-track-image')
+      .trim()
+  }
+
+  browser('runs from the left on a left-to-right page', async () => {
+    expect(await along()).toMatch(/^linear-gradient\(\s*to right,/)
+  })
+
+  browser('and from the right on a right-to-left one, where the minimum is', async () => {
+    document.documentElement.dir = 'rtl'
+    expect(await along()).toMatch(/^linear-gradient\(\s*to left,/)
   })
 })

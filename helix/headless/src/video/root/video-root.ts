@@ -1528,8 +1528,15 @@ export class HelixHeadlessVideo extends HelixElement {
         ${drawIcon(this.playing ? pause : play)}
       </button>
       <span part="time">${clock(this.position)} / ${clock(this.knownDuration)}</span>
+      <!-- Left to right on every page. A player's timeline is a tape running
+           one way rather than a line of text, which is why its skip glyphs are
+           not mirrored and the left arrow rewinds whatever the script. Allowed
+           to follow the page, a range turns round on a right-to-left one, and
+           the arrows on the scrubber moved through time the other way to the
+           same arrows pressed on the video. -->
       <input
         part="scrubber"
+        dir="ltr"
         type="range"
         min="0"
         max=${Number.isFinite(this.knownDuration) && this.knownDuration > 0 ? this.knownDuration : 0}

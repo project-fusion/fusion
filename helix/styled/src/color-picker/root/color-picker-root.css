@@ -2,8 +2,17 @@
  *  The inset the rows under the square take, and the picker's own bottom.
  */
 :host {
+  /* Which way saturation, hue and opacity grow: along the line, the way the
+     native ranges under the square and the rails already move on a
+     right-to-left page. A gradient takes no logical keyword, so it is said
+     once here and every ramp below reads it. */
+  --_color-picker-along: to right;
   display: block;
   padding-block-end: var(--color-picker-padding, var(--helix-space-none));
+}
+
+:host(:dir(rtl)) {
+  --_color-picker-along: to left;
 }
 
 /* The chip of the current color, and every preset: one square, two sizes.
@@ -34,14 +43,14 @@
 }
 
 /*
- *  The square: saturation left to right over brightness top to bottom, which is
- * the picker every reader has already used.
+ *  The square: saturation along the line over brightness top to bottom, which
+ * is the picker every reader has already used.
  */
 [part="grid"] {
   aspect-ratio: var(--color-picker-grid-ratio, 1 / 0.7);
   background-image:
     linear-gradient(to top, hsl(0 0% 0%), transparent),
-    linear-gradient(to right, hsl(0 0% 100%), transparent),
+    linear-gradient(var(--_color-picker-along), hsl(0 0% 100%), transparent),
     linear-gradient(hsl(var(--color-picker-hue) 100% 50%), hsl(var(--color-picker-hue) 100% 50%));
   border-radius: var(--color-picker-grid-radius, var(--helix-radii-sm));
   cursor: crosshair;
@@ -62,6 +71,11 @@
   pointer-events: none;
   position: absolute;
   translate: -50% -50%;
+}
+
+/* Centered on its point from the other side, the inline start being the right. */
+:host(:dir(rtl)) [part="grid-handle"] {
+  translate: 50% -50%;
 }
 
 /*
@@ -177,7 +191,7 @@
    publishes for it. */
 [part="channel"][data-channel="hue"] {
   --slider-track-image: linear-gradient(
-    to right,
+    var(--_color-picker-along),
     hsl(0 100% 50%),
     hsl(60 100% 50%),
     hsl(120 100% 50%),
@@ -193,7 +207,7 @@
    background happens to match. */
 [part="channel"][data-channel="alpha"] {
   --slider-track-image:
-    linear-gradient(to right, transparent, hsl(var(--color-picker-hue) 100% 50%)),
+    linear-gradient(var(--_color-picker-along), transparent, hsl(var(--color-picker-hue) 100% 50%)),
     conic-gradient(
       var(--helix-color-surface-sunken) 0 25%,
       var(--helix-color-surface) 0 50%,
