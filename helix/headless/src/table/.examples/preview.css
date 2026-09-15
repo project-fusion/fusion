@@ -65,10 +65,16 @@ helix-headless-table-cell {
   color: var(--_gray-strong);
   display: flex;
   font-size: 0.8125rem;
+  /* The edge the cell's column is set to, which the table publishes onto each
+     cell as `--table-cell-align` rather than writing onto markup it did not
+     write. `start` and `end` are the inline edges for both properties. */
+  justify-content: var(--table-cell-align);
   min-block-size: 2.5rem;
   min-inline-size: 0;
   overflow-wrap: anywhere;
-  padding: 0.5rem 1rem 0.5rem 0;
+  padding-block: 0.5rem;
+  padding-inline: 0 1rem;
+  text-align: var(--table-cell-align);
 }
 
 helix-headless-table-cell[header] {
@@ -111,4 +117,15 @@ helix-headless-table-column::part(column) {
   min-block-size: 3rem;
   min-inline-size: 0;
   padding-inline-end: 1rem;
+}
+
+/* A column set to the end or the middle takes its heading there too, over the
+   values it names. `align` reflects, so the attribute is there to match however
+   it was set. */
+helix-headless-table-column[align="center"]::part(column) {
+  justify-content: center;
+}
+
+helix-headless-table-column[align="end"]::part(column) {
+  justify-content: flex-end;
 }

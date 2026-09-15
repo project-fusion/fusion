@@ -2,6 +2,10 @@ import { customElement, HelixElement, MixinCollection } from '@fusion.dev/helix-
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessTableColumn } from '../column/table-column.js'
+import type { HelixHeadlessTableRow } from '../row/table-row.js'
+
+/** The edges a column's `align` may name. */
+const EDGES = new Set(['center', 'end', 'start'])
 
 /**
  * @summary Tabular data laid out on a grid.
@@ -166,9 +170,74 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     body.assign(...this.slotted)
   }
 
+  /**
+   * The rules handing each column's `align` to the cells under it. One sheet for
+   * every row this table holds, rewritten in place, so a column changing its
+   * edge reaches every row in one write.
+   */
+  private alignment: CSSStyleSheet | undefined = undefined
+
+  /** What `alignment` was last written with, so a render that changed no edge writes nothing. */
+  private aligned = ''
+
+  /**
+   * Tells every row which edge each of its cells lines up against.
+   *
+   * **A rule in each row's shadow root, keyed on position and written by this
+   * table.** The cells are the consumer's markup, so nothing may be written onto
+   * them, and each of the other ways fails somewhere a table goes:
+   *
+   * - This element's own sheet cannot reach them. `::slotted()` matches what is
+   *   assigned here, which is the rows, and never a row's children.
+   * - A property per column published here, `--table-align-2: end`, still needs
+   *   a rule that knows which column a cell is in, and a fixed ladder of
+   *   `:nth-child` rules in a static sheet is a ceiling on the column count.
+   * - A custom state set on each cell by script is right only until a cell
+   *   moves, and a cell moving inside a row changes no child list this element
+   *   watches.
+   *
+   * `:nth-child` is matched by the browser against wherever a cell is now, so a
+   * cell that moves takes its new column's edge with no script at all; a column
+   * that moves rewrites the rules on the render the watcher asks for; and a
+   * column hidden along with its cells keeps its place in both counts, since
+   * `:nth-child` counts a hidden sibling the way `tableColumns` counts a hidden
+   * column. The row is where they go because only the shadow root holding a
+   * slot can style what is assigned to it.
+   *
+   * **A custom property and nothing else**, which is how this tier publishes a
+   * fact: the edge is the author's declaration, and what lining up means, a
+   * `justify-content` or a `text-align`, belongs to whoever draws the cell.
+   * `initial` on every cell first, so a table nested in an aligned cell does not
+   * take the outer column's edge for columns of its own that set none.
+   */
+  private alignCells(): void {
+    if (typeof CSSStyleSheet === 'undefined' || !('replaceSync' in CSSStyleSheet.prototype)) {
+      return
+    }
+    /* The attribute is a string anybody can write and this is a stylesheet, so
+       only the three edges reach it. */
+    const rules = this.tableColumns.flatMap((column, index) =>
+      column.align && EDGES.has(column.align)
+        ? [`::slotted(:nth-child(${index + 1})) { --table-cell-align: ${column.align}; }`]
+        : [],
+    )
+    const text = ['::slotted(*) { --table-cell-align: initial; }', ...rules].join('\n')
+    this.alignment ??= new CSSStyleSheet()
+    if (text !== this.aligned) {
+      this.alignment.replaceSync(text)
+      this.aligned = text
+    }
+    for (const row of this.slotted) {
+      if ('isTableRow' in row) {
+        ;(row as HelixHeadlessTableRow).alignCells(this.alignment)
+      }
+    }
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.assign()
+    this.alignCells()
   }
 
   protected override render(): TemplateResult {

@@ -76,3 +76,80 @@ describe('a table told about what changed after it drew', () => {
     expect(template(host)).toContain('minmax(max-content, 1fr) 12rem')
   })
 })
+
+/**
+ * A column's edge, handed to the cells under it.
+ *
+ * **Published and not drawn**, which is this tier's side of it: each cell
+ * carries its column's `align` as `--table-cell-align`, and what lining up
+ * means is the sheet's that draws the cell. Browser only, since it arrives
+ * through a `::slotted()` rule and happy-dom computes no custom property from
+ * one.
+ */
+describe("a table publishing each column's edge to its cells", () => {
+  const edge = (cell: Element | undefined): string =>
+    getComputedStyle(cell as Element)
+      .getPropertyValue('--table-cell-align')
+      .trim()
+
+  const aligned = async (inner = ''): Promise<Updating> => {
+    const host = (await mount(`
+      <helix-headless-table label="Deployments">
+        <helix-headless-table-column>Service</helix-headless-table-column>
+        <helix-headless-table-column align="end">Count</helix-headless-table-column>
+        <helix-headless-table-row>
+          <helix-headless-table-cell>helix-web</helix-headless-table-cell>
+          <helix-headless-table-cell>34${inner}</helix-headless-table-cell>
+        </helix-headless-table-row>
+      </helix-headless-table>`)) as Updating
+    await settle(host)
+    return host
+  }
+
+  browser('to the cells under a column set to one, and to no others', async () => {
+    const cells = [...(await aligned()).querySelectorAll('helix-headless-table-cell')]
+    expect(edge(cells[0])).toBe('')
+    expect(edge(cells[1])).toBe('end')
+  })
+
+  /* A column hidden with its cells keeps its place in both counts, so the
+     cells after it keep their own column's edge rather than taking the next
+     one's. The edge only: the hidden column keeps its track, which is the
+     table's to drop and does not yet. */
+  browser('to the same cells when a column before them is hidden with its own', async () => {
+    const host = await aligned()
+    ;(host.querySelector('helix-headless-table-column') as HTMLElement).hidden = true
+    const cells = [...host.querySelectorAll('helix-headless-table-cell')] as HTMLElement[]
+    ;(cells[0] as HTMLElement).hidden = true
+    await settle(host)
+    expect(edge(cells[1])).toBe('end')
+  })
+
+  /* A custom property inherits, so a table inside an aligned cell would take
+     the outer column's edge for every column of its own that sets none. */
+  browser("and not to a table nested in an aligned cell's own cells", async () => {
+    const host = await aligned(`
+      <helix-headless-table label="Inner">
+        <helix-headless-table-column>Zone</helix-headless-table-column>
+        <helix-headless-table-row>
+          <helix-headless-table-cell id="inner">a</helix-headless-table-cell>
+        </helix-headless-table-row>
+      </helix-headless-table>`)
+    await settle(host.querySelector('[label="Inner"]') as Updating)
+    expect(edge(host.querySelector('#inner') ?? undefined)).toBe('')
+  })
+
+  /* The attribute is a string anybody can write, and it lands in a stylesheet. */
+  browser('only as one of the three edges', async () => {
+    const host = await aligned()
+    const count = host.querySelectorAll('helix-headless-table-column')[1] as Updating & {
+      align?: string
+    }
+    count.setAttribute('align', 'end; } ::slotted(*) { display: none')
+    await count.updateComplete
+    await settle(host)
+    const cells = [...host.querySelectorAll('helix-headless-table-cell')]
+    expect(edge(cells[1])).toBe('')
+    expect(getComputedStyle(cells[1] as Element).display).not.toBe('none')
+  })
+})

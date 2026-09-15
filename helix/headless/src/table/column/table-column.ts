@@ -108,9 +108,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * `end` is what a column of numbers wants, so digits of the same magnitude sit
    * above each other. Left unset the cell inherits the table's own alignment,
    * which is `start` for text in either writing direction. `helix-data-table`
-   * aligns the cells it draws; a `helix-table`'s cells are markup the consumer
-   * wrote, and align as the consumer styles them. The heading is this element's
-   * own, and `@fusion.dev/helix` sets it to the same edge in either table.
+   * aligns the cells it draws. A `helix-table`'s cells are markup the consumer
+   * wrote, so the table writes nothing onto them: it publishes the edge to each
+   * cell under this column as `--table-cell-align`, which `@fusion.dev/helix`
+   * reads. The heading is this element's own, and `@fusion.dev/helix` sets it to
+   * the same edge in either table. `end` is the inline end, so in a
+   * right-to-left table it is the left.
    *
    * **Reflected, because the heading is drawn by a stylesheet and has no other
    * way to learn it.** Set as a property, which is how React sets it, an
@@ -357,11 +360,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
     /* **The table reads this column in its own render, and a property changing
        here is nothing the table hears.** A resize in a `helix-table` moved the
        separator and left the track where it was, the track list being composed
-       from every column's width once and never again. Asked of whatever holds
+       from every column's width once and never again, and the cells under a
+       column take their edge from the same render. Asked of whatever holds
        the column rather than of a table by name: both tables are Lit elements
        that read it when they render, and a column held by anything else has
        nobody to tell. */
-    if (changed.has('width')) {
+    if (changed.has('align') || changed.has('width')) {
       ;(this.parentElement as Partial<ReactiveElement> | null)?.requestUpdate?.()
     }
   }

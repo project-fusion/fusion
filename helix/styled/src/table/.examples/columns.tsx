@@ -6,7 +6,7 @@ export function Example() {
     >
       <helix-table-column>Service</helix-table-column>
       <helix-table-column>Last change</helix-table-column>
-      <helix-table-column>Count</helix-table-column>
+      <helix-table-column align="end">Count</helix-table-column>
 
       <helix-table-row>
         <helix-table-cell header>Gateway</helix-table-cell>

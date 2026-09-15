@@ -157,3 +157,117 @@ describe('a heading, where there is layout to place it', () => {
     expect(expected).not.toBe('31px')
   })
 })
+
+describe('the cells under a column set to an edge, where there is layout to place them', () => {
+  type Updating = HTMLElement & { updateComplete: Promise<boolean> }
+
+  /* The table's render, then the watcher's turn and the render it asks for. */
+  const settle = async (host: Updating): Promise<void> => {
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+  }
+
+  const table = async (dir: 'ltr' | 'rtl', count = 'align="end"'): Promise<Updating> => {
+    const host = (await mount(
+      `<helix-table dir="${dir}" label="Deploys">
+        <helix-table-column width="10rem">Service</helix-table-column>
+        <helix-table-column ${count} width="10rem">Count</helix-table-column>
+        <helix-table-row>
+          <helix-table-cell header>Gateway</helix-table-cell>
+          <helix-table-cell>34</helix-table-cell>
+        </helix-table-row>
+        <helix-table-row>
+          <helix-table-cell header>Billing</helix-table-cell>
+          <helix-table-cell>1800</helix-table-cell>
+        </helix-table-row>
+      </helix-table>`,
+    )) as Updating
+    await settle(host)
+    return host
+  }
+
+  /* Where the words are, rather than where the boxes are: the heading and the
+     cells share a track whatever either one's content does, so only the text
+     says which edge it went to. */
+  const words = (node: Node): DOMRect => {
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    return range.getBoundingClientRect()
+  }
+
+  /** A column's heading and every cell under it, found by the heading's words. */
+  const column = (host: HTMLElement, name: string): { cells: DOMRect[]; heading: DOMRect } => {
+    const headings = [...host.querySelectorAll('helix-table-column')]
+    const index = headings.findIndex((one) => one.textContent?.trim() === name)
+    const cells = [...host.querySelectorAll('helix-table-row')].map(
+      (row) => row.children[index] as Node,
+    )
+    return { cells: cells.map(words), heading: words(headings[index] as Node) }
+  }
+
+  /** The largest distance between the heading's edge and a cell's. */
+  const off = (
+    { cells, heading }: { cells: DOMRect[]; heading: DOMRect },
+    edge: 'left' | 'right',
+  ): number => Math.max(...cells.map((cell) => Math.abs(cell[edge] - heading[edge])))
+
+  geometry(
+    'end where the heading ends, and a column left alone starts with its heading',
+    async () => {
+      const host = await table('ltr')
+      expect(off(column(host, 'Count'), 'right')).toBeLessThan(2)
+      expect(off(column(host, 'Service'), 'left')).toBeLessThan(2)
+      /* And it is the edge that moved them: two values of different lengths
+       starting at one place would pass the start as easily. */
+      const [short, long] = column(host, 'Count').cells as [DOMRect, DOMRect]
+      expect(long.left).toBeLessThan(short.left - 4)
+    },
+  )
+
+  /* The end is the inline end. The cell's inset was physical, so in this
+     direction it sat on the wrong side of every value, the heading's on the
+     right one, and the two edges disagreed by the inset. */
+  geometry('end at the left in a right-to-left table, where the heading ends', async () => {
+    const host = await table('rtl')
+    expect(off(column(host, 'Count'), 'left')).toBeLessThan(2)
+    expect(off(column(host, 'Service'), 'right')).toBeLessThan(2)
+    expect(column(host, 'Count').heading.left).toBeLessThan(column(host, 'Service').heading.left)
+  })
+
+  /* Set from script, which is how React sets it: the table reads the edge in
+     its own render, and the column asks for one. */
+  geometry('follow an edge the column is given after the table drew', async () => {
+    const host = await table('ltr', '')
+    const count = host.querySelectorAll('helix-table-column')[1] as Updating & { align?: string }
+    count.align = 'end'
+    await count.updateComplete
+    await settle(host)
+    expect(off(column(host, 'Count'), 'right')).toBeLessThan(2)
+  })
+
+  /* A consumer reordering columns moves the heading and the cell in every row.
+     The edge goes with the column rather than staying with the position. */
+  geometry('go with their column when it moves', async () => {
+    const host = await table('ltr')
+    const [service, count] = [...host.querySelectorAll('helix-table-column')] as Element[]
+    host.insertBefore(count as Element, service as Element)
+    for (const row of host.querySelectorAll('helix-table-row')) {
+      row.insertBefore(row.children[1] as Element, row.children[0] as Element)
+    }
+    await settle(host)
+    expect(off(column(host, 'Count'), 'right')).toBeLessThan(2)
+    expect(off(column(host, 'Service'), 'left')).toBeLessThan(2)
+    expect(column(host, 'Count').heading.right).toBeLessThan(column(host, 'Service').heading.left)
+  })
+
+  /* The cells are the consumer's markup, and the edge reaches them through a
+     rule in each row's shadow root rather than through anything written on
+     them. */
+  test('writes nothing onto a cell', async () => {
+    const host = await table('ltr')
+    for (const cell of host.querySelectorAll('helix-table-cell')) {
+      expect(cell.getAttributeNames()).toEqual(cell.hasAttribute('header') ? ['header'] : [])
+    }
+  })
+})

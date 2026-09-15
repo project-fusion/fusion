@@ -20,6 +20,8 @@ import { property } from 'lit/decorators.js'
  * @documentation https://helix.fusion.dev/components/table
  *
  * @slot - The cell's content.
+ *
+ * @cssproperty --table-cell-align - The edge the column this cell sits under is set to, `start`, `center` or `end`, and unset under a column that sets none. Written by the table around it, since the cell is the consumer's markup and nothing is written onto it; read by the sheet that draws the cell, where `justify-content` and `text-align` both take it as it comes and both follow the writing direction.
  */
 @customElement('helix-headless-table-cell')
 export class HelixHeadlessTableCell extends HelixElement {
