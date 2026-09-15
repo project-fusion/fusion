@@ -45,20 +45,68 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A column, so the label, the field and the hint stack at one gap without
+   any of them carrying a margin. */
+helix-headless-color-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* The field carries the box rather than the input, so the swatch sits inside
+   the same frame as the text. */
 helix-headless-color-input::part(field) {
   align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  overflow: hidden;
+  padding-inline-start: 0.5rem;
 }
 
 helix-headless-color-input::part(control) {
-  font: inherit;
+  all: unset;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-inline-size: 0;
 }
 
 helix-headless-color-input::part(trigger) {
   all: unset;
+  align-self: stretch;
   box-sizing: border-box;
   cursor: pointer;
+  display: flex;
+  flex: none;
+}
+
+/* The chip fills the trailing end of the field. The color is the value, which
+   the component publishes; the checkerboard under it is what shows through a
+   color carrying alpha. Desaturated, so the example stays in grays while the
+   chip still reads lighter or darker with the value. */
+helix-headless-color-input::part(preview) {
+  background-image:
+    linear-gradient(var(--color-input-swatch, transparent), var(--color-input-swatch, transparent)),
+    conic-gradient(
+      var(--_gray-fill) 0 25%,
+      var(--_gray-surface) 0 50%,
+      var(--_gray-fill) 0 75%,
+      var(--_gray-surface) 0
+    );
+  background-size:
+    100% 100%,
+    0.75rem 0.75rem;
+  border-inline-start: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  display: block;
+  filter: grayscale(1);
+  inline-size: 2.5rem;
 }
 
 helix-headless-color-input::part(surface) {
@@ -70,17 +118,28 @@ helix-headless-color-input::part(surface) {
 
 helix-headless-color-input::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+helix-headless-color-input::part(hint),
+helix-headless-color-input::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0;
+  margin-block-start: 0.25rem;
 }
 
 helix-headless-color-input::part(hint) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
 }
 
 helix-headless-color-input::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  color: var(--_gray-strong);
+  font-weight: 500;
 }
 
 helix-headless-icon::part(svg) {
@@ -89,10 +148,23 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-color-input::part(control):focus-visible {
+/* The keyboard reaches the input, but the ring goes around the field that
+   holds it, since a ring on the text alone would sit inside the frame and be
+   clipped by it. Taking the UA outline off without putting one back is the
+   commonest way a headless control stops being operable without a pointer. */
+helix-headless-color-input:focus-within::part(field) {
   outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
+  outline-offset: 0;
+}
+
+/* The trigger is its own stop, and its ring is inset so the field's edge
+   does not cut it. */
+helix-headless-color-input::part(trigger):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+helix-headless-color-input::part(control)::placeholder {
+  color: var(--_gray-muted);
+  font-weight: 500;
 }

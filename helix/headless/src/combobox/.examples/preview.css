@@ -45,28 +45,70 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A column, so the label, the field and the hint stack at one gap without
+   any of them carrying a margin. Positioned, so the panel has an edge to hang
+   from. */
+helix-headless-combobox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+}
+
+/* The field carries the box rather than the input, so the caret sits inside
+   the same frame as the text. */
 helix-headless-combobox::part(field) {
   align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
   display: flex;
   gap: 0.5rem;
+  padding-inline: 0.5rem;
 }
 
 helix-headless-combobox::part(control) {
-  font: inherit;
+  all: unset;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-inline-size: 0;
 }
 
+helix-headless-combobox::part(control)::placeholder {
+  color: var(--_gray-muted);
+  font-weight: 500;
+}
+
+helix-headless-combobox::part(indicator) {
+  block-size: 1rem;
+  fill: var(--_gray-muted);
+  flex: none;
+  inline-size: 1rem;
+}
+
+/* One frame for the panel, and none on the list inside it, which would draw
+   the shape twice. */
 helix-headless-combobox::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
   color: var(--_gray-strong);
-  padding: 0.5rem;
+  padding: 0;
 }
 
 helix-headless-combobox::part(listbox) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+  border: 0;
+  display: block;
+}
+
+helix-headless-combobox::part(listbox-items) {
+  display: flex;
+  flex-direction: column;
+  padding-block: 0.25rem;
 }
 
 helix-headless-combobox::part(listbox-filter-mark) {
@@ -83,28 +125,51 @@ helix-headless-combobox::part(tag-dismiss-mark) {
 
 helix-headless-combobox::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+helix-headless-combobox::part(hint),
+helix-headless-combobox::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0;
+  margin-block-start: 0.25rem;
 }
 
 helix-headless-combobox::part(hint) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
 }
 
 helix-headless-combobox::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  color: var(--_gray-strong);
+  font-weight: 500;
 }
 
+/* A stated row height, so every row is the same whatever is slotted into it,
+   and the words on the field's own inset so they do not shift when the panel
+   opens. */
 helix-headless-option::part(item) {
+  align-items: center;
   background-color: transparent;
   border: 0;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  line-height: 1.5;
+  min-block-size: 2rem;
   padding: 0.25rem 0.5rem;
 }
 
 helix-headless-option::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 helix-headless-icon::part(svg) {
@@ -113,17 +178,11 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-combobox::part(control):focus-visible {
+/* The keyboard reaches the input, but the ring goes around the field that
+   holds it, so it circles the caret too. Taking the UA outline off without
+   putting one back is the commonest way a headless control stops being
+   operable without a pointer. */
+helix-headless-combobox:focus-within::part(field) {
   outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
-}
-
-helix-headless-combobox::part(indicator) {
-  block-size: 1em;
-  fill: var(--_gray-muted);
-  flex: none;
-  inline-size: 1em;
+  outline-offset: 0;
 }

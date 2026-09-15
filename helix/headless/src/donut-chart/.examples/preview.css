@@ -41,16 +41,38 @@
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
+/* The source table stays in the page for assistive technology, which reads
+   the figures from it, and is clipped out of sight: the ring is what a
+   sighted reader is shown. `display: none` would take it out of the tree. */
+[data-hidden-visually] {
+  block-size: 1px;
+  border: 0;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* A bounded ring: the drawing takes the width of its box, so the box is what
+   says how big it is. One distinct step of the ramp per slice, darkest first,
+   so the slices read apart by weight alone. */
 helix-headless-donut-chart {
-  --chart-series-1: light-dark(#2a2a2e, #e9e9ec);
-  --chart-series-2: light-dark(#4a4a50, #c9c9ce);
-  --chart-series-3: light-dark(#6b6b73, #a1a1aa);
-  --chart-series-4: light-dark(#8e8e96, #86868f);
-  --chart-series-5: light-dark(#b1b1b8, #63636b);
-  --chart-series-6: light-dark(#d2d2d7, #45454b);
+  display: grid;
+  inline-size: 14rem;
+  place-items: center;
+  position: relative;
+  --chart-series-1: var(--_gray-strong);
+  --chart-series-2: var(--_gray-muted);
+  --chart-series-3: var(--_gray-mark);
+  --chart-series-4: var(--_gray-line);
+  --chart-series-5: var(--_gray-fill);
+  --chart-series-6: var(--_gray-subtle);
 }
 
 helix-headless-icon {
@@ -60,30 +82,52 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+helix-headless-donut-chart::part(plot) {
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  position: relative;
+}
+
+/* Turned a quarter, so the first slice starts at the top rather than at
+   three o'clock. */
+helix-headless-donut-chart::part(track),
+helix-headless-donut-chart::part(segment) {
+  transform: rotate(-90deg);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+helix-headless-donut-chart::part(track) {
+  stroke: var(--_gray-subtle);
+}
+
+helix-headless-donut-chart::part(segment) {
+  fill: none;
+  stroke: var(--chart-series, var(--chart-series-1));
+  stroke-linecap: butt;
+  stroke-width: var(--donut-chart-stroke);
+}
+
+helix-headless-donut-chart::part(center) {
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+}
+
 helix-headless-donut-chart::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+  background-color: var(--_gray-strong);
+  border: 0;
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
 }
 
 helix-headless-donut-chart::part(mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
-}
-
-helix-headless-donut-chart::part(segment) {
-  fill: none;
-  stroke: var(--chart-series, var(--chart-series-1));
-  stroke-width: var(--donut-chart-stroke);
-}
-
-helix-headless-donut-chart::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
 }
 
 helix-headless-icon::part(svg) {

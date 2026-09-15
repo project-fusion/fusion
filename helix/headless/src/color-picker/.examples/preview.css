@@ -45,20 +45,236 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+helix-headless-color-picker {
+  display: block;
+}
+
+/* The square, drawn from the ramp: the lightest gray at the top left, the
+   darkest along the bottom. It is a picture of brightness rather than a
+   surface, so it keeps its light reading in dark mode instead of turning
+   upside down with the page. The handle stands where the component says the
+   color sits, through the two positions it publishes. */
+helix-headless-color-picker::part(grid) {
+  aspect-ratio: 1 / 0.7;
+  background-image:
+    linear-gradient(to top, var(--_gray-strong), transparent),
+    linear-gradient(to right, var(--_gray-surface), transparent),
+    linear-gradient(var(--_gray-mark), var(--_gray-mark));
+  color-scheme: light;
+  cursor: crosshair;
+  position: relative;
+  touch-action: none;
+}
+
+helix-headless-color-picker::part(grid-handle) {
+  block-size: 1rem;
+  border: 2px solid var(--_gray-surface);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--_gray-strong);
+  box-sizing: border-box;
+  inline-size: 1rem;
+  inset-block-start: calc(100% - var(--color-picker-brightness, 100%));
+  inset-inline-start: var(--color-picker-saturation, 100%);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* The two range inputs stay, since they are what the keyboard and a screen
+   reader use, and are laid invisibly over the square. */
+helix-headless-color-picker::part(grid-saturation),
+helix-headless-color-picker::part(grid-brightness) {
+  appearance: none;
+  background: none;
+  inline-size: 100%;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* The sample and the hue rail, in a row under the square. */
 helix-headless-color-picker::part(controls) {
   align-items: center;
   display: flex;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  padding-block-start: 0.75rem;
 }
 
-helix-headless-color-picker::part(actions) {
+/* The chip of the current color, which the component publishes, over a
+   checkerboard for a color carrying alpha. Desaturated, so the example stays
+   in grays while the chip still reads lighter or darker with the value. */
+helix-headless-color-picker::part(sample),
+helix-headless-color-picker::part(swatch) {
+  background-image:
+    linear-gradient(
+      var(--color-picker-swatch, transparent),
+      var(--color-picker-swatch, transparent)
+    ),
+    conic-gradient(
+      var(--_gray-fill) 0 25%,
+      var(--_gray-surface) 0 50%,
+      var(--_gray-fill) 0 75%,
+      var(--_gray-surface) 0
+    );
+  background-size:
+    100% 100%,
+    0.75rem 0.75rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  filter: grayscale(1);
+  padding: 0;
+}
+
+helix-headless-color-picker::part(sample) {
+  appearance: none;
+  block-size: 36px;
+  cursor: copy;
+  flex: none;
+  inline-size: 36px;
+}
+
+helix-headless-color-picker::part(channels) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+
+/* Named but not shown: the rail says what it is by being a rail, and the
+   name is for assistive technology. The clip keeps it in the tree, where
+   `display: none` would take it out. */
+helix-headless-color-picker::part(channel-label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-color-picker::part(channel-field) {
   align-items: center;
   display: flex;
+}
+
+/* The platform's range input, so `accent-color` is the whole of what a gray
+   rail needs. */
+helix-headless-color-picker::part(channel-control) {
+  accent-color: var(--_gray-strong);
+  inline-size: 100%;
+  margin: 0;
+}
+
+/* The value and the tools, in a row under the rail. */
+helix-headless-color-picker::part(footer) {
+  display: flex;
+  gap: 0.5rem;
+  margin-block-start: 0.75rem;
+}
+
+helix-headless-color-picker::part(value) {
+  all: unset;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  min-inline-size: 0;
+  padding-inline: 0.5rem;
+}
+
+/* The eyedropper and the syntax toggle share the other half of the row, as
+   one joined group of equal buttons. */
+helix-headless-color-picker::part(actions) {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+helix-headless-color-picker::part(eyedropper),
+helix-headless-color-picker::part(format) {
+  display: flex;
+  flex: 1 1 0;
+}
+
+helix-headless-color-picker::part(format) {
+  margin-inline-start: -1px;
+}
+
+helix-headless-color-picker::part(eyedropper-button),
+helix-headless-color-picker::part(format-button) {
+  all: unset;
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 auto;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: center;
+}
+
+/* The glyph is the component's own and carries no size, so the button gives
+   it one: a single track at the icon size, centered, which the glyph fills. */
+helix-headless-color-picker::part(eyedropper-button) {
+  display: grid;
+  grid-template-columns: 1.25rem;
+  place-content: center;
+}
+
+helix-headless-color-picker::part(format-button) {
+  font-family: ui-monospace, monospace;
+  font-variant-caps: all-small-caps;
+}
+
+helix-headless-color-picker::part(swatches) {
+  border-block-start: 1px solid var(--_gray-line);
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
+  margin-block-start: 0.75rem;
+  padding-block-start: 0.75rem;
+}
+
+helix-headless-color-picker::part(swatch) {
+  block-size: 1.5rem;
+  cursor: pointer;
+  inline-size: 1.5rem;
 }
 
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+/* The keyboard reaches the two inputs inside the square, which are
+   invisible, so the ring goes around the square. Taking the UA outline off
+   without putting one back is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-color-picker::part(grid):focus-within {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-color-picker::part(sample):focus-visible,
+helix-headless-color-picker::part(eyedropper-button):focus-visible,
+helix-headless-color-picker::part(format-button):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-color-picker::part(value):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 0;
 }

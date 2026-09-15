@@ -41,7 +41,13 @@
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
+}
+
+.stack p {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
 }
 
 helix-headless-icon {
@@ -51,17 +57,70 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A button at control height, filled in the strongest gray where the styled
+   tier fills it with its primary tone. Both buttons here are that one kind. */
 helix-headless-button::part(button) {
-  all: unset;
+  align-items: center;
+  background-color: var(--_gray-strong);
+  block-size: 2.5rem;
+  border: 1px solid transparent;
   box-sizing: border-box;
+  color: var(--_gray-surface);
   cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  justify-content: center;
+  line-height: 1.2;
+  padding-inline: 1rem;
+  white-space: nowrap;
 }
 
+/* The panel runs the full height of the edge it comes from. The header stays
+   put and the content under it scrolls. */
 helix-headless-drawer::part(panel) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 0;
+  border-inline-start: 1px solid var(--_gray-line);
+  box-sizing: border-box;
   color: var(--_gray-strong);
-  padding: 0.5rem;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+/* Only while open: a closed `<dialog>` is hidden by the UA's `display: none`,
+   and a `display` written for every state would override it. */
+helix-headless-drawer::part(panel):modal {
+  display: flex;
+}
+
+helix-headless-drawer[placement="end"]::part(panel) {
+  block-size: 100dvh;
+  inline-size: min(20rem, 100%);
+  margin-block: 0;
+  margin-inline: auto 0;
+  max-block-size: none;
+}
+
+/* A shade rather than a gray from the ramp. It darkens the page in both
+   modes, where a ramp value would lighten it in dark. */
+helix-headless-drawer::part(panel)::backdrop {
+  background-color: rgb(0 0 0 / 0.4);
+}
+
+helix-headless-drawer::part(header) {
+  flex: none;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+helix-headless-drawer::part(content) {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
 }
 
 helix-headless-icon::part(svg) {

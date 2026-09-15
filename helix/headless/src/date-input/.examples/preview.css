@@ -45,27 +45,73 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* A column, so the label, the field and the hint stack at one gap without
+   any of them carrying a margin. Positioned, so the panel has an edge to hang
+   from. */
+helix-headless-date-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+}
+
+/* The field carries the box rather than the input, so the calendar trigger
+   sits inside the same frame as the text. A floor rather than a height, since
+   in `multiple` the held dates wrap onto more lines. */
 helix-headless-date-input::part(field) {
   align-items: center;
+  background-color: var(--_gray-subtle);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-block-size: 2.5rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
 }
 
 helix-headless-date-input::part(control) {
-  font: inherit;
+  all: unset;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-inline-size: 0;
+}
+
+helix-headless-date-input::part(control)::placeholder {
+  color: var(--_gray-muted);
+  font-weight: 500;
 }
 
 helix-headless-date-input::part(trigger) {
   all: unset;
+  block-size: 1.25rem;
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1.25rem;
+}
+
+helix-headless-date-input::part(trigger-icon) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+helix-headless-date-input::part(date) {
+  flex: none;
 }
 
 helix-headless-date-input::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
   color: var(--_gray-strong);
-  padding: 0.5rem;
+  inline-size: max-content;
+  padding: 0.75rem;
 }
 
 helix-headless-date-input::part(date-dismiss-mark) {
@@ -88,17 +134,28 @@ helix-headless-date-input::part(picker-previous-mark) {
 
 helix-headless-date-input::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+helix-headless-date-input::part(hint),
+helix-headless-date-input::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0;
+  margin-block-start: 0.25rem;
 }
 
 helix-headless-date-input::part(hint) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
 }
 
 helix-headless-date-input::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  color: var(--_gray-strong);
+  font-weight: 500;
 }
 
 helix-headless-icon::part(svg) {
@@ -107,10 +164,16 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-date-input::part(control):focus-visible {
+/* The keyboard reaches the input, but the ring goes around the field that
+   holds it, since a ring on the text alone would sit inside the frame. Taking
+   the UA outline off without putting one back is the commonest way a headless
+   control stops being operable without a pointer. */
+helix-headless-date-input:focus-within::part(field) {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 0;
+}
+
+helix-headless-date-input::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }

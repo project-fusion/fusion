@@ -45,44 +45,121 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-date-picker::part(cell) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
+/* As wide as its month and no wider, so the header's controls sit over the
+   first and last columns rather than at the ends of the page. */
+helix-headless-date-picker {
+  display: inline-block;
 }
 
-helix-headless-date-picker::part(day) {
-  background-color: transparent;
-  border: 0;
+/* The months side by side, as many columns as the component says it drew. */
+helix-headless-date-picker::part(months) {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(var(--date-picker-column-count, 1), max-content);
+  justify-content: start;
+}
+
+/* The heading centered between two square controls, with room under it
+   before the weekdays. */
+helix-headless-date-picker::part(header) {
+  align-items: center;
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: 1.875rem 1fr 1.875rem;
+  margin-block-end: 1.5rem;
 }
 
 helix-headless-date-picker::part(heading) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  grid-column: 2;
+  text-align: center;
+}
+
+helix-headless-date-picker::part(previous),
+helix-headless-date-picker::part(next) {
+  all: unset;
+  align-items: center;
+  block-size: 1.875rem;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 1.875rem;
+  justify-content: center;
+}
+
+helix-headless-date-picker::part(previous) {
+  grid-column: 1;
 }
 
 helix-headless-date-picker::part(next) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
+  grid-column: 3;
 }
 
+helix-headless-date-picker::part(previous):hover,
+helix-headless-date-picker::part(next):hover {
+  background-color: var(--_gray-fill);
+  color: var(--_gray-strong);
+}
+
+helix-headless-date-picker::part(previous-mark),
 helix-headless-date-picker::part(next-mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
-helix-headless-date-picker::part(previous) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
+/* Each week is a row of seven equal tracks, the weekday row included, so the
+   names stand over their columns. */
+helix-headless-date-picker::part(week) {
+  display: grid;
+  grid-template-columns: repeat(7, 2.5rem);
 }
 
-helix-headless-date-picker::part(previous-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+/* The names sit in the top half of their box, which leaves a gap under them
+   before the first week. */
+helix-headless-date-picker::part(weekday) {
+  align-items: center;
+  block-size: 2.5rem;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 500;
+  inline-size: 2.5rem;
+  justify-content: center;
+  padding-block-end: 1.25rem;
+}
+
+/* The cell is the column track and the day is the square centered in it.
+   Which day is chosen, which is today and which belong to the next month are
+   attributes on the cell, inside the shadow root, and an attribute selector
+   cannot follow `::part()`: a document sheet reaches every cell alike, so the
+   chosen day is not marked here. */
+helix-headless-date-picker::part(cell) {
+  align-items: center;
+  block-size: 2.25rem;
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 2.5rem;
+  justify-content: center;
+}
+
+helix-headless-date-picker::part(day) {
+  align-items: center;
+  block-size: 1.875rem;
+  color: var(--_gray-strong);
+  display: inline-flex;
+  font-size: 0.8125rem;
+  inline-size: 1.875rem;
+  justify-content: center;
+}
+
+helix-headless-date-picker::part(cell):hover {
+  background-color: var(--_gray-subtle);
 }
 
 helix-headless-icon::part(svg) {
@@ -91,27 +168,12 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-helix-headless-date-picker::part(grid) {
-  display: grid;
-  gap: 0.125rem;
-  grid-template-columns: repeat(7, 2rem);
-}
-
-helix-headless-date-picker::part(week) {
-  display: contents;
-}
-
-helix-headless-date-picker::part(weekday),
-helix-headless-date-picker::part(day) {
-  display: block;
-  padding: 0.25rem 0;
-  text-align: center;
-}
-
-helix-headless-date-picker::part(header) {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
-  justify-content: space-between;
-  padding-block-end: 0.5rem;
+/* The keyboard reaches the cells and the two controls, so the ring goes on
+   them. Taking the UA outline off without putting one back is the commonest
+   way a headless control stops being operable without a pointer. */
+helix-headless-date-picker::part(cell):focus-visible,
+helix-headless-date-picker::part(previous):focus-visible,
+helix-headless-date-picker::part(next):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
 }

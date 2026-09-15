@@ -1,0 +1,135 @@
+/* What the headless tier asks a consumer to write for Data Table.
+ *
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
+ * says primary and a red one says danger, and this tier holds no such opinion.
+ * A neutral ramp says only where one surface ends and the next begins.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
+ *
+ * A part with no rule below is one the platform already renders acceptably, and
+ * a wrong rule is worse than none: paint a checkbox but leave the input at
+ * `appearance: auto` and the browser draws its own control over everything
+ * written for it.
+ *
+ * **The grid is the component's, and the columns are its answer.** The table
+ * writes the track list it worked out from the declared columns into
+ * `--data-table-template`, on the element that reads it, so the sheet lays the
+ * grid out from that and never restates a width. The rows and the heading row
+ * are `display: contents`, which is what lets every cell be a cell of one grid.
+ *
+ * **The rules run above each row rather than below it.** A structural
+ * pseudo-class cannot follow `::part()`, so the styled tier's "no rule under the
+ * last row" cannot be said from outside. A rule on top of every cell says the
+ * same thing: it separates the heading from the first row and each row from
+ * the next, and leaves nothing under the last. */
+
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+helix-headless-data-table {
+  display: block;
+}
+
+helix-headless-data-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--data-table-template, minmax(0, 1fr));
+  inline-size: 100%;
+  overflow-x: auto;
+}
+
+helix-headless-data-table::part(head),
+helix-headless-data-table::part(row) {
+  display: contents;
+}
+
+helix-headless-data-table::part(cell) {
+  border-block-start: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  padding: 0.75rem;
+}
+
+/* The heading takes no box of its own, so its heading cell is the grid item. */
+helix-headless-table-column {
+  display: contents;
+}
+
+helix-headless-table-column::part(column) {
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  min-block-size: 3rem;
+  min-inline-size: 0;
+  padding-inline-end: 1rem;
+}
+
+helix-headless-table-column::part(sort) {
+  all: unset;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 1;
+  gap: 0.25rem;
+  min-inline-size: 0;
+}
+
+helix-headless-data-table::part(empty),
+helix-headless-data-table::part(loading) {
+  grid-column: 1 / -1;
+}
+
+/* The pagination sits at the end of the row under the grid. Its own controls
+   are inside its shadow root and the table forwards none of them, so a
+   document sheet reaches the box and not what is in it: the row is laid out
+   here, and the pages inside it stay the platform's list and buttons. */
+helix-headless-data-table::part(footer) {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-block-start: 0.75rem;
+}
+
+helix-headless-data-table::part(pagination) {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+  margin-inline-start: auto;
+}
+
+/* The keyboard reaches the sort buttons, so the ring goes on them. Taking the
+   UA outline off without putting one back is the commonest way a headless
+   control stops being operable without a pointer. */
+helix-headless-table-column::part(sort):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}

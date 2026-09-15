@@ -10,11 +10,10 @@
  * rather than softened. The page is set in the system's sans-serif, which is
  * the page's decision and not the component's.
  *
- * **Grays, and only grays.** A headless example is a diagram, and color in a
- * diagram reads as meaning: a green cell says the day went well and a red one
- * says it did not, neither of which this tier has an opinion about. A neutral
- * ramp says nothing except which cell is heavier than which, which on a heatmap
- * is the whole job.
+ * **Grays, and only grays.** Color in an example reads as meaning: a green
+ * cell says the day went well and a red one says it did not, neither of which
+ * this tier has an opinion about. A neutral ramp says nothing except which
+ * cell is heavier than which, which on a heatmap is the whole job.
  *
  * Named by role rather than numbered, because a number implies a scale somebody
  * maintains and this is seven values in one file. Underscored, because they are
@@ -44,7 +43,7 @@
    reaches. The base tier turns a tone name into a `--heatmap-tone-*` reference
    and never resolves it, so a consumer answering in grays is the whole contract
    working: five steps that differ by weight, and three categories that differ by
-   nothing else, since a diagram cannot mean "danger".
+   nothing else, since a gray cannot mean "danger".
 
    The call is not spelled out here, because a stylesheet is read whole and
    prose quoting the substitution counts as a reader. */
@@ -71,19 +70,18 @@ helix-headless-heatmap {
    a template row and a column of it is an implicit track, and an implicit track
    left at `auto` stretches to fill whatever box the strip is in.
 
-   **8 and 2 are the base tier's own `min-cell` and `gap`**, and they are those
-   numbers because a sheet has to agree with the arithmetic that decides how many
-   cells there is room for. A consumer drawing a bigger cell than the one the
-   defaults describe gets a strip wider than its box, silently, and the count the
-   element publishes is wrong by the same ratio. This file is the smallest
-   demonstration of the contract: change one of these and change the attribute
-   beside it. */
+   **The cell and the gap are the styled tier's, and the count follows them.**
+   The element reads the track and the gap back from this box and plans how
+   many cells there is room for with what it finds, so a sheet drawing bigger
+   cells gets fewer of them rather than a strip wider than its box. Writing
+   `min-cell` or `gap` on the element overrides the reading, and then the two
+   have to agree by hand. */
 helix-headless-heatmap::part(strip) {
   display: grid;
-  gap: 2px;
-  grid-auto-columns: 8px;
+  gap: 0.25rem;
+  grid-auto-columns: 0.75rem;
   grid-auto-flow: column;
-  grid-template-rows: repeat(var(--heatmap-rows, 1), 8px);
+  grid-template-rows: repeat(var(--heatmap-rows, 1), 0.75rem);
   justify-content: start;
   /* The mark the tooltip hangs off is placed against this box. */
   position: relative;
@@ -120,10 +118,11 @@ helix-headless-heatmap::part(tooltip-label) {
    with no fill is not a quiet day, it is a hole. */
 helix-headless-heatmap::part(cell) {
   background-color: var(--heatmap-tone, var(--_gray-surface));
-  inline-size: 8px;
+  inline-size: 0.75rem;
 }
 
 helix-headless-heatmap::part(footer) {
+  align-items: baseline;
   color: var(--_gray-muted);
   display: grid;
   font-size: 0.75rem;
