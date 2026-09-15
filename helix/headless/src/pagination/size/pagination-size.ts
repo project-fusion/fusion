@@ -51,9 +51,29 @@ import '../../select/index.js'
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. The only way to refuse one.
  *
  * @csspart control - The select.
- * @csspart label - The words beside the number, forwarded from the select.
- * @csspart trigger - The closed control, forwarded from the select.
- * @csspart value - The chosen size inside the trigger, forwarded from the select.
+ * @csspart control-feedback - What is wrong with it.
+ * @csspart control-hint - Help under the trigger.
+ * @csspart control-indicator - The caret saying the control opens.
+ * @csspart control-label - The words beside the number.
+ * @csspart control-listbox - The list inside it.
+ * @csspart control-listbox-empty - Shown when a filter has hidden everything.
+ * @csspart control-listbox-feedback - What is wrong with the list.
+ * @csspart control-listbox-filter-icon - The mark beside the filter field.
+ * @csspart control-listbox-filter-mark - The glyph beside the filter field, where none is slotted.
+ * @csspart control-listbox-hint - Help under the list.
+ * @csspart control-listbox-items - The list itself.
+ * @csspart control-listbox-label - The question, over the list.
+ * @csspart control-listbox-loading - Shown while the options are still on their way.
+ * @csspart control-listbox-search - The region holding the field that narrows the list.
+ * @csspart control-listbox-search-field - The field itself.
+ * @csspart control-surface - The floating panel.
+ * @csspart control-trigger - The closed control, which says what size is chosen.
+ * @csspart control-value - The chosen size inside the trigger.
+ * @csspart option - One size on offer.
+ * @csspart option-description - The caption under the number, when there is one.
+ * @csspart option-item - The row.
+ * @csspart option-label - The number.
+ * @csspart option-text - The number and the caption, as one column.
  */
 @customElement('helix-headless-pagination-size')
 export class HelixHeadlessPaginationSize extends HelixElement {
@@ -189,13 +209,27 @@ export class HelixHeadlessPaginationSize extends HelixElement {
     const option = this.tag('option')
     return html`<${select}
       part="control"
-      exportparts="label, trigger, value"
+      exportparts="feedback: control-feedback, hint: control-hint, indicator: control-indicator,
+        label: control-label, listbox: control-listbox, listbox-empty: control-listbox-empty,
+        listbox-feedback: control-listbox-feedback, listbox-filter-icon: control-listbox-filter-icon,
+        listbox-filter-mark: control-listbox-filter-mark, listbox-hint: control-listbox-hint,
+        listbox-items: control-listbox-items, listbox-label: control-listbox-label,
+        listbox-loading: control-listbox-loading, listbox-search: control-listbox-search,
+        listbox-search-field: control-listbox-search-field, surface: control-surface,
+        trigger: control-trigger, value: control-value"
       label=${this.label}
       .value=${String(this.current)}
       @helix-before-change=${this.handleChange}
     >
       ${this.options.map(
-        (size) => html`<${option} value=${String(size)}>${this.numbers(size)}</${option}>`,
+        (size) =>
+          html`<${option}
+            part="option"
+            exportparts="description: option-description, item: option-item, label: option-label,
+              text: option-text"
+            value=${String(size)}
+            >${this.numbers(size)}</${option}
+          >`,
       )}
     </${select}>`
   }

@@ -65,6 +65,22 @@ import '../../menu/index.js'
  * @slot trigger - The control that opens the menu. A `Button` is the usual one.
  *
  * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: refusing it takes the decision and nothing moves.
+ *
+ * @csspart divider - The rule between a field's comparisons and its values.
+ * @csspart divider-content - What is set into the rule.
+ * @csspart divider-line - The rule itself.
+ * @csspart entry - One row: a field, its comparison, an operator or a value.
+ * @csspart entry-item - The row itself.
+ * @csspart entry-mark - The trailing mark: a tick on a chosen value, a caret on a field.
+ * @csspart entry-start - The leading column.
+ * @csspart menu - The menu the fields are offered in.
+ * @csspart menu-back - The control that returns from a field's page.
+ * @csspart menu-back-mark - The glyph on the back control.
+ * @csspart menu-empty - Shown when there are no fields to offer.
+ * @csspart menu-header - The bar above a field's page, holding the way back and its name.
+ * @csspart menu-loading - Shown while the fields are still on their way.
+ * @csspart menu-surface - The floating panel the menu is drawn on.
+ * @csspart menu-title - The name of the field whose page is showing.
  */
 @customElement('helix-headless-filter-menu')
 export class HelixHeadlessFilterMenu extends HelixElement {
@@ -271,7 +287,13 @@ export class HelixHeadlessFilterMenu extends HelixElement {
     const divider = this.tag('divider')
     const menu = this.tag('menu')
     const item = this.tag('menu-item')
-    return html`<${menu} label=${this.label} @helix-select=${this.handleSelect}>
+    return html`<${menu}
+      part="menu"
+      exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
+        loading: menu-loading, surface: menu-surface, title: menu-title"
+      label=${this.label}
+      @helix-select=${this.handleSelect}
+    >
       <slot name="trigger" slot="trigger"></slot>
       ${this.fields.map((field) => {
         const { label, name, operators, values } = field.vocabulary
@@ -282,7 +304,12 @@ export class HelixHeadlessFilterMenu extends HelixElement {
            choices that change nothing, and ticking one would say something the
            comparison cannot mean. */
         const offered = using?.arity === 'none' ? [] : values
-        return html`<${item} data-facet="field" data-field=${name}>
+        return html`<${item}
+          part="entry"
+          exportparts="item: entry-item, mark: entry-mark, start: entry-start"
+          data-facet="field"
+          data-field=${name}
+        >
           ${label}
           ${
             /* **A page of its own rather than a run of rows above the values.**
@@ -294,10 +321,18 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                somewhere a tick means one thing. A field with one comparison has
                nothing to choose and shows no row at all. */
             operators.length > 1
-              ? html`<${item} slot="submenu" data-facet="comparison" data-field=${name}>
+              ? html`<${item}
+                  part="entry"
+                  exportparts="item: entry-item, mark: entry-mark, start: entry-start"
+                  slot="submenu"
+                  data-facet="comparison"
+                  data-field=${name}
+                >
                   ${using?.label ?? ''}
                   ${operators.map(
                     (operator) => html`<${item}
+                      part="entry"
+                      exportparts="item: entry-item, mark: entry-mark, start: entry-start"
                       slot="submenu"
                       checkable
                       exclusive
@@ -318,11 +353,18 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                that happens to change halfway down. Only where there is a
                comparison to separate. */
             operators.length > 1 && offered.length > 0
-              ? html`<${divider} slot="submenu" announced></${divider}>`
+              ? html`<${divider}
+                  part="divider"
+                  exportparts="content: divider-content, line: divider-line"
+                  slot="submenu"
+                  announced
+                ></${divider}>`
               : nothing
           }
           ${offered.map(
             (option) => html`<${item}
+              part="entry"
+              exportparts="item: entry-item, mark: entry-mark, start: entry-start"
               slot="submenu"
               checkable
               ?exclusive=${using?.arity === 'one'}

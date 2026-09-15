@@ -142,6 +142,18 @@ const spoken = (message: Element): string =>
  * @csspart live - Where each settled turn is said, for a reader who cannot see it arrive.
  * @csspart loading - Shown while the history is still on its way.
  * @csspart log - The transcript, which is the thing that scrolls.
+ * @csspart message - A turn fed as data: the message drawn for it, forwarded whole.
+ * @csspart message-actions - The controls offered on a fed turn, beside its time.
+ * @csspart message-avatar - A fed turn's leading slot's box.
+ * @csspart message-body - What a fed turn said, and the line under it.
+ * @csspart message-content - A fed turn's text.
+ * @csspart message-indicator - A fed turn's default wait.
+ * @csspart message-mark - The status glyph beside a fed turn's failure.
+ * @csspart message-meta - The line under a fed turn: its time, its state, and its controls.
+ * @csspart message-retry - The control offered on a fed turn that failed.
+ * @csspart message-sources - What a fed turn was drawn from.
+ * @csspart message-state - What has happened to a fed turn, where that is worth saying.
+ * @csspart message-time - When a fed turn was said.
  * @csspart resume - The affordance offered while the reader is away from the bottom.
  * @csspart status - The status region, which is not part of the log.
  * @csspart turn - One turn fed as data, around the message drawn for it.
@@ -840,6 +852,10 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         (turn, offset) =>
           html`<div part="turn" data-index=${first + offset}>
             <${message}
+              exportparts="actions: message-actions, avatar: message-avatar, body: message-body,
+                content: message-content, indicator: message-indicator, mark: message-mark, message,
+                meta: message-meta, retry: message-retry, sources: message-sources,
+                state: message-state, time: message-time"
               author=${turn.author ?? nothing}
               at=${turn.at ?? nothing}
               state=${turn.state ?? nothing}

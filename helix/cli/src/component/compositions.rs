@@ -10,6 +10,12 @@
 //! living in `menu/item/`, so a directory lookup asks for a family called
 //! `menu-item`, finds none, and reports composition sites as having nothing to
 //! forward.
+//!
+//! **A tag held in a name is a composition too.** `const pagination =
+//! this.tag('pagination')` and then `<${pagination}>` is the form
+//! `static-html` asks for, and CONVENTIONS shows it. Reading only
+//! `<${this.tag(...)}` missed every one of them: Data Table rendered a
+//! pagination and forwarded none of its parts, and nothing said so.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -40,6 +46,16 @@ static COMPOSES: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"<\$\{this\.tag\(\s*['"]([a-z-]+)['"]\s*\)\}"#)
         .expect("a literal pattern compiles")
 });
+
+/// A tag bound to a name, for a template to open later.
+static BINDS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"\b(?:const|let)\s+(\w+)\s*=\s*this\.tag\(\s*['"]([a-z-]+)['"]\s*\)"#)
+        .expect("a literal pattern compiles")
+});
+
+/// An open tag whose name is interpolated from a variable.
+static OPENS: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"<\$\{\s*(\w+)\s*\}").expect("a literal pattern compiles"));
 
 static ROLE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r#"(?:^|\s)part="([a-z0-9-]+)""#).expect("a literal pattern compiles")
@@ -210,9 +226,16 @@ pub struct Site {
 
 /// Every site where a component renders another, with what it forwards.
 ///
-/// A site is `<${this.tag('child')} …>`, which is the only way a component may
-/// name another. The `part` on that element is the role the child plays here,
-/// and is what a forwarded name is prefixed with.
+/// A site is `<${this.tag('child')} …>`, or `<${name} …>` where `name` holds
+/// `this.tag('child')`, which are the only ways a component may name another.
+/// The `part` on that element is the role the child plays here, and is what a
+/// forwarded name is prefixed with.
+///
+/// **A tag handed to a shared helper is not followed.** `drawTooltip` opens
+/// `<${tag}>` for six charts, and the tag is the caller's argument: nothing in
+/// the helper's file says which element it is. It forwards by hand, under the
+/// `tooltip` its charts published before the prefix rule, beside the
+/// `tooltip-anchor` role that rule would take instead.
 pub fn compositions(context: &Context) -> Vec<Site> {
     let mut found = Vec::new();
     for tier in context.settings.roots(&context.root) {
@@ -223,9 +246,31 @@ pub fn compositions(context: &Context) -> Vec<Site> {
                 continue;
             };
             let code = uncommented(&text);
-            for one in COMPOSES.captures_iter(&code) {
+            let bound: Vec<(usize, String, String)> = BINDS
+                .captures_iter(&code)
+                .map(|one| {
+                    let at = one.get(0).expect("group zero always matches").start();
+                    (at, one[1].to_owned(), one[2].to_owned())
+                })
+                .collect();
+            /* The nearest binding above the site, which is the one in scope: two
+            methods binding `option` to two different tags is legal, and the file
+            order is what tells them apart. A name bound to nothing here is not a
+            Helix tag this file chose, and is left alone. */
+            let held = OPENS.captures_iter(&code).filter_map(|one| {
                 let whole = one.get(0).expect("group zero always matches");
-                let attributes = open_tag(&code, whole.end());
+                bound
+                    .iter()
+                    .rev()
+                    .find(|(at, name, _)| *at < whole.start() && name == &one[1])
+                    .map(|(_, _, child)| (whole.end(), child.clone()))
+            });
+            let inline = COMPOSES.captures_iter(&code).map(|one| {
+                let whole = one.get(0).expect("group zero always matches");
+                (whole.end(), one[1].to_owned())
+            });
+            for (end, child) in inline.chain(held).collect::<Vec<_>>() {
+                let attributes = open_tag(&code, end);
                 let mut forwarded = BTreeMap::new();
                 let raw = FORWARDS
                     .captures(&attributes)
@@ -239,8 +284,8 @@ pub fn compositions(context: &Context) -> Vec<Site> {
                     forwarded.insert(inner.to_owned(), outer.to_owned());
                 }
                 found.push(Site {
-                    at: whole.end(),
-                    child: one[1].to_owned(),
+                    at: end,
+                    child,
                     forwarded,
                     path: file.clone(),
                     role: ROLE.captures(&attributes).map(|two| two[1].to_owned()),

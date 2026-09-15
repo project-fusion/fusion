@@ -108,7 +108,7 @@ export const drawTooltip = (
       style=${styleMap({ insetBlockStart: place.y, insetInlineStart: place.x })}
     ></div>
     <${tag}
-      exportparts="tooltip"
+      exportparts="arrow: tooltip-arrow, tooltip"
       for="helix-chart-mark"
       open
       part="tooltip-anchor"
