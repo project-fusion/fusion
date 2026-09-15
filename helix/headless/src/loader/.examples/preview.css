@@ -44,10 +44,21 @@
   --_radius-panel: 0.75rem;
 }
 
+/* The host turns and the drawing reads the angle, so a slotted mark stays
+   upright: Chromium 132 finds no keyframes from a ::part() rule. */
+@property --_turn {
+  inherits: true;
+  initial-value: 0deg;
+  syntax: "<angle>";
+}
+
 /* A one-cell grid, so a slotted mark is centered over the circles with no
    offsets to keep in step with the size, and still inline, so a loader beside
-   text sits on the line with it. */
+   text sits on the line with it. The turn is what says busy: a still arc reads
+   as a broken one. A reader who asked for less motion gets a crawl rather than
+   a stop, for the same reason. */
 helix-headless-loader {
+  animation: loader-turn 0.8s linear infinite;
   color: var(--_gray-strong);
   display: inline-grid;
   flex-shrink: 0;
@@ -55,23 +66,21 @@ helix-headless-loader {
   vertical-align: middle;
 }
 
-/* The turn is what says busy: a still arc reads as a broken one. A reader who
-   asked for less motion gets a crawl rather than a stop, for the same reason. */
 helix-headless-loader::part(svg) {
-  animation: loader-turn 0.8s linear infinite;
   block-size: 1.5rem;
   grid-area: 1 / 1;
   inline-size: 1.5rem;
+  rotate: var(--_turn);
 }
 
 @keyframes loader-turn {
   to {
-    transform: rotate(1turn);
+    --_turn: 1turn;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  helix-headless-loader::part(svg) {
+  helix-headless-loader {
     animation-duration: 4s;
   }
 }

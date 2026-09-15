@@ -49,6 +49,12 @@ they are load-bearing: the first is how every token expresses both color modes
 in one declaration, and the second is how every overlay is drawn in the top
 layer.
 
+Chromium 132 has both and still misses two things a page's stylesheet can say
+through `::part()`, measured 15 Sep 2026: it ignores a range input's
+`::-webkit-slider-thumb` and `::-webkit-slider-runnable-track` after a part, and
+it looks for the `@keyframes` a `::part()` rule names inside the component's
+shadow root, so no animation starts; the headless examples use neither.
+
 `:state()` is the third and is deliberately not with them, because it does
 degrade: a component that cannot record a state keeps whatever its resting rule
 draws, so a checkbox is drawn unchecked rather than drawn wrong or not at all.

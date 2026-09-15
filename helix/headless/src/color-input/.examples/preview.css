@@ -266,29 +266,33 @@ helix-headless-color-input::part(picker-channel-field) {
   display: flex;
 }
 
-/* The platform's range input with its chrome taken off. Left alone it is the
-   browser's blue rail, which is the one color on the page. */
+/* The platform's range input with its chrome taken off, drawn as the track.
+   Left alone it is the browser's blue rail, which is the one color on the
+   page. One gray the whole length and no fill: on a hue rail the track is the
+   value rather than a measure of it. */
 helix-headless-color-input::part(picker-channel-control) {
+  /* Chromium 132 ignores ::part()::-webkit-slider-thumb: the input is the track, its accent the thumb. */
+  accent-color: var(--_gray-strong);
   appearance: none;
-  background: transparent;
+  background-color: var(--_gray-fill);
+  block-size: 0.75rem;
+  border-radius: 9999px;
   cursor: pointer;
   inline-size: 100%;
   margin: 0;
 }
 
-/* One gray the whole length and no fill: on a hue rail the track is the value
-   rather than a measure of it. Each engine's name is said on its own, since a
-   list holding a name one engine does not know is dropped whole. */
+/* The engines' own tracks stay clear, so the input is the whole of the track.
+   Each engine's name is said on its own, since a list holding a name one engine
+   does not know is dropped whole. */
 helix-headless-color-input::part(picker-channel-control)::-webkit-slider-runnable-track {
-  background-color: var(--_gray-fill);
+  background: none;
   block-size: 0.75rem;
-  border-radius: 9999px;
 }
 
 helix-headless-color-input::part(picker-channel-control)::-moz-range-track {
-  background-color: var(--_gray-fill);
+  background: none;
   block-size: 0.75rem;
-  border-radius: 9999px;
 }
 
 helix-headless-color-input::part(picker-channel-control)::-webkit-slider-thumb {
