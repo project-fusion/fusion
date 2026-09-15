@@ -185,7 +185,10 @@
   padding-block-start: var(--_code-block-gutter);
 }
 
-[part="header"] + [part="frame"] [part="split"] > * {
+/* Under a header, as code's block does. Restated because the rule above sets the
+   whole border at the same weight and later, so a unified diff under its name
+   drew a second edge and a rounded top. */
+[part="header"] + [part="frame"] :is([part="block"], [part="split"] > *) {
   border-block-start-width: var(--helix-space-none);
   border-start-end-radius: var(--helix-radii-none);
   border-start-start-radius: var(--helix-radii-none);
@@ -205,6 +208,14 @@
 @container (inline-size < 40rem) {
   [part="split"] {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Stacked, the new version stands under the old one rather than the header,
+     so it keeps its top edge and corners. */
+  [part="header"] + [part="frame"] [part="new"] {
+    border-block-start-width: var(--helix-border-thin);
+    border-start-end-radius: var(--code-block-radius, var(--helix-radii-lg));
+    border-start-start-radius: var(--code-block-radius, var(--helix-radii-lg));
   }
 
   /* Stacked, the button's band is the old version's alone, at the top. */

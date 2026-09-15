@@ -36,6 +36,17 @@ describe('the diff example', () => {
     expect(Math.round(added?.width ?? 0)).toBeGreaterThanOrEqual(Math.round((pre?.width ?? 0) - 2))
   })
 
+  run('under its name, the block draws no top edge or corner of its own', async () => {
+    await example(diff)
+    await idle()
+    const pre = getComputedStyle(block().shadowRoot?.querySelector('[part="block"]') as Element)
+    expect([pre.borderTopWidth, pre.borderTopLeftRadius, pre.borderTopRightRadius]).toEqual([
+      '0px',
+      '0px',
+      '0px',
+    ])
+  })
+
   run('an insertion is not underlined, since on code that reads as markup', async () => {
     await example(diff)
     await idle()
@@ -70,6 +81,17 @@ describe('the split example', () => {
     const old = root?.querySelector('[part="old"]')?.getBoundingClientRect()
     const now = root?.querySelector('[part="new"]')?.getBoundingClientRect()
     expect(now?.top).toBeGreaterThanOrEqual(old?.bottom ?? 0)
+  })
+
+  /* Only the version under the header gives its top edge to it. */
+  run('stacked, the new version keeps the top edge the old one gives the header', async () => {
+    await example(split)
+    block().style.inlineSize = '20rem'
+    await idle()
+    const root = block().shadowRoot
+    const edge = (name: string): string =>
+      getComputedStyle(root?.querySelector(`[part="${name}"]`) as Element).borderTopWidth
+    expect([edge('old'), edge('new')]).toEqual(['0px', '1px'])
   })
 })
 
