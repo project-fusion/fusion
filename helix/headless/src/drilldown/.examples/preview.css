@@ -146,6 +146,20 @@ helix-headless-drilldown-item::part(label) {
   white-space: nowrap;
 }
 
+/* The caret on a row that opens a page, in the quiet gray the Menu preview
+   draws its submenu caret in. The label grows, so the caret is at the end, and
+   it mirrors in a right-to-left document, a caret pointing where it goes. */
+helix-headless-drilldown-item::part(mark) {
+  block-size: 1rem;
+  color: var(--_gray-muted);
+  flex: none;
+  inline-size: 1rem;
+}
+
+helix-headless-drilldown-item:dir(rtl)::part(mark) {
+  scale: -1 1;
+}
+
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;

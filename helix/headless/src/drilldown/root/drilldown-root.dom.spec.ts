@@ -98,4 +98,25 @@ describe('drilldown', () => {
     await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
     expect(host.shadowRoot?.querySelector('[part="title"]')?.textContent?.trim()).toBe('Appearance')
   })
+
+  /* The row renders its page's slot in two places, beside the row and as the
+     page, and going in and out swaps one for the other. The slot thrown away
+     fires on its way out with nothing assigned, which is what cleared every
+     caret in `Menu` after one drill-in until it read the live slot instead. */
+  test('the row that opened a page still says so after coming back from it', async () => {
+    const host = await stack()
+    const appearance = host.querySelector('[value="appearance"]') as HTMLElement
+    const mark = () => appearance.shadowRoot?.querySelector('[part="mark"]') ?? null
+    expect(mark()).not.toBeNull()
+    expect(
+      host.querySelector('[value="about"]')?.shadowRoot?.querySelector('[part="mark"]'),
+    ).toBeNull()
+
+    await press(host, appearance)
+    host.back()
+    await host.updateComplete
+    await (appearance as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(mark()).not.toBeNull()
+  })
 })

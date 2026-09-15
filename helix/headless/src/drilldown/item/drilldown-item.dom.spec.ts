@@ -67,3 +67,56 @@ describe('one drilldown row', () => {
     expect(part(host, 'item')?.getAttribute('tabindex')).toBe('0')
   })
 })
+
+/**
+ * Whether a row says it goes somewhere.
+ *
+ * A row that opens a page and a row that runs a command were drawn identically,
+ * in both tiers, so the only way to learn which was which was to press one.
+ * `Menu` marks its rows with a submenu, and this is the same mark for the same
+ * fact.
+ */
+describe('a row that opens a page', () => {
+  const withPage = async (): Promise<Row> =>
+    (await mount(
+      `<helix-headless-drilldown-item value="appearance">
+        Appearance
+        <helix-headless-drilldown-item slot="page" value="theme">Theme</helix-headless-drilldown-item>
+      </helix-headless-drilldown-item>`,
+    )) as Row
+
+  /* Hidden from the accessibility tree, because the glyph says nothing a reader
+     can use and `aria-haspopup` says it in words. Inside the row, after the
+     `end` slot, so a count a consumer puts there sits before the caret. */
+  test('draws a caret at its end, and says it opens a menu', async () => {
+    const host = await withPage()
+    const mark = part(host, 'mark')
+    expect(mark?.localName).toBe('svg')
+    expect(mark?.getAttribute('aria-hidden')).toBe('true')
+    expect(mark?.parentElement).toBe(part(host, 'item') as HTMLElement)
+    expect(mark?.previousElementSibling?.getAttribute('name')).toBe('end')
+    expect(part(host, 'item')?.getAttribute('aria-haspopup')).toBe('menu')
+  })
+
+  test('a row with no page draws no caret and promises nothing', async () => {
+    const host = await row()
+    expect(part(host, 'mark')).toBeNull()
+    expect(part(host, 'item')?.hasAttribute('aria-haspopup')).toBe(false)
+  })
+
+  /* A page a framework fills after the row has drawn changes no property here,
+     so the row hears it from the slot the page is assigned to, which stays in
+     the row while the row is showing. */
+  test('a page arriving after the row has drawn still gets its caret', async () => {
+    const host = await row()
+    expect(part(host, 'mark')).toBeNull()
+    const child = document.createElement('helix-headless-drilldown-item')
+    child.slot = 'page'
+    child.textContent = 'Theme'
+    host.append(child)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(part(host, 'mark')).not.toBeNull()
+    expect(part(host, 'item')?.getAttribute('aria-haspopup')).toBe('menu')
+  })
+})

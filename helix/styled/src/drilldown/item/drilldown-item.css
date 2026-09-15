@@ -37,6 +37,25 @@
   white-space: nowrap;
 }
 
+/* The caret on a row that opens a page, drawn as `Menu` draws the one on a row
+   with a submenu: sixteen pixels in the quiet ink, so it reads as a mark about
+   the row rather than as one of its words. `-tight`, because the menu's
+   surface moves the icon step down to `sm` and this region does not, and it is
+   the step the back control's caret is drawn at, so the two carets on a page
+   are one size. The row's gap is the seam before it, and the label's growth is
+   what puts it at the end. */
+[part="mark"] {
+  block-size: var(--helix-size-icon-tight);
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+  inline-size: var(--helix-size-icon-tight);
+}
+
+/* A caret is physical and the thing it points at is not. */
+:host(:dir(rtl)) [part="mark"] {
+  scale: -1 1;
+}
+
 :host(:not([disabled])) [part="item"]:hover {
   background-color: var(
     --drilldown-item-hover-color,

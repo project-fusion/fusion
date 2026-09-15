@@ -1,6 +1,8 @@
 import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
-import { html, nothing, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { caretRight } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary One row of a drill-down, which may hold a page of its own.
@@ -20,6 +22,11 @@ import { property } from 'lit/decorators.js'
  * Choosing is announced, never applied. The row dispatches and the stack
  * decides whether that means drilling in or choosing a command.
  *
+ * **A row that opens a page says so**, with a caret after its words and
+ * `aria-haspopup`, the way `Menu` marks a row with a submenu: a row that goes
+ * somewhere and a row that does something otherwise look the same until one is
+ * pressed. Not on the server, which cannot see the children and so cannot know.
+ *
  * @since 0.1.0
  * @status experimental
  * @aliases Panel item, Drill row
@@ -34,6 +41,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart item - The row itself.
  * @csspart label - The words.
+ * @csspart mark - The caret at the end of a row that opens a page, after the `end` slot. A caret points, so a sheet mirrors it in a right-to-left document.
  */
 @customElement('helix-headless-drilldown-item')
 export class HelixHeadlessDrilldownItem extends HelixElement {
@@ -88,6 +96,51 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   @property()
   value = ''
 
+  /**
+   * Whether anything is slotted into `page`.
+   *
+   * State rather than a getter over `children`, for the reason `Menu.Item`
+   * backs `hasSubmenu` the same way: a getter is read during `render()` with
+   * nothing to re-read it, so a page a framework fills after the row's first
+   * render would open with no caret on the row that leads to it.
+   */
+  @state()
+  private page = false
+
+  /**
+   * Reads the children before each render, where they can be known.
+   *
+   * Not on the server, where there are none to read, nor while hydrating what
+   * one sent, whose row carried no caret. `finishHydration` asks for the read
+   * that skipped.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (this.childrenKnown) {
+      this.page = this.knownChildren.some((child) => child.slot === 'page')
+    }
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
+  /**
+   * Re-reads whether a page is slotted, from whichever `page` slot is current.
+   *
+   * Bound in the template, on both of them. The row and the page it opens each
+   * render a `slot[name="page"]`, and moving between them makes Lit build a new
+   * slot and throw the old one away, which fires on its way out with nothing
+   * assigned: a listener on the discarded one would clear the caret on every row
+   * that has been drilled into and back out of. `Menu.Item.readSubmenu` carries
+   * the same note.
+   */
+  private readonly readPage = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="page"]')
+    this.page = (slot?.assignedElements().length ?? 0) > 0
+  }
+
   /** Moves focus onto the row itself. */
   focusItem(): void {
     this.partNamed('item')?.focus()
@@ -103,7 +156,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
 
   protected override render(): TemplateResult | typeof nothing {
     if (this.showingPage) {
-      return html`<slot name="page"></slot>`
+      return html`<slot name="page" @slotchange=${this.readPage}></slot>`
     }
     if (!this.onPage) {
       return nothing
@@ -120,19 +173,33 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
      * items by one role and the kind of them by the other.
      *
      * `aria-disabled` rather than `disabled`, so a row that cannot be chosen is
-     * still reachable and still announces why. `select()` is what refuses. */
+     * still reachable and still announces why. `select()` is what refuses.
+     *
+     * The page's slot stays while the row shows, in a hidden box, so a page
+     * that arrives later is heard and the caret follows it. Nothing in it
+     * paints: its rows are not on the page showing and draw nothing, and
+     * anything else in it is hidden with the box. */
     return html`<button
       part="item"
       type="button"
       role="menuitem"
       aria-disabled=${this.disabled ? 'true' : nothing}
+      aria-haspopup=${this.page ? 'menu' : nothing}
       tabindex=${this.focusable ? '0' : '-1'}
       @click=${() => this.select()}
     >
       <slot name="start"></slot>
       <span part="label"><slot></slot></span>
       <slot name="end"></slot>
-    </button>`
+      ${
+        this.page
+          ? html`<svg part="mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+              ${unsafeSVG(caretRight.content)}
+            </svg>`
+          : nothing
+      }
+    </button>
+    <div hidden><slot name="page" @slotchange=${this.readPage}></slot></div>`
   }
 }
 
