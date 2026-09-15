@@ -71,16 +71,23 @@ helix-headless-textarea::part(field):hover {
   border-color: var(--_gray-line);
 }
 
+/* Reset by name: `all: unset` would also undo the height the resize grip writes. */
 helix-headless-textarea::part(control) {
-  all: unset;
+  appearance: none;
+  background: none;
+  border: 0;
   box-sizing: border-box;
   color: var(--_gray-strong);
   flex: 1 1 auto;
+  font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.5;
+  margin: 0;
   min-inline-size: 0;
+  outline: none;
   overflow-wrap: break-word;
+  padding: 0;
   resize: vertical;
   white-space: pre-wrap;
 }
