@@ -12,9 +12,12 @@
   box-shadow: 0 0 0 100vmax var(--tour-scrim-color, var(--helix-color-overlay));
   pointer-events: none;
   position: fixed;
+  /* `left` and `top`, which are what the root writes: the box is measured
+     from the viewport's left edge, so it is placed from it in either
+     direction. */
   transition:
-    inset-block-start var(--helix-duration-normal) var(--helix-easing-standard),
-    inset-inline-start var(--helix-duration-normal) var(--helix-easing-standard),
+    left var(--helix-duration-normal) var(--helix-easing-standard),
+    top var(--helix-duration-normal) var(--helix-easing-standard),
     block-size var(--helix-duration-normal) var(--helix-easing-standard),
     inline-size var(--helix-duration-normal) var(--helix-easing-standard);
   z-index: var(--helix-layer-overlay);

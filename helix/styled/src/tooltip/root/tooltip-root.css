@@ -84,20 +84,25 @@
   color: var(--helix-color-foreground);
 }
 
+/* The edge facing the trigger, and physical, because a placement is: `right`
+   puts the bubble to the right of its trigger in either direction, so its
+   point is on the bubble's left. Written as `inset-inline-start` it hung off
+   the far side on a right-to-left page and pointed away. The controller writes
+   the other axis, measured from the left and top. */
 [part="tooltip"][data-placement^="bottom"] [part="arrow"] {
-  inset-block-start: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
+  top: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
 }
 
 [part="tooltip"][data-placement^="top"] [part="arrow"] {
-  inset-block-end: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
+  bottom: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
 }
 
 [part="tooltip"][data-placement^="right"] [part="arrow"] {
-  inset-inline-start: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
+  left: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
 }
 
 [part="tooltip"][data-placement^="left"] [part="arrow"] {
-  inset-inline-end: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
+  right: calc(var(--tooltip-arrow-size, 0.5rem) / -2);
 }
 
 /* It grows out of its own point, so a tooltip above its trigger expands downward

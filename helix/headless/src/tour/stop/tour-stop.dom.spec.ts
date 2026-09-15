@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -95,8 +95,14 @@ if (hasLayout()) {
     <div id="band"></div>
     <div id="post"></div>`
 
+  /* The direction on the root rather than on a wrapper, because the bubble is
+     in the top layer and laid out against the viewport, whose direction is the
+     root's. Under a `<div dir="rtl">` in an English page a panel placed from
+     the wrong edge still landed, so a wrapper proved nothing: on a page that
+     was right-to-left from the root, every stop sat a window's width out. */
   const placed = async (stop: string, direction = 'ltr'): Promise<Stop> => {
-    await mount(`<div dir="${direction}">${stop}${FIXTURE}</div>`)
+    document.documentElement.dir = direction
+    await mount(`<div>${stop}${FIXTURE}</div>`)
     const host = document.querySelector('helix-headless-tour-stop') as Stop
     await host.updateComplete
     /* `computePosition` resolves after the update, and `autoUpdate` places once
@@ -116,6 +122,10 @@ if (hasLayout()) {
     `<helix-headless-tour-stop current for="${target}" placement="right-start">Here.</helix-headless-tour-stop>`
 
   describe('a stop placed beside its target', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
     test('stays beside it where there is room', async () => {
       const host = await placed(beside('post'))
       const { bubble, target } = boxes(host)
@@ -150,6 +160,18 @@ if (hasLayout()) {
       const rtl = await placed(beside('band'), 'rtl')
       expect(part(rtl, 'bubble')?.getAttribute('data-placement')).toBe('bottom-start')
       expect(Math.round(boxes(rtl).bubble.right)).toBe(Math.round(boxes(rtl).target.right))
+    })
+
+    /* The preview's first stop, mirrored: a rail at the start of a
+       right-to-left page is at its right, so the right of it is the window's
+       edge and the stop crosses to the left, saying so for its arrow. */
+    test('crosses to the other side of a target at the start of a right-to-left page', async () => {
+      const host = await placed(beside('post'), 'rtl')
+      const { bubble, target } = boxes(host)
+      expect(part(host, 'bubble')?.getAttribute('data-placement')).toBe('left-start')
+      expect(bubble.right).toBeLessThanOrEqual(target.left)
+      expect(bubble.left).toBeGreaterThanOrEqual(0)
+      expect(hasState(host, 'placed-left')).toBe(true)
     })
   })
 }
