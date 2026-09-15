@@ -9,6 +9,7 @@ beforeAll(async () => {
 type Column = HTMLElement & {
   align?: string
   isTableColumn: boolean
+  sortable: boolean
   track: string
   updateComplete: Promise<boolean>
   width: string
@@ -76,5 +77,19 @@ describe('one table column', () => {
     host.align = 'end'
     await host.updateComplete
     expect(host.getAttribute('align')).toBe('end')
+  })
+
+  /* The same fault on the next property: a data table's sheet gives a sortable
+     heading its pointer by the attribute, and a column React made sortable had
+     none. Taken away, it goes, so the pointer does not outlive the sort. */
+  test('says it is sortable on its host, however that was set', async () => {
+    const host = await column()
+    expect(host.hasAttribute('sortable')).toBe(false)
+    host.sortable = true
+    await host.updateComplete
+    expect(host.hasAttribute('sortable')).toBe(true)
+    host.sortable = false
+    await host.updateComplete
+    expect(host.hasAttribute('sortable')).toBe(false)
   })
 })
