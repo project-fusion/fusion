@@ -1338,10 +1338,12 @@ direction: React writes the property and no attribute appears, so `:host([max])`
 `:host(:not([href]))` and `:host(:not([no-copy]))` match the wrong way round and
 the component works while looking wrong. Four had drifted, three of them found by
 rendering pictures rather than by reading. `helix component`'s `reachable` reads
-every host-attribute selector against whether its property reflects, and it is the
-third check on that one rule: `reflected` and `reflected-defaults`
-both ask about properties that already reflect, and neither notices one that
-should and does not.
+every attribute selector on a host, or on an element a sheet slots, against
+whether its property reflects, and it is the third check on that one rule:
+`reflected` and `reflected-defaults` both ask about properties that already
+reflect, and neither notices one that should and does not. A fifth had drifted
+where it did not look: Data Table's `::slotted(helix-table-column[sortable])`
+gave no pointer to a column React made sortable.
 
 `useHelixEvent` is deleted. It existed to bind from an effect because the prop
 did not survive hydration, and all twenty-one of its call sites were binding to

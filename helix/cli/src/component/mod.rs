@@ -658,7 +658,7 @@ pub fn all() -> Vec<Rule> {
             fix: None,
             name: "reachable",
             run: Runner::Source(reachable::run),
-            summary: "every attribute a stylesheet selects on the host reflects from a property",
+            summary: "every attribute a stylesheet selects on a host or a slotted element reflects",
         },
         Rule {
             fix: None,

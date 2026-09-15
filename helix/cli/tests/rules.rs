@@ -1388,6 +1388,47 @@ fn reachable() {
     );
 }
 
+/// The selector is in one family's sheet and the property in another's: the
+/// attribute belongs to whichever family registers the tag the `::slotted()`
+/// names. A slotted tag nobody registers is a consumer's, and is not asked
+/// about.
+#[test]
+fn reachable_slotted() {
+    let column = |options: &str| {
+        format!(
+            "@customElement('x-column')
+export class Column extends HTMLElement {{
+  @property({options})
+  sortable = false
+}}
+"
+        )
+    };
+    let tree = Tree::new("reachable-through-a-slot");
+    tree.write("helix.json", TIERS)
+        .write(
+            "src/grid/grid.css",
+            "::slotted(x-column[sortable]) {\n  cursor: pointer;\n}\n\
+             ::slotted(y-theirs[sortable]) {\n  cursor: pointer;\n}\n",
+        )
+        .write(
+            "src/grid/grid.ts",
+            "export class Grid extends HTMLElement {}\n",
+        )
+        .write(
+            "src/table/column.ts",
+            &column("{ reflect: true, type: Boolean }"),
+        );
+    assert_clean("reachable", &judge(&tree, "reachable", "reachable"));
+    tree.write("src/table/column.ts", &column("{ type: Boolean }"));
+    assert_found(
+        "reachable",
+        &judge(&tree, "reachable", "reachable"),
+        "table: `sortable` is selected on by CSS, and `sortable` does not reflect",
+        "src/table/column.ts",
+    );
+}
+
 /// Exactly two files: the last `layer` sheet and, hardcoded under the last
 /// `layers` source, `button/root/button-root.css`.
 #[test]
