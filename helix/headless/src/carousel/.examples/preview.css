@@ -38,70 +38,127 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+/* A frame around the track, and each group of chrome placed on a side of it:
+   the slides in the middle cell, and the dots and the arrows sharing the row
+   beneath, the dots at the start and the arrows at the end. */
+helix-headless-carousel {
+  display: grid;
+  font-size: 0.875rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  line-height: 1.5;
 }
 
-helix-headless-carousel::part(controls) {
+/* The track is the scroller the slides sit in, not a slider's bar: a row that
+   scrolls and snaps, which is the minimum a carousel is. Without the snap the
+   slides are a list that happens to overflow. Inset on the inline axis so a
+   slide's edge is not flush with the frame's. */
+helix-headless-carousel::part(track) {
+  display: flex;
+  gap: 1rem;
+  grid-area: 2 / 2;
+  overflow-x: auto;
+  padding: 1rem;
+  scroll-padding-inline: 1rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+/* One slide per view, this tier having no `per-view` arithmetic to do. */
+helix-headless-carousel::part(slide) {
+  display: flex;
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+/* The slide fills its pane, and has to be told to. */
+helix-headless-carousel > * {
+  flex: 1 1 0;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+/* The slides here are cards, framed as the styled preview frames them. */
+helix-headless-card {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-muted);
+  display: block;
+  padding: 1rem;
+}
+
+helix-headless-carousel::part(controls),
+helix-headless-carousel::part(indicators) {
   align-items: center;
   display: flex;
   gap: 0.25rem;
+  grid-area: 3 / 2;
+  padding: 0.75rem 1rem 0;
 }
 
-helix-headless-carousel::part(next) {
+helix-headless-carousel::part(indicators) {
+  justify-self: start;
+}
+
+helix-headless-carousel::part(controls) {
+  justify-self: end;
+}
+
+helix-headless-carousel::part(previous),
+helix-headless-carousel::part(next),
+helix-headless-carousel::part(rotation) {
   all: unset;
+  align-items: center;
+  block-size: 2rem;
+  border: 1px solid var(--_gray-line);
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-flex;
+  inline-size: 2rem;
+  justify-content: center;
 }
 
-helix-headless-carousel::part(next-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-carousel::part(previous):hover,
+helix-headless-carousel::part(next):hover,
+helix-headless-carousel::part(rotation):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
-helix-headless-carousel::part(previous) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-helix-headless-carousel::part(previous-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
+helix-headless-carousel::part(previous-mark),
+helix-headless-carousel::part(next-mark),
 helix-headless-carousel::part(rotation-mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
-/* The track is the scroller the slides sit in, not a slider's bar: a row that
-   scrolls and snaps, which is the minimum a carousel is. Without the snap the
-   slides are a list that happens to overflow. `flex: 0 0 100%` is one slide per
-   view, this tier having no `per-view` arithmetic to do and no token to do it
-   with. */
-helix-headless-carousel::part(track) {
-  background-color: transparent;
-  block-size: auto;
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
+/* Dots, which are round rather than softened. The current one cannot be told
+   apart from here: the component marks it with `aria-current` and
+   `data-current` on the button, and an attribute selector after `::part()` is
+   dropped at parse time, so every dot is drawn alike. */
+helix-headless-carousel::part(indicator) {
+  all: unset;
+  background-color: var(--_gray-line);
+  block-size: 0.5rem;
+  border-radius: 50%;
+  box-sizing: border-box;
+  cursor: pointer;
+  inline-size: 0.5rem;
 }
 
-helix-headless-carousel > * {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
+helix-headless-carousel::part(indicator):hover {
+  background-color: var(--_gray-muted);
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+/* The keyboard reaches these, so the ring goes on them. Taking the UA outline
+   off without putting one back is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-carousel::part(previous):focus-visible,
+helix-headless-carousel::part(next):focus-visible,
+helix-headless-carousel::part(rotation):focus-visible,
+helix-headless-carousel::part(indicator):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }

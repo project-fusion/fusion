@@ -38,25 +38,21 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-/* A column, which is what a group of checkboxes is. Left to normal flow the
-   boxes and their labels run together as inline content and the group reads as
-   a paragraph rather than a set. */
+/* The host is the stack: a name, the set, and one line under it. */
 helix-headless-checkbox-group {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* Above the set, with a step of its own under it. */
 helix-headless-checkbox-group::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
 }
 
 /* A column of options, which is what a group of checkboxes is. Left as a
@@ -67,54 +63,89 @@ helix-headless-checkbox-group::part(items) {
   align-items: start;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+}
+
+helix-headless-checkbox-group::part(hint),
+helix-headless-checkbox-group::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
 }
 
 helix-headless-checkbox-group::part(hint) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
 }
 
 helix-headless-checkbox-group::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  color: var(--_gray-strong);
+  font-weight: 500;
+}
+
+/* Each option is the checkbox's own sheet again: the box, the tick over it and
+   the words beside it. */
+helix-headless-checkbox {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 helix-headless-checkbox::part(field) {
   align-items: center;
-  display: flex;
+  cursor: pointer;
+  display: inline-flex;
   gap: 0.5rem;
 }
 
+helix-headless-checkbox::part(box) {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+
+/* The input, painted rather than replaced: leave it at `appearance: auto` and
+   the browser's own box, blue tick and all, is what a reader sees. */
 helix-headless-checkbox::part(control) {
-  font: inherit;
+  appearance: none;
+  background-color: transparent;
+  block-size: 1.25rem;
+  border: 1px solid var(--_gray-line);
+  cursor: inherit;
+  grid-area: 1 / 1;
+  inline-size: 1.25rem;
+  margin: 0;
+}
+
+helix-headless-checkbox:not(:disabled):hover::part(control) {
+  border-color: var(--_gray-muted);
+}
+
+/* A tick with no asset and no icon set, over the input in the same cell. */
+helix-headless-checkbox::part(mark) {
+  block-size: 0.75rem;
+  clip-path: polygon(14% 44%, 0 65%, 40% 100%, 100% 16%, 84% 0, 39% 62%);
+  grid-area: 1 / 1;
+  inline-size: 0.75rem;
+  pointer-events: none;
+}
+
+helix-headless-checkbox:state(checked)::part(control) {
+  border-color: var(--_gray-strong);
+}
+
+helix-headless-checkbox:state(checked)::part(mark) {
+  background-color: var(--_gray-strong);
 }
 
 helix-headless-checkbox::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
-helix-headless-checkbox::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-checkbox::part(hint) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-checkbox::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-checkbox:disabled {
+  opacity: 0.5;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

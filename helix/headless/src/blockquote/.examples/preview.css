@@ -38,28 +38,31 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+/* The quotation is set large and a step back from full strength, with no rule
+   beside it: the size is what says "quoted". Written on the host because the
+   words are slotted straight in, and the footer below takes itself back down
+   to body size. */
+helix-headless-blockquote {
+  color: var(--_gray-muted);
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 helix-headless-blockquote::part(blockquote) {
-  border-inline-start: 2px solid var(--_gray-line);
   display: block;
   margin: 0;
-  padding-inline-start: 0.75rem;
 }
 
+/* Room to be a separate thing. */
 helix-headless-blockquote::part(attribution) {
   color: var(--_gray-muted);
   display: block;
-  margin-block-start: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.5;
+  margin-block-start: 0.75rem;
 }

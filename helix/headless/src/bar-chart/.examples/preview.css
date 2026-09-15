@@ -38,34 +38,57 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+/* Out of sight and still in the accessibility tree: the table is what the
+   chart reads and what a screen reader reads, and the columns are the picture
+   of it. Never `display: none`, which would take it from both. */
+[data-hidden-visually] {
+  block-size: 1px;
+  border: 0;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+}
+
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
+/* A grid of two rows, the drawing and the words under it, so the labels line
+   up with the columns without either knowing the other's size. Several series
+   take several steps of the ramp, darkest first. */
 helix-headless-bar-chart {
-  --chart-series-1: light-dark(#2a2a2e, #e9e9ec);
-  --chart-series-2: light-dark(#4a4a50, #c9c9ce);
-  --chart-series-3: light-dark(#6b6b73, #a1a1aa);
-  --chart-series-4: light-dark(#8e8e96, #86868f);
-  --chart-series-5: light-dark(#b1b1b8, #63636b);
-  --chart-series-6: light-dark(#d2d2d7, #45454b);
+  --chart-series-1: var(--_gray-strong);
+  --chart-series-2: var(--_gray-muted);
+  --chart-series-3: var(--_gray-mark);
+  --chart-series-4: var(--_gray-line);
+  --chart-series-5: var(--_gray-fill);
+  --chart-series-6: var(--_gray-subtle);
+
+  display: grid;
+  font-size: 0.875rem;
+  gap: 0.25rem;
+  position: relative;
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+/* A bounded height: the drawing fills its box, and a box nobody sized is as
+   tall as the page lets it be. */
+helix-headless-bar-chart::part(plot) {
+  block-size: 12em;
+  cursor: crosshair;
+  position: relative;
 }
 
-helix-headless-bar-chart::part(axis) {
-  stroke: var(--_gray-line);
-}
-
-helix-headless-bar-chart::part(band) {
-  stroke: var(--_gray-fill);
+helix-headless-bar-chart::part(svg) {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  overflow: visible;
 }
 
 helix-headless-bar-chart::part(bar) {
@@ -74,58 +97,96 @@ helix-headless-bar-chart::part(bar) {
 
 helix-headless-bar-chart::part(baseline) {
   stroke: var(--_gray-line);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
 }
 
 helix-headless-bar-chart::part(gridline) {
-  stroke: var(--_gray-fill);
+  stroke: var(--_gray-line);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
 }
 
-helix-headless-bar-chart::part(group) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
-helix-headless-bar-chart::part(label) {
-  fill: var(--_gray-muted);
-  font-size: 0.75rem;
-}
-
-helix-headless-bar-chart::part(labels) {
-  fill: var(--_gray-muted);
-  font-size: 0.75rem;
+helix-headless-bar-chart::part(band) {
+  fill: var(--_gray-subtle);
 }
 
 helix-headless-bar-chart::part(line) {
   fill: none;
   stroke: var(--chart-series, var(--chart-series-1));
-  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2px;
   vector-effect: non-scaling-stroke;
 }
 
-helix-headless-bar-chart::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+/* The names in a row of equal columns, one under each group. */
+helix-headless-bar-chart::part(labels) {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
 }
 
-helix-headless-bar-chart::part(svg) {
-  display: block;
-  inline-size: 100%;
+helix-headless-bar-chart::part(label) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+helix-headless-bar-chart::part(axis) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  position: relative;
 }
 
 helix-headless-bar-chart::part(tick) {
-  stroke: var(--_gray-line);
+  position: absolute;
 }
 
+helix-headless-bar-chart::part(mark) {
+  block-size: 1px;
+  inline-size: 1px;
+  pointer-events: none;
+  position: absolute;
+}
+
+helix-headless-bar-chart::part(tooltip-anchor) {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* The bubble is the page inverted, the way a tooltip is. */
 helix-headless-bar-chart::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+  background-color: var(--_gray-strong);
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
 }
 
-helix-headless-icon::part(svg) {
+helix-headless-bar-chart::part(tooltip-label) {
   display: block;
-  inline-size: 100%;
+  font-weight: 500;
+  margin-block-end: 0.25rem;
+}
+
+helix-headless-bar-chart::part(tooltip-cell) {
+  align-items: baseline;
+  column-gap: 0.75rem;
+  display: grid;
+  grid-template-columns: 0.5em minmax(0, 1fr) auto;
+}
+
+helix-headless-bar-chart::part(tooltip-name) {
+  grid-column: 2;
+}
+
+helix-headless-bar-chart::part(tooltip-value) {
+  font-variant-numeric: tabular-nums;
+  grid-column: 3;
 }

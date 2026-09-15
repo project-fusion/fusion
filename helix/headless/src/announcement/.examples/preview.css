@@ -38,45 +38,76 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* A band across the page, filled, bounded beneath only because the page's own
+   edges bound the other three sides. One height whether or not an action is
+   slotted: the floor is a small control plus the padding. */
 helix-headless-announcement {
   align-items: center;
+  background-color: var(--_gray-subtle);
   border-block-end: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
   display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  inline-size: 100%;
+  line-height: 1.5;
+  min-block-size: 3rem;
+  padding: 0.5rem 1.5rem;
+  position: relative;
+}
+
+/* A tone is meaning rather than styling, so it survives the monotone as a step
+   up the ramp instead of as a hue. */
+helix-headless-announcement[tone]:not([tone="neutral"]) {
+  background-color: var(--_gray-fill);
+}
+
+helix-headless-announcement::part(content) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  text-align: center;
 }
 
 helix-headless-announcement::part(actions) {
   align-items: center;
   display: flex;
-  gap: 0.25rem;
+  flex: none;
+  gap: 0.5rem;
 }
 
+helix-headless-announcement [slot="actions"] {
+  margin-inline-start: 1rem;
+}
+
+/* Out of flow, so the message is centered on the band and not on whatever is
+   left beside the control. */
 helix-headless-announcement::part(dismiss) {
   all: unset;
+  align-items: center;
+  block-size: 1.5rem;
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-flex;
+  inline-size: 1.5rem;
+  inset-inline-end: 1.5rem;
+  justify-content: center;
+  position: absolute;
+}
+
+helix-headless-announcement::part(dismiss):hover {
+  background-color: var(--_gray-line);
+  color: var(--_gray-strong);
+}
+
+helix-headless-announcement::part(dismiss):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }
 
 helix-headless-announcement::part(dismiss-mark) {
-  block-size: 1em;
+  block-size: 1rem;
   flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-announcement::part(content) {
-  flex: 1;
+  inline-size: 1rem;
 }

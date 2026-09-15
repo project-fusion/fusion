@@ -38,33 +38,127 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* No rule beneath it at rest, and no fill of its own: the bar is the page's
+   ground until something scrolls under it. */
 helix-headless-app-header {
-  border-block-end: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
   display: block;
+  font-size: 0.875rem;
+  inline-size: 100%;
+  line-height: 1.5;
 }
 
+/* Equal outer tracks put the middle of the navigation at the middle of the
+   bar and keep it there, whatever the brand and the actions measure. */
 helix-headless-app-header::part(row) {
-  background-color: transparent;
-  border: 0;
+  align-items: center;
+  block-size: 3.5rem;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr auto 1fr;
+  margin-inline: auto;
+  max-inline-size: 72rem;
+  padding-inline: 1.5rem;
 }
 
+helix-headless-app-header::part(start) {
+  align-items: center;
+  display: flex;
+  min-inline-size: 0;
+}
+
+helix-headless-app-header [slot="start"] {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+helix-headless-app-header::part(content) {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-inline-size: 0;
+}
+
+helix-headless-app-header::part(end) {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  min-inline-size: 0;
+}
+
+helix-headless-navigation::part(nav) {
+  align-items: center;
+  block-size: 2rem;
+  display: flex;
+  gap: 0.25rem;
+  min-inline-size: 0;
+  overflow-x: auto;
+  position: relative;
+}
+
+/* Destinations, not prose links: no underline, muted until current. */
+helix-headless-navigation a {
+  align-items: center;
+  block-size: 100%;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding-inline: 0.75rem;
+  position: relative;
+  text-decoration: none;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+helix-headless-navigation a:hover {
+  color: var(--_gray-strong);
+}
+
+helix-headless-navigation a[aria-current="page"] {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-navigation a:focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+/* The quiet fill behind the current destination. The component measures where
+   that is and publishes it; the fill, and its sitting behind the text, are
+   this sheet's. */
+helix-headless-navigation::part(indicator) {
+  background-color: var(--_gray-subtle);
+  block-size: var(--indicator-block-size, 0);
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  position: absolute;
+  translate: var(--indicator-x, 0) -50%;
+  z-index: 0;
+}
+
+/* A ghost at rest: a bar of framed squares is a bar of boxes. */
 helix-headless-icon-button::part(button) {
-  all: unset;
+  align-items: center;
+  background-color: transparent;
+  block-size: 2rem;
+  border: 1px solid transparent;
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  inline-size: 2rem;
+  justify-content: center;
+  padding: 0;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-icon-button::part(button):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -75,15 +169,15 @@ helix-headless-icon-button::part(button):focus-visible {
   outline-offset: 2px;
 }
 
-helix-headless-app-header::part(row) {
-  align-items: center;
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  min-block-size: 3rem;
-  padding: 0 0.75rem;
+helix-headless-icon {
+  block-size: 1rem;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1rem;
 }
 
-helix-headless-app-header::part(content) {
-  flex: 1;
+helix-headless-icon::part(svg) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
 }

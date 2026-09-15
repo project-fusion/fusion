@@ -1,13 +1,34 @@
-/* What the headless tier asks a consumer to write.
+/* What the headless tier asks a consumer to write for Checkbox.
+ *
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
+ * says primary and a red one says danger, and this tier holds no such opinion.
+ * A neutral ramp says only where one surface ends and the next begins.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
+ *
+ * A part with no rule below is one the platform already renders acceptably, and
+ * a wrong rule is worse than none: paint a checkbox but leave the input at
+ * `appearance: auto` and the browser draws its own control over everything
+ * written for it.
  *
  * `helix-headless-checkbox` ships a real `<input type="checkbox">`, its label, its
  * ARIA and its form participation, and no appearance at all. Everything below
  * is the part you own.
- *
- * Deliberately skeletal. No color beyond `currentColor`, no type ramp and no
- * token, because this is a diagram of what has to be styled rather than a theme
- * to copy: `@fusion.dev/helix` is the theme, and a second one growing inside an
- * example would be a design system nobody decided on.
  *
  * **The input is the box.** Paint `box` and leave the input alone and the
  * browser draws its own control beside the frame: what a reader sees is the UA
@@ -18,16 +39,30 @@
  * Parts are the interface. `::part()` is the published door into a shadow root,
  * so nothing here depends on the component's internal structure. */
 
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+/* The row, and the hint under it. */
 helix-headless-checkbox {
-  display: block;
-  margin-block-end: 0.75rem;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 /* The row the control and its label share. */
 helix-headless-checkbox::part(field) {
   align-items: center;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   gap: 0.5rem;
 }
 
@@ -35,18 +70,25 @@ helix-headless-checkbox::part(field) {
    with no offsets to keep in step. */
 helix-headless-checkbox::part(box) {
   display: grid;
+  flex: none;
   place-items: center;
 }
 
-/* The input, painted rather than replaced. */
+/* The input, painted rather than replaced: the page's own ground inside a
+   hairline, so the box reads as a hole rather than a button. */
 helix-headless-checkbox::part(control) {
   appearance: none;
-  block-size: 1rem;
-  border: 1px solid currentColor;
-  border-radius: 0.1875rem;
+  background-color: transparent;
+  block-size: 1.25rem;
+  border: 1px solid var(--_gray-line);
+  cursor: inherit;
   grid-area: 1 / 1;
-  inline-size: 1rem;
+  inline-size: 1.25rem;
   margin: 0;
+}
+
+helix-headless-checkbox:not(:disabled):hover::part(control) {
+  border-color: var(--_gray-muted);
 }
 
 /* The mark, over the input in the same cell.
@@ -57,31 +99,63 @@ helix-headless-checkbox::part(control) {
  * until you say. A `clip-path` is the cheapest way to say "tick" with no asset
  * and no icon set. */
 helix-headless-checkbox::part(mark) {
-  block-size: 0.625rem;
+  block-size: 0.75rem;
   clip-path: polygon(14% 44%, 0 65%, 40% 100%, 100% 16%, 84% 0, 39% 62%);
   grid-area: 1 / 1;
-  inline-size: 0.625rem;
+  inline-size: 0.75rem;
+  pointer-events: none;
 }
 
-/* State comes off the host, not off a class a consumer maintains. */
+/* State comes off the host, not off a class a consumer maintains. Checked is
+   ink and not a fill: the edge goes to the strongest gray and the tick is
+   drawn in it, on the same ground as before. */
 helix-headless-checkbox:state(checked)::part(control) {
-  background-color: currentColor;
+  border-color: var(--_gray-strong);
 }
 
 helix-headless-checkbox:state(checked)::part(mark) {
-  background-color: canvas;
+  background-color: var(--_gray-strong);
+}
+
+helix-headless-checkbox::part(label) {
+  color: var(--_gray-strong);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* Lined up under the words rather than under the mark, because the mark is the
+   control and the description is about what the words say. */
+helix-headless-checkbox::part(hint),
+helix-headless-checkbox::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
+  padding-inline-start: 1.75rem;
+}
+
+helix-headless-checkbox::part(hint) {
+  color: var(--_gray-muted);
+}
+
+helix-headless-checkbox::part(feedback) {
+  color: var(--_gray-strong);
+  font-weight: 500;
 }
 
 /* Disabled is the native pseudo-class, the control being a real input on a
    form-associated element. */
+helix-headless-checkbox:disabled {
+  opacity: 0.5;
+}
+
 helix-headless-checkbox:disabled::part(field) {
   cursor: not-allowed;
-  opacity: 0.5;
 }
 
 /* The ring is yours as well. Taking the UA outline off without putting one back
    is the commonest way a headless control stops being usable by keyboard. */
 helix-headless-checkbox::part(control):focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }

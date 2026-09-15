@@ -38,28 +38,31 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-headless-badge {
   display: inline-flex;
   position: relative;
+  vertical-align: middle;
 }
 
+/* A ghost at rest, around a glyph half its size. */
 helix-headless-icon-button::part(button) {
-  all: unset;
+  align-items: center;
+  background-color: transparent;
+  block-size: 2.5rem;
+  border: 1px solid transparent;
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  inline-size: 2.5rem;
+  justify-content: center;
+  padding: 0;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-icon-button::part(button):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -70,16 +73,43 @@ helix-headless-icon-button::part(button):focus-visible {
   outline-offset: 2px;
 }
 
+helix-headless-icon {
+  block-size: 1.25rem;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1.25rem;
+}
+
+helix-headless-icon::part(svg) {
+  block-size: 1.25rem;
+  flex: none;
+  inline-size: 1.25rem;
+}
+
+/* **An icon button is mostly padding**, so the mark is pinned 8px inside its
+   corner and centered on that point: at the corner itself it would float in
+   the empty part of the target rather than sit on the bell. Round, which is
+   the shape of a count, and ringed in the page's own color so it stays apart
+   from whatever it overlaps. */
 helix-headless-badge::part(indicator) {
+  align-items: center;
   background-color: var(--_gray-strong);
+  block-size: 1rem;
   border-radius: 999px;
+  box-shadow: 0 0 0 2px Canvas;
+  box-sizing: border-box;
   color: var(--_gray-surface);
-  font-size: 0.6875rem;
-  inset-block-start: -0.25rem;
-  inset-inline-end: -0.5rem;
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 600;
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  justify-content: center;
   line-height: 1;
   min-inline-size: 1rem;
-  padding: 0.125rem 0.25rem;
+  padding-inline: 0.25rem;
+  pointer-events: none;
   position: absolute;
-  text-align: center;
+  translate: 50% -50%;
+  white-space: nowrap;
 }

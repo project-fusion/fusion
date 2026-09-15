@@ -38,22 +38,43 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
+helix-headless-button {
   display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+  max-inline-size: 100%;
 }
 
+/* `all: unset` first, so the UA's own button is gone before anything is drawn
+   on it. Then the styled preview's solid primary at the control height: the
+   strongest gray as the fill and the page's lightest as the ink, which is what
+   a primary fill is once its hue is taken away. */
 helix-headless-button::part(button) {
   all: unset;
+  align-items: center;
+  background-color: var(--_gray-strong);
+  block-size: 2.5rem;
+  border: 1px solid transparent;
   box-sizing: border-box;
+  color: var(--_gray-surface);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  inline-size: 100%;
+  justify-content: center;
+  line-height: 1.2;
+  padding-inline: 1rem;
+  white-space: nowrap;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-button:not(:disabled)::part(button):hover {
+  background-color: var(--_gray-muted);
+}
+
+helix-headless-button:disabled::part(button) {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -62,12 +83,4 @@ helix-headless-icon::part(svg) {
 helix-headless-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
-}
-
-helix-headless-button::part(button) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  cursor: pointer;
-  display: inline-flex;
-  padding: 0.25rem 0.75rem;
 }

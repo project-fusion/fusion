@@ -38,28 +38,33 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* Round, which is the shape rather than a softening of one. A quiet fill, not
+   a tinted one: an avatar with no picture is a placeholder for a person, and a
+   colored disc makes every one of them look like it means something. */
 helix-headless-avatar {
   align-items: center;
-  background-color: var(--_gray-fill);
-  block-size: 2.5rem;
+  background-color: var(--_gray-subtle);
+  block-size: 2rem;
   border-radius: 50%;
   color: var(--_gray-strong);
   display: inline-flex;
-  font-size: 0.875rem;
-  inline-size: 2.5rem;
+  flex: none;
+  inline-size: 2rem;
   justify-content: center;
   overflow: hidden;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-avatar::part(image) {
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+/* Two fifths of the avatar, so the letters scale with it. */
+helix-headless-avatar::part(initials) {
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  user-select: none;
 }
