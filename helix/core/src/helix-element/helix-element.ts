@@ -322,8 +322,10 @@ export class HelixElement extends LitElement {
    * in `@fusion.dev/helix-testing` is written around.
    *
    * It never resolves where `requestAnimationFrame` never fires, which is a
-   * server, a hidden tab, and happy-dom. Callers that must not hang race it
-   * against a timeout; `readyToMove` does exactly that.
+   * server, a hidden tab, and happy-dom. Callers that must not hang there race
+   * it against a timeout, as the happy-dom harness's `readyToMove` does. The
+   * browser harness's awaits it alone: a browser always runs the frame, and a
+   * timer beside it was a bet on how long one takes, which a busy run lost.
    */
   readonly whenSettled: Promise<void>
 
