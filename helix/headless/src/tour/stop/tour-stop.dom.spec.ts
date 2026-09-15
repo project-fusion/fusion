@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -74,3 +74,82 @@ describe('one tour stop', () => {
     expect(part(await stop(''), 'bubble')?.hasAttribute('hidden')).toBe(true)
   })
 })
+
+/**
+ * Where the panel goes when the side it asked for has no room, and neither has
+ * the other one.
+ *
+ * Browser-only because it is geometry: happy-dom lays nothing out, so every
+ * side fits a box of no size and the question never comes up.
+ *
+ * The target is a band the width of the window, which is what a rail becomes on
+ * a phone and what sent the tour's first stop off the window: beside it
+ * there is no room on either side, whatever the window's width.
+ */
+if (hasLayout()) {
+  const FIXTURE = `<style>
+      #band { block-size: 3rem; inset-block-start: 4rem; inset-inline: 1rem; position: fixed }
+      #post { block-size: 3rem; inline-size: 6rem; inset-block-start: 4rem; inset-inline-start: 1rem; position: fixed }
+      helix-headless-tour-stop::part(bubble) { box-sizing: border-box; inline-size: 16rem; margin: 0; overflow: visible; padding: 0 }
+    </style>
+    <div id="band"></div>
+    <div id="post"></div>`
+
+  const placed = async (stop: string, direction = 'ltr'): Promise<Stop> => {
+    await mount(`<div dir="${direction}">${stop}${FIXTURE}</div>`)
+    const host = document.querySelector('helix-headless-tour-stop') as Stop
+    await host.updateComplete
+    /* `computePosition` resolves after the update, and `autoUpdate` places once
+       as it starts: two frames cover both. */
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+    return host
+  }
+
+  const boxes = (host: Stop): { bubble: DOMRect; target: DOMRect } => ({
+    bubble: (part(host, 'bubble') as HTMLElement).getBoundingClientRect(),
+    target: (
+      document.getElementById(host.getAttribute('for') ?? '') as HTMLElement
+    ).getBoundingClientRect(),
+  })
+
+  const beside = (target: string): string =>
+    `<helix-headless-tour-stop current for="${target}" placement="right-start">Here.</helix-headless-tour-stop>`
+
+  describe('a stop placed beside its target', () => {
+    test('stays beside it where there is room', async () => {
+      const host = await placed(beside('post'))
+      const { bubble, target } = boxes(host)
+      expect(part(host, 'bubble')?.getAttribute('data-placement')).toBe('right-start')
+      expect(bubble.left).toBeGreaterThanOrEqual(target.right)
+      expect(hasState(host, 'placed-right')).toBe(true)
+      expect(hasState(host, 'placed-bottom')).toBe(false)
+    })
+
+    test('moves below it, inside the window, where neither side has room', async () => {
+      const host = await placed(beside('band'))
+      const { bubble, target } = boxes(host)
+      expect(part(host, 'bubble')?.getAttribute('data-placement')).toBe('bottom-start')
+      expect(bubble.top).toBeGreaterThanOrEqual(target.bottom)
+      expect(bubble.left).toBeGreaterThanOrEqual(0)
+      expect(bubble.right).toBeLessThanOrEqual(window.innerWidth)
+      expect(bubble.bottom).toBeLessThanOrEqual(window.innerHeight)
+      /* And the arrow can say so. The stop still asks for the right, so a sheet
+         reading `placement` would point the arrow from a side the panel is not
+         on. */
+      expect(hasState(host, 'placed-bottom')).toBe(true)
+      expect(hasState(host, 'placed-right')).toBe(false)
+    })
+
+    /* The side it falls back to does not turn with the writing direction, and
+       the end it lines up with does: `-start` is the target's right edge in a
+       right-to-left page, as it is for any other panel below its anchor. */
+    test('lines up with the target’s start edge in either direction', async () => {
+      const ltr = await placed(beside('band'))
+      expect(Math.round(boxes(ltr).bubble.left)).toBe(Math.round(boxes(ltr).target.left))
+
+      const rtl = await placed(beside('band'), 'rtl')
+      expect(part(rtl, 'bubble')?.getAttribute('data-placement')).toBe('bottom-start')
+      expect(Math.round(boxes(rtl).bubble.right)).toBe(Math.round(boxes(rtl).target.right))
+    })
+  })
+}

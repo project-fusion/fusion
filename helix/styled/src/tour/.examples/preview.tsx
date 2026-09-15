@@ -80,7 +80,7 @@ export function Example() {
       >
         <helix-tour-stop
           for="rail"
-          placement="bottom-start"
+          placement="right-start"
         >
           <helix-card separation="plain">
             <helix-text

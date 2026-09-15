@@ -66,6 +66,12 @@ export interface PopoverOptions {
   onDismiss: () => void
 
   /**
+   * Told the placement the surface landed on, after every measurement. Passed
+   * through to the floating pass, which says why a host would want it.
+   */
+  onPlace?: (placement: Placement) => void
+
+  /**
    * Whether the host wants the surface up, read after every update.
    *
    * **The open state is a property, and a consumer may set it directly**, so
@@ -139,6 +145,7 @@ export class PopoverController implements ReactiveController {
       ...(options.arrow === undefined ? {} : { arrow: options.arrow }),
       floating: options.surface,
       ...(options.offset === undefined ? {} : { offset: options.offset }),
+      ...(options.onPlace === undefined ? {} : { onPlace: options.onPlace }),
       ...(options.placement === undefined ? {} : { placement: options.placement }),
       ...(options.within === undefined ? {} : { within: options.within }),
     })
