@@ -94,6 +94,32 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Watches the light DOM for rows and columns arriving, leaving and moving.
+   *
+   * **A manually assigned slot does not announce them**, the same gap `Chat`
+   * and `Carousel` watch for. Under `slotAssignment: 'manual'` only `assign`
+   * changes an assignment, so a row appended after the first render reached no
+   * slot and drew nowhere, and a column moved to another place lost its
+   * assignment on the way out and never got it back: measured in Chromium, both
+   * `assignedSlot` null a render later. A table whose definition loaded before
+   * its markup was parsed drew no columns at all, having rendered before any
+   * arrived.
+   */
+  private watcher: MutationObserver | undefined = undefined
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.watcher = new MutationObserver(() => this.requestUpdate())
+    this.watcher.observe(this, { childList: true })
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.watcher?.disconnect()
+    this.watcher = undefined
+  }
+
+  /**
    * Nothing is assigned by name, so the columns can be put in a row.
    *
    * The table pattern is `table > row > columnheader`, and a header cell
