@@ -711,6 +711,56 @@ export class HelixField extends LitElement {}
     );
 }
 
+/// A tag held in a name is a composition as much as one written inline: the
+/// child here is opened as `<${pager}>`, which is how `static-html` wants it.
+/// The layer is what turns `helix-pager` into the `pager` that `this.tag()`
+/// names, so without one the child resolves to nothing and nothing is asked.
+#[test]
+fn exportparts_through_a_name() {
+    let table = |forwards: &str| {
+        format!(
+            r#"/**
+ * @csspart pager - The pagination.
+ * @csspart pager-page - One page.
+ */
+@customElement('helix-table')
+export class HelixTable extends LitElement {{
+  render() {{
+    const pager = this.tag('pager')
+    return html`<${{pager}} part="pager"{forwards}></${{pager}}>`
+  }}
+}}
+"#
+        )
+    };
+    let tree = Tree::new("exportparts-through-a-name");
+    tree.write(
+        "helix.json",
+        r#"{ "tiers": ["src"], "layers": [{ "prefix": "helix-", "source": "src" }] }"#,
+    )
+    .write(
+        "src/pager/pager.ts",
+        r"/**
+ * @csspart page - One page.
+ */
+@customElement('helix-pager')
+export class HelixPager extends LitElement {}
+",
+    )
+    .write(
+        "src/table/table.ts",
+        &table(r#" exportparts="page: pager-page""#),
+    );
+    assert_clean("exportparts", &judge(&tree, "exportparts", "exportparts"));
+    tree.write("src/table/table.ts", &table(""));
+    assert_found(
+        "exportparts",
+        &judge(&tree, "exportparts", "exportparts"),
+        "renders <pager> and does not forward its `page` part",
+        "src/table/table.ts",
+    );
+}
+
 /// The method pattern wants exactly two spaces of indentation, and a seam is a
 /// protected `render*` method that is not `render` itself.
 #[test]

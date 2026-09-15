@@ -116,6 +116,17 @@ import {
  * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
  * @csspart loading - Shown while the rows are still on their way.
  * @csspart pagination - The pagination, where this draws one.
+ * @csspart pagination-first - The pagination's control that jumps to the first page, under `ends`.
+ * @csspart pagination-gap - The pagination's control standing over pages not shown.
+ * @csspart pagination-item - One slot in the pagination's run, holding a page or a gap.
+ * @csspart pagination-last - The pagination's control that jumps to the last page, under `ends`.
+ * @csspart pagination-list - The pagination's run of pages.
+ * @csspart pagination-live - The region that says the page changed. Clipped, not hidden.
+ * @csspart pagination-mark - The glyph on a first, previous, next or last control.
+ * @csspart pagination-next - The pagination's control that moves forward one page.
+ * @csspart pagination-page - The pagination's control for one page.
+ * @csspart pagination-previous - The pagination's control that moves back one page.
+ * @csspart pagination-status - The pagination's reading of where you are, in `compact`.
  * @csspart row - One row of data.
  * @csspart select - The cell holding a row's checkbox.
  * @csspart select-all - The heading holding the checkbox that selects every row.
@@ -1293,6 +1304,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           this.paginated
             ? html`<${pagination}
               part="pagination"
+              exportparts="first: pagination-first, gap: pagination-gap, item: pagination-item,
+                last: pagination-last, list: pagination-list, live: pagination-live,
+                mark: pagination-mark, next: pagination-next, page: pagination-page,
+                previous: pagination-previous, status: pagination-status"
               page=${this.page}
               page-size=${this.pageSize || 1}
               total=${matched}

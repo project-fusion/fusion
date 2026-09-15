@@ -13,8 +13,9 @@ import { styles } from './pagination-size.css.js'
  * stands in a column of fields; this one stands in a footer beside a run of page
  * numbers, where a two-line control makes the whole row two lines tall.
  *
- * `Select`'s own parts are exported, so `::part(trigger)` and `::part(label)`
- * reach through both boundaries and a consumer styles it as the select it is.
+ * `Select`'s own parts are exported under `control-`, so `::part(control-trigger)` and
+ * `::part(control-label)` reach through both boundaries and a consumer styles it
+ * as the select it is.
  *
  * @since 0.1.0
  * @status experimental
