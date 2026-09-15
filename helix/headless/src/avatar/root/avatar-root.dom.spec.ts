@@ -108,3 +108,46 @@ describe('avatar', () => {
     expect(part(avatar, 'initials')?.textContent?.trim()).toBe('RS')
   })
 })
+
+describe('the status an avatar reports', () => {
+  type Reporting = Updatable & { src: string; status: string }
+
+  test('says where the picture stands, for a listener that arrived after it settled', async () => {
+    // `load` and `error` fire once, so a script binding after them hears
+    // neither and has only this to ask.
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ross Sheppard" src="/missing.avif"></helix-headless-avatar>',
+    )) as Reporting
+    expect(avatar.status).toBe('loading')
+    expect(avatar.hasAttribute('data-status')).toBe(false)
+
+    part(avatar, 'image')?.dispatchEvent(new Event('error'))
+    await avatar.updateComplete
+    expect(avatar.status).toBe('error')
+    expect(avatar.getAttribute('data-status')).toBe('error')
+  })
+
+  test('arrives as loaded', async () => {
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ross Sheppard" src="/ross.avif"></helix-headless-avatar>',
+    )) as Reporting
+    part(avatar, 'image')?.dispatchEvent(new Event('load'))
+    await avatar.updateComplete
+    expect(avatar.status).toBe('loaded')
+    expect(avatar.getAttribute('data-status')).toBe('loaded')
+  })
+
+  test('starts over with a new source, and the image comes back', async () => {
+    const avatar = (await mount(
+      '<helix-headless-avatar name="Ross Sheppard" src="/missing.avif"></helix-headless-avatar>',
+    )) as Reporting
+    part(avatar, 'image')?.dispatchEvent(new Event('error'))
+    await avatar.updateComplete
+
+    avatar.src = '/ross.avif'
+    await avatar.updateComplete
+    expect(avatar.status).toBe('loading')
+    expect(avatar.hasAttribute('data-status')).toBe(false)
+    expect(part(avatar, 'image')).not.toBeNull()
+  })
+})

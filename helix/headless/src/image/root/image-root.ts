@@ -136,6 +136,14 @@ export class HelixHeadlessImage extends HelixElement {
   private answered = ''
 
   /**
+   * Whether this picture's answer has been given, or is on its way.
+   *
+   * `status` cannot say so for a picture a server sent, since it waits a task
+   * for the event it reports, and `settle` runs twice in the first update.
+   */
+  private reported = false
+
+  /**
    * Says so under the platform's own name, because the platform's cannot escape.
    *
    * `load` and `error` on an `<img>` neither bubble nor compose, so the ones
@@ -158,9 +166,10 @@ export class HelixHeadlessImage extends HelixElement {
    * in the capture phase or listen per picture.
    */
   private announce(status: 'error' | 'loaded', event?: Event): void {
-    this.status = status
+    this.reported = true
     const name = status === 'loaded' ? 'load' : 'error'
     if (event) {
+      this.status = status
       this.relayNativeEvent(event)
       return
     }
@@ -173,7 +182,11 @@ export class HelixHeadlessImage extends HelixElement {
        A task later where a server sent the picture, so a page's scripts, which
        run once the definitions have hydrated what was sent, are listening when
        it arrives, as they would be for the real one. */
+    /* **The report moves with the event, never before it**, so a script that
+       asks `status` once it is listening and then hears the event cannot count
+       one picture twice. */
     const send = (): void => {
+      this.status = status
       this.dispatchEvent(new Event(name, { bubbles: false, cancelable: false, composed: false }))
     }
     if (this.serverRendered) {
@@ -218,7 +231,7 @@ export class HelixHeadlessImage extends HelixElement {
    */
   private settle(): void {
     const image = this.renderRoot?.querySelector('img')
-    if (this.src === '' || this.status !== 'loading' || !image?.complete) {
+    if (this.src === '' || this.reported || !image?.complete) {
       return
     }
     if (image.naturalWidth > 0) {
@@ -235,6 +248,7 @@ export class HelixHeadlessImage extends HelixElement {
        placeholder. */
     if (changed.has('src') && this.answered !== this.src) {
       this.answered = this.src
+      this.reported = false
       this.status = 'loading'
     }
   }

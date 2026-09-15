@@ -68,19 +68,36 @@ export class HelixHeadlessAvatar extends HelixElement {
   src = ''
 
   /**
-   * Whether the image failed.
+   * Where the image stands: still on its way, arrived, or failed and replaced
+   * by the initials.
    *
-   * The element's own observation, never set.
+   * Read-only to a consumer: it is a report rather than a setting, and the same
+   * report `Image` gives, for the same reason. `load` and `error` fire once, so
+   * a listener bound after the picture settled hears neither, which is the
+   * platform on an `<img>` too, and this is what that listener asks instead.
+   * Mirrored to `data-status` rather than reflected, as `Image` explains.
+   */
+  @property({ attribute: false })
+  status: 'error' | 'loaded' | 'loading' = 'loading'
+
+  /**
+   * Whether the picture failed, which is what the fallback draws from.
+   *
+   * **Separate from `status`, because the two move at different moments** for
+   * a picture a server sent: the fallback belongs on screen at once, while the
+   * report waits for the event it reports, below.
    */
   @state()
-  private failed = false
+  private broken = false
 
   private readonly handleError = (event: Event): void => {
-    this.failed = true
+    this.broken = true
+    this.status = 'error'
     this.relayNativeEvent(event)
   }
 
   private readonly handleLoad = (event: Event): void => {
+    this.status = 'loaded'
     this.relayNativeEvent(event)
   }
 
@@ -88,13 +105,14 @@ export class HelixHeadlessAvatar extends HelixElement {
     super.willUpdate(changed)
     /* A new source is a new attempt.
      *
-     * `failed` is an observation about the image that was loading, so it has to
+     * `status` is an observation about the image that was loading, so it has to
      * be cleared with the source. Latched, an avatar that failed once falls back
      * to initials for the life of the element, and a consumer swapping a broken
      * URL for a good one, or a list reusing an avatar for the next person, gets
      * the initials forever with no error to say why. */
     if (changed.has('src')) {
-      this.failed = false
+      this.broken = false
+      this.status = 'loading'
     }
     /* A role only where there is a name to carry.
      *
@@ -119,15 +137,33 @@ export class HelixHeadlessAvatar extends HelixElement {
     const image = this.serverRendered ? this.renderRoot.querySelector('img') : null
     if (image?.complete) {
       const broken = image.naturalWidth === 0
-      if (broken) {
-        this.failed = true
+      this.broken = broken
+      /* **The report moves with the event, never before it.** A script that
+         asks `status` once it is listening, and then hears the event, would
+         otherwise count this picture twice: measured by `check:spec:dsd`, where
+         the events example hydrated with its error logged two times. */
+      setTimeout(() => {
+        this.status = broken ? 'error' : 'loaded'
+        this.relayNativeEvent(new Event(broken ? 'error' : 'load'))
+      })
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* The mirror, written here rather than reflected, the way `Image` writes
+       it: `loading` is the resting state and writes nothing. */
+    if (changed.has('status')) {
+      if (this.status === 'loading') {
+        this.removeAttribute('data-status')
+      } else {
+        this.setAttribute('data-status', this.status)
       }
-      setTimeout(() => this.relayNativeEvent(new Event(broken ? 'error' : 'load')))
     }
   }
 
   protected override render(): TemplateResult {
-    if (this.src !== '' && !this.failed) {
+    if (this.src !== '' && !this.broken) {
       return html`<img
         part="image"
         src=${this.src}
