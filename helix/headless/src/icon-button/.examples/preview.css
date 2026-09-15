@@ -54,6 +54,7 @@ helix-headless-icon-button::part(button) {
   all: unset;
   align-items: center;
   block-size: 2.5rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;

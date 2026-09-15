@@ -49,6 +49,7 @@
    picture arrives. */
 helix-headless-image {
   aspect-ratio: 16 / 9;
+  border-radius: var(--_radius-surface);
   display: block;
   inline-size: 24rem;
   max-inline-size: 100%;

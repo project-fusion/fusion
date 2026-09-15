@@ -64,7 +64,8 @@ helix-headless-listbox::part(label) {
    holds the first and last rows clear of the frame. */
 helix-headless-listbox::part(items) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   display: flex;
   flex-direction: column;
   max-block-size: 14rem;

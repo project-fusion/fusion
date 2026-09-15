@@ -68,14 +68,15 @@ helix-headless-number-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   display: flex;
   overflow: hidden;
 }
 
 helix-headless-number-input:not(:disabled)::part(field):hover {
-  border-color: var(--_gray-mark);
+  border-color: var(--_gray-line);
 }
 
 /* The ring goes on the frame rather than on the input, so it surrounds the
@@ -121,11 +122,11 @@ helix-headless-number-input::part(increment) {
 }
 
 helix-headless-number-input::part(decrement) {
-  border-inline-end: 1px solid var(--_gray-line);
+  border-inline-end: 1px solid var(--_gray-edge);
 }
 
 helix-headless-number-input::part(increment) {
-  border-inline-start: 1px solid var(--_gray-line);
+  border-inline-start: 1px solid var(--_gray-edge);
 }
 
 helix-headless-number-input::part(decrement):hover:not(:disabled),

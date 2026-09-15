@@ -13,9 +13,11 @@
  * is the page's decision and not the component's.
  *
  * **Grays, and only grays.** Color in an example reads as meaning, and this
- * tier holds no such opinion: the types are told apart by shade and slant
- * here, and by their own text everywhere, since a string keeps its quotes and
- * a null is spelled.
+ * tier holds no such opinion: a key is drawn in the strong gray and a value in
+ * the muted one, and the types are told apart by their own text, since a
+ * string keeps its quotes and a null is spelled. Not by slant: a monospace
+ * italic is a narrower face, and strings set in it stop lining up with the
+ * rows around them.
  *
  * The values are named by role rather than numbered, since a number
  * implies a scale somebody maintains, and underscored because they never leave
@@ -52,12 +54,15 @@ helix-headless-object-inspector {
 }
 
 /* The label rides on a bar joined to the top of the tree, so the two read as
-   one panel: the bar draws three edges and the tree the fourth. */
+   one panel: the bar draws three edges and the top corners, the tree the
+   fourth edge and the bottom corners. */
 helix-headless-object-inspector::part(header) {
   align-items: center;
   background-color: var(--_gray-subtle);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
   border-block-end: none;
+  border-start-end-radius: var(--_radius-panel);
+  border-start-start-radius: var(--_radius-panel);
   display: flex;
   padding: 0.5rem 1rem;
 }
@@ -72,20 +77,36 @@ helix-headless-object-inspector::part(frame) {
   position: relative;
 }
 
-/* `ui-monospace` ahead of the generic, because `monospace` on its own drops an
-   `em` size to the browser's smaller monospace default. */
+/* Named faces ahead of the generic: Chromium does not honor `ui-monospace`, and
+   a bare `monospace` both lands on Courier and drops an `em` size to the
+   browser's smaller monospace default. */
 helix-headless-object-inspector::part(tree) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-panel);
   color: var(--_gray-strong);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   line-height: 1.5;
   padding-block: 0.5rem;
+}
+
+/* Square on top where the bar sits over it, so the two meet in a straight
+   seam. */
+helix-headless-object-inspector[label]::part(tree) {
+  border-start-end-radius: 0;
+  border-start-start-radius: 0;
 }
 
 helix-headless-object-inspector::part(tree):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+/* The row the keys are on, while the tree holds focus. `row-active` is the
+   second part name the row carries for as long as it is the one. */
+helix-headless-object-inspector:focus-within::part(row-active) {
+  background-color: var(--_gray-subtle);
 }
 
 /* Every row is indented as though it had a caret, and a branch's caret is
@@ -109,10 +130,7 @@ helix-headless-object-inspector::part(toggle) {
   vertical-align: -0.125em;
 }
 
-helix-headless-object-inspector::part(string) {
-  font-style: italic;
-}
-
+helix-headless-object-inspector::part(string),
 helix-headless-object-inspector::part(number),
 helix-headless-object-inspector::part(boolean),
 helix-headless-object-inspector::part(null),
@@ -139,6 +157,7 @@ helix-headless-object-inspector::part(copy-button) {
   all: unset;
   align-items: center;
   block-size: 2.5rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -161,4 +180,30 @@ helix-headless-object-inspector::part(copy-mark) {
   block-size: 1rem;
   display: block;
   inline-size: 1rem;
+}
+
+/* The name of the copy button, over it on hover. `inset`, `margin` and
+   `overflow` said, because the bubble is a popover: the user agent centers one
+   in the window, where the component places this one over its trigger, and
+   scrolls its overflow, which would clip the point. */
+helix-headless-object-inspector::part(copy-tooltip) {
+  background-color: var(--_gray-strong);
+  border: none;
+  border-radius: var(--_radius-control);
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  inset: auto;
+  line-height: 1.2;
+  margin: 0;
+  overflow: visible;
+  padding: 0.25rem 0.5rem;
+}
+
+helix-headless-object-inspector::part(copy-tooltip-arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  inset-block-end: -0.25rem;
+  position: absolute;
+  rotate: 45deg;
 }

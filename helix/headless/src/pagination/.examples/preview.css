@@ -87,6 +87,7 @@ helix-headless-pagination::part(next) {
   background-color: transparent;
   block-size: 2rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -106,13 +107,13 @@ helix-headless-pagination::part(next):hover {
   color: var(--_gray-strong);
 }
 
-/* Where you are: a raised chip with an edge, which stays put under the pointer.
-   `page-current` is the second part name the page carries while it is the one
-   you are on, since its `aria-current` cannot follow `::part()`. */
+/* Where you are: a filled chip with a quiet edge, which stays put under the
+   pointer. `page-current` is the second part name the page carries while it is
+   the one you are on, since its `aria-current` cannot follow `::part()`. */
 helix-headless-pagination::part(page-current),
 helix-headless-pagination::part(page-current):hover {
-  background-color: var(--_gray-surface);
-  border-color: var(--_gray-line);
+  background-color: var(--_gray-subtle);
+  border-color: var(--_gray-edge);
   color: var(--_gray-strong);
   font-weight: 600;
 }
