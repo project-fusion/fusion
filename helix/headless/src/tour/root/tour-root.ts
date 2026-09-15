@@ -361,13 +361,18 @@ export class HelixHeadlessTour extends HelixElement {
 
   protected override render(): TemplateResult {
     const spot = this.spot
+    /* `left` and `top`, physical because the box is: it is the target's
+       `getBoundingClientRect`, measured from the viewport's left edge in either
+       direction. As `inset-inline-start` it was the right edge on a
+       right-to-left page, so the light fell on the mirror of its target and
+       the stop beside it pointed into the dark. */
     return html`${
       spot === undefined
         ? ''
         : html`<div
             part="spotlight"
             aria-hidden="true"
-            style=${`inset-block-start: ${spot.top}px; inset-inline-start: ${spot.left}px; block-size: ${spot.height}px; inline-size: ${spot.width}px`}
+            style=${`left: ${spot.left}px; top: ${spot.top}px; block-size: ${spot.height}px; inline-size: ${spot.width}px`}
           ></div>`
     }
       <slot></slot>`
