@@ -45,19 +45,28 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-qr-code {
-  display: block;
-  inline-size: 8rem;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
+/* A light plate under dark modules in both modes, because a scanner reads a
+   code by its contrast and many will not read one inverted. `color-scheme:
+   light` on the element resolves the ramp's `light-dark()` to its light side
+   here and nowhere else, so the plate stays the same grays rather than
+   borrowing colors from outside the ramp. */
+helix-headless-qr-code {
+  background-color: var(--_gray-surface);
+  block-size: 12rem;
+  color: var(--_gray-strong);
+  color-scheme: light;
+  display: block;
+  inline-size: 12rem;
+}
+
 helix-headless-qr-code::part(code) {
-  block-size: auto;
+  block-size: 100%;
   display: block;
   inline-size: 100%;
 }

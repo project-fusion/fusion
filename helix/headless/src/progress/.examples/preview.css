@@ -45,8 +45,27 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+helix-headless-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-progress {
+  display: block;
+}
+
+/* The reading sits beside the bar rather than under it, the bar taking
+   whatever the number leaves. */
+helix-headless-progress[show-value] {
+  align-items: center;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr auto;
+}
+
 helix-headless-progress::part(track) {
-  background-color: var(--_gray-fill);
+  background-color: var(--_gray-subtle);
   block-size: 0.5rem;
   display: block;
   inline-size: 100%;
@@ -60,15 +79,20 @@ helix-headless-progress::part(groove) {
   inline-size: 100%;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-headless-progress::part(indicator) {
   background-color: var(--_gray-strong);
   block-size: 100%;
   display: block;
   inline-size: calc(var(--progress-fraction, 0) * 100%);
+}
+
+/* Tabular and right-aligned over a floor, so `100%` and `9%` take the same
+   room and the bar does not shuffle as the number changes. */
+helix-headless-progress::part(value) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  min-inline-size: 3ch;
+  text-align: end;
 }

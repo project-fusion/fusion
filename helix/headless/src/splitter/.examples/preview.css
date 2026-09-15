@@ -45,33 +45,88 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-splitter {
-  block-size: 8rem;
-  border: 1px solid var(--_gray-line);
-  display: block;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
-/* The panes and the handle between them, which is the whole
-   component: without a row the two stack and the separator is a stray square. */
-helix-headless-splitter::part(start),
-helix-headless-splitter::part(end) {
+/* The panes side by side with the divider between them, which is the whole
+   component: without a row the two stack and the divider is a stray bar. A
+   splitter fills whatever it is given, so the example gives it a height. */
+helix-headless-splitter {
+  block-size: 12rem;
+  display: flex;
+  min-block-size: 0;
   min-inline-size: 0;
-  overflow: auto;
-  padding: 0.5rem;
+  position: relative;
 }
 
-/* The divider is the component's whole point, so it has to be visible before
-   anything else here matters. `flex: none` keeps the row from shrinking it away. */
+/* The first pane takes where the divider is, which the component writes on it
+   as `--splitter-position`; the second takes the rest. */
+helix-headless-splitter::part(start) {
+  flex: 0 0 var(--splitter-position, 50%);
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: auto;
+}
+
+helix-headless-splitter::part(end) {
+  flex: 1 1 0;
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: auto;
+}
+
+/* An eight pixel target drawn as a one pixel line. The target overlaps both
+   panes by half its width, so it takes nothing out of either and the seam can
+   be reached from both sides; the line is drawn on its middle. */
 helix-headless-splitter::part(separator) {
-  background-color: var(--_gray-line);
-  block-size: 100%;
+  background-color: transparent;
+  box-sizing: border-box;
   cursor: col-resize;
   flex: none;
-  inline-size: 3px;
+  inline-size: 0.5rem;
+  margin-inline: -0.25rem;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  z-index: 1;
+}
+
+helix-headless-splitter::part(separator)::before {
+  background-color: var(--_gray-line);
+  content: "";
+  inline-size: 1px;
+  inset-block: 0;
+  inset-inline-start: 50%;
+  margin-inline-start: -0.5px;
+  position: absolute;
+}
+
+/* The keyboard reaches the divider, so it has to say so: the line thickens and
+   darkens where it is, rather than a ring boxing its invisible target. */
+helix-headless-splitter::part(separator):hover::before,
+helix-headless-splitter::part(separator):focus-visible::before {
+  background-color: var(--_gray-muted);
+  inline-size: 2px;
+  margin-inline-start: -1px;
+}
+
+helix-headless-splitter::part(separator):focus-visible {
+  outline: none;
+}
+
+helix-headless-card {
+  align-content: start;
+  color: var(--_gray-muted);
+  display: grid;
+  gap: 0.75rem;
+  line-height: 1.5;
+  padding: 1rem;
+}
+
+helix-headless-card p {
+  font-size: 0.875rem;
+  margin: 0;
 }

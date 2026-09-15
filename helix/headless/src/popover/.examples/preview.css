@@ -38,12 +38,6 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 helix-headless-icon {
   block-size: 1em;
   display: inline-flex;
@@ -51,23 +45,40 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-popover::part(popover) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
-}
-
-helix-headless-button::part(button) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+/* The trigger and the close are the one button, at control height: a quiet
+   fill under a line, the label in the strong gray. */
+helix-headless-button {
+  display: inline-flex;
+}
+
+helix-headless-button::part(button) {
+  align-items: center;
+  appearance: none;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  justify-content: center;
+  line-height: 1.2;
+  padding: 0 1rem;
+  white-space: nowrap;
+}
+
+helix-headless-button::part(button):hover {
+  background-color: var(--_gray-fill);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -78,16 +89,39 @@ helix-headless-button::part(button):focus-visible {
   outline-offset: 2px;
 }
 
+/* A width, because prose needs one. The styled tier publishes
+   `--popover-inline-size` for this; the headless tier has no hook and no
+   opinion, so a consumer writes the rule, which is what this file is for.
+
+   The margin goes too. The platform centers a `popover` in the window through
+   `inset: 0` and `margin: auto`, and the component writes its position as a
+   translate from the top-left, so a margin left in place puts the panel
+   mid-page rather than under its trigger. */
+helix-headless-popover::part(popover) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  inline-size: 20rem;
+  margin: 0;
+  padding: 1rem;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  gap: 1rem;
+  line-height: 1.5;
+}
+
+.stack p {
+  margin: 0;
+}
+
 /* The close button sits at the end of the panel, which is where an action in a
    panel goes: the styled twin does the same with `<helix-flex justify="end">`. */
 .actions {
   display: flex;
   justify-content: flex-end;
-}
-
-/* A width, because prose needs one. The styled tier publishes
-   `--popover-inline-size` for this; the headless tier has no hook and no
-   opinion, so a consumer writes the rule, which is what this file is for. */
-helix-headless-popover::part(popover) {
-  inline-size: 20rem;
 }

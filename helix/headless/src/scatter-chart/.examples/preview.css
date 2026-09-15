@@ -1,40 +1,92 @@
 /* What the headless tier asks a consumer to write for Scatter Chart.
  *
- * Deliberately skeletal, and gray for Line Chart's reason. The one thing a
- * consumer cannot skip is placing the points: the component writes where each
- * one goes as `--chart-point-x` and `--chart-point-y`, and the stylesheet is
- * what puts it there. The axes are laid out the same way, from `--chart-tick`. */
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
+ * says primary and a red one says danger, and this tier holds no such opinion.
+ * A neutral ramp says only where one surface ends and the next begins.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
+ *
+ * A part with no rule below is one the platform already renders acceptably, and
+ * a wrong rule is worse than none: paint a checkbox but leave the input at
+ * `appearance: auto` and the browser draws its own control over everything
+ * written for it.
+ *
+ * The one thing a consumer cannot skip is placing the points: the component
+ * writes where each one goes as `--chart-point-x` and `--chart-point-y`, and the
+ * stylesheet is what puts it there. The axes are laid out the same way, from
+ * `--chart-tick`.
+ */
 
 :root {
   color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
-  --_gray-surface: light-dark(#fafafa, #18181b);
+}
+
+/* The source table stays in the accessibility tree and off the screen: the
+   clip, not `display: none`, which would take it out of the tree along with
+   the picture. No `display: block` either, because a table forced to a block
+   box loses its table semantics, which is the one thing this keeps. */
+[data-hidden-visually] {
+  block-size: 1px;
+  border: 0;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
 }
 
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
+/* What each axis measures at its far end, the levels up beside the plot and
+   the levels across under it. */
 helix-headless-scatter-chart {
-  --chart-series-1: light-dark(#2a2a2e, #e9e9ec);
-  --chart-series-2: light-dark(#8e8e96, #86868f);
+  --chart-series-1: var(--_gray-strong);
+  --chart-series-2: var(--_gray-mark);
 
+  column-gap: 0.5rem;
   display: grid;
-  gap: 0.25rem;
-  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "y-name ."
+    "y-axis plot"
+    ". x-axis"
+    ". x-name";
+  grid-template-columns: auto minmax(0, 1fr);
+  position: relative;
+  row-gap: 0.25rem;
 }
 
 helix-headless-scatter-chart::part(plot) {
-  block-size: 10rem;
-  border-block-end: 1px solid var(--_gray-line);
-  border-inline-start: 1px solid var(--_gray-line);
-  grid-column: 2;
-  grid-row: 1;
+  block-size: 12.25rem;
+  grid-area: plot;
   position: relative;
 }
 
@@ -42,41 +94,53 @@ helix-headless-scatter-chart::part(svg) {
   block-size: 100%;
   display: block;
   inline-size: 100%;
+  overflow: visible;
 }
 
+helix-headless-scatter-chart::part(gridline) {
+  stroke: var(--_gray-fill);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Short of opaque, so a cluster reads darker where it is denser, and ringed in
+   the surface so two points overlapping each keep an edge. */
 helix-headless-scatter-chart::part(point) {
   background-color: var(--chart-series);
-  block-size: 6px;
+  block-size: 8px;
   border-radius: 50%;
-  inline-size: 6px;
+  box-shadow: 0 0 0 1px var(--_gray-surface);
+  inline-size: 8px;
   inset-block-start: var(--chart-point-y);
   inset-inline-start: var(--chart-point-x);
+  opacity: 0.8;
+  pointer-events: none;
   position: absolute;
   translate: -50% -50%;
 }
 
 helix-headless-scatter-chart::part(y-axis),
 helix-headless-scatter-chart::part(x-axis) {
-  color: var(--_gray-muted);
   display: grid;
-  font-size: 0.75rem;
 }
 
 helix-headless-scatter-chart::part(y-axis) {
-  grid-column: 1;
-  grid-row: 1;
+  grid-area: y-axis;
 }
 
 helix-headless-scatter-chart::part(x-axis) {
-  grid-column: 2;
-  grid-row: 2;
+  grid-area: x-axis;
 }
 
 helix-headless-scatter-chart::part(x-tick),
 helix-headless-scatter-chart::part(y-tick) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
   grid-area: 1 / 1;
   line-height: 1;
   position: relative;
+  white-space: nowrap;
 }
 
 helix-headless-scatter-chart::part(x-tick) {
@@ -93,12 +157,32 @@ helix-headless-scatter-chart::part(y-tick) {
 }
 
 helix-headless-scatter-chart::part(x-name),
-helix-headless-scatter-chart::part(y-name),
-helix-headless-scatter-chart::part(summary) {
+helix-headless-scatter-chart::part(y-name) {
   color: var(--_gray-muted);
   font-size: 0.75rem;
-  grid-column: 2;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+helix-headless-scatter-chart::part(x-name) {
+  grid-area: x-name;
+  justify-self: end;
+}
+
+helix-headless-scatter-chart::part(y-name) {
+  grid-area: y-name;
+}
+
+/* Said to a reader who cannot see the points, and drawn nowhere: the same clip
+   as the table. */
+helix-headless-scatter-chart::part(summary) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
   margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }
 
 helix-headless-scatter-chart::part(mark) {

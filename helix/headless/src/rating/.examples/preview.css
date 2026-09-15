@@ -48,31 +48,105 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-rating::part(option) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-helix-headless-rating::part(label) {
-  color: var(--_gray-strong);
-  font-weight: 600;
-}
-
-helix-headless-rating::part(hint) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-rating::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+helix-headless-rating {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+helix-headless-rating::part(label) {
+  color: var(--_gray-strong);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+helix-headless-rating::part(hint),
+helix-headless-rating::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* Two layers in one place, which is what this component is.
+
+   Both track and fill hold every mark, and the fill is a clip of the whole row
+   rather than a subset of it, so they have to be stacked and not laid side by
+   side. Laid out by what their names suggest, track becomes a progress groove
+   painted over the marks it is made of and the component renders as a bar of
+   flat gray. */
+helix-headless-rating::part(marks) {
+  display: inline-flex;
+  position: relative;
+}
+
+/* Colored through currentColor, because a consumer cannot reach inside.
+
+   A filled mark is a mark inside the fill layer, and ::part(fill) [part="mark"]
+   selects nothing: ::part() reaches the part and no further, so descendants of a
+   part are unreachable from outside the tree. The styled tier writes exactly
+   that selector and it works there, its sheet being inside the shadow root.
+   Color inherits across the boundary where a selector does not, so the layers
+   set it and the marks take it. */
+helix-headless-rating::part(track),
+helix-headless-rating::part(fill) {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+helix-headless-rating::part(track) {
+  color: var(--_gray-line);
+}
+
+/* The clip, from the component's own arithmetic: `--rating-full` and
+   `--rating-part` are published on the row, so this says how wide the filled
+   run is without knowing the score. Each whole mark takes its gap with it and
+   the part-filled one does not. */
+helix-headless-rating::part(fill) {
+  color: var(--_gray-strong);
+  inline-size: calc(var(--rating-full, 0) * 1.5rem + var(--rating-part, 0) * 1.25rem);
+  inset-block: 0;
+  inset-inline-start: 0;
+  overflow: hidden;
+  position: absolute;
+}
+
+/* The mark ships with no glyph, deliberately, so the example draws one: a
+   star, as a mask over the mark's own fill, so the layer's color is the
+   star's. */
+helix-headless-rating::part(mark) {
+  background-color: currentColor;
+  block-size: 1.25rem;
+  flex: none;
+  inline-size: 1.25rem;
+  mask-image: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>');
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+/* One transparent target per step over the row, each a mark and half the gap
+   either side of it wide: what the reader sees is the row underneath, and what
+   they press is this. `--rating-step` is written on each by the component. */
+helix-headless-rating::part(option) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  inline-size: calc((100% + 0.25rem) / var(--rating-steps, 1));
+  inset-block: 0;
+  inset-inline-start: calc(
+    (var(--rating-step, 1) - 1) *
+    (100% + 0.25rem) /
+    var(--rating-steps, 1) -
+    0.125rem
+  );
+  position: absolute;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -83,71 +157,9 @@ helix-headless-rating::part(option):focus-visible {
   outline-offset: 2px;
 }
 
-/* The mark ships with no glyph, deliberately, so the example draws one.
-   A square rotated forty-five degrees is a diamond and needs no asset.
-   
-   `display` is the load-bearing line. A mark is an inline box, and width and
-   height do not apply to those, so a rule giving it three quarters of a rem
-   leaves every mark at zero by zero with its fill set and nothing on screen at
-   all. */
-helix-headless-rating::part(mark) {
-  background-color: currentColor;
-  block-size: 0.75rem;
-  display: block;
-  flex: none;
-  inline-size: 0.75rem;
-  rotate: 45deg;
-}
-
-/* Two layers in one place, which is what this component is.
-   
-   Both track and fill hold every mark, and the fill is a clip of the whole row
-   rather than a subset of it, so they have to be stacked and not laid side by
-   side. Laid out by what their names suggest, track becomes a progress groove
-   painted over the marks it is made of and the component renders as a bar of
-   flat gray.
-   
-   The width of the clip is the component's own arithmetic, published as
-   --rating-full, --rating-part and --rating-steps on the container so a sheet
-   can say this without knowing the score. */
-helix-headless-rating::part(marks) {
-  display: inline-block;
-  position: relative;
-}
-
-/* Colored through currentColor, because a consumer cannot reach inside.
-   
-   A filled mark is a mark inside the fill layer, and ::part(fill) [part="mark"]
-   selects nothing: ::part() reaches the part and no further, so descendants of a
-   part are unreachable from outside the tree. The styled tier writes exactly
-   that selector and it works there, its sheet being inside the shadow root.
-   Color inherits across the boundary where a selector does not, so the layers
-   set it and the marks take it. */
-helix-headless-rating::part(track),
-helix-headless-rating::part(fill) {
-  background-color: transparent;
-  block-size: auto;
-  display: flex;
-  gap: 0.25rem;
-  inline-size: auto;
-}
-
-helix-headless-rating::part(track) {
-  color: var(--_gray-fill);
-}
-
-helix-headless-rating::part(fill) {
-  inline-size: calc(
-    (var(--rating-full, 0) + var(--rating-part, 0)) /
-    var(--rating-steps, 1) *
-    100%
-  );
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  overflow: hidden;
-  position: absolute;
-}
-
-helix-headless-rating::part(fill) {
-  color: var(--_gray-strong);
+helix-headless-rating::part(value) {
+  color: var(--_gray-muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
 }

@@ -19,8 +19,11 @@
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
   --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
@@ -33,18 +36,25 @@ helix-headless-skip-link:not(:focus-within) {
   white-space: nowrap;
 }
 
+/* Over the page's corner once focus arrives, the one inverse surface here: a
+   control that exists to be seen the moment it is reached. */
 helix-headless-skip-link:focus-within {
-  inset-block-start: 0.5rem;
-  inset-inline-start: 0.5rem;
+  display: block;
+  inset-block-start: 0.75rem;
+  inset-inline-start: 0.75rem;
   position: fixed;
+  z-index: 1;
 }
 
 helix-headless-skip-link::part(link) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
+  background-color: var(--_gray-strong);
+  color: var(--_gray-surface);
   display: inline-block;
-  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
 }
 
 /* The keyboard is the only thing that ever reaches this, so the ring is the
@@ -54,8 +64,63 @@ helix-headless-skip-link::part(link):focus-visible {
   outline-offset: 2px;
 }
 
-header,
+/* The page it skips: a header row with the mark at the start and the sections
+   centered, then the content it lands on. */
+header {
+  align-items: center;
+  block-size: 3.5rem;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr auto 1fr;
+  padding: 0 1.5rem;
+}
+
+header > span {
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 nav {
+  align-items: center;
+  block-size: 2rem;
   display: flex;
-  gap: 1rem;
+  gap: 0.25rem;
+}
+
+/* Nav items rather than links in a sentence: no underline, muted until they
+   are the page you are on. */
+nav a {
+  align-items: center;
+  block-size: 100%;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0 0.75rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+nav a:hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+nav a[aria-current="page"] {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+nav a:focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+main p {
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
 }

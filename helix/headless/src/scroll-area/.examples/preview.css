@@ -45,14 +45,61 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-scroll-area {
-  block-size: 8rem;
-  border: 1px solid var(--_gray-line);
-  display: block;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+/* A box with a size, because a scroll area has none of its own: it scrolls
+   whatever it is given against whatever room it is given. */
+helix-headless-scroll-area {
+  --_fade-block-start: 0rem;
+  --_fade-block-end: 0rem;
+
+  block-size: 12rem;
+  display: block;
+  inline-size: 20rem;
+  position: relative;
+}
+
+/* The fades are the component's own report of where there is more, read as
+   custom states, and drawn as a mask over the viewport rather than as a
+   gradient of the page's color laid on top: a mask needs no idea what is
+   behind the box. The opaque stops only have to be opaque, so they take the
+   ramp's darkest gray and the page never sees it. */
+helix-headless-scroll-area:state(more-block-start) {
+  --_fade-block-start: 2rem;
+}
+
+helix-headless-scroll-area:state(more-block-end) {
+  --_fade-block-end: 2rem;
+}
+
+helix-headless-scroll-area::part(viewport) {
+  block-size: 100%;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--_gray-strong) var(--_fade-block-start),
+    var(--_gray-strong) calc(100% - var(--_fade-block-end)),
+    transparent
+  );
+  overscroll-behavior: contain;
+  scrollbar-color: var(--_gray-line) transparent;
+  scrollbar-width: thin;
+}
+
+/* The viewport is the tab stop, so the ring goes on it, drawn inside because a
+   ring outside a box that clips would be cut off by whatever holds it. */
+helix-headless-scroll-area::part(viewport):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+helix-headless-scroll-area p {
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
 }

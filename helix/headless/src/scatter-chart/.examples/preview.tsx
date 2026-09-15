@@ -97,7 +97,10 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-headless-scatter-chart for="pages"></helix-headless-scatter-chart>
+      <helix-headless-scatter-chart
+        for="pages"
+        gridlines="both"
+      ></helix-headless-scatter-chart>
     </div>
   )
 }
