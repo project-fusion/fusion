@@ -118,6 +118,15 @@ helix-headless-select > helix-headless-icon[slot="indicator"] {
   font-size: 1.25rem;
 }
 
+/* The caret turns over while the list is open. `open` is a custom state the
+   select records on itself, so the page reads it off the host, and the caret
+   it turns is either the part or whatever was slotted over it. No transition,
+   for the reason the switch sheet gives. */
+helix-headless-select:state(open)::part(indicator),
+helix-headless-select:state(open) > [slot="indicator"] {
+  scale: 1 -1;
+}
+
 helix-headless-select::part(hint),
 helix-headless-select::part(feedback) {
   font-size: 0.75rem;

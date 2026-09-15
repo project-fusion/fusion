@@ -383,6 +383,23 @@ helix-headless-video-playlist-item::part(item) {
   text-align: start;
 }
 
+/* The one playing: a quiet ground and a rule down the leading edge, in the
+   margin the row's padding leaves for it. `item-current` is the name the row
+   takes while its entry is current; `current` is a property and reaches no
+   attribute a selector could read. */
+helix-headless-video-playlist-item::part(item-current) {
+  background-color: var(--_gray-subtle);
+}
+
+helix-headless-video-playlist-item::part(item-current)::before {
+  background-color: var(--_gray-strong);
+  content: "";
+  inline-size: 2px;
+  inset-block: 0.25rem;
+  inset-inline-start: 0.25rem;
+  position: absolute;
+}
+
 helix-headless-video-playlist-item[disabled]::part(item) {
   cursor: not-allowed;
   opacity: 0.5;

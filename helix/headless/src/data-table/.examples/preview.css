@@ -107,10 +107,10 @@ helix-headless-data-table::part(loading) {
   grid-column: 1 / -1;
 }
 
-/* The pagination sits at the end of the row under the grid. Its own controls
-   are inside its shadow root and the table forwards none of them, so a
-   document sheet reaches the box and not what is in it: the row is laid out
-   here, and the pages inside it stay the platform's list and buttons. */
+/* The pagination sits at the end of the row under the grid, drawn as the
+   headless Pagination preview draws itself. Its controls are inside its own
+   shadow root, and the table forwards every one of them under `pagination-`,
+   so these are that preview's rules with the prefix. */
 helix-headless-data-table::part(footer) {
   align-items: center;
   display: flex;
@@ -122,14 +122,88 @@ helix-headless-data-table::part(footer) {
 helix-headless-data-table::part(pagination) {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
   gap: 0.25rem;
   margin-inline-start: auto;
+}
+
+helix-headless-data-table::part(pagination-list) {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+helix-headless-data-table::part(pagination-item) {
+  display: inline-flex;
+}
+
+/* One square box for every control in the row, pages and arrows alike. */
+helix-headless-data-table::part(pagination-page),
+helix-headless-data-table::part(pagination-gap),
+helix-headless-data-table::part(pagination-previous),
+helix-headless-data-table::part(pagination-next) {
+  align-items: center;
+  appearance: none;
+  background-color: transparent;
+  block-size: 2rem;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  justify-content: center;
+  min-inline-size: 2rem;
+  padding: 0 0.25rem;
+}
+
+helix-headless-data-table::part(pagination-page):hover,
+helix-headless-data-table::part(pagination-previous):hover,
+helix-headless-data-table::part(pagination-next):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+/* The page you are on, a raised chip with an edge. */
+helix-headless-data-table::part(pagination-page-current),
+helix-headless-data-table::part(pagination-page-current):hover {
+  background-color: var(--_gray-surface);
+  border-color: var(--_gray-line);
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+helix-headless-data-table::part(pagination-gap) {
+  user-select: none;
+}
+
+helix-headless-data-table::part(pagination-mark) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
+}
+
+helix-headless-data-table::part(pagination-previous):disabled,
+helix-headless-data-table::part(pagination-next):disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 /* The keyboard reaches the sort buttons, so the ring goes on them. Taking the
    UA outline off without putting one back is the commonest way a headless
    control stops being operable without a pointer. */
-helix-headless-table-column::part(sort):focus-visible {
+helix-headless-table-column::part(sort):focus-visible,
+helix-headless-data-table::part(pagination-page):focus-visible,
+helix-headless-data-table::part(pagination-gap):focus-visible,
+helix-headless-data-table::part(pagination-previous):focus-visible,
+helix-headless-data-table::part(pagination-next):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
