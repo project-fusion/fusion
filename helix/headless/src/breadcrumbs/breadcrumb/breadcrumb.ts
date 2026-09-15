@@ -113,7 +113,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    */
   protected renderSeparator(): TemplateResult {
     return html`<slot name="separator"
-      ><svg part="separator-mark" fill="currentColor" viewBox=${caretRight.viewBox}>
+      ><svg part="separator-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>
         ${unsafeSVG(caretRight.content)}
       </svg></slot
     >`

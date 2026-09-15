@@ -171,8 +171,3 @@ slot[name="submenu"] {
 slot[name="submenu"]::slotted(helix-divider) {
   margin-block: var(--helix-space-2xs);
 }
-
-/* A caret is physical and the thing it points at is not. */
-:host(:dir(rtl)) [part="mark"][data-submenu] {
-  scale: -1 1;
-}

@@ -100,11 +100,6 @@
   color: var(--helix-color-foreground);
 }
 
-/* A caret is physical and the thing it points at is not. */
-:host(:dir(rtl)) [part="separator"] svg {
-  scale: -1 1;
-}
-
 /* The crumb itself, whether it is a link or the current page.
  *
  * **The gap is what sits between a mark and the word beside it**, and it only

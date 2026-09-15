@@ -708,7 +708,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
    */
   protected renderPreviousMark(): TemplateResult {
     return html`<slot name="previous-icon">
-      <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+      <svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
         ${unsafeSVG(caretLeft.content)}
       </svg>
     </slot>`
@@ -716,7 +716,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
 
   protected renderNextMark(): TemplateResult {
     return html`<slot name="next-icon">
-      <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+      <svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
         ${unsafeSVG(caretRight.content)}
       </svg>
     </slot>`

@@ -449,7 +449,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
                   aria-label=${this.backLabel}
                   @click=${() => this.leave()}
                 >
-                  <svg part="back-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                  <svg part="back-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
                     ${unsafeSVG(caretLeft.content)}
                   </svg>
                 </button>

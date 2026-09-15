@@ -278,7 +278,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
         ? ''
         : html`<div part="header">
             <button part="back" type="button" aria-label=${this.backLabel} @click=${() => this.back()}>
-              <svg part="back-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+              <svg part="back-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
                 ${unsafeSVG(caretLeft.content)}
               </svg>
             </button>

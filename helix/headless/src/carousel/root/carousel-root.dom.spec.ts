@@ -1,5 +1,12 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  role,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -618,3 +625,39 @@ describe('carousel across several slides at once', () => {
    stylesheet and reports `''` for every side of the track's padding, so the
    number under test does not exist on that harness and neither does the
    scrolling it has to survive. */
+
+/* A caret means previous or next, so it points where that slide is: toward the
+   start and toward the end of the line, which on a right-to-left page are the
+   right and the left. The headless tier draws the caret and says so with the
+   mark `core` turns, so a page with no stylesheet gets it right; before, the
+   caret kept its left-to-right face and each pointed at the other button.
+
+   A browser's, because the turn is a `:dir()` rule and happy-dom matches no
+   `:dir()` at all. */
+const browser = hasLayout() ? test : (): void => {}
+
+describe('the carets', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  const faces = async (): Promise<{ next: string; previous: string; previousOnRight: boolean }> => {
+    const host = await carousel()
+    const previous = part(host, 'previous') as HTMLElement
+    const next = part(host, 'next') as HTMLElement
+    return {
+      next: getComputedStyle(part(host, 'next-mark') as Element).scale,
+      previous: getComputedStyle(part(host, 'previous-mark') as Element).scale,
+      previousOnRight: previous.getBoundingClientRect().left > next.getBoundingClientRect().left,
+    }
+  }
+
+  browser('keep their faces on a left-to-right page', async () => {
+    expect(await faces()).toEqual({ next: 'none', previous: 'none', previousOnRight: false })
+  })
+
+  browser('and turn on a right-to-left one, each toward its own side', async () => {
+    document.documentElement.dir = 'rtl'
+    expect(await faces()).toEqual({ next: '-1 1', previous: '-1 1', previousOnRight: true })
+  })
+})

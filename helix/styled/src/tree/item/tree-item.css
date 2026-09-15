@@ -124,6 +124,13 @@ a[part="row"] {
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* Shut, it points along the row into what it holds, which on a right-to-left
+   page is the left. Before the open rule, which has the same weight and has to
+   win over both. */
+:host(:dir(rtl)) [part="toggle"] {
+  transform: rotate(90deg);
+}
+
 :host(:state(open)) [part="toggle"] {
   transform: rotate(0deg);
 }

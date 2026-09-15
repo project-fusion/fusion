@@ -485,6 +485,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         row.branch
           ? html`<svg
               part="toggle"
+              ?data-mirror=${!row.open}
               fill="currentColor"
               viewBox=${(row.open ? caretDown : caretRight).viewBox}
               aria-hidden="true"

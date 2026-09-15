@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -97,4 +97,37 @@ describe('tree item geometry', () => {
       Number.parseFloat(style.columnGap)
     expect(Math.round(uncovered)).toBeLessThanOrEqual(Math.ceil(inset))
   })
+})
+
+/* A shut branch's chevron points along its row into what it holds, which is
+   toward its own label: the right on a left-to-right page and the left on a
+   right-to-left one. The sheet stands a downward caret on its side, so the
+   sheet is what turns it; it had turned it the one way whatever the page. */
+describe('a shut branch', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  for (const dir of ['ltr', 'rtl'] as const) {
+    geometry(`points its chevron at its own label, ${dir}`, async () => {
+      document.documentElement.dir = dir
+      const tree = await mount(`<helix-tree label="Files">
+        <helix-tree-item value="branch">Branch
+          <helix-tree-item slot="children" value="child">Child</helix-tree-item>
+        </helix-tree-item>
+      </helix-tree>`)
+      const branch = items(tree)[0] as HTMLElement
+      const toggle = part(branch, 'toggle') as HTMLElement
+      /* The glyph points down, so where down lands once the sheet has turned it
+         is where it points. */
+      const turned = new DOMMatrix(getComputedStyle(toggle).transform).transformPoint(
+        new DOMPoint(0, 1),
+      )
+      const box = toggle.getBoundingClientRect()
+      const label = (part(branch, 'label') as HTMLElement).getBoundingClientRect()
+      const towardLabel = Math.sign(label.left + label.width / 2 - (box.left + box.width / 2))
+      expect(Math.sign(Math.round(turned.x))).toBe(towardLabel)
+      expect(towardLabel).toBe(dir === 'rtl' ? -1 : 1)
+    })
+  }
 })

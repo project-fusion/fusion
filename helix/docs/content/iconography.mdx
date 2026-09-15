@@ -52,6 +52,20 @@ An icon with no `label` is hidden from assistive technology, which is right when
 the words are beside it and wrong when they are not. `Icon.Button` takes a
 `label` because it never has words beside it.
 
+## One that points along the line
+
+```html
+<helix-icon
+  mirror
+  name="arrow-right"
+></helix-icon>
+```
+
+The names are physical, so `arrow-right` points right on every page. An arrow
+that means forward or back asks with `mirror` to turn round on a right-to-left
+page, which every caret the library draws already does.
+[Localization](./localization) has the rest.
+
 ## Importing a glyph directly
 
 ```ts

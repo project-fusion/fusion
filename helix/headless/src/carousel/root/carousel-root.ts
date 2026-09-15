@@ -784,7 +784,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   aria-label="Previous slide"
                   @click=${() => this.goTo(this.index - 1)}
                 >
-                  <svg part="previous-mark" fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
+                  <svg part="previous-mark" data-mirror fill="currentColor" viewBox=${caretLeft.viewBox} aria-hidden="true">
                     ${unsafeSVG(caretLeft.content)}
                   </svg>
                 </button>
@@ -794,7 +794,7 @@ export class HelixHeadlessCarousel extends HelixElement {
                   aria-label="Next slide"
                   @click=${() => this.goTo(this.index + 1)}
                 >
-                  <svg part="next-mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+                  <svg part="next-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
                     ${unsafeSVG(caretRight.content)}
                   </svg>
                 </button>`

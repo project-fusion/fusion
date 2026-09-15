@@ -21,8 +21,8 @@ shipped one package in five files.
 **It is a rule about the dependency, not about the character `{`.** `core`
 already ships token-free rules into every shadow root through
 `HelixElement.finalizeStyles`: `box-sizing`, `:host([hidden]) { display: none }`,
-a scroll container's `overflow`, the mirror a chart's drawing takes on a
-right-to-left page, and the transition suppression that stops a component
+a scroll container's `overflow`, the mirror a chart's drawing and a caret take
+on a right-to-left page, and the transition suppression that stops a component
 animating its own arrival. `HIDDEN` is the clearest case, because the
 notes below argue that `hidden` is base-tier *state* on the grounds that the
 platform acts on it, and the way the headless tier makes the platform act is a CSS
@@ -51,6 +51,18 @@ before the mark, the columns under them did not. Values keep their vertical
 sense and numerals are text, so neither reverses. A whole ring stays unmarked,
 clockwise from twelve being a clock's convention rather than a script's, and a
 half ring is marked, being read across like a line.
+
+**A glyph that points along the line takes the same mark**, from the component
+that draws it and so knows what it means: a caret meaning next or previous, the
+one between two crumbs, a shut disclosure. The headless tier then points it the
+right way with no stylesheet, where each styled sheet used to turn its own and a
+headless page had to know to. A glyph a sheet stands on its side is that
+sheet's to turn, and a consumer's icon asks with `mirror`, the icon names being
+physical. **An arrow key moves where it points** by the same reasoning:
+`inlineStep` says which way along the line a horizontal key goes, and every
+component moving on the horizontal pair asks it rather than reading
+`ArrowRight` as forward. A media player's timeline is the exception, a tape
+running one way whatever the script, and says so where it is drawn.
 
 **A rule and not an inline `style`**, which was the first idea. An inline style
 on a rendered part outranks every author rule short of `!important`, so a

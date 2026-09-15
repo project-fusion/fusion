@@ -112,15 +112,6 @@
   vertical-align: -0.125em;
 }
 
-/* **Two glyphs rather than one turned**, so the base tier draws the right one
-   with no stylesheet at all: a headless consumer cannot reach a row's
-   `aria-expanded` from outside, `::part()` taking no attribute after it. The
-   closed one points along the line, which on a right-to-left page is the other
-   way. */
-:host(:dir(rtl)) [part~="row"][aria-expanded="false"] > [part="toggle"] {
-  scale: -1 1;
-}
-
 /* Each type in its own ink, from the syntax set the code blocks use, so a
    string, a number and a null read as three different things at a glance. The
    text itself says the same thing for a reader who cannot see the color: a

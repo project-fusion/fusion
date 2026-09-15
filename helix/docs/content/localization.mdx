@@ -33,6 +33,16 @@ their vertical sense and numerals are not reversed. A whole donut stays
 clockwise from twelve, which is a clock's convention rather than a script's.
 [Charting](./charting) has the rest.
 
+**Carets and arrow keys turn too.** A caret meaning next or previous, the one
+between two crumbs and a shut disclosure all point along the line, so on a
+right-to-left page they point the other way, and every arrow key moves where it
+points on screen: the left arrow moves to the next tab, the next day, the next
+control in a toolbar, and opens a tree's branch or a menu's submenu, whose caret
+points left. A slider and a splitter's divider move the way the key points.
+
+A media player is the exception: its timeline and its skip buttons run left to
+right in every script, a tape having one direction, so the left arrow rewinds.
+
 That is also how `placement` reads. The side is physical and the alignment is
 logical: `right` is the right of the anchor in either direction, and
 `bottom-start` lines a panel up with the anchor's start edge, which is its right
@@ -100,8 +110,20 @@ would be a second one to keep in step with yours.
   and font fallback all key off it.
 - **Numerals.** `Intl` handles the digits; a hardcoded `%` or a currency symbol
   in your own markup will not move to the right side.
-- **Icons that point.** A chevron meaning "forward" is mirrored by the logical
-  properties; one baked into an SVG path is not.
+- **Icons that point.** A caret a component draws turns on its own. An icon you
+  place does not unless you ask, because the names are physical: `mirror` turns
+  one on a right-to-left page, for an arrow that means forward or back.
+
+  ```html
+  <helix-button>
+    Continue
+    <helix-icon
+      mirror
+      name="arrow-right"
+      slot="end"
+    ></helix-icon>
+  </helix-button>
+  ```
 
 ## What is not covered
 

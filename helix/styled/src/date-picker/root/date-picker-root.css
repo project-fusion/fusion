@@ -239,11 +239,9 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/*
- *  A caret is physical and the thing it points at is not.
- */
-:host(:dir(rtl)) [part="previous"] svg,
-:host(:dir(rtl)) [part="next"] svg,
+/* An icon put in one of the slots turns on a right-to-left page as the caret
+   it replaces does. The caret is turned by `core`, being marked where it is
+   drawn; what a consumer slots carries no mark, so it is turned here. */
 :host(:dir(rtl)) ::slotted([slot="previous-icon"]),
 :host(:dir(rtl)) ::slotted([slot="next-icon"]) {
   scale: -1 1;

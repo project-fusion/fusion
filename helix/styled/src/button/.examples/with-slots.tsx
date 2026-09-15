@@ -11,6 +11,7 @@ export function Example() {
         ></helix-icon>
         Play
         <helix-icon
+          mirror
           name="arrow-right"
           slot="end"
         ></helix-icon>

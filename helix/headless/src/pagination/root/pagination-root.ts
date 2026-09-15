@@ -589,7 +589,7 @@ export class HelixHeadlessPagination extends HelixElement {
     return {
       address: spent ? nothing : fill(this.href, to, this.count),
       click: (event: Event): void => this.go(to, event),
-      glyph: html`<svg part="mark" fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
+      glyph: html`<svg part="mark" data-mirror fill="currentColor" viewBox=${icon.viewBox} aria-hidden="true">
         ${unsafeSVG(icon.content)}
       </svg>`,
       name,

@@ -162,6 +162,12 @@ helix-headless-tree-item::part(toggle) {
   rotate: -90deg;
 }
 
+/* Along the row is the left on a right-to-left page. Before the open rule,
+   which weighs the same and has to win over both. */
+helix-headless-tree-item:dir(rtl)::part(toggle) {
+  rotate: 90deg;
+}
+
 helix-headless-tree-item:state(open)::part(toggle) {
   rotate: 0deg;
 }
