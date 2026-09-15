@@ -338,8 +338,18 @@
     // sandbox stylesheet, which is also what the browser spec runner serves as
     // its whole token layer, could sit a build behind the components it is
     // meant to paint.
+    //
+    // **The two packages it bundles, and not the site's every dependency.**
+    // `^build` waited for all of them, `helix-docs` among them, whose build
+    // waits on `docs` and `metrics`: 45 seconds of measuring bundle sizes on a
+    // two-core runner, measured 15 Sep 2026, that nothing in the frame reads.
+    // Every browser job in `verify` waits on the frame and on nothing else of the
+    // site, so this is what lets `warm-browser` finish while `warm` is still
+    // measuring. The entry imports `@fusion.dev/helix`, whose own `^build`
+    // brings the core, the headless tier and the icons, and the stylesheets
+    // are `@fusion.dev/helix-styles`' output.
     "frame": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["@fusion.dev/helix#build", "@fusion.dev/helix-styles#build"],
       "inputs": [
         "preview/preview-frame-entry.ts",
         "preview/preview-frame.css",
@@ -430,8 +440,11 @@
     "routes": { "cache": false, "dependsOn": ["catalog"] },
     "samples": { "cache": false },
 
+    // The same narrowing as `frame`, for the same wait: the spec bundles reach
+    // the tiers through `@fusion.dev/helix`'s graph and the harness through
+    // `@fusion.dev/helix-testing`, and nothing of `helix-docs`.
     "specs": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["@fusion.dev/helix#build", "@fusion.dev/helix-testing#build"],
       "inputs": [
         "$TURBO_ROOT$/helix/headless/src/**/*.dom.spec.ts",
         "$TURBO_ROOT$/helix/styled/src/**/*.dom.spec.ts",
