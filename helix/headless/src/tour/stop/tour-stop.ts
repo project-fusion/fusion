@@ -136,6 +136,17 @@ export class HelixHeadlessTourStop extends HelixElement {
   private readonly floating = new PopoverController(this, {
     anchor: () => this.target,
     arrow: () => this.partNamed('arrow'),
+    /* Clear of the light, measured to the point of the arrow. The tour lights
+       `spotlight-padding` around the target and the arrow reaches `n / sqrt(2)`
+       past the panel's edge, and with no offset the panel sat on the target
+       itself, over the lit margin, with its point 5.7px into what it pointed
+       at. `offsetWidth` rather than a rect, which reports the rotated box. */
+    offset: () => {
+      const tour = this.parentElement as (HTMLElement & { spotlightPadding?: number }) | null
+      return (
+        (tour?.spotlightPadding ?? 0) + (this.partNamed('arrow')?.offsetWidth ?? 0) / Math.SQRT2
+      )
+    },
     /* A press outside does not end a tour, and this is the decision rather than
        a stub. Everywhere else a surface closes on an outside press because
        pressing elsewhere means the reader is finished with it. Here elsewhere

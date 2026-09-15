@@ -7,10 +7,8 @@
   display: block;
 }
 
-/* A hair between rows. */
 [part="item"] {
   border-radius: var(--helix-radii-sm);
-  margin-block-end: var(--tree-gap, var(--helix-space-2xs));
   outline: none;
 }
 
@@ -29,8 +27,15 @@
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: flex;
-  font-size: var(--_tree-text, var(--helix-text-sm));
+  /* One size at every depth: the indent is what says a row is nested. A step
+     down for children set every child a size under its parent and under the
+     top-level leaf after it, so depth read as a change of voice. */
+  font-size: var(--helix-text-sm);
   gap: var(--helix-space-2xs);
+  /* A hair between rows, and on the row rather than the item. On the item it
+     added up, a parent's under its last child's, so the gaps in one tree came
+     out 0, 4 and 8px. */
+  margin-block-end: var(--tree-gap, var(--helix-space-2xs));
   /* One line plus the padding, floored at the target size: a row you can hit,
      rather than one sized to the height of its own text. */
   block-size: max(
@@ -78,11 +83,6 @@
 /* And a leaf carries the same weight, not a lighter one. */
 [part="row"]:not(:has([part="toggle"])) {
   font-weight: var(--helix-weight-medium);
-}
-
-/* Children read as children: one step down the type scale, and one only. */
-slot[name="children"]::slotted(*) {
-  --_tree-text: var(--helix-text-xs);
 }
 
 [part="row"]:hover {

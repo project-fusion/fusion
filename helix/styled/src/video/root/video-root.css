@@ -20,6 +20,13 @@
 [part="stage"] {
   border-radius: var(--video-radius, var(--helix-radii-md));
   display: block;
+  /* *An edge, for a dark page.** The well is black in both schemes and so is a
+     dark page, so without one only the control bar said where the player was.
+     Drawn inside and over the picture, in the border color as the player's own
+     dark scheme resolves it: on a light page that is a line inside a black box
+     and reads as nothing. */
+  outline: var(--helix-border-thin) solid var(--helix-color-border);
+  outline-offset: calc(var(--helix-border-thin) * -1);
   overflow: hidden;
   position: relative;
 }

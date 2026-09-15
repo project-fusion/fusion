@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -386,5 +386,47 @@ describe('a time picker drawn from outside', () => {
     expect(row(chosen)).toContain('item-selected')
     expect(row(other)).not.toContain('item-selected')
     expect(chosen?.getAttribute('exportparts')).toContain('item-selected: option-item-selected')
+  })
+})
+
+describe('a time picker opens on its answer', () => {
+  /* The headless tier draws no bound on the list, and a list with none has
+     nothing to scroll, so the spec writes the one every sheet drawing it does.
+     `::part()` because it is the published door, and a document rule beats a
+     shadow one. */
+  const BOUND = `helix-headless-time-picker::part(list-items) {
+    display: block;
+    max-block-size: 14rem;
+    overflow-y: auto;
+  }
+  helix-headless-time-picker::part(option) {
+    display: block;
+  }`
+
+  test('a list holding a time shows that time, rather than midnight', async () => {
+    if (!hasLayout()) {
+      return
+    }
+    const sheet = document.createElement('style')
+    sheet.textContent = BOUND
+    document.head.append(sheet)
+    try {
+      const host = await picker('default-value="09:30"')
+      const items = part(part(host, 'list') as HTMLElement, 'items') as HTMLElement
+      const chosen = options(host).find((one) => one.getAttribute('value') === '09:30')
+      /* It brings itself there once its rows exist, which is after its own
+         first update, so the check waits on the rows too. */
+      await Promise.all(
+        options(host).map((one) => (one as Partial<Time>).updateComplete ?? Promise.resolve()),
+      )
+      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+      const box = items.getBoundingClientRect()
+      const row = (chosen as HTMLElement).getBoundingClientRect()
+      expect(items.scrollTop).toBeGreaterThan(0)
+      expect(row.top).toBeGreaterThanOrEqual(box.top)
+      expect(row.bottom).toBeLessThanOrEqual(box.bottom)
+    } finally {
+      sheet.remove()
+    }
   })
 })

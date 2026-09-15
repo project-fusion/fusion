@@ -419,15 +419,22 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Each wheel comes to rest on its own answer.
+   * Each wheel comes to rest on its own answer, and the list on the time it
+   * holds.
    *
    * A dial that opens at midnight when it holds ten in the evening is a dial
    * showing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a
    * snap point when something scrolls, and nothing has. Measured before this,
-   * with the value at 22:00, the hour wheel sat 288 pixels above its answer.
+   * with the value at 22:00, the hour wheel sat 288 pixels above its answer. The
+   * list had the same fault: holding 09:30 it opened on 12:00 AM with the answer
+   * 38 rows down and out of sight, flat on a page and in every Time Input panel.
+   * A list holding several, a range or a set, is left where it is, having no
+   * one row to come to rest on.
    *
-   * On every update rather than on the first, because the columns re-render as
-   * the value moves and the minute column's contents change with the hour.
+   * The wheels on every update, because the columns re-render as the value
+   * moves and the minute column's contents change with the hour. The list on
+   * the first only, where it is flat on a page: centering it on every choice
+   * would move the row out from under the pointer that chose it.
    *
    * **And it is public, because an update is not the only moment that matters.**
    * Inside a panel this element renders while the panel is still
@@ -438,7 +445,11 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * rather than wrong, which is why it can be left in.
    */
   reveal(): void {
-    if (this.variant !== 'wheels' || this.mode !== undefined) {
+    if (this.mode !== undefined) {
+      return
+    }
+    if (this.variant !== 'wheels') {
+      this.partNamed<HTMLElement & { reveal?: () => void }>('list')?.reveal?.()
       return
     }
     for (const column of this.renderRoot?.querySelectorAll<HTMLElement & { reveal?: () => void }>(
@@ -559,7 +570,7 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   }
 
   /**
-   * Reveals once the wheels have rendered themselves.
+   * Reveals once the wheels, or the list and its rows, have rendered themselves.
    *
    * `updated` is this element's own moment, and each wheel is a `helix-listbox`
    * that was created during this very render: its first update has been
@@ -578,14 +589,20 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
    * scrolling a wheel changes no property and so schedules no update.
    */
   private async revealWhenSettled(): Promise<void> {
-    const columns = [
+    const settling = [
       ...(this.renderRoot?.querySelectorAll<HTMLElement & { updateComplete?: Promise<unknown> }>(
-        '[part="column"]',
+        '[part="column"], [part="list"], [part~="option"]',
       ) ?? []),
     ]
-    await Promise.all(columns.map((column) => column.updateComplete))
+    await Promise.all(settling.map((one) => one.updateComplete))
     this.reveal()
   }
+
+  /**
+   * Whether the list has brought itself to its answer yet. It does that once,
+   * and after that only whatever opens a panel calls `reveal`.
+   */
+  private listRevealed = false
 
   /* `ariaInvalid` on the host through `ElementInternals`, the same route
      Date Picker takes and for the reason the whole library records: a `role` or a
@@ -603,8 +620,13 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.reportRequired()
-    this.reveal()
-    void this.revealWhenSettled()
+    if (this.variant === 'wheels') {
+      this.reveal()
+      void this.revealWhenSettled()
+    } else if (!this.listRevealed) {
+      this.listRevealed = true
+      void this.revealWhenSettled()
+    }
   }
 
   /** Puts the keyboard on the list, which is the only control here. */

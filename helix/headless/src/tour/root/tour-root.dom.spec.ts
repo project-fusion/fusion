@@ -170,6 +170,31 @@ if (hasLayout()) {
       await tour.updateComplete
       expect(width()).toBe(before + 40)
     })
+
+    test('and a stop points at it from outside, not from on top of the target', async () => {
+      /* The panel had no offset, so it sat on the target, over the lit margin,
+         with its point inside what it pointed at. The rules are what every sheet
+         drawing a tour writes: the light is placed by insets, which a static box
+         ignores, the UA's margin centers a popover in the window, and an arrow
+         with no size has no reach. */
+      const sheet = document.createElement('style')
+      sheet.textContent = `helix-headless-tour::part(spotlight) { position: fixed }
+        helix-headless-tour-stop::part(bubble) { margin: 0 }
+        helix-headless-tour-stop::part(arrow) { block-size: 8px; inline-size: 8px; position: absolute }`
+      document.head.append(sheet)
+      try {
+        const tour = await run()
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+        const light = (part(tour, 'spotlight') as HTMLElement).getBoundingClientRect()
+        const panel = (part(at(tour.stops, 0), 'bubble') as HTMLElement).getBoundingClientRect()
+        /* The arrow's reach, `8 / sqrt(2)`, give or take the pixel the
+           controller rounds its position to. */
+        expect(panel.top - light.bottom).toBeGreaterThan(5)
+        expect(panel.top - light.bottom).toBeLessThan(7)
+      } finally {
+        sheet.remove()
+      }
+    })
   })
 }
 
