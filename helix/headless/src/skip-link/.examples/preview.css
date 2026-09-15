@@ -54,6 +54,7 @@ helix-headless-skip-link:focus-within {
 
 helix-headless-skip-link::part(link) {
   background-color: var(--_gray-strong);
+  border-radius: var(--_radius-control);
   color: var(--_gray-surface);
   display: inline-block;
   font-size: 0.8125rem;
@@ -99,6 +100,7 @@ nav {
 nav a {
   align-items: center;
   block-size: 100%;
+  border-radius: var(--_radius-control);
   color: var(--_gray-muted);
   display: inline-flex;
   font-size: 0.8125rem;
@@ -122,6 +124,12 @@ nav a[aria-current="page"] {
 nav a:focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: -2px;
+}
+
+/* The content starts on the header's inset, so the page reads as one column
+   rather than a header and a paragraph a step to its left. */
+main {
+  padding-inline: 1.5rem;
 }
 
 main p {

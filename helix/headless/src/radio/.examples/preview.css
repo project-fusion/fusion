@@ -100,21 +100,22 @@ helix-headless-radio {
 }
 
 /* The button is the whole row, circle and words, so `all: unset` takes the
-   platform's button chrome off it. */
+   platform's button chrome off it. Its corner is for the focus ring, which
+   follows it. */
 helix-headless-radio::part(item) {
   all: unset;
   align-items: center;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
   gap: 0.5rem;
 }
 
-/* A circle is round rather than softened, so it keeps its radius. */
 helix-headless-radio::part(box) {
   background-color: var(--_gray-surface);
   block-size: 1.25rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
   border-radius: 50%;
   box-sizing: border-box;
   display: grid;

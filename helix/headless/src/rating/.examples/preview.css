@@ -159,6 +159,7 @@ helix-headless-rating::part(option) {
    off without putting one back is the commonest way a headless control stops
    being operable without a pointer. */
 helix-headless-rating::part(option):focus-visible {
+  border-radius: var(--_radius-control);
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }

@@ -67,6 +67,7 @@ helix-headless-skeleton {
 helix-headless-skeleton::part(skeleton) {
   background-color: var(--_gray-fill);
   block-size: 100%;
+  border-radius: var(--_radius-control);
   display: block;
   inline-size: 100%;
 }
@@ -77,7 +78,7 @@ helix-headless-skeleton::part(skeleton) {
   gap: 1rem;
 }
 
-/* A control-sized circle, round rather than softened. */
+/* A control-sized circle. */
 .avatar {
   block-size: 2.5rem;
   flex: none;
@@ -89,12 +90,17 @@ helix-headless-skeleton::part(skeleton) {
 }
 
 /* Takes the rest of the row, so the lines are measured against the space left
-   after the avatar rather than against the viewport. */
+   after the avatar rather than against the viewport. The width is what the row
+   asks for when nothing else gives it one: the preview shrinks to its content,
+   a flex basis does not count toward that, and lines sized as a share of a box
+   with no width of its own drew nothing at all. */
 .stack {
   display: flex;
-  flex: 1;
+  flex: auto;
+  inline-size: 16rem;
   flex-direction: column;
   gap: 0.25rem;
+  min-inline-size: 0;
 }
 
 /* A line of text is as tall as the text it stands in for, and the two are
@@ -103,6 +109,12 @@ helix-headless-skeleton::part(skeleton) {
 .line-name,
 .line-detail {
   block-size: 0.875rem;
+}
+
+/* A line of text is a pill, the shape the styled tier gives `shape="text"`. */
+.line-name::part(skeleton),
+.line-detail::part(skeleton) {
+  border-radius: 9999px;
 }
 
 .line-name {

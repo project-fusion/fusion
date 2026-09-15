@@ -70,24 +70,21 @@ helix-headless-progress[show-value] {
   grid-template-columns: 1fr auto;
 }
 
+/* A pill, and the fill a pill inside it: the fill is sized rather than scaled,
+   so its own radius rounds the end it has reached. */
 helix-headless-progress::part(track) {
   background-color: var(--_gray-subtle);
   block-size: 0.5rem;
+  border-radius: 9999px;
   display: block;
   inline-size: 100%;
   overflow: hidden;
 }
 
-helix-headless-progress::part(groove) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
-}
-
 helix-headless-progress::part(indicator) {
   background-color: var(--_gray-strong);
   block-size: 100%;
+  border-radius: inherit;
   display: block;
   inline-size: calc(var(--progress-fraction, 0) * 100%);
 }

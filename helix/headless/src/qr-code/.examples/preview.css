@@ -65,6 +65,7 @@ helix-headless-icon::part(svg) {
 helix-headless-qr-code {
   background-color: var(--_gray-surface);
   block-size: 12rem;
+  border-radius: var(--_radius-control);
   color: var(--_gray-strong);
   color-scheme: light;
   display: block;

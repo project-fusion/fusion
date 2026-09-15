@@ -124,11 +124,14 @@ helix-headless-step::part(label) {
   max-inline-size: 100%;
 }
 
+/* A ghost button, as the styled tier's is: nothing at rest, a wash under the
+   pointer. */
 helix-headless-step::part(label-button) {
   align-items: center;
   background-color: transparent;
   block-size: 2rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -144,6 +147,10 @@ helix-headless-step::part(label-button) {
 helix-headless-step[complete]::part(label-button),
 helix-headless-step[current]::part(label-button) {
   color: var(--_gray-strong);
+}
+
+helix-headless-step::part(label-button):hover {
+  background-color: var(--_gray-subtle);
 }
 
 /* The keyboard reaches this, so the ring goes here. */

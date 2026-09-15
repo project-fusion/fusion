@@ -101,6 +101,7 @@ helix-headless-slider::part(control)::-webkit-slider-runnable-track {
     var(--_gray-fill) calc(var(--slider-fraction, 0) * 100%)
   );
   block-size: 0.5rem;
+  border-radius: 9999px;
 }
 
 helix-headless-slider::part(control)::-moz-range-track {
@@ -110,12 +111,12 @@ helix-headless-slider::part(control)::-moz-range-track {
     var(--_gray-fill) calc(var(--slider-fraction, 0) * 100%)
   );
   block-size: 0.5rem;
+  border-radius: 9999px;
 }
 
-/* Round, which a thumb is rather than softened, in the darkest gray with a ring
-   of the page's lightest, so it reads over the fill and the track alike. A
-   WebKit thumb is laid out from the top of the track, so it is centered by
-   hand. */
+/* Round, in the darkest gray with a ring of the page's lightest, so it reads
+   over the fill and the track alike. A WebKit thumb is laid out from the top of
+   the track, so it is centered by hand. */
 helix-headless-slider::part(control)::-webkit-slider-thumb {
   appearance: none;
   background-color: var(--_gray-strong);

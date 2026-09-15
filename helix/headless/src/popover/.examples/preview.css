@@ -58,7 +58,7 @@ helix-headless-icon::part(svg) {
 }
 
 /* The trigger and the close are the one button, at control height: a quiet
-   fill under a line, the label in the strong gray. */
+   fill inside a quiet edge, the label in the strong gray. */
 helix-headless-button {
   display: inline-flex;
 }
@@ -68,7 +68,8 @@ helix-headless-button::part(button) {
   appearance: none;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;
@@ -99,17 +100,24 @@ helix-headless-button::part(button):focus-visible {
    `--popover-inline-size` for this; the headless tier has no hook and no
    opinion, so a consumer writes the rule, which is what this file is for.
 
-   The margin goes too. The platform centers a `popover` in the window through
-   `inset: 0` and `margin: auto`, and the component writes its position as a
-   translate from the top-left, so a margin left in place puts the panel
-   mid-page rather than under its trigger. */
+   The inset and the margin go too. The platform centers a `popover` in the
+   window through `inset: 0` and `margin: auto`, and the component writes its
+   position as a translate from the top-left, so either left in place puts the
+   panel somewhere other than under its trigger.
+
+   The edge is the darker of the two, because it is all that separates the
+   panel from whatever it opens over: the styled tier lifts it with a shadow,
+   and this tier draws no shadow. */
 helix-headless-popover::part(popover) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   inline-size: 20rem;
+  inset: auto;
   margin: 0;
+  max-inline-size: calc(100vw - 1.5rem);
   padding: 1rem;
 }
 

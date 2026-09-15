@@ -81,7 +81,8 @@ helix-headless-select::part(trigger) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;
@@ -151,10 +152,13 @@ helix-headless-select::part(feedback) {
 
 /* The panel over the page, as wide as the field it came out of. The platform
    centers a `popover` through `inset: 0` and `margin: auto`, and the component
-   writes its position as a translate from the top-left, so both go. */
+   writes its position as a translate from the top-left, so both go. The darker
+   edge, because it is all that separates the panel from what it opens over:
+   the styled tier lifts it with a shadow, and this tier draws none. */
 helix-headless-select::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   inline-size: var(--floating-anchor-inline-size, 100%);

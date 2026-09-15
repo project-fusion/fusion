@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import './preview.css'
 
 export function Example() {
   useEffect(() => {

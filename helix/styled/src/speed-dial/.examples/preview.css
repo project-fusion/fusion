@@ -17,8 +17,10 @@ helix-icon-button[slot="trigger"] {
  * **Written here rather than built into the component**, because the trigger's
  * mark is the consumer's: the dial cannot know it was given a plus, and turning
  * an arbitrary glyph by any angle is a wonky camera. It costs one rule because
- * `helix-speed-dial` writes `aria-expanded` onto whatever was slotted, so the
- * state is already on the element the rule needs it on.
+ * the dial records `open` as a state of its own. **Not `[aria-expanded]` on the
+ * trigger**: the dial never writes onto the consumer's element, and hands the
+ * state into the trigger's shadow root as a property, so a rule reading the
+ * attribute never matches and the plus never turns.
  *
  * **45 degrees, not 90.** A plus has four-fold symmetry, so a quarter turn ends
  * exactly where it started and the only thing anyone sees is the spin. An eighth
@@ -27,7 +29,7 @@ helix-icon-button[slot="trigger"] helix-icon {
   transition: rotate var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
 
-helix-icon-button[slot="trigger"][aria-expanded="true"] helix-icon {
+helix-speed-dial:state(open) > helix-icon-button[slot="trigger"] helix-icon {
   rotate: 45deg;
 }
 
