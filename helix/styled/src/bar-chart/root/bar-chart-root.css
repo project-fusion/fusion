@@ -133,11 +133,11 @@
 /*
  *  The groups the tooltip is not about, faded.
  */
-[part="plot"]:has([data-active]) [part="group"]:not([data-active]) {
+[part="plot"]:has([data-active]) [part~="group"]:not([data-active]) {
   opacity: 0.45;
 }
 
-[part="group"] {
+[part~="group"] {
   transition: opacity var(--helix-duration-fast) var(--helix-easing-decelerate);
 }
 

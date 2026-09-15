@@ -76,7 +76,7 @@
 }
 
 /* The tick and the dash, as masks rather than glyphs, so their weight is ours. */
-[part="mark"] {
+[part~="mark"] {
   /* The foreground, like any other mark made of ink. */
   background-color: var(--checkbox-mark-color, var(--helix-color-foreground));
   block-size: var(--_checkbox-size);
@@ -96,14 +96,14 @@
   transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
 }
 
-:host(:state(checked)) [part="mark"],
-:host([indeterminate]) [part="mark"] {
+:host(:state(checked)) [part~="mark"],
+:host([indeterminate]) [part~="mark"] {
   scale: 1;
 }
 
 /* Indeterminate wins where both are set, because a box that is both is showing a
    mixed set and the dash is what says so. */
-:host([indeterminate]) [part="mark"] {
+:host([indeterminate]) [part~="mark"] {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E");
 }
 

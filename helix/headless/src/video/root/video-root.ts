@@ -151,6 +151,7 @@ const clock = (seconds: number): string => {
  * @csspart poster - What covers it before it plays.
  * @csspart previous - Asks for the previous one.
  * @csspart remote - Play on another device, where one is available.
+ * @csspart remote-pressed - The remote control while the picture is on another device, beside `remote`.
  * @csspart rewind - The control that goes back ten seconds.
  * @csspart scrubber - Where it is, and where to go.
  * @csspart sound - The speaker and its level, which are one control.
@@ -1278,7 +1279,7 @@ export class HelixHeadlessVideo extends HelixElement {
   protected renderExtra(one: string): TemplateResult {
     if (one === 'remote') {
       return html`<button
-        part="remote"
+        part="remote${this.remoteConnected ? ' remote-pressed' : ''}"
         type="button"
         aria-label="Play on another device"
         aria-pressed=${this.remoteConnected ? 'true' : 'false'}

@@ -29,7 +29,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 use crate::component::compositions::{compositions, exposed_as, part_docs_by_tag};
-use crate::component::text::{line_of, uncommented};
+use crate::component::text::{flattened, line_of, uncommented};
 use crate::component::{sources, walk_outside, Context, Finding, Report};
 
 /// Every tag's parts and their descriptions, keyed by tag suffix.
@@ -55,7 +55,7 @@ fn renders_own(context: &Context) -> BTreeMap<std::path::PathBuf, BTreeSet<Strin
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            let code = uncommented(&text);
+            let code = flattened(&uncommented(&text));
             let mut own = BTreeSet::new();
             for found in PART.captures_iter(&code) {
                 let whole = found.get(0).expect("group zero always matches");

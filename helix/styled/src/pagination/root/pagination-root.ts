@@ -44,6 +44,7 @@ import { styles } from './pagination-root.css.js'
  * @csspart list - The run of pages.
  * @csspart next - The control that moves forward one page.
  * @csspart page - The control for one page.
+ * @csspart page-current - The page you are on, beside `page`.
  * @csspart previous - The control that moves back one page.
  * @csspart status - The reading of where you are, in `compact`.
  *

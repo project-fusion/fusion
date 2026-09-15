@@ -43,6 +43,11 @@ import { styles } from './meter-root.css.js'
  * @documentation https://helix.fusion.dev/components/meter
  *
  * @csspart indicator - The part of it the value fills.
+ * @csspart indicator-fair - The fill while the reading is in a band beside the good one, beside `indicator`.
+ * @csspart indicator-good - The fill while the reading is in the good band, beside `indicator`.
+ * @csspart indicator-over - The fill while the value is past the top, beside `indicator`.
+ * @csspart indicator-poor - The fill while the reading is two bands from the good one, beside `indicator`.
+ * @csspart indicator-under - The fill while the value is below the floor, beside `indicator`.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart track - The whole range.
  * @csspart value - The reading, under `show-value`.

@@ -56,7 +56,7 @@ const settled = async (element: Table): Promise<void> => {
 }
 
 const cells = (element: HTMLElement) =>
-  [...(element.shadowRoot?.querySelectorAll('[part="cell"]') ?? [])].map((cell) =>
+  [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])].map((cell) =>
     cell.textContent?.trim(),
   )
 

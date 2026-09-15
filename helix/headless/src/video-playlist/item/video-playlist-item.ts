@@ -37,6 +37,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart container - The `listitem`, which the button sits in.
  * @csspart item - The row, which is a button.
+ * @csspart item-current - The row of the entry the player is on, beside `item`.
  * @csspart label - The name and whatever follows it.
  * @csspart media - The leading column.
  * @csspart thumbnail - The image `poster` falls back to.
@@ -130,10 +131,11 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   protected override render(): TemplateResult {
     /* `aria-current="true"`, and absent rather than `"false"` otherwise. A
        reader is told which one is playing; being told about each of the others
-       that it is not playing is the same fact eleven times. */
+       that it is not playing is the same fact eleven times. `item-current` is
+       the same fact for a stylesheet, since `current` reaches no attribute. */
     return html`<div part="container" role="listitem">
       <button
-        part="item"
+        part="item${this.current ? ' item-current' : ''}"
         type="button"
         aria-current=${this.current ? 'true' : nothing}
         ?disabled=${this.disabled}

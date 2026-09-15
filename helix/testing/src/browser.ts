@@ -684,9 +684,9 @@ export const hasState = (host: Element, name: string): boolean =>
     host as unknown as { internals?: { states?: { has(value: string): boolean } } }
   ).internals?.states?.has(name) ?? false
 
-/** Finds a shadow part by name. */
+/** Finds a shadow part by name, among the names an element carries. */
 export const part = (host: HTMLElement, name: string): Element | null =>
-  host.shadowRoot?.querySelector(`[part="${name}"]`) ?? null
+  host.shadowRoot?.querySelector(`[part~="${name}"]`) ?? null
 
 /**
  * Waits until a component has stopped asking for updates, with a ceiling.

@@ -18,7 +18,7 @@ describe('the events example', () => {
     const clock = document.getElementById('clock') as HTMLElement & { value: string | null }
     const options = [...(clock.shadowRoot?.querySelectorAll<HTMLElement>('[part~="option"]') ?? [])]
     const other = options.find((one) => one.getAttribute('aria-selected') !== 'true')
-    ;(other?.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null)?.click()
+    ;(other?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement | null)?.click()
     await idle()
     expect(logged()).toEqual(['helix-before-change', 'input', 'change'])
   })

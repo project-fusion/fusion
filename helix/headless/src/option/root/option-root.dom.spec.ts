@@ -7,6 +7,24 @@ beforeAll(async () => {
 })
 
 describe('option', () => {
+  test('its row says selected and active in part names, and only while they hold', async () => {
+    /* For the option a component draws in its own shadow root, where no
+       selector naming the host can reach `:state(selected)` or `data-active`. */
+    const host = (await mount(
+      '<helix-headless-option value="a">Alpha</helix-headless-option>',
+    )) as HTMLElement & { active: boolean; selected: boolean; updateComplete: Promise<unknown> }
+    const names = (): string => part(host, 'item')?.getAttribute('part') ?? ''
+    expect(names()).toBe('item')
+    host.selected = true
+    host.active = true
+    await host.updateComplete
+    expect(names()).toBe('item item-selected item-active')
+    host.selected = false
+    host.active = false
+    await host.updateComplete
+    expect(names()).toBe('item')
+  })
+
   test('is an option, which is what an owning listbox needs it to be', async () => {
     const host = (await mount(
       '<helix-headless-option value="a">Alpha</helix-headless-option>',

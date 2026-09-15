@@ -203,7 +203,7 @@ if (hasLayout()) {
     const press = async (host: HTMLElement, value: string): Promise<void> => {
       const option = host.querySelector(`helix-headless-option[value="${value}"]`) as HTMLElement
       await (option as unknown as { updateComplete: Promise<boolean> }).updateComplete
-      const row = option.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null
+      const row = option.shadowRoot?.querySelector('[part~="item"]') as HTMLElement | null
       if (!row) {
         throw new Error('the option renders no row, so there is nothing to press')
       }

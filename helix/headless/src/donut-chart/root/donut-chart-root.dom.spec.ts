@@ -43,7 +43,7 @@ const chart = async (table: string, attributes = ''): Promise<HTMLElement> => {
 }
 
 const segments = (host: HTMLElement): Element[] => [
-  ...(host.shadowRoot?.querySelectorAll('[part="segment"]') ?? []),
+  ...(host.shadowRoot?.querySelectorAll('[part~="segment"]') ?? []),
 ]
 
 /** The drawn length of a slice, which is the first number of its dash. */
@@ -168,6 +168,22 @@ describe('donut chart tooltip', () => {
       false,
       false,
       true,
+    ])
+  })
+
+  test('and it is a part of its own, so a stylesheet outside can thicken it too', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    await hover(host, 2)
+    expect(segments(host).map((one) => one.getAttribute('part'))).toEqual([
+      'segment',
+      'segment',
+      'segment segment-active',
+    ])
+    await hover(host, 0)
+    expect(segments(host).map((one) => one.getAttribute('part'))).toEqual([
+      'segment segment-active',
+      'segment',
+      'segment',
     ])
   })
 })

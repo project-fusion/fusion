@@ -32,7 +32,7 @@
 
 /* Zero at twelve o'clock. */
 [part="track"],
-[part="segment"] {
+[part~="segment"] {
   transform: rotate(-90deg);
   transform-box: fill-box;
   transform-origin: center;
@@ -48,7 +48,7 @@
 }
 
 /* Butt caps, not round. */
-[part="segment"] {
+[part~="segment"] {
   stroke-linecap: butt;
   /* From the markup, which is where the radius is decided, so the two cannot
      disagree. Left out entirely the stroke falls to the SVG default of 1 and
@@ -108,18 +108,18 @@
    selector, so a consumer looking at `data-series="2"` written on the part has
    no selector able to use it. Measured, `::part(bar)[data-series="2"]` is
    dropped at parse time. */
-[part="segment"] {
+[part~="segment"] {
   stroke: var(--chart-series);
 }
 
 /* The slice under the pointer, thickened rather than recolored. */
-[part="segment"][data-active] {
+[part~="segment"][data-active] {
   stroke-width: calc(var(--donut-chart-stroke) * 1.18);
 }
 
 /* *Under `outlined` the slice fills in instead of growing.** Two reasons, and
    the second is the one that forces it. */
-:host([emphasis="outlined"]) [part="segment"][data-active] {
+:host([emphasis="outlined"]) [part~="segment"][data-active] {
   stroke: var(--chart-series);
   stroke-width: var(--donut-chart-stroke);
 }
@@ -132,7 +132,7 @@
    0, 1)`, monotonic, so every frame is a value between where the reading was and
    where it is. */
 /* The ring answers a change in its numbers, and draws itself on arrival. */
-[part="segment"] {
+[part~="segment"] {
   transition:
     r var(--helix-duration-normal) var(--helix-easing-decelerate),
     stroke var(--helix-duration-fast) var(--helix-easing-decelerate),
@@ -142,7 +142,7 @@
 }
 
 @starting-style {
-  [part="segment"] {
+  [part~="segment"] {
     stroke-dasharray: 0 9999;
   }
 }
@@ -155,7 +155,7 @@
    a chart with axes: a line answers anywhere along its width, so the whole
    drawing is the target, while a ring answers only where a slice is and the hole
    in the middle answers nothing. */
-[part="segment"] {
+[part~="segment"] {
   cursor: crosshair;
 }
 
@@ -170,7 +170,7 @@
 }
 
 :host([sweep="half"]) [part="track"],
-:host([sweep="half"]) [part="segment"] {
+:host([sweep="half"]) [part~="segment"] {
   transform: rotate(180deg);
 }
 
@@ -208,7 +208,7 @@
 /* *Emphasis takes three values.** A slice is a stroke on a ring and the edge is*
    the mark, with nothing within it to fade, which reads at first as `outlined`
    requiring slices to be filled paths instead of arcs. */
-:host([emphasis="subtle"]) [part="segment"] {
+:host([emphasis="subtle"]) [part~="segment"] {
   stroke: color-mix(
     in oklab,
     var(--chart-series) 30%,
@@ -224,7 +224,7 @@
   stroke: none;
 }
 
-:host([emphasis="outlined"]) [part="segment"] {
+:host([emphasis="outlined"]) [part~="segment"] {
   stroke: color-mix(
     in oklab,
     var(--chart-series) 55%,
@@ -243,13 +243,13 @@
    `BarChart` argues this from its gridlines reading through the columns, and a
    donut has none; what reads through here is the page, which is the case that
    matters when the chart is on a surface that is itself translucent. */
-:host([material="glass"]) [part="segment"] {
+:host([material="glass"]) [part~="segment"] {
   stroke-opacity: calc(0.62 * var(--helix-material-opacity));
 }
 /* `frosted` admits less, which on a mark is more ink rather than more ground.
    0.88 against glass's 0.62 is the same relationship the surface tokens carry,
    `material-translucent` at 60% against `material-translucent-strong` at 88%, so
    a chart and a card mean the same thing by the word. */
-:host([material="frosted"]) [part="segment"] {
+:host([material="frosted"]) [part~="segment"] {
   stroke-opacity: calc(0.88 * var(--helix-material-opacity));
 }

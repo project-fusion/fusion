@@ -17,7 +17,7 @@ const picker = async (attrs = ''): Promise<Time> => {
 }
 
 const options = (host: Time): HTMLElement[] =>
-  [...(host.shadowRoot?.querySelectorAll('[part="option"]') ?? [])] as HTMLElement[]
+  [...(host.shadowRoot?.querySelectorAll('[part~="option"]') ?? [])] as HTMLElement[]
 
 describe('time', () => {
   test('a day at a quarter hour is ninety-six rows', async () => {
@@ -56,7 +56,7 @@ describe('time', () => {
     const host = await picker('min="09:00" max="10:00" step="30"')
     const heard: string[] = []
     host.addEventListener('input', () => heard.push('input'))
-    ;(options(host)[1]?.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null)?.click()
+    ;(options(host)[1]?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement | null)?.click()
     await host.updateComplete
     expect(host.value).toBe('09:30')
     expect(heard).toEqual(['input'])
@@ -108,7 +108,7 @@ describe('time as wheels', () => {
     host.shadowRoot?.querySelector(`[data-column="${which}"]`) as HTMLElement
 
   const values = (host: Time, which: string): (string | null)[] =>
-    [...column(host, which).querySelectorAll('[part="option"]')].map((one) =>
+    [...column(host, which).querySelectorAll('[part~="option"]')].map((one) =>
       one.getAttribute('value'),
     )
 
@@ -231,6 +231,14 @@ describe('time holds more than one', () => {
     expect(marked).toEqual(['09:15', '09:30', '09:45'])
   })
 
+  test('and are a part of their own too, which the ends are not', async () => {
+    const host = await many('default-value="09:00,10:00" max="11:00" min="09:00" mode="range"')
+    const named = [...(host.shadowRoot?.querySelectorAll('[part~="option-between"]') ?? [])].map(
+      (one) => one.getAttribute('value'),
+    )
+    expect(named).toEqual(['09:15', '09:30', '09:45'])
+  })
+
   test('a multiple keeps whatever the list announced', async () => {
     const host = await many('mode="multiple"')
     await announce(host, '09:00,12:00,15:00')
@@ -304,7 +312,7 @@ describe('times can be taken out of the list by name', () => {
   }
 
   const barred = (host: Time): string[] =>
-    [...(host.shadowRoot?.querySelectorAll('[part="option"][disabled]') ?? [])].map(
+    [...(host.shadowRoot?.querySelectorAll('[part~="option"][disabled]') ?? [])].map(
       (one) => one.getAttribute('value') ?? '',
     )
 
@@ -315,7 +323,7 @@ describe('times can be taken out of the list by name', () => {
     const host = await picker('disable-times="09:30,11:00" max="12:00" min="09:00"')
     expect(barred(host)).toEqual(['09:30', '11:00'])
     // Still in the list, which is the half that says "taken" rather than "no".
-    const shown = [...(host.shadowRoot?.querySelectorAll('[part="option"]') ?? [])].map((one) =>
+    const shown = [...(host.shadowRoot?.querySelectorAll('[part~="option"]') ?? [])].map((one) =>
       one.getAttribute('value'),
     )
     expect(shown).toContain('09:30')
@@ -362,5 +370,21 @@ describe('times can be taken out of the list by name', () => {
       .map((one) => one.getAttribute('value'))
       .sort()
     expect(shut).toEqual(['10'])
+  })
+})
+
+describe('a time picker drawn from outside', () => {
+  /* The options are in this element's shadow root, so a stylesheet reaches a
+     chosen row only through the name the option gives it and this element
+     forwards. */
+  test('the chosen time’s row carries its state as a part name, forwarded', async () => {
+    const host = await picker('default-value="09:30"')
+    const chosen = options(host).find((one) => one.getAttribute('value') === '09:30')
+    const other = options(host).find((one) => one.getAttribute('value') === '09:45')
+    const row = (one?: HTMLElement): string =>
+      one?.shadowRoot?.querySelector('[part~="item"]')?.getAttribute('part') ?? ''
+    expect(row(chosen)).toContain('item-selected')
+    expect(row(other)).not.toContain('item-selected')
+    expect(chosen?.getAttribute('exportparts')).toContain('item-selected: option-item-selected')
   })
 })

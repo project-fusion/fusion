@@ -162,6 +162,22 @@ describe('meter beyond its range', () => {
     expect(part(host, 'indicator')?.getAttribute('data-beyond')).toBeNull()
     expect(internals(host).ariaValueText).toBeNull()
   })
+
+  test('the band and the overrun are part names on the fill, where a stylesheet can reach them', async () => {
+    /* `data-band` and `data-beyond` are for this tier's sheet; nothing outside
+       can follow `::part()` with an attribute. */
+    const names = async (attrs: string): Promise<string> =>
+      part(await meter(attrs), 'indicator')?.getAttribute('part') ?? ''
+    expect(await names('value="110"')).toBe('indicator indicator-over')
+    expect(await names('min="10" value="4"')).toBe('indicator indicator-under')
+    expect(await names('value="40"')).toBe('indicator')
+    expect(await names('low="30" high="70" optimum="10" value="20"')).toBe(
+      'indicator indicator-good',
+    )
+    expect(await names('low="30" high="70" optimum="10" value="90"')).toBe(
+      'indicator indicator-poor',
+    )
+  })
 })
 
 describe('meter band, said outright', () => {

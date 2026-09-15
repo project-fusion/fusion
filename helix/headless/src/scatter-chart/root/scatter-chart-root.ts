@@ -120,6 +120,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
  * @csspart point - One row, as a point.
+ * @csspart point-active - A point of the row a pointer is asking about, beside `point`.
  * @csspart summary - How strongly the measures relate, for a reader who cannot see the points.
  * @csspart svg - The drawing surface the rules sit on.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
@@ -302,7 +303,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
         return html`<span
           data-series=${index}
           ?data-active=${point.row === at}
-          part="point"
+          part="point${point.row === at ? ' point-active' : ''}"
           style=${`--chart-series: var(--chart-series-${index}); --chart-point-x: ${point.x}%; --chart-point-y: ${point.y}%`}
         ></span>`
       })}

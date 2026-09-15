@@ -81,6 +81,7 @@ const THICKNESS: Record<string, number> = {
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing.
  * @csspart segment - One slice.
+ * @csspart segment-active - The slice under the pointer, beside `segment`.
  * @csspart segment-edge - One slice as a closed shape, for a boundary to trace.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -268,15 +269,16 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
        a positive offset would run the slices anticlockwise from twelve. The
        rotation that puts zero at the top is the stylesheet's, since it is a
        fact about how the picture is presented rather than about the numbers. */
+    const active = this.pointer.at === index
     return svg`<circle
       cx=${CENTER}
       cy=${CENTER}
-      data-active=${this.pointer.at === index ? '' : nothing}
+      data-active=${active ? '' : nothing}
       data-series=${seriesIndex(index)}
       fill="none"
       style="--chart-series: var(--chart-series-${seriesIndex(index)})"
       @pointerenter=${() => this.pointer.set(index)}
-      part="segment"
+      part="segment${active ? ' segment-active' : ''}"
       r=${this.radius}
       stroke-dasharray="${length} ${GAP}"
       stroke-dashoffset=${-share.start * circumference * this.span}

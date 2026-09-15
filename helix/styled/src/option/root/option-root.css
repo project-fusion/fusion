@@ -9,7 +9,7 @@
   display: none;
 }
 
-[part="item"] {
+[part~="item"] {
   align-items: center;
   /* From the container, because the container decides whether this row is inset
      or full-bleed and only a row with space around it has corners worth
@@ -73,7 +73,7 @@
 }
 
 /* The chosen option, which is not the same fact as where the keyboard is. */
-:host(:state(selected)) [part="item"]::after {
+:host(:state(selected)) [part~="item"]::after {
   content: "";
   background-color: currentColor;
   block-size: var(--helix-size-icon-tight);
@@ -86,8 +86,8 @@
   mask-size: contain;
 }
 
-:host([data-active]) [part="item"],
-:host(:not([disabled])) [part="item"]:hover {
+:host([data-active]) [part~="item"],
+:host(:not([disabled])) [part~="item"]:hover {
   /* A wash of the foreground rather than a step on the surface ladder. */
   background-color: var(
     --option-active-color,
@@ -98,7 +98,7 @@
   );
 }
 
-:host([disabled]) [part="item"] {
+:host([disabled]) [part~="item"] {
   cursor: default;
   opacity: 0.5;
 }

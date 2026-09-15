@@ -202,7 +202,7 @@ describe('a chosen row', () => {
     const element = await table('selectable default-selected="b"')
     const rows = [...(element.shadowRoot?.querySelectorAll<HTMLElement>('[part="row"]') ?? [])]
     const fill = (row: HTMLElement | undefined): string =>
-      getComputedStyle(row?.querySelector('[part="cell"]') as Element).backgroundColor
+      getComputedStyle(row?.querySelector('[part~="cell"]') as Element).backgroundColor
     /* Against the ground itself, read inside the table so it inherits the same
        tokens. Against the unchosen row alone this passes with no wash at all,
        since that row is transparent and any opaque fill differs from it. */
@@ -220,7 +220,7 @@ describe('a chosen row', () => {
   geometry('is chosen by a click on its checkbox', async () => {
     const element = await table('selectable')
     const box = element.shadowRoot?.querySelector(
-      '[part="select"] [part="checkbox"]',
+      '[part~="select"] [part="checkbox"]',
     ) as HTMLElement
     box.shadowRoot?.querySelector('input')?.click()
     await frames(element)

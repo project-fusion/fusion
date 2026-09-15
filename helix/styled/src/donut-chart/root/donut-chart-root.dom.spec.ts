@@ -47,7 +47,7 @@ describe('donut chart', () => {
   test('draws the track under one slice per row, in its own shadow root', async () => {
     const host = await chart()
     expect(part(host, 'track')).not.toBeNull()
-    expect(host.shadowRoot?.querySelectorAll('[part="segment"]')).toHaveLength(3)
+    expect(host.shadowRoot?.querySelectorAll('[part~="segment"]')).toHaveLength(3)
   })
 
   test('the tooltip it renders is the styled one, since this is the styled tier', async () => {
@@ -92,11 +92,13 @@ describe('donut chart', () => {
   })
 
   test('subtle is a wash toward the track, and glass and frosted thin the slices in that order', () => {
-    expect(rule(':host([emphasis="subtle"]) [part="segment"]')).toContain('var(--chart-series) 30%')
-    expect(rule(':host([material="glass"]) [part="segment"]')).toContain(
+    expect(rule(':host([emphasis="subtle"]) [part~="segment"]')).toContain(
+      'var(--chart-series) 30%',
+    )
+    expect(rule(':host([material="glass"]) [part~="segment"]')).toContain(
       'stroke-opacity: calc(0.62 * var(--helix-material-opacity))',
     )
-    expect(rule(':host([material="frosted"]) [part="segment"]')).toContain(
+    expect(rule(':host([material="frosted"]) [part~="segment"]')).toContain(
       'stroke-opacity: calc(0.88 * var(--helix-material-opacity))',
     )
   })

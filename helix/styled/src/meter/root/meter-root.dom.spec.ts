@@ -49,10 +49,10 @@ describe('meter', () => {
     // only says "poor" in red says nothing to a reader who cannot see red.
     const tokens = { fair: 'warning', good: 'success', poor: 'danger' }
     for (const [band, token] of Object.entries(tokens)) {
-      expect(rule(`[part="indicator"][data-band="${band}"]`)).toContain(
+      expect(rule(`[part~="indicator"][data-band="${band}"]`)).toContain(
         `--_meter-hue: var(--meter-color, var(--helix-color-${token}))`,
       )
-      expect(rule(`:host([shape="ring"]) [part="indicator"][data-band="${band}"]`)).toContain(
+      expect(rule(`:host([shape="ring"]) [part~="indicator"][data-band="${band}"]`)).toContain(
         `--_meter-hue: var(--helix-color-${token})`,
       )
     }
@@ -60,10 +60,10 @@ describe('meter', () => {
   })
 
   test('a reading past either end squares the corner it ran out at', () => {
-    expect(rule('[part="indicator"][data-beyond="over"]')).toContain(
+    expect(rule('[part~="indicator"][data-beyond="over"]')).toContain(
       'border-end-end-radius: var(--helix-radii-none)',
     )
-    expect(rule('[part="indicator"][data-beyond="under"]')).toContain(
+    expect(rule('[part~="indicator"][data-beyond="under"]')).toContain(
       'border-start-start-radius: var(--helix-radii-none)',
     )
   })
@@ -72,7 +72,7 @@ describe('meter', () => {
     /* `--meter-fraction` is never written in these shapes, so the bar's
        fallback wins and the circle is scaled to zero width: present, correctly
        stroked, and invisible. */
-    const round = rule(':host([shape="ring"]) [part="indicator"]')
+    const round = rule(':host([shape="ring"]) [part~="indicator"]')
     expect(round).toContain('scale: none')
     expect(round).toContain('stroke-dasharray: var(--meter-along) 100')
     // Twelve o'clock for a ring, where an SVG circle starts at three; an arc
@@ -84,8 +84,10 @@ describe('meter', () => {
   test('subtle is a wash of whichever color the band chose', () => {
     // Written against the one variable, so a single rule quiets all four
     // colors, and the bands keep saying what they mean.
-    expect(rule(':host([emphasis="subtle"]) [part="indicator"]')).toContain('var(--_meter-hue) 30%')
-    expect(rule(':host([emphasis="subtle"][shape="ring"]) [part="indicator"]')).toContain(
+    expect(rule(':host([emphasis="subtle"]) [part~="indicator"]')).toContain(
+      'var(--_meter-hue) 30%',
+    )
+    expect(rule(':host([emphasis="subtle"][shape="ring"]) [part~="indicator"]')).toContain(
       'var(--_meter-hue) 30%',
     )
   })

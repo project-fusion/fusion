@@ -31,7 +31,7 @@ const inspector = async (attrs = '', value: unknown = VALUE): Promise<Inspector>
 }
 
 const rows = (host: HTMLElement): HTMLElement[] => [
-  ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part="row"]') ?? []),
+  ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="row"]') ?? []),
 ]
 const tree = (host: HTMLElement): HTMLElement =>
   host.shadowRoot?.querySelector('[part="tree"]') as HTMLElement
@@ -93,6 +93,15 @@ describe('an object inspector', () => {
     expect(active(host)?.textContent).toContain('target')
     await press(host, 'Home')
     expect(active(host)).toBe(rows(host)[0])
+  })
+
+  test('the row the keys are on is a part of its own, and the name moves with it', async () => {
+    const host = await inspector()
+    const named = (): HTMLElement[] =>
+      rows(host).filter((row) => (row.getAttribute('part') ?? '').split(' ').includes('row-active'))
+    expect(named()).toEqual([active(host) as HTMLElement])
+    await press(host, 'ArrowDown')
+    expect(named()).toEqual([rows(host)[1] as HTMLElement])
   })
 
   test('opens a branch with Right, enters it with Right, and goes back up with Left', async () => {

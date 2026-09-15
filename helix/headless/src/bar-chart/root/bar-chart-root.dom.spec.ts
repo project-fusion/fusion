@@ -37,6 +37,21 @@ const labels = (host: HTMLElement): string[] =>
   )
 
 describe('bar chart', () => {
+  test('the group the tooltip is about is a part of its own, and the others are not', async () => {
+    const host = (await chart(REVENUE, 'for="revenue"')) as HTMLElement & {
+      pointer: { set: (at: number) => void }
+      updateComplete: Promise<unknown>
+    }
+    const named = (): (string | null)[] =>
+      [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])].map((one) =>
+        one.getAttribute('part'),
+      )
+    expect(named()).toEqual(['group', 'group', 'group'])
+    host.pointer.set(1)
+    await host.updateComplete
+    expect(named()).toEqual(['group', 'group group-active', 'group'])
+  })
+
   test('a column per category, named by the row headers', async () => {
     const host = await chart(REVENUE, 'for="revenue"')
     expect(bars(host)).toHaveLength(3)

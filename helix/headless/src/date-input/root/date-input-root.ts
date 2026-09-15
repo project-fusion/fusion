@@ -84,7 +84,14 @@ const dates = (value: string): string[] =>
  * @csspart label - The question, over the field.
  * @csspart picker - The date picker inside it.
  * @csspart picker-cell - One column of a row, which is what a range paints.
+ * @csspart picker-cell-range-end - The cell of a range's last day, beside `picker-cell`.
+ * @csspart picker-cell-range-middle - A cell between a range's ends, beside `picker-cell`.
+ * @csspart picker-cell-range-start - The cell of a range's first day, beside `picker-cell`.
  * @csspart picker-day - The shape inside a cell, which is what a single date paints.
+ * @csspart picker-day-disabled - A day that cannot be chosen, beside `picker-day`.
+ * @csspart picker-day-outside - A day from a neighboring month, beside `picker-day`.
+ * @csspart picker-day-selected - The chosen day, or either end of a chosen range, beside `picker-day`.
+ * @csspart picker-day-today - Today, beside `picker-day`.
  * @csspart picker-grid - The grid of days.
  * @csspart picker-header - The month name and its controls.
  * @csspart picker-heading - The month and year being shown.
@@ -433,8 +440,12 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
   protected renderPicker(): TemplateResult {
     return html`<${this.tag('date-picker')}
       part="picker"
-      exportparts="cell: picker-cell, day: picker-day, grid: picker-grid, header: picker-header,
-        heading: picker-heading, month: picker-month, months: picker-months, next: picker-next,
+      exportparts="cell: picker-cell, cell-range-end: picker-cell-range-end,
+        cell-range-middle: picker-cell-range-middle, cell-range-start: picker-cell-range-start,
+        day: picker-day, day-disabled: picker-day-disabled, day-outside: picker-day-outside,
+        day-selected: picker-day-selected, day-today: picker-day-today, grid: picker-grid,
+        header: picker-header, heading: picker-heading, month: picker-month, months: picker-months,
+        next: picker-next,
         next-mark: picker-next-mark, previous: picker-previous, previous-mark: picker-previous-mark,
         week: picker-week, weekday: picker-weekday"
       ?invalid=${this.resolvedFeedback !== ''}

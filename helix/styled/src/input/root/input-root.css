@@ -55,7 +55,7 @@ slot[name="end"]::slotted(*) {
 
 /* The two marks the field owns, dressed as one thing. */
 [part="clear"],
-[part="reveal"] {
+[part~="reveal"] {
   --icon-size: var(--helix-size-icon-tight);
   all: unset;
 
@@ -73,19 +73,19 @@ slot[name="end"]::slotted(*) {
 }
 
 [part="clear"]:hover,
-[part="reveal"]:hover {
+[part~="reveal"]:hover {
   color: var(--helix-color-foreground);
 }
 
 [part="clear"]:focus-visible,
-[part="reveal"]:focus-visible {
+[part~="reveal"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
 /* A revealed password is a state the reader chose and should be able to see they
    are in, from the mark alone, without hovering it to find out. */
-[part="reveal"][aria-pressed="true"] {
+[part~="reveal"][aria-pressed="true"] {
   color: var(--helix-color-foreground);
 }
 

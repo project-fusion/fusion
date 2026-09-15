@@ -8,12 +8,12 @@ beforeAll(async () => {
 
 /** Everything in the run, in order, with a gap reading as an ellipsis. */
 const run = (host: HTMLElement): string[] =>
-  [...(host.shadowRoot?.querySelectorAll('[part="page"], [part="gap"]') ?? [])].map(
+  [...(host.shadowRoot?.querySelectorAll('[part~="page"], [part="gap"]') ?? [])].map(
     (one) => one.textContent?.trim() ?? '',
   )
 
 const pages = (host: HTMLElement): HTMLElement[] => [
-  ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part="page"]') ?? []),
+  ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="page"]') ?? []),
 ]
 
 describe('pagination', () => {
@@ -90,6 +90,23 @@ describe('pagination', () => {
     expect(current).toHaveLength(1)
     expect(current[0]?.textContent?.trim()).toBe('4')
     expect(current[0]?.tagName).toBe('BUTTON')
+  })
+
+  test('the page you are on is also a part of its own, which moves with it', async () => {
+    const nav = (await mount(
+      '<helix-headless-pagination default-page="4" pages="12"></helix-headless-pagination>',
+    )) as HTMLElement & { page: number; updateComplete: Promise<unknown> }
+    const named = (): string[] =>
+      [...(nav.shadowRoot?.querySelectorAll('[part~="page-current"]') ?? [])].map(
+        (one) => one.textContent?.trim() ?? '',
+      )
+    expect(named()).toEqual(['4'])
+    nav.page = 5
+    await nav.updateComplete
+    expect(named()).toEqual(['5'])
+    expect(pages(nav).filter((one) => one.getAttribute('part') === 'page')).toHaveLength(
+      pages(nav).length - 1,
+    )
   })
 
   test('a gap goes to the middle of what it hides, and its label says so', async () => {
@@ -294,7 +311,7 @@ describe('pagination in another language', () => {
         previous-label="Page précédente"
       ></helix-headless-pagination>`,
     )
-    const first = nav.shadowRoot?.querySelector('[part="page"]')
+    const first = nav.shadowRoot?.querySelector('[part~="page"]')
     expect(first?.getAttribute('aria-label')).toBe('Page 1 sur 40')
     expect(part(nav, 'previous')?.getAttribute('aria-label')).toBe('Page précédente')
     expect(nav.shadowRoot?.querySelector('[part="gap"]')?.getAttribute('aria-label')).toBe(
@@ -377,7 +394,7 @@ describe('pagination count', () => {
     const nav = await mount(
       '<helix-headless-pagination default-page="1" page-size="25" total="248"></helix-headless-pagination>',
     )
-    const shown = [...(nav.shadowRoot?.querySelectorAll('[part="page"]') ?? [])]
+    const shown = [...(nav.shadowRoot?.querySelectorAll('[part~="page"]') ?? [])]
     expect(shown.at(-1)?.textContent?.trim()).toBe('10')
   })
 
@@ -385,7 +402,7 @@ describe('pagination count', () => {
     const nav = await mount(
       '<helix-headless-pagination default-page="1" page-size="25" pages="4" total="248"></helix-headless-pagination>',
     )
-    const shown = [...(nav.shadowRoot?.querySelectorAll('[part="page"]') ?? [])]
+    const shown = [...(nav.shadowRoot?.querySelectorAll('[part~="page"]') ?? [])]
     expect(shown.at(-1)?.textContent?.trim()).toBe('4')
   })
 
@@ -487,7 +504,7 @@ describe('pagination announcements', () => {
       '<helix-headless-pagination default-page="4" pages="12"></helix-headless-pagination>',
     )
     nav.shadowRoot
-      ?.querySelectorAll('[part="page"]')[4]
+      ?.querySelectorAll('[part~="page"]')[4]
       ?.dispatchEvent(new Event('click', { bubbles: true }))
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     await (nav as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete

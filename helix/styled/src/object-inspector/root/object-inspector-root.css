@@ -69,7 +69,7 @@
    wrapping, so every row is the same height: that is what lets a windowed tree
    place ten thousand of them without measuring each. The whole value is one
    copy away. The inset is the row's depth, which the base tier writes. */
-[part="row"] {
+[part~="row"] {
   cursor: default;
   overflow: hidden;
   padding-inline-end: var(--helix-space-2xl);
@@ -86,7 +86,7 @@
 
 /* A branch spends its caret's width on the caret, where a leaf spends it on an
    indent, so every key at one depth starts on one line. */
-[part="row"][aria-expanded] {
+[part~="row"][aria-expanded] {
   cursor: pointer;
   padding-inline-start: calc(
     var(--object-inspector-level) *
@@ -95,11 +95,11 @@
   );
 }
 
-[part="tree"]:focus [part="row"][data-active] {
+[part="tree"]:focus [part~="row"][data-active] {
   background-color: var(--helix-color-surface-sunken);
 }
 
-[part="tree"]:focus-visible [part="row"][data-active] {
+[part="tree"]:focus-visible [part~="row"][data-active] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
@@ -117,7 +117,7 @@
    `aria-expanded` from outside, `::part()` taking no attribute after it. The
    closed one points along the line, which on a right-to-left page is the other
    way. */
-:host(:dir(rtl)) [part="row"][aria-expanded="false"] > [part="toggle"] {
+:host(:dir(rtl)) [part~="row"][aria-expanded="false"] > [part="toggle"] {
   scale: -1 1;
 }
 

@@ -362,7 +362,7 @@ describe('carousel settling', () => {
     await frame()
     await host.updateComplete
     const dots = [
-      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part="indicator"]'),
+      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part~="indicator"]'),
     ]
     expect({
       announced: dots.findIndex((dot) => dot.getAttribute('aria-current') === 'true'),
@@ -381,7 +381,7 @@ describe('carousel settling', () => {
     settle(track, 300)
     await host.updateComplete
     const dots = [
-      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part="indicator"]'),
+      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part~="indicator"]'),
     ]
     expect({
       index: host.index,
@@ -404,7 +404,7 @@ describe('carousel settling', () => {
     track.dispatchEvent(new Event('scrollend'))
     await host.updateComplete
     const dots = [
-      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part="indicator"]'),
+      ...(part(host, 'indicators') as HTMLElement).querySelectorAll('[part~="indicator"]'),
     ]
     expect({
       index: host.index,
@@ -470,7 +470,7 @@ describe('carousel indicators', () => {
        space for it. The run stopped reading as a run. */
     const host = await carousel('default-index="1"')
     await host.updateComplete
-    const dots = [...(host.shadowRoot?.querySelectorAll('[part="indicator"]') ?? [])]
+    const dots = [...(host.shadowRoot?.querySelectorAll('[part~="indicator"]') ?? [])]
     expect(dots).toHaveLength(3)
     expect(dots.map((dot) => dot.hasAttribute('data-current'))).toEqual([false, true, false])
   })
@@ -478,8 +478,24 @@ describe('carousel indicators', () => {
   test('the state a reader hears is on the dot, where a screen reader finds it', async () => {
     const host = await carousel('default-index="1"')
     await host.updateComplete
-    const dots = [...(host.shadowRoot?.querySelectorAll('[part="indicator"]') ?? [])]
+    const dots = [...(host.shadowRoot?.querySelectorAll('[part~="indicator"]') ?? [])]
     expect(dots.map((dot) => dot.getAttribute('aria-current'))).toEqual([null, 'true', null])
+  })
+
+  test('the current dot is a part of its own, and stops being one when it is not', async () => {
+    /* `::part()` takes no attribute after it, so `data-current` is out of reach
+       of a stylesheet outside the element and the second name is how one draws
+       it. */
+    const host = (await carousel('default-index="1"')) as Carousel
+    await host.updateComplete
+    const named = (): boolean[] =>
+      [...(host.shadowRoot?.querySelectorAll('[part~="indicator"]') ?? [])].map((dot) =>
+        (dot.getAttribute('part') ?? '').split(' ').includes('indicator-current'),
+      )
+    expect(named()).toEqual([false, true, false])
+    host.index = 2
+    await host.updateComplete
+    expect(named()).toEqual([false, false, true])
   })
 })
 
@@ -526,7 +542,7 @@ describe('carousel across several slides at once', () => {
 
   test('the indicators count positions, not slides', async () => {
     const host = await four()
-    expect(part(host, 'indicators')?.querySelectorAll('[part="indicator"]')).toHaveLength(3)
+    expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(3)
   })
 
   test('and it will not walk past the last one', async () => {
@@ -542,7 +558,7 @@ describe('carousel across several slides at once', () => {
     const host = await mount(`<helix-headless-carousel label="Reel">
       <div>1</div><div>2</div><div>3</div>
     </helix-headless-carousel>`)
-    expect(part(host, 'indicators')?.querySelectorAll('[part="indicator"]')).toHaveLength(3)
+    expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(3)
   })
 })
 

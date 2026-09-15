@@ -23,7 +23,7 @@ const calendar = async (
 
 /** The cells, which is what carries a day's role, state, and tab stop. */
 const days = (cal: DatePicker): HTMLElement[] => [
-  ...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part="cell"]') ?? []),
+  ...(cal.shadowRoot?.querySelectorAll<HTMLElement>('[part~="cell"]') ?? []),
 ]
 
 /** Presses the forward arrow, which is the only way a reader pages. */
@@ -32,7 +32,7 @@ const next = (cal: DatePicker): void => {
 }
 
 const stop = (cal: DatePicker): string | null =>
-  cal.shadowRoot?.querySelector('[part="cell"][tabindex="0"]')?.getAttribute('aria-label') ?? null
+  cal.shadowRoot?.querySelector('[part~="cell"][tabindex="0"]')?.getAttribute('aria-label') ?? null
 
 /* From the grid, which is where a reader's presses come from.
  *
@@ -166,6 +166,20 @@ describe('date picker', () => {
     expect(days(cal).filter((day) => day.hasAttribute('aria-selected'))).toHaveLength(4)
     expect(days(cal).filter((day) => day.hasAttribute('data-range-start'))).toHaveLength(1)
     expect(days(cal).filter((day) => day.hasAttribute('data-range-end'))).toHaveLength(1)
+  })
+
+  test('and says so in part names: the band on the cells, the solid mark on the two ends', async () => {
+    const cal = await calendar(
+      'mode="range" default-month="2026-08" default-value="2026-08-11,2026-08-14"',
+    )
+    const named = (name: string): string[] =>
+      [...(cal.shadowRoot?.querySelectorAll(`[part~="${name}"]`) ?? [])].map(
+        (one) => one.textContent?.trim() ?? '',
+      )
+    expect(named('cell-range-start')).toEqual(['11'])
+    expect(named('cell-range-middle')).toEqual(['12', '13'])
+    expect(named('cell-range-end')).toEqual(['14'])
+    expect(named('day-selected')).toEqual(['11', '14'])
   })
 
   test('a range starts over on the third date', async () => {
@@ -475,5 +489,38 @@ describe('an invalid calendar says so where it can be heard', () => {
         expect(host.shadowRoot?.querySelectorAll(`slot[name="${name}"]`).length).toBe(1)
       }
     })
+  })
+})
+
+describe('a date picker drawn from outside', () => {
+  /* Each state the grid draws is also a part name on the box it is drawn on,
+     because nothing can follow `::part()` with `[aria-selected]`. */
+  const named = (cal: DatePicker, name: string): string[] =>
+    [...(cal.shadowRoot?.querySelectorAll(`[part~="${name}"]`) ?? [])].map(
+      (one) => one.textContent?.trim() ?? '',
+    )
+
+  test('the chosen day is a part of its own, and moves when the choice does', async () => {
+    const cal = (await calendar()) as DatePicker & { updateComplete: Promise<unknown> }
+    expect(named(cal, 'day-selected')).toEqual(['14'])
+    cal.value = '2026-08-20'
+    await cal.updateComplete
+    expect(named(cal, 'day-selected')).toEqual(['20'])
+  })
+
+  test('a neighboring month’s days and a barred day say so', async () => {
+    const cal = await calendar('default-month="2026-08" min="2026-08-03"')
+    const outside = days(cal).filter((one) => one.hasAttribute('data-outside'))
+    expect(named(cal, 'day-outside')).toHaveLength(outside.length)
+    expect(outside.length).toBeGreaterThan(0)
+    expect(named(cal, 'day-disabled')).toContain('2')
+    expect(named(cal, 'day-disabled')).not.toContain('3')
+  })
+
+  test('today is a part of its own, on the one day that is today', async () => {
+    const cal = await calendar('')
+    const today = days(cal).filter((one) => one.hasAttribute('data-today'))
+    expect(named(cal, 'day-today')).toEqual(today.map((one) => one.textContent?.trim() ?? ''))
+    expect(today).toHaveLength(1)
   })
 })

@@ -126,7 +126,7 @@
  *    row on its own, where a fill painted on the day has to be bridged across the
  *    space between them and then clipped at the row's edge.
  */
-[part="cell"] {
+[part~="cell"] {
   align-items: center;
   block-size: var(--_calendar-row);
   cursor: pointer;
@@ -135,7 +135,7 @@
   justify-content: center;
 }
 
-[part="day"] {
+[part~="day"] {
   align-items: center;
   block-size: var(--_calendar-day);
   /* `sm`, not `full`. A pill is a shape for a word; a date is a number in a
@@ -152,19 +152,19 @@
 /*
  *  Today, which is a fact about the calendar rather than about the answer.
  */
-[part="cell"][data-today] [part="day"] {
+[part~="cell"][data-today] [part~="day"] {
   box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
 }
 
 /* Days either side of the month stay in place and stay selectable, so the
    first and last weeks are whole rows rather than ragged ones. */
-[part="cell"][data-outside] [part="day"] {
+[part~="cell"][data-outside] [part~="day"] {
   color: var(--helix-color-foreground-subtle);
 }
 
 /* `:not([data-outside])` as well, since a filler day takes no click and a cell
    that lights under the pointer is a cell offering one. */
-[part="cell"]:hover:not([aria-disabled], [data-outside]) [part="day"] {
+[part~="cell"]:hover:not([aria-disabled], [data-outside]) [part~="day"] {
   background-color: var(--helix-color-surface-sunken);
 }
 
@@ -174,7 +174,7 @@
  * of a lone selected one draws an oval around a circular day. The mark for a
  * single date is a ring on the day itself, which is round because the day is
  * square, and the gap between the two sizes is exactly what the ring is. */
-[part="cell"][aria-selected]:is([data-range-start], [data-range-middle], [data-range-end]) {
+[part~="cell"][aria-selected]:is([data-range-start], [data-range-middle], [data-range-end]) {
   background-color: var(
     --date-picker-range-color,
     light-dark(
@@ -184,8 +184,8 @@
   );
 }
 
-[part="cell"][aria-selected]:not([data-range-start]):not([data-range-middle]):not([data-range-end])
-  [part="day"] {
+[part~="cell"][aria-selected]:not([data-range-start]):not([data-range-middle]):not([data-range-end])
+  [part~="day"] {
   box-shadow: 0 0 0 calc((var(--_calendar-row) - var(--_calendar-day)) / 2)
     var(
       --date-picker-range-color,
@@ -196,14 +196,14 @@
     );
 }
 
-[part="cell"][data-range-start],
-[part="cell"][aria-selected]:not([data-range-middle]):not([data-range-end]) {
+[part~="cell"][data-range-start],
+[part~="cell"][aria-selected]:not([data-range-middle]):not([data-range-end]) {
   border-end-start-radius: var(--helix-radii-sm);
   border-start-start-radius: var(--helix-radii-sm);
 }
 
-[part="cell"][data-range-end],
-[part="cell"][aria-selected]:not([data-range-middle]):not([data-range-start]) {
+[part~="cell"][data-range-end],
+[part~="cell"][aria-selected]:not([data-range-middle]):not([data-range-start]) {
   border-end-end-radius: var(--helix-radii-sm);
   border-start-end-radius: var(--helix-radii-sm);
 }
@@ -216,25 +216,25 @@
    against white in light and 2.58:1 in dark, an ink following the page and
    inverting with it. A ground that must stay dark while the page goes light is
    `surface-inverse`, which is what it says. */
-[part="cell"][aria-selected]:not([data-range-middle]) [part="day"] {
+[part~="cell"][aria-selected]:not([data-range-middle]) [part~="day"] {
   background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
   color: var(--helix-color-foreground-inverse);
 }
 
-[part="cell"][aria-disabled] {
+[part~="cell"][aria-disabled] {
   cursor: default;
 }
 
-[part="cell"][aria-disabled] [part="day"] {
+[part~="cell"][aria-disabled] [part~="day"] {
   color: var(--helix-color-foreground-subtle);
   opacity: 0.4;
 }
 
-[part="cell"]:focus-visible {
+[part~="cell"]:focus-visible {
   outline: none;
 }
 
-[part="cell"]:focus-visible [part="day"] {
+[part~="cell"]:focus-visible [part~="day"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
@@ -264,14 +264,14 @@
 /*
  *  Wrong, and the mark says so.
  */
-:host([invalid]) [part="cell"][aria-selected] [part="day"] {
+:host([invalid]) [part~="cell"][aria-selected] [part~="day"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: var(--helix-size-focus-offset);
 }
 
 /* And the focus ring goes danger with it, for the reason above: focused, the two
    rings would otherwise be a blue one over a red one on the same day. */
-:host([invalid]) [part="cell"]:focus-visible [part="day"] {
+:host([invalid]) [part~="cell"]:focus-visible [part~="day"] {
   outline-color: var(--helix-color-danger);
 }
 

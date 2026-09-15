@@ -98,6 +98,7 @@ const child = (path: string, key: string): string =>
  * @csspart null - A `null`.
  * @csspart number - A number.
  * @csspart row - One entry, a tree item.
+ * @csspart row-active - The entry the keyboard is on, beside `row`.
  * @csspart string - A string, in quotes.
  * @csspart summary - The brackets standing for a branch's contents.
  * @csspart toggle - The caret on a branch: down when open, across when closed.
@@ -185,7 +186,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     estimate: () => 24,
     measured: () => this.windowed,
     rows: () =>
-      [...(this.renderRoot?.querySelectorAll<HTMLElement>('[part="row"]') ?? [])].map(
+      [...(this.renderRoot?.querySelectorAll<HTMLElement>('[part~="row"]') ?? [])].map(
         (element) => ({ element, index: Number(element.dataset.index) }),
       ),
   })
@@ -329,7 +330,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       scrollItemIntoView(row)
       return
     }
-    const drawn = [...(tree?.querySelectorAll<HTMLElement>('[part="row"]') ?? [])]
+    const drawn = [...(tree?.querySelectorAll<HTMLElement>('[part~="row"]') ?? [])]
     const first = drawn[0]
     const last = drawn.at(-1)
     if (!tree || !this.windowed || !first || !last || attempts === 0) {
@@ -463,12 +464,13 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   }
 
   private renderRow(row: Row, index: number): TemplateResult {
+    const active = index === this.active
     return html`<div
-      part="row"
+      part="row${active ? ' row-active' : ''}"
       role="treeitem"
       id=${`row-${index}`}
       data-index=${index}
-      ?data-active=${index === this.active}
+      ?data-active=${active}
       aria-level=${row.depth + 1}
       aria-posinset=${row.position}
       aria-setsize=${row.siblings}

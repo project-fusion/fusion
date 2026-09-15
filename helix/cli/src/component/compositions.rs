@@ -23,7 +23,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::text::uncommented;
+use crate::component::text::{flattened, uncommented};
 use crate::component::{sources, Context};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -58,7 +58,7 @@ static OPENS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"<\$\{\s*(\w+)\s*\}").expect("a literal pattern compiles"));
 
 static ROLE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"(?:^|\s)part="([a-z0-9-]+)""#).expect("a literal pattern compiles")
+    Regex::new(r#"(?:^|\s)part="([a-z0-9-]+)[\s"]"#).expect("a literal pattern compiles")
 });
 
 static FORWARDS: LazyLock<Regex> =
@@ -245,7 +245,7 @@ pub fn compositions(context: &Context) -> Vec<Site> {
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            let code = uncommented(&text);
+            let code = flattened(&uncommented(&text));
             let bound: Vec<(usize, String, String)> = BINDS
                 .captures_iter(&code)
                 .map(|one| {

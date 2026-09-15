@@ -41,7 +41,7 @@ const chart = async (): Promise<Chart> => {
 }
 
 const all = (host: HTMLElement, name: string): HTMLElement[] => [
-  ...(host.shadowRoot?.querySelectorAll<HTMLElement>(`[part="${name}"]`) ?? []),
+  ...(host.shadowRoot?.querySelectorAll<HTMLElement>(`[part~="${name}"]`) ?? []),
 ]
 const middle = (element: Element): { x: number; y: number } => {
   const box = element.getBoundingClientRect()

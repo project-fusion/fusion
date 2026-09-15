@@ -25,6 +25,27 @@ const checkbox = async (attrs = ''): Promise<Checkbox> =>
 const control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HTMLInputElement
 
 describe('checkbox', () => {
+  test('its mark says checked and indeterminate in part names, and only while they hold', async () => {
+    /* For the box a component draws in its own shadow root, where nothing can
+       name the host to reach `:state(checked)`. */
+    const box = (await mount(
+      '<helix-headless-checkbox label="Tea"></helix-headless-checkbox>',
+    )) as HTMLElement & {
+      checked: boolean
+      indeterminate: boolean
+      updateComplete: Promise<unknown>
+    }
+    const names = (): string => part(box, 'mark')?.getAttribute('part') ?? ''
+    expect(names()).toBe('mark')
+    box.checked = true
+    await box.updateComplete
+    expect(names()).toBe('mark mark-checked')
+    box.checked = false
+    box.indeterminate = true
+    await box.updateComplete
+    expect(names()).toBe('mark mark-indeterminate')
+  })
+
   test('is a real input, so the platform gives it the space key and the tick', async () => {
     const box = await checkbox()
     expect(control(box).type).toBe('checkbox')

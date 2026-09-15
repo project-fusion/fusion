@@ -6,7 +6,7 @@
    `border-box` from `HelixElement.finalizeStyles`, and a rule that unsets
    everything outranks it, so the row would quietly revert to `content-box` and
    overflow itself by its own padding. */
-[part="item"] {
+[part~="item"] {
   all: unset;
   box-sizing: border-box;
 
@@ -31,7 +31,7 @@
 /* A wash of the ink rather than a fixed surface, for the reason the ghost
    button records: a playlist sits on a page, a card or a panel, and an absolute
    neutral is a step away from exactly one of them. */
-:host(:not([disabled])) [part="item"]:hover {
+:host(:not([disabled])) [part~="item"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
 }
 
@@ -43,7 +43,7 @@
  * against zero slack either side, which clipped both verticals and left two
  * horizontal lines that read as a drawing fault rather than as focus.
  */
-[part="item"]:focus-visible {
+[part~="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
@@ -51,12 +51,12 @@
 /*
  *  The one playing, and it stays marked under the pointer.
  */
-[part="item"][aria-current="true"] {
+[part~="item"][aria-current="true"] {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
   color: var(--helix-color-foreground);
 }
 
-[part="item"][aria-current="true"]::before {
+[part~="item"][aria-current="true"]::before {
   background-color: var(--helix-color-primary);
   border-radius: var(--helix-radii-full);
   content: "";
@@ -66,7 +66,7 @@
   position: absolute;
 }
 
-:host([disabled]) [part="item"] {
+:host([disabled]) [part~="item"] {
   cursor: not-allowed;
   opacity: 0.5;
 }
