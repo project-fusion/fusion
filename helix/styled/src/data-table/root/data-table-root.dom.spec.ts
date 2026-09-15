@@ -269,3 +269,24 @@ describe('a heading, where there is layout to place it', () => {
     expect(Math.abs(name.heading.left - name.cell.left)).toBeLessThan(2)
   })
 })
+
+/* The pointer is a `::slotted()` rule keyed on the attribute, which happy-dom
+   computes nothing from, so this runs in the browser with the geometry. */
+describe('a sortable heading, however it was made sortable', () => {
+  geometry('takes the pointer when a script sets it, which is how React sets it', async () => {
+    const element = await mount(`
+      <helix-data-table label="Objects">
+        <helix-table-column field="name">Name</helix-table-column>
+      </helix-data-table>`)
+    const column = element.querySelector('helix-table-column') as HTMLElement & {
+      sortable: boolean
+      updateComplete: Promise<unknown>
+    }
+    await column.updateComplete
+    const heading = (): string => getComputedStyle(part(column, 'column') as Element).cursor
+    expect(heading()).not.toBe('pointer')
+    column.sortable = true
+    await column.updateComplete
+    expect(heading()).toBe('pointer')
+  })
+})

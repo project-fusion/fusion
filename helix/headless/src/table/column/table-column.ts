@@ -184,8 +184,15 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * Ignored without a `field`, and silently: a column with nothing to sort by
    * has no order to offer, and refusing loudly would mean an actions column
    * carrying `sortable` breaks a table rather than doing nothing.
+   *
+   * **Reflected, because a stylesheet selects on it.** `@fusion.dev/helix`
+   * gives a data table's sortable headings a pointer through
+   * `::slotted(helix-table-column[sortable])`, and set as a property, which is
+   * how React sets it, an unreflected `sortable` left no attribute to match.
+   * `false` reflects as no attribute at all, so an unset column writes nothing
+   * onto its host.
    */
-  @property({ type: Boolean })
+  @property({ reflect: true, type: Boolean })
   sortable = false
 
   /**
