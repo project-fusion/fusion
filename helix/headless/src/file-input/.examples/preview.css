@@ -60,12 +60,15 @@ helix-headless-file-input {
 }
 
 /* The drop zone: a dashed box, because it is a place to put something rather
-   than a control to type in, with the prompt centered in it. Positioned, so
-   the file input can cover the whole of it. */
+   than a control to type in, with the prompt centered in it. The dashes are
+   what say so, and in the quiet resting gray they vanish into the fill in
+   dark, so they take the rule's gray, which a broken line already softens.
+   Positioned, so the file input can cover the whole of it. */
 helix-headless-file-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
   border: 1px dashed var(--_gray-line);
+  border-radius: var(--_radius-control);
   display: flex;
   gap: 0.5rem;
   justify-content: center;
@@ -115,7 +118,8 @@ helix-headless-file-input::part(list) {
 helix-headless-file-input::part(file) {
   align-items: center;
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   display: flex;
   gap: 0.75rem;
   padding-block: 0.5rem;
@@ -146,21 +150,48 @@ helix-headless-file-input::part(meta) {
   gap: 0.25rem;
 }
 
+/* The size and the kind are tags, at the small tag's height, quiet chips with
+   an edge like every other tag here. */
+helix-headless-file-input::part(size),
+helix-headless-file-input::part(kind) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 1.5rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-inline: 0.5rem;
+  white-space: nowrap;
+}
+
 helix-headless-file-input::part(size) {
   font-variant-numeric: tabular-nums;
 }
 
+/* The glyph in it has no part of its own and takes the box it is given, so
+   the box's padding is what sets it at an icon's tight size. */
 helix-headless-file-input::part(remove) {
   all: unset;
   align-items: center;
+  block-size: 1.5rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
   display: flex;
   flex: none;
+  inline-size: 1.5rem;
   justify-content: center;
-  min-block-size: 1.5rem;
-  min-inline-size: 1.5rem;
+  padding: 0.25rem;
+}
+
+helix-headless-file-input::part(remove):hover {
+  color: var(--_gray-strong);
 }
 
 helix-headless-file-input::part(kind-dismiss-mark) {

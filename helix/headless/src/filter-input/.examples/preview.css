@@ -45,7 +45,8 @@ helix-headless-filter-input {
 helix-headless-filter-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   display: flex;
@@ -85,6 +86,7 @@ helix-headless-filter-input::part(control)::placeholder {
 helix-headless-filter-input::part(clear) {
   all: unset;
   align-items: center;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -120,8 +122,9 @@ helix-headless-filter-input::part(feedback) {
    with no operator closes up. */
 helix-headless-filter-chip {
   align-items: center;
-  background-color: var(--_gray-fill);
-  border: 1px solid var(--_gray-line);
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   display: inline-flex;
@@ -159,12 +162,19 @@ helix-headless-filter-chip::part(values) {
 helix-headless-filter-chip::part(dismiss) {
   all: unset;
   block-size: 1rem;
+  border-radius: var(--_radius-control);
   color: var(--_gray-muted);
   cursor: pointer;
   display: grid;
   inline-size: 1rem;
   margin-inline-start: 0.25rem;
   place-items: center;
+}
+
+helix-headless-filter-input::part(clear):hover,
+helix-headless-filter-chip::part(dismiss):hover {
+  background-color: var(--_gray-fill);
+  color: var(--_gray-strong);
 }
 
 helix-headless-filter-chip::part(dismiss-mark) {

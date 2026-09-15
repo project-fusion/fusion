@@ -6,16 +6,16 @@
    The unit is chosen per value rather than fixed. Formatted in megabytes
    throughout, 2,100 bytes and 812 bytes both read "0 MB": the table looks
    broken and the values are correct, which is the failure this whole column is
-   here to demonstrate rather than commit. */
-const units = ['byte', 'kilobyte', 'megabyte', 'gigabyte']
+   here to demonstrate rather than commit. The symbols are written out because
+   `Intl`'s short name for a byte is "byte", which reads as a typo beside "kB". */
+const units = ['B', 'kB', 'MB', 'GB']
 
 const bytes = (value: number): string => {
   const step = Math.min(units.length - 1, Math.floor(Math.log10(Math.max(value, 1)) / 3))
-  return new Intl.NumberFormat(undefined, {
+  const amount = new Intl.NumberFormat(undefined, {
     maximumFractionDigits: step === 0 ? 0 : 1,
-    style: 'unit',
-    unit: units[step],
   }).format(value / 1000 ** step)
+  return `${amount} ${units[step]}`
 }
 
 /* Module scope, so the identity is stable across renders. An array written
@@ -43,7 +43,7 @@ export function Example() {
       <helix-table-column
         field="name"
         sortable
-        width="14rem"
+        width="minmax(9rem, 14rem)"
       >
         Name
       </helix-table-column>
@@ -59,7 +59,7 @@ export function Example() {
         compare={(row) => row.size}
         field="size"
         sortable
-        width="8rem"
+        width="6rem"
       >
         Size
       </helix-table-column>
