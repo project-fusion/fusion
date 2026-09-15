@@ -265,3 +265,38 @@ describe('slider fill on a right-to-left page', () => {
     expect(await along()).toMatch(/^linear-gradient\(\s*to left,/)
   })
 })
+
+/* The labels under the marks. The mask that punches the thumb out of the marks
+   clips to the box it is on, and the labels hung below that box, so the
+   markers example drew none in either direction. Each has to sit inside the
+   box and be centered under its own mark, which on a right-to-left page is
+   placed from the right. */
+describe('slider marker labels', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  for (const dir of ['ltr', 'rtl'] as const) {
+    browser(`sit inside the masked box, each under its mark, ${dir}`, async () => {
+      document.documentElement.dir = dir
+      const host = (await mount(
+        '<helix-slider default-value="50" label="A" marker-labels markers="5" max="100" min="0" step="25"></helix-slider>',
+      )) as Updatable
+      await host.updateComplete
+      const box = (part(host, 'markers') as HTMLElement).getBoundingClientRect()
+      const marks = [...(host.shadowRoot as ShadowRoot).querySelectorAll('[part="marker"]')]
+      expect(marks).toHaveLength(5)
+      for (const mark of marks) {
+        const label = (
+          mark.querySelector('[part="marker-label"]') as HTMLElement
+        ).getBoundingClientRect()
+        const line = mark.getBoundingClientRect()
+        expect(label.top).toBeGreaterThanOrEqual(box.top)
+        expect(label.bottom).toBeLessThanOrEqual(box.bottom)
+        expect(
+          Math.abs((label.left + label.right) / 2 - (line.left + line.right) / 2),
+        ).toBeLessThan(0.5)
+      }
+    })
+  }
+})
