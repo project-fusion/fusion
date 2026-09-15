@@ -59,6 +59,7 @@ helix-headless-copy-button::part(button) {
   all: unset;
   block-size: 2.5rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -67,7 +68,10 @@ helix-headless-copy-button::part(button) {
   place-items: center;
 }
 
+/* A quiet fill under the pointer, so the target shows its size before the
+   press rather than only the glyph darkening. */
 helix-headless-copy-button::part(button):hover {
+  background-color: var(--_gray-subtle);
   color: var(--_gray-strong);
 }
 
@@ -77,12 +81,41 @@ helix-headless-copy-button::part(mark) {
   inline-size: 1rem;
 }
 
+/* The bubble that says Copy, and Copied after a press: the page's opposite,
+   small and tight. It is a popover the component places, so the UA's centering
+   `margin` goes and the position is `fixed`, which is what the component writes
+   its coordinates for. */
 helix-headless-copy-button::part(tooltip) {
+  align-items: center;
   background-color: var(--_gray-strong);
   border: 0;
+  border-radius: var(--_radius-control);
   color: var(--_gray-surface);
+  display: flex;
   font-size: 0.75rem;
+  inline-size: max-content;
+  line-height: 1.2;
+  margin: 0;
+  overflow: visible;
   padding: 0.25rem 0.5rem;
+  position: fixed;
+}
+
+/* Only while open: the `display` above would otherwise override the UA's
+   `display: none` on a closed popover. */
+helix-headless-copy-button::part(tooltip):not(:popover-open) {
+  display: none;
+}
+
+/* A square turned to a point in the bubble's own fill, hanging below it: the
+   default placement is `top`. */
+helix-headless-copy-button::part(tooltip-arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  inset-block-end: -0.25rem;
+  position: absolute;
+  rotate: 45deg;
 }
 
 helix-headless-icon::part(svg) {

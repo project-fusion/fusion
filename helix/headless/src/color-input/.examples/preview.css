@@ -60,17 +60,22 @@ helix-headless-color-input {
 }
 
 /* The field carries the box rather than the input, so the swatch sits inside
-   the same frame as the text. */
+   the same frame as the text, and its clip rounds the swatch's far corners. */
 helix-headless-color-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   display: flex;
   gap: 0.25rem;
   overflow: hidden;
   padding-inline-start: 0.5rem;
+}
+
+helix-headless-color-input:not(:disabled)::part(field):hover {
+  border-color: var(--_gray-muted);
 }
 
 helix-headless-color-input::part(control) {
@@ -108,18 +113,271 @@ helix-headless-color-input::part(preview) {
   background-size:
     100% 100%,
     0.75rem 0.75rem;
-  border-inline-start: 1px solid var(--_gray-line);
+  border-inline-start: 1px solid var(--_gray-edge);
   box-sizing: border-box;
   display: block;
   filter: grayscale(1);
   inline-size: 2.5rem;
 }
 
+/* The panel over the page, under the field it came out of, at its own width:
+   a picker is not a longer text field, and a square stretched to a 600 pixel
+   field is a square no longer. The platform centers a `popover` through
+   `inset: 0` and `margin: auto`, and the component writes its position as a
+   translate from the top-left, so both go. No padding of its own: the picker
+   inside carries the inset, so every row sits on one column. */
 helix-headless-color-input::part(surface) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 0.75rem 2rem light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.5));
+  box-sizing: border-box;
   color: var(--_gray-strong);
-  padding: 0.5rem;
+  inline-size: 16.5rem;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+}
+
+/* The picker, inset on every side so the handle stands whole in a corner of
+   the square rather than being cut by the panel's edge. */
+helix-headless-color-input::part(picker) {
+  display: block;
+  padding: 0.75rem;
+}
+
+/* What follows is Color Picker's own example again, under the names the field
+   forwards it by. The square, drawn from the ramp and kept in its light
+   reading in dark mode, since it is a picture of brightness and not a surface. */
+helix-headless-color-input::part(picker-grid) {
+  aspect-ratio: 1 / 0.7;
+  background-image:
+    linear-gradient(to top, var(--_gray-strong), transparent),
+    linear-gradient(to right, var(--_gray-surface), transparent),
+    linear-gradient(var(--_gray-mark), var(--_gray-mark));
+  border-radius: var(--_radius-control);
+  color-scheme: light;
+  cursor: crosshair;
+  position: relative;
+  touch-action: none;
+}
+
+helix-headless-color-input::part(picker-grid-handle) {
+  block-size: 1rem;
+  border: 2px solid var(--_gray-surface);
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1px var(--_gray-strong);
+  box-sizing: border-box;
+  inline-size: 1rem;
+  inset-block-start: calc(100% - var(--color-picker-brightness, 100%));
+  inset-inline-start: var(--color-picker-saturation, 100%);
+  pointer-events: none;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* The two range inputs stay, since they are what the keyboard and a screen
+   reader use, and are laid invisibly over the square. */
+helix-headless-color-input::part(picker-grid-saturation),
+helix-headless-color-input::part(picker-grid-brightness) {
+  appearance: none;
+  background: none;
+  inline-size: 100%;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+helix-headless-color-input::part(picker-controls) {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  padding-block-start: 0.75rem;
+}
+
+helix-headless-color-input::part(picker-sample),
+helix-headless-color-input::part(picker-swatch) {
+  background-image:
+    linear-gradient(
+      var(--color-picker-swatch, transparent),
+      var(--color-picker-swatch, transparent)
+    ),
+    conic-gradient(
+      var(--_gray-fill) 0 25%,
+      var(--_gray-surface) 0 50%,
+      var(--_gray-fill) 0 75%,
+      var(--_gray-surface) 0
+    );
+  background-size:
+    100% 100%,
+    0.75rem 0.75rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  filter: grayscale(1);
+  padding: 0;
+}
+
+helix-headless-color-input::part(picker-sample) {
+  appearance: none;
+  block-size: 36px;
+  cursor: copy;
+  flex: none;
+  inline-size: 36px;
+}
+
+helix-headless-color-input::part(picker-channels) {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+
+/* Named for assistive technology and not shown, clipped rather than removed
+   so the name stays in the tree. */
+helix-headless-color-input::part(picker-channel-label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-color-input::part(picker-channel-field) {
+  align-items: center;
+  display: flex;
+}
+
+/* The platform's range input with its chrome taken off. Left alone it is the
+   browser's blue rail, which is the one color on the page. */
+helix-headless-color-input::part(picker-channel-control) {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  inline-size: 100%;
+  margin: 0;
+}
+
+/* One gray the whole length and no fill: on a hue rail the track is the value
+   rather than a measure of it. Each engine's name is said on its own, since a
+   list holding a name one engine does not know is dropped whole. */
+helix-headless-color-input::part(picker-channel-control)::-webkit-slider-runnable-track {
+  background-color: var(--_gray-fill);
+  block-size: 0.75rem;
+  border-radius: 9999px;
+}
+
+helix-headless-color-input::part(picker-channel-control)::-moz-range-track {
+  background-color: var(--_gray-fill);
+  block-size: 0.75rem;
+  border-radius: 9999px;
+}
+
+helix-headless-color-input::part(picker-channel-control)::-webkit-slider-thumb {
+  appearance: none;
+  background-color: var(--_gray-strong);
+  block-size: 1.25rem;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 2px var(--_gray-surface);
+  inline-size: 1.25rem;
+  margin-block-start: -0.25rem;
+}
+
+helix-headless-color-input::part(picker-channel-control)::-moz-range-thumb {
+  background-color: var(--_gray-strong);
+  block-size: 1.25rem;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 2px var(--_gray-surface);
+  inline-size: 1.25rem;
+}
+
+/* The tools, in a row under the rail. The field already holds the value as
+   text, so the picker withholds its own and the two buttons take the row. */
+helix-headless-color-input::part(picker-footer) {
+  display: flex;
+  gap: 0.5rem;
+  margin-block-start: 0.75rem;
+}
+
+helix-headless-color-input::part(picker-actions) {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+helix-headless-color-input::part(picker-eyedropper),
+helix-headless-color-input::part(picker-format) {
+  display: flex;
+  flex: 1 1 0;
+}
+
+helix-headless-color-input::part(picker-format) {
+  margin-inline-start: -1px;
+}
+
+helix-headless-color-input::part(picker-eyedropper-button),
+helix-headless-color-input::part(picker-format-button) {
+  all: unset;
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-edge);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 auto;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: center;
+  padding-inline: 1rem;
+}
+
+helix-headless-color-input::part(picker-eyedropper-button):hover,
+helix-headless-color-input::part(picker-format-button):hover {
+  background-color: var(--_gray-fill);
+}
+
+/* One joined pair: the outer corners rounded, the seam one shared edge. The
+   glyph carries no size, so the button gives it a single track at the icon
+   size. */
+helix-headless-color-input::part(picker-eyedropper-button) {
+  border-end-start-radius: var(--_radius-control);
+  border-start-start-radius: var(--_radius-control);
+  display: grid;
+  grid-template-columns: 1.25rem;
+  place-content: center;
+}
+
+/* Small caps rather than uppercased text, so a screen reader reads the word
+   and not a shouted token. */
+helix-headless-color-input::part(picker-format-button) {
+  border-end-end-radius: var(--_radius-control);
+  border-start-end-radius: var(--_radius-control);
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-variant-caps: all-small-caps;
+}
+
+helix-headless-color-input::part(picker-swatches) {
+  border-block-start: 1px solid var(--_gray-line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-block-start: 0.75rem;
+  padding-block-start: 0.75rem;
+}
+
+helix-headless-color-input::part(picker-swatch) {
+  block-size: 1.5rem;
+  cursor: pointer;
+  inline-size: 1.5rem;
 }
 
 helix-headless-color-input::part(label) {
@@ -168,6 +426,34 @@ helix-headless-color-input:focus-within::part(field) {
 helix-headless-color-input::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: -2px;
+}
+
+/* Inside the panel: around the square, whose two inputs are invisible, and on
+   the rail's thumb rather than the whole track. */
+helix-headless-color-input::part(picker-grid):focus-within {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-color-input::part(picker-channel-control):focus-visible {
+  outline: none;
+}
+
+helix-headless-color-input::part(picker-channel-control):focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-color-input::part(picker-channel-control):focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-color-input::part(picker-sample):focus-visible,
+helix-headless-color-input::part(picker-eyedropper-button):focus-visible,
+helix-headless-color-input::part(picker-format-button):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }
 
 helix-headless-color-input::part(control)::placeholder {

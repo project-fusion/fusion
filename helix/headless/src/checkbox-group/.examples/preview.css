@@ -110,12 +110,14 @@ helix-headless-checkbox::part(box) {
 }
 
 /* The input, painted rather than replaced: leave it at `appearance: auto` and
-   the browser's own box, blue tick and all, is what a reader sees. */
+   the browser's own box, blue tick and all, is what a reader sees. The page's
+   ground inside the quiet edge, so the box reads as a hole. */
 helix-headless-checkbox::part(control) {
   appearance: none;
   background-color: transparent;
   block-size: 1.25rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   cursor: inherit;
   grid-area: 1 / 1;
   inline-size: 1.25rem;
@@ -126,20 +128,32 @@ helix-headless-checkbox:not(:disabled):hover::part(control) {
   border-color: var(--_gray-muted);
 }
 
-/* A tick with no asset and no icon set, over the input in the same cell. */
+/* The tick the checkbox's own example draws, and the styled tier's: a stroke
+   2.5 units wide with round ends, inlined as a mask so there is no asset and the
+   ink is a color. The component shows the element and names it; the shape is
+   yours. */
 helix-headless-checkbox::part(mark) {
-  block-size: 0.75rem;
-  clip-path: polygon(14% 44%, 0 65%, 40% 100%, 100% 16%, 84% 0, 39% 62%);
+  block-size: 1.25rem;
   grid-area: 1 / 1;
-  inline-size: 0.75rem;
+  inline-size: 1.25rem;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 100%;
   pointer-events: none;
 }
 
-helix-headless-checkbox:state(checked)::part(control) {
+helix-headless-checkbox::part(mark-indeterminate) {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E");
+}
+
+helix-headless-checkbox:state(checked)::part(control),
+helix-headless-checkbox[indeterminate]::part(control) {
   border-color: var(--_gray-strong);
 }
 
-helix-headless-checkbox:state(checked)::part(mark) {
+helix-headless-checkbox::part(mark-checked),
+helix-headless-checkbox::part(mark-indeterminate) {
   background-color: var(--_gray-strong);
 }
 

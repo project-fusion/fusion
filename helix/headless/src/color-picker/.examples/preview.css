@@ -66,16 +66,19 @@ helix-headless-color-picker::part(grid) {
     linear-gradient(to top, var(--_gray-strong), transparent),
     linear-gradient(to right, var(--_gray-surface), transparent),
     linear-gradient(var(--_gray-mark), var(--_gray-mark));
+  border-radius: var(--_radius-control);
   color-scheme: light;
   cursor: crosshair;
   position: relative;
   touch-action: none;
 }
 
+/* A ring of the page's lightest gray inside a hairline of its darkest, so the
+   handle reads on the light corner of the square and the dark edge alike. */
 helix-headless-color-picker::part(grid-handle) {
   block-size: 1rem;
   border: 2px solid var(--_gray-surface);
-  border-radius: 50%;
+  border-radius: 9999px;
   box-shadow: 0 0 0 1px var(--_gray-strong);
   box-sizing: border-box;
   inline-size: 1rem;
@@ -127,7 +130,8 @@ helix-headless-color-picker::part(swatch) {
   background-size:
     100% 100%,
     0.75rem 0.75rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   filter: grayscale(1);
   padding: 0;
@@ -167,12 +171,55 @@ helix-headless-color-picker::part(channel-field) {
   display: flex;
 }
 
-/* The platform's range input, so `accent-color` is the whole of what a gray
-   rail needs. */
+/* The platform's range input with its chrome taken off, so the track and the
+   thumb below are the whole of what is drawn. */
 helix-headless-color-picker::part(channel-control) {
-  accent-color: var(--_gray-strong);
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
   inline-size: 100%;
   margin: 0;
+}
+
+/* **One gray the whole length, with no fill.** On a hue rail the track is the
+   value rather than a measure of it, so a darker run up to the thumb would be a
+   second reading of something the position already says, and a ramp of grays
+   would claim the rail is lightness. The engines name the track and the thumb
+   differently, and a selector list holding a name one engine does not know is
+   dropped whole, so each is said twice. */
+helix-headless-color-picker::part(channel-control)::-webkit-slider-runnable-track {
+  background-color: var(--_gray-fill);
+  block-size: 0.75rem;
+  border-radius: 9999px;
+}
+
+helix-headless-color-picker::part(channel-control)::-moz-range-track {
+  background-color: var(--_gray-fill);
+  block-size: 0.75rem;
+  border-radius: 9999px;
+}
+
+/* Round, in the darkest gray with a ring of the page's lightest, so it reads
+   over the rail in either mode. A WebKit thumb is laid out from the top of the
+   track, so it is centered by hand. */
+helix-headless-color-picker::part(channel-control)::-webkit-slider-thumb {
+  appearance: none;
+  background-color: var(--_gray-strong);
+  block-size: 1.25rem;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 2px var(--_gray-surface);
+  inline-size: 1.25rem;
+  margin-block-start: -0.25rem;
+}
+
+helix-headless-color-picker::part(channel-control)::-moz-range-thumb {
+  background-color: var(--_gray-strong);
+  block-size: 1.25rem;
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 2px var(--_gray-surface);
+  inline-size: 1.25rem;
 }
 
 /* The value and the tools, in a row under the rail. */
@@ -186,7 +233,8 @@ helix-headless-color-picker::part(value) {
   all: unset;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   flex: 1 1 auto;
@@ -196,8 +244,13 @@ helix-headless-color-picker::part(value) {
   padding-inline: 0.5rem;
 }
 
+helix-headless-color-picker::part(value):hover {
+  border-color: var(--_gray-muted);
+}
+
 /* The eyedropper and the syntax toggle share the other half of the row, as
-   one joined group of equal buttons. */
+   one joined group of equal buttons: the outer corners rounded, the seam
+   between them one shared edge. */
 helix-headless-color-picker::part(actions) {
   display: flex;
   flex: 1 1 auto;
@@ -213,13 +266,16 @@ helix-headless-color-picker::part(format) {
   margin-inline-start: -1px;
 }
 
+/* A button's own inset around the glyph and the word, which is what gives
+   the pair its width: without it the two collapsed to 22 and 18 pixels beside
+   a 183 pixel field. */
 helix-headless-color-picker::part(eyedropper-button),
 helix-headless-color-picker::part(format-button) {
   all: unset;
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;
@@ -228,6 +284,22 @@ helix-headless-color-picker::part(format-button) {
   font-size: 0.8125rem;
   font-weight: 500;
   justify-content: center;
+  padding-inline: 1rem;
+}
+
+helix-headless-color-picker::part(eyedropper-button):hover,
+helix-headless-color-picker::part(format-button):hover {
+  background-color: var(--_gray-fill);
+}
+
+helix-headless-color-picker::part(eyedropper-button) {
+  border-end-start-radius: var(--_radius-control);
+  border-start-start-radius: var(--_radius-control);
+}
+
+helix-headless-color-picker::part(format-button) {
+  border-end-end-radius: var(--_radius-control);
+  border-start-end-radius: var(--_radius-control);
 }
 
 /* The glyph is the component's own and carries no size, so the button gives
@@ -238,8 +310,11 @@ helix-headless-color-picker::part(eyedropper-button) {
   place-content: center;
 }
 
+/* Small caps rather than uppercased text, so a screen reader reads the word
+   and not a shouted token. */
 helix-headless-color-picker::part(format-button) {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-variant-caps: all-small-caps;
 }
 
@@ -269,6 +344,22 @@ helix-headless-icon::part(svg) {
    without putting one back is the commonest way a headless control stops
    being operable without a pointer. */
 helix-headless-color-picker::part(grid):focus-within {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+/* On the rail, the ring goes on the thumb that moves rather than around the
+   whole track. */
+helix-headless-color-picker::part(channel-control):focus-visible {
+  outline: none;
+}
+
+helix-headless-color-picker::part(channel-control):focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-color-picker::part(channel-control):focus-visible::-moz-range-thumb {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
