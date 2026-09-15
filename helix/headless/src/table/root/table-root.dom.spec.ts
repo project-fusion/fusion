@@ -154,6 +154,71 @@ describe("a table publishing each column's edge to its cells", () => {
 })
 
 /**
+ * The tracks, from the columns and the table's `columns`.
+ *
+ * **Each column takes the track in its place in the list, unless it sets a
+ * `width`.** A width is written on the column it sizes, and it is where a
+ * resize lands, so were the list to win a reader's drag would move nothing.
+ */
+describe('a table whose columns are sized by its `columns`', () => {
+  const sized = async (list: string, columns: string): Promise<string> => {
+    const host = (await mount(
+      `<helix-headless-table columns="${list}" label="Deploys">${columns}</helix-headless-table>`,
+    )) as Updating
+    await settle(host)
+    return template(host)
+  }
+
+  const three = `
+    <helix-headless-table-column>Service</helix-headless-table-column>
+    <helix-headless-table-column>Last change</helix-headless-table-column>
+    <helix-headless-table-column>Count</helix-headless-table-column>`
+
+  test('gives each column the track in its place', async () => {
+    expect(await sized('14rem 1fr 6rem', three)).toBe('--table-template: 14rem 1fr 6rem')
+  })
+
+  test("and a column's own width wins over it", async () => {
+    expect(
+      await sized(
+        '14rem 1fr 6rem',
+        `<helix-headless-table-column>Service</helix-headless-table-column>
+         <helix-headless-table-column width="20rem">Last change</helix-headless-table-column>
+         <helix-headless-table-column>Count</helix-headless-table-column>`,
+      ),
+    ).toBe('--table-template: 14rem 20rem 6rem')
+  })
+
+  /* The columns say how many tracks there are, and the list only how wide. */
+  test('leaves a column past the list its default, and drops a track past the columns', async () => {
+    const two = `
+      <helix-headless-table-column>Service</helix-headless-table-column>
+      <helix-headless-table-column>Count</helix-headless-table-column>`
+    expect(await sized('14rem', two)).toBe('--table-template: 14rem minmax(max-content, 1fr)')
+    expect(await sized('1px 2px 3px', two)).toBe('--table-template: 1px 2px')
+  })
+
+  test('counts the tracks the way the grid does', async () => {
+    expect(await sized('[start] minmax(0, 1fr) repeat(2, 8rem)', three)).toBe(
+      '--table-template: [start] minmax(0, 1fr) 8rem 8rem',
+    )
+    /* An automatic repeat names no count to hand out, so it hands out none. */
+    expect(await sized('repeat(auto-fill, 8rem) 6rem', three)).toBe(
+      '--table-template: 6rem minmax(max-content, 1fr) minmax(max-content, 1fr)',
+    )
+  })
+
+  /* One invalid track makes the whole list invalid, which a grid drops in
+     silence and draws as one column. Browser only: happy-dom's `CSS.supports`
+     answers yes to everything. */
+  browser('leaves a column at its default where its track is one the grid refuses', async () => {
+    expect(await sized('Service 1fr 6rem', three)).toBe(
+      '--table-template: minmax(max-content, 1fr) 1fr 6rem',
+    )
+  })
+})
+
+/**
  * A hidden column, which takes no track.
  *
  * Left in, the header row had a heading fewer than the grid had tracks, the
@@ -195,6 +260,14 @@ describe('a table with a column hidden', () => {
     service.hidden = true
     await settle(host)
     expect(template(host)).toBe('--table-template: minmax(max-content, 1fr) 6rem')
+  })
+
+  test('takes its track in `columns` with it, and the rest keep theirs', async () => {
+    const host = (await mount(
+      hiding('columns="14rem 1fr 3rem"').replace(' width="12rem"', ''),
+    )) as Updating
+    await settle(host)
+    expect(template(host)).toBe('--table-template: 1fr 6rem')
   })
 
   /* The heading stays drawn under `until-found`, as every Helix host does, so

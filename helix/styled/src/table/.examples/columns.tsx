@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-table
-      columns="14rem 1fr 6rem"
+      columns="10rem 1fr 5rem"
       label="Deploys"
     >
       <helix-table-column>Service</helix-table-column>

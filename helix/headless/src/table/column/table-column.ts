@@ -208,8 +208,11 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * The track this column takes, as CSS.
    *
    * A single track value, so anything valid in `grid-template-columns` works:
-   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column shares what is
-   * left over equally, as `minmax(max-content, 1fr)`.
+   * `16rem`, `auto`, `minmax(0, 2fr)`. Left unset the column takes the track
+   * in its place in a `helix-table`'s `columns`, where that table sets one, and
+   * otherwise shares what is left over equally, as `minmax(max-content, 1fr)`.
+   * Set here, it wins over that list, which is what lets a reader resize a
+   * column in a table that set one.
    *
    * **The floor is `max-content`, never `0` and never `min-content`.** A zero
    * floor lets a track shrink under its own content: at 375 the columns squeeze

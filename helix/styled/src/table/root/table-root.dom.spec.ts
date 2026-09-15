@@ -83,8 +83,10 @@ describe('table columns', () => {
     expect(template(await table())).toContain('minmax(max-content, 1fr)')
   })
 
-  test('declared columns win over the deprecated string', async () => {
-    expect(template(await table('columns="1px 2px 3px"'))).not.toContain('1px 2px 3px')
+  /* A column with a width keeps it, and one without takes the track in its
+     place. The columns decide how many tracks there are, so the third goes. */
+  test('the string sizes the columns that set no width, in their places', async () => {
+    expect(template(await table('columns="1px 2px 3px"'))).toBe('--table-template: 12rem 2px')
   })
 
   test('the string still works for a table with no columns', async () => {
@@ -288,6 +290,33 @@ describe('the tracks, where there is layout to measure them', () => {
       .map((column) =>
         Math.round((part(column, 'column') as Element).getBoundingClientRect().width),
       )
+
+  /* The `columns` example, which drew three equal columns while its summary
+     promised these. */
+  geometry('are the ones `columns` names, for columns that set no width', async () => {
+    const host = (await mount(`
+      <div style="inline-size: 640px"><helix-table columns="10rem 1fr 5rem" label="Deploys">
+        <helix-table-column>Service</helix-table-column>
+        <helix-table-column>Last change</helix-table-column>
+        <helix-table-column align="end">Count</helix-table-column>
+      </helix-table></div>`)) as HTMLElement
+    const table = host.querySelector('helix-table') as Updating
+    await settle(table)
+    expect(widths(table)).toEqual([160, 640 - 160 - 80, 80])
+  })
+
+  /* A width is the column's own, and it is what a resize writes. */
+  geometry("give way to a column's own width", async () => {
+    const host = (await mount(`
+      <div style="inline-size: 640px"><helix-table columns="10rem 1fr 5rem" label="Deploys">
+        <helix-table-column width="14rem">Service</helix-table-column>
+        <helix-table-column>Last change</helix-table-column>
+        <helix-table-column>Count</helix-table-column>
+      </helix-table></div>`)) as HTMLElement
+    const table = host.querySelector('helix-table') as Updating
+    await settle(table)
+    expect(widths(table)[0]).toBe(224)
+  })
 
   /** A table with its first column hidden, heading and cells both. */
   const hiding = async (dir: 'ltr' | 'rtl'): Promise<Updating> => {
