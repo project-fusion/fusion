@@ -111,7 +111,7 @@ describe('the copy button in a diff', () => {
      end, since a line that ran under the button did so once it was scrolled. */
   const covered = (host: HTMLElement): DOMRect[] => {
     const root = host.shadowRoot
-    const copy = root?.querySelector('[part="copy"]')?.getBoundingClientRect()
+    const copy = root?.querySelector<HTMLElement>('[part="copy"]')?.getBoundingClientRect()
     expect(copy).toBeDefined()
     const scrollers = [
       ...(root?.querySelectorAll<HTMLElement>('[part="block"], [part="old"], [part="new"]') ?? []),
@@ -132,8 +132,8 @@ describe('the copy button in a diff', () => {
       await example(markup)
       await idle()
       const root = block().shadowRoot
-      const copy = root?.querySelector('[part="copy"]')
-      const header = root?.querySelector('[part="header"]')
+      const copy = root?.querySelector<HTMLElement>('[part="copy"]')
+      const header = root?.querySelector<HTMLElement>('[part="header"]')
       expect(copy?.parentElement).toBe(header)
       const inner = copy?.getBoundingClientRect()
       const outer = header?.getBoundingClientRect()
