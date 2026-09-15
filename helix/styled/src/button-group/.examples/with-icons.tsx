@@ -3,6 +3,7 @@ export function Example() {
     <helix-button-group label="Label">
       <helix-button>
         <helix-icon
+          mirror
           name="arrow-left"
           slot="start"
         ></helix-icon>
@@ -11,6 +12,7 @@ export function Example() {
       <helix-button>
         Forward
         <helix-icon
+          mirror
           name="arrow-right"
           slot="end"
         ></helix-icon>

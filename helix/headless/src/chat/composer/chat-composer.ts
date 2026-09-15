@@ -174,6 +174,10 @@ export class HelixHeadlessChatComposer extends HelixElement {
    * and the key are one affordance and should look like it. `send-label` is the
    * accessible name rather than a visible one, so a screen reader still hears
    * the word.
+   *
+   * **Not mirrored on a right-to-left page**, where every caret meaning next
+   * is. It pictures a key rather than a way to go, like the arrows `Kbd`
+   * draws, and a picture of a key is not turned round with the text.
    */
   protected renderSend(): TemplateResult {
     return html`<button

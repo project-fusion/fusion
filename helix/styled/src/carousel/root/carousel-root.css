@@ -402,12 +402,6 @@
   order: 1;
 }
 
-/* A caret is physical and the thing it points at is not. */
-:host(:dir(rtl)) [part="previous"] svg,
-:host(:dir(rtl)) [part="next"] svg {
-  scale: -1 1;
-}
-
 /* ================================================ vertical, by default ==
  * **A vertical carousel's chrome runs down its side, and nothing had to be
  * said for that to be true of a horizontal one.**

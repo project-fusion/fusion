@@ -193,7 +193,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
       <slot name="end"></slot>
       ${
         this.page
-          ? html`<svg part="mark" fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
+          ? html`<svg part="mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox} aria-hidden="true">
               ${unsafeSVG(caretRight.content)}
             </svg>`
           : nothing

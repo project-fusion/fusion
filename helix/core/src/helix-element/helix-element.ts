@@ -109,8 +109,8 @@ const SCROLLER = css`
 `
 
 /**
- * Turns a drawing that runs along the line of text round with it, on a
- * right-to-left page.
+ * Turns a drawing that runs along the line of text, or a glyph that points
+ * along it, round with it on a right-to-left page.
  *
  * **A chart computes its geometry from the left, because an SVG's coordinates
  * do.** `x` grows rightward whatever `direction` says, while the words around a
@@ -141,6 +141,18 @@ const SCROLLER = css`
  * twelve, which is a clock's convention and not a script's. `scale` rather than
  * `transform`, so a consumer's `transform` on the same part composes with it,
  * and a consumer's `scale` there wins, a shadow rule losing to a document one.
+ *
+ * **A glyph that points along the line is the same case, marked the same
+ * way**: a caret meaning next or previous, the one between two crumbs, a shut
+ * disclosure. The component drawing it knows what it means, so the headless
+ * tier points it the right way with no stylesheet at all. Before the mark each
+ * styled sheet turned its own and a headless page had to know to, which the
+ * carousel's and the pagination's did not. A glyph a *sheet* stands on its side
+ * is that sheet's to turn: a tree draws its chevron pointing down, and a mark
+ * would come out right under a `transform: rotate()`, which applies before
+ * `scale`, and do nothing under the `rotate` property, which applies after it.
+ * A glyph for playing media is left unmarked too, a tape running one way
+ * whatever the script, and so is a picture of a key.
  */
 const MIRROR = css`
   :host(:dir(rtl)) [data-mirror] {

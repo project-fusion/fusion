@@ -48,6 +48,16 @@ export class HelixHeadlessIcon extends HelixElement {
   label = ''
 
   /**
+   * Turns the glyph round on a right-to-left page, for an arrow meaning forward or back.
+   *
+   * Asked for rather than inferred from the name. The names are physical, and
+   * `arrow-left` drawn pointing right on an Arabic page would be the icon
+   * disagreeing with its own name for every reader who meant the left.
+   */
+  @property({ type: Boolean })
+  mirror = false
+
+  /**
    * Name of the icon in the Helix set.
    */
   @property()
@@ -69,6 +79,7 @@ export class HelixHeadlessIcon extends HelixElement {
     const labeled = this.label.length > 0
     return html`<svg
       part="svg"
+      ?data-mirror=${this.mirror}
       fill="currentColor"
       viewBox=${icon.viewBox}
       role=${labeled ? 'img' : nothing}

@@ -77,7 +77,10 @@ export function Example() {
             slot="detail"
           >
             <helix-tag>In Progress</helix-tag>
-            <helix-icon name="arrow-right"></helix-icon>
+            <helix-icon
+              mirror
+              name="arrow-right"
+            ></helix-icon>
             <helix-tag tone="success">Completed</helix-tag>
           </helix-flex>
         </helix-notification>

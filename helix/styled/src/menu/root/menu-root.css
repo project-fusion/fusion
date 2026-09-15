@@ -150,13 +150,6 @@
   display: none;
 }
 
-/*
- *  A caret is physical and the thing it points at is not.
- */
-:host(:dir(rtl)) [part="back"] svg {
-  scale: -1 1;
-}
-
 /* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. Removing

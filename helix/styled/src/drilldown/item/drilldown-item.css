@@ -51,11 +51,6 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
-/* A caret is physical and the thing it points at is not. */
-:host(:dir(rtl)) [part="mark"] {
-  scale: -1 1;
-}
-
 :host(:not([disabled])) [part="item"]:hover {
   background-color: var(
     --drilldown-item-hover-color,
