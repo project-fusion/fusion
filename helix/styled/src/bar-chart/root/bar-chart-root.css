@@ -317,6 +317,12 @@
   translate: -50% 0;
 }
 
+/* Placed from the inline start, which is the right on a right-to-left page, so
+   centered the other way: `translate` is physical. */
+:host([direction="horizontal"]:dir(rtl)) [part="tick"] {
+  translate: 50% 0;
+}
+
 :host(:not([direction="horizontal"])) [part="axis"][data-axis="secondary"] [part="tick"] {
   inset-inline-end: auto;
   inset-inline-start: 0;

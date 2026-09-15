@@ -260,6 +260,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     const order = stack.layers.map((_, depth) => depth).reverse()
     return html`<div aria-hidden="true" id="helix-chart-plot" part="plot">
       <svg part="svg"
+        data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"

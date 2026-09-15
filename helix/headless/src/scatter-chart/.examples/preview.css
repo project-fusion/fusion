@@ -132,6 +132,11 @@ helix-headless-scatter-chart::part(point) {
   translate: -50% -50%;
 }
 
+/* Placed from the right on a right-to-left page, so centered the other way. */
+helix-headless-scatter-chart:dir(rtl)::part(point) {
+  translate: 50% -50%;
+}
+
 helix-headless-scatter-chart::part(y-axis),
 helix-headless-scatter-chart::part(x-axis) {
   display: grid;
@@ -160,6 +165,10 @@ helix-headless-scatter-chart::part(x-tick) {
   inset-inline-start: var(--chart-tick);
   justify-self: start;
   translate: -50% 0;
+}
+
+helix-headless-scatter-chart:dir(rtl)::part(x-tick) {
+  translate: 50% 0;
 }
 
 helix-headless-scatter-chart::part(y-tick) {

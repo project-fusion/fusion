@@ -143,6 +143,11 @@ helix-headless-line-chart::part(terminus) {
   translate: -50% -50%;
 }
 
+/* Placed from the right on a right-to-left page, so centered the other way. */
+helix-headless-line-chart:dir(rtl)::part(terminus) {
+  translate: 50% -50%;
+}
+
 /* One column per reading, so each name sits under its point rather than the
    names running together as one line of text. */
 helix-headless-line-chart::part(labels) {

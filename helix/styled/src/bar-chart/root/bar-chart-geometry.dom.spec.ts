@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, part, registerDom, settled } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -56,6 +56,73 @@ if (hasLayout()) {
          once they finish, bbox 44.44. */
       await settled(bar)
       expect(bar.getBBox().height).toBeGreaterThan(0)
+    })
+  })
+
+  /**
+   * Which end the first category is drawn at, and whether everything read
+   * against the drawing agrees.
+   *
+   * **A category axis starts where the text does.** The names are HTML and
+   * turned with `dir` on their own; the columns are SVG and did not, so on a
+   * right-to-left page Q1's name stood under Q3's column. Set on the root, as a
+   * page would set it.
+   */
+  describe('bar chart on either kind of page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    const center = (box: DOMRect): number => box.left + box.width / 2
+
+    for (const dir of ['ltr', 'rtl'] as const) {
+      test(`the first category is at the inline start, under its own name, ${dir}`, async () => {
+        document.documentElement.dir = dir
+        const host = await chart(REVENUE, 'for="revenue"')
+        const bars = [...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])]
+        await Promise.all(bars.map((one) => settled(one)))
+        const [first, , last] = bars.map((one) => center(one.getBoundingClientRect()))
+        const names = [...(host.shadowRoot?.querySelectorAll('[part="label"]') ?? [])]
+        const [q1, , q3] = names.map((one) => center(one.getBoundingClientRect()))
+        if (dir === 'ltr') {
+          expect(first as number).toBeLessThan(last as number)
+        } else {
+          expect(first as number).toBeGreaterThan(last as number)
+        }
+        expect(names[0]?.textContent?.trim()).toBe('Q1')
+        expect(Math.abs((q1 as number) - (first as number))).toBeLessThan(2)
+        expect(Math.abs((q3 as number) - (last as number))).toBeLessThan(2)
+      })
+    }
+
+    /* The pointer is read from the plot's right on a mirrored drawing, and the
+       mark the bubble points at is placed from the inline start, so a pointer
+       over the column above Q1's name asks about Q1 and is answered over it.
+       Aimed by the name rather than by the column, since the column is the
+       thing that was in the wrong place. */
+    test('a pointer over the column named Q1 is asking about Q1, rtl', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await chart(REVENUE, 'for="revenue"')
+      const bars = [...(host.shadowRoot?.querySelectorAll('[part="bar"]') ?? [])]
+      await Promise.all(bars.map((one) => settled(one)))
+      const name = (part(host, 'label') as HTMLElement).getBoundingClientRect()
+      const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+      host.dispatchEvent(
+        new PointerEvent('pointermove', {
+          bubbles: true,
+          clientX: center(name),
+          clientY: plot.bottom - 2,
+          composed: true,
+          pointerType: 'mouse',
+        }),
+      )
+      const first = (bars[0] as Element).getBoundingClientRect()
+      await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+      const active = host.shadowRoot?.querySelector('[part~="group-active"]')
+      expect(active?.contains(bars[0] as Element)).toBe(true)
+      const mark = (part(host, 'mark') as HTMLElement).getBoundingClientRect()
+      expect(mark.left).toBeGreaterThanOrEqual(first.left)
+      expect(mark.left).toBeLessThanOrEqual(first.right)
     })
   })
 }

@@ -398,6 +398,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       part="plot"
     >
       <svg part="svg"
+        data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 100 ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
@@ -643,8 +644,10 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
       return drawTooltip(this.sourceRows, at, this.tag('tooltip'))
     }
     /* Off the far end of the tallest bar in the group, so the box never covers
-       the columns it is describing. Horizontal bars grow rightward, so the far
-       end is along x and the arrow hangs off the box's start edge. */
+       the columns it is describing. Horizontal bars grow away from their names,
+       so the far end is along x: rightward, or leftward where the drawing is
+       mirrored, and the bubble goes on that side because a placement is
+       physical. */
     const values = series.map((one) => one.points[at]?.value ?? 0)
     const all = series.flatMap((one) => one.points.map((point) => point.value))
     const [low, high] = extent(all.length > 0 ? all : [0])
@@ -656,7 +659,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const slot = 100 / this.readings
     const across = at * slot + slot / 2
     return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
-      placement: sideways ? 'right' : 'top',
+      placement: sideways ? (this.pointer.mirrored ? 'left' : 'right') : 'top',
       x: sideways ? `${far}%` : `${across}%`,
       y: sideways ? `${across}%` : `${far}%`,
     })

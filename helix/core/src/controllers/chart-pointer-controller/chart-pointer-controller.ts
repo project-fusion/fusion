@@ -126,6 +126,26 @@ export class ChartPointerController implements ReactiveController {
     return this.plot?.getBoundingClientRect()
   }
 
+  /**
+   * Whether the drawing is turned to run right to left, which it is on a
+   * right-to-left page.
+   *
+   * `HelixElement` mirrors a drawing marked `data-mirror` there, so a reading
+   * drawn at 10% of the plot's width stands 10% in from its right edge. What is
+   * read against the drawing has to be read the same way: the pointer from the
+   * plot's right, and a bubble beside a bar's far end on its left. Asked of the
+   * host's computed `direction`, which is what the table and the splitter read
+   * for their own arrow keys.
+   *
+   * On the controller because it is what reads the pointer against the drawing,
+   * and a chart deciding which side a bubble goes asks here rather than
+   * repeating the question. Asked when needed rather than held, since a page
+   * can change its direction without the chart updating.
+   */
+  get mirrored(): boolean {
+    return typeof getComputedStyle === 'function' && getComputedStyle(this.host).direction === 'rtl'
+  }
+
   /** Puts the pointer on a reading, for a chart that resolves it some other way. */
   set(at: number): void {
     if (at !== this.at) {
@@ -149,8 +169,16 @@ export class ChartPointerController implements ReactiveController {
        middle of the `i`th of `count` equal slots, so the nearest is the slot
        the pointer is in. Rounding a proportion of `count - 1` instead puts the
        boundaries half a slot off and the first and last reading get half the
-       catchment of the others. */
-    const from = this.axis === 'block' ? event.clientY - box.top : event.clientX - box.left
+       catchment of the others.
+
+       From the right on a mirrored drawing, where the first slot is. Down the
+       box is down in every direction, so the block axis never turns. */
+    const from =
+      this.axis === 'block'
+        ? event.clientY - box.top
+        : this.mirrored
+          ? box.right - event.clientX
+          : event.clientX - box.left
     const slot = Math.floor((from / along) * count)
     const next = Math.min(Math.max(slot, 0), count - 1)
     if (next !== this.at) {

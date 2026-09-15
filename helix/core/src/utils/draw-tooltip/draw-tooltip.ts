@@ -32,11 +32,24 @@ import type { Row } from '../read-series/read-series.js'
 /** Where a tooltip points, in the plot's own percentages, and which side it prefers. */
 export interface TooltipAt {
   /**
+   * Whether `x` is measured from the plot's left in either direction, for a
+   * drawing that does not turn with the text.
+   *
+   * Absent measures from the plot's inline start, which is where a drawing
+   * marked `data-mirror` starts: its left, or its right on a right-to-left page.
+   * A whole ring is the case for this, its bearing being a clock's.
+   */
+  fixed?: boolean
+  /**
    * The side the bubble prefers. It moves if that side does not fit.
+   *
+   * Physical, as `Tooltip`'s own is: a chart that mirrors says `left` for the
+   * side it would call `right` on a left-to-right page.
    */
   placement: 'bottom' | 'left' | 'right' | 'top'
   /**
-   * How far across the plot the reading is, as a percentage.
+   * How far across the plot the reading is, as a percentage, from the plot's
+   * inline start unless `fixed` says its left.
    */
   x: string
   /**
@@ -103,15 +116,20 @@ export const drawTooltip = (
      one, so nothing can collide with it and nothing has to be threaded through
      a render to stay in step.
 
-     **From the left, in either direction**, because the drawing is. An SVG
-     does not turn with the text and the pointer is read as `clientX` from the
-     plot's left, so a mark at `inset-inline-start` stood at the mirror of its
-     reading on a right-to-left page and the bubble described one bar while
-     pointing at another. */
+     **From the inline start, because the drawing is.** A chart's drawing is
+     mirrored on a right-to-left page and its pointer read from the plot's
+     right, so a reading at 10% stands 10% in from the right edge, and so must
+     the mark: written from the left there, it pointed at the mirror of its own
+     reading. A whole ring is not mirrored, says `fixed`, and is measured from
+     the left, where its bearing's arithmetic starts. */
   return html`<div
       id="helix-chart-mark"
       part="mark"
-      style=${styleMap({ left: place.x, top: place.y })}
+      style=${styleMap(
+        place.fixed
+          ? { left: place.x, top: place.y }
+          : { insetBlockStart: place.y, insetInlineStart: place.x },
+      )}
     ></div>
     <${tag}
       exportparts="arrow: tooltip-arrow, tooltip"

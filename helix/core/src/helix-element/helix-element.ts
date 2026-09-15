@@ -109,6 +109,46 @@ const SCROLLER = css`
 `
 
 /**
+ * Turns a drawing that runs along the line of text round with it, on a
+ * right-to-left page.
+ *
+ * **A chart computes its geometry from the left, because an SVG's coordinates
+ * do.** `x` grows rightward whatever `direction` says, while the words around a
+ * drawing are HTML written in logical properties and turn on their own. Before
+ * this, a bar chart on an Arabic page wrote Q4 to Q1 from the left under
+ * columns still drawn Q1 to Q4, so each name stood under its mirror's column.
+ *
+ * **A rule rather than a second set of coordinates, and three things decide
+ * it.** A server renders the same markup whichever way the page reads, so the
+ * drawing it sends is right before a script runs. Everything drawn on a mark
+ * turns with it: a column rounded at its far end, a gradient toward its base,
+ * the hole a ring terminus cuts, each of which arithmetic would have to mirror
+ * again in every stylesheet that draws one. And it follows `dir` when it
+ * changes, which a render would only do on its next update.
+ *
+ * **About the vertical axis, never the horizontal.** Up is more in every
+ * script, so a value keeps its height and only the run along the line turns.
+ * The numbers are text beside the drawing rather than inside it, so they read
+ * the right way round.
+ *
+ * **Keyed on `:dir()`, which is what every sheet here mirrors a caret with.**
+ * The pointer arithmetic that has to agree with it asks the computed
+ * `direction`, the question the table and the splitter already ask, and the two
+ * part only where a sheet sets `direction` without `dir`.
+ *
+ * A component marks the drawing with `data-mirror`, and a drawing with no line
+ * of text to follow is left unmarked: a whole ring's slices run clockwise from
+ * twelve, which is a clock's convention and not a script's. `scale` rather than
+ * `transform`, so a consumer's `transform` on the same part composes with it,
+ * and a consumer's `scale` there wins, a shadow rule losing to a document one.
+ */
+const MIRROR = css`
+  :host(:dir(rtl)) [data-mirror] {
+    scale: -1 1;
+  }
+`
+
+/**
  * Stops a component animating its own arrival.
  *
  * A shadow root's stylesheets are adopted when the element upgrades, which is
@@ -526,7 +566,7 @@ export class HelixElement extends LitElement {
   protected static override finalizeStyles(
     styles?: CSSResultOrNative | CSSResultOrNative[],
   ): CSSResultOrNative[] {
-    return [BOX_SIZING, HIDDEN, SCROLLER, SETTLED, ...LitElement.finalizeStyles(styles)]
+    return [BOX_SIZING, HIDDEN, SCROLLER, MIRROR, SETTLED, ...LitElement.finalizeStyles(styles)]
   }
 
   /**
