@@ -77,5 +77,28 @@ if (hasLayout()) {
         }
       })
     }
+
+    /* Panes rounded up to whole pixels kept every resting place whole and
+       handed what they gained to the bleed after the last one in view: 14
+       pixels of it, against 16 before the first. */
+    for (const dir of ['ltr', 'rtl'] as const) {
+      test(`keeps every gap and both bleeds equal three across, ${dir}`, async () => {
+        document.documentElement.dir = dir
+        const host =
+          (await mount(`<helix-carousel label="Shelf" per-view="3" style="inline-size: 692px">
+          <div>One</div><div>Two</div><div>Three</div><div>Four</div><div>Five</div>
+        </helix-carousel>`)) as HTMLElement & { updateComplete: Promise<unknown> }
+        await host.updateComplete
+        const track = part(host, 'track') as HTMLElement
+        const style = getComputedStyle(track)
+        const box = track.getBoundingClientRect()
+        const slides = [0, 1, 2].map((index) => at(host.children, index).getBoundingClientRect())
+        const [left, middle, right] = dir === 'rtl' ? [...slides].reverse() : slides
+        expect(left.left - box.left).toBeCloseTo(Number.parseFloat(style.paddingLeft), 1)
+        expect(middle.left - left.right).toBeCloseTo(Number.parseFloat(style.columnGap), 1)
+        expect(right.left - middle.right).toBeCloseTo(Number.parseFloat(style.columnGap), 1)
+        expect(box.right - right.right).toBeCloseTo(Number.parseFloat(style.paddingRight), 1)
+      })
+    }
   })
 }

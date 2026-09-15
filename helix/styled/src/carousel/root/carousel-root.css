@@ -2,7 +2,14 @@
 :host {
   --_carousel-bleed: var(--carousel-bleed, var(--helix-space-md));
   --_carousel-gap: var(--carousel-gap, var(--helix-space-md));
+  /* The pane at its exact share, and to the nearest odd sixty-fourth of a
+     pixel, 0.015625: the pane rule below says why. */
+  --_carousel-pane: calc(round(var(--_carousel-share) - 0.015625px, 0.03125px) + 0.015625px);
   --_carousel-per-view: 1;
+  --_carousel-share: calc(
+    (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
+    var(--_carousel-per-view)
+  );
 }
 
 /* A frame around the track, and each group of chrome placed on a side of it. */
@@ -244,23 +251,62 @@
 
 /* The pane, not the slotted slide.
 
-   **Rounded up to a whole pixel, so a resting place is one both directions
-   reach.** Three across 692 pixels made each pane 209.33, and the last place
-   the track can rest 450.66 along: Chromium lets a left-to-right track overshoot
-   that to 451 and stops a right-to-left one at -450, which left two thirds of a
-   pixel of the slide before on screen. Whole panes put every resting place on a
-   whole pixel, none past the end, and what the panes gain, under a pixel each,
-   lands in the bleed after the last one in view. */
+   **Its exact share, so every gap is the gap.** Rounding panes up to whole
+   pixels, which is the obvious way to put every resting place on a whole
+   pixel, hands what they gain to the bleed after the last one in view: 14
+   pixels of it rather than 16 at three across 692.
+
+   **To the sixty-fourth, because that is the unit layout keeps.** Chromium and
+   WebKit both hold a length in sixty-fourths of a pixel and floor a third into
+   one: 209.33 is laid out 209.328. The run's end below is computed from this
+   width, so it has to be the width actually laid out.
+
+   **An odd number of them, because a half pixel is rounded two ways.** A
+   scroll offset is a whole pixel, and a resting place at an exact half became
+   339 left to right and -338 right to left: both engines round it up, which is
+   away from the start one way and toward it the other. Two across 693 put every
+   second place on a half. A step of an odd number of sixty-fourths reaches a
+   half only at the thirty-second place. A whole share pays a sixty-fourth for
+   it: one across 692 lays each pane out at 660.016.
+
+   Asking the scroller for a place another way was measured and changes
+   nothing: `scrollIntoView`, a target read off the pane's own box, and one
+   rounded in script all come to rest where the engine rounds the snap
+   position it chose, which is where the plain `scrollTo` rests. */
 [part="slide"] {
   display: flex;
-  flex: 0 0
-    round(
-      up,
-      (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
-      var(--_carousel-per-view),
-      1px
-    );
+  flex: 0 0 var(--_carousel-pane);
   scroll-snap-align: start;
+}
+
+/* **The run ends on a whole pixel, because a right-to-left track cannot reach
+   a fraction.** Three across 692 made the run 450.66 longer than the track.
+   Chromium measures a right-to-left scroller from its far end and floors that
+   length, so the track stopped at -450 where a left-to-right one rounded to
+   451, and two thirds of a pixel of the slide before stayed at the leading
+   edge. Ending on a whole pixel, the far end is one number both ways and the
+   last place rests on it in both, so a swipe to the end stops there too.
+
+   The margin is what that takes, under half a pixel either way, beyond the
+   last pane, where it moves nothing in view. Chromium is the engine that needs
+   it and has `sibling-count()` from 138; one without it has no margin and
+   keeps its own reach. Measured 15 Sep 2026 in Chromium 151 and WebKit 26.5,
+   one to five across, whole and fractional widths from 340 to 1300, at one and
+   two device pixels: the track rests at opposite signs of one number at every
+   place.
+
+   The pixel it rounds to is the step a scroll offset takes rather than a
+   spacing, so the margin is named as the correction it is and not as a length
+   a theme would want. */
+:host(:not([orientation="vertical"])) [part="slide"]:last-child {
+  --_carousel-overrun: calc(
+    sibling-count() *
+    (var(--_carousel-pane) + var(--_carousel-gap)) -
+    var(--_carousel-gap) -
+    100%
+  );
+  --_carousel-run-end: calc(round(var(--_carousel-overrun), 1px) - var(--_carousel-overrun));
+  margin-inline-end: var(--_carousel-run-end);
 }
 
 /* The slide fills the pane, and has to be told to. */
@@ -273,11 +319,7 @@
 /* Sized on the block axis instead, by the same arithmetic. */
 :host([orientation="vertical"]) [part="slide"] {
   flex-direction: column;
-  flex: 0 0
-    calc(
-      (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
-      var(--_carousel-per-view)
-    );
+  flex: 0 0 var(--_carousel-share);
 }
 
 :host([per-view="2"]) {
