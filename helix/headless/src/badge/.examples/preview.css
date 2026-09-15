@@ -56,6 +56,7 @@ helix-headless-icon-button::part(button) {
   background-color: transparent;
   block-size: 2.5rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -101,7 +102,7 @@ helix-headless-badge::part(indicator) {
   align-items: center;
   background-color: var(--_gray-strong);
   block-size: 1rem;
-  border-radius: 999px;
+  border-radius: 9999px;
   box-shadow: 0 0 0 2px Canvas;
   box-sizing: border-box;
   color: var(--_gray-surface);

@@ -75,6 +75,13 @@ helix-headless-announcement::part(content) {
   text-align: center;
 }
 
+/* Clear of the dismiss, which is out of flow, and on both sides so the middle
+   stays the middle: without it a wrapped line at 390 ran to the control's
+   edge. */
+helix-headless-announcement[dismissible]::part(content) {
+  padding-inline: 2rem;
+}
+
 helix-headless-announcement::part(actions) {
   align-items: center;
   display: flex;
@@ -92,6 +99,7 @@ helix-headless-announcement::part(dismiss) {
   all: unset;
   align-items: center;
   block-size: 1.5rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;

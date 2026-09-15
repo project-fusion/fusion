@@ -51,7 +51,8 @@
 helix-headless-card {
   align-content: start;
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-panel);
   color: var(--_gray-muted);
   display: grid;
   font-size: 0.875rem;
@@ -82,6 +83,7 @@ helix-headless-button::part(button) {
   align-items: center;
   block-size: 2.5rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;

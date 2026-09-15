@@ -3,7 +3,7 @@ import './preview.css'
 export function Example() {
   return (
     <helix-headless-accordion>
-      <helix-headless-accordion-item>
+      <helix-headless-accordion-item default-open>
         <span slot="summary">Accordion Item One</span>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
         labore.

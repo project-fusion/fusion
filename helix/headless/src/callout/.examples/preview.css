@@ -44,24 +44,41 @@
   --_radius-panel: 0.75rem;
 }
 
-/* The host is the box: a quiet fill with a rule down its start edge, the mark
+/* The host is the box: a quiet fill with a bar down its start edge, the mark
    beside the message rather than above it. The host has no layout of its own on
    this tier, so without this the icon is one block and the slotted text is the
-   next. The rule can be a plain border here, because the crescent a thick
-   border draws around a rounded corner needs a corner that is rounded. Type a
-   step down from the body it interrupts, since a callout is an aside. */
+   next. Type a step down from the body it interrupts, since a callout is an
+   aside. */
 helix-headless-callout {
   background-color: var(--_gray-subtle);
-  border-inline-start: 2px solid var(--_gray-strong);
+  border-radius: var(--_radius-control);
   color: var(--_gray-strong);
   display: flex;
   font-size: 0.8125rem;
   gap: 0.75rem;
+  overflow: hidden;
   padding: 1rem;
+  padding-inline-start: calc(1rem + 2px);
+  position: relative;
 }
 
+/* The bar is a rectangle clipped by the host's corners rather than a border: a
+   thick border on one side of a rounded box follows the radius and thins to
+   nothing at both ends, which draws a crescent. */
+helix-headless-callout::before {
+  background-color: var(--_gray-muted);
+  content: "";
+  inline-size: 2px;
+  inset-block: 0;
+  inset-inline-start: 0;
+  position: absolute;
+}
+
+/* The mark in the bar's ink rather than the text's: a solid disc at full
+   strength beside 13px type is the heaviest thing in the box, and pulls the eye
+   off the line it sits on. */
 helix-headless-callout::part(icon) {
-  color: var(--_gray-strong);
+  color: var(--_gray-muted);
   display: inline-flex;
   flex: none;
 }

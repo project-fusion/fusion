@@ -164,12 +164,33 @@ helix-headless-area-chart::part(tooltip-anchor) {
   position: absolute;
 }
 
-/* The bubble is the page inverted, the way a tooltip is. */
+/* The bubble is the page inverted, the way a tooltip is. `inset: auto` and
+   `margin: 0`, because it is a popover and the UA centers one in the viewport:
+   the component writes its position from the top-left corner, and left to the
+   UA the bubble landed far below and across from the reading it described. */
 helix-headless-area-chart::part(tooltip) {
   background-color: var(--_gray-strong);
+  border: 0;
+  border-radius: var(--_radius-control);
   color: var(--_gray-surface);
   font-size: 0.75rem;
+  inline-size: max-content;
+  inset: auto;
+  line-height: 1.2;
+  margin: 0;
+  overflow: visible;
   padding: 0.25rem 0.5rem;
+}
+
+/* A square turned to a point in the bubble's own fill, hanging below it: the
+   chart places its bubble above the reading. */
+helix-headless-area-chart::part(tooltip-arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  inset-block-end: -0.25rem;
+  position: absolute;
+  rotate: 45deg;
 }
 
 helix-headless-area-chart::part(tooltip-label) {
@@ -185,8 +206,22 @@ helix-headless-area-chart::part(tooltip-cell) {
   grid-template-columns: 0.5em minmax(0, 1fr) auto;
 }
 
+/* A dot in the band's own gray, so a row of the bubble and a band in the
+   drawing are visibly one thing. The chart writes `--chart-series` only on a
+   cell that was plotted, so an unplotted row draws nothing here. */
+helix-headless-area-chart::part(tooltip-cell)::before {
+  background-color: var(--chart-series);
+  block-size: 0.5em;
+  border-radius: 9999px;
+  content: "";
+  grid-column: 1;
+  inline-size: 0.5em;
+}
+
+/* Quieter than the number beside it, from the bubble's own ink. */
 helix-headless-area-chart::part(tooltip-name) {
   grid-column: 2;
+  opacity: 0.72;
 }
 
 helix-headless-area-chart::part(tooltip-value) {
