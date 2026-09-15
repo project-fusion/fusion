@@ -1,6 +1,8 @@
 /* Two columns, the nav beside the prose, which is the shape this component is
-   for. The nav sticks so it stays in view while the prose scrolls past it. */
+   for. The nav sticks so it stays in view while the prose scrolls past it. A
+   container, so the columns can answer the room they are given. */
 .layout {
+  container-type: inline-size;
   display: grid;
   gap: var(--helix-space-xl);
   grid-template-columns: 12rem minmax(0, 1fr);
@@ -10,6 +12,20 @@
   align-self: start;
   position: sticky;
   top: var(--helix-space-md);
+}
+
+/* Too narrow for two columns, the nav goes above the prose and stops sticking,
+   since stuck it would sit over the text scrolling under it. Beside a
+   twelve-rem rail a phone left the prose twelve characters a line. */
+@container (width < 36rem) {
+  .nav,
+  .prose {
+    grid-column: 1 / -1;
+  }
+
+  .nav {
+    position: static;
+  }
 }
 
 .prose {
