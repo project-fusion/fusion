@@ -356,10 +356,13 @@ fn resolve_docs(
 /// Prefixed with the role the parent gave the child, so two levels agreeing on a
 /// word cannot collide. **Except where the part already is the role**, which is
 /// the stutter the rule would otherwise produce: a `dialog` inside a
-/// `part="dialog"` is `dialog`, not `dialog-dialog`.
+/// `part="dialog"` is `dialog`, not `dialog-dialog`. **And so is a second name
+/// of it**, which is the role and one word more: a tooltip landed above its
+/// trigger names its bubble `tooltip-top` beside `tooltip`, and inside the
+/// `tooltip` role that stays `tooltip-top`, not `tooltip-tooltip-top`.
 pub fn exposed_as(role: &str, part: &str) -> String {
-    if part == role {
-        role.to_owned()
+    if part == role || second_name_of(part, role) {
+        part.to_owned()
     } else {
         format!("{role}-{part}")
     }
@@ -459,7 +462,7 @@ pub fn compositions(context: &Context) -> Vec<Site> {
 
 #[cfg(test)]
 mod tests {
-    use super::{forwards_in, second_name_of};
+    use super::{exposed_as, forwards_in, second_name_of};
 
     fn names(code: &str) -> Vec<String> {
         forwards_in(code)
@@ -509,5 +512,14 @@ html`<x exportparts="body: message-body${pick(NAMES, a)}${pick(NAMES, b)}${on ? 
         assert!(!second_name_of("message-body", "message-body"));
         assert!(!second_name_of("message-body-mine", "message"));
         assert!(!second_name_of("message-bodyx", "message-body"));
+    }
+
+    #[test]
+    fn a_part_named_for_its_role_keeps_the_role_alone_and_so_does_its_second_name() {
+        assert_eq!(exposed_as("tooltip", "arrow"), "tooltip-arrow");
+        assert_eq!(exposed_as("tooltip", "arrow-top"), "tooltip-arrow-top");
+        assert_eq!(exposed_as("tooltip", "tooltip"), "tooltip");
+        assert_eq!(exposed_as("tooltip", "tooltip-top"), "tooltip-top");
+        assert_eq!(exposed_as("copy", "tooltip-top"), "copy-tooltip-top");
     }
 }
