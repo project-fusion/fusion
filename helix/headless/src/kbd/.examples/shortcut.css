@@ -72,19 +72,23 @@ helix-headless-kbd {
   vertical-align: -0.05em;
 }
 
-/* `ui-monospace` ahead of the generic, because `monospace` on its own drops an
-   `em` size to the browser's smaller monospace default. The inset shadow is the
-   cap's lower edge, which is what makes a box read as a key rather than a tag. */
+/* Named faces ahead of the generic: Chromium does not honor `ui-monospace`, and
+   a bare `monospace` both lands on Courier and drops an `em` size to the
+   browser's smaller monospace default. The inset shadow is the cap's lower edge,
+   a step darker than the quiet edge around it, which is what makes a box read as
+   a key rather than a tag. */
 helix-headless-kbd::part(kbd) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 1.5em;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-shadow: inset 0 -1px 0 0 var(--_gray-line);
   box-sizing: border-box;
   color: var(--_gray-muted);
   display: inline-flex;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.85em;
   font-variant-ligatures: none;
   font-weight: 500;
@@ -118,7 +122,8 @@ helix-headless-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   display: flex;
   gap: 0.25rem;
@@ -126,7 +131,7 @@ helix-headless-input::part(field) {
 }
 
 helix-headless-input::part(field):hover {
-  border-color: var(--_gray-mark);
+  border-color: var(--_gray-line);
 }
 
 /* The ring goes on the frame rather than on the input, so it surrounds the

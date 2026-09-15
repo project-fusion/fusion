@@ -79,6 +79,7 @@ helix-headless-notifications > [slot="footer"] {
 helix-headless-notifications::part(mark-all),
 helix-headless-notification::part(dismiss) {
   all: unset;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -127,7 +128,7 @@ helix-headless-notification:last-of-type::part(item) {
 helix-headless-notification:not(:state(read))::part(item)::before {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
-  border-radius: 50%;
+  border-radius: 9999px;
   content: "";
   inline-size: 0.5rem;
   inset-block-start: calc(0.5rem + (1.21875rem - 0.5rem) / 2);
@@ -147,7 +148,7 @@ helix-headless-notification > helix-headless-avatar {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 1.5rem;
-  border-radius: 50%;
+  border-radius: 9999px;
   color: var(--_gray-strong);
   display: inline-flex;
   inline-size: 1.5rem;
@@ -191,6 +192,13 @@ helix-headless-notification:not(:state(read))::part(label) {
   font-weight: 500;
 }
 
+/* Named faces ahead of the generic: Chromium does not honor `ui-monospace`, and
+   the user agent's bare `monospace` for `code` is Courier. */
+helix-headless-notification code {
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
 helix-headless-notification::part(actions) {
   align-items: center;
   display: flex;
@@ -211,6 +219,7 @@ helix-headless-notification > button[slot="actions"] {
   align-items: center;
   background-color: var(--_gray-fill);
   block-size: 2rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;

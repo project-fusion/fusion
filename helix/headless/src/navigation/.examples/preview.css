@@ -65,6 +65,7 @@ helix-headless-navigation::part(nav) {
 helix-headless-navigation::part(indicator) {
   background-color: var(--_gray-subtle);
   block-size: var(--indicator-block-size, 0);
+  border-radius: var(--_radius-control);
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;
@@ -79,6 +80,7 @@ helix-headless-navigation::part(indicator) {
 helix-headless-navigation a {
   align-items: center;
   block-size: 100%;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   display: inline-flex;

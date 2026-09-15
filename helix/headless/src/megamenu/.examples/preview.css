@@ -65,6 +65,7 @@ helix-headless-navigation::part(nav) {
 helix-headless-navigation::part(indicator) {
   background-color: var(--_gray-subtle);
   block-size: var(--indicator-block-size, 0);
+  border-radius: var(--_radius-control);
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 50%;
   inset-inline-start: 0;
@@ -79,6 +80,7 @@ helix-headless-navigation::part(indicator) {
 helix-headless-navigation a {
   align-items: center;
   block-size: 100%;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   display: inline-flex;
@@ -119,6 +121,7 @@ helix-headless-megamenu {
 helix-headless-megamenu::part(trigger) {
   all: unset;
   align-items: center;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -147,18 +150,24 @@ helix-headless-megamenu::part(trigger):focus-visible {
   outline-offset: 2px;
 }
 
-/* The panel's columns. `display` only while it is open: the component closes it
+/* The panel's columns, a card hung under the trigger with a quiet edge and the
+   shadow of something over the page. `inset` and `margin` said, because the
+   user agent centers a popover in the window and the component places this one
+   against its trigger. `display` only while it is open: the component closes it
    with `hidden` and the popover's own state, and an author `display` on a closed
    one would beat the user agent's rule and paint it anyway. */
 helix-headless-megamenu::part(surface) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
   box-sizing: border-box;
   color: var(--_gray-strong);
   gap: 2rem;
   grid-auto-columns: minmax(15rem, 1fr);
   grid-auto-flow: column;
   inline-size: max-content;
+  inset: auto;
   line-height: 1.5;
   margin: 0;
   max-inline-size: min(52rem, calc(100% - 4rem));
@@ -167,6 +176,29 @@ helix-headless-megamenu::part(surface) {
 
 helix-headless-megamenu::part(surface):popover-open {
   display: grid;
+}
+
+/* Below its `full-below` width the component says `data-narrow` and stops
+   placing the panel, which becomes a band from edge to edge under the bar: the
+   columns stack, since two of them at fifteen rem do not fit a phone, and the
+   band scrolls rather than running off the bottom of the screen. The component
+   measures where the bar ends into `--megamenu-top`. */
+helix-headless-megamenu[data-narrow]::part(surface) {
+  border: none;
+  border-block-end: 1px solid var(--_gray-edge);
+  border-radius: 0;
+  box-shadow: 0 4px 12px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.1));
+  grid-auto-flow: row;
+  grid-template-columns: minmax(0, 1fr);
+  inline-size: auto;
+  inset-block-start: var(--megamenu-top, 100%);
+  inset-inline: 0;
+  max-block-size: calc(100dvh - var(--megamenu-top, 0px) - 2rem);
+  max-inline-size: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem 1rem 2rem;
+  position: fixed;
 }
 
 [data-megamenu-group] {

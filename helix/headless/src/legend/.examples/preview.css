@@ -101,6 +101,7 @@ helix-headless-legend::part(entry) {
 helix-headless-legend::part(swatch) {
   background-color: var(--chart-series, var(--chart-series-1));
   block-size: 0.75rem;
+  border-radius: var(--_radius-control);
   flex: none;
   inline-size: 0.75rem;
 }

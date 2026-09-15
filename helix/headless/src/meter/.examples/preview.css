@@ -70,6 +70,7 @@ helix-headless-meter::part(value) {
 helix-headless-meter::part(track) {
   background-color: var(--_gray-subtle);
   block-size: 1rem;
+  border-radius: var(--_radius-control);
   inline-size: 100%;
   overflow: hidden;
   position: relative;

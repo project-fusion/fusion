@@ -55,9 +55,11 @@ helix-headless-option {
 }
 
 /* A row at a fixed minimum, so a list is the same height whatever is slotted
-   into it. */
+   into it. Rounded here, where the rows stand free; a list that runs them the
+   full width of its frame squares them again. */
 helix-headless-option::part(item) {
   align-items: center;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;
