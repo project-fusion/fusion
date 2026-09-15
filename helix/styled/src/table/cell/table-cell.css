@@ -16,6 +16,14 @@
   color: var(--helix-color-foreground);
   display: flex;
   font-size: var(--helix-text-sm);
+  /* The edge the column is set to, which the table publishes because the cell
+     is the consumer's markup and it may write nothing onto it. Both properties:
+     `justify-content` moves a value that fits and `text-align` lines up one that
+     wraps, and each reads `start` and `end` as the inline edges, so a
+     right-to-left table needs nothing more. No fallback: under a column that
+     sets no edge both declarations drop out, and the cell inherits whatever
+     `text-align` its table has, as it did before. */
+  justify-content: var(--table-cell-align);
   min-block-size: var(--helix-size-control);
   min-inline-size: 0;
   /* A long identifier breaks rather than running into the column beside it.
@@ -25,7 +33,12 @@
      a cell that overflows. Measured at 760px on the Tree reference page, where
      `defaultActive` sat eleven pixels into the Type column. */
   overflow-wrap: anywhere;
-  padding: var(--helix-space-xs) var(--helix-space-md) var(--helix-space-xs) var(--helix-space-none);
+  /* Logical, as the heading's is, so the inset sits on the inline end in either
+     direction. Written physically it stayed on the right, and in a right-to-left
+     table a column set to the end ended its values 16px from its heading. */
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-none) var(--helix-space-md);
+  text-align: var(--table-cell-align);
 }
 
 /* The cell can shrink and its content could not: `min-inline-size: 0` above
