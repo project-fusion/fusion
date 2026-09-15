@@ -8,32 +8,48 @@
    legibility and is read letter by letter by some screen readers.
 
    The same rule, height and inset as a cell, because the heading is the first
-   line of its column rather than a band above the table. */
+   line of its column rather than a band above the table.
+
+   **Each `--_table-heading-*` is `helix-data-table`'s hooks, relayed.** That
+   table's sheet can reach the column element and not this box inside it, so it
+   sets these on the column and they inherit in here. Unset, each falls back to
+   what a heading is in either table. */
 [part="column"] {
   align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-block-end: var(--helix-border-thin) solid
+    var(--_table-heading-rule-color, var(--helix-color-border));
   box-sizing: border-box;
   /* Muted rather than subtle, and the same size as the cells under it. The
      caption treatment, `text-xs` in `foreground-subtle`, is two steps quieter
      and a step smaller than the column it names, which reads as a footnote to
      its own data. A heading recedes, but it is still part of the table and is
      read as often as anything in it: weight is what separates it, not size. */
-  color: var(--helix-color-foreground-muted);
+  color: var(--_table-heading-color, var(--helix-color-foreground-muted));
   display: flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--_table-heading-text, var(--helix-text-sm));
   font-weight: var(--helix-weight-semibold);
   /* Taller than a row, because the header is a band rather than the first row
      of data: at the same height it read as one, and the rule under it as the
      first of the row separators rather than as the line the table starts at. */
   min-block-size: var(--helix-size-control-loose);
   min-inline-size: 0;
-  padding-inline-end: var(--helix-space-md);
+  padding-block: var(--_table-heading-padding-block, var(--helix-space-none));
+  padding-inline: var(
+    --_table-heading-padding-inline,
+    var(--helix-space-none) var(--helix-space-md)
+  );
 }
 
-/* The positioning context for the separator on the heading's end edge. */
+/* The positioning context for the separator on the heading's end edge, and the
+   box that sticks when a windowed data table scrolls its rows under it. The
+   column element is `display: contents`, so a `position: sticky` written on it
+   is written on nothing. `inset-block-start` does nothing to a relative box. */
 [part="column"] {
-  position: relative;
+  background-color: var(--_table-heading-background-color, transparent);
+  inset-block-start: 0;
+  position: var(--_table-heading-position, relative);
+  z-index: var(--_table-heading-layer, auto);
 }
 
 /* **The heading's words are the button**, so a sortable heading looks exactly
@@ -49,6 +65,21 @@
   flex: 1;
   gap: var(--helix-space-2xs);
   min-inline-size: 0;
+}
+
+/* The heading goes to the edge its values go to, so `Size` sits over digits set
+   to the end rather than at the start above them. `justify-content` rather than
+   `text-align`: the words are a flex item as wide as they are, so there is no
+   room inside them to align in. `flex-end` is the inline end, so a right-to-left
+   table needs nothing more. */
+:host([align="center"]) [part="column"],
+:host([align="center"]) [part="sort"] {
+  justify-content: center;
+}
+
+:host([align="end"]) [part="column"],
+:host([align="end"]) [part="sort"] {
+  justify-content: flex-end;
 }
 
 [part="sort"]:focus-visible,

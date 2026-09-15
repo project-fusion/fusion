@@ -181,18 +181,91 @@ describe('a windowed table, where there is layout to window', () => {
   geometry('holds the headings in place while the rows pass under them', async () => {
     const element = await windowed()
     const box = part(element, 'table') as HTMLElement
-    const head = element.querySelector('helix-table-column') as HTMLElement
-    const offset = () => head.getBoundingClientRect().top - box.getBoundingClientRect().top
+    /* The heading's own box, and not the column element. The column is
+       `display: contents` and measures `0 0 0 0` wherever its heading is, so a
+       spec reading it passed on a page mounted at the top while every heading
+       scrolled off: measured, the column element at 0 and its heading at -301. */
+    const head = part(element.querySelector('helix-table-column') as HTMLElement, 'column')
+    const offset = () =>
+      (head as HTMLElement).getBoundingClientRect().top - box.getBoundingClientRect().top
 
     expect(Math.abs(offset())).toBeLessThan(2)
 
     box.scrollTop = 2_000
     box.dispatchEvent(new Event('scroll'))
     await settle(element)
-    /* `position: sticky` on the column elements rather than on `[part="head"]`,
-       which is `display: contents` and generates no box to stick. Written on the
-       wrapper instead this reads about -2000, with the headings scrolled off the
-       top of their own box. */
+    /* `position: sticky` on the heading's box inside each column, relayed from
+       this table's sheet. Written on `[part="head"]` or on the column element,
+       both `display: contents`, this reads about -2000, with the headings
+       scrolled off the top of their own box. */
     expect(Math.abs(offset())).toBeLessThan(2)
+  })
+})
+
+describe('a heading, where there is layout to place it', () => {
+  const mountIn = async (dir: 'ltr' | 'rtl', style = '') => {
+    const element = (await mount(`
+      <helix-data-table dir="${dir}" label="Objects" style="${style}">
+        <helix-table-column field="name" width="12rem">Name</helix-table-column>
+        <helix-table-column field="size" align="end" width="8rem">Size</helix-table-column>
+      </helix-data-table>`)) as HTMLElement & {
+      rows: readonly Record<string, unknown>[]
+      updateComplete: Promise<unknown>
+    }
+    element.rows = [{ name: 'alpha', size: 30 }]
+    await element.updateComplete
+    return element
+  }
+
+  /* Where the words are, rather than where the boxes are: the heading and the
+     cell are the same width whatever either one's content does, so only the
+     text says which edge it went to. */
+  const words = (node: Node): DOMRect => {
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    return range.getBoundingClientRect()
+  }
+
+  const measure = (element: HTMLElement) => {
+    const [name, size] = [...element.querySelectorAll('helix-table-column')] as HTMLElement[]
+    const cells = [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])]
+    return {
+      name: { cell: words(cells[0] as Node), heading: words(name as Node) },
+      size: { cell: words(cells[1] as Node), heading: words(size as Node) },
+    }
+  }
+
+  geometry('a column set to the end ends its heading where its values end', async () => {
+    const { name, size } = measure(await mountIn('ltr'))
+    expect(Math.abs(size.heading.right - size.cell.right)).toBeLessThan(2)
+    /* And a column left alone stays at the start, over its own values. */
+    expect(Math.abs(name.heading.left - name.cell.left)).toBeLessThan(2)
+  })
+
+  geometry('the end is the left edge in a right-to-left table', async () => {
+    const { name, size } = measure(await mountIn('rtl'))
+    expect(Math.abs(size.heading.left - size.cell.left)).toBeLessThan(2)
+    expect(size.heading.left).toBeLessThan(name.heading.left)
+    expect(Math.abs(name.heading.right - name.cell.right)).toBeLessThan(2)
+  })
+
+  /* The hooks were written on the column element, which is `display: contents`
+     and draws its heading one shadow root further in, so none of them reached
+     it: a heading color that changed nothing and an inset that left the
+     headings where they were while every cell moved. */
+  geometry('the documented hooks reach the headings as well as the cells', async () => {
+    const element = await mountIn(
+      'ltr',
+      '--data-table-heading-color: rgb(1, 2, 3); --data-table-text: 20px; ' +
+        '--data-table-padding-inline: 5px; --data-table-rule-color: rgb(4, 5, 6)',
+    )
+    const heading = part(element.querySelector('helix-table-column') as HTMLElement, 'column')
+    const style = getComputedStyle(heading as Element)
+    expect(style.color).toBe('rgb(1, 2, 3)')
+    expect(style.fontSize).toBe('20px')
+    expect(style.paddingInlineStart).toBe('5px')
+    expect(style.borderBlockEndColor).toBe('rgb(4, 5, 6)')
+    const { name } = measure(element)
+    expect(Math.abs(name.heading.left - name.cell.left)).toBeLessThan(2)
   })
 })

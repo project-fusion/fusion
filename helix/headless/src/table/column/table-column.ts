@@ -107,10 +107,21 @@ export class HelixHeadlessTableColumn extends HelixElement {
    *
    * `end` is what a column of numbers wants, so digits of the same magnitude sit
    * above each other. Left unset the cell inherits the table's own alignment,
-   * which is `start` for text in either writing direction.
+   * which is `start` for text in either writing direction. `helix-data-table`
+   * aligns the cells it draws; a `helix-table`'s cells are markup the consumer
+   * wrote, and align as the consumer styles them. The heading is this element's
+   * own, and `@fusion.dev/helix` sets it to the same edge in either table.
+   *
+   * **Reflected, because the heading is drawn by a stylesheet and has no other
+   * way to learn it.** Set as a property, which is how React sets it, an
+   * unreflected `align` left no attribute to select on, so the heading stayed at
+   * the start over a column of digits set to the end. It is the author's
+   * declaration and nothing moves it afterwards, so an attribute cannot come to
+   * disagree with the element, which is the reason `open` records a custom
+   * state instead. No default, so an unset column writes nothing onto its host.
    */
-  @property()
-  align: 'center' | 'end' | 'start' | '' = ''
+  @property({ reflect: true })
+  align?: 'center' | 'end' | 'start'
 
   /**
    * How to read the cell, where the field alone will not do.
