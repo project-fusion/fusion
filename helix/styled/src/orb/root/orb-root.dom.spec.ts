@@ -39,6 +39,20 @@ type Upgraded = HTMLElement & {
   updateComplete: Promise<boolean>
 }
 
+/** Runs `body` on a page claiming `ratio` device pixels to the CSS pixel. */
+const atDensity = async (ratio: number, body: () => Promise<void>): Promise<void> => {
+  const density = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio')
+  Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: ratio })
+  try {
+    await body()
+  } finally {
+    Reflect.deleteProperty(window, 'devicePixelRatio')
+    if (density) {
+      Object.defineProperty(window, 'devicePixelRatio', density)
+    }
+  }
+}
+
 describe('orb', () => {
   test('renders a canvas and keeps the name on the host', async () => {
     const host = (await mount('<helix-orb></helix-orb>')) as Upgraded
@@ -155,6 +169,55 @@ describe('orb', () => {
       parent?.append(host)
       expect(await framesBooked(4)).toBeGreaterThan(0)
     })
+
+    /* A page has no way to make a 2D context lose itself, so the two events are
+       sent by hand, and `reset` does to the state what a real restore does: a
+       crashed GPU process under headless Chromium gave the canvas back with
+       the identity for its transform. At twice the density, where the identity
+       is not also the right answer. */
+    test('a canvas the browser takes stops it, and it comes back at its own size', () =>
+      atDensity(2, async () => {
+        const host = (await mount('<helix-orb></helix-orb>')) as Upgraded
+        const canvas = host.shadowRoot?.querySelector('canvas')
+        const context = canvas?.getContext('2d')
+        if (!canvas || !context) {
+          return
+        }
+        expect(await framesBooked(4)).toBeGreaterThan(0)
+
+        canvas.dispatchEvent(new Event('contextlost', { cancelable: true }))
+        expect(await framesBooked(4)).toBe(0)
+        // Out of the way, leaving the empty box that is the orb's fallback.
+        expect(canvas.checkVisibility()).toBe(false)
+
+        context.reset()
+        canvas.dispatchEvent(new Event('contextrestored'))
+        expect(canvas.checkVisibility()).toBe(true)
+        expect(context.getTransform().a).toBe(2)
+        expect(await framesBooked(4)).toBeGreaterThan(0)
+      }))
+
+    /* The same, given back while the orb is out of the page and nothing is
+       listening. What it missed is the transform and the loss being over. */
+    test('given back while it is away, it returns shown and at its own size', () =>
+      atDensity(2, async () => {
+        const host = (await mount('<helix-orb></helix-orb>')) as Upgraded
+        const parent = host.parentElement
+        const canvas = host.shadowRoot?.querySelector('canvas')
+        const context = canvas?.getContext('2d')
+        if (!canvas || !context) {
+          return
+        }
+        canvas.dispatchEvent(new Event('contextlost', { cancelable: true }))
+        host.remove()
+        context.reset()
+        canvas.dispatchEvent(new Event('contextrestored'))
+
+        parent?.append(host)
+        expect(canvas.checkVisibility()).toBe(true)
+        expect(context.getTransform().a).toBe(2)
+        expect(await framesBooked(4)).toBeGreaterThan(0)
+      }))
   }
 })
 

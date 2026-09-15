@@ -152,6 +152,9 @@ export class HelixOrb extends HelixElement {
   private running = false
   private onScreen = false
 
+  /** Whether the browser has taken the canvas, as its own two events say. */
+  private lost = false
+
   /** The box the canvas was last measured at, in CSS pixels. */
   private box = 0
 
@@ -233,6 +236,12 @@ export class HelixOrb extends HelixElement {
        change of state after the removal played, `turn` being the one path to
        `play` that no observer gates: a loop with nothing left to stop it. */
     this.onScreen = false
+    /* Nor has it a box, so a return measures again: a context lost and given
+       back while it was away comes back in its default state, and `measure` is
+       what sets the transform. */
+    this.box = 0
+    this.canvas?.removeEventListener('contextlost', this.handleLost)
+    this.canvas?.removeEventListener('contextrestored', this.handleRestored)
     this.visible?.disconnect()
     this.visible = undefined
     this.sized?.disconnect()
@@ -270,6 +279,15 @@ export class HelixOrb extends HelixElement {
     this.context ??= canvas.getContext('2d')
     if (!this.context) {
       return
+    }
+    canvas.addEventListener('contextlost', this.handleLost)
+    canvas.addEventListener('contextrestored', this.handleRestored)
+    /* A restore that landed while it was away, which nothing heard. Asked only
+       once a loss was: the method is newer than the canvas, and an engine that
+       never reports a loss may not have it. */
+    if (this.lost && !this.context.isContextLost()) {
+      this.lost = false
+      canvas.toggleAttribute('hidden', false)
     }
 
     this.motion ??= window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -358,7 +376,7 @@ export class HelixOrb extends HelixElement {
   }
 
   private play(): void {
-    if (this.running || this.motion?.matches || !this.onScreen) {
+    if (this.running || this.motion?.matches || !this.onScreen || this.lost) {
       return
     }
     this.running = true
@@ -392,6 +410,40 @@ export class HelixOrb extends HelixElement {
     } else {
       this.play()
     }
+  }
+
+  /**
+   * Stops for a canvas the browser has taken, on a GPU reset, until it is
+   * given back.
+   *
+   * **Not canceled, which is the aura's contract turned over.** A 2D context
+   * comes back on its own unless its loss is canceled, where a WebGL one comes
+   * back only if it is. Hidden meanwhile, because a lost canvas is not reliably
+   * transparent (the aura's `handleLost` has what was measured), and hidden it
+   * leaves the empty box a machine with no 2D context is shown.
+   */
+  private readonly handleLost = (): void => {
+    this.lost = true
+    this.stop()
+    this.canvas?.toggleAttribute('hidden', true)
+  }
+
+  /**
+   * Draws again on the canvas the browser gave back.
+   *
+   * **Sized again, because it comes back in its default state.** Found 15 Sep
+   * 2026 by crashing the GPU process under headless Chromium: the transform
+   * `measure` sets came back the identity, and `measure` sets it only when the
+   * box changes. At twice the density that is an orb drawn at half its size in
+   * the top left corner, for as long as the box holds still.
+   */
+  private readonly handleRestored = (): void => {
+    this.lost = false
+    this.canvas?.toggleAttribute('hidden', false)
+    this.box = 0
+    this.measure()
+    this.paint(0)
+    this.play()
   }
 
   private readonly handleMotion = (): void => {
