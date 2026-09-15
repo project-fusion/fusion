@@ -39,6 +39,12 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  *
  * @csspart edges - Where the sideways edge cues are drawn.
  * @csspart viewport - The scrolling box.
+ *
+ * @cssstate more-block-end - While there is more to scroll to past the block end.
+ * @cssstate more-block-start - While there is more to scroll back to before the block start.
+ * @cssstate more-inline-end - While there is more to scroll to past the inline end.
+ * @cssstate more-inline-start - While there is more to scroll back to before the inline start.
+ * @cssstate scrolls - While the content is larger than the viewport, on either axis.
  */
 @customElement('helix-headless-scroll-area')
 export class HelixHeadlessScrollArea extends HelixElement {
@@ -178,11 +184,16 @@ export class HelixHeadlessScrollArea extends HelixElement {
        selectors are what the styled tier writes either way. */
     /* Through `toggleState` for the feature test it carries. This is `updated`
        rather than `willUpdate`, so the server never reaches it, but Safari
-       below 17.4 and Firefox below 126 do and have no `CustomStateSet`. */
+       below 17.4 and Firefox below 126 do and have no `CustomStateSet`.
+
+       Four calls rather than a loop over `EDGES`, because a state is read from
+       the source as a literal, the way a part is: `more-${edge}` is a name
+       nothing can pair with its `@cssstate`. */
     this.toggleState('scrolls', this.scrolls)
-    for (const edge of EDGES) {
-      this.toggleState(`more-${edge}`, this.more.includes(edge))
-    }
+    this.toggleState('more-block-start', this.more.includes('block-start'))
+    this.toggleState('more-block-end', this.more.includes('block-end'))
+    this.toggleState('more-inline-start', this.more.includes('inline-start'))
+    this.toggleState('more-inline-end', this.more.includes('inline-end'))
   }
 
   private readonly handleSlotChange = (event: Event): void => {

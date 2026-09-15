@@ -55,6 +55,8 @@ import { property } from 'lit/decorators.js'
  * @cssproperty --slider-from - Where the filled span starts, as a percentage of the track.
  * @cssproperty --slider-marker-at - Where one marker sits, as a percentage of the track.
  * @cssproperty --slider-to - Where the filled span ends, as a percentage of the track.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-slider')
 export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFormElement)) {

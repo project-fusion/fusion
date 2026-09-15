@@ -23,6 +23,8 @@ import { property } from 'lit/decorators.js'
  * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart tab - The tab itself.
+ *
+ * @cssstate selected - While it is the tab selected.
  */
 @customElement('helix-headless-tab')
 export class HelixHeadlessTab extends HelixElement {

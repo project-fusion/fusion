@@ -40,6 +40,8 @@ import { property } from 'lit/decorators.js'
  * @csspart item - The button, which is the whole row.
  * @csspart label - The words beside it.
  * @csspart mark - The dot inside it.
+ *
+ * @cssstate selected - While it is the one chosen.
  */
 @customElement('helix-headless-radio')
 export class HelixHeadlessRadio extends HelixElement {

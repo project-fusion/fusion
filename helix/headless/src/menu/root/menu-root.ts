@@ -59,6 +59,10 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @csspart loading - Shown while the items are still on their way.
  * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
+ *
+ * @cssstate mark - While a row on the page showing can be ticked or leads to a page, so the trailing column is held open for every row.
+ * @cssstate open - While the menu is open.
+ * @cssstate start - While a row on the page showing has something in its leading column, so that column is held open for every row.
  */
 @customElement('helix-headless-menu')
 export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(HelixElement)) {

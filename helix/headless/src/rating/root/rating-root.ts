@@ -52,6 +52,8 @@ import { property, state } from 'lit/decorators.js'
  * @cssproperty --rating-part - How much of the next mark is filled, 0 to 1.
  * @cssproperty --rating-step - The width of one step, as a fraction of a mark.
  * @cssproperty --rating-steps - How many steps one mark is divided into.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-rating')
 export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFormElement)) {

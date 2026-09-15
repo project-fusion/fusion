@@ -73,6 +73,9 @@ import '../../listbox/index.js'
  * @csspart surface - The floating panel.
  * @csspart trigger - The closed control, which says what is chosen.
  * @csspart value - The chosen option's text inside the trigger.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate open - While the list is open.
  */
 @customElement('helix-headless-select')
 export class HelixHeadlessSelect extends MixinControllerOpen(

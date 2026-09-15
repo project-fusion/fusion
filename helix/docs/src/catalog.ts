@@ -72,6 +72,7 @@ export interface Element {
   attributes: ApiMember[]
   cssParts: ApiMember[]
   cssProperties: ApiMember[]
+  cssStates: ApiMember[]
   description: string
   events: EventDoc[]
   label: string
@@ -439,6 +440,7 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
             attributes: members(entry.attributes),
             cssParts: members(entry.cssParts),
             cssProperties: members(entry.cssProperties),
+            cssStates: members(entry.cssStates),
             description: entry.description ?? '',
             events: (entry.events ?? []).map((event) => ({
               description: event.description ?? '',

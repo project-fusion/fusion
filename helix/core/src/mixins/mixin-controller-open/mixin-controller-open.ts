@@ -54,7 +54,10 @@ export declare class MixinControllerOpenInterface {
  * reset returns to.
  *
  * Records `:state(open)` whenever the element is open. Styled tiers select on
- * that rather than on `[open]`, which is absent until somebody writes it.
+ * that rather than on `[open]`, which is absent until somebody writes it. Each
+ * element applying this lists it as `@cssstate open`, because a class-level
+ * tag on a mixin reaches no manifest, here or on the inner class below: the
+ * note there is about members, which do travel.
  */
 export const MixinControllerOpen = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinControllerOpenInterface deliberately. The interface is

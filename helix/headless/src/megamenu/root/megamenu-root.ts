@@ -57,6 +57,8 @@ let showing: HelixHeadlessMegamenu | undefined
  * @csspart trigger - The default trigger, where none was slotted.
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
+ *
+ * @cssstate open - While the panel is open, which is when the trigger reads as current.
  */
 @customElement('helix-headless-megamenu')
 export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {

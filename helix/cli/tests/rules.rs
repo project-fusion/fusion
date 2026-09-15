@@ -1654,6 +1654,47 @@ fn ssr() {
     );
 }
 
+/// A mixin records for whatever applies it and documents for nothing, so the
+/// element applying it lists the state: the fault is the element's list going
+/// missing while the mixin still records.
+#[test]
+fn states() {
+    let dialog = |documented: &str| {
+        format!(
+            "/**
+ * @summary A dialog.
+ *{documented}
+ */
+export class Dialog extends MixinOpen(HTMLElement) {{}}
+"
+        )
+    };
+    plant(
+        "states",
+        &[
+            ("helix.json", TIERS),
+            (
+                "src/mixin-open/mixin-open.ts",
+                "export const MixinOpen = (Base) => class extends Base {
+  willUpdate() {
+    this.toggleState('open', this.open);
+  }
+};
+",
+            ),
+            (
+                "src/dialog/dialog.ts",
+                &dialog(" @cssstate open - While it is open."),
+            ),
+        ],
+        |tree| {
+            tree.write("src/dialog/dialog.ts", &dialog(""));
+        },
+        "Dialog records `:state(open)` and no `@cssstate` lists it",
+        "src/dialog/dialog.ts",
+    );
+}
+
 /// Two layers even though the base is empty; `index.ts` makes a family and
 /// `@status stable` has to sit in a non-spec module.
 #[test]

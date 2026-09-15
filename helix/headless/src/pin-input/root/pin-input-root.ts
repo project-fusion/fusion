@@ -52,6 +52,8 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @csspart field - The row of boxes.
  * @csspart hint - Help under the boxes, while nothing is wrong.
  * @csspart label - The question, over the boxes.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-pin-input')
 export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(HelixFormElement)) {

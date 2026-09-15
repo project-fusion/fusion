@@ -49,6 +49,8 @@ const ITEMS_ID = 'items'
  * @csspart items - The region holding the notifications.
  * @csspart label - What the group is called.
  * @csspart trigger - The control that collapses and expands, where collapsible.
+ *
+ * @cssstate open - While the group shows every notification in it rather than the first.
  */
 @customElement('helix-headless-notification-group')
 export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixElement) {

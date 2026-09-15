@@ -50,7 +50,7 @@ static OPENS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*/\*\*").expect("a literal pattern compiles"));
 static TERMINAL: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
-        r"^\s*\*\s+@(since|status|category|aliases|documentation|slot|csspart|cssproperty|event|controlled)\b",
+        r"^\s*\*\s+@(since|status|category|aliases|documentation|slot|csspart|cssproperty|cssstate|event|controlled)\b",
     )
     .expect("a literal pattern compiles")
 });

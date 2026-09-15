@@ -185,6 +185,8 @@ const SETTLED = css`
  * @since 0.1.0
  * @status experimental
  * @documentation https://helix.fusion.dev/core/helix-element
+ *
+ * @cssstate settled - Set a frame after the first render. Transitions are held off until it is, so an element never animates its own arrival.
  */
 export class HelixElement extends LitElement {
   /**

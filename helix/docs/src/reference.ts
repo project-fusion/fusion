@@ -168,6 +168,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
     attributes = [],
     cssParts = [],
     cssProperties = [],
+    cssStates = [],
     description,
     events = [],
     members = [],
@@ -255,6 +256,18 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
         one.inheritedFrom?.name ? `\`${one.inheritedFrom.name}\`` : '-',
         cell(one.description),
       ]),
+    ).trimEnd(),
+    /* Written as the selector a consumer types, because a custom state is in
+       no attribute and no property and this table is the only place one is
+       learned. Sorted, since `settled` arrives from the base class after the
+       element's own. */
+    table(
+      depth + 1,
+      'Custom states',
+      ['State', 'Description'],
+      [...cssStates]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((one: Documented) => [`\`:state(${one.name})\``, cell(one.description)]),
     ).trimEnd(),
     '',
   )

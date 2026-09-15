@@ -159,7 +159,8 @@ export declare class MixinFieldInterface {
  * inner-class version is the dangerous one, since it satisfies the rule while
  * every API page stays exactly as wrong as before. Members are different and
  * do inherit, which is what the note about the inner class in the area rules
- * is about.
+ * is about. `:state(invalid)` is listed the same way, as a `@cssstate` on each
+ * component, for the same reason.
  */
 export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinFieldInterface deliberately. The interface is

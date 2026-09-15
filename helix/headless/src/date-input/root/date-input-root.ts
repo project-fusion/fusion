@@ -108,6 +108,9 @@ const dates = (value: string): string[] =>
  * @csspart tags - The row the dates sit in.
  * @csspart trigger - The control that opens the calendar.
  * @csspart trigger-icon - The mark on the button that opens the calendar.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate open - While the calendar is open.
  */
 @customElement('helix-headless-date-input')
 export class HelixHeadlessDateInput extends MixinPickerEditing(

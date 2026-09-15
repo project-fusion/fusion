@@ -45,6 +45,8 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * @csspart label - The question, over the row.
  * @csspart row - The line the track sits on, with whatever flanks it.
  * @csspart track - The bar the items sit in.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-toggle-group')
 export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {

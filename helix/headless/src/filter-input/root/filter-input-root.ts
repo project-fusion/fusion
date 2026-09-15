@@ -157,6 +157,9 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @csspart rest - How many tokens did not fit. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
  * @csspart tags - The row the tokens sit in.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate open - While the suggestions are open.
  */
 @customElement('helix-headless-filter-input')
 export class HelixHeadlessFilterInput extends MixinControllerOpen(

@@ -18,6 +18,8 @@ import { property } from 'lit/decorators.js'
  * @slot - The panel's content.
  *
  * @csspart panel - The panel container.
+ *
+ * @cssstate selected - While its tab is the one selected.
  */
 @customElement('helix-headless-tab-panel')
 export class HelixHeadlessTabPanel extends HelixElement {

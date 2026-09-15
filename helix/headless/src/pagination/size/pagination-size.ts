@@ -76,6 +76,8 @@ import '../../select/index.js'
  * @csspart option-item-selected - The row of the size chosen.
  * @csspart option-label - The number.
  * @csspart option-text - The number and the caption, as one column.
+ *
+ * @cssstate empty - While there are no sizes to offer.
  */
 @customElement('helix-headless-pagination-size')
 export class HelixHeadlessPaginationSize extends HelixElement {

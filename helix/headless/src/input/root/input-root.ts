@@ -57,6 +57,8 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart label - The question, over the field.
  * @csspart reveal - The button that shows and hides a password.
  * @csspart reveal-pressed - The reveal button while the password shows, beside `reveal`.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {

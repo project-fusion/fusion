@@ -48,6 +48,9 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The words beside it.
  * @csspart thumb - The part that moves.
  * @csspart track - The groove the thumb travels in.
+ *
+ * @cssstate checked - While it is on.
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-switch')
 export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {

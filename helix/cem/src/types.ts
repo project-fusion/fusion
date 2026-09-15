@@ -260,6 +260,7 @@ export interface HelixDeclaration extends Documented {
   attributes?: HelixAttribute[]
   cssParts?: Documented[]
   cssProperties?: HelixCssProperty[]
+  cssStates?: Documented[]
   customElement?: boolean
   events?: HelixEvent[]
   helix?: HelixMetadata
