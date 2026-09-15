@@ -150,6 +150,20 @@
   padding-block-end: var(--helix-space-lg);
 }
 
+/* **And the same room inside the marks' own box.** The mask that punches the
+   thumb out clips to that box, and a label hung below it was clipped away
+   whole: the markers example drew no labels at all. The box reaches down past
+   the track and the margin gives the depth back, so it still centers on the
+   track; it reaches past the ends in a clear border, which the marks are not
+   placed against, so the first and last labels can hang off the ends. */
+:host([marker-labels]:not([orientation="vertical"])) [part="markers"] {
+  block-size: calc(var(--_slider-track) + var(--helix-space-lg));
+  border-inline: var(--helix-space-lg) solid transparent;
+  margin-block-end: calc(var(--helix-space-lg) * -1);
+  margin-inline: calc(var(--_slider-thumb-length) / 2 - var(--helix-space-lg));
+  mask-origin: padding-box;
+}
+
 /* The label hangs off the mark rather than being laid out beside it, so the
    marks stay where the values are and the text follows. Centered on its own
    mark, which is what puts the first and last labels half off the ends: they
@@ -166,6 +180,11 @@
   translate: -50% 0;
 }
 
+/* Centered from the other side, as the mark it hangs off is. */
+:host(:dir(rtl)) [part="marker-label"] {
+  translate: 50% 0;
+}
+
 /*
  * *Above the control, with the thumb punched out of it.**
  *
@@ -176,27 +195,44 @@
  */
 /* biome-ignore lint/style/noDescendingSpecificity: the rule above it places `control` and `markers` in the same grid cell in one selector list, which is one decision about one layout. Reordering to satisfy this would split that pair so a single-part rule could sit between them, and the pair is the thing worth keeping together. Specificity decides here either way. */
 [part="markers"] {
+  /* The hole is placed from the left, where the thumb is on a left-to-right
+     page and not on a right-to-left one, and centered on the track rather
+     than on the box, which reaches down past it to hold the labels. Under the
+     track everything shows, so a label under the thumb is whole. */
   --_slider-hole: calc(var(--_slider-thumb-length) / 2 + var(--helix-border-thin));
+  --_slider-hole-at: calc(var(--slider-fraction, 0) * 100%);
+  --_slider-hole-from: calc(var(--slider-from, 0) * 100%);
+  --_slider-hole-to: calc(var(--slider-to, 0) * 100%);
+  --_slider-under: linear-gradient(transparent var(--_slider-track), currentColor 0);
 
-  mask-image: radial-gradient(
-    circle at calc(var(--slider-fraction, 0) * 100%) 50%,
-    transparent var(--_slider-hole),
-    currentColor var(--_slider-hole)
-  );
+  mask-image:
+    var(--_slider-under),
+    radial-gradient(
+      circle at var(--_slider-hole-at) calc(var(--_slider-track) / 2),
+      transparent var(--_slider-hole),
+      currentColor var(--_slider-hole)
+    );
+}
+
+:host(:dir(rtl)) [part="markers"] {
+  --_slider-hole-at: calc(100% - var(--slider-fraction, 0) * 100%);
+  --_slider-hole-from: calc(100% - var(--slider-from, 0) * 100%);
+  --_slider-hole-to: calc(100% - var(--slider-to, 0) * 100%);
 }
 
 /* Two thumbs, two holes. Each mask is everything-but-a-hole, so intersecting
-   them is everything but both. */
+   them is everything but both, and what is under the track is added back. */
 [part="field"][data-range] [part="markers"] {
-  mask-composite: intersect;
+  mask-composite: add, intersect;
   mask-image:
+    var(--_slider-under),
     radial-gradient(
-      circle at calc(var(--slider-from, 0) * 100%) 50%,
+      circle at var(--_slider-hole-from) calc(var(--_slider-track) / 2),
       transparent var(--_slider-hole),
       currentColor var(--_slider-hole)
     ),
     radial-gradient(
-      circle at calc(var(--slider-to, 0) * 100%) 50%,
+      circle at var(--_slider-hole-to) calc(var(--_slider-track) / 2),
       transparent var(--_slider-hole),
       currentColor var(--_slider-hole)
     );
