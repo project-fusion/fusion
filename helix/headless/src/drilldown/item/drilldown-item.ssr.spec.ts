@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -40,5 +40,18 @@ describe('drilldown item server output', () => {
       'helix-headless-drilldown-item',
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
+  })
+
+  /* The server's shim carries no children, so it cannot know a row has a page,
+     and a caret it guessed at would be a promise made on nothing. The client
+     draws it after hydrating, reading the children the server could not. */
+  test('a row with a page is served without its caret, since the server cannot see the page', () => {
+    const markup = withoutStyles(
+      ssr(
+        html`<helix-headless-drilldown-item value="a">A<helix-headless-drilldown-item slot="page" value="b">B</helix-headless-drilldown-item></helix-headless-drilldown-item>`,
+      ),
+    )
+    expect(hasPart(markup, 'item')).toBe(true)
+    expect(hasPart(markup, 'mark')).toBe(false)
   })
 })
