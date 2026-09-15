@@ -44,11 +44,14 @@
  * and every wrapper in the tree would otherwise arrive as a pair.
  *
  * Run with `bun run check:css:contrast`, after `turbo run frame`.
+ * `--shard <i> --of <n>` measures one of `n` shares of the families, as
+ * `@fusion.dev/scripts/shard` splits them for CI.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { pool } from '@fusion.dev/scripts/pool'
+import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { pairs } from '@fusion.dev/scripts/theme-facts'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
@@ -97,7 +100,7 @@ const origin = `http://127.0.0.1:${server.address().port}`
 /** Every token the model names, which the page resolves to a color per mode. */
 const named = [...new Set([...pairs].flatMap((pair) => pair.split(' on ')))]
 
-const examples = []
+const every = []
 for (const family of readdirSync(source)) {
   let entries = []
   try {
@@ -113,12 +116,30 @@ for (const family of readdirSync(source)) {
     } catch {
       styles = ''
     }
-    examples.push({
+    every.push({
       html: readFileSync(join(source, family, '.examples', file), 'utf8'),
       name: `${family}/${slug}`,
       styles,
     })
   }
+}
+
+/* **This run's families, when CI splits the check**, weighed by examples:
+   `@fusion.dev/scripts/shard` argues the split. A shard with none passes before
+   the browser starts, and says so in words. */
+const familyOf = (one) => one.name.split('/')[0]
+const asked = shard()
+const ours = owner(
+  every.map(familyOf),
+  (family) => every.filter((one) => familyOf(one) === family).length,
+  asked,
+)
+const examples = every.filter((one) => ours(familyOf(one)))
+if (examples.length === 0) {
+  console.log(
+    `contrast: ${which(asked)} holds none of the families, which the other shards measure.`,
+  )
+  process.exit(0)
 }
 
 /**
@@ -798,15 +819,26 @@ if (findings.length > 0) {
 console.log(
   `contrast: ${measured} inks measured against the ground they are painted on, ` +
     `across ${examples.length} examples in both color modes, every one clearing its target` +
+    (asked === undefined ? '' : `, in ${which(asked)}`) +
     (unresolved > 0 ? `. ${unresolved} sit on an unbounded ground and cannot be` : '') +
     (offscreen > 0 ? `, ${offscreen} below the fold` : ''),
 )
 
 /* Reported rather than failed. A pair the model declares and no example paints
    is a gap in the examples, not a defect in the palette, and the engine measures
-   every one of them regardless. What this adds is knowing which. */
+   every one of them regardless. What this adds is knowing which.
+
+   **A question about the whole corpus, so a shard does not answer it.** A pair
+   the other shards paint would be listed here as painted by nothing, which is
+   the list being wrong in the direction that sends somebody to write an example
+   that already exists. A shard says where the answer is instead. */
 const unpainted = [...pairs].filter((pair) => !painted.has(pair)).sort()
-if (unpainted.length > 0) {
+if (asked !== undefined) {
+  console.log(
+    `contrast: which of the ${pairs.size} modeled pairs no example paints is a question for the ` +
+      'whole corpus, so a shard leaves it to `bun run check:css:contrast`.',
+  )
+} else if (unpainted.length > 0) {
   console.log(
     `contrast: ${pairs.size - unpainted.length} of ${pairs.size} modeled pairs ` +
       `appear in an example. No example paints ${unpainted.length}, so nothing here ` +

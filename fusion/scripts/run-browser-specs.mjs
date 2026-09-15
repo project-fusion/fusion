@@ -16,7 +16,9 @@ import { readFile } from 'node:fs/promises'
  * deleted from the source stops being reported here the same day.
  *
  * Run with `bun run specs:browser`, after `turbo run specs`. A family name limits
- * it to that one: `bun run specs:browser carousel`.
+ * it to that one: `bun run specs:browser carousel`. `--shard <i> --of <n>` runs
+ * one of `n` shares of the families, as `@fusion.dev/scripts/shard` splits them
+ * for CI.
  *
  * **The whole suite is every family, which is not a thing anybody runs while
  * fixing one component**, so it takes a family filter. Without one somebody
@@ -43,6 +45,7 @@ import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { pool, workers } from '@fusion.dev/scripts/pool'
+import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -95,19 +98,33 @@ const origin = `http://127.0.0.1:${server.address().port}`
 const only = process.argv
   .slice(2)
   .find((argument) => !argument.startsWith('--') && !/^\d+$/.test(argument))
-const named = JSON.parse(await readFile(join(specs, 'families.json'), 'utf8'))
-const families = named
+const listed = JSON.parse(await readFile(join(specs, 'families.json'), 'utf8'))
+const bundles = listed
   .map((name) => `${name}.js`)
   .filter((file) => only === undefined || file === `${only}.js`)
   .sort()
 
-if (families.length === 0) {
+if (bundles.length === 0) {
   console.error(
     only === undefined
       ? 'browser specs: no bundles. Run `turbo run specs` first.'
       : `browser specs: no bundle for \`${only}\`. Run \`turbo run specs\` first, and check the name.`,
   )
   process.exit(1)
+}
+
+/* **This run's families, when CI splits the check**, one weight apiece, since
+   what a family's specs cost is known only by running them:
+   `@fusion.dev/scripts/shard` argues the split. A shard with none passes before
+   the browser starts, and says so in words. */
+const asked = shard()
+const ours = owner(bundles, () => 1, asked)
+const families = bundles.filter(ours)
+if (families.length === 0) {
+  console.log(
+    `browser specs: ${which(asked)} holds none of the families, which the other shards run.`,
+  )
+  process.exit(0)
 }
 
 /** How long one family may block the page before the run gives up on it. */
@@ -290,5 +307,6 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `browser specs: ${passed} passed across ${families.length} families, in Chromium on ${Math.min(WORKERS, families.length)} worker(s)`,
+  `browser specs: ${passed} passed across ${families.length} families, in Chromium on ${Math.min(WORKERS, families.length)} worker(s)` +
+    (asked === undefined ? '' : `, in ${which(asked)}`),
 )
