@@ -57,13 +57,22 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
+/* The host is the box the tooltip is placed against, so it takes the
+   button's own box. Left inline it is a line box a line of text tall in the
+   middle of the button, and the bubble measured from it landed 10px lower
+   than the styled one, with its point on the button. */
+helix-headless-button {
+  display: inline-flex;
+}
+
 /* The trigger, at control height on a quiet fill. */
 helix-headless-button::part(button) {
   all: unset;
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;
@@ -75,6 +84,10 @@ helix-headless-button::part(button) {
   line-height: 1.2;
   padding-inline: 1rem;
   white-space: nowrap;
+}
+
+helix-headless-button::part(button):hover {
+  border-color: var(--_gray-line);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -92,9 +105,11 @@ helix-headless-tooltip::part(tooltip) {
   align-items: center;
   background-color: var(--_gray-strong);
   border: 0;
+  border-radius: var(--_radius-control);
   color: var(--_gray-surface);
   display: flex;
   font-size: 0.75rem;
+  font-weight: 400;
   gap: 0.25rem;
   inline-size: max-content;
   line-height: 1.2;

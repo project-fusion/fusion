@@ -77,6 +77,7 @@ helix-headless-tab::part(tab) {
   block-size: 2.5rem;
   border: 0;
   border-block-end: 2px solid transparent;
+  border-radius: var(--_radius-control);
   color: var(--_gray-muted);
   cursor: pointer;
   display: inline-flex;
@@ -122,11 +123,14 @@ helix-headless-tab::part(tab):focus-visible {
 
 /* The selected tab's frame, which is one box that travels rather than a
    border on each tab. Sized from the tab it marks, which the component
-   measures and publishes. */
+   measures and publishes. Raised off the page by a quiet edge and a shadow
+   a pixel deep, as the styled pill is. */
 helix-headless-tabs::part(indicator) {
   background-color: var(--_gray-surface);
   block-size: var(--indicator-block-size, 0);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.08));
   box-sizing: border-box;
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;

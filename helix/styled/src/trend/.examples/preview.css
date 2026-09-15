@@ -1,0 +1,6 @@
+/* Five trends are wider than a phone, so the row wraps, and the wrapped rows
+   are spaced as lines rather than by the gap between two trends: at `xl` both
+   ways, rows of 16px text sat 32px apart. */
+helix-flex {
+  row-gap: var(--helix-space-sm);
+}
