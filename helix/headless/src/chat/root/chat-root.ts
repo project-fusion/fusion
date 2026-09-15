@@ -47,6 +47,38 @@ export interface ChatTurn {
   text: string
 }
 
+/**
+ * What a fed turn's parts are called a second time, while the turn is one a
+ * stylesheet draws apart: `<part>-<state>`, as a state drawn on a part is, for
+ * each part the styled tier draws differently from inside the message.
+ *
+ * **Only `me` has a name.** `author` is free text, so the plain names are
+ * everyone else's.
+ *
+ * **Literal `inner: outer` lists**, because `helix component` reads them here
+ * to hold each name to its prefix and its `@csspart`, and a name put together
+ * from pieces is one no rule can read.
+ */
+const SECOND_NAMES = {
+  author: {
+    me: 'avatar: message-avatar-mine, body: message-body-mine, content: message-content-mine, message: message-mine, meta: message-meta-mine',
+  },
+  state: {
+    failed: 'meta: message-meta-failed',
+    sending: 'content: message-content-sending',
+    streaming: 'content: message-content-streaming',
+  },
+} as const
+
+/**
+ * The names `key` adds from `table`, as the tail of an `exportparts` list.
+ *
+ * Own keys only: `author` is free text, and a turn by `constructor` would
+ * otherwise forward the source of a function.
+ */
+const secondNames = (table: Readonly<Record<string, string>>, key: string | undefined): string =>
+  key !== undefined && Object.hasOwn(table, key) ? `, ${table[key]}` : ''
+
 /** A turn as the announcer reads it, whichever way it was handed over. */
 interface Heard {
   author: string | undefined
@@ -115,6 +147,15 @@ const spoken = (message: Element): string =>
  * too long to hold as elements: it is drawn a window at a time, measured as it
  * goes, and the log needs a block size of its own for that to mean anything.
  *
+ * **A fed turn is styled through this element, not its own.** Its message is
+ * drawn in this shadow root, where `[author="me"]` cannot reach it, so every
+ * fed turn's parts are forwarded as `message-*`, and the ones that change with
+ * the turn a second time while it holds: `-mine` for a turn by `me`, and
+ * `message-meta-failed`, `message-content-sending` and
+ * `message-content-streaming` for its state. Every other author has the plain
+ * names only, so a conversation styling each participant apart passes its
+ * turns as children.
+ *
  * @since 0.1.0
  * @status experimental
  * @category feedback
@@ -145,11 +186,19 @@ const spoken = (message: Element): string =>
  * @csspart message - A turn fed as data: the message drawn for it, forwarded whole.
  * @csspart message-actions - The controls offered on a fed turn, beside its time.
  * @csspart message-avatar - A fed turn's leading slot's box.
+ * @csspart message-avatar-mine - The leading slot's box on a fed turn by `me`.
  * @csspart message-body - What a fed turn said, and the line under it.
+ * @csspart message-body-mine - What a fed turn by `me` said, and the line under it.
  * @csspart message-content - A fed turn's text.
+ * @csspart message-content-mine - The text of a fed turn by `me`.
+ * @csspart message-content-sending - A fed turn's text while it is `sending`.
+ * @csspart message-content-streaming - A fed turn's text while it is `streaming`.
  * @csspart message-indicator - A fed turn's default wait.
  * @csspart message-mark - The status glyph beside a fed turn's failure.
  * @csspart message-meta - The line under a fed turn: its time, its state, and its controls.
+ * @csspart message-meta-failed - The line under a fed turn that `failed`, which says so.
+ * @csspart message-meta-mine - The line under a fed turn by `me`.
+ * @csspart message-mine - A fed turn by `me`: the message drawn for it.
  * @csspart message-retry - The control offered on a fed turn that failed.
  * @csspart message-sources - What a fed turn was drawn from.
  * @csspart message-state - What has happened to a fed turn, where that is worth saying.
@@ -855,7 +904,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
               exportparts="actions: message-actions, avatar: message-avatar, body: message-body,
                 content: message-content, indicator: message-indicator, mark: message-mark, message,
                 meta: message-meta, retry: message-retry, sources: message-sources,
-                state: message-state, time: message-time"
+                state: message-state, time: message-time${secondNames(SECOND_NAMES.author, turn.author)}${secondNames(SECOND_NAMES.state, turn.state)}"
               author=${turn.author ?? nothing}
               at=${turn.at ?? nothing}
               state=${turn.state ?? nothing}

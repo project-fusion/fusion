@@ -958,6 +958,15 @@ and what the platform already says after `::part()` (`:disabled`, `:checked`,
 is itself inside another component's shadow root: an option Time Picker draws is,
 so Option names its own row `item-selected`.
 
+**Or the parent names it, where the child's state is a host attribute.** A turn
+Chat draws from `turns` is a message in Chat's shadow root, so a document cannot
+ask it for `[author="me"]`, and the message's own sheet is the only thing that
+could. Chat forwards each part that changes a second time while the turn holds
+the state, `body: message-body-mine` beside `body: message-body`, read from a
+table of literal `inner: outer` lists so `helix component`'s `exportparts` can
+hold every name to its prefix: a second name is the first and one word more,
+never instead of it, and two parts under one name is refused.
+
 ### A custom state is documented
 
 **`@cssstate` on the element that records it.** A custom state is in no
