@@ -194,6 +194,26 @@ describe('a surface whose position is a fact about the page', () => {
     one.popover.show()
     expect(one.asked).toContain('measure')
   })
+
+  /* A megamenu is a card on a wide window and a band on a narrow one. Opened
+     as a card first, it kept the card's edges and translate, and those inline
+     declarations beat the band's own sheet, so the band opened where the card
+     had been. */
+  test('and loses what an earlier placement wrote on it', async () => {
+    let places = true
+    const one = scene({ place: () => places })
+    one.popover.show()
+    // `computePosition` is async, so the write lands after a tick.
+    await new Promise((done) => setTimeout(done, 0))
+    expect(one.surface.style.getPropertyValue('left')).toBe('0px')
+    one.popover.hide()
+    places = false
+    one.popover.show()
+    expect(
+      ['left', 'right', 'top', 'translate'].map((edge) => one.surface.style.getPropertyValue(edge)),
+    ).toEqual(['', '', '', ''])
+    expect(one.surface.hasAttribute('data-placement')).toBe(false)
+  })
 })
 
 describe('hiding', () => {

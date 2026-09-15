@@ -18,11 +18,21 @@ Set `dir` and the layout flips:
 ```
 
 Every component is written in logical properties, `inline-start` rather than
-`left`, `margin-block` rather than `margin-top`. Sixty-seven stylesheets name a
-direction, and **not one of them names a physical side**: there is no
-`margin-left`, no `padding-right` and no `inset-top` anywhere in the library.
-Nothing infers the direction for you and nothing needs to: the document says it
-and the components follow.
+`left`, `margin-block` rather than `margin-top`. Nothing infers the direction
+for you and nothing needs to: the document says it and the components follow.
+
+**A physical side appears only where the thing it places is physical.** A
+floating panel is placed from coordinates measured from the viewport's left
+edge, so it and its arrow are written in `left` and `top`. A chart's drawing
+does not turn with the text, so the mark its tooltip points at does not either.
+Everything a reader would expect to mirror still does.
+
+That is also how `placement` reads. The side is physical and the alignment is
+logical: `right` is the right of the anchor in either direction, and
+`bottom-start` lines a panel up with the anchor's start edge, which is its right
+edge on a right-to-left page. A panel with no room on its side still flips to
+the other one, so a `right-start` panel beside a rail at the start of a
+right-to-left page opens to its left.
 
 The same is true of anything you write on top. Use logical properties and your
 layout flips with ours; use `left` and `right` and it will not.

@@ -215,6 +215,8 @@ export class PopoverController implements ReactiveController {
     }
     if (this.places) {
       this.floating.start()
+    } else {
+      this.floating.release()
     }
     this.dismisser.activate()
   }

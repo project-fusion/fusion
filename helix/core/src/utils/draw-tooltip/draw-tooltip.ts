@@ -101,11 +101,17 @@ export const drawTooltip = (
   /* The mark and the bubble are siblings, and the id is fixed rather than
      generated: it is scoped to this chart's shadow root, where it is the only
      one, so nothing can collide with it and nothing has to be threaded through
-     a render to stay in step. */
+     a render to stay in step.
+
+     **From the left, in either direction**, because the drawing is. An SVG
+     does not turn with the text and the pointer is read as `clientX` from the
+     plot's left, so a mark at `inset-inline-start` stood at the mirror of its
+     reading on a right-to-left page and the bubble described one bar while
+     pointing at another. */
   return html`<div
       id="helix-chart-mark"
       part="mark"
-      style=${styleMap({ insetBlockStart: place.y, insetInlineStart: place.x })}
+      style=${styleMap({ left: place.x, top: place.y })}
     ></div>
     <${tag}
       exportparts="arrow: tooltip-arrow, tooltip"

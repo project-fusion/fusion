@@ -165,8 +165,8 @@ export interface FloatingOptions {
  * hook with a rule that reads one, in both directions.
  *
  * @cssproperty --floating-anchor-inline-size - How wide the anchor is, for a panel that matches it.
- * @cssproperty --floating-arrow-x - Where the pointer meets the anchor, along the inline axis.
- * @cssproperty --floating-arrow-y - Where the pointer meets the anchor, along the block axis.
+ * @cssproperty --floating-arrow-x - Where the pointer meets the anchor, from the panel's left edge in either direction.
+ * @cssproperty --floating-arrow-y - Where the pointer meets the anchor, from the panel's top edge.
  * @cssproperty --floating-available-block-size - How much room is left below, for a panel that scrolls.
  */
 export class FloatingController implements ReactiveController {
@@ -233,6 +233,38 @@ export class FloatingController implements ReactiveController {
     this.cleanup = undefined
     this.padding = undefined
     this.options.floating()?.removeAttribute('data-placed')
+  }
+
+  /**
+   * Takes back what placing wrote, for a surface its own sheet places now.
+   *
+   * **One surface can be both**, which is why this exists: a megamenu is a card
+   * its trigger places on a wide window and a band its sheet places on a narrow
+   * one. Opened once as a card, it kept the card's edges and translate, and
+   * inline declarations win over the band's own sheet, so the band opened at
+   * the card's offset with no right edge to stretch to. `stop` leaves them on
+   * purpose, since a panel transitioning out still has to be where it was.
+   */
+  release(): void {
+    const floating = this.options.floating()
+    if (!floating) {
+      return
+    }
+    for (const one of [
+      '--floating-anchor-inline-size',
+      '--floating-arrow-x',
+      '--floating-arrow-y',
+      '--floating-available-block-size',
+      'bottom',
+      'left',
+      'position',
+      'right',
+      'top',
+      'translate',
+    ]) {
+      floating.style.removeProperty(one)
+    }
+    floating.removeAttribute('data-placement')
   }
 
   /** Measures both elements and writes the position. */
@@ -347,9 +379,40 @@ export class FloatingController implements ReactiveController {
         return
       }
       this.placement = placement
+      /* **Physical, because the numbers are.** `x` is measured from the
+         viewport's left edge whatever the writing direction, so the edge it is
+         added to has to be the left one. Written as `inset-inline-start` it was
+         the right edge on a right-to-left page, and every panel there landed a
+         window's width past its anchor: the tour's first stop at x 1848 in a
+         window 1280 wide.
+
+         **The far edges said too, as `auto`.** The user agent gives a popover
+         `inset: 0`, so a panel whose sheet leaves that standing has both a left
+         and a right. Over-constrained, a box keeps the edge its containing
+         block starts from and drops the other, which for the top layer is the
+         root's direction: the left in English and the right in Arabic, where
+         `left: 0` was then the value thrown away. `auto` on the far side leaves
+         nothing to choose between, and takes the auto margins the same agent
+         centers a popover with down to zero.
+
+         **And `important`, which is the cascade's doing rather than a
+         preference.** A sheet outside the shadow root reaches the panel through
+         `::part()`, and for normal declarations the outer tree's win over the
+         inner tree's, inline ones included. The headless previews say
+         `inset: auto` there, to undo the user agent's centering, and with it
+         standing the panel sat at its static position, the viewport's start
+         corner: the left in English, where that happened to be right, and the
+         right in Arabic. Nothing else has a claim on these four, since a
+         surface its own sheet places opts out with `place: false`. */
+      for (const [edge, value] of [
+        ['bottom', 'auto'],
+        ['left', '0'],
+        ['right', 'auto'],
+        ['top', '0'],
+      ] as const) {
+        floating.style.setProperty(edge, value, 'important')
+      }
       Object.assign(floating.style, {
-        insetBlockStart: '0',
-        insetInlineStart: '0',
         position: 'fixed',
         // A translate rather than insets, so the position never lands on a
         // subpixel boundary and blurs the text inside it.
@@ -372,11 +435,11 @@ export class FloatingController implements ReactiveController {
          *
          * A surface landing hundreds of pixels from its anchor looks like an
          * ancestor stealing the containing block, which `transform`, `filter`
-         * and `backdrop-filter` all do to a `fixed` descendant. Check the tier
-         * first: the UA stylesheet centers a `popover` through `inset: 0` and
-         * `margin: auto`, and the headless tooltip ships no styles to overrule
-         * it, so it sits mid-viewport with a zeroed translate while `Tooltip`,
-         * which sets `margin: 0`, never does. A correction added for that
+         * and `backdrop-filter` all do to a `fixed` descendant. Check the edges
+         * first: the UA stylesheet's `inset: 0` and `margin: auto` sat a
+         * headless tooltip with no sheet of its own mid-viewport, and put every
+         * panel on a right-to-left page a window's width out, until the far
+         * edges above were written as `auto`. A correction added for either
          * subtracts a real ancestor's origin from an already correct number and
          * throws every tooltip on the page off by it. */
         translate: `${Math.round(x)}px ${Math.round(y)}px`,
@@ -399,9 +462,13 @@ export class FloatingController implements ReactiveController {
 
       const point = middlewareData.arrow
       if (pointer && point) {
+        /* Physical for the reason the panel is: Floating UI measures the
+           arrow's offset from the panel's left and top. The edge it hangs off
+           is the stylesheet's, chosen from `data-placement`, and is physical
+           too, `right` in a placement being the right in either direction. */
         Object.assign(pointer.style, {
-          insetBlockStart: point.y === undefined ? '' : `${point.y}px`,
-          insetInlineStart: point.x === undefined ? '' : `${point.x}px`,
+          left: point.x === undefined ? '' : `${point.x}px`,
+          top: point.y === undefined ? '' : `${point.y}px`,
         })
         /* Where the pointer ended up, as the center of it, published for
            anything that has to grow out of the thing it points at.
