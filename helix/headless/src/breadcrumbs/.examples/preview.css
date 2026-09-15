@@ -38,39 +38,40 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-/* A row, so the separator sits on the text's middle rather than on its
-   baseline. An inline box of 1em aligns its bottom to the baseline, which puts
-   a chevron a third of a line high beside the word it separates.
-
-   And the first item has nothing to be separated from. The styled tier hides
-   that one; a diagram that leaves it in teaches a leading chevron. */
-helix-headless-breadcrumb {
-  align-items: center;
-  display: inline-flex;
-  gap: 0.25rem;
-}
-
-helix-headless-breadcrumb:first-child::part(separator) {
-  display: none;
-}
-
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* A wrapping row with no markers and none of the list's UA inset. The
+   component sets `role="list"` because Safari drops list semantics when it
+   sees `list-style: none`. */
 helix-headless-breadcrumbs::part(list) {
   align-items: center;
   display: flex;
-  gap: 0.25rem;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  line-height: 1.5;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* A row, so the separator sits on the text's middle rather than on its
+   baseline. An inline box of 1em aligns its bottom to the baseline, which puts
+   a chevron a third of a line high beside the word it separates. */
+helix-headless-breadcrumb {
+  align-items: center;
+  display: inline-flex;
+  font-weight: 500;
+  gap: 0.5rem;
 }
 
 helix-headless-breadcrumb::part(separator) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+  color: var(--_gray-mark);
+  display: inline-flex;
+  user-select: none;
+}
+
+/* The first item has nothing to be separated from. */
+helix-headless-breadcrumb:first-child::part(separator) {
+  display: none;
 }
 
 helix-headless-breadcrumb::part(separator-mark) {
@@ -79,8 +80,39 @@ helix-headless-breadcrumb::part(separator-mark) {
   inline-size: 1em;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-breadcrumb::part(link) {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  gap: 0.25rem;
+  padding-inline: 0.5rem;
+  text-decoration: none;
+}
+
+/* The page the reader is on reads as where they are, not as somewhere to go. */
+helix-headless-breadcrumb[current]::part(link) {
+  color: var(--_gray-strong);
+}
+
+/* Steps, not prose links: gray and not underlined, with the room a hover fill
+   needs. Only the first is pulled back, on the side facing the edge, so the
+   trail starts where the content around it starts. */
+helix-headless-breadcrumb a {
+  color: var(--_gray-muted);
+  padding: 0.25rem 0.5rem;
+  text-decoration: none;
+}
+
+helix-headless-breadcrumb:first-child a {
+  margin-inline-start: -0.5rem;
+}
+
+helix-headless-breadcrumb a:hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-breadcrumb a:focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }

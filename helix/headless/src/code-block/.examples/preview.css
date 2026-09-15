@@ -38,26 +38,90 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+/* A column: the name over the code, and a block given a height spends it on
+   the code. */
+helix-headless-code-block {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
 }
 
+/* The name, over the code rather than floating on it, in a bar on a quiet fill
+   that shares the block's edge. */
+helix-headless-code-block::part(header) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  border: 1px solid var(--_gray-line);
+  display: flex;
+  padding: 0.5rem 1rem;
+}
+
+/* The name is a name, not code, so it is set in the page's face. */
 helix-headless-code-block::part(label) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* The positioning context for the copy button, which sits inside the code box. */
+helix-headless-code-block::part(frame) {
+  flex: 1;
+  position: relative;
+}
+
+/* Scrolls, never wraps, on the page's own ground inside a hairline. The top
+   edge is the header's, so the block does not draw a second one under it; the
+   trailing inset is the copy button's gutter. */
+helix-headless-code-block::part(block) {
+  block-size: 100%;
+  border: 1px solid var(--_gray-line);
+  border-block-start-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+  overflow-x: auto;
+  padding: 0.75rem 3.25rem 0.75rem 1rem;
+}
+
+helix-headless-code-block::part(code) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+helix-headless-code-block::part(copy) {
+  inset-block-start: 0.25rem;
+  inset-inline-end: 0.25rem;
+  position: absolute;
+}
+
+/* A ghost icon button: no fill and no edge until a pointer is on it. */
+helix-headless-code-block::part(copy-button) {
+  all: unset;
+  block-size: 2.5rem;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-grid;
+  inline-size: 2.5rem;
+  place-items: center;
+}
+
+helix-headless-code-block::part(copy-button):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
 helix-headless-code-block::part(copy-mark) {
-  block-size: 1em;
+  block-size: 1rem;
   flex: none;
-  inline-size: 1em;
+  inline-size: 1rem;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+/* The keyboard reaches this, so the ring goes here. Taking the UA outline
+   off without putting one back is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-code-block::part(copy-button):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }

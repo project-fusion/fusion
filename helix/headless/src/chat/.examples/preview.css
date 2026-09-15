@@ -1,0 +1,352 @@
+/* What the headless tier asks a consumer to write for Chat.
+ *
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
+ * says primary and a red one says danger, and this tier holds no such opinion.
+ * A neutral ramp says only where one surface ends and the next begins.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
+ *
+ * A part with no rule below is one the platform already renders acceptably, and
+ * a wrong rule is worse than none: paint a checkbox but leave the input at
+ * `appearance: auto` and the browser draws its own control over everything
+ * written for it.
+ *
+ * **Three elements, and each is styled from outside its own shadow root.** The
+ * transcript, each turn in it and the composer under it render their own parts,
+ * so every rule below names the element before the part.
+ *
+ * **A region the component hides stays hidden only while nothing here sets its
+ * `display`.** The header, the status line and a turn's sources and actions
+ * carry `hidden` when nothing is slotted into them, and an author `display`
+ * beats the UA's `[hidden]`. An attribute selector after `::part()` is dropped
+ * at parse time, so the one region that needs a layout, the header, asks the
+ * host whether anything was slotted for it instead, and the rest are left
+ * their UA box. */
+
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+/* Five rows: the header, the transcript that scrolls, the way back over it,
+   the status line and the composer. */
+helix-headless-chat {
+  color: var(--_gray-strong);
+  display: grid;
+  font-size: 0.875rem;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  line-height: 1.5;
+  min-block-size: 0;
+}
+
+helix-headless-chat::part(header) {
+  grid-row: 1;
+}
+
+helix-headless-chat::part(log) {
+  grid-row: 2;
+}
+
+helix-headless-chat::part(resume) {
+  grid-row: 3;
+}
+
+helix-headless-chat::part(status) {
+  grid-row: 4;
+}
+
+helix-headless-chat::part(composer) {
+  grid-row: 5;
+}
+
+/* What the conversation is, on one line with a rule under it. */
+helix-headless-chat:has(> [slot="header"], > [slot="actions"])::part(header) {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+helix-headless-chat::part(header) {
+  border-block-end: 1px solid var(--_gray-line);
+  min-block-size: 2.5rem;
+  padding: 0.25rem 1rem;
+}
+
+/* The transcript scrolls, and a short one sits against the bottom, where the
+   next turn arrives. */
+helix-headless-chat::part(log) {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: safe flex-end;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+/* Over the transcript rather than in the column, so offering the way back does
+   not move the turns. */
+helix-headless-chat::part(resume) {
+  margin-block-start: -2rem;
+  pointer-events: none;
+  position: relative;
+  text-align: center;
+}
+
+helix-headless-chat::part(status) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  padding: 0.5rem 1rem 0.25rem;
+}
+
+/* Inset less than the transcript by the composer's own padding and edge, so
+   the words typed into it start where the turns above them do. */
+helix-headless-chat::part(composer) {
+  padding: 0.75rem calc(0.5rem - 1px);
+}
+
+/* Where each settled turn is said: out of sight and still in the tree. */
+helix-headless-chat::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Two columns, the avatar and everything else. */
+helix-headless-chat-message {
+  display: block;
+}
+
+helix-headless-chat-message::part(message) {
+  align-items: start;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+helix-headless-chat-message::part(avatar) {
+  align-items: center;
+  display: flex;
+  font-size: 0.8125rem;
+  grid-column: 1;
+  line-height: 1.5;
+}
+
+/* The reader's own turns carry no avatar; they sit against the trailing edge
+   instead. */
+helix-headless-chat-message[author="me"]::part(avatar) {
+  display: none;
+}
+
+/* What was said and the line under it, hugging its text up to a measure. */
+helix-headless-chat-message::part(body) {
+  display: grid;
+  gap: 0.25rem;
+  grid-column: 2;
+  justify-items: start;
+  max-inline-size: min(42rem, 80%);
+}
+
+helix-headless-chat-message[author="me"]::part(body) {
+  justify-items: end;
+  justify-self: end;
+}
+
+/* The bubble. A step apart for each side, so who said what survives the
+   monotone: the other party on the fill, the reader a rung darker. */
+helix-headless-chat-message::part(content) {
+  background-color: var(--_gray-fill);
+  color: var(--_gray-strong);
+  font-size: 0.8125rem;
+  inline-size: fit-content;
+  line-height: 1.5;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow-x: auto;
+  padding: 0.5rem 0.75rem;
+}
+
+helix-headless-chat-message[author="me"]::part(content) {
+  background-color: var(--_gray-line);
+}
+
+helix-headless-chat-message[state="sending"]::part(content) {
+  opacity: 0.6;
+}
+
+/* The line under a turn: its time, its state and its controls, in one row
+   against whichever edge the turn is. */
+helix-headless-chat-message::part(meta) {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: flex;
+  font-size: 0.75rem;
+  gap: 0.25rem;
+}
+
+helix-headless-chat-message[author="me"]::part(meta) {
+  justify-content: flex-end;
+}
+
+/* A failure is the one state with a tone, and in grays the tone is the
+   strongest ink rather than a red. */
+helix-headless-chat-message[state="failed"]::part(meta) {
+  color: var(--_gray-strong);
+}
+
+helix-headless-chat-message::part(state) {
+  align-items: center;
+  display: inline-flex;
+  font-weight: 500;
+  gap: 0.25rem;
+}
+
+/* The glyph is drawn at whatever size it is given, and it is given none: left
+   alone it fills the width of the page. */
+helix-headless-chat-message::part(mark) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
+}
+
+helix-headless-chat-message::part(retry) {
+  background: none;
+  border: 0;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  min-block-size: 1.75rem;
+  padding: 0.25rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+helix-headless-chat-message::part(retry):hover {
+  background-color: var(--_gray-subtle);
+}
+
+/* The controls are there when the turn is, and not before. */
+helix-headless-chat-message::part(actions) {
+  opacity: 0;
+}
+
+helix-headless-chat-message:hover::part(actions),
+helix-headless-chat-message:focus-within::part(actions) {
+  opacity: 1;
+}
+
+helix-headless-chat-message::part(sources) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}
+
+/* The composer is a box, and the field inside it owns no edge or ground of its
+   own: it is the inside of the box. */
+helix-headless-chat-composer {
+  display: block;
+}
+
+helix-headless-chat-composer::part(composer) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+helix-headless-chat-composer::part(composer):focus-within {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 0;
+}
+
+/* `field-sizing` grows the box with the text and stops at the ceiling. */
+helix-headless-chat-composer::part(field) {
+  background-color: transparent;
+  border: 0;
+  color: var(--_gray-strong);
+  field-sizing: content;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  max-block-size: 12rem;
+  padding: 0.25rem 0;
+  resize: none;
+}
+
+helix-headless-chat-composer::part(field):focus-visible {
+  outline: none;
+}
+
+helix-headless-chat-composer::part(tools) {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+  justify-content: flex-end;
+}
+
+helix-headless-chat-composer::part(start) {
+  margin-inline-end: auto;
+}
+
+helix-headless-chat-composer::part(send) {
+  align-items: center;
+  background-color: transparent;
+  block-size: 1.75rem;
+  border: 0;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 1.75rem;
+  justify-content: center;
+  padding: 0;
+}
+
+helix-headless-chat-composer::part(send):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-chat-composer::part(send):disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+helix-headless-chat-composer::part(mark) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
+}
+
+/* The keyboard reaches these, so the ring goes on them. Taking the UA outline
+   off without putting one back is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-chat-message::part(retry):focus-visible,
+helix-headless-chat-composer::part(send):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}

@@ -38,30 +38,59 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* The host is the surface, and a grid of whatever is slotted: the regions are
+   bare slots, so the heading, the prose and the footer are its rows and an
+   omitted one takes no gap. Packed at the top, so a card stretched beside a
+   taller one keeps its slack at the end rather than between its own rows. */
 helix-headless-card {
+  align-content: start;
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
-  display: block;
-  padding: 0.75rem;
+  color: var(--_gray-muted);
+  display: grid;
+  font-size: 0.875rem;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+  line-height: 1.5;
+  overflow: hidden;
+  padding: 1rem;
 }
 
+/* The header reads as the card's own voice rather than as body copy. */
+helix-headless-card > [slot="header"] {
+  color: var(--_gray-strong);
+  margin: 0;
+}
+
+/* Trailing actions sit at the end of the line instead of stretching across it,
+   which is what a grid item does by default. */
+helix-headless-card > [slot="footer"] {
+  justify-self: end;
+}
+
+/* A ghost button: no fill and no edge until a pointer is on it, since the card
+   is already the frame. `all: unset` first, so the UA's own button is gone
+   before anything is drawn on it. */
 helix-headless-button::part(button) {
   all: unset;
+  align-items: center;
+  block-size: 2.5rem;
+  border: 1px solid transparent;
   box-sizing: border-box;
+  color: var(--_gray-strong);
   cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: center;
+  line-height: 1.2;
+  padding-inline: 1rem;
+  white-space: nowrap;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-button::part(button):hover {
+  background-color: var(--_gray-subtle);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

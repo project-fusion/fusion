@@ -1,34 +1,87 @@
 /* What the headless tier asks a consumer to write for Area Chart.
  *
- * Deliberately skeletal, and gray for Line Chart's reason: color in a diagram
- * reads as meaning, and this tier holds none. The bands are opaque grays from
- * dark at the bottom to light at the top, since each band covers the part of
- * the one above it that sits below its own edge. */
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
+ * says primary and a red one says danger, and this tier holds no such opinion.
+ * A neutral ramp says only where one surface ends and the next begins.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
+ *
+ * A part with no rule below is one the platform already renders acceptably, and
+ * a wrong rule is worse than none: paint a checkbox but leave the input at
+ * `appearance: auto` and the browser draws its own control over everything
+ * written for it.
+ *
+ * The bands are opaque grays, from the step furthest from the page at the
+ * bottom to the one nearest it at the top, since each band covers the part of
+ * the one above it that sits below its own edge, and a translucent band would
+ * show the ones behind it through itself. */
 
 :root {
   color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
-  --_gray-surface: light-dark(#fafafa, #18181b);
+}
+
+/* Out of sight and still in the accessibility tree: the table is what the
+   chart reads and what a screen reader reads, and the bands are the picture of
+   it. Never `display: none`, which would take it from both. */
+[data-hidden-visually] {
+  block-size: 1px;
+  border: 0;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
 }
 
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
+/* The drawing and the words under it, in two rows. */
 helix-headless-area-chart {
-  --chart-series-1: light-dark(#4a4a50, #c9c9ce);
-  --chart-series-2: light-dark(#6b6b73, #a1a1aa);
-  --chart-series-3: light-dark(#8e8e96, #86868f);
-  --chart-series-4: light-dark(#b1b1b8, #63636b);
+  --chart-series-1: var(--_gray-mark);
+  --chart-series-2: var(--_gray-line);
+  --chart-series-3: var(--_gray-fill);
+  --chart-series-4: var(--_gray-subtle);
+
+  display: grid;
+  font-size: 0.875rem;
+  gap: 0.25rem;
+  position: relative;
 }
 
+/* A bounded height: the drawing fills its box, and a box nobody sized is as
+   tall as the page lets it be. */
 helix-headless-area-chart::part(plot) {
-  block-size: 10rem;
+  block-size: 12em;
+  cursor: crosshair;
   position: relative;
 }
 
@@ -36,52 +89,101 @@ helix-headless-area-chart::part(svg) {
   block-size: 100%;
   display: block;
   inline-size: 100%;
+  overflow: visible;
 }
 
 helix-headless-area-chart::part(area) {
   fill: var(--chart-series);
+  stroke: none;
 }
 
+/* Each band's top edge drawn rather than left to two pale fills meeting. */
 helix-headless-area-chart::part(line) {
-  stroke: var(--_gray-surface);
-  stroke-width: 1;
+  stroke: var(--_gray-muted);
+  stroke-linejoin: round;
+  stroke-width: 2px;
   vector-effect: non-scaling-stroke;
 }
 
-helix-headless-area-chart::part(baseline) {
+helix-headless-area-chart::part(baseline),
+helix-headless-area-chart::part(gridline) {
   stroke: var(--_gray-line);
+  stroke-width: 1px;
   vector-effect: non-scaling-stroke;
 }
 
 helix-headless-area-chart::part(guide) {
-  stroke: var(--_gray-strong);
+  stroke: var(--_gray-muted);
+  stroke-dasharray: 3 3;
+  stroke-width: 1px;
   vector-effect: non-scaling-stroke;
 }
 
 helix-headless-area-chart::part(labels) {
-  color: var(--_gray-muted);
   display: grid;
-  font-size: 0.75rem;
   grid-auto-columns: 1fr;
   grid-auto-flow: column;
-  text-align: center;
 }
 
-helix-headless-area-chart::part(summary) {
+helix-headless-area-chart::part(label) {
   color: var(--_gray-muted);
   font-size: 0.75rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Said and not shown, for the table's reason. */
+helix-headless-area-chart::part(summary) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
   margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }
 
 helix-headless-area-chart::part(mark) {
   block-size: 1px;
   inline-size: 1px;
+  pointer-events: none;
   position: absolute;
 }
 
+helix-headless-area-chart::part(tooltip-anchor) {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* The bubble is the page inverted, the way a tooltip is. */
 helix-headless-area-chart::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+  background-color: var(--_gray-strong);
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+helix-headless-area-chart::part(tooltip-label) {
+  display: block;
+  font-weight: 500;
+  margin-block-end: 0.25rem;
+}
+
+helix-headless-area-chart::part(tooltip-cell) {
+  align-items: baseline;
+  column-gap: 0.75rem;
+  display: grid;
+  grid-template-columns: 0.5em minmax(0, 1fr) auto;
+}
+
+helix-headless-area-chart::part(tooltip-name) {
+  grid-column: 2;
+}
+
+helix-headless-area-chart::part(tooltip-value) {
+  font-variant-numeric: tabular-nums;
+  grid-column: 3;
 }
