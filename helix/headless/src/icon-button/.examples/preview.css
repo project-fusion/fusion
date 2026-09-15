@@ -1,20 +1,22 @@
 /* What the headless tier asks a consumer to write for Icon Button.
  *
  * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the same parts boxed, the same direction, gaps and corners, so a reader sees
  * the component a consumer would build rather than a sketch of it. No token,
  * because `headless` does not depend on `helix/styles` and a consumer taking
  * that tier has none to reach for, so the styled values are written out in
- * `rem`. No corner radius, because rounding says how a thing should feel and
- * that is not this tier's to say; the exceptions are shapes that are round
- * rather than softened. The page is set in the system's sans-serif, which is
- * the page's decision and not the component's.
+ * `rem`, radii included: a corner is structure the way a padding is, and it is
+ * what makes a bubble a bubble and a joined group one object. Two grays draw
+ * edges, as the styled tier's two do: `edge` is the quiet resting border of a
+ * control or a surface, and `line` the rule between content and the edge of
+ * anything hovered or chosen. The page is set in the system's sans-serif, which
+ * is the page's decision and not the component's.
  *
  * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
  * says primary and a red one says danger, and this tier holds no such opinion.
  * A neutral ramp says only where one surface ends and the next begins.
  *
- * The seven values are named by role rather than numbered, since a number
+ * The values are named by role rather than numbered, since a number
  * implies a scale somebody maintains, and underscored because they never leave
  * this file: an unprefixed name reads as a hook the example publishes, and it
  * publishes none. Written through `light-dark()` with `color-scheme` declared,
@@ -31,11 +33,15 @@
   font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #26262a);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
   --_gray-mark: light-dark(#8e8e96, #86868f);
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+  --_radius-surface: 0.5rem;
+  --_radius-panel: 0.75rem;
 }
 
 helix-headless-icon-button {
