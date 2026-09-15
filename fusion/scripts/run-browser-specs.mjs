@@ -25,9 +25,10 @@ import { readFile } from 'node:fs/promises'
  *
  * **Families run on a fixed number of workers, and every family on a page of
  * its own**, through `@fusion.dev/scripts/pool`, which carries the argument for
- * the stripe and the worker count, and which the pixel checks share. A fresh
- * page is what keeps one family's definitions from deciding another's result
- * (the note in `run` has the case that made it necessary). Results are
+ * the stripe and the worker count, and which the pixel checks share on one page
+ * per worker. The specs keep the pool's default, a fresh page per family,
+ * because that is what keeps one family's definitions from deciding another's
+ * result (the note in `run` has the case that made it necessary). Results are
  * reported in the order the families sort, whichever worker ran them. Measured
  * 14 Sep 2026 on twelve cores, 2251 specs passing every time: 91 seconds on the
  * one shared page this replaced, of which 60 were the stuck timer holding the

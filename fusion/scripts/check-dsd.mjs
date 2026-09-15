@@ -410,7 +410,7 @@ const origin = `http://127.0.0.1:${listening.port}`
 const browser = await chromium.launch()
 /* `reducedMotion` and nothing leaving the machine, for the reasons parity gives:
    a canvas holds still only when asked to, and a remote asset answers
-   differently each time. Given to every worker's context, so each fresh page
+   differently each time. Given to every worker's context, so each worker's page
    starts with the settings the one shared page had. */
 const CONTEXT = { reducedMotion: 'reduce', viewport: { height: 800, width: WIDTH } }
 const closed = (context) =>
@@ -570,24 +570,27 @@ const examine = async (watched, one) => {
 }
 
 /**
- * Every example in `groups` examined, a fresh page to each group on the workers
- * `pool` decides, and the findings handed back as one list per group, holding
- * one list per example, in the order the groups were given.
+ * Every example in `groups` examined, one page per worker on the workers `pool`
+ * decides, and the findings handed back as one list per group, holding one list
+ * per example, in the order the groups were given.
  *
  * Each load is a navigation, so a family already starts from an empty registry
- * here; the page per family is what keeps what a page heard, its errors and its
- * warnings, from being read against a family on another worker. Measured 14 Sep
- * 2026 on twelve cores, the whole corpus clean every time and the output the
- * same to the byte: 586 seconds on the one page this replaced, 263 on four
- * workers, 607 on one.
+ * here, and `load` clears what the page heard, its errors and its warnings,
+ * before each one, so nothing a family heard is read against the next. The
+ * throttle and the listeners go on once per page, and a page per family kept
+ * nothing apart that this does not, while costing a runner a page load per
+ * family (see `pool`). Measured 15 Sep 2026 on twelve cores, the whole corpus clean
+ * every time and the output the same to the byte as on a page per family: 259
+ * seconds twice on four workers and 603 on one, against 261 twice and 606.
  */
 const examineAll = (groups) =>
   pool(groups, {
     browser,
     context: CONTEXT,
+    open: watch,
+    page: 'worker',
     prepare: closed,
-    run: async (page, group) => {
-      const watched = await watch(page)
+    run: async (watched, group) => {
       const found = []
       for (const one of group) {
         found.push(await examine(watched, one))
