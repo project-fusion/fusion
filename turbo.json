@@ -359,7 +359,9 @@
     // and reported the page written, never having compared anything. The
     // writer is `turbo run metrics` and the judge is
     // `bun fusion/scripts/build-metrics.mjs --check`, which no cache can
-    // answer for.
+    // answer for. It skips its own measurement only on the receipt a write on
+    // the same machine left for the same inputs, which a restore never brings,
+    // so `verify` measures a changed tree once rather than twice.
     "metrics": {
       "dependsOn": [
         "@fusion.dev/helix#build",

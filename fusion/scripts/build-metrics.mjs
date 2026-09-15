@@ -28,7 +28,25 @@
  *
  * Run `bun run gen:metrics` to write it, `bun run check:gen:metrics` to fail when it is
  * behind. `verify` runs the check, for the reason `verify` never writes.
+ *
+ * **Measured once per set of inputs, not once per command.** `verify` runs the
+ * writer, as the dependency of `turbo run docs -- --check`, and then the
+ * check, so a change to any component measured every family twice, a few
+ * seconds apart, from the same `dist`. So a write leaves a receipt in
+ * `.local/`: a fingerprint of everything the measurement reads, and a hash of
+ * each file it wrote. The check reads the fingerprint first, which costs a hash
+ * of a few megabytes rather than two bundles per family, and when the receipt
+ * vouches for the files on disk it says so and measures nothing.
+ *
+ * **What the receipt cannot vouch for is exactly what the check is for.** A
+ * turbo cache restore writes the page and not the receipt, so a page restored
+ * from somewhere else, the laptop build that once reported the theme at 16
+ * files where Linux ships 8, arrives with no receipt or a mismatched hash and
+ * is measured. The receipt is per machine and gitignored, and the fingerprint
+ * takes the Bun version, so a page this checkout measured is the only one it
+ * ever skips.
  */
+import { createHash } from 'node:crypto'
 import {
   existsSync,
   mkdirSync,
@@ -46,6 +64,19 @@ import { emit } from '@fusion.dev/scripts/emit'
 import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 
 const OUTPUT = 'helix/docs/content/metrics.mdx'
+
+/**
+ * The four claims the landing page prints, emitted rather than copied.
+ *
+ * The landing page says "every number here was produced, not written", and a
+ * number a generator could produce and a human retypes goes stale on a day
+ * nobody is looking.
+ *
+ * Emitted from this script rather than a generator of its own because every
+ * value is already computed for the MDX, and measuring them twice is how
+ * two documents come to disagree about one run.
+ */
+const CLAIMS_OUT = 'fusion/site/content/landing/claims.generated.ts'
 
 /**
  * What the other systems measured, from `turbo run peers`.
@@ -353,6 +384,79 @@ for (const tier of TIERS) {
       `${tier.dir}/dist is missing. Metrics measure the published artifact, so run \`bun run build\` first.`,
     )
     process.exit(1)
+  }
+}
+
+/** Where a write records what it measured from and what it wrote. */
+const RECEIPT = join(root, '.local/metrics/receipt.json')
+
+/** The two files a run emits, relative to the root. */
+const OUTPUTS = [OUTPUT, CLAIMS_OUT]
+
+const digest = (bytes) => createHash('sha256').update(bytes).digest('hex')
+
+/**
+ * Everything the measurement reads, as one hash.
+ *
+ * **Wider than the reads, on purpose.** Listing exactly the files this script
+ * opens would let a new read go unhashed, and the receipt would vouch for a
+ * page measured before that file moved. So it takes every package the page
+ * measures whole, `package.json`, manifest and all of `dist`, beside the
+ * lockfile, the data files, the other pages, this script and the library it
+ * imports. A few megabytes, hashed in a fifth of a second.
+ */
+const fingerprint = () => {
+  const hash = createHash('sha256').update(`bun ${Bun.version}\n`)
+  const take = (path) => {
+    const full = join(root, path)
+    if (!existsSync(full)) {
+      return
+    }
+    for (const file of walk(full).sort()) {
+      hash.update(file.slice(root.length))
+      hash.update(readFileSync(file))
+    }
+  }
+  for (const path of [
+    'bun.lock',
+    'fusion/scripts/build-metrics.mjs',
+    'fusion/scripts/lib',
+    PEERS,
+    TIMINGS,
+    ARTIFACT.tokens,
+    'helix/styled/src',
+  ]) {
+    take(path)
+  }
+  for (const file of readdirSync(join(root, 'helix/docs/content')).sort()) {
+    if (file.endsWith('.mdx') && file !== 'metrics.mdx') {
+      take(join('helix/docs/content', file))
+    }
+  }
+  for (const dir of ['core', 'headless', 'icons', 'styled', 'styles', 'theme']) {
+    for (const part of ['package.json', 'custom-elements.json', 'dist']) {
+      take(join('helix', dir, part))
+    }
+  }
+  return hash.digest('hex')
+}
+
+const inputs = fingerprint()
+
+if (check && existsSync(RECEIPT)) {
+  const receipt = JSON.parse(readFileSync(RECEIPT, 'utf8'))
+  const vouched =
+    receipt.inputs === inputs &&
+    OUTPUTS.every((path) => {
+      const full = join(root, path)
+      return existsSync(full) && receipt.outputs?.[path] === digest(readFileSync(full))
+    })
+  if (vouched) {
+    console.log(
+      `metrics: ${receipt.styled} styled and ${receipt.headless} headless families, current: ` +
+        'this checkout measured them from the same inputs and wrote the page on disk',
+    )
+    process.exit(0)
   }
 }
 
@@ -732,19 +836,6 @@ const written = `${lines
   .trimEnd()}\n`
 const output = join(root, OUTPUT)
 
-/**
- * The four claims the landing page prints, emitted rather than copied.
- *
- * The landing page says "every number here was produced, not written", and a
- * number a generator could produce and a human retypes goes stale on a day
- * nobody is looking.
- *
- * Emitted from this script rather than a generator of its own because every
- * value is already computed for the MDX above, and measuring them twice is how
- * two documents come to disagree about one run.
- */
-const CLAIMS_OUT = 'fusion/site/content/landing/claims.generated.ts'
-
 const claims = [
   {
     label: 'Components',
@@ -847,6 +938,27 @@ const stale = [
 ].some((one) => one.stale)
 if (stale) {
   process.exit(1)
+}
+/* Only a write leaves one. The check measured what is on disk and found it
+   current, which is as good a reason, but a check that writes is the thing
+   `verify` is built not to have, even into `.local/`. */
+if (!check) {
+  mkdirSync(join(root, '.local/metrics'), { recursive: true })
+  writeFileSync(
+    RECEIPT,
+    `${JSON.stringify(
+      {
+        headless: headless.rows.length,
+        inputs,
+        outputs: Object.fromEntries(
+          OUTPUTS.map((path) => [path, digest(readFileSync(join(root, path)))]),
+        ),
+        styled: styled.rows.length,
+      },
+      null,
+      2,
+    )}\n`,
+  )
 }
 console.log(
   `metrics: ${styled.rows.length} styled and ${headless.rows.length} headless families ` +
