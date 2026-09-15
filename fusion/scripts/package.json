@@ -18,6 +18,7 @@
     "./frontmatter": "./lib/frontmatter.mjs",
     "./literal": "./lib/literal.mjs",
     "./paint": "./lib/paint.mjs",
+    "./pool": "./lib/pool.mjs",
     "./scope": "./lib/scope.mjs",
     "./settle": "./lib/settle.mjs",
     "./theme-facts": "./lib/theme-facts.mjs",
