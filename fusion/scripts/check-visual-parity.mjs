@@ -42,8 +42,9 @@ import {
 import { createServer } from 'node:http'
 import { join, relative } from 'node:path'
 import { pool } from '@fusion.dev/scripts/pool'
-import { scopeFor } from '@fusion.dev/scripts/scope'
+import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
+import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
@@ -185,13 +186,13 @@ const scope =
     ? null
     : scopeFor(changedFrom, {
         label: 'parity',
-        own: ['fusion/scripts/check-visual-parity.mjs'],
+        own: OWN.parity,
         root,
         tiers: TIERS,
       })
 
 /** Every example that is authored in both syntaxes, which is what can be paired. */
-const corpus = []
+const reached = []
 const skipped = new Set()
 for (const tier of TIERS) {
   for (const entry of readdirSync(tier.source, { withFileTypes: true })) {
@@ -213,10 +214,22 @@ for (const tier of TIERS) {
       if (!existsSync(join(dir, `${slug}.tsx`))) {
         continue
       }
-      corpus.push({ dir, family: entry.name, slug, tier })
+      reached.push({ dir, family: entry.name, slug, tier })
     }
   }
 }
+
+/* **This run's families, when CI splits the check**, weighed by how many
+   examples each brings: `@fusion.dev/scripts/shard` argues the split. After the
+   scope rather than before, so the shards divide what the change reaches and
+   not the whole corpus. */
+const asked = shard()
+const ours = owner(
+  reached.map((one) => one.family),
+  (family) => reached.filter((one) => one.family === family).length,
+  asked,
+)
+const corpus = reached.filter((one) => ours(one.family))
 
 /* **What the scope came to, without paying for the pictures.** A run that
    compares a subset should be able to say which subset before it spends twelve
@@ -228,6 +241,7 @@ if (dryRun) {
   console.log(
     `parity: would compare ${corpus.length} examples across ${families.length} ` +
       `${families.length === 1 ? 'family' : 'families'}` +
+      (asked === undefined ? '' : ` in ${which(asked)}`) +
       (skipped.size > 0 ? `, skipping ${skipped.size}` : '') +
       (families.length > 0 ? `: ${families.join(', ')}` : ''),
   )
@@ -239,9 +253,22 @@ if (dryRun) {
    legitimately has no example to compare, and failing there would make the
    check impossible to keep green. An unscoped run finding no corpus means the
    corpus is missing, which is a real fault. */
-if (corpus.length === 0 && scope !== null) {
+if (reached.length === 0 && scope !== null) {
   console.log(
     `parity: nothing changed that any example renders, ${skipped.size} families not compared.`,
+  )
+  process.exit(0)
+}
+
+/* **A shard holding none of what is in scope passes, and says whose it is.**
+   A scope of three families split four ways leaves one shard empty, and that is
+   the split working rather than the corpus missing: the families are compared,
+   by the other shards. It says so in words, with no count of nothing in it. */
+if (corpus.length === 0 && asked !== undefined && reached.length > 0) {
+  const families = new Set(reached.map((one) => one.family)).size
+  console.log(
+    `parity: ${which(asked)} holds none of the ${families} ` +
+      `${families === 1 ? 'family' : 'families'} in scope, which the other shards compare.`,
   )
   process.exit(0)
 }
@@ -719,6 +746,8 @@ if (findings.length > 0) {
 
 console.log(
   `parity: ${compared} examples render identically from their HTML and their TSX` +
+    /* A shard says which, for the reason a scoped run does below. */
+    (asked === undefined ? '' : `, in ${which(asked)}`) +
     /* **A scoped run says so in the same line as its verdict.** A number on its
        own reads as the whole corpus, which is how a check that stopped covering
        things goes on looking like one that passes. See `check:spec:floors`. */

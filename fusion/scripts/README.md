@@ -15,6 +15,7 @@ it is the workspace's own tooling.
 | `./pool` | Running a browser check's families side by side, on a fresh page each or one per worker |
 | `./scope` | Which families a change reaches, for the checks that compare examples |
 | `./settle` | Waiting for an example to stop changing before it is photographed |
+| `./shard` | Which of a browser check's families a CI job takes, when one check is split across several |
 | `./workspace` | Where things are, so a generator does not hardcode a path |
 
 The `.mjs` files beside them are the generators themselves, run as turbo tasks

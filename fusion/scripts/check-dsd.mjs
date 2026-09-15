@@ -3,9 +3,11 @@
  * Whether what a server rendered hydrates, and whether a client renders once.
  *
  *   check-dsd.mjs [family] [--fixtures | --corpus] [--changed <ref>] [--workers <n>]
+ *                 [--shard <i> --of <n>]
  *
  * `--changed` compares only the families a change since `<ref>` reaches, by the
- * rule parity scopes with, and says which it skipped. The fixtures always run.
+ * rule parity scopes with, and says which it skipped. The fixtures always run,
+ * and in the first shard only when `--shard` splits the corpus between jobs.
  * `--workers` is how many families are compared at once, which
  * `@fusion.dev/scripts/pool` otherwise decides; `--workers 1` is the serial run.
  *
@@ -40,8 +42,9 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { mkdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { pool } from '@fusion.dev/scripts/pool'
-import { scopeFor } from '@fusion.dev/scripts/scope'
+import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
+import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
@@ -235,12 +238,12 @@ const scope =
     ? null
     : scopeFor(args[changedAt + 1], {
         label: 'dsd',
-        own: ['fusion/scripts/check-dsd.mjs', 'fusion/scripts/render-server.mjs'],
+        own: OWN.dsd,
         root,
         tiers: TIERS,
       })
 const skipped = new Set()
-const corpus = []
+const scoped = []
 if (wantsCorpus) {
   for (const tier of TIERS) {
     for (const entry of readdirSync(tier.source, { withFileTypes: true })) {
@@ -256,7 +259,7 @@ if (wantsCorpus) {
         .filter((one) => one.endsWith('.html'))
         .sort()) {
         const slug = file.replace(/\.html$/, '')
-        corpus.push({
+        scoped.push({
           dir,
           family: entry.name,
           id: `${tier.name}/${entry.name}/${slug}`,
@@ -268,9 +271,37 @@ if (wantsCorpus) {
     }
   }
 }
-const fixtures = wantsFixtures
-  ? FIXTURES.filter((fixture) => only === undefined || fixture.name === only)
-  : []
+
+/* **This run's families, when CI splits the check**, weighed by examples, as
+   parity splits: `@fusion.dev/scripts/shard` argues it. The fixtures are one
+   page holding every one of them, so they are not split: the first shard runs
+   them, and the rest leave them to it rather than rendering the same page
+   several times over. */
+const asked = shard()
+const ours = owner(
+  scoped.map((one) => one.family),
+  (family) => scoped.filter((one) => one.family === family).length,
+  asked,
+)
+const corpus = scoped.filter((one) => ours(one.family))
+const fixtures =
+  wantsFixtures && (asked === undefined || asked.index === 0)
+    ? FIXTURES.filter((fixture) => only === undefined || fixture.name === only)
+    : []
+
+/* **A shard with nothing to do passes before it builds anything, and says why.**
+   Past this point a run renders every example on a server, bundles the client
+   and starts a browser, which is most of a minute to learn that no example was
+   this shard's. */
+if (asked !== undefined && corpus.length === 0 && fixtures.length === 0) {
+  const families = new Set(scoped.map((one) => one.family)).size
+  console.log(
+    families > 0
+      ? `dsd: ${which(asked)} holds none of the ${families} ${families === 1 ? 'family' : 'families'} in scope, which the other shards compare, and the fixtures run in the first.`
+      : `dsd: ${which(asked)} has nothing to compare, the change reaching no example, and the fixtures run in the first.`,
+  )
+  process.exit(0)
+}
 
 /* The server's markup for all of it, from a process of its own. */
 await mkdir(work, { recursive: true })
@@ -674,12 +705,22 @@ if (failures.length > 0) {
 }
 const heldBack = [...held].filter(([family, count]) => reached.has(family) && count > 0).length
 /* A scoped run says what it skipped in the same line as its verdict, for the
-   reason parity does: a number on its own reads as the whole corpus. */
-const verdict = [
-  `${fixtures.length} fixtures end in their state from a server's markup and a client's`,
-]
+   reason parity does: a number on its own reads as the whole corpus. A shard
+   after the first says where the fixtures ran rather than counting none of
+   them, for the reason `which` counts from 1. */
+const verdict = []
+if (fixtures.length > 0) {
+  verdict.push(
+    `${fixtures.length} fixtures end in their state from a server's markup and a client's`,
+  )
+} else if (wantsFixtures && asked !== undefined) {
+  verdict.push('the fixtures run in the first shard')
+}
 if (wantsCorpus) {
   verdict.push(`${clean} examples hydrate to the picture a client renders`)
+}
+if (asked !== undefined) {
+  verdict.push(`in ${which(asked)}`)
 }
 if (heldBack > 0) {
   verdict.push(`${heldBack} known ${heldBack === 1 ? 'family is' : 'families are'} held`)

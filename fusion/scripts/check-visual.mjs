@@ -93,6 +93,7 @@
  * bun run check:spec:visual accordion    just that family, in whichever tiers have one
  * bun run visual:update             rewrite the baselines
  * bun run check:spec:visual --workers 1  one family at a time, as a runner does
+ * bun run check:spec:visual --shard 0 --of 3  the first of three shards, as CI splits it
  * ```
  *
  * A failure writes `preview.diff.png` beside the baseline, the changed pixels
@@ -103,6 +104,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { createServer } from 'node:http'
 import { dirname, join, relative } from 'node:path'
 import { pool } from '@fusion.dev/scripts/pool'
+import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
@@ -203,14 +205,31 @@ const found = (source) =>
     .filter((name) => only === undefined || name === only)
     .sort()
 
-const tiers = TIERS.map((tier) => ({ ...tier, families: found(tier.source) }))
-const total = tiers.reduce((count, tier) => count + tier.families.length, 0)
+const every = TIERS.map((tier) => ({ ...tier, families: found(tier.source) }))
+const total = every.reduce((count, tier) => count + tier.families.length, 0)
 
 if (total === 0) {
   console.error(
     only ? `visual: no example for ${only} in either tier.` : 'visual: no examples found.',
   )
   process.exit(1)
+}
+
+/* **This run's families, when CI splits the check**, a family's tiers together
+   and weighed by the tiers that picture it: `@fusion.dev/scripts/shard` argues
+   the split. A shard with none passes before a browser starts and says so in
+   words, which only happens when there are more shards than families, since
+   this check reads the whole corpus. */
+const asked = shard()
+const ours = owner(
+  every.flatMap((tier) => tier.families),
+  (family) => every.filter((tier) => tier.families.includes(family)).length,
+  asked,
+)
+const tiers = every.map((tier) => ({ ...tier, families: tier.families.filter(ours) }))
+if (tiers.every((tier) => tier.families.length === 0)) {
+  console.log(`visual: ${which(asked)} holds none of the families, which the other shards picture.`)
+  process.exit(0)
 }
 
 /* A named family present in one tier and not the other is reported and not
@@ -602,4 +621,7 @@ if (written.length > 0) {
   process.exit(0)
 }
 
-console.log(`visual: ${counted(compared)} examples, every one pixel for pixel with its baseline`)
+console.log(
+  `visual: ${counted(compared)} examples, every one pixel for pixel with its baseline` +
+    (asked === undefined ? '' : `, in ${which(asked)}`),
+)

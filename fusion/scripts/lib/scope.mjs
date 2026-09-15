@@ -36,6 +36,17 @@ const GLOBAL = [
   'fusion/site/scripts/build-frame.mjs',
 ]
 
+/**
+ * Each scoped check's own files, a change to which reaches every result it gives.
+ *
+ * Held here rather than in each check, so `plan-browser.mjs` sizes a check's
+ * shards by the scope the check will compute and not by a copy of it.
+ */
+export const OWN = {
+  dsd: ['fusion/scripts/check-dsd.mjs', 'fusion/scripts/render-server.mjs'],
+  parity: ['fusion/scripts/check-visual-parity.mjs'],
+}
+
 const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//
 
 /**

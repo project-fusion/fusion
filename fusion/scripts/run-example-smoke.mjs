@@ -25,12 +25,14 @@
  *
  * Run with `bun run smoke:examples`, after `turbo run frame`. Families run side
  * by side on the workers `@fusion.dev/scripts/pool` decides, and `--workers 1`
- * takes them one at a time.
+ * takes them one at a time. `--shard <i> --of <n>` takes one of `n` shares of
+ * the families, as `@fusion.dev/scripts/shard` splits them for CI.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { pool } from '@fusion.dev/scripts/pool'
+import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root, SOURCE, TAG_PREFIX } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -55,7 +57,7 @@ await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
 /** Every example, as the pair of files the sandbox would hand the frame. */
-const examples = []
+const every = []
 for (const family of readdirSync(source)) {
   let entries = []
   try {
@@ -71,7 +73,7 @@ for (const family of readdirSync(source)) {
     } catch {
       styles = ''
     }
-    examples.push({
+    every.push({
       html: readFileSync(join(source, family, '.examples', file), 'utf8'),
       name: `${family}/${slug}`,
       styles,
@@ -79,9 +81,27 @@ for (const family of readdirSync(source)) {
   }
 }
 
-if (examples.length === 0) {
+if (every.length === 0) {
   console.error('example smoke: no examples found.')
   process.exit(1)
+}
+
+/* **This run's families, when CI splits the check**, weighed by examples:
+   `@fusion.dev/scripts/shard` argues the split. A shard with none passes before
+   the server and the browser start, and says so in words. */
+const familyOf = (one) => one.name.split('/')[0]
+const asked = shard()
+const ours = owner(
+  every.map(familyOf),
+  (family) => every.filter((one) => familyOf(one) === family).length,
+  asked,
+)
+const examples = every.filter((one) => ours(familyOf(one)))
+if (examples.length === 0) {
+  console.log(
+    `example smoke: ${which(asked)} holds none of the families, which the other shards render.`,
+  )
+  process.exit(0)
 }
 
 /* A request that failed is not a component that failed.
@@ -214,4 +234,7 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`example smoke: ${examples.length} examples rendered clean, in Chromium`)
+console.log(
+  `example smoke: ${examples.length} examples rendered clean, in Chromium` +
+    (asked === undefined ? '' : `, in ${which(asked)}`),
+)

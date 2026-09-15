@@ -21,6 +21,7 @@
     "./pool": "./lib/pool.mjs",
     "./scope": "./lib/scope.mjs",
     "./settle": "./lib/settle.mjs",
+    "./shard": "./lib/shard.mjs",
     "./theme-facts": "./lib/theme-facts.mjs",
     "./theme-intents": "./lib/theme-intents.mjs",
     "./workspace": "./lib/workspace.mjs"
