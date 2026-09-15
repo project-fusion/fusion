@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { inlineStep } from '../../utils/inline-step/inline-step.js'
 
 /** What a controller needs of an item to move to it and choose it. */
 export interface NavigableItem {
@@ -88,6 +89,13 @@ const KEYS = new Set(['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 
  * `orientation` is presentation: the same set of choices reads the same way
  * whichever direction it runs.
  *
+ * **The horizontal pair turns with the line.** On a right-to-left page the
+ * first item is on the right, so left is forward there, which is what a native
+ * radio group does, measured in Chromium on 15 Sep 2026. Vertical sets
+ * included: the key a reader guesses on a column is the one that goes forward
+ * along a row of the same items, and the two answering differently would make
+ * `orientation` more than presentation after all.
+ *
  * Disabled items are skipped rather than stopped at, so a set with a gap in it
  * still moves in one press.
  *
@@ -157,10 +165,11 @@ export class KeyboardNavigationController implements ReactiveController {
     }
     const last = items.length - 1
 
+    const along = inlineStep(this.host, event.key)
     let next = current
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    if (along === 1 || event.key === 'ArrowDown') {
       next = this.wrap ? (current + 1) % items.length : Math.min(current + 1, last)
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    } else if (along === -1 || event.key === 'ArrowUp') {
       /* From nothing, backwards is the last, which the arithmetic did not give.
        *
        * `(-1 - 1 + length) % length` is `length - 2`: the *second* to last, so

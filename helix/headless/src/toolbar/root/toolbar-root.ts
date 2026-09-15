@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, inlineStep } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -197,11 +197,14 @@ export class HelixHeadlessToolbar extends HelixElement {
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    const forward = this.axis === 'horizontal' ? 'ArrowRight' : 'ArrowDown'
-    const back = this.axis === 'horizontal' ? 'ArrowLeft' : 'ArrowUp'
     if (!KEYS.has(event.key) || claimed(event)) {
       return
     }
+    /* Along the line on a horizontal toolbar, so the forward key is the left on
+       a right-to-left page, where the first control is on the right. */
+    const along = inlineStep(this, event.key)
+    const forward = this.axis === 'horizontal' ? along === 1 : event.key === 'ArrowDown'
+    const back = this.axis === 'horizontal' ? along === -1 : event.key === 'ArrowUp'
 
     const controls = this.controls
     const current = controls.findIndex((entry) => entry.contains(event.target as Node))
@@ -210,9 +213,9 @@ export class HelixHeadlessToolbar extends HelixElement {
     }
 
     let next = current
-    if (event.key === forward) {
+    if (forward) {
       next = (current + 1) % controls.length
-    } else if (event.key === back) {
+    } else if (back) {
       next = (current - 1 + controls.length) % controls.length
     } else if (event.key === 'Home') {
       next = 0

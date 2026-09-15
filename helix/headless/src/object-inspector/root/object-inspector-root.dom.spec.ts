@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -115,6 +115,31 @@ describe('an object inspector', () => {
     expect(active(host)?.textContent).toContain('meta')
     await press(host, 'ArrowLeft')
     expect(active(host)?.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  /* A shut row's caret points along the line, so on a right-to-left page it
+     points left and the left arrow is the one that opens. The right arrow had
+     opened a row whose caret pointed away from it. */
+  describe('on a right-to-left page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    test('opens and enters with Left, and goes back up with Right', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await inspector()
+      await press(host, 'ArrowDown')
+      await press(host, 'ArrowLeft')
+      expect(active(host)?.getAttribute('aria-expanded')).toBe('true')
+      await press(host, 'ArrowLeft')
+      expect(active(host)?.textContent).toContain('branch')
+      await press(host, 'ArrowRight')
+      expect(active(host)?.textContent).toContain('meta')
+      await press(host, 'ArrowRight')
+      expect(active(host)?.getAttribute('aria-expanded')).toBe('false')
+      await press(host, 'ArrowRight')
+      expect(active(host)).toBe(rows(host)[0])
+    })
   })
 
   test('copies the active row: a branch as JSON, a string as itself', async () => {

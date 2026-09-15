@@ -3,6 +3,7 @@ import {
   customElement,
   HelixCompleteEvent,
   HelixFormElement,
+  inlineStep,
   MixinControllerValue,
   MixinField,
 } from '@fusion.dev/helix-core'
@@ -302,6 +303,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     if (at === -1 || this.isDisabled || this.readOnly) {
       return
     }
+    /* The boxes run along the line, so on a right-to-left page the first is on
+       the right and the left arrow is the one that moves on. */
+    const to = at + inlineStep(this, event.key)
     if (event.key === 'Backspace' && cell.value === '' && at > 0) {
       const characters = this.characters
       characters[at - 1] = ''
@@ -310,12 +314,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         this.paint()
         this.cells[at - 1]?.focus()
       })
-    } else if (event.key === 'ArrowLeft' && at > 0) {
-      this.cells[at - 1]?.focus()
-      this.cells[at - 1]?.select()
-    } else if (event.key === 'ArrowRight' && at < this.count - 1) {
-      this.cells[at + 1]?.focus()
-      this.cells[at + 1]?.select()
+    } else if (to !== at && to >= 0 && to < this.count) {
+      this.cells[to]?.focus()
+      this.cells[to]?.select()
     } else {
       return
     }

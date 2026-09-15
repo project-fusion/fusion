@@ -3,6 +3,7 @@ import {
   customElement,
   DrilldownController,
   HelixElement,
+  inlineStep,
   KeyboardNavigationController,
   MixinCollection,
   MixinControllerOpen,
@@ -281,13 +282,16 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const items = this.items
     const at = items.indexOf(document.activeElement as HelixHeadlessMenuItem)
+    /* In is where a submenu's caret points and out is back along the line, so
+       on a right-to-left page the left arrow opens and the right comes back. */
+    const along = inlineStep(this, event.key)
 
     if (event.key === 'Escape') {
       event.stopPropagation()
       this.leave()
-    } else if (event.key === 'ArrowRight' && items[at]?.hasSubmenu) {
+    } else if (along === 1 && items[at]?.hasSubmenu) {
       this.enter(items[at] as HelixHeadlessMenuItem)
-    } else if (event.key === 'ArrowLeft') {
+    } else if (along === -1) {
       this.leave()
     } else if (event.key === 'Tab') {
       /* Out, and the panel goes with it.

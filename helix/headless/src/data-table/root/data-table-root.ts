@@ -8,6 +8,7 @@ import {
   HelixSelectEvent,
   HelixSortEvent,
   hostAria,
+  inlineStep,
   MixinCollection,
   requestChange,
   slotFilled,
@@ -1422,8 +1423,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     const column = this.columnFrom(event)
-    const forward = getComputedStyle(this).direction === 'rtl' ? -1 : 1
-    const by = event.key === 'ArrowRight' ? forward : event.key === 'ArrowLeft' ? -forward : 0
+    const by = inlineStep(this, event.key)
     if (column && by !== 0) {
       event.preventDefault()
       this.moveColumn(column.field, by)

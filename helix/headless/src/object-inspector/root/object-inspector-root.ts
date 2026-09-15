@@ -2,6 +2,7 @@ import {
   CopyController,
   customElement,
   HelixElement,
+  inlineStep,
   scrollItemIntoView,
   VirtualizeController,
 } from '@fusion.dev/helix-core'
@@ -402,14 +403,16 @@ export class HelixHeadlessObjectInspector extends HelixElement {
         this.move(rows.length - 1)
         break
       case 'ArrowRight':
-        if (row.branch && !row.open) {
-          this.toggle(row, true)
-        } else if (row.open) {
-          this.move(this.active + 1)
-        }
-        break
       case 'ArrowLeft':
-        if (row.open) {
+        /* In is where a shut row's caret points, along the line, so it is the
+           left arrow on a right-to-left page and the right one comes back. */
+        if (inlineStep(this, event.key) === 1) {
+          if (row.branch && !row.open) {
+            this.toggle(row, true)
+          } else if (row.open) {
+            this.move(this.active + 1)
+          }
+        } else if (row.open) {
           this.toggle(row, false)
         } else {
           const parent = rows.findLastIndex(

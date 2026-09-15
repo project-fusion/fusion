@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, role, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -515,6 +515,36 @@ describe('carousel indicators', () => {
     host.index = 2
     await host.updateComplete
     expect(named()).toEqual([false, false, true])
+  })
+})
+
+describe('the arrows on the indicators', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  const press = async (host: Carousel, key: string): Promise<void> => {
+    host.shadowRoot
+      ?.querySelector('[part~="indicator-current"]')
+      ?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+    await host.updateComplete
+  }
+
+  test('move along the line, the right arrow to the next slide', async () => {
+    const host = await carousel('default-index="1"')
+    await press(host, 'ArrowRight')
+    expect(host.index).toBe(2)
+  })
+
+  /* The first dot is on the right of a right-to-left page, so the right arrow
+     pointed away from the slide it moved to. */
+  test('which on a right-to-left page is the left arrow', async () => {
+    document.documentElement.dir = 'rtl'
+    const host = await carousel('default-index="1"')
+    await press(host, 'ArrowLeft')
+    expect(host.index).toBe(2)
+    await press(host, 'ArrowRight')
+    expect(host.index).toBe(1)
   })
 })
 

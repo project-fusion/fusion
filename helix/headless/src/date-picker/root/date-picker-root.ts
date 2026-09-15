@@ -5,6 +5,7 @@ import {
   HelixFormElement,
   HelixNavigateEvent,
   hostAria,
+  inlineStep,
   MixinControllerValue,
   requestChange,
 } from '@fusion.dev/helix-core'
@@ -480,13 +481,14 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
       return
     }
     const from = this.anchor
+    /* A day along the week, which runs from the right on a right-to-left page:
+       the left arrow there is tomorrow, the day it points at. */
+    const along = inlineStep(this, event.key)
 
     if (event.key === 'Enter' || event.key === ' ') {
       this.select(from)
-    } else if (event.key === 'ArrowLeft') {
-      this.moveTo(addDays(from, -1))
-    } else if (event.key === 'ArrowRight') {
-      this.moveTo(addDays(from, 1))
+    } else if (along !== 0) {
+      this.moveTo(addDays(from, along))
     } else if (event.key === 'ArrowUp') {
       this.moveTo(addDays(from, -7))
     } else if (event.key === 'ArrowDown') {

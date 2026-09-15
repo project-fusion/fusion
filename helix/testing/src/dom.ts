@@ -16,8 +16,30 @@ export const registerDom = (): void => {
   }
   registered = true
   GlobalRegistrator.register()
+  shimDirection()
   shimElementInternals()
   shimTableSections()
+}
+
+/**
+ * Gives `dir` the effect on `direction` that a browser's own stylesheet gives it.
+ *
+ * Measured rather than assumed: under happy-dom, `<html dir="rtl">` leaves
+ * `getComputedStyle` reporting `ltr` for everything in the page, while an inline
+ * `direction: rtl` is inherited as it should be. The two rules are the ones the
+ * HTML standard's rendering section puts in every user agent's sheet, so a spec
+ * sets the attribute a page sets and reads the answer a browser gives, and the
+ * same file makes the same claim in both harnesses.
+ *
+ * A document sheet reaches no shadow root, so this covers a `dir` on the page
+ * and on a host, which is where a component reads its direction from, and not
+ * one written inside a component. `:dir()` is still unmatched here, so a rule
+ * keyed on it is a browser's question, the way `:state()` is.
+ */
+const shimDirection = (): void => {
+  const sheet = document.createElement('style')
+  sheet.textContent = '[dir="rtl" i] { direction: rtl; } [dir="ltr" i] { direction: ltr; }'
+  document.head.append(sheet)
 }
 
 /**

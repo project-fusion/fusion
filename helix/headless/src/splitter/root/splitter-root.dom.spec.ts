@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -75,6 +75,47 @@ describe('splitter keyboard', () => {
     const host = await splitter('default-position="50" orientation="vertical" step="5"')
     await press(host, 'ArrowDown')
     expect(host.position).toBe(55)
+  })
+
+  /* The start pane is on the right of a right-to-left page, so the left
+     arrow, which moves the divider left, is the one that grows it. It shrank
+     it, sending the divider the opposite way to where the key points. */
+  describe('on a right-to-left page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    test('the left arrow moves the divider left, growing the start pane', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await splitter('default-position="50" step="5"')
+      await press(host, 'ArrowLeft')
+      expect(host.position).toBe(55)
+      await press(host, 'ArrowRight')
+      await press(host, 'ArrowRight')
+      expect(host.position).toBe(45)
+    })
+
+    test('while panes one above the other keep Down as down', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await splitter('default-position="50" orientation="vertical" step="5"')
+      await press(host, 'ArrowDown')
+      expect(host.position).toBe(55)
+    })
+
+    test('and the corner moves each divider the way its arrow points', async () => {
+      document.documentElement.dir = 'rtl'
+      const [host, within] = await nested(
+        'default-position="30" step="5"',
+        'orientation="vertical" default-position="60" step="5"',
+      )
+      const handle = corner(host) as HTMLElement
+      handle.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowLeft' }),
+      )
+      await host.updateComplete
+      await within.updateComplete
+      expect([host.position, within.position]).toEqual([35, 60])
+    })
   })
 
   test('Home and End go all the way to either end', async () => {

@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 import {
   KeyboardNavigationController,
@@ -93,6 +93,48 @@ describe('moving backward', () => {
       const { asked, host } = set('aAa')
       press(host, key)
       expect(asked).toEqual(['focus item-0', 'select item-0'])
+    }
+  })
+})
+
+/* The first item is on the right of a right-to-left page, so an arrow that
+   kept its left-to-right meaning sent focus the opposite way to where it
+   points. The direction is asked of the host, so a region of the page set the
+   other way round is answered in its own direction. */
+describe('on a right-to-left page', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  test('Left is forward and Right is back', () => {
+    document.documentElement.dir = 'rtl'
+    for (const [key, lands] of [
+      ['ArrowLeft', 'item-2'],
+      ['ArrowRight', 'item-0'],
+    ]) {
+      const { asked, host } = set('aAa')
+      press(host, key as string)
+      expect(asked).toEqual([`focus ${lands}`, `select ${lands}`])
+    }
+  })
+
+  test('and so it is inside a region set that way on a page that is not', () => {
+    const { asked, host } = set('aAa')
+    ;(host.parentElement as HTMLElement).dir = 'rtl'
+    press(host, 'ArrowLeft')
+    ;(host.parentElement as HTMLElement).removeAttribute('dir')
+    expect(asked).toEqual(['focus item-2', 'select item-2'])
+  })
+
+  test('while Down and Up mean what they always did', () => {
+    document.documentElement.dir = 'rtl'
+    for (const [key, lands] of [
+      ['ArrowDown', 'item-2'],
+      ['ArrowUp', 'item-0'],
+    ]) {
+      const { asked, host } = set('aAa')
+      press(host, key as string)
+      expect(asked).toEqual([`focus ${lands}`, `select ${lands}`])
     }
   })
 })
