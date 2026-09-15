@@ -1,6 +1,8 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import preview from '../.examples/preview.html' with { type: 'text' }
+import transcriptSheet from '../.examples/transcript.css' with { type: 'text' }
+import transcript from '../.examples/transcript.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -29,5 +31,31 @@ describe('the preview example', () => {
     const turns = document.querySelectorAll('helix-headless-chat-message')
     expect(turns).toHaveLength(before + 1)
     expect(turns[turns.length - 1]?.textContent?.trim()).toBe('Is it the lock on the jobs table?')
+  })
+})
+
+describe('the transcript example', () => {
+  run('opens at the latest turn, with the reader’s own against the trailing edge', async () => {
+    await example(transcript, transcriptSheet)
+    const build = document.getElementById('run') as HTMLElement
+    const drawn = (): HTMLElement[] => [
+      ...(build.shadowRoot?.querySelectorAll<HTMLElement>('[part="turn"] > *') ?? []),
+    ]
+    const started = performance.now()
+    while (drawn().length === 0 && performance.now() - started < 6000) {
+      await new Promise((done) => setTimeout(done, 50))
+    }
+    await idle()
+    const mine = drawn().at(-1)
+    const theirs = drawn().at(-2)
+    expect(mine?.textContent?.trim()).toBe('Continue from step 2000.')
+    /* The sheet reaches a fed turn only through the names the chat forwards,
+       so the edge a turn sits against is the second name at work. */
+    const edge = (turn: HTMLElement | undefined): string => {
+      const body = turn?.shadowRoot?.querySelector('[part="body"]')
+      return body ? getComputedStyle(body).justifySelf : ''
+    }
+    expect(edge(mine)).toBe('end')
+    expect(edge(theirs)).not.toBe('end')
   })
 })

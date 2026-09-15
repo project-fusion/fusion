@@ -198,10 +198,10 @@ describe('turns handed over as data', () => {
 
   /* A box to window, which headless leaves to the consumer: without one the
      log is as tall as what it draws, and every turn fits. */
-  const fed = async (turns: ChatTurn[]): Promise<Chat> => {
+  const fed = async (turns: ChatTurn[], sheet = ''): Promise<Chat> => {
     const element = (await mount(
       `<helix-headless-chat label="Support"></helix-headless-chat>
-      <style>helix-headless-chat::part(log) { block-size: 20rem; overflow-y: auto }</style>`,
+      <style>helix-headless-chat::part(log) { block-size: 20rem; overflow-y: auto } ${sheet}</style>`,
     )) as Chat
     element.turns = turns
     await settle(element)
@@ -251,6 +251,92 @@ describe('turns handed over as data', () => {
     await settle(element)
     expect(utterance(element)).toBe(before)
   })
+
+  /* A fed turn's host is inside the chat's shadow root, so a document's
+     `[author="me"]::part(body)` cannot reach it: what can is the name the chat
+     forwards it under, which is all these read. */
+  const forwarded = (message: HTMLElement | undefined): string[] =>
+    (message?.getAttribute('exportparts') ?? '')
+      .split(',')
+      .map((pair) => pair.split(':').at(-1)?.trim() ?? '')
+      .filter((name) => name !== '')
+
+  const second = (message: HTMLElement | undefined): string[] =>
+    forwarded(message).filter((name) => /-(mine|failed|sending|streaming)$/.test(name))
+
+  test('forward the reader’s own turn a second time, as theirs, and nobody else’s', async () => {
+    const element = await fed([
+      { author: 'them', key: 'a', text: 'How can I help?' },
+      { author: 'me', key: 'b', text: 'The deploy is stuck.' },
+      { author: 'Ada', key: 'c', text: 'Looking now.' },
+    ])
+    const [theirs, mine, named] = drawn(element)
+    expect(second(mine).sort()).toEqual([
+      'message-avatar-mine',
+      'message-body-mine',
+      'message-content-mine',
+      'message-meta-mine',
+      'message-mine',
+    ])
+    /* Beside the plain names, never instead of them. */
+    expect(forwarded(mine)).toContain('message-body')
+    expect(second(theirs)).toEqual([])
+    expect(second(named)).toEqual([])
+    expect(forwarded(theirs)).toContain('message-body')
+  })
+
+  test('forward a turn’s state a second time, on the part that shows it', async () => {
+    const element = await fed([
+      { author: 'them', key: 'a', state: 'sent', text: 'Sent' },
+      { author: 'them', key: 'b', state: 'failed', text: 'Failed' },
+      { author: 'them', key: 'c', state: 'sending', text: 'Sending' },
+      { author: 'them', key: 'd', state: 'streaming', text: 'Streaming' },
+    ])
+    expect(drawn(element).map(second)).toEqual([
+      [],
+      ['message-meta-failed'],
+      ['message-content-sending'],
+      ['message-content-streaming'],
+    ])
+  })
+
+  test('forward the second name while the turn holds it, and drop it when it stops', async () => {
+    const element = await fed([{ author: 'me', key: 'a', state: 'sending', text: 'Hi' }])
+    expect(second(drawn(element)[0])).toContain('message-content-sending')
+    element.turns = [{ author: 'me', key: 'a', state: 'sent', text: 'Hi' }]
+    await settle(element)
+    expect(second(drawn(element)[0])).not.toContain('message-content-sending')
+    expect(second(drawn(element)[0])).toContain('message-body-mine')
+  })
+
+  test('forward only the plain names for an author the table does not hold as its own', async () => {
+    /* `author` is free text, and `constructor` is a key every object answers to. */
+    const element = await fed([{ author: 'constructor', key: 'a', text: 'Hi' }])
+    const plain = await fed([{ author: 'them', key: 'a', text: 'Hi' }])
+    expect(drawn(element)[0]?.getAttribute('exportparts')).toBe(
+      drawn(plain)[0]?.getAttribute('exportparts') ?? '',
+    )
+  })
+
+  browser(
+    'a document rule on a second name reaches the reader’s own turn and no other',
+    async () => {
+      const element = await fed(
+        [
+          { author: 'them', key: 'a', text: 'How can I help?' },
+          { author: 'me', key: 'b', text: 'The deploy is stuck.' },
+        ],
+        'helix-headless-chat::part(message-body-mine) { outline-style: dotted }',
+      )
+      const outline = (message: HTMLElement | undefined): string => {
+        const body = message?.shadowRoot?.querySelector('[part="body"]')
+        return body ? getComputedStyle(body).outlineStyle : ''
+      }
+      const [theirs, mine] = drawn(element)
+      expect(outline(mine)).toBe('dotted')
+      expect(outline(theirs)).toBe('none')
+    },
+  )
 
   browser('keep the children out of the log while there are any', async () => {
     const element = (await mount(`<helix-headless-chat label="Support">

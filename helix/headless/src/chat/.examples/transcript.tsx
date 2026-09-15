@@ -1,0 +1,27 @@
+import './transcript.css'
+
+/* Some short and some that wrap, so no two windows are the same height. */
+const STEPS = [
+  'Resolved 412 packages.',
+  'Compiled the core package in 3.1 seconds.',
+  'Ran 1,589 specs. All of them passed, including the eleven that only run in a browser.',
+  'Retook three baselines on the Linux container. Only the headless data table moved, because its sortable headings are buttons now.',
+  'Uploaded the bundle.',
+]
+
+const turns = Array.from({ length: 2000 }, (_, index) => ({
+  author: index % 5 === 4 ? 'me' : 'them',
+  key: String(index),
+  text: index % 5 === 4 ? `Continue from step ${index + 1}.` : `${index + 1}. ${STEPS[index % 5]}`,
+}))
+
+export function Example() {
+  return (
+    <helix-headless-chat
+      label="Build agent"
+      turns={turns}
+    >
+      <strong slot="header">Build agent</strong>
+    </helix-headless-chat>
+  )
+}
