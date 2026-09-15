@@ -109,6 +109,14 @@ helix-card > [slot="media"] {
   font: inherit;
 }
 
+/* **Everywhere, and not only in prose.** The browser's own `monospace` is
+   Courier in Chromium on macOS and Linux, which does not honor `ui-monospace`,
+   so a `code` in a notification or a table cell outside `[data-prose]` came out
+   in a slab serif beside every code block set in the mono family. */
+:where(code, kbd, samp, pre) {
+  font-family: var(--helix-font-mono);
+}
+
 /* Anchors are styled here rather than wrapped in a `Link` component. */
 /* Prose, and anything that says it is a link. **A helper needs its base case,
    not only its variants.** `data-link="subtle"` and `"quiet"` are departures
@@ -1077,10 +1085,6 @@ helix-toggle[disabled]::part(item) {
 /* The toast is the opposite of the page it is over. */
 helix-toast:not([data-color-mode]) {
   color-scheme: var(--_helix-mode-inverted);
-}
-
-:where([data-prose] code, [data-prose] kbd, [data-prose] samp, [data-prose] pre) {
-  font-family: var(--helix-font-mono);
 }
 
 /* ================================================================== prose ==
