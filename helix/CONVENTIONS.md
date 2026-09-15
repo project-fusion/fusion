@@ -72,8 +72,11 @@ sheet's to turn, and a consumer's icon asks with `mirror`, the icon names being
 physical. **An arrow key moves where it points** by the same reasoning:
 `inlineStep` says which way along the line a horizontal key goes, and every
 component moving on the horizontal pair asks it rather than reading
-`ArrowRight` as forward. A media player's timeline is the exception, a tape
-running one way whatever the script, and says so where it is drawn.
+`ArrowRight` as forward. A media player's timeline is an exception, a tape
+running one way whatever the script, and says so where it is drawn. Pin Input's
+row of boxes is the other, a code being read like a phone number: the row
+carries `dir="ltr"`, so the right arrow moves on and a paste fills rightward on
+every page, while the label, hint and feedback keep the page's direction.
 
 **A rule and not an inline `style`**, which was the first idea. An inline style
 on a rendered part outranks every author rule short of `!important`, so a

@@ -60,8 +60,11 @@ helix-headless-pin-input::part(label) {
 }
 
 /* Apart and not joined: the code is read as separate characters, and boxes
-   shoulder to shoulder read as one field with lines drawn in it. */
+   shoulder to shoulder read as one field with lines drawn in it. As wide as its
+   boxes, so a row the component runs left to right on every page still starts
+   where its label does on a right-to-left one. */
 helix-headless-pin-input::part(field) {
+  align-self: start;
   display: flex;
   gap: 0.5rem;
 }

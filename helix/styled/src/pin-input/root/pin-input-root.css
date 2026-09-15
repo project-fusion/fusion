@@ -6,8 +6,13 @@
 
 /* A row of boxes with real space between them, which is the whole picture: a
    code is read as separate characters and boxes shoulder to shoulder read as one
-   field with lines drawn in it. */
+   field with lines drawn in it.
+
+   As wide as its boxes, so the row starts where the label does. The component
+   runs it left to right on every page, and stretched across a right-to-left
+   form it would start at the far side from its label. */
 [part="field"] {
+  align-self: start;
   display: flex;
   gap: var(--pin-input-gap, var(--helix-space-xs));
 }

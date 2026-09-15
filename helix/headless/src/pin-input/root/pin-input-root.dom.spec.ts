@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -40,6 +40,15 @@ const arrive = async (host: Pin, at: number, text: string): Promise<void> => {
   await host.updateComplete
 }
 
+/** What a paste or an autofill drops into one box. */
+const paste = async (host: Pin, at: number, text: string): Promise<void> => {
+  const event = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
+  Object.defineProperty(event, 'clipboardData', { value: { getData: () => text } })
+  cells(host)[at]?.dispatchEvent(event)
+  await host.updateComplete
+  await host.updateComplete
+}
+
 describe('input pin', () => {
   test('one box per character', async () => {
     const host = await pin('length="4"')
@@ -58,14 +67,6 @@ describe('input pin', () => {
     expect(host.value).toBe('7')
     expect(cells(host)[0]?.value).toBe('7')
   })
-
-  const paste = async (host: Pin, at: number, text: string): Promise<void> => {
-    const event = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
-    Object.defineProperty(event, 'clipboardData', { value: { getData: () => text } })
-    cells(host)[at]?.dispatchEvent(event)
-    await host.updateComplete
-    await host.updateComplete
-  }
 
   test('a paste into an empty field fills from the start, wherever it landed', async () => {
     /* A code has no holes in it. Writing from box three of an empty field puts
@@ -230,20 +231,52 @@ describe('input pin keyboard', () => {
     expect(host.shadowRoot?.activeElement).toBe(cells(host)[0] as HTMLInputElement)
   })
 
-  /* The boxes run from the right on a right-to-left page, so the left arrow
-     points at the next one. It went to the box on its right. */
+  /* A code reads left to right on every page, the way a phone number does, so
+     the row keeps its order on a right-to-left page and the right arrow still
+     moves on. It ran from the right there, with the left arrow moving on. */
   describe('on a right-to-left page', () => {
     afterEach(() => {
       document.documentElement.removeAttribute('dir')
     })
 
-    test('the left arrow is the next box and the right the one before', async () => {
+    test('the row is left to right, and the words around it are not', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await pin('hint="Sent to your phone" length="4"')
+      expect(part(host, 'field')?.getAttribute('dir')).toBe('ltr')
+      expect(part(host, 'label')?.hasAttribute('dir')).toBe(false)
+      expect(part(host, 'hint')?.hasAttribute('dir')).toBe(false)
+    })
+
+    test('the right arrow is the next box and the left the one before', async () => {
       document.documentElement.dir = 'rtl'
       const host = await pin('length="4"')
-      await press(host, 1, 'ArrowLeft')
+      await press(host, 1, 'ArrowRight')
       expect(host.shadowRoot?.activeElement).toBe(cells(host)[2] as HTMLInputElement)
-      await press(host, 2, 'ArrowRight')
+      await press(host, 2, 'ArrowLeft')
       expect(host.shadowRoot?.activeElement).toBe(cells(host)[1] as HTMLInputElement)
+    })
+
+    /* Where the boxes are, which needs a browser: happy-dom lays nothing out. */
+    const laid = hasLayout() ? test : (): void => {}
+    const left = (cell: HTMLInputElement | undefined): number =>
+      cell?.getBoundingClientRect().left ?? Number.NaN
+
+    laid('the first character typed is in the leftmost box', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await pin('length="4"')
+      await arrive(host, 0, '7')
+      const boxes = cells(host)
+      const leftmost = [...boxes].sort((a, b) => left(a) - left(b))[0]
+      expect(leftmost?.value).toBe('7')
+      expect(left(boxes[0])).toBeLessThan(left(boxes[1]))
+    })
+
+    laid('a paste fills from the left, a character a box', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await pin('length="4"')
+      await paste(host, 0, '4821')
+      const boxes = [...cells(host)].sort((a, b) => left(a) - left(b))
+      expect(boxes.map((one) => one.value)).toEqual(['4', '8', '2', '1'])
     })
   })
 
