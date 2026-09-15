@@ -26,7 +26,11 @@ export function Example() {
         at={at[0]}
         dismissible
       >
-        Ada Okonjo approved your deploy to production.
+        <helix-headless-avatar
+          name="Ada Okonjo"
+          slot="media"
+        ></helix-headless-avatar>
+        <strong>Ada Okonjo</strong> approved your deploy to production.
         <button
           slot="actions"
           type="button"
@@ -38,7 +42,11 @@ export function Example() {
         at={at[1]}
         dismissible
       >
-        Build #4821 failed on main
+        <helix-headless-icon
+          name="warning"
+          slot="media"
+        ></helix-headless-icon>
+        Build <strong>#4821</strong> failed on <code>main</code>
         <button
           slot="actions"
           type="button"
@@ -51,7 +59,11 @@ export function Example() {
         default-read
         dismissible
       >
-        Your invitation to the Platform team was accepted.
+        <helix-headless-avatar
+          name="Platform Team"
+          slot="media"
+        ></helix-headless-avatar>
+        Your invitation to the <strong>Platform</strong> team was accepted.
       </helix-headless-notification>
       <a
         href="#all"

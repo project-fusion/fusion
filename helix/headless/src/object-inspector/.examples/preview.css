@@ -1,10 +1,26 @@
 /* What the headless tier asks a consumer to write for Object Inspector.
  *
- * Deliberately skeletal: a diagram of what has to be styled, not a theme to
- * copy. No token, because `headless` does not depend on `helix/styles`, and
- * grays only, because color here would read as an opinion this tier does not
- * hold: the types are told apart by weight and slant here, and by their own
- * text everywhere, since a string keeps its quotes and a null is spelled.
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning, and this
+ * tier holds no such opinion: the types are told apart by shade and slant
+ * here, and by their own text everywhere, since a string keeps its quotes and
+ * a null is spelled.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
  *
  * **The indent is the one rule that is not optional.** Every row is a sibling
  * in one tree, so nesting is not in the markup; the base tier writes each row's
@@ -13,17 +29,52 @@
 
 :root {
   color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
   --_gray-mark: light-dark(#8e8e96, #86868f);
   --_gray-muted: light-dark(#63636b, #a1a1aa);
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
+helix-headless-object-inspector {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8125rem;
+}
+
+/* The label rides on a bar joined to the top of the tree, so the two read as
+   one panel: the bar draws three edges and the tree the fourth. */
+helix-headless-object-inspector::part(header) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  border: 1px solid var(--_gray-line);
+  border-block-end: none;
+  display: flex;
+  padding: 0.5rem 1rem;
+}
+
+helix-headless-object-inspector::part(label) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+helix-headless-object-inspector::part(frame) {
+  position: relative;
+}
+
+/* `ui-monospace` ahead of the generic, because `monospace` on its own drops an
+   `em` size to the browser's smaller monospace default. */
 helix-headless-object-inspector::part(tree) {
+  background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
   color: var(--_gray-strong);
-  font-family: monospace;
+  font-family: ui-monospace, monospace;
+  line-height: 1.5;
+  padding-block: 0.5rem;
 }
 
 helix-headless-object-inspector::part(tree):focus-visible {
@@ -31,33 +82,43 @@ helix-headless-object-inspector::part(tree):focus-visible {
   outline-offset: 2px;
 }
 
+/* Every row is indented as though it had a caret, and a branch's caret is
+   pulled back into that room below: a page cannot tell a branch from a leaf
+   through `::part()`, which takes no attribute selector, so the gutter is the
+   same on both and the caret hangs in it. The end padding keeps a long value
+   clear of the copy button. */
 helix-headless-object-inspector::part(row) {
-  padding-inline-start: calc(var(--object-inspector-level) * 1.25rem + 1.25rem);
+  overflow: hidden;
+  padding-inline-end: 3rem;
+  padding-inline-start: calc(var(--object-inspector-level) * 1.5rem + 0.75rem + 1em + 0.25rem);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 helix-headless-object-inspector::part(toggle) {
   block-size: 1em;
+  color: var(--_gray-muted);
   inline-size: 1em;
-  margin-inline-start: -1.25rem;
-  margin-inline-end: 0.25rem;
-}
-
-helix-headless-object-inspector::part(key) {
-  font-weight: bold;
+  margin-inline: calc(-1em - 0.25rem) 0.25rem;
+  vertical-align: -0.125em;
 }
 
 helix-headless-object-inspector::part(string) {
   font-style: italic;
 }
 
-helix-headless-object-inspector::part(count),
-helix-headless-object-inspector::part(summary) {
+helix-headless-object-inspector::part(number),
+helix-headless-object-inspector::part(boolean),
+helix-headless-object-inspector::part(null),
+helix-headless-object-inspector::part(summary),
+helix-headless-object-inspector::part(count) {
   color: var(--_gray-muted);
 }
 
-helix-headless-object-inspector::part(frame) {
-  position: relative;
+helix-headless-object-inspector::part(count) {
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  margin-inline-start: 0.5rem;
 }
 
 helix-headless-object-inspector::part(copy) {
@@ -66,11 +127,23 @@ helix-headless-object-inspector::part(copy) {
   position: absolute;
 }
 
+/* A ghost square at control height, the glyph muted until the pointer is on
+   it. */
 helix-headless-object-inspector::part(copy-button) {
   all: unset;
+  align-items: center;
+  block-size: 2.5rem;
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-grid;
+  inline-size: 2.5rem;
+  justify-content: center;
+}
+
+helix-headless-object-inspector::part(copy-button):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
 helix-headless-object-inspector::part(copy-button):focus-visible {
@@ -79,7 +152,7 @@ helix-headless-object-inspector::part(copy-button):focus-visible {
 }
 
 helix-headless-object-inspector::part(copy-mark) {
-  block-size: 1em;
+  block-size: 1rem;
   display: block;
-  inline-size: 1em;
+  inline-size: 1rem;
 }

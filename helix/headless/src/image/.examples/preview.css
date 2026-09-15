@@ -38,21 +38,43 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* The box is the consumer's to choose: an image has no size of its own until
+   something gives it one, and the ratio is what reserves the room before the
+   picture arrives. */
 helix-headless-image {
-  background-color: var(--_gray-fill);
+  aspect-ratio: 16 / 9;
   display: block;
+  inline-size: 24rem;
   max-inline-size: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-image::part(image) {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+/* Nothing to look at until there is something to look at: a picture on its way
+   or one that failed would otherwise show the browser's broken-image glyph and
+   the alternative text over the stand-in. */
+helix-headless-image:not([data-status="loaded"])::part(image) {
+  visibility: hidden;
+}
+
+/* Both stand-ins cover the box exactly, because they are standing in for it.
+   No `display` here: the component hides whichever is not in use with `hidden`,
+   and an author `display` would beat the user agent's `[hidden]` rule and paint
+   both. */
+helix-headless-image::part(placeholder),
+helix-headless-image::part(fallback) {
+  background-color: var(--_gray-subtle);
+  inset: 0;
+  position: absolute;
+}
+
+helix-headless-image::part(fallback) {
+  color: var(--_gray-muted);
 }

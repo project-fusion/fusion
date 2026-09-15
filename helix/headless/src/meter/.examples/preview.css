@@ -38,48 +38,105 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-headless-meter {
   display: block;
 }
 
+/* The reading at the end of the track rather than under it. The grid exists
+   only under `show-value`, so a plain meter keeps the box it always had. */
+helix-headless-meter[show-value] {
+  align-items: center;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr auto;
+}
+
+/* Tabular figures and a floor of three characters, so a reading that changes
+   does not shuffle the track beside it. */
+helix-headless-meter::part(value) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 3ch;
+  text-align: end;
+}
+
 helix-headless-meter::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
+  background-color: var(--_gray-subtle);
+  block-size: 1rem;
   inline-size: 100%;
+  overflow: hidden;
+  position: relative;
 }
 
-helix-headless-meter::part(groove) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
-}
-
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
+/* Scaled rather than sized, from the inline start, so it grows from the same
+   edge in both writing directions. */
 helix-headless-meter::part(indicator) {
   background-color: var(--_gray-strong);
   block-size: 100%;
-  display: block;
-  inline-size: calc(var(--meter-fraction, 0) * 100%);
+  inline-size: 100%;
+  scale: var(--meter-fraction, 0) 1;
+  transform-origin: left center;
 }
 
+helix-headless-meter:dir(rtl)::part(indicator) {
+  transform-origin: right center;
+}
+
+/* A threshold is a notch in the page's own ground, two pixels wide against a
+   sixteen pixel track, so one near the end does not read as part of the fill. */
+helix-headless-meter::part(tick) {
+  background-color: var(--_gray-surface);
+  block-size: 100%;
+  inline-size: 2px;
+  inset-block-start: 0;
+  inset-inline-start: var(--meter-at, 0%);
+  position: absolute;
+  translate: -50%;
+}
+
+helix-headless-meter:is([shape="ring"], [shape="arc"]) {
+  display: inline-grid;
+  place-items: center;
+}
+
+/* In a ring or an arc the track is the drawing, so it loses the bar's fill and
+   the value sits in the middle of it. */
 helix-headless-meter:is([shape="ring"], [shape="arc"])::part(track) {
   background-color: transparent;
-  block-size: auto;
+  block-size: 6rem;
+  grid-area: 1 / 1;
+  inline-size: 6rem;
+}
+
+helix-headless-meter[shape="ring"]::part(track) {
+  rotate: -90deg;
+}
+
+helix-headless-meter[shape="arc"]::part(track) {
+  rotate: 135deg;
+}
+
+helix-headless-meter:is([shape="ring"], [shape="arc"])::part(groove),
+helix-headless-meter:is([shape="ring"], [shape="arc"])::part(indicator) {
+  cx: 50%;
+  cy: 50%;
   fill: none;
-  stroke: var(--_gray-fill);
-  stroke-width: 8;
+  r: calc(50% - 0.25rem);
+  stroke-width: 0.5rem;
+}
+
+helix-headless-meter:is([shape="ring"], [shape="arc"])::part(groove) {
+  stroke: var(--_gray-subtle);
+  stroke-dasharray: var(--meter-sweep) 100;
+}
+
+helix-headless-meter:is([shape="ring"], [shape="arc"])::part(indicator) {
+  scale: none;
+  stroke: var(--_gray-strong);
+  stroke-dasharray: var(--meter-along) 100;
+}
+
+helix-headless-meter:is([shape="ring"], [shape="arc"])::part(value) {
+  grid-area: 1 / 1;
 }

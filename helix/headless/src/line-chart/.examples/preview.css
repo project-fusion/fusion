@@ -41,82 +41,154 @@
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
+/* The table is what the chart reads its readings from, and it stays in the page
+   for assistive technology: clipped to a pixel rather than `display: none`,
+   which would take it out of the accessibility tree along with the screen. */
+[data-hidden-visually] {
+  block-size: 1px;
+  border: 0;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* One gray per series, far enough apart on the ramp to tell the first three
+   apart at a glance. The component points `--chart-series` on each line, wash
+   and terminus at one of these six by its index, so they are the whole
+   palette. */
 helix-headless-line-chart {
-  --chart-series-1: light-dark(#2a2a2e, #e9e9ec);
-  --chart-series-2: light-dark(#4a4a50, #c9c9ce);
-  --chart-series-3: light-dark(#6b6b73, #a1a1aa);
-  --chart-series-4: light-dark(#8e8e96, #86868f);
-  --chart-series-5: light-dark(#b1b1b8, #63636b);
-  --chart-series-6: light-dark(#d2d2d7, #45454b);
+  --chart-series-1: var(--_gray-strong);
+  --chart-series-2: var(--_gray-mark);
+  --chart-series-3: var(--_gray-line);
+  --chart-series-4: var(--_gray-muted);
+  --chart-series-5: var(--_gray-fill);
+  --chart-series-6: var(--_gray-subtle);
+
+  display: grid;
+  gap: 0.25rem;
+  position: relative;
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+/* The drawing is stretched to its box with `preserveAspectRatio="none"`, so the
+   box has to be bounded: without a height the plot takes its width's worth and
+   runs off the page. */
+helix-headless-line-chart::part(plot) {
+  block-size: 10.5rem;
+  position: relative;
 }
 
-helix-headless-line-chart::part(area) {
-  fill: var(--chart-series, var(--chart-series-1));
-  opacity: 0.25;
-}
-
-helix-headless-line-chart::part(band) {
-  stroke: var(--_gray-fill);
-}
-
-helix-headless-line-chart::part(baseline) {
-  stroke: var(--_gray-line);
-}
-
-helix-headless-line-chart::part(gridline) {
-  stroke: var(--_gray-fill);
-}
-
-helix-headless-line-chart::part(guide) {
-  stroke: var(--_gray-line);
-}
-
-helix-headless-line-chart::part(label) {
-  fill: var(--_gray-muted);
-  font-size: 0.75rem;
-}
-
-helix-headless-line-chart::part(labels) {
-  fill: var(--_gray-muted);
-  font-size: 0.75rem;
+helix-headless-line-chart::part(svg) {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  overflow: visible;
 }
 
 helix-headless-line-chart::part(line) {
   fill: none;
   stroke: var(--chart-series, var(--chart-series-1));
-  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2px;
   vector-effect: non-scaling-stroke;
 }
 
-helix-headless-line-chart::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-line-chart::part(area) {
+  fill: var(--chart-series, var(--chart-series-1));
+  opacity: 0.16;
+  stroke: none;
 }
 
-helix-headless-line-chart::part(svg) {
-  display: block;
-  inline-size: 100%;
+helix-headless-line-chart::part(baseline),
+helix-headless-line-chart::part(gridline) {
+  stroke: var(--_gray-line);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+helix-headless-line-chart::part(guide) {
+  stroke: var(--_gray-muted);
+  stroke-dasharray: 3 3;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+helix-headless-line-chart::part(band) {
+  fill: var(--_gray-subtle);
+}
+
+/* The last reading's dot, placed by the component at a percentage of the plot.
+   Round because it is a point, not a softened square. */
+helix-headless-line-chart::part(terminus) {
+  background-color: var(--chart-series, var(--chart-series-1));
+  block-size: 5px;
+  border-radius: 50%;
+  inline-size: 5px;
+  inset-block-start: var(--chart-terminus-y);
+  inset-inline-start: var(--chart-terminus-x);
+  position: absolute;
+  translate: -50% -50%;
+}
+
+/* One column per reading, so each name sits under its point rather than the
+   names running together as one line of text. */
+helix-headless-line-chart::part(labels) {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+}
+
+helix-headless-line-chart::part(label) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The tooltip hangs from a one-pixel anchor the component moves to the reading
+   under the pointer, and the anchor's box covers the plot so it can. */
+helix-headless-line-chart::part(mark) {
+  block-size: 1px;
+  inline-size: 1px;
+  pointer-events: none;
+  position: absolute;
+}
+
+helix-headless-line-chart::part(tooltip-anchor) {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
 }
 
 helix-headless-line-chart::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+  background-color: var(--_gray-strong);
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
 }
 
-helix-headless-icon::part(svg) {
+helix-headless-line-chart::part(tooltip-label) {
   display: block;
-  inline-size: 100%;
+  font-weight: 500;
+  margin-block-end: 0.25rem;
+}
+
+helix-headless-line-chart::part(tooltip-cell) {
+  align-items: baseline;
+  column-gap: 0.75rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+helix-headless-line-chart::part(tooltip-value) {
+  font-variant-numeric: tabular-nums;
 }

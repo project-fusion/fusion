@@ -38,59 +38,33 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
+/* The trigger is a button at control height, filled quietly and edged, so it
+   reads as the thing to press rather than as a word on the page. */
+helix-headless-button {
   display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-menu::part(back) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-helix-headless-menu::part(back-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-menu::part(surface) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
-}
-
-helix-headless-menu::part(title) {
-  color: var(--_gray-strong);
-  font-weight: 600;
 }
 
 helix-headless-button::part(button) {
   all: unset;
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
   box-sizing: border-box;
+  color: var(--_gray-strong);
   cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  justify-content: center;
+  line-height: 1.2;
+  padding-inline: 1rem;
+  white-space: nowrap;
 }
 
-helix-headless-menu-item::part(item) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-helix-headless-menu-item::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-button:not(:disabled)::part(button):hover {
+  background-color: var(--_gray-fill);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -99,4 +73,133 @@ helix-headless-icon::part(svg) {
 helix-headless-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+/* No `display` here: the component closes the panel with `hidden` and the
+   popover's own state, and an author `display` would beat both and paint it. The
+   rows run the full width, so a highlighted one is a band across the panel. */
+helix-headless-menu::part(surface) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  margin: 0;
+  min-inline-size: 12rem;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+}
+
+helix-headless-menu::part(header) {
+  align-items: center;
+  border-block-end: 1px solid var(--_gray-line);
+  display: flex;
+  gap: 0.25rem;
+  margin-block-end: 0.25rem;
+  padding: 0.25rem 0.5rem 0.5rem;
+}
+
+helix-headless-menu::part(back) {
+  all: unset;
+  align-items: center;
+  block-size: 1.5rem;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 1.5rem;
+  justify-content: center;
+}
+
+helix-headless-menu::part(back):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-menu::part(back):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+helix-headless-menu::part(back-mark) {
+  block-size: 1rem;
+  inline-size: 1rem;
+}
+
+helix-headless-menu::part(title) {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+helix-headless-menu-item {
+  display: block;
+}
+
+/* A flex row rather than the styled tier's three-column grid: the label is bare
+   text in the default slot, which cannot be placed from a page, so the trailing
+   mark is pushed to the end instead of assigned a column. */
+helix-headless-menu-item::part(item) {
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-block-size: 2rem;
+  padding-inline: 0.75rem;
+  text-decoration: none;
+  user-select: none;
+}
+
+helix-headless-menu-item::part(item):hover {
+  background-color: var(--_gray-subtle);
+}
+
+helix-headless-menu-item::part(item):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+helix-headless-menu-item::part(start) {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: flex;
+}
+
+helix-headless-menu-item > [slot="start"] {
+  margin-inline-end: 0.5rem;
+}
+
+/* The seam before the mark is padding inside its own box, which the shadow
+   root sizes `border-box`, so the box is the glyph plus the seam. */
+helix-headless-menu-item::part(mark) {
+  block-size: 1rem;
+  color: var(--_gray-muted);
+  flex: none;
+  inline-size: 1.5rem;
+  margin-inline-start: auto;
+  padding-inline-start: 0.5rem;
+}
+
+helix-headless-menu-item[checked]::part(mark) {
+  color: var(--_gray-strong);
+}
+
+helix-headless-menu > helix-headless-divider {
+  background-color: var(--_gray-line);
+  block-size: 1px;
+  display: block;
+  margin-block: 0.25rem;
+}
+
+helix-headless-icon {
+  block-size: 1rem;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1rem;
+}
+
+helix-headless-icon::part(svg) {
+  block-size: 100%;
+  inline-size: 100%;
 }

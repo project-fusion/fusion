@@ -1,24 +1,154 @@
-/* What the headless tier asks a consumer to write for a chord, and how little.
+/* What the headless tier asks a consumer to write for a chord and the field it
+ * binds within.
  *
- * The same terms as `preview.css` beside it: grays only, no token, no radius
- * beyond what is round rather than softened. The key itself is drawn by
- * `preview.css`, so what is left here is the layout around it, which the styled
- * tier gets from `helix-flex` and this tier does not.
- */
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
+ *
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
+ * says primary and a red one says danger, and this tier holds no such opinion.
+ * A neutral ramp says only where one surface ends and the next begins.
+ *
+ * The seven values are named by role rather than numbered, since a number
+ * implies a scale somebody maintains, and underscored because they never leave
+ * this file: an unprefixed name reads as a hook the example publishes, and it
+ * publishes none. Written through `light-dark()` with `color-scheme` declared,
+ * so the sandbox's dark mode inverts rather than showing a pale card on a dark
+ * page.
+ *
+ * The key and the field are drawn here in full rather than borrowed from
+ * `preview.css` beside it, because an example is read and copied as one page
+ * and one sheet. The stack is what the styled tier gets from `helix-flex`. */
 
-.stack {
-  display: grid;
-  gap: 1rem;
-  justify-items: start;
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-/* Quieter than the sentence above it, and quiet by lightness rather than by
-   size: the note is an aside about the field, not a smaller kind of prose. */
-.caption {
-  color: #6b7280;
-  margin: 0;
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .stack p {
+  font-size: 0.875rem;
+  line-height: 1.5;
   margin: 0;
+}
+
+/* Quieter than the sentence above it, a step smaller and lighter: the note is
+   an aside about the field. */
+.stack .caption {
+  color: var(--_gray-muted);
+  font-size: 0.8125rem;
+}
+
+/* Sized in `em`, so a key follows whatever text it sits in. The nudge down is
+   because the box centers on half the line and a key cap reads right centered
+   on half the x-height. */
+helix-headless-kbd {
+  display: inline-flex;
+  font: inherit;
+  vertical-align: -0.05em;
+}
+
+/* `ui-monospace` ahead of the generic, because `monospace` on its own drops an
+   `em` size to the browser's smaller monospace default. The inset shadow is the
+   cap's lower edge, which is what makes a box read as a key rather than a tag. */
+helix-headless-kbd::part(kbd) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 1.5em;
+  border: 1px solid var(--_gray-line);
+  box-shadow: inset 0 -1px 0 0 var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+  font-variant-ligatures: none;
+  font-weight: 500;
+  justify-content: center;
+  line-height: 1;
+  min-inline-size: 1.5em;
+  padding-block-start: 1px;
+  padding-inline: 0.4em;
+  white-space: nowrap;
+}
+
+helix-headless-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* `aria-label` names the field without showing a label: the component still
+   renders one, so the name reaches the control through `<label for>`, and the
+   page clips it the accessible way rather than removing it. */
+helix-headless-input[aria-label]:not([label])::part(label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-input::part(field) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  display: flex;
+  gap: 0.25rem;
+  padding-inline: 0.5rem;
+}
+
+helix-headless-input::part(field):hover {
+  border-color: var(--_gray-mark);
+}
+
+/* The ring goes on the frame rather than on the input, so it surrounds the
+   whole field and not the text inside it. Taking the UA outline off the input
+   without putting one back here is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-input:focus-within::part(field) {
+  border-color: var(--_gray-strong);
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 0;
+}
+
+helix-headless-input::part(control) {
+  all: unset;
+  block-size: 100%;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-inline-size: 0;
+}
+
+helix-headless-input::part(control)::placeholder {
+  color: var(--_gray-muted);
+  font-weight: 500;
+}
+
+helix-headless-input > [slot="end"] {
+  flex: none;
 }
