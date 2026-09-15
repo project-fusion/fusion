@@ -2,9 +2,15 @@
   display: block;
 }
 
-/* Bounded, and scrolling inside that bound. */
+/* Bounded, and scrolling inside that bound. Seven rows by default, an odd
+   number of the option's own height, because the list comes to rest with its
+   chosen time in the middle: at 16rem, eight rows, it rested with half a row
+   cut off at each end. */
 [part="list"] {
-  --listbox-max-block-size: var(--time-picker-list-block-size, 16rem);
+  --listbox-max-block-size: var(
+    --time-picker-list-block-size,
+    calc(var(--helix-size-control-tight) * 7)
+  );
 
   display: block;
 }
