@@ -96,7 +96,7 @@ helix-headless-chat:has(> [slot="header"], > [slot="actions"])::part(header) {
 }
 
 helix-headless-chat::part(header) {
-  border-block-end: 1px solid var(--_gray-line);
+  border-block-end: 1px solid var(--_gray-edge);
   min-block-size: 2.5rem;
   padding: 0.25rem 1rem;
 }
@@ -127,10 +127,10 @@ helix-headless-chat::part(status) {
   padding: 0.5rem 1rem 0.25rem;
 }
 
-/* Inset less than the transcript by the composer's own padding and edge, so
-   the words typed into it start where the turns above them do. */
+/* Inset as the transcript is, so the composer's edge is the bubbles' edge and
+   the conversation has one left edge rather than two. */
 helix-headless-chat::part(composer) {
-  padding: 0.75rem calc(0.5rem - 1px);
+  padding: 0.75rem 1rem;
 }
 
 /* Where each settled turn is said: out of sight and still in the tree. */
@@ -183,9 +183,12 @@ helix-headless-chat-message[author="me"]::part(body) {
 }
 
 /* The bubble. A step apart for each side, so who said what survives the
-   monotone: the other party on the fill, the reader a rung darker. */
+   monotone: the other party on the subtle gray, the reader on the fill a rung
+   darker. Not the line gray, which is an edge's, and as a ground read as a
+   bubble disabled or dirty. */
 helix-headless-chat-message::part(content) {
-  background-color: var(--_gray-fill);
+  background-color: var(--_gray-subtle);
+  border-radius: var(--_radius-surface);
   color: var(--_gray-strong);
   font-size: 0.8125rem;
   inline-size: fit-content;
@@ -197,7 +200,7 @@ helix-headless-chat-message::part(content) {
 }
 
 helix-headless-chat-message[author="me"]::part(content) {
-  background-color: var(--_gray-line);
+  background-color: var(--_gray-fill);
 }
 
 helix-headless-chat-message[state="sending"]::part(content) {
@@ -239,13 +242,18 @@ helix-headless-chat-message::part(mark) {
   inline-size: 1rem;
 }
 
+/* Pulled over its own trailing padding, so the words end on the bubble's edge
+   above them rather than four pixels short of it; the padding is only the room
+   the hover fill needs. */
 helix-headless-chat-message::part(retry) {
   background: none;
   border: 0;
+  border-radius: var(--_radius-control);
   color: var(--_gray-strong);
   cursor: pointer;
   font: inherit;
   font-weight: 500;
+  margin-inline-end: -0.25rem;
   min-block-size: 1.75rem;
   padding: 0.25rem;
   text-decoration: underline;
@@ -279,7 +287,8 @@ helix-headless-chat-composer {
 
 helix-headless-chat-composer::part(composer) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-surface);
   display: grid;
   gap: 0.25rem;
   padding: 0.5rem;
@@ -290,7 +299,9 @@ helix-headless-chat-composer::part(composer):focus-within {
   outline-offset: 0;
 }
 
-/* `field-sizing` grows the box with the text and stops at the ceiling. */
+/* `field-sizing` grows the box with the text and stops at the ceiling. The
+   inline padding makes up the box's edge and padding to a bubble's, so what is
+   typed starts where the words in the bubbles above it do. */
 helix-headless-chat-composer::part(field) {
   background-color: transparent;
   border: 0;
@@ -300,7 +311,7 @@ helix-headless-chat-composer::part(field) {
   font-size: 0.8125rem;
   line-height: 1.5;
   max-block-size: 12rem;
-  padding: 0.25rem 0;
+  padding: 0.25rem calc(0.25rem - 1px);
   resize: none;
 }
 
@@ -324,6 +335,7 @@ helix-headless-chat-composer::part(send) {
   background-color: transparent;
   block-size: 1.75rem;
   border: 0;
+  border-radius: var(--_radius-control);
   color: var(--_gray-muted);
   cursor: pointer;
   display: inline-flex;

@@ -87,7 +87,8 @@ helix-headless-carousel > * {
 /* The slides here are cards, framed as the styled preview frames them. */
 helix-headless-card {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-panel);
   color: var(--_gray-muted);
   display: block;
   padding: 1rem;
@@ -116,7 +117,8 @@ helix-headless-carousel::part(rotation) {
   all: unset;
   align-items: center;
   block-size: 2rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -140,16 +142,17 @@ helix-headless-carousel::part(rotation-mark) {
   inline-size: 1em;
 }
 
-/* Dots, which are round rather than softened. The current one lengthens into a
-   pill and takes the strong ink, so the run reads without color. It is reached
-   by `indicator-current`, the second part name the component writes on it
-   while it is current: its `aria-current` and `data-current` are attributes,
-   and nothing can follow `::part()` with one. */
+/* Dots, in the gray a mark takes rather than a rule's, which at 1.65:1 on white
+   was very nearly not there. The current one lengthens into a pill and takes
+   the strong ink, so the run reads without color. It is reached by
+   `indicator-current`, the second part name the component writes on it while it
+   is current: its `aria-current` and `data-current` are attributes, and nothing
+   can follow `::part()` with one. */
 helix-headless-carousel::part(indicator) {
   all: unset;
-  background-color: var(--_gray-line);
+  background-color: var(--_gray-mark);
   block-size: 0.5rem;
-  border-radius: 999px;
+  border-radius: 9999px;
   box-sizing: border-box;
   cursor: pointer;
   inline-size: 0.5rem;

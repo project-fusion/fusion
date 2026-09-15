@@ -84,15 +84,19 @@ helix-headless-accordion-item::part(trigger) {
   text-align: start;
 }
 
-/* The chevron is drawn by the component and turned by it. Only its size and
-   place are left, and the turn is worth leaving alone: it is keyed on the open
-   state the component resolves, not on a class a consumer has to keep in step. */
+/* The chevron is drawn by the component, and turned here: flipped while the
+   item is open, keyed on the `open` state the component resolves rather than on
+   a class a consumer has to keep in step. */
 helix-headless-accordion-item::part(chevron) {
   block-size: 1em;
   color: var(--_gray-muted);
   flex: none;
   inline-size: 1em;
   margin-inline-start: auto;
+}
+
+helix-headless-accordion-item:state(open)::part(chevron) {
+  scale: 1 -1;
 }
 
 helix-headless-accordion-item::part(content-inner) {

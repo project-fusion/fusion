@@ -67,13 +67,15 @@
 
 /* A grid of two rows, the drawing and the words under it, so the labels line
    up with the columns without either knowing the other's size. Several series
-   take several steps of the ramp, darkest first. */
+   take several steps of the ramp from the middle, the first on the mark gray:
+   the strongest ink drew black slabs on white and near-white ones on black,
+   the heaviest thing on either page, where a mid gray reads as data in both. */
 helix-headless-bar-chart {
-  --chart-series-1: var(--_gray-strong);
-  --chart-series-2: var(--_gray-muted);
-  --chart-series-3: var(--_gray-mark);
-  --chart-series-4: var(--_gray-line);
-  --chart-series-5: var(--_gray-fill);
+  --chart-series-1: var(--_gray-mark);
+  --chart-series-2: var(--_gray-line);
+  --chart-series-3: var(--_gray-fill);
+  --chart-series-4: var(--_gray-muted);
+  --chart-series-5: var(--_gray-strong);
   --chart-series-6: var(--_gray-subtle);
 
   display: grid;
@@ -97,7 +99,11 @@ helix-headless-bar-chart::part(svg) {
   overflow: visible;
 }
 
+/* Rounded at the far end only, as the styled columns are: a rounded foot would
+   lift a bar off the rule it is measured from. An SVG rect has one radius for
+   all four corners, so the square is clipped instead. */
 helix-headless-bar-chart::part(bar) {
+  clip-path: inset(0 round 2px 2px 0 0);
   fill: var(--chart-series, var(--chart-series-1));
 }
 
@@ -167,12 +173,33 @@ helix-headless-bar-chart::part(tooltip-anchor) {
   position: absolute;
 }
 
-/* The bubble is the page inverted, the way a tooltip is. */
+/* The bubble is the page inverted, the way a tooltip is. `inset: auto` and
+   `margin: 0`, because it is a popover and the UA centers one in the viewport:
+   the component writes its position from the top-left corner, and left to the
+   UA it landed 370 pixels below and 300 across from the column it described. */
 helix-headless-bar-chart::part(tooltip) {
   background-color: var(--_gray-strong);
+  border: 0;
+  border-radius: var(--_radius-control);
   color: var(--_gray-surface);
   font-size: 0.75rem;
+  inline-size: max-content;
+  inset: auto;
+  line-height: 1.2;
+  margin: 0;
+  overflow: visible;
   padding: 0.25rem 0.5rem;
+}
+
+/* A square turned to a point in the bubble's own fill, hanging below it: the
+   chart places its bubble above the reading. */
+helix-headless-bar-chart::part(tooltip-arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  inset-block-end: -0.25rem;
+  position: absolute;
+  rotate: 45deg;
 }
 
 helix-headless-bar-chart::part(tooltip-label) {
@@ -188,8 +215,22 @@ helix-headless-bar-chart::part(tooltip-cell) {
   grid-template-columns: 0.5em minmax(0, 1fr) auto;
 }
 
+/* A dot in the column's own gray, so a row of the bubble and a mark in the
+   drawing are visibly one thing. The chart writes `--chart-series` only on a
+   cell that was plotted, so an unplotted row draws nothing here. */
+helix-headless-bar-chart::part(tooltip-cell)::before {
+  background-color: var(--chart-series);
+  block-size: 0.5em;
+  border-radius: 9999px;
+  content: "";
+  grid-column: 1;
+  inline-size: 0.5em;
+}
+
+/* Quieter than the number beside it, from the bubble's own ink. */
 helix-headless-bar-chart::part(tooltip-name) {
   grid-column: 2;
+  opacity: 0.72;
 }
 
 helix-headless-bar-chart::part(tooltip-value) {

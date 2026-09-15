@@ -59,9 +59,8 @@ helix-headless-breadcrumbs::part(list) {
   padding: 0;
 }
 
-/* A row, so the separator sits on the text's middle rather than on its
-   baseline. An inline box of 1em aligns its bottom to the baseline, which puts
-   a chevron a third of a line high beside the word it separates. */
+/* A row, so the separator, the link and anything slotted after it share one
+   middle. */
 helix-headless-breadcrumb {
   align-items: center;
   display: inline-flex;
@@ -69,9 +68,12 @@ helix-headless-breadcrumb {
   gap: 0.5rem;
 }
 
+/* A line box of the crumb's own type rather than a flex row, so the chevron has
+   a baseline to be set against: the box is as tall as the link's text line and
+   centered with it, so the two baselines are one. */
 helix-headless-breadcrumb::part(separator) {
   color: var(--_gray-mark);
-  display: inline-flex;
+  display: block;
   user-select: none;
 }
 
@@ -80,30 +82,38 @@ helix-headless-breadcrumb:first-child::part(separator) {
   display: none;
 }
 
+/* Centered on the capitals rather than on the line. Centered on the line, a
+   1em chevron is centered on the lowercase and hangs 1.25px under the
+   baseline; half the gap between the em and the cap height, taken off the
+   baseline, is the same answer in any face. */
 helix-headless-breadcrumb::part(separator-mark) {
   block-size: 1em;
-  flex: none;
   inline-size: 1em;
+  vertical-align: calc(0.5cap - 0.5em);
 }
 
+/* The span around the crumb's label. Only the current page's words need the
+   inset a link's hover fill is made of, so the three sit the same distance
+   from their chevrons; a slotted link brings its own. */
 helix-headless-breadcrumb::part(link) {
   align-items: center;
   color: var(--_gray-muted);
   display: inline-flex;
   gap: 0.25rem;
-  padding-inline: 0.5rem;
   text-decoration: none;
 }
 
 /* The page the reader is on reads as where they are, not as somewhere to go. */
 helix-headless-breadcrumb[current]::part(link) {
   color: var(--_gray-strong);
+  padding-inline: 0.5rem;
 }
 
 /* Steps, not prose links: gray and not underlined, with the room a hover fill
    needs. Only the first is pulled back, on the side facing the edge, so the
-   trail starts where the content around it starts. */
+   trail's first word starts where the content around it starts. */
 helix-headless-breadcrumb a {
+  border-radius: var(--_radius-control);
   color: var(--_gray-muted);
   padding: 0.25rem 0.5rem;
   text-decoration: none;

@@ -30,8 +30,9 @@
  *
  * The buttons are drawn as `preview.css` beside it draws them. What is
  * different is the axis, which is the whole of this example: the pull onto a
- * neighbor's border is a block margin rather than an inline one, and the
- * buttons stretch to the widest so the column has one edge. */
+ * neighbor's border is a block margin rather than an inline one, the rounded
+ * corners are the top pair and the bottom pair rather than the start and the
+ * end, and the buttons stretch to the widest so the column has one edge. */
 
 :root {
   color-scheme: light dark;
@@ -59,6 +60,18 @@ helix-headless-button-group[orientation="vertical"] > helix-headless-button:not(
   margin-block-start: -1px;
 }
 
+helix-headless-button-group[orientation="vertical"]
+  > helix-headless-button:first-child::part(button) {
+  border-start-end-radius: var(--_radius-control);
+  border-start-start-radius: var(--_radius-control);
+}
+
+helix-headless-button-group[orientation="vertical"]
+  > helix-headless-button:last-child::part(button) {
+  border-end-end-radius: var(--_radius-control);
+  border-end-start-radius: var(--_radius-control);
+}
+
 /* A hovered or focused button draws above its neighbors, or the edge it lights
    up is half covered by the one overlapping it. */
 helix-headless-button-group > helix-headless-button:hover,
@@ -73,13 +86,14 @@ helix-headless-button {
 
 /* The styled button at rest: a quiet fill inside a hairline, at the control
    height. `all: unset` first, so the UA's own button is gone before anything
-   is drawn on it. */
+   is drawn on it. The hairline is `edge` in light and `fill` in dark, where
+   `edge` is 1.02:1 on this fill and the seams between the buttons vanish. */
 helix-headless-button::part(button) {
   all: unset;
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid light-dark(var(--_gray-edge), var(--_gray-fill));
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;
