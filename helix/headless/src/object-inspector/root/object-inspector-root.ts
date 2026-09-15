@@ -450,6 +450,14 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
   }
 
+  /* **What follows a key is isolated, so a right-to-left page orders the row
+     and not the text inside it.** Unisolated, a row was one bidirectional run:
+     a string's closing quote went to the far end, `"id: "dpl_8f2c`, a row
+     holding a number or a branch read left to right while a row holding a
+     string read right to left, and "8 keys" came out "keys 8". A value is
+     code, a JSON literal, so it reads left to right on any page, and the count
+     takes the direction of what it says. The key stays in the line: isolating
+     it as well changed no row's order and redrew the colon after an index. */
   private renderValue(row: Row): TemplateResult {
     const { value } = row
     if (row.branch) {
@@ -457,21 +465,21 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       const array = Array.isArray(value)
       const noun = array ? (count === 1 ? 'item' : 'items') : count === 1 ? 'key' : 'keys'
       return html`<span part="summary">${array ? '[…]' : '{…}'}</span>
-        <span part="count">${`${count} ${noun}`}</span>`
+        <span part="count" dir="auto">${`${count} ${noun}`}</span>`
     }
     if (typeof value === 'string') {
-      return html`<span part="string">${JSON.stringify(value)}</span>`
+      return html`<span part="string" dir="ltr">${JSON.stringify(value)}</span>`
     }
     if (typeof value === 'number') {
-      return html`<span part="number">${String(value)}</span>`
+      return html`<span part="number" dir="ltr">${String(value)}</span>`
     }
     if (typeof value === 'boolean') {
-      return html`<span part="boolean">${String(value)}</span>`
+      return html`<span part="boolean" dir="ltr">${String(value)}</span>`
     }
     if (value === null) {
-      return html`<span part="null">null</span>`
+      return html`<span part="null" dir="ltr">null</span>`
     }
-    return html`<span part="string">${String(value)}</span>`
+    return html`<span part="string" dir="ltr">${String(value)}</span>`
   }
 
   private renderRow(row: Row, index: number): TemplateResult {
