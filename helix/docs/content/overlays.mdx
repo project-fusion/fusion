@@ -29,8 +29,9 @@ else is wrong.
 ## Positioning is JavaScript
 
 Placement uses `@floating-ui/dom` rather than CSS anchor positioning: flip when
-there is no room below, shift to stay on screen, size to the available space.
-Anchor positioning would be the platform answer and is not yet available
+there is no room below, move below or above when a panel placed beside its
+anchor has room on neither side, shift to stay on screen, size to the available
+space. Anchor positioning would be the platform answer and is not yet available
 everywhere the rest of the library's requirements are. See [Browser
 support](./browser-support).
 
