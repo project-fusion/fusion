@@ -57,7 +57,16 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
+/* The host turns and the loading mark reads the angle: Chromium 132 finds no
+   keyframes from a ::part() rule. */
+@property --_spin {
+  inherits: true;
+  initial-value: 0deg;
+  syntax: "<angle>";
+}
+
 helix-headless-video {
+  animation: video-spin 0.8s linear infinite;
   display: block;
   position: relative;
 }
@@ -122,7 +131,6 @@ helix-headless-video::part(failure) {
 /* A ring with one side drawn, which is the part that turns. Still under
    reduced motion, because the words beside it are the message. */
 helix-headless-video::part(loading-mark) {
-  animation: video-spin 0.8s linear infinite;
   block-size: 1rem;
   border: 2px solid var(--_gray-muted);
   border-block-start-color: var(--_gray-surface);
@@ -130,16 +138,17 @@ helix-headless-video::part(loading-mark) {
   box-sizing: border-box;
   flex: none;
   inline-size: 1rem;
+  rotate: var(--_spin);
 }
 
 @keyframes video-spin {
   to {
-    rotate: 1turn;
+    --_spin: 1turn;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  helix-headless-video::part(loading-mark) {
+  helix-headless-video {
     animation: none;
   }
 }
@@ -263,6 +272,8 @@ helix-headless-video::part(time) {
 /* A thin rail filled as far as playback has reached, with a round thumb. */
 helix-headless-video::part(scrubber),
 helix-headless-video::part(volume) {
+  /* Chromium 132 ignores ::part()::-webkit-slider-thumb, so the accent grays its own thumb. */
+  accent-color: var(--_gray-surface);
   appearance: none;
   background-color: var(--_gray-muted);
   block-size: 4px;

@@ -57,7 +57,13 @@
 }
 
 helix-headless-data-table {
+  /* Chromium 132 finds no keyframes from a ::part() rule and WebKit has no timeline-scope: both drive. */
+  animation: data-table-edges linear;
+  /* No fill, which WebKit holds with no timeline, so the range runs past the end to keep its last frame. */
+  animation-range: 0% 101%;
+  animation-timeline: --_data-table-scroll;
   display: block;
+  timeline-scope: --_data-table-scroll;
 }
 
 /* Where the columns are wider than the box, the grid scrolls, and the edge
@@ -79,6 +85,7 @@ helix-headless-data-table::part(table) {
     transparent
   );
   overflow-x: auto;
+  scroll-timeline: --_data-table-scroll inline;
 }
 
 @keyframes data-table-edges {
@@ -100,6 +107,7 @@ helix-headless-data-table::part(table) {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  helix-headless-data-table,
   helix-headless-data-table::part(table) {
     animation: none;
   }

@@ -86,39 +86,38 @@ helix-headless-slider::part(field) {
   gap: 0.75rem;
 }
 
-/* The platform's range input, with its chrome taken off so the track and thumb
-   below are the whole of what is drawn. */
+/* The platform's range input with its chrome taken off, drawn as the track:
+   the fill and the rest as one gradient, split where the component says the
+   value is, `--slider-fraction` being published on the row. */
 helix-headless-slider::part(control) {
+  /* Chromium 132 ignores ::part()::-webkit-slider-thumb: the input is the track, its accent the thumb. */
+  accent-color: var(--_gray-strong);
   appearance: none;
-  background: transparent;
+  background: linear-gradient(
+    var(--_along),
+    var(--_gray-mark) calc(var(--slider-fraction, 0) * 100%),
+    var(--_gray-fill) calc(var(--slider-fraction, 0) * 100%)
+  );
+  block-size: 0.5rem;
+  border-radius: 9999px;
   cursor: pointer;
   flex: 1 1 auto;
   font: inherit;
   min-inline-size: 0;
 }
 
-/* The fill and the rest of the track as one gradient, split where the
-   component says the value is: `--slider-fraction` is published on the row. The
-   engines name the track and the thumb differently, and a selector list holding
-   a name one engine does not know is dropped whole, so each is said twice. */
+/* The engines' own tracks stay clear, so the input is the whole of the track.
+   The engines name the track and the thumb differently, and a selector list
+   holding a name one engine does not know is dropped whole, so each is said
+   twice. */
 helix-headless-slider::part(control)::-webkit-slider-runnable-track {
-  background: linear-gradient(
-    var(--_along),
-    var(--_gray-mark) calc(var(--slider-fraction, 0) * 100%),
-    var(--_gray-fill) calc(var(--slider-fraction, 0) * 100%)
-  );
+  background: none;
   block-size: 0.5rem;
-  border-radius: 9999px;
 }
 
 helix-headless-slider::part(control)::-moz-range-track {
-  background: linear-gradient(
-    var(--_along),
-    var(--_gray-mark) calc(var(--slider-fraction, 0) * 100%),
-    var(--_gray-fill) calc(var(--slider-fraction, 0) * 100%)
-  );
+  background: none;
   block-size: 0.5rem;
-  border-radius: 9999px;
 }
 
 /* Round, in the darkest gray with a ring of the page's lightest, so it reads

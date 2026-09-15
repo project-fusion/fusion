@@ -184,32 +184,35 @@ helix-headless-color-picker::part(channel-field) {
   display: flex;
 }
 
-/* The platform's range input with its chrome taken off, so the track and the
-   thumb below are the whole of what is drawn. */
+/* The platform's range input with its chrome taken off, drawn as the track.
+   **One gray the whole length, with no fill.** On a hue rail the track is the
+   value rather than a measure of it, so a darker run up to the thumb would be a
+   second reading of something the position already says, and a ramp of grays
+   would claim the rail is lightness. */
 helix-headless-color-picker::part(channel-control) {
+  /* Chromium 132 ignores ::part()::-webkit-slider-thumb: the input is the track, its accent the thumb. */
+  accent-color: var(--_gray-strong);
   appearance: none;
-  background: transparent;
+  background-color: var(--_gray-fill);
+  block-size: 0.75rem;
+  border-radius: 9999px;
   cursor: pointer;
   inline-size: 100%;
   margin: 0;
 }
 
-/* **One gray the whole length, with no fill.** On a hue rail the track is the
-   value rather than a measure of it, so a darker run up to the thumb would be a
-   second reading of something the position already says, and a ramp of grays
-   would claim the rail is lightness. The engines name the track and the thumb
-   differently, and a selector list holding a name one engine does not know is
-   dropped whole, so each is said twice. */
+/* The engines' own tracks stay clear, so the input is the whole of the track.
+   The engines name the track and the thumb differently, and a selector list
+   holding a name one engine does not know is dropped whole, so each is said
+   twice. */
 helix-headless-color-picker::part(channel-control)::-webkit-slider-runnable-track {
-  background-color: var(--_gray-fill);
+  background: none;
   block-size: 0.75rem;
-  border-radius: 9999px;
 }
 
 helix-headless-color-picker::part(channel-control)::-moz-range-track {
-  background-color: var(--_gray-fill);
+  background: none;
   block-size: 0.75rem;
-  border-radius: 9999px;
 }
 
 /* Round, in the darkest gray with a ring of the page's lightest, so it reads
