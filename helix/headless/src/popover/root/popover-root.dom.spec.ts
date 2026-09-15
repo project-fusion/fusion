@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -120,6 +120,77 @@ if (hasLayout()) {
       host.show()
       await host.updateComplete
       expect((part(host, 'popover') as HTMLElement).matches(':popover-open')).toBe(true)
+    })
+  })
+
+  /**
+   * Where the panel lands on a right-to-left page.
+   *
+   * **The direction is set on the root, and a wrapper would not do.** A panel
+   * in the top layer is laid out against the viewport, whose direction is the
+   * root's, and with the user agent's `inset: 0` standing on both sides that
+   * direction decides which of the two survives. Under `<div dir="rtl">` in an
+   * English document the left one does, and a panel written from the
+   * inline-start edge still lands; under `<html dir="rtl">` it was put a
+   * window's width out, measured past the right edge of every window.
+   *
+   * No sheet for the panel beyond its size, so the user agent's inset and
+   * margin are what it is placed against, as they are for any consumer who
+   * styles nothing.
+   */
+  describe('popover on a right-to-left page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    const opened = async (
+      placement: string,
+      at: string,
+    ): Promise<{ panel: DOMRect; trigger: DOMRect; side: string | null }> => {
+      document.documentElement.dir = 'rtl'
+      const host = (await mount(
+        `<helix-headless-popover label="Details" placement="${placement}">
+          <button id="trigger" slot="trigger">Details</button>
+          <span>Body</span>
+        </helix-headless-popover>
+        <style>
+          #trigger { block-size: 2rem; inline-size: 8rem; inset-block-start: 4rem; position: fixed; ${at} }
+          helix-headless-popover::part(popover) { block-size: 4rem; box-sizing: border-box; inline-size: 12rem; padding: 0 }
+        </style>`,
+      )) as Popover
+      host.show()
+      await host.updateComplete
+      /* `computePosition` resolves after the update, and `autoUpdate` places
+         once as it starts: two frames cover both. */
+      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+      const panel = part(host, 'popover') as HTMLElement
+      return {
+        panel: panel.getBoundingClientRect(),
+        side: panel.getAttribute('data-placement'),
+        trigger: (host.querySelector('#trigger') as HTMLElement).getBoundingClientRect(),
+      }
+    }
+
+    /* `-start` is the trigger's start edge, which is its right here. Floating
+       UI resolves the alignment from the panel's own direction; what it hands
+       back is a distance from the left, and that is the edge it is added to. */
+    test('bottom-start lines the panel up with the trigger’s start edge, its right', async () => {
+      const { panel, side, trigger } = await opened('bottom-start', 'left: 20rem;')
+      expect(side).toBe('bottom-start')
+      expect(Math.round(panel.right)).toBe(Math.round(trigger.right))
+      expect(panel.top).toBeGreaterThanOrEqual(trigger.bottom)
+      expect(panel.left).toBeGreaterThanOrEqual(0)
+    })
+
+    /* A side is physical, as the name says, and the flip reads the same
+       measurements the placement does: with no room on the right of a trigger
+       at the window's right edge, it goes left, and inside the window. */
+    test('a side with no room flips to the other one, inside the window', async () => {
+      const { panel, side, trigger } = await opened('right', 'right: 1rem;')
+      expect(side).toBe('left')
+      expect(panel.right).toBeLessThanOrEqual(trigger.left)
+      expect(panel.left).toBeGreaterThanOrEqual(0)
+      expect(panel.right).toBeLessThanOrEqual(window.innerWidth)
     })
   })
 }
