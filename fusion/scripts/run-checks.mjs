@@ -119,8 +119,14 @@ for (const step of checks) {
  * in the workflow as well, the two disagree and `--list` run by hand describes a
  * different shard than CI runs. `--count` is what the workflow reads, so the
  * number leaves this file rather than being written twice.
+ *
+ * **Three, because these are off the critical path.** Measured on CI 15 Sep
+ * 2026, a shard of ten was 13 to 67 seconds of checks behind ten of setup, and
+ * all ten finished minutes before the browser jobs beside them: each was a
+ * billed minute buying no speed. Three still finish inside that shadow. The
+ * number to raise again is the day a shard becomes the longest job in a run.
  */
-const SHARDS = 10
+const SHARDS = 3
 
 if (process.argv.includes('--count')) {
   console.log(SHARDS)

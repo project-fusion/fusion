@@ -60,35 +60,99 @@ action, `.github/actions/setup`, which reads the bun version off
 `packageManager` so the runtime CI runs on is the one the lockfile was written
 by, and there is no second copy of that number to bump.
 
-## One build, before the many that would each do their own
+A browser job adds `.github/actions/browser`: the headless shell, cached under
+the Playwright version the lockfile holds, and the system packages it links
+against, which are not cached and include the fonts every baseline was taken
+with.
 
-Every check shard runs `build`, `analyze` and `catalog` as prerequisites and
-every browser job runs `build`, so with a warm remote cache they all cost a
-restore. The gap the `warm` job fills is that the cache is warm *across* runs and
-cold *within* one: every job starts at the same second on a commit that
-invalidates the build, none can restore what none has written yet, and all of
-them pay for it. A cold build is about 52 seconds.
+## One build, before the jobs that would each do their own
 
-**Only `checks` and `browser` wait on it**, which is the whole of the trade.
-`lint` reads files and builds nothing. `types` and `tests` do pay a cold build,
-and at 1m19s and 2m14s they are inside the budget already, so gating them would
-buy a faster job nobody is waiting on and cost every run the stage. `tests` is
-also the one job that installs Rust, and it installs the floor `Cargo.toml`
-declares rather than stable, so `rust-version` is a number something compiles
-against rather than a promise.
+Every job that reads built output restores it, and with a warm remote cache
+that is seconds. The gap the two warm jobs fill is that the cache is warm
+*across* runs and cold *within* one: every job starts at the same second on a
+commit that invalidates the build, none can restore what none has written yet,
+and all of them pay for it.
 
-**It costs a stage the wall clock did not have**, about 40 seconds on a run that
-restores and 85 on one that does not. The ceiling on any single job comes down
-and the floor under every run goes up, which is the right way round when a job
-that overruns is the thing being fixed.
+**Two warm jobs, because the browser jobs want a fraction of the build.** They
+render from the frame and the spec bundles, which wait for the components and
+not for the docs, so `warm-browser` builds those and finishes while `warm` is
+still measuring bundle sizes for `metrics` and running `next build`. Both build
+the components, side by side, which is a minute of compute bought for the same
+minute off every browser job.
+
+**Everything else waits on `warm`**, `floors`, `packaging`, `types` and both
+test jobs included. They each built their own before, beside it: 139 seconds in
+`floors` and 214 in `packaging`, measured 15 Sep 2026, to make what `warm` was
+making at the same time. `lint` reads files and builds nothing, so it alone
+starts at once.
+
+**A second turbo command in a job restores what the first built**, and that is
+what `turbo.json` has to keep true. Turbo hashes the tree as it stands when a
+run starts, so a clean checkout hashes no generated file and every run after
+the first hashes them all: a task whose `inputs` reach one has two keys for one
+source, and a restore in one job is a rebuild in the next command. `analyze`
+reached three kinds and rebuilt fourteen tasks in 81 seconds, in every job that
+ran a second command. No generated file is an input of a task another task
+depends on; what the file says is carried by the hash of the task that wrote it.
+
+**A judge's graph is built a second time, by `warm-check`.** Turbo hashes a
+pass-through argument into every task of a run, so `turbo run docs -- --check`
+wants every package's `build` under a key with `--check` in it, and misses
+all of them after a plain build. `docs`, `routes` and `themed-page` reach the
+whole workspace; `warm-check` runs them beside `warm`, so the shards and
+`floors` restore that graph as well rather than each rebuilding it.
+
+`tests` is the JavaScript specs and `rust` is everything that compiles Rust, the
+toolchain installed once, the floor `Cargo.toml` declares rather than stable, so
+`rust-version` is a number something compiles against rather than a promise.
+
+## How many browser jobs
+
+`fusion/scripts/plan-browser.mjs` decides, in `plan`, and the matrix is what it
+prints. Each check is split into as many shards as its share of the corpus needs
+to finish in about seventy seconds, measured per example on a runner. Parity and
+hydration are scoped to what a change reaches, so a change to one family plans a
+job apiece and a change to `helix/core` plans the whole corpus; contrast, visual,
+smoke and the specs read every example whatever changed.
+
+**The planner decides how many and the check decides which.** Each check splits
+its own corpus with `@fusion.dev/scripts/shard`: by family, deterministic,
+balanced by what each family renders. So the shards of a check are its whole
+corpus whatever the count, and a wrong estimate costs time and never coverage.
+A shard with nothing to do passes in seconds and says whose work it left to the
+others.
+
+**Seventy seconds because of how a runner is billed**, which is per job and
+rounded up to the minute. A job is its setup and its share, and seventy leaves
+a setup of fifty seconds inside two minutes, where ninety would bill every job
+three.
+
+## A tree is verified once
+
+A pull request's run verifies the merge of its head into its base. Merged by
+rebasing a branch that was up to date, `main` receives a new commit holding that
+same tree, and running every job again on it would verify the same files twice.
+
+So `plan` records the tree it checked out as the name of an artifact, and on a
+push to `main` the first job, `proven`, looks that name up. A successful
+`verify` run on a pull request that recorded this tree skips every other job,
+and the gate passes. Anything else, a tree nobody verified, a run that failed or
+is still going, a lookup that errored, runs the whole workflow as before. The
+tree and not the head, because a head behind its base was verified merged with
+a base it no longer matches.
+
+`release.yml` does not wait on `verify`, and nothing reads its jobs, so a
+skipped run takes nothing from it. What a skipped run would have left behind is
+the caches a pull request cannot share, which `seed` writes on `main` when they
+are missing.
 
 ## One context to require
 
 **The job names are not stable enough to require directly.** A branch protection
 rule matches a job name, and this workflow's are `checks (0)` through
-`checks (9)` and `browser (smoke, bun run smoke:examples)`: the shard count is an
-argument and the matrix label carries the command, so renaming a script or
-changing the count silently un-requires whatever was named. One aggregating job
+`checks (2)` and `browser (parity 3/9)`: the shard counts are arguments and a
+browser job's name carries its count, which `plan` changes with every diff, so
+changing either silently un-requires whatever was named. One aggregating job
 means the rule keeps holding, and a job added to `needs` is covered without
 anyone touching the branch settings.
 
