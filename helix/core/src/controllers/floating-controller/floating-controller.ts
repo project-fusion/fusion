@@ -243,7 +243,45 @@ export class FloatingController implements ReactiveController {
         : this.options.placement
     const middleware: Middleware[] = [offset(gap ?? 0)]
     if (this.options.flip !== false) {
-      middleware.push(flip())
+      const side = (preferred ?? 'bottom-start').split('-')[0]
+      /* **A panel beside its anchor may leave for the axis across, and one
+         above or below may not.** The asymmetry is the one `size` makes further
+         down: it writes a block size and no inline one, so a panel on the block
+         axis that has no room above or below shrinks into what there is and
+         scrolls, which is how every list here copes. Nothing narrows a panel
+         beside its anchor, so with neither side free it ran off the window:
+         the tour's first stop, `right-start` against a rail as wide as a
+         phone, tried `left-start`, found no room there either, and was drawn
+         there anyway, measured at 390 wholly past the left edge. Leaving the
+         block axis alone is also what keeps every menu, list and picker where
+         it was.
+
+         **`'end'`, so below first and above second.** For a side placement the
+         axis across is the block axis, and below is where every surface here
+         opens when nothing says otherwise, where the page goes on, and where
+         the panel covers nothing the reader has already read. The block axis
+         does not turn with the writing direction, so neither does this; the
+         alignment does, and Floating UI resolves it: `right-start` in
+         right-to-left text falls back to `bottom-start` on the anchor's right
+         edge, which is its start.
+
+         **`crossAxis: 'alignment'`, or the side is given up too readily.** By
+         default an overflow along the side counts as not fitting as well, so
+         a panel centered beside a target near the bottom of the window, which
+         runs out below on the right and on the left alike, would jump above
+         the target where `shift` would have slid it up and kept it beside.
+         Measured against Floating UI with `right` 30px from the bottom of the
+         window: above without this, beside with it. This way the axis is left
+         only when every placement on it runs out of room on its main side,
+         and choosing between `-start` and `-end` on one side reads the cross
+         axis as it always did. */
+      middleware.push(
+        flip(
+          side === 'left' || side === 'right'
+            ? { crossAxis: 'alignment', fallbackAxisSideDirection: 'end' }
+            : {},
+        ),
+      )
     }
     if (this.options.shift !== false) {
       const inside = this.options.within?.()
