@@ -128,8 +128,11 @@ const isTwelveHour = (locale?: string): boolean =>
  * @csspart list-search - The region holding the field that narrows the list.
  * @csspart list-search-field - The field itself.
  * @csspart option - One time in it. Carries `data-between` inside a range.
+ * @csspart option-between - A time inside a chosen range, short of either end, beside `option`.
  * @csspart option-description - The caption under the words, when there is one.
  * @csspart option-item - The row.
+ * @csspart option-item-active - The row the keyboard is on.
+ * @csspart option-item-selected - The row of a chosen time: the one time, or either end of a range.
  * @csspart option-label - The words.
  * @csspart option-text - The words and the caption, as one column.
  */
@@ -647,8 +650,13 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     >
       ${values.map(
         (one) =>
-          html`<${this.tag('option')} part="option"
-          exportparts="description: option-description, item: option-item, label: option-label, text: option-text" value=${one} ?disabled=${barred(one)}
+          html`<${this.tag('option')}
+            part="option"
+            exportparts="description: option-description, item: option-item,
+              item-active: option-item-active, item-selected: option-item-selected,
+              label: option-label, text: option-text"
+            value=${one}
+            ?disabled=${barred(one)}
             >${written(one)}</${this.tag('option')}
           >`,
       )}
@@ -725,12 +733,15 @@ export class HelixHeadlessTimePicker extends MixinControllerValue(HelixFormEleme
     >
       ${this.times.map((minutes) => {
         const at = fromMinutes(minutes)
+        const between = this.between(at)
         return html`<${this.tag('option')}
-          part="option"
-      exportparts="description: option-description, item: option-item, label: option-label, text: option-text"
+          part="option${between ? ' option-between' : ''}"
+          exportparts="description: option-description, item: option-item,
+            item-active: option-item-active, item-selected: option-item-selected,
+            label: option-label, text: option-text"
           value=${at}
           ?disabled=${this.barred(at)}
-          data-between=${this.between(at) ? '' : nothing}
+          data-between=${between ? '' : nothing}
           >${writeTime(at, this.locale)}</${this.tag('option')}
         >`
       })}

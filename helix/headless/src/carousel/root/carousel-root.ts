@@ -41,6 +41,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart controls - The row of controls.
  * @csspart indicator - One of them, and a way to reach that slide.
+ * @csspart indicator-current - The one for the slide showing, beside `indicator`.
  * @csspart indicators - The row of controls saying where the reader is.
  * @csspart next - The control that moves to the next slide.
  * @csspart next-mark - The glyph on the next control.
@@ -263,7 +264,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     event.preventDefault()
     this.goTo(this.index + step)
     this.updateComplete.then(() => {
-      this.renderRoot.querySelector<HTMLElement>('[part="indicator"][data-current]')?.focus()
+      this.renderRoot.querySelector<HTMLElement>('[part~="indicator-current"]')?.focus()
     })
   }
 
@@ -808,18 +809,19 @@ export class HelixHeadlessCarousel extends HelixElement {
                  * being selected. */
                 ''
               }
-              ${Array.from({ length: this.positions }).map(
-                (_place, at) => html`<button
-                  part="indicator"
+              ${Array.from({ length: this.positions }).map((_place, at) => {
+                const current = at === (this.showing ?? this.index)
+                return html`<button
+                  part="indicator${current ? ' indicator-current' : ''}"
                   type="button"
                   aria-label=${`Slide ${at + 1}`}
                   aria-current=${at === this.index ? 'true' : nothing}
                   tabindex=${at === this.index ? '0' : '-1'}
-                  ?data-current=${at === (this.showing ?? this.index)}
+                  ?data-current=${current}
                   @keydown=${this.handleIndicatorKeydown}
                   @click=${() => this.goTo(at)}
-                ></button>`,
-              )}
+                ></button>`
+              })}
             </div>`
           : nothing
       }`

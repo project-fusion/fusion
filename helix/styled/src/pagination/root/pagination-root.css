@@ -44,7 +44,7 @@
 [part="first"],
 [part="gap"],
 [part="last"],
-[part="page"],
+[part~="page"],
 [part="previous"],
 [part="next"] {
   align-items: center;
@@ -71,7 +71,7 @@
 [part="first"]:hover,
 [part="gap"]:hover,
 [part="last"]:hover,
-[part="page"]:hover,
+[part~="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
   background-color: var(--pagination-hover-color, var(--helix-color-surface-sunken));
@@ -81,7 +81,7 @@
 [part="first"]:focus-visible,
 [part="gap"]:focus-visible,
 [part="last"]:focus-visible,
-[part="page"]:focus-visible,
+[part~="page"]:focus-visible,
 [part="previous"]:focus-visible,
 [part="next"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
@@ -98,8 +98,8 @@
  * are on and the page under the pointer are the same chip. A shadow at this size
  * cannot carry a distinction that fine.
  */
-[part="page"][aria-current="page"],
-[part="page"][aria-current="page"]:hover {
+[part~="page"][aria-current="page"],
+[part~="page"][aria-current="page"]:hover {
   background-color: var(--pagination-current-color, var(--helix-color-surface-raised));
   border-color: var(--helix-color-border);
   color: var(--helix-color-foreground);

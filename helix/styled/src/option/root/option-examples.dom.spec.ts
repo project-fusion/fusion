@@ -15,7 +15,7 @@ const run = hasLayout() ? test : (): void => {}
 
 /* An option answers a press on its own row, inside its shadow root. */
 const choose = (option: Element | null | undefined): void => {
-  ;(option?.shadowRoot?.querySelector('[part="item"]') as HTMLElement | null)?.click()
+  ;(option?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement | null)?.click()
 }
 
 describe('the events example', () => {

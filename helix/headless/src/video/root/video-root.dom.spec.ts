@@ -301,6 +301,19 @@ describe('video', () => {
     expect(part(host, 'remote')).toBeNull()
   })
 
+  test('connected, the remote control says so in a part name as well as aloud', async () => {
+    const host = (await player(
+      '<helix-headless-video extra-controls="remote" label="A clip" src="/clip.mp4"></helix-headless-video>',
+    )) as Player & { remoteAvailable: boolean; remoteConnected: boolean }
+    host.remoteAvailable = true
+    await host.updateComplete
+    expect(part(host, 'remote')?.getAttribute('part')).toBe('remote')
+    host.remoteConnected = true
+    await host.updateComplete
+    expect(part(host, 'remote')?.getAttribute('part')).toBe('remote remote-pressed')
+    expect(part(host, 'remote')?.getAttribute('aria-pressed')).toBe('true')
+  })
+
   test('the page"s media session goes to whichever player was started last', async () => {
     /* There is one session per page and it decides where a headset's buttons
        land, so two players cannot both hold it. Render order is the wrong rule:

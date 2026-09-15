@@ -15,7 +15,7 @@ describe('the preview example', () => {
     await example(preview)
     await idle()
     const host = document.querySelector('helix-headless-object-inspector') as HTMLElement
-    const rows = [...(host.shadowRoot?.querySelectorAll('[part="row"]') ?? [])]
+    const rows = [...(host.shadowRoot?.querySelectorAll('[part~="row"]') ?? [])]
     expect(rows[0]?.getAttribute('aria-expanded')).toBe('true')
     expect(rows.some((row) => row.textContent?.includes('Ada Okonjo'))).toBe(true)
   })

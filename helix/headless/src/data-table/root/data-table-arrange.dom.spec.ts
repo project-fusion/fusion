@@ -52,14 +52,14 @@ const shadow = (element: HTMLElement, selector: string): HTMLElement[] => [
   ...(element.shadowRoot?.querySelectorAll<HTMLElement>(selector) ?? []),
 ]
 const cells = (element: HTMLElement): string[] =>
-  shadow(element, '[part="cell"]').map((cell) => cell.textContent?.trim() ?? '')
+  shadow(element, '[part~="cell"]').map((cell) => cell.textContent?.trim() ?? '')
 const boxes = (element: HTMLElement): Box[] => shadow(element, '[part="checkbox"]') as Box[]
 
 describe('selection', () => {
   test('puts a checkbox before every row and one in the heading', async () => {
     const element = await table('selectable row-key="id"')
     expect(shadow(element, '[part="select-all"] [part="checkbox"]')).toHaveLength(1)
-    expect(shadow(element, '[part="select"] [part="checkbox"]')).toHaveLength(4)
+    expect(shadow(element, '[part~="select"] [part="checkbox"]')).toHaveLength(4)
   })
 
   test('selects by key, so the choice follows the row through a sort', async () => {
@@ -76,7 +76,7 @@ describe('selection', () => {
     await element.updateComplete
     const rows = shadow(element, '[part="row"]')
     const chosen = rows.filter((row) => row.getAttribute('aria-selected') === 'true')
-    expect(chosen.map((row) => row.querySelector('[part="cell"]')?.textContent?.trim())).toEqual([
+    expect(chosen.map((row) => row.querySelector('[part~="cell"]')?.textContent?.trim())).toEqual([
       'delta',
     ])
   })
@@ -112,6 +112,29 @@ describe('selection', () => {
     expect(internals.ariaMultiSelectable).toBe('true')
     expect(shadow(element, '[part="row"]').map((row) => row.getAttribute('aria-selected'))).toEqual(
       ['false', 'false', 'false', 'true'],
+    )
+  })
+
+  test('and paints it by part name, on the cells, since the row takes no box', async () => {
+    const element = await table('selectable row-key="id" default-selected="b"')
+    expect(
+      shadow(element, '[part~="cell-selected"]').map((cell) => cell.textContent?.trim()),
+    ).toEqual(['bravo', '4'])
+    expect(shadow(element, '[part~="select-selected"]')).toHaveLength(1)
+    element.selected = ''
+    await element.updateComplete
+    expect(shadow(element, '[part~="cell-selected"]')).toHaveLength(0)
+  })
+
+  test('a checked box’s mark says so in a part name, which the table forwards', async () => {
+    const element = await table('selectable row-key="id" default-selected="a,c"')
+    const mark = (box?: Box): string =>
+      box?.shadowRoot?.querySelector('[part~="mark"]')?.getAttribute('part') ?? ''
+    expect(mark(boxes(element)[0])).toBe('mark mark-indeterminate')
+    expect(mark(boxes(element)[2])).toBe('mark mark-checked')
+    expect(mark(boxes(element)[1])).toBe('mark')
+    expect(boxes(element)[0]?.getAttribute('exportparts')).toContain(
+      'mark-checked: checkbox-mark-checked',
     )
   })
 

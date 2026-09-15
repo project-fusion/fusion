@@ -503,7 +503,7 @@
 /* Connected reads as on, the way the mute and fullscreen toggles do: the mark
    goes to full ink so a reader can see at a glance that the picture is
    somewhere else. */
-[part="remote"][aria-pressed="true"] {
+[part~="remote"][aria-pressed="true"] {
   color: var(--helix-color-primary);
 }
 

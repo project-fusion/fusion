@@ -37,7 +37,7 @@
    points overlap each keeps its own edge rather than merging into a blot. The
    fill stops short of opaque for the same reason: a cluster reads darker
    where it is denser, which is what a reader is looking at a scatter for. */
-[part="point"] {
+[part~="point"] {
   background-color: var(--chart-series);
   block-size: var(--scatter-chart-point-size, 8px);
   border-radius: var(--helix-radii-full);
@@ -58,7 +58,7 @@
 
 /* The row a pointer is asking about, which may be more than one point when the
    table has more than one series. */
-[part="point"][data-active] {
+[part~="point"][data-active] {
   opacity: 1;
   scale: 1.5;
 }
@@ -143,7 +143,7 @@
 }
 
 @starting-style {
-  [part="point"] {
+  [part~="point"] {
     opacity: 0;
   }
 }

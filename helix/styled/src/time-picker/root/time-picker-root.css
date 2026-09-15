@@ -18,7 +18,7 @@
 }
 
 /* The two ends of a range are the answer, so they are filled rather than washed. */
-:host([mode="range"]) [part="option"]:state(selected)::part(item) {
+:host([mode="range"]) [part~="option"]:state(selected)::part(item) {
   /* *The inverse pair, and never `foreground-muted` carrying
      `foreground-on-accent`.** That pairing measures 6.01 in light and 2.96:1 in
      dark, under AA: `foreground-muted` flips to a *light* gray there, and the
@@ -31,7 +31,7 @@
 
 /* The times inside a range, which are part of the answer without having been
    chosen. */
-[part="option"][data-between]::part(item) {
+[part~="option"][data-between]::part(item) {
   background-color: var(
     --time-picker-range-color,
     light-dark(
@@ -42,7 +42,7 @@
 }
 
 /* A dot where a terminus has its tick. */
-[part="option"][data-between]::part(item)::after {
+[part~="option"][data-between]::part(item)::after {
   content: "";
   background-color: currentColor;
   block-size: var(--helix-size-icon-tight);
@@ -90,22 +90,22 @@
   scrollbar-width: none;
 }
 
-[part="column"] [part="option"] {
+[part="column"] [part~="option"] {
   scroll-snap-align: center;
 }
 
 /* Centered, because a column of numbers read against its own edge is a list and
    read against its middle is a dial. */
-[part="column"] [part="option"]::part(item) {
+[part="column"] [part~="option"]::part(item) {
   justify-content: center;
 }
 
-[part="column"] [part="option"]::part(label) {
+[part="column"] [part~="option"]::part(label) {
   text-align: center;
 }
 
 /* Square, and roomy. */
-[part="column"] [part="option"]::part(item) {
+[part="column"] [part~="option"]::part(item) {
   min-block-size: var(--_time-row);
   min-inline-size: var(--_time-row);
   /* No block padding, which Option gives every row so that a slotted avatar has
@@ -116,11 +116,11 @@
 }
 
 /* A wheel row is a calendar day, and for the same reason it is one there. */
-[part="column"] [part="option"]::part(item) {
+[part="column"] [part~="option"]::part(item) {
   background-color: transparent;
 }
 
-[part="column"] [part="option"]::part(label) {
+[part="column"] [part~="option"]::part(label) {
   align-items: center;
   block-size: var(--_time-row);
   /* `sm`, not `full`, which the calendar's own note argues: a pill is a shape
@@ -134,8 +134,8 @@
 }
 
 /* Hover on the mark rather than the row, since the row no longer carries one. */
-[part="column"] [part="option"]:not([disabled]):hover::part(label),
-[part="column"] [part="option"][data-active]::part(label) {
+[part="column"] [part~="option"]:not([disabled]):hover::part(label),
+[part="column"] [part~="option"][data-active]::part(label) {
   background-color: var(--helix-color-surface-sunken);
 }
 
@@ -151,18 +151,18 @@
  *
  * `surface-inverse` is the ground that stays dark while the page goes light,
  * and `foreground-inverse` is the ink solved against it. */
-[part="column"] [part="option"]:state(selected)::part(label) {
+[part="column"] [part~="option"]:state(selected)::part(label) {
   background-color: var(--time-picker-selected-color, var(--helix-color-surface-inverse));
   color: var(--helix-color-foreground-inverse);
 }
 
 /* No tick. */
-[part="column"] [part="option"]::part(item)::after {
+[part="column"] [part~="option"]::part(item)::after {
   content: none;
 }
 /* Wrong, and the mark says so. */
-:host([invalid]) [part="option"]:state(selected)::part(item),
-:host([invalid]) [part="column"] [part="option"]:state(selected)::part(label) {
+:host([invalid]) [part~="option"]:state(selected)::part(item),
+:host([invalid]) [part="column"] [part~="option"]:state(selected)::part(label) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-danger);
   outline-offset: var(--helix-size-focus-offset);
 }

@@ -1149,6 +1149,38 @@ export class Card extends HTMLElement {{
     );
 }
 
+/// A state published as a second part name is read from the interpolation
+/// that writes it, `part="page${on ? ' page-current' : ''}"`, so documenting it
+/// is clean and a documented state nothing writes is still a finding.
+#[test]
+fn parts_through_a_state() {
+    let pager = |state: &str| {
+        format!(
+            "/**
+ * @csspart page - One page.
+ * @csspart page-{state} - The page you are on.
+ */
+export class Pager extends HTMLElement {{
+  render() {{
+    return html`<b part=\"page${{on ? ' page-current' : ''}}\"></b>`;
+  }}
+}}
+"
+        )
+    };
+    let tree = Tree::new("parts-through-a-state");
+    tree.write("helix.json", TIERS)
+        .write("src/pager/pager.ts", &pager("current"));
+    assert_clean("parts", &judge(&tree, "parts", "parts"));
+    tree.write("src/pager/pager.ts", &pager("chosen"));
+    assert_found(
+        "parts",
+        &judge(&tree, "parts", "parts"),
+        "Pager documents `@csspart page-chosen` and nothing in its render chain writes it",
+        "src/pager/pager.ts",
+    );
+}
+
 /// The one rule reading outside the tiers, and still in-tree: the DOM library
 /// is any `node_modules/@typescript/*/lib/lib.dom.d.ts`, so a fake one is
 /// written. The interface pattern wants a newline before `interface`, which

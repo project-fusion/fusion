@@ -38,6 +38,7 @@ import '../../table/index.js'
  * @slot toolbar - Above the grid, for a search field or actions.
  *
  * @csspart cell - One cell.
+ * @csspart cell-selected - A cell of a selected row, beside `cell`.
  * @csspart table - The grid.
  *
  * @cssproperty --data-table-block-size - How tall the scrolling box is while `windowed`.

@@ -42,7 +42,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::text::{line_of, uncommented};
+use crate::component::text::{flattened, line_of, uncommented};
 use crate::component::{sources, stylesheets, Context, Finding, Report};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -58,7 +58,7 @@ static PART: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"part="([a-z0-9 -]+)""#).expect("a literal pattern compiles"));
 
 static SELECTS: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"\[part="([a-z-]+)"\]"#).expect("a literal pattern compiles"));
+    LazyLock::new(|| Regex::new(r#"\[part~?="([a-z-]+)"\]"#).expect("a literal pattern compiles"));
 
 static HELPER: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"export const (draw[A-Z]\w*)").expect("a literal pattern compiles")
@@ -130,7 +130,7 @@ static MIXIN: LazyLock<Regex> = LazyLock::new(|| {
 
 static OWN_ROOT: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
-        r#"(?s)this\.(?:(?:renderRoot|shadowRoot)\??\s*\.\s*querySelector(?:All)?(?:<[^>(]*>)?\(\s*['"`]\[part=["']([a-z0-9-]+)["']\]|partNamed(?:<[^>(]*>)?\(\s*['"`]([a-z0-9-]+)['"`]\s*\))"#,
+        r#"(?s)this\.(?:(?:renderRoot|shadowRoot)\??\s*\.\s*querySelector(?:All)?(?:<[^>(]*>)?\(\s*['"`]\[part~?=["']([a-z0-9-]+)["']\]|partNamed(?:<[^>(]*>)?\(\s*['"`]([a-z0-9-]+)['"`]\s*\))"#,
     )
     .expect("a literal pattern compiles")
 });
@@ -230,7 +230,7 @@ fn survey(context: &Context) -> Survey {
             let Ok(raw) = fs::read_to_string(&file) else {
                 continue;
             };
-            let code = uncommented(&raw);
+            let code = flattened(&uncommented(&raw));
             if let Some(name) = HELPER.captures(&code) {
                 helpers.insert(name[1].to_owned(), written(&code));
             }
@@ -244,7 +244,7 @@ fn survey(context: &Context) -> Survey {
             let Ok(raw) = fs::read_to_string(&file) else {
                 continue;
             };
-            let text = uncommented(&raw);
+            let text = flattened(&uncommented(&raw));
             let where_ = context.relative(&file);
 
             /* Every name in the clause, not just the innermost: a control

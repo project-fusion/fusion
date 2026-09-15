@@ -254,9 +254,14 @@ export const hasState = (host: Element, name: string): boolean =>
     host as unknown as { internals?: { states?: { has(value: string): boolean } } }
   ).internals?.states?.has(name) ?? false
 
-/** Finds a shadow part by name. */
+/**
+ * Finds a shadow part by name.
+ *
+ * `~=`, because a part carrying a state carries a second name while it holds,
+ * `part="page page-current"`, and an exact match stops finding it then.
+ */
 export const part = (host: HTMLElement, name: string): Element | null =>
-  host.shadowRoot?.querySelector(`[part="${name}"]`) ?? null
+  host.shadowRoot?.querySelector(`[part~="${name}"]`) ?? null
 
 /** Elements the consumer assigned to a slot, by slot name. */
 export const slotted = (host: HTMLElement, name?: string): Element[] => {

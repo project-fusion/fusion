@@ -237,13 +237,19 @@ export class HelixElement extends LitElement {
    * a fifth site with none. Null on the server, which is what the rest of the
    * code already treats a part that has not rendered as.
    *
+   * **`~=` and not `=`.** A part drawn in a state carries a second name while
+   * the state holds, `part="page page-current"`, and an exact match stops
+   * finding it for exactly as long as it is the one that matters.
+   *
    * `helix component`'s `selectors` reads these calls the way it reads a
    * `querySelector('[part="x"]')`, so a name nothing renders is a finding
    * rather than a null an optional chain swallows.
    */
   protected partNamed<T extends Element = HTMLElement>(name: string): T | null {
     const root = this.renderRoot as { querySelector?: (selectors: string) => T | null } | undefined
-    return typeof root?.querySelector === 'function' ? root.querySelector(`[part="${name}"]`) : null
+    return typeof root?.querySelector === 'function'
+      ? root.querySelector(`[part~="${name}"]`)
+      : null
   }
 
   /**

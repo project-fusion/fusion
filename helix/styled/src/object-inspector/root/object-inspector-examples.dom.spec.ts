@@ -13,7 +13,7 @@ const run = hasLayout() ? test : (): void => {}
 
 const inspector = (): HTMLElement => document.querySelector('helix-object-inspector') as HTMLElement
 const rows = (): HTMLElement[] => [
-  ...(inspector().shadowRoot?.querySelectorAll<HTMLElement>('[part="row"]') ?? []),
+  ...(inspector().shadowRoot?.querySelectorAll<HTMLElement>('[part~="row"]') ?? []),
 ]
 const tree = (): HTMLElement =>
   inspector().shadowRoot?.querySelector('[part="tree"]') as HTMLElement

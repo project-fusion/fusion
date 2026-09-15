@@ -56,6 +56,7 @@ const HEIGHT = 100
  * @csspart baseline - The rule the columns stand on.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart group - One category's columns, together.
+ * @csspart group-active - The group the tooltip is about, beside `group`.
  * @csspart label - One category's name.
  * @csspart labels - The row of category names.
  * @csspart line - A series drawn as a line rather than as columns, under `lines`.
@@ -441,7 +442,10 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
                the rest. A tooltip over a chart of five categories otherwise
                makes a reader match its heading against the row of names to find
                out which columns it means. */
-            svg`<g data-active=${this.pointer.at === index ? '' : nothing} part="group">
+            svg`<g
+              data-active=${this.pointer.at === index ? '' : nothing}
+              part="group${this.pointer.at === index ? ' group-active' : ''}"
+            >
               ${columns.map(({ one, tone }, depth) => bar(one.points[index]?.value ?? 0, index, depth, tone, against(one)))}
             </g>`,
         )}

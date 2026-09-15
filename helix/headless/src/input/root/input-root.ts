@@ -56,6 +56,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart label - The question, over the field.
  * @csspart reveal - The button that shows and hides a password.
+ * @csspart reveal-pressed - The reveal button while the password shows, beside `reveal`.
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -438,7 +439,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
       ${
         this.reveal && this.type === 'password'
           ? html`<button
-              part="reveal"
+              part="reveal${this.revealed ? ' reveal-pressed' : ''}"
               type="button"
               aria-label=${this.revealLabel}
               aria-pressed=${this.revealed ? 'true' : 'false'}

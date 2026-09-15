@@ -141,7 +141,7 @@ const FIXTURES = [
     name: 'checkbox-group',
   },
   {
-    check: `const rows = host.shadowRoot.querySelectorAll('[part="row"]').length
+    check: `const rows = host.shadowRoot.querySelectorAll('[part~="row"]').length
       return rows > 0 ? null : 'draws no rows'`,
     markup:
       '<helix-object-inspector for="dsd-object" label="Payload"></helix-object-inspector><script type="application/json" id="dsd-object">{"id":42,"tags":["a","b"]}</script>',

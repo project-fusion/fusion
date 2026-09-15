@@ -120,6 +120,7 @@ const fill = (
  * @csspart mark - The glyph on a first, previous, next or last control, where none is slotted.
  * @csspart next - The control that moves forward one page.
  * @csspart page - The control for one page.
+ * @csspart page-current - The page you are on, beside `page`.
  * @csspart previous - The control that moves back one page.
  * @csspart status - The reading of where you are, in `compact`.
  */
@@ -496,6 +497,8 @@ export class HelixHeadlessPagination extends HelixElement {
    * `aria-current="page"` is what says which one you are on, and it stays a
    * control rather than becoming text: a reader who tabs into the run and finds
    * the current page missing from it has lost the only landmark in the row.
+   * `page-current` says the same to a stylesheet, which the attribute cannot:
+   * nothing can follow `::part()` to read it.
    */
   private renderPage(page: number): TemplateResult {
     const current = page === this.current
@@ -505,7 +508,7 @@ export class HelixHeadlessPagination extends HelixElement {
       ${
         this.href
           ? html`<a
-              part="page"
+              part="page${current ? ' page-current' : ''}"
               href=${fill(this.href, page, this.count)}
               aria-current=${current ? 'page' : nothing}
               aria-label=${name}
@@ -513,7 +516,7 @@ export class HelixHeadlessPagination extends HelixElement {
               >${shown}</a
             >`
           : html`<button
-              part="page"
+              part="page${current ? ' page-current' : ''}"
               type="button"
               aria-current=${current ? 'page' : nothing}
               aria-label=${name}

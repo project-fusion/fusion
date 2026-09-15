@@ -92,8 +92,11 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart picker-list-search - The region holding the field that narrows the list.
  * @csspart picker-list-search-field - The field itself.
  * @csspart picker-option - One time in it. Carries `data-between` inside a range.
+ * @csspart picker-option-between - A time inside a chosen range, short of either end, beside `picker-option`.
  * @csspart picker-option-description - The caption under the words, when there is one.
  * @csspart picker-option-item - The row.
+ * @csspart picker-option-item-active - The row the keyboard is on.
+ * @csspart picker-option-item-selected - The row of a chosen time: the one time, or either end of a range.
  * @csspart picker-option-label - The words.
  * @csspart picker-option-text - The words and the caption, as one column.
  * @csspart rest - How many times are held beyond the ones shown. A `<button>` with `expandable`, a `<span>` without it.
@@ -398,6 +401,8 @@ export class HelixHeadlessTimeInput extends MixinPickerEditing(
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
         list-loading: picker-list-loading, list-search: picker-list-search,
         list-search-field: picker-list-search-field, option: picker-option,
+        option-between: picker-option-between, option-item-active: picker-option-item-active,
+        option-item-selected: picker-option-item-selected,
         option-description: picker-option-description, option-item: picker-option-item,
         option-label: picker-option-label, option-text: picker-option-text"
       ?invalid=${this.resolvedFeedback !== ''}

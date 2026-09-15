@@ -22,6 +22,19 @@ const entry = async (attributes = 'value="a"', inner = 'His Girl Friday'): Promi
  * asks the entry.
  */
 describe('one playlist entry', () => {
+  test('the row of the entry playing is a part of its own, and only while it plays', async () => {
+    /* `current` is a property and reaches no attribute, so without the second
+       name a stylesheet outside has nothing to draw the one playing by. */
+    const one = await entry()
+    expect(part(one, 'item')?.getAttribute('part')).toBe('item')
+    one.current = true
+    await one.updateComplete
+    expect(part(one, 'item')?.getAttribute('part')).toBe('item item-current')
+    one.current = false
+    await one.updateComplete
+    expect(part(one, 'item')?.getAttribute('part')).toBe('item')
+  })
+
   /* `textContent` takes the whole subtree, so a row with a duration beside it
      reads "His Girl Friday0:06", and that string goes to the player and on to
      the lock screen. Only the unslotted nodes are the name; anything named is a

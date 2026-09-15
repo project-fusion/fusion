@@ -48,3 +48,133 @@ fn spaces(found: &regex::Captures) -> String {
         .map(|one| if one == '\n' { '\n' } else { ' ' })
         .collect()
 }
+
+/// Every `part="…"` whose value interpolates, rewritten as the names it can
+/// take, at the same length. For a module, after [`uncommented`].
+///
+/// **A state is published as a second part name, written only while it
+/// holds**: `part="page${current ? ' page-current' : ''}"`. The names are still
+/// literals in the source, which is the property every part rule depends on,
+/// and this is what lets a rule read them as literals: the static words and
+/// every quoted word inside an interpolation, `part="page page-current"`. So a
+/// quoted word in that interpolation is a part name and nothing else may be
+/// quoted there. The rest of the value becomes spaces, newlines kept, so an
+/// offset still names its line.
+///
+/// **A `[part="${…}"]` is a selector string, not a render**, and is left as it
+/// is: the rules that read renders already refuse a leading bracket.
+pub fn flattened(code: &str) -> String {
+    const OPEN: &str = "part=\"";
+    let bytes = code.as_bytes();
+    let mut out = String::with_capacity(code.len());
+    let mut from = 0;
+    let mut search = 0;
+    while let Some(found) = code[search..].find(OPEN) {
+        let start = search + found;
+        let value = start + OPEN.len();
+        search = value;
+        if code[..start].ends_with('[') {
+            continue;
+        }
+        let Some((close, names)) = interpolated(bytes, value) else {
+            continue;
+        };
+        let written = names.join(" ");
+        let replaced = &code[value..=close];
+        let newlines = replaced.matches('\n').count();
+        out.push_str(&code[from..value]);
+        out.push_str(&written);
+        out.push('"');
+        out.extend(std::iter::repeat_n(
+            ' ',
+            replaced.len() - written.len() - 1 - newlines,
+        ));
+        out.extend(std::iter::repeat_n('\n', newlines));
+        from = close + 1;
+        search = from;
+    }
+    out.push_str(&code[from..]);
+    out
+}
+
+/// Where an attribute value beginning at `from` closes, and the names it can
+/// take, if it interpolates. `None` for a plain value, which needs nothing.
+fn interpolated(bytes: &[u8], from: usize) -> Option<(usize, Vec<String>)> {
+    let mut names = Vec::new();
+    let mut run = Vec::new();
+    let mut depth = 0usize;
+    let mut quote = 0u8;
+    let mut interpolates = false;
+    let mut at = from;
+    loop {
+        let character = *bytes.get(at)?;
+        if depth == 0 {
+            match character {
+                b'"' => break,
+                b'$' if bytes.get(at + 1) == Some(&b'{') => {
+                    words(&run, &mut names);
+                    run.clear();
+                    interpolates = true;
+                    depth = 1;
+                    at += 1;
+                }
+                b'>' | b'`' => return None,
+                _ => run.push(character),
+            }
+        } else if quote != 0 {
+            if character == quote {
+                quote = 0;
+                words(&run, &mut names);
+                run.clear();
+            } else {
+                run.push(character);
+            }
+        } else {
+            match character {
+                b'\'' | b'"' => quote = character,
+                b'{' => depth += 1,
+                b'}' => depth -= 1,
+                _ => {}
+            }
+        }
+        at += 1;
+    }
+    if !interpolates {
+        return None;
+    }
+    words(&run, &mut names);
+    Some((at, names))
+}
+
+/// The part-shaped words in a run of text, appended in order.
+fn words(text: &[u8], names: &mut Vec<String>) {
+    for word in String::from_utf8_lossy(text).split_whitespace() {
+        if word
+            .bytes()
+            .all(|one| one.is_ascii_lowercase() || one.is_ascii_digit() || one == b'-')
+        {
+            names.push(word.to_owned());
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::flattened;
+
+    #[test]
+    fn a_state_part_reads_as_both_names_at_the_same_length() {
+        let code = "<b part=\"page${on ? ' page-current' : ''}\"\n  type=\"button\">";
+        let flat = flattened(code);
+        assert_eq!(flat.len(), code.len());
+        assert!(flat.starts_with("<b part=\"page page-current\""));
+        assert_eq!(flat.matches('\n').count(), 1);
+        assert!(flat.ends_with("  type=\"button\">"));
+    }
+
+    #[test]
+    fn a_plain_value_and_a_selector_are_left_alone() {
+        let code = "<b part=\"page\"></b> find(`[part=\"${name}\"]`)";
+        assert_eq!(flattened(code), code);
+    }
+}

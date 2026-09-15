@@ -93,4 +93,6 @@ export const hasPart = (markup: string, name: string): boolean => partTag(markup
  * from what the consumer wrote on the host.
  */
 export const partTag = (markup: string, name: string): string =>
-  new RegExp(`<[a-z-]+\\s[^>]*part="${name}"[^>]*>`).exec(withoutStyles(markup))?.[0] ?? ''
+  new RegExp(`<[a-z-]+\\s[^>]*part="(?:[^"]* )?${name}(?: [^"]*)?"[^>]*>`).exec(
+    withoutStyles(markup),
+  )?.[0] ?? ''

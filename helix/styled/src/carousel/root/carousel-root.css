@@ -298,7 +298,7 @@
    mark.** The pill is three times a dot's width, so a mark that does not take
    room in the row has to sit over its neighbors and the pitch has to go from 12
    to 20 to make space for it, at which point the run stops being a run. */
-[part="indicator"] {
+[part~="indicator"] {
   /* **One duration and one curve for both, which is the whole of the fix.** Color
      over `fast` and size over `normal` is 120ms against 200ms, so the two halves
      of one change finish 80ms apart: the arriving dot fully blue while four
@@ -321,31 +321,31 @@
 
 /* The current one lengthens rather than only changing color, so the set reads at
    a glance and still reads without color. */
-[part="indicator"][data-current] {
+[part~="indicator"][data-current] {
   background-color: var(--helix-color-primary);
   inline-size: var(--helix-space-lg);
 }
 
 /* The current dot stretches along the run, whichever way the run goes. */
-:host([indicator-placement="inline-start"]) [part="indicator"],
-:host([indicator-placement="inline-end"]) [part="indicator"] {
+:host([indicator-placement="inline-start"]) [part~="indicator"],
+:host([indicator-placement="inline-end"]) [part~="indicator"] {
   transition:
     background-color var(--_carousel-indicator-motion),
     block-size var(--_carousel-indicator-motion);
 }
 
-:host([indicator-placement="inline-start"]) [part="indicator"][data-current],
-:host([indicator-placement="inline-end"]) [part="indicator"][data-current] {
+:host([indicator-placement="inline-start"]) [part~="indicator"][data-current],
+:host([indicator-placement="inline-end"]) [part~="indicator"][data-current] {
   block-size: var(--helix-space-lg);
   inline-size: var(--helix-space-xs);
 }
 
 /* Neutral, not brand. */
-[part="indicator"]:hover {
+[part~="indicator"]:hover {
   background-color: var(--helix-color-foreground-muted);
 }
 
-[part="indicator"]:focus-visible {
+[part~="indicator"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
@@ -449,13 +449,13 @@
 }
 
 /* The current dot stretches along the run, and the run now goes down. */
-:host([orientation="vertical"]:not([indicator-placement])) [part="indicator"] {
+:host([orientation="vertical"]:not([indicator-placement])) [part~="indicator"] {
   transition:
     background-color var(--_carousel-indicator-motion),
     block-size var(--_carousel-indicator-motion);
 }
 
-:host([orientation="vertical"]:not([indicator-placement])) [part="indicator"][data-current] {
+:host([orientation="vertical"]:not([indicator-placement])) [part~="indicator"][data-current] {
   block-size: var(--helix-space-lg);
   inline-size: var(--helix-space-xs);
 }

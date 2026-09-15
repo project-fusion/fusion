@@ -27,7 +27,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::text::uncommented;
+use crate::component::text::{flattened, uncommented};
 use crate::component::{sources, Context, Finding, Report};
 
 /// The registered words, each with the one question it answers.
@@ -69,7 +69,7 @@ pub fn run(context: &Context) -> Report {
             let Ok(raw) = fs::read_to_string(&file) else {
                 continue;
             };
-            let code = uncommented(&raw);
+            let code = flattened(&uncommented(&raw));
             let where_ = context.relative(&file);
 
             for found in PART.captures_iter(&code) {

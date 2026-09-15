@@ -28,6 +28,11 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  *
  * @csspart groove - The unfilled circle, in `ring` and `arc`.
  * @csspart indicator - The part of it the value fills.
+ * @csspart indicator-fair - The fill while the reading is in a band beside the good one, beside `indicator`.
+ * @csspart indicator-good - The fill while the reading is in the good band, beside `indicator`.
+ * @csspart indicator-over - The fill while the value is past the top, beside `indicator`.
+ * @csspart indicator-poor - The fill while the reading is two bands from the good one, beside `indicator`.
+ * @csspart indicator-under - The fill while the value is below the floor, beside `indicator`.
  * @csspart tick - A mark at `low` or at `high`.
  * @csspart track - The whole range, or the drawing in `ring` and `arc`.
  * @csspart value - The reading, under `show-value`.
@@ -62,8 +67,10 @@ export class HelixHeadlessMeter extends HelixElement {
    * again is a worse API than letting them say it.
    *
    * Not reflected. Nothing selects on it: the band reaches the stylesheet as
-   * `data-band` on the fill, because that is the element being colored, so
-   * reflecting here would write an attribute onto the host for no reader.
+   * `data-band` on the fill, because that is the element being colored, and a
+   * stylesheet outside as `indicator-good`, `-fair` or `-poor` among the fill's
+   * part names, so reflecting here would write an attribute onto the host for
+   * no reader.
    */
   @property()
   band?: MeterBand
@@ -195,8 +202,9 @@ export class HelixHeadlessMeter extends HelixElement {
    * "you are over" is worse than no meter for the one case anybody checks it in.
    *
    * The bar still stops at its end, because that is what an end is. The words
-   * and the accessible reading carry the truth, and `data-beyond` is on the fill
-   * so a consumer can say more about it.
+   * and the accessible reading carry the truth, and the fill carries
+   * `indicator-over` or `indicator-under` among its part names so a consumer can
+   * say more about it.
    */
   private get ratio(): number {
     const { max, min } = this.span
@@ -296,6 +304,8 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   private renderRound(): TemplateResult {
     const bounds = this.thresholds
+    const band = this.computedBand
+    const beyond = this.beyond
     const { max, min } = this.span
     const sweep = this.shape === 'arc' ? 75 : 100
     const along = (value: number): number => ((value - min) / (max - min)) * sweep
@@ -320,10 +330,10 @@ export class HelixHeadlessMeter extends HelixElement {
           : nothing
       }
       <circle
-        part="indicator"
+        part="indicator${band ? { fair: ' indicator-fair', good: ' indicator-good', poor: ' indicator-poor' }[band] : ''}${beyond ? { over: ' indicator-over', under: ' indicator-under' }[beyond] : ''}"
         pathLength="100"
-        data-band=${this.computedBand ?? nothing}
-        data-beyond=${this.beyond ?? nothing}
+        data-band=${band ?? nothing}
+        data-beyond=${beyond ?? nothing}
         style="--meter-along: ${this.fraction * sweep}"
       />
     </svg>`
@@ -331,6 +341,8 @@ export class HelixHeadlessMeter extends HelixElement {
 
   protected override render(): TemplateResult {
     const bounds = this.thresholds
+    const band = this.computedBand
+    const beyond = this.beyond
     const { max, min } = this.span
     const at = (value: number): string => `${((value - min) / (max - min)) * 100}%`
     return html`${
@@ -344,9 +356,9 @@ export class HelixHeadlessMeter extends HelixElement {
                 : nothing
             }
             <div
-              part="indicator"
-              data-band=${this.computedBand ?? nothing}
-              data-beyond=${this.beyond ?? nothing}
+              part="indicator${band ? { fair: ' indicator-fair', good: ' indicator-good', poor: ' indicator-poor' }[band] : ''}${beyond ? { over: ' indicator-over', under: ' indicator-under' }[beyond] : ''}"
+              data-band=${band ?? nothing}
+              data-beyond=${beyond ?? nothing}
               style="--meter-fraction: ${this.fraction}"
             ></div>
           </div>`

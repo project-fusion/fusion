@@ -41,13 +41,29 @@ const chart = async (table: string, attributes = ''): Promise<Chart> => {
 }
 
 const all = (host: HTMLElement, name: string): HTMLElement[] => [
-  ...(host.shadowRoot?.querySelectorAll<HTMLElement>(`[part="${name}"]`) ?? []),
+  ...(host.shadowRoot?.querySelectorAll<HTMLElement>(`[part~="${name}"]`) ?? []),
 ]
 
 const at = (point: HTMLElement, axis: 'x' | 'y'): number =>
   Number.parseFloat(point.style.getPropertyValue(`--chart-point-${axis}`))
 
 describe('points', () => {
+  test('the points of the row a pointer is on are a part of their own, and only those', async () => {
+    const host = (await chart(SPEND, 'for="spend"')) as Chart & {
+      pointer: { set: (at: number) => void }
+    }
+    const named = (): number[] =>
+      all(host, 'point')
+        .map((one, index) =>
+          (one.getAttribute('part') ?? '').includes('point-active') ? index : -1,
+        )
+        .filter((index) => index >= 0)
+    expect(named()).toEqual([])
+    host.pointer.set(2)
+    await host.updateComplete
+    expect(named()).toEqual([2])
+  })
+
   test('one per row, measured across by the first numeric column and up by the next', async () => {
     const host = await chart(SPEND, 'for="spend"')
     const points = all(host, 'point')

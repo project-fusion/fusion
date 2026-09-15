@@ -49,6 +49,8 @@ import { property } from 'lit/decorators.js'
  * @csspart hint - Help under the control, while nothing is wrong.
  * @csspart label - The label beside it.
  * @csspart mark - The tick, or the dash when the box is indeterminate.
+ * @csspart mark-checked - The mark while the box is checked, beside `mark`.
+ * @csspart mark-indeterminate - The mark while the box is indeterminate, beside `mark`.
  */
 @customElement('helix-headless-checkbox')
 export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {
@@ -182,7 +184,11 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
        write and none to get wrong.
 
        The one line of description goes under that row, which is where a field
-       puts it too. */
+       puts it too.
+
+       `mark-checked` and `mark-indeterminate` repeat the host's state on the
+       mark, for the box a component draws in its own shadow root: Data Table's
+       are out of reach of any selector naming the host. */
     return html`<label part="field">
       <span part="box">
         <input
@@ -196,7 +202,10 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
           @change=${this.handleChange}
           @input=${this.stopInner}
         />
-        <span part="mark" aria-hidden="true"></span>
+        <span
+          part="mark${this.checked ? ' mark-checked' : ''}${this.indeterminate ? ' mark-indeterminate' : ''}"
+          aria-hidden="true"
+        ></span>
       </span>
       <span part="label"><slot @slotchange=${this.handleLabelChange}>${this.label}</slot></span>
     </label>

@@ -63,7 +63,7 @@ static RULE: LazyLock<Regex> =
 /// where it sits. Taking the first would file every descendant's corner under
 /// the panel it happens to be inside.
 static PART: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"\[part="([a-z-]+)"\]"#).expect("a literal pattern compiles"));
+    LazyLock::new(|| Regex::new(r#"\[part~?="([a-z-]+)"\]"#).expect("a literal pattern compiles"));
 
 /// `border-radius` and the longhands, since a sheet may round two corners only.
 static RADIUS: LazyLock<Regex> = LazyLock::new(|| {

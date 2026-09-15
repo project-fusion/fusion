@@ -63,6 +63,8 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  *
  * @csspart description - The caption under the words, when there is one.
  * @csspart item - The row.
+ * @csspart item-active - The row the keyboard is on, beside `item`.
+ * @csspart item-selected - The row of a chosen option, beside `item`.
  * @csspart label - The words.
  * @csspart text - The words and the caption under them, as one column.
  */
@@ -280,8 +282,16 @@ export class HelixHeadlessOption extends HelixElement {
        `Tree.Item` and `Menu.Item` all bind one. Nothing else listens for a click
        on an option, so removing this leaves a select the keyboard can use and a
        pointer cannot. A spec that chooses by calling `select()` or by pressing a
-       key cannot tell the difference. */
-    return html`<div part="item" @click=${() => this.select()}>
+       key cannot tell the difference.
+
+       `item-selected` and `item-active` say on the row what `:state(selected)`
+       and `data-active` say on the host, for the option a component draws in
+       its own shadow root: `Time Picker`'s times are out of reach of any
+       selector naming the host, and `::part()` reaches the row. */
+    return html`<div
+      part="item${this.selected ? ' item-selected' : ''}${this.active ? ' item-active' : ''}"
+      @click=${() => this.select()}
+    >
       <slot name="start"></slot>
       <span part="text">
         <span part="label"><slot></slot></span>

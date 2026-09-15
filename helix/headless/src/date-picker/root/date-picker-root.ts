@@ -120,7 +120,14 @@ const addMonths = (date: Date, months: number): Date => {
  * @event {Event} input - Announced once the value has moved.
  *
  * @csspart cell - One column of a row, which is what a range paints.
+ * @csspart cell-range-end - The cell of a range's last day, beside `cell`.
+ * @csspart cell-range-middle - A cell between a range's ends, beside `cell`.
+ * @csspart cell-range-start - The cell of a range's first day, beside `cell`.
  * @csspart day - The shape inside a cell, which is what a single date paints.
+ * @csspart day-disabled - A day that cannot be chosen, beside `day`.
+ * @csspart day-outside - A day from a neighboring month, filling the grid out, beside `day`.
+ * @csspart day-selected - The chosen day, or either end of a chosen range, beside `day`.
+ * @csspart day-today - Today, beside `day`.
  * @csspart grid - The grid of days.
  * @csspart header - The month name and its controls.
  * @csspart heading - The month and year being shown.
@@ -414,7 +421,7 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     this.focused = toIso(date)
     this.show(date)
     this.updateComplete.then(() => {
-      this.renderRoot.querySelector<HTMLElement>('[part="cell"][tabindex="0"]')?.focus()
+      this.renderRoot.querySelector<HTMLElement>('[part~="cell"][tabindex="0"]')?.focus()
     })
   }
 
@@ -717,9 +724,9 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
     const { full, heading, weekday } = this.formats
     const weeks = this.weeksOf(month)
     const anchor = toIso(this.anchor)
-    /* Today, marked with `aria-current="date"` in the accessibility tree and on
-       the cell, so a consumer can add a mark from CSS. Computed once per month
-       rather than per cell. */
+    /* Today, marked with `aria-current="date"` in the accessibility tree and as
+       `day-today` on the day, so a consumer can add a mark from CSS. Computed
+       once per month rather than per cell. */
     const today = localToday()
     const range = this.range
 
@@ -782,26 +789,37 @@ export class HelixHeadlessDatePicker extends MixinControllerValue(HelixFormEleme
                  rows. The band stops at the last day the grid owns and picks up
                  in the next, which is where those dates actually are. */
               const outside = !sameMonth(date, month)
+              const start = !outside && range !== null && iso === range[0]
+              const end = !outside && range !== null && iso === range[1]
+              const middle = !outside && range !== null && iso > range[0] && iso < range[1]
               // The cell is the column track and the day is the shape centered
               // in it. A range paints the track, so it runs continuously
               // between days and stops at the ends of a row on its own.
+              //
+              // Each state is written twice, as an attribute and as a second
+              // part name on the box it is drawn on: the attribute for this
+              // tier's own sheet and the accessibility tree, the name for a
+              // stylesheet outside, which cannot follow `::part()` with one.
+              // `day-selected` is the solid mark, so a day between a range's
+              // ends is not one: its cell carries the band instead.
               return html`<span
-                part="cell"
+                part="cell${start ? ' cell-range-start' : ''}${middle ? ' cell-range-middle' : ''}${end ? ' cell-range-end' : ''}"
                 role="gridcell"
                 aria-disabled=${disabled ? 'true' : nothing}
                 aria-label=${full.format(date)}
                 aria-current=${iso === today ? 'date' : nothing}
                 aria-selected=${!outside && selected ? 'true' : nothing}
                 data-outside=${outside ? '' : nothing}
-                data-range-end=${!outside && range && iso === range[1] ? '' : nothing}
-                data-range-middle=${
-                  !outside && range && iso > range[0] && iso < range[1] ? '' : nothing
-                }
-                data-range-start=${!outside && range && iso === range[0] ? '' : nothing}
+                data-range-end=${end ? '' : nothing}
+                data-range-middle=${middle ? '' : nothing}
+                data-range-start=${start ? '' : nothing}
                 data-today=${iso === today ? '' : nothing}
                 tabindex=${!outside && iso === anchor ? '0' : '-1'}
                 @click=${outside ? nothing : () => this.select(date)}
-                ><span part="day">${date.getUTCDate()}</span></span
+                ><span
+                  part="day${!outside && selected && !middle ? ' day-selected' : ''}${iso === today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${disabled ? ' day-disabled' : ''}"
+                  >${date.getUTCDate()}</span
+                ></span
               >`
             })}
           </div>`,

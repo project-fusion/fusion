@@ -72,6 +72,8 @@ import '../../select/index.js'
  * @csspart option - One size on offer.
  * @csspart option-description - The caption under the number, when there is one.
  * @csspart option-item - The row.
+ * @csspart option-item-active - The row the keyboard is on.
+ * @csspart option-item-selected - The row of the size chosen.
  * @csspart option-label - The number.
  * @csspart option-text - The number and the caption, as one column.
  */
@@ -225,8 +227,9 @@ export class HelixHeadlessPaginationSize extends HelixElement {
         (size) =>
           html`<${option}
             part="option"
-            exportparts="description: option-description, item: option-item, label: option-label,
-              text: option-text"
+            exportparts="description: option-description, item: option-item,
+              item-active: option-item-active, item-selected: option-item-selected,
+              label: option-label, text: option-text"
             value=${String(size)}
             >${this.numbers(size)}</${option}
           >`,

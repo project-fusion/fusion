@@ -36,7 +36,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::text::uncommented;
+use crate::component::text::{flattened, uncommented};
 use crate::component::{sources, Context, Finding, Report};
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -59,7 +59,7 @@ static DOCUMENTED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"@csspart\s+([a-z0-9-]+)").expect("a literal pattern compiles"));
 
 static PART: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"part="([a-z0-9-]+)""#).expect("a literal pattern compiles"));
+    LazyLock::new(|| Regex::new(r#"part="([a-z0-9 -]+)""#).expect("a literal pattern compiles"));
 
 static FORWARDS: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"exportparts="([^"]+)""#).expect("a literal pattern compiles"));
@@ -75,7 +75,12 @@ fn written(code: &str) -> Vec<String> {
             let at = one.get(0).expect("group zero always matches").start();
             !code[..at].ends_with('[')
         })
-        .map(|one| one[1].to_owned())
+        .flat_map(|one| {
+            one[1]
+                .split_whitespace()
+                .map(str::to_owned)
+                .collect::<Vec<String>>()
+        })
         .collect();
     for one in FORWARDS.captures_iter(code) {
         for pair in one[1].split(',') {
@@ -133,7 +138,7 @@ fn survey(context: &Context) -> BTreeMap<String, Component> {
             has to write out, so the sentence reads as a render and every family
             calling the helper inherits a part it does not have. Found the hour a
             prose pass added that sentence. */
-            let code = uncommented(&text);
+            let code = flattened(&uncommented(&text));
             let Some(name) = HELPER.captures(&code) else {
                 continue;
             };
@@ -159,7 +164,7 @@ fn survey(context: &Context) -> BTreeMap<String, Component> {
                 (None, Some(one)) => (one[1].to_owned(), String::new()),
                 (None, None) => continue,
             };
-            let code = uncommented(&text);
+            let code = flattened(&uncommented(&text));
             let mut rendered = written(&code);
             for one in CALLS.captures_iter(&code) {
                 if let Some(parts) = helpers.get(&one[1]) {

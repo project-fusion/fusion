@@ -103,6 +103,7 @@ import {
  * @csspart after - The room the rows below the window would have taken. Windowed only.
  * @csspart before - The room the rows above the window would have taken. Windowed only.
  * @csspart cell - One cell.
+ * @csspart cell-selected - A cell of a selected row, beside `cell`.
  * @csspart checkbox - A row's checkbox, or the one in the heading that selects them all.
  * @csspart checkbox-box - The frame the checkbox's input is painted as.
  * @csspart checkbox-control - The checkbox's input.
@@ -111,6 +112,8 @@ import {
  * @csspart checkbox-hint - Forwarded from the checkbox, and never drawn here.
  * @csspart checkbox-label - Forwarded from the checkbox; the label is spoken, not shown.
  * @csspart checkbox-mark - The tick, or the dash while some rows are selected.
+ * @csspart checkbox-mark-checked - The mark while its box is checked, beside `checkbox-mark`.
+ * @csspart checkbox-mark-indeterminate - The dash while only some rows are selected, beside `checkbox-mark`.
  * @csspart empty - Shown when no rows match.
  * @csspart footer - The region below the grid.
  * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
@@ -125,11 +128,13 @@ import {
  * @csspart pagination-mark - The glyph on a first, previous, next or last control.
  * @csspart pagination-next - The pagination's control that moves forward one page.
  * @csspart pagination-page - The pagination's control for one page.
+ * @csspart pagination-page-current - The page you are on, beside `pagination-page`.
  * @csspart pagination-previous - The pagination's control that moves back one page.
  * @csspart pagination-status - The pagination's reading of where you are, in `compact`.
  * @csspart row - One row of data.
  * @csspart select - The cell holding a row's checkbox.
  * @csspart select-all - The heading holding the checkbox that selects every row.
+ * @csspart select-selected - The checkbox cell of a selected row, beside `select`.
  * @csspart table - The grid.
  * @csspart toolbar - The region above the grid.
  *
@@ -1116,9 +1121,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestUpdate()
   }
 
-  private renderCell(column: HelixHeadlessTableColumn, row: DataRow): TemplateResult {
+  private renderCell(
+    column: HelixHeadlessTableColumn,
+    row: DataRow,
+    picked: boolean,
+  ): TemplateResult {
     return html`<span
-      part="cell"
+      part="cell${picked ? ' cell-selected' : ''}"
       role="gridcell"
       style=${column.align ? `text-align: ${column.align}` : nothing}
       >${column.read(row)}</span
@@ -1141,7 +1150,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return html`<${checkbox}
       part="checkbox"
       exportparts="box: checkbox-box, control: checkbox-control, feedback: checkbox-feedback,
-        field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark"
+        field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark,
+        mark-checked: checkbox-mark-checked, mark-indeterminate: checkbox-mark-indeterminate"
       aria-label=${name}
       .checked=${checked}
       .indeterminate=${indeterminate}
@@ -1169,6 +1179,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       (row, index) => {
         const key = chosen ? this.keyOf(row, this.rowIndex(index) - 2) : ''
         const picked = chosen?.has(key) ?? false
+        /* Selected is said on the row for the accessibility tree and on each of
+           its cells for a stylesheet: the row is `display: contents`, so the
+           cells are what a selection is painted on, and nothing outside can
+           reach a cell by the row it sits in. */
         return html`<div
           part="row"
           role="row"
@@ -1178,14 +1192,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         >
           ${
             chosen
-              ? html`<span part="select" role="gridcell">${this.renderCheckbox(
-                  `Select ${named ? String(named.order(row) ?? key) : key}`,
-                  picked,
-                  false,
-                  (event) => this.toggleRow(key, event),
-                )}</span>`
+              ? html`<span part="select${picked ? ' select-selected' : ''}" role="gridcell"
+                  >${this.renderCheckbox(
+                    `Select ${named ? String(named.order(row) ?? key) : key}`,
+                    picked,
+                    false,
+                    (event) => this.toggleRow(key, event),
+                  )}</span
+                >`
               : nothing
-          }${columns.map((column) => this.renderCell(column, row))}
+          }${columns.map((column) => this.renderCell(column, row, picked))}
         </div>`
       },
     )}`
@@ -1307,7 +1323,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               exportparts="first: pagination-first, gap: pagination-gap, item: pagination-item,
                 last: pagination-last, list: pagination-list, live: pagination-live,
                 mark: pagination-mark, next: pagination-next, page: pagination-page,
-                previous: pagination-previous, status: pagination-status"
+                page-current: pagination-page-current, previous: pagination-previous,
+                status: pagination-status"
               page=${this.page}
               page-size=${this.pageSize || 1}
               total=${matched}
