@@ -30,7 +30,8 @@
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
-    "@phosphor-icons/core": "^2.1.1"
+    "@phosphor-icons/core": "^2.1.1",
+    "svgo": "^4.1.0"
   },
   "homepage": "https://fusion.dev",
   "keywords": [
