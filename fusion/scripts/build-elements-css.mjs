@@ -21,10 +21,27 @@ import { root } from '@fusion.dev/scripts/workspace'
  */
 const TAG = /@customElement\(\s*['"]([a-z][a-z0-9]*(?:-[a-z0-9]+)+)['"]\s*\)/g
 
-/** Every element source under a directory, the specs left out. */
+/**
+ * Every element source under a directory, the specs left out, and so are the
+ * two kinds of module a generator writes there.
+ *
+ * **Read, they were the reason a build did not restore.** `styles` writes each
+ * `.css.ts` and `element-events` writes its `.generated.ts` beside the sources,
+ * and neither can hold a `@customElement`. Hashed as inputs they moved this
+ * task's key between a clean checkout, where this runs before them, and every
+ * run after, so a build restored on CI missed here and rebuilt every package
+ * above `helix-styles`. `turbo.json` leaves them out of `inputs` for the same
+ * reason, and the two lists have to agree.
+ */
 const walk = (dir) =>
   readdirSync(dir, { recursive: true })
-    .filter((entry) => entry.endsWith('.ts') && !entry.endsWith('.spec.ts'))
+    .filter(
+      (entry) =>
+        entry.endsWith('.ts') &&
+        !entry.endsWith('.spec.ts') &&
+        !entry.endsWith('.css.ts') &&
+        !entry.endsWith('.generated.ts'),
+    )
     .map((entry) => join(dir, entry))
 
 /* Two packages, because the tags and the stylesheet no longer live together:
