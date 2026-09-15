@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { at, hasState, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason:
@@ -126,6 +126,39 @@ describe('moving through a menu with the keyboard', () => {
     press(host, 'ArrowLeft')
     await host.updateComplete
     expect(focused(share)).toBe(share)
+  })
+
+  /* The submenu's caret points left on a right-to-left page, so left is the way
+     in there. The right arrow had opened a row whose caret pointed away from
+     it, and the left one would not. */
+  describe('on a right-to-left page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    test('the pair turns round: left goes in and right comes back', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await menu(
+        `<helix-headless-menu-item value="share">Share
+           <helix-headless-menu-item slot="submenu" value="link">Copy link</helix-headless-menu-item>
+         </helix-headless-menu-item>
+         <helix-headless-menu-item value="rename">Rename</helix-headless-menu-item>`,
+      )
+      host.open = true
+      await host.updateComplete
+      const share = host.querySelector('helix-headless-menu-item[value="share"]') as Item
+      const link = host.querySelector('helix-headless-menu-item[value="link"]') as Item
+      await (share as unknown as { updateComplete: Promise<boolean> }).updateComplete
+
+      press(host, 'ArrowDown')
+      press(host, 'ArrowLeft')
+      await host.updateComplete
+      expect(focused(link)).toBe(link)
+
+      press(host, 'ArrowRight')
+      await host.updateComplete
+      expect(focused(share)).toBe(share)
+    })
   })
 })
 

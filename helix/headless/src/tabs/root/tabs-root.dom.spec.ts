@@ -101,6 +101,28 @@ describe('tabs keyboard', () => {
     expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
   })
 
+  /* The strip starts on the right of a right-to-left page, so the left arrow
+     points at the next tab. The shared controller asks the host which way the
+     line runs, so this is every set built on it, and Tabs is the one a reader
+     meets first. */
+  test('on a right-to-left page the left arrow is the next tab', async () => {
+    document.documentElement.dir = 'rtl'
+    try {
+      /* From the middle of three, so neither press can arrive by wrapping. */
+      const host = (await mount(
+        markup.replace('default-active="one"', 'default-active="two"').replace(' disabled', ''),
+      )) as Updatable
+      press(host, 'ArrowLeft')
+      await host.updateComplete
+      expect(hasState(tabs(host)[2] as Element, 'selected')).toBe(true)
+      press(host, 'ArrowRight')
+      await host.updateComplete
+      expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
+    } finally {
+      document.documentElement.removeAttribute('dir')
+    }
+  })
+
   test('both axes move the row, not only the one it is laid out on', async () => {
     /* `KeyboardNavigationController` binds both axes on purpose: a reader who
        guesses the wrong axis gets nothing, and `variant` is presentation. Down

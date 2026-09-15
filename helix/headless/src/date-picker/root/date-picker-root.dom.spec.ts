@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { formValue, mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -89,6 +89,37 @@ describe('date picker', () => {
     expect(stop(cal)).toContain('August 15')
     await press(cal, 'ArrowLeft')
     expect(stop(cal)).toContain('August 14')
+  })
+
+  /* The week runs from the right on a right-to-left page, so the left arrow
+     points at tomorrow. It went to yesterday, the cell to its right. Home and
+     End and the page keys are about the week and the month, not a side, and
+     keep their meaning. */
+  describe('on a right-to-left page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    test('the left arrow is the next day and the right the day before', async () => {
+      document.documentElement.dir = 'rtl'
+      const cal = await calendar()
+      await press(cal, 'ArrowLeft')
+      expect(stop(cal)).toContain('August 15')
+      await press(cal, 'ArrowRight')
+      await press(cal, 'ArrowRight')
+      expect(stop(cal)).toContain('August 13')
+    })
+
+    test('while Home, End and the page keys mean what they did', async () => {
+      document.documentElement.dir = 'rtl'
+      const cal = await calendar()
+      await press(cal, 'Home')
+      expect(stop(cal)).toContain('August 9')
+      await press(cal, 'End')
+      expect(stop(cal)).toContain('August 15')
+      await press(cal, 'PageDown')
+      expect(stop(cal)).toContain('September 15')
+    })
   })
 
   test('Home and End go to the ends of the week', async () => {

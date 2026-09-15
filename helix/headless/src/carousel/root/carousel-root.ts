@@ -3,6 +3,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
+  inlineStep,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
@@ -255,9 +256,12 @@ export class HelixHeadlessCarousel extends HelixElement {
    * changes the slide, because an indicator that could be focused without
    * selecting would leave the highlight and the slide disagreeing with nothing
    * on screen saying which is which.
+   *
+   * Along the line, so on a right-to-left page, where the first indicator is on
+   * the right, the left arrow is the one that moves on.
    */
   private readonly handleIndicatorKeydown = (event: KeyboardEvent): void => {
-    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+    const step = inlineStep(this, event.key)
     if (step === 0) {
       return
     }

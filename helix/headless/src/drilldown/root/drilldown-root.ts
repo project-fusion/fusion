@@ -3,6 +3,7 @@ import {
   DrilldownController,
   HelixElement,
   hostAria,
+  inlineStep,
   MixinCollection,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
@@ -189,16 +190,19 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
       ;(event.key === 'Home' ? items[0] : items[items.length - 1])?.focusItem()
       return
     }
-    /* Left and Escape both go back, and neither closes anything: this is a
-       region rather than an overlay, so there is nothing above it to close. */
-    if (event.key === 'ArrowLeft' || event.key === 'Escape') {
+    /* Back along the line and Escape both go back, and neither closes
+       anything: this is a region rather than an overlay, so there is nothing
+       above it to close. On a right-to-left page back is the right arrow and in
+       is the left, which is where a row's caret points. */
+    const along = inlineStep(this, event.key)
+    if (along === -1 || event.key === 'Escape') {
       if (this.back()) {
         event.preventDefault()
         event.stopPropagation()
       }
       return
     }
-    if (event.key === 'ArrowRight' && current !== -1) {
+    if (along === 1 && current !== -1) {
       const item = items[current]
       if (item && this.drilldown.hasPage(item)) {
         event.preventDefault()

@@ -2,6 +2,7 @@ import {
   closestInstance,
   customElement,
   HelixElement,
+  inlineStep,
   MixinCollection,
   MixinControllerActive,
   scrollItemIntoView,
@@ -175,6 +176,11 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       return
     }
 
+    /* In and out are along the line, which is where a shut branch's chevron
+       points: right on a left-to-right page and left on a right-to-left one,
+       so the key that opens a branch is the one its chevron points along. */
+    const along = inlineStep(this, event.key)
+
     if (event.key === 'ArrowDown') {
       this.move(current, 1)
     } else if (event.key === 'ArrowUp') {
@@ -183,7 +189,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       this.focusOn(this.visibleItems[0])
     } else if (event.key === 'End') {
       this.focusOn(this.visibleItems.at(-1))
-    } else if (event.key === 'ArrowRight') {
+    } else if (along === 1) {
       // Open a closed branch, then step into it. Two presses rather than one
       // that does both, which is what the pattern specifies.
       if (current.isBranch && !current.open) {
@@ -192,7 +198,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       } else if (current.isBranch) {
         this.move(current, 1)
       }
-    } else if (event.key === 'ArrowLeft') {
+    } else if (along === -1) {
       if (current.isBranch && current.open) {
         current.requestOpen(false)
         this.syncItems()

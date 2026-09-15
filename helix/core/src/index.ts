@@ -185,6 +185,7 @@ export {
   forgetDisabled,
   inheritDisabled,
 } from './utils/inherit-disabled/inherit-disabled.js'
+export { inlineStep } from './utils/inline-step/inline-step.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export {

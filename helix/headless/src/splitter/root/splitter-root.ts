@@ -5,6 +5,7 @@ import {
   HelixBeforeCollapseEvent,
   HelixBeforeResizeEvent,
   HelixElement,
+  inlineStep,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -647,13 +648,10 @@ export class HelixHeadlessSplitter extends HelixElement {
    * only place in a splitter where a second axis means anything.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    const back = this.vertical ? 'ArrowUp' : 'ArrowLeft'
-    const forward = this.vertical ? 'ArrowDown' : 'ArrowRight'
+    const toward = this.travel(event.key)
     let next: number
-    if (event.key === back) {
-      next = this.position - this.step
-    } else if (event.key === forward) {
-      next = this.position + this.step
+    if (toward !== 0) {
+      next = this.position + toward * this.step
     } else if (event.key === 'Home') {
       next = this.minPercent
     } else if (event.key === 'End') {
@@ -665,6 +663,23 @@ export class HelixHeadlessSplitter extends HelixElement {
     this.settle(next)
     // Or the arrows scroll the page under the divider being moved.
     event.preventDefault()
+  }
+
+  /**
+   * Which way a key moves the divider, as a sign on `position`, or `0` for a key
+   * that is not along its axis.
+   *
+   * **The arrow says where the divider goes on screen**, the way the window
+   * splitter pattern words it: left moves a side-by-side divider to the left.
+   * `position` is the start pane's share, and the start pane is on the right of
+   * a right-to-left page, so there the left arrow grows it. It used to shrink
+   * it on every page, which on a right-to-left one sent the divider right.
+   */
+  private travel(key: string): -1 | 0 | 1 {
+    if (!this.vertical) {
+      return inlineStep(this, key)
+    }
+    return key === 'ArrowDown' ? 1 : key === 'ArrowUp' ? -1 : 0
   }
 
   /** Puts the divider back where the markup put it. */
@@ -858,15 +873,13 @@ export class HelixHeadlessSplitter extends HelixElement {
       return
     }
     const inner = crossing.by
-    const mineBack = this.vertical ? 'ArrowUp' : 'ArrowLeft'
-    const mineForward = this.vertical ? 'ArrowDown' : 'ArrowRight'
-    const theirsBack = inner.vertical ? 'ArrowUp' : 'ArrowLeft'
-    const theirsForward = inner.vertical ? 'ArrowDown' : 'ArrowRight'
+    const mine = this.travel(event.key)
+    const theirs = inner.travel(event.key)
 
-    if (event.key === mineBack || event.key === mineForward) {
-      this.moveTo(this.position + (event.key === mineBack ? -this.step : this.step), true)
-    } else if (event.key === theirsBack || event.key === theirsForward) {
-      inner.moveTo(inner.position + (event.key === theirsBack ? -inner.step : inner.step), true)
+    if (mine !== 0) {
+      this.moveTo(this.position + mine * this.step, true)
+    } else if (theirs !== 0) {
+      inner.moveTo(inner.position + theirs * inner.step, true)
     } else {
       return
     }

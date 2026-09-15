@@ -3,6 +3,7 @@ import {
   HelixBeforeResizeEvent,
   HelixElement,
   hostAria,
+  inlineStep,
   requestChange,
 } from '@fusion.dev/helix-core'
 import { dotsThreeVertical } from '@fusion.dev/helix-icons'
@@ -438,7 +439,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     })
   }
 
-  /** Which way a drag or an arrow key grows the column, in this writing direction. */
+  /** Which way a drag grows the column, in this writing direction. */
   private get forward(): number {
     return getComputedStyle(this).direction === 'rtl' ? -1 : 1
   }
@@ -476,8 +477,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   private readonly handleResizeKey = (event: KeyboardEvent): void => {
     const step = HelixHeadlessTableColumn.STEP * (event.shiftKey ? 4 : 1)
-    const grow =
-      event.key === 'ArrowRight' ? this.forward : event.key === 'ArrowLeft' ? -this.forward : 0
+    const grow = inlineStep(this, event.key)
     if (grow !== 0) {
       event.preventDefault()
       this.resizeTo(this.drawn + grow * step)

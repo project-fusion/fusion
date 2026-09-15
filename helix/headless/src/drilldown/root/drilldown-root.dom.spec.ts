@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { hasLayout, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason: an
    element registered against the `customElements` happy-dom then replaces never
@@ -118,5 +118,50 @@ describe('drilldown', () => {
     await (appearance as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
     await new Promise((resolve) => setTimeout(resolve, 0))
     expect(mark()).not.toBeNull()
+  })
+})
+
+/* In is where a row's caret points, along the line, and back is the other way.
+   On a right-to-left page the caret points left, and the right arrow had gone
+   in past it.
+
+   A browser's, because the stack finds the row a press came from by
+   `:focus-within`, and happy-dom does not match it on a row whose focus is
+   inside its own shadow root: there, no press comes from any row. */
+const browser = hasLayout() ? test : (): void => {}
+
+describe('the horizontal arrows', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  const key = async (host: Stack, name: string): Promise<void> => {
+    host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: name }))
+    await host.updateComplete
+  }
+
+  const onAppearance = async (): Promise<Stack> => {
+    const host = await stack()
+    ;(host.querySelector('[value="appearance"]') as HTMLElement & { focusItem(): void }).focusItem()
+    return host
+  }
+
+  browser('go in with the right arrow and back with the left', async () => {
+    const host = await onAppearance()
+    await key(host, 'ArrowRight')
+    expect(showing(host)).toEqual(['theme'])
+    await key(host, 'ArrowLeft')
+    expect(showing(host)).toEqual(['appearance', 'about'])
+  })
+
+  browser('and the other way round on a right-to-left page', async () => {
+    document.documentElement.dir = 'rtl'
+    const host = await onAppearance()
+    await key(host, 'ArrowRight')
+    expect(showing(host)).toEqual(['appearance', 'about'])
+    await key(host, 'ArrowLeft')
+    expect(showing(host)).toEqual(['theme'])
+    await key(host, 'ArrowRight')
+    expect(showing(host)).toEqual(['appearance', 'about'])
   })
 })

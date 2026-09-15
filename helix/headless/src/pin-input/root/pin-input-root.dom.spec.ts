@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -227,6 +227,24 @@ describe('input pin keyboard', () => {
     const host = await pin('length="4"')
     const event = await press(host, 1, 'ArrowLeft')
     expect(event.defaultPrevented).toBe(true)
+    expect(host.shadowRoot?.activeElement).toBe(cells(host)[0] as HTMLInputElement)
+  })
+
+  /* The boxes run from the right on a right-to-left page, so the left arrow
+     points at the next one. It went to the box on its right. */
+  describe('on a right-to-left page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    test('the left arrow is the next box and the right the one before', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await pin('length="4"')
+      await press(host, 1, 'ArrowLeft')
+      expect(host.shadowRoot?.activeElement).toBe(cells(host)[2] as HTMLInputElement)
+      await press(host, 2, 'ArrowRight')
+      expect(host.shadowRoot?.activeElement).toBe(cells(host)[1] as HTMLInputElement)
+    })
   })
 
   test('a read-only field refuses to move', async () => {

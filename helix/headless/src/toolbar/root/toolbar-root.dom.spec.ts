@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -39,6 +39,10 @@ const settle = async (toolbar: HTMLElement): Promise<void> => {
 }
 
 describe('toolbar', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
   test('is announced as a toolbar with its orientation', async () => {
     const toolbar = await mount(markup)
     const inner = part(toolbar, 'toolbar')
@@ -81,6 +85,26 @@ describe('toolbar', () => {
     press(controls[0] as HTMLElement, 'ArrowLeft')
     await settle(toolbar)
     expect(stops(toolbar)).toEqual(['out', 'out', 'in'])
+  })
+
+  /* The first control is on the right of a right-to-left page, so the left
+     arrow points at the second. The right arrow had moved to it, away from
+     where it points. */
+  test('on a right-to-left page the left arrow moves on and the right one back', async () => {
+    document.documentElement.dir = 'rtl'
+    const toolbar = await mount(markup)
+    await settle(toolbar)
+    const controls = [...toolbar.children] as HTMLElement[]
+    const press = (from: HTMLElement, key: string) =>
+      from.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
+
+    press(controls[0] as HTMLElement, 'ArrowLeft')
+    await settle(toolbar)
+    expect(stops(toolbar)).toEqual(['out', 'in', 'out'])
+
+    press(controls[1] as HTMLElement, 'ArrowRight')
+    await settle(toolbar)
+    expect(stops(toolbar)).toEqual(['in', 'out', 'out'])
   })
 
   test('an arrow along the other axis is left to the page', async () => {
