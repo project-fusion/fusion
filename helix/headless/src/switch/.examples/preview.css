@@ -45,33 +45,39 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-switch::part(field) {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
+helix-headless-switch {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-helix-headless-switch::part(thumb) {
-  background-color: var(--_gray-strong);
-  block-size: 0.75rem;
-  display: block;
-  inline-size: 0.75rem;
-  border-radius: 50%;
+helix-headless-switch::part(field) {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.5rem;
 }
 
 helix-headless-switch::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
-helix-headless-switch::part(hint) {
+/* Indented past the track, so the words line up under the label they
+   describe rather than under the control. */
+helix-headless-switch::part(hint),
+helix-headless-switch::part(feedback) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
+  padding-inline-start: 3.125rem;
 }
 
 helix-headless-switch::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  font-weight: 500;
 }
 
 helix-headless-icon::part(svg) {
@@ -80,52 +86,68 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-switch::part(control):focus-visible {
-  outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
-}
-
 /* The input is the hit target and lies over the track, which is what
-   draws. Left visible it is a checkbox sitting beside a switch. */
+   draws. Left at `appearance: auto` it is a checkbox sitting beside a
+   switch; stripped, it draws nothing but the focus ring. */
 helix-headless-switch::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 1rem;
-  border-radius: 0.5rem;
+  background-color: var(--_gray-subtle);
+  block-size: 1.5rem;
+  border: 1px solid var(--_gray-line);
+  border-radius: 9999px;
+  box-sizing: border-box;
   display: inline-block;
-  inline-size: 1.75rem;
+  flex: none;
+  inline-size: 2.625rem;
   position: relative;
 }
 
 helix-headless-switch::part(control) {
   appearance: none;
-  background-color: var(--_gray-surface);
+  background-color: transparent;
   block-size: 100%;
-  border: 1px solid var(--_gray-line);
+  border: 0;
+  border-radius: 9999px;
+  cursor: inherit;
   inline-size: 100%;
   inset: 0;
   margin: 0;
-  opacity: 0;
   position: absolute;
 }
 
 /* No transition, and it is worth saying so: anything that
-   moves owes a `prefers-reduced-motion` block repeating the same selector. A
-   skeletal sheet has nothing to gain from the animation and would be teaching
+   moves owes a `prefers-reduced-motion` block repeating the same selector. An
+   example sheet has nothing to gain from the animation and would be teaching
    the omission along with it. */
 helix-headless-switch::part(thumb) {
-  inset-block-start: 0.125rem;
-  inset-inline-start: 0.125rem;
+  background-color: var(--_gray-surface);
+  block-size: 1.25rem;
+  border: 1px solid var(--_gray-line);
+  border-radius: 50%;
+  box-sizing: border-box;
+  inline-size: 1.25rem;
+  inset-block-start: 50%;
+  inset-inline-start: calc(0.125rem - 1px);
+  pointer-events: none;
   position: absolute;
+  translate: 0 -50%;
+}
+
+/* The keyboard reaches this, so the ring goes here. Taking the UA outline
+   off without putting one back is the commonest way a headless control stops
+   being operable without a pointer. The input covers the track, so the ring
+   is drawn around it. */
+helix-headless-switch::part(control):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }
 
 helix-headless-switch:state(checked)::part(track) {
   background-color: var(--_gray-strong);
+  border-color: var(--_gray-strong);
 }
 
 helix-headless-switch:state(checked)::part(thumb) {
   background-color: var(--_gray-surface);
-  translate: 0.75rem 0;
+  border-color: transparent;
+  translate: 1.125rem -50%;
 }

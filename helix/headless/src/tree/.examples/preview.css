@@ -48,32 +48,61 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-tree-item::part(item) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-helix-headless-tree-item::part(row) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-helix-headless-tree-item::part(toggle) {
-  all: unset;
-  box-sizing: border-box;
-}
-
-helix-headless-tree-item::part(label) {
-  color: var(--_gray-strong);
-  font-weight: 600;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+helix-headless-tree,
+helix-headless-tree-item {
+  display: block;
+}
+
+helix-headless-tree-item::part(item) {
+  margin-block-end: 0.25rem;
+}
+
+/* A padded row, each level in by the chevron and the gap after it, so a child
+   starts under its parent's label. */
+helix-headless-tree-item::part(row) {
+  align-items: center;
+  block-size: max(2rem, calc(1lh + 1rem));
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.25rem;
+  line-height: 1.5;
+  padding: 0.5rem;
+  padding-inline-start: calc(0.5rem + (var(--tree-level, 1) - 1) * 1.25rem);
+  user-select: none;
+}
+
+/* A leaf has no chevron, so it keeps the chevron's room at the start and its
+   label lines up with its siblings'. */
+helix-headless-tree-item:not(:has(> [slot="children"]))::part(row) {
+  padding-inline-start: calc(0.5rem + (var(--tree-level, 1) - 1) * 1.25rem + 1.25rem);
+}
+
+helix-headless-tree-item[slot="children"]::part(row) {
+  font-size: 0.75rem;
+}
+
+helix-headless-tree-item:state(selected)::part(row) {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-tree-item::part(label) {
+  align-self: stretch;
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -95,11 +124,6 @@ helix-headless-tree-item::part(group) {
   flex-direction: column;
 }
 
-helix-headless-tree-item::part(group) {
-  gap: 0.25rem;
-  padding-inline-start: 1rem;
-}
-
 /* And closed still means closed.
 
    A group carries the hidden attribute when its item is shut, and that rule is
@@ -116,18 +140,18 @@ helix-headless-tree-item:not(:state(open))::part(group) {
   display: none;
 }
 
-/* The chevron is the toggle itself, not a glyph inside one. */
+/* The chevron is the toggle itself, not a glyph inside one. It points along
+   the row while the branch is shut and down while it is open. */
 helix-headless-tree-item::part(toggle) {
-  block-size: 1em;
+  align-self: center;
+  block-size: 1rem;
+  color: var(--_gray-mark);
   cursor: pointer;
-  fill: var(--_gray-muted);
   flex: none;
-  inline-size: 1em;
+  inline-size: 1rem;
+  rotate: -90deg;
 }
 
-helix-headless-tree-item::part(row) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-  padding-inline-start: calc(var(--tree-level, 0) * 1rem);
+helix-headless-tree-item:state(open)::part(toggle) {
+  rotate: 0deg;
 }

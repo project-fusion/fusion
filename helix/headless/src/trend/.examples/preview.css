@@ -45,7 +45,7 @@
      preview, and a row that overflows pictures the example being cut off
      rather than the component being wrong. */
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 helix-headless-icon {
@@ -55,10 +55,44 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+/* The arrow, the figure and what it measures, on one line. Unjudged, it
+   recedes; judged either way, it reads at full strength, since the word the
+   component writes says which way the judgment went. */
+helix-headless-trend {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.25rem;
+  line-height: 1.2;
+}
+
+helix-headless-trend[good="up"],
+helix-headless-trend[good="down"] {
+  color: var(--_gray-strong);
+}
+
+helix-headless-trend > [slot="label"] {
+  color: var(--_gray-muted);
+  font-weight: 400;
+}
+
 helix-headless-trend::part(icon) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+/* The direction as a word, for readers who are not looking at the arrow.
+   Clipped rather than removed, so it is still read out. */
+helix-headless-trend::part(direction) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }
 
 helix-headless-icon::part(svg) {

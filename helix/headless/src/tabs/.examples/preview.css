@@ -45,17 +45,58 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+helix-headless-tabs {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+helix-headless-tabs::part(tabs) {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  position: relative;
+}
+
+/* Above the indicator, which is drawn behind the row and travels under it. */
+helix-headless-tab {
+  display: inline-flex;
+  position: relative;
+  z-index: 10;
+}
+
 helix-headless-tab::part(tab) {
+  align-items: center;
   background-color: transparent;
+  block-size: 2.5rem;
   border: 0;
-  padding: 0.25rem 0.5rem;
+  border-block-end: 2px solid transparent;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: center;
+  padding-inline: 0.75rem;
+  white-space: nowrap;
+}
+
+helix-headless-tab:state(selected)::part(tab) {
+  color: var(--_gray-strong);
+}
+
+/* No box around the panel: the content starts a rem under the row. */
+helix-headless-tab-panel {
+  display: contents;
 }
 
 helix-headless-tab-panel::part(panel) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
   color: var(--_gray-strong);
-  padding: 0.5rem;
+  font-size: 0.875rem;
+  min-inline-size: 0;
+  outline: none;
+  padding-block-start: 1rem;
 }
 
 helix-headless-icon::part(svg) {
@@ -66,22 +107,24 @@ helix-headless-icon::part(svg) {
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
    off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
+   being operable without a pointer. Inset, because the row scrolls and would
+   clip one drawn outside. */
 helix-headless-tab::part(tab):focus-visible {
   outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
-helix-headless-tabs::part(tabs) {
-  position: relative;
-}
-
+/* The selected tab's frame, which is one box that travels rather than a
+   border on each tab. Sized from the tab it marks, which the component
+   measures and publishes. */
 helix-headless-tabs::part(indicator) {
-  background-color: var(--_gray-strong);
-  block-size: 2px;
+  background-color: var(--_gray-surface);
+  block-size: var(--indicator-block-size, 0);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
   inset-inline-start: 0;
   position: absolute;
-  translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--indicator-block-size, 0px));
+  translate: var(--indicator-x, 0) var(--indicator-y, 0px);
 }

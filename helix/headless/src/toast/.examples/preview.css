@@ -45,71 +45,137 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-toast-item::part(actions) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
-helix-headless-toast-item::part(dismiss) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-helix-headless-toast-item::part(dismiss-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-toast-item::part(icon) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-toast-item::part(icon-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-button::part(button) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-toast-item::part(item):focus-visible {
-  outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
+/* Over the page, in the corner `placement` names, and out of the way of the
+   pointer except where a message is. */
+helix-headless-toast {
+  inset-block-end: 1.5rem;
+  inset-inline: 1.5rem;
+  pointer-events: none;
+  position: fixed;
+  z-index: 1200;
 }
 
 helix-headless-toast::part(region) {
+  align-items: flex-end;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
 }
 
+helix-headless-toast-item {
+  display: grid;
+  inline-size: 22rem;
+  margin-block-start: 0.5rem;
+  max-inline-size: calc(100vw - 2rem);
+  pointer-events: auto;
+}
+
+/* The page's opposite, so a message reads as over the page rather than part
+   of it. Two columns, the mark and the words, with the actions under the
+   words; the close is out of flow at the end, which is what the padding
+   there makes room for. */
 helix-headless-toast-item::part(item) {
-  align-items: center;
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
+  align-items: start;
+  background-color: var(--_gray-strong);
+  box-sizing: border-box;
+  color: var(--_gray-surface);
+  display: grid;
+  font-size: 0.8125rem;
+  grid-template-columns: auto 1fr;
+  line-height: 1.5;
+  min-block-size: 0;
+  overflow: hidden;
+  padding: 0.75rem 3rem 0.75rem 0.75rem;
+  position: relative;
+}
+
+/* Centered on the first line of the message however many lines follow. */
+helix-headless-toast-item::part(icon) {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  margin-block-start: calc((1.21875rem - 1rem) / 2);
+  margin-inline-end: 0.75rem;
+}
+
+helix-headless-toast-item::part(icon-mark) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
 }
 
 helix-headless-toast-item::part(content) {
-  flex: 1;
+  grid-area: 1 / 2;
+  min-inline-size: 0;
+}
+
+helix-headless-toast-item::part(actions) {
+  display: flex;
+  gap: 0.25rem;
+  grid-area: 2 / 2;
+}
+
+helix-headless-toast-item > [slot="actions"] {
+  margin-block-start: 0.5rem;
+}
+
+helix-headless-toast-item::part(dismiss) {
+  all: unset;
+  block-size: 2rem;
+  box-sizing: border-box;
+  color: var(--_gray-mark);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 2rem;
+  inset-block-start: calc(0.75rem + (1.21875rem - 2rem) / 2);
+  inset-inline-end: 0.75rem;
+  place-content: center;
+  place-items: center;
+  position: absolute;
+}
+
+helix-headless-toast-item::part(dismiss-mark) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
+}
+
+helix-headless-toast-item::part(timer) {
+  background-color: var(--_gray-mark);
+  block-size: 0.25rem;
+  inset-block-start: 0;
+  inset-inline: 0;
+  position: absolute;
+}
+
+/* The action, at the row's control height and edged rather than filled, so it
+   reads on the strong surface in either scheme. */
+helix-headless-button::part(button) {
+  all: unset;
+  align-items: center;
+  block-size: 2rem;
+  border: 1px solid var(--_gray-muted);
+  box-sizing: border-box;
+  color: var(--_gray-surface);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: center;
+  line-height: 1.2;
+  padding-inline: 1rem;
+  white-space: nowrap;
+}
+
+/* The keyboard reaches these, so the rings go here. Taking the UA outline
+   off without putting one back is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-toast-item::part(dismiss):focus-visible,
+helix-headless-button::part(button):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }
