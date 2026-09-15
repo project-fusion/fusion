@@ -9,6 +9,9 @@ describe('scatter chart server output', () => {
       ssr(html`<helix-headless-scatter-chart for="pages"></helix-headless-scatter-chart>`),
     )
     expect(hasPart(markup, 'plot')).toBe(true)
+    /* In the plane that holds it left to right, so a right-to-left page gets
+       the same layout before a script runs as after. */
+    expect(markup).toMatch(/<div dir="ltr" part="plane">/)
     expect(markup).toContain('id="helix-chart-plot"')
     expect(markup).not.toContain('part="point"')
   })

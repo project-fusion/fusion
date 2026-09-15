@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* Where the numbers land against the drawing, and what a pointer finds. Every
@@ -127,5 +127,101 @@ describe('a pointer', () => {
     await frames(host)
     expect(all(host, 'point').some((one) => one.hasAttribute('data-active'))).toBe(false)
     expect(part(host, 'tooltip-label')).toBeNull()
+  })
+})
+
+/**
+ * The plane on a right-to-left page.
+ *
+ * **Laid out as on a left-to-right one.** A measure runs left to right in every
+ * script, as a number line does, so the y axis stays on the left and more stays
+ * to the right. Mirrored with the bar and line charts, it put the levels up on
+ * the right and ran the levels across from 1,600 down to 200. Set on the root,
+ * as a page would set it.
+ */
+describe('on a right-to-left page', () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute('dir')
+  })
+
+  const PLANE = ['plot', 'point', 'gridline', 'x-tick', 'y-tick', 'x-name', 'y-name']
+
+  /** Every box in the plane, from the host's own left edge. */
+  const layout = async (): Promise<number[]> => {
+    const host = await chart()
+    const origin = host.getBoundingClientRect().left
+    return PLANE.flatMap((name) =>
+      all(host, name).map((one) => one.getBoundingClientRect().left - origin),
+    )
+  }
+
+  geometry('everything in the plane is where a left-to-right page puts it', async () => {
+    const ltr = await layout()
+    document.documentElement.dir = 'rtl'
+    const rtl = await layout()
+    expect(rtl).toHaveLength(ltr.length)
+    rtl.forEach((left, index) => {
+      expect(Math.abs(left - (ltr[index] ?? 0))).toBeLessThan(1)
+    })
+  })
+
+  geometry('the levels up are left of the plot, and more is to the right', async () => {
+    document.documentElement.dir = 'rtl'
+    const host = await chart()
+    const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+    for (const tick of all(host, 'y-tick')) {
+      expect(tick.getBoundingClientRect().right).toBeLessThanOrEqual(plot.left + 1)
+    }
+    const levels = all(host, 'x-tick')
+      .sort((a, b) => middle(a).x - middle(b).x)
+      .map((tick) => Number(tick.textContent?.replaceAll(',', '')))
+    expect(levels).toEqual([...levels].sort((a, b) => a - b))
+    // Status is the lightest page and Blog the heaviest.
+    const across = all(host, 'point').map((one) => middle(one).x)
+    expect(Math.min(...across)).toBe(across[2] as number)
+    expect(Math.max(...across)).toBe(across[3] as number)
+  })
+
+  geometry('a pointer near a point asks about its row, and is answered over it', async () => {
+    document.documentElement.dir = 'rtl'
+    const host = await chart()
+    const docs = all(host, 'point')[1] as HTMLElement
+    const { x, y } = middle(docs)
+    host.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        clientX: x + 6,
+        clientY: y - 4,
+        composed: true,
+        pointerType: 'mouse',
+      }),
+    )
+    await frames(host)
+    expect(docs.hasAttribute('data-active')).toBe(true)
+    expect(part(host, 'tooltip-label')?.textContent).toBe('Docs')
+    const mark = (part(host, 'mark') as HTMLElement).getBoundingClientRect()
+    expect(Math.abs(mark.left - x)).toBeLessThan(2)
+  })
+
+  /* The names and the bubble are words, so they read the page's way. The
+     plane's `dir` would otherwise reach the bubble, which sits inside it. */
+  geometry('the bubble and the summary read the way the page does', async () => {
+    document.documentElement.dir = 'rtl'
+    const host = await chart()
+    const docs = middle(all(host, 'point')[1] as HTMLElement)
+    host.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        clientX: docs.x,
+        clientY: docs.y,
+        composed: true,
+        pointerType: 'mouse',
+      }),
+    )
+    await frames(host)
+    const bubble = part(host, 'tooltip-anchor') as HTMLElement
+    expect(getComputedStyle(bubble).direction).toBe('rtl')
+    expect(getComputedStyle(part(host, 'summary') as HTMLElement).direction).toBe('rtl')
+    expect(getComputedStyle(part(host, 'plot') as HTMLElement).direction).toBe('ltr')
   })
 })

@@ -98,6 +98,35 @@ describe('points', () => {
   })
 })
 
+/* A measure runs left to right in every script, as a number line does, so the
+   component holds its plane that way itself and a page's `dir` reaches only the
+   words. The pictures of it are in the styled tier's specs. */
+describe('which way it reads', () => {
+  test('the plane is left to right, with nothing turning it', async () => {
+    const host = await chart(SPEND, 'for="spend"')
+    const plane = part(host, 'plane')
+    expect(plane?.getAttribute('dir')).toBe('ltr')
+    for (const name of ['plot', 'x-axis', 'y-axis', 'x-name', 'y-name']) {
+      expect(plane?.contains(part(host, name))).toBe(true)
+    }
+    expect(host.shadowRoot?.querySelector('[data-mirror]')).toBeNull()
+  })
+
+  test('an empty chart holds its plot in the same plane', async () => {
+    const host = await chart('', 'for="nothing"')
+    expect(part(host, 'plane')?.getAttribute('dir')).toBe('ltr')
+    expect(part(host, 'plane')?.contains(part(host, 'plot'))).toBe(true)
+  })
+
+  test('the names read their own way, and the summary the page’s', async () => {
+    const host = await chart(SPEND, 'for="spend"')
+    expect(part(host, 'x-name')?.getAttribute('dir')).toBe('auto')
+    expect(part(host, 'y-name')?.getAttribute('dir')).toBe('auto')
+    expect(part(host, 'plane')?.contains(part(host, 'summary'))).toBe(false)
+    expect(part(host, 'summary')?.hasAttribute('dir')).toBe(false)
+  })
+})
+
 describe('gridlines', () => {
   const rules = async (value: string): Promise<{ down: number; across: number }> => {
     const host = await chart(SPEND, `for="spend" ${value}`)

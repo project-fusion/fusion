@@ -1,5 +1,7 @@
 /* Both axes are measured, so both carry numbers: the levels up beside the plot,
-   the levels across under it, and what each axis measures at its far end.
+   the levels across under it, and what each axis measures at its far end. They
+   are laid out in the plane, which the component holds left to right on every
+   page, so nothing here says which way the text runs.
 
    The name up top spans both columns, or the column the levels sit in is as
    wide as the name and the plot loses the difference: measured 15 Sep 2026 at
@@ -9,8 +11,13 @@
    it: at `space-2xs` they touched the name over them and the first level
    across. */
 :host {
-  column-gap: var(--helix-space-xs);
   container-type: inline-size;
+  display: block;
+  position: relative;
+}
+
+[part="plane"] {
+  column-gap: var(--helix-space-xs);
   display: grid;
   grid-template-areas:
     "y-name y-name"
@@ -18,7 +25,6 @@
     ". x-axis"
     ". x-name";
   grid-template-columns: auto minmax(0, 1fr);
-  position: relative;
   row-gap: var(--scatter-chart-gap, var(--helix-space-xs));
 }
 
@@ -64,13 +70,6 @@
   translate: -50% -50%;
 }
 
-/* The x axis runs from the inline start, so on a right-to-left page a point is
-   placed from the right and centered back the other way: `translate` is
-   physical. The drawing it sits on is mirrored to match. */
-:host(:dir(rtl)) [part~="point"] {
-  translate: 50% -50%;
-}
-
 /* The row a pointer is asking about, which may be more than one point when the
    table has more than one series. */
 [part~="point"][data-active] {
@@ -112,10 +111,6 @@
   translate: -50% 0;
 }
 
-:host(:dir(rtl)) [part="x-tick"] {
-  translate: 50% 0;
-}
-
 [part="y-tick"] {
   align-self: start;
   inset-block-start: var(--chart-tick);
@@ -146,8 +141,11 @@
   justify-self: end;
 }
 
+/* Over the axis it names. Stretched across both columns, a name in Arabic or
+   Hebrew starts at its own right, over the far corner of the plot. */
 [part="y-name"] {
   grid-area: y-name;
+  justify-self: start;
 }
 
 /* Said and not shown: the points are the picture of it. */

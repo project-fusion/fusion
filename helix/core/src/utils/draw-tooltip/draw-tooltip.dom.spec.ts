@@ -123,6 +123,15 @@ describe('where the bubble points', () => {
     expect(mark.style.insetInlineStart).toBe('')
   })
 
+  /* A scatter's plane is left to right on every page and the bubble is inside
+     it, so the words would run that way too. The chart says which way they
+     run, and says nothing otherwise, the bubble then taking the plot's. */
+  test('with its words running the way the chart says, and the plot’s otherwise', () => {
+    const into = drawn(0, { dir: 'rtl', fixed: true, placement: 'top', x: '10%', y: '40%' })
+    expect(into.querySelector('helix-tooltip')?.getAttribute('dir')).toBe('rtl')
+    expect(drawn(0).querySelector('helix-tooltip')?.hasAttribute('dir')).toBe(false)
+  })
+
   /* The id is fixed rather than generated: it is scoped to this chart's shadow
      root, where it is the only one, so nothing can collide with it and nothing
      has to be threaded through a render to stay in step. `for` resolves through

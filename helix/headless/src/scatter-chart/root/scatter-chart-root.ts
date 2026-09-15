@@ -110,6 +110,17 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * a `<span>` placed by percentage over it, which is how `LineChart` draws its
  * termini and for the same reason.
  *
+ * **Left to right on every page, the one chart here that is.** A bar or a line
+ * chart's across is the order its readings are named in, which follows the
+ * line of text and turns with it. Here it is a measure, and a measure has a
+ * direction of its own: more is to the right in every script, as a number line
+ * is. So the plot, its axes and the names at their ends sit in a `plane` part
+ * that carries `dir="ltr"`, which holds the y axis on the left and the points,
+ * rules, ticks, pointer and tooltip mark where a left-to-right page puts them,
+ * with no stylesheet asked to know. The names carry `dir="auto"`, so one written
+ * in Arabic or Hebrew still reads its own way; the summary is outside the plane
+ * and the bubble is told the page's direction, both being words.
+ *
  * @since 0.1.0
  * @status experimental
  * @category charts
@@ -118,6 +129,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  *
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart mark - The invisible point the tooltip is anchored to.
+ * @csspart plane - The plot, both axes and their names, left to right on every page. The grid they are laid out in.
  * @csspart plot - The drawing.
  * @csspart point - One row, as a point.
  * @csspart point-active - A point of the row a pointer is asking about, beside `point`.
@@ -253,26 +265,30 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const field = this.field
     this.drawn = field.points
     if (field.points.length === 0) {
-      return html`<div id="helix-chart-plot" part="plot"></div>`
+      return html`<div dir="ltr" part="plane">
+        <div id="helix-chart-plot" part="plot"></div>
+      </div>`
     }
     const format = formatNumbers('')
     const along = linear(field.x, [0, WIDTH])
     const up = linear(field.y, [HEIGHT, 0])
-    return html`${this.renderPlot(field, along, up)}
-      <div aria-hidden="true" part="x-axis">
-        ${ticks(field.x).map(
-          (level) =>
-            html`<span part="x-tick" style="--chart-tick: ${along(level)}%">${format(level)}</span>`,
-        )}
+    return html`<div dir="ltr" part="plane">
+        ${this.renderPlot(field, along, up)}
+        <div aria-hidden="true" part="x-axis">
+          ${ticks(field.x).map(
+            (level) =>
+              html`<span part="x-tick" style="--chart-tick: ${along(level)}%">${format(level)}</span>`,
+          )}
+        </div>
+        <div aria-hidden="true" part="y-axis">
+          ${ticks(field.y).map(
+            (level) =>
+              html`<span part="y-tick" style="--chart-tick: ${up(level)}%">${format(level)}</span>`,
+          )}
+        </div>
+        <span aria-hidden="true" dir="auto" part="x-name">${field.xName}</span>
+        <span aria-hidden="true" dir="auto" part="y-name">${field.yNames.join(', ')}</span>
       </div>
-      <div aria-hidden="true" part="y-axis">
-        ${ticks(field.y).map(
-          (level) =>
-            html`<span part="y-tick" style="--chart-tick: ${up(level)}%">${format(level)}</span>`,
-        )}
-      </div>
-      <span aria-hidden="true" part="x-name">${field.xName}</span>
-      <span aria-hidden="true" part="y-name">${field.yNames.join(', ')}</span>
       ${this.renderSummary(field)}`
   }
 
@@ -285,7 +301,6 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     return html`<div aria-hidden="true" id="helix-chart-plot" part="plot">
       <svg part="svg"
-        data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
@@ -346,6 +361,10 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
       return drawTooltip(this.sourceRows, -1, this.tag('tooltip'))
     }
     return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
+      /* The host's, which the plane's `dir` does not reach: a bubble of names
+         and values is words, and reads the way the page does. */
+      dir: getComputedStyle(this).direction === 'rtl' ? 'rtl' : 'ltr',
+      fixed: true,
       placement: 'top',
       x: `${point.x}%`,
       y: `${point.y}%`,
@@ -368,10 +387,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     if (!box || box.width === 0 || box.height === 0) {
       return
     }
-    /* From the right on a mirrored drawing. The x axis runs from the inline
-       start like every other chart's, numbers or not, so a point at 10% stands
-       10% in from the right edge there. */
-    const across = this.pointer.mirrored ? box.right - event.clientX : event.clientX - box.left
+    const across = event.clientX - box.left
     const up = event.clientY - box.top
     let found: ScatterPoint | undefined
     let best = REACH ** 2
