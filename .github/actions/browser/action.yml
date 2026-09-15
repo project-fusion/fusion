@@ -1,0 +1,40 @@
+# Chromium, restored when it can be, and what it links against.
+#
+# **Keyed on the Playwright version and nothing else**, because that is what
+# decides which browser build `playwright install` fetches. It was keyed on the
+# lockfile, so any dependency bump downloaded the same browser again, and it
+# never hit anyway: every job of a run started together on an empty key, each
+# downloaded, and the cache one of them saved was scoped to that pull request.
+# `seed` in `verify.yml` saves it on `main`, where every pull request can read it.
+#
+# **The headless shell and not the whole browser.** `chromium.launch()` runs the
+# shell unless it is given a channel, and nothing here gives one, so the full
+# Chrome for Testing was a second download no check started.
+#
+# **`--with-deps` still runs**: the system packages are not in this cache, and
+# among them are the fonts a picture is taken with, installed on the runner that
+# took every baseline.
+name: Install Chromium
+description: Restores the Playwright browser for the version the lockfile holds, and installs its system packages.
+
+runs:
+  using: composite
+  steps:
+    - name: Read the Playwright version off the lockfile
+      id: version
+      shell: bash
+      run: |
+        set -euo pipefail
+        version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)
+        [ -n "$version" ] || { echo "::error::bun.lock names no playwright-core"; exit 1; }
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Restore the browser
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
+        path: ~/.cache/ms-playwright
+
+    - name: Install Chromium and its system packages
+      shell: bash
+      run: bunx playwright install --with-deps --only-shell chromium

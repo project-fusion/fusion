@@ -1,7 +1,7 @@
 # `verify` split across jobs, with the list of checks derived from `verify`
 # itself rather than mirrored here. The shape, why the browser matrix is
-# skippable for some diffs, and why there is no Node on the runner are in
-# [VERIFYING.md](../VERIFYING.md).
+# skippable for some diffs, how its jobs are counted, and why there is no Node
+# on the runner are in [VERIFYING.md](../VERIFYING.md).
 
 name: verify
 
@@ -34,23 +34,97 @@ env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
-  # The shard count lives in one place and the matrix is built from it, so a
-  # matrix of six against `--of 8` cannot silently drop a third of the checks.
+  # A push to `main` whose tree a pull request's run already verified runs
+  # nothing again: [VERIFYING.md](../VERIFYING.md#a-tree-is-verified-once).
+  # Every job below that starts the work waits on this one and skips on `true`;
+  # on a pull request this is skipped and they start at once.
+  proven:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      proven: ${{ steps.look.outputs.proven }}
+    steps:
+      - name: Check out the script
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: .github/scripts
+      - name: Look for a pull request that verified this tree
+        id: look
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TREE: ${{ github.event.head_commit.tree_id }}
+        run: .github/scripts/proven.sh
+
+  # When `proven` skipped the run, the caches this workflow reads still want
+  # writing where every pull request can read them. A cache a pull request saves
+  # is its own, so with `main` running nothing a new lockfile or a new
+  # Playwright would be fetched afresh by every pull request after it. Each is
+  # looked up first and fetched only when missing, so a hit costs the lookup.
+  # Not in the gate's `needs`: it checks nothing, and a cache it could not write
+  # is no reason to call a verified tree unverified.
+  seed:
+    needs: proven
+    if: needs.proven.outputs.proven == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Read the Playwright version off the lockfile
+        id: version
+        run: echo "version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)" >> "$GITHUB_OUTPUT"
+      - name: Look up the dependencies
+        id: dependencies
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          lookup-only: true
+          path: ~/.bun/install/cache
+      - name: Look up the browser
+        id: browser
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
+          lookup-only: true
+          path: ~/.cache/ms-playwright
+      # Saves the dependencies on its way out when they missed.
+      - name: Set up bun and the dependencies
+        if: steps.dependencies.outputs.cache-hit != 'true' || steps.browser.outputs.cache-hit != 'true'
+        uses: ./.github/actions/setup
+      # Saves the browser on its way out when it missed.
+      - name: Install Chromium
+        if: steps.browser.outputs.cache-hit != 'true'
+        uses: ./.github/actions/browser
+
+  # The shard counts live in one place each and the matrices are built from
+  # them, so a matrix of six against `--of 8` cannot silently drop a third of
+  # the checks.
   plan:
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       browser: ${{ steps.scope.outputs.browser }}
+      matrix: ${{ steps.browser.outputs.matrix }}
       of: ${{ steps.shards.outputs.of }}
       shards: ${{ steps.shards.outputs.shards }}
     steps:
       # Full history, because `scope` below diffs against the base and a
-      # depth-1 checkout has nothing to diff against. Same reason `browser`
-      # already takes it for `parity`.
+      # depth-1 checkout has nothing to diff against. Without the blobs, which
+      # a diff of names never reads and a partial clone fetches for the
+      # checkout alone: the history was twelve seconds of every job that took
+      # it.
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          filter: blob:none
 
       # **This job needs bun installed and the jobs below did not tell it so.**
       # It ran `node` until 2 Sep 2026, and a runner has node already; bun is
@@ -85,10 +159,51 @@ jobs:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD: ${{ github.sha }}
         run: .github/scripts/touched.sh
-  # One build, before the sixteen that would each do their own: the remote
-  # cache is warm across runs and cold within one.
-  # [VERIFYING.md](../VERIFYING.md#one-build-before-the-sixteen-that-would-each-do-their-own)
+
+      # How many jobs each browser check takes, from how much of the corpus the
+      # change reaches: [VERIFYING.md](../VERIFYING.md#how-many-browser-jobs).
+      - name: Plan the browser jobs
+        id: browser
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          matrix=$(bun fusion/scripts/plan-browser.mjs --changed "$BASE" 2> "$RUNNER_TEMP/plan.log")
+          cat "$RUNNER_TEMP/plan.log"
+          { echo '```'; cat "$RUNNER_TEMP/plan.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+      # The tree this run checks out, named where `proven` on `main` can find
+      # it. On a pull request that is the merge into the base, which is the tree
+      # a rebase of an up-to-date branch lands. Nothing is in the file; the
+      # name is the record, and `proven` reads whether this run went on to pass.
+      - name: Record the tree this run verifies
+        if: github.event_name == 'pull_request'
+        id: tree
+        run: |
+          set -euo pipefail
+          tree=$(git rev-parse 'HEAD^{tree}')
+          echo "tree=$tree" >> "$GITHUB_OUTPUT"
+          echo "$tree" > "$RUNNER_TEMP/tree"
+      - name: Upload the record
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: verified-tree-${{ steps.tree.outputs.tree }}
+          path: ${{ runner.temp }}/tree
+          retention-days: 14
+
+  # One build, before the jobs that would each do their own: the remote cache
+  # is warm across runs and cold within one.
+  # [VERIFYING.md](../VERIFYING.md#one-build-before-the-jobs-that-would-each-do-their-own)
+  #
+  # **One turbo run, and not the three steps it was.** `bun run build` already
+  # reaches `analyze` and `catalog`, and a second invocation hashed a tree the
+  # first had filled with generated files: `analyze` missed, and rebuilt
+  # fourteen tasks in 81 seconds. Named together, the three are one graph.
   warm:
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -96,27 +211,62 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
-
-      # The three `PREREQUISITES` in `run-checks.mjs`, in its order. They are
-      # named here rather than derived because this job exists to fill a cache
-      # and a wrong guess costs a restore, not a wrong answer: a task this
-      # misses is one the shard builds itself, exactly as it does today.
-      - name: Build
-        run: bun run build
-      - name: Write the manifests and framework typings
-        run: bun run analyze
       # `bunx`, because `turbo` is a workspace binary and a `run:` step does not
       # get the PATH `bun run` arranges: bare `turbo` here is exit 127.
       #
-      # `turbo run catalog` rather than `bun run catalog`, which is not a script.
-      - name: Build the catalog
-        run: bunx turbo run catalog
+      # The three `PREREQUISITES` in `run-checks.mjs`, named rather than
+      # derived because this job exists to fill a cache and a wrong guess costs
+      # a restore, not a wrong answer: a task this misses is one the shard
+      # builds itself.
+      - name: Build, and write the manifests and the catalog
+        run: bunx turbo run build analyze catalog
 
-  # **Ten shards, because `warm` makes the build a restore.** What is left in a
-  # shard is setup plus its share of the checks, so splitting the share is what
-  # moves the number.
+  # **The part of the build the browser jobs render, on its own.** They read the
+  # frame and the spec bundles and nothing else of the site, and those wait for
+  # the components and not for the docs, so this finishes while `warm` is still
+  # measuring bundle sizes, and every browser job starts that much sooner. The
+  # two jobs build the components side by side, which is a minute of compute
+  # bought for the same minute off every run.
+  warm-browser:
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+      - name: Build the frame and the spec bundles
+        run: bunx turbo run frame specs
+
+  # **The build again, under the hash a judge gives it.** Turbo hashes a
+  # pass-through argument into every task of a run, dependencies included, so
+  # `turbo run docs -- --check` asks for a `build` of every package with
+  # `--check` in its key, and the plain build `warm` made is a miss under it.
+  # `docs`, `routes` and `themed-page` are the three judges whose graph is the
+  # workspace, and each shard or `floors` drawing one rebuilt it: measured in a
+  # fresh clone on 15 Sep 2026, `turbo run docs -- --check` after a restored
+  # build hit none of its 23 tasks. Running the three here, beside `warm`, puts
+  # that graph in the cache once for every job after it.
+  warm-check:
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+      - name: Build what the judges read, under their hash
+        run: bunx turbo run docs routes themed-page -- --check
+
+  # **Three shards, because they are off the critical path.** Every check here
+  # is seconds of work behind a job's setup, so ten shards finished no sooner
+  # than the browser jobs beside them and were billed a minute apiece.
   checks:
-    needs: [plan, warm]
+    needs: [plan, warm, warm-check]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -151,8 +301,10 @@ jobs:
   # a single shard doing all of it and finished no sooner than that shard did.
   #
   # Same prerequisites as a shard, for the same reason: the checks it runs read
-  # what `build` and `analyze` write.
+  # what `build` writes. After `warm`, so the build is a restore: it built its
+  # own beside `warm` for 139 seconds, measured 15 Sep 2026.
   floors:
+    needs: [warm, warm-check]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -186,8 +338,10 @@ jobs:
   #
   # `analyze` is not optional: `files` names `custom-elements.json` and the
   # three framework typings, and `build` does not produce them, so without it
-  # the tarballs ship without files their own manifests promise.
+  # the tarballs ship without files their own manifests promise. After `warm`,
+  # so both are a restore rather than the 214 seconds they were.
   packaging:
+    needs: warm
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -197,11 +351,8 @@ jobs:
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
 
-      - name: Build
-        run: bun run build
-
-      - name: Write the manifests and framework typings
-        run: bun run analyze
+      - name: Build, and write the manifests and framework typings
+        run: bunx turbo run build analyze
 
       - name: Install a template out of the pack
         run: bun run smoke:template
@@ -209,6 +360,8 @@ jobs:
   # Its own job because it reads every file regardless of who owns it, so
   # sharding it would mean a pass over the same tree per shard.
   lint:
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -234,7 +387,10 @@ jobs:
           HEAD: ${{ github.event.pull_request.head.sha }}
         run: bun fusion/scripts/check-withheld.mjs --commits "$BASE..$HEAD"
 
+  # After `warm`, because `typecheck` reads nearly everything `build` writes:
+  # the site's types import the catalog, the frame and the spec bundles.
   types:
+    needs: warm
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -245,9 +401,25 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
-  # One job for all three: `bun run test` is partly Rust, and splitting it
-  # would pay for a toolchain twice.
+  # **The JavaScript specs, apart from the Rust**, which they do not need: the
+  # shim specs put their own `PATH` in front of every binary they run, cargo
+  # included. Together the two took 321 seconds on 15 Sep 2026, one after the
+  # other, with most of the Rust job's toolchain idle through the specs.
   tests:
+    needs: warm
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+      - name: Run the specs
+        run: bun run test
+
+  # Everything that compiles Rust, in the one job that installs it.
+  rust:
+    needs: warm
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -265,8 +437,14 @@ jobs:
           toolchain: 1.90
       - name: Restore the Cargo cache
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-      - name: Run the specs
-        run: bun run test
+      # **The build is what `references` reads.** That rule asks whether a path a
+      # comment names is on disk, and several of them name generated files:
+      # `fusion/site/public/sandbox/frame.css` is written by the site build and
+      # is gitignored. A shard had it because the shards build first; this job
+      # did not, so moving the check here turned seven true references into
+      # findings. After `warm`, so it is a restore rather than a build.
+      - name: Build
+        run: bun run build
       # **`check:cli` is here rather than in the shard pool**, because it is the
       # only check that runs a binary: a shard has bun and no cargo, so
       # the npm shim would build one from cold on whichever of the six drew it,
@@ -274,10 +452,9 @@ jobs:
       # cache is warm and `rs:build` is the same compile `rs:check` and
       # `rs:test` were going to do anyway.
       #
-      # It reads source rather than `dist`, so it does not want the shard's
-      # `build` prerequisite. The one thing `dist` buys is naming the exact
-      # subpath in a barrel finding, and without it that advice degrades to
-      # `dependency/<part>` in words rather than silently.
+      # It reads source rather than `dist`. The one thing `dist` buys is naming
+      # the exact subpath in a barrel finding, and without it that advice
+      # degrades to `dependency/<part>` in words rather than silently.
       - name: Build the Rust workspace
         run: bun run rs:build
       - name: The rules that ship
@@ -286,15 +463,6 @@ jobs:
       # one compiles Rust to do it, and six doing that at once took the runner's
       # memory: exit 137 on one shard, SIGTERM on another, a third canceled
       # behind them. Here the cargo cache is warm and the binary already built.
-      #
-      # **The build is what `references` reads.** That rule asks whether a path a
-      # comment names is on disk, and several of them name generated files:
-      # `fusion/site/public/sandbox/frame.css` is written by the site build and
-      # is gitignored. A shard had it because the shards build first; this job
-      # did not, so moving the check here turned seven true references into
-      # findings. Cached, so it is a restore rather than a build.
-      - name: Build
-        run: bun run build
       - name: Seed tokens
         run: bun run check:css:seeds
       - name: Prose
@@ -306,18 +474,25 @@ jobs:
       - name: Rust tests
         run: bun run rs:test
 
-  # Six jobs, because they need a browser and `verify` deliberately does not:
-  # everything in `verify` runs anywhere bun runs. These are the checks behind
-  # `hasLayout()`, which happy-dom skips because it has no boxes, and a
-  # component can render perfect markup in the wrong place with no DOM saying
-  # so. Split because nothing here needs what another produces.
+  # Every example rendered, pictured and measured, in a browser, because
+  # `verify` deliberately does not have one: everything in `verify` runs
+  # anywhere bun runs. These are the checks behind `hasLayout()`, which
+  # happy-dom skips because it has no boxes, and a component can render perfect
+  # markup in the wrong place with no DOM saying so.
+  #
+  # **One job per shard of a check, and `plan` decides how many.** A check
+  # whose share of the corpus would take longer than a job's worth is split by
+  # family, so the longest of these is a shard and not the whole corpus: parity
+  # and hydration were each ten minutes of one job. What each check is, and why
+  # it wants a browser, is in the file that runs it.
   browser:
+    name: browser (${{ matrix.label }})
     # `plan` decides whether this matrix can fail at all for the diff in hand,
-    # and `warm` means the build below is a restore. Skipped is neither a
-    # failure nor a cancellation, so the `verify` gate at the bottom passes a
-    # run where this never reported, which is the property that lets the
-    # required check stay exactly as it is.
-    needs: [plan, warm]
+    # and how it splits, and `warm-browser` means the build is a restore.
+    # Skipped is neither a failure nor a cancellation, so the `verify` gate at
+    # the bottom passes a run where this never reported, which is the property
+    # that lets the required check stay exactly as it is.
+    needs: [plan, warm-browser]
     # **`!= 'false'`, so the unknown case runs rather than skips.** `scope`
     # states the required direction: a path nobody thought about lands outside
     # the list and runs, which is the direction this has to fail in. `== 'true'`
@@ -332,137 +507,48 @@ jobs:
     # own failure is what the gate catches, so the safe case is unchanged.
     if: needs.plan.outputs.browser != 'false'
     runs-on: ubuntu-latest
-    # Sized for `parity`, which compares every example pair and needs most of
-    # it; the others are billed for what they use rather than for the ceiling.
-    # Too low and the job is `cancelled`, which reports as neither pass nor fail  # dialect:quoted, GitHub spells this conclusion value so
-    # and reads in the summary as a job that did not object.
-    timeout-minutes: 45
+    # A shard is sized to about a minute of work, so this is five times that
+    # and room for a slow runner. Too low and the job is `cancelled`, which  # dialect:quoted, GitHub spells this conclusion value so
+    # reports as neither pass nor fail and reads in the summary as a job that
+    # did not object.
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # Every ink, measured against the ground it is really painted on. The
-          # stylesheets can only be read for the eleven rules that set an ink
-          # and a ground together; the rest inherit theirs from a host, a part
-          # above them or the page, and only a laid-out document knows. Both
-          # color modes, because the half not on screen is the half that fails.
-          - task: contrast
-            run: bun run check:css:contrast
-          # The token reference's hex column, against what the browser paints.
-          # The column is arithmetic in Node, because that file is committed and
-          # `verify` checks it in a job with no browser; this is the other half
-          # of that trade and it belongs here, where one is already installed.
-          - task: hexes
-            run: bun run check:css:hexes
-          # The specs themselves.
-          - task: specs
-            run: bun run specs:browser
-          # Every example, rendered. `helix component`'s `examples` reads them and can tell
-          # you an attribute no component declares; only running one can tell
-          # you it throws on upgrade, names an element registered nowhere, or
-          # lays out to nothing.
-          - task: smoke
-            run: bun run smoke:examples
-          # Every example in both tiers, pixel for pixel against a committed
-          # baseline. This is the one fault class the rest of `verify` cannot
-          # reach: everything else reads source or asserts a fact somebody
-          # thought to assert, and a chevron drawn at 233 pixels breaks nothing
-          # anybody wrote down. Here rather than in `verify` because it wants a
-          # browser and a baseline taken on this runner: the comparison never
-          # crosses platforms, so on a contributor's Mac it says so and exits
-          # clean.
-          - task: visual
-            run: bun run check:spec:visual
-          # Every example rendered twice, from its HTML and from its TSX, and
-          # the two compared. Both are authored now, neither derived from the
-          # other, which is the right arrangement and costs exactly one thing:
-          # nothing else notices them drifting. `helix component`'s `examples-paired` holds
-          # the two files to each other; only a picture can hold the two
-          # renders.
-          #
-          # Here rather than in `verify` for the reason `visual` is, and for one
-          # more: it wants a `frame.js` newer than the components, which
-          # `bun run build` produces above and a contributor's tree may not
-          # have. Unlike `visual` it needs no baseline, so it does not care
-          # which platform it runs on: it compares two renders taken seconds
-          # apart in one browser.
-          - task: parity
-            # Scoped to what the push or the pull request actually changed, and
-            # to whatever composes it. A change under `helix/styles`, `core`,
-            # `icons`, `theme` or either `shared/` is read by every example, so
-            # the script recognizes those and compares the whole corpus anyway.
-            # The run says which families it skipped, in the same line as its
-            # verdict: a subset that reports like a full pass is the failure
-            # this whole check exists to prevent.
-            run: >-
-              bun run check:spec:visual-parity --changed
-              "${{ github.event_name == 'pull_request'
-              && github.event.pull_request.base.sha
-              || github.event.before }}"
-          # Every example, rendered by a client and hydrated from a server's
-          # declarative shadow DOM, and the two pictures compared; and a fixture
-          # per component that reads its children, held to its end state both
-          # ways and to rendering once. The site ships no DSD, so nothing else
-          # here would notice a component that stopped hydrating. Here rather
-          # than in `verify` because it wants a browser, and scoped the way
-          # `parity` is, by the same rule, for the same reason.
-          - task: dsd
-            run: >-
-              bun run check:spec:dsd --changed
-              "${{ github.event_name == 'pull_request'
-              && github.event.pull_request.base.sha
-              || github.event.before }}"
-          # The collector in `@fusion.dev/helix-diagnostics`, against real components.
-          # Here and not in `verify` because the DOM `verify` runs under drops a
-          # `::part()` rule on the floor: happy-dom parses
-          # `helix-button::part(button) { }` to zero rules, so every spec for the
-          # part rules runs on hand-built objects, and the collector's central
-          # assumption, that CSSOM hands back what it reads, is asserted nowhere
-          # else.
-          - task: diagnostics
-            run: bun run check:spec:diagnostics
+        include: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      # What the scoped checks diff against, once for every entry `plan` wrote.
+      BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
     steps:
-      # **Full history, because `parity` scopes itself by diffing against the
-      # base and a depth-1 checkout has nothing to diff against.** The script
-      # treats an unresolvable range as "assume everything", which is the right
-      # default and would also have made the scoping silently never happen: it
-      # would have compared all 610 examples on every run while reporting that
-      # it had scoped. The other tasks in this matrix do not read history and
-      # are not harmed by having it.
+      # **Full history, because parity and hydration scope themselves by
+      # diffing against the base and a depth-1 checkout has nothing to diff
+      # against.** The scripts treat an unresolvable range as "assume
+      # everything", which is the right default and would also have made the
+      # scoping silently never happen: they would have compared all 663 examples
+      # on every run while reporting that they had scoped. No blobs, for the
+      # reason `plan` gives.
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          filter: blob:none
 
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
 
-      # The browser is a 130MB download that changes only when Playwright does,
-      # so it is keyed on the lockfile. `--with-deps` still runs: the apt
-      # packages are not in this cache, and a headless browser in CI fails on a
-      # missing `libnss3` far more often than on anything to do with the tests.
-      - name: Restore the spec bundle cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: ~/.cache/ms-playwright
-
-      # No Rust: since 273 the wasm is tracked and `helix/theme`'s build is
-      # `tsc` alone, so `turbo run build` never touches cargo here.
-      - name: Build
-        run: bun run build
-
       - name: Install Chromium
-        run: bunx playwright install --with-deps chromium
+        uses: ./.github/actions/browser
 
-      - name: ${{ matrix.task }}
+      # Each check builds what it reads, `turbo run frame` first, which after
+      # `warm-browser` is a restore.
+      - name: ${{ matrix.label }}
         run: ${{ matrix.run }}
 
       # **The pictures, when it fails, because nothing else can show them.**
       # `check:spec:visual` marks the changed pixels into `preview.diff.png` beside
       # each baseline and those files die with the runner, so a reviewer got a
       # pixel count and no way to see what moved. `if-no-files-found: ignore`
-      # because only the visual shard ever writes one.
+      # because only the pixel checks ever write one.
       #
       # **One glob per tier rather than one per picture, because the enumeration
       # rotted twice.** A diff lands beside the baseline it belongs to, so the
@@ -485,7 +571,7 @@ jobs:
         with:
           if-no-files-found: ignore
           include-hidden-files: true
-          name: visual-diffs-${{ matrix.task }}
+          name: visual-diffs-${{ matrix.id }}
           path: |
             helix/headless/src/*/.examples/preview*.diff.png
             helix/styled/src/*/.examples/preview*.diff.png
@@ -493,12 +579,12 @@ jobs:
             helix/styled/src/*/.examples/*.parity.png
             .local/dsd/diff/*.png
 
-  # The one required context, because the shard count is an argument and the
-  # job names move with it. `always()` is load-bearing:
+  # The one required context, because the shard counts are arguments and the
+  # job names move with them. `always()` is load-bearing:
   # [VERIFYING.md](../VERIFYING.md#one-context-to-require)
   verify:
     if: always()
-    needs: [plan, warm, checks, floors, packaging, lint, types, tests, browser]
+    needs: [proven, plan, warm, warm-browser, warm-check, checks, floors, packaging, lint, types, tests, rust, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
