@@ -45,29 +45,58 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-textarea::part(field) {
-  align-items: center;
+helix-headless-textarea {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* The box is the field rather than the control, so the focus ring is drawn
+   once around the whole thing. */
+helix-headless-textarea::part(field) {
+  background-color: var(--_gray-subtle);
+  border: 1px solid var(--_gray-line);
+  display: flex;
+  padding: 0.5rem;
 }
 
 helix-headless-textarea::part(control) {
-  font: inherit;
+  all: unset;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  min-inline-size: 0;
+  overflow-wrap: break-word;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+
+helix-headless-textarea::part(control)::placeholder {
+  color: var(--_gray-muted);
 }
 
 helix-headless-textarea::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
 }
 
-helix-headless-textarea::part(hint) {
+helix-headless-textarea::part(hint),
+helix-headless-textarea::part(feedback) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
 }
 
 helix-headless-textarea::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  font-weight: 500;
 }
 
 helix-headless-icon::part(svg) {
@@ -78,8 +107,8 @@ helix-headless-icon::part(svg) {
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
    off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-textarea::part(control):focus-visible {
+   being operable without a pointer. On the field, against its edge, since
+   the control inside it draws no box of its own. */
+helix-headless-textarea::part(field):focus-within {
   outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
 }

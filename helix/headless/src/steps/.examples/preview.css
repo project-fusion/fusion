@@ -38,31 +38,122 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
+/* A row handing each step an equal share, so the marks sit at even intervals
+   whatever the names measure. */
+helix-headless-steps {
+  display: flex;
+  gap: 1rem;
+}
+
+helix-headless-step {
+  align-items: start;
+  display: grid;
+  flex: 1 1 0;
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  position: relative;
+  row-gap: 0.5rem;
+}
+
+/* Two half lines, each from a quarter rem clear of the mark to half the gap
+   past the step's edge, so they meet the neighbor's in the middle of the gap. */
+helix-headless-step::part(lead),
+helix-headless-step::part(trail) {
+  background-color: var(--_gray-line);
+  block-size: 1px;
+  inline-size: calc(50% - 0.375rem);
+  inset-block-start: 0.625rem;
+  position: absolute;
+}
+
+helix-headless-step::part(lead) {
+  inset-inline-start: -0.5rem;
+}
+
+helix-headless-step::part(trail) {
+  inset-inline-start: calc(50% + 0.875rem);
+}
+
+helix-headless-step:first-child::part(lead),
+helix-headless-step:last-child::part(trail) {
+  display: none;
+}
+
+helix-headless-step::part(marker) {
+  align-items: center;
+  block-size: 1.25rem;
+  color: var(--_gray-line);
   display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+  grid-column: 1;
+  grid-row: 1;
+  inline-size: 1.25rem;
+  justify-content: center;
+  justify-self: center;
+  position: relative;
+  z-index: 1;
 }
 
-helix-headless-step::part(description) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-step::part(label) {
+helix-headless-step[complete]::part(marker),
+helix-headless-step[current]::part(marker) {
   color: var(--_gray-strong);
-  font-weight: 600;
 }
 
 helix-headless-step::part(mark) {
-  block-size: 1em;
+  block-size: 1.25rem;
   flex: none;
-  inline-size: 1em;
+  inline-size: 1.25rem;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-step::part(body) {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  grid-column: 1;
+  grid-row: 2;
+  min-inline-size: 0;
+}
+
+helix-headless-step::part(label) {
+  display: inline-flex;
+  max-inline-size: 100%;
+}
+
+helix-headless-step::part(label-button) {
+  align-items: center;
+  background-color: transparent;
+  block-size: 2rem;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-inline: 0.75rem;
+  white-space: nowrap;
+}
+
+helix-headless-step[complete]::part(label-button),
+helix-headless-step[current]::part(label-button) {
+  color: var(--_gray-strong);
+}
+
+/* The keyboard reaches this, so the ring goes here. */
+helix-headless-step::part(label-button):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+/* The same inset the name takes as padding, so the two start on one line. */
+helix-headless-step::part(description) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  padding-inline: 0.75rem;
+}
+
+/* A row has no room under a step for what the stage holds. */
+helix-headless-step::part(content) {
+  display: none;
 }

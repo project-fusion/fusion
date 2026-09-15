@@ -45,9 +45,28 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+helix-headless-table {
+  display: block;
+  overflow-x: auto;
+}
+
+/* A rule under each cell and none between them, so a row reads as a line
+   across the table rather than as a run of boxes. */
 helix-headless-table-cell {
+  align-items: center;
   border-block-end: 1px solid var(--_gray-line);
-  padding: 0.375rem 0.5rem;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  display: flex;
+  font-size: 0.8125rem;
+  min-block-size: 2.5rem;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  padding: 0.5rem 1rem 0.5rem 0;
+}
+
+helix-headless-table-cell[header] {
+  font-weight: 500;
 }
 
 helix-headless-icon::part(svg) {
@@ -60,15 +79,30 @@ helix-headless-icon::part(svg) {
    `--table-template` because only it has counted the columns. */
 helix-headless-table::part(table) {
   display: grid;
-  gap: 0.25rem 1rem;
-  grid-template-columns: var(--table-template, 1fr);
+  grid-template-columns: var(--table-template, minmax(0, 1fr));
+  inline-size: 100%;
 }
 
-/* The head and every row take no box, so their cells are the grid's items.
-   Without it the cells stay inside their rows, the grid gets one item per row
-   instead of one per cell, and the headings run together as one string with the
-   rows under them out of step. */
+/* The head, every row and every column take no box, so the headings and the
+   cells are the grid's items. Without it the cells stay inside their rows, the
+   grid gets one item per row instead of one per cell, and the headings run
+   together as one string with the rows under them out of step. */
 helix-headless-table::part(head),
+helix-headless-table-column,
 helix-headless-table-row {
   display: contents;
+}
+
+/* Taller than a row of data, and set apart by weight rather than size. */
+helix-headless-table-column::part(column) {
+  align-items: center;
+  border-block-end: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  min-block-size: 3rem;
+  min-inline-size: 0;
+  padding-inline-end: 1rem;
 }

@@ -48,13 +48,23 @@ helix-headless-icon {
 helix-headless-tag::part(dismiss) {
   all: unset;
   box-sizing: border-box;
+  color: inherit;
   cursor: pointer;
+  display: inline-flex;
+  margin-inline-end: -0.25rem;
+  padding: 0.25rem;
+}
+
+/* The keyboard reaches this, so the ring goes here. */
+helix-headless-tag::part(dismiss):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
 }
 
 helix-headless-tag::part(dismiss-mark) {
-  block-size: 1em;
+  block-size: 0.85em;
   flex: none;
-  inline-size: 1em;
+  inline-size: 0.85em;
 }
 
 helix-headless-icon::part(svg) {
@@ -63,10 +73,19 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
+/* Shorter than a control, so a row of them does not read as a row of buttons. */
 helix-headless-tag {
   align-items: center;
-  background-color: var(--_gray-fill);
+  background-color: var(--_gray-subtle);
+  block-size: 1.75rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
   display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 500;
   gap: 0.25rem;
-  padding: 0.125rem 0.5rem;
+  line-height: 1.2;
+  padding-inline: 0.5rem;
+  white-space: nowrap;
 }

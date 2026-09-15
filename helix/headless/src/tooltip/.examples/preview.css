@@ -45,29 +45,30 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-tooltip::part(arrow) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-tooltip::part(tooltip) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
-}
-
-helix-headless-button::part(button) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+/* The trigger, at control height on a quiet fill. */
+helix-headless-button::part(button) {
+  all: unset;
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  justify-content: center;
+  line-height: 1.2;
+  padding-inline: 1rem;
+  white-space: nowrap;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -76,4 +77,40 @@ helix-headless-icon::part(svg) {
 helix-headless-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+/* The page's opposite, small and tight, and never wider than a short
+   sentence. `margin: 0` because the UA gives a popover its own, and the
+   position the component writes is measured from the border box. */
+helix-headless-tooltip::part(tooltip) {
+  align-items: center;
+  background-color: var(--_gray-strong);
+  border: 0;
+  color: var(--_gray-surface);
+  display: flex;
+  font-size: 0.75rem;
+  gap: 0.25rem;
+  inline-size: max-content;
+  line-height: 1.2;
+  margin: 0;
+  max-inline-size: 16rem;
+  overflow: visible;
+  padding: 0.25rem 0.5rem;
+  position: fixed;
+}
+
+helix-headless-tooltip::part(tooltip):not(:popover-open) {
+  display: none;
+}
+
+/* A square turned to a point in the bubble's own fill. The component writes
+   where along the edge it sits; which edge is the placement's, and this
+   example's is the default `top`, so the point hangs below. */
+helix-headless-tooltip::part(arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  inset-block-end: -0.25rem;
+  position: absolute;
+  rotate: 45deg;
 }

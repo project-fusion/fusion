@@ -45,44 +45,101 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-toggle-group::part(row) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-helix-headless-toggle-group::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
-}
-
-helix-headless-toggle-group::part(label) {
-  color: var(--_gray-strong);
-  font-weight: 600;
-}
-
-helix-headless-toggle-group::part(hint) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-toggle-group::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-toggle::part(item) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+helix-headless-toggle-group {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+helix-headless-toggle-group::part(label) {
+  color: var(--_gray-strong);
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+helix-headless-toggle-group::part(hint),
+helix-headless-toggle-group::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
+}
+
+helix-headless-toggle-group::part(feedback) {
+  font-weight: 500;
+}
+
+helix-headless-toggle-group::part(row) {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* One joined group on a quiet fill, control height overall, with the options
+   a quarter rem inside its edge. */
+helix-headless-toggle-group::part(track) {
+  background-color: var(--_gray-subtle);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  min-block-size: 2.5rem;
+  padding: 0.25rem;
+  position: relative;
+}
+
+/* The selected option is raised by one box that travels rather than by a
+   fill on each option. Sized from the option it marks, which the component
+   measures and publishes. */
+helix-headless-toggle-group::part(indicator) {
+  background-color: var(--_gray-surface);
+  block-size: var(--indicator-block-size, 0);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  position: absolute;
+  translate: var(--indicator-x, 0) var(--indicator-y, 0);
+}
+
+/* Above the indicator, which is drawn behind the row and travels under it. */
+helix-headless-toggle {
+  block-size: calc(2rem - 2px);
+  display: inline-flex;
+  flex: 1 1 auto;
+  position: relative;
+  z-index: 10;
+}
+
+helix-headless-toggle::part(item) {
+  all: unset;
+  align-items: center;
+  block-size: calc(2rem - 2px);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 1 1 auto;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: center;
+  padding-inline: 0.75rem;
+  white-space: nowrap;
+}
+
+helix-headless-toggle:state(selected)::part(item) {
+  color: var(--_gray-strong);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -91,18 +148,4 @@ helix-headless-icon::part(svg) {
 helix-headless-toggle::part(item):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
-}
-
-helix-headless-toggle-group::part(track) {
-  position: relative;
-}
-
-helix-headless-toggle-group::part(indicator) {
-  background-color: var(--_gray-strong);
-  block-size: 2px;
-  inline-size: var(--indicator-inline-size, 0);
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  position: absolute;
-  translate: var(--indicator-x, 0) calc(var(--indicator-y, 0px) + var(--indicator-block-size, 0px));
 }
