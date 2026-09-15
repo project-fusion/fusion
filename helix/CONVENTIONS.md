@@ -52,6 +52,17 @@ sense and numerals are text, so neither reverses. A whole ring stays unmarked,
 clockwise from twelve being a clock's convention rather than a script's, and a
 half ring is marked, being read across like a line.
 
+**An axis that follows reading order mirrors, and a value axis does not.** Bar,
+line, area and sparkline run along their categories or their time, which is the
+order the text reads in. A horizontal bar's length is a value, and it still
+grows out of its name at the inline start, the name being where the row is
+read from. A scatter's across is a measure with no name to grow from, and more
+is to the right in every script, as on a number line, so the chart holds its
+plane left to right itself: a `plane` part carrying `dir="ltr"` around the plot,
+both axes and their names, which keeps the y axis on the left with no sheet
+asked to know. The names carry `dir="auto"` so one in Arabic reads its own way,
+and the summary and the bubble keep the page's direction, being words.
+
 **A glyph that points along the line takes the same mark**, from the component
 that draws it and so knows what it means: a caret meaning next or previous, the
 one between two crumbs, a shut disclosure. The headless tier then points it the

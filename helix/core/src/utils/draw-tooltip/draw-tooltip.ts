@@ -32,12 +32,22 @@ import type { Row } from '../read-series/read-series.js'
 /** Where a tooltip points, in the plot's own percentages, and which side it prefers. */
 export interface TooltipAt {
   /**
+   * Which way the bubble's words run, for a chart whose plot holds a direction
+   * the page does not have.
+   *
+   * Absent, the bubble takes the plot's, which is the page's for every chart
+   * but a scatter: its plane is left to right on every page, and the bubble is
+   * a row's names and values, which read the way the page does.
+   */
+  dir?: 'ltr' | 'rtl'
+  /**
    * Whether `x` is measured from the plot's left in either direction, for a
    * drawing that does not turn with the text.
    *
    * Absent measures from the plot's inline start, which is where a drawing
    * marked `data-mirror` starts: its left, or its right on a right-to-left page.
-   * A whole ring is the case for this, its bearing being a clock's.
+   * A whole ring is the case for this, its bearing being a clock's, and a
+   * scatter's plane, whose across is a measure and not the line of text.
    */
   fixed?: boolean
   /**
@@ -120,8 +130,8 @@ export const drawTooltip = (
      mirrored on a right-to-left page and its pointer read from the plot's
      right, so a reading at 10% stands 10% in from the right edge, and so must
      the mark: written from the left there, it pointed at the mirror of its own
-     reading. A whole ring is not mirrored, says `fixed`, and is measured from
-     the left, where its bearing's arithmetic starts. */
+     reading. A whole ring and a scatter's plane are not mirrored, say
+     `fixed`, and are measured from the left, where their arithmetic starts. */
   return html`<div
       id="helix-chart-mark"
       part="mark"
@@ -132,6 +142,7 @@ export const drawTooltip = (
       )}
     ></div>
     <${tag}
+      dir=${place.dir ?? nothing}
       exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
         arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
         arrow-top: tooltip-arrow-top, tooltip, tooltip-bottom, tooltip-left, tooltip-right,

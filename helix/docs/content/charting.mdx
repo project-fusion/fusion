@@ -99,22 +99,25 @@ them disagree, and it is not something to do by accident.
 
 ## Right-to-left
 
-On a page with `dir="rtl"`, every axis that runs along the line starts where the
-text does, on the right. The words around a drawing are HTML and turn on their
-own, and the drawing turns with them, so the name under a column is that
-column's name in either direction. The pointer and the tooltip read the drawing
-the same way.
+On a page with `dir="rtl"`, an axis that follows reading order starts where the
+text does, on the right: categories and time. The words around a drawing are
+HTML and turn on their own, and the drawing turns with them, so the name under
+a column is that column's name in either direction. The pointer and the tooltip
+read the drawing the same way. An axis of values keeps its own direction.
 
 - **What turns.** `Bar Chart`'s columns, and its rows, which grow out of their
   names at the right. `Line Chart`, `Area Chart` and `Sparkline`, with their
-  end marks. `Scatter Chart`'s horizontal axis, numbers included: one rule for
-  every chart is easier to read than a numeric axis that keeps its own
-  direction. `Heatmap`'s weeks, which were already a grid laid out along the
+  end marks. `Heatmap`'s weeks, which were already a grid laid out along the
   line. A half `Donut Chart`, which is read across.
 - **What does not.** Up is more in every script, so values keep their vertical
   sense, and numerals are text beside the drawing, so none reads backwards. A
   whole `Donut Chart` keeps its first slice at twelve and runs clockwise, which
-  is a clock's convention rather than a script's.
+  is a clock's convention rather than a script's. `Scatter Chart` is laid out as
+  on a left-to-right page, its y axis on the left and more to the right, because
+  both of its axes are measures and a number line runs that way in every
+  script. Its axis names read in their own direction, so a name in Arabic reads
+  right to left under the plot's far end, and its summary and tooltip read the
+  way the page does.
 
 A chart that should read left to right anyway, a number line in a mathematics
 text for instance, takes `dir="ltr"` on the element, and the platform's own
