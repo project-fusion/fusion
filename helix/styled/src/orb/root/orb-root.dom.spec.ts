@@ -1,5 +1,14 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, label, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  at,
+  hasLayout,
+  hasState,
+  label,
+  mount,
+  readyToMove,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 import { readColor } from '../color.js'
 import {
   blendParams,
@@ -40,6 +49,15 @@ describe('orb', () => {
        DOM finds them. */
     expect(canvas?.getAttribute('aria-hidden')).toBe('true')
   })
+
+  /* Browser only: happy-dom never runs the frame the state is recorded from. */
+  if (hasLayout()) {
+    test('settles like every other element, so a transition on it can run', async () => {
+      const host = (await mount('<helix-orb></helix-orb>')) as Upgraded
+      await readyToMove(host)
+      expect(hasState(host, 'settled')).toBe(true)
+    })
+  }
 
   test('survives a machine that refuses a 2D context', async () => {
     /* happy-dom returns null from `getContext`, which is exactly what a reader

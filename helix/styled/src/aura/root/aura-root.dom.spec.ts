@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, readyToMove, registerDom } from '@fusion.dev/helix-testing/dom'
 import { exitOf, tiltFor } from '../axis.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
@@ -40,6 +40,15 @@ describe('aura', () => {
     expect(canvas?.getAttribute('aria-hidden')).toBe('true')
     expect(host.getAttribute('aria-hidden')).toBeNull()
   })
+
+  /* Browser only: happy-dom never runs the frame the state is recorded from. */
+  if (hasLayout()) {
+    test('settles like every other element, so a transition on it can run', async () => {
+      const host = (await mount(undrawn())) as HTMLElement
+      await readyToMove(host)
+      expect(hasState(host, 'settled')).toBe(true)
+    })
+  }
 
   test('survives a machine with no WebGL, because the fallback is underneath', async () => {
     /* happy-dom returns null from `getContext`, which is exactly the case a

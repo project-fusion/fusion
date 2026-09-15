@@ -208,7 +208,11 @@ export class HelixOrb extends HelixElement {
     return html`<canvas part="canvas" aria-hidden="true"></canvas>`
   }
 
-  protected override firstUpdated(): void {
+  protected override firstUpdated(changed: PropertyValues): void {
+    /* The base class's first, which is what records the settled state a frame
+       from now. Without it `whenSettled` never resolves and the transition
+       guard never lifts, so a consumer's transition on the host never runs. */
+    super.firstUpdated(changed)
     this.start()
   }
 
