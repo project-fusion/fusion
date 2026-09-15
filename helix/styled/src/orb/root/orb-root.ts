@@ -228,6 +228,11 @@ export class HelixOrb extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.stop()
+    /* **A detached orb is not on screen**, and the observer that would say so
+       is disconnected on the next line, so it is said here. Left standing, a
+       change of state after the removal played, `turn` being the one path to
+       `play` that no observer gates: a loop with nothing left to stop it. */
+    this.onScreen = false
     this.visible?.disconnect()
     this.visible = undefined
     this.sized?.disconnect()
@@ -245,6 +250,15 @@ export class HelixOrb extends HelixElement {
    * by a framework with no observers and nothing to rebuild them: a live
    * component painting one frame forever, with no error anywhere. */
   private start(): void {
+    /* **Connected, and not only rendered.** Lit runs the first update in the
+       microtask after the first connection whether or not the element is still
+       there, so one inserted and removed in the same task reaches
+       `firstUpdated` detached, and what it installed there no disconnection was
+       left to take down: the document listener held the element for the life
+       of the page. */
+    if (!this.isConnected) {
+      return
+    }
     const canvas = this.renderRoot.querySelector('canvas')
     /* Client only, and by contract. There is no canvas on a server, and a
        machine that refuses a 2D context gets an empty box rather than a

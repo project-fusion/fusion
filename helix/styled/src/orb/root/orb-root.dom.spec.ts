@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   at,
+  framesBooked,
   hasLayout,
   hasState,
   label,
@@ -100,6 +101,61 @@ describe('orb', () => {
     await host.updateComplete
     expect(label(host)).toBe('Running tests')
   })
+
+  /* **Lit updates an element whether or not it is still connected**, so one
+     inserted and removed in the same task reaches `firstUpdated` detached. What
+     it installed there had no disconnection left to take it down, and the
+     document listener among it held the element for the life of the page.
+     Both lanes: happy-dom refuses the context, but the asking is what is
+     counted. */
+  test('removed before its first update, it never sets up', async () => {
+    const host = document.createElement('helix-orb')
+    const original = HTMLCanvasElement.prototype.getContext
+    let asked = 0
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      ...args: Parameters<HTMLCanvasElement['getContext']>
+    ) {
+      if (this.getRootNode() === host.shadowRoot) {
+        asked += 1
+      }
+      return original.apply(this, args)
+    } as HTMLCanvasElement['getContext']
+    try {
+      document.body.replaceChildren(host)
+      host.remove()
+      await host.updateComplete
+    } finally {
+      HTMLCanvasElement.prototype.getContext = original
+    }
+    expect(asked).toBe(0)
+  })
+
+  /* The loop, which only a browser runs. */
+  if (hasLayout()) {
+    test('removed, it books no frame, even when its state changes after', async () => {
+      const host = (await mount('<helix-orb></helix-orb>')) as Upgraded
+      /* Running first, which the intersection observer decides on a frame of
+         its own: a running orb books one on every frame. */
+      expect(await framesBooked(4)).toBeGreaterThan(0)
+      host.remove()
+      /* A change of state starts a transition, and a transition plays. On a
+         detached orb that was a loop with nothing left to stop it. */
+      host.state = 'working'
+      await host.updateComplete
+      expect(await framesBooked(4)).toBe(0)
+    })
+
+    test('put back, it runs again', async () => {
+      const host = (await mount('<helix-orb></helix-orb>')) as Upgraded
+      const parent = host.parentElement
+      expect(await framesBooked(4)).toBeGreaterThan(0)
+      host.remove()
+      expect(await framesBooked(2)).toBe(0)
+      parent?.append(host)
+      expect(await framesBooked(4)).toBeGreaterThan(0)
+    })
+  }
 })
 
 describe('orb shapes', () => {
