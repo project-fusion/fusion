@@ -430,6 +430,10 @@ slot[name="indicator"]::slotted(helix-orb) {
   cursor: pointer;
   font: inherit;
   font-weight: var(--helix-weight-medium);
+  /* Pulled over its own trailing padding, so the words end on the edge of the
+     bubble above them rather than four pixels short of it on a reader's turn:
+     the padding is the room the hover fill needs, and nothing else. */
+  margin-inline-end: calc(var(--helix-space-2xs) * -1);
   min-block-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-2xs);

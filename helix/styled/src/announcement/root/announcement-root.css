@@ -167,6 +167,14 @@
   text-align: center;
 }
 
+/* **Clear of the dismiss, on both sides so the middle stays the middle.** The
+   control is out of flow and the message did not know it was there: measured at
+   390, a wrapped line ended at 317.7 against a control starting at 318, and a
+   longer word runs under the cross. */
+:host([dismissible]) [part="content"] {
+  padding-inline: calc(var(--helix-size-icon) + var(--helix-space-2xs) * 2 + var(--helix-space-xs));
+}
+
 /* The gap sits on what is slotted rather than on this region, because the
    region always holds a `<slot>` element and is therefore never `:empty`
    however little is assigned. With the gap on the row, a band with no actions

@@ -179,29 +179,18 @@
    the pair reads as one badly drawn border. The header
    keeps its rule because a header is a band of chrome with nothing else to bound
    it; a composer is a control and a control's own edge is its boundary. */
-/* **The composer's frame is inset less than everything else, so the words inside
-   it line up with the words above it.**
-
-   Every other region here pads by `--chat-padding-inline`, and their content
-   starts on that line: measured, the header's text and a plain answer's text
-   both at 16. The composer is a framed control, so its own edge and its own
-   padding sit between that line and the first character, which put the caret at
-   29 while everything above it started at 16. Thirteen pixels is not a near miss,
-   and no amount of tuning inside a box fixes it: a frame with padding cannot put
-   its text where an unframed paragraph puts its text unless the frame moves out.
-
-   So the frame moves out by exactly what it spends inside itself: its border and
-   its own inline padding, subtracted from the line. Written as that subtraction
-   rather than as the 7px it comes to, so a consumer moving
-   `--chat-padding-inline` moves the caret and the frame together and the three
-   still add up. */
+/* **The composer's frame sits on the line everything else starts on.** Every
+   region pads by `--chat-padding-inline`, and a bubble's edge, the header's
+   text and a plain answer's text all start there. Do not pull the frame out by
+   its own border and padding so that the caret lands on that line instead:
+   measured in the preview, that put the frame at 7 between a header rule at 0
+   and turns at 16, three left edges in one column, and a frame standing proud
+   of every bubble above it reads as misplaced where a caret inset inside a box
+   reads as a caret. The field insets its text to where a bubble's starts
+   instead, in `chat-composer.css`. */
 [part="composer"] {
   padding-block: var(--helix-space-sm);
-  padding-inline: calc(
-    var(--chat-padding-inline, var(--helix-space-md)) -
-    var(--helix-space-xs) -
-    var(--helix-border-thin)
-  );
+  padding-inline: var(--chat-padding-inline, var(--helix-space-md));
 }
 
 /* What a conversation says instead of turns is `shared/collection/state`'s,
