@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cem",
   "description": "Shared custom-elements-manifest analyzer configuration and Helix plugins.",
-  "version": "0.26.0",
+  "version": "0.30.0",
   "private": true,
   "license": "MIT",
   "repository": {
