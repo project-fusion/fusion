@@ -1,5 +1,14 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  example,
+  hasLayout,
+  idle,
+  logged,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 import agent from '../.examples/agent.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 import historySheet from '../.examples/history.css' with { type: 'text' }
@@ -37,16 +46,21 @@ const type = (control: HTMLInputElement | HTMLTextAreaElement, text: string): vo
   )
 }
 
-const composer = (): HTMLElement => document.querySelector('helix-chat-composer') as HTMLElement
+const composer = (): Updatable => document.querySelector('helix-chat-composer') as Updatable
 
+/* **The two sends below settle the composer, and do not idle.** The words are
+   the composer's the moment `input` arrives, and a press sends them and the
+   page appends its turn before `click()` returns, so the composer's own update
+   is all there is left. Six frames a step on top of it bought nothing, and a
+   busy run could not always find them inside the two seconds a test gets. */
 describe('the preview example', () => {
   run('sending a message puts it in the conversation as the reader wrote it', async () => {
     await example(preview)
     const before = document.querySelectorAll('helix-chat-message').length
     type(part(composer(), 'field') as HTMLTextAreaElement, 'Is it the lock on the jobs table?')
-    await idle()
+    await settle(composer())
     ;(part(composer(), 'send') as HTMLElement).click()
-    await idle()
+    await settle(composer())
     const turns = document.querySelectorAll('helix-chat-message')
     expect(turns).toHaveLength(before + 1)
     expect(turns[turns.length - 1]?.textContent?.trim()).toBe('Is it the lock on the jobs table?')
@@ -58,9 +72,9 @@ describe('the events example', () => {
   run('sending is heard from the conversation', async () => {
     await example(events)
     type(part(composer(), 'field') as HTMLTextAreaElement, 'Hello')
-    await idle()
+    await settle(composer())
     ;(part(composer(), 'send') as HTMLElement).click()
-    await idle()
+    await settle(composer())
     expect(logged()).toContain('helix-send')
   })
 })
