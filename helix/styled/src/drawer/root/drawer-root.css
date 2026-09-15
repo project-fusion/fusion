@@ -175,6 +175,27 @@
   flex: 0 0 auto;
 }
 
+/* **The title, whatever the consumer slotted**, set as a title and a step clear
+   of the content under it. Left to the page it was body text run straight into
+   the first paragraph, which read as that paragraph's first line.
+
+   The step is the heading's own margin rather than a `gap` on the panel,
+   because the header region is a wrapper and always takes a place in the
+   column: a gap would open the same space over a drawer with no title at all.
+   `block` so the margin applies to a bare `<span>`, and a document rule still
+   wins over this one for a consumer whose header is a row of its own. */
+::slotted([slot="header"]) {
+  color: var(--helix-color-foreground);
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-lg);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  margin: var(--helix-space-none);
+  margin-block-end: var(--helix-space-md);
+}
+
 [part="content"] {
   flex: 1 1 auto;
   min-block-size: 0;

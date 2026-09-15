@@ -131,10 +131,14 @@
   position: absolute;
 }
 
+/* **Quieter by the bubble's own ink, never a page color.** The bubble is
+   `surface-inverse`, so `foreground-muted` on it was a light gray on white in
+   dark mode and a mid gray on near black in light: the fault `shared/chart/
+   tooltip.css` records for the other charts, and the same answer. */
 [part="tooltip-label"] {
-  color: var(--helix-color-foreground-muted);
   display: block;
   font-weight: var(--helix-weight-medium);
+  opacity: 0.72;
 }
 
 /* Name and value on one line, the value pushed to the end so a column of them
@@ -147,7 +151,7 @@
 }
 
 [part="tooltip-name"] {
-  color: var(--helix-color-foreground-muted);
+  opacity: 0.72;
 }
 
 [part="tooltip-value"] {
