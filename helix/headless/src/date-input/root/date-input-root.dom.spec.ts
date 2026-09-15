@@ -607,7 +607,7 @@ if (hasLayout()) {
          follows it, so two frames and the update that asked for. */
       await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
       await host.updateComplete
-      await (picker(host) as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+      await (picker(host) as unknown as { updateComplete: Promise<unknown> }).updateComplete
     }
 
     test('two months at a desktop width, as asked', async () => {
