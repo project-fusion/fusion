@@ -1,17 +1,25 @@
 /* Both axes are measured, so both carry numbers: the levels up beside the plot,
-   the levels across under it, and what each axis measures at its far end. */
+   the levels across under it, and what each axis measures at its far end.
+
+   The name up top spans both columns, or the column the levels sit in is as
+   wide as the name and the plot loses the difference: measured 15 Sep 2026 at
+   390 wide, 83 pixels for four digits and a plot of 251 rather than 300. The
+   rows stand `space-xs` apart because a level is centered on its rule, so the
+   top one reaches half its line above the plot and the bottom one half below
+   it: at `space-2xs` they touched the name over them and the first level
+   across. */
 :host {
   column-gap: var(--helix-space-xs);
   container-type: inline-size;
   display: grid;
   grid-template-areas:
-    "y-name ."
+    "y-name y-name"
     "y-axis plot"
     ". x-axis"
     ". x-name";
   grid-template-columns: auto minmax(0, 1fr);
   position: relative;
-  row-gap: var(--scatter-chart-gap, var(--helix-space-2xs));
+  row-gap: var(--scatter-chart-gap, var(--helix-space-xs));
 }
 
 [part="plot"] {

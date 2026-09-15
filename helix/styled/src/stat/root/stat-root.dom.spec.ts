@@ -66,7 +66,9 @@ describe('stat', () => {
 
   test('a group wraps, and divides on the figure rather than between slots', async () => {
     /* A `<slot>` is `display: contents` and generates no box to put a border
-       on, so the rule lands on the slotted figure and skips the first one. */
+       on, so the rule lands on every slotted figure, and the group clips the
+       one pulled out past the start of each row rather than skipping the first
+       figure, which leaves a rule at the start of a row that wrapped. */
     const group = (await mount(
       `<helix-stat-group>${figure}${figure}</helix-stat-group>`,
     )) as Updatable & { divided: boolean }
@@ -75,9 +77,11 @@ describe('stat', () => {
     await group.updateComplete
     expect(group.hasAttribute('divided')).toBe(true)
     expect(rule('helix-stat-group', ':host')).toContain('flex-wrap: wrap')
-    const divided = rule('helix-stat-group', ':host([divided]) ::slotted(*:not(:first-child))')
+    expect(rule('helix-stat-group', ':host([divided])')).toContain('overflow-x: clip')
+    const divided = rule('helix-stat-group', ':host([divided]) ::slotted(*)')
     expect(divided).toContain('border-inline-start: var(--helix-border-thin) solid')
-    expect(divided).toContain('padding-inline-start: var(--stat-group-gap,')
+    expect(divided).toContain('margin-inline-start: calc(var(--_stat-group-gap) * -1')
+    expect(divided).toContain('padding-inline-start: var(--_stat-group-gap)')
   })
 
   test('the hooks the docs name are what the sheets read', () => {
