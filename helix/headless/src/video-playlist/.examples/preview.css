@@ -59,6 +59,10 @@ helix-headless-video {
 /* The stage is the dark box the picture sits in, and the bar and the messages
    are laid over it rather than under it. */
 helix-headless-video::part(stage) {
+  /* A player's stage is dark whatever the page is, as the styled one is, so
+     the ramp resolves to its light-mode values in here: the strong gray is the
+     stage and the surface gray is its ink, in both modes. */
+  color-scheme: light;
   display: block;
   overflow: hidden;
   position: relative;
