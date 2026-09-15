@@ -116,7 +116,7 @@ describe('the words in a chart’s reading bubble', () => {
         for (const tag of CHARTS) {
           const host = await open(tag)
           const anchor = host.shadowRoot?.querySelector('[part="tooltip-anchor"]')
-          const bubble = anchor?.shadowRoot?.querySelector('[part="tooltip"]')
+          const bubble = anchor?.shadowRoot?.querySelector('[part~="tooltip"]')
           expect(bubble).toBeTruthy()
           const ground = paint(getComputedStyle(bubble as Element).backgroundColor)
           for (const name of ['tooltip-label', 'tooltip-name', 'tooltip-value']) {

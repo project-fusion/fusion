@@ -972,13 +972,27 @@ part that can carry one writes `[part~="x"]`: an exact match stops matching for
 exactly as long as the state is the thing worth drawing.
 
 **What stays an attribute is what no consumer draws from.** A gesture in flight
-(dragging, dropping, a copy just made), a geometry fact (which side a floating
-panel landed on), a category rather than a state (a series, an axis, a thumb),
-and what the platform already says after `::part()` (`:disabled`, `:checked`,
-`:open`, `hidden`). A host attribute or a host state needs nothing either, since
-`helix-select:state(open)::part(indicator)` already reaches it, unless that host
-is itself inside another component's shadow root: an option Time Picker draws is,
-so Option names its own row `item-selected`.
+(dragging, dropping, a copy just made), a category rather than a state (a
+series, an axis, a thumb), and what the platform already says after `::part()`
+(`:disabled`, `:checked`, `:open`, `hidden`). A host attribute or a host state
+needs nothing either, since `helix-select:state(open)::part(indicator)` already
+reaches it, unless that host is itself inside another component's shadow root:
+an option Time Picker draws is, so Option names its own row `item-selected`.
+
+**The side a floating panel landed on was on that list, and an arrow took it
+off.** `data-placement` on the panel is read by the panel's own entrance, which
+is still all a menu or a select draws from it. A bubble with a point is drawn
+from outside by side: every headless sheet pinned its tooltip's arrow to the
+bottom edge, so a bubble that flipped below its trigger at the top of a page
+pointed away from it, and a tooltip is usually two shadow roots deep, inside a
+copy button or a chart, where no host state reaches. So the placing pass puts
+the arrow on the edge facing the anchor itself, a tooltip names its bubble and
+its arrow for the side, `tooltip-top` and `arrow-top` while it is above its
+trigger, and records `:state(placed-top)` on its host, as Tour Stop does. The
+names are the hosts' literals rather than the controller's: a controller adding
+a part at runtime is one `parts` and `exportparts` cannot read, and a menu or a
+select taking four more names would oblige every composition of one to forward
+them, for a fact nobody outside draws from.
 
 **Or the parent names it, where the child's state is a host attribute.** A turn
 Chat draws from `turns` is a message in Chat's shadow root, so a document cannot

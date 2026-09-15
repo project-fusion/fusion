@@ -127,13 +127,12 @@ helix-headless-heatmap::part(tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
-/* The point under the bubble. The component places it along the edge and a
-   heatmap asks for the top, so it hangs from the bottom. */
+/* The bubble's point. The component puts it on the edge facing the cell, so a
+   bubble that flips below a strip at the top of a page still points up. */
 helix-headless-heatmap::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
   inline-size: 0.5rem;
-  inset-block-end: -0.25rem;
   position: absolute;
   rotate: 45deg;
 }

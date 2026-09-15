@@ -40,6 +40,14 @@ const CONFIRM = 1600
  * @csspart mark - The clipboard glyph, and the confirmation that replaces it.
  * @csspart tooltip - The bubble, forwarded from the tooltip inside.
  * @csspart tooltip-arrow - The point, resting against the trigger.
+ * @csspart tooltip-arrow-bottom - The point while the bubble is below the button, so on its top edge, beside `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The point while the bubble is left of the button, so on its right edge, beside `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The point while the bubble is right of the button, so on its left edge, beside `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The point while the bubble is above the button, so on its bottom edge, beside `tooltip-arrow`.
+ * @csspart tooltip-bottom - The bubble while it is below the button, beside `tooltip`.
+ * @csspart tooltip-left - The bubble while it is left of the button, beside `tooltip`.
+ * @csspart tooltip-right - The bubble while it is right of the button, beside `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above the button, beside `tooltip`.
  */
 @customElement('helix-headless-copy-button')
 export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
@@ -189,7 +197,10 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
        content to Copied, so the words this component takes such care over were
        written and then taken off screen in the same frame. */
     return html`<${this.tag('tooltip')} content=${this.says} persist
-    exportparts="arrow: tooltip-arrow, tooltip">
+    exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
+      arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
+      arrow-top: tooltip-arrow-top, tooltip, tooltip-bottom, tooltip-left, tooltip-right,
+      tooltip-top">
       ${control}
     </${this.tag('tooltip')}>`
   }

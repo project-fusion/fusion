@@ -197,12 +197,12 @@ helix-headless-line-chart::part(tooltip) {
 }
 
 /* The point, a square turned and half buried under the bubble, so what shows
-   is a triangle in its fill pointing down at the reading. */
+   is a triangle in its fill pointing at the reading. The component puts it on
+   whichever edge faces the reading. */
 helix-headless-line-chart::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
   inline-size: 0.5rem;
-  inset-block-end: -0.25rem;
   position: absolute;
   rotate: 45deg;
 }

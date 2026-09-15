@@ -199,11 +199,12 @@ helix-headless-object-inspector::part(copy-tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
+/* The point, on whichever edge faces the copy button: the component puts it
+   there. */
 helix-headless-object-inspector::part(copy-tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
   inline-size: 0.5rem;
-  inset-block-end: -0.25rem;
   position: absolute;
   rotate: 45deg;
 }

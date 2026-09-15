@@ -6,9 +6,10 @@ import {
   MixinControllerOpen,
   type Placement,
   PopoverController,
+  type Side,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 
 /** Tags that exist to hold something, and say nothing when they hold nothing. */
 const GENERIC = new Set(['div', 'p', 'section', 'span'])
@@ -64,9 +65,21 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart arrow - The point, resting against the trigger.
+ * @csspart arrow-bottom - The point while the bubble is below its trigger, so on the bubble's top edge, beside `arrow`.
+ * @csspart arrow-left - The point while the bubble is left of its trigger, so on the bubble's right edge, beside `arrow`.
+ * @csspart arrow-right - The point while the bubble is right of its trigger, so on the bubble's left edge, beside `arrow`.
+ * @csspart arrow-top - The point while the bubble is above its trigger, so on the bubble's bottom edge, beside `arrow`.
  * @csspart tooltip - The bubble.
+ * @csspart tooltip-bottom - The bubble while it is below its trigger, beside `tooltip`.
+ * @csspart tooltip-left - The bubble while it is left of its trigger, beside `tooltip`.
+ * @csspart tooltip-right - The bubble while it is right of its trigger, beside `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above its trigger, beside `tooltip`.
  *
  * @cssstate open - While the tooltip shows.
+ * @cssstate placed-bottom - While the bubble sits below its trigger.
+ * @cssstate placed-left - While the bubble sits to the left of its trigger.
+ * @cssstate placed-right - While the bubble sits to the right of its trigger.
+ * @cssstate placed-top - While the bubble sits above its trigger.
  */
 @customElement('helix-headless-tooltip')
 export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
@@ -181,6 +194,16 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   @property()
   within = ''
 
+  /**
+   * The side of its trigger the bubble last landed on, which is not always
+   * `placement`: a bubble with no room there is moved.
+   *
+   * Undefined until the first placement, which the server never makes, so a
+   * part name it adds is never markup the server did not send.
+   */
+  @state()
+  private side?: Side
+
   private timer: ReturnType<typeof setTimeout> | undefined
 
   /**
@@ -290,6 +313,22 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     onDismiss: () => {
       this.holds.clear()
       this.hide()
+    },
+    /* The side it landed on, said where a sheet outside can read it. The
+       controller writes `data-placement` on the bubble and puts the arrow on
+       the edge facing the trigger itself, so nothing here is needed to point
+       it; this is for a sheet that draws by side, an entrance growing out of
+       the trigger or an edge on the arrow's two outer sides, and that sheet is
+       outside the shadow root, where no attribute can follow `::part()`. A
+       part name because a tooltip is usually inside another component, where
+       a document cannot reach its host's state. */
+    onPlace: (placement) => {
+      const side = placement.split('-')[0] as Side
+      this.toggleState('placed-bottom', side === 'bottom')
+      this.toggleState('placed-left', side === 'left')
+      this.toggleState('placed-right', side === 'right')
+      this.toggleState('placed-top', side === 'top')
+      this.side = side
     },
     placement: () => this.placement,
     surface: () => this.partNamed('tooltip'),
@@ -719,9 +758,16 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   }
 
   protected override render(): TemplateResult {
+    const side = this.side
     return html`<slot></slot>
-      <div part="tooltip" popover="manual" role="tooltip">
-        <span part="arrow"></span>
+      <div
+        part="tooltip${side ? { bottom: ' tooltip-bottom', left: ' tooltip-left', right: ' tooltip-right', top: ' tooltip-top' }[side] : ''}"
+        popover="manual"
+        role="tooltip"
+      >
+        <span
+          part="arrow${side ? { bottom: ' arrow-bottom', left: ' arrow-left', right: ' arrow-right', top: ' arrow-top' }[side] : ''}"
+        ></span>
         <slot name="content" @slotchange=${this.handleContentChange}
           >${this.content}</slot
         >

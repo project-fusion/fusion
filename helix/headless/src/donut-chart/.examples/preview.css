@@ -136,9 +136,8 @@ helix-headless-donut-chart::part(segment-active) {
    slice's outer edge. The component writes the position as a `translate` from
    the viewport's corner, and the UA centers a popover through `inset: 0` and
    `margin: auto`, so both are undone or the bubble lands in the middle of the
-   window. No arrow: which side the bubble landed on is not something a sheet
-   outside can read, so an arrow would point the wrong way on three sides of
-   four. */
+   window. `overflow` too, which the UA sets to scroll and which would clip the
+   point. */
 helix-headless-donut-chart::part(tooltip) {
   background-color: var(--_gray-strong);
   border: 0;
@@ -148,7 +147,19 @@ helix-headless-donut-chart::part(tooltip) {
   inset: auto;
   line-height: 1.5;
   margin: 0;
+  overflow: visible;
   padding: 0.25rem 0.5rem;
+}
+
+/* A square turned to a point in the bubble's own fill. A slice can be at any
+   bearing, so the bubble lands on any side of it, and the component puts the
+   point on whichever edge faces the slice. */
+helix-headless-donut-chart::part(tooltip-arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  position: absolute;
+  rotate: 45deg;
 }
 
 helix-headless-donut-chart::part(tooltip-label) {

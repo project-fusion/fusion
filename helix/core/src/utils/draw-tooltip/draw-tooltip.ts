@@ -132,7 +132,10 @@ export const drawTooltip = (
       )}
     ></div>
     <${tag}
-      exportparts="arrow: tooltip-arrow, tooltip"
+      exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
+        arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
+        arrow-top: tooltip-arrow-top, tooltip, tooltip-bottom, tooltip-left, tooltip-right,
+        tooltip-top"
       for="helix-chart-mark"
       open
       part="tooltip-anchor"
