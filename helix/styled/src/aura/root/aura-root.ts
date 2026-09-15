@@ -398,6 +398,14 @@ export class HelixAura extends HelixElement {
    * Guarded at the call site on `hasUpdated`, because the first connection
    * happens before the first render and there is no canvas yet. */
   private start(): void {
+    /* **Connected, and not only rendered.** Lit runs the first update in the
+       microtask after the first connection whether or not the element is still
+       there, so one inserted and removed in the same task reaches
+       `firstUpdated` detached. Started there, it made a context and installed
+       listeners that no disconnection was left to take down. */
+    if (!this.isConnected) {
+      return
+    }
     /* Client only, and by contract. There is no canvas on a server, so the
        shader is an enhancement over markup that already renders a gradient. */
     if (!this.renderRoot.querySelector('canvas')) {
@@ -451,7 +459,10 @@ export class HelixAura extends HelixElement {
     this.sized.observe(this)
 
     this.readPalette()
-    if (this.measure()) {
+    /* The second half is a return before the first frame. The removal canceled
+       the opening, and a move comes back to a box the same size, so `measure`
+       reports nothing to do while the opening is still owed. */
+    if (this.measure() || (this.width && !this.opened)) {
       this.open()
     }
   }
@@ -562,6 +573,18 @@ export class HelixAura extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.stop()
+    /* **The opening frame as well, which `stop` does not own**, and cannot:
+       `stop` is also what going off screen calls, and an aura that lost its
+       opening there would never open. Left booked here, it drew into a
+       detached canvas whenever it ran before the release, and then started a
+       loop after `stop` had already run: `tick` books its own next frame, so
+       nothing ever ended it, and it went on ticking after the context was gone.
+       `openBy` goes with it, so a return waits for its own box to settle. */
+    if (this.opening) {
+      cancelAnimationFrame(this.opening)
+      this.opening = 0
+      this.openBy = 0
+    }
     this.visible?.disconnect()
     this.visible = undefined
     this.removeEventListener('pointermove', this.handlePointer)
@@ -850,7 +873,11 @@ export class HelixAura extends HelixElement {
 
   /** One frame, now, for a change that has to show while the loop is stopped. */
   private paintOnce(): void {
-    if (this.frame) {
+    /* **Not before the opening frame**, which is the whole of what `opened`
+       promises. `updated` runs straight after `firstUpdated`, so without this
+       the first box measured was painted at once: the frame the settle exists
+       to hold back, drawn a frame early. Nor detached, where nobody sees it. */
+    if (this.frame || !this.opened || !this.isConnected) {
       return
     }
     this.paint()
@@ -954,9 +981,18 @@ export class HelixAura extends HelixElement {
     this.frame = requestAnimationFrame(this.tick)
   }
 
+  /**
+   * Starts the loop, where it is wanted and can be ended.
+   *
+   * **Never while detached.** `tick` books its own next frame, so the only
+   * thing that ends the loop is `stop`, and a disconnection is the last time
+   * `stop` is called. Everything that plays is canceled or disconnected there,
+   * and this holds for whatever callback was already on its way.
+   */
   private play(): void {
     if (
       this.frame ||
+      !this.isConnected ||
       this.motion?.matches ||
       document.hidden ||
       !this.gl ||

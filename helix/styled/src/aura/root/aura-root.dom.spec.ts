@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, readyToMove, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  framesBooked,
+  hasLayout,
+  hasState,
+  mount,
+  readyToMove,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 import { exitOf, tiltFor } from '../axis.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
@@ -25,6 +32,71 @@ beforeAll(async () => {
    once per aura mounted here, and specs there waiting on frames timed out. */
 const undrawn = (attributes = ''): string =>
   `<helix-aura ${attributes} style="block-size: 0"></helix-aura>`
+
+/* An aura with a box, so `measure` succeeds and the opening frame is booked:
+   what the lifecycle specs need. Its draws are stubbed by `countDraws`, so it
+   still never pays the cost the note above measures. */
+const drawn = (): string => '<helix-aura style="block-size: 16px"></helix-aura>'
+
+/**
+ * Counts the draws the element's current context is asked for, and makes none.
+ *
+ * **Stubbed rather than spied on**, because a draw that reaches the GPU is the
+ * 450ms the note above `undrawn` measured, once per fresh context. What these
+ * specs are about is the loop that asks for draws, and the frames, the
+ * observers and the release that drive it are all real.
+ *
+ * `null` where there is no WebGL, which is happy-dom and a refused context.
+ */
+const countDraws = (host: HTMLElement): { count: number } | null => {
+  const gl = host.shadowRoot?.querySelector('canvas')?.getContext('webgl2')
+  if (!gl || gl.isContextLost()) {
+    return null
+  }
+  const tally = { count: 0 }
+  gl.drawArrays = () => {
+    tally.count += 1
+  }
+  return tally
+}
+
+/** Waits a frame at a time, up to a second's worth, for `done` to hold. */
+const until = async (done: () => boolean): Promise<boolean> => {
+  for (let frame = 0; frame < 60 && !done(); frame++) {
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+  }
+  return done()
+}
+
+/**
+ * Removes the element in the frame its opening draw is booked for, before it.
+ *
+ * Booked before `mount`, so before the element books its opening frame, and
+ * the callbacks of one frame run in the order they were booked. That is the
+ * order a busy page produces by accident, the removal landing between the
+ * booking and the draw, and the one that left a detached aura looping forever.
+ * `then` runs on the element as it is taken out, for a spec that puts it back.
+ */
+const removeBeforeOpening = (
+  markup: string,
+  then?: (host: HTMLElement, parent: HTMLElement | null) => void,
+): Promise<{ host: HTMLElement; removed: Promise<void> }> => {
+  let host: HTMLElement | undefined
+  const removed = new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      const parent = host?.parentElement ?? null
+      host?.remove()
+      if (host) {
+        then?.(host, parent)
+      }
+      resolve()
+    })
+  })
+  return mount(markup).then((mounted) => {
+    host = mounted
+    return { host: mounted, removed }
+  })
+}
 
 describe('aura', () => {
   test('renders a canvas and hides it from assistive technology', async () => {
@@ -177,6 +249,100 @@ describe('aura', () => {
     parent?.append(host)
     expect(painting()).toBe(true)
   })
+
+  /* **Lit updates an element whether or not it is still connected**, so one
+     inserted and removed in the same task reaches `firstUpdated` detached. A
+     context made there has no disconnection left to release it, and counts
+     against the browser's cap of about sixteen until the element is collected.
+     Both lanes: happy-dom answers `null`, but the asking is what is counted. */
+  test('removed before its first update, it never asks for a context', async () => {
+    const host = document.createElement('helix-aura')
+    const original = HTMLCanvasElement.prototype.getContext
+    let asked = 0
+    HTMLCanvasElement.prototype.getContext = function (
+      this: HTMLCanvasElement,
+      ...args: Parameters<HTMLCanvasElement['getContext']>
+    ) {
+      if (args[0] === 'webgl2') {
+        asked += 1
+      }
+      return original.apply(this, args)
+    } as HTMLCanvasElement['getContext']
+    try {
+      document.body.replaceChildren(host)
+      host.remove()
+      await host.updateComplete
+    } finally {
+      HTMLCanvasElement.prototype.getContext = original
+    }
+    expect(asked).toBe(0)
+  })
+
+  /* The loop, which only a browser runs. Every draw is stubbed by `countDraws`,
+     so none of these reaches the GPU. */
+  if (hasLayout()) {
+    test('removed before its first frame, it draws nothing and books nothing', async () => {
+      const { host, removed } = await removeBeforeOpening(drawn())
+      const draws = countDraws(host)
+      if (!draws) {
+        return
+      }
+      /* Four frames, which spans the release's task as well: a loop that
+         outlived the removal books one on every one of them. */
+      const frames = await framesBooked(4)
+      await removed
+      expect(draws.count).toBe(0)
+      expect(frames).toBe(0)
+    })
+
+    test('removed while running, it stops and gives its context back', async () => {
+      const host = await mount(drawn())
+      const gl = host.shadowRoot?.querySelector('canvas')?.getContext('webgl2')
+      const draws = countDraws(host)
+      if (!draws) {
+        return
+      }
+      // Two, so the loop is running rather than only the opening frame drawn.
+      expect(await until(() => draws.count >= 2)).toBe(true)
+      host.remove()
+      const before = draws.count
+      expect(await framesBooked(4)).toBe(0)
+      expect(draws.count).toBe(before)
+      expect(gl?.isContextLost()).toBe(true)
+    })
+
+    test('put back before its first frame, it still opens', async () => {
+      /* A move cancels the opening along with everything else, and the box it
+         comes back to is the same size, so `measure` reports nothing to do.
+         The opening is still owed. */
+      const { host, removed } = await removeBeforeOpening(drawn(), (moved, parent) => {
+        parent?.append(moved)
+      })
+      const draws = countDraws(host)
+      if (!draws) {
+        return
+      }
+      await removed
+      expect(await until(() => draws.count >= 1)).toBe(true)
+    })
+
+    test('comes back drawing after a real removal', async () => {
+      const { host, removed } = await removeBeforeOpening(drawn())
+      const parent = host.parentElement
+      if (!countDraws(host)) {
+        return
+      }
+      await removed
+      // A task, so the release runs and the canvas is spent.
+      await new Promise((resolve) => setTimeout(resolve, 0))
+      parent?.append(host)
+      /* Read again: coming back from a spent context replaces the canvas. Two
+         draws, the opening frame and the loop behind it. */
+      const draws = countDraws(host)
+      expect(draws).not.toBeNull()
+      expect(await until(() => (draws?.count ?? 0) >= 2)).toBe(true)
+    })
+  }
 })
 
 /* The axis, asserted where it lands rather than at what angle.

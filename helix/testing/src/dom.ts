@@ -204,6 +204,10 @@ export const example = (_file: unknown, _styles?: unknown): Promise<HTMLElement>
 export const idle = (): Promise<void> =>
   Promise.reject(new Error('An example runs only in the browser harness.'))
 
+/** The browser harness's count of booked frames, which happy-dom never runs. */
+export const framesBooked = (_count: number): Promise<number> =>
+  Promise.reject(new Error('Frames run only in the browser harness.'))
+
 /** An `events` example's log, which only a running example can have written. */
 export const logged = (): string[] => {
   throw new Error('An example logs only in the browser harness.')

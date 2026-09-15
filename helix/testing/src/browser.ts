@@ -632,6 +632,40 @@ export const idle = async (): Promise<void> => {
 }
 
 /**
+ * How many animation frames the page books while `count` frames pass.
+ *
+ * For a component that draws in a loop, which books its next frame from each
+ * one, so this is how a spec asks whether it is running and whether it
+ * stopped. Counted at the global a component calls, and the wait itself is
+ * booked on the original so it never counts itself.
+ */
+export const framesBooked = async (count: number): Promise<number> => {
+  const original = window.requestAnimationFrame
+  let calls = 0
+  window.requestAnimationFrame = (callback) => {
+    calls += 1
+    return original.call(window, callback)
+  }
+  try {
+    await new Promise<void>((done) => {
+      let left = count
+      const step = (): void => {
+        left -= 1
+        if (left <= 0) {
+          done()
+        } else {
+          original.call(window, step)
+        }
+      }
+      original.call(window, step)
+    })
+  } finally {
+    window.requestAnimationFrame = original
+  }
+  return calls
+}
+
+/**
  * What an `events` example has logged, as the event name each row opens with.
  *
  * Every one of them keeps the same log, a `#log` list whose rows are the event
