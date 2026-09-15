@@ -12,12 +12,26 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
+/* **Every aura here is mounted with no height, so none of them draws.** What
+   these assert is markup, attributes and whether a context is alive, and not
+   one reads a pixel: at no height the canvas, the context and the program are
+   all still made, and only the draw is skipped, `measure` declining an empty
+   box. The picture is the visual check's.
+
+   The draw is the expensive part, and not for this page alone. Measured 15 Sep
+   2026 in headless Chromium: the first frame a fresh context draws of this
+   shader held the GPU process for about 450ms, and that process is every page's,
+   so on four workers the other pages in the run went that long without a frame,
+   once per aura mounted here, and specs there waiting on frames timed out. */
+const undrawn = (attributes = ''): string =>
+  `<helix-aura ${attributes} style="block-size: 0"></helix-aura>`
+
 describe('aura', () => {
   test('renders a canvas and hides it from assistive technology', async () => {
     /* Decorative by definition: it draws light behind content and has nothing
        to announce. The host stays visible to the tree so a consumer can label
        the region it sits behind. */
-    const host = (await mount('<helix-aura></helix-aura>')) as HTMLElement & {
+    const host = (await mount(undrawn())) as HTMLElement & {
       updateComplete: Promise<boolean>
     }
     await host.updateComplete
@@ -32,7 +46,7 @@ describe('aura', () => {
        reader on a refused context gets. The element must render and stay
        usable: the canvas simply never paints, and the host's own token
        gradient is what shows. Nothing detects this, which is the point. */
-    const host = (await mount('<helix-aura variant="rays"></helix-aura>')) as HTMLElement & {
+    const host = (await mount(undrawn('variant="rays"'))) as HTMLElement & {
       updateComplete: Promise<boolean>
     }
     await host.updateComplete
@@ -68,7 +82,7 @@ describe('aura', () => {
   test('the variant reflects and the numbers do not', async () => {
     // Reflection exists so a selector can reach a value. The fallback gradient
     // selects on `variant`; nothing selects on `speed`.
-    const host = (await mount('<helix-aura></helix-aura>')) as HTMLElement & {
+    const host = (await mount(undrawn())) as HTMLElement & {
       variant: string
       speed: number
       updateComplete: Promise<boolean>
@@ -86,7 +100,7 @@ describe('aura', () => {
        real gesture before this: the host reported `pointer-events: none` and
        not one mark reached the wake, while synthetic events kept passing
        because dispatching skips hit-testing entirely. */
-    const host = (await mount('<helix-aura></helix-aura>')) as HTMLElement & {
+    const host = (await mount(undrawn())) as HTMLElement & {
       interactive: boolean
       updateComplete: Promise<boolean>
     }
@@ -120,7 +134,7 @@ describe('aura', () => {
    * asserting something the double cannot know. `specs:browser` is where it
    * bites. */
   test('comes back from a reorder, and from a real removal', async () => {
-    const host = (await mount('<helix-aura></helix-aura>')) as HTMLElement & {
+    const host = (await mount(undrawn())) as HTMLElement & {
       updateComplete: Promise<boolean>
     }
     await host.updateComplete
