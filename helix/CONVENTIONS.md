@@ -915,6 +915,61 @@ least styleable half.
   declaration fails there rather than in `helix component`'s `exportparts`. The two are one
   contract read from two ends.
 
+**Every composed child forwards, however its tag is named.** The rule read only
+`<${this.tag('x')}>`, so a tag bound first, `const pagination =
+this.tag('pagination')` and then `<${pagination}>`, was no composition to it,
+and that is the form `static-html` wants. Four families sat in the gap: Data
+Table forwarded none of its pagination's eleven parts, Pagination Size three of
+the select's eighteen and those unprefixed, and Filter Menu and a chat fed as
+data gave their children no role at all. A name holding `this.tag()` is read now.
+A tag handed to a shared helper as an argument is not: `drawTooltip` cannot know
+which element it opens, and forwards by hand.
+
+### A state drawn on a part is a part name too
+
+**Nothing can follow `::part()` with an attribute.** A consumer reaches a
+component through its parts, its host attributes and its host states, so a state
+the styled tier draws as `[part="x"][data-current]` or `[aria-current]` on an
+element inside the shadow root was the styled tier's alone. The headless
+previews could not mark Carousel's current dot, Pagination's page, the
+playlist's current entry, a chosen time or a chosen day, whatever they wrote.
+
+**So the part takes a second name while the state holds**, and only then:
+`part="page${current ? ' page-current' : ''}"`, forwarded under the parent's
+prefix like any other part (`option-item-selected`). The attribute stays beside
+it, because the name is for a stylesheet and the attribute for the
+accessibility tree. The name goes on the box the state is drawn on, which is not
+always the one carrying the attribute: Date Picker's selection is an attribute
+on the cell and the mark is on the day, so the name is `day-selected`.
+
+**Written as literals inside the interpolation**, because a part is read from
+the source: every quoted word there is a name the element can carry, and nothing
+else may be quoted in it, which is why Meter keys its bands through an object
+literal rather than comparing strings. And a sheet or a lookup reaching for a
+part that can carry one writes `[part~="x"]`: an exact match stops matching for
+exactly as long as the state is the thing worth drawing.
+
+**What stays an attribute is what no consumer draws from.** A gesture in flight
+(dragging, dropping, a copy just made), a geometry fact (which side a floating
+panel landed on), a category rather than a state (a series, an axis, a thumb),
+and what the platform already says after `::part()` (`:disabled`, `:checked`,
+`:open`, `hidden`). A host attribute or a host state needs nothing either, since
+`helix-select:state(open)::part(indicator)` already reaches it, unless that host
+is itself inside another component's shadow root: an option Time Picker draws is,
+so Option names its own row `item-selected`.
+
+### A custom state is documented
+
+**`@cssstate` on the element that records it.** A custom state is in no
+attribute, no property and no DOM a reader can inspect, so the manifest is the
+only place a consumer learns one exists. Sixty-two were recorded and none was
+written down: `Select` turned its caret on `:state(open)`, and the author of its
+headless example read the docs and concluded it had no open state. The analyzer
+reads the tag into `cssStates` and carries it to subclasses, so `settled` is
+listed once, on `HelixElement`. A mixin's are listed on each element applying
+it, for the reason its parts are. `helix component`'s `states` holds what is
+recorded and what is listed together, and refuses a name computed at the call.
+
 **A `::part()` written from outside is checked too, and nothing checked it
 before.** `helix component`'s `selectors` reads `[part="x"]` inside a component's own sheet and
 stops there, so a selector naming a part nothing publishes was unchecked in every
@@ -1062,13 +1117,13 @@ badge a docs page or warn a consumer.
 
 ```
 @summary  @description  @since  @status  @category  @groups  @aliases
-@documentation  @slot  @event  @csspart  @cssproperty
+@documentation  @slot  @event  @csspart  @cssproperty  @cssstate
 ```
 
 One blank line between groups and none between the metadata tags, which is what
 makes those six read as a block rather than six statements. `@slot`, `@event`,
-`@csspart` and `@cssproperty` sort by name within their own group, and the
-default slot, written with no name at all, sorts first: it is the slot a
+`@csspart`, `@cssproperty` and `@cssstate` sort by name within their own group,
+and the default slot, written with no name at all, sorts first: it is the slot a
 component has before it has any other.
 
 Most of that is the corpus stating a rule rather than a decision taken. Measured
