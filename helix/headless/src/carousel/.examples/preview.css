@@ -134,18 +134,24 @@ helix-headless-carousel::part(rotation-mark) {
   inline-size: 1em;
 }
 
-/* Dots, which are round rather than softened. The current one cannot be told
-   apart from here: the component marks it with `aria-current` and
-   `data-current` on the button, and an attribute selector after `::part()` is
-   dropped at parse time, so every dot is drawn alike. */
+/* Dots, which are round rather than softened. The current one lengthens into a
+   pill and takes the strong ink, so the run reads without color. It is reached
+   by `indicator-current`, the second part name the component writes on it
+   while it is current: its `aria-current` and `data-current` are attributes,
+   and nothing can follow `::part()` with one. */
 helix-headless-carousel::part(indicator) {
   all: unset;
   background-color: var(--_gray-line);
   block-size: 0.5rem;
-  border-radius: 50%;
+  border-radius: 999px;
   box-sizing: border-box;
   cursor: pointer;
   inline-size: 0.5rem;
+}
+
+helix-headless-carousel::part(indicator-current) {
+  background-color: var(--_gray-strong);
+  inline-size: 1.5rem;
 }
 
 helix-headless-carousel::part(indicator):hover {

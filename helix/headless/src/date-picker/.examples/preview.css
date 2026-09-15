@@ -136,9 +136,10 @@ helix-headless-date-picker::part(weekday) {
 
 /* The cell is the column track and the day is the square centered in it.
    Which day is chosen, which is today and which belong to the next month are
-   attributes on the cell, inside the shadow root, and an attribute selector
-   cannot follow `::part()`: a document sheet reaches every cell alike, so the
-   chosen day is not marked here. */
+   attributes on the cell for the accessibility tree, and an attribute cannot
+   follow `::part()`, so the component also writes each as a second part name
+   on the box it is drawn on: `day-selected`, `day-today`, `day-outside` and
+   `day-disabled` on the day, and a range's band on its cells. */
 helix-headless-date-picker::part(cell) {
   align-items: center;
   block-size: 2.25rem;
@@ -160,6 +161,40 @@ helix-headless-date-picker::part(day) {
 
 helix-headless-date-picker::part(cell):hover {
   background-color: var(--_gray-subtle);
+}
+
+/* Days either side of the month stay in place, so the first and last weeks are
+   whole rows, and step back. */
+helix-headless-date-picker::part(day-outside) {
+  color: var(--_gray-mark);
+}
+
+helix-headless-date-picker::part(day-disabled) {
+  color: var(--_gray-mark);
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* Today is a fact about the calendar rather than about the answer, so it is an
+   edge and not a fill. */
+helix-headless-date-picker::part(day-today) {
+  box-shadow: inset 0 0 0 1px var(--_gray-line);
+}
+
+/* A range is a band on the cells, which run unbroken between the days and stop
+   at the ends of a row on their own. */
+helix-headless-date-picker::part(cell-range-start),
+helix-headless-date-picker::part(cell-range-middle),
+helix-headless-date-picker::part(cell-range-end) {
+  background-color: var(--_gray-fill);
+}
+
+/* The chosen day, or a range's two ends, solid, with the band's gray as a ring
+   out to the edge of the row so a lone date reads as the same mark. */
+helix-headless-date-picker::part(day-selected) {
+  background-color: var(--_gray-strong);
+  box-shadow: 0 0 0 0.1875rem var(--_gray-fill);
+  color: var(--_gray-surface);
 }
 
 helix-headless-icon::part(svg) {

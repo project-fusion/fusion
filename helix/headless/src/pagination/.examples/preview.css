@@ -100,6 +100,17 @@ helix-headless-pagination::part(next):hover {
   color: var(--_gray-strong);
 }
 
+/* Where you are: a raised chip with an edge, which stays put under the pointer.
+   `page-current` is the second part name the page carries while it is the one
+   you are on, since its `aria-current` cannot follow `::part()`. */
+helix-headless-pagination::part(page-current),
+helix-headless-pagination::part(page-current):hover {
+  background-color: var(--_gray-surface);
+  border-color: var(--_gray-line);
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
 helix-headless-pagination::part(gap) {
   cursor: pointer;
   user-select: none;
