@@ -65,7 +65,7 @@ export function Example() {
         {' '}
         <helix-headless-tour-stop
           for="rail"
-          placement="bottom-start"
+          placement="right-start"
         >
           {' '}
           <helix-headless-card>

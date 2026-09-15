@@ -64,6 +64,11 @@ import '../../button/index.js'
  * @csspart next-button - The inner control.
  * @csspart skip - The control that leaves the tour.
  * @csspart skip-button - The inner control.
+ *
+ * @cssstate placed-bottom - While the panel sits below its target.
+ * @cssstate placed-left - While the panel sits to the left of its target.
+ * @cssstate placed-right - While the panel sits to the right of its target.
+ * @cssstate placed-top - While the panel sits above its target.
  */
 @customElement('helix-headless-tour-stop')
 export class HelixHeadlessTourStop extends HelixElement {
@@ -155,6 +160,20 @@ export class HelixHeadlessTourStop extends HelixElement {
        describing would be the press that ends the tour. Leaving is the skip
        control and `Escape`, both of which say so. */
     onDismiss: () => {},
+    /* The side the panel landed on, which is not always `placement`: a stop
+       with no room on the side it asked for is moved. The styled tier points
+       its arrow from `data-placement` on the panel, inside this shadow root; a
+       stylesheet outside cannot follow `::part(arrow)` with an attribute, and
+       reading the stop's own `placement` instead pointed the arrow from the
+       side that was asked for, or from below wherever React had set it as a
+       property and there was no attribute to read. */
+    onPlace: (placement) => {
+      const side = placement.split('-')[0]
+      this.toggleState('placed-bottom', side === 'bottom')
+      this.toggleState('placed-left', side === 'left')
+      this.toggleState('placed-right', side === 'right')
+      this.toggleState('placed-top', side === 'top')
+    },
     placement: () => this.placement,
     surface: () => this.partNamed('bubble'),
   })

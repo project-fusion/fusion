@@ -300,29 +300,27 @@ helix-headless-tour-stop::part(arrow) {
 
 /* Half the square outside the bubble, edged on the two sides that show, on
    the edge facing the target. The component writes where along that edge it
-   sits. Which edge is read from the stop's own `placement`, since the side it
-   landed on is an attribute inside the shadow root and `::part()` cannot be
-   followed by one; a stop with none is placed below its target. */
-helix-headless-tour-stop:not([placement])::part(arrow),
-helix-headless-tour-stop[placement^="bottom"]::part(arrow) {
+   sits, and which side of the target the panel landed on, which is not always
+   the side the stop asked for. */
+helix-headless-tour-stop:state(placed-bottom)::part(arrow) {
   border-block-start: 1px solid var(--_gray-edge);
   border-inline-start: 1px solid var(--_gray-edge);
   inset-block-start: -0.25rem;
 }
 
-helix-headless-tour-stop[placement^="top"]::part(arrow) {
+helix-headless-tour-stop:state(placed-top)::part(arrow) {
   border-block-end: 1px solid var(--_gray-edge);
   border-inline-end: 1px solid var(--_gray-edge);
   inset-block-end: -0.25rem;
 }
 
-helix-headless-tour-stop[placement^="right"]::part(arrow) {
+helix-headless-tour-stop:state(placed-right)::part(arrow) {
   border-block-end: 1px solid var(--_gray-edge);
   border-inline-start: 1px solid var(--_gray-edge);
   inset-inline-start: -0.25rem;
 }
 
-helix-headless-tour-stop[placement^="left"]::part(arrow) {
+helix-headless-tour-stop:state(placed-left)::part(arrow) {
   border-block-start: 1px solid var(--_gray-edge);
   border-inline-end: 1px solid var(--_gray-edge);
   inset-inline-end: -0.25rem;

@@ -82,6 +82,16 @@ export interface FloatingOptions {
   flip?: boolean
 
   /**
+   * Told the placement the element landed on, after every measurement.
+   *
+   * `data-placement` already says it, on the floating element, which is inside
+   * the host's shadow root. A stylesheet outside reaches that element through
+   * `::part()`, and `::part()` cannot be followed by an attribute selector, so
+   * a host whose surface is drawn from outside records the side on itself.
+   */
+  onPlace?: (placement: Placement) => void
+
+  /**
    * Space between the anchor and the floating element, in pixels.
    *
    * A function where it can change. Options are read at construction, and a
@@ -385,6 +395,7 @@ export class FloatingController implements ReactiveController {
          A panel that wants to fade in on placement selects on this. Nothing
          has to. */
       floating.setAttribute('data-placed', '')
+      this.options.onPlace?.(placement)
 
       const point = middlewareData.arrow
       if (pointer && point) {
