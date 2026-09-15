@@ -424,6 +424,25 @@ describe('carousel settling', () => {
     expect(host.index).toBe(2)
   })
 
+  test('a move back before our own scroll has left sends the track back with it', async () => {
+    /* Two presses inside one frame. The first press's scroll is smooth and has
+       not moved the track yet, so the second finds the track already on its
+       slide. Asking nothing then left the first scroll running: in Chromium the
+       index said the first slide and the track came to rest on the second.
+       Stated here as a scroll that is asked for and never moves, which is that
+       frame held still. */
+    const { host, track } = await scrolling('default-index="0"')
+    const asked: ScrollToOptions[] = []
+    track.scrollTo = ((options: ScrollToOptions) => {
+      asked.push(options)
+    }) as typeof track.scrollTo
+    host.goTo(1)
+    await host.updateComplete
+    host.goTo(0)
+    await host.updateComplete
+    expect(asked.map((options) => options.left)).toEqual([100, 0])
+  })
+
   test('a reader’s drag still moves it', async () => {
     const { host, track } = await scrolling('default-index="0"')
     track.dispatchEvent(new Event('pointerdown'))
