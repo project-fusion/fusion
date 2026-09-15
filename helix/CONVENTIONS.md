@@ -19,10 +19,11 @@ headless tier independently consumable. If styling leaks downward, we have
 shipped one package in five files.
 
 **It is a rule about the dependency, not about the character `{`.** `core`
-already ships four token-free rules into every shadow root through
+already ships token-free rules into every shadow root through
 `HelixElement.finalizeStyles`: `box-sizing`, `:host([hidden]) { display: none }`,
-a scroll container's `overflow`, and the transition suppression that stops a
-component animating its own arrival. `HIDDEN` is the clearest case, because the
+a scroll container's `overflow`, the mirror a chart's drawing takes on a
+right-to-left page, and the transition suppression that stops a component
+animating its own arrival. `HIDDEN` is the clearest case, because the
 notes below argue that `hidden` is base-tier *state* on the grounds that the
 platform acts on it, and the way the headless tier makes the platform act is a CSS
 rule shipped from here.
@@ -41,6 +42,15 @@ panel also scrolls and is deliberately unmarked, because it scrolls only from a
 it is scrolled to. That line was found by measurement rather than by argument:
 marking it moved a heading four pixels, `overflow` establishing a block
 formatting context and margins that had been collapsing stopping.
+
+**A chart marks the drawing that runs along the line of text, with
+`data-mirror`**, and on a right-to-left page `core` turns it about its vertical
+axis, so a category or a time axis starts where the text does. The names and
+ticks around a drawing are HTML in logical properties and turned on their own;
+before the mark, the columns under them did not. Values keep their vertical
+sense and numerals are text, so neither reverses. A whole ring stays unmarked,
+clockwise from twelve being a clock's convention rather than a script's, and a
+half ring is marked, being read across like a line.
 
 **A rule and not an inline `style`**, which was the first idea. An inline style
 on a rendered part outranks every author rule short of `!important`, so a

@@ -277,6 +277,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     const at = this.pointer.at
     return html`<div aria-hidden="true" id="helix-chart-plot" part="plot">
       <svg part="svg"
+        data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
@@ -359,7 +360,10 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     if (!box || box.width === 0 || box.height === 0) {
       return
     }
-    const across = event.clientX - box.left
+    /* From the right on a mirrored drawing. The x axis runs from the inline
+       start like every other chart's, numbers or not, so a point at 10% stands
+       10% in from the right edge there. */
+    const across = this.pointer.mirrored ? box.right - event.clientX : event.clientX - box.left
     const up = event.clientY - box.top
     let found: ScatterPoint | undefined
     let best = REACH ** 2

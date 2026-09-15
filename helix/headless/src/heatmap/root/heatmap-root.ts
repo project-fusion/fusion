@@ -127,8 +127,9 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    *
    * `1` is a status strip and `7` is a calendar week, which are the two readings
    * this covers. Cells fill down the column and then across, which is what a
-   * calendar heatmap does: a week is a column, so the strip reads left to right
-   * in weeks and top to bottom in days.
+   * calendar heatmap does: a week is a column, so the strip reads along the
+   * line in weeks, from the right on a right-to-left page, and top to bottom in
+   * days.
    */
   @property({ type: Number })
   rows = 1

@@ -13,6 +13,13 @@
   translate: -50% -50%;
 }
 
+/* On a right-to-left page the inline start is the right, so the mark hangs
+   left of its reading and is brought back the other way. `translate` is
+   physical and has no logical spelling. */
+:host(:dir(rtl)) [part="terminus"] {
+  translate: 50% -50%;
+}
+
 /* A dot is what an absent attribute draws. A reflecting property with a default
    would write its attribute onto a consumer-rendered host, which React reports
    as a hydration mismatch. */
@@ -51,4 +58,9 @@
   background-color: currentColor;
   border-radius: var(--helix-radii-none);
   clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+/* Onward is leftward where the drawing runs right to left. */
+:host([terminus="triangle"]:dir(rtl)) [part="terminus"] {
+  clip-path: polygon(100% 0%, 0% 50%, 100% 100%);
 }

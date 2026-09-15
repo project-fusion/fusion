@@ -272,6 +272,7 @@ export class HelixHeadlessSparkline extends HelixElement {
     return html`<svg
         aria-hidden=${this.label === '' ? 'true' : nothing}
         aria-label=${this.label === '' ? nothing : this.label}
+        data-mirror
         part="svg"
         preserveAspectRatio="none"
         role=${this.label === '' ? nothing : 'img'}

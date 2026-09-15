@@ -134,3 +134,8 @@ helix-headless-sparkline::part(terminus) {
   position: absolute;
   translate: -50% -50%;
 }
+
+/* Placed from the right on a right-to-left page, so centered the other way. */
+helix-headless-sparkline:dir(rtl)::part(terminus) {
+  translate: 50% -50%;
+}

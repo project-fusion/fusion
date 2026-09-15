@@ -163,8 +163,9 @@
    tier crops the view box to the band it draws, from the top of the ring to the
    center line plus the half stroke the flat ends hang below it. **The first
    slice starts at nine o'clock**, not twelve, because the whole is now the top
-   half and a reader reads it left to right. `rotate(180deg)` rather than
-   `-90deg`, and the same rule covers the track so the two cannot part. */
+   half and a reader reads it along the line; on a right-to-left page the tier
+   below mirrors the drawing and it starts at three. `rotate(180deg)` rather
+   than `-90deg`, and the same rule covers the track so the two cannot part. */
 :host([sweep="half"]) [part="plot"] svg {
   aspect-ratio: 100 / calc(40 + var(--donut-chart-stroke, 16) / 2);
 }
@@ -196,6 +197,17 @@
   --stat-value-size: 12cqi;
 
   font-size: 6.5cqi;
+}
+
+/* Placed from the inline start, which is the right on a right-to-left page, so
+   centered back the other way: `translate` is physical. Left as it was, the
+   total sat a hole's width left of the ring, over the slices. */
+:host(:dir(rtl)) [part="center"] {
+  translate: 50% -50%;
+}
+
+:host([sweep="half"]:dir(rtl)) [part="center"] {
+  translate: 50% 0;
 }
 
 /* Print: the same, and a donut with no fill is a ring of nothing. */

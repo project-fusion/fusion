@@ -98,8 +98,8 @@ describe('the color a cell wears', () => {
 describe('where the bubble points', () => {
   test('is the middle of the reading’s own slot when the chart says nothing', () => {
     const mark = drawn(1).querySelector('[part="mark"]') as HTMLElement
-    expect(mark.style.left).toBe('75%')
-    expect(mark.style.top).toBe('0%')
+    expect(mark.style.insetInlineStart).toBe('75%')
+    expect(mark.style.insetBlockStart).toBe('0%')
   })
 
   /* The chart says which side it prefers and `FloatingController` moves it if
@@ -109,8 +109,18 @@ describe('where the bubble points', () => {
   test('and is whatever the chart worked out, where it worked one out', () => {
     const into = drawn(0, { placement: 'left', x: '12%', y: '80%' })
     const mark = into.querySelector('[part="mark"]') as HTMLElement
-    expect([mark.style.left, mark.style.top]).toEqual(['12%', '80%'])
+    expect([mark.style.insetInlineStart, mark.style.insetBlockStart]).toEqual(['12%', '80%'])
     expect(into.querySelector('helix-tooltip')?.getAttribute('placement')).toBe('left')
+  })
+
+  /* A drawing that mirrors on a right-to-left page is measured from its inline
+     start, so the mark follows the reading there. A whole ring does not mirror,
+     so its bearing is measured from the left in either direction. */
+  test('from the plot’s left instead, for a drawing that does not turn', () => {
+    const into = drawn(0, { fixed: true, placement: 'right', x: '90%', y: '50%' })
+    const mark = into.querySelector('[part="mark"]') as HTMLElement
+    expect([mark.style.left, mark.style.top]).toEqual(['90%', '50%'])
+    expect(mark.style.insetInlineStart).toBe('')
   })
 
   /* The id is fixed rather than generated: it is scoped to this chart's shadow

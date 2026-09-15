@@ -99,7 +99,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
   /**
    * The pointer is not mapped across this one.
    *
-   * Every other chart lays its readings out left to right, so the nearest is
+   * Every other chart lays its readings out along the line, so the nearest is
    * arithmetic on x. A ring's slices are real elements at every angle, and x
    * alone would answer with whichever slice shared a horizontal position with
    * the pointer: at three o'clock and at nine o'clock it would give the same
@@ -169,6 +169,17 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
     return this.sweep === 'half' ? 0.5 : 1
   }
 
+  /**
+   * Where the first slice starts, as an angle from three o'clock.
+   *
+   * Twelve for a whole ring and nine for a half, the turns the stylesheet gives
+   * the circles. Anything drawn or placed by arithmetic has to start from the
+   * same place, or it describes a slice the ring is not showing there.
+   */
+  private get origin(): number {
+    return this.sweep === 'half' ? Math.PI : -Math.PI / 2
+  }
+
   /** How thick the ring is drawn, in the drawing's own units. */
   private get thickness(): number {
     return THICKNESS[this.hole ?? 'medium'] ?? THICKNESS.medium ?? 0
@@ -224,7 +235,11 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
       part="plot"
       style="--donut-chart-stroke: ${this.thickness}"
     >
-      <svg viewBox=${this.frame} xmlns="http://www.w3.org/2000/svg">
+      <svg
+        data-mirror=${this.sweep === 'half' ? '' : nothing}
+        viewBox=${this.frame}
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <circle
           cx=${CENTER}
           cy=${CENTER}
@@ -311,15 +326,15 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * turn, so a growing slice would pop partway through the transition it was
    * meant to smooth. Both animations stay on the dash and this path follows it.
    *
-   * The turn to twelve o'clock is arithmetic here rather than the rotation the
-   * stylesheet gives the circles. That rule uses `transform-box: fill-box`, so
-   * it spins each element about its own bounding box, which is the ring's center
-   * for a circle and is not for a sector.
+   * The turn to twelve o'clock, or to nine for a half, is `origin` here rather
+   * than the rotation the stylesheet gives the circles. That rule uses
+   * `transform-box: fill-box`, so it spins each element about its own bounding
+   * box, which is the ring's center for a circle and is not for a sector.
    */
   protected renderEdge(share: { fraction: number; start: number }, index: number): TemplateResult {
     const turn = 2 * Math.PI * this.span
-    const from = share.start * turn - Math.PI / 2
-    const to = (share.start + share.fraction) * turn - Math.PI / 2
+    const from = share.start * turn + this.origin
+    const to = (share.start + share.fraction) * turn + this.origin
     const outer = EDGE
     const inner = EDGE - this.thickness
     const at = (radius: number, angle: number): string =>
@@ -395,22 +410,34 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
        the hole: centered covers the data on a pie, and in neither shape does it
        say *which* slice it means. Out here one rule serves both.
 
-       The mid-angle, less a quarter turn because the ring is rotated to start
-       at twelve o'clock and this arithmetic starts at three. The point is the
-       outer edge, and the box is pushed a little further along the same bearing
-       so its arrow rests on the ring rather than in it. */
-    const angle = (share.start + share.fraction / 2) * 2 * Math.PI - Math.PI / 2
+       The mid-angle, from `origin` because the ring is turned to start at
+       twelve o'clock, or nine for a half, and this arithmetic starts at three.
+       The point is the outer edge. A half ring's box is cropped to the band it
+       draws, so the height is measured from the top of that band. */
+    const angle = (share.start + share.fraction / 2) * 2 * Math.PI * this.span + this.origin
     const edge = EDGE
     const x = CENTER + Math.cos(angle) * edge
-    const y = CENTER + Math.sin(angle) * edge
+    const top = this.sweep === 'half' ? CENTER - EDGE : 0
+    const tall = this.sweep === 'half' ? EDGE + this.thickness / 2 : BOX
+    const y = ((CENTER + Math.sin(angle) * edge - top) / tall) * 100
+    /* **A whole ring stays as drawn on a right-to-left page, and a half ring
+       turns.** Clockwise from twelve is a clock's convention, and a clock does
+       not run backwards in Arabic or Hebrew, so the ring's bearing is measured
+       from the left in either direction. A half ring is read across, the first
+       slice where a line of text starts, so it is marked `data-mirror` like any
+       axis and its bearing is measured from the inline start, with the side the
+       bubble prefers turned to match. */
+    const turned = this.sweep === 'half' && this.pointer.mirrored
+    const across = Math.cos(angle) > 0 !== turned
     return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
+      fixed: this.sweep !== 'half',
       /* The preferred side from the bearing's dominant axis, and
          `FloatingController` moves it if that side does not fit. A fixed side
          cannot express a bearing, so the arrow misses the ring; a preference
          plus flipping can. */
       placement:
         Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))
-          ? Math.cos(angle) > 0
+          ? across
             ? 'right'
             : 'left'
           : Math.sin(angle) > 0

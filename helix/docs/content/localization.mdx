@@ -23,9 +23,15 @@ for you and nothing needs to: the document says it and the components follow.
 
 **A physical side appears only where the thing it places is physical.** A
 floating panel is placed from coordinates measured from the viewport's left
-edge, so it and its arrow are written in `left` and `top`. A chart's drawing
-does not turn with the text, so the mark its tooltip points at does not either.
-Everything a reader would expect to mirror still does.
+edge, so it and its arrow are written in `left` and `top`. Everything a reader
+would expect to mirror still does.
+
+**Charts mirror too.** A category or time axis starts where the text does, so
+on a right-to-left page the first reading is on the right and the drawing,
+its labels, its hover targets and its tooltips all turn together. Values keep
+their vertical sense and numerals are not reversed. A whole donut stays
+clockwise from twelve, which is a clock's convention rather than a script's.
+[Charting](./charting) has the rest.
 
 That is also how `placement` reads. The side is physical and the alignment is
 logical: `right` is the right of the anchor in either direction, and

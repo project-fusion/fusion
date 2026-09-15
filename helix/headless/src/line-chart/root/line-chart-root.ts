@@ -158,7 +158,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    * property with a default writes its attribute onto a host the consumer
    * rendered, which React reports as a hydration mismatch.
    *
-   * **One per series, in a column at the right edge**, because every series here
+   * **One per series, in a column at the far edge**, because every series here
    * shares an x-axis and therefore ends at the same reading. That column is the
    * useful thing: it is where a reader looks for "and what is it now", which is
    * the question a sparkline's single mark answers too.
@@ -293,6 +293,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       style=${holes ? `--_line-chart-holes: ${holes}` : nothing}
     >
       <svg part="svg"
+        data-mirror
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"

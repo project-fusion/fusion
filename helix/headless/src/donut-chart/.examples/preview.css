@@ -122,6 +122,11 @@ helix-headless-donut-chart::part(center) {
   translate: -50% -50%;
 }
 
+/* Placed from the right on a right-to-left page, so centered the other way. */
+helix-headless-donut-chart:dir(rtl)::part(center) {
+  translate: 50% -50%;
+}
+
 /* The slice under the pointer stands out from the ring by its width. */
 helix-headless-donut-chart::part(segment-active) {
   stroke-width: calc(var(--donut-chart-stroke) * 1.18);
