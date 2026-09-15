@@ -365,7 +365,23 @@ export class HelixHeadlessCarousel extends HelixElement {
      * here would be cleared by the reader's *next* drag rather than by its own
      * scroll, swallowing it. A pixel of slack, because a snapped offset is
      * fractional and an exact comparison never holds. */
+    const at: ScrollToOptions = vertical ? { top: target } : { left: target }
     if (Math.abs(target - (vertical ? track.scrollTop : track.scrollLeft)) < 1) {
+      /* **Unless a scroll of ours is still on its way somewhere else.** Where
+         the track is and where it is going differ until that scroll arrives,
+         and two presses inside one frame leave the first one's smooth scroll
+         not yet moved: the second found the track already at its slide, asked
+         nothing, and the first carried on. Measured in Chromium on the events
+         example, next then previous: the index said the first slide and the
+         track came to rest on the second. An instant scroll to here replaces
+         the one in flight, and the claim goes with it rather than waiting on a
+         `scrollend` a scroll that moved nothing need not send. Chromium does
+         send one, and it then finds the track on the index's own slide, which
+         reads as nothing to do. */
+      if (this.settling) {
+        track.scrollTo({ behavior: 'instant', ...at })
+        this.settling = false
+      }
       return
     }
 
@@ -378,10 +394,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     /* The scroll about to run is ours, so the `scrollend` it produces is not a
        reader saying where they went. See `handleScroll`. */
     this.settling = true
-    track.scrollTo({
-      behavior: still ? 'instant' : 'smooth',
-      ...(vertical ? { top: target } : { left: target }),
-    })
+    track.scrollTo({ behavior: still ? 'instant' : 'smooth', ...at })
   }
 
   /**
