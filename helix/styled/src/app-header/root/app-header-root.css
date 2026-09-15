@@ -16,6 +16,9 @@
 
   background-color: var(--app-header-background-color, var(--helix-color-background));
   border-block-end: var(--helix-border-thin) solid var(--app-header-border-color, transparent);
+  /* What the narrow row below measures itself against: the bar's own width,
+     which is `100%` and so never taken from its content. */
+  container-type: inline-size;
   display: block;
   inline-size: 100%;
   /* The background as well as the border, or `transparent` takes its surface in
@@ -63,13 +66,20 @@
 
 /* The row is what gets centered, so the content lines up with the page while the
    banner behind it runs edge to edge. Equal `1fr` tracks put the middle of the
-   nav at the middle of the window and keep it there. */
+   nav at the middle of the window and keep it there while there is room to.
+
+   **Neither outer track may shrink below what it holds.** A bare `1fr` has a
+   floor of zero, so where the row runs short both fall to the narrower side's
+   width: measured at 390, the end track was 41.3 wide, the brand's width, around
+   two 32 pixel buttons and their gap, and the actions overflowed backwards
+   across the navigation by 6.7. With the floor at `max-content` it is the
+   navigation that yields, and it already scrolls. */
 [part="row"] {
   align-items: center;
   block-size: var(--app-header-block-size, var(--helix-size-header));
   display: grid;
   gap: var(--helix-space-lg);
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr);
   margin-inline: auto;
   max-inline-size: var(--app-header-max-inline-size, 72rem);
   padding-inline: var(--app-header-padding, var(--helix-space-lg));
@@ -120,7 +130,10 @@ slot[name="start"]::slotted(*) {
   /* The marker is positioned against this region. */
   position: relative;
   gap: var(--helix-space-md);
-  justify-content: center;
+  /* `safe`, or navigation wider than the region overflows both edges equally,
+     and the half past the start edge is out of the scroller's reach: measured
+     at 390, the current destination's fill was cut at its leading edge. */
+  justify-content: safe center;
   /* Long navigation scrolls inside the bar instead of widening the page. */
   min-inline-size: 0;
   overflow-x: auto;
@@ -128,6 +141,17 @@ slot[name="start"]::slotted(*) {
 
 :host([content-align="start"]) [part="content"] {
   justify-content: flex-start;
+}
+
+/* **A phone-sized bar spends less on its insets and more on its navigation.**
+   At the `lg` step the padding and the two gaps are 96 pixels of a 342 pixel
+   row, which left two destinations 141 of the 163 they need. At `md` they fit,
+   and a 360 pixel phone keeps both on screen rather than scrolling one. */
+@container (inline-size < 24rem) {
+  [part="row"] {
+    gap: var(--helix-space-md);
+    padding-inline: var(--app-header-padding, var(--helix-space-md));
+  }
 }
 
 /* Print: a bar of destinations, and a printed page has no elsewhere to go. */

@@ -27,11 +27,11 @@
 /* The field owns no edge and no ground of its own: it is the inside of the box
    above, and a second border inside the first is the double-struck look every
    field rule in this library exists to prevent.
-   **And no inline padding either, for the same reason one step further.** The
-   box above already pads; four more pixels here were a second inset inside the
-   first, doing nothing a reader could see except moving the caret off the line
-   the transcript above it starts on. The block padding stays: that one is the
-   line's own breathing room and has no twin. */
+   **The inline padding tops the box's inset up to a bubble's.** The frame sits
+   on the line a bubble's edge does, and its border and its own `xs` put the
+   caret three pixels short of where a bubble's words start, `sm` in. This is
+   those three, written as the difference so that it follows either. The block
+   padding is the line's own breathing room. */
 [part="field"] {
   background-color: transparent;
   border: 0;
@@ -46,7 +46,7 @@
   line-height: var(--helix-leading-normal);
   max-block-size: var(--chat-composer-max-block-size, 12rem);
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-none);
+  padding-inline: calc(var(--helix-space-sm) - var(--helix-space-xs) - var(--helix-border-thin));
   resize: none;
 }
 

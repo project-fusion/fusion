@@ -34,15 +34,24 @@
   gap: var(--breadcrumbs-gap, var(--helix-space-xs));
 }
 
+/* A line box of the crumb's own type rather than a flex row, so the chevron has
+   a baseline to be set against: the box is as tall as the link's text line and
+   centered with it, so the two baselines are one. */
 [part="separator"] {
   color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
-  display: inline-flex;
+  display: block;
   user-select: none;
 }
 
+/* **Centered on the capitals rather than on the line.** Centered on the line, a
+   1em chevron is centered on the lowercase: measured in Fusion Sans at 13px, its
+   ink sat 1.25px lower than the capitals beside it and hung that far under the
+   baseline. Half the gap between the em and the cap height, taken off the
+   baseline, is the same answer in any face, which a nudge in pixels is not. */
 [part="separator"] svg {
   block-size: 1em;
   inline-size: 1em;
+  vertical-align: calc(0.5cap - 0.5em);
 }
 
 /* Each item draws the separator that precedes it, and the first one hides it. */
@@ -113,6 +122,12 @@
   text-decoration: none;
 }
 
+/* The first crumb's own anchor is pulled back as a slotted one is above, so a
+   trail of `href` crumbs starts its first word, or its icon, on the edge too. */
+:host(:first-child) a[part="link"] {
+  margin-inline-start: calc(var(--helix-space-xs) * -1);
+}
+
 /* The block half of that padding is what the hover fill is made of, so a crumb
    that has no fill does not need it. For a control that padding is counted
    twice: the control is already sized to a crumb's own box above, so wrapping it
@@ -122,6 +137,16 @@
    the other end. */
 :host(:not([href])) [part="link"] {
   padding-block: var(--helix-space-none);
+}
+
+/* **And the inline half is only for words this span draws itself**, which is
+   the current page. A crumb with no `href` holds the consumer's own anchor or
+   control, which brings the padding its own fill is made of. The span's added
+   to it: measured, 30 pixels between a linked word and a chevron against 20
+   beside the current page, and the trail's first word 9 pixels inside the edge
+   the pull above is there to put it on. */
+:host(:not([href]):not([current])) [part="link"] {
+  padding-inline: var(--helix-space-none);
 }
 
 /* The same hover the slotted path has, because `::slotted(a:hover)` cannot reach
