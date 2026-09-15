@@ -38,56 +38,57 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+/* A one-cell grid, so a slotted mark is centered over the circles with no
+   offsets to keep in step with the size, and still inline, so a loader beside
+   text sits on the line with it. */
+helix-headless-loader {
+  color: var(--_gray-strong);
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  vertical-align: middle;
 }
 
-helix-headless-loader {
+/* The turn is what says busy: a still arc reads as a broken one. A reader who
+   asked for less motion gets a crawl rather than a stop, for the same reason. */
+helix-headless-loader::part(svg) {
+  animation: loader-turn 0.8s linear infinite;
   block-size: 1.5rem;
-  color: var(--_gray-mark);
-  display: inline-block;
+  grid-area: 1 / 1;
   inline-size: 1.5rem;
 }
 
-helix-headless-loader::part(svg) {
-  flex: none;
+@keyframes loader-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  helix-headless-loader::part(svg) {
+    animation-duration: 4s;
+  }
+}
+
+helix-headless-loader::part(track) {
+  stroke: var(--_gray-fill);
+  stroke-width: 2;
+}
+
+/* Half the circle drawn and the ends round, because this is a spinner and the
+   round end is its shape rather than a softening of it. */
+helix-headless-loader::part(indicator) {
+  stroke: currentColor;
+  stroke-dasharray: 50, 100;
+  stroke-linecap: round;
+  stroke-width: 2;
 }
 
 helix-headless-loader::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-loader::part(track) {
-  background-color: var(--_gray-fill);
-  block-size: 0.5rem;
-  display: block;
-  inline-size: 100%;
-}
-
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-loader::part(svg) {
-  block-size: 100%;
-  inline-size: 100%;
-}
-
-helix-headless-loader::part(track) {
-  fill: none;
-  stroke: var(--_gray-fill);
-  stroke-width: 4;
-}
-
-helix-headless-loader::part(indicator) {
-  fill: none;
-  stroke: var(--_gray-strong);
-  stroke-width: 4;
+  align-items: center;
+  block-size: 0.6rem;
+  display: flex;
+  grid-area: 1 / 1;
+  inline-size: 0.6rem;
+  justify-content: center;
 }

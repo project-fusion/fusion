@@ -38,30 +38,99 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+helix-headless-navigation {
+  display: block;
 }
 
+/* A bar at one fixed height, which the items fill, so the bar and its items
+   agree wherever it is put. */
+helix-headless-navigation::part(nav) {
+  align-items: center;
+  block-size: 2rem;
+  display: flex;
+  gap: 0.25rem;
+  min-inline-size: 0;
+  overflow-x: auto;
+  position: relative;
+}
+
+/* The mark behind the current destination is a quiet fill the component sizes
+   and moves to it, under the items rather than over them. */
+helix-headless-navigation::part(indicator) {
+  background-color: var(--_gray-subtle);
+  block-size: var(--indicator-block-size, 0);
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  position: absolute;
+  translate: var(--indicator-x, 0) -50%;
+}
+
+/* Destinations in a bar are items, not prose links: gray, not underlined, and
+   the full height of the bar. The minimum as well as the percentage, because a
+   `Megamenu` slots its trigger inside its own auto-height host, where a
+   percentage resolves against nothing. */
+helix-headless-navigation a {
+  align-items: center;
+  block-size: 100%;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  justify-content: center;
+  min-block-size: 2rem;
+  padding-inline: 0.75rem;
+  position: relative;
+  text-decoration: none;
+  white-space: nowrap;
+  z-index: 1;
+}
+
+helix-headless-navigation a:hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-navigation a[aria-current="page"] {
+  color: var(--_gray-strong);
+  font-weight: 600;
+}
+
+/* Inside the item rather than around it, so the ring is not cut off by the
+   bar's own overflow. */
+helix-headless-navigation a:focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+helix-headless-megamenu {
+  display: inline-flex;
+}
+
+/* Drawn as one of the bar's items, so the one that opens a panel reads as a
+   destination beside the others rather than as a button among links. */
 helix-headless-megamenu::part(trigger) {
   all: unset;
+  align-items: center;
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.25rem;
+  min-block-size: 2rem;
+  padding-inline: 0.5rem;
 }
 
-helix-headless-megamenu::part(surface) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+helix-headless-megamenu::part(trigger):hover {
   color: var(--_gray-strong);
-  padding: 0.5rem;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-megamenu:state(open)::part(trigger) {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -70,4 +139,104 @@ helix-headless-icon::part(svg) {
 helix-headless-megamenu::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+/* The panel's columns. `display` only while it is open: the component closes it
+   with `hidden` and the popover's own state, and an author `display` on a closed
+   one would beat the user agent's rule and paint it anyway. */
+helix-headless-megamenu::part(surface) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  gap: 2rem;
+  grid-auto-columns: minmax(15rem, 1fr);
+  grid-auto-flow: column;
+  inline-size: max-content;
+  line-height: 1.5;
+  margin: 0;
+  max-inline-size: min(52rem, calc(100% - 4rem));
+  padding: 1rem;
+}
+
+helix-headless-megamenu::part(surface):popover-open {
+  display: grid;
+}
+
+[data-megamenu-group] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+[data-megamenu-heading] {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: 500;
+  gap: 0.5rem;
+  margin: 0 0 0.25rem;
+  padding-inline: 0.75rem;
+}
+
+/* The rows are anchors inside the navigation, so they match its bar rule
+   above and each of its bar-sized declarations is taken back here: a row is as
+   tall as its content and its sentence wraps. */
+helix-headless-navigation [data-megamenu-item] {
+  align-items: start;
+  block-size: auto;
+  color: var(--_gray-strong);
+  column-gap: 0.75rem;
+  display: grid;
+  font-weight: 400;
+  grid-template-columns: auto minmax(0, 1fr);
+  justify-content: stretch;
+  min-block-size: 0;
+  padding: 0.75rem;
+  row-gap: 0.25rem;
+  white-space: normal;
+}
+
+/* Pulled up by the group's gap, so the space between two rows is part of a row
+   and every pixel down a column is somewhere to click. */
+[data-megamenu-item] + [data-megamenu-item] {
+  margin-block-start: -0.5rem;
+}
+
+helix-headless-navigation [data-megamenu-item]:hover {
+  background-color: transparent;
+}
+
+helix-headless-icon {
+  display: inline-flex;
+  flex: none;
+}
+
+helix-headless-icon::part(svg) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+[data-megamenu-item] > helix-headless-icon {
+  block-size: 1.5rem;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  inline-size: 1.5rem;
+}
+
+[data-megamenu-item] > strong {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  grid-column: 2;
+}
+
+[data-megamenu-item] > span {
+  color: var(--_gray-muted);
+  font-size: 0.8125rem;
+  grid-column: 2;
+}
+
+[data-megamenu-item]:hover > span {
+  color: var(--_gray-strong);
 }

@@ -38,60 +38,136 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-number-input::part(control) {
-  font: inherit;
-}
-
-helix-headless-number-input::part(decrement-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-number-input::part(field) {
-  align-items: center;
+/* A column, so the label, the field and the hint stack with one gap between
+   them and the field takes the width it is given. */
+helix-headless-number-input {
   display: flex;
-  gap: 0.5rem;
-}
-
-helix-headless-number-input::part(increment-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 helix-headless-number-input::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+/* The same frame an input wears, with a button at each end inside it rather
+   than beside it, so the whole thing reads as one field and not a field with
+   two controls after it. */
+helix-headless-number-input::part(field) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  display: flex;
+  overflow: hidden;
+}
+
+helix-headless-number-input:not(:disabled)::part(field):hover {
+  border-color: var(--_gray-mark);
+}
+
+/* The ring goes on the frame rather than on the input, so it surrounds the
+   whole field and not the number inside it. Taking the UA outline off the input
+   without putting one back here is the commonest way a headless control stops
+   being operable without a pointer. */
+helix-headless-number-input:focus-within::part(field) {
+  border-color: var(--_gray-strong);
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 0;
+}
+
+/* Tabular figures, because the digits are what change under a repeated press
+   and proportional ones make the number jump about. */
+helix-headless-number-input::part(control) {
+  all: unset;
+  block-size: 100%;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  min-inline-size: 0;
+  padding-inline: 0.5rem;
+  text-align: center;
+}
+
+/* A rule between each button and the number rather than a border of its own:
+   the button is part of the field. */
+helix-headless-number-input::part(decrement),
+helix-headless-number-input::part(increment) {
+  all: unset;
+  align-items: center;
+  align-self: stretch;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: flex;
+  flex: none;
+  inline-size: 2.5rem;
+  justify-content: center;
+}
+
+helix-headless-number-input::part(decrement) {
+  border-inline-end: 1px solid var(--_gray-line);
+}
+
+helix-headless-number-input::part(increment) {
+  border-inline-start: 1px solid var(--_gray-line);
+}
+
+helix-headless-number-input::part(decrement):hover:not(:disabled),
+helix-headless-number-input::part(increment):hover:not(:disabled) {
+  background-color: var(--_gray-surface);
+  color: var(--_gray-strong);
+}
+
+helix-headless-number-input::part(decrement):focus-visible,
+helix-headless-number-input::part(increment):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
+}
+
+/* Dimmed rather than removed, so a button at the end of its range keeps its
+   width and the number beside it holds still. */
+helix-headless-number-input::part(decrement):disabled,
+helix-headless-number-input::part(increment):disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+helix-headless-number-input::part(decrement-mark),
+helix-headless-number-input::part(increment-mark) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
+}
+
+helix-headless-number-input::part(hint),
+helix-headless-number-input::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
 }
 
 helix-headless-number-input::part(hint) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
 }
 
+/* What is wrong is told apart from help by weight and ink, since a red here
+   would be an opinion this tier does not hold. */
 helix-headless-number-input::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  color: var(--_gray-strong);
+  font-weight: 500;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-number-input::part(control):focus-visible {
-  outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
+helix-headless-number-input:disabled::part(field) {
+  cursor: not-allowed;
+  opacity: 0.5;
 }

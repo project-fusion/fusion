@@ -38,27 +38,59 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
-  display: inline-flex;
-  flex: none;
-  inline-size: 1em;
+helix-headless-list {
+  display: flex;
+  flex-direction: column;
 }
 
+/* A hairline between rows rather than around each, so the list reads as one
+   object. */
+helix-headless-list-item + helix-headless-list-item {
+  border-block-start: 1px solid var(--_gray-line);
+}
+
+/* A grid, so the label and the caption stack in one column and the leading mark
+   is centered against both. The label is bare text in the default slot, which
+   lands in the grid as an anonymous box that cannot be placed; everything else
+   is placed around it, and it takes the first free cell, beside the mark on the
+   first line. */
 helix-headless-list-item::part(row) {
-  background-color: transparent;
-  border: 0;
+  align-items: center;
+  color: var(--_gray-strong);
+  display: grid;
+  font-size: 0.8125rem;
+  grid-template-columns: auto 1fr auto;
+  line-height: 1.5;
+  padding: 0.75rem 1rem;
+}
+
+helix-headless-list-item > [slot="start"] {
+  color: var(--_gray-muted);
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin-inline-end: 0.75rem;
+}
+
+helix-headless-list-item > [slot="supporting"] {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  grid-column: 2;
+  grid-row: 2;
+}
+
+helix-headless-list-item > [slot="end"] {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+}
+
+helix-headless-icon {
+  block-size: 1.25rem;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1.25rem;
 }
 
 helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-list-item::part(row) {
-  align-items: baseline;
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.25rem 0;
+  block-size: 100%;
+  inline-size: 100%;
 }

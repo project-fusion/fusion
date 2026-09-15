@@ -38,23 +38,27 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-helix-headless-icon {
-  block-size: 1em;
+helix-headless-icon-button {
   display: inline-flex;
-  flex: none;
-  inline-size: 1em;
 }
 
+/* Square by construction, and a ghost at rest: a toolbar of framed squares is a
+   toolbar of boxes, so the edge and the fill arrive only under the pointer. */
 helix-headless-icon-button::part(button) {
   all: unset;
+  align-items: center;
+  block-size: 2.5rem;
   box-sizing: border-box;
+  color: var(--_gray-muted);
   cursor: pointer;
+  display: inline-flex;
+  inline-size: 2.5rem;
+  justify-content: center;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+helix-headless-icon-button::part(button):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
@@ -65,7 +69,14 @@ helix-headless-icon-button::part(button):focus-visible {
   outline-offset: 2px;
 }
 
-helix-headless-icon-button::part(button) {
-  border: 1px solid var(--_gray-line);
-  padding: 0.375rem;
+helix-headless-icon {
+  block-size: 1.25rem;
+  display: inline-flex;
+  flex: none;
+  inline-size: 1.25rem;
+}
+
+helix-headless-icon::part(svg) {
+  block-size: 100%;
+  inline-size: 100%;
 }
