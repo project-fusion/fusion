@@ -206,6 +206,27 @@ describe('column order', () => {
     expect(element.order).toBe('size name')
   })
 
+  /* Counted among all of them, the step went past the hidden column: the order
+     changed and nothing a reader could see moved. The hidden one keeps its
+     place among the rest. */
+  test('an arrow moves a column past the next one a reader can see', async () => {
+    const element = await table(
+      'reorderable',
+      `<helix-headless-table-column field="name">Name</helix-headless-table-column>
+       <helix-headless-table-column field="id" hidden>Id</helix-headless-table-column>
+       <helix-headless-table-column field="size">Size</helix-headless-table-column>`,
+    )
+    const grip = element
+      .querySelector('helix-headless-table-column')
+      ?.shadowRoot?.querySelector('[part="grip"]') as HTMLElement
+    grip.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowRight' }),
+    )
+    await element.updateComplete
+    expect(element.order).toBe('id size name')
+    expect(cells(element).slice(0, 2)).toEqual(['200', 'delta'])
+  })
+
   test('a click on a grip does not sort the column', async () => {
     const element = await table('reorderable')
     const grip = element
@@ -285,6 +306,16 @@ describe('csv', () => {
       '1000,charlie',
       '200,delta',
     ])
+  })
+
+  test('leaves out a hidden column, which is not on screen', async () => {
+    const element = await table(
+      'default-sort="name:asc"',
+      `<helix-headless-table-column field="name">Name</helix-headless-table-column>
+       <helix-headless-table-column field="id" hidden>Id</helix-headless-table-column>
+       <helix-headless-table-column field="size">Size</helix-headless-table-column>`,
+    )
+    expect(element.csv().split('\r\n').slice(0, 2)).toEqual(['Name,Size', 'alpha,30'])
   })
 
   test('quotes what CSV has to quote, and marks what a spreadsheet would run as text', async () => {

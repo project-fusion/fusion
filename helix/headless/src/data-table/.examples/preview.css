@@ -122,8 +122,11 @@ helix-headless-data-table::part(cell) {
   padding-inline: 0 1rem;
 }
 
-/* The heading takes no box of its own, so its heading cell is the grid item. */
-helix-headless-table-column {
+/* The heading takes no box of its own, so its heading cell is the grid item.
+   `:not([hidden])`, because an author `display` beats the UA's `[hidden]`: the
+   table drops a hidden column's track and its cells, and set unconditionally
+   this would still draw the heading, one more than the grid has tracks for. */
+helix-headless-table-column:not([hidden]) {
   display: contents;
 }
 

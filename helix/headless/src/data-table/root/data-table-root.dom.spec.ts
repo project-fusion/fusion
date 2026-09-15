@@ -631,3 +631,51 @@ describe('windowing', () => {
     remove()
   })
 })
+
+/**
+ * A hidden column, which takes no track and draws no cells.
+ *
+ * Left in, its heading went and its track and a cell in every row stayed, so
+ * the header row came up a heading short, the first cell filled the gap, and
+ * every row after it began a column late.
+ */
+describe('a hidden column', () => {
+  const HIDING = `
+    <helix-headless-data-table label="Files" default-sort="name:asc">
+      <helix-headless-table-column field="name" hidden width="12rem">Name</helix-headless-table-column>
+      <helix-headless-table-column field="size" width="6rem">Size</helix-headless-table-column>
+    </helix-headless-data-table>`
+
+  const template = (element: HTMLElement): string =>
+    part(element, 'table')?.getAttribute('style') ?? ''
+
+  test('lays out no track for it and draws none of its cells', async () => {
+    const { element, remove } = await mount(HIDING)
+    expect(template(element)).toBe('--data-table-template: 6rem')
+    expect(cells(element)).toEqual(['30', '4', '1000', '200'])
+    expect(part(element, 'table')?.getAttribute('aria-colcount')).toBe('1')
+    remove()
+  })
+
+  /* It is still the sort's, which is by field. */
+  test('still orders the rows', async () => {
+    const { element, remove } = await mount(HIDING)
+    element.sort = 'name:desc'
+    await settled(element)
+    expect(cells(element)).toEqual(['200', '1000', '4', '30'])
+    remove()
+  })
+
+  /* `hidden` is the platform's attribute and no property of the column's, so
+     nothing but the column watching it tells the table. */
+  test('draws it again once it is shown', async () => {
+    const { element, remove } = await mount(HIDING)
+    heading(element).hidden = false
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await settled(element)
+    expect(template(element)).toBe('--data-table-template: 12rem 6rem')
+    expect(cells(element).slice(0, 2)).toEqual(['alpha', '30'])
+    expect(part(element, 'table')?.getAttribute('aria-colcount')).toBe('2')
+    remove()
+  })
+})

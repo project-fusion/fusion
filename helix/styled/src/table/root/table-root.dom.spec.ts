@@ -271,3 +271,69 @@ describe('the cells under a column set to an edge, where there is layout to plac
     }
   })
 })
+
+describe('the tracks, where there is layout to measure them', () => {
+  type Updating = HTMLElement & { updateComplete: Promise<boolean> }
+
+  const settle = async (host: Updating): Promise<void> => {
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+  }
+
+  /** How wide each drawn heading is, in the order written. */
+  const widths = (host: HTMLElement): number[] =>
+    ([...host.querySelectorAll('helix-table-column')] as HTMLElement[])
+      .filter((column) => !column.hidden)
+      .map((column) =>
+        Math.round((part(column, 'column') as Element).getBoundingClientRect().width),
+      )
+
+  /** A table with its first column hidden, heading and cells both. */
+  const hiding = async (dir: 'ltr' | 'rtl'): Promise<Updating> => {
+    const host = (await mount(`
+      <helix-table dir="${dir}" label="Deploys">
+        <helix-table-column hidden width="12rem">Service</helix-table-column>
+        <helix-table-column>Region</helix-table-column>
+        <helix-table-column align="end" width="6rem">Count</helix-table-column>
+        <helix-table-row>
+          <helix-table-cell header hidden>Gateway</helix-table-cell>
+          <helix-table-cell>us-east-1</helix-table-cell>
+          <helix-table-cell>34</helix-table-cell>
+        </helix-table-row>
+        <helix-table-row>
+          <helix-table-cell header hidden>Billing</helix-table-cell>
+          <helix-table-cell>eu-west-2</helix-table-cell>
+          <helix-table-cell>1800</helix-table-cell>
+        </helix-table-row>
+      </helix-table>`)) as Updating
+    await settle(host)
+    return host
+  }
+
+  /* Left in, the hidden column's track was one the header row had no heading
+     for, so the first cell took it and every row began a column late. */
+  for (const dir of ['ltr', 'rtl'] as const) {
+    geometry(
+      `leave none for a hidden column, and every cell under its heading, ${dir}`,
+      async () => {
+        const host = await hiding(dir)
+        const columns = [...host.querySelectorAll('helix-table-column')] as HTMLElement[]
+        columns.forEach((column, index) => {
+          if (column.hidden) {
+            return
+          }
+          const heading = (part(column, 'column') as Element).getBoundingClientRect()
+          for (const row of host.querySelectorAll('helix-table-row')) {
+            const cell = (row.children[index] as Element).getBoundingClientRect()
+            expect(Math.abs(cell.left - heading.left)).toBeLessThan(1)
+            expect(Math.abs(cell.right - heading.right)).toBeLessThan(1)
+            expect(cell.top).toBeGreaterThanOrEqual(heading.bottom - 1)
+          }
+        })
+        /* The twelve rems went with the column, rather than to Region. */
+        expect(widths(host)[1]).toBe(96)
+      },
+    )
+  }
+})

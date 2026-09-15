@@ -180,6 +180,28 @@ describe('a grip', () => {
     await frames(element)
     expect(asked).toEqual([])
   })
+
+  /* A hidden heading has no box, and its empty rect sat left of every pointer,
+     so it counted as passed wherever it was: the column dropped past Size went
+     past Kind too. */
+  geometry('passes over a hidden heading, which keeps its place', async () => {
+    const element = await table('reorderable')
+    column(element, 'kind').hidden = true
+    await frames(element)
+    const asked: string[] = []
+    element.addEventListener('helix-reorder', (event) =>
+      asked.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    const grip = inner(column(element, 'name'), 'grip')
+    const from = grip.getBoundingClientRect()
+    const past = heading(element, 'size')
+    const y = from.top + from.height / 2
+    pointer(grip, 'pointerdown', from.left + 2, y)
+    pointer(window, 'pointermove', past.right - 4, y)
+    pointer(window, 'pointerup', past.right - 4, y)
+    await frames(element)
+    expect(asked).toEqual(['size name kind'])
+  })
 })
 
 /* Painted and read back, so two colors compare as pixels. Computed styles write

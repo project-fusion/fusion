@@ -57,8 +57,10 @@ helix-headless-table {
 }
 
 /* A rule under each cell and none between them, so a row reads as a line
-   across the table rather than as a run of boxes. */
-helix-headless-table-cell {
+   across the table rather than as a run of boxes. Not on a hidden cell, since
+   an author `display` beats the UA's `[hidden]`: a column is hidden with the
+   cells under it, and the table drops its track. */
+helix-headless-table-cell:not([hidden]) {
   align-items: center;
   border-block-end: 1px solid var(--_gray-line);
   box-sizing: border-box;
@@ -98,10 +100,11 @@ helix-headless-table::part(table) {
 /* The head, every row and every column take no box, so the headings and the
    cells are the grid's items. Without it the cells stay inside their rows, the
    grid gets one item per row instead of one per cell, and the headings run
-   together as one string with the rows under them out of step. */
+   together as one string with the rows under them out of step. A hidden one
+   is left to the UA's `[hidden]`, for the reason the cell's rule gives. */
 helix-headless-table::part(head),
-helix-headless-table-column,
-helix-headless-table-row {
+helix-headless-table-column:not([hidden]),
+helix-headless-table-row:not([hidden]) {
   display: contents;
 }
 

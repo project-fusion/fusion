@@ -74,6 +74,15 @@ export const at = (row: Readonly<Record<string, unknown>>, path: string): unknow
  * item of the table, so it lines up with the cells under it rather than sitting
  * in a wrapper that has to be kept the same width.
  *
+ * **`hidden` takes the column out of the grid**, its heading and its track
+ * both, so the columns after it keep their own widths and every row keeps its
+ * cells under their headings. `hidden="until-found"` keeps its track, the
+ * heading being left drawn, as every Helix element leaves one with that value.
+ * `helix-data-table` draws the cells, so it leaves out the ones under a hidden
+ * column. A `helix-table`'s cells are markup the consumer wrote, so hide them
+ * with the column, as removing a column means removing its cells: a row with a
+ * cell more than the table has tracks wraps into the next.
+ *
  * **A heading that does something holds a control that does it.** The host is
  * the column header, and a header is not focusable, so a sortable heading is a
  * `<button>` inside it: the pattern for a sortable table, and the only way a
@@ -255,6 +264,9 @@ export class HelixHeadlessTableColumn extends HelixElement {
   /** Watches the heading's width, which changes with the table as well as with a drag. */
   private watcher: ResizeObserver | undefined
 
+  /** Watches `hidden`, which is the platform's attribute and no property of this element's. */
+  private hiding: MutationObserver | undefined
+
   /**
    * The narrowest a reader can drag a column, in pixels.
    *
@@ -270,6 +282,17 @@ export class HelixHeadlessTableColumn extends HelixElement {
   /** The track this column contributes, resolved. */
   get track(): string {
     return this.width || 'minmax(max-content, 1fr)'
+  }
+
+  /**
+   * @internal Whether this column takes a track, read by the table that holds
+   * it. Not a consumer's to read: `hidden` is the setting. Read off the
+   * attribute the way `HelixElement` hides a host, so the table drops a track
+   * exactly when the heading stops being drawn.
+   */
+  get shown(): boolean {
+    const hidden = this.getAttribute('hidden')
+    return hidden === null || hidden === 'until-found'
   }
 
   /** Whether a reader can actually reorder by this column. */
@@ -343,6 +366,13 @@ export class HelixHeadlessTableColumn extends HelixElement {
          run again, so the new observer is given it here. */
       this.observeHeading()
     }
+    /* `hidden` changes which tracks the table lays out, and nothing here
+       renders differently for it, so no property of this element's carries it
+       to `updated`. Watched the way `align` and `width` are passed on. */
+    if (typeof MutationObserver !== 'undefined') {
+      this.hiding = new MutationObserver(() => this.tellHolder())
+      this.hiding.observe(this, { attributeFilter: ['hidden'] })
+    }
   }
 
   private observeHeading(): void {
@@ -355,6 +385,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.watcher?.disconnect()
+    this.hiding?.disconnect()
+    this.hiding = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -373,8 +405,13 @@ export class HelixHeadlessTableColumn extends HelixElement {
        that read it when they render, and a column held by anything else has
        nobody to tell. */
     if (changed.has('align') || changed.has('width')) {
-      ;(this.parentElement as Partial<ReactiveElement> | null)?.requestUpdate?.()
+      this.tellHolder()
     }
+  }
+
+  /** Asks whatever holds this column to render, since it reads the column when it does. */
+  private tellHolder(): void {
+    ;(this.parentElement as Partial<ReactiveElement> | null)?.requestUpdate?.()
   }
 
   /**

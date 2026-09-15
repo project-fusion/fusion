@@ -270,6 +270,51 @@ describe('a heading, where there is layout to place it', () => {
   })
 })
 
+/* Left in, a hidden column's heading went and its track and its cells stayed,
+   so the header row came up a heading short and every row began a column late. */
+describe('a hidden column, where there is layout to place the rest', () => {
+  const hiding = async (dir: 'ltr' | 'rtl') => {
+    const element = (await mount(`
+      <helix-data-table dir="${dir}" label="Objects">
+        <helix-table-column field="name" hidden width="12rem">Name</helix-table-column>
+        <helix-table-column field="region">Region</helix-table-column>
+        <helix-table-column field="size" align="end" width="6rem">Size</helix-table-column>
+      </helix-data-table>`)) as HTMLElement & {
+      rows: readonly Record<string, unknown>[]
+      updateComplete: Promise<unknown>
+    }
+    element.rows = [
+      { name: 'alpha', region: 'us-east-1', size: 30 },
+      { name: 'bravo', region: 'eu-west-2', size: 4 },
+    ]
+    await element.updateComplete
+    return element
+  }
+
+  for (const dir of ['ltr', 'rtl'] as const) {
+    geometry(`puts every cell under its own heading, ${dir}`, async () => {
+      const element = await hiding(dir)
+      const drawn = [...element.querySelectorAll('helix-table-column')]
+        .filter((column) => !(column as HTMLElement).hidden)
+        .map((column) => (part(column as HTMLElement, 'column') as Element).getBoundingClientRect())
+      const rows = [...(element.shadowRoot?.querySelectorAll('[part="row"]') ?? [])]
+      for (const row of rows) {
+        const cells = [...row.querySelectorAll('[part~="cell"]')].map((cell) =>
+          cell.getBoundingClientRect(),
+        )
+        expect(cells).toHaveLength(drawn.length)
+        cells.forEach((cell, index) => {
+          const heading = drawn[index] as DOMRect
+          expect(Math.abs(cell.left - heading.left)).toBeLessThan(1)
+          expect(Math.abs(cell.right - heading.right)).toBeLessThan(1)
+        })
+      }
+      /* The hidden column's twelve rems went with it, rather than to Region. */
+      expect(Math.round((drawn[1] as DOMRect).width)).toBe(96)
+    })
+  }
+})
+
 /* The pointer is a `::slotted()` rule keyed on the attribute, which happy-dom
    computes nothing from, so this runs in the browser with the geometry. */
 describe('a sortable heading, however it was made sortable', () => {

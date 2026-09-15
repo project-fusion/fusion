@@ -595,6 +595,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return columns.map((column) => (column.field === '' ? column : (moving[next++] ?? column)))
   }
 
+  /**
+   * The columns drawn: the arranged ones less any that are hidden.
+   *
+   * **A hidden column takes no track and draws no cells.** Left in, its
+   * heading went and its track and its cell in every row stayed, so the header
+   * row came up a heading short, the first cell filled the gap, and every row
+   * after it began a column late. It keeps its place in `order` and in the
+   * sort, which are by field, so showing it again puts it back where it was.
+   */
+  private get shownColumns(): HelixHeadlessTableColumn[] {
+    return this.orderedColumns.filter((column) => column.shown)
+  }
+
   /** The fields in the order on screen. */
   private get fields(): string[] {
     return this.orderedColumns.filter((column) => column.field !== '').map((column) => column.field)
@@ -609,7 +622,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** The track list, from the columns if there are any. */
   private get template(): string {
-    const declared = this.orderedColumns
+    const declared = this.shownColumns
     if (declared.length === 0) {
       return ''
     }
@@ -878,16 +891,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestSelected(keys)
   }
 
-  /** Moves a column by some places among the ones that move. */
+  /**
+   * Moves a column by some places among the ones that move and are drawn.
+   *
+   * Counted among the drawn ones, so a key moves the heading past one a reader
+   * can see: counted among all of them, a step past a hidden column changed the
+   * order and nothing on screen. A hidden column keeps its place among the rest.
+   */
   private moveColumn(field: string, by: number): boolean {
-    const fields = this.fields
-    const from = fields.indexOf(field)
-    const to = from + by
-    if (from < 0 || to < 0 || to >= fields.length) {
+    const drawn = this.shownColumns.filter((column) => column.field !== '')
+    const from = drawn.findIndex((column) => column.field === field)
+    const past = drawn[from + by]
+    if (from < 0 || !past) {
       return false
     }
-    fields.splice(to, 0, ...fields.splice(from, 1))
-    return this.requestOrder(fields)
+    return this.requestOrder(this.placed(field, past.field, by > 0))
+  }
+
+  /** Every field in order, with one taken out and put back beside another. */
+  private placed(field: string, beside: string, after: boolean): string[] {
+    const fields = this.fields.filter((one) => one !== field)
+    fields.splice(fields.indexOf(beside) + (after ? 1 : 0), 0, field)
+    return fields
   }
 
   /**
@@ -896,8 +921,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    *
    * **Values, not cells.** A cell may be a template, a badge or a link, so each
    * column gives its field's value, which is what a spreadsheet wants anyway.
-   * A column with no field has no value and is left out. In `server` mode this
-   * is the page it holds, which is all it can know.
+   * A column with no field has no value and is left out, and so is a hidden
+   * one, which is not on screen. In `server` mode this is the page it holds,
+   * which is all it can know.
    *
    * **A text value that a spreadsheet would run is quoted as text.** A cell
    * opening with `=`, `+`, `-` or `@` is a formula to a spreadsheet, and a
@@ -906,7 +932,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * left alone, so a negative one stays a number.
    */
   csv(): string {
-    const columns = this.orderedColumns.filter((column) => column.field !== '')
+    const columns = this.shownColumns.filter((column) => column.field !== '')
     const rows = this.mode === 'server' ? this.rows : this.arrange().rows
     const quote = (value: unknown): string => {
       if (value === undefined || value === null) {
@@ -1160,7 +1186,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   private renderRows(rows: readonly DataRow[]): TemplateResult {
-    const columns = this.orderedColumns
+    const columns = this.shownColumns
     const field = this.rowKey
     /* Keyed, so a sort moves a row's element rather than rewriting every cell
        in place: focus inside a cell survives and a transition stays attached to
@@ -1289,7 +1315,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   protected override render(): TemplateResult {
     const { available, matched, rows } = this.view
     const template = this.template
-    const columns = this.tableColumns
+    const columns = this.shownColumns
     const pagination = this.tag('pagination')
     return html`<div part="toolbar"><slot name="toolbar"></slot></div>
       <div
@@ -1432,11 +1458,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     const rtl = getComputedStyle(this).direction === 'rtl'
-    const others = this.orderedColumns.filter(
+    /* Only the drawn ones: a hidden heading has no box, and its zero rect sat
+       left of every pointer, so it counted as passed wherever it was. */
+    const others = this.shownColumns.filter(
       (column) => column.field !== '' && column.field !== dragging.field,
     )
     /* How many of the other headings the pointer has passed, reading in the
-       writing direction: that is the place the dragged one goes. */
+       writing direction: the dragged one goes after the last of them, or ahead
+       of the first where it has passed none. */
     const place = others.filter((column) => {
       const box = column.shadowRoot?.querySelector('[part="column"]')?.getBoundingClientRect()
       if (!box) {
@@ -1445,8 +1474,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       const middle = box.left + box.width / 2
       return rtl ? event.clientX < middle : event.clientX > middle
     }).length
-    const next = others.map((column) => column.field)
-    next.splice(place, 0, dragging.field)
+    const beside = others[place - 1] ?? others[0]
+    if (!beside) {
+      return
+    }
+    const next = this.placed(dragging.field, beside.field, place > 0)
     if (next.join(' ') !== this.dragOrder.join(' ')) {
       this.dragOrder = next
     }
