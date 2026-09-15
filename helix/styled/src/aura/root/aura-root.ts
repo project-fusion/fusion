@@ -40,6 +40,33 @@ const MAX_CANVAS_PIXELS = 4_194_304
  */
 const OPENING_PATIENCE = 500
 
+/*
+ * **A context apiece, and nothing shared between them, on purpose.**
+ *
+ * The tempting fix for a page of auras is a module-level cache of the compiled
+ * program, and WebGL rules it out: a program belongs to the context that linked
+ * it. The one shape that would share is a single context drawing for every
+ * aura, which copies each frame into each canvas. What a context apiece costs
+ * was measured first, 15 Sep 2026, on one page of 1, 3 and 6 auras 720 pixels
+ * tall, with the shader cache made cold on every run:
+ *
+ * - **On a GPU the browser already shares it.** Chromium on Metal, an M2 Max:
+ *   the first aura links in about 90ms and its first draw takes 135ms more,
+ *   while every aura after it links in under a millisecond and draws its first
+ *   frame in 2. What each pays alone is translating the shader, about 8ms on
+ *   the main thread. Six had all drawn 262ms after navigation, against 206ms
+ *   for one.
+ * - **Under SwiftShader nothing is shared.** Headless Chromium's software
+ *   renderer, which the spec runner draws with, compiles the pipeline again
+ *   for each context, about 450ms apiece, and the page shows no new frame for
+ *   0.5s with one aura, 1.3s with three and 2.6s with six.
+ *
+ * That second cost is the one inherent to a context per element, and a shared
+ * context would take it back by charging every reader with a GPU a copy per
+ * aura per frame, for a cost they do not pay. So it stays, and the specs stub
+ * their draws rather than paying it.
+ */
+
 /**
  * @summary A lit, drifting background, drawn from the token layer.
  *
