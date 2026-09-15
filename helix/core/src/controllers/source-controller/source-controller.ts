@@ -46,10 +46,10 @@ export interface SourceHost extends ReactiveControllerHost, HTMLElement {
  * and nothing in a page has reason to know a chart is reading it.
  */
 export class SourceController implements ReactiveController {
-  #host: SourceHost
-  #observer: MutationObserver | undefined
+  private host: SourceHost
+  private observer: MutationObserver | undefined
   /** Whether a hydrating render was told there was nothing, and needs the render after. */
-  #deferred = false
+  private deferred = false
 
   /**
    * Which edit of the table the parses below belong to.
@@ -58,13 +58,13 @@ export class SourceController implements ReactiveController {
    * change what a chart reads without the chart doing anything: an edit to the
    * table, and `for` naming another one.
    */
-  #version = 0
+  private version = 0
 
-  #rows: Parsed<Row[]> | undefined
-  #series: Parsed<Series[]> | undefined
+  private heldRows: Parsed<Row[]> | undefined
+  private heldSeries: Parsed<Series[]> | undefined
 
   constructor(host: SourceHost) {
-    this.#host = host
+    this.host = host
     host.addController(this)
   }
 
@@ -80,11 +80,11 @@ export class SourceController implements ReactiveController {
    * a template Lit throws on. The update after it, which this asks for, draws.
    */
   get element(): Element | null {
-    if ((this.#host as unknown as { hydrating?: boolean }).hydrating === true) {
-      this.#deferred = this.#host.for !== ''
+    if ((this.host as unknown as { hydrating?: boolean }).hydrating === true) {
+      this.deferred = this.host.for !== ''
       return null
     }
-    return this.#resolve()
+    return this.resolve()
   }
 
   /**
@@ -95,8 +95,8 @@ export class SourceController implements ReactiveController {
    * the render that hydrates, it resolved nothing there and never watched, so a
    * table a page filled afterwards drew no line.
    */
-  #resolve(): Element | null {
-    const host = this.#host
+  private resolve(): Element | null {
+    const host = this.host
     if (host.for === '') {
       return null
     }
@@ -136,23 +136,23 @@ export class SourceController implements ReactiveController {
    * compare by identity.
    */
   get series(): Series[] {
-    this.#series = this.#parsed(this.#series, (table) => (table ? readSeries(table) : []))
-    return this.#series.value
+    this.heldSeries = this.parsed(this.heldSeries, (table) => (table ? readSeries(table) : []))
+    return this.heldSeries.value
   }
 
   /** Every row it holds, text and number alike, or none. Held the way `series` is. */
   get rows(): Row[] {
-    this.#rows = this.#parsed(this.#rows, (table) => (table ? readRows(table) : []))
-    return this.#rows.value
+    this.heldRows = this.parsed(this.heldRows, (table) => (table ? readRows(table) : []))
+    return this.heldRows.value
   }
 
   /** A held parse where it still describes the table, or a fresh one. */
-  #parsed<T>(held: Parsed<T> | undefined, read: (table: Element | null) => T): Parsed<T> {
+  private parsed<T>(held: Parsed<T> | undefined, read: (table: Element | null) => T): Parsed<T> {
     const element = this.element
-    if (held && held.element === element && held.version === this.#version) {
+    if (held && held.element === element && held.version === this.version) {
       return held
     }
-    return { element, value: read(element), version: this.#version }
+    return { element, value: read(element), version: this.version }
   }
 
   hostConnected(): void {
@@ -161,15 +161,15 @@ export class SourceController implements ReactiveController {
 
   /* The drawing a hydrating render left out, asked for once it is done. */
   hostUpdated(): void {
-    if (this.#deferred) {
-      this.#deferred = false
-      this.#host.requestUpdate()
+    if (this.deferred) {
+      this.deferred = false
+      this.host.requestUpdate()
     }
   }
 
   hostDisconnected(): void {
-    this.#observer?.disconnect()
-    this.#observer = undefined
+    this.observer?.disconnect()
+    this.observer = undefined
   }
 
   /**
@@ -179,17 +179,17 @@ export class SourceController implements ReactiveController {
    * there is no `MutationObserver`, which is the server.
    */
   watch(): void {
-    this.#observer?.disconnect()
-    this.#version += 1
-    const element = this.#resolve()
+    this.observer?.disconnect()
+    this.version += 1
+    const element = this.resolve()
     if (!element || typeof MutationObserver === 'undefined') {
       return
     }
-    this.#observer ??= new MutationObserver(() => {
-      this.#version += 1
-      this.#host.requestUpdate()
+    this.observer ??= new MutationObserver(() => {
+      this.version += 1
+      this.host.requestUpdate()
     })
-    this.#observer.observe(element, {
+    this.observer.observe(element, {
       characterData: true,
       childList: true,
       subtree: true,

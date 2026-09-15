@@ -37,9 +37,9 @@ export interface ChartPointerHost extends ReactiveControllerHost, HTMLElement {
  * `pointerType` is not fine.
  */
 export class ChartPointerController implements ReactiveController {
-  #host: ChartPointerHost
-  #moved = false
-  #plot: HTMLElement | undefined
+  private host: ChartPointerHost
+  private moved = false
+  private plot: HTMLElement | undefined
 
   /** The reading under the pointer, or -1 when the pointer is elsewhere. */
   at = -1
@@ -63,18 +63,18 @@ export class ChartPointerController implements ReactiveController {
   axis: 'block' | 'inline' | 'none' = 'inline'
 
   constructor(host: ChartPointerHost) {
-    this.#host = host
+    this.host = host
     host.addController(this)
   }
 
   hostConnected(): void {
-    this.#host.addEventListener('pointermove', this.#move)
-    this.#host.addEventListener('pointerleave', this.#leave)
+    this.host.addEventListener('pointermove', this.move)
+    this.host.addEventListener('pointerleave', this.leave)
   }
 
   hostDisconnected(): void {
-    this.#host.removeEventListener('pointermove', this.#move)
-    this.#host.removeEventListener('pointerleave', this.#leave)
+    this.host.removeEventListener('pointermove', this.move)
+    this.host.removeEventListener('pointerleave', this.leave)
     this.at = -1
   }
 
@@ -93,11 +93,11 @@ export class ChartPointerController implements ReactiveController {
    * position until the render that follows.
    */
   hostUpdated(): void {
-    if (!this.#moved) {
+    if (!this.moved) {
       return
     }
-    this.#moved = false
-    this.#host.renderRoot
+    this.moved = false
+    this.host.renderRoot
       .querySelector<HTMLElement & { reposition?: () => void }>('[part="tooltip-anchor"]')
       ?.reposition?.()
   }
@@ -119,28 +119,28 @@ export class ChartPointerController implements ReactiveController {
    * whenever the held one has left, which is once per data arrival rather than
    * once per move.
    */
-  #box(): DOMRect | undefined {
-    if (!this.#plot?.isConnected) {
-      this.#plot = this.#host.renderRoot.querySelector<HTMLElement>('[part="plot"]') ?? undefined
+  private box(): DOMRect | undefined {
+    if (!this.plot?.isConnected) {
+      this.plot = this.host.renderRoot.querySelector<HTMLElement>('[part="plot"]') ?? undefined
     }
-    return this.#plot?.getBoundingClientRect()
+    return this.plot?.getBoundingClientRect()
   }
 
   /** Puts the pointer on a reading, for a chart that resolves it some other way. */
   set(at: number): void {
     if (at !== this.at) {
       this.at = at
-      this.#moved = true
-      this.#host.requestUpdate()
+      this.moved = true
+      this.host.requestUpdate()
     }
   }
 
-  readonly #move = (event: PointerEvent): void => {
+  private readonly move = (event: PointerEvent): void => {
     if (this.axis === 'none' || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) {
       return
     }
-    const box = this.#box()
-    const count = this.#host.readings
+    const box = this.box()
+    const count = this.host.readings
     const along = this.axis === 'block' ? box?.height : box?.width
     if (!box || !along || count === 0) {
       return
@@ -155,15 +155,15 @@ export class ChartPointerController implements ReactiveController {
     const next = Math.min(Math.max(slot, 0), count - 1)
     if (next !== this.at) {
       this.at = next
-      this.#moved = true
-      this.#host.requestUpdate()
+      this.moved = true
+      this.host.requestUpdate()
     }
   }
 
-  readonly #leave = (): void => {
+  private readonly leave = (): void => {
     if (this.at !== -1) {
       this.at = -1
-      this.#host.requestUpdate()
+      this.host.requestUpdate()
     }
   }
 }
