@@ -1,12 +1,16 @@
 /* What the headless tier asks a consumer to write for Drawer.
  *
- * Deliberately skeletal: a diagram of what has to be styled, not a theme to
- * copy. No token, because `headless` does not depend on `helix/styles` and a
- * consumer taking that tier has none to reach for. No corner radius, because
- * rounding says how a thing should feel and that is not this tier's to say; the
- * exceptions are shapes that are round rather than softened.
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
  *
- * **Grays, and only grays.** Color in a diagram reads as meaning: a blue fill
+ * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
  * says primary and a red one says danger, and this tier holds no such opinion.
  * A neutral ramp says only where one surface ends and the next begins.
  *
@@ -24,6 +28,7 @@
 
 :root {
   color-scheme: light dark;
+  font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);

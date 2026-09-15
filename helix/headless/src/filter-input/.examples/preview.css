@@ -1,10 +1,14 @@
 /* What the headless tier asks a consumer to write for Filter Input.
  *
- * Deliberately skeletal: a diagram of what has to be styled, not a theme to
- * copy. No token, because `headless` does not depend on `helix/styles` and a
- * consumer taking that tier has none to reach for. Grays only, because color in
- * a diagram reads as meaning and this tier holds no such opinion. The seven are
- * named by role and underscored, since they never leave this file.
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
  *
  * **The row is the rule worth reading here.** `[part="tags"]` has to be
  * `display: contents`, and it is the one rule a consumer will not think to
@@ -14,6 +18,7 @@
 
 :root {
   color-scheme: light dark;
+  font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);

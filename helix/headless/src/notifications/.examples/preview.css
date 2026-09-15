@@ -1,9 +1,14 @@
 /* What the headless tier asks a consumer to write for Notifications.
  *
- * Deliberately skeletal: a diagram of what has to be styled, not a theme to
- * copy. No token, because `headless` does not depend on `helix/styles`, and no
- * corner radius, because rounding says how a thing should feel and that is not
- * this tier's to say.
+ * The styled tier's default state, in structure and spacing, drawn in grays:
+ * the same parts boxed, the same direction and the same gaps, so a reader sees
+ * the component a consumer would build rather than a sketch of it. No token,
+ * because `headless` does not depend on `helix/styles` and a consumer taking
+ * that tier has none to reach for, so the styled values are written out in
+ * `rem`. No corner radius, because rounding says how a thing should feel and
+ * that is not this tier's to say; the exceptions are shapes that are round
+ * rather than softened. The page is set in the system's sans-serif, which is
+ * the page's decision and not the component's.
  *
  * **Grays, and only grays.** An unread item is told apart by a fill rather than
  * a colored dot, since a hue here would read as an opinion this tier does not
@@ -13,6 +18,7 @@
 
 :root {
   color-scheme: light dark;
+  font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
   --_gray-line: light-dark(#c9c9ce, #45454b);
