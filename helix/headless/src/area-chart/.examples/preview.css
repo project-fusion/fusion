@@ -38,7 +38,7 @@
   font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
-  --_gray-edge: light-dark(#e6e6e8, #26262a);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
   --_gray-mark: light-dark(#8e8e96, #86868f);
