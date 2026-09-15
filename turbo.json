@@ -185,16 +185,31 @@
     // already held it. Untracked, the same cache hit leaves nothing at all, and
     // `files` names it, so the package would ship without the typings a Svelte
     // consumer imports.
-    // Its own `build` was in `dependsOn` and did not belong: `inputs` is
-    // `src/**`, the config imports `@fusion.dev/helix-cem` which `^build`
-    // already covers, and a manifest built with `dist` absent is byte-identical
-    // to one built beside it, measured at 75,232 lines on `helix/headless`.
-    // Removing it is what lets `build` depend on `analyze` instead, so a tier
-    // can generate `element-events.generated.ts` as a prebuild step rather than
-    // tracking it.
+    // Its own `build` was in `dependsOn` and did not belong: the config imports
+    // `@fusion.dev/helix-cem`, which `^build` already covers, and a manifest
+    // built with `dist` absent is byte-identical to one built beside it,
+    // measured at 75,232 lines on `helix/headless`. Removing it is what lets
+    // `build` depend on `analyze` instead, so a tier can generate
+    // `element-events.generated.ts` as a prebuild step rather than tracking it.
+    //
+    // **`$TURBO_DEFAULT$`, so no generated file is an input, because turbo
+    // hashes the tree as it stands when a run starts.** A clean checkout has
+    // none of them and a second run in the same job has them all, so `src/**`
+    // gave this task two keys for one source: `bun run analyze` straight after
+    // `bun run build` missed, and so did every `build` depending on it. Measured
+    // on CI 15 Sep 2026, fourteen tasks rebuilt in 81 seconds, paid again by
+    // every job that ran a second turbo command. What the default reads that
+    // `src/**` did not is the package's other tracked files, `package.json`
+    // among them, which the analyzer reads for `exports`.
+    //
+    // The generated files it leaves out are each accounted for. The analyzer
+    // does not read `element-events.generated.ts`, which is written from this
+    // task's output. It does read each `.css.ts`, which is `styles`' output, so
+    // `styles` is a dependency: its hash stands for them, and the analyzer no
+    // longer races it for whether they exist yet.
     "analyze": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "cem.config.ts"],
+      "dependsOn": ["^build", "styles"],
+      "inputs": ["$TURBO_DEFAULT$"],
       "outputs": ["custom-elements.json", "types/jsx.d.ts", "types/svelte.d.ts", "types/vue.d.ts"]
     },
     "build": {
@@ -295,9 +310,15 @@
     // Reads `@customElement('tag')` out of the element sources and writes the
     // sheet that hides each one until it upgrades. A workspace step rather than
     // a package's, because it reads one package and writes another.
+    //
+    // **The generated modules beside the sources are not inputs**, because the
+    // script does not read them: `build-elements-css.mjs` says why, and the two
+    // lists have to agree.
     "elements-css": {
       "inputs": [
         "$TURBO_ROOT$/helix/styled/src/**/*.ts",
+        "!$TURBO_ROOT$/helix/styled/src/**/*.css.ts",
+        "!$TURBO_ROOT$/helix/styled/src/**/*.generated.ts",
         "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
       ],
       "outputs": ["$TURBO_ROOT$/helix/styles/src/elements.css"]
@@ -426,9 +447,18 @@
     // while the file stays missing, because a cache hit restores what a task
     // claims and nothing else. The next thing to read it fails, which is how
     // this was found: `build-frame.mjs` on ENOENT.
+    //
+    // **The two layers `helix-styles` generates into its `src` are not
+    // inputs**, for the reason `analyze` gives: hashed, they gave the task one
+    // key on a clean checkout and another once a build had written them, and
+    // every `build` above it missed on the second. That package has no
+    // `styles` script, and the hash of the task it does not have is still one
+    // its own `build` depends on.
     "styles": {
       "inputs": [
         "src/**/*.css",
+        "!src/elements.css",
+        "!src/tokens.css",
         "$TURBO_ROOT$/fusion/scripts/build-styles.mjs",
         "$TURBO_ROOT$/fusion/scripts/build-elements-css.mjs"
       ],

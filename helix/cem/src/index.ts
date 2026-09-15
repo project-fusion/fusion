@@ -172,7 +172,13 @@ export const createHelixCemConfig = ({
     // members, events, slots, and parts inherited across package boundaries,
     // stamping each with `inheritedFrom`.
     dependencies: true,
-    exclude: ['src/**/*.spec.ts', 'src/**/*.d.ts'],
+    /* **A generated module is not read, because it is written from this
+       manifest.** `element-events.generated.ts` comes out of the manifest
+       after `analyze`, so read here it put an empty module in the manifest
+       only when a build had already run: two manifests for one source, and
+       every task hashing `src/**` after it a cache miss. Measured on CI 15 Sep
+       2026, 81 seconds of `analyze` rebuilding what `build` had just built. */
+    exclude: ['src/**/*.spec.ts', 'src/**/*.d.ts', 'src/**/*.generated.ts'],
     globs,
     litelement: true,
     outdir: '.',

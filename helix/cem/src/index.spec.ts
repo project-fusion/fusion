@@ -350,4 +350,8 @@ describe('createHelixCemConfig', () => {
   test('specs are excluded so they do not enter the manifest', () => {
     expect(createHelixCemConfig({ tier: 'styled' }).exclude).toContain('src/**/*.spec.ts')
   })
+
+  test('a module generated from the manifest is excluded from it', () => {
+    expect(createHelixCemConfig({ tier: 'styled' }).exclude).toContain('src/**/*.generated.ts')
+  })
 })
