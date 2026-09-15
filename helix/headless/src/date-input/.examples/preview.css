@@ -208,6 +208,13 @@ helix-headless-date-input::part(picker-next-mark) {
   inline-size: 1em;
 }
 
+/* A caret is physical and the thing it points at is not: on a right-to-left
+   page the earlier month is on the right, and its caret points there. */
+helix-headless-date-input:dir(rtl)::part(picker-previous-mark),
+helix-headless-date-input:dir(rtl)::part(picker-next-mark) {
+  scale: -1 1;
+}
+
 /* Each week is a row of seven equal tracks, the weekday row included, so the
    names stand over their columns. */
 helix-headless-date-input::part(picker-week) {

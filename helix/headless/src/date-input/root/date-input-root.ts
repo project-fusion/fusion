@@ -215,10 +215,70 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
    *
    * Worth more than one mainly for a range, where picking a start in March and
    * an end in April otherwise means paging between them and losing sight of the
-   * first. The panel is sized by its content, so this widens it.
+   * first. The panel is sized by its content, so this widens it, and where the
+   * window has no room for that width it shows one month until there is.
    */
   @property({ type: Number })
   months = 1
+
+  /**
+   * How many months the panel is showing, where that is fewer than `months`.
+   *
+   * **One month rather than a squeezed two**, and decided here rather than in a
+   * stylesheet because what changes is markup. Two months measure 600 pixels
+   * across, measured 15 Sep 2026, and in a 390 window that ran past both
+   * edges. A rule could only clip them, which hides the next-month control with
+   * the month it sits on, or stack them, which makes a panel taller than most
+   * of a phone. The count is behavior, as a carousel's per-view is.
+   */
+  @state()
+  private fitted: number | undefined = undefined
+
+  /**
+   * How wide the panel was the last time it held every month, in pixels.
+   *
+   * Measured rather than estimated, because a month's width is its locale's:
+   * the weekday names set it. Remembered, so a panel showing one month knows
+   * what it would take to show them all, and the answer cannot flip back and
+   * forth between two measurements of different things.
+   */
+  private wide: number | undefined = undefined
+
+  /**
+   * Shows one month where the window has no room for them all, and all of them
+   * again once it does.
+   *
+   * Called after every placement, with the room the floating pass measured,
+   * which is the window less a margin on each side. The panel hangs in the top
+   * layer, so the window is its box, the argument Dialog makes for reading the
+   * viewport. The surface's own width is read, since it is sized by its content
+   * and never capped.
+   */
+  protected override placed(room: number | undefined): void {
+    const all = Math.max(1, Math.floor(this.months) || 1)
+    const surface = this.partNamed('surface')
+    if (room === undefined || all === 1 || !surface) {
+      return
+    }
+    if (this.fitted === undefined) {
+      this.wide = surface.offsetWidth
+    }
+    const next = this.wide === undefined || this.wide <= room ? undefined : 1
+    if (next !== this.fitted) {
+      this.fitted = next
+    }
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* A different count or a different language is a different width, so what
+       was measured no longer answers and every month is shown to be measured
+       again at the next placement. */
+    if (changed.has('months') || changed.has('locale')) {
+      this.fitted = undefined
+      this.wide = undefined
+    }
+  }
 
   /**
    * What the field says before a date is in it.
@@ -453,7 +513,7 @@ export class HelixHeadlessDateInput extends MixinPickerEditing(
         week: picker-week, weekday: picker-weekday"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
-      months=${this.months}
+      months=${this.fitted ?? this.months}
       .value=${this.picked}
       disable-dates=${this.disableDates || nothing}
       disable-days=${this.disableDays || nothing}

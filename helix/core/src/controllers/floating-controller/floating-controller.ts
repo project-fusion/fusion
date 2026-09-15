@@ -82,14 +82,20 @@ export interface FloatingOptions {
   flip?: boolean
 
   /**
-   * Told the placement the element landed on, after every measurement.
+   * Told the placement the element landed on, after every measurement, and
+   * how wide the window leaves it room to be.
    *
-   * `data-placement` already says it, on the floating element, which is inside
-   * the host's shadow root. A stylesheet outside reaches that element through
-   * `::part()`, and `::part()` cannot be followed by an attribute selector, so
-   * a host whose surface is drawn from outside records the side on itself.
+   * `data-placement` already says the side, on the floating element, which is
+   * inside the host's shadow root. A stylesheet outside reaches that element
+   * through `::part()`, and `::part()` cannot be followed by an attribute
+   * selector, so a host whose surface is drawn from outside records the side on
+   * itself.
+   *
+   * The room is in pixels, and absent where `resize` is off. It is for a host
+   * that changes what it shows to fit, which a stylesheet cannot do when what
+   * changes is markup: Date Input shows one month instead of two.
    */
-  onPlace?: (placement: Placement) => void
+  onPlace?: (placement: Placement, room: number | undefined) => void
 
   /**
    * Space between the anchor and the floating element, in pixels.
@@ -284,6 +290,7 @@ export class FloatingController implements ReactiveController {
         ? this.options.placement()
         : this.options.placement
     const middleware: Middleware[] = [offset(gap ?? 0)]
+    let room: number | undefined
     if (this.options.flip !== false) {
       const side = (preferred ?? 'bottom-start').split('-')[0]
       /* **A panel beside its anchor may leave for the axis across, and one
@@ -338,8 +345,13 @@ export class FloatingController implements ReactiveController {
              inline twin, so writing it would be a `setProperty` on every
              reposition of every floating element for nobody. Declared and never
              read is a promise on the API page with nothing behind it. It comes
-             back the day a rule wants it, together with that rule. */
-          apply: ({ availableHeight, elements, rects }) => {
+             back the day a rule wants it, together with that rule.
+
+             The width is handed to `onPlace` instead, which costs nothing
+             where nobody listens: a host that fits its contents to it is
+             deciding markup, which no rule could do with a property. */
+          apply: ({ availableHeight, availableWidth, elements, rects }) => {
+            room = availableWidth
             elements.floating.style.setProperty(
               '--floating-available-block-size',
               `${Math.round(availableHeight)}px`,
@@ -458,7 +470,7 @@ export class FloatingController implements ReactiveController {
          A panel that wants to fade in on placement selects on this. Nothing
          has to. */
       floating.setAttribute('data-placed', '')
-      this.options.onPlace?.(placement)
+      this.options.onPlace?.(placement, room === undefined ? undefined : Math.floor(room))
 
       const point = middlewareData.arrow
       if (pointer && point) {

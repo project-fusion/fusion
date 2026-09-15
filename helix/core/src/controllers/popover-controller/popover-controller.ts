@@ -66,10 +66,11 @@ export interface PopoverOptions {
   onDismiss: () => void
 
   /**
-   * Told the placement the surface landed on, after every measurement. Passed
-   * through to the floating pass, which says why a host would want it.
+   * Told the placement the surface landed on, after every measurement, and how
+   * wide the window leaves it room to be. Passed through to the floating pass,
+   * which says why a host would want either.
    */
-  onPlace?: (placement: Placement) => void
+  onPlace?: (placement: Placement, room: number | undefined) => void
 
   /**
    * Whether the host wants the surface up, read after every update.
