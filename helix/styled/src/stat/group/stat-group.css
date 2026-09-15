@@ -1,13 +1,28 @@
 :host {
+  --_stat-group-gap: var(--stat-group-gap, var(--helix-space-2xl));
   display: flex;
   flex-wrap: wrap;
-  gap: var(--stat-group-gap, var(--helix-space-2xl));
+  gap: var(--_stat-group-gap);
 }
 
 /* The rule goes on the figure rather than between slots, because a `<slot>` is
-   `display: contents` and generates no box to put a border on. First-child
-   skips the leading edge without needing a selector that counts. */
-:host([divided]) ::slotted(*:not(:first-child)) {
+   `display: contents` and generates no box to put a border on.
+
+   **Every figure carries it and the group clips the one that starts a row.**
+   `:not(:first-child)` skipped only the first figure, and a figure that wraps
+   is first in its row without being first: measured 15 Sep 2026 at 390 wide,
+   the third kept its rule and its inset, a bar at the start of the second row.
+   Each rule is pulled back past the start by the gap and its own width, so the
+   one leading a row lands outside the box and the clip takes it, and the rest
+   land halfway between two figures, which is why the gap between them
+   doubles. */
+:host([divided]) {
+  column-gap: calc(var(--_stat-group-gap) * 2);
+  overflow-x: clip;
+}
+
+:host([divided]) ::slotted(*) {
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-  padding-inline-start: var(--stat-group-gap, var(--helix-space-2xl));
+  margin-inline-start: calc(var(--_stat-group-gap) * -1 - var(--helix-border-thin));
+  padding-inline-start: var(--_stat-group-gap);
 }
