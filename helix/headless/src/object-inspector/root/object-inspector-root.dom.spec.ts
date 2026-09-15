@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -140,6 +140,37 @@ describe('an object inspector', () => {
       await press(host, 'ArrowRight')
       expect(active(host)).toBe(rows(host)[0])
     })
+
+    /* A row was one bidirectional run, so the closing quote of a string went
+       to the far end of the row, `"name: "dpl`, and a row holding a number
+       read left to right beside one holding a string that read right to left.
+       Each piece is isolated now: the key is at the start of the line, and a
+       value, being code, reads left to right inside its quotes. */
+    if (hasLayout()) {
+      test('keeps a string inside its quotes, and its key at the start of the line', async () => {
+        document.documentElement.dir = 'rtl'
+        const host = await inspector()
+        for (const [name, kind] of [
+          ['name', 'string'],
+          ['size', 'number'],
+        ] as const) {
+          const row = rows(host).find(
+            (one) => one.querySelector('[part="key"]')?.textContent === name,
+          ) as HTMLElement
+          const key = (row.querySelector('[part="key"]') as HTMLElement).getBoundingClientRect()
+          const value = row.querySelector(`[part="${kind}"]`) as HTMLElement
+          expect(key.left).toBeGreaterThan(value.getBoundingClientRect().right)
+          const text = [...value.childNodes].find((one) => one.nodeType === Node.TEXT_NODE) as Text
+          const glyph = (index: number): DOMRect => {
+            const range = document.createRange()
+            range.setStart(text, index)
+            range.setEnd(text, index + 1)
+            return range.getBoundingClientRect()
+          }
+          expect(glyph(0).left).toBeLessThan(glyph(text.length - 1).left)
+        }
+      })
+    }
   })
 
   test('copies the active row: a branch as JSON, a string as itself', async () => {
