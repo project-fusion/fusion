@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Select.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -57,7 +27,6 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The question over the control, the hint under it. */
 helix-headless-select {
   display: flex;
   flex-direction: column;
@@ -74,8 +43,6 @@ helix-headless-select::part(label) {
   padding-block-end: 0.25rem;
 }
 
-/* A field and not a button: a quiet fill at control height, the chosen text
-   first and the caret at the far end. */
 helix-headless-select::part(trigger) {
   all: unset;
   align-items: center;
@@ -98,7 +65,6 @@ helix-headless-select:not(:disabled)::part(trigger):hover {
   border-color: var(--_gray-muted);
 }
 
-/* On the field's own edge, as the other fields draw it. */
 helix-headless-select::part(trigger):focus-visible {
   border-color: var(--_gray-strong);
   outline: 2px solid var(--_gray-mark);
@@ -119,16 +85,11 @@ helix-headless-select::part(indicator) {
   inline-size: 1rem;
 }
 
-/* A slotted caret, sized through its font because the icon draws at `1em`. */
 helix-headless-select > helix-headless-icon[slot="indicator"] {
   color: var(--_gray-muted);
   font-size: 1.25rem;
 }
 
-/* The caret turns over while the list is open. `open` is a custom state the
-   select records on itself, so the page reads it off the host, and the caret
-   it turns is either the part or whatever was slotted over it. No transition,
-   for the reason the switch sheet gives. */
 helix-headless-select:state(open)::part(indicator),
 helix-headless-select:state(open) > [slot="indicator"] {
   scale: 1 -1;
@@ -150,11 +111,6 @@ helix-headless-select::part(feedback) {
   font-weight: 500;
 }
 
-/* The panel over the page, as wide as the field it came out of. The platform
-   centers a `popover` through `inset: 0` and `margin: auto`, and the component
-   writes its position as a translate from the top-left, so both go. Lifted as
-   the styled panel is, on the quiet edge with the floating shadow, which every
-   panel in these examples shares. */
 helix-headless-select::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -174,10 +130,6 @@ helix-headless-select::part(listbox-items) {
   overflow: auto;
 }
 
-/* The panel names itself from the select's label, so the words would be said
-   twice on screen; clipped rather than removed, since the list is still named
-   by them. The keyboard's place is drawn on the active option, not as a ring
-   around the whole list. */
 helix-headless-select::part(listbox-label) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -215,8 +167,6 @@ helix-headless-option:not([disabled])::part(item):hover {
   background-color: var(--_gray-subtle);
 }
 
-/* The chosen option carries a tick at the far end, which is a different fact
-   from where the keyboard is. */
 helix-headless-option:state(selected)::part(item)::after {
   background-color: currentColor;
   block-size: 1rem;

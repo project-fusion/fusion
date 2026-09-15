@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for App Header.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -44,8 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* No rule beneath it at rest, and no fill of its own: the bar is the page's
-   ground until something scrolls under it. */
 helix-headless-app-header {
   color: var(--_gray-strong);
   container-type: inline-size;
@@ -55,11 +23,6 @@ helix-headless-app-header {
   line-height: 1.5;
 }
 
-/* Equal outer tracks put the middle of the navigation at the middle of the
-   bar and keep it there while there is room to. Neither may shrink below what
-   it holds, so where there is not, the navigation is what yields and scrolls:
-   with plain `1fr` both fell to the brand's width at 390, and the actions
-   overflowed backwards across the navigation. */
 helix-headless-app-header::part(row) {
   align-items: center;
   block-size: 3.5rem;
@@ -82,8 +45,6 @@ helix-headless-app-header [slot="start"] {
   letter-spacing: -0.01em;
 }
 
-/* `safe`, so navigation wider than its room overflows at the end, where its
-   own scroller can take it, rather than past both edges at once. */
 helix-headless-app-header::part(content) {
   align-items: center;
   display: flex;
@@ -91,8 +52,6 @@ helix-headless-app-header::part(content) {
   min-inline-size: 0;
 }
 
-/* A phone-sized bar spends less on its insets and more on its navigation: at
-   `1.5rem` the padding and the gaps took 96 of a 342 pixel row. */
 @container (inline-size < 24rem) {
   helix-headless-app-header::part(row) {
     gap: 1rem;
@@ -108,7 +67,6 @@ helix-headless-app-header::part(end) {
   min-inline-size: 0;
 }
 
-/* Allowed to be narrower than its destinations, so its bar is what scrolls. */
 helix-headless-navigation {
   min-inline-size: 0;
 }
@@ -123,7 +81,6 @@ helix-headless-navigation::part(nav) {
   position: relative;
 }
 
-/* Destinations, not prose links: no underline, muted until current. */
 helix-headless-navigation a {
   align-items: center;
   block-size: 100%;
@@ -152,9 +109,6 @@ helix-headless-navigation a:focus-visible {
   outline-offset: -2px;
 }
 
-/* The quiet fill behind the current destination. The component measures where
-   that is and publishes it; the fill, and its sitting behind the text, are
-   this sheet's. */
 helix-headless-navigation::part(indicator) {
   background-color: var(--_gray-subtle);
   block-size: var(--indicator-block-size, 0);
@@ -167,7 +121,6 @@ helix-headless-navigation::part(indicator) {
   z-index: 0;
 }
 
-/* A ghost at rest: a bar of framed squares is a bar of boxes. */
 helix-headless-icon-button::part(button) {
   align-items: center;
   background-color: transparent;
@@ -189,9 +142,6 @@ helix-headless-icon-button::part(button):hover {
   color: var(--_gray-strong);
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
 helix-headless-icon-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;

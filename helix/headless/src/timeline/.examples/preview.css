@@ -1,36 +1,3 @@
-/* What the headless tier asks a consumer to write for Timeline.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** A headless example is a diagram, and color in a
- * diagram reads as meaning: a blue fill says primary and a red one says danger,
- * neither of which this tier has an opinion about. A neutral ramp says nothing
- * except where one surface ends and the next begins, which is the whole job.
- *
- * Named by role rather than numbered, because a number implies a scale somebody
- * maintains and this is a dozen values in one file. Underscored, because they are
- * declared and read in that same file and never leave it, which is the one case
- * the sigil is for: an unprefixed name reads as a hook this example
- * publishes, and a diagram of what to style publishes none. Written through
- * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets
- * a sheet that inverts rather than a pale card on a dark page: the headless tier
- * has no theming and this is the cheapest honest substitute.
- *
- * A part with no rule below is one the platform already renders acceptably. A
- * wrong rule is worse than none: a sheet that paints a box while leaving the
- * input at `appearance: auto` gets the browser's own control drawn over it, and
- * nothing written for it is ever visible. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -65,9 +32,6 @@ helix-headless-timeline {
   flex-direction: column;
 }
 
-/* Two rows, named rather than left implicit, because the rail below is a
-   subgrid and a subgrid needs tracks to borrow. The time is the first and the
-   entry is the second. */
 helix-headless-timeline-item {
   column-gap: 1rem;
   display: grid;
@@ -75,20 +39,6 @@ helix-headless-timeline-item {
   grid-template-rows: auto minmax(0, 1fr);
 }
 
-/* **The rail takes the entry's own rows**, which is what puts the mark beside
-   the entry rather than beside nothing.
- *
- * As a flex column it could not: the connector grew, the mark was pushed to
- * wherever the growing stopped, and it floated between the time and the first
- * line of the entry, level with neither. The rail has no idea how tall a time
- * is, so no gap or margin can answer that question, and a consumer writing two
- * lines of it moves the mark again.
- *
- * A subgrid does answer it, by not asking: the rail borrows the two rows the
- * entry already has, the line above the mark sits in the first and the mark
- * itself in the second, so the mark lands on the entry's first line whatever
- * the time above it does. This is the styled tier's arrangement written out by
- * hand, which is what a headless example is for. */
 helix-headless-timeline-item::part(rail) {
   display: grid;
   grid-column: 1;
@@ -97,9 +47,6 @@ helix-headless-timeline-item::part(rail) {
   justify-items: center;
 }
 
-/* The line above the mark, filling the time's row. The first entry has
-   nothing above it; hidden rather than removed, so its mark stays on the same
-   line as every other one. */
 helix-headless-timeline-item::part(connector) {
   background-color: var(--_gray-line);
   block-size: 100%;
@@ -111,10 +58,6 @@ helix-headless-timeline-item:first-child::part(connector) {
   visibility: hidden;
 }
 
-/* And the line below it, which is a pseudo-element because the component draws
-   only one connector and a rail needs a second segment to carry on down. It
-   shares the mark's row and starts where the mark ends, so the two never draw
-   over each other. */
 helix-headless-timeline-item::part(rail)::after {
   align-self: stretch;
   background-color: var(--_gray-line);
@@ -129,24 +72,9 @@ helix-headless-timeline-item:last-child::part(rail)::after {
   visibility: hidden;
 }
 
-/* The mark's box, and it needs one because two different things go in it.
-   An entry that slots nothing gets the component's own dot; one that slots an
-   icon gets that instead, and with no rule here the span was inline, so the
-   icons came out at the text's own size and sat on its baseline. A fixed
-   square that centers whatever it holds is what makes the four marks line up
-   on one rail. An entry with a tone is marked at full strength and one without
-   recedes. */
 helix-headless-timeline-item::part(marker) {
   align-items: center;
-  /* The top of the entry's row, which is the line the mark is about. Stretched,
-     it would center itself against the whole entry and drift down as the entry
-     grows. */
   align-self: start;
-  /* The box is the entry's first line and the mark inside it is smaller, which
-     is what puts the two centers on top of each other. Sized to the mark
-     instead, the smaller square starts where the line starts and its center
-     lands high on every row, which is why the styled tier sizes the box and not
-     the glyph. */
   block-size: 1.25rem;
   color: var(--_gray-mark);
   display: flex;
@@ -160,21 +88,12 @@ helix-headless-timeline-item[tone]::part(marker) {
   color: var(--_gray-strong);
 }
 
-/* A slotted mark fills that square rather than following the type around it.
-   `helix-headless-icon` is sized in `em` further up, which is the right default
-   for an icon beside words and the wrong one for a mark on a rail. */
 helix-headless-timeline-item > [slot="marker"],
 helix-headless-timeline-item > [slot="marker"]::part(svg) {
   block-size: 1rem;
   inline-size: 1rem;
 }
 
-/* Timeline's `dot` is a glyph rather than a filled shape: the component
-   renders `<svg part="dot" fill="currentColor">`, so a background painted
-   behind it, the way a round part is filled elsewhere, moves opposite to the
-   glyph's own color. Measured that way, black on `#2a2a2e` at 1.47:1 in light
-   and white on `#e9e9ec` at 1.21:1 in dark, against a target of 3. The mark's
-   color is the glyph's, which puts it on the page rather than on itself. */
 helix-headless-timeline-item::part(dot) {
   block-size: 1rem;
   display: block;
@@ -204,11 +123,6 @@ helix-headless-timeline-item:last-child::part(content) {
   padding-block-end: 0;
 }
 
-/* The entry's own paragraphs, whose UA margin is the thing the gap above was
-   written to replace. Left alone the two both apply, so the entry is spaced by
-   sixteen pixels it never asked for and its first line starts well below the
-   mark that the subgrid just went to the trouble of aligning with it. The
-   first is the event and the rest describe it. */
 helix-headless-timeline-item > p {
   color: var(--_gray-strong);
   font-size: 0.875rem;

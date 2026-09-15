@@ -1,35 +1,3 @@
-/* What the headless tier asks a consumer to write for a transcript fed as data.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * **Every turn here is drawn inside the transcript's shadow root**, so no rule
- * names `helix-headless-chat-message` and none can ask a turn's `author`: each
- * part is reached through the name the transcript forwards it under, and the
- * reader's own turns through the second name it adds for them, `-mine`. Drawn
- * in full rather than borrowed from `preview.css` beside it, because an example
- * is read and copied as one page and one sheet. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -46,8 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* A transcript drawn a window at a time needs a box to window, and this is it:
-   the header, then the transcript, which is the one thing that scrolls. */
 helix-headless-chat {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -70,9 +36,6 @@ helix-headless-chat::part(header) {
   padding: 0.25rem 1rem;
 }
 
-/* No gap and no top inset: a turn fed as data is placed by the height it
-   measured, and a flex gap is room no turn measures, so each turn carries the
-   space above it inside itself. */
 helix-headless-chat::part(log) {
   display: flex;
   flex-direction: column;
@@ -87,7 +50,6 @@ helix-headless-chat::part(turn) {
   padding-block-start: 1rem;
 }
 
-/* Where each settled turn is said: out of sight and still in the tree. */
 helix-headless-chat::part(live) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -97,7 +59,6 @@ helix-headless-chat::part(live) {
   white-space: nowrap;
 }
 
-/* Two columns, the avatar and everything else. */
 helix-headless-chat::part(message) {
   align-items: start;
   display: grid;
@@ -112,13 +73,10 @@ helix-headless-chat::part(message-avatar) {
   line-height: 1.5;
 }
 
-/* The reader's own turns carry no avatar; they sit against the trailing edge
-   instead. */
 helix-headless-chat::part(message-avatar-mine) {
   display: none;
 }
 
-/* What was said and the line under it, hugging its text up to a measure. */
 helix-headless-chat::part(message-body) {
   display: grid;
   gap: 0.25rem;
@@ -132,8 +90,6 @@ helix-headless-chat::part(message-body-mine) {
   justify-self: end;
 }
 
-/* The bubble, a step darker for the reader's own turns, so who said what
-   survives the monotone. */
 helix-headless-chat::part(message-content) {
   background-color: var(--_gray-subtle);
   border-radius: var(--_radius-surface);

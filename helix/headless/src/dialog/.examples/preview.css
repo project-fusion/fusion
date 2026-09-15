@@ -1,49 +1,3 @@
-/* What the headless tier asks a consumer to write for Dialog.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * `helix-headless-dialog` renders a real `<dialog>` and calls `showModal()`, so the
- * top layer, the inert page behind it, the focus trap and Escape are the
- * platform's and the component's. None of that is below. What is below is the
- * surface: a modal that looks like nothing still traps focus correctly.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it.
- *
- * **The triggers are `helix-headless-button` and not a bare `<button>`**, which is
- * the one thing here that is not about appearance. `command` and `commandfor`
- * are Chrome 135, Firefox 137 and Safari 18.4, and before those a bare button
- * carrying them is simply inert: no error, no warning, the markup right and the
- * control dead. `HelixHeadlessButton` sends the event itself where the platform
- * will not. An example that only runs on last-year's browsers teaches a
- * consumer to ship one.
- *
- * **`::backdrop` inherits from its originating element**, so a custom property
- * set on the dialog reaches the backdrop. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -60,9 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* A column, so the heading, the body and the actions stand at one gap and
-   none of them carries a margin. The width is a ceiling, so a narrow viewport
-   keeps a margin of page around it. */
 helix-headless-dialog::part(dialog) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -78,17 +29,10 @@ helix-headless-dialog::part(dialog) {
   padding: 1.5rem;
 }
 
-/* Only while open: a closed `<dialog>` is hidden by the UA's `display: none`,
-   and a `display` written for every state would override it. */
 helix-headless-dialog::part(dialog):modal {
   display: flex;
 }
 
-/* Pinned to the bottom edge on a narrow screen, the full width of it, with
-   room above so the page is still visibly there behind it. A modal `<dialog>`
-   is fixed with `margin: auto` from the UA, so taking the bottom margin to
-   zero is the whole of what moves it down. Square where it meets the window,
-   rounded where it meets the page. */
 @media (width < 30rem) {
   helix-headless-dialog::part(dialog) {
     border-end-end-radius: 0;
@@ -100,14 +44,10 @@ helix-headless-dialog::part(dialog):modal {
   }
 }
 
-/* A shade rather than a gray from the ramp. It darkens the page in both
-   modes, where a ramp value would lighten it in dark. */
 helix-headless-dialog::part(dialog)::backdrop {
   background-color: rgb(0 0 0 / 0.4);
 }
 
-/* The regions are slots, so an omitted one generates no box and needs no
-   hiding: a dialog with no footer has no empty band where the footer was. */
 helix-headless-dialog h2 {
   font-size: 1.5rem;
   font-weight: 600;
@@ -128,8 +68,6 @@ helix-headless-dialog [slot="footer"] {
   justify-content: flex-start;
 }
 
-/* The trigger is a component rather than a bare element, so its own button is
-   what takes the treatment. `::part` is the published door into it. */
 helix-headless-button::part(button) {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -150,8 +88,6 @@ helix-headless-button::part(button) {
   white-space: nowrap;
 }
 
-/* The action the page is about, and the one the dialog asks for, filled in the
-   strongest gray where the styled tier fills them with a tone. */
 helix-headless-button:not(helix-headless-dialog *)::part(button),
 helix-headless-dialog [slot="footer"] > helix-headless-button:first-child::part(button) {
   background-color: var(--_gray-strong);
@@ -159,9 +95,6 @@ helix-headless-dialog [slot="footer"] > helix-headless-button:first-child::part(
   color: var(--_gray-surface);
 }
 
-/* The keyboard reaches the buttons, so the ring goes on them. Taking the UA
-   outline off without putting one back is the commonest way a headless
-   control stops being operable without a pointer. */
 helix-headless-button::part(button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;

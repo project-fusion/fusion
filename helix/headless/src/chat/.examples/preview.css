@@ -1,45 +1,3 @@
-/* What the headless tier asks a consumer to write for Chat.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it.
- *
- * **Three elements, and each is styled from outside its own shadow root.** The
- * transcript, each turn in it and the composer under it render their own parts,
- * so every rule below names the element before the part.
- *
- * **A region the component hides stays hidden only while nothing here sets its
- * `display`.** The header, the status line and a turn's sources and actions
- * carry `hidden` when nothing is slotted into them, and an author `display`
- * beats the UA's `[hidden]`. An attribute selector after `::part()` is dropped
- * at parse time, so the one region that needs a layout, the header, asks the
- * host whether anything was slotted for it instead, and the rest are left
- * their UA box. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -56,8 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* Five rows: the header, the transcript that scrolls, the way back over it,
-   the status line and the composer. */
 helix-headless-chat {
   color: var(--_gray-strong);
   display: grid;
@@ -87,7 +43,6 @@ helix-headless-chat::part(composer) {
   grid-row: 5;
 }
 
-/* What the conversation is, on one line with a rule under it. */
 helix-headless-chat:has(> [slot="header"], > [slot="actions"])::part(header) {
   align-items: center;
   display: flex;
@@ -101,8 +56,6 @@ helix-headless-chat::part(header) {
   padding: 0.25rem 1rem;
 }
 
-/* The transcript scrolls, and a short one sits against the bottom, where the
-   next turn arrives. */
 helix-headless-chat::part(log) {
   display: flex;
   flex-direction: column;
@@ -112,8 +65,6 @@ helix-headless-chat::part(log) {
   padding: 1rem;
 }
 
-/* Over the transcript rather than in the column, so offering the way back does
-   not move the turns. */
 helix-headless-chat::part(resume) {
   margin-block-start: -2rem;
   pointer-events: none;
@@ -127,13 +78,10 @@ helix-headless-chat::part(status) {
   padding: 0.5rem 1rem 0.25rem;
 }
 
-/* Inset as the transcript is, so the composer's edge is the bubbles' edge and
-   the conversation has one left edge rather than two. */
 helix-headless-chat::part(composer) {
   padding: 0.75rem 1rem;
 }
 
-/* Where each settled turn is said: out of sight and still in the tree. */
 helix-headless-chat::part(live) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -143,7 +91,6 @@ helix-headless-chat::part(live) {
   white-space: nowrap;
 }
 
-/* Two columns, the avatar and everything else. */
 helix-headless-chat-message {
   display: block;
 }
@@ -162,13 +109,10 @@ helix-headless-chat-message::part(avatar) {
   line-height: 1.5;
 }
 
-/* The reader's own turns carry no avatar; they sit against the trailing edge
-   instead. */
 helix-headless-chat-message[author="me"]::part(avatar) {
   display: none;
 }
 
-/* What was said and the line under it, hugging its text up to a measure. */
 helix-headless-chat-message::part(body) {
   display: grid;
   gap: 0.25rem;
@@ -182,10 +126,6 @@ helix-headless-chat-message[author="me"]::part(body) {
   justify-self: end;
 }
 
-/* The bubble. A step apart for each side, so who said what survives the
-   monotone: the other party on the subtle gray, the reader on the fill a rung
-   darker. Not the line gray, which is an edge's, and as a ground read as a
-   bubble disabled or dirty. */
 helix-headless-chat-message::part(content) {
   background-color: var(--_gray-subtle);
   border-radius: var(--_radius-surface);
@@ -207,8 +147,6 @@ helix-headless-chat-message[state="sending"]::part(content) {
   opacity: 0.6;
 }
 
-/* The line under a turn: its time, its state and its controls, in one row
-   against whichever edge the turn is. */
 helix-headless-chat-message::part(meta) {
   align-items: center;
   color: var(--_gray-muted);
@@ -221,8 +159,6 @@ helix-headless-chat-message[author="me"]::part(meta) {
   justify-content: flex-end;
 }
 
-/* A failure is the one state with a tone, and in grays the tone is the
-   strongest ink rather than a red. */
 helix-headless-chat-message[state="failed"]::part(meta) {
   color: var(--_gray-strong);
 }
@@ -234,17 +170,12 @@ helix-headless-chat-message::part(state) {
   gap: 0.25rem;
 }
 
-/* The glyph is drawn at whatever size it is given, and it is given none: left
-   alone it fills the width of the page. */
 helix-headless-chat-message::part(mark) {
   block-size: 1rem;
   flex: none;
   inline-size: 1rem;
 }
 
-/* Pulled over its own trailing padding, so the words end on the bubble's edge
-   above them rather than four pixels short of it; the padding is only the room
-   the hover fill needs. */
 helix-headless-chat-message::part(retry) {
   background: none;
   border: 0;
@@ -264,7 +195,6 @@ helix-headless-chat-message::part(retry):hover {
   background-color: var(--_gray-subtle);
 }
 
-/* The controls are there when the turn is, and not before. */
 helix-headless-chat-message::part(actions) {
   opacity: 0;
 }
@@ -279,8 +209,6 @@ helix-headless-chat-message::part(sources) {
   font-size: 0.75rem;
 }
 
-/* The composer is a box, and the field inside it owns no edge or ground of its
-   own: it is the inside of the box. */
 helix-headless-chat-composer {
   display: block;
 }
@@ -299,9 +227,6 @@ helix-headless-chat-composer::part(composer):focus-within {
   outline-offset: 0;
 }
 
-/* `field-sizing` grows the box with the text and stops at the ceiling. The
-   inline padding makes up the box's edge and padding to a bubble's, so what is
-   typed starts where the words in the bubbles above it do. */
 helix-headless-chat-composer::part(field) {
   background-color: transparent;
   border: 0;
@@ -360,9 +285,6 @@ helix-headless-chat-composer::part(mark) {
   inline-size: 1rem;
 }
 
-/* The keyboard reaches these, so the ring goes on them. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
 helix-headless-chat-message::part(retry):focus-visible,
 helix-headless-chat-composer::part(send):focus-visible {
   outline: 2px solid var(--_gray-mark);

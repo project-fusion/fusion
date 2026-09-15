@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Outline.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -44,9 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* Two columns, the outline beside the prose, which is the shape this component
-   is for. The outline sticks so it stays in view while the prose scrolls past.
-   A container, so the columns can answer the room they are given. */
 .layout {
   container-type: inline-size;
   display: grid;
@@ -60,9 +27,6 @@
   top: 1rem;
 }
 
-/* Too narrow for two columns, the outline goes above the prose and stops
-   sticking, since stuck it would sit over the text scrolling under it. Beside a
-   twelve-rem rail a phone left the prose twelve characters a line. */
 @container (width < 36rem) {
   .nav,
   .prose {
@@ -80,9 +44,6 @@
   gap: 3rem;
 }
 
-/* Tall enough that the sections cross the top of the viewport one at a time,
-   which is the whole thing being demonstrated. A column that all fits on screen
-   would leave the mark on the last heading forever. */
 .prose section {
   display: flex;
   flex-direction: column;
@@ -109,8 +70,6 @@ helix-headless-outline {
   display: block;
 }
 
-/* The rail is a hairline down the start of the list, drawn as a background so
-   it needs no element of its own, and the links stand off it by its width. */
 helix-headless-outline::part(nav) {
   background-image: linear-gradient(var(--_gray-line), var(--_gray-line));
   background-position: 1.5px 0;
@@ -121,8 +80,6 @@ helix-headless-outline::part(nav) {
   position: relative;
 }
 
-/* The current section's mark, laid on the rail. The component sizes it to the
-   current link and moves it there. */
 helix-headless-outline::part(indicator) {
   background-color: var(--_gray-strong);
   block-size: var(--indicator-block-size, 0);
@@ -139,7 +96,6 @@ helix-headless-outline:hover::part(indicator) {
   inset-inline-start: 1px;
 }
 
-/* Destinations, not prose links: gray, not underlined, the current one strong. */
 helix-headless-outline a {
   border-radius: var(--_radius-control);
   color: var(--_gray-muted);

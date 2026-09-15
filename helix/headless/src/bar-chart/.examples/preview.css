@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Bar Chart.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -44,9 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* Out of sight and still in the accessibility tree: the table is what the
-   chart reads and what a screen reader reads, and the columns are the picture
-   of it. Never `display: none`, which would take it from both. */
 [data-hidden-visually] {
   block-size: 1px;
   border: 0;
@@ -65,11 +32,6 @@
   gap: 1rem;
 }
 
-/* A grid of two rows, the drawing and the words under it, so the labels line
-   up with the columns without either knowing the other's size. Several series
-   take several steps of the ramp from the middle, the first on the mark gray:
-   the strongest ink drew black slabs on white and near-white ones on black,
-   the heaviest thing on either page, where a mid gray reads as data in both. */
 helix-headless-bar-chart {
   --chart-series-1: var(--_gray-mark);
   --chart-series-2: var(--_gray-line);
@@ -84,8 +46,6 @@ helix-headless-bar-chart {
   position: relative;
 }
 
-/* A bounded height: the drawing fills its box, and a box nobody sized is as
-   tall as the page lets it be. */
 helix-headless-bar-chart::part(plot) {
   block-size: 12em;
   cursor: crosshair;
@@ -99,9 +59,6 @@ helix-headless-bar-chart::part(svg) {
   overflow: visible;
 }
 
-/* Rounded at the far end only, as the styled columns are: a rounded foot would
-   lift a bar off the rule it is measured from. An SVG rect has one radius for
-   all four corners, so the square is clipped instead. */
 helix-headless-bar-chart::part(bar) {
   clip-path: inset(0 round 2px 2px 0 0);
   fill: var(--chart-series, var(--chart-series-1));
@@ -132,7 +89,6 @@ helix-headless-bar-chart::part(line) {
   vector-effect: non-scaling-stroke;
 }
 
-/* The names in a row of equal columns, one under each group. */
 helix-headless-bar-chart::part(labels) {
   display: grid;
   grid-auto-columns: 1fr;
@@ -173,10 +129,6 @@ helix-headless-bar-chart::part(tooltip-anchor) {
   position: absolute;
 }
 
-/* The bubble is the page inverted, the way a tooltip is. `inset: auto` and
-   `margin: 0`, because it is a popover and the UA centers one in the viewport:
-   the component writes its position from the top-left corner, and left to the
-   UA it landed 370 pixels below and 300 across from the column it described. */
 helix-headless-bar-chart::part(tooltip) {
   background-color: var(--_gray-strong);
   border: 0;
@@ -191,8 +143,6 @@ helix-headless-bar-chart::part(tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
-/* A square turned to a point in the bubble's own fill. The component puts it
-   on the edge facing the reading, below the bubble or, where it flipped, above. */
 helix-headless-bar-chart::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
@@ -214,9 +164,6 @@ helix-headless-bar-chart::part(tooltip-cell) {
   grid-template-columns: 0.5em minmax(0, 1fr) auto;
 }
 
-/* A dot in the column's own gray, so a row of the bubble and a mark in the
-   drawing are visibly one thing. The chart writes `--chart-series` only on a
-   cell that was plotted, so an unplotted row draws nothing here. */
 helix-headless-bar-chart::part(tooltip-cell)::before {
   background-color: var(--chart-series);
   block-size: 0.5em;
@@ -226,7 +173,6 @@ helix-headless-bar-chart::part(tooltip-cell)::before {
   inline-size: 0.5em;
 }
 
-/* Quieter than the number beside it, from the bubble's own ink. */
 helix-headless-bar-chart::part(tooltip-name) {
   grid-column: 2;
   opacity: 0.72;

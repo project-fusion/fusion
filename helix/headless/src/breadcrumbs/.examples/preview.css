@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Breadcrumbs.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -44,9 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* A wrapping row with no markers and none of the list's UA inset. The
-   component sets `role="list"` because Safari drops list semantics when it
-   sees `list-style: none`. */
 helix-headless-breadcrumbs::part(list) {
   align-items: center;
   display: flex;
@@ -59,8 +26,6 @@ helix-headless-breadcrumbs::part(list) {
   padding: 0;
 }
 
-/* A row, so the separator, the link and anything slotted after it share one
-   middle. */
 helix-headless-breadcrumb {
   align-items: center;
   display: inline-flex;
@@ -68,33 +33,22 @@ helix-headless-breadcrumb {
   gap: 0.5rem;
 }
 
-/* A line box of the crumb's own type rather than a flex row, so the chevron has
-   a baseline to be set against: the box is as tall as the link's text line and
-   centered with it, so the two baselines are one. */
 helix-headless-breadcrumb::part(separator) {
   color: var(--_gray-mark);
   display: block;
   user-select: none;
 }
 
-/* The first item has nothing to be separated from. */
 helix-headless-breadcrumb:first-child::part(separator) {
   display: none;
 }
 
-/* Centered on the capitals rather than on the line. Centered on the line, a
-   1em chevron is centered on the lowercase and hangs 1.25px under the
-   baseline; half the gap between the em and the cap height, taken off the
-   baseline, is the same answer in any face. */
 helix-headless-breadcrumb::part(separator-mark) {
   block-size: 1em;
   inline-size: 1em;
   vertical-align: calc(0.5cap - 0.5em);
 }
 
-/* The span around the crumb's label. Only the current page's words need the
-   inset a link's hover fill is made of, so the three sit the same distance
-   from their chevrons; a slotted link brings its own. */
 helix-headless-breadcrumb::part(link) {
   align-items: center;
   color: var(--_gray-muted);
@@ -103,15 +57,11 @@ helix-headless-breadcrumb::part(link) {
   text-decoration: none;
 }
 
-/* The page the reader is on reads as where they are, not as somewhere to go. */
 helix-headless-breadcrumb[current]::part(link) {
   color: var(--_gray-strong);
   padding-inline: 0.5rem;
 }
 
-/* Steps, not prose links: gray and not underlined, with the room a hover fill
-   needs. Only the first is pulled back, on the side facing the edge, so the
-   trail's first word starts where the content around it starts. */
 helix-headless-breadcrumb a {
   border-radius: var(--_radius-control);
   color: var(--_gray-muted);

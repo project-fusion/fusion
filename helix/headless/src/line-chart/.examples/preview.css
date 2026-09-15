@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Line Chart.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -50,9 +20,6 @@
   gap: 1rem;
 }
 
-/* The table is what the chart reads its readings from, and it stays in the page
-   for assistive technology: clipped to a pixel rather than `display: none`,
-   which would take it out of the accessibility tree along with the screen. */
 [data-hidden-visually] {
   block-size: 1px;
   border: 0;
@@ -65,10 +32,6 @@
   white-space: nowrap;
 }
 
-/* One gray per series, far enough apart on the ramp to tell the first three
-   apart at a glance. The component points `--chart-series` on each line, wash
-   and terminus at one of these six by its index, so they are the whole
-   palette. */
 helix-headless-line-chart {
   --chart-series-1: var(--_gray-strong);
   --chart-series-2: var(--_gray-mark);
@@ -82,9 +45,6 @@ helix-headless-line-chart {
   position: relative;
 }
 
-/* The drawing is stretched to its box with `preserveAspectRatio="none"`, so the
-   box has to be bounded: without a height the plot takes its width's worth and
-   runs off the page. */
 helix-headless-line-chart::part(plot) {
   block-size: 10.5rem;
   position: relative;
@@ -130,8 +90,6 @@ helix-headless-line-chart::part(band) {
   fill: var(--_gray-subtle);
 }
 
-/* The last reading's dot, placed by the component at a percentage of the plot.
-   Round because it is a point, not a softened square. */
 helix-headless-line-chart::part(terminus) {
   background-color: var(--chart-series, var(--chart-series-1));
   block-size: 5px;
@@ -143,13 +101,10 @@ helix-headless-line-chart::part(terminus) {
   translate: -50% -50%;
 }
 
-/* Placed from the right on a right-to-left page, so centered the other way. */
 helix-headless-line-chart:dir(rtl)::part(terminus) {
   translate: 50% -50%;
 }
 
-/* One column per reading, so each name sits under its point rather than the
-   names running together as one line of text. */
 helix-headless-line-chart::part(labels) {
   display: grid;
   grid-auto-columns: 1fr;
@@ -165,8 +120,6 @@ helix-headless-line-chart::part(label) {
   white-space: nowrap;
 }
 
-/* The tooltip hangs from a one-pixel anchor the component moves to the reading
-   under the pointer, and the anchor's box covers the plot so it can. */
 helix-headless-line-chart::part(mark) {
   block-size: 1px;
   inline-size: 1px;
@@ -180,9 +133,6 @@ helix-headless-line-chart::part(tooltip-anchor) {
   position: absolute;
 }
 
-/* `inset`, `margin` and `overflow` said, because the bubble is a popover: the
-   user agent centers one in the window, where the component places this one
-   over the reading, and scrolls its overflow, which would clip the point. */
 helix-headless-line-chart::part(tooltip) {
   background-color: var(--_gray-strong);
   border: none;
@@ -196,9 +146,6 @@ helix-headless-line-chart::part(tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
-/* The point, a square turned and half buried under the bubble, so what shows
-   is a triangle in its fill pointing at the reading. The component puts it on
-   whichever edge faces the reading. */
 helix-headless-line-chart::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
@@ -213,8 +160,6 @@ helix-headless-line-chart::part(tooltip-label) {
   margin-block-end: 0.25rem;
 }
 
-/* No series dot before the name, which the styled tier draws: the first
-   series is the strongest gray, which is the bubble's own fill. */
 helix-headless-line-chart::part(tooltip-cell) {
   align-items: baseline;
   column-gap: 0.75rem;
@@ -222,7 +167,6 @@ helix-headless-line-chart::part(tooltip-cell) {
   grid-template-columns: minmax(0, 1fr) auto;
 }
 
-/* Quieter than the number beside it, from the bubble's own ink. */
 helix-headless-line-chart::part(tooltip-name) {
   opacity: 0.72;
 }

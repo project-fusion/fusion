@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Time Picker.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -55,9 +25,6 @@ helix-headless-time-picker {
   display: block;
 }
 
-/* The list's name comes from the picker's own label, so it is read out and
-   not shown, the same as the styled tier. Clipped rather than removed, so it
-   stays in the accessibility tree. */
 helix-headless-time-picker::part(list-label) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -71,8 +38,6 @@ helix-headless-time-picker::part(option) {
   display: block;
 }
 
-/* Every row one height, whatever it holds, so the keyboard moves down the list
-   evenly. */
 helix-headless-time-picker::part(option-item) {
   align-items: center;
   box-sizing: border-box;
@@ -98,12 +63,6 @@ helix-headless-time-picker::part(option-label) {
   white-space: nowrap;
 }
 
-/* The tick at the end of the chosen row, masked from a drawing so it takes the
-   row's ink, as the styled tier draws it. The row is the option's, inside this
-   element's shadow root, so the option names it `item-selected` while it is
-   chosen and the picker forwards that as `option-item-selected`: `::part()`
-   takes a state after it and never a second part, so the option's own
-   `:state(selected)` could reach its host and not its row. */
 helix-headless-time-picker::part(option-item-selected)::after {
   background-color: currentColor;
   block-size: 1rem;
@@ -135,19 +94,11 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. Inset, because the list scrolls and would
-   clip one drawn outside. */
 helix-headless-time-picker::part(list-items):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: -2px;
 }
 
-/* No frame of its own: the list is the picker, and a picker set inside a
-   field's panel would otherwise draw a box in a box. Seven rows tall, an odd
-   number, because the list comes to rest with its chosen time in the middle
-   and at eight it rested with half a row cut off at each end. */
 helix-headless-time-picker::part(list-items),
 helix-headless-time-picker::part(column-items) {
   display: flex;

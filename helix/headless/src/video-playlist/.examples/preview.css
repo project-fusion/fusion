@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Video Playlist.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -57,8 +27,7 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The host turns and the loading mark reads the angle: Chromium 132 finds no
-   keyframes from a ::part() rule. */
+/* The host turns and the loading mark reads the angle: Chromium 132 finds no keyframes from a ::part() rule. */
 @property --_spin {
   inherits: true;
   initial-value: 0deg;
@@ -71,12 +40,7 @@ helix-headless-video {
   position: relative;
 }
 
-/* The stage is the dark box the picture sits in, and the bar and the messages
-   are laid over it rather than under it. */
 helix-headless-video::part(stage) {
-  /* A player's stage is dark whatever the page is, as the styled one is, so
-     the ramp resolves to its light-mode values in here: the strong gray is the
-     stage and the surface gray is its ink, in both modes. */
   border-radius: var(--_radius-surface);
   color-scheme: light;
   display: block;
@@ -84,14 +48,11 @@ helix-headless-video::part(stage) {
   position: relative;
 }
 
-/* Inset, because the stage clips what is drawn outside it. */
 helix-headless-video::part(stage):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: -2px;
 }
 
-/* The media's own ratio once it is known, 16:9 until then, so the box does not
-   take the shape of whatever still covers it. */
 helix-headless-video::part(video) {
   aspect-ratio: var(--video-aspect-ratio, var(--video-intrinsic-ratio, 16 / 9));
   background-color: var(--_gray-strong);
@@ -101,8 +62,6 @@ helix-headless-video::part(video) {
   object-fit: contain;
 }
 
-/* Over the whole picture, and letting presses through to the video under it
-   unless something is slotted. */
 helix-headless-video::part(poster) {
   display: block;
   inset: 0;
@@ -110,8 +69,6 @@ helix-headless-video::part(poster) {
   position: absolute;
 }
 
-/* Centered over the picture, in the stage's opposite ink on a backing of
-   the stage's own, since the picture under it may be a light poster. */
 helix-headless-video::part(loading),
 helix-headless-video::part(failure) {
   align-items: center;
@@ -128,8 +85,6 @@ helix-headless-video::part(failure) {
   translate: -50% -50%;
 }
 
-/* A ring with one side drawn, which is the part that turns. Still under
-   reduced motion, because the words beside it are the message. */
 helix-headless-video::part(loading-mark) {
   block-size: 1rem;
   border: 2px solid var(--_gray-muted);
@@ -153,7 +108,6 @@ helix-headless-video::part(loading-mark) {
   }
 }
 
-/* The mark over the picture while it is not playing: press this to play. */
 helix-headless-video::part(start) {
   all: unset;
   align-items: center;
@@ -195,9 +149,6 @@ helix-headless-video::part(back) {
   z-index: 10;
 }
 
-/* The shading the bar sits on, reaching higher than the bar does, so its
-   light ink reads over a light picture. A `::before` so it paints under the
-   bar, which comes after it, and over the video, which is not positioned. */
 helix-headless-video::part(stage)::before {
   background-image: linear-gradient(
     to top,
@@ -212,7 +163,6 @@ helix-headless-video::part(stage)::before {
   position: absolute;
 }
 
-/* The bar along the bottom of the picture, in the stage's opposite ink. */
 helix-headless-video::part(controls) {
   align-items: center;
   color: var(--_gray-surface);
@@ -224,10 +174,6 @@ helix-headless-video::part(controls) {
   position: absolute;
 }
 
-/* Each control a square a step larger than its glyph. The glyphs are drawn
-   by the component with no part of their own, so the square sizes them: a
-   flex row stretches each glyph to the height inside the padding and its
-   square viewBox gives it the same width. */
 helix-headless-video::part(play),
 helix-headless-video::part(rewind),
 helix-headless-video::part(forward),
@@ -261,15 +207,12 @@ helix-headless-video::part(speed) {
   min-inline-size: 2.5rem;
 }
 
-/* A clock, so its figures keep one width and the scrubber beside it does not
-   move as the seconds change. */
 helix-headless-video::part(time) {
   flex: none;
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 
-/* A thin rail filled as far as playback has reached, with a round thumb. */
 helix-headless-video::part(scrubber),
 helix-headless-video::part(volume) {
   /* Chromium 132 ignores ::part()::-webkit-slider-thumb, so the accent grays its own thumb. */
@@ -310,10 +253,6 @@ helix-headless-video::part(volume)::-moz-range-thumb {
   inline-size: 12px;
 }
 
-/* The speaker and its level are one control. The level stands on its end
-   above the speaker, loud end up, and is out of sight until it is reached:
-   `::part()` cannot reach one part from the hover of another, so what reveals
-   it is the pointer or the keyboard arriving on the level itself. */
 helix-headless-video::part(sound) {
   align-items: center;
   display: flex;
@@ -347,9 +286,6 @@ helix-headless-video::part(overflow) {
   display: contents;
 }
 
-/* The keyboard reaches these, so the rings go here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
 helix-headless-video::part(play):focus-visible,
 helix-headless-video::part(rewind):focus-visible,
 helix-headless-video::part(forward):focus-visible,
@@ -385,15 +321,12 @@ helix-headless-video-playlist-menu::part(menu-back-mark) {
   inline-size: 1em;
 }
 
-/* The player above and the entries under it. */
 helix-headless-video-playlist {
   display: grid;
   gap: 1rem;
   grid-template-columns: 1fr;
 }
 
-/* Capped rather than matched to the player, so a long set scrolls in its own
-   box. */
 helix-headless-video-playlist::part(items) {
   display: flex;
   flex-direction: column;
@@ -406,8 +339,6 @@ helix-headless-video-playlist-item {
   display: block;
 }
 
-/* A row per entry: the still at a fixed width, and the name with its length
-   under it. */
 helix-headless-video-playlist-item::part(item) {
   all: unset;
   align-items: center;
@@ -422,10 +353,6 @@ helix-headless-video-playlist-item::part(item) {
   text-align: start;
 }
 
-/* The one playing: a quiet ground and a rule down the leading edge, in the
-   margin the row's padding leaves for it. `item-current` is the name the row
-   takes while its entry is current; `current` is a property and reaches no
-   attribute a selector could read. */
 helix-headless-video-playlist-item::part(item-current) {
   background-color: var(--_gray-subtle);
 }
@@ -481,7 +408,6 @@ helix-headless-video-playlist-item > [slot="meta"] {
   font-weight: 400;
 }
 
-/* Inset, because the list scrolls and would clip one drawn outside. */
 helix-headless-video-playlist-item::part(item):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: -2px;

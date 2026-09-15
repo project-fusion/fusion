@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for File Input.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -51,19 +21,12 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-/* A column, so the label, the drop zone, the hint and the list stack at one
-   gap without any of them carrying a margin. */
 helix-headless-file-input {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-/* The drop zone: a dashed box, because it is a place to put something rather
-   than a control to type in, with the prompt centered in it. The dashes are
-   what say so, and in the quiet resting gray they vanish into the fill in
-   dark, so they take the rule's gray, which a broken line already softens.
-   Positioned, so the file input can cover the whole of it. */
 helix-headless-file-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -76,9 +39,6 @@ helix-headless-file-input::part(field) {
   position: relative;
 }
 
-/* The native input stays, since it carries the label and the validity, and is
-   stretched invisibly over the zone, so a press anywhere in it opens the
-   picker. */
 helix-headless-file-input::part(control) {
   cursor: pointer;
   inset: 0;
@@ -86,8 +46,6 @@ helix-headless-file-input::part(control) {
   position: absolute;
 }
 
-/* The icon over the prompt, and the pointer passed through to the input under
-   it. */
 helix-headless-file-input::part(trigger) {
   align-items: center;
   color: var(--_gray-strong);
@@ -150,8 +108,6 @@ helix-headless-file-input::part(meta) {
   gap: 0.25rem;
 }
 
-/* The size and the kind are tags, at the small tag's height, quiet chips with
-   an edge like every other tag here. */
 helix-headless-file-input::part(size),
 helix-headless-file-input::part(kind) {
   align-items: center;
@@ -173,8 +129,6 @@ helix-headless-file-input::part(size) {
   font-variant-numeric: tabular-nums;
 }
 
-/* The glyph in it has no part of its own and takes the box it is given, so
-   the box's padding is what sets it at an icon's tight size. */
 helix-headless-file-input::part(remove) {
   all: unset;
   align-items: center;
@@ -243,10 +197,6 @@ helix-headless-file-input > helix-headless-icon[slot="trigger"]::part(svg) {
   inline-size: 100%;
 }
 
-/* The keyboard reaches the input, which is invisible, so the ring goes around
-   the zone it covers. Taking the UA outline off without putting one back is
-   the commonest way a headless control stops being operable without a
-   pointer. */
 helix-headless-file-input:focus-within::part(field) {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 0;

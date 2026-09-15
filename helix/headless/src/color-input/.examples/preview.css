@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Color Input.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -51,11 +21,7 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-/* A column, so the label, the field and the hint stack at one gap without
-   any of them carrying a margin. */
 helix-headless-color-input {
-  /* Which way saturation grows across the picker's square: along the line,
-     as the range laid over it does. A gradient takes no logical keyword. */
   --_along: to right;
   display: flex;
   flex-direction: column;
@@ -66,8 +32,6 @@ helix-headless-color-input:dir(rtl) {
   --_along: to left;
 }
 
-/* The field carries the box rather than the input, so the swatch sits inside
-   the same frame as the text, and its clip rounds the swatch's far corners. */
 helix-headless-color-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -104,10 +68,6 @@ helix-headless-color-input::part(trigger) {
   flex: none;
 }
 
-/* The chip fills the trailing end of the field. The color is the value, which
-   the component publishes; the checkerboard under it is what shows through a
-   color carrying alpha. Desaturated, so the example stays in grays while the
-   chip still reads lighter or darker with the value. */
 helix-headless-color-input::part(preview) {
   background-image:
     linear-gradient(var(--color-input-swatch, transparent), var(--color-input-swatch, transparent)),
@@ -127,12 +87,6 @@ helix-headless-color-input::part(preview) {
   inline-size: 2.5rem;
 }
 
-/* The panel over the page, under the field it came out of, at its own width:
-   a picker is not a longer text field, and a square stretched to a 600 pixel
-   field is a square no longer. The platform centers a `popover` through
-   `inset: 0` and `margin: auto`, and the component writes its position as a
-   translate from the top-left, so both go. No padding of its own: the picker
-   inside carries the inset, so every row sits on one column. */
 helix-headless-color-input::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -146,16 +100,11 @@ helix-headless-color-input::part(surface) {
   padding: 0;
 }
 
-/* The picker, inset on every side so the handle stands whole in a corner of
-   the square rather than being cut by the panel's edge. */
 helix-headless-color-input::part(picker) {
   display: block;
   padding: 0.75rem;
 }
 
-/* What follows is Color Picker's own example again, under the names the field
-   forwards it by. The square, drawn from the ramp and kept in its light
-   reading in dark mode, since it is a picture of brightness and not a surface. */
 helix-headless-color-input::part(picker-grid) {
   aspect-ratio: 1 / 0.7;
   background-image:
@@ -183,14 +132,10 @@ helix-headless-color-input::part(picker-grid-handle) {
   translate: -50% -50%;
 }
 
-/* Centered on its point from the other side on a right-to-left page, where
-   saturation grows toward the left as the range under the square does. */
 helix-headless-color-input:dir(rtl)::part(picker-grid-handle) {
   translate: 50% -50%;
 }
 
-/* The two range inputs stay, since they are what the keyboard and a screen
-   reader use, and are laid invisibly over the square. */
 helix-headless-color-input::part(picker-grid-saturation),
 helix-headless-color-input::part(picker-grid-brightness) {
   appearance: none;
@@ -249,8 +194,6 @@ helix-headless-color-input::part(picker-channels) {
   min-inline-size: 0;
 }
 
-/* Named for assistive technology and not shown, clipped rather than removed
-   so the name stays in the tree. */
 helix-headless-color-input::part(picker-channel-label) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -266,10 +209,6 @@ helix-headless-color-input::part(picker-channel-field) {
   display: flex;
 }
 
-/* The platform's range input with its chrome taken off, drawn as the track.
-   Left alone it is the browser's blue rail, which is the one color on the
-   page. One gray the whole length and no fill: on a hue rail the track is the
-   value rather than a measure of it. */
 helix-headless-color-input::part(picker-channel-control) {
   /* Chromium 132 ignores ::part()::-webkit-slider-thumb: the input is the track, its accent the thumb. */
   accent-color: var(--_gray-strong);
@@ -282,9 +221,6 @@ helix-headless-color-input::part(picker-channel-control) {
   margin: 0;
 }
 
-/* The engines' own tracks stay clear, so the input is the whole of the track.
-   Each engine's name is said on its own, since a list holding a name one engine
-   does not know is dropped whole. */
 helix-headless-color-input::part(picker-channel-control)::-webkit-slider-runnable-track {
   background: none;
   block-size: 0.75rem;
@@ -315,8 +251,6 @@ helix-headless-color-input::part(picker-channel-control)::-moz-range-thumb {
   inline-size: 1.25rem;
 }
 
-/* The tools, in a row under the rail. The field already holds the value as
-   text, so the picker withholds its own and the two buttons take the row. */
 helix-headless-color-input::part(picker-footer) {
   display: flex;
   gap: 0.5rem;
@@ -361,9 +295,6 @@ helix-headless-color-input::part(picker-format-button):hover {
   background-color: var(--_gray-fill);
 }
 
-/* One joined pair: the outer corners rounded, the seam one shared edge. The
-   glyph carries no size, so the button gives it a single track at the icon
-   size. */
 helix-headless-color-input::part(picker-eyedropper-button) {
   border-end-start-radius: var(--_radius-control);
   border-start-start-radius: var(--_radius-control);
@@ -372,8 +303,6 @@ helix-headless-color-input::part(picker-eyedropper-button) {
   place-content: center;
 }
 
-/* Small caps rather than uppercased text, so a screen reader reads the word
-   and not a shouted token. */
 helix-headless-color-input::part(picker-format-button) {
   border-end-end-radius: var(--_radius-control);
   border-start-end-radius: var(--_radius-control);
@@ -429,39 +358,22 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches the input, but the ring goes around the field that
-   holds it, since a ring on the text alone would sit inside the frame and be
-   clipped by it. Taking the UA outline off without putting one back is the
-   commonest way a headless control stops being operable without a pointer. */
 helix-headless-color-input:focus-within::part(field) {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 0;
 }
 
-/* The trigger is its own stop, and its ring is inset so the field's edge
-   does not cut it. */
 helix-headless-color-input::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: -2px;
 }
 
-/* Inside the panel: around the square, whose two inputs are invisible, and on
-   the rail's thumb rather than the whole track. */
 helix-headless-color-input::part(picker-grid):focus-within {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
 
 helix-headless-color-input::part(picker-channel-control):focus-visible {
-  outline: none;
-}
-
-helix-headless-color-input::part(picker-channel-control):focus-visible::-webkit-slider-thumb {
-  outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
-}
-
-helix-headless-color-input::part(picker-channel-control):focus-visible::-moz-range-thumb {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }

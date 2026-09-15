@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Date Picker.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -51,13 +21,10 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-/* As wide as its month and no wider, so the header's controls sit over the
-   first and last columns rather than at the ends of the page. */
 helix-headless-date-picker {
   display: inline-block;
 }
 
-/* The months side by side, as many columns as the component says it drew. */
 helix-headless-date-picker::part(months) {
   align-items: start;
   display: grid;
@@ -66,8 +33,6 @@ helix-headless-date-picker::part(months) {
   justify-content: start;
 }
 
-/* The heading centered between two square controls, with room under it
-   before the weekdays. */
 helix-headless-date-picker::part(header) {
   align-items: center;
   display: grid;
@@ -119,15 +84,11 @@ helix-headless-date-picker::part(next-mark) {
   inline-size: 1em;
 }
 
-/* Each week is a row of seven equal tracks, the weekday row included, so the
-   names stand over their columns. */
 helix-headless-date-picker::part(week) {
   display: grid;
   grid-template-columns: repeat(7, 2.5rem);
 }
 
-/* The names sit in the top half of their box, which leaves a gap under them
-   before the first week. */
 helix-headless-date-picker::part(weekday) {
   align-items: center;
   block-size: 2.5rem;
@@ -141,12 +102,6 @@ helix-headless-date-picker::part(weekday) {
   padding-block-end: 1.25rem;
 }
 
-/* The cell is the column track and the day is the square centered in it.
-   Which day is chosen, which is today and which belong to the next month are
-   attributes on the cell for the accessibility tree, and an attribute cannot
-   follow `::part()`, so the component also writes each as a second part name
-   on the box it is drawn on: `day-selected`, `day-today`, `day-outside` and
-   `day-disabled` on the day, and a range's band on its cells. */
 helix-headless-date-picker::part(cell) {
   align-items: center;
   block-size: 2.25rem;
@@ -167,14 +122,10 @@ helix-headless-date-picker::part(day) {
   justify-content: center;
 }
 
-/* The day lights under the pointer rather than its whole track, and only a day
-   that can be chosen: one from the next month or out of range offers nothing. */
 helix-headless-date-picker::part(day):hover {
   background-color: var(--_gray-subtle);
 }
 
-/* Days either side of the month stay in place, so the first and last weeks are
-   whole rows, and step back. */
 helix-headless-date-picker::part(day-outside),
 helix-headless-date-picker::part(day-outside):hover {
   background-color: transparent;
@@ -189,14 +140,10 @@ helix-headless-date-picker::part(day-disabled):hover {
   opacity: 0.4;
 }
 
-/* Today is a fact about the calendar rather than about the answer, so it is an
-   edge and not a fill. */
 helix-headless-date-picker::part(day-today) {
   box-shadow: inset 0 0 0 1px var(--_gray-line);
 }
 
-/* A range is a band on the cells, which run unbroken between the days and round
-   off at its two ends. */
 helix-headless-date-picker::part(cell-range-start),
 helix-headless-date-picker::part(cell-range-middle),
 helix-headless-date-picker::part(cell-range-end) {
@@ -213,8 +160,6 @@ helix-headless-date-picker::part(cell-range-end) {
   border-start-end-radius: var(--_radius-control);
 }
 
-/* The chosen day, or a range's two ends, solid, with the band's gray as a ring
-   out to the edge of the row so a lone date reads as the same mark. */
 helix-headless-date-picker::part(day-selected),
 helix-headless-date-picker::part(day-selected):hover {
   background-color: var(--_gray-strong);
@@ -228,9 +173,6 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches the cells and the two controls, so the ring goes on
-   them. Taking the UA outline off without putting one back is the commonest
-   way a headless control stops being operable without a pointer. */
 helix-headless-date-picker::part(cell):focus-visible,
 helix-headless-date-picker::part(previous):focus-visible,
 helix-headless-date-picker::part(next):focus-visible {
