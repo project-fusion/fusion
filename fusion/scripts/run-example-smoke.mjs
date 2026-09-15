@@ -119,20 +119,25 @@ const AUDIT = /is controlled: `/
 
 const browser = await chromium.launch()
 
-/* **A frame of its own for every family**, on the workers `pool` decides. The
-   bundle defines every family either way, so no definitions are at stake as
-   they were for the specs; what a fresh frame removes is whatever the family
-   before it left running, whose error would otherwise land in the next
-   family's noise and be charged to an example that did nothing. Failures are
-   listed in the order the examples were read, whichever worker rendered them.
+/* **One frame per worker, loaded once**, on the workers `pool` decides, every
+   family that worker is given rendered into it as the one shared page did. The
+   bundle defines every family before the first, so no definitions are at stake
+   as they were for the specs. What a frame per family removed was whatever the
+   family before left running, and with the noise cleared before every example
+   that reaches an example only if it speaks while the example is watched, which
+   every example already risks from the one before it in its own family. So a
+   frame per family bought little, and cost a runner a frame load per family
+   (see `pool`). Failures are listed in the order the examples were read,
+   whichever worker rendered them.
 
-   Measured 14 Sep 2026 on twelve cores, 567 examples clean every time: 70
-   seconds on the one shared page this replaced, 23 on four workers, and 88 on
-   one, the difference being a frame loaded per family. */
+   Measured 15 Sep 2026 on twelve cores, 567 examples clean every time and the
+   output the same to the byte as on a frame per family: 21 seconds twice on four
+   workers and 70 on one, against 23 twice and 87, the difference being a frame
+   loaded per family. */
 const families = [...Map.groupBy(examples, (one) => one.name.split('/')[0]).values()]
 const byFamily = await pool(families, {
   browser,
-  run: async (page, family) => {
+  open: async (page) => {
     const noise = []
     page.on('pageerror', (error) => noise.push(`threw: ${error.message}`))
     page.on('console', (message) => {
@@ -144,9 +149,11 @@ const byFamily = await pool(families, {
         noise.push(`controlled and unattended: ${text}`)
       }
     })
-
     await page.goto(`${origin}/frame.html`, { waitUntil: 'load' })
-
+    return { noise, page }
+  },
+  page: 'worker',
+  run: async ({ noise, page }, family) => {
     const broken = []
     for (const example of family) {
       noise.length = 0

@@ -483,8 +483,8 @@ const browser = await chromium.launch()
    What it gives up is comparing a moving state, which was never being compared,
    only sampled.
 
-   Given to every worker's context, so each fresh page starts with the settings
-   the one shared page had. */
+   Given to every worker's context, so each worker's page starts with the
+   settings the one shared page had. */
 const CONTEXT = { reducedMotion: 'reduce', viewport: { height: 800, width: WIDTH } }
 
 /* Nothing leaves this machine, for the reason `check-visual.mjs` gives: three
@@ -515,7 +515,8 @@ const closed = (context) =>
 /* **What the page said, kept so a blank render can explain itself.** The guard
    below can tell that `#root` is empty and nothing else; the reason is always in
    the console, and a harness that makes somebody re-run it by hand to read the
-   reason is a harness that gets guessed at instead. Cleared per navigation. */
+   reason is a harness that gets guessed at instead. Attached once to each page
+   the pool opens, and cleared per navigation. */
 const watch = (tab) => {
   const said = []
   tab.on('console', (one) => {
@@ -662,22 +663,25 @@ const judge = async ({ picture, said, tab }, entry) => {
   return verdict
 }
 
-/* **A page of its own for every family, on the workers `pool` decides.** Each
-   side is a navigation, so the registry is empty for every picture either way;
-   what the page per family keeps apart is what a page heard, the errors a blank
-   render explains itself with. The verdicts are read back in the order the
-   examples were listed, whichever worker took them, so the findings print as
-   they always did. Measured 14 Sep 2026 on twelve cores, 663 examples matching
-   every time and the output the same to the byte: 615 seconds on the one page
-   this replaced, 262 and 268 on four workers, 600 on one. */
+/* **One page per worker, on the workers `pool` decides, taking every family that
+   worker is given.** Each side is a navigation, so the registry is empty for
+   every picture either way, and what a page heard, the errors a blank render
+   explains itself with, is cleared before each one; a page per family kept
+   nothing apart that this does not, and cost a runner a page load per family
+   (see `pool`). The verdicts are read back in the order the examples were listed,
+   whichever worker took them, so the findings print as they always did.
+   Measured 15 Sep 2026 on twelve cores, 663 examples matching every time and
+   the output the same to the byte as on a page per family: 259 and 261 seconds
+   on four workers and 602 on one, against 262, 263 and 614. */
 const families = [...Map.groupBy(entries, (one) => `${one.tier.name}/${one.family}`).values()]
 const verdicts = (
   await pool(families, {
     browser,
     context: CONTEXT,
+    open: watch,
+    page: 'worker',
     prepare: closed,
-    run: async (page, family) => {
-      const watched = watch(page)
+    run: async (watched, family) => {
       const judged = []
       for (const entry of family) {
         judged.push(await judge(watched, entry))

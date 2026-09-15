@@ -515,20 +515,22 @@ const shoot = async (tab, tier, family, { mode, suffix, width }) => {
   return outcome
 }
 
-/* **A page of its own for every family, on the workers `pool` decides**, taking
-   all three of its pictures there. Each picture is a navigation, so the
-   registry was already empty for every one of them; what the pool shares with
-   the other checks is the shape, and what it keeps is everything a picture
-   depends on: the viewport and the mode are set per picture as they were, and
-   reduced motion, the route and the device scale belong to the context every
-   worker is given. Measured 15 Sep 2026 in the Playwright image on twelve
-   cores, whose fonts moved 26 pictures from their ubuntu-latest baselines by
-   the same count on every run: 67 seconds on the one page this replaced, 25
-   and 26 on four workers, 70 on one. */
+/* **One page per worker, on the workers `pool` decides**, taking all three
+   pictures of every family that worker is given. Each picture is a navigation,
+   so the registry is empty for every one of them, and nothing here listens, so
+   a page per family kept nothing apart and cost a runner a page load per
+   family (see `pool`). What a picture depends on is set where it was: the
+   viewport and the mode per picture, and reduced motion, the route and the
+   device scale on the context every worker is given. Measured 15 Sep 2026 in
+   the Playwright image on twelve cores, whose fonts move 254 pictures from
+   their ubuntu-latest baselines, the same pictures by the same counts on every
+   run either way: 32 and 29 seconds on four workers and 69 on one, against 30,
+   30 and 73 on a page per family. */
 const units = tiers.flatMap((tier) => tier.families.map((family) => ({ family, tier })))
 const outcomes = await pool(units, {
   browser,
   context: CONTEXT,
+  page: 'worker',
   prepare: closed,
   run: async (tab, { family, tier }) => {
     const taken = []

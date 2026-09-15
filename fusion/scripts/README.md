@@ -12,7 +12,7 @@ it is the workspace's own tooling.
 | `./frontmatter` | The `key: value` block at the top of an MDX file, as strings |
 | `./literal` | Text as a quoted string or a template literal in a generated module |
 | `./paint`, `./theme-facts`, `./theme-intents` | The theme engine's shared vocabulary |
-| `./pool` | Running a browser check's families side by side, each on a fresh page |
+| `./pool` | Running a browser check's families side by side, on a fresh page each or one per worker |
 | `./scope` | Which families a change reaches, for the checks that compare examples |
 | `./settle` | Waiting for an example to stop changing before it is photographed |
 | `./workspace` | Where things are, so a generator does not hardcode a path |
