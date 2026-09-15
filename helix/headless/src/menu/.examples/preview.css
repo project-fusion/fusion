@@ -205,6 +205,12 @@ helix-headless-menu > helix-headless-divider {
   margin-block: 0.25rem;
 }
 
+/* A rule left on a submenu's page is a rule between nothing, so it leaves with
+   the page it was on, as the styled menu's does. */
+helix-headless-menu:state(drilled) > helix-headless-divider {
+  display: none;
+}
+
 helix-headless-icon {
   block-size: 1rem;
   display: inline-flex;
