@@ -16,6 +16,59 @@
   overflow-x: auto;
 }
 
+/*
+ *  **A grid wider than its box says so**, by fading out whichever edge has more
+ *    behind it. Clipped flat, the last column at 390 pixels was cut through its
+ *    heading with nothing to say the table went on, and a phone shows no
+ *    scrollbar until the reader has already guessed there is one to use.
+ *
+ *    A scroll timeline drives it rather than a measurement, and a timeline over a
+ *    box with nothing to scroll is inactive, so a table that fits is never
+ *    masked. The two edges step between keyframes rather than easing, because a
+ *    custom property cannot be registered from a shadow root and an unregistered
+ *    one animates discretely.
+ */
+[part="table"] {
+  --_data-table-fade: to right;
+  animation: data-table-edges linear both;
+  animation-timeline: scroll(self inline);
+  mask-image: linear-gradient(
+    var(--_data-table-fade),
+    transparent,
+    #000 var(--_data-table-fade-start, 0rem),
+    #000 calc(100% - var(--_data-table-fade-end, 0rem)),
+    transparent
+  );
+}
+
+:host(:dir(rtl)) [part="table"] {
+  --_data-table-fade: to left;
+}
+
+@keyframes data-table-edges {
+  0% {
+    --_data-table-fade-end: var(--helix-space-xl);
+    --_data-table-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_data-table-fade-end: var(--helix-space-xl);
+    --_data-table-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_data-table-fade-end: 0rem;
+    --_data-table-fade-start: var(--helix-space-xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="table"] {
+    animation: none;
+  }
+}
+
 /* The header row exists for the accessibility tree and must not exist for the
    layout: the whole grid is one grid, which is what aligns every column across
    every row, so a wrapper that generated a box would take one cell and put every
@@ -36,7 +89,10 @@
   font-family: var(--helix-font-sans);
   font-size: var(--data-table-text, var(--helix-text-sm));
   padding-block: var(--data-table-padding-block, var(--helix-space-sm));
-  padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
+  /* The heading's own inset: flush at the start and a step at the end, which is
+     what `Table` draws too. Symmetric, the words of every column started twelve
+     pixels to the end of their heading's. */
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-none) var(--helix-space-md));
 }
 
 /*
