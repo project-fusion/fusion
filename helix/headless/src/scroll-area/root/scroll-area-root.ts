@@ -108,10 +108,15 @@ export class HelixHeadlessScrollArea extends HelixElement {
     if (box.scrollTop + box.clientHeight < box.scrollHeight - slack) {
       found.push('block-end')
     }
-    if (box.scrollLeft > slack) {
+    /* How far from the inline start, whichever side that is. A right-to-left
+       scroller counts `scrollLeft` down from zero, and read as a count up its
+       start never had more and its end always did, however far the reader had
+       scrolled. */
+    const along = Math.abs(box.scrollLeft)
+    if (along > slack) {
       found.push('inline-start')
     }
-    if (box.scrollLeft + box.clientWidth < box.scrollWidth - slack) {
+    if (along + box.clientWidth < box.scrollWidth - slack) {
       found.push('inline-end')
     }
     this.more = found
