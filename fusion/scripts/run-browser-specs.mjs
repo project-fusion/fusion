@@ -24,16 +24,15 @@ import { readFile } from 'node:fs/promises'
  * reads the missing tokens as component failures.
  *
  * **Families run on a fixed number of workers, and every family on a page of
- * its own.** A family is an independent bundle, so nothing is gained by running
- * them one at a time, and a fresh page is what keeps one family's definitions
- * from deciding another's result (the note in `worker` has the case that made
- * it necessary). Worker `k` takes families `k`, `k + n`, and so on. Results
- * are reported in the order the families sort, whichever worker ran them.
- * Measured 14 Sep 2026 on twelve cores, 2251 specs passing every time: 91
- * seconds on the one shared page this replaced, of which 60 were the stuck
- * timer holding the process open; 44 on one worker, 24 on two, 17 on four.
- * `--workers` overrides the default, and `--workers 1 --throttle 4` is a
- * runner on a desk.
+ * its own**, through `@fusion.dev/scripts/pool`, which carries the argument for
+ * the stripe and the worker count. A fresh page is what keeps one family's
+ * definitions from deciding another's result (the note in `run` has the case
+ * that made it necessary). Results are reported in the order the families
+ * sort, whichever worker ran them. Measured 14 Sep 2026 on twelve cores, 2251
+ * specs passing every time: 91 seconds on the one shared page this replaced, of
+ * which 60 were the stuck timer holding the process open; 44 on one worker, 24
+ * on two, 17 on four. `--workers` overrides the default, and
+ * `--workers 1 --throttle 4` is a runner on a desk.
  *
  * Playwright rather than Puppeteer, for one reason worth naming: its GitHub
  * action installs the browser and its system libraries in one step, and a
@@ -41,9 +40,8 @@ import { readFile } from 'node:fs/promises'
  * on anything to do with the tests.
  */
 import { createServer } from 'node:http'
-import { availableParallelism } from 'node:os'
 import { extname, join } from 'node:path'
-import { argument } from '@fusion.dev/scripts/argv'
+import { pool, workers } from '@fusion.dev/scripts/pool'
 import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -121,30 +119,27 @@ const THROTTLE = Number(
 )
 
 /**
- * How many families run at once: one core left for the browser process and
- * this script, and four at most.
- *
- * **One on a GitHub runner, which is two cores.** Measured on the first CI run
- * of this, 14 Sep 2026: two workers there timed out four Chat specs at the
- * harness's two-second bound, where a desk at a quarter of its speed with two
- * workers passed everything. The runner still gets a page per family and the
- * cleared timer, which is where most of the time was.
+ * How many families run at once, which `pool` decides and argues: a core left
+ * free, four at most, and one on a GitHub runner, which is two cores. Measured
+ * on the first CI run of this, 14 Sep 2026: two workers there timed out four
+ * Chat specs at the harness's two-second bound, where a desk at a quarter of
+ * its speed with two workers passed everything. The runner still gets a page
+ * per family and the cleared timer, which is where most of the time was.
  */
-const WORKERS = Math.max(1, Number(argument('workers') ?? Math.min(4, availableParallelism() - 1)))
+const WORKERS = workers()
 
 const browser = await chromium.launch()
-const crashes = []
 
 /**
- * A blank page at the origin, ready to import a bundle.
+ * The fresh page `pool` hands a family, made a blank page at the origin and
+ * ready to import a bundle.
  *
- * Made again after a family destroys the one before it, which is what a
- * navigation or a renderer crash does: the context a spec was evaluating in is
- * gone, and every family after it would fail against a page that no longer
- * exists.
+ * A family that destroys its page, which is what a navigation or a renderer
+ * crash does, takes only that page with it: the context a spec was evaluating
+ * in is gone, and on a shared page every family after it would fail against a
+ * page that no longer exists.
  */
-const freshPage = async (context) => {
-  const made = await context.newPage()
+const ready = async (made, crashes) => {
   made.on('pageerror', (error) => crashes.push(String(error)))
 
   /* **A way to reproduce a runner's speed on a desk**, for the specs that fail
@@ -179,13 +174,12 @@ const freshPage = async (context) => {
 
 let passed = 0
 const failures = []
-/** Each family's results, in the order the families sort, whichever worker ran it. */
-const byFamily = new Array(families.length)
 
-const worker = async (k) => {
-  const context = await browser.newContext()
-  for (let at = k; at < families.length; at += WORKERS) {
-    const family = families[at]
+/** Each family's results, in the order the families sort, whichever worker ran it. */
+const byFamily = await pool(families, {
+  browser,
+  count: WORKERS,
+  run: async (fresh, family) => {
     /* **A page of its own for every family**, so the custom element registry
        starts empty each time. Each bundle carries its own copy of the headless
        modules the shared runtime does not, and on a shared page the first
@@ -195,7 +189,8 @@ const worker = async (k) => {
        passed on one page only because Combobox happened to run first and
        defined both from one copy. A consumer installs one copy, so a spec is
        run the way a consumer's page would load it. */
-    const page = await freshPage(context)
+    const crashes = []
+    const page = await ready(fresh, crashes)
     /* Each family in its own evaluation, so one that throws while loading is one
        family reported as broken rather than the run ending with no results at
        all. A bundle that cannot even be imported is the failure most worth
@@ -258,15 +253,11 @@ const worker = async (k) => {
         },
       ]
     }
-    byFamily[at] = results
-    await page.close().catch(() => {})
-  }
-  await context.close()
-}
+    return { crashes, results }
+  },
+})
 
-await Promise.all(Array.from({ length: Math.min(WORKERS, families.length) }, (_, k) => worker(k)))
-
-for (const [at, results] of byFamily.entries()) {
+for (const [at, { results }] of byFamily.entries()) {
   const name = families[at].replace(/\.js$/, '')
   for (const result of results) {
     if (result.passed) {
@@ -281,8 +272,12 @@ for (const [at, results] of byFamily.entries()) {
 await browser.close()
 server.close()
 
-for (const crash of crashes) {
-  failures.push(`uncaught in the page: ${crash}`)
+/* After every result, as before, and in family order rather than in the order
+   the workers happened to hear them, so two runs list them alike. */
+for (const { crashes } of byFamily) {
+  for (const crash of crashes) {
+    failures.push(`uncaught in the page: ${crash}`)
+  }
 }
 
 if (failures.length > 0) {
