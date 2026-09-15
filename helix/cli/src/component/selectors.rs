@@ -42,6 +42,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::compositions::forwards_in;
 use crate::component::text::{flattened, line_of, uncommented};
 use crate::component::{sources, stylesheets, Context, Finding, Report};
 
@@ -111,9 +112,6 @@ static EXPLICIT: LazyLock<Regex> =
 
 static PROPERTY_NAME: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"([a-z-]+)\s*:").expect("a literal pattern compiles"));
-
-static FORWARDS: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"exportparts="([^"]*)""#).expect("a literal pattern compiles"));
 
 /// A `[part=]` lookup on the component's own root, and only that.
 ///
@@ -315,14 +313,7 @@ fn survey(context: &Context) -> Survey {
             let found = survey.in_family.entry(family.to_owned()).or_default();
             found.extend(written(&text));
             /* A forwarded name is reachable on the host too. */
-            for one in FORWARDS.captures_iter(&text) {
-                for pair in one[1].split(',') {
-                    let exposed = pair.split(':').next_back().unwrap_or("").trim();
-                    if !exposed.is_empty() {
-                        found.insert(exposed.to_owned());
-                    }
-                }
-            }
+            found.extend(forwards_in(&text).into_iter().map(|(_, exposed)| exposed));
         }
     }
     survey

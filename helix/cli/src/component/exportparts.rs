@@ -16,6 +16,14 @@
 //! selector match two boxes, which is the failure the prefix exists to prevent,
 //! arrived at from the opposite direction.
 //!
+//! **A part may be forwarded twice, the second time under a state.** Nothing
+//! follows `::part()` with an attribute, so a composition drawing a child's
+//! state for a document stylesheet forwards the part again as
+//! `<role>-<part>-<state>` while the state holds, the name a state drawn on a
+//! part takes. A second name is the first one and one word more, beside it and
+//! never instead of it, and two parts under one name is a collision however it
+//! was arrived at.
+//!
 //! **And every `::part()` written from outside is held to naming one that
 //! exists.** Sheets, examples, documentation and a site alike: a selector naming
 //! a part nothing publishes is dead in all four and silent in all four. Nothing
@@ -28,7 +36,9 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::compositions::{compositions, exposed_as, part_docs_by_tag};
+use crate::component::compositions::{
+    compositions, exposed_as, part_docs_by_tag, second_name_of, Site,
+};
 use crate::component::text::{flattened, line_of, uncommented};
 use crate::component::{sources, walk_outside, Context, Finding, Report};
 
@@ -44,7 +54,6 @@ static REACHES: LazyLock<Regex> = LazyLock::new(|| {
         .expect("a literal pattern compiles")
 });
 
-/// What each composition forwards, and whether it forwards enough.
 /// What each file renders in its own right, for the collision rule.
 fn renders_own(context: &Context) -> BTreeMap<std::path::PathBuf, BTreeSet<String>> {
     let mut renders_own: BTreeMap<std::path::PathBuf, BTreeSet<String>> = BTreeMap::new();
@@ -72,6 +81,7 @@ fn renders_own(context: &Context) -> BTreeMap<std::path::PathBuf, BTreeSet<Strin
     renders_own
 }
 
+/// What each composition forwards, and whether it forwards enough.
 fn composed(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> usize {
     let sites = compositions(context);
     let renders_own = renders_own(context);
@@ -94,8 +104,8 @@ fn composed(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> 
         /* Something has to name the child, or a forward has no prefix to take. */
         let roles: BTreeSet<&str> = site
             .forwarded
-            .values()
-            .filter_map(|one| one.split('-').next())
+            .iter()
+            .filter_map(|(_, one)| one.split('-').next())
             .collect();
         let role = site.role.clone().or_else(|| {
             (roles.len() == 1).then(|| (*roles.iter().next().expect("one role")).to_owned())
@@ -115,60 +125,114 @@ fn composed(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> 
             continue;
         };
 
-        for part in published.keys() {
-            let exposed = exposed_as(&role, part);
-            let Some(actual) = site.forwarded.get(part) else {
-                findings.push(Finding {
-                    detail: format!(
-                        "A consumer writing `::part({exposed})` reaches nothing, and gets no \
-                         error for it. Add `{part}: {exposed}` to this element's `exportparts`."
-                    ),
-                    file: where_.clone(),
-                    message: format!(
-                        "renders <{}> and does not forward its `{part}` part",
-                        site.child
-                    ),
-                });
-                continue;
-            };
-            if actual != &exposed {
-                findings.push(Finding {
-                    detail: "One prefix per site, or two levels agreeing on a word collide under \
-                             one name."
-                        .to_owned(),
-                    file: where_.clone(),
-                    message: format!(
-                        "forwards <{}>'s `{part}` as `{actual}`, and the role here is `{role}`, \
-                         so it reads as `{exposed}`",
-                        site.child
-                    ),
-                });
-            }
-        }
-
-        for (part, exposed) in &site.forwarded {
-            if Some(exposed) == site.role.as_ref() && part != &role {
-                continue;
-            }
-            if exposed == &role
-                && renders_own
-                    .get(&site.path)
-                    .is_some_and(|one| one.contains(&role))
-            {
-                findings.push(Finding {
-                    detail: "Rename the role.".to_owned(),
-                    file: where_.clone(),
-                    message: format!(
-                        "forwards <{}>'s `{part}` as `{role}`, and this component also renders \
-                         `part=\"{role}\"`, so `::part({role})` matches both",
-                        site.child
-                    ),
-                });
-            }
-        }
+        prefixed(site, published, &role, &where_, findings);
+        collisions(site, &role, renders_own.get(&site.path), &where_, findings);
     }
 
     forwarded
+}
+
+/// Every part the child publishes, forwarded under the role, and any second
+/// name it takes being that name and a word more.
+fn prefixed(
+    site: &Site,
+    published: &BTreeMap<String, String>,
+    role: &str,
+    where_: &str,
+    findings: &mut Vec<Finding>,
+) {
+    for part in published.keys() {
+        let exposed = exposed_as(role, part);
+        let names: Vec<&String> = site
+            .forwarded
+            .iter()
+            .filter(|(inner, _)| inner == part)
+            .map(|(_, outer)| outer)
+            .collect();
+        /* A second name alone is not a forward: it holds only while the state
+        does, and the plain name is the one a consumer can always reach. */
+        if !names.contains(&&exposed) && names.iter().all(|one| second_name_of(one, &exposed)) {
+            findings.push(Finding {
+                detail: format!(
+                    "A consumer writing `::part({exposed})` reaches nothing, and gets no error \
+                     for it. Add `{part}: {exposed}` to this element's `exportparts`."
+                ),
+                file: where_.to_owned(),
+                message: format!(
+                    "renders <{}> and does not forward its `{part}` part",
+                    site.child
+                ),
+            });
+            continue;
+        }
+        for actual in names {
+            if actual == &exposed || second_name_of(actual, &exposed) {
+                continue;
+            }
+            findings.push(Finding {
+                detail: "One prefix per site, or two levels agreeing on a word collide under one \
+                         name. A second name is the first and one word more."
+                    .to_owned(),
+                file: where_.to_owned(),
+                message: format!(
+                    "forwards <{}>'s `{part}` as `{actual}`, and the role here is `{role}`, so it \
+                     reads as `{exposed}`",
+                    site.child
+                ),
+            });
+        }
+    }
+}
+
+/// One selector matching two boxes, which is what the prefix exists to prevent.
+fn collisions(
+    site: &Site,
+    role: &str,
+    own: Option<&BTreeSet<String>>,
+    where_: &str,
+    findings: &mut Vec<Finding>,
+) {
+    let renders = |name: &str| own.is_some_and(|one| one.contains(name));
+    let mut named: BTreeMap<&str, &str> = BTreeMap::new();
+    for (part, exposed) in &site.forwarded {
+        /* Two of the child's parts under one name, however it was arrived at:
+        a second name that is also a plain one, or one second name given twice. */
+        if let Some(other) = named
+            .insert(exposed.as_str(), part.as_str())
+            .filter(|other| *other != part.as_str())
+        {
+            findings.push(Finding {
+                detail: "Rename one of them.".to_owned(),
+                file: where_.to_owned(),
+                message: format!(
+                    "forwards <{}>'s `{other}` and `{part}` both as `{exposed}`, so \
+                     `::part({exposed})` matches both",
+                    site.child
+                ),
+            });
+        }
+        let second = second_name_of(exposed, &exposed_as(role, part));
+        if (second && renders(exposed))
+            || (exposed == role
+                && renders(role)
+                && (Some(exposed) != site.role.as_ref() || part == role))
+        {
+            findings.push(Finding {
+                detail: if second {
+                    "Rename the second name."
+                } else {
+                    "Rename the role."
+                }
+                .to_owned(),
+                file: where_.to_owned(),
+                message: format!(
+                    "forwards <{}>'s `{part}` as `{exposed}`, and this component also renders \
+                     `part=\"{exposed}\"`, so `::part({exposed})` matches both",
+                    site.child
+                ),
+            });
+        }
+    }
 }
 
 /// Every `::part()` written from outside a component, wherever it is written.
