@@ -18,11 +18,22 @@ import { readFile } from 'node:fs/promises'
  * Run with `bun run specs:browser`, after `turbo run specs`. A family name limits
  * it to that one: `bun run specs:browser carousel`.
  *
- * **The whole suite is eighty-eight families and twenty minutes**, which is
- * fine for CI and is not a thing anybody runs while fixing one component, so it
- * takes a family filter. Without one somebody writes a throwaway copy of this
- * script, leaves out the stylesheet below, and reads the missing tokens as
- * component failures.
+ * **The whole suite is every family, which is not a thing anybody runs while
+ * fixing one component**, so it takes a family filter. Without one somebody
+ * writes a throwaway copy of this script, leaves out the stylesheet below, and
+ * reads the missing tokens as component failures.
+ *
+ * **Families run on a fixed number of workers, and every family on a page of
+ * its own.** A family is an independent bundle, so nothing is gained by running
+ * them one at a time, and a fresh page is what keeps one family's definitions
+ * from deciding another's result (the note in `worker` has the case that made
+ * it necessary). Worker `k` takes families `k`, `k + n`, and so on. Results
+ * are reported in the order the families sort, whichever worker ran them.
+ * Measured 14 Sep 2026 on twelve cores, 2251 specs passing every time: 91
+ * seconds on the one shared page this replaced, of which 60 were the stuck
+ * timer holding the process open; 44 on one worker, 24 on two, 17 on four.
+ * `--workers` overrides the default, and `--workers 1 --throttle 4` is a
+ * runner on a desk.
  *
  * Playwright rather than Puppeteer, for one reason worth naming: its GitHub
  * action installs the browser and its system libraries in one step, and a
@@ -30,7 +41,9 @@ import { readFile } from 'node:fs/promises'
  * on anything to do with the tests.
  */
 import { createServer } from 'node:http'
+import { availableParallelism } from 'node:os'
 import { extname, join } from 'node:path'
+import { argument } from '@fusion.dev/scripts/argv'
 import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -107,6 +120,18 @@ const THROTTLE = Number(
     (process.argv.includes('--throttle') ? 4 : 1),
 )
 
+/**
+ * How many families run at once: one core left for the browser process and
+ * this script, and four at most.
+ *
+ * **One on a GitHub runner, which is two cores.** Measured on the first CI run
+ * of this, 14 Sep 2026: two workers there timed out four Chat specs at the
+ * harness's two-second bound, where a desk at a quarter of its speed with two
+ * workers passed everything. The runner still gets a page per family and the
+ * cleared timer, which is where most of the time was.
+ */
+const WORKERS = Math.max(1, Number(argument('workers') ?? Math.min(4, availableParallelism() - 1)))
+
 const browser = await chromium.launch()
 const crashes = []
 
@@ -118,8 +143,8 @@ const crashes = []
  * gone, and every family after it would fail against a page that no longer
  * exists.
  */
-const freshPage = async () => {
-  const made = await browser.newPage()
+const freshPage = async (context) => {
+  const made = await context.newPage()
   made.on('pageerror', (error) => crashes.push(String(error)))
 
   /* **A way to reproduce a runner's speed on a desk**, for the specs that fail
@@ -152,72 +177,97 @@ const freshPage = async () => {
   return made
 }
 
-let page = await freshPage()
-
 let passed = 0
 const failures = []
+/** Each family's results, in the order the families sort, whichever worker ran it. */
+const byFamily = new Array(families.length)
 
-for (const family of families) {
-  const name = family.replace(/\.js$/, '')
-  /* Each family in its own evaluation, so one that throws while loading is one
-     family reported as broken rather than the run ending with no results at
-     all. A bundle that cannot even be imported is the failure most worth
-     seeing, since it means the component does not load in a browser. */
-  let results
-  try {
-    /* A wall clock on this side, because the one inside the page cannot always
-       fire.
-     *
-       Every test is already raced against a 2000ms `setTimeout` in the harness,
-       and that is enough for a test that merely waits too long. It is no use
-       against one that pegs the main thread: a timer cannot run when nothing
-       yields, so the page never comes back, `page.evaluate` never settles, and
-       the run stops with no output and no name to blame.
-     *
-       A spec measuring a box whose height its own render decides is the shape
-       that does this: the window never settles. `bun run probe:stuck <family>`
-       is what to reach for when this line fires.
-     *
-       Sixty seconds is thirty times the slowest family measured, so this can
-       only ever catch something genuinely stuck. */
-    results = await Promise.race([
-      page.evaluate(async (url) => {
-        try {
-          const module = await import(url)
-          if (typeof module.run !== 'function') {
-            return [
-              { error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' },
-            ]
+const worker = async (k) => {
+  const context = await browser.newContext()
+  for (let at = k; at < families.length; at += WORKERS) {
+    const family = families[at]
+    /* **A page of its own for every family**, so the custom element registry
+       starts empty each time. Each bundle carries its own copy of the headless
+       modules the shared runtime does not, and on a shared page the first
+       family to define a tag owns its class: measured 14 Sep 2026, Filter
+       Input defined `helix-headless-option`, and Select's listbox, built from
+       another copy, then failed every `instanceof` and found no options. It
+       passed on one page only because Combobox happened to run first and
+       defined both from one copy. A consumer installs one copy, so a spec is
+       run the way a consumer's page would load it. */
+    const page = await freshPage(context)
+    /* Each family in its own evaluation, so one that throws while loading is one
+       family reported as broken rather than the run ending with no results at
+       all. A bundle that cannot even be imported is the failure most worth
+       seeing, since it means the component does not load in a browser. */
+    let results
+    let stuck
+    try {
+      /* A wall clock on this side, because the one inside the page cannot always
+         fire.
+       *
+         Every test is already raced against a 2000ms `setTimeout` in the harness,
+         and that is enough for a test that merely waits too long. It is no use
+         against one that pegs the main thread: a timer cannot run when nothing
+         yields, so the page never comes back, `page.evaluate` never settles, and
+         the run stops with no output and no name to blame.
+       *
+         A spec measuring a box whose height its own render decides is the shape
+         that does this: the window never settles. `bun run probe:stuck <family>`
+         is what to reach for when this line fires.
+       *
+         Sixty seconds is thirty times the slowest family measured, so this can
+         only ever catch something genuinely stuck. */
+      results = await Promise.race([
+        page.evaluate(async (url) => {
+          try {
+            const module = await import(url)
+            if (typeof module.run !== 'function') {
+              return [
+                { error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' },
+              ]
+            }
+            return await module.run()
+          } catch (error) {
+            return [{ error: String(error), name: 'load', passed: false, suite: '' }]
           }
-          return await module.run()
-        } catch (error) {
-          return [{ error: String(error), name: 'load', passed: false, suite: '' }]
-        }
-      }, `${origin}/${family}`),
-      new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(new Error(`blocked the page for ${STUCK / 1000}s, so the run gave up on it`))
-        }, STUCK)
-      }),
-    ])
-  } catch (error) {
-    /* The `try` inside the page cannot catch this one: the context it would
-       have run in is gone. A family navigates the page, or crashes the
-       renderer, and everything after it would then be evaluated against a page
-       that no longer exists, so the whole run reports nothing at all rather than
-       naming the one family that broke. */
-    results = [
-      {
-        error: `it destroyed the page: ${String(error).split('\n')[0]}. A spec that navigates, submits a form for real, or crashes the renderer will do this, and none of them show up under happy-dom.`,
-        name: 'the page',
-        passed: false,
-        suite: '',
-      },
-    ]
+        }, `${origin}/${family}`),
+        new Promise((_, reject) => {
+          stuck = setTimeout(() => {
+            reject(new Error(`blocked the page for ${STUCK / 1000}s, so the run gave up on it`))
+          }, STUCK)
+        }),
+      ])
+      /* Cleared as soon as the family answers. A timer left running holds the
+         process open, so every family that finished would keep the run alive
+         for its full sixty seconds after the last one reported. */
+      clearTimeout(stuck)
+    } catch (error) {
+      clearTimeout(stuck)
+      /* The `try` inside the page cannot catch this one: the context it would
+         have run in is gone. A family navigates the page, or crashes the
+         renderer, and everything after it would then be evaluated against a page
+         that no longer exists, so the whole run reports nothing at all rather than
+         naming the one family that broke. */
+      results = [
+        {
+          error: `it destroyed the page: ${String(error).split('\n')[0]}. A spec that navigates, submits a form for real, or crashes the renderer will do this, and none of them show up under happy-dom.`,
+          name: 'the page',
+          passed: false,
+          suite: '',
+        },
+      ]
+    }
+    byFamily[at] = results
     await page.close().catch(() => {})
-    page = await freshPage()
   }
+  await context.close()
+}
 
+await Promise.all(Array.from({ length: Math.min(WORKERS, families.length) }, (_, k) => worker(k)))
+
+for (const [at, results] of byFamily.entries()) {
+  const name = families[at].replace(/\.js$/, '')
   for (const result of results) {
     if (result.passed) {
       passed += 1
@@ -243,4 +293,6 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`browser specs: ${passed} passed across ${families.length} families, in Chromium`)
+console.log(
+  `browser specs: ${passed} passed across ${families.length} families, in Chromium on ${Math.min(WORKERS, families.length)} worker(s)`,
+)
