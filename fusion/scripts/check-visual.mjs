@@ -92,6 +92,7 @@
  * bun run check:spec:visual              compare both tiers, and fail on a difference
  * bun run check:spec:visual accordion    just that family, in whichever tiers have one
  * bun run visual:update             rewrite the baselines
+ * bun run check:spec:visual --workers 1  one family at a time, as a runner does
  * ```
  *
  * A failure writes `preview.diff.png` beside the baseline, the changed pixels
@@ -101,6 +102,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { dirname, join, relative } from 'node:path'
+import { pool } from '@fusion.dev/scripts/pool'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
 import { chromium } from 'playwright'
@@ -166,9 +168,10 @@ const FONTS = join(root, 'fusion/site/public/fonts')
    argument. `visual:update` puts `--update` in that slot itself, so reading
    position two meant `bun run visual:update accordion` silently rewrote every
    baseline in the repository: the one command where doing more than was asked
-   is least recoverable. */
+   is least recoverable. Nor is a number a family: it is the value of
+   `--workers`, and no family's name is one. */
 const args = process.argv.slice(2)
-const only = args.find((one) => !one.startsWith('--'))
+const only = args.find((one) => !one.startsWith('--') && !/^\d+$/.test(one))
 const update = args.includes('--update')
 
 if (process.platform !== 'linux') {
@@ -356,10 +359,7 @@ const browser = await chromium.launch()
    **0 of them draw differently under it**, so nothing else is repictured and no
    baseline moves for this. The two `aura` pictures become byte-identical run to
    run. */
-const tab = await browser.newPage({
-  reducedMotion: 'reduce',
-  viewport: { height: 800, width: SHOTS[0].width },
-})
+const CONTEXT = { reducedMotion: 'reduce', viewport: { height: 800, width: SHOTS[0].width } }
 
 /* Nothing leaves this machine, and that is a correctness rule rather than a
  * courtesy.
@@ -380,139 +380,180 @@ const tab = await browser.newPage({
  *
  * The brand faces are the reason this is an origin test rather than a scheme
  * test: they are served from here, so they continue, and nothing else does. */
-await tab.route('**/*', (route) => {
-  const url = route.request().url()
-  return url.startsWith(origin) ? route.continue() : route.abort()
+const closed = (context) =>
+  context.route('**/*', (route) => {
+    const url = route.request().url()
+    return url.startsWith(origin) ? route.continue() : route.abort()
+  })
+
+/**
+ * One picture of one family, compared with its baseline or written over it.
+ *
+ * What it found is returned rather than recorded, so the pictures can be taken
+ * on any worker and still be reported in the order the loop over them had.
+ */
+const shoot = async (tab, tier, family, { mode, suffix, width }) => {
+  const outcome = { changed: [], compared: false, held: [], written: [] }
+  await tab.setViewportSize({ height: 800, width })
+  await tab.emulateMedia({ colorScheme: mode })
+  await tab.goto(`${origin}/${tier.name}/${family}/?w=${width}&m=${mode}`, {
+    waitUntil: 'load',
+  })
+  /* The tags upgrade when the bundle runs, and a component may render again
+     after that: Lit batches, so the first paint can be the pre-update one.
+     Waiting on the definition and then on the frame after it is what the spec
+     runner does for the same reason. */
+  await tab.evaluate(async () => {
+    await Promise.all(
+      [...document.body.querySelectorAll(':not(:defined)')].map((one) =>
+        customElements.whenDefined(one.localName),
+      ),
+    )
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+    await document.fonts.ready
+  })
+
+  /* **`animations: 'disabled'` or the animated families can never settle.**
+     Loader carries three `infinite` animations, a 0.8s turn and two 2.4s
+     breathes, so a screenshot catches the spinner wherever it happened to be
+     and the comparison reports a difference that is only a phase. Measured on
+     26 Aug 2026: `styled/loader`, 17 pixels moved, against a baseline taken
+     from the same source minutes earlier.
+
+     Playwright cancels infinite animations to their initial state and
+     fast-forwards finite ones to completion, so every family is pictured at
+     one definite moment rather than at whatever moment the runner reached it.
+     That is what makes a baseline a fact about the component rather than
+     about the machine's timing. */
+  const shot = await tab.screenshot({ animations: 'disabled', fullPage: true })
+  const baseline = join(tier.source, family, `.examples/preview${suffix}.png`)
+  /* Both tiers, both widths, one name each. The pictures never collide
+     because the tiers keep separate `src` trees, so the name says only
+     which width it is and the path says which tier. */
+  const what = `${tier.name}/${family}${suffix}`
+
+  /* A missing baseline is a failure and not a chance to write one. Seeding on a
+     bare run is the version of this that passes forever: CI would take its own
+     picture, agree with it, report success and commit nothing, so the check
+     would be green from the day it was added without ever having compared
+     anything. `--update` is the only thing that writes, and what it writes is
+     reviewed as a diff before it counts. */
+  const has = existsSync(baseline)
+  if (!has && !update) {
+    outcome.changed.push(
+      `${what}: no baseline. Dispatch the \`Visual baselines\` workflow and look at the pull ` +
+        'request it opens: the first picture is the one every later comparison trusts.',
+    )
+    return outcome
+  }
+
+  const after = PNG.sync.read(shot)
+  const before = has ? PNG.sync.read(readFileSync(baseline)) : undefined
+  const resized =
+    before !== undefined && (before.width !== after.width || before.height !== after.height)
+
+  let moved = 0
+  let diff
+  if (before !== undefined && !resized) {
+    diff = new PNG({ height: before.height, width: before.width })
+    /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
+       tolerated pixels, because this only ever compares Linux to Linux and a
+       single moved pixel is the fault it exists to catch. The threshold is off
+       the floor only so a renderer's own dithering does not read as a change. */
+    moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
+      threshold: 0.1,
+    })
+  }
+
+  /* **Writing only what the comparison would have rejected**, which is not
+     the same as writing what changed. A PNG whose bytes differ is not a
+     picture that differs: re-encoding the same page produced files unequal
+     to `git` and equal to `pixelmatch` on ten of the ninety-three families,
+     and a retake that committed them proposed twenty-three files for review
+     when two had actually moved. The sub-threshold ones measured 3 to 5
+     pixels a side apart, at a channel delta of 1, except `styled/aura`,
+     which redraws a soft field across 44,573 pixels at a delta of 22 and
+     still lands inside the threshold.
+
+     Holding those keeps a retake reviewable, since every file in it is one
+     somebody has to look at, and keeps the baseline the picture a reviewer
+     approved rather than the newest byte-identical rendering of it. It also
+     bounds the drift: each comparison is against the committed baseline, so
+     sub-threshold movement cannot accumulate past the threshold by being
+     re-recorded a run at a time. */
+  if (update) {
+    if (!has || resized || moved > 0) {
+      mkdirSync(dirname(baseline), { recursive: true })
+      writeFileSync(baseline, shot)
+      outcome.written.push(what)
+    } else {
+      outcome.held.push(what)
+    }
+    return outcome
+  }
+
+  outcome.compared = true
+
+  if (resized) {
+    outcome.changed.push(
+      `${what}: ${before.width}x${before.height} became ${after.width}x${after.height}. A size ` +
+        'change is a layout change, and no diff image is written because there is nothing to ' +
+        'lay one over.',
+    )
+    return outcome
+  }
+
+  if (moved > 0) {
+    const where = join(tier.source, family, `.examples/preview${suffix}.diff.png`)
+    writeFileSync(where, PNG.sync.write(diff))
+    outcome.changed.push(
+      `${what}: ${moved} pixels moved. The marked difference is at ${relative(root, where)}. ` +
+        'If the change was meant, dispatch the `Visual baselines` workflow and the review is ' +
+        'the diff on the baseline.',
+    )
+  }
+  return outcome
+}
+
+/* **A page of its own for every family, on the workers `pool` decides**, taking
+   all three of its pictures there. Each picture is a navigation, so the
+   registry was already empty for every one of them; what the pool shares with
+   the other checks is the shape, and what it keeps is everything a picture
+   depends on: the viewport and the mode are set per picture as they were, and
+   reduced motion, the route and the device scale belong to the context every
+   worker is given. Measured 15 Sep 2026 in the Playwright image on twelve
+   cores, whose fonts moved 26 pictures from their ubuntu-latest baselines by
+   the same count on every run: 67 seconds on the one page this replaced, 25
+   and 26 on four workers, 70 on one. */
+const units = tiers.flatMap((tier) => tier.families.map((family) => ({ family, tier })))
+const outcomes = await pool(units, {
+  browser,
+  context: CONTEXT,
+  prepare: closed,
+  run: async (tab, { family, tier }) => {
+    const taken = []
+    for (const shot of SHOTS) {
+      taken.push(await shoot(tab, tier, family, shot))
+    }
+    return taken
+  },
 })
 
+/* Read back picture by picture, then tier, then family, the order a single page
+   took them in, so a failing run lists what moved as it always did. */
 const changed = []
 const written = []
 /** Baselines a retake left alone, because the comparison would have passed. */
 const held = []
 const compared = new Map(TIERS.map((tier) => [tier.name, 0]))
-
-for (const { mode, suffix, width } of SHOTS) {
-  await tab.setViewportSize({ height: 800, width })
-  await tab.emulateMedia({ colorScheme: mode })
-
-  for (const tier of tiers) {
-    for (const family of tier.families) {
-      await tab.goto(`${origin}/${tier.name}/${family}/?w=${width}&m=${mode}`, {
-        waitUntil: 'load',
-      })
-      /* The tags upgrade when the bundle runs, and a component may render again
-         after that: Lit batches, so the first paint can be the pre-update one.
-         Waiting on the definition and then on the frame after it is what the spec
-         runner does for the same reason. */
-      await tab.evaluate(async () => {
-        await Promise.all(
-          [...document.body.querySelectorAll(':not(:defined)')].map((one) =>
-            customElements.whenDefined(one.localName),
-          ),
-        )
-        await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-        await document.fonts.ready
-      })
-
-      /* **`animations: 'disabled'` or the animated families can never settle.**
-         Loader carries three `infinite` animations, a 0.8s turn and two 2.4s
-         breathes, so a screenshot catches the spinner wherever it happened to be
-         and the comparison reports a difference that is only a phase. Measured on
-         26 Aug 2026: `styled/loader`, 17 pixels moved, against a baseline taken
-         from the same source minutes earlier.
-
-         Playwright cancels infinite animations to their initial state and
-         fast-forwards finite ones to completion, so every family is pictured at
-         one definite moment rather than at whatever moment the runner reached it.
-         That is what makes a baseline a fact about the component rather than
-         about the machine's timing. */
-      const shot = await tab.screenshot({ animations: 'disabled', fullPage: true })
-      const baseline = join(tier.source, family, `.examples/preview${suffix}.png`)
-      /* Both tiers, both widths, one name each. The pictures never collide
-         because the tiers keep separate `src` trees, so the name says only
-         which width it is and the path says which tier. */
-      const what = `${tier.name}/${family}${suffix}`
-
-      /* A missing baseline is a failure and not a chance to write one. Seeding on a
-         bare run is the version of this that passes forever: CI would take its own
-         picture, agree with it, report success and commit nothing, so the check
-         would be green from the day it was added without ever having compared
-         anything. `--update` is the only thing that writes, and what it writes is
-         reviewed as a diff before it counts. */
-      const has = existsSync(baseline)
-      if (!has && !update) {
-        changed.push(
-          `${what}: no baseline. Dispatch the \`Visual baselines\` workflow and look at the pull ` +
-            'request it opens: the first picture is the one every later comparison trusts.',
-        )
-        continue
-      }
-
-      const after = PNG.sync.read(shot)
-      const before = has ? PNG.sync.read(readFileSync(baseline)) : undefined
-      const resized =
-        before !== undefined && (before.width !== after.width || before.height !== after.height)
-
-      let moved = 0
-      let diff
-      if (before !== undefined && !resized) {
-        diff = new PNG({ height: before.height, width: before.width })
-        /* `threshold` is per-pixel color distance, not a budget of pixels. Zero
-           tolerated pixels, because this only ever compares Linux to Linux and a
-           single moved pixel is the fault it exists to catch. The threshold is off
-           the floor only so a renderer's own dithering does not read as a change. */
-        moved = pixelmatch(before.data, after.data, diff.data, before.width, before.height, {
-          threshold: 0.1,
-        })
-      }
-
-      /* **Writing only what the comparison would have rejected**, which is not
-         the same as writing what changed. A PNG whose bytes differ is not a
-         picture that differs: re-encoding the same page produced files unequal
-         to `git` and equal to `pixelmatch` on ten of the ninety-three families,
-         and a retake that committed them proposed twenty-three files for review
-         when two had actually moved. The sub-threshold ones measured 3 to 5
-         pixels a side apart, at a channel delta of 1, except `styled/aura`,
-         which redraws a soft field across 44,573 pixels at a delta of 22 and
-         still lands inside the threshold.
-
-         Holding those keeps a retake reviewable, since every file in it is one
-         somebody has to look at, and keeps the baseline the picture a reviewer
-         approved rather than the newest byte-identical rendering of it. It also
-         bounds the drift: each comparison is against the committed baseline, so
-         sub-threshold movement cannot accumulate past the threshold by being
-         re-recorded a run at a time. */
-      if (update) {
-        if (!has || resized || moved > 0) {
-          mkdirSync(dirname(baseline), { recursive: true })
-          writeFileSync(baseline, shot)
-          written.push(what)
-        } else {
-          held.push(what)
-        }
-        continue
-      }
-
+for (const at of SHOTS.keys()) {
+  for (const [index, { tier }] of units.entries()) {
+    const outcome = outcomes[index][at]
+    changed.push(...outcome.changed)
+    written.push(...outcome.written)
+    held.push(...outcome.held)
+    if (outcome.compared) {
       compared.set(tier.name, compared.get(tier.name) + 1)
-
-      if (resized) {
-        changed.push(
-          `${what}: ${before.width}x${before.height} became ${after.width}x${after.height}. A size ` +
-            'change is a layout change, and no diff image is written because there is nothing to ' +
-            'lay one over.',
-        )
-        continue
-      }
-
-      if (moved > 0) {
-        const where = join(tier.source, family, `.examples/preview${suffix}.diff.png`)
-        writeFileSync(where, PNG.sync.write(diff))
-        changed.push(
-          `${what}: ${moved} pixels moved. The marked difference is at ${relative(root, where)}. ` +
-            'If the change was meant, dispatch the `Visual baselines` workflow and the review is ' +
-            'the diff on the baseline.',
-        )
-      }
     }
   }
 }

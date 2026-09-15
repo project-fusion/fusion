@@ -121,7 +121,20 @@ for (const family of readdirSync(source)) {
 }
 
 const browser = await chromium.launch()
-/* Tall, because paint order can only be read inside the viewport and an example
+/* **One page for the whole corpus, and not the pool the other browser checks
+   run on**, because a reading here is not yet a function of its example alone.
+   Measured 14 Sep 2026 on twelve cores: this page read 8411 inks on three runs
+   out of three, and a page per family on four workers read 8382 on one run and
+   8415 on the next. Two things move it. A two-frame wait is a race a busier page
+   loses, so `data-table/preview` read 16 inks or 1 and
+   `object-inspector/windowed` 99 or 1. And a reading depends on what rendered
+   before it: four Toggle examples read their selected label as contested here
+   and as ink on the track on a fresh page. Waiting for every element's settle
+   signal and refusing off-machine requests closed most of it, and left the
+   image and avatar fallbacks, which draw on a failed request's schedule, moving
+   an ink a run. Pool this once a reading waits for what its example waits for.
+
+   Tall, because paint order can only be read inside the viewport and an example
    that scrolls would otherwise arrive as a page of unmeasurable text. */
 const page = await browser.newPage({ viewport: { height: 2400, width: 1280 } })
 await page.goto(`${origin}/frame.html`, { waitUntil: 'load' })

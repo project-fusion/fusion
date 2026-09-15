@@ -4,7 +4,9 @@
  * Shared by the checks that drive a browser through the whole corpus, because
  * each carried the same loop, one page walked through every family in turn, and
  * the first of them to be pooled (`run-browser-specs.mjs`) learned what the
- * others would otherwise learn again.
+ * others would otherwise learn again. `check-contrast.mjs` still walks one
+ * page, and says why: a check can join only once its result is a function of
+ * each family alone, which is the property this is built on.
  *
  * **A family gets a fresh page, and the check decides what goes on it.** A
  * family is an independent bundle, and a page that has run one family carries

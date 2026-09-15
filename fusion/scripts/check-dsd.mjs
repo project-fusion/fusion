@@ -2,10 +2,12 @@
 /**
  * Whether what a server rendered hydrates, and whether a client renders once.
  *
- *   check-dsd.mjs [family] [--fixtures | --corpus] [--changed <ref>]
+ *   check-dsd.mjs [family] [--fixtures | --corpus] [--changed <ref>] [--workers <n>]
  *
  * `--changed` compares only the families a change since `<ref>` reaches, by the
  * rule parity scopes with, and says which it skipped. The fixtures always run.
+ * `--workers` is how many families are compared at once, which
+ * `@fusion.dev/scripts/pool` otherwise decides; `--workers 1` is the serial run.
  *
  * **Declarative shadow DOM is a capability Helix keeps, not one it ships.** The
  * site renders no DSD (see `helix/CONVENTIONS.md`), but a consumer rendering
@@ -37,6 +39,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
+import { pool } from '@fusion.dev/scripts/pool'
 import { scopeFor } from '@fusion.dev/scripts/scope'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
@@ -407,44 +410,52 @@ const origin = `http://127.0.0.1:${listening.port}`
 const browser = await chromium.launch()
 /* `reducedMotion` and nothing leaving the machine, for the reasons parity gives:
    a canvas holds still only when asked to, and a remote asset answers
-   differently each time. */
-const tab = await browser.newPage({
-  reducedMotion: 'reduce',
-  viewport: { height: 800, width: WIDTH },
-})
-if (THROTTLE > 1) {
-  const session = await tab.context().newCDPSession(tab)
-  await session.send('Emulation.setCPUThrottlingRate', { rate: THROTTLE })
-}
-await tab.route('**/*', (route) =>
-  route.request().url().startsWith(origin) ? route.continue() : route.abort(),
-)
-const said = []
-const warned = new Set()
-tab.on('pageerror', (error) => said.push(error.message))
-tab.on('console', (message) => {
-  const text = message.text()
-  if (message.type() === 'error') {
-    said.push(text)
+   differently each time. Given to every worker's context, so each fresh page
+   starts with the settings the one shared page had. */
+const CONTEXT = { reducedMotion: 'reduce', viewport: { height: 800, width: WIDTH } }
+const closed = (context) =>
+  context.route('**/*', (route) =>
+    route.request().url().startsWith(origin) ? route.continue() : route.abort(),
+  )
+
+/** A page throttled as asked, with what it says kept, and a way to load it and wait. */
+const watch = async (tab) => {
+  if (THROTTLE > 1) {
+    const session = await tab.context().newCDPSession(tab)
+    await session.send('Emulation.setCPUThrottlingRate', { rate: THROTTLE })
   }
-  const twice = /Element (\S+) scheduled an update/.exec(text)
-  if (twice) {
-    warned.add(twice[1])
+  const said = []
+  const warned = new Set()
+  tab.on('pageerror', (error) => said.push(error.message))
+  tab.on('console', (message) => {
+    const text = message.text()
+    if (message.type() === 'error') {
+      said.push(text)
+    }
+    const twice = /Element (\S+) scheduled an update/.exec(text)
+    if (twice) {
+      warned.add(twice[1])
+    }
+  })
+  const load = async (url) => {
+    said.length = 0
+    warned.clear()
+    await tab.goto(url, { waitUntil: 'load' })
+    const undefinedTags = await awaitUpgrades(tab)
+    await awaitStill(tab)
+    return { undefinedTags }
   }
-})
-const load = async (url) => {
-  said.length = 0
-  warned.clear()
-  await tab.goto(url, { waitUntil: 'load' })
-  const undefinedTags = await awaitUpgrades(tab)
-  await awaitStill(tab)
-  return { undefinedTags }
+  return { load, said, tab, warned }
 }
 
 const failures = []
 
-/* The fixtures: each asked for the state it must end in, both ways. */
+/* The fixtures: each asked for the state it must end in, both ways. One page,
+   holding every fixture at once, so there is nothing here to pool. */
 if (fixtures.length > 0) {
+  const context = await browser.newContext(CONTEXT)
+  await closed(context)
+  const { load, said, tab, warned } = await watch(await context.newPage())
   for (const mode of ['server', 'client']) {
     await load(`${origin}/fixtures/${mode}`)
     const rootless = mode === 'server' ? await tab.evaluate(() => window.__rootless) : []
@@ -495,12 +506,13 @@ if (fixtures.length > 0) {
       }
     }
   }
+  await context.close()
 }
 
 /* The corpus: each example rendered by a client and hydrated from a server, and
    the two pictures compared. Taken twice where they differ, and reported only if
    they differ again, for the reason parity retries. */
-const picture = async (one, mode) => {
+const picture = async ({ load, said, tab }, one, mode) => {
   const { undefinedTags } = await load(`${origin}/${mode}/${one.id}/`)
   return {
     errors: [...said],
@@ -510,16 +522,16 @@ const picture = async (one, mode) => {
   }
 }
 /** What is wrong with one example, as sentences, or nothing. */
-const examine = async (one) => {
+const examine = async (watched, one) => {
   const rendered = server[one.id]
   if (rendered.error !== undefined) {
     return [`${one.id}: the server render threw, ${rendered.error}`]
   }
-  let client = await picture(one, 'client')
-  let hydrated = await picture(one, 'server')
+  let client = await picture(watched, one, 'client')
+  let hydrated = await picture(watched, one, 'server')
   if (!client.shot.equals(hydrated.shot)) {
-    client = await picture(one, 'client')
-    hydrated = await picture(one, 'server')
+    client = await picture(watched, one, 'client')
+    hydrated = await picture(watched, one, 'server')
   }
   const missing = [...new Set([...client.undefinedTags, ...hydrated.undefinedTags])]
   if (missing.length > 0) {
@@ -557,12 +569,44 @@ const examine = async (one) => {
   return found
 }
 
+/**
+ * Every example in `groups` examined, a fresh page to each group on the workers
+ * `pool` decides, and the findings handed back as one list per group, holding
+ * one list per example, in the order the groups were given.
+ *
+ * Each load is a navigation, so a family already starts from an empty registry
+ * here; the page per family is what keeps what a page heard, its errors and its
+ * warnings, from being read against a family on another worker. Measured 14 Sep
+ * 2026 on twelve cores, the whole corpus clean every time and the output the
+ * same to the byte: 586 seconds on the one page this replaced, 263 on four
+ * workers, 607 on one.
+ */
+const examineAll = (groups) =>
+  pool(groups, {
+    browser,
+    context: CONTEXT,
+    prepare: closed,
+    run: async (page, group) => {
+      const watched = await watch(page)
+      const found = []
+      for (const one of group) {
+        found.push(await examine(watched, one))
+      }
+      return found
+    },
+  })
+
+const compared = corpus.filter((each) => !UNCOMPARED.has(each.id))
+const examined = (
+  await examineAll([...Map.groupBy(compared, (one) => `${one.tier.name}/${one.family}`).values()])
+).flat()
+
 let clean = 0
 const heldLines = []
 /* Findings against a known family are counted and held rather than failed on. */
 const held = new Map([...KNOWN.keys()].map((family) => [family, 0]))
-for (const one of corpus.filter((each) => !UNCOMPARED.has(each.id))) {
-  const found = await examine(one)
+for (const [at, one] of compared.entries()) {
+  const found = examined[at]
   if (held.has(one.family)) {
     held.set(one.family, held.get(one.family) + found.length)
     /* Named in full on a run narrowed to one family, which is the run somebody
@@ -583,14 +627,12 @@ for (const one of corpus.filter((each) => !UNCOMPARED.has(each.id))) {
    likely to be luck as a fix. The same confirmation parity asks of a listed
    exception before calling it spent. */
 const reached = new Set(corpus.map((one) => one.family))
-for (const [family, count] of held) {
-  if (!reached.has(family) || count > 0) {
-    continue
-  }
-  let again = 0
-  for (const one of corpus.filter((each) => each.family === family && !UNCOMPARED.has(each.id))) {
-    again += (await examine(one)).length
-  }
+const recheck = [...held.keys()].filter((family) => reached.has(family) && held.get(family) === 0)
+const rechecked = await examineAll(
+  recheck.map((family) => compared.filter((each) => each.family === family)),
+)
+for (const [at, family] of recheck.entries()) {
+  const again = rechecked[at].flat().length
   held.set(family, again)
   if (again === 0) {
     failures.push(
