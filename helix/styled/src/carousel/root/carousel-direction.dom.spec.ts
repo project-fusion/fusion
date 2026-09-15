@@ -93,7 +93,11 @@ if (hasLayout()) {
         const style = getComputedStyle(track)
         const box = track.getBoundingClientRect()
         const slides = [0, 1, 2].map((index) => at(host.children, index).getBoundingClientRect())
-        const [left, middle, right] = dir === 'rtl' ? [...slides].reverse() : slides
+        const [left, middle, right] = (dir === 'rtl' ? [...slides].reverse() : slides) as [
+          DOMRect,
+          DOMRect,
+          DOMRect,
+        ]
         expect(left.left - box.left).toBeCloseTo(Number.parseFloat(style.paddingLeft), 1)
         expect(middle.left - left.right).toBeCloseTo(Number.parseFloat(style.columnGap), 1)
         expect(right.left - middle.right).toBeCloseTo(Number.parseFloat(style.columnGap), 1)
