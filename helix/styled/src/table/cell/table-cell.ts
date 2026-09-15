@@ -7,9 +7,10 @@ import { styles } from './table-cell.css.js'
  * @summary One cell of a table.
  *
  * @description
- * Hairline rules between rows and no fill, per the rule that depth comes from a
- * single border rather than from elevation. A dense table earns its density by
- * decorating none of it.
+ * Every cell is the same height whatever it holds, so a row with a tag or an
+ * icon button in it sits level with a row of text. Content is set in full
+ * foreground, since the cells are what a reader is reading, and a long
+ * identifier breaks rather than running into the next column.
  *
  * @since 0.1.0
  * @status experimental
