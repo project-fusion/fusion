@@ -242,13 +242,23 @@
   scroll-snap-type: y mandatory;
 }
 
-/* The pane, not the slotted slide. */
+/* The pane, not the slotted slide.
+
+   **Rounded up to a whole pixel, so a resting place is one both directions
+   reach.** Three across 692 pixels made each pane 209.33, and the last place
+   the track can rest 450.66 along: Chromium lets a left-to-right track overshoot
+   that to 451 and stops a right-to-left one at -450, which left two thirds of a
+   pixel of the slide before on screen. Whole panes put every resting place on a
+   whole pixel, none past the end, and what the panes gain, under a pixel each,
+   lands in the bleed after the last one in view. */
 [part="slide"] {
   display: flex;
   flex: 0 0
-    calc(
+    round(
+      up,
       (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
-      var(--_carousel-per-view)
+      var(--_carousel-per-view),
+      1px
     );
   scroll-snap-align: start;
 }

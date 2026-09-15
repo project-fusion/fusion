@@ -48,5 +48,34 @@ if (hasLayout()) {
         )
       })
     }
+
+    /* Three across 692 pixels is a pane of 209.33, and the last place the
+       track rests at 450.66 along. Chromium took a left-to-right track to 451
+       and stopped a right-to-left one at -450, so two thirds of a pixel of the
+       slide before the first in view stayed on screen at the leading edge. */
+    for (const dir of ['ltr', 'rtl'] as const) {
+      test(`shows none of the slide before at its last place, ${dir}`, async () => {
+        document.documentElement.dir = dir
+        const host =
+          (await mount(`<helix-carousel label="Shelf" per-view="3" style="inline-size: 692px">
+          <div>One</div><div>Two</div><div>Three</div><div>Four</div><div>Five</div>
+        </helix-carousel>`)) as HTMLElement & { index: number; updateComplete: Promise<unknown> }
+        await host.updateComplete
+        const track = part(host, 'track') as HTMLElement
+        for (let press = 0; press < 2; press++) {
+          const settled = rest(track)
+          ;(part(host, 'next') as HTMLElement).click()
+          await settled
+        }
+        const box = track.getBoundingClientRect()
+        const before = at(host.children, 1).getBoundingClientRect()
+        expect(host.index).toBe(2)
+        if (dir === 'rtl') {
+          expect(before.left).toBeGreaterThanOrEqual(box.right)
+        } else {
+          expect(before.right).toBeLessThanOrEqual(box.left)
+        }
+      })
+    }
   })
 }
