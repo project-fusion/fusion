@@ -25,14 +25,14 @@ import { readFile } from 'node:fs/promises'
  *
  * **Families run on a fixed number of workers, and every family on a page of
  * its own**, through `@fusion.dev/scripts/pool`, which carries the argument for
- * the stripe and the worker count. A fresh page is what keeps one family's
- * definitions from deciding another's result (the note in `run` has the case
- * that made it necessary). Results are reported in the order the families
- * sort, whichever worker ran them. Measured 14 Sep 2026 on twelve cores, 2251
- * specs passing every time: 91 seconds on the one shared page this replaced, of
- * which 60 were the stuck timer holding the process open; 44 on one worker, 24
- * on two, 17 on four. `--workers` overrides the default, and
- * `--workers 1 --throttle 4` is a runner on a desk.
+ * the stripe and the worker count, and which the pixel checks share. A fresh
+ * page is what keeps one family's definitions from deciding another's result
+ * (the note in `run` has the case that made it necessary). Results are
+ * reported in the order the families sort, whichever worker ran them. Measured
+ * 14 Sep 2026 on twelve cores, 2251 specs passing every time: 91 seconds on the
+ * one shared page this replaced, of which 60 were the stuck timer holding the
+ * process open; 44 on one worker, 24 on two, 17 on four. `--workers` overrides
+ * the default, and `--workers 1 --throttle 4` is a runner on a desk.
  *
  * Playwright rather than Puppeteer, for one reason worth naming: its GitHub
  * action installs the browser and its system libraries in one step, and a

@@ -23,11 +23,14 @@
  * second harness that rendered examples its own way would be checking a
  * relationship nobody has.
  *
- * Run with `bun run smoke:examples`, after `turbo run frame`.
+ * Run with `bun run smoke:examples`, after `turbo run frame`. Families run side
+ * by side on the workers `@fusion.dev/scripts/pool` decides, and `--workers 1`
+ * takes them one at a time.
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
+import { pool } from '@fusion.dev/scripts/pool'
 import { root, SOURCE, TAG_PREFIX } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -81,11 +84,6 @@ if (examples.length === 0) {
   process.exit(1)
 }
 
-const browser = await chromium.launch()
-const page = await browser.newPage()
-
-const noise = []
-page.on('pageerror', (error) => noise.push(`threw: ${error.message}`))
 /* A request that failed is not a component that failed.
  *
  * The browser reports a 404 as a `console.error`, and `avatar/broken-image`
@@ -119,63 +117,84 @@ const NETWORK = /Failed to load resource/
  * follow: `filter-input-examples.dom.spec.ts` is the first. */
 const AUDIT = /is controlled: `/
 
-page.on('console', (message) => {
-  const text = message.text()
-  if (message.type() === 'error' && !NETWORK.test(text)) {
-    noise.push(`console.error: ${text}`)
-  }
-  if (message.type() === 'warning' && AUDIT.test(text)) {
-    noise.push(`controlled and unattended: ${text}`)
-  }
-})
+const browser = await chromium.launch()
 
-await page.goto(`${origin}/frame.html`, { waitUntil: 'load' })
+/* **A frame of its own for every family**, on the workers `pool` decides. The
+   bundle defines every family either way, so no definitions are at stake as
+   they were for the specs; what a fresh frame removes is whatever the family
+   before it left running, whose error would otherwise land in the next
+   family's noise and be charged to an example that did nothing. Failures are
+   listed in the order the examples were read, whichever worker rendered them.
 
-const failures = []
-
-for (const example of examples) {
-  noise.length = 0
-  const result = await page.evaluate(
-    async ({ html, prefix, styles }) => {
-      window.postMessage(
-        { layout: 'padded', source: html, styles, type: 'helix-preview-render' },
-        '*',
-      )
-      /* Two frames and a tick. One is not enough: an element upgrades, renders,
-       and several of these place themselves in a `requestAnimationFrame` after
-       that. */
-      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-      await new Promise((done) => setTimeout(done, 50))
-
-      const host = document.getElementById('preview-root')
-      const tags = [...host.querySelectorAll('*')].filter((element) =>
-        element.tagName.toLowerCase().startsWith(prefix),
-      )
-      return {
-        painted: host.getBoundingClientRect().height,
-        unupgraded: [
-          ...new Set(
-            tags
-              .filter((element) => !customElements.get(element.tagName.toLowerCase()))
-              .map((element) => element.tagName.toLowerCase()),
-          ),
-        ],
+   Measured 14 Sep 2026 on twelve cores, 567 examples clean every time: 70
+   seconds on the one shared page this replaced, 23 on four workers, and 88 on
+   one, the difference being a frame loaded per family. */
+const families = [...Map.groupBy(examples, (one) => one.name.split('/')[0]).values()]
+const byFamily = await pool(families, {
+  browser,
+  run: async (page, family) => {
+    const noise = []
+    page.on('pageerror', (error) => noise.push(`threw: ${error.message}`))
+    page.on('console', (message) => {
+      const text = message.text()
+      if (message.type() === 'error' && !NETWORK.test(text)) {
+        noise.push(`console.error: ${text}`)
       }
-    },
-    { ...example, prefix: TAG_PREFIX },
-  )
+      if (message.type() === 'warning' && AUDIT.test(text)) {
+        noise.push(`controlled and unattended: ${text}`)
+      }
+    })
 
-  const problems = [...noise]
-  if (result.unupgraded.length > 0) {
-    problems.push(`never upgraded: ${result.unupgraded.join(', ')}`)
-  }
-  if (result.painted === 0) {
-    problems.push('rendered nothing at all')
-  }
-  if (problems.length > 0) {
-    failures.push(`${example.name}\n    ${problems.join('\n    ')}`)
-  }
-}
+    await page.goto(`${origin}/frame.html`, { waitUntil: 'load' })
+
+    const broken = []
+    for (const example of family) {
+      noise.length = 0
+      const result = await page.evaluate(
+        async ({ html, prefix, styles }) => {
+          window.postMessage(
+            { layout: 'padded', source: html, styles, type: 'helix-preview-render' },
+            '*',
+          )
+          /* Two frames and a tick. One is not enough: an element upgrades, renders,
+           and several of these place themselves in a `requestAnimationFrame` after
+           that. */
+          await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+          await new Promise((done) => setTimeout(done, 50))
+
+          const host = document.getElementById('preview-root')
+          const tags = [...host.querySelectorAll('*')].filter((element) =>
+            element.tagName.toLowerCase().startsWith(prefix),
+          )
+          return {
+            painted: host.getBoundingClientRect().height,
+            unupgraded: [
+              ...new Set(
+                tags
+                  .filter((element) => !customElements.get(element.tagName.toLowerCase()))
+                  .map((element) => element.tagName.toLowerCase()),
+              ),
+            ],
+          }
+        },
+        { ...example, prefix: TAG_PREFIX },
+      )
+
+      const problems = [...noise]
+      if (result.unupgraded.length > 0) {
+        problems.push(`never upgraded: ${result.unupgraded.join(', ')}`)
+      }
+      if (result.painted === 0) {
+        problems.push('rendered nothing at all')
+      }
+      if (problems.length > 0) {
+        broken.push(`${example.name}\n    ${problems.join('\n    ')}`)
+      }
+    }
+    return broken
+  },
+})
+const failures = byFamily.flat()
 
 await browser.close()
 server.close()
