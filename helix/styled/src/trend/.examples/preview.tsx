@@ -1,3 +1,5 @@
+import './preview.css'
+
 export function Example() {
   return (
     <helix-flex

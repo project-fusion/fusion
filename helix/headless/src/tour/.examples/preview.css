@@ -57,15 +57,25 @@ helix-headless-icon::part(svg) {
   inline-size: 100%;
 }
 
-/* What each stop says, a title over a line or two. */
+/* What each stop says, a title over a line or two, in a card inset from the
+   bubble's edge by the width of a button's own padding: the title then starts
+   on the same line as the word Skip under it. */
+helix-headless-tour-stop helix-headless-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
 helix-headless-tour-stop h3,
 helix-headless-tour-stop p {
   margin: 0;
 }
 
 helix-headless-tour-stop h3 {
-  font-size: 1.125rem;
+  color: var(--_gray-strong);
+  font-size: 1.5rem;
   font-weight: 600;
+  line-height: calc(0.99em + 0.5rem);
 }
 
 helix-headless-tour-stop p {
@@ -78,7 +88,8 @@ helix-headless-tour-stop p {
    interface to be a tour of, so the page draws one, a framed app with a
    quiet rail down its side, a bar of controls and a sheet under the bar. */
 .app {
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-surface);
   display: grid;
   grid-template-columns: 11rem minmax(0, 1fr);
   margin-block-end: 1.5rem;
@@ -87,7 +98,7 @@ helix-headless-tour-stop p {
 
 .rail {
   background-color: var(--_gray-subtle);
-  border-inline-end: 1px solid var(--_gray-line);
+  border-inline-end: 1px solid var(--_gray-edge);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -111,10 +122,26 @@ helix-headless-tour-stop p {
 
 .bar {
   align-items: center;
-  border-block-end: 1px solid var(--_gray-line);
+  border-block-end: 1px solid var(--_gray-edge);
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
+}
+
+/* On a phone the rail goes over the document rather than beside it, which is
+   what an app does there. Beside it, the document is left 170px and the bar
+   runs out through the frame. The page's width, so a media query: this is the
+   page's layout and not the component's. */
+@media (width < 32rem) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    border-block-end: 1px solid var(--_gray-edge);
+    border-inline-end: 0;
+  }
 }
 
 .sheet {
@@ -140,6 +167,13 @@ helix-headless-tour-stop p {
   margin: 0;
 }
 
+/* The host is the box a stop is placed against, so it takes the button's own
+   box. Left inline it is a line box a line of text tall, in the middle of the
+   button, and a bubble placed against it lands on the button. */
+helix-headless-button {
+  display: inline-flex;
+}
+
 /* Every button at control height on a quiet fill, and the one that publishes
    filled at full strength as the thing to press. */
 helix-headless-button::part(button),
@@ -150,7 +184,8 @@ helix-headless-tour-stop::part(skip-button) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;
@@ -162,6 +197,11 @@ helix-headless-tour-stop::part(skip-button) {
   line-height: 1.2;
   padding-inline: 1rem;
   white-space: nowrap;
+}
+
+helix-headless-button::part(button):hover,
+helix-headless-tour-stop::part(back-button):hover {
+  border-color: var(--_gray-line);
 }
 
 #publish::part(button),
@@ -181,6 +221,7 @@ helix-headless-icon-button::part(button) {
   align-items: center;
   block-size: 2.5rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -213,11 +254,25 @@ helix-headless-tour-stop {
   display: contents;
 }
 
-/* The panel pointing at the target. `overflow: visible` because the UA gives
-   a popover `overflow: auto`, which clips the half of the arrow outside it. */
+/* The light on the current target, which is a shadow rather than a hole: a
+   box the size of the target and its padding, whose spread dims the rest of
+   the page. */
+helix-headless-tour::part(spotlight) {
+  border-radius: var(--_radius-surface);
+  box-shadow: 0 0 0 100vmax light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.64));
+  pointer-events: none;
+  position: fixed;
+  z-index: 1000;
+}
+
+/* The panel pointing at the target, over the page on a shadow as a popover
+   is. `overflow: visible` because the UA gives a popover `overflow: auto`,
+   which clips the half of the arrow outside it. */
 helix-headless-tour-stop::part(bubble) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
   box-sizing: border-box;
   color: var(--_gray-strong);
   display: flex;
@@ -241,6 +296,36 @@ helix-headless-tour-stop::part(arrow) {
   inline-size: 0.5rem;
   position: absolute;
   rotate: 45deg;
+}
+
+/* Half the square outside the bubble, edged on the two sides that show, on
+   the edge facing the target. The component writes where along that edge it
+   sits. Which edge is read from the stop's own `placement`, since the side it
+   landed on is an attribute inside the shadow root and `::part()` cannot be
+   followed by one; a stop with none is placed below its target. */
+helix-headless-tour-stop:not([placement])::part(arrow),
+helix-headless-tour-stop[placement^="bottom"]::part(arrow) {
+  border-block-start: 1px solid var(--_gray-edge);
+  border-inline-start: 1px solid var(--_gray-edge);
+  inset-block-start: -0.25rem;
+}
+
+helix-headless-tour-stop[placement^="top"]::part(arrow) {
+  border-block-end: 1px solid var(--_gray-edge);
+  border-inline-end: 1px solid var(--_gray-edge);
+  inset-block-end: -0.25rem;
+}
+
+helix-headless-tour-stop[placement^="right"]::part(arrow) {
+  border-block-end: 1px solid var(--_gray-edge);
+  border-inline-start: 1px solid var(--_gray-edge);
+  inset-inline-start: -0.25rem;
+}
+
+helix-headless-tour-stop[placement^="left"]::part(arrow) {
+  border-block-start: 1px solid var(--_gray-edge);
+  border-inline-end: 1px solid var(--_gray-edge);
+  inset-inline-end: -0.25rem;
 }
 
 helix-headless-tour-stop::part(content) {

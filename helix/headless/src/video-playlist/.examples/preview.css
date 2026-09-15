@@ -68,6 +68,7 @@ helix-headless-video::part(stage) {
   /* A player's stage is dark whatever the page is, as the styled one is, so
      the ramp resolves to its light-mode values in here: the strong gray is the
      stage and the surface gray is its ink, in both modes. */
+  border-radius: var(--_radius-surface);
   color-scheme: light;
   display: block;
   overflow: hidden;
@@ -100,10 +101,13 @@ helix-headless-video::part(poster) {
   position: absolute;
 }
 
-/* Centered over the picture, in the stage's opposite ink. */
+/* Centered over the picture, in the stage's opposite ink on a backing of
+   the stage's own, since the picture under it may be a light poster. */
 helix-headless-video::part(loading),
 helix-headless-video::part(failure) {
   align-items: center;
+  background-color: color-mix(in srgb, var(--_gray-strong) 72%, transparent);
+  border-radius: var(--_radius-surface);
   color: var(--_gray-surface);
   display: flex;
   font-size: 0.8125rem;
@@ -180,6 +184,23 @@ helix-headless-video::part(back) {
   inset-inline-start: 0.75rem;
   position: absolute;
   z-index: 10;
+}
+
+/* The shading the bar sits on, reaching higher than the bar does, so its
+   light ink reads over a light picture. A `::before` so it paints under the
+   bar, which comes after it, and over the video, which is not positioned. */
+helix-headless-video::part(stage)::before {
+  background-image: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--_gray-strong) 64%, transparent),
+    transparent
+  );
+  block-size: 4.5rem;
+  content: "";
+  inset-block-end: 0;
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
 }
 
 /* The bar along the bottom of the picture, in the stage's opposite ink. */
@@ -379,6 +400,7 @@ helix-headless-video-playlist-item {
 helix-headless-video-playlist-item::part(item) {
   all: unset;
   align-items: center;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
@@ -399,11 +421,16 @@ helix-headless-video-playlist-item::part(item-current) {
 
 helix-headless-video-playlist-item::part(item-current)::before {
   background-color: var(--_gray-strong);
+  border-radius: 9999px;
   content: "";
   inline-size: 2px;
   inset-block: 0.25rem;
   inset-inline-start: 0.25rem;
   position: absolute;
+}
+
+helix-headless-video-playlist-item:not([disabled])::part(item):hover {
+  background-color: var(--_gray-subtle);
 }
 
 helix-headless-video-playlist-item[disabled]::part(item) {
@@ -413,6 +440,7 @@ helix-headless-video-playlist-item[disabled]::part(item) {
 
 helix-headless-video-playlist-item::part(media) {
   aspect-ratio: 16 / 9;
+  border-radius: var(--_radius-control);
   flex: none;
   inline-size: 5rem;
   overflow: hidden;
@@ -473,7 +501,8 @@ helix-headless-video-playlist-menu::part(trigger):focus-visible {
 
 helix-headless-video-playlist-menu::part(menu-surface) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   color: var(--_gray-strong);
   padding: 0.25rem 0;
 }

@@ -23,8 +23,24 @@
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
+  flex-wrap: wrap;
   gap: var(--helix-space-sm);
   padding: var(--helix-space-sm) var(--helix-space-md);
+}
+
+/* On a phone the rail goes over the document rather than beside it, which is
+   what an app does there. Beside it, the document is left 170px and the bar
+   runs out through the frame. The page's width, so a media query: this is the
+   page's layout and not the component's. */
+@media (width < 32rem) {
+  .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rail {
+    border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+    border-inline-end: 0;
+  }
 }
 
 .sheet {

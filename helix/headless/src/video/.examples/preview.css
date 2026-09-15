@@ -68,6 +68,7 @@ helix-headless-video::part(stage) {
   /* A player's stage is dark whatever the page is, as the styled one is, so
      the ramp resolves to its light-mode values in here: the strong gray is the
      stage and the surface gray is its ink, in both modes. */
+  border-radius: var(--_radius-surface);
   color-scheme: light;
   display: block;
   overflow: hidden;
@@ -100,10 +101,13 @@ helix-headless-video::part(poster) {
   position: absolute;
 }
 
-/* Centered over the picture, in the stage's opposite ink. */
+/* Centered over the picture, in the stage's opposite ink on a backing of
+   the stage's own, since the picture under it may be a light poster. */
 helix-headless-video::part(loading),
 helix-headless-video::part(failure) {
   align-items: center;
+  background-color: color-mix(in srgb, var(--_gray-strong) 72%, transparent);
+  border-radius: var(--_radius-surface);
   color: var(--_gray-surface);
   display: flex;
   font-size: 0.8125rem;
@@ -180,6 +184,23 @@ helix-headless-video::part(back) {
   inset-inline-start: 0.75rem;
   position: absolute;
   z-index: 10;
+}
+
+/* The shading the bar sits on, reaching higher than the bar does, so its
+   light ink reads over a light picture. A `::before` so it paints under the
+   bar, which comes after it, and over the video, which is not positioned. */
+helix-headless-video::part(stage)::before {
+  background-image: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--_gray-strong) 64%, transparent),
+    transparent
+  );
+  block-size: 4.5rem;
+  content: "";
+  inset-block-end: 0;
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
 }
 
 /* The bar along the bottom of the picture, in the stage's opposite ink. */

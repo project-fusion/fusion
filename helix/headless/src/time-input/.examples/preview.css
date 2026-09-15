@@ -62,12 +62,17 @@ helix-headless-time-input {
 helix-headless-time-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   display: flex;
   gap: 0.25rem;
   min-block-size: 2.5rem;
   padding: 0.25rem 0.5rem;
+}
+
+helix-headless-time-input::part(field):hover {
+  border-color: var(--_gray-line);
 }
 
 helix-headless-time-input::part(control) {
@@ -99,12 +104,95 @@ helix-headless-time-input::part(trigger-icon) {
   inline-size: 1.25rem;
 }
 
+/* The panel under the field and as wide as it, since its rows are the same
+   words the field shows. `inset: auto` and `margin: 0` because the UA centers
+   a popover in the window, and the position the component writes is measured
+   from where the box would otherwise sit. */
 helix-headless-time-input::part(surface) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
+  box-sizing: border-box;
   color: var(--_gray-strong);
+  inline-size: var(--floating-anchor-inline-size, 100%);
+  inset: auto;
+  margin: 0;
   min-inline-size: max-content;
+  overflow: hidden;
   padding: 0.25rem 0;
+}
+
+helix-headless-time-input::part(picker) {
+  display: block;
+}
+
+/* The list's name is the field's label, so it is read out and not shown.
+   Clipped rather than removed, so it stays in the accessibility tree. */
+helix-headless-time-input::part(picker-list-label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Bounded, and scrolling inside the bound: a day at a quarter hour is
+   ninety-six rows. Seven of them, an odd number, because the list opens with
+   the chosen time in the middle and at eight it opened with half a row cut off
+   at each end. */
+helix-headless-time-input::part(picker-list-items) {
+  display: flex;
+  flex-direction: column;
+  max-block-size: 14rem;
+  overflow-y: auto;
+}
+
+helix-headless-time-input::part(picker-option) {
+  display: block;
+}
+
+/* A row at a fixed minimum, inset as the field's text is, so the time in the
+   field and the times under it start on one line. */
+helix-headless-time-input::part(picker-option-item) {
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  min-block-size: 2rem;
+  padding: 0.25rem 0.5rem;
+  user-select: none;
+}
+
+helix-headless-time-input::part(picker-option-item):hover,
+helix-headless-time-input::part(picker-option-item-active) {
+  background-color: var(--_gray-subtle);
+}
+
+helix-headless-time-input::part(picker-option-label) {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The tick at the end of the chosen row, masked from a drawing so it takes the
+   row's ink. */
+helix-headless-time-input::part(picker-option-item-selected)::after {
+  background-color: currentColor;
+  block-size: 1rem;
+  content: "";
+  flex: none;
+  inline-size: 1rem;
+  margin-inline-start: auto;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
 }
 
 helix-headless-time-input::part(time-dismiss-mark) {

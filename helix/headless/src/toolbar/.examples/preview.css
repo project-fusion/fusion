@@ -68,12 +68,18 @@ helix-headless-icon-button::part(button) {
   align-items: center;
   block-size: 2rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
   display: inline-flex;
   inline-size: 2rem;
   justify-content: center;
+}
+
+helix-headless-icon-button::part(button):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
 }
 
 helix-headless-toolbar helix-headless-icon {

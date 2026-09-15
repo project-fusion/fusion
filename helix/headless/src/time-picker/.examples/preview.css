@@ -86,6 +86,11 @@ helix-headless-time-picker::part(option-item) {
   user-select: none;
 }
 
+helix-headless-time-picker::part(option-item):hover,
+helix-headless-time-picker::part(option-item-active) {
+  background-color: var(--_gray-subtle);
+}
+
 helix-headless-time-picker::part(option-label) {
   min-inline-size: 0;
   overflow: hidden;
@@ -140,11 +145,13 @@ helix-headless-time-picker::part(list-items):focus-visible {
 }
 
 /* No frame of its own: the list is the picker, and a picker set inside a
-   field's panel would otherwise draw a box in a box. */
+   field's panel would otherwise draw a box in a box. Seven rows tall, an odd
+   number, because the list comes to rest with its chosen time in the middle
+   and at eight it rested with half a row cut off at each end. */
 helix-headless-time-picker::part(list-items),
 helix-headless-time-picker::part(column-items) {
   display: flex;
   flex-direction: column;
-  max-block-size: 16rem;
+  max-block-size: 14rem;
   overflow-y: auto;
 }

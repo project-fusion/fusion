@@ -88,6 +88,8 @@ helix-headless-toast-item {
 helix-headless-toast-item::part(item) {
   align-items: start;
   background-color: var(--_gray-strong);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
   box-sizing: border-box;
   color: var(--_gray-surface);
   display: grid;
@@ -132,6 +134,7 @@ helix-headless-toast-item > [slot="actions"] {
 helix-headless-toast-item::part(dismiss) {
   all: unset;
   block-size: 2rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-mark);
   cursor: pointer;
@@ -158,13 +161,14 @@ helix-headless-toast-item::part(timer) {
   position: absolute;
 }
 
-/* The action, at the row's control height and edged rather than filled, so it
-   reads on the strong surface in either scheme. */
+/* The action, at the row's control height on a wash of the message's own ink,
+   so it reads as a quiet button on the strong surface in either scheme. */
 helix-headless-button::part(button) {
   all: unset;
   align-items: center;
+  background-color: color-mix(in srgb, var(--_gray-surface) 12%, transparent);
   block-size: 2rem;
-  border: 1px solid var(--_gray-muted);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-surface);
   cursor: pointer;
@@ -175,6 +179,12 @@ helix-headless-button::part(button) {
   line-height: 1.2;
   padding-inline: 1rem;
   white-space: nowrap;
+}
+
+helix-headless-toast-item::part(dismiss):hover,
+helix-headless-button::part(button):hover {
+  background-color: color-mix(in srgb, var(--_gray-surface) 20%, transparent);
+  color: var(--_gray-surface);
 }
 
 /* The keyboard reaches these, so the rings go here. Taking the UA outline

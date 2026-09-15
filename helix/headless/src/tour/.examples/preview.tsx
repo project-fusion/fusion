@@ -65,12 +65,12 @@ export function Example() {
         {' '}
         <helix-headless-tour-stop
           for="rail"
-          placement="right-start"
+          placement="bottom-start"
         >
           {' '}
           <helix-headless-card>
             {' '}
-            <h3>Everything lives here</h3>{' '}
+            <h3 slot="header">Everything lives here</h3>{' '}
             <p> Drafts, published work and the archive. Nothing is ever deleted. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
@@ -78,7 +78,7 @@ export function Example() {
           {' '}
           <helix-headless-card>
             {' '}
-            <h3>Write in the open</h3>{' '}
+            <h3 slot="header">Write in the open</h3>{' '}
             <p>
               {' '}
               Saved as you type. There is no save button because there is nothing to press.{' '}
@@ -92,7 +92,7 @@ export function Example() {
           {' '}
           <helix-headless-card>
             {' '}
-            <h3>See it as a reader would</h3>{' '}
+            <h3 slot="header">See it as a reader would</h3>{' '}
             <p> Opens the same page anybody with the link gets. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}
@@ -103,7 +103,7 @@ export function Example() {
           {' '}
           <helix-headless-card>
             {' '}
-            <h3>And when it is ready</h3>{' '}
+            <h3 slot="header">And when it is ready</h3>{' '}
             <p> Publishing is reversible. The archive keeps every version you ever had. </p>{' '}
           </helix-headless-card>{' '}
         </helix-headless-tour-stop>{' '}

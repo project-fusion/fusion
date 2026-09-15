@@ -80,10 +80,15 @@ export function Example() {
       >
         <helix-tour-stop
           for="rail"
-          placement="right-start"
+          placement="bottom-start"
         >
           <helix-card separation="plain">
-            <helix-text as="h3">Everything lives here</helix-text>
+            <helix-text
+              as="h3"
+              slot="header"
+            >
+              Everything lives here
+            </helix-text>
             <helix-text emphasis="muted">
               Drafts, published work and the archive. Nothing is ever deleted.
             </helix-text>
@@ -92,7 +97,12 @@ export function Example() {
 
         <helix-tour-stop for="sheet">
           <helix-card separation="plain">
-            <helix-text as="h3">Write in the open</helix-text>
+            <helix-text
+              as="h3"
+              slot="header"
+            >
+              Write in the open
+            </helix-text>
             <helix-text emphasis="muted">
               Saved as you type. There is no save button because there is nothing to press.
             </helix-text>
@@ -104,7 +114,12 @@ export function Example() {
           placement="bottom"
         >
           <helix-card separation="plain">
-            <helix-text as="h3">See it as a reader would</helix-text>
+            <helix-text
+              as="h3"
+              slot="header"
+            >
+              See it as a reader would
+            </helix-text>
             <helix-text emphasis="muted">
               Opens the same page anybody with the link gets.
             </helix-text>
@@ -116,7 +131,12 @@ export function Example() {
           placement="bottom-start"
         >
           <helix-card separation="plain">
-            <helix-text as="h3">And when it is ready</helix-text>
+            <helix-text
+              as="h3"
+              slot="header"
+            >
+              And when it is ready
+            </helix-text>
             <helix-text emphasis="muted">
               Publishing is reversible. The archive keeps every version you ever had.
             </helix-text>

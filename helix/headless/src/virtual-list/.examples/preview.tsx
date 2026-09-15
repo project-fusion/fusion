@@ -10,22 +10,21 @@ import './preview.css'
    JSX children the list draws the right number of rows and every one of them is
    empty. Assigning `innerHTML` on a template parses into `content`, which is
    the behavior the HTML parser gives the markup example for free. */
+const ORDINAL = new Intl.PluralRules('en-US', { type: 'ordinal' })
+const SUFFIX: Record<string, string> = { few: 'rd', one: 'st', other: 'th', two: 'nd' }
 const rows = Array.from({ length: 2000 }, (_, index) => ({
   name: `Row ${index + 1}`,
-  note: `the ${index + 1}th of two thousand`,
+  note: `the ${(index + 1).toLocaleString('en-US')}${SUFFIX[ORDINAL.select(index + 1)]} of two thousand`,
 }))
 
 /* The example's own stylesheet, which the HTML file carries as a `<style>`
    block. `dangerouslySetInnerHTML` because CSS is full of braces and JSX reads a
    brace in children as an expression: written as a child it is a syntax error,
    and there is no `.css` file beside this example to import instead. */
-const SHEET = `\n  .virtualRow {\n    align-items: baseline;\n    block-size: 32px;\n    display: flex;\n    gap: 0.5rem;\n    padding-inline: 0.5rem;\n  }\n`
+const SHEET = `\n  .virtualRow {\n    align-content: center;\n    align-items: baseline;\n    block-size: 32px;\n    display: grid;\n    gap: 0.75rem;\n    grid-template-columns: 4.5rem minmax(0, 1fr);\n    padding-inline: 0.75rem;\n  }\n`
 
 /* Byte for byte what the HTML example's `<template>` holds, indentation
-   included. The whitespace is not decoration: `<strong>` and `<span>` are
-   inline, so the newline between them is the space separating a row's name from
-   its note. Written without it the two words run together, which the picture
-   comparison catches as 10,470 pixels on an example that otherwise matches. */
+   included, so the two examples clone the same nodes and picture the same. */
 const ROW = `
     <div class="virtualRow">
       <strong data-field="name"></strong>

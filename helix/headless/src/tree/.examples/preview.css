@@ -65,8 +65,14 @@ helix-headless-tree-item {
   display: block;
 }
 
+/* One gap between every pair of rows, whatever their depth: a parent's row
+   and its group, and the items in a group, are all spaced by the same flex
+   gap. A margin under each item added up instead, a parent's under its last
+   child's, so the gaps in this tree came out 0, 4 and 8px. */
 helix-headless-tree-item::part(item) {
-  margin-block-end: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 /* A padded row, each level in by the chevron and the gap after it, so a child
@@ -74,6 +80,7 @@ helix-headless-tree-item::part(item) {
 helix-headless-tree-item::part(row) {
   align-items: center;
   block-size: max(2rem, calc(1lh + 1rem));
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -91,10 +98,6 @@ helix-headless-tree-item::part(row) {
    label lines up with its siblings'. */
 helix-headless-tree-item:not(:has(> [slot="children"]))::part(row) {
   padding-inline-start: calc(0.5rem + (var(--tree-level, 1) - 1) * 1.25rem + 1.25rem);
-}
-
-helix-headless-tree-item[slot="children"]::part(row) {
-  font-size: 0.75rem;
 }
 
 helix-headless-tree-item:state(selected)::part(row) {
@@ -128,6 +131,7 @@ helix-headless-tree-item::part(group) {
   align-items: stretch;
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 }
 
 /* And closed still means closed.

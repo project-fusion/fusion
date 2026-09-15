@@ -94,7 +94,8 @@ helix-headless-toggle-group::part(row) {
    a quarter rem inside its edge. */
 helix-headless-toggle-group::part(track) {
   background-color: var(--_gray-subtle);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   display: inline-flex;
   flex: 1 1 auto;
@@ -106,11 +107,15 @@ helix-headless-toggle-group::part(track) {
 
 /* The selected option is raised by one box that travels rather than by a
    fill on each option. Sized from the option it marks, which the component
-   measures and publishes. */
+   measures and publishes. Lighter than the groove and lifted by a shadow
+   rather than framed, since a frame inside the track's frame reads as a box
+   in a box; its corner is the track's less the border, so the two curves
+   are concentric. */
 helix-headless-toggle-group::part(indicator) {
-  background-color: var(--_gray-surface);
+  background-color: light-dark(#fff, var(--_gray-fill));
   block-size: var(--indicator-block-size, 0);
-  border: 1px solid var(--_gray-line);
+  border-radius: calc(var(--_radius-control) - 1px);
+  box-shadow: 0 1px 2px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.3));
   box-sizing: border-box;
   inline-size: var(--indicator-inline-size, 0);
   inset-block-start: 0;
@@ -132,6 +137,7 @@ helix-headless-toggle::part(item) {
   all: unset;
   align-items: center;
   block-size: calc(2rem - 2px);
+  border-radius: calc(var(--_radius-control) - 1px);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
