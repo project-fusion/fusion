@@ -39,7 +39,7 @@
   font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
-  --_gray-edge: light-dark(#e6e6e8, #26262a);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
   --_gray-mark: light-dark(#8e8e96, #86868f);
@@ -86,14 +86,13 @@ helix-headless-button {
 
 /* The styled button at rest: a quiet fill inside a hairline, at the control
    height. `all: unset` first, so the UA's own button is gone before anything
-   is drawn on it. The hairline is `edge` in light and `fill` in dark, where
-   `edge` is 1.02:1 on this fill and the seams between the buttons vanish. */
+   is drawn on it. */
 helix-headless-button::part(button) {
   all: unset;
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid light-dark(var(--_gray-edge), var(--_gray-fill));
+  border: 1px solid var(--_gray-edge);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;

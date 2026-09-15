@@ -33,7 +33,7 @@
   font-family: system-ui, sans-serif;
   --_gray-surface: light-dark(#fafafa, #18181b);
   --_gray-subtle: light-dark(#f0f0f1, #232326);
-  --_gray-edge: light-dark(#e6e6e8, #26262a);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
   --_gray-fill: light-dark(#e2e2e5, #2f2f33);
   --_gray-line: light-dark(#c9c9ce, #45454b);
   --_gray-mark: light-dark(#8e8e96, #86868f);
@@ -114,7 +114,7 @@ helix-headless-combobox::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
   border-radius: var(--_radius-control);
-  box-shadow: 0 0.75rem 2rem light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.5));
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
   box-sizing: border-box;
   color: var(--_gray-strong);
   inline-size: var(--floating-anchor-inline-size, 100%);
