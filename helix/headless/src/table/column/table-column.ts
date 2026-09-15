@@ -6,7 +6,7 @@ import {
   requestChange,
 } from '@fusion.dev/helix-core'
 import { dotsThreeVertical } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
@@ -350,6 +350,20 @@ export class HelixHeadlessTableColumn extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
     this.observeHeading()
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* **The table reads this column in its own render, and a property changing
+       here is nothing the table hears.** A resize in a `helix-table` moved the
+       separator and left the track where it was, the track list being composed
+       from every column's width once and never again. Asked of whatever holds
+       the column rather than of a table by name: both tables are Lit elements
+       that read it when they render, and a column held by anything else has
+       nobody to tell. */
+    if (changed.has('width')) {
+      ;(this.parentElement as Partial<ReactiveElement> | null)?.requestUpdate?.()
+    }
   }
 
   /**
