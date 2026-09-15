@@ -119,6 +119,33 @@ const run = (binary) => {
   process.exit(status ?? 70)
 }
 
+/* **In this repository, cargo is asked first, and asking is cheap.** A binary
+   under `target/` is whatever the last build left, so after an edit to a rule,
+   or a branch switch, this ran the old rules against the new tree: measured on
+   14 Sep 2026, a checkout judged by a prose rule the branch did not have. So
+   where there is a crate and a cargo, the build comes first and the debug
+   binary it leaves is the one that runs.
+
+   **`--workspace`, the selection `rs:build` and CI build.** Cargo unifies
+   features per selection, so alternating `-p fusion-cli` with `--workspace`
+   recompiled on every switch, about a second each, where asking for the same
+   selection twice is 0.14s. `FUSION_BIN` still outranks everything, and a checkout
+   with no cargo falls through to whatever is already built. */
+if (process.env.FUSION_BIN === undefined && hasCargo()) {
+  const fresh = spawnSync('cargo', ['build', '--workspace', '--quiet'], {
+    cwd: WORKSPACE,
+    stdio: 'inherit',
+  })
+  if (fresh.status !== 0) {
+    console.error('fusion: the build failed, so there is nothing current to run.')
+    process.exit(fresh.status ?? 70)
+  }
+  const current = join(target, 'debug', NAME)
+  if (existsSync(current)) {
+    run(current)
+  }
+}
+
 const found = process.env.FUSION_BIN ?? built()
 if (found && existsSync(found)) {
   run(found)
@@ -142,8 +169,8 @@ if (!hasCargo()) {
   process.exit(69)
 }
 
-console.error('fusion: no binary yet, building it once (cargo build -p fusion-cli)')
-const build = spawnSync('cargo', ['build', '-p', 'fusion-cli'], {
+console.error('fusion: no binary yet, building it once (cargo build --workspace)')
+const build = spawnSync('cargo', ['build', '--workspace'], {
   cwd: WORKSPACE,
   stdio: 'inherit',
 })
