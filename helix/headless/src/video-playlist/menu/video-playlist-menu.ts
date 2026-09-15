@@ -74,7 +74,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   @property()
   placement = 'top-end'
 
-  #observer: MutationObserver | undefined
+  private observer: MutationObserver | undefined
 
   override connectedCallback(): void {
     super.connectedCallback()
@@ -86,8 +86,8 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-before-open', this.reread)
-    this.#observer?.disconnect()
-    this.#observer = undefined
+    this.observer?.disconnect()
+    this.observer = undefined
   }
 
   /* Resolved once, on the client, and never during a render.
@@ -100,11 +100,11 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    * on a server, and the server has no tree to walk anyway. Set after the first
    * update, and `undefined` on the server, where an empty menu is the honest
    * output. */
-  #playlist: HelixHeadlessVideoPlaylist | undefined
+  private foundPlaylist: HelixHeadlessVideoPlaylist | undefined
 
   /** The playlist this menu belongs to, found upward through the slots. */
   private get playlist(): HelixHeadlessVideoPlaylist | undefined {
-    return this.#playlist
+    return this.foundPlaylist
   }
 
   /** The playlist's entries, in the order it holds them. */
@@ -134,14 +134,14 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    * can see.
    */
   private watch(): void {
-    this.#playlist ??= closestInstance(this, HelixHeadlessVideoPlaylist) ?? undefined
-    const playlist = this.#playlist
-    if (!playlist || this.#observer) {
+    this.foundPlaylist ??= closestInstance(this, HelixHeadlessVideoPlaylist) ?? undefined
+    const playlist = this.playlist
+    if (!playlist || this.observer) {
       return
     }
     this.addEventListener('helix-before-open', this.reread)
-    this.#observer = new MutationObserver(this.reread)
-    this.#observer.observe(playlist, { childList: true, subtree: true })
+    this.observer = new MutationObserver(this.reread)
+    this.observer.observe(playlist, { childList: true, subtree: true })
     this.reread()
   }
 

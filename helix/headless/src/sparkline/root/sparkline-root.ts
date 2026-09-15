@@ -178,7 +178,7 @@ export class HelixHeadlessSparkline extends HelixElement {
   }
 
   /** The series to draw: the table if there is one, the attribute otherwise. */
-  #points(): number[] {
+  private points(): number[] {
     const series = this.source.series
     return series.length > 0
       ? (series[0]?.points.map((point) => point.value) ?? [])
@@ -186,7 +186,7 @@ export class HelixHeadlessSparkline extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    const points = this.#points()
+    const points = this.points()
     /* Two points minimum, because one is not a trend and zero is not a line.
        An `<svg>` given a `d` of `M NaN,NaN` draws nothing and reports nothing,
        so the empty case is stated here rather than left to look like a bug. */
