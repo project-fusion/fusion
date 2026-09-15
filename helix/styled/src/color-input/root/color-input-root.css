@@ -93,13 +93,15 @@
   position: absolute;
 }
 
-/* Square corners on the picker's own square, since the panel is doing the
-   rounding now, and the room the picker needs under it. */
+/* **Inset on every side, the square included.** Run to the panel's edges, the
+   square put its handle on the panel's corner for every field without a value
+   (hue 0 at full saturation and brightness is the top right), where the
+   panel's `overflow: hidden` cut it to a quarter circle. Inset by `sm`, the
+   handle stands whole, the square keeps its own corner, and every row sits on
+   the one column. */
 [part="picker"] {
-  --color-picker-grid-radius: var(--helix-radii-none);
-  --color-picker-padding: var(--helix-space-sm);
-
   display: block;
+  padding: var(--helix-space-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
