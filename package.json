@@ -24,7 +24,7 @@
     "check:gen:metrics": "turbo run build --filter=@fusion.dev/helix --filter=@fusion.dev/helix-headless --filter=@fusion.dev/helix-styles --filter=@fusion.dev/helix-theme && bun fusion/scripts/build-metrics.mjs --check",
     "check:prose": "bun run fusion prose check",
     "check:spec": "bun run fusion spec check && bun run check:spec:diagnostics && bun run check:spec:floors && bun run check:spec:visual && bun run check:spec:visual-parity && bun run check:spec:dsd",
-    "check:spec:diagnostics": "turbo run analyze frame && bun fusion/scripts/check-diagnostics.mjs",
+    "check:spec:diagnostics": "turbo run @fusion.dev/helix#analyze @fusion.dev/helix-headless#analyze frame && bun fusion/scripts/check-diagnostics.mjs",
     "check:spec:dsd": "turbo run frame && bun fusion/scripts/check-dsd.mjs",
     "check:spec:floors": "bun fusion/scripts/check-floors.mjs",
     "check:spec:visual": "turbo run frame && bun fusion/scripts/check-visual.mjs",
