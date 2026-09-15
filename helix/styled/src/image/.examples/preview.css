@@ -1,7 +1,9 @@
 /* The box is the consumer's to choose: an image has no size of its own until
-   something gives it one. */
+   something gives it one. Capped at the room there is, or a phone's column is
+   narrower than the picture and it runs off the side. */
 helix-image {
   --image-aspect: 16 / 9;
 
   inline-size: 24rem;
+  max-inline-size: 100%;
 }

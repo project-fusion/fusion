@@ -22,3 +22,9 @@
 
   color: var(--helix-color-foreground-muted);
 }
+
+/* The base layer gives a bare `code` no face, and the user agent's `monospace`
+   for it is Courier in Chromium. */
+.feed code {
+  font-family: var(--helix-font-mono);
+}

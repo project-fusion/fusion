@@ -4,4 +4,5 @@ helix-image {
   --image-aspect: 4 / 3;
 
   inline-size: 20rem;
+  max-inline-size: 100%;
 }
