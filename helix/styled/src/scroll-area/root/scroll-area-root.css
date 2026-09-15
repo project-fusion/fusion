@@ -83,11 +83,20 @@
 
 /* The sideways pair, on an element of its own because the host has two
    pseudo-elements and four edges want four. Placed with logical properties, so
-   inline-start is the right-hand edge for a reader who reads that way. */
+   inline-start is the right-hand edge for a reader who reads that way, and
+   each fades away from its own edge: a gradient takes no logical keyword, so
+   the direction it runs in is said once per writing direction. */
 [part="edges"] {
+  --_scroll-area-from-start: to right;
+  --_scroll-area-from-end: to left;
   inset: 0;
   pointer-events: none;
   position: absolute;
+}
+
+:host(:dir(rtl)) [part="edges"] {
+  --_scroll-area-from-start: to left;
+  --_scroll-area-from-end: to right;
 }
 
 [part="edges"]::before,
@@ -102,7 +111,7 @@
 
 [part="edges"]::before {
   background: linear-gradient(
-    to right,
+    var(--_scroll-area-from-start),
     var(--scroll-area-fade-color, var(--helix-color-background)),
     transparent
   );
@@ -112,7 +121,7 @@
 
 [part="edges"]::after {
   background: linear-gradient(
-    to left,
+    var(--_scroll-area-from-end),
     var(--scroll-area-fade-color, var(--helix-color-background)),
     transparent
   );

@@ -105,6 +105,32 @@ if (hasLayout()) {
       expect(globalThis.getComputedStyle(edges, '::after').opacity).toBe('1')
     })
 
+    /* Each sideways fade is solid at the edge it sits on and clear toward the
+       middle. On a right-to-left page inline-start is the right-hand edge, and
+       a fade still running `to right` there was clear at the edge and solid
+       over the content. */
+    for (const [dir, start, end] of [
+      ['ltr', 'to right', 'to left'],
+      ['rtl', 'to left', 'to right'],
+    ] as const) {
+      test(`fades each sideways edge away from itself, ${dir}`, async () => {
+        document.documentElement.dir = dir
+        try {
+          const host = (await mount(
+            `<helix-scroll-area label="Row" style="display:block;inline-size:120px"><div style="display:flex"><span style="flex:0 0 200px">a</span></div></helix-scroll-area>`,
+          )) as Area
+          await host.updateComplete
+          const edges = part(host, 'edges') as HTMLElement
+          const runs = (which: '::after' | '::before'): string =>
+            globalThis.getComputedStyle(edges, which).backgroundImage
+          expect(runs('::before')).toMatch(new RegExp(`^linear-gradient\\(${start},`))
+          expect(runs('::after')).toMatch(new RegExp(`^linear-gradient\\(${end},`))
+        } finally {
+          document.documentElement.removeAttribute('dir')
+        }
+      })
+    }
+
     test('an edge is opted out by giving its fade no depth', async () => {
       /* A size rather than a switch, because it is the same question at both
          ends and a zero-depth fade has no box to be drawn in. A list scrolled

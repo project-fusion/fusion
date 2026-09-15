@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { ReactiveElement } from 'lit'
 
 beforeAll(async () => {
@@ -40,6 +40,44 @@ describe('a scroll area', () => {
     expect(part(await area('label="Notes"'), 'viewport')?.getAttribute('aria-label')).toBe('Notes')
   })
 })
+
+/* The inline edges on a right-to-left page, where the start is the right-hand
+   edge and `scrollLeft` counts down from zero. Read as a count up, the start
+   never had more and the end always did. A browser's: happy-dom lays nothing
+   out, so nothing scrolls. */
+if (hasLayout()) {
+  describe('a scroll area on a right-to-left page', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    test('says which inline edge has more, counting from the right', async () => {
+      document.documentElement.dir = 'rtl'
+      const host = await area(
+        'label="Row" style="display:block;inline-size:120px"',
+        '<div style="inline-size:400px">Row</div>',
+      )
+      await new Promise((settled) => {
+        requestAnimationFrame(() => {
+          settled(undefined)
+        })
+      })
+      const view = part(host, 'viewport') as HTMLElement
+      const more = (): string[] =>
+        ['inline-start', 'inline-end'].filter((edge) => host.matches(`:state(more-${edge})`))
+      const to = async (left: number): Promise<void> => {
+        view.scrollLeft = left
+        view.dispatchEvent(new Event('scroll'))
+        await host.updateComplete
+      }
+      expect(more()).toEqual(['inline-end'])
+      await to(-100)
+      expect(more()).toEqual(['inline-start', 'inline-end'])
+      await to(-view.scrollWidth)
+      expect(more()).toEqual(['inline-start'])
+    })
+  })
+}
 
 /**
  * The box scrolls on this tier, with no stylesheet from `helix/styled` involved.
