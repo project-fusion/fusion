@@ -399,6 +399,20 @@ describe('menu submenus, coming and going', () => {
     await row.updateComplete
   }
 
+  /* What a consumer's sheet asks to take a divider off a submenu page: the
+     divider is their child, and the surface's `data-drilled` is inside a shadow
+     root their selectors cannot enter. */
+  test('records drilled while a submenu page shows, and not on the menu itself', async () => {
+    const host = await deep()
+    host.open = true
+    await host.updateComplete
+    expect(hasState(host, 'drilled')).toBe(false)
+
+    at(host, 'field').select()
+    await host.updateComplete
+    expect(hasState(host, 'drilled')).toBe(true)
+  })
+
   test('every row on the way to the open page keeps its own slot', async () => {
     const host = await deep()
     // `open`, which is how every other block here opens a menu.

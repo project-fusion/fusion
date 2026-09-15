@@ -60,6 +60,7 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @csspart surface - The floating panel the menu is drawn on.
  * @csspart title - The name of the submenu that is showing.
  *
+ * @cssstate drilled - While a submenu's page is showing rather than the menu's own, so what is not a row can leave with the page it was on.
  * @cssstate mark - While a row on the page showing can be ticked or leads to a page, so the trailing column is held open for every row.
  * @cssstate open - While the menu is open.
  * @cssstate start - While a row on the page showing has something in its leading column, so that column is held open for every row.
@@ -345,6 +346,11 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       }
       this.mark(item, this.drilldown.atRoot)
     }
+    /* A state as well as the surface's `data-drilled`, because a divider is the
+       consumer's child: a stylesheet outside can take it off a submenu page
+       only by asking the host, and an attribute inside the shadow root is not
+       something it can ask. */
+    this.toggleState('drilled', !this.drilldown.atRoot)
     this.markColumns()
   }
 
