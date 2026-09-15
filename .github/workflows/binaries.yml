@@ -75,18 +75,44 @@ jobs:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # **The binary these sources already built, at this version, when there
+      # is one**, and everything that would build it skipped. Keyed on what the
+      # binary is compiled from, the paths this workflow's `pull_request`
+      # filter names, and on this file, which holds the toolchain and the flags.
+      # Hashed before the stamp below writes the version into a manifest.
+      #
+      # **The version is in the key because it is in the binary.** `--version`
+      # prints the crate's version, compiled in, and both the step below and
+      # `publish.mjs` refuse a binary reporting another. So a pull request,
+      # always at the placeholder, rebuilds only when the Rust moves, where it
+      # rebuilt all five platforms on every push; and a release, always at a new
+      # number, always misses. What would let a release reuse one is the binary
+      # reading its version at run time rather than at compile time, a change
+      # to `helix/cli` and not to this file.
+      - name: Restore a binary built from these sources
+        id: built
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: >-
+            helix-cli-${{ matrix.target }}-${{ env.VERSION }}-${{ hashFiles(
+            '.github/workflows/binaries.yml', 'Cargo.lock', 'Cargo.toml',
+            'fusion/rules/**', 'helix/cli/**', 'helix/theme/**') }}
+          path: ${{ env.BINARY }}
+
       # Statically linked, so one binary runs on a glibc distribution and on
       # Alpine alike, which is why the Linux packages declare no `libc`.
       - name: Install musl
-        if: startsWith(matrix.platform, 'linux-')
+        if: startsWith(matrix.platform, 'linux-') && steps.built.outputs.cache-hit != 'true'
         run: sudo apt-get update && sudo apt-get install -y musl-tools
 
       - name: Install Rust
+        if: steps.built.outputs.cache-hit != 'true'
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
           targets: ${{ matrix.target }}
 
       - name: Restore the Cargo cache
+        if: steps.built.outputs.cache-hit != 'true'
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           key: ${{ matrix.target }}
@@ -101,6 +127,7 @@ jobs:
       # before the `\r`, so the pattern matched nothing there and the check below
       # refused the build, which was the release of 14 Sep 2026.
       - name: Stamp the version into the crate
+        if: steps.built.outputs.cache-hit != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -110,8 +137,11 @@ jobs:
 
       # Not `--locked`: `Cargo.lock` still names the crate at the placeholder.
       - name: Build
+        if: steps.built.outputs.cache-hit != 'true'
         run: cargo build --release -p fusion-helix-cli --target ${{ matrix.target }}
 
+      # A restored binary as well as a built one, so a key that matched the
+      # wrong binary is caught here rather than by `publish.mjs`.
       - name: Prove it reports the version
         if: matrix.runs
         shell: bash
