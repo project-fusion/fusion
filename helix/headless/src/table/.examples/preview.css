@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Table.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -56,10 +26,6 @@ helix-headless-table {
   overflow-x: auto;
 }
 
-/* A rule under each cell and none between them, so a row reads as a line
-   across the table rather than as a run of boxes. Not on a hidden cell, since
-   an author `display` beats the UA's `[hidden]`: a column is hidden with the
-   cells under it, and the table drops its track. */
 helix-headless-table-cell:not([hidden]) {
   align-items: center;
   border-block-end: 1px solid var(--_gray-line);
@@ -67,9 +33,6 @@ helix-headless-table-cell:not([hidden]) {
   color: var(--_gray-strong);
   display: flex;
   font-size: 0.8125rem;
-  /* The edge the cell's column is set to, which the table publishes onto each
-     cell as `--table-cell-align` rather than writing onto markup it did not
-     write. `start` and `end` are the inline edges for both properties. */
   justify-content: var(--table-cell-align);
   min-block-size: 2.5rem;
   min-inline-size: 0;
@@ -89,26 +52,18 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The column tracks are the component's arithmetic, published as
-   `--table-template` because only it has counted the columns. */
 helix-headless-table::part(table) {
   display: grid;
   grid-template-columns: var(--table-template, minmax(0, 1fr));
   inline-size: 100%;
 }
 
-/* The head, every row and every column take no box, so the headings and the
-   cells are the grid's items. Without it the cells stay inside their rows, the
-   grid gets one item per row instead of one per cell, and the headings run
-   together as one string with the rows under them out of step. A hidden one
-   is left to the UA's `[hidden]`, for the reason the cell's rule gives. */
 helix-headless-table::part(head),
 helix-headless-table-column:not([hidden]),
 helix-headless-table-row:not([hidden]) {
   display: contents;
 }
 
-/* Taller than a row of data, and set apart by weight rather than size. */
 helix-headless-table-column::part(column) {
   align-items: center;
   border-block-end: 1px solid var(--_gray-line);
@@ -122,9 +77,6 @@ helix-headless-table-column::part(column) {
   padding-inline-end: 1rem;
 }
 
-/* A column set to the end or the middle takes its heading there too, over the
-   values it names. `align` reflects, so the attribute is there to match however
-   it was set. */
 helix-headless-table-column[align="center"]::part(column) {
   justify-content: center;
 }

@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Sparkline.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -57,7 +27,6 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* Three plots in a row, which wraps where a narrow page runs out of room. */
 .row {
   align-items: center;
   display: flex;
@@ -65,9 +34,6 @@ helix-headless-icon::part(svg) {
   gap: 2rem;
 }
 
-/* A figure-sized box, because a sparkline sits beside a figure or in a table
-   cell, and one ink for every mark in it, carried as `color` so the line, the
-   bars, the wash and the end dot cannot disagree. */
 helix-headless-sparkline {
   block-size: 2.1875rem;
   color: var(--_gray-strong);
@@ -97,9 +63,6 @@ helix-headless-sparkline::part(bar) {
   fill: currentColor;
 }
 
-/* The area is a wash under the line, strongest where it meets the line and
-   nearly gone at the floor: the component ships the gradient, and the stops
-   take the ink. */
 helix-headless-sparkline::part(area) {
   fill: none;
 }
@@ -122,8 +85,6 @@ helix-headless-sparkline[plot="area"]::part(wash-end) {
   stop-opacity: 0.05;
 }
 
-/* The last reading, a dot, placed from `--chart-terminus-x` and
-   `--chart-terminus-y`, which the component writes. */
 helix-headless-sparkline::part(terminus) {
   background-color: currentColor;
   block-size: 5px;
@@ -135,7 +96,6 @@ helix-headless-sparkline::part(terminus) {
   translate: -50% -50%;
 }
 
-/* Placed from the right on a right-to-left page, so centered the other way. */
 helix-headless-sparkline:dir(rtl)::part(terminus) {
   translate: 50% -50%;
 }

@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Announcement.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -44,9 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* A band across the page, filled, bounded beneath only because the page's own
-   edges bound the other three sides. One height whether or not an action is
-   slotted: the floor is a small control plus the padding. */
 helix-headless-announcement {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -63,8 +30,6 @@ helix-headless-announcement {
   position: relative;
 }
 
-/* A tone is meaning rather than styling, so it survives the monotone as a step
-   up the ramp instead of as a hue. */
 helix-headless-announcement[tone]:not([tone="neutral"]) {
   background-color: var(--_gray-fill);
 }
@@ -75,9 +40,6 @@ helix-headless-announcement::part(content) {
   text-align: center;
 }
 
-/* Clear of the dismiss, which is out of flow, and on both sides so the middle
-   stays the middle: without it a wrapped line at 390 ran to the control's
-   edge. */
 helix-headless-announcement[dismissible]::part(content) {
   padding-inline: 2rem;
 }
@@ -93,8 +55,6 @@ helix-headless-announcement [slot="actions"] {
   margin-inline-start: 1rem;
 }
 
-/* Out of flow, so the message is centered on the band and not on whatever is
-   left beside the control. */
 helix-headless-announcement::part(dismiss) {
   all: unset;
   align-items: center;

@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Tour.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -57,9 +27,6 @@ helix-headless-icon::part(svg) {
   inline-size: 100%;
 }
 
-/* What each stop says, a title over a line or two, in a card inset from the
-   bubble's edge by the width of a button's own padding: the title then starts
-   on the same line as the word Skip under it. */
 helix-headless-tour-stop helix-headless-card {
   display: grid;
   gap: 0.75rem;
@@ -84,9 +51,6 @@ helix-headless-tour-stop p {
   line-height: 1.5;
 }
 
-/* A shell to point at. Nothing here is the component: a tour needs an
-   interface to be a tour of, so the page draws one, a framed app with a
-   quiet rail down its side, a bar of controls and a sheet under the bar. */
 .app {
   border: 1px solid var(--_gray-edge);
   border-radius: var(--_radius-surface);
@@ -112,7 +76,6 @@ helix-headless-tour-stop p {
   margin: 0;
 }
 
-/* The rail's heading, a step smaller and quieter than the places under it. */
 .rail p:first-child {
   color: var(--_gray-muted);
   font-size: 0.75rem;
@@ -129,10 +92,6 @@ helix-headless-tour-stop p {
   padding: 0.75rem 1rem;
 }
 
-/* On a phone the rail goes over the document rather than beside it, which is
-   what an app does there. Beside it, the document is left 170px and the bar
-   runs out through the frame. The page's width, so a media query: this is the
-   page's layout and not the component's. */
 @media (width < 32rem) {
   .app {
     grid-template-columns: minmax(0, 1fr);
@@ -167,15 +126,10 @@ helix-headless-tour-stop p {
   margin: 0;
 }
 
-/* The host is the box a stop is placed against, so it takes the button's own
-   box. Left inline it is a line box a line of text tall, in the middle of the
-   button, and a bubble placed against it lands on the button. */
 helix-headless-button {
   display: inline-flex;
 }
 
-/* Every button at control height on a quiet fill, and the one that publishes
-   filled at full strength as the thing to press. */
 helix-headless-button::part(button),
 helix-headless-tour-stop::part(back-button),
 helix-headless-tour-stop::part(next-button),
@@ -235,9 +189,6 @@ helix-headless-icon-button helix-headless-icon {
   inline-size: 1.25rem;
 }
 
-/* The keyboard reaches these, so the rings go here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
 helix-headless-button::part(button):focus-visible,
 helix-headless-icon-button::part(button):focus-visible,
 helix-headless-tour-stop::part(back-button):focus-visible,
@@ -247,16 +198,11 @@ helix-headless-tour-stop::part(skip-button):focus-visible {
   outline-offset: 2px;
 }
 
-/* The tour and its stops are containers for what they point at and carry no
-   box of their own. */
 helix-headless-tour,
 helix-headless-tour-stop {
   display: contents;
 }
 
-/* The light on the current target, which is a shadow rather than a hole: a
-   box the size of the target and its padding, whose spread dims the rest of
-   the page. */
 helix-headless-tour::part(spotlight) {
   border-radius: var(--_radius-surface);
   box-shadow: 0 0 0 100vmax light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.64));
@@ -265,9 +211,6 @@ helix-headless-tour::part(spotlight) {
   z-index: 1000;
 }
 
-/* The panel pointing at the target, over the page on a shadow as a popover
-   is. `overflow: visible` because the UA gives a popover `overflow: auto`,
-   which clips the half of the arrow outside it. */
 helix-headless-tour-stop::part(bubble) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -298,12 +241,6 @@ helix-headless-tour-stop::part(arrow) {
   rotate: 45deg;
 }
 
-/* Edged on the two sides that show. The component puts the square half
-   outside the bubble on the edge facing the target, and names the arrow for
-   the side of the target the panel landed on, which is not always the side the
-   stop asked for. Physical, because a side is: a stop to the right of its
-   target is to the right on a right-to-left page too, and the corner turned
-   outward is the same corner. */
 helix-headless-tour-stop::part(arrow-bottom) {
   border-left: 1px solid var(--_gray-edge);
   border-top: 1px solid var(--_gray-edge);
@@ -330,7 +267,6 @@ helix-headless-tour-stop::part(content) {
   gap: 0.5rem;
 }
 
-/* Leaving sits apart from going on, at the start of the row. */
 helix-headless-tour-stop::part(actions) {
   align-items: center;
   display: flex;

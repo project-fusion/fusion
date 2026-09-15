@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Code Block.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -44,21 +14,13 @@
   --_radius-panel: 0.75rem;
 }
 
-/* A column: the name over the code, and a block given a height spends it on
-   the code. */
 helix-headless-code-block {
-  /* Where the copy button stands: centered on the first line of code, which is
-     the block's padding twice and one line, and as far from the end as from
-     the top. */
   --_copy-inset: calc((0.75rem * 2 + 0.8125rem * 1.5 - 2rem) / 2);
   display: flex;
   flex-direction: column;
   line-height: 1.5;
 }
 
-/* The name, over the code rather than floating on it, in a bar on a quiet fill
-   that shares the block's edge. The header takes the top two corners and the
-   block the bottom two, so the pair reads as one rounded surface. */
 helix-headless-code-block::part(header) {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -68,29 +30,17 @@ helix-headless-code-block::part(header) {
   padding: 0.5rem 1rem;
 }
 
-/* The name is a name, not code, so it is set in the page's face. */
 helix-headless-code-block::part(label) {
   color: var(--_gray-muted);
   font-size: 0.75rem;
   font-weight: 500;
 }
 
-/* The positioning context for the copy button, which stands in the block's
-   trailing gutter. */
 helix-headless-code-block::part(frame) {
   flex: 1;
   position: relative;
 }
 
-/* On the page's own ground inside the quiet edge, the trailing inset being the
-   copy button's gutter. The top edge and corners are the header's, so the block
-   draws neither.
-
-   **Written for a named block, and not read off `[label]`.** A sibling
-   combinator cannot follow `::part()`, which makes the attribute look like the
-   way to ask whether a header is drawn, but React sets `label` as a property on
-   a defined element and the attribute is never there to match. A block with no
-   name wants the top edge and corners back. */
 helix-headless-code-block::part(block) {
   block-size: 100%;
   border: 1px solid var(--_gray-edge);
@@ -102,11 +52,6 @@ helix-headless-code-block::part(block) {
   padding: 0.75rem calc(2rem + var(--_copy-inset) * 2) 0.75rem 1rem;
 }
 
-/* **The code scrolls, not the block.** Scrolled by the `<pre>`, a long line
-   runs under the copy button, because a scroller's end padding exists only at
-   the end of its content and the button stands over everything before it. The
-   `<code>` scrolls inside the block's padding instead, so a line stops at the
-   gutter and the button never covers a character. */
 helix-headless-code-block::part(code) {
   color: var(--_gray-strong);
   display: block;
@@ -123,9 +68,6 @@ helix-headless-code-block::part(copy) {
   position: absolute;
 }
 
-/* A ghost icon button a step under control height, so a one-line block holds
-   it with the same room on every side: no fill and no edge until a pointer is
-   on it. */
 helix-headless-code-block::part(copy-button) {
   all: unset;
   block-size: 2rem;
@@ -149,10 +91,6 @@ helix-headless-code-block::part(copy-mark) {
   inline-size: 1rem;
 }
 
-/* The bubble that says Copy, and Copied after a press: the page's opposite,
-   small and tight. It is a popover the component places, so the UA's centering
-   `margin` goes and the position is `fixed`, which is what the component writes
-   its coordinates for. */
 helix-headless-code-block::part(copy-tooltip) {
   align-items: center;
   background-color: var(--_gray-strong);
@@ -169,15 +107,10 @@ helix-headless-code-block::part(copy-tooltip) {
   position: fixed;
 }
 
-/* Only while open: the `display` above would otherwise override the UA's
-   `display: none` on a closed popover. */
 helix-headless-code-block::part(copy-tooltip):not(:popover-open) {
   display: none;
 }
 
-/* A square turned to a point in the bubble's own fill. No edge: the component
-   puts it on the one facing the copy button, so a bubble that flips below it at
-   the top of a page still points up at it. */
 helix-headless-code-block::part(copy-tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
@@ -186,9 +119,6 @@ helix-headless-code-block::part(copy-tooltip-arrow) {
   rotate: 45deg;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
 helix-headless-code-block::part(copy-button):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;

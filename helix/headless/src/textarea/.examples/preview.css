@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Textarea.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -57,8 +27,6 @@ helix-headless-textarea {
   gap: 0.25rem;
 }
 
-/* The box is the field rather than the control, so the focus ring is drawn
-   once around the whole thing. */
 helix-headless-textarea::part(field) {
   background-color: var(--_gray-subtle);
   border: 1px solid var(--_gray-edge);
@@ -123,10 +91,6 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. On the field, against its edge, since
-   the control inside it draws no box of its own. */
 helix-headless-textarea::part(field):focus-within {
   outline: 2px solid var(--_gray-mark);
 }

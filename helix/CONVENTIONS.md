@@ -1869,6 +1869,11 @@ than duplication to remove. What is not the example's business goes to the
 base layer instead: the `fieldset` reset ten form examples each carried is in
 `base.css` now, because a page using the component would want it too.
 
+**An example sheet carries no commentary.** A reader copies it as the CSS they
+would write, so it holds rules and nothing else. The one exception is a single
+line over a rule that would otherwise read as a mistake, such as a browser
+workaround. The reasoning behind a sheet belongs in the commit that wrote it.
+
 **Both syntaxes are authored, and neither is derived from the other.** The
 **Do not derive one from the other.** A converted example is a function of its
 twin rather than a thing anybody wrote, and conversion cannot be made to work:

@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Donut Chart.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -50,9 +20,6 @@
   gap: 1rem;
 }
 
-/* The source table stays in the page for assistive technology, which reads
-   the figures from it, and is clipped out of sight: the ring is what a
-   sighted reader is shown. `display: none` would take it out of the tree. */
 [data-hidden-visually] {
   block-size: 1px;
   border: 0;
@@ -65,9 +32,6 @@
   white-space: nowrap;
 }
 
-/* A bounded ring: the drawing takes the width of its box, so the box is what
-   says how big it is. One distinct step of the ramp per slice, darkest first,
-   so the slices read apart by weight alone. */
 helix-headless-donut-chart {
   display: grid;
   inline-size: 14rem;
@@ -94,8 +58,6 @@ helix-headless-donut-chart::part(plot) {
   position: relative;
 }
 
-/* Turned a quarter, so the first slice starts at the top rather than at
-   three o'clock. */
 helix-headless-donut-chart::part(track),
 helix-headless-donut-chart::part(segment) {
   transform: rotate(-90deg);
@@ -122,22 +84,14 @@ helix-headless-donut-chart::part(center) {
   translate: -50% -50%;
 }
 
-/* Placed from the right on a right-to-left page, so centered the other way. */
 helix-headless-donut-chart:dir(rtl)::part(center) {
   translate: 50% -50%;
 }
 
-/* The slice under the pointer stands out from the ring by its width. */
 helix-headless-donut-chart::part(segment-active) {
   stroke-width: calc(var(--donut-chart-stroke) * 1.18);
 }
 
-/* The bubble a resting pointer summons, placed by the component off the
-   slice's outer edge. The component writes the position as a `translate` from
-   the viewport's corner, and the UA centers a popover through `inset: 0` and
-   `margin: auto`, so both are undone or the bubble lands in the middle of the
-   window. `overflow` too, which the UA sets to scroll and which would clip the
-   point. */
 helix-headless-donut-chart::part(tooltip) {
   background-color: var(--_gray-strong);
   border: 0;
@@ -151,9 +105,6 @@ helix-headless-donut-chart::part(tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
-/* A square turned to a point in the bubble's own fill. A slice can be at any
-   bearing, so the bubble lands on any side of it, and the component puts the
-   point on whichever edge faces the slice. */
 helix-headless-donut-chart::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
@@ -168,10 +119,6 @@ helix-headless-donut-chart::part(tooltip-label) {
   margin-block-end: 0.25rem;
 }
 
-/* A dot, a name and a value in three columns. The component writes the
-   slice's `--chart-series` on a cell only where something was plotted, so the
-   dot draws itself there and nowhere else, ringed so the darkest gray still
-   shows on a bubble of the same gray. */
 helix-headless-donut-chart::part(tooltip-cell) {
   align-items: baseline;
   column-gap: 0.75rem;
@@ -199,11 +146,6 @@ helix-headless-donut-chart::part(tooltip-value) {
   grid-column: 3;
 }
 
-/* The point the bubble hangs from, placed by the component on the slice's
-   outer edge. A pixel rather than nothing, because the placement cannot
-   track a box with no area, and out of the flow so it takes no room under
-   the ring. The anchor covers the drawing and takes no pointer, so it cannot
-   eat the hover that summoned it. */
 helix-headless-donut-chart::part(mark) {
   block-size: 1px;
   inline-size: 1px;

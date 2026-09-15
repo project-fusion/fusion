@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Command.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -51,10 +21,6 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-/* A wide panel set high on the page rather than centered, since the eye is
-   on the field and the list grows down from it. No padding of its own: the
-   search row, the list and the footer each carry their own inset, so the
-   rules between them run edge to edge. */
 helix-headless-command::part(dialog) {
   align-self: start;
   background-color: var(--_gray-surface);
@@ -70,14 +36,10 @@ helix-headless-command::part(dialog) {
   padding: 0;
 }
 
-/* Only while open: a closed `<dialog>` is hidden by the UA's `display: none`,
-   and a `display` written for every state would override it. */
 helix-headless-command::part(dialog):modal {
   display: flex;
 }
 
-/* A shade rather than a gray from the ramp. It darkens the page in both
-   modes, where a ramp value would lighten it in dark. */
 helix-headless-command::part(dialog)::backdrop {
   background-color: rgb(0 0 0 / 0.4);
 }
@@ -90,9 +52,6 @@ helix-headless-command::part(listbox) {
   padding: 0;
 }
 
-/* Named but not shown: the palette's name is for assistive technology, and
-   the field under it already says what it is for. The clip keeps it in the
-   tree, where `display: none` would take it out. */
 helix-headless-command::part(listbox-label) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -102,7 +61,6 @@ helix-headless-command::part(listbox-label) {
   white-space: nowrap;
 }
 
-/* The search row, ruled off from the list under it. */
 helix-headless-command::part(listbox-search) {
   align-items: center;
   border-block-end: 1px solid var(--_gray-line);
@@ -152,8 +110,6 @@ helix-headless-command::part(listbox-items) {
   padding-block: 0.5rem;
 }
 
-/* Roomy rows, since a palette is read at a glance and chosen from by
-   pointer as often as by key. */
 helix-headless-option::part(item) {
   align-items: center;
   background-color: transparent;
@@ -173,24 +129,15 @@ helix-headless-option::part(label) {
   color: var(--_gray-strong);
 }
 
-/* Where the keyboard is, and where the pointer is, as one fill. The option
-   names its own row `item-active` once typing or the arrows have put the
-   keyboard on it, which is what reaches it from here. */
 helix-headless-option::part(item-active),
 helix-headless-option:not([disabled])::part(item):hover {
   background-color: var(--_gray-fill);
 }
 
-/* What the typing matched, painted over the option's own text. A highlight is
-   styled from the document the text lives in, so this page names it; left to
-   the base layer it is the brand's blue. */
 ::highlight(helix-filter-match) {
   background-color: var(--_gray-line);
 }
 
-/* The hint row, ruled off from the list above it. No `display` here: the
-   component hides the row with `hidden` when nothing is slotted into it, and a
-   `display` written for every state would bring it back as an empty band. */
 helix-headless-command::part(footer) {
   border-block-start: 1px solid var(--_gray-line);
   color: var(--_gray-muted);
@@ -202,8 +149,6 @@ helix-headless-command p {
   margin: 0;
 }
 
-/* A key: a quiet edge, and a lower one a step darker, which is what makes the
-   box read as a cap pressed into the panel rather than a tag. */
 helix-headless-kbd::part(kbd) {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -231,9 +176,6 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The field takes focus as the palette opens and needs no ring of its own:
-   the caret says where typing goes. The rows are reached with the arrows and
-   marked by the list, so the ring goes on a row a pointer or key lands on. */
 helix-headless-command::part(listbox-search-field):focus-visible {
   outline: none;
 }

@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Combobox.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -51,16 +21,12 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-/* A column, so the label, the field and the hint stack at one gap without
-   any of them carrying a margin. */
 helix-headless-combobox {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-/* The field carries the box rather than the input, so the caret sits inside
-   the same frame as the text. */
 helix-headless-combobox::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -99,17 +65,10 @@ helix-headless-combobox::part(indicator) {
   inline-size: 1rem;
 }
 
-/* The caret turns over while the list is open, saying which way it went. */
 helix-headless-combobox:state(open)::part(indicator) {
   scale: 1 -1;
 }
 
-/* The panel over the page, as wide as the field it came out of and never
-   taller than the room under it, both of which the component publishes. The
-   platform centers a `popover` through `inset: 0` and `margin: auto`, and the
-   component writes its position as a translate from the top-left, so both
-   go. One frame for the panel and none on the list inside it, which would
-   draw the shape twice. */
 helix-headless-combobox::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -131,9 +90,6 @@ helix-headless-combobox::part(listbox) {
   display: block;
 }
 
-/* The panel is named by the field's label, so the list's own caption would
-   say it twice on screen. Clipped rather than removed, since the list is still
-   named by it. */
 helix-headless-combobox::part(listbox-label) {
   block-size: 1px;
   clip-path: inset(50%);
@@ -143,9 +99,6 @@ helix-headless-combobox::part(listbox-label) {
   white-space: nowrap;
 }
 
-/* A list of a few rows' height that scrolls past that, held a step off the
-   panel's edge top and bottom. The keyboard's place is drawn on the active
-   row, so the list itself takes no ring. */
 helix-headless-combobox::part(listbox-items) {
   display: flex;
   flex-direction: column;
@@ -202,9 +155,6 @@ helix-headless-combobox::part(feedback) {
   font-weight: 500;
 }
 
-/* A stated row height, so every row is the same whatever is slotted into it,
-   and the words on the field's own inset so they do not shift when the panel
-   opens. Full width, the panel doing the rounding. */
 helix-headless-option::part(item) {
   align-items: center;
   background-color: transparent;
@@ -225,26 +175,15 @@ helix-headless-option::part(label) {
   color: var(--_gray-strong);
 }
 
-/* Where the keyboard is, and where the pointer is, as one fill. The option
-   names its own row `item-active`, which is what reaches it from here. A step
-   darker than the quiet fill, which on the panel's ground measured 1.05:1 in
-   light and 1.1:1 in dark: too faint to answer where the keyboard is. */
 helix-headless-option::part(item-active),
 helix-headless-option:not([disabled])::part(item):hover {
   background-color: var(--_gray-fill);
 }
 
-/* What the typing matched, which the list paints as a highlight over the
-   option's own text rather than wrapping it. A highlight is styled from the
-   document the text lives in, so this page names it; left to the base layer it
-   is the brand's blue. A step darker than the active row, so it shows there
-   too. */
 ::highlight(helix-filter-match) {
   background-color: var(--_gray-line);
 }
 
-/* The chosen option carries a tick at the far end, which is a different fact
-   from where the keyboard is. */
 helix-headless-option::part(item-selected)::after {
   background-color: currentColor;
   block-size: 1rem;
@@ -264,10 +203,6 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* The keyboard reaches the input, but the ring goes around the field that
-   holds it, so it circles the caret too. Taking the UA outline off without
-   putting one back is the commonest way a headless control stops being
-   operable without a pointer. */
 helix-headless-combobox:focus-within::part(field) {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 0;

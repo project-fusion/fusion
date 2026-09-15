@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Carousel.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -44,9 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* A frame around the track, and each group of chrome placed on a side of it:
-   the slides in the middle cell, and the dots and the arrows sharing the row
-   beneath, the dots at the start and the arrows at the end. */
 helix-headless-carousel {
   display: grid;
   font-size: 0.875rem;
@@ -55,10 +22,6 @@ helix-headless-carousel {
   line-height: 1.5;
 }
 
-/* The track is the scroller the slides sit in, not a slider's bar: a row that
-   scrolls and snaps, which is the minimum a carousel is. Without the snap the
-   slides are a list that happens to overflow. Inset on the inline axis so a
-   slide's edge is not flush with the frame's. */
 helix-headless-carousel::part(track) {
   display: flex;
   gap: 1rem;
@@ -70,21 +33,18 @@ helix-headless-carousel::part(track) {
   scrollbar-width: none;
 }
 
-/* One slide per view, this tier having no `per-view` arithmetic to do. */
 helix-headless-carousel::part(slide) {
   display: flex;
   flex: 0 0 100%;
   scroll-snap-align: start;
 }
 
-/* The slide fills its pane, and has to be told to. */
 helix-headless-carousel > * {
   flex: 1 1 0;
   min-block-size: 0;
   min-inline-size: 0;
 }
 
-/* The slides here are cards, framed as the styled preview frames them. */
 helix-headless-card {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -142,12 +102,6 @@ helix-headless-carousel::part(rotation-mark) {
   inline-size: 1em;
 }
 
-/* Dots, in the gray a mark takes rather than a rule's, which at 1.65:1 on white
-   was very nearly not there. The current one lengthens into a pill and takes
-   the strong ink, so the run reads without color. It is reached by
-   `indicator-current`, the second part name the component writes on it while it
-   is current: its `aria-current` and `data-current` are attributes, and nothing
-   can follow `::part()` with one. */
 helix-headless-carousel::part(indicator) {
   all: unset;
   background-color: var(--_gray-mark);
@@ -167,9 +121,6 @@ helix-headless-carousel::part(indicator):hover {
   background-color: var(--_gray-muted);
 }
 
-/* The keyboard reaches these, so the ring goes on them. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
 helix-headless-carousel::part(previous):focus-visible,
 helix-headless-carousel::part(next):focus-visible,
 helix-headless-carousel::part(rotation):focus-visible,

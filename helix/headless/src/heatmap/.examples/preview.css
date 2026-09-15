@@ -1,34 +1,3 @@
-/* What the headless tier asks a consumer to write for Heatmap.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a green
- * cell says the day went well and a red one says it did not, neither of which
- * this tier has an opinion about. A neutral ramp says nothing except which
- * cell is heavier than which, which on a heatmap is the whole job.
- *
- * Named by role rather than numbered, because a number implies a scale somebody
- * maintains and this is a dozen values in one file. Underscored, because they are
- * declared and read in that same file and never leave it. Written through
- * `light-dark()` with `color-scheme` declared, so the sandbox's dark mode gets a
- * sheet that inverts rather than a pale card on a dark page.
- *
- * **A cell is an empty `<span>`, which a missing sheet makes completely
- * invisible rather than merely wrong**: with no size and no fill every cell
- * lays out as an empty inline box, and the strip is a blank page under a row of
- * footer text.
- */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -45,18 +14,6 @@
   --_radius-panel: 0.75rem;
 }
 
-/* The tone names this example's table asks for, and the ramp a `tones` list
-   reaches. The base tier turns a tone name into a `--heatmap-tone-*` reference
-   and never resolves it, so a consumer answering in grays is the whole contract
-   working: five steps that differ by weight, and three categories that differ by
-   nothing else, since a gray cannot mean "danger".
-
-   The call is not spelled out here, because a stylesheet is read whole and
-   prose quoting the substitution counts as a reader. */
-/* One column of the strip's own width, so the two labels under it bracket the
-   picture rather than the box: a thirty day strip 300 pixels across sat in a
-   592 pixel host, and "Today" floated 290 pixels past the last cell it was
-   naming. The strip is the widest child, so the track is the strip. */
 helix-headless-heatmap {
   display: grid;
   grid-template-columns: minmax(0, max-content);
@@ -71,17 +28,6 @@ helix-headless-heatmap {
   --heatmap-tone-5: var(--_gray-strong);
 }
 
-/* A cell has no size of its own: it is an empty `<span>`, so the grid's tracks
-   are the only thing that gives it one. Both axes, because a row of the strip is
-   a template row and a column of it is an implicit track, and an implicit track
-   left at `auto` stretches to fill whatever box the strip is in.
-
-   **The cell and the gap are the styled tier's, and the count follows them.**
-   The element reads the track and the gap back from this box and plans how
-   many cells there is room for with what it finds, so a sheet drawing bigger
-   cells gets fewer of them rather than a strip wider than its box. Writing
-   `min-cell` or `gap` on the element overrides the reading, and then the two
-   have to agree by hand. */
 helix-headless-heatmap::part(strip) {
   display: grid;
   gap: 0.25rem;
@@ -89,14 +35,9 @@ helix-headless-heatmap::part(strip) {
   grid-auto-flow: column;
   grid-template-rows: repeat(var(--heatmap-rows, 1), 0.75rem);
   justify-content: start;
-  /* The mark the tooltip hangs off is placed against this box. */
   position: relative;
 }
 
-/* The point the bubble hangs from, placed by the component over the cell a
-   pointer rests on. A pixel rather than nothing, because the placement cannot
-   track a box with no area. The anchor covers the strip and takes no pointer,
-   so it cannot eat the hover that summoned it. */
 helix-headless-heatmap::part(mark) {
   block-size: 1px;
   inline-size: 1px;
@@ -110,10 +51,6 @@ helix-headless-heatmap::part(tooltip-anchor) {
   position: absolute;
 }
 
-/* The bubble, above the cell, drawn as a tooltip is. The component writes the
-   position as a `translate` from the viewport's corner, and the UA centers a
-   popover through `inset: 0` and `margin: auto`, so both are undone or the
-   bubble lands in the middle of the window. */
 helix-headless-heatmap::part(tooltip) {
   background-color: var(--_gray-strong);
   border: 0;
@@ -127,8 +64,6 @@ helix-headless-heatmap::part(tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
-/* The bubble's point. The component puts it on the edge facing the cell, so a
-   bubble that flips below a strip at the top of a page still points up. */
 helix-headless-heatmap::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
@@ -137,9 +72,6 @@ helix-headless-heatmap::part(tooltip-arrow) {
   rotate: 45deg;
 }
 
-/* The day, then a name and a value to a line with the value at the end. The
-   quieter words step back by the bubble's own ink rather than a page gray,
-   which on a bubble of the strongest gray would all but vanish. */
 helix-headless-heatmap::part(tooltip-label) {
   display: block;
   font-weight: 500;
@@ -162,17 +94,12 @@ helix-headless-heatmap::part(tooltip-value) {
   font-weight: 500;
 }
 
-/* Half the control corner, because a corner is a fraction of the box it
-   rounds and a cell is a small one. The ground under an untoned cell is drawn
-   too, because a cell with no fill is not a quiet day, it is a hole. */
 helix-headless-heatmap::part(cell) {
   background-color: var(--heatmap-tone, var(--_gray-surface));
   border-radius: calc(var(--_radius-control) / 2);
   inline-size: 0.75rem;
 }
 
-/* The cell a pointer rests on, ringed just outside itself so the ring never
-   covers the fill it is pointing at. */
 @media (hover: hover) {
   helix-headless-heatmap::part(cell):hover {
     outline: 1px solid var(--_gray-strong);

@@ -1,36 +1,3 @@
-/* What the headless tier asks a consumer to write for Object Inspector.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning, and this
- * tier holds no such opinion: a key is drawn in the strong gray and a value in
- * the muted one, and the types are told apart by their own text, since a
- * string keeps its quotes and a null is spelled. Not by slant: a monospace
- * italic is a narrower face, and strings set in it stop lining up with the
- * rows around them.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * **The indent is the one rule that is not optional.** Every row is a sibling
- * in one tree, so nesting is not in the markup; the base tier writes each row's
- * depth into `--object-inspector-level`, and without a rule reading it the
- * whole value is one flat column. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -53,9 +20,6 @@ helix-headless-object-inspector {
   font-size: 0.8125rem;
 }
 
-/* The label rides on a bar joined to the top of the tree, so the two read as
-   one panel: the bar draws three edges and the top corners, the tree the
-   fourth edge and the bottom corners. */
 helix-headless-object-inspector::part(header) {
   align-items: center;
   background-color: var(--_gray-subtle);
@@ -77,9 +41,6 @@ helix-headless-object-inspector::part(frame) {
   position: relative;
 }
 
-/* Named faces ahead of the generic: Chromium does not honor `ui-monospace`, and
-   a bare `monospace` both lands on Courier and drops an `em` size to the
-   browser's smaller monospace default. */
 helix-headless-object-inspector::part(tree) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -91,8 +52,6 @@ helix-headless-object-inspector::part(tree) {
   padding-block: 0.5rem;
 }
 
-/* Square on top where the bar sits over it, so the two meet in a straight
-   seam. */
 helix-headless-object-inspector[label]::part(tree) {
   border-start-end-radius: 0;
   border-start-start-radius: 0;
@@ -103,17 +62,10 @@ helix-headless-object-inspector::part(tree):focus-visible {
   outline-offset: 2px;
 }
 
-/* The row the keys are on, while the tree holds focus. `row-active` is the
-   second part name the row carries for as long as it is the one. */
 helix-headless-object-inspector:focus-within::part(row-active) {
   background-color: var(--_gray-subtle);
 }
 
-/* Every row is indented as though it had a caret, and a branch's caret is
-   pulled back into that room below: a page cannot tell a branch from a leaf
-   through `::part()`, which takes no attribute selector, so the gutter is the
-   same on both and the caret hangs in it. The end padding keeps a long value
-   clear of the copy button. */
 helix-headless-object-inspector::part(row) {
   overflow: hidden;
   padding-inline-end: 3rem;
@@ -151,8 +103,6 @@ helix-headless-object-inspector::part(copy) {
   position: absolute;
 }
 
-/* A ghost square at control height, the glyph muted until the pointer is on
-   it. */
 helix-headless-object-inspector::part(copy-button) {
   all: unset;
   align-items: center;
@@ -182,10 +132,6 @@ helix-headless-object-inspector::part(copy-mark) {
   inline-size: 1rem;
 }
 
-/* The name of the copy button, over it on hover. `inset`, `margin` and
-   `overflow` said, because the bubble is a popover: the user agent centers one
-   in the window, where the component places this one over its trigger, and
-   scrolls its overflow, which would clip the point. */
 helix-headless-object-inspector::part(copy-tooltip) {
   background-color: var(--_gray-strong);
   border: none;
@@ -199,8 +145,6 @@ helix-headless-object-inspector::part(copy-tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
-/* The point, on whichever edge faces the copy button: the component puts it
-   there. */
 helix-headless-object-inspector::part(copy-tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;

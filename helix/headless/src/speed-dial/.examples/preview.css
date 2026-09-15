@@ -1,33 +1,3 @@
-/* What the headless tier asks a consumer to write for Speed Dial.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **Grays, and only grays.** Color in an example reads as meaning: a blue fill
- * says primary and a red one says danger, and this tier holds no such opinion.
- * A neutral ramp says only where one surface ends and the next begins.
- *
- * The values are named by role rather than numbered, since a number
- * implies a scale somebody maintains, and underscored because they never leave
- * this file: an unprefixed name reads as a hook the example publishes, and it
- * publishes none. Written through `light-dark()` with `color-scheme` declared,
- * so the sandbox's dark mode inverts rather than showing a pale card on a dark
- * page.
- *
- * A part with no rule below is one the platform already renders acceptably, and
- * a wrong rule is worse than none: paint a checkbox but leave the input at
- * `appearance: auto` and the browser draws its own control over everything
- * written for it. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -57,9 +27,6 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
-/* A box for the dial to be docked inside, since a page in a preview pane is not
-   the window: a quiet surface, and the positioned ancestor the dial measures
-   against. */
 .page {
   background-color: var(--_gray-subtle);
   block-size: 20rem;
@@ -67,9 +34,6 @@ helix-headless-icon::part(svg) {
   position: relative;
 }
 
-/* Docked to the box's bottom-end corner. The styled tier reads `data-dock` and
-   `data-dock-within` from its base layer; the headless tier has none, so the
-   placement they ask for is written out. */
 helix-headless-speed-dial[data-dock-within] {
   display: inline-flex;
   inset-block-end: 1.5rem;
@@ -81,8 +45,6 @@ helix-headless-icon-button {
   display: inline-flex;
 }
 
-/* The one action on the page that is always there: round, filled in the
-   darkest gray at the large control step. */
 helix-headless-icon-button[slot="trigger"]::part(button) {
   all: unset;
   align-items: center;
@@ -104,28 +66,16 @@ helix-headless-speed-dial::part(trigger) {
   cursor: pointer;
 }
 
-/* The plus turns into a cross while the dial is open, read off the dial's own
-   `open` state: an eighth of a turn, because a quarter ends where it started.
-   No transition, for the reason the switch sheet gives. */
 helix-headless-speed-dial:state(open) > [slot="trigger"] helix-headless-icon {
   rotate: 45deg;
 }
 
-/* The keyboard reaches these, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
 helix-headless-icon-button[slot="trigger"]::part(button):focus-visible,
 helix-headless-speed-dial::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
 
-/* The fanned-out actions, a column over the trigger with no panel of their
-   own. `display` only while the panel is open: an author `display` outranks
-   the platform's `[hidden]` and its closed-popover rule alike, and would draw
-   the actions with the dial shut. The platform also centers a `popover`
-   through `inset: 0` and `margin: auto`, and the component positions this one
-   as a translate from the top-left, so the margin goes. */
 helix-headless-speed-dial::part(actions) {
   align-items: flex-end;
   background-color: transparent;
@@ -141,7 +91,6 @@ helix-headless-speed-dial::part(actions):popover-open {
   display: flex;
 }
 
-/* The name beside the mark, on the end the trigger is on. */
 helix-headless-speed-dial-item::part(item) {
   align-items: center;
   background: none;
@@ -155,11 +104,6 @@ helix-headless-speed-dial-item::part(item) {
   padding: 0;
 }
 
-/* The ring follows the round mark, which is what a reader presses, rather than
-   boxing the name and the mark together. A page cannot say "the icon of the
-   item that has keyboard focus" through `::part()`, so it asks the host, which
-   holds focus while its button does; pressing an action closes the dial, so a
-   pointer never leaves the ring standing. */
 helix-headless-speed-dial-item::part(item):focus-visible {
   outline: none;
 }
@@ -169,7 +113,6 @@ helix-headless-speed-dial-item:focus-within::part(icon) {
   outline-offset: 2px;
 }
 
-/* A smaller circle than the trigger that opened it, one step down. */
 helix-headless-speed-dial-item::part(icon) {
   align-items: center;
   aspect-ratio: 1;

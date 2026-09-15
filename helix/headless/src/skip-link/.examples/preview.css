@@ -1,22 +1,3 @@
-/* What the headless tier asks a consumer to write for Skip Link.
- *
- * The styled tier's default state, in structure and spacing, drawn in grays:
- * the same parts boxed, the same direction, gaps and corners, so a reader sees
- * the component a consumer would build rather than a sketch of it. No token,
- * because `headless` does not depend on `helix/styles` and a consumer taking
- * that tier has none to reach for, so the styled values are written out in
- * `rem`, radii included: a corner is structure the way a padding is, and it is
- * what makes a bubble a bubble and a joined group one object. Two grays draw
- * edges, as the styled tier's two do: `edge` is the quiet resting border of a
- * control or a surface, and `line` the rule between content and the edge of
- * anything hovered or chosen. The page is set in the system's sans-serif, which
- * is the page's decision and not the component's.
- *
- * **The one rule that is not optional is the first.** Hidden until focused,
- * and hidden by clipping rather than by `display: none` or `visibility:
- * hidden`, both of which take the link out of the tab order. A skip link that
- * the keyboard cannot reach is the commonest way one is broken. */
-
 :root {
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
@@ -42,8 +23,6 @@ helix-headless-skip-link:not(:focus-within) {
   white-space: nowrap;
 }
 
-/* Over the page's corner once focus arrives, the one inverse surface here: a
-   control that exists to be seen the moment it is reached. */
 helix-headless-skip-link:focus-within {
   display: block;
   inset-block-start: 0.75rem;
@@ -64,15 +43,11 @@ helix-headless-skip-link::part(link) {
   text-decoration: none;
 }
 
-/* The keyboard is the only thing that ever reaches this, so the ring is the
-   point of it. */
 helix-headless-skip-link::part(link):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
 }
 
-/* The page it skips: a header row with the mark at the start and the sections
-   centered, then the content it lands on. */
 header {
   align-items: center;
   block-size: 3.5rem;
@@ -95,8 +70,6 @@ nav {
   gap: 0.25rem;
 }
 
-/* Nav items rather than links in a sentence: no underline, muted until they
-   are the page you are on. */
 nav a {
   align-items: center;
   block-size: 100%;
@@ -126,8 +99,6 @@ nav a:focus-visible {
   outline-offset: -2px;
 }
 
-/* The content starts on the header's inset, so the page reads as one column
-   rather than a header and a paragraph a step to its left. */
 main {
   padding-inline: 1.5rem;
 }
