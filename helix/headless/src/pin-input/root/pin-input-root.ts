@@ -3,7 +3,6 @@ import {
   customElement,
   HelixCompleteEvent,
   HelixFormElement,
-  inlineStep,
   MixinControllerValue,
   MixinField,
 } from '@fusion.dev/helix-core'
@@ -37,6 +36,12 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * the field as a whole, and repeating it on six boxes offers a browser six
  * places to put one code.
  *
+ * **Left to right on every page.** A code is read the way a phone number is,
+ * one character after another from the left, in Arabic and Hebrew as in
+ * English, so the row carries `dir="ltr"`: the first box is the leftmost, a
+ * paste fills rightward and the right arrow moves on. The label, the hint and
+ * the feedback are words and keep the page's direction.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -50,7 +55,7 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  *
  * @csspart cell - One box.
  * @csspart feedback - What is wrong with it.
- * @csspart field - The row of boxes.
+ * @csspart field - The row of boxes, left to right on every page.
  * @csspart hint - Help under the boxes, while nothing is wrong.
  * @csspart label - The question, over the boxes.
  *
@@ -303,9 +308,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     if (at === -1 || this.isDisabled || this.readOnly) {
       return
     }
-    /* The boxes run along the line, so on a right-to-left page the first is on
-       the right and the left arrow is the one that moves on. */
-    const to = at + inlineStep(this, event.key)
+    /* Not `inlineStep`: the row is left to right whatever the page, so the key
+       pointing right is the one that moves on in every script. */
+    const to = at + (event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0)
     if (event.key === 'Backspace' && cell.value === '' && at > 0) {
       const characters = this.characters
       characters[at - 1] = ''
@@ -520,6 +525,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
        The set names itself through `hostAria` instead. */
     return html`${this.renderGroupLabel()}
       <div
+        dir="ltr"
         part="field"
         role="group"
         aria-describedby=${this.describedBy ?? nothing}
