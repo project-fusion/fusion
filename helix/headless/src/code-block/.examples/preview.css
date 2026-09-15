@@ -47,17 +47,23 @@
 /* A column: the name over the code, and a block given a height spends it on
    the code. */
 helix-headless-code-block {
+  /* Where the copy button stands: centered on the first line of code, which is
+     the block's padding twice and one line, and as far from the end as from
+     the top. */
+  --_copy-inset: calc((0.75rem * 2 + 0.8125rem * 1.5 - 2rem) / 2);
   display: flex;
   flex-direction: column;
   line-height: 1.5;
 }
 
 /* The name, over the code rather than floating on it, in a bar on a quiet fill
-   that shares the block's edge. */
+   that shares the block's edge. The header takes the top two corners and the
+   block the bottom two, so the pair reads as one rounded surface. */
 helix-headless-code-block::part(header) {
   align-items: center;
   background-color: var(--_gray-subtle);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-panel) var(--_radius-panel) 0 0;
   display: flex;
   padding: 0.5rem 1rem;
 }
@@ -69,47 +75,66 @@ helix-headless-code-block::part(label) {
   font-weight: 500;
 }
 
-/* The positioning context for the copy button, which sits inside the code box. */
+/* The positioning context for the copy button, which stands in the block's
+   trailing gutter. */
 helix-headless-code-block::part(frame) {
   flex: 1;
   position: relative;
 }
 
-/* Scrolls, never wraps, on the page's own ground inside a hairline. The top
-   edge is the header's, so the block does not draw a second one under it; the
-   trailing inset is the copy button's gutter. */
+/* On the page's own ground inside the quiet edge, the trailing inset being the
+   copy button's gutter. The top edge and corners are the header's, so the block
+   draws neither.
+
+   **Written for a named block, and not read off `[label]`.** A sibling
+   combinator cannot follow `::part()`, which makes the attribute look like the
+   way to ask whether a header is drawn, but React sets `label` as a property on
+   a defined element and the attribute is never there to match. A block with no
+   name wants the top edge and corners back. */
 helix-headless-code-block::part(block) {
   block-size: 100%;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
   border-block-start-width: 0;
+  border-radius: 0 0 var(--_radius-panel) var(--_radius-panel);
   box-sizing: border-box;
   margin: 0;
-  overflow-x: auto;
-  padding: 0.75rem 3.25rem 0.75rem 1rem;
+  overflow: auto;
+  padding: 0.75rem calc(2rem + var(--_copy-inset) * 2) 0.75rem 1rem;
 }
 
+/* **The code scrolls, not the block.** Scrolled by the `<pre>`, a long line
+   runs under the copy button, because a scroller's end padding exists only at
+   the end of its content and the button stands over everything before it. The
+   `<code>` scrolls inside the block's padding instead, so a line stops at the
+   gutter and the button never covers a character. */
 helix-headless-code-block::part(code) {
   color: var(--_gray-strong);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  display: block;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.8125rem;
   line-height: 1.5;
+  overflow-x: auto;
 }
 
 helix-headless-code-block::part(copy) {
-  inset-block-start: 0.25rem;
-  inset-inline-end: 0.25rem;
+  inset-block-start: var(--_copy-inset);
+  inset-inline-end: var(--_copy-inset);
   position: absolute;
 }
 
-/* A ghost icon button: no fill and no edge until a pointer is on it. */
+/* A ghost icon button a step under control height, so a one-line block holds
+   it with the same room on every side: no fill and no edge until a pointer is
+   on it. */
 helix-headless-code-block::part(copy-button) {
   all: unset;
-  block-size: 2.5rem;
+  block-size: 2rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
   display: inline-grid;
-  inline-size: 2.5rem;
+  inline-size: 2rem;
   place-items: center;
 }
 
@@ -122,6 +147,43 @@ helix-headless-code-block::part(copy-mark) {
   block-size: 1rem;
   flex: none;
   inline-size: 1rem;
+}
+
+/* The bubble that says Copy, and Copied after a press: the page's opposite,
+   small and tight. It is a popover the component places, so the UA's centering
+   `margin` goes and the position is `fixed`, which is what the component writes
+   its coordinates for. */
+helix-headless-code-block::part(copy-tooltip) {
+  align-items: center;
+  background-color: var(--_gray-strong);
+  border: 0;
+  border-radius: var(--_radius-control);
+  color: var(--_gray-surface);
+  display: flex;
+  font-size: 0.75rem;
+  inline-size: max-content;
+  line-height: 1.2;
+  margin: 0;
+  overflow: visible;
+  padding: 0.25rem 0.5rem;
+  position: fixed;
+}
+
+/* Only while open: the `display` above would otherwise override the UA's
+   `display: none` on a closed popover. */
+helix-headless-code-block::part(copy-tooltip):not(:popover-open) {
+  display: none;
+}
+
+/* A square turned to a point in the bubble's own fill, hanging below it: the
+   default placement is `top`. */
+helix-headless-code-block::part(copy-tooltip-arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  inset-block-end: -0.25rem;
+  position: absolute;
+  rotate: 45deg;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline

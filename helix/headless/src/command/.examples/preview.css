@@ -58,7 +58,9 @@ helix-headless-icon {
 helix-headless-command::part(dialog) {
   align-self: start;
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 0.75rem 2rem light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.5));
   box-sizing: border-box;
   color: var(--_gray-strong);
   flex-direction: column;
@@ -164,10 +166,26 @@ helix-headless-option::part(item) {
   line-height: 1.5;
   min-block-size: 2rem;
   padding: 0.75rem;
+  user-select: none;
 }
 
 helix-headless-option::part(label) {
   color: var(--_gray-strong);
+}
+
+/* Where the keyboard is, and where the pointer is, as one fill. The option
+   names its own row `item-active` once typing or the arrows have put the
+   keyboard on it, which is what reaches it from here. */
+helix-headless-option::part(item-active),
+helix-headless-option:not([disabled])::part(item):hover {
+  background-color: var(--_gray-fill);
+}
+
+/* What the typing matched, painted over the option's own text. A highlight is
+   styled from the document the text lives in, so this page names it; left to
+   the base layer it is the brand's blue. */
+::highlight(helix-filter-match) {
+  background-color: var(--_gray-line);
 }
 
 /* The hint row, ruled off from the list above it. No `display` here: the
@@ -184,20 +202,26 @@ helix-headless-command p {
   margin: 0;
 }
 
+/* A key: a quiet edge, and a lower one a step darker, which is what makes the
+   box read as a cap pressed into the panel rather than a tag. */
 helix-headless-kbd::part(kbd) {
   align-items: center;
-  background-color: var(--_gray-fill);
+  background-color: var(--_gray-subtle);
   block-size: 1.5em;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: inset 0 -1px 0 0 var(--_gray-line);
   box-sizing: border-box;
   color: var(--_gray-muted);
   display: inline-flex;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.85em;
   font-weight: 500;
   justify-content: center;
   line-height: 1;
   min-inline-size: 1.5em;
+  padding-block-start: 1px;
   padding-inline: 0.4em;
 }
 

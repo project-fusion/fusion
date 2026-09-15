@@ -52,13 +52,11 @@ helix-headless-icon {
 }
 
 /* A column, so the label, the field and the hint stack at one gap without
-   any of them carrying a margin. Positioned, so the panel has an edge to hang
-   from. */
+   any of them carrying a margin. */
 helix-headless-combobox {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  position: relative;
 }
 
 /* The field carries the box rather than the input, so the caret sits inside
@@ -67,11 +65,16 @@ helix-headless-combobox::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   display: flex;
   gap: 0.5rem;
   padding-inline: 0.5rem;
+}
+
+helix-headless-combobox:not(:disabled)::part(field):hover {
+  border-color: var(--_gray-muted);
 }
 
 helix-headless-combobox::part(control) {
@@ -96,13 +99,30 @@ helix-headless-combobox::part(indicator) {
   inline-size: 1rem;
 }
 
-/* One frame for the panel, and none on the list inside it, which would draw
-   the shape twice. */
+/* The caret turns over while the list is open, saying which way it went. */
+helix-headless-combobox:state(open)::part(indicator) {
+  scale: 1 -1;
+}
+
+/* The panel over the page, as wide as the field it came out of and never
+   taller than the room under it, both of which the component publishes. The
+   platform centers a `popover` through `inset: 0` and `margin: auto`, and the
+   component writes its position as a translate from the top-left, so both
+   go. One frame for the panel and none on the list inside it, which would
+   draw the shape twice. */
 helix-headless-combobox::part(surface) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 0.75rem 2rem light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.5));
   box-sizing: border-box;
   color: var(--_gray-strong);
+  inline-size: var(--floating-anchor-inline-size, 100%);
+  inset: auto;
+  margin: 0;
+  max-block-size: var(--floating-available-block-size, none);
+  min-inline-size: max-content;
+  overflow: hidden;
   padding: 0;
 }
 
@@ -111,10 +131,37 @@ helix-headless-combobox::part(listbox) {
   display: block;
 }
 
+/* The panel is named by the field's label, so the list's own caption would
+   say it twice on screen. Clipped rather than removed, since the list is still
+   named by it. */
+helix-headless-combobox::part(listbox-label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* A list of a few rows' height that scrolls past that, held a step off the
+   panel's edge top and bottom. The keyboard's place is drawn on the active
+   row, so the list itself takes no ring. */
 helix-headless-combobox::part(listbox-items) {
   display: flex;
   flex-direction: column;
+  max-block-size: 14rem;
+  overflow: auto;
   padding-block: 0.25rem;
+}
+
+helix-headless-combobox::part(listbox-items):focus-visible {
+  outline: none;
+}
+
+helix-headless-combobox::part(listbox-empty) {
+  color: var(--_gray-muted);
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.5rem;
 }
 
 helix-headless-combobox::part(listbox-filter-mark) {
@@ -157,7 +204,7 @@ helix-headless-combobox::part(feedback) {
 
 /* A stated row height, so every row is the same whatever is slotted into it,
    and the words on the field's own inset so they do not shift when the panel
-   opens. */
+   opens. Full width, the panel doing the rounding. */
 helix-headless-option::part(item) {
   align-items: center;
   background-color: transparent;
@@ -171,11 +218,44 @@ helix-headless-option::part(item) {
   line-height: 1.5;
   min-block-size: 2rem;
   padding: 0.25rem 0.5rem;
+  user-select: none;
 }
 
 helix-headless-option::part(label) {
   color: var(--_gray-strong);
-  font-weight: 500;
+}
+
+/* Where the keyboard is, and where the pointer is, as one fill. The option
+   names its own row `item-active`, which is what reaches it from here. A step
+   darker than the quiet fill, which on the panel's ground measured 1.05:1 in
+   light and 1.1:1 in dark: too faint to answer where the keyboard is. */
+helix-headless-option::part(item-active),
+helix-headless-option:not([disabled])::part(item):hover {
+  background-color: var(--_gray-fill);
+}
+
+/* What the typing matched, which the list paints as a highlight over the
+   option's own text rather than wrapping it. A highlight is styled from the
+   document the text lives in, so this page names it; left to the base layer it
+   is the brand's blue. A step darker than the active row, so it shows there
+   too. */
+::highlight(helix-filter-match) {
+  background-color: var(--_gray-line);
+}
+
+/* The chosen option carries a tick at the far end, which is a different fact
+   from where the keyboard is. */
+helix-headless-option::part(item-selected)::after {
+  background-color: currentColor;
+  block-size: 1rem;
+  content: "";
+  flex: none;
+  inline-size: 1rem;
+  margin-inline-start: auto;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
 }
 
 helix-headless-icon::part(svg) {

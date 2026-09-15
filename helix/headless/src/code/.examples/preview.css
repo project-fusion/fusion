@@ -58,11 +58,15 @@ helix-headless-code {
 
 /* A step down by ratio rather than to a fixed size, since a monospace face
    reads larger than the prose around it, on a quiet fill. Half a step of inline
-   room: a full one renders `(code)` as `( code )`. */
+   room: a full one renders `(code)` as `( code )`. The ink sits a little back
+   from the prose, so the fragment reads as quoted rather than as emphasis; the
+   muted gray alone is too far back for something a reader has to copy. */
 helix-headless-code::part(code) {
   background-color: var(--_gray-subtle);
-  color: var(--_gray-strong);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  border-radius: var(--_radius-control);
+  color: color-mix(in oklab, var(--_gray-strong) 30%, var(--_gray-muted));
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.9286em;
   padding: 0 0.125rem;
 }
