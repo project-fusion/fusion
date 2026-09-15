@@ -17,7 +17,12 @@ export function Example() {
       <header>
         <span>Logo</span>
         <nav aria-label="Sections">
-          <a href="#one">Item One</a>
+          <a
+            aria-current="page"
+            href="#one"
+          >
+            Item One
+          </a>
           <a href="#two">Item Two</a>
         </nav>
       </header>

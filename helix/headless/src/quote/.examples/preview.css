@@ -50,3 +50,17 @@ helix-headless-icon::part(svg) {
   flex: none;
   inline-size: 1em;
 }
+
+p {
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Set apart from the sentence carrying it by the slant, and by how far its
+   gray steps back from the text around it. */
+helix-headless-quote::part(quote) {
+  color: var(--_gray-muted);
+  font-style: italic;
+}

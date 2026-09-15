@@ -45,45 +45,129 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-speed-dial::part(trigger) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-helix-headless-speed-dial::part(actions) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
-helix-headless-icon-button::part(button) {
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
-helix-headless-speed-dial-item::part(item) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
+/* A box for the dial to be docked inside, since a page in a preview pane is not
+   the window: a quiet surface, and the positioned ancestor the dial measures
+   against. */
+.page {
+  background-color: var(--_gray-subtle);
+  block-size: 20rem;
+  position: relative;
 }
 
-helix-headless-speed-dial-item::part(label) {
-  color: var(--_gray-strong);
-  font-weight: 600;
+/* Docked to the box's bottom-end corner. The styled tier reads `data-dock` and
+   `data-dock-within` from its base layer; the headless tier has none, so the
+   placement they ask for is written out. */
+helix-headless-speed-dial[data-dock-within] {
+  display: inline-flex;
+  inset-block-end: 1.5rem;
+  inset-inline-end: 1.5rem;
+  position: absolute;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
+helix-headless-icon-button {
+  display: inline-flex;
+}
+
+/* The one action on the page that is always there: round, which a floating
+   action button is rather than softened, filled in the darkest gray at the
+   large control step. */
+helix-headless-icon-button[slot="trigger"]::part(button) {
+  all: unset;
+  align-items: center;
+  background-color: var(--_gray-strong);
+  block-size: 3rem;
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: var(--_gray-surface);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1.25rem;
+  inline-size: 3rem;
+  justify-content: center;
+}
+
+helix-headless-speed-dial::part(trigger) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+/* The keyboard reaches these, so the ring goes here. Taking the UA outline
    off without putting one back is the commonest way a headless control stops
    being operable without a pointer. */
+helix-headless-icon-button[slot="trigger"]::part(button):focus-visible,
 helix-headless-speed-dial::part(trigger):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+/* The fanned-out actions, a column over the trigger with no panel of their
+   own. `display` only while the panel is open: an author `display` outranks
+   the platform's `[hidden]` and its closed-popover rule alike, and would draw
+   the actions with the dial shut. The platform also centers a `popover`
+   through `inset: 0` and `margin: auto`, and the component positions this one
+   as a translate from the top-left, so the margin goes. */
+helix-headless-speed-dial::part(actions) {
+  align-items: flex-end;
+  background-color: transparent;
+  border: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+helix-headless-speed-dial::part(actions):popover-open {
+  display: flex;
+}
+
+/* The name beside the mark, on the end the trigger is on. */
+helix-headless-speed-dial-item::part(item) {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: row-reverse;
+  font: inherit;
+  gap: 0.75rem;
+  padding: 0;
+}
+
+helix-headless-speed-dial-item::part(item):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+/* A smaller circle than the trigger that opened it, one step down. */
+helix-headless-speed-dial-item::part(icon) {
+  align-items: center;
+  aspect-ratio: 1;
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  border-radius: 50%;
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  display: inline-flex;
+  font-size: 1.25rem;
+  inline-size: 2rem;
+  justify-content: center;
+}
+
+helix-headless-speed-dial-item::part(label) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  color: var(--_gray-strong);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  white-space: nowrap;
 }

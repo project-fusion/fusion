@@ -45,27 +45,55 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-stat {
-  display: flex;
-  flex-direction: column;
-  font-size: 1.25rem;
-  gap: 0.125rem;
-  margin-inline-end: 2rem;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
-/* No parts at all, so the arrangement is the host and its children. */
+/* No parts at all, so the arrangement is the host and its children: the
+   figures in a row, wrapping on a narrow page, with a rule before every one but
+   the first. */
 helix-headless-stat-group {
   display: flex;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  gap: 3rem;
+}
+
+helix-headless-stat-group > helix-headless-stat:not(:first-child) {
+  border-inline-start: 1px solid var(--_gray-line);
+  padding-inline-start: 3rem;
+}
+
+/* The label across the top, the figure under it and its unit beside it on the
+   same baseline. The figure is the element's own text, so the host carries its
+   type and the label and unit set their own. */
+helix-headless-stat {
+  align-content: start;
+  align-items: baseline;
+  color: var(--_gray-strong);
+  display: grid;
+  font-size: 2.75rem;
+  font-weight: 600;
+  gap: 0.25rem;
+  grid-template-columns: auto 1fr;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 helix-headless-stat [slot="label"] {
   color: var(--_gray-muted);
   font-size: 0.75rem;
+  font-weight: 500;
+  grid-column: 1 / -1;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+helix-headless-stat [slot="unit"] {
+  color: var(--_gray-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.5;
 }

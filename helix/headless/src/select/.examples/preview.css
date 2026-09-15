@@ -45,39 +45,130 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
+helix-headless-icon::part(svg) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+/* The question over the control, the hint under it. */
+helix-headless-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: relative;
+}
+
 helix-headless-select::part(label) {
   color: var(--_gray-strong);
-  font-weight: 600;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
 }
 
+/* A field and not a button: a quiet fill at control height, the chosen text
+   first and the caret at the far end. */
 helix-headless-select::part(trigger) {
   all: unset;
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2.5rem;
+  border: 1px solid var(--_gray-line);
   box-sizing: border-box;
+  color: var(--_gray-strong);
   cursor: pointer;
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  justify-content: space-between;
+  line-height: 1.5;
+  padding: 0 0.5rem;
 }
 
-helix-headless-select::part(surface) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+helix-headless-select:not(:disabled)::part(trigger):hover {
+  border-color: var(--_gray-muted);
 }
 
-helix-headless-select::part(listbox) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  padding: 0.5rem;
+/* On the field's own edge, as the other fields draw it. */
+helix-headless-select::part(trigger):focus-visible {
+  border-color: var(--_gray-strong);
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 0;
+}
+
+helix-headless-select::part(value) {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+helix-headless-select::part(indicator) {
+  block-size: 1rem;
+  fill: var(--_gray-muted);
+  flex: none;
+  inline-size: 1rem;
+}
+
+/* A slotted caret, sized through its font because the icon draws at `1em`. */
+helix-headless-select > helix-headless-icon[slot="indicator"] {
+  color: var(--_gray-muted);
+  font-size: 1.25rem;
+}
+
+helix-headless-select::part(hint),
+helix-headless-select::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
 }
 
 helix-headless-select::part(hint) {
   color: var(--_gray-muted);
-  font-size: 0.875em;
 }
 
 helix-headless-select::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
+  color: var(--_gray-strong);
+  font-weight: 500;
+}
+
+/* The panel over the page, as wide as the field it came out of. The platform
+   centers a `popover` through `inset: 0` and `margin: auto`, and the component
+   writes its position as a translate from the top-left, so both go. */
+helix-headless-select::part(surface) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-line);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  inline-size: var(--floating-anchor-inline-size, 100%);
+  inset: auto;
+  margin: 0;
+  min-inline-size: max-content;
+  padding: 0.5rem 0;
+}
+
+helix-headless-select::part(listbox-items) {
+  max-block-size: 14rem;
+  overflow: auto;
+}
+
+/* The panel names itself from the select's label, so the words would be said
+   twice on screen; clipped rather than removed, since the list is still named
+   by them. The keyboard's place is drawn on the active option, not as a ring
+   around the whole list. */
+helix-headless-select::part(listbox-label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-select::part(listbox-items):focus-visible {
+  outline: none;
 }
 
 helix-headless-select::part(listbox-filter-mark) {
@@ -86,34 +177,35 @@ helix-headless-select::part(listbox-filter-mark) {
   inline-size: 1em;
 }
 
-helix-headless-icon::part(svg) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
 helix-headless-option::part(item) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-helix-headless-option::part(label) {
+  align-items: center;
+  box-sizing: border-box;
   color: var(--_gray-strong);
-  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  min-block-size: 2rem;
+  padding: 0.25rem 0.5rem;
+  user-select: none;
 }
 
-/* The keyboard reaches this, so the ring goes here. Taking the UA outline
-   off without putting one back is the commonest way a headless control stops
-   being operable without a pointer. */
-helix-headless-select::part(trigger):focus-visible {
-  outline: 2px solid var(--_gray-mark);
-  outline-offset: 2px;
+helix-headless-option[data-active]::part(item),
+helix-headless-option:not([disabled])::part(item):hover {
+  background-color: var(--_gray-subtle);
 }
 
-helix-headless-select::part(indicator) {
-  block-size: 1em;
-  fill: var(--_gray-muted);
+/* The chosen option carries a tick at the far end, which is a different fact
+   from where the keyboard is. */
+helix-headless-option:state(selected)::part(item)::after {
+  background-color: currentColor;
+  block-size: 1rem;
+  content: "";
   flex: none;
-  inline-size: 1em;
+  inline-size: 1rem;
+  margin-inline-start: auto;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
 }

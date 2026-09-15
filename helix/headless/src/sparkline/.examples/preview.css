@@ -38,21 +38,6 @@
   --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-helix-headless-sparkline {
-  --chart-series-1: light-dark(#2a2a2e, #e9e9ec);
-  --chart-series-2: light-dark(#4a4a50, #c9c9ce);
-  --chart-series-3: light-dark(#6b6b73, #a1a1aa);
-  --chart-series-4: light-dark(#8e8e96, #86868f);
-  --chart-series-5: light-dark(#b1b1b8, #63636b);
-  --chart-series-6: light-dark(#d2d2d7, #45454b);
-}
-
 helix-headless-icon {
   block-size: 1em;
   display: inline-flex;
@@ -60,46 +45,86 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-sparkline {
-  block-size: 3rem;
-  display: block;
-  inline-size: 12rem;
-}
-
-helix-headless-sparkline::part(area) {
-  fill: var(--chart-series, var(--chart-series-1));
-  opacity: 0.25;
-}
-
-helix-headless-sparkline::part(bar) {
-  fill: var(--chart-series, var(--chart-series-1));
-}
-
-helix-headless-sparkline::part(line) {
-  fill: none;
-  stroke: var(--chart-series, var(--chart-series-1));
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
-helix-headless-sparkline::part(svg) {
-  display: block;
-  inline-size: 100%;
-}
-
-helix-headless-sparkline::part(terminus) {
-  fill: var(--chart-series, var(--chart-series-1));
-}
-
 helix-headless-icon::part(svg) {
-  display: block;
-  inline-size: 100%;
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
 }
 
-/* Two plots side by side, which is what the styled twin shows. */
+/* Three plots in a row, which wraps where a narrow page runs out of room. */
 .row {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 2rem;
+}
+
+/* A figure-sized box, because a sparkline sits beside a figure or in a table
+   cell, and one ink for every mark in it, carried as `color` so the line, the
+   bars, the wash and the end dot cannot disagree. */
+helix-headless-sparkline {
+  block-size: 2.1875rem;
+  color: var(--_gray-strong);
+  display: inline-block;
+  inline-size: 6.125rem;
+  position: relative;
+  vertical-align: middle;
+}
+
+helix-headless-sparkline::part(svg) {
+  block-size: 100%;
+  display: block;
+  inline-size: 100%;
+  overflow: visible;
+}
+
+helix-headless-sparkline::part(line) {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+}
+
+helix-headless-sparkline::part(bar) {
+  fill: currentColor;
+}
+
+/* The area is a wash under the line, strongest where it meets the line and
+   nearly gone at the floor: the component ships the gradient, and the stops
+   take the ink. */
+helix-headless-sparkline::part(area) {
+  fill: none;
+}
+
+helix-headless-sparkline[plot="area"]::part(area) {
+  fill: url("#sparkline-wash");
+}
+
+helix-headless-sparkline::part(wash-start),
+helix-headless-sparkline::part(wash-end) {
+  stop-color: currentColor;
+  stop-opacity: 0;
+}
+
+helix-headless-sparkline[plot="area"]::part(wash-start) {
+  stop-opacity: 0.45;
+}
+
+helix-headless-sparkline[plot="area"]::part(wash-end) {
+  stop-opacity: 0.05;
+}
+
+/* The last reading, a dot, which is round rather than softened. Placed from
+   `--chart-terminus-x` and `--chart-terminus-y`, which the component writes. */
+helix-headless-sparkline::part(terminus) {
+  background-color: currentColor;
+  block-size: 5px;
+  border-radius: 50%;
+  inline-size: 5px;
+  inset-block-start: var(--chart-terminus-y);
+  inset-inline-start: var(--chart-terminus-x);
+  position: absolute;
+  translate: -50% -50%;
 }

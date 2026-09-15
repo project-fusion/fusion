@@ -45,48 +45,107 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-radio-group::part(label) {
-  color: var(--_gray-strong);
-  font-weight: 600;
-}
-
-helix-headless-radio-group::part(items) {
-  align-items: center;
-  display: flex;
-  gap: 0.25rem;
-}
-
-helix-headless-radio-group::part(hint) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-radio-group::part(feedback) {
-  color: var(--_gray-muted);
-  font-size: 0.875em;
-}
-
-helix-headless-radio::part(item) {
-  background-color: transparent;
-  border: 0;
-  padding: 0.25rem 0.5rem;
-}
-
-helix-headless-radio::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
-}
-
-helix-headless-radio::part(label) {
-  color: var(--_gray-strong);
-  font-weight: 600;
-}
-
 helix-headless-icon::part(svg) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
+}
+
+/* The question over the set, the choices in a column, the hint under them. */
+helix-headless-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+helix-headless-radio-group::part(label) {
+  color: var(--_gray-strong);
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+helix-headless-radio-group::part(items) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+helix-headless-radio-group::part(hint),
+helix-headless-radio-group::part(feedback) {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
+}
+
+helix-headless-radio-group::part(hint) {
+  color: var(--_gray-muted);
+}
+
+helix-headless-radio-group::part(feedback) {
+  color: var(--_gray-strong);
+  font-weight: 500;
+}
+
+helix-headless-radio {
+  display: block;
+}
+
+/* The button is the whole row, circle and words, so `all: unset` takes the
+   platform's button chrome off it. */
+helix-headless-radio::part(item) {
+  all: unset;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+/* A circle is round rather than softened, so it keeps its radius. */
+helix-headless-radio::part(box) {
+  background-color: var(--_gray-surface);
+  block-size: 1.25rem;
+  border: 1px solid var(--_gray-line);
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: grid;
+  flex: none;
+  inline-size: 1.25rem;
+  place-items: center;
+}
+
+helix-headless-radio::part(mark) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  border-radius: 50%;
+  inline-size: 0.5rem;
+  scale: 0;
+}
+
+helix-headless-radio:not([disabled]):hover::part(box) {
+  border-color: var(--_gray-muted);
+}
+
+helix-headless-radio:state(selected)::part(box) {
+  border-color: var(--_gray-strong);
+}
+
+helix-headless-radio:state(selected)::part(mark) {
+  scale: 1;
+}
+
+helix-headless-radio::part(label) {
+  color: var(--_gray-strong);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+helix-headless-radio[disabled] {
+  opacity: 0.5;
 }
 
 /* The keyboard reaches this, so the ring goes here. Taking the UA outline
