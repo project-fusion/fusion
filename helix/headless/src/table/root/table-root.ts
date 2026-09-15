@@ -8,6 +8,72 @@ import type { HelixHeadlessTableRow } from '../row/table-row.js'
 const EDGES = new Set(['center', 'end', 'start'])
 
 /**
+ * The first `wanted` tracks of a track list, one entry each, so every declared
+ * column can take the one in its place.
+ *
+ * Split on the spaces between tracks and never inside a function, so
+ * `minmax(0, 1fr)` stays one track. A `repeat()` with a count is that many
+ * tracks, written out; an automatic one names no count and yields none. Line
+ * names go with the track after them.
+ *
+ * **A track the grid would refuse yields nothing either**, where the platform
+ * can say. One invalid track makes the whole `grid-template-columns` invalid,
+ * which a grid ignores in silence and draws as one column. That is the failure
+ * that once had `columns` deprecated, a list of headings handed over as widths,
+ * and dealt out a track at a time it costs the one column its width and no
+ * more.
+ */
+const tracksOf = (list: string, wanted: number): string[] => {
+  const words: string[] = []
+  let depth = 0
+  let word = ''
+  for (const char of list.trim()) {
+    if (char === '(' || char === '[') {
+      depth += 1
+    } else if (char === ')' || char === ']') {
+      depth -= 1
+    }
+    if (depth === 0 && /\s/.test(char)) {
+      if (word) {
+        words.push(word)
+      }
+      word = ''
+    } else {
+      word += char
+    }
+  }
+  if (word) {
+    words.push(word)
+  }
+  const valid = (track: string): boolean =>
+    typeof CSS === 'undefined' || CSS.supports('grid-template-columns', track)
+  const tracks: string[] = []
+  let names = ''
+  for (const one of words) {
+    if (tracks.length >= wanted) {
+      break
+    }
+    if (one.startsWith('[')) {
+      names += `${one} `
+      continue
+    }
+    const repeat = /^repeat\(\s*(\d+)\s*,(.*)\)$/is.exec(one)
+    if (repeat) {
+      const inner = tracksOf(repeat[2] ?? '', wanted)
+      for (let time = 0; time < Number(repeat[1]) && tracks.length < wanted; time += 1) {
+        tracks.push(
+          ...inner.map((track, index) => (time === 0 && index === 0 ? names + track : track)),
+        )
+      }
+    } else if (!/^repeat\(/i.test(one)) {
+      tracks.push(valid(names + one) ? names + one : '')
+    }
+    names = ''
+  }
+  return tracks.slice(0, wanted)
+}
+
+/**
  * @summary Tabular data laid out on a grid.
  *
  * @description
@@ -45,15 +111,24 @@ const EDGES = new Set(['center', 'end', 'start'])
 @customElement('helix-headless-table')
 export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /**
-   * Column track list, as CSS. Deprecated: declare columns instead.
+   * The column widths as one track list, written once on the table.
    *
-   * Kept for a table that has no `helix-table-column` children, and ignored the
-   * moment it has one. A raw track list is the right shape for the value and
-   * the wrong place for it: the headings and the widths were two halves of one
-   * fact held in two places, and nothing checked that they agreed. Worse, the
-   * value is CSS, so handing it headings by mistake produced an invalid track
-   * list, which a grid ignores in silence: the table collapsed to one column
-   * and said nothing. Columns carry both halves now.
+   * With `helix-table-column` children, each track sizes the column in its
+   * place, a hidden column counted, so hiding one takes its track with it and
+   * the rest keep theirs. The columns decide how many tracks there are and this
+   * list only how wide: a track past the last column is dropped, and a column
+   * past the last track shares what is left. With no columns declared it is
+   * the whole track list. Tracks count as the grid counts them, so
+   * `minmax(0, 1fr)` is one and `repeat(2, 8rem)` is two, and one the grid
+   * would refuse leaves its column at the default rather than taking the table
+   * down to one column.
+   *
+   * **A column's own `width` wins over its track here.** The width is written
+   * on the column it sizes, which is the more particular statement, and it is
+   * where a resize lands: a reader dragging a column's edge writes `width`, so
+   * were this list to win, the drag would move the separator and leave the
+   * track where the list put it. This is the table's default for its columns,
+   * and each column may say otherwise.
    */
   @property()
   columns = ''
@@ -82,15 +157,20 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * nothing else to be told. A hidden column takes no track: left in, the
    * header row had a heading fewer than the grid had tracks, the first cell
    * filled the gap, and every row after it began a column late. Falls back to
-   * the `columns` string for a table written before columns existed, and to a
-   * single track for one that declares neither.
+   * the `columns` string for a table that declares no columns, and to a single
+   * track for one that declares neither.
    */
   private get template(): string {
     const declared = this.tableColumns
     if (declared.length === 0) {
       return this.columns
     }
-    return declared.flatMap((column) => (column.shown ? [column.track] : [])).join(' ')
+    const listed = tracksOf(this.columns, declared.length)
+    return declared
+      .flatMap((column, index) =>
+        column.shown ? [column.width ? column.track : listed[index] || column.track] : [],
+      )
+      .join(' ')
   }
 
   /* Columns arrive from the light DOM, which changes no property here, so
