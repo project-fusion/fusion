@@ -52,7 +52,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart row - The clickable label row, which is an `<a>` where `href` is set.
  * @csspart toggle - The expand and collapse control.
  *
- * @cssproperty --tree-level - How deep this row sits, counting from zero, for the indent.
+ * @cssproperty --tree-level - How deep this row sits, counting from one as `aria-level` does, for the indent.
  */
 @customElement('helix-headless-tree-item')
 export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
