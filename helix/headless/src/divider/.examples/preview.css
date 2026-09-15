@@ -51,8 +51,16 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-/* The prose either side, set flush against the rule: the rule is the whole of
-   the separation, with no margin above or below it. */
+/* The rule and the prose either side of it stand at one gap, so a descender
+   never sits on the line and the next capital never hangs from it. The
+   divider carries no margin of its own: the space between blocks is the
+   column's to say. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 p {
   color: var(--_gray-strong);
   font-size: 0.875rem;

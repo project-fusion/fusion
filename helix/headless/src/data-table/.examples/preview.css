@@ -60,11 +60,49 @@ helix-headless-data-table {
   display: block;
 }
 
+/* Where the columns are wider than the box, the grid scrolls, and the edge
+   with more behind it fades out so the clipped column reads as continuing
+   rather than cut. A scroll timeline drives it, and a timeline over a box
+   with nothing to scroll is inactive, so a table that fits is never
+   masked. */
 helix-headless-data-table::part(table) {
+  animation: data-table-edges linear both;
+  animation-timeline: scroll(self inline);
   display: grid;
   grid-template-columns: var(--data-table-template, minmax(0, 1fr));
   inline-size: 100%;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--_fade-start, 0rem),
+    #000 calc(100% - var(--_fade-end, 0rem)),
+    transparent
+  );
   overflow-x: auto;
+}
+
+@keyframes data-table-edges {
+  0% {
+    --_fade-end: 2rem;
+    --_fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_fade-end: 2rem;
+    --_fade-start: 2rem;
+  }
+
+  100% {
+    --_fade-end: 0rem;
+    --_fade-start: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  helix-headless-data-table::part(table) {
+    animation: none;
+  }
 }
 
 helix-headless-data-table::part(head),
@@ -72,12 +110,16 @@ helix-headless-data-table::part(row) {
   display: contents;
 }
 
+/* The heading's own inset, a flush start and a step at the end, so the words
+   of every column start where their heading does and a column set to the end
+   ends where its heading does. */
 helix-headless-data-table::part(cell) {
   border-block-start: 1px solid var(--_gray-line);
   color: var(--_gray-strong);
   font-size: 0.8125rem;
   line-height: 1.5;
-  padding: 0.75rem;
+  padding-block: 0.75rem;
+  padding-inline: 0 1rem;
 }
 
 /* The heading takes no box of its own, so its heading cell is the grid item. */
@@ -106,6 +148,16 @@ helix-headless-table-column::part(sort) {
   flex: 1;
   gap: 0.25rem;
   min-inline-size: 0;
+}
+
+/* The size column is set to the end, and its heading goes there too, over the
+   digits it names: the component aligns the cells and leaves the heading to
+   the sheet. Named by position rather than by `[align="end"]`, because
+   `align` is a property that does not reflect, and React sets it as one, so
+   the TSX twin carries no attribute to match. */
+helix-headless-table-column:last-of-type::part(column),
+helix-headless-table-column:last-of-type::part(sort) {
+  justify-content: flex-end;
 }
 
 helix-headless-data-table::part(empty),
@@ -158,6 +210,7 @@ helix-headless-data-table::part(pagination-next) {
   background-color: transparent;
   block-size: 2rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -177,11 +230,11 @@ helix-headless-data-table::part(pagination-next):hover {
   color: var(--_gray-strong);
 }
 
-/* The page you are on, a raised chip with an edge. */
+/* The page you are on, a filled chip with a quiet edge. */
 helix-headless-data-table::part(pagination-page-current),
 helix-headless-data-table::part(pagination-page-current):hover {
-  background-color: var(--_gray-surface);
-  border-color: var(--_gray-line);
+  background-color: var(--_gray-subtle);
+  border-color: var(--_gray-edge);
   color: var(--_gray-strong);
   font-weight: 600;
 }

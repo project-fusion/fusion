@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <>
+    <helix-flex
+      direction="column"
+      gap="sm"
+    >
       <helix-text>
         Helix ships two tiers from one source. The headless tier carries behavior, semantics and
         nothing else.
@@ -10,6 +13,6 @@ export function Example() {
         The styled tier is the same components with the design system applied, which is what most
         consumers install.
       </helix-text>
-    </>
+    </helix-flex>
   )
 }

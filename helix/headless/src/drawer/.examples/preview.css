@@ -45,6 +45,7 @@
 }
 
 .stack {
+  align-items: flex-start;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -70,6 +71,7 @@ helix-headless-button::part(button) {
   background-color: var(--_gray-strong);
   block-size: 2.5rem;
   border: 1px solid transparent;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-surface);
   cursor: pointer;
@@ -84,17 +86,23 @@ helix-headless-button::part(button) {
   white-space: nowrap;
 }
 
-/* The panel runs the full height of the edge it comes from. The header stays
-   put and the content under it scrolls. */
+/* The panel runs the full height of the edge it comes from, lifted off the
+   page with a quiet edge on the side that faces it, square where it meets the
+   window and rounded where it meets the page. More room over the title than
+   around the rest, as the styled tier gives it. The header stays put and the
+   content under it scrolls. */
 helix-headless-drawer::part(panel) {
   background-color: var(--_gray-surface);
   border: 0;
-  border-inline-start: 1px solid var(--_gray-line);
+  border-end-start-radius: var(--_radius-control);
+  border-inline-start: 1px solid var(--_gray-edge);
+  border-start-start-radius: var(--_radius-control);
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
   box-sizing: border-box;
   color: var(--_gray-strong);
   flex-direction: column;
-  gap: 1rem;
   padding: 1.5rem;
+  padding-block-start: 3rem;
 }
 
 /* Only while open: a closed `<dialog>` is hidden by the UA's `display: none`,
@@ -119,8 +127,18 @@ helix-headless-drawer::part(panel)::backdrop {
 
 helix-headless-drawer::part(header) {
   flex: none;
+}
+
+/* The title, a step clear of the content. The margin is the title's rather
+   than a gap on the panel, because the header region is always drawn and a gap
+   would open over a drawer with no title too. */
+helix-headless-drawer > [slot="header"] {
+  display: block;
   font-size: 1.125rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-block-end: 1rem;
 }
 
 helix-headless-drawer::part(content) {

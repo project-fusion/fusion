@@ -9,7 +9,7 @@
   <helix-table-column
     field="name"
     sortable
-    width="14rem"
+    width="minmax(9rem, 14rem)"
   >Name</helix-table-column>
   <helix-table-column
     field="region"
@@ -19,7 +19,7 @@
     align="end"
     field="size"
     sortable
-    width="8rem"
+    width="6rem"
   >Size</helix-table-column>
 </helix-data-table>
 
@@ -45,16 +45,17 @@
      The unit is chosen per value rather than fixed. Formatted in megabytes
      throughout, 2,100 bytes and 812 bytes both read "0 MB": the table looks
      broken and the values are correct, which is the failure this whole column
-     is here to demonstrate rather than commit. */
-  const units = ['byte', 'kilobyte', 'megabyte', 'gigabyte']
+     is here to demonstrate rather than commit. The symbols are written out
+     because `Intl`'s short name for a byte is "byte", which reads as a typo
+     beside "kB". */
+  const units = ['B', 'kB', 'MB', 'GB']
 
   const bytes = (value) => {
     const step = Math.min(units.length - 1, Math.floor(Math.log10(Math.max(value, 1)) / 3))
-    return new Intl.NumberFormat(undefined, {
+    const amount = new Intl.NumberFormat(undefined, {
       maximumFractionDigits: step === 0 ? 0 : 1,
-      style: 'unit',
-      unit: units[step],
     }).format(value / 1000 ** step)
+    return `${amount} ${units[step]}`
   }
 
   const size = files.querySelector('[field="size"]')

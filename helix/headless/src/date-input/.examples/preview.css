@@ -52,13 +52,11 @@ helix-headless-icon {
 }
 
 /* A column, so the label, the field and the hint stack at one gap without
-   any of them carrying a margin. Positioned, so the panel has an edge to hang
-   from. */
+   any of them carrying a margin. */
 helix-headless-date-input {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  position: relative;
 }
 
 /* The field carries the box rather than the input, so the calendar trigger
@@ -67,7 +65,8 @@ helix-headless-date-input {
 helix-headless-date-input::part(field) {
   align-items: center;
   background-color: var(--_gray-subtle);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
@@ -95,12 +94,17 @@ helix-headless-date-input::part(control)::placeholder {
 helix-headless-date-input::part(trigger) {
   all: unset;
   block-size: 1.25rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
   display: inline-flex;
   flex: none;
   inline-size: 1.25rem;
+}
+
+helix-headless-date-input::part(trigger):hover {
+  color: var(--_gray-strong);
 }
 
 helix-headless-date-input::part(trigger-icon) {
@@ -112,30 +116,199 @@ helix-headless-date-input::part(date) {
   flex: none;
 }
 
-helix-headless-date-input::part(surface) {
-  background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
-  color: var(--_gray-strong);
-  inline-size: max-content;
-  padding: 0.75rem;
-}
-
 helix-headless-date-input::part(date-dismiss-mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
+/* The calendar floats over the page, hung under the start of the field by the
+   component, which writes the position as a `translate` from the viewport's
+   corner. The UA centers a popover through `inset: 0` and `margin: auto`, so
+   both are undone here or the panel lands in the middle of the window. A lift
+   and a quiet edge, as every panel over the page takes. */
+helix-headless-date-input::part(surface) {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  inline-size: max-content;
+  inset: auto;
+  margin: 0;
+  padding: 0.75rem;
+}
+
+/* The calendar is Date Picker, forwarded under `picker-`, so these are that
+   preview's rules with the prefix. */
+helix-headless-date-input::part(picker) {
+  display: inline-block;
+}
+
+/* The months side by side, as many columns as the component says it drew. */
+helix-headless-date-input::part(picker-months) {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(var(--date-picker-column-count, 1), max-content);
+  justify-content: start;
+}
+
+/* The heading centered between two square controls, with room under it
+   before the weekdays. */
+helix-headless-date-input::part(picker-header) {
+  align-items: center;
+  display: grid;
+  gap: 0.25rem;
+  grid-template-columns: 1.875rem 1fr 1.875rem;
+  margin-block-end: 1.5rem;
+}
+
+helix-headless-date-input::part(picker-heading) {
+  color: var(--_gray-strong);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  grid-column: 2;
+  text-align: center;
+}
+
+helix-headless-date-input::part(picker-previous),
+helix-headless-date-input::part(picker-next) {
+  all: unset;
+  align-items: center;
+  block-size: 1.875rem;
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 1.875rem;
+  justify-content: center;
+}
+
+helix-headless-date-input::part(picker-previous) {
+  grid-column: 1;
+}
+
+helix-headless-date-input::part(picker-next) {
+  grid-column: 3;
+}
+
+helix-headless-date-input::part(picker-previous):hover,
+helix-headless-date-input::part(picker-next):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-date-input::part(picker-previous-mark),
 helix-headless-date-input::part(picker-next-mark) {
   block-size: 1em;
   flex: none;
   inline-size: 1em;
 }
 
-helix-headless-date-input::part(picker-previous-mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+/* Each week is a row of seven equal tracks, the weekday row included, so the
+   names stand over their columns. */
+helix-headless-date-input::part(picker-week) {
+  display: grid;
+  grid-template-columns: repeat(7, 2.5rem);
+}
+
+/* The names sit in the top half of their box, which leaves a gap under them
+   before the first week. */
+helix-headless-date-input::part(picker-weekday) {
+  align-items: center;
+  block-size: 2.5rem;
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 500;
+  inline-size: 2.5rem;
+  justify-content: center;
+  padding-block-end: 1.25rem;
+}
+
+/* The cell is the column track and the day is the square centered in it.
+   Which day is chosen, which is today and which belong to the next month are
+   attributes on the cell for the accessibility tree, and an attribute cannot
+   follow `::part()`, so the component also writes each as a second part name
+   on the box it is drawn on: `day-selected`, `day-today`, `day-outside` and
+   `day-disabled` on the day, and a range's band on its cells. */
+helix-headless-date-input::part(picker-cell) {
+  align-items: center;
+  block-size: 2.25rem;
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 2.5rem;
+  justify-content: center;
+}
+
+helix-headless-date-input::part(picker-day) {
+  align-items: center;
+  block-size: 1.875rem;
+  border-radius: var(--_radius-control);
+  color: var(--_gray-strong);
+  display: inline-flex;
+  font-size: 0.8125rem;
+  inline-size: 1.875rem;
+  justify-content: center;
+}
+
+/* The day lights under the pointer rather than its whole track, and only a day
+   that can be chosen: one from the next month or out of range offers nothing. */
+helix-headless-date-input::part(picker-day):hover {
+  background-color: var(--_gray-subtle);
+}
+
+/* Days either side of the month stay in place, so the first and last weeks are
+   whole rows, and step back. */
+helix-headless-date-input::part(picker-day-outside),
+helix-headless-date-input::part(picker-day-outside):hover {
+  background-color: transparent;
+  color: var(--_gray-mark);
+}
+
+helix-headless-date-input::part(picker-day-disabled),
+helix-headless-date-input::part(picker-day-disabled):hover {
+  background-color: transparent;
+  color: var(--_gray-mark);
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* Today is a fact about the calendar rather than about the answer, so it is an
+   edge and not a fill. */
+helix-headless-date-input::part(picker-day-today) {
+  box-shadow: inset 0 0 0 1px var(--_gray-line);
+}
+
+/* A range is a band on the cells, which run unbroken between the days and round
+   off at its two ends. */
+helix-headless-date-input::part(picker-cell-range-start),
+helix-headless-date-input::part(picker-cell-range-middle),
+helix-headless-date-input::part(picker-cell-range-end) {
+  background-color: var(--_gray-fill);
+}
+
+helix-headless-date-input::part(picker-cell-range-start) {
+  border-end-start-radius: var(--_radius-control);
+  border-start-start-radius: var(--_radius-control);
+}
+
+helix-headless-date-input::part(picker-cell-range-end) {
+  border-end-end-radius: var(--_radius-control);
+  border-start-end-radius: var(--_radius-control);
+}
+
+/* The chosen day, or a range's two ends, solid, with the band's gray as a ring
+   out to the edge of the row so a lone date reads as the same mark. */
+helix-headless-date-input::part(picker-day-selected),
+helix-headless-date-input::part(picker-day-selected):hover {
+  background-color: var(--_gray-strong);
+  box-shadow: 0 0 0 0.1875rem var(--_gray-fill);
+  color: var(--_gray-surface);
 }
 
 helix-headless-date-input::part(label) {
@@ -179,7 +352,14 @@ helix-headless-date-input:focus-within::part(field) {
   outline-offset: 0;
 }
 
-helix-headless-date-input::part(trigger):focus-visible {
+helix-headless-date-input::part(trigger):focus-visible,
+helix-headless-date-input::part(picker-previous):focus-visible,
+helix-headless-date-input::part(picker-next):focus-visible {
   outline: 2px solid var(--_gray-mark);
   outline-offset: 2px;
+}
+
+helix-headless-date-input::part(picker-cell):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: -2px;
 }

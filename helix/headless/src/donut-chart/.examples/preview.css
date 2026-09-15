@@ -122,18 +122,83 @@ helix-headless-donut-chart::part(center) {
   translate: -50% -50%;
 }
 
+/* The slice under the pointer stands out from the ring by its width. */
+helix-headless-donut-chart::part(segment-active) {
+  stroke-width: calc(var(--donut-chart-stroke) * 1.18);
+}
+
+/* The bubble a resting pointer summons, placed by the component off the
+   slice's outer edge. The component writes the position as a `translate` from
+   the viewport's corner, and the UA centers a popover through `inset: 0` and
+   `margin: auto`, so both are undone or the bubble lands in the middle of the
+   window. No arrow: which side the bubble landed on is not something a sheet
+   outside can read, so an arrow would point the wrong way on three sides of
+   four. */
 helix-headless-donut-chart::part(tooltip) {
   background-color: var(--_gray-strong);
   border: 0;
+  border-radius: var(--_radius-control);
   color: var(--_gray-surface);
   font-size: 0.75rem;
+  inset: auto;
+  line-height: 1.5;
+  margin: 0;
   padding: 0.25rem 0.5rem;
 }
 
+helix-headless-donut-chart::part(tooltip-label) {
+  display: block;
+  font-weight: 500;
+  margin-block-end: 0.25rem;
+}
+
+/* A dot, a name and a value in three columns. The component writes the
+   slice's `--chart-series` on a cell only where something was plotted, so the
+   dot draws itself there and nowhere else, ringed so the darkest gray still
+   shows on a bubble of the same gray. */
+helix-headless-donut-chart::part(tooltip-cell) {
+  align-items: baseline;
+  column-gap: 0.75rem;
+  display: grid;
+  grid-template-columns: 0.5em minmax(0, 1fr) auto;
+}
+
+helix-headless-donut-chart::part(tooltip-cell)::before {
+  background-color: var(--chart-series, transparent);
+  block-size: 0.5em;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--_gray-surface) 60%, transparent);
+  content: "";
+  grid-column: 1;
+  inline-size: 0.5em;
+}
+
+helix-headless-donut-chart::part(tooltip-name) {
+  grid-column: 2;
+  opacity: 0.72;
+}
+
+helix-headless-donut-chart::part(tooltip-value) {
+  font-variant-numeric: tabular-nums;
+  grid-column: 3;
+}
+
+/* The point the bubble hangs from, placed by the component on the slice's
+   outer edge. A pixel rather than nothing, because the placement cannot
+   track a box with no area, and out of the flow so it takes no room under
+   the ring. The anchor covers the drawing and takes no pointer, so it cannot
+   eat the hover that summoned it. */
 helix-headless-donut-chart::part(mark) {
-  block-size: 1em;
-  flex: none;
-  inline-size: 1em;
+  block-size: 1px;
+  inline-size: 1px;
+  pointer-events: none;
+  position: absolute;
+}
+
+helix-headless-donut-chart::part(tooltip-anchor) {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
 }
 
 helix-headless-icon::part(svg) {

@@ -105,7 +105,8 @@ helix-headless-tag {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 1.75rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   display: inline-flex;

@@ -65,7 +65,9 @@
    keeps a margin of page around it. */
 helix-headless-dialog::part(dialog) {
   background-color: var(--_gray-surface);
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-shadow: 0 12px 32px light-dark(rgb(0 0 0 / 0.09), rgb(0 0 0 / 0.14));
   box-sizing: border-box;
   color: var(--_gray-strong);
   flex-direction: column;
@@ -85,9 +87,12 @@ helix-headless-dialog::part(dialog):modal {
 /* Pinned to the bottom edge on a narrow screen, the full width of it, with
    room above so the page is still visibly there behind it. A modal `<dialog>`
    is fixed with `margin: auto` from the UA, so taking the bottom margin to
-   zero is the whole of what moves it down. */
+   zero is the whole of what moves it down. Square where it meets the window,
+   rounded where it meets the page. */
 @media (width < 30rem) {
   helix-headless-dialog::part(dialog) {
+    border-end-end-radius: 0;
+    border-end-start-radius: 0;
     inline-size: 100vw;
     margin-block: auto 0;
     max-block-size: calc(100dvh - 4rem);
@@ -106,6 +111,7 @@ helix-headless-dialog::part(dialog)::backdrop {
 helix-headless-dialog h2 {
   font-size: 1.5rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.2;
   margin: 0;
 }
@@ -128,7 +134,8 @@ helix-headless-button::part(button) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2.5rem;
-  border: 1px solid var(--_gray-line);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-strong);
   cursor: pointer;

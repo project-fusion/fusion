@@ -93,12 +93,14 @@ helix-headless-heatmap::part(strip) {
   position: relative;
 }
 
-/* The bubble a pointer summons, which this tier renders and does not place.
-   A point with no size for it to hang off, and an anchor that covers the strip
-   and takes no pointer events, so it cannot eat the hover that summoned it. */
+/* The point the bubble hangs from, placed by the component over the cell a
+   pointer rests on. A pixel rather than nothing, because the placement cannot
+   track a box with no area. The anchor covers the strip and takes no pointer,
+   so it cannot eat the hover that summoned it. */
 helix-headless-heatmap::part(mark) {
-  block-size: 0;
-  inline-size: 0;
+  block-size: 1px;
+  inline-size: 1px;
+  pointer-events: none;
   position: absolute;
 }
 
@@ -108,23 +110,75 @@ helix-headless-heatmap::part(tooltip-anchor) {
   position: absolute;
 }
 
+/* The bubble, above the cell, drawn as a tooltip is. The component writes the
+   position as a `translate` from the viewport's corner, and the UA centers a
+   popover through `inset: 0` and `margin: auto`, so both are undone or the
+   bubble lands in the middle of the window. */
+helix-headless-heatmap::part(tooltip) {
+  background-color: var(--_gray-strong);
+  border: 0;
+  border-radius: var(--_radius-control);
+  color: var(--_gray-surface);
+  font-size: 0.75rem;
+  inset: auto;
+  line-height: 1.2;
+  margin: 0;
+  overflow: visible;
+  padding: 0.25rem 0.5rem;
+}
+
+/* The point under the bubble. The component places it along the edge and a
+   heatmap asks for the top, so it hangs from the bottom. */
+helix-headless-heatmap::part(tooltip-arrow) {
+  background-color: var(--_gray-strong);
+  block-size: 0.5rem;
+  inline-size: 0.5rem;
+  inset-block-end: -0.25rem;
+  position: absolute;
+  rotate: 45deg;
+}
+
+/* The day, then a name and a value to a line with the value at the end. The
+   quieter words step back by the bubble's own ink rather than a page gray,
+   which on a bubble of the strongest gray would all but vanish. */
+helix-headless-heatmap::part(tooltip-label) {
+  display: block;
+  font-weight: 500;
+  opacity: 0.72;
+}
+
 helix-headless-heatmap::part(tooltip-cell) {
+  align-items: baseline;
   display: flex;
   gap: 0.75rem;
   justify-content: space-between;
 }
 
-helix-headless-heatmap::part(tooltip-label) {
-  color: var(--_gray-muted);
-  display: block;
+helix-headless-heatmap::part(tooltip-name) {
+  opacity: 0.72;
 }
 
-/* No corner radius: rounding says how a thing should feel and that is not this
-   tier's to say. The ground under an untoned cell is, though, because a cell
-   with no fill is not a quiet day, it is a hole. */
+helix-headless-heatmap::part(tooltip-value) {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+/* Half the control corner, because a corner is a fraction of the box it
+   rounds and a cell is a small one. The ground under an untoned cell is drawn
+   too, because a cell with no fill is not a quiet day, it is a hole. */
 helix-headless-heatmap::part(cell) {
   background-color: var(--heatmap-tone, var(--_gray-surface));
+  border-radius: calc(var(--_radius-control) / 2);
   inline-size: 0.75rem;
+}
+
+/* The cell a pointer rests on, ringed just outside itself so the ring never
+   covers the fill it is pointing at. */
+@media (hover: hover) {
+  helix-headless-heatmap::part(cell):hover {
+    outline: 1px solid var(--_gray-strong);
+    outline-offset: 1px;
+  }
 }
 
 helix-headless-heatmap::part(footer) {

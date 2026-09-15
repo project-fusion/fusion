@@ -89,6 +89,7 @@ helix-headless-date-picker::part(next) {
   all: unset;
   align-items: center;
   block-size: 1.875rem;
+  border-radius: var(--_radius-control);
   box-sizing: border-box;
   color: var(--_gray-muted);
   cursor: pointer;
@@ -107,7 +108,7 @@ helix-headless-date-picker::part(next) {
 
 helix-headless-date-picker::part(previous):hover,
 helix-headless-date-picker::part(next):hover {
-  background-color: var(--_gray-fill);
+  background-color: var(--_gray-subtle);
   color: var(--_gray-strong);
 }
 
@@ -158,6 +159,7 @@ helix-headless-date-picker::part(cell) {
 helix-headless-date-picker::part(day) {
   align-items: center;
   block-size: 1.875rem;
+  border-radius: var(--_radius-control);
   color: var(--_gray-strong);
   display: inline-flex;
   font-size: 0.8125rem;
@@ -165,17 +167,23 @@ helix-headless-date-picker::part(day) {
   justify-content: center;
 }
 
-helix-headless-date-picker::part(cell):hover {
+/* The day lights under the pointer rather than its whole track, and only a day
+   that can be chosen: one from the next month or out of range offers nothing. */
+helix-headless-date-picker::part(day):hover {
   background-color: var(--_gray-subtle);
 }
 
 /* Days either side of the month stay in place, so the first and last weeks are
    whole rows, and step back. */
-helix-headless-date-picker::part(day-outside) {
+helix-headless-date-picker::part(day-outside),
+helix-headless-date-picker::part(day-outside):hover {
+  background-color: transparent;
   color: var(--_gray-mark);
 }
 
-helix-headless-date-picker::part(day-disabled) {
+helix-headless-date-picker::part(day-disabled),
+helix-headless-date-picker::part(day-disabled):hover {
+  background-color: transparent;
   color: var(--_gray-mark);
   cursor: default;
   opacity: 0.4;
@@ -187,17 +195,28 @@ helix-headless-date-picker::part(day-today) {
   box-shadow: inset 0 0 0 1px var(--_gray-line);
 }
 
-/* A range is a band on the cells, which run unbroken between the days and stop
-   at the ends of a row on their own. */
+/* A range is a band on the cells, which run unbroken between the days and round
+   off at its two ends. */
 helix-headless-date-picker::part(cell-range-start),
 helix-headless-date-picker::part(cell-range-middle),
 helix-headless-date-picker::part(cell-range-end) {
   background-color: var(--_gray-fill);
 }
 
+helix-headless-date-picker::part(cell-range-start) {
+  border-end-start-radius: var(--_radius-control);
+  border-start-start-radius: var(--_radius-control);
+}
+
+helix-headless-date-picker::part(cell-range-end) {
+  border-end-end-radius: var(--_radius-control);
+  border-start-end-radius: var(--_radius-control);
+}
+
 /* The chosen day, or a range's two ends, solid, with the band's gray as a ring
    out to the edge of the row so a lone date reads as the same mark. */
-helix-headless-date-picker::part(day-selected) {
+helix-headless-date-picker::part(day-selected),
+helix-headless-date-picker::part(day-selected):hover {
   background-color: var(--_gray-strong);
   box-shadow: 0 0 0 0.1875rem var(--_gray-fill);
   color: var(--_gray-surface);
