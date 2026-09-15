@@ -32,7 +32,7 @@ export function Example() {
         Left
       </helix-button>
       <helix-tooltip
-        content="Before"
+        content="To the left"
         for="placements-left"
         id="placements-left-tip"
         placement="left"
@@ -44,7 +44,7 @@ export function Example() {
         Right
       </helix-button>
       <helix-tooltip
-        content="After"
+        content="To the right"
         for="placements-right"
         id="placements-right-tip"
         placement="right"
