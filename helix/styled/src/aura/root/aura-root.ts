@@ -87,7 +87,9 @@ const OPENING_PATIENCE = 500
  * from `gl_VertexID`, so there is no attribute, no buffer and no upload.
  *
  * **It stops when nobody is looking**, off screen and in a background tab, and
- * `prefers-reduced-motion` gets one still frame rather than an empty box.
+ * `prefers-reduced-motion` gets one still frame rather than an empty box. A
+ * context the browser takes back, on a GPU reset or past its cap of about
+ * sixteen, stops it too, and the gradient shows until the context returns.
  *
  * Styled only, and with behavior, which the tier split does not otherwise
  * allow: the behavior is drawing to a canvas, so there is no structure a
@@ -348,6 +350,12 @@ export class HelixAura extends HelixElement {
   private visible: IntersectionObserver | undefined
 
   /**
+   * What the intersection observer last said, kept because it says so only on
+   * a change: every other path to `play` has to ask it.
+   */
+  private onScreen = false
+
+  /**
    * The element's box, cached.
    *
    * **Never read per event.** `getBoundingClientRect` forces a synchronous
@@ -440,17 +448,31 @@ export class HelixAura extends HelixElement {
     }
     /* A reconnection that outran its own release has everything already: the
        context is live and the program is linked, so the reorder costs the
-       listeners and the observers and no GL work at all. */
-    if (!this.program && !this.build()) {
+       listeners and the observers and no GL work at all.
+
+       **A context the browser took is waited for rather than replaced.**
+       `handleLost` asked for it back, and a fresh canvas here would take a
+       second context while the first is still owed, which past the cap costs
+       some other aura its own. One taken while the element was away was never
+       asked for, so nothing will return it, and it goes the way of a context
+       this element spent itself. */
+    if (this.program && this.gl?.isContextLost()) {
+      this.program = null
+      this.gl = null
+    }
+    if (!this.program && !this.gl?.isContextLost() && !this.build()) {
       return
     }
+    this.canvas?.addEventListener('webglcontextlost', this.handleLost)
+    this.canvas?.addEventListener('webglcontextrestored', this.handleRestored)
 
     this.motion = window.matchMedia('(prefers-reduced-motion: reduce)')
     this.addEventListener('pointermove', this.handlePointer)
     this.addEventListener('pointerleave', this.handleLeave)
 
     this.visible = new IntersectionObserver(([entry]) => {
-      if (entry?.isIntersecting) {
+      this.onScreen = entry?.isIntersecting ?? false
+      if (this.onScreen) {
         this.play()
       } else {
         this.stop()
@@ -513,6 +535,10 @@ export class HelixAura extends HelixElement {
    * event default-prevented and the extension held from before the loss, and it
    * restores asynchronously, so `start` would have to become a state machine to
    * use it. A fresh canvas is synchronous and cannot half-succeed.
+   *
+   * That is a context this element released. One the browser takes is not
+   * spent: `handleLost` asks for it back, and `start` waits for it rather than
+   * coming here.
    */
   private build(): boolean {
     let canvas = this.renderRoot.querySelector('canvas')
@@ -546,11 +572,27 @@ export class HelixAura extends HelixElement {
     if (!gl || gl.isContextLost()) {
       return false
     }
+    return this.prepare()
+  }
 
+  /**
+   * The program and where its uniforms live, on the context already held.
+   *
+   * Apart from `build` because a restored context comes here alone. It is the
+   * same object the browser took, with every program and location it had made
+   * gone, and `build` would replace a canvas that had been lost again before
+   * this ran rather than wait for it a second time.
+   */
+  private prepare(): boolean {
+    const gl = this.gl
+    if (!gl) {
+      return false
+    }
     this.program = this.link(VERTEX, FRAGMENT)
     if (!this.program) {
       return false
     }
+    this.canvas?.toggleAttribute('hidden', false)
     gl.useProgram(this.program)
     for (const name of [
       'uBloom',
@@ -614,6 +656,11 @@ export class HelixAura extends HelixElement {
     }
     this.visible?.disconnect()
     this.visible = undefined
+    this.onScreen = false
+    /* Before the release below, which loses the context itself and must not be
+       answered by asking for it back. */
+    this.canvas?.removeEventListener('webglcontextlost', this.handleLost)
+    this.canvas?.removeEventListener('webglcontextrestored', this.handleRestored)
     this.removeEventListener('pointermove', this.handlePointer)
     this.removeEventListener('pointerleave', this.handleLeave)
     document.removeEventListener('visibilitychange', this.handleVisibility)
@@ -658,6 +705,59 @@ export class HelixAura extends HelixElement {
     this.gl?.getExtension('WEBGL_lose_context')?.loseContext()
     this.program = null
     this.gl = null
+  }
+
+  /**
+   * Stops for a context the browser has taken, and asks for it back.
+   *
+   * **Taken on a GPU reset, and past the cap** of about sixteen, where the
+   * browser drops the oldest context for the newest while its aura is still on
+   * screen. `tick` books its own next frame, so the loop went on at 30 frames a
+   * second against a context that draws nothing, and nothing made the program
+   * again once the context came back: the aura never recovered.
+   *
+   * **The canvas is hidden until then, because a lost one is not reliably
+   * transparent.** Measured 15 Sep 2026: headless Chromium painted a plain
+   * canvas white with a broken-image glyph in its corner, force-lost and on a
+   * crashed GPU process alike, while this one came out clear there and on
+   * Metal, and the landing page once held a spent one's last frame (`build`
+   * has it). Hidden, it shows what a machine with no WebGL is shown, the host's
+   * gradient, whatever the engine does with a lost canvas.
+   *
+   * `preventDefault` is the asking: a browser restores only a context whose
+   * loss was canceled.
+   */
+  private readonly handleLost = (event: Event): void => {
+    event.preventDefault()
+    this.stop()
+    if (this.opening) {
+      cancelAnimationFrame(this.opening)
+      this.opening = 0
+    }
+    this.program = null
+    this.canvas?.toggleAttribute('hidden', true)
+  }
+
+  /**
+   * Draws again on the context the browser gave back.
+   *
+   * Everything made on it went with the loss, so the program is linked again
+   * and the buffer measured as though it were new, which is what gives the new
+   * program its resolution.
+   */
+  private readonly handleRestored = (): void => {
+    if (!this.prepare()) {
+      return
+    }
+    this.width = 0
+    this.height = 0
+    this.measure()
+    if (this.opened) {
+      this.paint()
+      this.play()
+    } else if (this.width) {
+      this.open()
+    }
   }
 
   /**
@@ -1015,14 +1115,22 @@ export class HelixAura extends HelixElement {
    * thing that ends the loop is `stop`, and a disconnection is the last time
    * `stop` is called. Everything that plays is canceled or disconnected there,
    * and this holds for whatever callback was already on its way.
+   *
+   * **Nor off screen, whoever asks.** The observer is the one caller that
+   * knows, and a tab coming back, a resize and a restored context all play
+   * too. An aura 2600 pixels below the fold booked no frame at rest and one on
+   * every frame after its tab came back, until it had been scrolled in and out
+   * again. Nor on a lost context, which draws nothing.
    */
   private play(): void {
     if (
       this.frame ||
       !this.isConnected ||
+      !this.onScreen ||
       this.motion?.matches ||
       document.hidden ||
       !this.gl ||
+      this.gl.isContextLost() ||
       !this.width ||
       !this.opened
     ) {

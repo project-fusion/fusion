@@ -38,6 +38,13 @@
   block-size: 100%;
 }
 
+/* While the browser holds the context, because a lost canvas is not reliably
+   transparent. Restated because the UA's `[hidden]` loses to the `display`
+   above. */
+[part="canvas"][hidden] {
+  display: none;
+}
+
 /* A printer drops it or renders a gray slab. */
 @media print {
   :host {

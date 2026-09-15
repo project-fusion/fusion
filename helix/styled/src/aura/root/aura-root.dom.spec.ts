@@ -342,6 +342,92 @@ describe('aura', () => {
       expect(draws).not.toBeNull()
       expect(await until(() => (draws?.count ?? 0) >= 2)).toBe(true)
     })
+
+    /* A context the browser takes, on a GPU reset or past its cap, forced here
+       the one way a page can. The extension is held from before, because a
+       lost context answers `null` to `getExtension`. */
+    test('a context the browser takes stops it and shows the fallback, until it is given back', async () => {
+      const host = await mount(drawn())
+      const canvas = host.shadowRoot?.querySelector('canvas')
+      const lose = canvas?.getContext('webgl2')?.getExtension('WEBGL_lose_context')
+      const draws = countDraws(host)
+      if (!canvas || !lose || !draws) {
+        return
+      }
+      expect(await until(() => draws.count >= 2)).toBe(true)
+
+      /* Awaited through a listener added after the element's own, so it runs
+         once the element has answered. */
+      const lost = new Promise((resolve) => {
+        canvas.addEventListener('webglcontextlost', resolve, { once: true })
+      })
+      lose.loseContext()
+      await lost
+      expect(await framesBooked(4)).toBe(0)
+      /* The fallback is the host's own gradient, and what it needs is nothing
+         in front of it: a lost canvas is not reliably transparent. */
+      expect(getComputedStyle(host).backgroundImage).toContain('radial-gradient')
+      expect(canvas.checkVisibility()).toBe(false)
+
+      /* Given back only because the element canceled the loss: `restoreContext`
+         refuses a context whose loss nobody asked to undo. */
+      const before = draws.count
+      const restored = new Promise((resolve) => {
+        canvas.addEventListener('webglcontextrestored', resolve, { once: true })
+      })
+      lose.restoreContext()
+      await restored
+      expect(canvas.checkVisibility()).toBe(true)
+      expect(await until(() => draws.count >= before + 2)).toBe(true)
+    })
+
+    test('a context lost after it is removed does nothing, and it still comes back', async () => {
+      const host = await mount(drawn())
+      const parent = host.parentElement
+      const canvas = host.shadowRoot?.querySelector('canvas')
+      const lose = canvas?.getContext('webgl2')?.getExtension('WEBGL_lose_context')
+      const draws = countDraws(host)
+      if (!canvas || !lose || !draws) {
+        return
+      }
+      expect(await until(() => draws.count >= 1)).toBe(true)
+
+      host.remove()
+      const lost = new Promise<Event>((resolve) => {
+        canvas.addEventListener('webglcontextlost', resolve, { once: true })
+      })
+      lose.loseContext()
+      /* Not asked back, since nothing is left to draw it, and not answered. */
+      expect((await lost).defaultPrevented).toBe(false)
+      expect(canvas.hasAttribute('hidden')).toBe(false)
+      expect(await framesBooked(4)).toBe(0)
+
+      parent?.append(host)
+      const again = countDraws(host)
+      expect(again).not.toBeNull()
+      expect(await until(() => (again?.count ?? 0) >= 2)).toBe(true)
+    })
+
+    /* A move, with the loss landing between the removal and the return. Its
+       event arrives later and at nobody, so nothing will restore it, and an
+       element that kept the program it had waited on it for good. */
+    test('lost while it is being moved, it draws on a fresh canvas', async () => {
+      const host = await mount(drawn())
+      const parent = host.parentElement
+      const lose = host.shadowRoot
+        ?.querySelector('canvas')
+        ?.getContext('webgl2')
+        ?.getExtension('WEBGL_lose_context')
+      if (!lose || !countDraws(host)) {
+        return
+      }
+      host.remove()
+      lose.loseContext()
+      parent?.append(host)
+      const draws = countDraws(host)
+      expect(draws).not.toBeNull()
+      expect(await until(() => (draws?.count ?? 0) >= 2)).toBe(true)
+    })
   }
 })
 
