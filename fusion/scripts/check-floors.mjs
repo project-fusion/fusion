@@ -121,8 +121,17 @@ const EXEMPT = [
     nothing. */
 const DELEGATED = /\b(?:fusion|helix) (?:workspace|component|prose|spec|theme)\b/
 
+/**
+ * **A prerequisite is not a check.** A script builds what it reads before
+ * reading it, `turbo run frame && bun ...`, and the build's summary line counts
+ * cache hits: a cold cache prints `0 cached`, which read here as a check that
+ * counted nothing. A `turbo run` step is a check when it passes `-- --check` or
+ * runs a `-check` task, and a prerequisite otherwise.
+ */
+const prerequisite = (one) =>
+  one.startsWith('turbo run ') && !one.includes('-- --check') && !/^turbo run \S*-check\b/.test(one)
 const checks = [...new Set(expand('bun run check'))].filter(
-  (one) => !EXEMPT.includes(bare(one)) && !DELEGATED.test(one),
+  (one) => !EXEMPT.includes(bare(one)) && !DELEGATED.test(one) && !prerequisite(one),
 )
 
 /* **A floor with nothing under it is what this file exists to refuse**, so it

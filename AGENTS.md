@@ -35,6 +35,14 @@ for `helix/**`, [cortex/CONVENTIONS.md](cortex/CONVENTIONS.md) for `cortex/**`. 
 that edits your files cannot tell you whether they were correct. `fix` writes;
 `check` and `verify` judge.
 
+**A script builds what it reads.** A root script whose command reads built
+output names that output's turbo task first, `turbo run frame && bun ...`, so it
+is correct on a fresh clone and after a branch switch rather than only after the
+right build happened to run. With a warm cache that costs a fraction of a
+second. The CLIs do the same for themselves: in this checkout, with cargo on the
+path, `bun run helix` and `bun run fusion` build the workspace first and run
+that binary, so an edited rule is the rule that runs.
+
 **No generated file is committed.** Each one is written by the build of the
 package that needs it and named in that task's `outputs`, so a fresh clone has
 none of them until the thing that reads them has been built, and every rule that
