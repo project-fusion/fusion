@@ -1,5 +1,5 @@
-import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -548,3 +548,89 @@ describe('an invalid date field marks the calendar too', () => {
     expect(part(host, 'picker')?.hasAttribute('invalid')).toBe(false)
   })
 })
+
+/**
+ * How many months the panel shows where the window has no room for them all.
+ *
+ * **The window is narrowed where placement reads it**, because a spec page
+ * cannot be resized from inside. Floating UI measures the viewport from
+ * `visualViewport`, so a 390-wide one is a phone's window to everything that
+ * decides where the panel goes and how much room it has, and deleting the own
+ * property hands the real one back. `matchMedia` is stubbed the same way
+ * elsewhere, for the same reason.
+ */
+if (hasLayout()) {
+  describe('months, where the window is narrow', () => {
+    const narrow = (width: number): void => {
+      const real = window.visualViewport
+      /* An `EventTarget`, because the page listens on the real one. */
+      Object.defineProperty(window, 'visualViewport', {
+        configurable: true,
+        value: Object.assign(new EventTarget(), {
+          height: real?.height ?? window.innerHeight,
+          offsetLeft: 0,
+          offsetTop: 0,
+          pageLeft: 0,
+          pageTop: 0,
+          scale: 1,
+          width,
+        }),
+      })
+    }
+
+    afterEach(() => {
+      delete (window as { visualViewport?: unknown }).visualViewport
+    })
+
+    const shown = (host: InputDate): number =>
+      picker(host).shadowRoot?.querySelectorAll('[part~="month"]').length ?? 0
+
+    /* Side by side, as a sheet would put them: with none the months stack,
+       a stack of two fits a phone, and two is then the right answer. */
+    const beside = async (): Promise<InputDate> => {
+      const host = (await mount(
+        `<helix-headless-date-input label="Starts" months="2"></helix-headless-date-input>
+        <style>
+          helix-headless-date-input::part(picker-months) {
+            display: grid;
+            grid-template-columns: repeat(var(--date-picker-column-count), 18rem);
+          }
+        </style>`,
+      )) as InputDate
+      await host.updateComplete
+      return host
+    }
+
+    const placed = async (host: InputDate): Promise<void> => {
+      await host.updateComplete
+      /* `computePosition` resolves after the update and the month count
+         follows it, so two frames and the update that asked for. */
+      await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+      await host.updateComplete
+      await (picker(host) as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    }
+
+    test('two months at a desktop width, as asked', async () => {
+      const host = await beside()
+      host.toggleOpen()
+      await placed(host)
+      expect(shown(host)).toBe(2)
+    })
+
+    test('one at a phone’s, inside the window, and both again once there is room', async () => {
+      narrow(390)
+      const host = await beside()
+      host.toggleOpen()
+      await placed(host)
+      expect(shown(host)).toBe(1)
+      const surface = (part(host, 'surface') as HTMLElement).getBoundingClientRect()
+      expect(surface.left).toBeGreaterThanOrEqual(0)
+      expect(surface.right).toBeLessThanOrEqual(390)
+
+      delete (window as { visualViewport?: unknown }).visualViewport
+      window.dispatchEvent(new Event('resize'))
+      await placed(host)
+      expect(shown(host)).toBe(2)
+    })
+  })
+}

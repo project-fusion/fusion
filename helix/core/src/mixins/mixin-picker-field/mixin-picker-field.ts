@@ -55,6 +55,14 @@ export declare class MixinPickerFieldInterface {
   /** The overlay, placed against the field rather than the trigger. */
   protected readonly panel: PopoverController
 
+  /**
+   * Told the panel has been placed, and how wide the window leaves it room to
+   * be, in pixels.
+   *
+   * Nothing, unless a family fits what its panel holds to the room it has.
+   */
+  protected placed(room: number | undefined): void
+
   /** Puts the field back where the answer differs from what was typed. */
   protected restore(): void
 
@@ -166,10 +174,21 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
          says the two are separate things rather than one control that grew. */
       offset: () => 8,
       onDismiss: () => this.requestOpen(false),
+      onPlace: (_placement, room) => this.placed(room),
       open: () => this.open,
       placement: 'bottom-start',
       surface: () => this.partNamed('surface'),
     })
+
+    /**
+     * Told the panel has been placed, and how wide the window leaves it room to
+     * be, in pixels.
+     *
+     * Nothing, unless a family fits what its panel holds to the room it has.
+     */
+    protected placed(_room: number | undefined): void {
+      // A seam: Date Input shows one month where two do not fit.
+    }
 
     /**
      * What the label points at and focus lands on.
