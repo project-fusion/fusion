@@ -8,9 +8,12 @@ import '../../copy-button/index.js'
  * @summary A block of code, with somewhere to put its name and a way to take it.
  *
  * @description
- * The header sits above the code rather than floating on it. Overlaid, which is
- * the usual build, the copy button covers the first line, which is the one line
- * of a snippet a reader is most likely to be reading.
+ * The header sits above the code rather than floating on it, and the copy
+ * button stands at its end. Overlaid, which is the usual build, the button
+ * covers the first line, which is the one line of a snippet a reader is most
+ * likely to be reading. A block with no name has no header, and the button
+ * stands beside the code in room the block keeps clear: an end gutter for code,
+ * a band above the first hunk for a diff.
  *
  * A diff is drawn a block per file in the same frame, each changed line washed
  * in its tone at Tag's resting strength with its `+` or `-` in the tone's ink,

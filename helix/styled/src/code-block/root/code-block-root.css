@@ -3,10 +3,11 @@
    host empty: stretched into a 118px row beside a card, the snippet draws 82px
    of itself and 36px of nothing. */
 :host {
-  /* Where the copy button stands: centered on the first line of code, which is
-     the block's padding and half a line down, and as far from the end as from
-     the top. At `size-control` and a `2xs` inset it sat 2.25px below that line
-     and filled a one-line block to within 2px of either edge. */
+  /* Where the copy button stands in a block with no header: centered on the
+     first line of code, which is the block's padding and half a line down, and
+     as far from the end as from the top. At `size-control` and a `2xs` inset it
+     sat 2.25px below that line and filled a one-line block to within 2px of
+     either edge. */
   --_code-block-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
   --_code-block-copy-inset: calc(
     var(--helix-space-sm) +
@@ -42,22 +43,34 @@
   border-start-end-radius: var(--code-block-radius, var(--helix-radii-lg));
   border-start-start-radius: var(--code-block-radius, var(--helix-radii-lg));
   display: flex;
+  gap: var(--helix-space-sm);
   /* `2xs` around a line of `xs` text is a 24px strip, which reads as squeezed
      rather than deliberately tight. */
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-md);
 }
 
+/* **The button sets the bar's height, and stands as far from the end as from
+   the top.** At `xs` around a `control-sm` button the bar is 50px with its
+   edges, for one glyph; at `2xs` it is 42px, against 36px for a name alone. */
+[part="header"]:has(> [part="copy"]) {
+  padding-block: var(--helix-space-2xs);
+  padding-inline-end: var(--helix-space-2xs);
+}
+
 /* *The name is a name, not code**, so it is not in the mono face: the block
-   below is the only thing here that is code. */
+   below is the only thing here that is code. A long path wraps rather than
+   pushing the copy button off the end of the bar. */
 [part="label"] {
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
 }
 
-/* The positioning context for the copy button, which sits inside the code box. */
+/* The positioning context for a copy button standing beside the code. */
 [part="frame"] {
   position: relative;
 }
@@ -70,6 +83,13 @@
 
 [part="copy"] {
   --icon-button-size: var(--helix-size-control-sm);
+}
+
+[part="header"] > [part="copy"] {
+  margin-inline-start: auto;
+}
+
+[part="frame"] > [part="copy"] {
   inset-block-start: var(--_code-block-copy-inset);
   inset-inline-end: var(--_code-block-copy-inset);
   position: absolute;
@@ -88,10 +108,11 @@
   padding-inline: var(--helix-space-md);
 }
 
-/* *The gutter is only reserved when something is standing in it.** Held
-   unconditionally, the end padding costs a block with `no-copy` 44px of empty
-   margin for a button that was never rendered. */
-:host(:not([no-copy])) [part="block"] {
+/* *The gutter is only reserved when something is standing in it**, which is a
+   block with no header and no `no-copy`. Held unconditionally, the end padding
+   costs a block with `no-copy` 44px of empty margin for a button that was never
+   rendered. */
+:host(:not([diff], [no-copy])) [part="frame"]:not([part="header"] + *) > [part="block"] {
   padding-inline-end: var(--_code-block-gutter);
 }
 
@@ -115,7 +136,8 @@
    of its content and the button stands over everything before it: at 390 the
    button sat on `tone="pri`. The `<code>` scrolls inside the block's padding
    instead, so a line stops at the gutter. A diff keeps the block as its
-   scroller, since its washes are meant to run under the button to the edge. */
+   scroller, so its washes run to the edge, and keeps its button off the lines
+   instead. */
 :host(:not([diff])) [part="code"] {
   display: block;
   overflow-x: auto;
@@ -154,6 +176,15 @@
   padding-inline: var(--helix-space-none);
 }
 
+/* **With no header, the button stands in a band above the first hunk.** An end
+   gutter keeps nothing clear in a diff, whose block scrolls and whose washes
+   run to the edge: the lines slide under anything standing beside them. */
+:host([diff]:not([no-copy]))
+  [part="frame"]:not([part="header"] + *)
+  :is([part="block"], [part="old"], [part="new"]) {
+  padding-block-start: var(--_code-block-gutter);
+}
+
 [part="header"] + [part="frame"] [part="split"] > * {
   border-block-start-width: var(--helix-space-none);
   border-start-end-radius: var(--helix-radii-none);
@@ -175,6 +206,11 @@
   [part="split"] {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  /* Stacked, the button's band is the old version's alone, at the top. */
+  :host([diff]:not([no-copy])) [part="frame"]:not([part="header"] + *) [part="new"] {
+    padding-block-start: var(--helix-space-none);
+  }
 }
 
 /* **As wide as the longest line and never narrower than the block**, so a
@@ -192,12 +228,6 @@
   display: flex;
   padding-inline: var(--helix-space-md);
   text-decoration: none;
-}
-
-/* The copy button's gutter, on the lines rather than on the block, so the
-   washes still reach the edge under it. */
-:host(:not([no-copy])) :is([part="hunk"], [part="context"], [part="added"], [part="removed"]) {
-  padding-inline-end: var(--_code-block-gutter);
 }
 
 [part="hunk"] {

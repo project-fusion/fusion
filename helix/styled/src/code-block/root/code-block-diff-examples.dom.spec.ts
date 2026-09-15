@@ -27,7 +27,7 @@ describe('the diff example', () => {
     expect(new Set(drawn.map((row) => Math.round(row.height))).size).toBe(1)
   })
 
-  run('a changed line’s wash runs the width of the block, under the copy button too', async () => {
+  run('a changed line’s wash runs the width of the block', async () => {
     await example(diff)
     await idle()
     const root = block().shadowRoot
@@ -70,5 +70,77 @@ describe('the split example', () => {
     const old = root?.querySelector('[part="old"]')?.getBoundingClientRect()
     const now = root?.querySelector('[part="new"]')?.getBoundingClientRect()
     expect(now?.top).toBeGreaterThanOrEqual(old?.bottom ?? 0)
+  })
+})
+
+/**
+ * The copy button stands over nothing a reader reads.
+ *
+ * A diff scrolls its block so its washes reach the edge, which leaves no end
+ * padding to keep a line clear of anything standing beside it: the button stood
+ * on the hunk line and the line under it. It is in the header now, and a diff
+ * with no name keeps a band above its first hunk for it.
+ */
+describe('the copy button in a diff', () => {
+  const overlaps = (a: DOMRect, b: DOMRect): boolean =>
+    a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
+
+  /* Every line the button covers, with each scroller at its start and at its
+     end, since a line that ran under the button did so once it was scrolled. */
+  const covered = (host: HTMLElement): DOMRect[] => {
+    const root = host.shadowRoot
+    const copy = root?.querySelector('[part="copy"]')?.getBoundingClientRect()
+    expect(copy).toBeDefined()
+    const scrollers = [
+      ...(root?.querySelectorAll<HTMLElement>('[part="block"], [part="old"], [part="new"]') ?? []),
+    ]
+    return [0, 1].flatMap((end) => {
+      for (const scroller of scrollers) {
+        scroller.scrollLeft = end * scroller.scrollWidth
+      }
+      return rows(root).filter((row) => copy !== undefined && overlaps(row, copy))
+    })
+  }
+
+  for (const [name, markup] of [
+    ['diff', diff],
+    ['split', split],
+  ] as const) {
+    run(`stands in the ${name} example’s header, inside its box`, async () => {
+      await example(markup)
+      await idle()
+      const root = block().shadowRoot
+      const copy = root?.querySelector('[part="copy"]')
+      const header = root?.querySelector('[part="header"]')
+      expect(copy?.parentElement).toBe(header)
+      const inner = copy?.getBoundingClientRect()
+      const outer = header?.getBoundingClientRect()
+      expect(inner?.top).toBeGreaterThanOrEqual(outer?.top ?? Number.POSITIVE_INFINITY)
+      expect(inner?.bottom).toBeLessThanOrEqual(outer?.bottom ?? Number.NEGATIVE_INFINITY)
+      expect(inner?.right).toBeLessThanOrEqual(outer?.right ?? Number.NEGATIVE_INFINITY)
+    })
+
+    run(`covers no line of the ${name} example, scrolled to either end`, async () => {
+      await example(markup)
+      await idle()
+      expect(rows(block().shadowRoot).length).toBeGreaterThan(4)
+      expect(covered(block())).toHaveLength(0)
+    })
+  }
+
+  run('covers no line of the split example stacked one above the other', async () => {
+    await example(split)
+    block().style.inlineSize = '20rem'
+    await idle()
+    expect(covered(block())).toHaveLength(0)
+  })
+
+  run('and a diff with no name keeps a band above its first hunk for it', async () => {
+    await example('<helix-code-block diff>@@ -1 +1 @@\n-a\n+b\n</helix-code-block>')
+    await idle()
+    const root = block().shadowRoot
+    expect(root?.querySelector('[part="header"]')).toBeNull()
+    expect(root?.querySelector('[part="frame"] > [part="copy"]')).not.toBeNull()
+    expect(covered(block())).toHaveLength(0)
   })
 })

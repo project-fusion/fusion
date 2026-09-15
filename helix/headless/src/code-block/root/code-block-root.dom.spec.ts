@@ -40,6 +40,48 @@ describe('code block', () => {
   })
 })
 
+/* In the header it stands over nothing; beside the code it stands over the
+   block, which then has to keep room for it. */
+describe('where the copy button stands', () => {
+  test('in the header, after the name, when there is a name', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block label="index.html">one</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    await el.updateComplete
+    const header = el.shadowRoot?.querySelector('[part="header"]')
+    expect([...(header?.children ?? [])].map((child) => child.getAttribute('part'))).toEqual([
+      'label',
+      'copy',
+    ])
+    expect(el.shadowRoot?.querySelector('[part="frame"] > [part="copy"]')).toBeNull()
+    const copy = header?.lastElementChild as (HTMLElement & { value: string }) | null | undefined
+    expect(copy?.value).toBe('one')
+  })
+
+  test('beside the code when there is none, and draws no header to hold it', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block>one</helix-headless-code-block>',
+    )) as Updatable
+    expect(el.shadowRoot?.querySelector('[part="header"]')).toBeNull()
+    expect(el.shadowRoot?.querySelector('[part="frame"] > [part="copy"]')).not.toBeNull()
+  })
+
+  test('in each file’s header, in a diff', async () => {
+    const el = (await mount(
+      '<helix-headless-code-block diff>--- a/a.ts\n+++ b/a.ts\n@@ -1 +1 @@\n-a\n+b\n--- a/b.ts\n+++ b/b.ts\n@@ -1 +1 @@\n-c\n+d\n</helix-headless-code-block>',
+    )) as Updatable
+    await el.updateComplete
+    await el.updateComplete
+    const files = [...(el.shadowRoot?.querySelectorAll('[part="file"]') ?? [])]
+    expect(files).toHaveLength(2)
+    expect(
+      files.map((file) => file.querySelector('[part="header"] > [part="copy"]') !== null),
+    ).toEqual([true, true])
+    expect(el.shadowRoot?.querySelector('[part="frame"] > [part="copy"]')).toBeNull()
+  })
+})
+
 /**
  * `no-copy` reaches the host, because the gutter is a rule and not code.
  *
