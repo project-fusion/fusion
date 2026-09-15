@@ -64,4 +64,14 @@
     say('error', `${event.target.name} did not, so the initials stand in`)
   }, true)
 
+  /* A picture that settled before these listeners existed fired its event to
+     nobody, so ask each one where it stands. */
+  for (const avatar of people.querySelectorAll('helix-avatar')) {
+    if (avatar.status === 'loaded') {
+      say('load', `${avatar.name} arrived`)
+    } else if (avatar.status === 'error') {
+      say('error', `${avatar.name} did not, so the initials stand in`)
+    }
+  }
+
 </script>
