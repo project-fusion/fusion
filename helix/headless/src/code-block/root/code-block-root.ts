@@ -57,7 +57,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart block - The scrolling `<pre>`.
  * @csspart code - The `<code>` inside it.
  * @csspart context - In a diff, a line both versions share.
- * @csspart copy - The copy button.
+ * @csspart copy - The copy button: in the header where there is one, and otherwise beside the code.
  * @csspart copy-button - The inner button.
  * @csspart copy-mark - The clipboard glyph, and the confirmation that replaces it.
  * @csspart copy-tooltip - The bubble, forwarded from the tooltip inside.
@@ -72,8 +72,8 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @csspart copy-tooltip-top - The bubble while it is above the copy button, beside `copy-tooltip`.
  * @csspart file - In a diff, one file's header and block.
  * @csspart filler - In a split diff, the empty row opposite a line the other side does not have.
- * @csspart frame - The code and the copy button beside it.
- * @csspart header - The bar carrying the name, where there is one.
+ * @csspart frame - The code, and the copy button beside it where there is no header.
+ * @csspart header - The bar carrying the name and the copy button, where there is a name.
  * @csspart hunk - In a diff, a `@@` line saying where the lines under it are.
  * @csspart label - The file name or language, where one is given.
  * @csspart marker - In a diff, the `+`, `-` or space that opens a line.
@@ -192,19 +192,34 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     if (files.length > 0) {
       return this.renderDiff(files)
     }
-    /* The copy button sits beside the code, not in a bar above it. In the
-       header, a block with nothing to call itself still draws a full-width bar
-       to hold one button, so a `Usage` section of one-line imports is a run of
-       empty strips. Beside the code, the header exists only when there is a
-       name to put in it. */
-    return html`${
-      this.label ? html`<div part="header"><span part="label">${this.label}</span></div>` : nothing
-    }
+    return html`${this.renderHeader(this.label)}
       <div part="frame">
         <pre part="block"><code part="code"><slot @slotchange=${() =>
           this.requestUpdate()}></slot></code></pre>
-        ${this.noCopy ? nothing : this.renderCopyButton()}
+        ${this.label ? nothing : this.renderCopy()}
       </div>`
+  }
+
+  /**
+   * The name with the copy button beside it, or nothing when there is no name.
+   *
+   * **The button is in the header wherever there is one**, because beside the
+   * code it stands over the block and the block has to make room for it. A
+   * diff cannot: its washes run to the edge, so the button stood on the hunk
+   * line and the line under it. In the header it is over nothing.
+   *
+   * **No name draws no header**, rather than a bar to hold one button, which
+   * turned a `Usage` section of one-line imports into a run of empty strips.
+   * The button then stands beside the code, in room the block keeps for it.
+   */
+  private renderHeader(name: string, value?: string): TemplateResult | typeof nothing {
+    return name
+      ? html`<div part="header"><span part="label">${name}</span>${this.renderCopy(value)}</div>`
+      : nothing
+  }
+
+  private renderCopy(value?: string): TemplateResult | typeof nothing {
+    return this.noCopy ? nothing : this.renderCopyButton(value)
   }
 
   /**
@@ -301,7 +316,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         .map((line) => line.text)
         .join('\n')
       return html`<div part="file">
-        ${name ? html`<div part="header"><span part="label">${name}</span></div>` : nothing}
+        ${this.renderHeader(name, now)}
         <div part="frame">
           ${
             this.variant === 'split'
@@ -311,7 +326,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
                     html`${this.renderHunk(hunk)}${hunk.lines.map((line) => this.renderLine(line, width))}`,
                 )}</code></pre>`
           }
-          ${this.noCopy ? nothing : this.renderCopyButton(now)}
+          ${name ? nothing : this.renderCopy(now)}
         </div>
       </div>`
     })}<slot hidden @slotchange=${() => this.requestUpdate()}></slot>`
