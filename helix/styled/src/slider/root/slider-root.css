@@ -34,9 +34,19 @@
  * that alone.
  */
   --_slider-track-color: var(--slider-track-color, var(--helix-color-border));
+  /* Which way the fill runs, from the minimum. A gradient takes no logical
+     keyword, and the native range turns round on a right-to-left page, its
+     minimum going to the right: painted `to right` there, the fill grew from
+     the left while the thumb that ends it moved in from the right, so at 40
+     the two were a fifth of the track apart. */
+  --_slider-along: to right;
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
+}
+
+:host(:dir(rtl)) {
+  --_slider-along: to left;
 }
 
 [part="field"] {
@@ -107,7 +117,7 @@
   --_slider-track-image: var(
     --slider-track-image,
     linear-gradient(
-      to right,
+      var(--_slider-along),
       var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-fraction, 0) * 100%),
       var(--_slider-track-color) calc(var(--slider-fraction, 0) * 100%)
     )
@@ -213,6 +223,11 @@
   inset-inline-start: var(--slider-marker-at, 0%);
   position: absolute;
   translate: -50% 0;
+}
+
+/* Centered from the other side, where the inline start is the right. */
+:host(:dir(rtl)) [part="marker"] {
+  translate: 50% 0;
 }
 
 /* `:host(:disabled)`, not `:host([disabled])`.
@@ -379,7 +394,7 @@
   --_slider-track-image: var(
     --slider-track-image,
     linear-gradient(
-      to right,
+      var(--_slider-along),
       var(--_slider-track-color) calc(var(--slider-from, 0) * 100%),
       var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-from, 0) * 100%),
       var(--slider-fill-color, var(--helix-color-primary)) calc(var(--slider-to, 1) * 100%),

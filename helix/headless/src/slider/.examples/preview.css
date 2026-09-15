@@ -59,9 +59,16 @@ helix-headless-icon::part(svg) {
 
 /* The question over the track, the hint under it. */
 helix-headless-slider {
+  /* Which way the fill runs from the minimum, which a native range puts on
+     the right of a right-to-left page. A gradient takes no logical keyword. */
+  --_along: to right;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+helix-headless-slider:dir(rtl) {
+  --_along: to left;
 }
 
 helix-headless-slider::part(label) {
@@ -96,7 +103,7 @@ helix-headless-slider::part(control) {
    a name one engine does not know is dropped whole, so each is said twice. */
 helix-headless-slider::part(control)::-webkit-slider-runnable-track {
   background: linear-gradient(
-    to right,
+    var(--_along),
     var(--_gray-mark) calc(var(--slider-fraction, 0) * 100%),
     var(--_gray-fill) calc(var(--slider-fraction, 0) * 100%)
   );
@@ -106,7 +113,7 @@ helix-headless-slider::part(control)::-webkit-slider-runnable-track {
 
 helix-headless-slider::part(control)::-moz-range-track {
   background: linear-gradient(
-    to right,
+    var(--_along),
     var(--_gray-mark) calc(var(--slider-fraction, 0) * 100%),
     var(--_gray-fill) calc(var(--slider-fraction, 0) * 100%)
   );

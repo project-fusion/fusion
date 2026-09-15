@@ -52,7 +52,14 @@ helix-headless-icon {
 }
 
 helix-headless-color-picker {
+  /* Which way saturation grows across the square: along the line, as the
+     range laid over it does. A gradient takes no logical keyword. */
+  --_along: to right;
   display: block;
+}
+
+helix-headless-color-picker:dir(rtl) {
+  --_along: to left;
 }
 
 /* The square, drawn from the ramp: the lightest gray at the top left, the
@@ -64,7 +71,7 @@ helix-headless-color-picker::part(grid) {
   aspect-ratio: 1 / 0.7;
   background-image:
     linear-gradient(to top, var(--_gray-strong), transparent),
-    linear-gradient(to right, var(--_gray-surface), transparent),
+    linear-gradient(var(--_along), var(--_gray-surface), transparent),
     linear-gradient(var(--_gray-mark), var(--_gray-mark));
   border-radius: var(--_radius-control);
   color-scheme: light;
@@ -87,6 +94,12 @@ helix-headless-color-picker::part(grid-handle) {
   pointer-events: none;
   position: absolute;
   translate: -50% -50%;
+}
+
+/* Centered on its point from the other side on a right-to-left page, where
+   saturation grows toward the left as the range under the square does. */
+helix-headless-color-picker:dir(rtl)::part(grid-handle) {
+  translate: 50% -50%;
 }
 
 /* The two range inputs stay, since they are what the keyboard and a screen

@@ -291,6 +291,26 @@ describe('video', () => {
     }
   })
 
+  /* A tape runs one way whatever the script, so the timeline is left to right
+     on every page, as the skip glyphs beside it are. Following the page, the
+     range turned round on a right-to-left one, and its arrows moved through
+     time the other way to the same arrows pressed on the video. */
+  test('the scrubber runs left to right on a right-to-left page', async () => {
+    document.documentElement.dir = 'rtl'
+    try {
+      const host = await player()
+      const scrubber = part(host, 'scrubber') as Element
+      expect(scrubber.getAttribute('dir')).toBe('ltr')
+      /* The attribute is the whole of it under happy-dom, whose stand-in for the
+         browser's own `dir` rule is a document sheet and reaches no shadow root. */
+      if (hasLayout()) {
+        expect(getComputedStyle(scrubber).direction).toBe('ltr')
+      }
+    } finally {
+      document.documentElement.removeAttribute('dir')
+    }
+  })
+
   test('remote is offered only once something answers, not merely where supported', async () => {
     /* A button that opens an empty device list is worse than no button. The
        platform answers `watchAvailability` late and often with nothing, so the
@@ -457,6 +477,27 @@ if (hasLayout()) {
         new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }),
       )
       expect(video.currentTime).toBe(before)
+    })
+
+    test('and on a right-to-left page the left arrow still rewinds', async () => {
+      document.documentElement.dir = 'rtl'
+      try {
+        const host = await player()
+        const video = part(host, 'video') as HTMLVideoElement
+        Object.defineProperty(video, 'duration', { configurable: true, value: 120 })
+        const stage = part(host, 'stage') as HTMLElement
+        const press = (key: string): boolean =>
+          stage.dispatchEvent(
+            new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }),
+          )
+        press('ArrowRight')
+        press('ArrowRight')
+        const ahead = video.currentTime
+        press('ArrowLeft')
+        expect(video.currentTime).toBeLessThan(ahead)
+      } finally {
+        document.documentElement.removeAttribute('dir')
+      }
     })
 
     test('playback is on the host, because CSS cannot ask a video', async () => {

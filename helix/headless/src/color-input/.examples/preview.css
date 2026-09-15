@@ -54,9 +54,16 @@ helix-headless-icon {
 /* A column, so the label, the field and the hint stack at one gap without
    any of them carrying a margin. */
 helix-headless-color-input {
+  /* Which way saturation grows across the picker's square: along the line,
+     as the range laid over it does. A gradient takes no logical keyword. */
+  --_along: to right;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+helix-headless-color-input:dir(rtl) {
+  --_along: to left;
 }
 
 /* The field carries the box rather than the input, so the swatch sits inside
@@ -153,7 +160,7 @@ helix-headless-color-input::part(picker-grid) {
   aspect-ratio: 1 / 0.7;
   background-image:
     linear-gradient(to top, var(--_gray-strong), transparent),
-    linear-gradient(to right, var(--_gray-surface), transparent),
+    linear-gradient(var(--_along), var(--_gray-surface), transparent),
     linear-gradient(var(--_gray-mark), var(--_gray-mark));
   border-radius: var(--_radius-control);
   color-scheme: light;
@@ -174,6 +181,12 @@ helix-headless-color-input::part(picker-grid-handle) {
   pointer-events: none;
   position: absolute;
   translate: -50% -50%;
+}
+
+/* Centered on its point from the other side on a right-to-left page, where
+   saturation grows toward the left as the range under the square does. */
+helix-headless-color-input:dir(rtl)::part(picker-grid-handle) {
+  translate: 50% -50%;
 }
 
 /* The two range inputs stay, since they are what the keyboard and a screen

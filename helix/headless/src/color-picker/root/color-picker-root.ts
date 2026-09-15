@@ -359,7 +359,12 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
     if (box.width === 0 || box.height === 0) {
       return
     }
-    const across = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width))
+    /* Saturation runs along the line, the way the two ramps under the square
+       do, being native ranges: on a right-to-left page it grows toward the
+       left. The pointer is physical, so it is turned here, where the handle and
+       the saturation range are logical already. */
+    const fromLeft = Math.min(1, Math.max(0, (event.clientX - box.left) / box.width))
+    const across = getComputedStyle(grid).direction === 'rtl' ? 1 - fromLeft : fromLeft
     const down = Math.min(1, Math.max(0, (event.clientY - box.top) / box.height))
     this.move({ brightness: Math.round((1 - down) * 100), saturation: Math.round(across * 100) })
   }

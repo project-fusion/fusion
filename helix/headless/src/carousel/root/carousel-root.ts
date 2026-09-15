@@ -341,11 +341,24 @@ export class HelixHeadlessCarousel extends HelixElement {
    * to index 0 put its edge back on the clip edge. Measured on the insights
    * carousel: `scrollLeft` resting at 4 against a 4px bleed, the first card
    * shaved, and no scrolling done to cause it.
+   *
+   * **On a right-to-left track the leading edge is the right one**, and
+   * `scrollLeft` counts down from zero as the track moves on. Measured from the
+   * left, a carousel showing one slide at a time happened to come out right,
+   * each slide a whole track to the left of the one before it; one showing
+   * three put every one of the first few slides at a positive offset the
+   * scroller cannot reach, so it clamped to zero and the next arrow moved the
+   * dots and not the slides. Measured in Chromium on the several-across
+   * example: three presses of next, `index` at 2 and `scrollLeft` still at 0.
    */
   private edgeOf(slide: HTMLElement, track: HTMLElement, bleed: number): number {
-    return this.orientation === 'vertical'
-      ? slide.offsetTop - track.offsetTop - bleed
-      : slide.offsetLeft - track.offsetLeft - bleed
+    if (this.orientation === 'vertical') {
+      return slide.offsetTop - track.offsetTop - bleed
+    }
+    if (getComputedStyle(track).direction === 'rtl') {
+      return slide.offsetLeft + slide.offsetWidth - (track.offsetLeft + track.offsetWidth) + bleed
+    }
+    return slide.offsetLeft - track.offsetLeft - bleed
   }
 
   private scrollToIndex(): void {
