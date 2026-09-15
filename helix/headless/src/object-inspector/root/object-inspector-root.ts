@@ -91,6 +91,14 @@ const child = (path: string, key: string): string =>
  * @csspart copy-mark - The clipboard glyph, and the confirmation that replaces it.
  * @csspart copy-tooltip - The bubble, forwarded from the tooltip inside.
  * @csspart copy-tooltip-arrow - The point, resting against the trigger.
+ * @csspart copy-tooltip-arrow-bottom - The point while the bubble is below the copy button, so on its top edge, beside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-left - The point while the bubble is left of the copy button, so on its right edge, beside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-right - The point while the bubble is right of the copy button, so on its left edge, beside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-arrow-top - The point while the bubble is above the copy button, so on its bottom edge, beside `copy-tooltip-arrow`.
+ * @csspart copy-tooltip-bottom - The bubble while it is below the copy button, beside `copy-tooltip`.
+ * @csspart copy-tooltip-left - The bubble while it is left of the copy button, beside `copy-tooltip`.
+ * @csspart copy-tooltip-right - The bubble while it is right of the copy button, beside `copy-tooltip`.
+ * @csspart copy-tooltip-top - The bubble while it is above the copy button, beside `copy-tooltip`.
  * @csspart count - How many entries a branch holds.
  * @csspart frame - The tree and the copy button beside it.
  * @csspart header - The bar carrying the label, where there is one.
@@ -502,7 +510,10 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     return staticHtml`<${this.tag('copy-button')}
       part="copy"
       exportparts="button: copy-button, mark: copy-mark, tooltip: copy-tooltip,
-        tooltip-arrow: copy-tooltip-arrow"
+        tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
+        tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
+        tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
+        tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
       label=${row?.key === undefined ? 'Copy value' : `Copy ${row.key}`}
       .value=${this.copyable(row)}
     ></${this.tag('copy-button')}>`

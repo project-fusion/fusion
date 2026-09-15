@@ -132,6 +132,7 @@ if (hasLayout()) {
       expect(part(host, 'bubble')?.getAttribute('data-placement')).toBe('right-start')
       expect(bubble.left).toBeGreaterThanOrEqual(target.right)
       expect(hasState(host, 'placed-right')).toBe(true)
+      expect(part(host, 'arrow')?.getAttribute('part')).toBe('arrow arrow-right')
       expect(hasState(host, 'placed-bottom')).toBe(false)
     })
 
@@ -147,6 +148,7 @@ if (hasLayout()) {
          reading `placement` would point the arrow from a side the panel is not
          on. */
       expect(hasState(host, 'placed-bottom')).toBe(true)
+      expect(part(host, 'arrow')?.getAttribute('part')).toBe('arrow arrow-bottom')
       expect(hasState(host, 'placed-right')).toBe(false)
     })
 
@@ -172,6 +174,7 @@ if (hasLayout()) {
       expect(bubble.right).toBeLessThanOrEqual(target.left)
       expect(bubble.left).toBeGreaterThanOrEqual(0)
       expect(hasState(host, 'placed-left')).toBe(true)
+      expect(part(host, 'arrow')?.getAttribute('part')).toBe('arrow arrow-left')
     })
   })
 }

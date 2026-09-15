@@ -61,7 +61,7 @@
 /*
  *  The point, half outside the panel and pointing at the target.
  */
-[part="arrow"] {
+[part~="arrow"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
   /* `0.5rem`, which is Tooltip's point: one shape, one size. No size token
      holds it, the size scale being controls, icons and marks. Settled 14 Sep
@@ -72,36 +72,33 @@
   rotate: 45deg;
 }
 
-/* Half of the box, so the point sits outside and the rest covers the edge it
-   came through. `data-placement` is on the panel, written by the floating pass
-   once it knows which side it ended up on.
+/* The floating pass puts the point on the edge facing the target, half of it
+   outside, and the rest covers the edge it came through. What is left here is
+   the edge drawn on it, and `data-placement` is on the panel, written by the
+   same pass once it knows which side it ended up on.
 
-   **Physical, edges and borders both**, because a placement is: `right` is the
-   right of the target in either direction, so the point is on the panel's left.
-   The borders are the two sides that meet at the corner turned outward, and
-   that corner does not turn with the text either: a turned square's top-left
-   corner is its top point, and `border-inline-start` on a right-to-left page
-   edged the top-right one, which is its right. */
-[part="bubble"][data-placement^="bottom"] [part="arrow"] {
+   **Physical**, because a placement is: `right` is the right of the target in
+   either direction, so the point is on the panel's left. The borders are the
+   two sides that meet at the corner turned outward, and that corner does not
+   turn with the text either: a turned square's top-left corner is its top
+   point, and `border-inline-start` on a right-to-left page edged the top-right
+   one, which is its right. */
+[part="bubble"][data-placement^="bottom"] [part~="arrow"] {
   border-left: var(--helix-border-thin) solid var(--helix-color-border);
   border-top: var(--helix-border-thin) solid var(--helix-color-border);
-  top: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }
 
-[part="bubble"][data-placement^="top"] [part="arrow"] {
+[part="bubble"][data-placement^="top"] [part~="arrow"] {
   border-bottom: var(--helix-border-thin) solid var(--helix-color-border);
   border-right: var(--helix-border-thin) solid var(--helix-color-border);
-  bottom: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }
 
-[part="bubble"][data-placement^="right"] [part="arrow"] {
+[part="bubble"][data-placement^="right"] [part~="arrow"] {
   border-bottom: var(--helix-border-thin) solid var(--helix-color-border);
   border-left: var(--helix-border-thin) solid var(--helix-color-border);
-  left: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }
 
-[part="bubble"][data-placement^="left"] [part="arrow"] {
+[part="bubble"][data-placement^="left"] [part~="arrow"] {
   border-right: var(--helix-border-thin) solid var(--helix-color-border);
   border-top: var(--helix-border-thin) solid var(--helix-color-border);
-  right: calc(var(--tour-arrow-size, 0.5rem) / -2);
 }

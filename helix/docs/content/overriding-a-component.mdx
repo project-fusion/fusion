@@ -98,6 +98,12 @@ helix-video::part(overflow-header) { … }
 role stands alone: the tooltip inside `<helix-copy-button>` is `tooltip`, and
 its arrow is `tooltip-arrow`.
 
+A part that changes with a state takes a second name while the state holds, and
+that name is forwarded too. A tooltip that landed below its button is also
+`tooltip-bottom`, and its arrow `tooltip-arrow-bottom`, which is how a sheet out
+here draws by a side it cannot otherwise see. The arrow already faces the button
+whichever side that is; the name is for what you draw on top.
+
 **The prefix is not decoration.** Two levels can agree on a word, and did:
 `Command` forwarded the listbox's `search-field` under a name it also rendered
 itself, so `::part(search-field)` matched two elements at once.

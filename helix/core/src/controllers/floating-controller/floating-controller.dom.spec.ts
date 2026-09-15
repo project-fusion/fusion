@@ -89,3 +89,76 @@ describe('the arrow’s clearance from the corners', () => {
     expect(await radiusReads(false)).toBe(0)
   })
 })
+
+/**
+ * The arrow's four edges, which is what lets any sheet draw the arrow without
+ * knowing which side the panel landed on.
+ *
+ * A document sheet reaches the arrow through `::part()` and cannot follow it
+ * with `data-placement`, so every headless preview pinned one edge, and a panel
+ * that flipped pointed away from its anchor. What is asserted is which edge
+ * faces the anchor for each side, that the other two are `auto` so nothing is
+ * left for the writing direction to settle, and that all four are `important`,
+ * which is what beats a normal declaration arriving through `::part()`.
+ * happy-dom lays nothing out, so the reach is zero here; the browser specs of
+ * each family measure it.
+ */
+describe('the arrow', () => {
+  const FACING = { bottom: 'top', left: 'right', right: 'left', top: 'bottom' } as const
+
+  for (const side of ['bottom', 'left', 'right', 'top'] as const) {
+    test(`hangs off the edge facing the anchor when the panel lands ${side}`, async () => {
+      document.body.innerHTML =
+        '<div id="host"><button id="anchor">open</button><div id="floating"><i id="arrow"></i></div></div>'
+      const host = document.getElementById('host') as HTMLElement
+      Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
+      const arrow = document.getElementById('arrow') as HTMLElement
+      const controller = new FloatingController(host as never, {
+        anchor: () => document.getElementById('anchor'),
+        arrow: () => arrow,
+        flip: false,
+        floating: () => document.getElementById('floating'),
+        placement: side,
+        shift: false,
+      })
+      live.push(controller)
+      controller.update()
+      await new Promise((done) => setTimeout(done, 0))
+      const facing = FACING[side]
+      const along = side === 'top' || side === 'bottom' ? 'left' : 'top'
+      const reach = (along === 'left' ? arrow.offsetHeight : arrow.offsetWidth) / 2
+      for (const edge of ['bottom', 'left', 'right', 'top']) {
+        expect(arrow.style.getPropertyPriority(edge)).toBe('important')
+        const value = arrow.style.getPropertyValue(edge)
+        if (edge === facing) {
+          expect(value).toBe(`${-reach}px`)
+        } else if (edge === along) {
+          expect(value).toMatch(/^-?\d+(\.\d+)?px$/)
+        } else {
+          expect(value).toBe('auto')
+        }
+      }
+    })
+  }
+
+  test('and gives all four back when placing is taken back', async () => {
+    document.body.innerHTML =
+      '<div id="host"><button id="anchor">open</button><div id="floating"><i id="arrow"></i></div></div>'
+    const host = document.getElementById('host') as HTMLElement
+    Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
+    const arrow = document.getElementById('arrow') as HTMLElement
+    const controller = new FloatingController(host as never, {
+      anchor: () => document.getElementById('anchor'),
+      arrow: () => arrow,
+      floating: () => document.getElementById('floating'),
+    })
+    live.push(controller)
+    controller.update()
+    await new Promise((done) => setTimeout(done, 0))
+    expect(arrow.style.getPropertyValue('top')).not.toBe('')
+    controller.release()
+    for (const edge of ['bottom', 'left', 'right', 'top']) {
+      expect(arrow.style.getPropertyValue(edge)).toBe('')
+    }
+  })
+})

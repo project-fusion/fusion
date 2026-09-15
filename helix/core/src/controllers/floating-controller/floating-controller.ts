@@ -6,12 +6,16 @@ import {
   type Middleware,
   offset,
   type Placement,
+  type Side,
   shift,
   size,
 } from '@floating-ui/dom'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 
-export type { Placement }
+export type { Placement, Side }
+
+/** The panel's edge facing its anchor, for each side of it the panel can land on. */
+const FACING: Record<Side, Side> = { bottom: 'top', left: 'right', right: 'left', top: 'bottom' }
 
 /**
  * The panel's largest corner radius, which is how far its arrow has to stay
@@ -162,7 +166,8 @@ export interface FloatingOptions {
  *
  * The side the element actually landed on is written back as `data-placement`,
  * so a styled tier can animate from it rather than from the side that was
- * asked for.
+ * asked for. An arrow is placed whole, on the edge facing the anchor, so no
+ * stylesheet has to know which side that is to point it the right way.
  *
  * **The custom properties are declared here because this is what writes them.**
  * Each carries a measurement taken against the viewport that no stylesheet can
@@ -269,6 +274,10 @@ export class FloatingController implements ReactiveController {
       'translate',
     ]) {
       floating.style.removeProperty(one)
+    }
+    const pointer = this.options.arrow?.()
+    for (const one of ['bottom', 'left', 'right', 'top']) {
+      pointer?.style.removeProperty(one)
     }
     floating.removeAttribute('data-placement')
   }
@@ -474,14 +483,44 @@ export class FloatingController implements ReactiveController {
 
       const point = middlewareData.arrow
       if (pointer && point) {
-        /* Physical for the reason the panel is: Floating UI measures the
-           arrow's offset from the panel's left and top. The edge it hangs off
-           is the stylesheet's, chosen from `data-placement`, and is physical
-           too, `right` in a placement being the right in either direction. */
-        Object.assign(pointer.style, {
-          left: point.x === undefined ? '' : `${point.x}px`,
-          top: point.y === undefined ? '' : `${point.y}px`,
-        })
+        /* **All four edges, so the arrow faces its anchor whatever sheet draws
+           it.** Floating UI measures the arrow's offset along the edge from the
+           panel's left and top, physical for the reason the panel is. The edge
+           it hangs off is the one facing the anchor, across from the side the
+           panel landed on, and it used to be the stylesheet's to choose from
+           `data-placement`. Only a sheet inside the shadow root can read that:
+           a document sheet reaches the arrow through `::part()`, which nothing
+           can follow with an attribute, so every headless example pinned its
+           arrow to the bottom edge for a `top` placement, and a bubble that
+           flipped below its anchor pointed away from it.
+
+           **Half the arrow's own box outward, which centers it on that edge.**
+           Not a custom property: the size is `--tooltip-arrow-size` in one
+           family, `--tour-arrow-size` in another and a bare `0.5rem` in a
+           headless sheet, and `core` naming a tier's hook is the dependency the
+           tiers exist to prevent. The box is what whichever sheet it was has
+           already decided, border included, every shadow root here being
+           `border-box`, and it is read below for `--floating-arrow-x` anyway.
+           `offsetWidth` rather than a rect, which reports the rotated box.
+
+           **`important`, and the other edges `auto`, for the panel's reasons
+           above.** A document sheet's normal declarations through `::part()`
+           outrank inline ones, so an edge pinned there still won, and two
+           opposite edges both set leave the writing direction to decide which
+           one counts. */
+        const facing = FACING[placement.split('-')[0] as Side]
+        const reach =
+          (facing === 'left' || facing === 'right' ? pointer.offsetWidth : pointer.offsetHeight) / 2
+        const edges: Record<Side, string> = {
+          bottom: 'auto',
+          left: point.x === undefined ? 'auto' : `${point.x}px`,
+          right: 'auto',
+          top: point.y === undefined ? 'auto' : `${point.y}px`,
+        }
+        edges[facing] = `${-reach}px`
+        for (const [edge, value] of Object.entries(edges)) {
+          pointer.style.setProperty(edge, value, 'important')
+        }
         /* Where the pointer ended up, as the center of it, published for
            anything that has to grow out of the thing it points at.
          *

@@ -124,14 +124,13 @@ helix-headless-tooltip::part(tooltip):not(:popover-open) {
   display: none;
 }
 
-/* A square turned to a point in the bubble's own fill. The component writes
-   where along the edge it sits; which edge is the placement's, and this
-   example's is the default `top`, so the point hangs below. */
+/* A square turned to a point in the bubble's own fill. No edge: the component
+   puts it on the one facing the trigger, half outside, whichever side the
+   bubble landed on. */
 helix-headless-tooltip::part(arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
   inline-size: 0.5rem;
-  inset-block-end: -0.25rem;
   position: absolute;
   rotate: 45deg;
 }

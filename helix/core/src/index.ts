@@ -32,6 +32,7 @@ export {
   FloatingController,
   type FloatingOptions,
   type Placement,
+  type Side,
 } from './controllers/floating-controller/floating-controller.js'
 export { FocusTrapController } from './controllers/focus-trap-controller/focus-trap-controller.js'
 export {

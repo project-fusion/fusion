@@ -5,9 +5,10 @@ import {
   hostAria,
   type Placement,
   PopoverController,
+  type Side,
 } from '@fusion.dev/helix-core'
 import type { PropertyValues, TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import '../../button/index.js'
 
@@ -56,6 +57,10 @@ import '../../button/index.js'
  *
  * @csspart actions - The row the controls sit in.
  * @csspart arrow - The point, which the floating pass places against the target.
+ * @csspart arrow-bottom - The point while the panel is below its target, so on the panel's top edge, beside `arrow`.
+ * @csspart arrow-left - The point while the panel is left of its target, so on the panel's right edge, beside `arrow`.
+ * @csspart arrow-right - The point while the panel is right of its target, so on the panel's left edge, beside `arrow`.
+ * @csspart arrow-top - The point while the panel is above its target, so on the panel's bottom edge, beside `arrow`.
  * @csspart back - The control that goes to the previous stop.
  * @csspart back-button - The inner control.
  * @csspart bubble - The panel that points at the target.
@@ -132,6 +137,14 @@ export class HelixHeadlessTourStop extends HelixElement {
   @property({ attribute: 'skip-label' })
   skipLabel = 'Skip'
 
+  /**
+   * The side of its target the panel last landed on, which names the arrow's
+   * second part. Undefined until the first placement, which the server never
+   * makes.
+   */
+  @state()
+  private side?: Side
+
   /** The element this stop is about, or null where the id resolves to nothing. */
   get target(): HTMLElement | null {
     const scope = this.getRootNode() as Document | ShadowRoot
@@ -161,18 +174,21 @@ export class HelixHeadlessTourStop extends HelixElement {
        control and `Escape`, both of which say so. */
     onDismiss: () => {},
     /* The side the panel landed on, which is not always `placement`: a stop
-       with no room on the side it asked for is moved. The styled tier points
-       its arrow from `data-placement` on the panel, inside this shadow root; a
-       stylesheet outside cannot follow `::part(arrow)` with an attribute, and
-       reading the stop's own `placement` instead pointed the arrow from the
-       side that was asked for, or from below wherever React had set it as a
-       property and there was no attribute to read. */
+       with no room on the side it asked for is moved. The floating pass puts
+       the arrow on the edge facing the target itself; what a sheet draws by
+       side is the edge on the arrow's two outer sides. The styled tier reads
+       `data-placement` on the panel, inside this shadow root; a stylesheet
+       outside cannot follow `::part(arrow)` with an attribute, and reading the
+       stop's own `placement` instead drew from the side that was asked for, or
+       from below wherever React had set it as a property and there was no
+       attribute to read. */
     onPlace: (placement) => {
-      const side = placement.split('-')[0]
+      const side = placement.split('-')[0] as Side
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')
       this.toggleState('placed-top', side === 'top')
+      this.side = side
     },
     placement: () => this.placement,
     surface: () => this.partNamed('bubble'),
@@ -251,7 +267,10 @@ export class HelixHeadlessTourStop extends HelixElement {
            off elsewhere is house style rather than a fact about the system. */
         ''
       }
-      <div part="arrow" aria-hidden="true"></div>
+      <div
+        part="arrow${this.side ? { bottom: ' arrow-bottom', left: ' arrow-left', right: ' arrow-right', top: ' arrow-top' }[this.side] : ''}"
+        aria-hidden="true"
+      ></div>
       <div part="content"><slot></slot></div>
       <div part="actions">
         ${this.renderActions()}

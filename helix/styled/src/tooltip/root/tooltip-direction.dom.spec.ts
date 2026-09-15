@@ -30,13 +30,13 @@ interface Pointed {
  * entrance, which scales the bubble and everything in it.
  */
 if (hasLayout()) {
-  const pointed = async (placement: string, direction: string): Promise<Pointed> => {
+  const pointed = async (placement: string, direction: string, top = '12rem'): Promise<Pointed> => {
     document.documentElement.dir = direction
     await mount(`<div>
         <button aria-describedby="tip" id="trigger">Deploy</button>
         <helix-tooltip content="Ships the build" for="trigger" id="tip" placement="${placement}"></helix-tooltip>
         <style>
-          #trigger { block-size: 2rem; inline-size: 6rem; inset-block-start: 12rem; left: calc(50% - 3rem); position: fixed }
+          #trigger { block-size: 2rem; inline-size: 6rem; inset-block-start: ${top}; left: calc(50% - 3rem); position: fixed }
         </style>
       </div>`)
     const tip = document.querySelector('helix-tooltip') as Tip
@@ -111,6 +111,19 @@ if (hasLayout()) {
         expect(Math.abs(x - bubble.right)).toBeLessThanOrEqual(1)
         expect(y).toBeGreaterThanOrEqual(trigger.top)
         expect(y).toBeLessThanOrEqual(trigger.bottom)
+      })
+
+      /* Asked for above, at the top of the window, where there is no room: the
+         bubble flips below and the point goes with it, which the controller
+         decides now rather than a sheet keyed on the side. */
+      test('asked for above with no room there, flips below and points up', async () => {
+        const { arrow, bubble, side, trigger } = await pointed('top', direction, '0.25rem')
+        const { x, y } = across(arrow)
+        expect(side).toBe('bottom')
+        expect(bubble.top).toBeGreaterThanOrEqual(trigger.bottom)
+        expect(Math.abs(y - bubble.top)).toBeLessThanOrEqual(1)
+        expect(x).toBeGreaterThanOrEqual(trigger.left)
+        expect(x).toBeLessThanOrEqual(trigger.right)
       })
     })
   }

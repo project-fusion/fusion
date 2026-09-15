@@ -107,13 +107,13 @@ helix-headless-copy-button::part(tooltip):not(:popover-open) {
   display: none;
 }
 
-/* A square turned to a point in the bubble's own fill, hanging below it: the
-   default placement is `top`. */
+/* A square turned to a point in the bubble's own fill. No edge: the component
+   puts it on the one facing the button, so a bubble that flips below it at the
+   top of a page still points up at it. */
 helix-headless-copy-button::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
   inline-size: 0.5rem;
-  inset-block-end: -0.25rem;
   position: absolute;
   rotate: 45deg;
 }

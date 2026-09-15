@@ -191,13 +191,12 @@ helix-headless-bar-chart::part(tooltip) {
   padding: 0.25rem 0.5rem;
 }
 
-/* A square turned to a point in the bubble's own fill, hanging below it: the
-   chart places its bubble above the reading. */
+/* A square turned to a point in the bubble's own fill. The component puts it
+   on the edge facing the reading, below the bubble or, where it flipped, above. */
 helix-headless-bar-chart::part(tooltip-arrow) {
   background-color: var(--_gray-strong);
   block-size: 0.5rem;
   inline-size: 0.5rem;
-  inset-block-end: -0.25rem;
   position: absolute;
   rotate: 45deg;
 }
