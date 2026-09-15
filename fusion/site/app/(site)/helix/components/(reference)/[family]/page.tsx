@@ -428,6 +428,7 @@ function ElementApi({ element }: { element: Element }) {
       <MemberTable label="Method" rows={element.methods} />
       <MemberTable label="Part" rows={element.cssParts} typed={false} />
       <MemberTable label="CSS Property" rows={element.cssProperties} typed={false} />
+      <MemberTable label="Custom state" rows={element.cssStates} typed={false} />
     </helix-flex>
   )
 }

@@ -65,6 +65,8 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  *
  * @csspart arrow - The point, resting against the trigger.
  * @csspart tooltip - The bubble.
+ *
+ * @cssstate open - While the tooltip shows.
  */
 @customElement('helix-headless-tooltip')
 export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {

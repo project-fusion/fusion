@@ -53,6 +53,8 @@ const TRIGGER_ID = 'trigger'
  * @csspart content - The revealed region.
  * @csspart content-inner - The clipping box inside the animated region.
  * @csspart trigger - The clickable summary row.
+ *
+ * @cssstate open - While the item is open.
  */
 @customElement('helix-headless-accordion-item')
 export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement) {

@@ -53,6 +53,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart toggle - The expand and collapse control.
  *
  * @cssproperty --tree-level - How deep this row sits, counting from one as `aria-level` does, for the indent.
+ *
+ * @cssstate open - While its children are shown.
+ * @cssstate selected - While it is selected.
  */
 @customElement('helix-headless-tree-item')
 export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {

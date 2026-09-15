@@ -51,6 +51,10 @@ import { property } from 'lit/decorators.js'
  * @csspart mark - The tick, or the dash when the box is indeterminate.
  * @csspart mark-checked - The mark while the box is checked, beside `mark`.
  * @csspart mark-indeterminate - The mark while the box is indeterminate, beside `mark`.
+ *
+ * @cssstate checked - While the box is checked.
+ * @cssstate has-label - While the label slot holds something to read, which is what draws a label at all.
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-checkbox')
 export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(HelixFormElement)) {

@@ -58,7 +58,8 @@ export declare class MixinControllerCheckedInterface {
  *
  * Records `:state(checked)` whenever the element is checked. Styled tiers
  * select on that rather than on `[checked]`, which is absent until somebody
- * writes it.
+ * writes it. Each element applying this lists it as `@cssstate checked`: a
+ * class-level tag on a mixin reaches no manifest, here or on the inner class.
  */
 export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base: T) => {
   // JSDoc is duplicated from MixinControllerCheckedInterface deliberately. The

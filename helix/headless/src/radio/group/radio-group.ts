@@ -53,6 +53,8 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @csspart hint - Help under the set.
  * @csspart items - The choices, which is what `orientation` lays out.
  * @csspart label - The question, over the set.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-radio-group')
 export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(HelixFormElement)) {

@@ -102,6 +102,9 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @csspart trigger - The control that opens the panel.
  *
  * @cssproperty --color-input-swatch - The chosen color, to paint over the transparency check.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate open - While the picker is open.
  */
 @customElement('helix-headless-color-input')
 export class HelixHeadlessColorInput extends MixinPickerField(

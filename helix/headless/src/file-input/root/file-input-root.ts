@@ -109,6 +109,8 @@ const kind = (file: File): string => {
  * @csspart size-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart size-prefix - The category before the label.
  * @csspart trigger - The label that opens the picker.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-file-input')
 export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {

@@ -76,6 +76,10 @@ import '../../format-date/index.js'
  * @csspart media - The leading slot's box.
  * @csspart time - When it happened, read the way a person reads one.
  * @csspart trailing - The column holding the time and the controls.
+ *
+ * @cssstate actions - While the actions slot holds something, so the words above make room for it.
+ * @cssstate controls - While it can be dismissed, so the time makes way for the control under a pointer.
+ * @cssstate read - While it has been read.
  */
 @customElement('helix-headless-notification')
 export class HelixHeadlessNotification extends HelixElement {

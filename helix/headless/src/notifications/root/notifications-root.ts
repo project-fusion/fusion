@@ -51,6 +51,8 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart list - The list itself.
  * @csspart loading - Shown while the feed is still on its way.
  * @csspart mark-all - The control that marks everything read.
+ *
+ * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
  */
 @customElement('helix-headless-notifications')
 export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {

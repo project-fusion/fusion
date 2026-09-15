@@ -85,6 +85,8 @@ const parse = (hotkey: string) => {
  * @csspart listbox-loading - Shown while the options are still on their way.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The field itself.
+ *
+ * @cssstate open - While the palette is open.
  */
 @customElement('helix-headless-command')
 export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {

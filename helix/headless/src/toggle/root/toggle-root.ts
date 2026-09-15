@@ -23,6 +23,8 @@ import { property } from 'lit/decorators.js'
  * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: refusing it takes the decision and nothing moves.
  *
  * @csspart item - The radio button.
+ *
+ * @cssstate selected - While it is on.
  */
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends HelixElement {

@@ -38,6 +38,8 @@ import { property } from 'lit/decorators.js'
  * @csspart end - The trailing region.
  * @csspart row - The centered row inside the banner.
  * @csspart start - The leading region.
+ *
+ * @cssstate scrolled - While the page is scrolled down from the top, which is when the bar lifts off it.
  */
 @customElement('helix-headless-app-header')
 export class HelixHeadlessAppHeader extends HelixElement {

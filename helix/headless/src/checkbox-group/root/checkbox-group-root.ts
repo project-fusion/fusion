@@ -50,6 +50,8 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @csspart hint - Help under the set.
  * @csspart items - The list itself, which is what `orientation` lays out.
  * @csspart label - The group's name, over the set.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-checkbox-group')
 export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {

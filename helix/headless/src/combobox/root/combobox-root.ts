@@ -113,6 +113,9 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tag-dismiss-mark - The glyph on the dismiss control, where none is slotted.
  * @csspart tag-prefix - The category before the label.
  * @csspart tags - The row of chosen options, when `multiple` is set.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate open - While the list is open.
  */
 @customElement('helix-headless-combobox')
 export class HelixHeadlessCombobox extends MixinControllerOpen(

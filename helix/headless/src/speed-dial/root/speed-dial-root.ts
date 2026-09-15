@@ -56,6 +56,8 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  *
  * @csspart actions - The region the actions are drawn in.
  * @csspart trigger - The default trigger, where none was slotted.
+ *
+ * @cssstate open - While the actions are out.
  */
 @customElement('helix-headless-speed-dial')
 export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {

@@ -87,6 +87,8 @@ const SCRUB_FINE = 16
  * @csspart increment - The control that steps up.
  * @csspart increment-mark - The glyph on the step up control.
  * @csspart label - The name over the field, which is also the scrub grip.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-number-input')
 export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(HelixFormElement)) {

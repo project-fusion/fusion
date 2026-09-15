@@ -108,6 +108,9 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @csspart time-prefix - The category before the label.
  * @csspart trigger - The control that opens the list.
  * @csspart trigger-icon - The mark on the button that opens the clock.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
+ * @cssstate open - While the clock is open.
  */
 @customElement('helix-headless-time-input')
 export class HelixHeadlessTimeInput extends MixinPickerEditing(

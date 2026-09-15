@@ -96,6 +96,9 @@ export const at = (row: Readonly<Record<string, unknown>>, path: string): unknow
  * @csspart grip-mark - The glyph on it.
  * @csspart resizer - The edge a reader drags to change the width, where the column allows it.
  * @csspart sort - The button a sortable heading is.
+ *
+ * @cssstate sorted-ascending - While the table is sorted by this column, smallest first.
+ * @cssstate sorted-descending - While the table is sorted by this column, largest first.
  */
 @customElement('helix-headless-table-column')
 export class HelixHeadlessTableColumn extends HelixElement {
@@ -293,17 +296,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
        from: no state and no part told the sorted column from the rest, so the
        only way to it was listening for `helix-sort` and reading the order back a
        microtask later, which is a lot of machinery for one glyph. */
-    for (const [name, on] of [
-      ['sorted-ascending', this.sorted === 'ascending'],
-      ['sorted-descending', this.sorted === 'descending'],
-    ] as const) {
-      /* Through `toggleState`, which carries the feature test, the way
-         `pagination-root.ts` does in this same hook. Safari below 17.4 and
-         Firefox below 126 have no `CustomStateSet`, and there
-         `internals.states.delete` is a `TypeError` thrown from `willUpdate`:
-         the column would fail to render rather than render without a caret. */
-      this.toggleState(name, on)
-    }
+    /* Through `toggleState`, which carries the feature test, the way
+       `pagination-root.ts` does in this same hook. Safari below 17.4 and
+       Firefox below 126 have no `CustomStateSet`, and there
+       `internals.states.delete` is a `TypeError` thrown from `willUpdate`: the
+       column would fail to render rather than render without a caret. Each
+       name written out, since a state is read from the source as a literal. */
+    this.toggleState('sorted-ascending', this.sorted === 'ascending')
+    this.toggleState('sorted-descending', this.sorted === 'descending')
   }
 
   /** The words of the heading, for naming the controls on it. */

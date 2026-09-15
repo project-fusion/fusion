@@ -52,6 +52,8 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart content - The scrolling region inside the panel.
  * @csspart popover - The panel.
+ *
+ * @cssstate open - While the popover is open.
  */
 @customElement('helix-headless-popover')
 export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {

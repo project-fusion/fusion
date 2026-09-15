@@ -52,6 +52,8 @@ import { property } from 'lit/decorators.js'
  * @csspart content - The scrolling content region.
  * @csspart header - The header region.
  * @csspart panel - The sliding panel.
+ *
+ * @cssstate open - While the drawer is open.
  */
 @customElement('helix-headless-drawer')
 export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {

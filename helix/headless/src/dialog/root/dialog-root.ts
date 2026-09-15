@@ -41,6 +41,8 @@ import { property } from 'lit/decorators.js'
  * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart dialog - The native dialog element.
+ *
+ * @cssstate open - While the dialog is open.
  */
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {

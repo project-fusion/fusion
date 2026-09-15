@@ -123,6 +123,8 @@ const fill = (
  * @csspart page-current - The page you are on, beside `page`.
  * @csspart previous - The control that moves back one page.
  * @csspart status - The reading of where you are, in `compact`.
+ *
+ * @cssstate empty - While there is one page or none, which is nothing to page through.
  */
 @customElement('helix-headless-pagination')
 export class HelixHeadlessPagination extends HelixElement {

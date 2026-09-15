@@ -46,8 +46,9 @@ use crate::rules::{Context, Finding, Report, Unwritten, Written};
 /// which the corpus split almost evenly and which is settled here: slots and
 /// events are what a consumer writes markup against, parts and custom properties
 /// are what they write CSS against, and the two pairs are worth not
-/// interleaving.
-const SECTIONS: [&[&str]; 7] = [
+/// interleaving. `@cssstate` came later and joins the second pair at its end,
+/// being the third thing a stylesheet names.
+const SECTIONS: [&[&str]; 8] = [
     &["summary"],
     &["description"],
     &[
@@ -62,13 +63,14 @@ const SECTIONS: [&[&str]; 7] = [
     &["event"],
     &["csspart"],
     &["cssproperty"],
+    &["cssstate"],
 ];
 
 /// The tags whose entries are a list, and so are sorted within their section.
 ///
 /// The metadata tags are not here because each appears once, and `@description`
 /// is prose whose paragraphs are an argument in sequence.
-const SORTED: [&str; 4] = ["csspart", "cssproperty", "event", "slot"];
+const SORTED: [&str; 5] = ["csspart", "cssproperty", "cssstate", "event", "slot"];
 
 static BLOCK: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?ms)^([ \t]*)/\*\*\n(.*?)^[ \t]*\*/").expect("a literal pattern compiles")

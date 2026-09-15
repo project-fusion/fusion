@@ -154,6 +154,8 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @csspart loading - Shown while the options are still on their way.
  * @csspart search - The region holding the field that narrows the list.
  * @csspart search-field - The field itself.
+ *
+ * @cssstate invalid - While there is feedback to show: the platform's verdict, or the consumer's `feedback`.
  */
 @customElement('helix-headless-listbox')
 export class HelixHeadlessListbox extends MixinCollection(

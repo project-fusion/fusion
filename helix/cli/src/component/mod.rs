@@ -82,6 +82,7 @@ pub mod shared;
 pub mod slots;
 pub mod ssr;
 pub mod stable;
+pub mod states;
 pub mod text;
 pub mod tier;
 pub mod token_defaults;
@@ -628,6 +629,12 @@ pub fn all() -> Vec<Rule> {
             name: "parts",
             run: Runner::Source(parts::run),
             summary: "a documented part is rendered, and a rendered part is documented",
+        },
+        Rule {
+            fix: None,
+            name: "states",
+            run: Runner::Source(states::run),
+            summary: "a recorded custom state is documented, and a documented one is recorded",
         },
         Rule {
             fix: None,

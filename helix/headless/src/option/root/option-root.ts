@@ -67,6 +67,8 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @csspart item-selected - The row of a chosen option, beside `item`.
  * @csspart label - The words.
  * @csspart text - The words and the caption under them, as one column.
+ *
+ * @cssstate selected - While the option is chosen.
  */
 @customElement('helix-headless-option')
 export class HelixHeadlessOption extends HelixElement {
