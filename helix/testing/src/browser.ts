@@ -784,23 +784,19 @@ export const settled = async (element: Element | null): Promise<void> => {
  * host it was an attribute React had not rendered and hydration said so.
  * `settled()` is the other half and is not this: that one waits for animations
  * to *finish*, where this one waits for them to become possible at all.
+ *
+ * **The promise alone, with no timer beside it, which is where this parts from
+ * the node harness's copy.** That one races a 50ms timeout because happy-dom
+ * never runs the frame the promise resolves from. A browser always does, and a
+ * timer here is a bet on how long a frame takes: measured 15 Sep 2026 on four
+ * workers, a page in the run went 400 to 1600ms without one while the aura
+ * specs in another page drew their shader, the timer won, and both checkbox
+ * mark specs read a transition that had not been switched on yet. A frame that
+ * never comes is still bounded, by the harness's own two seconds, and named as
+ * a timeout rather than as a missing transition.
  */
 export const readyToMove = async (element: Element | null): Promise<void> => {
-  const settled = (element as (Element & { whenSettled?: Promise<void> }) | null)?.whenSettled
-  if (!settled) {
-    return
-  }
-  await new Promise<void>((resolve) => {
-    void settled.then(resolve)
-    /* happy-dom never calls `requestAnimationFrame`'s callback the way a browser
-       does, so the promise alone would hang there: it is resolved from that
-       frame and that frame never comes. A macrotask is enough in both, a browser
-       having painted by then and happy-dom having nothing to wait for.
-
-       `Promise.resolve` is idempotent, so whichever arrives first wins and the
-       loser is a no-op. */
-    setTimeout(resolve, 50)
-  })
+  await (element as (Element & { whenSettled?: Promise<void> }) | null)?.whenSettled
 }
 
 /**
