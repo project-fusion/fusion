@@ -3,6 +3,17 @@
    host empty: stretched into a 118px row beside a card, the snippet draws 82px
    of itself and 36px of nothing. */
 :host {
+  /* Where the copy button stands: centered on the first line of code, which is
+     the block's padding and half a line down, and as far from the end as from
+     the top. At `size-control` and a `2xs` inset it sat 2.25px below that line
+     and filled a one-line block to within 2px of either edge. */
+  --_code-block-line: calc(var(--helix-text-sm) * var(--helix-leading-normal));
+  --_code-block-copy-inset: calc(
+    var(--helix-space-sm) +
+    (var(--_code-block-line) - var(--helix-size-control-sm)) /
+    2
+  );
+  --_code-block-gutter: calc(var(--helix-size-control-sm) + var(--_code-block-copy-inset) * 2);
   display: flex;
   flex-direction: column;
 }
@@ -58,8 +69,9 @@
 }
 
 [part="copy"] {
-  inset-block-start: var(--helix-space-2xs);
-  inset-inline-end: var(--helix-space-2xs);
+  --icon-button-size: var(--helix-size-control-sm);
+  inset-block-start: var(--_code-block-copy-inset);
+  inset-inline-end: var(--_code-block-copy-inset);
   position: absolute;
 }
 
@@ -77,10 +89,10 @@
 }
 
 /* *The gutter is only reserved when something is standing in it.** Held
-   unconditionally, the end padding costs a block with `no-copy` 40px of empty
+   unconditionally, the end padding costs a block with `no-copy` 44px of empty
    margin for a button that was never rendered. */
 :host(:not([no-copy])) [part="block"] {
-  padding-inline-end: calc(var(--helix-size-control) + var(--helix-space-sm));
+  padding-inline-end: var(--_code-block-gutter);
 }
 
 /* Only under a header does the block give up its top edge, so the two boxes read
@@ -96,6 +108,17 @@
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-sm);
   line-height: var(--helix-leading-normal);
+}
+
+/* **The code scrolls, not the block.** Scrolled by the `<pre>`, a long line ran
+   under the copy button, because a scroller's end padding exists only at the end
+   of its content and the button stands over everything before it: at 390 the
+   button sat on `tone="pri`. The `<code>` scrolls inside the block's padding
+   instead, so a line stops at the gutter. A diff keeps the block as its
+   scroller, since its washes are meant to run under the button to the edge. */
+:host(:not([diff])) [part="code"] {
+  display: block;
+  overflow-x: auto;
 }
 
 /* ================================================================ diff === */
@@ -174,7 +197,7 @@
 /* The copy button's gutter, on the lines rather than on the block, so the
    washes still reach the edge under it. */
 :host(:not([no-copy])) :is([part="hunk"], [part="context"], [part="added"], [part="removed"]) {
-  padding-inline-end: calc(var(--helix-size-control) + var(--helix-space-sm));
+  padding-inline-end: var(--_code-block-gutter);
 }
 
 [part="hunk"] {
