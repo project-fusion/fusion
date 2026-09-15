@@ -109,19 +109,24 @@
   border-block-end-color: transparent;
 }
 
-/* The heading is the cell's own box, and the column element is what carries it.
-   Weight rather than a fill, per the rule that depth comes from a single border:
-   a filled header band is elevation spelled differently. */
+/*
+ *  **The hooks reach a heading by inheritance, because nothing else here can.** A
+ *    column is `display: contents` and draws its heading inside its own shadow
+ *    root, so a padding, a rule or a color set on the column element from this
+ *    sheet lands on a box that is never drawn, and `::part()` cannot follow
+ *    `::slotted()`. A custom property inherits into that root, so these are set
+ *    on the column and `table-column.css` reads them. No fallbacks: an unset hook
+ *    leaves its relay unset, and the heading keeps its own resting value.
+ *
+ *    Relayed rather than read there under these names, so a `helix-table` on a
+ *    page that sets `--data-table-text` keeps the headings it had.
+ */
 ::slotted(helix-table-column) {
-  border-block-end: var(--helix-border-thin) solid
-    var(--data-table-rule-color, var(--helix-color-border));
-  color: var(--data-table-heading-color, var(--helix-color-foreground-subtle));
-  font-family: var(--helix-font-sans);
-  font-size: var(--data-table-text, var(--helix-text-sm));
-  font-weight: var(--helix-weight-medium);
-  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
-  padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
-  text-align: start;
+  --_table-heading-color: var(--data-table-heading-color);
+  --_table-heading-padding-block: var(--data-table-padding-block);
+  --_table-heading-padding-inline: var(--data-table-padding-inline);
+  --_table-heading-rule-color: var(--data-table-rule-color);
+  --_table-heading-text: var(--data-table-text);
 }
 
 /* A sortable heading is a control, and looking like one is not optional: a
@@ -229,10 +234,13 @@
 }
 
 /*
- *  The headings stick, and it is the cells that do it. `[part="head"]` is
- *    `display: contents`, so the whole grid stays one grid and every column lines
- *    up across every row; an element with no box cannot be stuck to anything, so
- *    the sticking happens on the column elements that are the grid items.
+ *  The headings stick, and it is the headings' own boxes that do it.
+ *    `[part="head"]` is `display: contents`, so the whole grid stays one grid and
+ *    every column lines up across every row, and so is the column element: an
+ *    element with no box cannot be stuck to anything, and `position: sticky`
+ *    written on either one scrolled every heading off the top of the box. The box
+ *    that is a grid item is `[part="column"]` inside each column, so this is
+ *    relayed there like the hooks above.
  *
  *    The fill is not the header band this sheet refuses elsewhere. Rows scroll
  *    *under* a sticky heading, and without an opaque background they show through
@@ -240,10 +248,20 @@
  *    nothing is passing beneath it the heading reads as weight again.
  */
 :host([windowed]) ::slotted(helix-table-column) {
+  --_table-heading-background-color: var(
+    --data-table-heading-background-color,
+    var(--helix-color-background)
+  );
+  --_table-heading-layer: var(--helix-layer-sticky);
+  --_table-heading-position: sticky;
+}
+
+/* The checkbox heading is this sheet's own box, and sticks beside them. */
+:host([windowed]) [part="select-all"] {
   background-color: var(--data-table-heading-background-color, var(--helix-color-background));
   inset-block-start: 0;
   position: sticky;
-  z-index: 1;
+  z-index: var(--helix-layer-sticky);
 }
 
 /* The spacers are geometry rather than content: they carry the room the rows

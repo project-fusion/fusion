@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -99,5 +99,61 @@ describe('table columns', () => {
     const column = host.querySelector('helix-table-column') as HTMLElement
     expect(role(column)).toBe('columnheader')
     expect(column.hasAttribute('role')).toBe(false)
+  })
+})
+
+/* Layout, so honestly absent under `bun test`, where every box is `0 0 0 0`.
+   `bun run specs:browser table`. */
+const geometry = hasLayout() ? test : (): void => {}
+
+describe('a heading, where there is layout to place it', () => {
+  const heading = async (attributes: string, around = ''): Promise<HTMLElement> => {
+    const host = (await mount(
+      `<div style="${around}"><helix-table label="Deployments">
+        <helix-table-column width="10rem">Service</helix-table-column>
+        <helix-table-column ${attributes} width="10rem">Count</helix-table-column>
+      </helix-table></div>`,
+    )) as HTMLElement
+    const columns = host.querySelectorAll('helix-table-column')
+    const count = columns[1] as HTMLElement & { updateComplete: Promise<unknown> }
+    await count.updateComplete
+    return count
+  }
+
+  const words = (node: Node): DOMRect => {
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    return range.getBoundingClientRect()
+  }
+
+  /* Where the words end against where the heading's content ends, which is its
+     box less the inset on the inline end: the right in one direction and the
+     left in the other. */
+  const gap = (count: HTMLElement): { end: number; start: number } => {
+    const column = part(count, 'column') as HTMLElement
+    const box = column.getBoundingClientRect()
+    const inset = Number.parseFloat(getComputedStyle(column).paddingInlineEnd)
+    const text = words(count)
+    return getComputedStyle(column).direction === 'rtl'
+      ? { end: text.left - (box.left + inset), start: box.right - text.right }
+      : { end: box.right - inset - text.right, start: text.left - box.left }
+  }
+
+  geometry('follows `align` to the edge it names, in either direction', async () => {
+    expect(Math.abs(gap(await heading('')).start)).toBeLessThan(2)
+    expect(Math.abs(gap(await heading('align="end"')).end)).toBeLessThan(2)
+    expect(Math.abs(gap(await heading('align="end" dir="rtl"')).end)).toBeLessThan(2)
+  })
+
+  /* Data Table's hooks reach a heading by being relayed onto its columns, and
+     only onto its columns: read under those names by the column itself, a page
+     setting them for its data tables would restyle every other table's
+     headings too. */
+  geometry("keeps its own size where a page sets a data table's", async () => {
+    const plain = await heading('')
+    const expected = getComputedStyle(part(plain, 'column') as Element).fontSize
+    const count = await heading('', '--data-table-text: 31px')
+    expect(getComputedStyle(part(count, 'column') as Element).fontSize).toBe(expected)
+    expect(expected).not.toBe('31px')
   })
 })

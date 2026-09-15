@@ -6,7 +6,13 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
-type Column = HTMLElement & { isTableColumn: boolean; track: string; width: string }
+type Column = HTMLElement & {
+  align?: string
+  isTableColumn: boolean
+  track: string
+  updateComplete: Promise<boolean>
+  width: string
+}
 
 const column = async (attributes = ''): Promise<Column> =>
   (await mount(
@@ -57,5 +63,18 @@ describe('one table column', () => {
      `instanceof`, which is cheaper and survives two copies of the module. */
   test('is identifiable by its parent without an instanceof', async () => {
     expect((await column()).isTableColumn).toBe(true)
+  })
+
+  /* The heading is placed by whatever sheet draws it, and a sheet reads an
+     attribute. Set as a property, which is how React sets it, an `align` that
+     did not reflect left nothing to select on, so the heading sat at the start
+     over a column of digits at the end. Unset, it writes nothing: a column
+     nobody aligned carries no attribute a server did not send. */
+  test('says which edge it is set to on its host, however that was set', async () => {
+    const host = await column()
+    expect(host.hasAttribute('align')).toBe(false)
+    host.align = 'end'
+    await host.updateComplete
+    expect(host.getAttribute('align')).toBe('end')
   })
 })

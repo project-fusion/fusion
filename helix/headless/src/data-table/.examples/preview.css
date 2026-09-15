@@ -150,13 +150,11 @@ helix-headless-table-column::part(sort) {
   min-inline-size: 0;
 }
 
-/* The size column is set to the end, and its heading goes there too, over the
-   digits it names: the component aligns the cells and leaves the heading to
-   the sheet. Named by position rather than by `[align="end"]`, because
-   `align` is a property that does not reflect, and React sets it as one, so
-   the TSX twin carries no attribute to match. */
-helix-headless-table-column:last-of-type::part(column),
-helix-headless-table-column:last-of-type::part(sort) {
+/* A column set to the end takes its heading there too, over the digits it
+   names: the component aligns the cells and leaves the heading to the sheet.
+   `align` reflects, so the attribute is there to match however it was set. */
+helix-headless-table-column[align="end"]::part(column),
+helix-headless-table-column[align="end"]::part(sort) {
   justify-content: flex-end;
 }
 
