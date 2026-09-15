@@ -114,8 +114,7 @@ describe("a table publishing each column's edge to its cells", () => {
 
   /* A column hidden with its cells keeps its place in both counts, so the
      cells after it keep their own column's edge rather than taking the next
-     one's. The edge only: the hidden column keeps its track, which is the
-     table's to drop and does not yet. */
+     one's. */
   browser('to the same cells when a column before them is hidden with its own', async () => {
     const host = await aligned()
     ;(host.querySelector('helix-headless-table-column') as HTMLElement).hidden = true
@@ -152,4 +151,110 @@ describe("a table publishing each column's edge to its cells", () => {
     expect(edge(cells[1])).toBe('')
     expect(getComputedStyle(cells[1] as Element).display).not.toBe('none')
   })
+})
+
+/**
+ * A hidden column, which takes no track.
+ *
+ * Left in, the header row had a heading fewer than the grid had tracks, the
+ * first cell filled the gap, and every row after it began a column late.
+ */
+describe('a table with a column hidden', () => {
+  const hiding = (attributes = ''): string => `
+    <helix-headless-table label="Deploys" ${attributes}>
+      <helix-headless-table-column hidden width="12rem">Service</helix-headless-table-column>
+      <helix-headless-table-column>Region</helix-headless-table-column>
+      <helix-headless-table-column width="6rem">Count</helix-headless-table-column>
+      <helix-headless-table-row>
+        <helix-headless-table-cell hidden>helix-web</helix-headless-table-cell>
+        <helix-headless-table-cell>us-east-1</helix-headless-table-cell>
+        <helix-headless-table-cell>34</helix-headless-table-cell>
+      </helix-headless-table-row>
+      <helix-headless-table-row>
+        <helix-headless-table-cell hidden>cortex-core</helix-headless-table-cell>
+        <helix-headless-table-cell>eu-west-2</helix-headless-table-cell>
+        <helix-headless-table-cell>1800</helix-headless-table-cell>
+      </helix-headless-table-row>
+    </helix-headless-table>`
+
+  test('lays out no track for it', async () => {
+    const host = (await mount(hiding())) as Updating
+    await settle(host)
+    expect(template(host)).toBe('--table-template: minmax(max-content, 1fr) 6rem')
+  })
+
+  /* `hidden` is the platform's attribute and no property of the column's, so
+     nothing but the column watching it tells the table. */
+  test('takes the track back when the column is shown, and gives it up again', async () => {
+    const host = (await mount(hiding())) as Updating
+    await settle(host)
+    const service = host.querySelector('helix-headless-table-column') as HTMLElement
+    service.hidden = false
+    await settle(host)
+    expect(template(host)).toBe('--table-template: 12rem minmax(max-content, 1fr) 6rem')
+    service.hidden = true
+    await settle(host)
+    expect(template(host)).toBe('--table-template: minmax(max-content, 1fr) 6rem')
+  })
+
+  /* The heading stays drawn under `until-found`, as every Helix host does, so
+     the track stays with it. */
+  test('keeps it under `hidden="until-found"`', async () => {
+    const host = (await mount(
+      hiding().replace('hidden width', 'hidden="until-found" width'),
+    )) as Updating
+    await settle(host)
+    expect(template(host)).toBe('--table-template: 12rem minmax(max-content, 1fr) 6rem')
+  })
+
+  /* What a headless consumer writes, and no more than the layout needs: the
+     grid from the published track list, and no box for the head, a row or a
+     column. A hidden one is left to the UA's `[hidden]`, which an author
+     `display` would beat. */
+  const sheet = `<style>
+    helix-headless-table::part(table) {
+      display: grid;
+      grid-template-columns: var(--table-template);
+    }
+    helix-headless-table::part(head),
+    helix-headless-table-column:not([hidden]),
+    helix-headless-table-row:not([hidden]) {
+      display: contents;
+    }
+    helix-headless-table-cell:not([hidden]) {
+      display: block;
+    }
+  </style>`
+
+  /** The farthest any drawn cell sits from the edges of its column's heading. */
+  const misplaced = (host: HTMLElement): number => {
+    const headings = [...host.querySelectorAll('helix-headless-table-column')] as HTMLElement[]
+    let worst = 0
+    headings.forEach((column, index) => {
+      if (column.hidden) {
+        return
+      }
+      const heading = (part(column, 'column') as Element).getBoundingClientRect()
+      for (const row of host.querySelectorAll('helix-headless-table-row')) {
+        const cell = (row.children[index] as Element).getBoundingClientRect()
+        worst = Math.max(
+          worst,
+          Math.abs(cell.left - heading.left),
+          Math.abs(cell.right - heading.right),
+        )
+      }
+    })
+    return worst
+  }
+
+  for (const dir of ['ltr', 'rtl'] as const) {
+    browser(`puts every cell after it under its own heading, ${dir}`, async () => {
+      const host = (await mount(hiding(`dir="${dir}"`) + sheet)) as Updating
+      await settle(host)
+      expect(misplaced(host)).toBeLessThan(1)
+      /* The hidden column's twelve rems went with it, rather than to Region. */
+      const count = host.querySelectorAll('helix-headless-table-column')[2] as HTMLElement
+      expect(Math.round((part(count, 'column') as Element).getBoundingClientRect().width)).toBe(96)
+    })
+  }
 })

@@ -79,16 +79,18 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * The track list, from the columns if there are any.
    *
    * Read from the DOM rather than kept, so adding or removing a column needs
-   * nothing else to be told. Falls back to the `columns` string for a table
-   * written before columns existed, and to a single track for one that declares
-   * neither.
+   * nothing else to be told. A hidden column takes no track: left in, the
+   * header row had a heading fewer than the grid had tracks, the first cell
+   * filled the gap, and every row after it began a column late. Falls back to
+   * the `columns` string for a table written before columns existed, and to a
+   * single track for one that declares neither.
    */
   private get template(): string {
     const declared = this.tableColumns
-    if (declared.length > 0) {
-      return declared.map((column) => column.track).join(' ')
+    if (declared.length === 0) {
+      return this.columns
     }
-    return this.columns
+    return declared.flatMap((column) => (column.shown ? [column.track] : [])).join(' ')
   }
 
   /* Columns arrive from the light DOM, which changes no property here, so
