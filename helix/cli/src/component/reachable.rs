@@ -1,4 +1,5 @@
-//! Every attribute a stylesheet selects on the host can be reached from a property.
+//! Every attribute a stylesheet selects on can be reached from a property, on a
+//! host and on an element it slots.
 //!
 //! **The direction the reflection rules do not ask about.** `reflected` bans a
 //! default on a property that reflects; it looks at properties that already do.
@@ -14,6 +15,14 @@
 //! three of them were invisible to reading: a group whose overflow count claimed
 //! avatars were hidden while every one drew full size, a trail losing 8px per
 //! crumb at once, a gutter reserved for a button that had gone away.
+//!
+//! **A `::slotted()` rule keyed on an attribute is the same fault one element
+//! over.** Data Table gives a sortable heading its pointer through
+//! `::slotted(helix-table-column[sortable])`, and while this read `:host()`
+//! alone it never asked whether `sortable` reflected: it did not, and every
+//! column React made sortable went without. The attribute belongs to the family
+//! that registers the tag, whichever family's sheet wrote the selector, and a
+//! slotted selector naming no tag of ours is keyed on a consumer's element.
 //!
 //! **What is not asked about.** A `data-` name is the library's own answer to
 //! this problem, written by the component rather than by a property, and
@@ -49,6 +58,22 @@ static HOST: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r":host\(([^)]*(?:\([^)]*\)[^)]*)*)\)").expect("a literal pattern compiles")
 });
 
+/// A `::slotted(...)` selector, tolerating one level of nested parens inside it.
+static SLOTTED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"::slotted\(([^)]*(?:\([^)]*\)[^)]*)*)\)").expect("a literal pattern compiles")
+});
+
+/// The custom element a compound selector opens with, when it opens with one.
+static TAG: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^\s*([a-z][a-z0-9]*(?:-[a-z0-9]+)+)").expect("a literal pattern compiles")
+});
+
+/// The tag a source file registers.
+static ELEMENT: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"@customElement\(\s*['"]([a-z][a-z0-9-]*)['"]\s*\)"#)
+        .expect("a literal pattern compiles")
+});
+
 /// An attribute name opening a bracket inside a selector.
 static ATTRIBUTE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\[\s*([a-zA-Z][\w-]*)").expect("a literal pattern compiles"));
@@ -72,12 +97,27 @@ struct Declared {
     reflect: bool,
 }
 
-pub fn run(context: &Context) -> Report {
-    let tiers = context.settings.roots(&context.root);
+/// The attribute names inside one selector's parentheses that a property could set.
+fn attributes(inside: &str) -> impl Iterator<Item = &str> {
+    ATTRIBUTE
+        .captures_iter(inside)
+        .filter_map(|found| found.get(1).map(|one| one.as_str()))
+        .filter(|name| !NOT_A_PROPERTY.is_match(name))
+}
 
-    /* Selected on: family to the attribute names its stylesheets key on. */
-    let mut selected: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
-    for tier in &tiers {
+/// Family to the attribute names its stylesheets key on.
+type Selected = BTreeMap<String, BTreeSet<String>>;
+
+/// Each tag and attribute a `::slotted()` keys on.
+type Slotted = Vec<(String, String)>;
+
+/// What the stylesheets select on: the attributes keyed on each family's hosts,
+/// and every tag and attribute a `::slotted()` keys on, whose family is the
+/// tag's and is known only once the sources have been read.
+fn selected_on(tiers: &[std::path::PathBuf]) -> (Selected, Slotted) {
+    let mut selected = Selected::new();
+    let mut slotted = Vec::new();
+    for tier in tiers {
         let mut sheets = Vec::new();
         stylesheets(tier, &mut sheets);
         for sheet in sheets {
@@ -86,24 +126,35 @@ pub fn run(context: &Context) -> Report {
             };
             let text = COMMENT.replace_all(&raw, "");
             for host in HOST.captures_iter(&text) {
-                let inside = host.get(1).map_or("", |one| one.as_str());
-                for found in ATTRIBUTE.captures_iter(inside) {
-                    let name = found.get(1).map_or("", |one| one.as_str());
-                    if NOT_A_PROPERTY.is_match(name) {
-                        continue;
-                    }
+                for name in attributes(host.get(1).map_or("", |one| one.as_str())) {
                     selected
                         .entry(family.to_owned())
                         .or_default()
                         .insert(name.to_owned());
                 }
             }
+            for one in SLOTTED.captures_iter(&text) {
+                let inside = one.get(1).map_or("", |two| two.as_str());
+                let Some(tag) = TAG.captures(inside).and_then(|two| two.get(1)) else {
+                    continue;
+                };
+                for name in attributes(inside) {
+                    slotted.push((tag.as_str().to_owned(), name.to_owned()));
+                }
+            }
         }
     }
+    (selected, slotted)
+}
+
+pub fn run(context: &Context) -> Report {
+    let tiers = context.settings.roots(&context.root);
+    let (mut selected, slotted) = selected_on(&tiers);
 
     /* Declared: every tier, since a styled sheet routinely selects on something
     the headless base declares. */
     let mut declared: BTreeMap<String, BTreeMap<String, Declared>> = BTreeMap::new();
+    let mut tags: BTreeMap<String, String> = BTreeMap::new();
     for tier in &tiers {
         let mut files = Vec::new();
         sources(tier, &mut files);
@@ -111,6 +162,9 @@ pub fn run(context: &Context) -> Report {
             let (Some(family), Ok(text)) = (family(&file, tier), fs::read_to_string(&file)) else {
                 continue;
             };
+            for one in ELEMENT.captures_iter(&text) {
+                tags.insert(one[1].to_owned(), family.to_owned());
+            }
             let where_ = context.relative(&file);
             for capture in DECLARATION.captures_iter(&text) {
                 let options = capture.get(1).map_or("", |one| one.as_str());
@@ -139,6 +193,15 @@ pub fn run(context: &Context) -> Report {
         }
     }
 
+    /* A slotted element belongs to the family that registers its tag, whichever
+    family's sheet selects on it. A tag nobody here registers is a consumer's
+    element, and its attributes are the consumer's to write. */
+    for (tag, name) in slotted {
+        if let Some(family) = tags.get(&tag) {
+            selected.entry(family.clone()).or_default().insert(name);
+        }
+    }
+
     let mut findings = Vec::new();
     let mut checked = 0;
     for (family, attributes) in &selected {
@@ -154,10 +217,11 @@ pub fn run(context: &Context) -> Report {
                 continue;
             }
             findings.push(Finding {
-                detail: "Add `reflect: true`. If the property carries a default, make it optional \
-                         first, or `reflected` will refuse it: a reflected property takes no \
-                         default."
-                    .to_owned(),
+                detail:
+                    "Add `reflect: true`. If the property carries a default other than `false`, \
+                         make it optional first, or `reflected` will refuse it: a reflected \
+                         property takes no default."
+                        .to_owned(),
                 file: property.file.clone(),
                 message: format!(
                     "{family}: `{attribute}` is selected on by CSS, and `{}` does not reflect",
@@ -171,6 +235,6 @@ pub fn run(context: &Context) -> Report {
         checked,
         findings,
         notes: Vec::new(),
-        unit: "host-attribute rules",
+        unit: "attribute rules on a host or a slotted element",
     }
 }

@@ -43,9 +43,10 @@ bunx biome ci . >/dev/null 2>&1 || {
   exit 1
 }
 
-# `reachable` is the rule that earned this line: it reads `:host([x])` against
-# whether `x` reflects, and the fault it catches is silent every other way. The
-# rest ride along because the whole set costs about a second.
+# `reachable` is the rule that earned this line: it reads `:host([x])` and
+# `::slotted(tag[x])` against whether `x` reflects, and the fault it catches is
+# silent every other way. The rest ride along because the whole set costs about
+# a second.
 printf 'pre-push: the rules that ship\n'
 bun run check:cli >/tmp/pre-push-$$.log 2>&1 || {
   printf '\n'
