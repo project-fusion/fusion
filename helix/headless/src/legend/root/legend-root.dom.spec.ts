@@ -61,6 +61,16 @@ describe('chart legend', () => {
     expect(names(host)).toEqual(['Accounts by plan'])
   })
 
+  /* A scatter reads its first numeric column as the measure *across*, so its
+     first plotted series is the table's second. Read as `series` a key beside
+     one named the across column in the color of the first series drawn and each
+     real series in the next one's: every entry one color out. */
+  test('measures drops the first column, which a scatter measures across', async () => {
+    const host = await legend(TRAFFIC, 'for="traffic" entries="measures"')
+    expect(names(host)).toEqual(['Search', 'Referral'])
+    expect(indices(host)).toEqual(['1', '2'])
+  })
+
   test('the entries carry a palette index, which starts over after twenty-four', async () => {
     /* The palette is eight hues in three tones, so a legend past eight repeats
        a hue in a different tone rather than repeating a color. The wrap has to
