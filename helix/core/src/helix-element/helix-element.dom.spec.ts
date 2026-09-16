@@ -405,6 +405,30 @@ describe('the object property React is holding', () => {
     expect(element.rows).toBe(rows)
   })
 
+  /* **The frame that one look was short of.** Measured on a project scaffolded
+     by `helix new --template react-nextjs`, under `next dev` and under
+     `next build && next start`, five runs each: React commits its props on the
+     second frame after the first update, so the single look a frame in found
+     nothing every time and a data table drew its empty state over data sitting
+     on the node.
+
+     The looking after that first frame is on a timer rather than a frame, which
+     is what `LOOK_EVERY` is about, so this waits on one. */
+  test('is assigned when React commits after the frame the first look was on', async () => {
+    const rows = [{ name: 'Cai Wen' }]
+    const element = document.createElement(carrier) as Carrier
+    document.body.append(element)
+    await element.updateComplete
+    await frame()
+    expect(element.rows).toEqual([])
+
+    early(element, { rows })
+    await new Promise((done) => setTimeout(done, 60))
+    await element.updateComplete
+
+    expect(element.rows).toBe(rows)
+  })
+
   /* **The narrowing, and why it is not "apply every prop React is holding".** A
      string reached the element as an attribute the server wrote, so it is
      already correct and re-applying it would be this reaching into a channel
