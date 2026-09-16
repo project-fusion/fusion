@@ -22,7 +22,7 @@
     "check:gen:element-events": "turbo run analyze && bun fusion/scripts/build-element-events.mjs --check",
     "check:gen:eval": "turbo run analyze token-layer && bun fusion/scripts/build-eval.mjs && bun fusion/scripts/build-eval.mjs --check && bun fusion/scripts/run-eval.mjs --check",
     "check:gen:metrics": "turbo run build --filter=@fusion.dev/helix --filter=@fusion.dev/helix-headless --filter=@fusion.dev/helix-styles --filter=@fusion.dev/helix-theme && bun fusion/scripts/build-metrics.mjs --check",
-    "check:prose": "bun run fusion prose check",
+    "check:prose": "turbo run catalog && bun run fusion prose check",
     "check:spec": "bun run fusion spec check && bun run check:spec:diagnostics && bun run check:spec:floors && bun run check:spec:visual && bun run check:spec:visual-parity && bun run check:spec:dsd",
     "check:spec:diagnostics": "turbo run @fusion.dev/helix#analyze @fusion.dev/helix-headless#analyze frame && bun fusion/scripts/check-diagnostics.mjs",
     "check:spec:dsd": "turbo run frame && bun fusion/scripts/check-dsd.mjs",

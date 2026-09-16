@@ -9,6 +9,7 @@ pub mod art;
 pub mod dashes;
 pub mod dialect;
 pub mod documented;
+pub mod links;
 pub mod orphans;
 pub mod references;
 pub mod repository;
@@ -42,6 +43,12 @@ pub fn all() -> Vec<Rule> {
             name: "documented",
             run: Runner::Source(documented::run),
             summary: "every API name the documentation uses is one that exists",
+        },
+        Rule {
+            fix: None,
+            name: "links",
+            run: Runner::Source(links::run),
+            summary: "every link into this site names an address the site serves",
         },
         Rule {
             fix: None,

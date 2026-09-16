@@ -109,6 +109,10 @@ pub struct Settings {
     /// The list of names an icon set actually has.
     pub icons: Option<String>,
 
+    /// Where the site declares its address, and where it says what it serves.
+    #[serde(default)]
+    pub site: Site,
+
     /// The paths the spec rules read, and what routes a suffix to a runner.
     pub spec: Spec,
 
@@ -137,6 +141,29 @@ pub struct Gallery {
 
     /// The manifests a family is derived from, which is how the page derives it.
     pub manifests: Vec<String>,
+}
+
+/// The three paths that answer "what does this site publish, and where".
+///
+/// **Grouped rather than three loose keys**, for the reason [`Gallery`] is
+/// grouped: an address taken from one site and a catalog taken from another
+/// would resolve every link against the wrong tree and report the difference as
+/// a fault. Unset is a workspace with no site of its own, which is most of them.
+#[derive(Debug, Default, Deserialize)]
+#[serde(default)]
+pub struct Site {
+    /// The module declaring the published address, which is read for the host.
+    ///
+    /// Read out of the module rather than repeated here, because the module is
+    /// where a move would be made and a second spelling is a move half made.
+    pub address: String,
+
+    /// The route tree, whose handlers answer at addresses that are not pages.
+    pub app: String,
+
+    /// The generated document per route, which is the catalog a link resolves
+    /// against, and the assets served at their own paths beside it.
+    pub routes: String,
 }
 
 /// What the spec rules need to know about a workspace they do not assume.

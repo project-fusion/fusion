@@ -773,6 +773,53 @@ fn documented() {
     );
 }
 
+/// Two faults, because the rule answers two questions: a host the site does
+/// not publish, and a path it does not serve. The fixture declares its own
+/// address, so nothing here is a link into the site this repository publishes.
+#[test]
+fn links() {
+    let tag = |url: &str| format!("/**\n * @documentation {url}\n */\nexport class Thing {{}}\n");
+    let written = tag("https://sandbox.test/docs/one");
+    let clean = [
+        (
+            "fusion.json",
+            r#"{ "site": { "address": "site/site.ts", "app": "site/app", "routes": "site/public" } }"#,
+        ),
+        (
+            "site/site.ts",
+            "export const SITE = 'https://sandbox.test'\n",
+        ),
+        ("site/public/index.md", "---\ntitle: Home\n---\n"),
+        ("site/public/docs/one.md", "---\ntitle: One\n---\n"),
+        (
+            "site/app/llms.txt/route.ts",
+            "export const GET = () => {}\n",
+        ),
+        ("src/thing.ts", &written),
+    ];
+
+    plant(
+        "prose",
+        "links",
+        &clean,
+        |tree| {
+            tree.write("src/thing.ts", &tag("https://docs.sandbox.test/docs/one"));
+        },
+        "`docs.sandbox.test` is not a host this site publishes",
+        "src/thing.ts:2",
+    );
+    plant(
+        "prose",
+        "links",
+        &clean,
+        |tree| {
+            tree.write("src/thing.ts", &tag("https://sandbox.test/docs/two"));
+        },
+        "`/docs/two` is not an address this site serves",
+        "src/thing.ts:2",
+    );
+}
+
 /// The file's own block is held by position, so the fault is the block after
 /// it that sits on a third.
 #[test]

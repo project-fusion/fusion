@@ -136,6 +136,11 @@
   "hydrates": ["fusion/site"],
   "icons": "helix/icons/icons.txt",
   "scope": "@fusion.dev/",
+  "site": {
+    "address": "fusion/site/utils/site/site.ts",
+    "app": "fusion/site/app",
+    "routes": "fusion/site/public"
+  },
   "spec": {
     "app": "fusion/site/app",
     "harness": "helix/testing/src/browser.ts",
