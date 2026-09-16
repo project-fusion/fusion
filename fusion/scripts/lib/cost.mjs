@@ -18,15 +18,19 @@
  * as it always did rather than weighing nothing and landing wherever the tie
  * broke.
  *
- * **The readings are local and the plan is in runner seconds**, which is what
- * `TARGET` in `plan-browser.mjs` is denominated in. A desk is several times a
- * two-core runner and not uniformly, so the shape is what the measurement is
- * trusted for: each check's families are scaled by `runner / their sum`, and
- * `runner` is what that check's family work took on a runner, which is the one
- * number in the file that is not measured here.
+ * **The seconds are a runner's**, which is what `TARGET` in `plan-browser.mjs`
+ * is denominated in, and the browser jobs record their own: a desk is several
+ * times a two-core runner and not uniformly, and the difference is not noise.
+ * Aura is a sixth of contrast on an M2 and a third of it on `ubuntu-latest`,
+ * which is a software rasterizer against a GPU, and shards packed from the
+ * first ran 127 and 84 seconds where they were planned at 106 each. A file
+ * measured on a desk is still worth having where no run can be read, and
+ * `measure-browser.mjs` scales that shape onto `runner`, which is what each
+ * check took on a runner: for readings already taken on one, that scaling is
+ * the identity.
  */
-import { readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 
 /** The file itself, so a spec can hold the readers to what it says. */
 export const MEASURED = JSON.parse(
@@ -98,22 +102,21 @@ export const costOver = (task, units, families) => {
 /**
  * A family's seconds, added to what `BROWSER_COST` names, for the run that is
  * being measured. Nothing is recorded when it is unset, which is every run but
- * `measure-browser.mjs`'s.
+ * `measure-browser.mjs`'s and the browser jobs of `verify`.
  *
  * Written on the way out rather than per family, because a check is one process
  * that ends once and a write per family would be a hundred of them.
  */
 const taken = new Map()
 export const record = (family, milliseconds) => {
-  if (process.env.BROWSER_COST === undefined) {
+  const where = process.env.BROWSER_COST
+  if (where === undefined) {
     return
   }
   if (taken.size === 0) {
     process.on('exit', () => {
-      writeFileSync(
-        process.env.BROWSER_COST,
-        `${JSON.stringify(Object.fromEntries([...taken].sort()), null, 2)}\n`,
-      )
+      mkdirSync(dirname(where), { recursive: true })
+      writeFileSync(where, `${JSON.stringify(Object.fromEntries([...taken].sort()), null, 2)}\n`)
     })
   }
   taken.set(family, (taken.get(family) ?? 0) + milliseconds / 1000)

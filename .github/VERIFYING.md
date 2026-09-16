@@ -141,13 +141,20 @@ every example whatever changed.
 examples a family holds, and that model is false wherever an example is not a
 unit of work: contrast reads every pair of inks an example paints, and on run
 35041878434 its four shards held 142, 142, 142 and 141 examples and took 118,
-43, 40 and 43 seconds. Aura alone is a sixth of that check. So
-`fusion/scripts/lib/browser-cost.json` holds what each family took each check,
-`measure-browser.mjs` refreshes it, and a family the file does not know falls
-back to the per-example estimate, which is what keeps a family added today from
-weighing nothing. The readings are taken on a desk and the plan is in runner
-seconds, so what the file is trusted for is the shape: each check's families are
-scaled onto what that check took on a runner.
+43, 40 and 43 seconds. So `fusion/scripts/lib/browser-cost.json` holds what each
+family took each check, and a family the file does not know falls back to the
+per-example estimate, which is what keeps a family added today from weighing
+nothing.
+
+**The browser jobs record their own.** Every one of them writes what `pool`
+timed for each of its families and uploads it, and the shards of a check are its
+corpus divided, so a run's artifacts added together are the corpus once.
+`measure-browser.mjs --from` merges them, and its header spells out the two
+commands. The alternative is running the checks on a desk, which the same script
+does and which is the fallback rather than the first choice: a desk is several
+times a two-core runner and not uniformly. Aura is a sixth of contrast on an M2
+and a third of it here, a software rasterizer against a GPU, and shards packed
+from the M2's reading ran 127 and 84 seconds against 106 each as planned.
 
 **The planner decides how many and the check decides which.** Each check splits
 its own corpus with `@fusion.dev/scripts/shard`: by family, deterministic,
