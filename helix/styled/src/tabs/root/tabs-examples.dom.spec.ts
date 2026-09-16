@@ -37,5 +37,16 @@ describe('the controlled example', () => {
     expect((document.getElementById('strip') as HTMLElement & { active: string }).active).toBe(
       'overview',
     )
+    /* **And the panel followed, which is the half that was not asserted.** The
+       root pairs a tab with a panel by walking its own children, so a panel
+       wrapped in anything is assigned to the slot and paired with nothing: two
+       of these examples shipped their panels inside a `<div slot="panels">` and
+       showed a strip of tabs over an empty box, for the life of the page, with
+       `active` moving correctly the whole time. Reading `active` alone is what
+       let that stand. */
+    const panel = document.querySelector('helix-tab-panel[value="overview"]') as HTMLElement & {
+      selected: boolean
+    }
+    expect(panel.selected).toBe(true)
   })
 })
