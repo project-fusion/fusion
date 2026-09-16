@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -27,16 +27,18 @@ describe('pagination server output', () => {
   })
 
   test('the page on show is already marked in the served markup', () => {
-    expect(withoutStyles(ssr(buttons))).toContain('aria-current="page"')
+    // The one control carrying `page-current` is the one that has to carry
+    // `aria-current`, so ask that control rather than the render.
+    expect(partTag(ssr(buttons), 'page-current')).toContain('aria-current="page"')
   })
 
   test('links are real links in the served markup, so a crawler follows them', () => {
     // The reason `href` exists at all. A button renders nothing a crawler can
     // follow, and a paged result whose pages have their own URLs should have
     // them reachable without the page running.
-    const markup = withoutStyles(ssr(links))
-    expect(markup).toContain('href="/results?p=1"')
-    expect(markup).toContain('href="/results?p=6"')
+    const shadow = rendered(ssr(links), 'helix-pagination')
+    expect(shadow).toContain('href="/results?p=1"')
+    expect(shadow).toContain('href="/results?p=6"')
   })
 
   test('the spent step ships without an href rather than as a disabled link', () => {
@@ -57,7 +59,7 @@ describe('pagination server output', () => {
       page-size="25"
       total="248"
     ></helix-pagination>`
-    expect(withoutStyles(ssr(counted))).toContain('>10<')
+    expect(rendered(ssr(counted), 'helix-pagination')).toContain('>10<')
   })
 
   test('the jump to either end ships with the rest, under `ends`', () => {
@@ -70,6 +72,6 @@ describe('pagination server output', () => {
   test('compact ships its reading rather than a run to be replaced', () => {
     const compact = html`<helix-pagination compact default-page="7" pages="24"></helix-pagination>`
     expect(hasPart(ssr(compact), 'list')).toBe(false)
-    expect(withoutStyles(ssr(compact))).toContain('7 of 24')
+    expect(rendered(ssr(compact), 'helix-pagination')).toContain('7 of 24')
   })
 })

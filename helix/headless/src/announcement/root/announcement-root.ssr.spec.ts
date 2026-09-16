@@ -1,14 +1,17 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('announcement server output', () => {
-  test('the message is in the served markup', () => {
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-announcement>Trial ending</helix-headless-announcement>`),
+  test('the region the message lands in is served', () => {
+    /* `toContain('Trial ending')` read the host's own light-DOM child back out
+       of the render, so it passed with the announcement rendering no slot at
+       all. Read off one with no children: the only shadow root is its own. */
+    const markup = ssr(html`<helix-headless-announcement></helix-headless-announcement>`)
+    expect(rendered(markup, 'helix-headless-announcement')).toContain(
+      '<div part="content"><slot></slot></div>',
     )
-    expect(markup).toContain('Trial ending')
   })
 
   test('the dismiss control ships with it, so it works before hydration', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,8 +8,14 @@ const tooltip = html`<helix-headless-tooltip content="Regenerates the manifests"
 </helix-headless-tooltip>`
 
 describe('tooltip server output', () => {
-  test('the trigger is in the served markup', () => {
-    expect(withoutStyles(ssr(tooltip))).toContain('Analyze')
+  test('the trigger is projected, through a bare slot outside the bubble', () => {
+    /* The button is the consumer's own markup, echoed by declarative shadow DOM
+       whatever the tooltip renders, so `toContain('Analyze')` held for one that
+       projected nothing. What the tooltip owes is the unnamed slot, and that it
+       sits outside the bubble: inside, the thing a reader points at would be in
+       a `popover` and so never on screen at all. */
+    const shadow = rendered(ssr(tooltip), 'helix-headless-tooltip')
+    expect(shadow).toMatch(/<slot\s*><\/slot>[\s\S]*<div[^>]*part="tooltip"/)
   })
 
   test('the bubble ships as a popover, so it needs no z-index', () => {

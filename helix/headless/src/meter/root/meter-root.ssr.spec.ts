@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -33,7 +33,7 @@ describe('meter server output', () => {
   })
 
   test('the reading is in the served markup', () => {
-    expect(withoutStyles(ssr(banded))).toContain('94%')
+    expect(rendered(ssr(banded), 'helix-headless-meter')).toContain('94%')
   })
 
   test('the role is on internals, so the host stays as written', () => {

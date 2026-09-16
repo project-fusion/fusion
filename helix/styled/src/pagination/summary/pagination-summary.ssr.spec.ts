@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,7 +12,7 @@ describe('pagination summary server output', () => {
       page-size="25"
       total="248"
     ></helix-pagination-summary>`
-    expect(withoutStyles(ssr(it))).toContain('76-100 of 248')
+    expect(rendered(ssr(it), 'helix-pagination-summary')).toContain('76-100 of 248')
   })
 
   test('a page past the end is clamped on the server too', () => {
@@ -21,7 +21,7 @@ describe('pagination summary server output', () => {
       page-size="25"
       total="248"
     ></helix-pagination-summary>`
-    expect(withoutStyles(ssr(it))).toContain('226-248 of 248')
+    expect(rendered(ssr(it), 'helix-pagination-summary')).toContain('226-248 of 248')
   })
 
   test('the host stays exactly as the consumer wrote it', () => {

@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  rendered,
+  servedParts,
+  ssr,
+  styles,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -13,11 +20,15 @@ describe('card server output', () => {
   const markup = withoutStyles(served)
 
   test('renders without touching a DOM it does not have', () => {
-    expect(markup).toContain('<helix-card')
+    /* `toContain('<helix-card')` was the consumer's own opening tag echoed
+       back, so it passed whether the card rendered its shadow root or nothing
+       at all. The unnamed slot is the smallest thing that is only there if it
+       rendered. */
+    expect(rendered(markup, 'helix-card')).toContain('<slot></slot>')
   })
 
   test('declarative shadow DOM carries the styles', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-card')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--helix-color-surface')
   })
 
@@ -25,7 +36,7 @@ describe('card server output', () => {
     // The host is the surface, so there is no container part to find: the
     // shadow root is slots and nothing else.
     expect(hostAttributes(markup, 'helix-card')).toEqual(['aria-labelledby'])
-    const structure = withoutStyles(markup)
+    const structure = rendered(markup, 'helix-card')
     for (const name of ['media', 'header', 'footer']) {
       expect(structure, name).toContain(`<slot name="${name}">`)
     }
@@ -40,7 +51,7 @@ describe('card server output', () => {
         Body
       </helix-card>
     `)
-    const structure = withoutStyles(horizontal)
+    const structure = rendered(horizontal, 'helix-card')
     for (const name of ['media', 'header', 'footer']) {
       expect(structure, name).toContain(`<slot name="${name}">`)
     }
@@ -51,10 +62,14 @@ describe('card server output', () => {
     expect(hostAttributes(horizontal, 'helix-card')).toContain('orientation')
   })
 
-  test('slotted content reaches the markup', () => {
-    // Light DOM is in the response, so a crawler reads the card without JS.
-    expect(markup).toContain('Report')
-    expect(markup).toContain('slot="header"')
+  test('every child is projected, with nothing of the card between it and the page', () => {
+    /* `toContain('Report')` and `toContain('slot="header"')` both passed on the
+       spec's own `<h2>`, which is in the response whatever the card renders:
+       measured with the shadow root emptied, both held. The served frame is the
+       claim a crawler cares about. Four slots and no part means every child
+       lands somewhere and nothing of the card's own wraps it or reorders it. */
+    expect(rendered(markup, 'helix-card').match(/<slot\b/g)).toHaveLength(4)
+    expect(servedParts(markup)).toEqual([])
   })
 
   test('an omitted region needs no rule to hide it', () => {
@@ -62,6 +77,6 @@ describe('card server output', () => {
     // and generates no box, which is what makes this correct on the server,
     // where the component cannot inspect its own children.
     expect(markup).not.toContain(':has(')
-    expect(markup).toContain('<slot name="footer">')
+    expect(rendered(markup, 'helix-card')).toContain('<slot name="footer">')
   })
 })

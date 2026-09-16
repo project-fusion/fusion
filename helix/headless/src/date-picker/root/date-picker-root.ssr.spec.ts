@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,12 +19,12 @@ const calendar = html`<helix-headless-date-picker
 describe('calendar server output', () => {
   test('the month is rendered on the server, not built on the client', () => {
     const markup = withoutStyles(ssr(calendar))
-    expect(markup).toContain('August 2026')
+    expect(rendered(markup, 'helix-headless-date-picker')).toContain('August 2026')
     expect(partTag(ssr(calendar), 'grid')).toContain('role="grid"')
   })
 
   test('the tab stop is in the served markup, so the grid is reachable at once', () => {
-    expect(withoutStyles(ssr(calendar))).toContain('tabindex="0"')
+    expect(rendered(ssr(calendar), 'helix-headless-date-picker')).toContain('tabindex="0"')
   })
 
   test('the host carries only what the consumer wrote', () => {

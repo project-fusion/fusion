@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -10,11 +17,17 @@ describe('page nav server output', () => {
     expect(partTag(markup, 'nav')).toContain('aria-label="On this page"')
   })
 
-  test('the links are served, because they are the consumer’s own anchors', () => {
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-outline><a href="#install">Install</a></helix-headless-outline>`),
+  test('the anchors are projected into the landmark, not collected beside it', () => {
+    /* The links are the consumer's own, echoed by declarative shadow DOM
+       whatever this renders, so `toContain('Install')` held for an outline that
+       projected nothing. The claim is the slot inside the `<nav>`: that is what
+       puts the anchors in the landmark rather than next to it. Read off a
+       render with no children, so the only shadow root here is the outline's
+       own. */
+    const markup = ssr(html`<helix-headless-outline></helix-headless-outline>`)
+    expect(rendered(markup, 'helix-headless-outline')).toMatch(
+      /<nav[^>]*part="nav"[^>]*>\s*(?:<!--[^>]*-->)?<slot\s*><\/slot>/,
     )
-    expect(markup).toContain('Install')
   })
 
   test('nothing is marked current, because scroll position is not a server’s to know', () => {

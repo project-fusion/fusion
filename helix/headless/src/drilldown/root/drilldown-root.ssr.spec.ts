@@ -1,17 +1,20 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('drilldown server output', () => {
-  test("the top page is served, because it is the consumer's own markup", () => {
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-drilldown label="Settings"
-        ><helix-headless-drilldown-item value="about">About</helix-headless-drilldown-item></helix-headless-drilldown
-      >`),
-    )
-    expect(markup).toContain('About')
+  test('the top page is served with the slot that projects the rows into it', () => {
+    /* The rows are the consumer's own markup, echoed by declarative shadow DOM
+       whatever the stack renders, so `toContain('About')` held for a drilldown
+       that projected nothing. What the top page owes is the page and the slot
+       inside it, read off a render with no children so the only shadow root
+       here is the stack's own. */
+    const markup = ssr(html`<helix-headless-drilldown label="Settings"></helix-headless-drilldown>`)
     expect(hasPart(markup, 'page')).toBe(true)
+    expect(rendered(markup, 'helix-headless-drilldown')).toMatch(
+      /<div[^>]*part="page">\s*(?:<!--[^>]*-->)?<slot\s*><\/slot>/,
+    )
   })
 
   test('no header is served, since nothing has been drilled into yet', () => {

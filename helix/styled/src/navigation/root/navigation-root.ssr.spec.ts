@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  styles,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,10 +19,14 @@ describe('navigation server output', () => {
   )
   const markup = withoutStyles(served)
 
-  test('the landmark is served with its name, and the links are in the markup for a crawler', () => {
+  test('the landmark is served with its name, and the links are projected into it', () => {
     expect(partTag(markup, 'nav')).toMatch(/^<nav\s/)
     expect(partTag(markup, 'nav')).toContain('aria-label="Sections"')
-    expect(markup).toContain('href="/one"')
+    /* `toContain('href="/one"')` passed on the spec's own `<a>`, which sits in
+       the host's light DOM and reaches a crawler whatever the component
+       renders. The claim is the unnamed slot inside the landmark: that is what
+       puts the links in the `<nav>` rather than beside it. */
+    expect(rendered(markup, 'helix-navigation')).toMatch(/<slot\s*><\/slot>\s*<\/nav>/)
   })
 
   test('the marker ships unplaced, since a server cannot measure', () => {
@@ -30,7 +41,7 @@ describe('navigation server output', () => {
   })
 
   test('declarative shadow DOM carries the styles', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-navigation')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--navigation-indicator-color')
   })
 })

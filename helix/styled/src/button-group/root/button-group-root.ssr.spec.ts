@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, hostTag, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  hostTag,
+  rendered,
+  servedParts,
+  ssr,
+  styles,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -11,10 +19,16 @@ describe('button group server output', () => {
   )
   const markup = withoutStyles(served)
 
-  test('the group is one slot, so the buttons are served as the consumer wrote them', () => {
-    expect(markup).toContain('<slot>')
-    expect(markup).toContain('<helix-button')
-    expect(markup).toContain('Save')
+  test('the group is one slot and no box of its own, so the buttons are served untouched', () => {
+    /* `toContain('<helix-button')` and `toContain('Save')` both passed on the
+       spec's own light DOM, which is in the response whatever the group
+       renders. What the group owes is the other half of the claim: a shadow
+       root that is one unnamed slot and renders no part of its own, so nothing
+       wraps or reorders what it was handed. Read off a childless render, so the
+       only shadow root here is the group's. */
+    const bare = ssr(html`<helix-button-group label="Record actions"></helix-button-group>`)
+    expect(rendered(bare, 'helix-button-group')).toContain('<slot></slot>')
+    expect(servedParts(bare)).toEqual([])
   })
 
   test('the host carries only what the consumer wrote', () => {
@@ -31,7 +45,7 @@ describe('button group server output', () => {
   })
 
   test('declarative shadow DOM carries the styles', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-button-group')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--button-group-gap')
   })
 })

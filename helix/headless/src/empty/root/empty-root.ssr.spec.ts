@@ -1,14 +1,15 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('empty view server output', () => {
-  test('the explanation is in the served markup', () => {
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-empty><p>No results.</p></helix-headless-empty>`),
-    )
-    expect(markup).toContain('No results.')
+  test('the slot the explanation lands in is served', () => {
+    /* `toContain('No results.')` read the host's own light-DOM child back out
+       of the render, so it passed with the view rendering no slot at all. Read
+       off one with no children: the only shadow root is its own. */
+    const markup = ssr(html`<helix-headless-empty></helix-headless-empty>`)
+    expect(rendered(markup, 'helix-headless-empty')).toContain('<slot></slot>')
   })
 
   test('the host carries only what the consumer wrote', () => {

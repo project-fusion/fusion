@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -24,6 +24,6 @@ describe('video playlist menu server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-video-playlist-menu label="Camera angles"></helix-video-playlist-menu>`),
     )
-    expect(markup).toContain('aria-label="Camera angles"')
+    expect(rendered(markup, 'helix-video-playlist-menu')).toContain('aria-label="Camera angles"')
   })
 })

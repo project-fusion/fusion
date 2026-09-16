@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,8 +8,8 @@ describe('callout server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-callout tone="warning">Careful</helix-headless-callout>`),
     )
-    expect(markup).toContain('aria-label="Warning"')
-    expect(markup).toContain('role="img"')
+    expect(rendered(markup, 'helix-headless-callout')).toContain('aria-label="Warning"')
+    expect(rendered(markup, 'helix-headless-callout')).toContain('role="img"')
   })
 
   test('the host carries nothing the consumer did not write', () => {
@@ -27,7 +27,7 @@ describe('callout server output', () => {
 
   test('the default icon ships as slot fallback, so a replacement needs no JavaScript', () => {
     const markup = withoutStyles(ssr(html`<helix-headless-callout>x</helix-headless-callout>`))
-    expect(markup).toContain('<slot name="icon">')
-    expect(markup).toContain('<svg')
+    expect(rendered(markup, 'helix-headless-callout')).toContain('<slot name="icon">')
+    expect(rendered(markup, 'helix-headless-callout')).toContain('<svg')
   })
 })

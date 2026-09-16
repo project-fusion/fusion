@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -24,18 +31,41 @@ describe('table server output', () => {
     expect(hostAttributes(markup, 'helix-headless-table-cell')).toEqual(['header'])
   })
 
-  test('the content is in the markup for a crawler', () => {
-    expect(withoutStyles(markup)).toContain('appearance')
+  test('every level projects, so a crawler reads the cells the consumer wrote', () => {
+    /* `toContain('appearance')` was the fixture's own cell text, in the
+       document whatever the table, the row and the cell did with it. What the
+       three owe is the slot at each level, read off renders with no children:
+       a row or a cell that dropped its slot would still have passed. */
+    expect(
+      rendered(
+        ssr(html`<helix-headless-table label="T"></helix-headless-table>`),
+        'helix-headless-table',
+      ),
+    ).toContain('<div part="head" role="row"><slot name="columns"></slot></div>')
+    expect(
+      rendered(
+        ssr(html`<helix-headless-table-row></helix-headless-table-row>`),
+        'helix-headless-table-row',
+      ),
+    ).toContain('<slot></slot>')
+    expect(
+      rendered(
+        ssr(html`<helix-headless-table-cell></helix-headless-table-cell>`),
+        'helix-headless-table-cell',
+      ),
+    ).toContain('<slot></slot>')
   })
 })
 
 describe('table column server output', () => {
-  test('a column serves its heading', () => {
-    expect(
-      withoutStyles(
-        ssr(html`<helix-headless-table-column width="12rem">Service</helix-headless-table-column>`),
-      ),
-    ).toContain('Service')
+  test('a column serves the box its heading is projected into', () => {
+    // `toContain('Service')` was the word the spec itself slotted, so it held
+    // for a column rendering nothing. The box is the part a consumer styles.
+    const markup = ssr(
+      html`<helix-headless-table-column width="12rem"></helix-headless-table-column>`,
+    )
+    expect(hasPart(markup, 'column')).toBe(true)
+    expect(rendered(markup, 'helix-headless-table-column')).toContain('<slot></slot>')
   })
 
   test('the track list is not served, because it is read from children', () => {

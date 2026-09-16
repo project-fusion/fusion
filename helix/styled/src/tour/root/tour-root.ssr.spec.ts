@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -22,10 +22,16 @@ describe('tour server output', () => {
     expect(markup).not.toMatch(/<div\s+part="spotlight"/)
   })
 
-  test('the stops are served, so their content is crawlable', () => {
+  test('the stops are projected, and each one projects its own content', () => {
+    /* Counting `<helix-tour-stop` tags and `toContain('Second')` both read the
+       spec's own light DOM, which is in the response whatever the tour renders.
+       Two claims replace them: the tour projects the stops through one unnamed
+       slot rather than collecting them, and each stop renders the content
+       region whose slot carries its text. */
+    const bare = ssr(html`<helix-tour label="Getting started"></helix-tour>`)
+    expect(rendered(bare, 'helix-tour')).toContain('<slot></slot>')
     const markup = withoutStyles(ssr(tour))
-    expect(markup.match(/<helix-tour-stop[\s>]/g)?.length).toBe(2)
-    expect(markup).toContain('Second')
+    expect(markup.match(/<div part="content"><slot><\/slot><\/div>/g)).toHaveLength(2)
   })
 
   test('and every panel is served hidden', () => {

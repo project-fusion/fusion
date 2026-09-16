@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -17,15 +17,20 @@ describe('toast server output', () => {
     ).toBe(true)
   })
 
-  test('messages already there are served with it', () => {
-    const markup = withoutStyles(
-      ssr(
-        html`<helix-headless-toast
-          ><helix-headless-toast-item tone="success">Saved</helix-headless-toast-item></helix-headless-toast
-        >`,
+  test('the region projects messages already there, rather than drawing them', () => {
+    /* `toContain('Saved')` was the word the spec itself slotted, in the document
+       whatever the region did with it. What the region owes is the slot inside
+       it, and a message the box it projects its words into, both read off
+       renders with no children. */
+    expect(
+      rendered(ssr(html`<helix-headless-toast></helix-headless-toast>`), 'helix-headless-toast'),
+    ).toContain('<div part="region"><slot></slot></div>')
+    expect(
+      rendered(
+        ssr(html`<helix-headless-toast-item tone="success"></helix-headless-toast-item>`),
+        'helix-headless-toast-item',
       ),
-    )
-    expect(markup).toContain('Saved')
+    ).toContain('<div part="content"><slot></slot></div>')
   })
 
   test('the host carries only what the consumer wrote', () => {

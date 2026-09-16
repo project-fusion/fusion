@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { rendered, ssr, styles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -16,7 +16,11 @@ describe('grid server output', () => {
     expect(styles(served)).toContain(':host([columns="3"])')
   })
 
-  test('content reaches the markup', () => {
-    expect(withoutStyles(ssr(html`<helix-grid>item</helix-grid>`))).toContain('item')
+  test('the content is projected, not built on the client', () => {
+    /* `toContain('item')` passed on the host's own text, which is in the
+       response whatever the grid renders. The unnamed slot is the claim. */
+    expect(rendered(ssr(html`<helix-grid>item</helix-grid>`), 'helix-grid')).toContain(
+      '<slot></slot>',
+    )
   })
 })

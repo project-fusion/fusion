@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -52,7 +52,7 @@ describe('format-date server output', () => {
         year="numeric"
       ></helix-headless-format-date>`,
     )
-    expect(withoutStyles(markup)).toContain('Jan 1, 2020')
+    expect(rendered(markup, 'helix-headless-format-date')).toContain('Jan 1, 2020')
   })
 
   /**

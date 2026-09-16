@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -7,7 +7,7 @@ const code = html`<helix-headless-pin-input label="Code" length="4"></helix-head
 
 describe('input pin server output', () => {
   test('every box ships, so the field is usable before any script loads', () => {
-    const markup = withoutStyles(ssr(code))
+    const markup = rendered(ssr(code), 'helix-headless-pin-input')
     expect(hasPart(ssr(code), 'cell')).toBe(true)
     expect([...markup.matchAll(/part="cell"/g)]).toHaveLength(4)
   })
@@ -15,17 +15,20 @@ describe('input pin server output', () => {
   test('the first box asks for the code in the served markup', () => {
     // A hint about the field as a whole, so repeating it would offer a browser
     // four places to put one code.
-    const markup = withoutStyles(ssr(code))
+    const markup = rendered(ssr(code), 'helix-headless-pin-input')
     expect([...markup.matchAll(/autocomplete="one-time-code"/g)]).toHaveLength(1)
   })
 
   test('a seeded code is already in its boxes', () => {
+    // `partTag` answers about the first box, which is where the first character
+    // belongs. Against the whole render the seed and the boxes are impossible
+    // to tell apart, the host carrying `default-value="1234"` itself.
     const seeded = html`<helix-headless-pin-input
       default-value="1234"
       label="Code"
       length="4"
     ></helix-headless-pin-input>`
-    expect(withoutStyles(ssr(seeded))).toContain('value="1"')
+    expect(partTag(ssr(seeded), 'cell')).toContain('value="1"')
   })
 
   test('the row is a group, and the boxes are named', () => {

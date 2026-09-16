@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -66,7 +73,7 @@ describe('sandbox server output', () => {
 
   test('the source pane is a labeled textarea in the served markup', () => {
     expect(partTag(markup, 'source')).toContain('aria-label="Example source"')
-    expect(withoutStyles(markup)).toContain('<textarea')
+    expect(rendered(markup, 'helix-sandbox')).toContain('<textarea')
   })
 
   test('the host carries only what the consumer wrote', () => {

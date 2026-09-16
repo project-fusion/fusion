@@ -1805,7 +1805,7 @@ fn ssr() {
             ("helix.json", TIERS),
             (
                 "src/card/card.ssr.spec.ts",
-                &spec("withoutStyles(await ssr('<hx-card></hx-card>'))"),
+                &spec("rendered(await ssr('<hx-card></hx-card>'), 'hx-card')"),
             ),
         ],
         |tree| {
@@ -1815,6 +1815,69 @@ fn ssr() {
             );
         },
         "`markup` is the whole server document",
+        "src/card/card.ssr.spec.ts:3",
+    );
+}
+
+/// Stripping the sheet is enough for a negative and not for a positive, because
+/// what it leaves opens with the host's own tag.
+#[test]
+fn ssr_host_tag() {
+    let spec = |assertion: &str| {
+        format!(
+            "test('renders', async () => {{
+  const markup = withoutStyles(await ssr('<hx-card label=\"Report\"></hx-card>'));
+  expect(markup){assertion};
+}});
+"
+        )
+    };
+    let tree = Tree::new("ssr-host-tag");
+    tree.write("helix.json", TIERS).write(
+        "src/card/card.ssr.spec.ts",
+        &spec(".not.toContain('part=\"footer\"')"),
+    );
+    assert_clean("ssr", &judge(&tree, "ssr", "ssr"));
+    tree.write(
+        "src/card/card.ssr.spec.ts",
+        &spec(".toContain('label=\"Report\"')"),
+    );
+    assert_found(
+        "ssr",
+        &judge(&tree, "ssr", "ssr"),
+        "`markup` still opens with the host's own tag",
+        "src/card/card.ssr.spec.ts:3",
+    );
+}
+
+/// `withoutStyles(markup)` names no render of its own, so the binding inside it
+/// has to be resolved or the assertion is read as being about something else and
+/// goes unexamined.
+#[test]
+fn ssr_stripped_binding() {
+    let spec = |assertion: &str| {
+        format!(
+            "test('renders', async () => {{
+  const markup = await ssr('<hx-card label=\"Report\"></hx-card>');
+  expect(withoutStyles(markup)){assertion};
+}});
+"
+        )
+    };
+    let tree = Tree::new("ssr-stripped-binding");
+    tree.write("helix.json", TIERS).write(
+        "src/card/card.ssr.spec.ts",
+        &spec(".not.toContain('part=\"footer\"')"),
+    );
+    assert_clean("ssr", &judge(&tree, "ssr", "ssr"));
+    tree.write(
+        "src/card/card.ssr.spec.ts",
+        &spec(".toContain('label=\"Report\"')"),
+    );
+    assert_found(
+        "ssr",
+        &judge(&tree, "ssr", "ssr"),
+        "`withoutStyles` still opens with the host's own tag",
         "src/card/card.ssr.spec.ts:3",
     );
 }

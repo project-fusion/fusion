@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -18,7 +18,7 @@ describe('object inspector server output', () => {
     )
     expect(partTag(markup, 'tree')).toContain('role="tree"')
     expect(partTag(markup, 'row')).toContain('role="treeitem"')
-    expect(withoutStyles(markup)).toContain('1 key')
+    expect(rendered(markup, 'helix-headless-object-inspector')).toContain('1 key')
   })
 
   /**
@@ -38,7 +38,19 @@ describe('object inspector server output', () => {
     )
     expect(partTag(markup, 'tree')).toContain('role="tree"')
     expect(partTag(markup, 'tree')).not.toContain('role="treeitem"')
-    expect(withoutStyles(markup)).toContain('{"a":1}')
+    /* The frame whole rather than the marks somebody thought to name, and not
+       `toContain('{"a":1}')`, which was the spec's own `<script>` sibling: this
+       component neither renders it nor can remove it, so that held whatever the
+       inspector drew, the empty render included. */
+    expect(servedParts(markup)).toEqual([
+      'arrow',
+      'button',
+      'copy',
+      'frame',
+      'mark',
+      'tooltip',
+      'tree',
+    ])
   })
 
   test('writes nothing onto the host that the consumer did not', () => {

@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  rendered,
+  ssr,
+  styles,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -9,14 +16,14 @@ describe('button server output', () => {
     // if it serializes onto the declarative template. If it did not, the button
     // would be unfocusable until hydration.
     const markup = withoutStyles(ssr(html`<helix-button>Go</helix-button>`))
-    expect(markup).toContain('shadowrootdelegatesfocus')
+    expect(rendered(markup, 'helix-button')).toContain('shadowrootdelegatesfocus')
     expect(hasPart(markup, 'button')).toBe(true)
-    expect(withoutStyles(markup)).toMatch(/<button\s+part="button"/)
+    expect(rendered(markup, 'helix-button')).toMatch(/<button\s+part="button"/)
   })
 
   test('the served control is a button, with no anchor branch to choose', () => {
     const structure = withoutStyles(ssr(html`<helix-button>Go</helix-button>`))
-    expect(structure).toMatch(/<button\s+part="button"/)
+    expect(rendered(structure, 'helix-button')).toMatch(/<button\s+part="button"/)
     expect(structure).not.toMatch(/<a\s+part="button"/)
   })
 
@@ -33,7 +40,7 @@ describe('button server output', () => {
     // anchor. What ships in the shadow root is what a document rule cannot
     // reach, which is why the focus ring is the thing to assert on here.
     const served = ssr(html`<helix-button emphasis="solid" tone="primary">Go</helix-button>`)
-    expect(withoutStyles(served)).toContain('shadowrootmode="open"')
+    expect(rendered(served, 'helix-button')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--helix-color-focus-ring')
   })
 })

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -41,13 +41,25 @@ describe('chat server output', () => {
     expect(partTag(markup, 'log')).toContain('aria-live="off"')
     /* Empty on arrival, or it announces itself on every page load. */
     expect(partTag(markup, 'live')).toContain('role="status"')
-    expect(withoutStyles(markup)).toMatch(/part="live" role="status">(<!--[^>]*-->)*<\/span>/)
+    expect(rendered(markup, 'helix-headless-chat')).toMatch(
+      /part="live" role="status">(<!--[^>]*-->)*<\/span>/,
+    )
   })
 
-  test('the turns are in the markup, which is what markup children buy', () => {
-    const served = withoutStyles(markup)
-    expect(served).toContain('How can I help?')
-    expect(served).toContain('It will not connect')
+  test('the turns are served by slots, which is what markup children buy', () => {
+    /* `toContain('How can I help?')` read the turns' own light-DOM text back
+       out of the render, so it passed with both elements rendering no slot at
+       all, and an unassigned turn paints nothing. Each is read off an element
+       with no children, so the only shadow root in it is that element's own. */
+    const chat = ssr(html`<helix-headless-chat label="Support"></helix-headless-chat>`)
+    expect(rendered(chat, 'helix-headless-chat')).toContain('<slot name="messages"')
+
+    const turn = ssr(
+      html`<helix-headless-chat-message author="them"></helix-headless-chat-message>`,
+    )
+    expect(rendered(turn, 'helix-headless-chat-message')).toMatch(
+      /<div part="content">\s*(<!--[^>]*-->)*<slot\s*>/,
+    )
   })
 
   test('a failed turn is served with its way back, since that is markup and not state', () => {

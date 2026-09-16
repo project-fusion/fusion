@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -21,8 +21,17 @@ const markup = ssr(
 )
 
 describe('notification server output', () => {
-  test('the content is served', () => {
-    expect(withoutStyles(markup)).toContain('Something happened')
+  test('the content is projected into the box a reader is given', () => {
+    /* `toContain('Something happened')` was the spec's own light-DOM child read
+       back out of the document, which is true of any element that renders
+       nothing at all. What the notification owes is the named box the words
+       land in, read off a render with no children. */
+    expect(
+      rendered(
+        ssr(html`<helix-headless-notification at=${at}></helix-headless-notification>`),
+        'helix-headless-notification',
+      ),
+    ).toContain('<div part="label"><slot></slot></div>')
   })
 
   test('the exact instant is in `datetime`, whatever clock computed the reading', () => {

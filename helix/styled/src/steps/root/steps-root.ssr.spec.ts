@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostTag, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -29,6 +29,6 @@ describe('steps server output', () => {
     // The state is declared on each step rather than counted from an index, so
     // the server can render it. An `active` on the list could not: it would
     // have to count slotted children, and there are none here.
-    expect(markup).toContain('svg')
+    expect(rendered(markup, 'helix-steps')).toContain('svg')
   })
 })

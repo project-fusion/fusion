@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,8 +15,8 @@ describe('speed dial server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-speed-dial label="Actions"></helix-headless-speed-dial>`),
     )
-    expect(markup).toContain('aria-expanded="false"')
-    expect(markup).toContain('aria-haspopup="menu"')
+    expect(partTag(markup, 'trigger')).toContain('aria-expanded="false"')
+    expect(partTag(markup, 'trigger')).toContain('aria-haspopup="menu"')
     expect(hasPart(markup, 'trigger')).toBe(true)
   })
 
@@ -20,7 +27,7 @@ describe('speed dial server output', () => {
       ssr(html`<helix-headless-speed-dial label="Actions"></helix-headless-speed-dial>`),
     )
     expect(hasPart(markup, 'actions')).toBe(true)
-    expect(markup).toContain('hidden')
+    expect(partTag(markup, 'actions')).toContain('hidden')
   })
 
   test('the host carries nothing the consumer did not write', () => {
@@ -33,13 +40,16 @@ describe('speed dial server output', () => {
     expect(hostAttributes(markup, 'helix-headless-speed-dial')).toEqual(['label'])
   })
 
-  test('an action ships as a menuitem with its name in the markup', () => {
-    const markup = withoutStyles(
-      ssr(
-        html`<helix-headless-speed-dial-item value="share">Share</helix-headless-speed-dial-item>`,
-      ),
+  test('an action ships as a menuitem, with a named box for its name', () => {
+    /* `toContain('Share')` was the word the spec itself slotted, so it held for
+       an element rendering nothing. Read off a render with no children, what
+       the action owes is the label box the word is projected into. */
+    const markup = ssr(
+      html`<helix-headless-speed-dial-item value="share"></helix-headless-speed-dial-item>`,
     )
-    expect(markup).toContain('role="menuitem"')
-    expect(markup).toContain('Share')
+    expect(partTag(markup, 'item')).toContain('role="menuitem"')
+    expect(rendered(markup, 'helix-headless-speed-dial-item')).toContain(
+      '<span part="label"><slot></slot></span>',
+    )
   })
 })

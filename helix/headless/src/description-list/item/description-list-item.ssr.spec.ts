@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -30,7 +30,12 @@ describe('description list item server output', () => {
         >Ada</helix-headless-description-list-item
       >`,
     )
-    expect(withoutStyles(markup)).toContain('Owner')
+    /* Off the item's own render, not out of the document: `label="Owner"` is on
+       the host two characters away, so a whole-render search for the word passes
+       whether or not the `<dt>` was given anything to show. */
+    expect(rendered(markup, 'helix-headless-description-list-item')).toMatch(
+      /<slot name="label">(<!--[^>]*-->)*Owner/,
+    )
   })
 
   test('the host declares nothing of its own', () => {

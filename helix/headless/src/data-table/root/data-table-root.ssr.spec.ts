@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 import '../../table/index.js'
@@ -69,10 +75,18 @@ describe('data table server output', () => {
    */
   test('the headings and the row structure are served, and the cell values are not', () => {
     const served = withoutStyles(markup)
-    expect(served).toContain('Name')
-    expect(served).toContain('Size')
-    expect(served).toContain('aria-rowindex="2"')
-    expect(served).toContain('aria-rowindex="3"')
+    /* `toContain('Name')` read the column's own light-DOM text back out of the
+       render, so it passed with the column rendering nothing: a heading is
+       served by the slot the column puts in its own shadow root, read off a
+       column with no children. */
+    const column = ssr(
+      html`<helix-headless-table-column field="name" sortable></helix-headless-table-column>`,
+    )
+    expect(rendered(column, 'helix-headless-table-column')).toMatch(
+      /<button part="sort"[^>]*><slot><\/slot>/,
+    )
+    expect(rendered(served, 'helix-headless-data-table')).toContain('aria-rowindex="2"')
+    expect(rendered(served, 'helix-headless-data-table')).toContain('aria-rowindex="3"')
     expect(served).not.toContain('alpha')
   })
 
