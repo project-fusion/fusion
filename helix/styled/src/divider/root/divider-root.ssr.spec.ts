@@ -3,6 +3,7 @@ import {
   hasPart,
   hostAttributes,
   partTag,
+  rendered,
   ssr,
   styles,
   withoutStyles,
@@ -13,9 +14,13 @@ import '../index.js'
 describe('divider server output', () => {
   test('both halves of the rule and the region between them ship', () => {
     const markup = withoutStyles(ssr(html`<helix-divider>OR</helix-divider>`))
-    expect(markup.match(/<div\s[^>]*part="line"/g)).toHaveLength(2)
+    const shadow = rendered(markup, 'helix-divider')
+    expect(shadow.match(/<div\s[^>]*part="line"/g)).toHaveLength(2)
     expect(hasPart(markup, 'content')).toBe(true)
-    expect(markup).toContain('OR')
+    /* `toContain('OR')` passed on the host's own text, which is in the response
+       whatever the divider renders. The slot in the content region is what sets
+       that text between the two rules. */
+    expect(shadow).toMatch(/<span part="content">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/span>/)
   })
 
   test('a plain rule is presentation, and an announced one a separator with its axis', () => {
@@ -42,7 +47,7 @@ describe('divider server output', () => {
 
   test('declarative shadow DOM carries the styles', () => {
     const served = ssr(html`<helix-divider></helix-divider>`)
-    expect(withoutStyles(served)).toContain('shadowrootmode="open"')
+    expect(rendered(served, 'helix-divider')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--divider-color')
   })
 })

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -15,9 +15,18 @@ describe('nav bar server output', () => {
     expect(partTag(ssr(bar), 'nav')).toContain('aria-label="Sections"')
   })
 
-  test('links are in the document, not behind a shadow root', () => {
-    // They are slotted, so a crawler and a router both see real anchors.
-    expect(withoutStyles(ssr(bar))).toContain('href="/design"')
+  test('the destinations are projected, so a router keeps its own anchors', () => {
+    /* They are slotted, so a crawler and a router both see real anchors.
+       `toContain('href="/design"')` could not say that: the anchor is the
+       fixture's own light-DOM child and is in the served markup whatever this
+       component does. What it owes is a bare slot inside the landmark, and no
+       anchor of its own, read off a render with no children. */
+    const empty = rendered(
+      ssr(html`<helix-headless-navigation label="Sections"></helix-headless-navigation>`),
+      'helix-headless-navigation',
+    )
+    expect(empty).toMatch(/<slot\s*><\/slot>/)
+    expect(empty).not.toContain('<a')
   })
 
   test('the host carries only what the consumer wrote', () => {

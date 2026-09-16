@@ -719,7 +719,7 @@ pub fn all() -> Vec<Rule> {
             fix: None,
             name: "ssr",
             run: Runner::Source(ssr::run),
-            summary: "a server-rendered assertion is made against structure, not the string",
+            summary: "a server-rendered assertion is made against what rendered, not the document",
         },
         Rule {
             fix: None,

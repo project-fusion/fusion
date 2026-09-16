@@ -1,12 +1,20 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('tag server output', () => {
-  test('the label is in the served markup', () => {
-    const markup = ssr(html`<helix-headless-tag>Draft</helix-headless-tag>`)
-    expect(withoutStyles(markup)).toContain('Draft')
+  test('the label is projected, and a glyph before it has a name to be styled by', () => {
+    /* `toContain('Draft')` against the whole render passed on the word the spec
+       itself slotted, which is the consumer's markup echoed back: it held with
+       the tag rendering no slot at all. Read off a render with no children, the
+       only shadow root in the markup is the tag's own. */
+    const markup = rendered(
+      ssr(html`<helix-headless-tag></helix-headless-tag>`),
+      'helix-headless-tag',
+    )
+    expect(markup).toContain('<slot name="prefix" part="prefix"></slot>')
+    expect(markup).toContain('<slot></slot>')
   })
 
   test('a plain tag ships no control', () => {

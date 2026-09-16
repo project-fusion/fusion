@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -25,7 +25,12 @@ describe('flex server output', () => {
     expect(hostAttributes(ssr(html`<helix-flex>x</helix-flex>`), 'helix-flex')).toEqual([])
   })
 
-  test('the content is served, not built on the client', () => {
-    expect(withoutStyles(ssr(html`<helix-flex>Contents</helix-flex>`))).toContain('Contents')
+  test('the content is projected, not built on the client', () => {
+    /* `toContain('Contents')` passed on the host's own text, which is in the
+       response whatever the element renders: the same fault the first test
+       above records for `direction="column"`. The unnamed slot is the claim. */
+    expect(rendered(ssr(html`<helix-flex>Contents</helix-flex>`), 'helix-flex')).toContain(
+      '<slot></slot>',
+    )
   })
 })

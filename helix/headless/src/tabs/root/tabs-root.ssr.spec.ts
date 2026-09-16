@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -50,8 +50,19 @@ describe('tabs server output', () => {
   })
 
   test('every panel ships its content, whichever is open', () => {
-    const structure = withoutStyles(markup)
-    expect(structure).toContain('First')
-    expect(structure).toContain('Second')
+    /* `toContain('First')` and `toContain('Second')` were the fixture's own
+       light-DOM panels read back out of the document, which is true of a panel
+       that renders nothing at all. The claim is that the panel a reader is not
+       on ships too, and the only difference between the two is `hidden`: the
+       subtree is present either way, so opening a tab after hydration is an
+       attribute coming off rather than content arriving. */
+    const current = ssr(
+      html`<helix-headless-tab-panel selected value="one"></helix-headless-tab-panel>`,
+    )
+    const other = ssr(html`<helix-headless-tab-panel value="two"></helix-headless-tab-panel>`)
+    expect(partTag(current, 'panel')).not.toContain('hidden')
+    expect(partTag(other, 'panel')).toContain('hidden')
+    expect(partTag(other, 'panel')).toContain('role="tabpanel"')
+    expect(rendered(other, 'helix-headless-tab-panel')).toContain('<slot></slot>')
   })
 })

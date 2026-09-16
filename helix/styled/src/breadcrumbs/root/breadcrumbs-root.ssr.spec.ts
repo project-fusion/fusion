@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  styles,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -20,8 +27,8 @@ describe('breadcrumbs server output', () => {
   test('a linked crumb is an anchor and the current one is not, decided on the server', () => {
     // A crawler follows the trail without the page running, and the current
     // page is never a link to itself.
-    expect(markup).toMatch(/<a\s[^>]*part="link"[^>]*href="\/"/)
-    expect(markup).toMatch(/<span\s[^>]*part="link"/)
+    expect(rendered(markup, 'helix-breadcrumbs')).toMatch(/<a\s[^>]*part="link"[^>]*href="\/"/)
+    expect(rendered(markup, 'helix-breadcrumbs')).toMatch(/<span\s[^>]*part="link"/)
   })
 
   test('each crumb serves its separator, hidden from assistive technology', () => {
@@ -36,7 +43,7 @@ describe('breadcrumbs server output', () => {
   })
 
   test('declarative shadow DOM carries both sheets', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-breadcrumbs')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--breadcrumbs-gap')
     expect(styles(served)).toContain('--breadcrumbs-separator-color')
   })

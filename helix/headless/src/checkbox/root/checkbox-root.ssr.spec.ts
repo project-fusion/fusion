@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -9,10 +15,14 @@ describe('checkbox server output', () => {
     expect(partTag(markup, 'control')).toContain('type="checkbox"')
   })
 
-  test('the label is in the served markup', () => {
-    expect(
-      withoutStyles(ssr(html`<helix-headless-checkbox>Terms</helix-headless-checkbox>`)),
-    ).toContain('Terms')
+  test('the slot the label lands in is served', () => {
+    /* `toContain('Terms')` read the host's own light-DOM child back out of the
+       render, so it passed with the checkbox rendering no slot at all. Read off
+       a checkbox with no children: the only shadow root is its own. */
+    const markup = ssr(html`<helix-headless-checkbox></helix-headless-checkbox>`)
+    expect(rendered(markup, 'helix-headless-checkbox')).toMatch(
+      /<span part="label">(<!--[^>]*-->)*<slot\s*>/,
+    )
   })
 
   test('a default-checked box is checked on the server, in the control', () => {

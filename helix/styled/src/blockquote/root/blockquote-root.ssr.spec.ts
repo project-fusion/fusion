@@ -3,6 +3,7 @@ import {
   hasPart,
   hostAttributes,
   partTag,
+  rendered,
   ssr,
   styles,
   withoutStyles,
@@ -22,7 +23,12 @@ describe('blockquote server output', () => {
   test('the passage is a blockquote with its source before any script runs', () => {
     expect(partTag(markup, 'blockquote')).toMatch(/^<blockquote\s/)
     expect(partTag(markup, 'blockquote')).toContain('cite="https://x.test"')
-    expect(markup).toContain('Said so.')
+    /* `toContain('Said so.')` passed on the host's own light DOM, which is in
+       the response whatever the element renders. The slot inside the
+       `<blockquote>` is what puts the passage in the quotation. */
+    expect(rendered(markup, 'helix-blockquote')).toMatch(
+      /<blockquote[^>]*part="blockquote"[^>]*>\s*<slot><\/slot>/,
+    )
   })
 
   test('the footer ships unmarked, since only a client can see whether it is filled', () => {
@@ -41,7 +47,7 @@ describe('blockquote server output', () => {
   })
 
   test('declarative shadow DOM carries the styles', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-blockquote')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--blockquote-size')
   })
 })

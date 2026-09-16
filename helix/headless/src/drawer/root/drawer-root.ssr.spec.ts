@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, hostTag, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, hostTag, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -39,11 +39,16 @@ describe('drawer server output', () => {
     expect(partTag(markup, 'panel')).toContain('aria-label="Examples"')
   })
 
-  test('content is in the markup even while closed', () => {
-    const markup = ssr(
-      html`<helix-headless-drawer label="Examples">Content</helix-headless-drawer>`,
+  test('the content region is served inside the panel, even while closed', () => {
+    /* `toContain('Content')` was the host's own text, which declarative shadow
+       DOM serializes whatever the drawer renders, so it held for a drawer with
+       an empty shadow root. The region and its slot are the claim, and that they
+       are inside the `<dialog>`: outside it the content is on screen when the
+       drawer is shut. */
+    const markup = ssr(html`<helix-headless-drawer label="Examples"></helix-headless-drawer>`)
+    expect(rendered(markup, 'helix-headless-drawer')).toMatch(
+      /<dialog[\s\S]*<div part="content"><slot><\/slot><\/div>[\s\S]*<\/dialog>/,
     )
-    expect(withoutStyles(markup)).toContain('Content')
   })
 
   test('renders without reaching for a document it does not have', () => {

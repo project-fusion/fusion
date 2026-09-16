@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 /* A crumb holds the menu the consumer wrote, so the server has to be able to
@@ -26,10 +32,15 @@ describe('breadcrumbs server output', () => {
     expect(hostAttributes(ssr(trail), 'helix-headless-breadcrumb')).toEqual([])
   })
 
-  test('the slotted link is crawlable in the served markup', () => {
-    // It sits in the light DOM, so it is in the document rather than behind a
-    // declarative shadow root.
-    expect(withoutStyles(ssr(trail))).toContain('href="/"')
+  test('a crumb serves the slot its link is projected through', () => {
+    /* The link sits in the light DOM, so `toContain('href="/"')` read this
+       spec's own markup back out of the render: it passed with the crumb
+       rendering no slot at all, which assigns the link nowhere. Read off a
+       crumb with no children, so the only shadow root here is the crumb's. */
+    const crumb = ssr(html`<helix-headless-breadcrumb></helix-headless-breadcrumb>`)
+    expect(rendered(crumb, 'helix-headless-breadcrumb')).toMatch(
+      /part="link">(<!--[^>]*-->)*<slot name="start"><\/slot><slot><\/slot>/,
+    )
   })
 
   test('separators ship with the markup rather than being added on connect', () => {

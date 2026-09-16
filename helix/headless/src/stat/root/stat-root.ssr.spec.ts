@@ -1,17 +1,21 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('stat server output', () => {
-  test('the figure and its label are in the served markup', () => {
-    const markup = withoutStyles(
-      ssr(
-        html`<helix-headless-stat><span slot="label">Revenue</span><span>42</span></helix-headless-stat>`,
-      ),
+  test('the figure, its label and its unit each have a slot to arrive through', () => {
+    /* `toContain('Revenue')` and `toContain('42')` were the spec's own
+       light-DOM children read back out of the document, so both held for a stat
+       that rendered nothing whatever. Stat renders no part at all, so what a
+       server owes is the three slots, read off a render with no children. */
+    const markup = rendered(
+      ssr(html`<helix-headless-stat></helix-headless-stat>`),
+      'helix-headless-stat',
     )
-    expect(markup).toContain('Revenue')
-    expect(markup).toContain('42')
+    expect(markup).toContain('<slot name="label"></slot>')
+    expect(markup).toContain('<slot></slot>')
+    expect(markup).toContain('<slot name="unit"></slot>')
   })
 
   test('the host carries nothing the consumer did not write', () => {

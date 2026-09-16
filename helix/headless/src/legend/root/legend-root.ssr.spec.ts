@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,7 +12,7 @@ describe('chart legend server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-legend for="traffic"></helix-headless-legend>`),
     )
-    expect(markup).toContain('part="list"')
+    expect(rendered(markup, 'helix-headless-legend')).toContain('part="list"')
     expect(markup).not.toContain('part="entry"')
   })
 

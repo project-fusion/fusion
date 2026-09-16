@@ -1,13 +1,14 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('avatar server output', () => {
   test('initials are computed on the server, not after hydration', () => {
     // A pure function of the name, so both sides agree without measuring.
-    const markup = withoutStyles(
+    const markup = rendered(
       ssr(html`<helix-headless-avatar name="Ross Sheppard"></helix-headless-avatar>`),
+      'helix-headless-avatar',
     )
     expect(markup).toContain('RS')
   })

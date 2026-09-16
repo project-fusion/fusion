@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -19,6 +19,6 @@ describe('skip link server output', () => {
 
   test('carries its words in the markup', () => {
     const markup = ssr(html`<helix-headless-skip-link></helix-headless-skip-link>`)
-    expect(withoutStyles(markup)).toContain('Skip to content')
+    expect(rendered(markup, 'helix-headless-skip-link')).toContain('Skip to content')
   })
 })

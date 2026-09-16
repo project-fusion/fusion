@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, partTag, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -30,6 +30,6 @@ describe('color server output', () => {
 
   test('the presets ship, since they are markup rather than state', () => {
     expect(hasPart(markup, 'swatches')).toBe(true)
-    expect(markup).toContain('aria-label="#ff0000"')
+    expect(rendered(markup, 'helix-color-picker')).toContain('aria-label="#ff0000"')
   })
 })

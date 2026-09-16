@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -28,6 +28,6 @@ describe('image server output', () => {
 
   test('nothing waits on the client to know the shape of it', () => {
     expect(hasPart(ssr(pier), 'placeholder')).toBe(true)
-    expect(withoutStyles(ssr(pier))).toContain('loading="lazy"')
+    expect(rendered(ssr(pier), 'helix-headless-image')).toContain('loading="lazy"')
   })
 })

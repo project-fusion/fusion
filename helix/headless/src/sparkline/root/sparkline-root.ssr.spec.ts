@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,20 +8,23 @@ describe('sparkline server output', () => {
     /* The reason `values` is worth having beyond the sentence in the docs: a
        sparkline reading an attribute needs no document to resolve, so unlike
        the legend it arrives whole and nothing appears on hydration. */
-    const markup = withoutStyles(
-      ssr(
-        html`<helix-headless-sparkline label="Sessions over a week" values="1 5 9"></helix-headless-sparkline>`,
-      ),
+    const markup = ssr(
+      html`<helix-headless-sparkline label="Sessions over a week" values="1 5 9"></helix-headless-sparkline>`,
     )
-    expect(markup).toContain('M0,32')
-    expect(markup).toContain('role="img"')
-    expect(markup).toContain('Sessions over a week')
+    expect(partTag(markup, 'line')).toContain('M0,32')
+    /* Read off the graphic rather than out of the document, because the name is
+       on the host two attributes away: a whole-render search for it passes on
+       the consumer's own `label=` whether or not the drawing carries a name,
+       and went on passing here with `aria-label` removed from the render. */
+    expect(partTag(markup, 'svg')).toContain('role="img"')
+    expect(partTag(markup, 'svg')).toContain('aria-label="Sessions over a week"')
   })
 
   test('an unlabelled one is served decorative rather than as an unnamed graphic', () => {
     expect(
-      withoutStyles(
+      partTag(
         ssr(html`<helix-headless-sparkline values="1 5 9"></helix-headless-sparkline>`),
+        'svg',
       ),
     ).toContain('aria-hidden="true"')
   })

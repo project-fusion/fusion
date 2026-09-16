@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -13,7 +20,7 @@ describe('popover server output', () => {
         Body
       </helix-headless-popover>`),
     )
-    expect(markup).toContain('name="trigger"')
+    expect(rendered(markup, 'helix-headless-popover')).toContain('name="trigger"')
     expect(hasPart(markup, 'popover')).toBe(true)
     expect(partTag(markup, 'popover')).toContain('hidden')
   })

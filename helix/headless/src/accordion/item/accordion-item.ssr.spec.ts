@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -24,14 +24,17 @@ describe('accordion server output', () => {
     expect(partTag(open, 'trigger')).toContain('aria-expanded="true"')
   })
 
-  test('content is in the markup even when closed', () => {
-    // Present for a crawler, and hidden rather than removed so it can animate.
-    const closed = withoutStyles(
-      ssr(
-        html`<helix-headless-accordion-item><span slot="summary">S</span>Body</helix-headless-accordion-item>`,
-      ),
+  test('the region the content lands in ships even when closed', () => {
+    /* Present for a crawler, and hidden rather than removed so it can animate.
+
+       `toContain('Body')` read the item's own light-DOM child back out of the
+       render, so it passed with the item rendering no content region and no
+       slot at all. Read off an item with no children, so the only shadow root
+       here is the item's own. */
+    const closed = ssr(html`<helix-headless-accordion-item></helix-headless-accordion-item>`)
+    expect(rendered(closed, 'helix-headless-accordion-item')).toMatch(
+      /<div part="content-inner">\s*<slot><\/slot>/,
     )
-    expect(closed).toContain('Body')
   })
 
   test('a closed section is closed with no stylesheet at all', () => {

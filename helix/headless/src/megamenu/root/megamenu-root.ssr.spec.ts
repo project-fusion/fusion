@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,7 +8,7 @@ describe('megamenu server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`),
     )
-    expect(markup).toContain('aria-expanded="false"')
+    expect(partTag(markup, 'trigger')).toContain('aria-expanded="false"')
     expect(hasPart(markup, 'trigger')).toBe(true)
   })
 
@@ -20,7 +20,10 @@ describe('megamenu server output', () => {
       ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`),
     )
     expect(hasPart(markup, 'surface')).toBe(true)
-    expect(markup).toContain('hidden')
+    // On the panel, not somewhere in the document: `hidden` is four characters
+    // that turn up in a `data-` name or a slot name as readily as on the box
+    // this test is about.
+    expect(partTag(markup, 'surface')).toContain('hidden')
   })
 
   test('the host carries nothing the consumer did not write', () => {

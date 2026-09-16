@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, ssr, styles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,7 +8,10 @@ describe('quote server output', () => {
     const served = ssr(html`<helix-quote cite="https://x.test">dolor</helix-quote>`)
     expect(partTag(served, 'quote')).toMatch(/^<q\s/)
     expect(partTag(served, 'quote')).toContain('cite="https://x.test"')
-    expect(withoutStyles(served)).toContain('dolor')
+    /* `toContain('dolor')` passed on the host's own text, which is in the
+       response whatever the element renders. The slot inside the `<q>` is what
+       puts the passage between the marks. */
+    expect(rendered(served, 'helix-quote')).toMatch(/<q[^>]*part="quote"[^>]*><slot><\/slot><\/q>/)
   })
 
   test('no source leaves no empty cite', () => {
@@ -24,7 +27,7 @@ describe('quote server output', () => {
 
   test('declarative shadow DOM carries the styles', () => {
     const served = ssr(html`<helix-quote>x</helix-quote>`)
-    expect(withoutStyles(served)).toContain('shadowrootmode="open"')
+    expect(rendered(served, 'helix-quote')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--quote-color')
   })
 })

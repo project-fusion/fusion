@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  servedParts,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -8,7 +14,12 @@ import '../index.js'
    **That it renders at all**, which is what fails when a component reaches for
    the DOM to draw itself: `querySelector` is undefined on the server and any
    parent-to-child coordination throws, so a part that works in a browser can
-   still take the whole page down before it reaches one.
+   still take the whole page down before it reaches one. Asked of what came out
+   of the render, because the tag name is no answer: it is the host's own opening
+   tag, which is the consumer's markup echoed back, so `toContain` on it passed
+   against a shadow root holding nothing whatever. The parts it drew, or, for the
+   five that pass their children straight through and carry no part at all, the
+   slot that does the passing.
 
    **That the host carries no attribute of its own beyond a `data-` mirror.** An
    element writing its own bookkeeping onto itself is markup the server never
@@ -30,8 +41,8 @@ import '../index.js'
 describe('drilldown item server output', () => {
   test('renders on a server, where there is no DOM to reach for', () => {
     expect(
-      withoutStyles(ssr(html`<helix-headless-drilldown-item></helix-headless-drilldown-item>`)),
-    ).toContain('helix-headless-drilldown-item')
+      servedParts(ssr(html`<helix-headless-drilldown-item></helix-headless-drilldown-item>`)),
+    ).not.toEqual([])
   })
 
   test('the host declares nothing of its own beyond a `data-` mirror', () => {

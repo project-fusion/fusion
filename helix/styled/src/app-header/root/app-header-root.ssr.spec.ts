@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 import {
-  hasPart,
   hostAttributes,
   hostTag,
+  rendered,
+  servedParts,
   ssr,
   styles,
   withoutStyles,
@@ -22,11 +23,13 @@ describe('app header server output', () => {
   test('renders without reaching for a window it does not have', () => {
     // The scroll listener is attached on connect, which the server never calls,
     // so rendering here proves the element does not touch `window` to render.
-    expect(markup).toContain('<helix-app-header')
+    /* The served frame rather than `toContain('<helix-app-header')`, which was
+       the consumer's own opening tag echoed back and would have passed with
+       nothing rendered at all. The banner is full width and the row inside it
+       is what centers. */
+    expect(servedParts(markup)).toEqual(['content', 'end', 'row', 'start'])
     expect(hostAttributes(markup, 'helix-app-header')).toEqual([])
-    expect(withoutStyles(markup)).toContain('<slot name="start">')
-    // The banner is full width and the row inside it is what centers.
-    expect(hasPart(markup, 'content')).toBe(true)
+    expect(rendered(markup, 'helix-app-header')).toContain('<slot name="start">')
   })
 
   test('ships un-scrolled, which is what a fresh load shows', () => {
@@ -35,12 +38,17 @@ describe('app header server output', () => {
     expect(hostTag(markup, 'helix-app-header')).not.toContain('data-scrolled')
   })
 
-  test('navigation is in the markup for a crawler with no JavaScript', () => {
-    expect(withoutStyles(markup)).toContain('href="/work"')
+  test('the navigation a consumer writes is projected, not rebuilt on the client', () => {
+    /* `toContain('href="/work"')` passed on the spec's own `<a>`, which sits in
+       the host's light DOM and is in the response whatever the header renders.
+       What the header owes a crawler is the unnamed slot that projects it, read
+       off a render with no children so the only shadow root here is its own. */
+    const bare = ssr(html`<helix-app-header></helix-app-header>`)
+    expect(rendered(bare, 'helix-app-header')).toContain('<div part="content"><slot></slot></div>')
   })
 
   test('declarative shadow DOM carries the material', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-app-header')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--helix-material-translucent')
   })
 })

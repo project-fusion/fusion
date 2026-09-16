@@ -349,10 +349,37 @@ stylesheet names every part, host attribute, and token the component uses. So
 both saying nothing about what rendered. This has produced a false pass twice,
 once hiding a stale build for several commits.
 
-Use the helpers in `helix/testing/src/ssr.ts`: `withoutStyles`, `styles`,
-`hasPart`, `partTag`, `hostTag`, `hostAttributes`, `servedParts`. Attribute
-bindings render across multiple lines, so match with `/<a\s+part="button"/`,
-never `'<a part="button"'`.
+Use the helpers in `helix/testing/src/ssr.ts`: `withoutStyles`, `rendered`,
+`styles`, `hasPart`, `partTag`, `hostTag`, `hostAttributes`, `servedParts`.
+Attribute bindings render across multiple lines, so match with
+`/<a\s+part="button"/`, never `'<a part="button"'`.
+
+**Stripping the sheet is enough for a negative and not for a positive**, and the
+difference is the host's own opening tag, which `withoutStyles` leaves behind
+and which is the consumer's markup echoed back. `<helix-date-input
+value="2026-08-18">` renders `August 18, 2026` into its field by design, and the
+spec claiming the date was already in the field passed for six weeks on the
+`value` two characters away in the host tag. It would have passed had the field
+rendered nothing at all. The plainest of the six found beside it is a tree
+asserting `toContain('helix')` against a document opening
+`<helix-headless-tree`: it passed with the whole render replaced by one empty
+element. Twenty-five more shared one shape, a part's server spec asking whether
+it renders at all by searching the document for its own tag name, which is the
+host's opening tag and is there whatever the shadow root holds.
+
+So a positive `toContain` or `toMatch` comes through `rendered`, which takes the
+host tag off too, or through `partTag` for one part, or `servedParts` for the
+frame whole. An assertion that is honestly about what the consumer wrote says so
+with `hostTag` or `hostAttributes`. A negative one may still read
+`withoutStyles`: nothing a consumer writes on a host can satisfy a claim about a
+part or about a rendered role, so the wider subject only makes it stronger.
+
+`rendered` leaves the host's *children*, being neither the component's render
+nor the host's own tag. So it does not rescue an assertion whose literal is a
+slotted node: what a component owes a server for content it did not write is the
+slot that projects it, read off a render with no children.
+
+**`helix component`'s `ssr` holds all of it.**
 
 ### A component that resolves a document serves the frame
 

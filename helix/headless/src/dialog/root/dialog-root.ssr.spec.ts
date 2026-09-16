@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -13,7 +13,14 @@ describe('dialog server output', () => {
     )
     expect(hasPart(markup, 'dialog')).toBe(true)
     expect(partTag(markup, 'dialog')).toMatch(/<dialog/)
-    expect(withoutStyles(markup)).toContain('Cannot be undone.')
+    /* `toContain('Cannot be undone.')` read the host's own light-DOM child back
+       out of the render, so it passed with the dialog rendering no slot at all.
+       What puts the content inside the dialog is the slot inside the `<dialog>`,
+       read off one with no children of its own. */
+    const bare = ssr(html`<helix-headless-dialog label="Delete"></helix-headless-dialog>`)
+    expect(rendered(bare, 'helix-headless-dialog')).toMatch(
+      /<dialog[\s\S]*<slot><\/slot>[\s\S]*<\/dialog>/,
+    )
   })
 
   test('open in the markup does not serve an open dialog', () => {

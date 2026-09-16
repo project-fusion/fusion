@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -15,7 +15,7 @@ describe('sandbox terminal server output', () => {
   })
 
   test('the log region is announced from the served markup', () => {
-    expect(withoutStyles(markup)).toContain('role="log"')
+    expect(rendered(markup, 'helix-sandbox-terminal')).toContain('role="log"')
   })
 
   test('the host carries only what the consumer wrote', () => {

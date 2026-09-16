@@ -1,11 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import {
-  hostAttributes,
-  partTag,
-  servedParts,
-  ssr,
-  withoutStyles,
-} from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, rendered, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -42,14 +36,12 @@ describe('heatmap server output', () => {
     expect(partTag(markup, 'strip')).toBeTruthy()
   })
 
-  test('the table is the reading, and it is in the markup in full', () => {
-    const served = withoutStyles(markup)
-    expect(served).toContain('81%')
-    expect(served).toContain('datetime="2026-08-25"')
-  })
-
-  test("the consumer's summary is served with it", () => {
-    expect(withoutStyles(markup)).toContain('99.6% over 90 days')
+  test("the slot the consumer's summary lands in is served", () => {
+    // `toContain('99.6% over 90 days')` passed on the host's own child, so it
+    // held with the footer rendering no summary slot at all.
+    expect(rendered(markup, 'helix-headless-heatmap')).toContain(
+      '<span part="summary"><slot name="summary"></slot></span>',
+    )
   })
 
   /**
@@ -64,6 +56,10 @@ describe('heatmap server output', () => {
    * So what is served is the strip and the footer it sits above, and nothing
    * else: no cells, no tooltip, and no empty state, an unresolved table being
    * unknown rather than empty.
+   *
+   * The reading itself is the consumer's `<table>`, which this component neither
+   * renders nor can remove, so `toContain('81%')` was reading the spec's own
+   * template back out of the document and held whatever the heatmap drew.
    */
   test('the frame is served and nothing is drawn in it', () => {
     expect(servedParts(markup)).toEqual(['end', 'footer', 'start', 'strip', 'summary'])

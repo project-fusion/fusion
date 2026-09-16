@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, partTag, rendered, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -19,7 +19,21 @@ describe('filter input server output', () => {
         Open
       </helix-headless-filter-chip>
     </helix-headless-filter-input>`)
-    expect(withoutStyles(markup)).toContain('Open')
+    /* `toContain('Open')` read the chip's own light-DOM text back out of the
+       render, which is in the document whether or not any of these elements
+       rendered at all. The frame is the claim, because the claim is that none
+       of them threw: `menu` and `surface` come from the menu, `values` from the
+       chip, the rest from the input, so an element that died fails here. */
+    expect(servedParts(markup)).toEqual([
+      'control',
+      'field',
+      'label',
+      'lead',
+      'menu',
+      'surface',
+      'tags',
+      'values',
+    ])
   })
 
   test('the field is usable before any script loads', () => {
@@ -31,7 +45,13 @@ describe('filter input server output', () => {
     )
     expect(hasPart(markup, 'field')).toBe(true)
     expect(partTag(markup, 'control')).toContain('placeholder="Add a filter"')
-    expect(withoutStyles(markup)).toContain('Filter rows')
+    /* `toContain('Filter rows')` passed on the host's own `label="Filter rows"`,
+       a few characters away in the opening tag, so it held whatever the input
+       drew. The host tag is what `rendered` takes off, which leaves the
+       `<label>` as the only place the words can be. */
+    expect(rendered(markup, 'helix-headless-filter-input')).toMatch(
+      /<slot name="label">(<!--[^>]*-->)*Filter rows/,
+    )
   })
 
   test('the row is served whether or not anything is in it', () => {
@@ -41,7 +61,7 @@ describe('filter input server output', () => {
       html`<helix-headless-filter-input label="Filter rows"></helix-headless-filter-input>`,
     )
     expect(hasPart(markup, 'tags')).toBe(true)
-    expect(withoutStyles(markup)).toContain('name="tags"')
+    expect(rendered(markup, 'helix-headless-filter-input')).toContain('name="tags"')
   })
 
   test('the count waits for a client, having nothing to count without one', () => {

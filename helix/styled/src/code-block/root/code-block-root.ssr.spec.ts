@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -23,6 +23,12 @@ describe('code-block diff server output', () => {
     )
     expect(hasPart(markup, 'code')).toBe(true)
     expect(hasPart(markup, 'added')).toBe(false)
-    expect(markup).toContain('+new')
+    /* `toContain('+new')` passed on the host's own light DOM, which is in the
+       response whatever the block renders: it would have gone on passing with
+       the shadow root empty. The claim is the slot inside the code element,
+       which is what sends the patch as code rather than as parsed rows. */
+    expect(rendered(markup, 'helix-code-block')).toMatch(
+      /<pre part="block"><code part="code">(?:<!--[^>]*-->)?<slot\s*><\/slot><\/code><\/pre>/,
+    )
   })
 })

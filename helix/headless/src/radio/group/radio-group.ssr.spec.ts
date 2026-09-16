@@ -1,14 +1,19 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostTag, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('radio group server output', () => {
   test('the question is served, so the set is named before any script', () => {
+    /* `toContain('Label')` against the whole render passed on the consumer's
+       own `label="Label"` two characters into the host tag, so it held with the
+       label deleted from the template. The name is the fallback of the label
+       slot, which is inside the shadow root and nowhere else. */
     const markup = ssr(
       html`<helix-headless-radio-group label="Label"></helix-headless-radio-group>`,
     )
-    expect(withoutStyles(markup)).toContain('Label')
+    expect(hasPart(markup, 'label')).toBe(true)
+    expect(rendered(markup, 'helix-headless-radio-group')).toContain('Label')
     expect(hasPart(markup, 'items')).toBe(true)
   })
 

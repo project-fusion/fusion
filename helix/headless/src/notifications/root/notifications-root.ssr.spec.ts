@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -34,23 +41,35 @@ describe('notifications server output', () => {
 
   /** Measured: a group read its rows by spreading `children`, which the shim does not have. */
   test('a group renders on a server', () => {
+    /* `toContain('Build passed')` was the fixture's own light-DOM row, which
+       survives an element that renders nothing, so it could not tell a group
+       that rendered from one that threw. The group's own frame can. */
     const grouped = ssr(html`<helix-headless-notifications label="Activity">
       <helix-headless-notification-group collapsible label="Earlier">
         <helix-headless-notification>Build failed</helix-headless-notification>
         <helix-headless-notification>Build passed</helix-headless-notification>
       </helix-headless-notification-group>
     </helix-headless-notifications>`)
-    expect(withoutStyles(grouped)).toContain('Build passed')
+    expect(partTag(grouped, 'trigger')).toContain('aria-controls="items"')
+    expect(hasPart(grouped, 'items')).toBe(true)
   })
 
   test('the region and the list are both served', () => {
     expect(partTag(markup, 'list')).toContain('role="list"')
   })
 
-  test('the content is in the markup, which is what markup children buy', () => {
-    const served = withoutStyles(markup)
-    expect(served).toContain('Ada approved your deploy')
-    expect(served).toContain('Your invitation was accepted')
+  test('the rows are projected rather than drawn from data, which is what markup children buy', () => {
+    /* Asserting the two sentences against the whole document said nothing: they
+       are the consumer's own children, in the markup whether this element
+       projects them or drops them on the floor. The difference between markup
+       children and `helix-data-table`'s rows is the slot inside the list, which
+       is what a render with no children shows. */
+    expect(
+      rendered(
+        ssr(html`<helix-headless-notifications label="Activity"></helix-headless-notifications>`),
+        'helix-headless-notifications',
+      ),
+    ).toMatch(/<slot\s+name="items"/)
   })
 
   test('the hosts write no attributes of their own, so hydration reconciles nothing', () => {

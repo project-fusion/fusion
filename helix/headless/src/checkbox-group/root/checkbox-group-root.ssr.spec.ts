@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 import '../../checkbox/index.js'
@@ -10,10 +10,19 @@ const group = html`<helix-headless-checkbox-group label="Verticals" name="vertic
 </helix-headless-checkbox-group>`
 
 describe('checkbox group server output', () => {
-  test('every box is in the served markup', () => {
-    const markup = withoutStyles(ssr(group))
-    expect(markup).toContain('Design')
-    expect(markup).toContain('Mind')
+  test('the region every box lands in is served', () => {
+    /* `toContain('Design')` read the group's own light-DOM children back out of
+       the render, so it passed with the group rendering no slot at all. Read
+       off a group with no children: the only shadow root is the group's own. */
+    const markup = ssr(
+      html`<helix-headless-checkbox-group
+        label="Verticals"
+        name="verticals"
+      ></helix-headless-checkbox-group>`,
+    )
+    expect(rendered(markup, 'helix-headless-checkbox-group')).toMatch(
+      /part="items">(\s|<!--[^>]*-->)*<slot\s*>/,
+    )
   })
 
   test('the host carries only what the consumer wrote', () => {

@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,7 +19,7 @@ describe('menu server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-headless-menu label="Actions"></helix-headless-menu>`),
     )
-    expect(markup).toContain('name="trigger"')
+    expect(rendered(markup, 'helix-headless-menu')).toMatch(/<slot\s+name="trigger"/)
     expect(hasPart(markup, 'surface')).toBe(true)
     expect(partTag(markup, 'surface')).toContain('hidden')
   })
@@ -30,9 +37,12 @@ describe('menu server output', () => {
   })
 
   test('a row serves its words and its role', () => {
-    const markup = ssr(html`<helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>`)
-    expect(hasPart(markup, 'item')).toBe(true)
-    expect(withoutStyles(markup)).toContain('menuitem')
+    // The words are the consumer's own, so what the row owes is the slot they
+    // land in. Read off a render with no children, since a slotted word sits in
+    // the served markup whatever the row does with it.
+    const markup = ssr(html`<helix-headless-menu-item value="copy"></helix-headless-menu-item>`)
+    expect(partTag(markup, 'item')).toContain('role="menuitem"')
+    expect(rendered(markup, 'helix-headless-menu-item')).toContain('<slot></slot>')
   })
 
   test('a row claims no submenu on the server, because it cannot see its children', () => {
@@ -47,10 +57,10 @@ describe('menu server output', () => {
   })
 
   test('a checkable row serves its state', () => {
-    expect(
-      withoutStyles(
-        ssr(html`<helix-headless-menu-item checked value="wrap">Wrap</helix-headless-menu-item>`),
-      ),
-    ).toContain('menuitemcheckbox')
+    const markup = ssr(
+      html`<helix-headless-menu-item checked value="wrap">Wrap</helix-headless-menu-item>`,
+    )
+    expect(partTag(markup, 'item')).toContain('role="menuitemcheckbox"')
+    expect(partTag(markup, 'item')).toContain('aria-checked="true"')
   })
 })

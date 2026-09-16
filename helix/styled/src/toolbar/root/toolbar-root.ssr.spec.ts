@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, styles, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  rendered,
+  ssr,
+  styles,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -27,7 +34,11 @@ describe('toolbar server output', () => {
   test('the controls are served as the consumer wrote them, with no tab stop written yet', () => {
     // A `tabindex` written onto a foreign control before any interaction is
     // markup React is still hydrating, which it reports and does not patch up.
-    expect(markup).toContain('<button type="button">Bold</button>')
+    /* `toContain('<button type="button">Bold</button>')` passed on the spec's
+       own light DOM, which is in the response whatever the toolbar renders. The
+       unnamed slot inside the toolbar region is what serves the controls where
+       the consumer put them, untouched. */
+    expect(rendered(markup, 'helix-toolbar')).toMatch(/<slot\s*><\/slot>\s*<\/div>/)
     expect(markup).not.toContain('tabindex')
   })
 
@@ -42,7 +53,7 @@ describe('toolbar server output', () => {
   })
 
   test('declarative shadow DOM carries the styles', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-toolbar')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--toolbar-gap')
   })
 })

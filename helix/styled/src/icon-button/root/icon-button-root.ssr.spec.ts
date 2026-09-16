@@ -3,6 +3,7 @@ import {
   hasPart,
   hostAttributes,
   partTag,
+  rendered,
   ssr,
   styles,
   withoutStyles,
@@ -17,7 +18,7 @@ describe('icon button server output', () => {
   test('is keyboard reachable before any JavaScript runs', () => {
     // `delegatesFocus` is a shadow root option, so it only reaches the browser
     // if it serializes onto the declarative template.
-    expect(markup).toContain('shadowrootdelegatesfocus')
+    expect(rendered(markup, 'helix-icon-button')).toContain('shadowrootdelegatesfocus')
     expect(hasPart(markup, 'button')).toBe(true)
     expect(partTag(markup, 'button')).toMatch(/^<button\s/)
   })
@@ -39,7 +40,7 @@ describe('icon button server output', () => {
   })
 
   test('declarative shadow DOM carries the styles', () => {
-    expect(markup).toContain('shadowrootmode="open"')
+    expect(rendered(markup, 'helix-icon-button')).toContain('shadowrootmode="open"')
     expect(styles(served)).toContain('--icon-button-size')
   })
 })

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -9,12 +9,21 @@ const carousel = html`<helix-headless-carousel label="Verticals">
 </helix-headless-carousel>`
 
 describe('carousel server output', () => {
-  test('every slide is in the served markup, not only the one in view', () => {
-    // They are content, so a crawler and a reader without script get all of
-    // them rather than the first.
-    const markup = withoutStyles(ssr(carousel))
-    expect(markup).toContain('Design')
-    expect(markup).toContain('Mind')
+  test('the frame is served and no pane is, a server having no slides to count', () => {
+    /* This was `toContain('Design')` on the whole render. The slides are the
+       host's own light-DOM children read back out of it, so it passed with the
+       carousel rendering nothing: `slides` is empty on a server, so neither a
+       pane nor a slot to project one is drawn, and what ships is the frame.
+       The frame entire rather than the parts somebody named, so a mark drawn
+       into a template nobody meant to change fails here. */
+    expect(servedParts(ssr(carousel))).toEqual([
+      'controls',
+      'next',
+      'next-mark',
+      'previous',
+      'previous-mark',
+      'track',
+    ])
   })
 
   test('the controls ship with the markup', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -34,7 +34,7 @@ describe('input file server output', () => {
 
   test('the trigger is a label pointing at the control', () => {
     expect(partTag(markup, 'trigger')).toMatch(/for="control"/)
-    expect(withoutStyles(markup)).toContain('Choose files')
+    expect(rendered(markup, 'helix-file-input')).toContain('Choose files')
   })
 
   test('the host carries only what the consumer wrote', () => {

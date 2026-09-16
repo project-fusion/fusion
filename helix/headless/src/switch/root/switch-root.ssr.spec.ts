@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -12,10 +12,14 @@ describe('switch server output', () => {
     expect(hasPart(markup, 'thumb')).toBe(true)
   })
 
-  test('the label arrives as the slot"s fallback, so the words are in the HTML', () => {
-    expect(
-      withoutStyles(ssr(html`<helix-headless-switch label="Dark mode"></helix-headless-switch>`)),
-    ).toContain('Dark mode')
+  test("the label arrives as the slot's fallback, so the words are in the HTML", () => {
+    /* Against the whole render this passed on the consumer's own
+       `label="Dark mode"` in the host tag, so it held with the fallback taken
+       out of the slot. The words are only in the HTML if the component drew
+       them, which is what the shadow root says. */
+    const markup = ssr(html`<helix-headless-switch label="Dark mode"></helix-headless-switch>`)
+    expect(hasPart(markup, 'label')).toBe(true)
+    expect(rendered(markup, 'helix-headless-switch')).toContain('Dark mode')
   })
 
   test('checked reaches the input, and the host carries only what was typed', () => {

@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hasPart,
+  hostAttributes,
+  rendered,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -18,7 +24,7 @@ describe('video playlist server output', () => {
     const markup = withoutStyles(
       ssr(html`<helix-video-playlist label="Episodes"></helix-video-playlist>`),
     )
-    expect(markup).toContain('aria-label="Episodes"')
+    expect(rendered(markup, 'helix-video-playlist')).toContain('aria-label="Episodes"')
   })
 
   test('the host carries nothing the consumer did not write', () => {
