@@ -32,7 +32,7 @@ import { styles } from './color-input-root.css.js'
  * pads its own lower rows.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases ColorField, ColourInput, InputColor
  * @documentation https://fusion.dev/helix/components/color-input
@@ -47,7 +47,7 @@ import { styles } from './color-input-root.css.js'
  *   `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it
  *   keeps a lift by default.
  * @cssproperty --color-input-swatch-radius - Corner radius of that block.
- * @cssproperty --color-input-swatch-size - Edge length of the block in `appearance="swatch"`.
+ * @cssproperty --color-input-swatch-size - Edge length of the block in `variant="swatch"`.
  */
 @customElement('helix-color-input')
 export class HelixColorInput extends HelixHeadlessColorInput {

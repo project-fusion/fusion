@@ -44,7 +44,7 @@ export class HelixRating extends HelixHeadlessRating {
    * `Radio.Group`, whose options already carry a value and a name each.
    *
    * **Undefaulted, because it reflects.** A default of `marks` writes
-   * `appearance="marks"` onto every server-rendered rating, which React holds no
+   * `variant="marks"` onto every server-rendered rating, which React holds no
    * prop for and reports as a hydration mismatch. The stylesheet names only
    * `dots`, so an unset one draws marks anyway.
    */

@@ -37,7 +37,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * input and its `validity` is copied onto the host.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases TextField, Field, TextInput
  * @documentation https://fusion.dev/helix/components/input
@@ -140,11 +140,6 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * against `read-only` it parses to no property at all, and the field stays
    * editable with no error anywhere. Measured on the dash-cased form, `readOnly`
    * came back `false`.
-   *
-   * A part was renamed for
-   * the same kind of reason: there is no `helix-v` tag, so no consumer is
-   * holding the old spelling, and this is free today and a deprecation after
-   * the first release.
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false

@@ -27,7 +27,7 @@ import '../../option/index.js'
  * from the field it came out of.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Dropdown, Picker
  * @documentation https://fusion.dev/helix/components/select

@@ -19,7 +19,7 @@ import { styles } from './listbox-root.css.js'
  * list moves under the reader rather than the reader moving to find it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Options, Select list
  * @documentation https://fusion.dev/helix/components/listbox

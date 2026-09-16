@@ -46,7 +46,7 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * back and `Intl` has no parser to make it so.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases TimeField, InputTime
  * @documentation https://fusion.dev/helix/components/time-input

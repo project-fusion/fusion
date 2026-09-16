@@ -10,6 +10,21 @@
 //! what it means. A component reintroducing it fails rather than being asked to
 //! explain itself.
 //!
+//! **And refused in what a component says as well as in what it declares.** The
+//! manifest half only ever saw an attribute, so a doc block telling a consumer
+//! to write `appearance="swatch"` passed, and that is the copy a consumer
+//! actually reads: the reference page is generated from these blocks, so the
+//! word reaches them under the library's own name while the property it names
+//! does not exist. Two survived the retirement that way, `ColorInput`'s
+//! `--color-input-swatch-size` naming `appearance="swatch"` for a `variant`, and
+//! `Rating` explaining why `variant` is undefaulted in terms of
+//! `appearance="marks"`. Both were found by reading, which is what a check is
+//! for.
+//!
+//! What this reads is the family's own sources, not its examples. An example is
+//! a consumer's markup and may quote anything, a code block's sample included,
+//! which is the same line the `slots` rule draws and for the same reason.
+//!
 //! **A visual axis belongs to the layer that paints.** `tone`, `shape` and
 //! `nesting` are the exceptions and each is principled: `tone` says what a thing
 //! *means*, and meaning survives having no stylesheet; `shape` says what gets
@@ -38,10 +53,22 @@
 //! that. Failing would pressure someone into declaring an axis to silence it.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::fs;
+use std::path::Path;
+use std::sync::LazyLock;
 
+use regex::Regex;
 use serde_json::Value;
 
-use crate::component::{Context, Finding, Report};
+use crate::component::{sources, walk_outside, Context, Finding, Report};
+
+/// `appearance` written as an attribute, wherever a component says it.
+///
+/// Anchored on the `=`, so CSS's own `appearance: none` is untouched: that is
+/// the property the platform has, and stripping a native control with it is
+/// what `field-frame.css` does on purpose.
+static WRITTEN: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"appearance\s*=\s*["']"#).expect("a literal pattern compiles"));
 
 /// The vocabulary. A component takes a subset; nobody invents a value.
 const AXES: [(&str, &[&str]); 7] = [
@@ -281,6 +308,66 @@ fn attribute_of(
     checked
 }
 
+/// Every file of a family a reader could take an instruction from.
+///
+/// The doc blocks and the stylesheets, and not `.examples`, which is markup
+/// somebody wrote as a consumer. `sources` is asked as well as `walk_outside`
+/// because the two disagree about a `.css.ts`, and a generated stylesheet module
+/// is the source read twice.
+fn said_in(family: &Path) -> Vec<std::path::PathBuf> {
+    let mut found = Vec::new();
+    walk_outside(family, &mut found);
+    found.retain(|path| !path.components().any(|one| one.as_os_str() == ".examples"));
+    let mut typed = Vec::new();
+    sources(family, &mut typed);
+    found.extend(typed);
+    found.sort();
+    found.dedup();
+    found
+}
+
+/// Families whose own text writes `appearance` as an attribute.
+fn reintroduced(context: &Context, findings: &mut Vec<Finding>) {
+    for layer in context.settings.roots(&context.root) {
+        let Ok(entries) = fs::read_dir(&layer) else {
+            continue;
+        };
+        let mut families: Vec<std::path::PathBuf> =
+            entries.flatten().map(|entry| entry.path()).collect();
+        families.sort();
+        for family in families {
+            if !family.is_dir() {
+                continue;
+            }
+            let name = family.file_name().unwrap_or_default().to_string_lossy();
+            for file in said_in(&family) {
+                let Ok(text) = fs::read_to_string(&file) else {
+                    continue;
+                };
+                if !WRITTEN.is_match(&text) {
+                    continue;
+                }
+                findings.push(Finding {
+                    detail: "It held four axes at once: `separation` is where a surface ends, \
+                             `emphasis` is how much ink a control claims, `material` is what it \
+                             is made of, `tone` is what it means, and a component-specific \
+                             choice that is none of those is `variant`."
+                        .to_owned(),
+                    file: file
+                        .strip_prefix(&context.root)
+                        .unwrap_or(&file)
+                        .to_string_lossy()
+                        .into_owned(),
+                    message: format!(
+                        "`{name}` writes `appearance=` in its own text, which is the word this \
+                         library retired, and the reference page is generated from it"
+                    ),
+                });
+            }
+        }
+    }
+}
+
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let Survey {
@@ -289,6 +376,8 @@ pub fn run(context: &Context) -> Report {
         groups,
         seen_lengths,
     } = survey(context, &mut findings);
+
+    reintroduced(context, &mut findings);
 
     for (family, why) in &context.settings.lengths {
         if seen_lengths.contains(family) {

@@ -33,7 +33,7 @@ import { styles } from './date-input-root.css.js'
  * whatever holds it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases DatePicker, DateField, InputDate
  * @documentation https://fusion.dev/helix/components/date-input

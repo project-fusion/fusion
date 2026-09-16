@@ -24,7 +24,7 @@ import { styles } from './number-input-root.css.js'
  * three times as long to cross.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://fusion.dev/helix/components/number-input

@@ -42,11 +42,15 @@ use crate::component::text::COMMENT;
 use crate::component::{specs, Context, Finding, Report};
 
 /// The helpers that narrow a rendered document to something structural.
-const HELPERS: [&str; 7] = [
+const HELPERS: [&str; 8] = [
     "hasPart",
     "hostAttributes",
     "hostTag",
     "partTag",
+    /* Stripping the host's own tag as well as the sheet, which is what an
+    assertion about *rendered* output wants. `withoutStyles` leaves the tag the
+    consumer wrote, so a substring can pass on an attribute nobody rendered. */
+    "rendered",
     "servedParts",
     /* The counterpart to stripping: a test asserting the sheet is *carried* is
     asking about the styles rather than about the markup, and reaching for the
