@@ -38,7 +38,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * shares.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Panel, Nested list, Drill-in
  * @documentation https://fusion.dev/helix/components/drilldown
@@ -54,6 +54,8 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @csspart loading - Shown while the entries are still on their way.
  * @csspart page - The region the rows are in.
  * @csspart title - The name of the page showing.
+ *
+ * @cssstate drilled - While a row's page is showing rather than the top one, so a frame around this can answer the depth it is at.
  */
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
@@ -249,7 +251,12 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
       this.mark(child, page, page === null)
     }
     this.placeTabStop()
-    this.toggleAttribute('data-drilled', !this.drilldown.atRoot)
+    /* The depth, said where a stylesheet outside can read it. `Menu` records
+       the same fact under the same name and for the same reason: a `data-`
+       mirror on the host is markup the server never sent, and this one was read
+       by nothing and documented nowhere, so it was the mirror without even the
+       consumer the exception is for. */
+    this.toggleState('drilled', !this.drilldown.atRoot)
     if (this.direction === undefined) {
       this.removeAttribute('data-direction')
     } else {

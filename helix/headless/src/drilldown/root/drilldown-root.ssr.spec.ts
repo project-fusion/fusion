@@ -32,8 +32,8 @@ describe('drilldown server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    // The role goes through internals, and `data-drilled` is not written on the
-    // server: it is decided by a tree the server cannot walk.
+    // The role and the depth both go through internals, so neither reaches the
+    // markup: the depth is decided by a tree the server cannot walk anyway.
     expect(
       hostAttributes(
         ssr(html`<helix-headless-drilldown label="Settings"></helix-headless-drilldown>`),

@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason: an
    element registered against the `customElements` happy-dom then replaces never
@@ -77,12 +77,12 @@ describe('drilldown', () => {
     const host = await stack()
     await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
     expect(host.getAttribute('data-direction')).toBe('forward')
-    expect(host.hasAttribute('data-drilled')).toBe(true)
+    expect(hasState(host, 'drilled')).toBe(true)
 
     host.back()
     await host.updateComplete
     expect(host.getAttribute('data-direction')).toBe('back')
-    expect(host.hasAttribute('data-drilled')).toBe(false)
+    expect(hasState(host, 'drilled')).toBe(false)
     expect(showing(host)).toEqual(['appearance', 'about'])
   })
 
