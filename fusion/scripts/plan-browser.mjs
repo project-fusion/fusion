@@ -35,6 +35,22 @@ import { argument } from '@fusion.dev/scripts/argv'
 import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 
+/**
+ * **Stdout carries the matrix and nothing else, whoever does the printing.**
+ * The workflow captures this file's stdout into a step output, so any other
+ * line written there becomes part of the value: `scopeFor` announces on stdout
+ * which changed file pulled the whole corpus in, and the step died with
+ * `Invalid format 'plan (dsd): fusion/scripts/check-dsd.mjs is read by every
+ * example, comparing the whole corpus.'` on the first real run, before the
+ * matrix it was planning had run once.
+ *
+ * Bound here rather than fixed in `scope.mjs`, because stdout is where that
+ * line belongs for the two checks that also call it and print their findings
+ * there. This says what *this* caller needs, and it covers the lines the
+ * modules below have not been written to print yet.
+ */
+console.log = console.error
+
 /** The seconds of work a shard is sized to, before setup. */
 const TARGET = 70
 
@@ -199,4 +215,4 @@ console.error(`plan: ${matrix.length} browser jobs, each sized to ${TARGET} seco
 for (const line of said) {
   console.error(`  ${line}`)
 }
-console.log(JSON.stringify(matrix))
+process.stdout.write(`${JSON.stringify(matrix)}\n`)
