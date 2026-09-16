@@ -41,7 +41,7 @@ let showing: HelixHeadlessMegamenu | undefined
  * expects to sweep along a row and see each section.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Mega menu, Flyout, Nav panel
  * @documentation https://fusion.dev/helix/components/megamenu
@@ -58,6 +58,7 @@ let showing: HelixHeadlessMegamenu | undefined
  *
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
+ * @cssstate narrow - While the page is under `full-below`, so the panel is a band whether or not one was asked for.
  * @cssstate open - While the panel is open, which is when the trigger reads as current.
  */
 @customElement('helix-headless-megamenu')
@@ -76,8 +77,16 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * a band is not a question of paint: a band is not placed against the trigger,
    * so the controller has to be told not to measure, and that decision is here
    * whatever the stylesheet says. Writing the width in both places would be one
-   * number in two languages, drifting the first time either moved. This sets
-   * `data-narrow` on the host and the stylesheet arranges itself off that.
+   * number in two languages, drifting the first time either moved. This records
+   * `:state(narrow)` on the host and the stylesheet arranges itself off that.
+   *
+   * **A custom state and never `data-narrow`, which is what it was.** The width
+   * is read in `connectedCallback`, so on a phone this is true on the very first
+   * update: an attribute written there is markup a consumer's server never sent,
+   * which React reports as a mismatch and answers by rebuilding the subtree. The
+   * narrow exception the server specs describe covers a mirror that can only
+   * become true long after hydration, and a viewport measured before the first
+   * paint is the opposite case. See `MixinControllerOpen` on `open`.
    */
   @property({ attribute: 'full-below', type: Number })
   fullBelow = 640
@@ -460,8 +469,10 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
       this.watchWidth()
     }
     /* The one thing the stylesheet cannot work out for itself, since the
-       breakpoint is declared up here. */
-    this.toggleAttribute('data-narrow', this.narrow)
+       breakpoint is declared up here. In `ElementInternals.states` rather than
+       an attribute, for the reason `full-below` records: this is true on the
+       first update on a phone, and the mirror would be a hydration mismatch. */
+    this.toggleState('narrow', this.narrow)
     /* A slotted trigger is told the disclosure state, by property.
 
        `render` writes `aria-expanded` onto the button it renders itself, and a

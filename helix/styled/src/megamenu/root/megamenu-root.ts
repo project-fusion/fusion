@@ -11,12 +11,13 @@ import { styles } from './megamenu-root.css.js'
  * Everything about what opens it and what closes it is the base class.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Mega menu, Flyout, Nav panel
  * @documentation https://fusion.dev/helix/components/megamenu
  *
- * @cssproperty --megamenu-backdrop - A filter behind the panel, for glass.
+ * @cssproperty --megamenu-backdrop - A filter behind the panel, which is `none` until one is
+ *   asked for: this family carries no `material`, so the pair is two hooks rather than a word.
  * @cssproperty --megamenu-background-color - The panel's own fill.
  * @cssproperty --megamenu-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
