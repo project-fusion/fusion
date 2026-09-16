@@ -60,14 +60,23 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   label = 'Tree'
 
   /**
-   * Whether a nested row is a peer of the row above it or subordinate to it.
+   * What a step inward means: nothing, a rank, or a heading over what follows.
    *
-   * Both answers are right, for different trees, which is why this is asked
-   * rather than decided. `peer` is a file explorer: every row is the same kind
-   * of thing, a name that may hold more names, and the indent alone says where
-   * one sits. `subordinate` is side navigation or a categorization: a section
-   * holds pages and a facet holds values, so a step inward is a change of kind
-   * and the rows say so.
+   * All three answers are right, for different trees, which is why this is
+   * asked rather than decided. `peer` is a file explorer: every row is the same
+   * kind of thing, a name that may hold more names, and the indent alone says
+   * where one sits. `subordinate` is side navigation or a categorization: a
+   * section holds pages and a facet holds values, so a step inward is a change
+   * of kind and the rows say so. `heading` is a documentation sidebar, where
+   * the change is at the *parent*: "Getting started" is not a lesser page than
+   * the pages under it and not a page at all, it is the name of the list, so
+   * the branch takes the rail-heading treatment and its children stay at the
+   * size every other row is.
+   *
+   * `subordinate` and `heading` are not the same answer said twice. One keys on
+   * depth and quiets the child; the other keys on holding children and relabels
+   * the parent, so a top-level leaf beside a branch is untouched by the first
+   * and untouched by the second for opposite reasons.
    *
    * On the root rather than the item, because it is a fact about the tree. Set
    * per row it would make a tree writable in which one branch ranks its
@@ -75,17 +84,18 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    * row to say one thing.
    *
    * Here rather than on the styled tier, because it is not about paint: with
-   * every stylesheet deleted it is still true that this tree ranks its depths
-   * and a file explorer does not. The styled tier steps a subordinate row once
-   * down the type scale; a headless consumer reads the attribute and the
-   * `--tree-level` each row carries, and draws the rank however they like.
+   * every stylesheet deleted it is still true that this tree ranks its depths,
+   * that this one heads them, and that a file explorer does neither. The styled
+   * tier steps a subordinate row once down the type scale and sets a heading
+   * branch as a label; a headless consumer reads the attribute and the
+   * `--tree-level` each row carries, and draws either however they like.
    *
    * **Optional, with no default**, per the reflected-property rule: a value
    * written here appears in the served markup of every tree anybody renders.
    * The resting state is the absence of the attribute, which is `peer`.
    */
   @property({ reflect: true })
-  nesting?: 'peer' | 'subordinate'
+  nesting?: 'heading' | 'peer' | 'subordinate'
 
   private watcher: MutationObserver | undefined
 

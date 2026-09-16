@@ -26,28 +26,66 @@ export function Example() {
       </helix-headless-tree>
 
       <helix-headless-tree
-        label="Documentation"
+        label="Filters"
         nesting="subordinate"
       >
         <helix-headless-tree-item
           default-open
-          value="components"
+          value="status"
         >
-          Components
+          Status
           <helix-headless-tree-item
             slot="children"
-            value="button"
+            value="open"
           >
-            Button
+            Open
           </helix-headless-tree-item>
           <helix-headless-tree-item
             slot="children"
-            value="tree"
+            value="merged"
           >
-            Tree
+            Merged
           </helix-headless-tree-item>
         </helix-headless-tree-item>
-        <helix-headless-tree-item value="tokens">Tokens</helix-headless-tree-item>
+        <helix-headless-tree-item value="mine">Assigned to me</helix-headless-tree-item>
+      </helix-headless-tree>
+
+      <helix-headless-tree
+        label="Documentation"
+        nesting="heading"
+      >
+        <helix-headless-tree-item
+          default-open
+          value="start"
+        >
+          Getting started
+          <helix-headless-tree-item
+            default-open
+            slot="children"
+            value="install"
+          >
+            Installation
+            <helix-headless-tree-item
+              slot="children"
+              value="any-framework"
+            >
+              Any framework
+            </helix-headless-tree-item>
+            <helix-headless-tree-item
+              slot="children"
+              value="react"
+            >
+              React
+            </helix-headless-tree-item>
+          </helix-headless-tree-item>
+          <helix-headless-tree-item
+            slot="children"
+            value="theming"
+          >
+            Theming
+          </helix-headless-tree-item>
+        </helix-headless-tree-item>
+        <helix-headless-tree-item value="changelog">Changelog</helix-headless-tree-item>
       </helix-headless-tree>
     </div>
   )

@@ -52,6 +52,15 @@ helix-headless-tree[nesting="subordinate"] [slot="children"]::part(row) {
   font-size: 0.75rem;
 }
 
+/* The other answer, and the whole of it: the branch is relabeled and the rows
+   under it are not touched. Nothing here is the styled tier's, which is the
+   point of writing it out. */
+helix-headless-tree[nesting="heading"] :has(> [slot="children"])::part(row) {
+  color: var(--_gray-mark);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
 helix-headless-tree-item:not(:has(> [slot="children"]))::part(row) {
   padding-inline-start: calc(0.5rem + (var(--tree-level, 1) - 1) * 1.25rem + 1.25rem);
 }

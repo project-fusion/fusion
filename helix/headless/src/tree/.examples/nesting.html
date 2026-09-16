@@ -1,4 +1,4 @@
-<!-- @summary Depth as a position, and depth as a rank, with every rule written by hand. -->
+<!-- @summary Depth as a position, depth as a rank, and a branch that is a heading, with every rule written by hand. -->
 
 <link
   href="styles.css"
@@ -25,23 +25,55 @@
   </helix-headless-tree>
 
   <helix-headless-tree
-    label="Documentation"
+    label="Filters"
     nesting="subordinate"
   >
     <helix-headless-tree-item
       default-open
-      value="components"
+      value="status"
     >
-      Components
+      Status
       <helix-headless-tree-item
         slot="children"
-        value="button"
-      >Button</helix-headless-tree-item>
+        value="open"
+      >Open</helix-headless-tree-item>
       <helix-headless-tree-item
         slot="children"
-        value="tree"
-      >Tree</helix-headless-tree-item>
+        value="merged"
+      >Merged</helix-headless-tree-item>
     </helix-headless-tree-item>
-    <helix-headless-tree-item value="tokens">Tokens</helix-headless-tree-item>
+    <helix-headless-tree-item value="mine">Assigned to me</helix-headless-tree-item>
+  </helix-headless-tree>
+
+  <helix-headless-tree
+    label="Documentation"
+    nesting="heading"
+  >
+    <helix-headless-tree-item
+      default-open
+      value="start"
+    >
+      Getting started
+      <helix-headless-tree-item
+        default-open
+        slot="children"
+        value="install"
+      >
+        Installation
+        <helix-headless-tree-item
+          slot="children"
+          value="any-framework"
+        >Any framework</helix-headless-tree-item>
+        <helix-headless-tree-item
+          slot="children"
+          value="react"
+        >React</helix-headless-tree-item>
+      </helix-headless-tree-item>
+      <helix-headless-tree-item
+        slot="children"
+        value="theming"
+      >Theming</helix-headless-tree-item>
+    </helix-headless-tree-item>
+    <helix-headless-tree-item value="changelog">Changelog</helix-headless-tree-item>
   </helix-headless-tree>
 </div>

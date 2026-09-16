@@ -14,7 +14,7 @@ type Item = HTMLElement & {
 }
 
 type Tree = HTMLElement & {
-  nesting?: 'peer' | 'subordinate'
+  nesting?: 'heading' | 'peer' | 'subordinate'
   updateComplete: Promise<unknown>
 }
 
@@ -74,16 +74,18 @@ describe('the horizontal arrows', () => {
    depth is a fact they can select on: what the tree says depth means, and how
    deep each row sits. Neither is drawn here and both are readable. */
 describe('depth is published, not drawn', () => {
-  test('the tree carries its answer, and carries nothing until it is asked', async () => {
-    const host = (await mount(`
-      <helix-headless-tree label="Files" nesting="subordinate">
-        <helix-headless-tree-item value="branch">Branch</helix-headless-tree-item>
-      </helix-headless-tree>`)) as Tree
-    expect(host.getAttribute('nesting')).toBe('subordinate')
-    host.nesting = undefined
-    await host.updateComplete
-    expect(host.hasAttribute('nesting')).toBe(false)
-  })
+  for (const answer of ['heading', 'subordinate'] as const) {
+    test(`the tree carries ${answer}, and carries nothing until it is asked`, async () => {
+      const host = (await mount(`
+        <helix-headless-tree label="Files" nesting="${answer}">
+          <helix-headless-tree-item value="branch">Branch</helix-headless-tree-item>
+        </helix-headless-tree>`)) as Tree
+      expect(host.getAttribute('nesting')).toBe(answer)
+      host.nesting = undefined
+      await host.updateComplete
+      expect(host.hasAttribute('nesting')).toBe(false)
+    })
+  }
 
   test('and every row says how deep it is, in a property a rule can read', async () => {
     const { branch, child } = await tree()
