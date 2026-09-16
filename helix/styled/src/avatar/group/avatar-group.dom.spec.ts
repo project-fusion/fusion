@@ -101,9 +101,31 @@ if (hasLayout()) {
       const b = second.getBoundingClientRect()
 
       expect(a.width).toBeGreaterThan(0)
-      // Reads from the start, and overlapping rather than merely adjacent.
+      // Reads from the start.
       expect(b.left).toBeGreaterThan(a.left)
-      expect(b.left).toBeLessThan(a.right)
+
+      /* **Overlapping rather than merely adjacent, asked of the margin as well
+         as of the boxes.** The overlap is the sheet's
+         `calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)))`, and a
+         token that does not resolve makes that calculation invalid, which
+         leaves the margin at its initial `0`. The second avatar then starts
+         exactly where the first ends, and `b.left < a.right` on its own fails
+         as one number not being less than the same number, which names neither
+         the token nor the stylesheet. Measured 14 Sep 2026 in a clone whose
+         frame went into the page without the token layer: three runs of three,
+         and nothing about the component.
+
+         **Zero is refused, deliberately.** Two avatars that touch are a row and
+         this component is a stack, so no overlap is a failure rather than a
+         subpixel: equal edges are what none looks like, not what rounding does
+         to a small one. A consumer who wants them adjacent sets
+         `--avatar-group-overlap: 0`, and is not this fixture. So the margin is
+         read, held to negative, and the boxes are held to it: 12 against a
+         32-pixel avatar in this checkout, and whatever the tokens say
+         elsewhere. */
+      const overlap = Number.parseFloat(getComputedStyle(second).marginInlineStart)
+      expect(overlap).toBeLessThan(0)
+      expect(a.right - b.left).toBeCloseTo(-overlap, 1)
     })
 
     /* The fold, asserted as boxes rather than as an attribute: state can be
