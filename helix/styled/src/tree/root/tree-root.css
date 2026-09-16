@@ -28,6 +28,14 @@
   --_tree-reserve: var(--helix-space-none);
 }
 
+/* Depth is a change of kind here, so a nested row drops a step down the type
+   scale. Handed to the items as the size itself rather than read from the
+   attribute by each of them: the item sheet is what can tell a nested row from a
+   top-level one, and this is the whole of the decision it needs. */
+:host([nesting="subordinate"]) {
+  --_tree-nested-text: var(--helix-text-xs);
+}
+
 /* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. */

@@ -27,10 +27,10 @@
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: flex;
-  /* One size at every depth: the indent is what says a row is nested. A step
-     down for children set every child a size under its parent and under the
-     top-level leaf after it, so depth read as a change of voice. */
-  font-size: var(--helix-text-sm);
+  /* The row's own size, which the tree's `nesting` decides. At `peer` nothing
+     sets it and every depth is this size, the indent being what says a row is
+     nested; at `subordinate` a nested row is handed the step below. */
+  font-size: var(--_tree-text, var(--helix-text-sm));
   gap: var(--helix-space-2xs);
   /* A hair between rows, and on the row rather than the item. On the item it
      added up, a parent's under its last child's, so the gaps in one tree came
@@ -83,6 +83,19 @@
 /* And a leaf carries the same weight, not a lighter one. */
 [part="row"]:not(:has([part="toggle"])) {
   font-weight: var(--helix-weight-medium);
+}
+
+/* The step a `subordinate` tree takes, applied here because the root knows what
+   depth means and only an item knows which of its rows are nested. The root's
+   answer inherits onto every row alike; this puts it on the nested ones only.
+
+   **One step, whatever the depth.** The type scale holds a single step below a
+   row and a tree holds any number of depths, so a step per level runs out and
+   sets the deepest names smaller than a caption. A reader needs to know that a
+   row is under another one, which the indent already says; the step says that
+   being under it means something. */
+slot[name="children"]::slotted(*) {
+  --_tree-text: var(--_tree-nested-text, var(--helix-text-sm));
 }
 
 [part="row"]:hover {

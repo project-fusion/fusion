@@ -597,14 +597,16 @@ that passes against code doing nothing.
 
 ## Visual axes are a registry, and `appearance` is refused
 
-**Five axes, fixed vocabularies, and a component takes a subset of one.** They
-are declared in `helix/cli/src/component/axes.rs`, which is the registry:
+**Fixed vocabularies, and a component takes a subset of one.** They are
+declared in `helix/cli/src/component/axes.rs`, which is the registry:
 
 | Axis | Values |
 |---|---|
 | `emphasis` | `ghost` `muted` `outlined` `solid` `subtle` |
 | `material` | `frosted` `glass` `transparent` |
+| `nesting` | `peer` `subordinate` |
 | `separation` | `elevated` `filled` `outlined` `plain` |
+| `shape` | `arc` `circle` `dots` `ring` `rounded` `square` `text` |
 | `tone` | `accent` `danger` `info` `neutral` `primary` `success` `surface` `warning` |
 | `width` | `auto` `full` `standard` |
 
@@ -620,8 +622,13 @@ structural wherever it is made. What it may not be is a place to put something
 that *is* on an axis.
 
 **A styled axis never appears on the headless tier**, which has nothing to paint
-and no box to size. `tone` is the exception and a principled one: it says what a
-thing means, and meaning survives having no stylesheet.
+and no box to size. The exceptions are each principled: `tone` says what a thing
+means, and meaning survives having no stylesheet; `shape` says what gets
+rendered, a meter at `ring` emitting an arc rather than a bar, so the markup
+differs before any rule is written; and `nesting` says what depth is, a row one
+step in being either the same kind of thing as the row above it (a file
+explorer) or a subordinate kind (a navigation, a categorization), which is as
+true of a tree nobody has styled.
 
 **`appearance` is not a property and must not be reintroduced.** `helix component`'s `axes`
 fails outright on the word, and `visual-axes.mdx` is the page that explains why

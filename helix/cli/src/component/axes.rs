@@ -10,13 +10,15 @@
 //! what it means. A component reintroducing it fails rather than being asked to
 //! explain itself.
 //!
-//! **A visual axis belongs to the layer that paints.** `tone` and `shape` are
-//! the two exceptions and both are principled: `tone` says what a thing *means*,
-//! and meaning survives having no stylesheet, while `shape` says what gets
-//! *rendered*: a meter at `ring` emits an arc rather than a bar, so the markup
-//! differs before any rule is written. `emphasis`, `material` and `separation`
-//! say how a thing is painted, so on a base layer they are a promise nobody
-//! keeps.
+//! **A visual axis belongs to the layer that paints.** `tone`, `shape` and
+//! `nesting` are the exceptions and each is principled: `tone` says what a thing
+//! *means*, and meaning survives having no stylesheet; `shape` says what gets
+//! *rendered*, a meter at `ring` emitting an arc rather than a bar, so the
+//! markup differs before any rule is written; and `nesting` says what depth
+//! *is*, a row one step in being either the same kind of thing as the row above
+//! it or a subordinate kind, which is as true of a tree nobody has styled.
+//! `emphasis`, `material` and `separation` say how a thing is painted, so on a
+//! base layer they are a promise nobody keeps.
 //!
 //! **`outlined` is in two vocabularies and no component may be asked both.** It
 //! is in `emphasis` and in `separation` verbatim, which looks like a collision
@@ -41,12 +43,13 @@ use serde_json::Value;
 use crate::component::{Context, Finding, Report};
 
 /// The vocabulary. A component takes a subset; nobody invents a value.
-const AXES: [(&str, &[&str]); 6] = [
+const AXES: [(&str, &[&str]); 7] = [
     (
         "emphasis",
         &["ghost", "muted", "outlined", "solid", "subtle"],
     ),
     ("material", &["frosted", "glass", "transparent"]),
+    ("nesting", &["peer", "subordinate"]),
     ("separation", &["elevated", "filled", "outlined", "plain"]),
     (
         "shape",
@@ -61,8 +64,8 @@ const AXES: [(&str, &[&str]); 6] = [
     ("width", &["auto", "full", "standard"]),
 ];
 
-/// The axes a base layer may carry, because neither is about paint.
-const UNPAINTED: [&str; 2] = ["shape", "tone"];
+/// The axes a base layer may carry, because none of them is about paint.
+const UNPAINTED: [&str; 3] = ["nesting", "shape", "tone"];
 
 /// What every family declares, gathered before anything is judged.
 ///
