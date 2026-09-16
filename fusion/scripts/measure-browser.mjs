@@ -23,8 +23,8 @@
  * scale.** A desk is several times a two-core runner and not uniformly: aura is
  * a sixth of contrast on an M2 and a third of it on `ubuntu-latest`, a software
  * rasterizer against a GPU, and shards packed from the M2's reading ran 127 and
- * 84 seconds against 106 planned. So a local reading is scaled onto `RUNNER`
- * below and is the fallback, not the first choice.
+ * 84 seconds against 106 planned. So a local reading is scaled onto the `runner`
+ * figures below and is the fallback, not the first choice.
  *
  * **One worker locally, because a runner gets one.** Four finish four times
  * sooner and compress the shape further: a family that waits on a decode is
@@ -44,20 +44,18 @@ import { argument } from '@fusion.dev/scripts/argv'
 import { root } from '@fusion.dev/scripts/workspace'
 
 /**
- * Each check, what runs it, and what its family work took on a runner.
- *
- * Measured on the CI run of #22 on 15 Sep 2026: parity 587 seconds, hydration
- * 611, contrast 235, visual 192, smoke 97 and the specs 68. Hydration's figure
- * holds the fixtures, which are one page and not a family's work, so the 15
- * seconds `ESTIMATE` carries as its fixed part come off it here.
+ * Each check, what runs it, and what its family work took on a runner. Read off
+ * the browser jobs of run 35052371545, which recorded it family by family, and
+ * only the local path uses these: readings taken on a runner are their own
+ * scale.
  */
 const CHECKS = [
-  { runner: 235, script: 'check:css:contrast', task: 'contrast' },
-  { runner: 596, script: 'check:spec:dsd', task: 'dsd' },
-  { runner: 587, script: 'check:spec:visual-parity', task: 'parity' },
-  { runner: 97, script: 'smoke:examples', task: 'smoke' },
-  { runner: 68, script: 'specs:browser', task: 'specs' },
-  { runner: 192, script: 'check:spec:visual', task: 'visual' },
+  { runner: 215, script: 'check:css:contrast', task: 'contrast' },
+  { runner: 539, script: 'check:spec:dsd', task: 'dsd' },
+  { runner: 566, script: 'check:spec:visual-parity', task: 'parity' },
+  { runner: 91, script: 'smoke:examples', task: 'smoke' },
+  { runner: 56, script: 'specs:browser', task: 'specs' },
+  { runner: 189, script: 'check:spec:visual', task: 'visual' },
 ]
 
 const OUT = join(root, 'fusion/scripts/lib/browser-cost.json')
@@ -141,8 +139,8 @@ for (const check of wanted) {
     continue
   }
   const readings = []
-  for (let run = 0; run < runs; run += 1) {
-    const file = join(SCRATCH, `${check.task}-${run}.json`)
+  for (let at = 0; at < runs; at += 1) {
+    const file = join(SCRATCH, `${check.task}-${at}.json`)
     const started = Date.now()
     /* The exit code is not read: a check that finds something real still
        measured everything it rendered, and a finding on a desk is usually this
@@ -159,7 +157,7 @@ for (const check of wanted) {
     readings.push(taken)
     const total = Object.values(taken).reduce((sum, one) => sum + one, 0)
     console.log(
-      `  ${check.task} run ${run + 1}: ${Object.keys(taken).length} families, ` +
+      `  ${check.task} run ${at + 1}: ${Object.keys(taken).length} families, ` +
         `${total.toFixed(1)}s of family work in ${((Date.now() - started) / 1000).toFixed(0)}s`,
     )
   }

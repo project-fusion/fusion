@@ -42,18 +42,20 @@ export const MEASURED = JSON.parse(
  * whatever that check renders for a family, and `fixed` for what it costs
  * whatever its share.
  *
- * Each `per` is a check's whole corpus divided by what it rendered, off the
- * runs `measure-browser.mjs` names beside its `runner` figures, so the two are
- * the same measurement read two ways rather than two measurements to keep in
- * step. `fixed` is hydration's fixtures, one page holding every one of them,
- * and the two checks that ride with the first shard of the specs.
+ * Each `per` is a check's whole corpus divided by what it rendered, off the run
+ * `measure-browser.mjs` names beside its `runner` figures, so the two are the
+ * same measurement read two ways rather than two to keep in step. `fixed` is
+ * hydration's fixtures, one page holding every one of them, and the two checks
+ * that ride with the first shard of the specs: 14 seconds of them on run
+ * 35052371545, against about 5 of build restore and browser start that every
+ * shard of every check pays.
  */
 export const ESTIMATE = {
-  contrast: { per: 0.41 },
-  dsd: { fixed: 15, per: 0.9 },
-  parity: { per: 0.88 },
-  smoke: { per: 0.17 },
-  specs: { fixed: 13, per: 0.68 },
+  contrast: { per: 0.38 },
+  dsd: { fixed: 15, per: 0.81 },
+  parity: { per: 0.85 },
+  smoke: { per: 0.16 },
+  specs: { fixed: 14, per: 0.55 },
   visual: { per: 0.33 },
 }
 
