@@ -46,12 +46,15 @@ export function SignupForm() {
   return (
     <div className="stack">
       <header className="hero">
+        <helix-text emphasis="muted" variant="label">
+          Form
+        </helix-text>
         <helix-text as="h1" variant="heading">
           Join the roster
         </helix-text>
         <helix-text as="p" className="lede" emphasis="muted" variant="body">
-          Nothing is posted anywhere. Submit it and the message shows exactly what a server would
-          have been handed.
+          Five controls, and a <helix-code>&lt;form&gt;</helix-code> reads every one of them the way
+          it reads an <helix-code>input</helix-code>.
         </helix-text>
       </header>
 
@@ -112,6 +115,16 @@ export function SignupForm() {
       </form>
 
         <aside className="notes">
+          {/* The one fact a reader needs before typing their name into a page
+              they have had for five minutes, which is why it is a callout and
+              not the fourth line of a paragraph. `tone` is the meaning and the
+              component decides what that looks like: a tint mixed from the
+              status color and a bar on the inline start, so it survives being
+              read in grayscale. */}
+          <helix-callout tone="info">
+            Nothing is posted anywhere. Submit it and the message shows exactly what a server would
+            have been handed.
+          </helix-callout>
           <helix-text as="h2" variant="title">
             What this is showing
           </helix-text>
