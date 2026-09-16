@@ -17,7 +17,6 @@ const FOOTER_GROUPS = [
       { href: '/company/services', label: 'Services' },
       { href: '/insights', label: 'Insights' },
       { href: '/company/thesis', label: 'Thesis' },
-      { href: '/company/trust', label: 'Trust' },
       { href: '/contact', label: 'Contact' },
     ],
   },

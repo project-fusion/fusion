@@ -202,9 +202,6 @@ export default async function Page() {
                       that panel has not asked yet. */}
                   {index === sections.length - 1 && (
                     <helix-flex data-density="lg" gap="sm" wrap>
-                      <a data-button href="/company/trust">
-                        The trust bar
-                      </a>
                       <a data-button="solid" data-button-tone="primary" href={MAILTO}>
                         {EMAIL}
                       </a>
