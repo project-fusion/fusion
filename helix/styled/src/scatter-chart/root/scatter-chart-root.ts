@@ -42,7 +42,7 @@ import '../../tooltip/index.js'
  * claim about the points.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @groups charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot

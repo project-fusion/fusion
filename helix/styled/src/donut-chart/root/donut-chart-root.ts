@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  * and `large` was drawn larger than the default.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @groups charts
  * @aliases Pie Chart, Ring Chart, Share Chart

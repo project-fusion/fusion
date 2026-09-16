@@ -71,7 +71,7 @@ const THICKNESS: Record<string, number> = {
  * dropped. Those rows are skipped and the total is of what is left.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @aliases Pie Chart, Ring Chart, Share Chart
  * @documentation https://fusion.dev/helix/components/donut-chart

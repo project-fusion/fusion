@@ -123,7 +123,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * and the bubble is told the page's direction, both being words.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
  * @documentation https://fusion.dev/helix/components/scatter-chart

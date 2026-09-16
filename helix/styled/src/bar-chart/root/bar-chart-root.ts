@@ -17,7 +17,7 @@ import '../../tooltip/index.js'
  * it is measured against.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @groups charts
  * @aliases Column Chart, Categorical Chart
