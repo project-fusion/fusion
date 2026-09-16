@@ -15,14 +15,14 @@ import { styles } from './tooltip-root.css.js'
  * still points at the trigger after the bubble has slid along to stay in view.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @groups charts
  * @aliases Hint, Popup label
  * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @cssproperty --tooltip-arrow-size - Size of the point at the bubble's edge.
- * @cssproperty --tooltip-backdrop - Blur behind a `glass` bubble.
+ * @cssproperty --tooltip-backdrop - Blur behind a `frosted` or `glass` bubble.
  * @cssproperty --tooltip-background-color - Fill of the bubble.
  * @cssproperty --tooltip-max-inline-size - Widest the bubble grows before wrapping.
  */
