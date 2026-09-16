@@ -106,8 +106,26 @@ depends on. The shards and `floors` restore `warm`'s build and ask their
 question on top of it. The remaining `-- --check` runs depend on nothing, so
 the flag in their key costs nothing.
 
-`tests` is the JavaScript specs and `rust` is everything that compiles Rust, the
-toolchain installed once, the floor `Cargo.toml` declares rather than stable, so
+`tests` is the JavaScript specs. The Rust is two jobs, and the line between them
+is whether a step reads what `turbo run build` wrote.
+
+**`rust` waits for nothing**, because cargo does not read the workspace build:
+it installs the toolchain, restores its cache and runs clippy and the Rust tests
+from the first second of the run. It was one job behind `warm`, which put the
+toolchain install and the compile behind a build none of it reads. Measured on
+run 35041878434, `warm` ended at 155 seconds and the Rust job at 262.
+
+**`cli` is the checks that run a binary over the built tree**, `check:cli`,
+the seed tokens, the prose and the spec rules, so it waits for `warm` as the
+other consumers of the build do. The two jobs compile the same workspace twice
+and each keeps a cache of its own, which is what leaving `rust-cache`'s key
+alone gives: clippy writes metadata where `cargo build` writes a binary, so one
+shared entry would be whichever job saved first and a recompile in the other.
+Handing the binary from one job to the other as an artifact would save the
+second compile and make every check that runs a rule wait on clippy, which is
+the thing this split just took off the critical path.
+
+Both install the floor `Cargo.toml` declares rather than stable, so
 `rust-version` is a number something compiles against rather than a promise.
 
 ## How many browser jobs
