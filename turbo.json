@@ -307,6 +307,23 @@
     // success from a replayed log. `samples` has the same shape and the same
     // answer.
     "docs": { "cache": false, "dependsOn": ["^build", "metrics"] },
+    // **A task of its own rather than `docs -- --check`, because of what the
+    // flag does to the hash.** Turbo hashes a pass-through argument into every
+    // task of the run, dependencies included, so `turbo run docs -- --check`
+    // asks for a `build` of every package under a key with `--check` in it and
+    // misses all of them after a plain build. Measured on 16 Sep 2026, that was
+    // 105 seconds of rebuilding the workspace to ask one question about one
+    // module, in whichever job asked it. Named here, the check's dependencies
+    // are the generator's dependencies and restore from the build the run
+    // already made. `routes-check` and `themed-page-check` below are the other
+    // two whose graph is the workspace; the remaining `-- --check` runs depend
+    // on nothing and so have nothing to poison.
+    //
+    // Uncached for the reason `wasm-check` is: a check that answers from a
+    // replayed log is a check that did not look. The generator it calls is the
+    // same script with one flag, which is a duplicated command and the price of
+    // the separate key.
+    "docs-check": { "cache": false, "dependsOn": ["^build", "metrics"] },
     // Reads `@customElement('tag')` out of the element sources and writes the
     // sheet that hides each one until it upgrades. A workspace step rather than
     // a package's, because it reads one package and writes another.
@@ -438,6 +455,10 @@
     // waits for it: run alone from `check:gen` or the hook it judged whatever
     // the last catalog had left, and on a clean tree that is nothing.
     "routes": { "cache": false, "dependsOn": ["catalog"] },
+    // Its own task for the reason `docs-check` gives. `routes` writes nothing,
+    // so the two differ only in the flag the script accepts and ignores; the
+    // pair is kept so the check reads the same in `verify` as the other two.
+    "routes-check": { "cache": false, "dependsOn": ["catalog"] },
     "samples": { "cache": false },
 
     // The same narrowing as `frame`, for the same wait: the spec bundles reach
@@ -505,6 +526,8 @@
       "inputs": ["app/*/helix/theme/**", "$TURBO_ROOT$/fusion/site/scripts/build-themed-page.mjs"],
       "outputs": ["app/*/helix/theme/themed-page-markup.generated.ts"]
     },
+    // Its own task for the reason `docs-check` gives.
+    "themed-page-check": { "cache": false, "dependsOn": ["^build"] },
     "timings": { "cache": false },
 
     // **The generators, one task each, and the reason is the cache rather than

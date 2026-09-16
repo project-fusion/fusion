@@ -18,7 +18,7 @@
     "check:css:contrast": "turbo run frame && bun fusion/scripts/check-contrast.mjs",
     "check:css:hexes": "turbo run frame && bun fusion/scripts/check-token-hexes.mjs",
     "check:css:seeds": "turbo run token-layer && bun run helix component check --only seeds",
-    "check:gen": "turbo run content -- --check && turbo run register -- --check && turbo run docs -- --check && bun run check:gen:element-events && bun run check:gen:eval && bun run check:gen:metrics && turbo run routes -- --check && turbo run samples -- --check && turbo run themed-page -- --check && turbo run token-layer -- --check",
+    "check:gen": "turbo run content -- --check && turbo run register -- --check && turbo run docs-check && bun run check:gen:element-events && bun run check:gen:eval && bun run check:gen:metrics && turbo run routes-check && turbo run samples -- --check && turbo run themed-page-check && turbo run token-layer -- --check",
     "check:gen:element-events": "turbo run analyze && bun fusion/scripts/build-element-events.mjs --check",
     "check:gen:eval": "turbo run analyze token-layer && bun fusion/scripts/build-eval.mjs && bun fusion/scripts/build-eval.mjs --check && bun fusion/scripts/run-eval.mjs --check",
     "check:gen:metrics": "turbo run build --filter=@fusion.dev/helix --filter=@fusion.dev/helix-headless --filter=@fusion.dev/helix-styles --filter=@fusion.dev/helix-theme && bun fusion/scripts/build-metrics.mjs --check",
@@ -63,7 +63,7 @@
     "test": "turbo run test",
     "trust": "bun fusion/scripts/trust.mjs",
     "typecheck": "turbo run typecheck",
-    "verify": "biome ci . && turbo run token-layer -- --check && bun run typecheck && bun run analyze && bun run check:cli && turbo run docs -- --check && turbo run samples -- --check && bun run check:gen:eval && turbo run content -- --check && turbo run catalog && turbo run routes -- --check && turbo run register -- --check && bun run check:gen:metrics && bun run check:css:seeds && turbo run wasm-check && bun run check:prose && bun run check:withheld && turbo run themed-page -- --check && bun run check:gen:element-events && bun run fusion spec check && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
+    "verify": "biome ci . && turbo run token-layer -- --check && bun run typecheck && bun run analyze && bun run check:cli && turbo run docs-check && turbo run samples -- --check && bun run check:gen:eval && turbo run content -- --check && turbo run catalog && turbo run routes-check && turbo run register -- --check && bun run check:gen:metrics && bun run check:css:seeds && turbo run wasm-check && bun run check:prose && bun run check:withheld && turbo run themed-page-check && bun run check:gen:element-events && bun run fusion spec check && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
     "visual:update": "turbo run frame && bun fusion/scripts/check-visual.mjs --update",
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },

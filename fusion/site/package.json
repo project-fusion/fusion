@@ -17,9 +17,11 @@
     "faces": "bun scripts/build-faces.mjs",
     "frame": "bun scripts/build-frame.mjs",
     "routes": "bun scripts/check-routes.mjs",
+    "routes-check": "bun scripts/check-routes.mjs --check",
     "specs": "bun scripts/build-specs.mjs",
     "start": "next start",
     "themed-page": "bun scripts/build-themed-page.mjs",
+    "themed-page-check": "bun scripts/build-themed-page.mjs --check",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "wasm-copy": "bun scripts/copy-wasm.mjs"
   },

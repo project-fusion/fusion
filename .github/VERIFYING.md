@@ -95,18 +95,16 @@ reached three kinds and rebuilt fourteen tasks in 81 seconds, in every job that
 ran a second command. No generated file is an input of a task another task
 depends on; what the file says is carried by the hash of the task that wrote it.
 
-**A judge's graph is built a second time, by `warm-check`.** Turbo hashes a
+**A judge asks its question under the build's own hash.** Turbo hashes a
 pass-through argument into every task of a run, so `turbo run docs -- --check`
-wants every package's `build` under a key with `--check` in it, and misses
-all of them after a plain build. `docs`, `routes` and `themed-page` reach the
-whole workspace; `warm-check` runs them beside `warm`, so the shards and
-`floors` restore that graph as well rather than each rebuilding it.
-
-It runs each of the three plainly first, because a judge reads a file it does
-not write. No generated file is committed, so a checkout holds none of them and
-`docs -- --check` on one compares its output against a module that is not there.
-Everywhere else a `build` had already run the generators; this job is the only
-place that reaches a judge without one.
+wanted every package's `build` under a key with `--check` in it and missed all
+of them after a plain build: 105 seconds of rebuilding the workspace, measured
+16 Sep 2026, in whichever job asked. `docs`, `routes` and `themed-page` are the
+three whose graph is the workspace, and each is now a task of its own,
+`docs-check` and its two, uncached and depending on exactly what the generator
+depends on. The shards and `floors` restore `warm`'s build and ask their
+question on top of it. The remaining `-- --check` runs depend on nothing, so
+the flag in their key costs nothing.
 
 `tests` is the JavaScript specs and `rust` is everything that compiles Rust, the
 toolchain installed once, the floor `Cargo.toml` declares rather than stable, so

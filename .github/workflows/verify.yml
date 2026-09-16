@@ -248,43 +248,11 @@ jobs:
       - name: Build the frame and the spec bundles
         run: bunx turbo run frame specs
 
-  # **The build again, under the hash a judge gives it.** Turbo hashes a
-  # pass-through argument into every task of a run, dependencies included, so
-  # `turbo run docs -- --check` asks for a `build` of every package with
-  # `--check` in its key, and the plain build `warm` made is a miss under it.
-  # `docs`, `routes` and `themed-page` are the three judges whose graph is the
-  # workspace, and each shard or `floors` drawing one rebuilt it: measured in a
-  # fresh clone on 15 Sep 2026, `turbo run docs -- --check` after a restored
-  # build hit none of its 23 tasks. Running the three here, beside `warm`, puts
-  # that graph in the cache once for every job after it.
-  warm-check:
-    needs: proven
-    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Check out
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Set up bun and the dependencies
-        uses: ./.github/actions/setup
-      # **Plainly first, because a judge reads a file it does not write.** No
-      # generated file is committed, so on a fresh checkout `docs -- --check`
-      # compares its output against a module that is not there and says
-      # `helix/docs/src/sources.generated.ts is missing`. Everywhere else the
-      # generators had already run under some `build`; here they had not, and
-      # this job checked out a tree, generated nothing and asked whether the
-      # nothing was current. The plain run is the same graph one hash over, so
-      # it costs a build this job was going to make anyway.
-      - name: Write what the judges read
-        run: bunx turbo run docs routes themed-page
-      - name: Build what the judges read, under their hash
-        run: bunx turbo run docs routes themed-page -- --check
-
   # **Three shards, because they are off the critical path.** Every check here
   # is seconds of work behind a job's setup, so ten shards finished no sooner
   # than the browser jobs beside them and were billed a minute apiece.
   checks:
-    needs: [plan, warm, warm-check]
+    needs: [plan, warm]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -322,7 +290,7 @@ jobs:
   # what `build` writes. After `warm`, so the build is a restore: it built its
   # own beside `warm` for 139 seconds, measured 15 Sep 2026.
   floors:
-    needs: [warm, warm-check]
+    needs: warm
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -602,7 +570,7 @@ jobs:
   # [VERIFYING.md](../VERIFYING.md#one-context-to-require)
   verify:
     if: always()
-    needs: [proven, plan, warm, warm-browser, warm-check, checks, floors, packaging, lint, types, tests, rust, browser]
+    needs: [proven, plan, warm, warm-browser, checks, floors, packaging, lint, types, tests, rust, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
