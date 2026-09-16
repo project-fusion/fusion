@@ -75,11 +75,17 @@ export function SiteMenu({
          *             the component reference, the sandbox, the theme builder, reachable
          *             only by landing on `/helix` first and looking for it.
          *
-         *             `subordinate`, because that depth is a rank and not a position: a
-         *             product holds the pages under it, so a destination is not a peer of
-         *             the product above it or of the top-level section after it.
+         *             `heading`, because a product row is not a destination. It carries
+         *             no `href`, its own page sitting under it as Overview, so it is the
+         *             name of the list and the list is what the drawer is for. Under
+         *             `subordinate`, which it had, the ranking landed on the wrong rows:
+         *             Docs and Sandbox came out smaller than Services and Insights while
+         *             all four are pages a reader can open, so the drawer sized its
+         *             destinations by which of them happened to sit under a product.
+         *             Here every destination is one size and the two product names are
+         *             the labels over them.
          */}
-        <helix-tree active={pathname} label="Site navigation" nesting="subordinate">
+        <helix-tree active={pathname} label="Site navigation" nesting="heading">
           {PRODUCTS.map((product) => (
             <helix-tree-item
               /* Open where the reader already is. A tree that opens nothing

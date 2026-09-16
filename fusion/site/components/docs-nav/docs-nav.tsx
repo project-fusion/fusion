@@ -107,15 +107,24 @@ export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
       onFocus={warm}
       onPointerOver={warm}
     >
-      {/* `subordinate`, because depth here is a rank. A section holds pages and a
-          page with children holds the readings of it, so a row one step in is a
-          different kind of thing from the section above it and from the section
-          after it, and the rows say so rather than leaving the indent to. */}
+      {/* `heading`, because every branch in this rail is the name of the list
+          under it and none of them is a page. A section is a bucket, and a
+          group row carries `group-<href>` precisely because its own page moved
+          down to be its first child, so nothing here that holds rows is
+          somewhere a reader can go.
+
+          It replaces `subordinate`, which was one reading short. That value
+          spends its single step on the first nesting and has nothing left for
+          the second, so "Installation" came out at the size of "Angular"
+          underneath it and only the indent said which held which. Under this
+          one the branch changes at every depth and the pages stay at the size
+          every other page is, which is the shape a reader of documentation
+          already knows. */}
       <helix-tree
         active={pathname}
         chevron-placement="end"
         label="Helix documentation"
-        nesting="subordinate"
+        nesting="heading"
       >
         {sections.map((section, index) => (
           <helix-tree-item
