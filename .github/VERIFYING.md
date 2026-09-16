@@ -145,6 +145,16 @@ is still going, a lookup that errored, runs the whole workflow as before. The
 tree and not the head, because a head behind its base was verified merged with
 a base it no longer matches.
 
+**`proven` runs on a pull request as well, where it answers `false` to a push
+that names no tree.** It was skipped there, and a skipped job skips every job
+under it, through jobs that ran and succeeded: only a status function in an
+`if:` stops that, which `warm` and its neighbors have and `types`, `tests`,
+`rust`, `packaging` and the browser matrix did not. Run 35039620254 passed this
+gate on a pull request having run `lint` and three builds, because skipped is
+neither a failure nor a cancellation. The gate now also refuses a run whose
+checks were skipped with no `proven` saying why, so the same hole is a red run
+rather than a green one.
+
 `release.yml` does not wait on `verify`, and nothing reads its jobs, so a
 skipped run takes nothing from it. What a skipped run would have left behind is
 the caches a pull request cannot share, which `seed` writes on `main` when they
