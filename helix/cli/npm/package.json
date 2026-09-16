@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-cli",
   "description": "The Helix command line, for a workspace that reaches it through npm.",
-  "version": "0.34.1",
+  "version": "0.34.2",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
