@@ -54,8 +54,14 @@ jobs:
   proven:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # **`contents` as well, because a job's block replaces the workflow's
+    # rather than adding to it.** With `actions: read` alone the checkout below
+    # gets no `contents` at all and dies with `remote: Repository not found`,
+    # which reads like a deleted repository and is a token that cannot see one.
+    # It was invisible while this job ran only on `main`.
     permissions:
       actions: read
+      contents: read
     outputs:
       proven: ${{ steps.look.outputs.proven }}
     steps:
