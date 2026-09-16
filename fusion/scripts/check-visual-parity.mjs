@@ -41,6 +41,7 @@ import {
 } from 'node:fs'
 import { createServer } from 'node:http'
 import { join, relative } from 'node:path'
+import { costOf } from '@fusion.dev/scripts/cost'
 import { pool } from '@fusion.dev/scripts/pool'
 import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
@@ -219,14 +220,15 @@ for (const tier of TIERS) {
   }
 }
 
-/* **This run's families, when CI splits the check**, weighed by how many
-   examples each brings: `@fusion.dev/scripts/shard` argues the split. After the
-   scope rather than before, so the shards divide what the change reaches and
-   not the whole corpus. */
+/* **This run's families, when CI splits the check**, weighed by what each was
+   measured to cost rather than by how many examples it brings:
+   `@fusion.dev/scripts/cost` argues that and `@fusion.dev/scripts/shard` the
+   split. After the scope rather than before, so the shards divide what the
+   change reaches and not the whole corpus. */
 const asked = shard()
 const ours = owner(
   reached.map((one) => one.family),
-  (family) => reached.filter((one) => one.family === family).length,
+  costOf('parity', (family) => reached.filter((one) => one.family === family).length),
   asked,
 )
 const corpus = reached.filter((one) => ours(one.family))
@@ -705,6 +707,7 @@ const verdicts = (
   await pool(families, {
     browser,
     context: CONTEXT,
+    family: (group) => group[0].family,
     open: watch,
     page: 'worker',
     prepare: closed,

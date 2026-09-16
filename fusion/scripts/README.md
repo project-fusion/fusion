@@ -6,6 +6,7 @@ it is the workspace's own tooling.
 | Export | What it answers |
 |---|---|
 | `./argv` | `--name value` and `--name`, read the one way |
+| `./cost` | What a family costs a browser check, measured, so the shards are packed by time |
 | `./emit` | Writes a generated file, or under `--check` says which lines are behind |
 | `./format-open-tags` | The one-attribute-per-line shape examples are written in |
 | `./formatted` | Runs biome over generated text, so nothing lands unformatted |

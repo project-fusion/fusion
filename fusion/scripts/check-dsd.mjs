@@ -41,6 +41,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { mkdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
+import { costOf } from '@fusion.dev/scripts/cost'
 import { pool } from '@fusion.dev/scripts/pool'
 import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
@@ -272,15 +273,15 @@ if (wantsCorpus) {
   }
 }
 
-/* **This run's families, when CI splits the check**, weighed by examples, as
-   parity splits: `@fusion.dev/scripts/shard` argues it. The fixtures are one
-   page holding every one of them, so they are not split: the first shard runs
-   them, and the rest leave them to it rather than rendering the same page
-   several times over. */
+/* **This run's families, when CI splits the check**, weighed by what each was
+   measured to cost, as parity splits: `@fusion.dev/scripts/cost` argues that and
+   `@fusion.dev/scripts/shard` the split. The fixtures are one page holding every
+   one of them, so they are not split: the first shard runs them, and the rest
+   leave them to it rather than rendering the same page several times over. */
 const asked = shard()
 const ours = owner(
   scoped.map((one) => one.family),
-  (family) => scoped.filter((one) => one.family === family).length,
+  costOf('dsd', (family) => scoped.filter((one) => one.family === family).length),
   asked,
 )
 const corpus = scoped.filter((one) => ours(one.family))
@@ -618,6 +619,7 @@ const examineAll = (groups) =>
   pool(groups, {
     browser,
     context: CONTEXT,
+    family: (group) => group[0].family,
     open: watch,
     page: 'worker',
     prepare: closed,

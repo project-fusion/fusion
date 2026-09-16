@@ -45,6 +45,13 @@
  * them, so a check prints its findings in the order it always did and two runs
  * on different worker counts read the same.
  *
+ * **`family(item)` is what the item belongs to, and it is how the corpus was
+ * weighed.** `measure-browser.mjs` runs a check with `BROWSER_COST` naming a
+ * file, and every `run` is timed and added to its family's total there, which is
+ * what `@fusion.dev/scripts/cost` reads back to pack the shards. Timed here
+ * rather than in each check because this is the one place that already brackets
+ * a family's work, and a check that names no `family` is simply not measured.
+ *
  * **One core is left for the browser process and the script, and four at most.**
  * Measured 14 Sep 2026 on twelve cores, the specs took 44 seconds on one worker,
  * 24 on two and 17 on four. **A GitHub runner is two cores, and gets one**: on
@@ -55,6 +62,7 @@
  */
 import { availableParallelism } from 'node:os'
 import { argument } from './argv.mjs'
+import { record } from './cost.mjs'
 
 /** How many workers a check runs on: `--workers n`, or every core but one, and four at most. */
 export const workers = () => {
@@ -82,12 +90,13 @@ export const workers = () => {
  * than to a page, such as a route. `page` is `'item'`, a fresh page for every
  * item and the default, or `'worker'`, one page for every item a worker takes.
  * `open(page)` runs on each page as it is opened, and `opened` is what it
- * returned, or the page itself when there is no `open`. Returns what `run`
- * returned, in item order.
+ * returned, or the page itself when there is no `open`. `family(item)` names the
+ * family an item belongs to, which is what a measured run records its time
+ * under. Returns what `run` returned, in item order.
  */
 export const pool = async (
   items,
-  { browser, context = {}, count = workers(), open, page = 'item', prepare, run },
+  { browser, context = {}, count = workers(), family, open, page = 'item', prepare, run },
 ) => {
   if (page !== 'item' && page !== 'worker') {
     throw new Error(`pool: \`page\` is 'item' or 'worker', and was given \`${page}\``)
@@ -105,9 +114,13 @@ export const pool = async (
       const kept = page === 'worker' ? await fresh() : undefined
       for (let at = k; at < items.length; at += lanes) {
         const one = kept ?? (await fresh())
+        const started = performance.now()
         try {
           results[at] = await run(one.opened, items[at], at)
         } finally {
+          if (family !== undefined) {
+            record(family(items[at]), performance.now() - started)
+          }
           if (kept === undefined) {
             await one.tab.close().catch(() => {})
           }

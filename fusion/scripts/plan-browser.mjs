@@ -10,14 +10,15 @@
  * workflow names none of them.
  *
  * **A check gets as many shards as its share of the corpus needs to finish in
- * `TARGET` seconds.** The shard count is its estimated cost over the target,
- * and the cost is what the check will render times what one of those cost on a
- * runner. Parity and hydration are scoped by the rule `@fusion.dev/scripts/scope`
- * gives them, with the same files named as their own, so a change to one family
- * plans a shard or two and a change to `helix/core` plans the whole corpus. The
- * rest read every example whatever changed, so their count holds still.
+ * `TARGET` seconds.** The shard count is its cost over the target, and the cost
+ * is what `@fusion.dev/scripts/cost` measured each family to take, which is the
+ * same function the check itself packs its shards by. Parity and hydration are
+ * scoped by the rule `@fusion.dev/scripts/scope` gives them, with the same files
+ * named as their own, so a change to one family plans a shard or two and a
+ * change to `helix/core` plans the whole corpus. The rest read every example
+ * whatever changed, so their count holds still.
  *
- * **An estimate decides how many shards, and never which families.** Each check
+ * **The cost decides how many shards, and never which families.** Each check
  * splits its own corpus with `@fusion.dev/scripts/shard` when it runs, so a
  * wrong number here costs a slower or a costlier run and never a family nobody
  * looked at: the shards of a check are its whole corpus whatever `n` is.
@@ -39,12 +40,18 @@
  *
  * **What this cannot buy is wall clock**, which is why the trade is read this
  * way round. The browser matrix finished 72 seconds before the run did on
- * 35040430279; `warm` and then `rust` are the critical path, so a larger share
- * spends some of that headroom and saves real money.
+ * 35040430279; `warm` is the critical path, so a larger share spends some of
+ * that headroom and saves real money.
+ *
+ * **What the target cannot fix is a shard that is not the share it was sized
+ * for**, which is `@fusion.dev/scripts/cost`'s half of this. A target of 125 and
+ * four contrast shards of 118, 43, 40 and 43 seconds is the right count spent
+ * on the wrong partition.
  */
 import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { argument } from '@fusion.dev/scripts/argv'
+import { costOver } from '@fusion.dev/scripts/cost'
 import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 
@@ -140,40 +147,31 @@ const reach = (label, units) => {
 }
 
 /**
- * Each check, what it renders per family, and what one of those costs in
- * seconds on `ubuntu-latest` on one worker, measured on the CI run of #22 on
- * 15 Sep 2026: parity 587 over 666 examples, hydration 611 over 663, contrast
- * 235 over 567, visual 192 over 582 pictures, smoke 97 over 567, the specs 68
- * over 100 families. `fixed` is what a check costs whatever its share, which
- * for hydration is the fixtures and for the specs is the two checks that ride
- * with them.
+ * Each check, what it renders per family, and what runs it. What a family costs
+ * is `@fusion.dev/scripts/cost`'s to say: measured where it has a measurement
+ * and `units` times a per-unit estimate where it has none.
  */
 const CHECKS = [
   {
-    per: 0.88,
     scoped: true,
     script: 'check:spec:visual-parity',
     task: 'parity',
     units: reach('parity', paired),
   },
   {
-    fixed: 15,
-    per: 0.9,
     scoped: true,
     script: 'check:spec:dsd',
     task: 'dsd',
     units: reach('dsd', markup),
   },
-  { per: 0.41, script: 'check:css:contrast', task: 'contrast', units: styled },
-  { per: 0.33, script: 'check:spec:visual', task: 'visual', units: pictured },
-  { per: 0.17, script: 'smoke:examples', task: 'smoke', units: styled },
+  { script: 'check:css:contrast', task: 'contrast', units: styled },
+  { script: 'check:spec:visual', task: 'visual', units: pictured },
+  { script: 'smoke:examples', task: 'smoke', units: styled },
   /* **Hexes and diagnostics ride with the first shard of the specs**, because
      each is about ten seconds of checking behind a job's worth of setup, and a
      job of their own was billed a minute apiece to say so. */
   {
     also: ['check:css:hexes', 'check:spec:diagnostics'],
-    fixed: 13,
-    per: 0.68,
     script: 'specs:browser',
     task: 'specs',
     units: specced,
@@ -183,8 +181,7 @@ const CHECKS = [
 const matrix = []
 const said = []
 for (const check of CHECKS) {
-  const units = [...check.units.values()].reduce((sum, one) => sum + one, 0)
-  const cost = units * check.per + (check.fixed ?? 0)
+  const cost = costOver(check.task, (family) => check.units.get(family) ?? 0, check.units.keys())
   const of = Math.max(1, Math.min(check.units.size, Math.ceil(cost / TARGET)))
   said.push(
     check.units.size === 0
