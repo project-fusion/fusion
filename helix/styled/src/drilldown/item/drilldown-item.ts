@@ -12,7 +12,7 @@ import { styles } from './drilldown-item.css.js'
  * lines up with the edge the eye is already following down the list.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Panel item, Drill row
  * @documentation https://fusion.dev/helix/components/drilldown
  *

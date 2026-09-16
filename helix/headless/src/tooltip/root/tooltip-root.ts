@@ -51,7 +51,7 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * been used.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Hint, Popup label
  * @documentation https://fusion.dev/helix/components/tooltip
