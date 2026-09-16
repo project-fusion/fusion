@@ -45,7 +45,7 @@ const HEIGHT = 100
  * computed and CSS cannot.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @aliases Column Chart, Categorical Chart
  * @documentation https://fusion.dev/helix/components/bar-chart

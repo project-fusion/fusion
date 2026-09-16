@@ -43,7 +43,7 @@ import '../../tooltip/index.js'
  * reader's.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @groups charts
  * @aliases Stacked Area Chart, Composition Chart, Banded Chart

@@ -94,7 +94,7 @@ export interface AreaStack {
  * nothing, and a band that folded under its neighbor would say it was.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @aliases Stacked Area Chart, Composition Chart, Banded Chart
  * @documentation https://fusion.dev/helix/components/area-chart
