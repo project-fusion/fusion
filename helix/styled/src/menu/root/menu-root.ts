@@ -17,7 +17,7 @@ import { styles } from './menu-root.css.js'
  * one panel and reads the same on a phone as on a desk.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Dropdown, Action menu
  * @documentation https://fusion.dev/helix/components/menu

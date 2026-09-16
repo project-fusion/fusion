@@ -25,7 +25,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * upgrades is a hydration mismatch waiting to happen.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Menu option, Menu row
  * @documentation https://fusion.dev/helix/components/menu
  *

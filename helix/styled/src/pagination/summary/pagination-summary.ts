@@ -12,7 +12,7 @@ import { styles } from './pagination-summary.css.js'
  * a way to move through it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Result count, Range
  * @documentation https://fusion.dev/helix/components/pagination
  */

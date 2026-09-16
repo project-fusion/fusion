@@ -10,7 +10,7 @@ import { styles } from './step.css.js'
  * @summary One stage in a sequence.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Stage
  * @documentation https://fusion.dev/helix/components/steps
  */

@@ -37,7 +37,7 @@ const TRIGGER_ID = 'trigger'
  * `display` has overridden the first.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Collapsible, Expander, Disclosure
  * @documentation https://fusion.dev/helix/components/accordion
  *

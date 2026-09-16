@@ -14,7 +14,7 @@ import { styles } from './accordion-root.css.js'
  * the default: an accordion is a list, where a card is a surface.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @aliases Collapse, Expander group
  * @documentation https://fusion.dev/helix/components/accordion

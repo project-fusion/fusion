@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
  * marker in the right place.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Nav, NavList, Tabs
  * @documentation https://fusion.dev/helix/components/navigation
