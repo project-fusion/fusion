@@ -71,14 +71,6 @@ const PROSE: Route[] = [
     title: 'Thesis',
   },
   {
-    description: findSitePage('/company/trust')?.description ?? '',
-    kind: 'page',
-    path: '/company/trust',
-    priority: 0.8,
-    section: 'Fusion',
-    title: 'Trust',
-  },
-  {
     description: 'What we take on, and what it costs.',
     kind: 'page',
     path: '/company/services',

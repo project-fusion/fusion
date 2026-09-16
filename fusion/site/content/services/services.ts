@@ -21,8 +21,8 @@ export interface Service {
    */
   name: string
   /**
-   * What the buyer holds at the end, written so the exit test is visible: in
-   * every case it is theirs to keep and run without us.
+   * What the buyer holds at the end. In every case it is theirs to keep and
+   * run without us.
    */
   outcome: string
   /**

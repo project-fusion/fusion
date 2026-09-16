@@ -8,7 +8,6 @@ import { MdxPage, mdxPageMetadata, type PageShape } from '@/components/mdx-page/
  */
 const PAGES: Record<string, PageShape> = {
   thesis: { hero: true },
-  trust: {},
 }
 
 export const dynamicParams = false

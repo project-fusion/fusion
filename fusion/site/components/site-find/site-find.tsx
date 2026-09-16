@@ -50,7 +50,6 @@ const DESTINATIONS: Findable[] = [
     items: [
       { href: '/insights', label: 'Insights' },
       { href: '/company/thesis', label: 'Thesis' },
-      { href: '/company/trust', label: 'Trust' },
     ],
   },
 ]

@@ -46,9 +46,9 @@
   text-wrap: balance;
 }
 
-/* The shell every argued document on this site shares. **Insights, Trust and
-   Thesis are the same kind of page**, which is what 206 settled: each is a
-   single argued document rather than a marketing surface. */
+/* The shell every argued document on this site shares. **Insights and Thesis
+   are the same kind of page**, which is what 206 settled: each is a single
+   argued document rather than a marketing surface. */
 
 .documentShell {
   /* Fixed, not `--site-inset`.** That clamp opens to seven rem on a wide screen,
