@@ -9,6 +9,11 @@
 # **And on a pull request that could break one**, at the placeholder and
 # uploading nothing. A platform that stops compiling would otherwise be found
 # by the release, which then ships no Helix at all until somebody fixes it.
+#
+# **One build serves many releases.** The binary reads its version from the
+# package installed beside it rather than compiling one in, so the cache below
+# is keyed on the Rust alone and a release that changes none downloads what an
+# earlier run built. `fusion/rules/src/version.rs` carries the reasoning.
 
 name: binaries
 
@@ -16,7 +21,7 @@ on:
   workflow_call:
     inputs:
       version:
-        description: What the binary reports, which is the version being published.
+        description: The version being published, which each binary is proved to report once installed.
         required: true
         type: string
   pull_request:
@@ -67,36 +72,44 @@ jobs:
     timeout-minutes: 30
     env:
       BINARY: target/${{ matrix.target }}/release/helix${{ startsWith(matrix.platform, 'win32') && '.exe' || '' }}
-      # A pull request has no version to give it, so it stamps one the crate
-      # does not carry. Stamping the placeholder the file already held passed
-      # while writing nothing, and the first release found that on Windows.
+      # What the proof below holds the binary to. A pull request has no release
+      # to be about, and the placeholder is deliberately not the `0.0.0-dev` the
+      # crate compiles at: the check is that the binary read the manifest beside
+      # it, so a value it could have printed from memory proves nothing.
       VERSION: ${{ inputs.version || '0.0.0-check' }}
     steps:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # **The binary these sources already built, at this version, when there
-      # is one**, and everything that would build it skipped. Keyed on what the
-      # binary is compiled from, the paths this workflow's `pull_request`
-      # filter names, and on this file, which holds the toolchain and the flags.
-      # Hashed before the stamp below writes the version into a manifest.
+      # **The binary these sources already built**, and everything that would
+      # build it skipped. Keyed on what the binary is compiled from and on this
+      # file, which holds the toolchain, the target and the flags.
       #
-      # **The version is in the key because it is in the binary.** `--version`
-      # prints the crate's version, compiled in, and both the step below and
-      # `publish.mjs` refuse a binary reporting another. So a pull request,
-      # always at the placeholder, rebuilds only when the Rust moves, where it
-      # rebuilt all five platforms on every push; and a release, always at a new
-      # number, always misses. What would let a release reuse one is the binary
-      # reading its version at run time rather than at compile time, a change
-      # to `helix/cli` and not to this file.
+      # **The version is not in the key, and that is the point.** It used to be,
+      # because it was compiled in, so a release was always at a new number and
+      # always missed: five platforms rebuilt for every release, two of them
+      # macOS at about ten times the Linux rate, on the releases that change no
+      # Rust at all. The binary reads it at run time now, from the package
+      # installed beside it, so the same file serves every number and a release
+      # reuses what an earlier one built. `fusion/rules/src/version.rs` carries
+      # the reasoning.
+      #
+      # **Narrower than this workflow's `pull_request` filter, on purpose.**
+      # That filter says what could break a build and this says what changes
+      # one. `helix/cli/**` covered the npm manifests, which the release stamps
+      # on every publish, and `helix/theme/**` covers that package's TypeScript,
+      # which the crate does not read: hashing either meant a key that moved
+      # when the binary did not. The crate's sources are `helix/theme/rust`.
       - name: Restore a binary built from these sources
         id: built
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: >-
-            helix-cli-${{ matrix.target }}-${{ env.VERSION }}-${{ hashFiles(
+            helix-cli-${{ matrix.target }}-${{ hashFiles(
             '.github/workflows/binaries.yml', 'Cargo.lock', 'Cargo.toml',
-            'fusion/rules/**', 'helix/cli/**', 'helix/theme/**') }}
+            'fusion/rules/Cargo.toml', 'fusion/rules/src/**',
+            'helix/cli/Cargo.toml', 'helix/cli/src/**',
+            'helix/theme/Cargo.toml', 'helix/theme/rust/**') }}
           path: ${{ env.BINARY }}
 
       # Statically linked, so one binary runs on a glibc distribution and on
@@ -117,38 +130,41 @@ jobs:
         with:
           key: ${{ matrix.target }}
 
-      # The crate's own line, which is what `--version` prints and what
-      # `publish.mjs` holds the binary to. `version.mjs` writes the same line on
-      # the release's runner; this one has no workspace installed to run it, and
-      # the first `version` at the start of a line is the package's.
-      #
-      # **A carriage return is allowed before the end of the line**, because a
-      # Windows runner checks text out with CRLF: `$` sits before the `\n` and not
-      # before the `\r`, so the pattern matched nothing there and the check below
-      # refused the build, which was the release of 14 Sep 2026.
-      - name: Stamp the version into the crate
-        if: steps.built.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          perl -0pi.bak -e 's/^version = "[^"]*"(\r?)$/version = "$ENV{VERSION}"$1/m' helix/cli/Cargo.toml
-          rm helix/cli/Cargo.toml.bak
-          grep -q "^version = \"$VERSION\"" helix/cli/Cargo.toml
-
-      # Not `--locked`: `Cargo.lock` still names the crate at the placeholder.
+      # **`--locked` now, because nothing rewrites a manifest before this.** The
+      # version was stamped into `helix/cli/Cargo.toml` here, which is what left
+      # `Cargo.lock` naming a version the tree no longer had.
       - name: Build
         if: steps.built.outputs.cache-hit != 'true'
-        run: cargo build --release -p fusion-helix-cli --target ${{ matrix.target }}
+        run: cargo build --release --locked -p fusion-helix-cli --target ${{ matrix.target }}
 
+      # **The version a consumer would see, which is the binary with its package
+      # beside it.** That manifest is what the binary reads, so the check has to
+      # put one there: asking the bare file proves only what it was compiled at,
+      # which is the placeholder and the same answer for every release.
+      # `publish.mjs` asks the same question of the real platform package, whose
+      # manifest the release has stamped, before anything publishes.
+      #
       # A restored binary as well as a built one, so a key that matched the
       # wrong binary is caught here rather than by `publish.mjs`.
-      - name: Prove it reports the version
+      - name: Prove it reports the version it ships as
         if: matrix.runs
         shell: bash
         run: |
           set -euo pipefail
-          said=$("$BINARY" --version)
+          # In the workspace rather than `mktemp -d`, which wants a template on
+          # a BSD userland, and rather than `RUNNER_TEMP`, which is a Windows
+          # path on that runner and not one this shell can join onto.
+          installed=.proof
+          rm -rf "$installed"
+          mkdir -p "$installed"
+          name=$(basename "$BINARY")
+          cp "$BINARY" "$installed/$name"
+          printf '{ "name": "@fusion.dev/helix-cli-%s", "version": "%s" }\n' \
+            "$PLATFORM" "$VERSION" >"$installed/package.json"
+          said=$("./$installed/$name" --version)
           [ "$said" = "helix $VERSION" ] || { echo "::error::$BINARY says '$said', not 'helix $VERSION'"; exit 1; }
+        env:
+          PLATFORM: ${{ matrix.platform }}
 
       - name: Upload
         if: inputs.version != ''
