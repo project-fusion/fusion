@@ -2,8 +2,6 @@
   display: inline-flex;
 }
 
-/* A rule under the active tab rather than a filled pill: the row stays flat,
-   and the underline reads as one mark moving rather than two fills swapping. */
 /*
  *  Every one of these comes from the tab set, which sets them all for its
  *    default and overrides what a variant changes. The fallbacks are what a tab
