@@ -82,12 +82,14 @@ export const FRAGMENT = `#version 300 es
   uniform float uGain;
 
   /* How much the members of a population differ from one another, 1 being the
-     resting amount and 0 a set that is uniform. Read by the shapes made of many
-     similar things, whether those are counted or continuous: streaks has lanes,
-     particles has motes, rays has a fan, and aurora has bundles and folds.
-     Braid, waves and flow have a single subject and nothing to vary. Threads is
-     the deliberate exception, being even on purpose: strands given their own
-     hashes are a scatter rather than a set. */
+     resting amount and 0 a set that is uniform. Read by four of the eleven
+     shapes, the ones made of many similar things, whether those are counted or
+     continuous: streaks has lanes, particles has motes, rays has a fan, and
+     aurora has bundles and folds. Braid, waves and flow have a single subject
+     and nothing to vary. Threads and lattice are even on purpose, a scatter of
+     strands and a regular structure each being what it is because its members do
+     not differ. Caustics and fracture are populations this does not reach, which
+     is a gap rather than a refusal. */
   uniform float uVariance;
   /* Where the pointer has been, as x, y and age. Age runs 0 at the moment it
      was left to 1 when it has faded, so a spent slot costs a compare.

@@ -13,7 +13,7 @@ import { styles } from './image-root.css.js'
  * base class.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Picture, Img, Figure
  * @documentation https://fusion.dev/helix/components/image

@@ -92,7 +92,7 @@ interface Dot {
  * consumer could restyle and nothing for a headless twin to hold.
  *
  * @since 0.8.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Thinking, Activity, Agent, Status
  * @documentation https://fusion.dev/helix/components/orb
@@ -559,14 +559,6 @@ export class HelixOrb extends HelixElement {
   }
 }
 
-/**
- * The numbers out of a resolved color.
- *
- * The engine reports color-typed properties as `rgb()` or `color()`, so the
- * digits are already there to be read. Deliberately forgiving all the same: a
- * value this cannot parse costs the orb its depth rather than its existence,
- * and a test environment with no layout engine is exactly such a value.
- */
 declare global {
   interface HTMLElementTagNameMap {
     'helix-orb': HelixOrb

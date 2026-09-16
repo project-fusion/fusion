@@ -38,7 +38,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @slot - The slides.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the slide in view changes, with its index. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixSelectEvent} helix-select - Fired when the slide in view changes, with its index. Cancelable where the carousel is about to move: refusing a control or an indicator takes the decision and nothing moves. A drag has already moved the track, so that one announces after the fact and refusing it does nothing. See `handleScroll`.
  *
  * @csspart controls - The row of controls.
  * @csspart indicator - One of them, and a way to reach that slide.

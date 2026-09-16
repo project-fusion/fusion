@@ -31,7 +31,7 @@ import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item
  * here: the reader already pressed play once.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Playlist, Queue, Up next
  * @documentation https://fusion.dev/helix/components/video-playlist
@@ -142,6 +142,24 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
        the *next* node: every listener already bound here still runs, so the
        entry's selection reaches them anyway. Command carries the longer note. */
     event.stopImmediatePropagation()
+    /* **And only if the choice stood.** `helix-select` is cancelable and both
+       the entry and the menu document it as refusable, the menu saying in its
+       own words that stopping the item's event and re-announcing it from the
+       host is what makes `preventDefault()` refuse the selection in one place.
+       Nothing read the flag, so refusing it did nothing at all: the same shape
+       `Menu` and `SpeedDial` each record having fixed, a documented veto with
+       no reader.
+
+       Read here and not a microtask later, which is the difference from those
+       two. Theirs run in capture, ahead of a consumer's listener on the same
+       host; this one is a bubble listener and the event comes from a
+       descendant, so every listener on the entry or the menu has already run by
+       the time it arrives. A consumer on this element cannot refuse, which is
+       the line above rather than this one, and their veto is
+       `helix-before-activate`. */
+    if (event.defaultPrevented) {
+      return
+    }
     this.chased = true
     this.requestActive((event as CustomEvent<{ value: string }>).detail.value)
   }

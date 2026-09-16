@@ -45,6 +45,7 @@ pub mod compositions;
 pub mod corners;
 pub mod derived_steps;
 pub mod disabled;
+pub mod displaced;
 pub mod events;
 pub mod example_events;
 pub mod example_specs;
@@ -534,6 +535,12 @@ pub fn all() -> Vec<Rule> {
             name: "disabled",
             run: Runner::Source(disabled::run),
             summary: "a form control reads `:host(:disabled)` rather than the attribute",
+        },
+        Rule {
+            fix: None,
+            name: "displaced",
+            run: Runner::Source(displaced::run),
+            summary: "a class doc block leaves a declared property's own block in place",
         },
         Rule {
             fix: None,

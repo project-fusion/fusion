@@ -11,7 +11,7 @@ import { styles } from './video-playlist-root.css.js'
  * entries sit in. Everything about which clip is current is the base class.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Playlist, Queue, Up next
  * @documentation https://fusion.dev/helix/components/video-playlist

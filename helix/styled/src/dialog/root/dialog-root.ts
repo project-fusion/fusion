@@ -31,9 +31,6 @@ import { styles } from './dialog-root.css.js'
  * @cssproperty --dialog-scrim - The wash over the page behind the dialog. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
  * @cssproperty --dialog-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
  *   floating surface sits over content nobody can predict, so it keeps a lift by default.
- *
- * @property align - Whether the panel's contents run from the start or center on it.
- * @property size - How wide the panel is allowed to be.
  */
 @customElement('helix-dialog')
 export class HelixDialog extends HelixHeadlessDialog {

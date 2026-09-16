@@ -28,7 +28,7 @@ import { styles } from './video-root.css.js'
  * keeps its bar, because a reader who stopped it is deciding what to do next.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @documentation https://fusion.dev/helix/components/video
  *
@@ -41,8 +41,6 @@ import { styles } from './video-root.css.js'
  * held, so the row does not move when the number changes.
  * @cssproperty --video-start-size - Width of the mark that starts it.
  * @cssproperty --video-well-color - Behind the picture, and in the letterbox bars.
- *
- * @property separation - Whether the bar floats on the picture or sits on its own ground.
  */
 @customElement('helix-video')
 export class HelixVideo extends HelixHeadlessVideo {

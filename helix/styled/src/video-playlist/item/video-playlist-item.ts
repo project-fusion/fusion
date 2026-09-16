@@ -11,7 +11,7 @@ import { styles } from './video-playlist-item.css.js'
  * playing. The base class holds what the entry is and what it announces.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @documentation https://fusion.dev/helix/components/video-playlist
  *

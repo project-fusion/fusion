@@ -77,6 +77,24 @@ describe('a video playlist', () => {
     expect(player(host).src).toBe('/two.mp4')
   })
 
+  test('and refusing the entry`s own event leaves the player where it was', async () => {
+    /* `helix-select` is documented as cancelable on the entry and on the menu,
+       and the menu's own comment says re-announcing it from the host is what
+       makes `preventDefault()` refuse the selection in one place. The playlist
+       is the one thing that reads it, so a refusal it ignored was a veto that
+       did nothing anywhere: valid code, no error, and the selection happening
+       regardless. Bound on the entry, which is the position that can refuse a
+       bubbling event before this element sees it. */
+    const host = await list()
+    await host.updateComplete
+    const second = entries(host)[1] as Entry
+    second.addEventListener('helix-select', (event) => event.preventDefault())
+    ;(part(second, 'item') as HTMLElement).click()
+    await host.updateComplete
+    expect(host.active).toBe('one')
+    expect(player(host).src).toBe('/one.mp4')
+  })
+
   test('only one entry is current, and it says so with aria-current', async () => {
     /* `aria-current` and not `aria-selected`, which belongs to the roles that
        have a selection. What is true of this row is that the player is on it. */
