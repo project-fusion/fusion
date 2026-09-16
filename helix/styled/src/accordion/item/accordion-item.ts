@@ -22,12 +22,10 @@ import { styles } from './accordion-item.css.js'
  * @slot - The content revealed when open.
  * @slot summary - The always-visible trigger content.
  *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the item opens or closes. Cancelable: refusing it takes the decision and nothing moves.
- *
  * @csspart chevron - The open and close indicator.
  * @csspart container - The outer wrapper.
  * @csspart content - The revealed region.
- * @csspart content-inner - Padding wrapper inside the animated region.
+ * @csspart content-inner - The clipping box inside the animated region. The inset is on the slot within it, not here: padding on the grid item survives a zero track, which left a shut section with a band of space under it.
  * @csspart trigger - The clickable summary row.
  *
  * @cssproperty --accordion-item-padding - Inset of the trigger and content.
