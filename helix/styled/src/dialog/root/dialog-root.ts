@@ -17,7 +17,7 @@ import { styles } from './dialog-root.css.js'
  * @status stable
  * @category overlays
  * @aliases Modal, Lightbox, Sheet
- * @documentation https://helix.fusion.dev/components/dialog
+ * @documentation https://fusion.dev/helix/components/dialog
  *
  * @cssproperty --dialog-border-color - Color of the panel's edge.
  * @cssproperty --dialog-border-width - Width of the panel's edge. Follows

@@ -16,7 +16,7 @@ import { styles } from './tag-root.css.js'
  * @status stable
  * @category markers
  * @aliases Chip, Pill, Label
- * @documentation https://helix.fusion.dev/components/tag
+ * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.
  *

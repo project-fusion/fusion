@@ -17,7 +17,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @status stable
  * @category feedback
  * @aliases Placeholder, Shimmer, Ghost
- * @documentation https://helix.fusion.dev/components/skeleton
+ * @documentation https://fusion.dev/helix/components/skeleton
  *
  * @csspart skeleton - The placeholder surface.
  */

@@ -15,7 +15,7 @@ import { styles } from './rating-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Stars, Score, Review score
- * @documentation https://helix.fusion.dev/components/rating
+ * @documentation https://fusion.dev/helix/components/rating
  *
  * @slot mark - The shape of a mark, cloned into every position. Left empty, the
  * stylesheet draws its own and `--rating-mark` swaps it.

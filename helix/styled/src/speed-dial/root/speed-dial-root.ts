@@ -17,7 +17,7 @@ import '../../icon/index.js'
  * @status experimental
  * @category actions
  * @aliases FAB, Floating action button, Action button, Quick actions
- * @documentation https://helix.fusion.dev/components/speed-dial
+ * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @cssproperty --speed-dial-gap - Space between the actions.
  */

@@ -20,7 +20,7 @@ import { styles } from './menu-root.css.js'
  * @status experimental
  * @category overlays
  * @aliases Dropdown, Action menu
- * @documentation https://helix.fusion.dev/components/menu
+ * @documentation https://fusion.dev/helix/components/menu
  *
  * @cssproperty --menu-background-color - Fill of the surface.
  * @cssproperty --menu-border-color - Color of the panel's edge.

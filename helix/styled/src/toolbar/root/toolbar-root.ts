@@ -14,7 +14,7 @@ import { styles } from './toolbar-root.css.js'
  * @status stable
  * @category layout
  * @aliases Actions, Action bar
- * @documentation https://helix.fusion.dev/components/toolbar
+ * @documentation https://fusion.dev/helix/components/toolbar
  *
  * @slot - The toolbar's controls.
  *

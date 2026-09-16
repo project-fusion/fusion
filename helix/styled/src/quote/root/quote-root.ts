@@ -14,7 +14,7 @@ import { styles } from './quote-root.css.js'
  * @status stable
  * @category typography
  * @aliases Q, InlineQuote
- * @documentation https://helix.fusion.dev/components/quote
+ * @documentation https://fusion.dev/helix/components/quote
  *
  * @cssproperty --quote-color - Color of the quoted text.
  */

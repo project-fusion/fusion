@@ -32,6 +32,6 @@ you believe `findings`.
 Development only. It walks stylesheets in the page and makes no network calls,
 ever.
 
-[Documentation](https://helix.fusion.dev)
+[Documentation](https://fusion.dev/helix)
 
 MIT

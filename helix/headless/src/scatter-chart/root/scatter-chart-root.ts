@@ -125,7 +125,7 @@ const correlation = (pairs: Array<[number, number]>): number | undefined => {
  * @status experimental
  * @category charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
- * @documentation https://helix.fusion.dev/components/scatter-chart
+ * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart mark - The invisible point the tooltip is anchored to.

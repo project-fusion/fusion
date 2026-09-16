@@ -17,7 +17,7 @@ import { styles } from './radio-group.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases RadioButtons, Choice group
- * @documentation https://helix.fusion.dev/components/radio-group
+ * @documentation https://fusion.dev/helix/components/radio
  *
  * @cssproperty --radio-group-gap - Space between the choices.
  */

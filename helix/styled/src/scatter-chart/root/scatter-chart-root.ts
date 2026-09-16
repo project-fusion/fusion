@@ -22,7 +22,7 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Scatter Plot, XY Chart, Correlation Chart, Dot Plot
- * @documentation https://helix.fusion.dev/components/scatter-chart
+ * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @cssproperty --scatter-chart-block-size - Height of the drawing.
  * @cssproperty --scatter-chart-gap - Space between the drawing and its axes.

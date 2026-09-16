@@ -29,7 +29,7 @@ const CONFIRM = 1600
  * @status stable
  * @category actions
  * @aliases Copy, Copy to clipboard
- * @documentation https://helix.fusion.dev/components/copy-button
+ * @documentation https://fusion.dev/helix/components/copy-button
  *
  * @slot - The resting icon. Falls back to a clipboard.
  * @slot copied - What replaces it once the write succeeds. Falls back to a check.

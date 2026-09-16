@@ -25,7 +25,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category markers
  * @aliases Count, Indicator, Pip
- * @documentation https://helix.fusion.dev/components/badge
+ * @documentation https://fusion.dev/helix/components/badge
  *
  * @slot - The element being decorated.
  *

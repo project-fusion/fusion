@@ -79,7 +79,7 @@ const child = (path: string, key: string): string =>
  * @status experimental
  * @category data
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
- * @documentation https://helix.fusion.dev/components/object-inspector
+ * @documentation https://fusion.dev/helix/components/object-inspector
  *
  * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
  *

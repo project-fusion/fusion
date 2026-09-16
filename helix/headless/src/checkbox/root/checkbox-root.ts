@@ -34,7 +34,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category forms
  * @aliases Tickbox
- * @documentation https://helix.fusion.dev/components/checkbox
+ * @documentation https://fusion.dev/helix/components/checkbox
  *
  * @slot - The label.
  *

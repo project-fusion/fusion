@@ -19,7 +19,7 @@ import { styles } from './filter-chip.css.js'
  * @status experimental
  * @category forms
  * @aliases FilterToken, FacetChip
- * @documentation https://helix.fusion.dev/components/filter-input
+ * @documentation https://fusion.dev/helix/components/filter-input
  *
  * @cssproperty --filter-input-chip-background-color - Fill behind the chip.
  * @cssproperty --filter-input-chip-border-color - Color of the edge.

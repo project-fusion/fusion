@@ -23,7 +23,7 @@ import { styles } from './progress-root.css.js'
  * @category feedback
  * @groups charts
  * @aliases Progress bar, Loading bar
- * @documentation https://helix.fusion.dev/components/progress
+ * @documentation https://fusion.dev/helix/components/progress
  *
  * @cssproperty --progress-color - Fill of the part that is done.
  * @cssproperty --progress-ring-size - Diameter of the ring appearance.

@@ -19,7 +19,7 @@ import { styles } from './tooltip-root.css.js'
  * @category overlays
  * @groups charts
  * @aliases Hint, Popup label
- * @documentation https://helix.fusion.dev/components/tooltip
+ * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @cssproperty --tooltip-arrow-size - Size of the point at the bubble's edge.
  * @cssproperty --tooltip-backdrop - Blur behind a `glass` bubble.

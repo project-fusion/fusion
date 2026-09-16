@@ -33,7 +33,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category forms
  * @aliases Toggle switch, On/off
- * @documentation https://helix.fusion.dev/components/switch
+ * @documentation https://fusion.dev/helix/components/switch
  *
  * @slot - The words naming what this turns on.
  *

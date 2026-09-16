@@ -41,7 +41,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @status experimental
  * @category navigation
  * @aliases Panel, Nested list, Drill-in
- * @documentation https://helix.fusion.dev/components/drilldown
+ * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @slot - The rows of the top page.
  *

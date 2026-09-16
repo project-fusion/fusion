@@ -34,7 +34,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status experimental
  * @category layout
  * @aliases Slider, Gallery, Slideshow
- * @documentation https://helix.fusion.dev/components/carousel
+ * @documentation https://fusion.dev/helix/components/carousel
  *
  * @slot - The slides.
  *

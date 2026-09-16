@@ -48,7 +48,7 @@ import '../../button/index.js'
  * @since 0.1.0
  * @status experimental
  * @category overlays
- * @documentation https://helix.fusion.dev/components/tour
+ * @documentation https://fusion.dev/helix/components/tour
  *
  * @slot - What this stop says. A card, a heading and a line, anything.
  * @slot actions - Replaces the controls, which are Back, Next and Skip.

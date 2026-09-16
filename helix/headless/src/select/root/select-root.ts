@@ -39,7 +39,7 @@ import '../../listbox/index.js'
  * @status experimental
  * @category forms
  * @aliases Dropdown, Picker
- * @documentation https://helix.fusion.dev/components/select
+ * @documentation https://fusion.dev/helix/components/select
  *
  * @slot - The options, and any groups of them.
  * @slot end - After it, for a count, a unit, or a clear button.

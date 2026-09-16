@@ -18,7 +18,7 @@ import '../../tooltip/index.js'
  * @since 0.1.0
  * @status stable
  * @category actions
- * @documentation https://helix.fusion.dev/components/copy-button
+ * @documentation https://fusion.dev/helix/components/copy-button
  */
 @customElement('helix-copy-button')
 export class HelixCopyButton extends MixinControlSurface(HelixHeadlessCopyButton) {

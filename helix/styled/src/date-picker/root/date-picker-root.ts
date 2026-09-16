@@ -22,7 +22,7 @@ import { styles } from './date-picker-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Calendar, Date grid, Month view
- * @documentation https://helix.fusion.dev/components/date-picker
+ * @documentation https://fusion.dev/helix/components/date-picker
  *
  * @cssproperty --date-picker-columns - Months per row. Two unless there is only one.
  * @cssproperty --date-picker-day-size - Width and height of a day.

@@ -73,7 +73,7 @@ const THICKNESS: Record<string, number> = {
  * @status experimental
  * @category charts
  * @aliases Pie Chart, Ring Chart, Share Chart
- * @documentation https://helix.fusion.dev/components/donut-chart
+ * @documentation https://fusion.dev/helix/components/donut-chart
  *
  * @slot - Goes in the middle of the ring. A total, usually.
  *

@@ -20,7 +20,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category layout
  * @aliases Separator, Rule
- * @documentation https://helix.fusion.dev/components/divider
+ * @documentation https://fusion.dev/helix/components/divider
  *
  * @slot - Content set into the rule, such as the word between two sections.
  *

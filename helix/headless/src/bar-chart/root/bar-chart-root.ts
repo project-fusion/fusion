@@ -46,7 +46,7 @@ const HEIGHT = 100
  * @status experimental
  * @category charts
  * @aliases Column Chart, Categorical Chart
- * @documentation https://helix.fusion.dev/components/bar-chart
+ * @documentation https://fusion.dev/helix/components/bar-chart
  *
  * @csspart axis - One scale's numbers, drawn only when `secondary` splits them.
  * @csspart band - The slot the pointer is resting in.

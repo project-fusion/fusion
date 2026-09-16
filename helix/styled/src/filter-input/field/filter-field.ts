@@ -20,7 +20,7 @@ import { styles } from './filter-field.css.js'
  * @status experimental
  * @category forms
  * @aliases Facet, Dimension
- * @documentation https://helix.fusion.dev/components/filter-input
+ * @documentation https://fusion.dev/helix/components/filter-input
  */
 @customElement('helix-filter-field')
 export class HelixFilterField extends HelixHeadlessFilterField {

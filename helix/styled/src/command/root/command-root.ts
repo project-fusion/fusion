@@ -18,7 +18,7 @@ import { styles } from './command-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category navigation
- * @documentation https://helix.fusion.dev/components/command
+ * @documentation https://fusion.dev/helix/components/command
  *
  * @cssproperty --command-list-size - How tall the list grows before it scrolls.
  * @cssproperty --command-size - How wide the palette is. Defaults to `40rem`.

@@ -35,7 +35,7 @@ import '../../format-date/index.js'
  * @since 0.1.0
  * @status experimental
  * @category feedback
- * @documentation https://helix.fusion.dev/components/notifications
+ * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - What happened, in the consumer's own markup.
  * @slot actions - What a reader can do about it.

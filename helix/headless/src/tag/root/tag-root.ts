@@ -20,7 +20,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status stable
  * @category markers
  * @aliases Chip, Pill, Label
- * @documentation https://helix.fusion.dev/components/tag
+ * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tag's label.
  * @slot prefix - A category the label belongs to, set before it and weightier.

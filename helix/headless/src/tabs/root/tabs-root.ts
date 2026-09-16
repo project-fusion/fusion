@@ -28,7 +28,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @status experimental
  * @category navigation
  * @aliases TabList, Segmented control
- * @documentation https://helix.fusion.dev/components/tabs
+ * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tabs.
  * @slot panels - The panels.

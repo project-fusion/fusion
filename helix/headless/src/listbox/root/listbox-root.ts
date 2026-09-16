@@ -133,7 +133,7 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * @status experimental
  * @category forms
  * @aliases Options, Select list
- * @documentation https://helix.fusion.dev/components/listbox
+ * @documentation https://fusion.dev/helix/components/listbox
  *
  * @slot - The options, and any groups of them.
  * @slot hint - Richer than a string.

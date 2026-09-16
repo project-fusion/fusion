@@ -40,7 +40,7 @@ import { styles } from './color-picker-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Color, ColorArea, Swatch picker
- * @documentation https://helix.fusion.dev/components/color-picker
+ * @documentation https://fusion.dev/helix/components/color-picker
  *
  * @cssproperty --color-picker-grid-radius - Corner radius of the square.
  * @cssproperty --color-picker-grid-ratio - Aspect ratio of the square.

@@ -2,7 +2,7 @@ body:
   - attributes:
       description: The URL, or the file if you were reading it in the repository.
       label: Which page
-      placeholder: https://helix.fusion.dev/docs/theming
+      placeholder: https://fusion.dev/helix/docs/theming
     id: page
     type: input
     validations:

@@ -32,6 +32,6 @@ disagreeing by construction.
 
 Zero dependencies and zero peers: it computes values and touches no DOM.
 
-[Documentation](https://helix.fusion.dev) · [Theme builder](https://helix.fusion.dev/theme)
+[Documentation](https://fusion.dev/helix) · [Theme builder](https://fusion.dev/helix/theme)
 
 MIT

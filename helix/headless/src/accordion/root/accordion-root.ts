@@ -58,7 +58,7 @@ const navigable = (item: HelixHeadlessAccordionItem): NavigableItem => ({
  * @status experimental
  * @category layout
  * @aliases Collapse, Expander group
- * @documentation https://helix.fusion.dev/components/accordion
+ * @documentation https://fusion.dev/helix/components/accordion
  *
  * @slot - The accordion's items.
  */

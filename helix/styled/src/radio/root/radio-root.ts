@@ -21,7 +21,7 @@ import { styles } from './radio-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Option, Choice
- * @documentation https://helix.fusion.dev/components/radio
+ * @documentation https://fusion.dev/helix/components/radio
  *
  * @cssproperty --radio-background-color - Fill of an unselected circle.
  * @cssproperty --radio-border-color - Edge of the circle, in every state.

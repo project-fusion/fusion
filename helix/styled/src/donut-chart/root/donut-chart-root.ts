@@ -33,7 +33,7 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Pie Chart, Ring Chart, Share Chart
- * @documentation https://helix.fusion.dev/components/donut-chart
+ * @documentation https://fusion.dev/helix/components/donut-chart
  *
  * @cssproperty --donut-chart-edge-stroke - Thickness of the slice boundary under `outlined`.
  * @cssproperty --donut-chart-size - Width and height of the ring.

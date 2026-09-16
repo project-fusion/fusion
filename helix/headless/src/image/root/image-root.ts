@@ -20,7 +20,7 @@ import { property, state } from 'lit/decorators.js'
  * @status experimental
  * @category media
  * @aliases Picture, Img, Figure
- * @documentation https://helix.fusion.dev/components/image
+ * @documentation https://fusion.dev/helix/components/image
  *
  * @slot fallback - Shown instead of it, if it never does.
  * @slot placeholder - Shown until the picture arrives.

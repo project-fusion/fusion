@@ -54,7 +54,7 @@ const GENERIC = new Set(['div', 'p', 'section', 'span'])
  * @status experimental
  * @category overlays
  * @aliases Hint, Popup label
- * @documentation https://helix.fusion.dev/components/tooltip
+ * @documentation https://fusion.dev/helix/components/tooltip
  *
  * @slot - The trigger.
  * @slot content - The bubble's content, when `content` is not enough. Anything

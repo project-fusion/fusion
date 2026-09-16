@@ -48,7 +48,7 @@ interface Absolute {
  * @status experimental
  * @category typography
  * @aliases RelativeTime, Timestamp, TimeAgo
- * @documentation https://helix.fusion.dev/components/format-date
+ * @documentation https://fusion.dev/helix/components/format-date
  *
  * @csspart time - The `<time>` element carrying the reading.
  */

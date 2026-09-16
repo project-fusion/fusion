@@ -25,7 +25,7 @@ import { styles } from './legend-root.css.js'
  * @category charts
  * @groups charts
  * @aliases Key, Series Key
- * @documentation https://helix.fusion.dev/components/legend
+ * @documentation https://fusion.dev/helix/components/legend
  *
  * @cssproperty --legend-direction - `row`, which wraps, or `column`.
  * @cssproperty --legend-gap - Space between entries.

@@ -16,7 +16,7 @@ import { styles } from './blockquote-root.css.js'
  * @status stable
  * @category typography
  * @aliases Pullquote, Citation, Excerpt
- * @documentation https://helix.fusion.dev/components/blockquote
+ * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @cssproperty --blockquote-size - Size of the quoted passage.
  */

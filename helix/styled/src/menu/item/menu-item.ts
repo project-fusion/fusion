@@ -14,7 +14,7 @@ import { styles } from './menu-item.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Menu option, Menu row
- * @documentation https://helix.fusion.dev/components/menu
+ * @documentation https://fusion.dev/helix/components/menu
  *
  * @cssproperty --menu-item-end - Width of the trailing column, seam included, which holds a tick or the caret into a page.
  * @cssproperty --menu-item-hover-color - Fill under the pointer.

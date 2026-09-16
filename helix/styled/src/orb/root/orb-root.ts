@@ -95,7 +95,7 @@ interface Dot {
  * @status experimental
  * @category feedback
  * @aliases Thinking, Activity, Agent, Status
- * @documentation https://helix.fusion.dev/components/orb
+ * @documentation https://fusion.dev/helix/components/orb
  *
  * @csspart canvas - The surface the cloud is drawn into.
  *

@@ -16,7 +16,7 @@ import { styles } from './stat-root.css.js'
  * @status stable
  * @category data
  * @aliases Metric, KPI, Figure
- * @documentation https://helix.fusion.dev/components/stat
+ * @documentation https://fusion.dev/helix/components/stat
  *
  * @cssproperty --stat-value-size - Size of the figure.
  */

@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category navigation
  * @aliases Masthead, Navbar, TopBar
- * @documentation https://helix.fusion.dev/components/app-header
+ * @documentation https://fusion.dev/helix/components/app-header
  *
  * @slot - The middle region, usually a `Navigation`.
  * @slot end - Trailing content.

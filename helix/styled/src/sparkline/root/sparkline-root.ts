@@ -33,7 +33,7 @@ import { styles } from './sparkline-root.css.js'
  * @category charts
  * @groups charts
  * @aliases Micro Chart, Trend Line, Inline Chart
- * @documentation https://helix.fusion.dev/components/sparkline
+ * @documentation https://fusion.dev/helix/components/sparkline
  *
  * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus, which is otherwise open.
  * @cssproperty --chart-terminus-size - Size of the mark on the last reading.

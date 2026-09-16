@@ -14,7 +14,7 @@ import { styles } from './megamenu-root.css.js'
  * @status experimental
  * @category navigation
  * @aliases Mega menu, Flyout, Nav panel
- * @documentation https://helix.fusion.dev/components/megamenu
+ * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @cssproperty --megamenu-backdrop - A filter behind the panel, for glass.
  * @cssproperty --megamenu-background-color - The panel's own fill.

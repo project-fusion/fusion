@@ -25,7 +25,7 @@ import { styles } from './combobox-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Autocomplete, Typeahead, Search select
- * @documentation https://helix.fusion.dev/components/combobox
+ * @documentation https://fusion.dev/helix/components/combobox
  *
  * @cssproperty --combobox-background-color - Fill behind the field.
  * @cssproperty --combobox-border-color - Color of the panel's edge.

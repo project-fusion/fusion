@@ -20,7 +20,7 @@ import { styles } from './carousel-root.css.js'
  * @status experimental
  * @category layout
  * @aliases Slider, Gallery, Slideshow
- * @documentation https://helix.fusion.dev/components/carousel
+ * @documentation https://fusion.dev/helix/components/carousel
  *
  * @cssproperty --carousel-bleed - Room inside the scroller so a slide's own shadow, border or
  * focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches

@@ -49,7 +49,7 @@ export type EditorLanguage = keyof typeof LANGUAGES
  * @status experimental
  * @category tooling
  * @aliases Code editor, Source pane
- * @documentation https://helix.fusion.dev/sandbox/editor
+ * @documentation https://fusion.dev/helix/docs/sandbox
  *
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves, with its line and column.

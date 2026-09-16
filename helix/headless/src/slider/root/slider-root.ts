@@ -35,7 +35,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category forms
  * @aliases Range, Range input
- * @documentation https://helix.fusion.dev/components/slider
+ * @documentation https://fusion.dev/helix/components/slider
  *
  * @event {Event} change - Relayed once the reader has let go.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the value changes, and cancelable.

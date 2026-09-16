@@ -31,7 +31,7 @@ import { styles } from './input-root.css.js'
  * @status experimental
  * @category forms
  * @aliases TextField, Field, TextInput
- * @documentation https://helix.fusion.dev/components/input
+ * @documentation https://fusion.dev/helix/components/input
  *
  * @cssproperty --input-background-color - Fill behind the text.
  * @cssproperty --input-size - Height of the field.

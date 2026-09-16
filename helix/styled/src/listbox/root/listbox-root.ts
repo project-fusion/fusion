@@ -22,7 +22,7 @@ import { styles } from './listbox-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Options, Select list
- * @documentation https://helix.fusion.dev/components/listbox
+ * @documentation https://fusion.dev/helix/components/listbox
  *
  * @cssproperty --listbox-background-color - The panel's fill. `transparent` where the list is already inside one.
  * @cssproperty --listbox-border - The panel's border, as a shorthand. `none` where the list is already inside one.

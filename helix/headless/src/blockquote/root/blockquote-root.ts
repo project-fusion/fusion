@@ -18,7 +18,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category typography
  * @aliases Pullquote, Citation, Excerpt
- * @documentation https://helix.fusion.dev/components/blockquote
+ * @documentation https://fusion.dev/helix/components/blockquote
  *
  * @slot - The quoted passage.
  * @slot attribution - Who said it, and where.

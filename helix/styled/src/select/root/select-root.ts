@@ -30,7 +30,7 @@ import '../../option/index.js'
  * @status experimental
  * @category forms
  * @aliases Dropdown, Picker
- * @documentation https://helix.fusion.dev/components/select
+ * @documentation https://fusion.dev/helix/components/select
  *
  * @cssproperty --select-border-color - Color of the panel's edge.
  * @cssproperty --select-border-width - Width of the panel's edge. Follows

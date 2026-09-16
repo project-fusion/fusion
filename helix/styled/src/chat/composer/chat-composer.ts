@@ -16,7 +16,7 @@ import { styles } from './chat-composer.css.js'
  * @since 0.1.0
  * @status experimental
  * @category forms
- * @documentation https://helix.fusion.dev/components/chat
+ * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot end - Under the field, beside the send control.
  * @slot start - Under the field, at the leading edge: attachments, a model picker.

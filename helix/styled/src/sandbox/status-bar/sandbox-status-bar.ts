@@ -38,7 +38,7 @@ const LABELS: Record<string, string> = {
  * @since 0.1.0
  * @status experimental
  * @aliases Status line
- * @documentation https://helix.fusion.dev/sandbox/status-bar
+ * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @slot - Items at the start of the bar.
  * @slot end - Items after the readouts, at the end of the bar.

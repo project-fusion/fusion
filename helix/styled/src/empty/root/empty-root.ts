@@ -15,7 +15,7 @@ import { styles } from './empty-root.css.js'
  * @status stable
  * @category feedback
  * @aliases Placeholder, NoResults, Blank
- * @documentation https://helix.fusion.dev/components/empty
+ * @documentation https://fusion.dev/helix/components/empty
  *
  * @cssproperty --empty-padding - Space around the whole block.
  */

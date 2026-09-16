@@ -14,7 +14,7 @@ import { styles } from './table-column.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Column header, Th
- * @documentation https://helix.fusion.dev/components/table
+ * @documentation https://fusion.dev/helix/components/table
  */
 @customElement('helix-table-column')
 export class HelixTableColumn extends HelixHeadlessTableColumn {

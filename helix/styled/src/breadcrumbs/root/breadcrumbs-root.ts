@@ -14,7 +14,7 @@ import { styles } from './breadcrumbs-root.css.js'
  * @status stable
  * @category navigation
  * @aliases Breadcrumb, Crumbs
- * @documentation https://helix.fusion.dev/components/breadcrumbs
+ * @documentation https://fusion.dev/helix/components/breadcrumbs
  *
  * @slot - The trail's items, in order from root to current page.
  *

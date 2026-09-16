@@ -35,7 +35,7 @@ import { styles } from './pagination-root.css.js'
  * @status experimental
  * @category navigation
  * @aliases Pager, Page nav
- * @documentation https://helix.fusion.dev/components/pagination
+ * @documentation https://fusion.dev/helix/components/pagination
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control standing over pages not shown, which jumps into them.

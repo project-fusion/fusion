@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category feedback
  * @aliases Placeholder, NoResults, Blank
- * @documentation https://helix.fusion.dev/components/empty
+ * @documentation https://fusion.dev/helix/components/empty
  *
  * @slot - Why, and what to do about it.
  * @slot actions - The way out.

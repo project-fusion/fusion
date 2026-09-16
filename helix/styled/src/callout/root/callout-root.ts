@@ -18,7 +18,7 @@ import { styles } from './callout-root.css.js'
  * @status stable
  * @category markers
  * @aliases Admonition, Notice, Note, Alert
- * @documentation https://helix.fusion.dev/components/callout
+ * @documentation https://fusion.dev/helix/components/callout
  *
  * @slot - The callout's content.
  * @slot icon - Replaces the icon chosen by `tone`.

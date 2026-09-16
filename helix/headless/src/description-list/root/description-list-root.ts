@@ -26,7 +26,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category data
  * @aliases Data list, Key-value list, Details, Properties
- * @documentation https://helix.fusion.dev/components/description-list
+ * @documentation https://fusion.dev/helix/components/description-list
  *
  * @slot - The items.
  *

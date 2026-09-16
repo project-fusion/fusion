@@ -110,7 +110,7 @@ const addMonths = (date: Date, months: number): Date => {
  * @status experimental
  * @category forms
  * @aliases Calendar, Date grid, Month view
- * @documentation https://helix.fusion.dev/components/date-picker
+ * @documentation https://fusion.dev/helix/components/date-picker
  *
  * @slot next-icon - The glyph on the control that moves forward a month, usually a caret.
  * @slot previous-icon - The glyph on the control that moves back a month, usually a caret.

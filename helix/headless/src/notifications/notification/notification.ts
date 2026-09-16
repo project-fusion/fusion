@@ -50,7 +50,7 @@ import '../../format-date/index.js'
  * @status experimental
  * @category feedback
  * @aliases Notification item, Inbox item
- * @documentation https://helix.fusion.dev/components/notifications
+ * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - What happened, in the consumer's own markup.
  * @slot actions - What a reader can do about it, under the words it is about. Drawn always

@@ -29,7 +29,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/components/toast
+ * @documentation https://fusion.dev/helix/components/toast
  *
  * @slot - The message.
  * @slot actions - What to do about it, usually a button or a link.

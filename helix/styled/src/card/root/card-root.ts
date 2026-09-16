@@ -24,7 +24,7 @@ import { styles } from './card-root.css.js'
  * @status stable
  * @category layout
  * @aliases Panel, Surface
- * @documentation https://helix.fusion.dev/components/card
+ * @documentation https://fusion.dev/helix/components/card
  *
  * @slot - The card's main content.
  * @slot footer - Actions that conclude the card.

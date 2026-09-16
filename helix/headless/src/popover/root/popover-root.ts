@@ -41,7 +41,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category overlays
  * @aliases Popper, Flyout, Overlay
- * @documentation https://helix.fusion.dev/components/popover
+ * @documentation https://fusion.dev/helix/components/popover
  *
  * @slot - The contents of the panel.
  * @slot trigger - What opens it.

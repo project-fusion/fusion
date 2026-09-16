@@ -26,7 +26,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category navigation
  * @aliases Nav, NavList, Tabs
- * @documentation https://helix.fusion.dev/components/navigation
+ * @documentation https://fusion.dev/helix/components/navigation
  *
  * @slot - The destinations, as the consumer's own links.
  *

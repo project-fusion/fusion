@@ -102,7 +102,7 @@ const fill = (
  * @status experimental
  * @category navigation
  * @aliases Pager, Page nav
- * @documentation https://helix.fusion.dev/components/pagination
+ * @documentation https://fusion.dev/helix/components/pagination
  *
  * @slot first-icon - The glyph on the jump-to-first control, usually a double caret.
  * @slot last-icon - The glyph on the jump-to-last control, usually a double caret.

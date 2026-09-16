@@ -13,7 +13,7 @@ import { styles } from './tab-panel.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/components/tabs
+ * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The panel's content.
  *

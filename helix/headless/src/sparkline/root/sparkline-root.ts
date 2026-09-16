@@ -60,7 +60,7 @@ const readValues = (input: string): number[] =>
  * @status stable
  * @category charts
  * @aliases Micro Chart, Trend Line, Inline Chart
- * @documentation https://helix.fusion.dev/components/sparkline
+ * @documentation https://fusion.dev/helix/components/sparkline
  *
  * @csspart area - The region between the line and the bottom of its range.
  * @csspart bar - One column, under `plot="bar"`.

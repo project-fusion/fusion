@@ -16,7 +16,7 @@ import { styles } from './divider-root.css.js'
  * @status stable
  * @category layout
  * @aliases Separator, Rule
- * @documentation https://helix.fusion.dev/components/divider
+ * @documentation https://fusion.dev/helix/components/divider
  *
  * @csspart line - The rule itself.
  *

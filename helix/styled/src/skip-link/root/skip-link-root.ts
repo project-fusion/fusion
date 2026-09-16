@@ -25,7 +25,7 @@ import { styles } from './skip-link-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @category navigation
- * @documentation https://helix.fusion.dev/components/skip-link
+ * @documentation https://fusion.dev/helix/components/skip-link
  *
  * @cssproperty --skip-link-border-color - Color of the revealed link's edge.
  * @cssproperty --skip-link-border-width - Width of the revealed link's edge. Follows

@@ -22,7 +22,7 @@ import { styles } from './avatar-group.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Avatar stack, Facepile
- * @documentation https://helix.fusion.dev/components/avatar
+ * @documentation https://fusion.dev/helix/components/avatar
  *
  * @cssproperty --avatar-group-overlap - How far each avatar sits over the one before it.
  * @cssproperty --avatar-group-ring-color - The separation drawn between one avatar and the next.

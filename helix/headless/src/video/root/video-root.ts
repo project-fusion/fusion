@@ -100,7 +100,7 @@ const clock = (seconds: number): string => {
  * @status experimental
  * @category media
  * @aliases Player, Media, Movie
- * @documentation https://helix.fusion.dev/components/video
+ * @documentation https://fusion.dev/helix/components/video
  *
  * @slot - `<source>` and `<track>` elements, which are copied into the video.
  * @slot back - Top left over the frame, for a way out of a set.

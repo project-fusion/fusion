@@ -18,7 +18,7 @@ import { styles } from './format-date-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @category typography
- * @documentation https://helix.fusion.dev/components/format-date
+ * @documentation https://fusion.dev/helix/components/format-date
  */
 @customElement('helix-format-date')
 export class HelixFormatDate extends HelixHeadlessFormatDate {

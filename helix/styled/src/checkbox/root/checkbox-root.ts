@@ -22,7 +22,7 @@ import { styles } from './checkbox-root.css.js'
  * @status stable
  * @category forms
  * @aliases Tickbox
- * @documentation https://helix.fusion.dev/components/checkbox
+ * @documentation https://fusion.dev/helix/components/checkbox
  *
  * @cssproperty --checkbox-background-color - Fill of the box, which does not change when it is ticked.
  * @cssproperty --checkbox-border-color - Edge of the box, in every state.

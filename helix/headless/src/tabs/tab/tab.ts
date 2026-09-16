@@ -16,7 +16,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Tab
- * @documentation https://helix.fusion.dev/components/tabs
+ * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tab's label.
  *

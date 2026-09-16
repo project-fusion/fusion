@@ -35,7 +35,7 @@ import { styles } from './color-input-root.css.js'
  * @status experimental
  * @category forms
  * @aliases ColorField, ColourInput, InputColor
- * @documentation https://helix.fusion.dev/components/color-input
+ * @documentation https://fusion.dev/helix/components/color-input
  *
  * @cssproperty --color-input-background-color - Fill behind the field.
  * @cssproperty --color-input-border-color - Color of the panel's edge.

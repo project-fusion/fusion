@@ -25,6 +25,6 @@ Most consumers get this transitively through
 [`@fusion.dev/helix-headless`](https://www.npmjs.com/package/@fusion.dev/helix-headless)
 and never import it by name.
 
-[Documentation](https://helix.fusion.dev)
+[Documentation](https://fusion.dev/helix)
 
 MIT

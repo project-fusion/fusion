@@ -128,7 +128,7 @@ const pathFor = (
  * @status stable
  * @category media
  * @aliases QR, Barcode, Scan code
- * @documentation https://helix.fusion.dev/components/qr-code
+ * @documentation https://fusion.dev/helix/components/qr-code
  *
  * @slot logo - A mark for the center, which only reads at a high correction.
  *

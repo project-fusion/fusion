@@ -19,7 +19,7 @@ import { styles } from './textarea-root.css.js'
  * @status stable
  * @category forms
  * @aliases Multiline, TextArea
- * @documentation https://helix.fusion.dev/components/textarea
+ * @documentation https://fusion.dev/helix/components/textarea
  *
  * @cssproperty --textarea-background-color - Fill behind the text.
  */

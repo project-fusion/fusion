@@ -17,7 +17,7 @@ import { styles } from './avatar-root.css.js'
  * @status stable
  * @category media
  * @aliases Profile picture, Gravatar
- * @documentation https://helix.fusion.dev/components/avatar
+ * @documentation https://fusion.dev/helix/components/avatar
  *
  * @slot - Replaces the image and initials entirely, for an icon.
  *

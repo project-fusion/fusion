@@ -34,7 +34,7 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * @status experimental
  * @category overlays
  * @aliases Coachmark, Product tour, Walkthrough, Onboarding
- * @documentation https://helix.fusion.dev/components/tour
+ * @documentation https://fusion.dev/helix/components/tour
  *
  * @slot - The stops, in the order they should be visited.
  *

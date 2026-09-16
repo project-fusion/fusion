@@ -14,7 +14,7 @@ import { styles } from './table-cell.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/components/table
+ * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The cell's content.
  */

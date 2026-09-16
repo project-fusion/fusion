@@ -35,7 +35,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status stable
  * @category media
  * @aliases Glyph, Symbol
- * @documentation https://helix.fusion.dev/components/icon
+ * @documentation https://fusion.dev/helix/components/icon
  *
  * @csspart svg - The rendered SVG.
  */

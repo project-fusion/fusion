@@ -23,7 +23,7 @@ import { styles } from './app-header-root.css.js'
  * @status stable
  * @category navigation
  * @aliases Masthead, Navbar, TopBar
- * @documentation https://helix.fusion.dev/components/app-header
+ * @documentation https://fusion.dev/helix/components/app-header
  *
  * @slot - Primary navigation.
  * @slot end - Trailing content, usually a call to action.

@@ -27,7 +27,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Menu option, Menu row
- * @documentation https://helix.fusion.dev/components/menu
+ * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The label.
  * @slot start - Before the label. A mark about the row.

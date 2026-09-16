@@ -89,7 +89,7 @@ import {
  * @status experimental
  * @category data
  * @aliases Grid, Result table, Data grid
- * @documentation https://helix.fusion.dev/components/data-table
+ * @documentation https://fusion.dev/helix/components/data-table
  *
  * @slot - The columns, declared as `helix-table-column` children.
  * @slot footer - Below the grid, replacing the pagination this would otherwise draw.

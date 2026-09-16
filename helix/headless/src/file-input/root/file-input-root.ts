@@ -79,7 +79,7 @@ const kind = (file: File): string => {
  * @status stable
  * @category forms
  * @aliases FileUpload, FilePicker, Dropzone, InputFile
- * @documentation https://helix.fusion.dev/components/file-input
+ * @documentation https://fusion.dev/helix/components/file-input
  *
  * @slot feedback - What is wrong with it.
  * @slot hint - Help under the field.

@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category navigation
  * @aliases Skip navigation, Skip to content
- * @documentation https://helix.fusion.dev/components/skip-link
+ * @documentation https://fusion.dev/helix/components/skip-link
  *
  * @slot - The link's words. Falls back to `label`.
  *

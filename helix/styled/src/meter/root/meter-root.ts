@@ -40,7 +40,7 @@ import { styles } from './meter-root.css.js'
  * @category feedback
  * @groups charts
  * @aliases Gauge, Level, Capacity
- * @documentation https://helix.fusion.dev/components/meter
+ * @documentation https://fusion.dev/helix/components/meter
  *
  * @csspart indicator - The part of it the value fills.
  * @csspart indicator-fair - The fill while the reading is in a band beside the good one, beside `indicator`.

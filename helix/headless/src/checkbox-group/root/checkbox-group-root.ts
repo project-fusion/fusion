@@ -36,7 +36,7 @@ import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
  * @status stable
  * @category forms
  * @aliases Checkbox list, Multi-select
- * @documentation https://helix.fusion.dev/components/checkbox-group
+ * @documentation https://fusion.dev/helix/components/checkbox-group
  *
  * @slot - The checkboxes.
  * @slot hint - Richer than a string.

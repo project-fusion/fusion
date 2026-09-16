@@ -39,7 +39,7 @@ import { styles } from './splitter-root.css.js'
  * @status experimental
  * @category layout
  * @aliases SplitPane, Resizable, SplitView
- * @documentation https://helix.fusion.dev/components/splitter
+ * @documentation https://fusion.dev/helix/components/splitter
  *
  * @csspart corner - The handle where a nested splitter's divider crosses this one.
  * @csspart end - The box holding the second.

@@ -31,7 +31,7 @@ import '../../table/index.js'
  * @since 0.1.0
  * @status experimental
  * @category data
- * @documentation https://helix.fusion.dev/components/data-table
+ * @documentation https://fusion.dev/helix/components/data-table
  *
  * @slot - The columns, declared as `helix-table-column` children.
  * @slot footer - Below the grid, replacing the pagination this would otherwise draw.

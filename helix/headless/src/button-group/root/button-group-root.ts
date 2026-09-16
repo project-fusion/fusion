@@ -22,7 +22,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category actions
  * @aliases Segmented buttons, Split button
- * @documentation https://helix.fusion.dev/components/button-group
+ * @documentation https://fusion.dev/helix/components/button-group
  *
  * @slot - The buttons in the group.
  */

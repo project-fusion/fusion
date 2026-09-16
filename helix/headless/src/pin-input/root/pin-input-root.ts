@@ -46,7 +46,7 @@ export type PinType = 'alphanumeric' | 'numeric' | 'text'
  * @status stable
  * @category forms
  * @aliases PinField, OTP, One-time code, Verification code, InputPin
- * @documentation https://helix.fusion.dev/components/pin-input
+ * @documentation https://fusion.dev/helix/components/pin-input
  *
  * @event {Event} change - Announced with a filled code, and when an edited one loses focus.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the code changes, and cancelable.

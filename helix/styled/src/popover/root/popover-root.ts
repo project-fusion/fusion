@@ -22,7 +22,7 @@ import { styles } from './popover-root.css.js'
  * @status stable
  * @category overlays
  * @aliases Popper, Flyout, Overlay
- * @documentation https://helix.fusion.dev/components/popover
+ * @documentation https://fusion.dev/helix/components/popover
  *
  * @cssproperty --popover-border-color - Color of the panel's edge.
  * @cssproperty --popover-border-width - Width of the panel's edge. Follows

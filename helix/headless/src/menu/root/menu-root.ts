@@ -43,7 +43,7 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * @status experimental
  * @category overlays
  * @aliases Dropdown, Action menu
- * @documentation https://helix.fusion.dev/components/menu
+ * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The items.
  * @slot trigger - What opens it.

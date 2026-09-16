@@ -27,7 +27,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category charts
  * @aliases Key, Series Key
- * @documentation https://helix.fusion.dev/components/legend
+ * @documentation https://fusion.dev/helix/components/legend
  *
  * @csspart entry - One name and its swatch.
  * @csspart list - The list itself.

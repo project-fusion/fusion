@@ -50,6 +50,6 @@ measurement and prints nothing on success. Use `audit` while you work and
 `check` in CI, and never both in one script: the difference is what is printed,
 never what is judged.
 
-[Documentation](https://helix.fusion.dev)
+[Documentation](https://fusion.dev/helix)
 
 MIT

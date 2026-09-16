@@ -30,7 +30,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @aliases Row, Entry
- * @documentation https://helix.fusion.dev/components/list
+ * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The label.
  * @slot end - Trailing content.

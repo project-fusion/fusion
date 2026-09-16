@@ -72,7 +72,7 @@ const isInsertion = (event: Event): boolean =>
  * @status experimental
  * @category forms
  * @aliases Autocomplete, Typeahead, Search select
- * @documentation https://helix.fusion.dev/components/combobox
+ * @documentation https://fusion.dev/helix/components/combobox
  *
  * @slot - The options, which are `helix-option` elements.
  * @slot end - After it, for a unit or a clear button.
