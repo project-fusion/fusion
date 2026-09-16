@@ -90,6 +90,32 @@ if (hasLayout()) {
       expect(getComputedStyle(bar).animationDuration).toBe('4s')
     })
 
+    test("the bar is the message's own top edge, not a stripe laid on it", async () => {
+      /* **Nothing but the pair below holds it there**, which is why it is worth
+         a spec: the surface is the bar's containing block and also what clips
+         it, so a `position: static` or a lost `overflow` would leave the bar
+         floating against the region while every other assertion here passed.
+         The ends take the corner radius from the clip rather than standing
+         square against it, and the radius is the bar's own height, so the corner
+         of a message with a clock on it is drawn in the tone.
+
+         `offset*` and not a client rect: the drain is running by now and a
+         `scale` shows up in a rect, so the box this asks about would be however
+         far the animation had got. */
+      const found = await item('duration="4000"')
+      const surface = part(found, 'item') as HTMLElement
+      const bar = part(found, 'timer') as HTMLElement
+
+      expect(getComputedStyle(surface).position).toBe('relative')
+      expect(getComputedStyle(surface).overflow).toBe('hidden')
+      expect(bar.offsetParent).toBe(surface)
+      expect(bar.offsetTop).toBe(0)
+      expect(bar.offsetLeft).toBe(0)
+      expect(bar.offsetWidth).toBe(surface.clientWidth)
+      // `space-2xs`, and the same 4px as `radii-sm` above it.
+      expect(bar.offsetHeight).toBe(4)
+    })
+
     test('pausing the clock freezes the bar with it', async () => {
       /* The half that makes the pair honest. Hovering stops the timer, and a
          bar that kept draining would promise the message was about to go while

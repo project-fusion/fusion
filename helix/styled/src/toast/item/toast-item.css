@@ -208,8 +208,15 @@ slot[name="icon"]::slotted(*) {
   animation: helix-toast-drain var(--toast-duration, 0ms) linear forwards;
   background-color: var(--_toast-severity, var(--helix-color-foreground-muted));
   block-size: var(--helix-space-2xs);
-  /* Along the top edge and edge to edge, so it reads as the message's own border
-     thickening rather than as a bar laid inside it. */
+  /* **Along the top edge and edge to edge, so it reads as the message's own top
+     edge rather than as a bar laid inside it.** Not as a border thickening,
+     which is what this said for a long time and is not available to it:
+     `border-floating` is `0` in both modes, so there is no border here to
+     thicken, and the tone spec asserts that. What makes it read as an edge is
+     that the surface is its containing block and clips it, so the bar takes the
+     corner radius at both ends. Measured 16 Sep 2026: the bar is 4px and the
+     radius is 4px, which is the whole of the corner, so the corner of a message
+     with a clock on it is drawn in the tone. */
   inset-block-start: 0;
   inset-inline: 0;
   position: absolute;
@@ -302,7 +309,7 @@ slot[name="icon"]::slotted(*) {
 
 /* Four moving selectors, and they do not get the same answer, which is why the
    check asks whether each was named rather than what was done about it. This is
-   the only thing telling a reader how long is left, and a 2px rule crossing once
+   the only thing telling a reader how long is left, and a 4px rule crossing once
    over the message's lifetime is nearer a clock than an animation. Measured under
    `prefers-reduced-motion: reduce`, this element kept its full eight seconds
    while a light-DOM element beside it came back at 1e-05s. */
