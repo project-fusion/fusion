@@ -23,6 +23,6 @@ describe('the events example', () => {
     api.click()
     await new Promise((done) => setTimeout(done, 900))
     await idle()
-    expect(logged().at(-1)).toBe('helix-before-activate')
+    expect(logged().at(-1)).toBe('helix-activate')
   })
 })

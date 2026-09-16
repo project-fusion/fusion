@@ -21,7 +21,7 @@ export function Example() {
   }
 
   const reading = (event: CustomEvent<{ value: string }>) => {
-    say('helix-before-activate', `"${event.detail.value}" is the one being read`)
+    say('helix-activate', `"${event.detail.value}" is the one being read`)
   }
 
   return (
@@ -31,7 +31,7 @@ export function Example() {
     >
       <helix-outline
         label="On this page"
-        onhelix-before-activate={reading}
+        onhelix-activate={reading}
       >
         <a href="#install">Install</a>
         <a href="#usage">Usage</a>

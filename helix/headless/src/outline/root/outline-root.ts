@@ -1,6 +1,6 @@
 import {
   customElement,
-  HelixBeforeActivateEvent,
+  HelixActivateEvent,
   HelixElement,
   IndicatorController,
 } from '@fusion.dev/helix-core'
@@ -31,7 +31,7 @@ import { property, state } from 'lit/decorators.js'
  *
  * @slot - The links, as anchors with fragment hrefs.
  *
- * @event {HelixBeforeActivateEvent} helix-before-activate - The section being read has changed, carrying its id as the value. Cancelable: refusing it takes the decision and nothing moves.
+ * @event {HelixActivateEvent} helix-activate - The section being read has changed, carrying its id as the value. An announcement: it is read off where the page is scrolled to, so there is no decision here to take.
  *
  * @csspart indicator - The mark that travels to the section being read.
  * @csspart nav - The navigation landmark.
@@ -208,11 +208,22 @@ export class HelixHeadlessOutline extends HelixElement {
      * `MutationObserver` on the anchors.
      *
      * Only on a change, because this runs from a scroll frame and an event per
-     * frame is not a signal, it is a firehose. */
+     * frame is not a signal, it is a firehose.
+     *
+     * **The announcement, and it was declared as the request.** This was
+     * `helix-before-activate`, whose `@event` line promised that refusing it
+     * took the decision: the links and `reading` are written above, the
+     * dispatch is a bare statement, and nothing anywhere reads what it
+     * returned, so a consumer's `preventDefault()` did nothing at all. Nor
+     * could it, for the reason `current` records: the value follows where the
+     * page is scrolled to, and the next frame that crosses the reading line
+     * computes it again. Every other family firing the before event routes it
+     * through `requestChange` and applies the answer. This one has only the
+     * notification to give, so it gives the library's word for that. */
     const next = active?.target.id ?? ''
     if (next !== this.reading) {
       this.reading = next
-      this.dispatchEvent(new HelixBeforeActivateEvent({ value: next }))
+      this.dispatchEvent(new HelixActivateEvent({ value: next }))
     }
   }
 

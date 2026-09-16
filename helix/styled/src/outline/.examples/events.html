@@ -58,7 +58,7 @@
     }
   }
 
-  rail.addEventListener('helix-before-activate', (event) => {
-    say('helix-before-activate', `"${event.detail.value}" is the one being read`)
+  rail.addEventListener('helix-activate', (event) => {
+    say('helix-activate', `"${event.detail.value}" is the one being read`)
   })
 </script>
