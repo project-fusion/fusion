@@ -22,7 +22,7 @@ import { styles } from './combobox-root.css.js'
  * Input, Color Input and Date Input all take.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Autocomplete, Typeahead, Search select
  * @documentation https://fusion.dev/helix/components/combobox
@@ -32,7 +32,7 @@ import { styles } from './combobox-root.css.js'
  * @cssproperty --combobox-border-width - Width of the panel's edge. Follows
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.
- * @cssproperty --combobox-control-size - Smallest the text field shrinks to
+ * @cssproperty --combobox-control-size - Smallest the text field shrinks to once tags share its line.
  * @cssproperty --combobox-panel-size - Width of the panel. Follows the field by default.
  * @cssproperty --combobox-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
  *   floating surface sits over content nobody can predict, so it keeps a lift by default.

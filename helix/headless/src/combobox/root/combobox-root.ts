@@ -69,7 +69,7 @@ const isInsertion = (event: Event): boolean =>
  * row and fires the event; adding the option is the consumer's.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Autocomplete, Typeahead, Search select
  * @documentation https://fusion.dev/helix/components/combobox
@@ -194,6 +194,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    *
    * A comma is therefore not available inside an option's value, which is the
    * listbox's contract and not this element's to change.
+   *
+   * **The list is told, and the field is not.** `aria-multiselectable` belongs
+   * to `listbox`, `grid`, `tree` and `tablist`, and `combobox` dropped it in
+   * ARIA 1.2; the list sets it on itself through `ElementInternals`, where a
+   * reader on the field hears it through `aria-controls`. This element wrote it
+   * onto its own `role="combobox"` input as well, which an audit reports as a
+   * property the role does not support and no spec here ever asserted: the one
+   * that covers this says in as many words that telling the list is what this
+   * element is responsible for.
    */
   @property({ type: Boolean })
   multiple = false
@@ -784,7 +793,6 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
           aria-autocomplete=${this.suggest ? 'both' : 'list'}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-describedby=${this.describedBy ?? nothing}
-          aria-multiselectable=${this.multiple ? 'true' : nothing}
           placeholder=${(this.chosen.length > 0 ? '' : this.placeholder) || nothing}
           ?disabled=${this.isDisabled}
           .value=${this.multiple || this.open ? this.suggestion || this.typed : this.word}
