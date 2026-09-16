@@ -60,6 +60,85 @@ const countDraws = (host: HTMLElement): { count: number } | null => {
   return tally
 }
 
+/** `UNMASKED_RENDERER_WEBGL`, which a stubbed extension has to carry itself. */
+const UNMASKED_RENDERER = 0x9246
+
+/** Two real names, as this machine reports them through ANGLE. */
+const HARDWARE = 'ANGLE (Apple, ANGLE Metal Renderer: Apple M2 Max, Unspecified Version)'
+const SOFTWARE =
+  'ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)'
+
+/**
+ * Makes `WEBGL_debug_renderer_info` report one name, and gives back the undo.
+ *
+ * **The renderer is a fact about the machine, and every lane here runs on one
+ * that draws in software.** Headless Chromium is SwiftShader, which is exactly
+ * what the element now declines, so without this every spec below about a
+ * context, a program or a loop would assert the drawing path on a machine that
+ * has stopped taking it. Stubbed at the extension rather than at `getContext`,
+ * so the context each spec gets is the real one and only the name it answers to
+ * is the spec's.
+ *
+ * `null` for a renderer that cannot be read, which is the extension missing
+ * rather than a name that says nothing.
+ *
+ * A no-op where there is no WebGL at all, which is the happy-dom lane.
+ */
+const reportRenderer = (name: string | null): (() => void) => {
+  const proto = globalThis.WebGL2RenderingContext?.prototype
+  if (!proto) {
+    return () => {}
+  }
+  /* Held as the one-argument shapes they are called with here. `getExtension`
+     is declared as an overload per extension name, so the real signature does
+     not accept the `string` this is forwarding. */
+  type Asked = (this: WebGL2RenderingContext, asked: never) => unknown
+  const extension = proto.getExtension as Asked
+  const parameter = proto.getParameter as Asked
+  proto.getExtension = function (this: WebGL2RenderingContext, asked: string) {
+    if (asked === 'WEBGL_debug_renderer_info') {
+      return name === null ? null : { UNMASKED_RENDERER_WEBGL: UNMASKED_RENDERER }
+    }
+    return extension.call(this, asked as never)
+  } as WebGL2RenderingContext['getExtension']
+  proto.getParameter = function (this: WebGL2RenderingContext, asked: number) {
+    if (asked === UNMASKED_RENDERER && name !== null) {
+      return name
+    }
+    return parameter.call(this, asked as never)
+  } as WebGL2RenderingContext['getParameter']
+  return () => {
+    proto.getExtension = extension as WebGL2RenderingContext['getExtension']
+    proto.getParameter = parameter as WebGL2RenderingContext['getParameter']
+  }
+}
+
+/**
+ * Every `webgl2` context the element's own canvas was asked for, counted.
+ *
+ * The detection probe asks on a canvas of its own, detached and one pixel
+ * square, so what separates the two is a parent: the element's canvas is a
+ * child of its shadow root and the probe's is a child of nothing.
+ */
+const askedOnElement = <T>(run: () => Promise<T>): Promise<{ asked: number; value: T }> => {
+  const original = HTMLCanvasElement.prototype.getContext
+  let asked = 0
+  HTMLCanvasElement.prototype.getContext = function (
+    this: HTMLCanvasElement,
+    ...args: Parameters<HTMLCanvasElement['getContext']>
+  ) {
+    if (args[0] === 'webgl2' && this.parentNode) {
+      asked += 1
+    }
+    return original.apply(this, args)
+  } as HTMLCanvasElement['getContext']
+  return run()
+    .then((value) => ({ asked, value }))
+    .finally(() => {
+      HTMLCanvasElement.prototype.getContext = original
+    })
+}
+
 /** Waits a frame at a time, up to a second's worth, for `done` to hold. */
 const until = async (done: () => boolean): Promise<boolean> => {
   for (let frame = 0; frame < 60 && !done(); frame++) {
@@ -99,6 +178,15 @@ const removeBeforeOpening = (
 }
 
 describe('aura', () => {
+  /* **Declared once for the file, and deliberately never put back.** The
+     browser lane gives this family a page of its own, so the stub outlives
+     nothing, and the three specs that want another answer install their own and
+     restore to this one. The harness has no `afterAll` to undo it in, which is
+     the smaller reason. */
+  beforeAll(() => {
+    reportRenderer(HARDWARE)
+  })
+
   test('renders a canvas and hides it from assistive technology', async () => {
     /* Decorative by definition: it draws light behind content and has nothing
        to announce. The host stays visible to the tree so a consumer can label
@@ -277,6 +365,54 @@ describe('aura', () => {
     }
     expect(asked).toBe(0)
   })
+
+  /* What the renderer's own name decides, which only a browser can answer: the
+     happy-dom lane has no WebGL to name, and its fallback is the spec above.
+     All three mount at no height, so the context and the program are made where
+     they are expected and not one draw is paid. */
+  if (hasLayout()) {
+    test('a renderer that draws in software takes the fallback, and asks for no context', async () => {
+      /* The gradient is the same palette from the same tokens, and the shader
+         costs about 450ms of first frame per element on a CPU. */
+      const restore = reportRenderer(SOFTWARE)
+      let host: HTMLElement
+      try {
+        const mounted = await askedOnElement(() => mount(undrawn()))
+        host = mounted.value
+        expect(mounted.asked).toBe(0)
+      } finally {
+        restore()
+      }
+      /* Not hidden, which is what separates this from a context the browser
+         took: the canvas is simply never painted, and a canvas that never
+         paints is transparent. */
+      expect(host.shadowRoot?.querySelector('canvas')?.hasAttribute('hidden')).toBe(false)
+      expect(getComputedStyle(host).backgroundImage).toContain('radial-gradient')
+      expect(await framesBooked(4)).toBe(0)
+    })
+
+    test('a renderer with a hardware name keeps the drawing path', async () => {
+      const host = await mount(undrawn())
+      const gl = host.shadowRoot?.querySelector('canvas')?.getContext('webgl2')
+      expect(gl).not.toBeNull()
+      expect(gl?.isContextLost()).toBe(false)
+    })
+
+    test('a renderer it cannot read keeps it too, because declining is the worse mistake', async () => {
+      /* The extension is optional and is withheld on purpose by the browsers
+         that resist fingerprinting. Reading "we cannot tell" as software would
+         take the shader from every reader whose machine hides a real GPU. */
+      const restore = reportRenderer(null)
+      try {
+        const host = await mount(undrawn())
+        const gl = host.shadowRoot?.querySelector('canvas')?.getContext('webgl2')
+        expect(gl).not.toBeNull()
+        expect(gl?.isContextLost()).toBe(false)
+      } finally {
+        restore()
+      }
+    })
+  }
 
   /* The loop, which only a browser runs. Every draw is stubbed by `countDraws`,
      so none of these reaches the GPU. */
