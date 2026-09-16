@@ -5,7 +5,7 @@ export function Example() {
       gap="md"
     >
       <helix-pagination-summary
-        format="compact"
+        format="{from}-{to} / {total}"
         locale="en-GB"
         page={42}
         page-size="25"

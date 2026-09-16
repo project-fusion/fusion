@@ -1,11 +1,11 @@
-<!-- @summary Large counts written short, so a summary does not wrap at page nine hundred. -->
+<!-- @summary Large counts grouped for the locale and written short, so a summary does not wrap at page nine hundred. -->
 
 <helix-flex
   direction="column"
   gap="md"
 >
   <helix-pagination-summary
-    format="compact"
+    format="{from}-{to} / {total}"
     locale="en-GB"
     page="42"
     page-size="25"
