@@ -51,7 +51,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { costOf } from '@fusion.dev/scripts/cost'
-import { pool } from '@fusion.dev/scripts/pool'
+import { offline, pool } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { pairs } from '@fusion.dev/scripts/theme-facts'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
@@ -663,10 +663,7 @@ const CONTEXT = { viewport: { height: 2400, width: 1280 } }
 /* Nothing leaves this machine. An avatar or an image pointing at another host
    draws its fallback when the request fails, and a request left open fails on
    the network's schedule rather than at once. */
-const closed = (context) =>
-  context.route('**/*', (route) =>
-    route.request().url().startsWith(origin) ? route.continue() : route.abort(),
-  )
+const closed = offline(origin)
 
 const MODES = ['light', 'dark']
 

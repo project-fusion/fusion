@@ -45,7 +45,7 @@ import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
 import { costOf } from '@fusion.dev/scripts/cost'
-import { pool, workers } from '@fusion.dev/scripts/pool'
+import { offline, pool, workers } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
@@ -202,6 +202,17 @@ const byFamily = await pool(families, {
   browser,
   count: WORKERS,
   family: named,
+  /* **Nothing leaves this machine, which the pixel checks already held to and
+     the specs did not.** Two examples point an image at
+     `https://example.invalid/missing.png` and their specs wait for the `error`
+     it produces, so what decided the result was how fast this runner's resolver
+     refused a name, raced against the harness's own 2000ms: `avatar > the
+     events example` timed out on 13 Sep 2026 in a run that had touched neither
+     family, having passed on the five before it. Refused at the context, the
+     `error` arrives at once and says the same thing everywhere, and the
+     examples stay what a consumer would write. `offline` carries the rest of
+     the argument. */
+  prepare: offline(origin),
   run: async (fresh, family) => {
     /* **A page of its own for every family**, so the custom element registry
        starts empty each time. Each bundle carries its own copy of the headless
