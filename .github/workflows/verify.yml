@@ -162,6 +162,14 @@ jobs:
 
       # How many jobs each browser check takes, from how much of the corpus the
       # change reaches: [VERIFYING.md](../VERIFYING.md#how-many-browser-jobs).
+      #
+      # **The value goes out under a delimiter, not as `matrix=$matrix`.** The
+      # one-line form is rejected outright for anything with a newline in it,
+      # with `Unable to process file command 'output' successfully`, and the
+      # script had put a second line on stdout. That is fixed where it belongs,
+      # in the script, and the delimiter is the half of it that holds whatever
+      # the script prints next: a matrix that grows past one line is then a
+      # bigger value and not a dead run.
       - name: Plan the browser jobs
         id: browser
         env:
@@ -171,7 +179,7 @@ jobs:
           matrix=$(bun fusion/scripts/plan-browser.mjs --changed "$BASE" 2> "$RUNNER_TEMP/plan.log")
           cat "$RUNNER_TEMP/plan.log"
           { echo '```'; cat "$RUNNER_TEMP/plan.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          { echo 'matrix<<PLAN_MATRIX'; echo "$matrix"; echo PLAN_MATRIX; } >> "$GITHUB_OUTPUT"
 
       # The tree this run checks out, named where `proven` on `main` can find
       # it. On a pull request that is the merge into the base, which is the tree
@@ -259,6 +267,16 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
+      # **Plainly first, because a judge reads a file it does not write.** No
+      # generated file is committed, so on a fresh checkout `docs -- --check`
+      # compares its output against a module that is not there and says
+      # `helix/docs/src/sources.generated.ts is missing`. Everywhere else the
+      # generators had already run under some `build`; here they had not, and
+      # this job checked out a tree, generated nothing and asked whether the
+      # nothing was current. The plain run is the same graph one hash over, so
+      # it costs a build this job was going to make anyway.
+      - name: Write what the judges read
+        run: bunx turbo run docs routes themed-page
       - name: Build what the judges read, under their hash
         run: bunx turbo run docs routes themed-page -- --check
 

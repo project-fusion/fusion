@@ -102,6 +102,12 @@ all of them after a plain build. `docs`, `routes` and `themed-page` reach the
 whole workspace; `warm-check` runs them beside `warm`, so the shards and
 `floors` restore that graph as well rather than each rebuilding it.
 
+It runs each of the three plainly first, because a judge reads a file it does
+not write. No generated file is committed, so a checkout holds none of them and
+`docs -- --check` on one compares its output against a module that is not there.
+Everywhere else a `build` had already run the generators; this job is the only
+place that reaches a judge without one.
+
 `tests` is the JavaScript specs and `rust` is everything that compiles Rust, the
 toolchain installed once, the floor `Cargo.toml` declares rather than stable, so
 `rust-version` is a number something compiles against rather than a promise.
