@@ -107,7 +107,16 @@ export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
       onFocus={warm}
       onPointerOver={warm}
     >
-      <helix-tree active={pathname} chevron-placement="end" label="Helix documentation">
+      {/* `subordinate`, because depth here is a rank. A section holds pages and a
+          page with children holds the readings of it, so a row one step in is a
+          different kind of thing from the section above it and from the section
+          after it, and the rows say so rather than leaving the indent to. */}
+      <helix-tree
+        active={pathname}
+        chevron-placement="end"
+        label="Helix documentation"
+        nesting="subordinate"
+      >
         {sections.map((section, index) => (
           <helix-tree-item
             key={section.title}

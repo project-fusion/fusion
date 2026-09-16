@@ -74,8 +74,12 @@ export function SiteMenu({
          *             leaves everything a reader actually goes to inside Helix, the docs,
          *             the component reference, the sandbox, the theme builder, reachable
          *             only by landing on `/helix` first and looking for it.
+         *
+         *             `subordinate`, because that depth is a rank and not a position: a
+         *             product holds the pages under it, so a destination is not a peer of
+         *             the product above it or of the top-level section after it.
          */}
-        <helix-tree active={pathname} label="Site navigation">
+        <helix-tree active={pathname} label="Site navigation" nesting="subordinate">
           {PRODUCTS.map((product) => (
             <helix-tree-item
               /* Open where the reader already is. A tree that opens nothing
