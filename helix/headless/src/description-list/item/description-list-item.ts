@@ -15,7 +15,7 @@ import { property } from 'lit/decorators.js'
  * it is also a property.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/description-list
  *
  * @slot - The value.
@@ -27,10 +27,11 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-description-list-item')
 export class HelixHeadlessDescriptionListItem extends HelixElement {
   /**
-   * What the value is, for the common case of plain text.
+   * What the value is called, for the common case of plain text.
    *
    * The fallback of the `label` slot, so slotted content replaces it rather than
-   * appearing beside it.
+   * appearing beside it. The value itself is the default slot: it is the half
+   * that varies and is often more than text.
    */
   @property()
   label = ''

@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  servedParts,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -47,12 +53,20 @@ describe('heatmap server output', () => {
   })
 
   /**
-   * No cells, because no id resolves. Asserted rather than left implicit: the
-   * day this changes it should be a spec that says so and not a surprise in a
-   * screenshot.
+   * **The frame whole, rather than the marks somebody thought to name.**
+   *
+   * A spec listing the three absences it could think of goes on passing when a
+   * fourth thing is added to the empty render, which is the failure this promise
+   * exists to prevent. It had already happened here: `not.toContain('part="cell"')`
+   * was true and `part="empty"` was served beside it, so a heatmap over a table
+   * of ninety days came out of the server saying "No readings".
+   *
+   * So what is served is the strip and the footer it sits above, and nothing
+   * else: no cells, no tooltip, and no empty state, an unresolved table being
+   * unknown rather than empty.
    */
-  test('no cells are drawn, since resolving an id wants a document', () => {
-    expect(partTag(markup, 'strip')).not.toContain('part="cell"')
+  test('the frame is served and nothing is drawn in it', () => {
+    expect(servedParts(markup)).toEqual(['end', 'footer', 'start', 'strip', 'summary'])
   })
 
   /**

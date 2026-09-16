@@ -11,7 +11,7 @@ import { styles } from './description-list-item.css.js'
  * to a screen reader, while lining up with every other pair in the list.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/description-list
  */
 @customElement('helix-description-list-item')

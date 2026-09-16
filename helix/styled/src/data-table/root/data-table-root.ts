@@ -29,7 +29,7 @@ import '../../table/index.js'
  * `helix-table` where the content has to be in the served HTML.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @documentation https://fusion.dev/helix/components/data-table
  *
