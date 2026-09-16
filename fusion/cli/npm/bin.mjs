@@ -11,8 +11,9 @@
  * because a caller that knows better should not have to argue. Then the cargo
  * target directory, release before debug, honoring `CARGO_TARGET_DIR` because a
  * shared target is common and guessing `./target` would miss it. Then whatever
- * is on `PATH`, which is what an installed binary looks like. Only then a
- * build, and only when cargo is present.
+ * is on `PATH`, which is what an installed binary looks like, named out loud
+ * because it is about to answer questions about a tree it was not built from.
+ * Only then a build, and only when cargo is present.
  *
  * **A build is a fallback and not the plan.** It happens once, prints that it
  * is happening, and a CI pipeline that has already run `cargo build` never
@@ -155,6 +156,23 @@ if (found && existsSync(found)) {
    probed: see `onPath`, where the probe this used to do is what recursed. */
 const installed = onPath()
 if (installed) {
+  /* **Say which binary this is before running it.** Getting here means no
+     `target/` and no cargo, so what runs is whatever some earlier install left
+     on the path, and it answers about this tree while knowing nothing about it.
+     Measured 14 Sep 2026 in a fresh clone: a `~/.cargo/bin/fusion` from August
+     read the configuration file under its previous name and reported "no
+     configuration", which reads as a fault in the checkout and is a fault in
+     the binary that was asked.
+
+     It still runs, because an installed binary is the only one there is and
+     refusing would leave a machine with no Rust unable to run any check at all.
+     What changes is that the answer is attributed. */
+  console.error(
+    `fusion: nothing built here, so running \`${installed}\` from PATH.\n` +
+      '  It was not built from this checkout and need not agree with it.\n' +
+      '  Install a Rust toolchain to build the one this tree defines, or point\n' +
+      '  `FUSION_BIN` at the binary to run.',
+  )
   run(installed)
 }
 
