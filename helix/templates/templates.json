@@ -7,14 +7,16 @@
       "named": [
         "index.html",
         "package.json",
+        "src/landing.tsx",
         "src/site-header.tsx"
       ],
       "title": "React (Vite)"
     },
     {
-      "description": "React and TypeScript on the Next.js App Router, with the two pages as real routes.",
+      "description": "React and TypeScript on the Next.js App Router, with the three pages as real routes.",
       "id": "react-nextjs",
       "named": [
+        "app/landing.tsx",
         "app/layout.tsx",
         "app/site-header.tsx",
         "package.json"

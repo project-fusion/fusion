@@ -5,21 +5,127 @@
  * measure, the rhythm between blocks, and the few things a component
  * deliberately leaves open. Everything below is a Helix token or a documented
  * hook, so a theme moves it and both color modes follow without a second copy
- * of anything.
+ * of anything. There is no color in here at all.
  */
 
-/* The same measure the header centers its row in, so the wordmark sits over the
-   first column of the page rather than near it. */
+/*
+ * **56rem, which is a measure rather than a maximum.** A page is as wide as its
+ * widest block can be read at, and the widest block here is a four-column table:
+ * given the whole of a 1280 window its first column came out 448 pixels across
+ * to hold a name, which reads as a table that has been stretched rather than
+ * laid out. The bar is centered in the same width, so the wordmark sits over the
+ * first column of the page rather than near it.
+ */
 .page {
   margin-inline: auto;
-  max-inline-size: 72rem;
-  padding-block: var(--helix-space-2xl);
+  max-inline-size: 56rem;
+  padding-block: var(--helix-space-2xl) var(--helix-space-3xl);
   padding-inline: var(--helix-space-lg);
+}
+
+/*
+ * Two documented hooks, and both are about agreeing with the page. The bar
+ * centers its row in the page's measure, so the wordmark sits over the first
+ * column rather than near it. And it draws no line under itself by default,
+ * because a header over a page that already has a surface does not need one:
+ * this page has no such surface, so it asks for one. A token rather than a
+ * color, so it follows the theme.
+ */
+helix-app-header {
+  --app-header-border-color: var(--helix-color-border);
+  --app-header-max-inline-size: 56rem;
+}
+
+/*
+ * One rhythm between the blocks of a page, so no page states its own.
+ *
+ * **`minmax(0, 1fr)` and never a bare column, which is the trap in every grid
+ * here.** An implicit track is `auto`, and an `auto` track's minimum is its
+ * content's min-content size, so a child that would rather scroll itself widens
+ * the track instead and takes the page with it. Measured at 320: the table's
+ * columns floor at 344, the column it sits in should have been 288, and
+ * `documentElement.scrollWidth` came back 360 against a 320 viewport. The whole
+ * page scrolled sideways so that a table with its own scrollport would not have
+ * to. Zero as the minimum hands the overflow back to whoever is equipped for it.
+ */
+.stack,
+.section,
+.hero,
+.notes,
+.split {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stack {
+  display: grid;
+  gap: var(--helix-space-2xl);
+}
+
+/* A heading and the line under it are one block, and the gap between them is
+   not the gap between blocks. */
+.hero {
+  display: grid;
+  gap: var(--helix-space-xs);
+  justify-items: start;
+}
+
+/* **A measure for the lede, which the page's own is too wide to be.** A line of
+   prose across 56rem is around 110 characters, and the readable range tops out
+   near 75. The heading above it is exempt: a heading is scanned rather than
+   read along. */
+.lede {
+  max-inline-size: 42rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-sm);
+  padding-block-start: var(--helix-space-sm);
+}
+
+/* A section is its heading and its one block, closer together than two sections
+   are. */
+.section {
+  display: grid;
+  gap: var(--helix-space-md);
+}
+
+/*
+ * **The one departure the grids state.** `helix-grid` takes a fixed count as
+ * plain CSS, which is what keeps a server-rendered row of cards correct before
+ * any JavaScript arrives. Below this width there is only ever room for one
+ * column, and `--grid-columns` is the documented way to say so from outside the
+ * shadow root.
+ */
+@media (width < 48rem) {
+  helix-grid {
+    --grid-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+ * **The cards keep `start`, which is `--card-align`'s resting value, and the
+ * alternative is worth naming because it looks right and is not.**
+ * `space-between` puts the doc link on each card's bottom edge, so a row of
+ * cards ends in a straight line. It gets there by sharing the slack out between
+ * every region, and the first thing that moves is the body: three cards of six,
+ * five and seven lines had their opening lines 50 pixels apart under headings
+ * that were level. A reader scans the first line of each, so that is the
+ * alignment worth keeping.
+ */
+
+/* The last block on the landing page, and the rule is what stops it reading as
+   one more paragraph of the section above it. */
+.closing {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  padding-block-start: var(--helix-space-lg);
 }
 
 /* A form is read straight down, and a field wider than about this stops being
    scannable however much room the window has. */
 .form {
+  align-content: start;
   display: grid;
   gap: var(--helix-space-lg);
   justify-items: start;
@@ -32,24 +138,71 @@
 }
 
 /*
- * **A documented hook.** The bar draws no line under itself by default, because
- * a header over a page that already has a surface does not need one. This page
- * does. A custom property rather than a fork, and a token rather than a color,
- * so it follows the theme.
+ * **The form takes a column and the notes take the rest.** A 28rem form on a
+ * 1280 window is a third of a page and two thirds of nothing, which is what the
+ * measure above cannot fix on its own: the form has a right width and the page
+ * does not shrink to it. Narrow, the two stack and the notes read as a
+ * postscript, which is the order they are written in.
  */
-helix-app-header {
-  --app-header-border-color: var(--helix-color-border);
+.split {
+  display: grid;
+  gap: var(--helix-space-2xl);
+}
+
+@media (width >= 60rem) {
+  .split {
+    grid-template-columns: minmax(0, 28rem) minmax(0, 1fr);
+  }
+}
+
+/* `start`, because a grid column stretches to its tallest sibling and a
+   stretched grid shares the difference out between its own rows: beside a form
+   half a page long, three paragraphs came out 140 pixels apart. */
+.notes {
+  align-content: start;
+  display: grid;
+  gap: var(--helix-space-sm);
+  justify-items: start;
+  max-inline-size: 32rem;
+}
+
+/*
+ * **Narrow, the gutter gives before the content does.** 24 pixels either side of
+ * a 390 window is 48 of 390 spent on margin, and the table needs 355 of what is
+ * left. At `md` it has 358 and fits; at `lg` it was 13 pixels short and the last
+ * column sat outside the box until the reader scrolled the table sideways.
+ */
+@media (width < 40rem) {
+  .page {
+    padding-block: var(--helix-space-xl) var(--helix-space-2xl);
+    padding-inline: var(--helix-space-md);
+  }
 }
 
 /*
  * **The escape hatch, and the reason a component names its parts.** The table
- * washes a chosen row; whether it also emphasizes one is the page's decision,
- * and there is no token for that. `::part` reaches the box the component drew
+ * washes a chosen row at the strength `Tag` rests at; this page wants a row
+ * somebody has ticked to be findable from across the screen, and there is no
+ * token for "more than that". `::part` reaches the boxes the component drew
  * without forking it, and a rule written out here beats the component's own
  * however specific that one is.
  *
- * The value is still the library's, so a theme carries it like everything else.
+ * **Two parts and not one, because a row has no box.** The row is
+ * `display: contents` so that one grid can align every column across every row,
+ * which leaves the cells as the only thing a selection can be painted on. The
+ * table names both: the data cells and the cell holding the checkbox. Naming
+ * only the first leaves a pale stripe down the left of every chosen row.
+ *
+ * The values are still the library's, so a theme carries them like everything
+ * else. `primary-subtle` and not `primary-surface`: the second is the solid
+ * accent a button stands on and expects white on top of it, so a row painted
+ * with it puts the table's own ink on a saturated fill.
  */
+helix-data-table::part(cell-selected),
+helix-data-table::part(select-selected) {
+  background-color: var(--helix-color-primary-subtle);
+}
+
 helix-data-table::part(cell-selected) {
   font-weight: var(--helix-weight-semibold);
 }

@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from 'react'
+import { type AnchorHTMLAttributes, useEffect, useState } from 'react'
 
 /* **The whole router, which is a hash and a listener.**
 
@@ -15,22 +15,16 @@ import { type ReactNode, useEffect, useState } from 'react'
 /** Where the reader is, as a path, so the overview is `/`. */
 const read = (): string => window.location.hash.slice(1) || '/'
 
-interface LinkProps {
-  /** Marks the destination the reader is already on. */
-  readonly 'aria-current'?: 'page'
-  /** The words. */
-  readonly children: ReactNode
-  /** A path, written as a path: the hash is this component's business. */
-  readonly href: string
-}
-
-/** A destination, addressed the way the Next.js template addresses one. */
-export function Link({ 'aria-current': current, children, href }: LinkProps) {
-  return (
-    <a aria-current={current} href={`#${href}`}>
-      {children}
-    </a>
-  )
+/**
+ * A destination, addressed the way the Next.js template addresses one.
+ *
+ * Everything but `href` goes straight through to the anchor, which is what
+ * `next/link` does and is why a `data-button` or a `slot` reads the same in both
+ * templates. The path is written as a path: the hash is this component's
+ * business and nobody else's.
+ */
+export function Link({ href, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  return <a {...rest} href={`#${href ?? '/'}`} />
 }
 
 /** The current path, and a re-render whenever it changes. */
