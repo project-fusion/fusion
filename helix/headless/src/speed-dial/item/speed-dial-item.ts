@@ -21,7 +21,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category actions
  * @aliases Speed dial action, FAB action, Quick action
- * @documentation https://helix.fusion.dev/components/speed-dial
+ * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @slot - The action's name.
  * @slot icon - The mark, which is what a dial is read by.

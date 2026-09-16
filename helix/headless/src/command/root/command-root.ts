@@ -62,7 +62,7 @@ const parse = (hotkey: string) => {
  * @status stable
  * @category navigation
  * @aliases Command palette, Quick open, Spotlight
- * @documentation https://helix.fusion.dev/components/command
+ * @documentation https://fusion.dev/helix/components/command
  *
  * @slot - The commands, which are `helix-option` elements and their groups.
  * @slot footer - Under the list, for the keys a reader can press.

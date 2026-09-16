@@ -130,7 +130,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @status experimental
  * @category forms
  * @aliases SearchField, FacetInput, TokenInput
- * @documentation https://helix.fusion.dev/components/filter-input
+ * @documentation https://fusion.dev/helix/components/filter-input
  *
  * @slot end - After the text, for a count or a control.
  * @slot start - Before the text, for a search icon.

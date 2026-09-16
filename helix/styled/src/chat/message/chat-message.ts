@@ -19,7 +19,7 @@ import { styles } from './chat-message.css.js'
  * @since 0.1.0
  * @status experimental
  * @category feedback
- * @documentation https://helix.fusion.dev/components/chat
+ * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot - What was said.
  * @slot actions - What can be done with it.

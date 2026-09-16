@@ -20,7 +20,7 @@ import { styles } from './steps-root.css.js'
  * @status experimental
  * @category navigation
  * @aliases Stepper, Wizard, Progress steps
- * @documentation https://helix.fusion.dev/components/steps
+ * @documentation https://fusion.dev/helix/components/steps
  *
  * @cssproperty --steps-complete-color - The mark on a finished step.
  * @cssproperty --steps-connector-color - The rule running through the steps.

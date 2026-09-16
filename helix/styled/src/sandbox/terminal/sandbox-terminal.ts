@@ -33,7 +33,7 @@ const LIMIT = 200
  * @since 0.1.0
  * @status experimental
  * @aliases Console, Output
- * @documentation https://helix.fusion.dev/sandbox/terminal
+ * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @csspart count - How many times a repeated line arrived.
  * @csspart empty - Shown while nothing has been written.

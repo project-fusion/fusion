@@ -32,7 +32,7 @@ import { property, state } from 'lit/decorators.js'
  * @status experimental
  * @category forms
  * @aliases Stars, Score, Review score
- * @documentation https://helix.fusion.dev/components/rating
+ * @documentation https://fusion.dev/helix/components/rating
  *
  * @event {Event} change - Announced with it, the choice being the commit.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the score changes, and cancelable.

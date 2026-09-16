@@ -30,7 +30,7 @@ import '../../menu/index.js'
  * @status experimental
  * @category media
  * @aliases Episode Menu, Queue Menu, Up Next
- * @documentation https://helix.fusion.dev/components/video-playlist
+ * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @cssproperty --video-playlist-menu-color - Color of the trigger, defaulting to the control bar's.
  * @cssproperty --video-playlist-menu-poster - Width of an entry's still.

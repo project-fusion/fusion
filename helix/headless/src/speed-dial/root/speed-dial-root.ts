@@ -44,7 +44,7 @@ import type { HelixHeadlessSpeedDialItem } from '../item/speed-dial-item.js'
  * @status experimental
  * @category actions
  * @aliases FAB, Floating action button, Action button, Quick actions
- * @documentation https://helix.fusion.dev/components/speed-dial
+ * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @slot - The actions.
  * @slot trigger - The control that opens it. Falls back to a button named by `label`.

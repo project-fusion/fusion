@@ -39,7 +39,7 @@ const KEYS = new Set([
  * @status experimental
  * @category navigation
  * @aliases FileTree, Navigation tree
- * @documentation https://helix.fusion.dev/components/tree
+ * @documentation https://fusion.dev/helix/components/tree
  *
  * @slot - The tree's items.
  *

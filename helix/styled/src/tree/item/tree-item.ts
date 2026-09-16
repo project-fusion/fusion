@@ -19,7 +19,7 @@ import { styles } from './tree-item.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases TreeNode, Branch, Leaf
- * @documentation https://helix.fusion.dev/components/tree
+ * @documentation https://fusion.dev/helix/components/tree
  *
  * @slot - The item's label.
  * @slot children - Nested items, which make this a branch.

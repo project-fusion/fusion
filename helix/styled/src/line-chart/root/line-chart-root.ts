@@ -29,7 +29,7 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Time Series, Trend Chart, Multi-line Chart
- * @documentation https://helix.fusion.dev/components/line-chart
+ * @documentation https://fusion.dev/helix/components/line-chart
  *
  * @cssproperty --chart-stroke - Thickness of a series drawn as a line, here and on Area
  *   Chart's top edge and Bar Chart's `lines`. Each family's own width hook overrides it.

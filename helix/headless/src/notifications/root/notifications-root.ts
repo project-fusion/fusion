@@ -36,7 +36,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @status experimental
  * @category feedback
  * @aliases Notification feed, Inbox, Activity
- * @documentation https://helix.fusion.dev/components/notifications
+ * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications, as `helix-notification` children.
  * @slot footer - Below the list, for a link to everything.

@@ -32,7 +32,7 @@ import { styles } from './time-input-root.css.js'
  * @status experimental
  * @category forms
  * @aliases TimeField, InputTime
- * @documentation https://helix.fusion.dev/components/time-input
+ * @documentation https://fusion.dev/helix/components/time-input
  *
  * @cssproperty --time-input-background-color - Fill behind the field.
  * @cssproperty --time-input-border-color - Color of the panel's edge.

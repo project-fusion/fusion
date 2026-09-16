@@ -36,7 +36,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @since 0.1.0
  * @status stable
  * @aliases Crumb
- * @documentation https://helix.fusion.dev/components/breadcrumbs
+ * @documentation https://fusion.dev/helix/components/breadcrumbs
  *
  * @slot - The step's label. Without an `href` this may be the consumer's own
  * anchor, styled with `data-link="quiet"`, since a slotted anchor belongs to the

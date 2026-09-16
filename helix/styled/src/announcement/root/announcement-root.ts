@@ -16,7 +16,7 @@ import { styles } from './announcement-root.css.js'
  * @status stable
  * @category feedback
  * @aliases Banner, Notification bar, Alert bar
- * @documentation https://helix.fusion.dev/components/announcement
+ * @documentation https://fusion.dev/helix/components/announcement
  *
  * @cssproperty --announcement-block-size - How tall the band is at its shortest, so adding a control to it does not move the page down. A floor, not a cap: a message long enough to wrap still gets the room.
  * @cssproperty --announcement-inset - Inline padding, matched to the page.

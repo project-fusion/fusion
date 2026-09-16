@@ -39,7 +39,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category overlays
  * @aliases Sheet, Sidebar, Panel, Off-canvas
- * @documentation https://helix.fusion.dev/components/drawer
+ * @documentation https://fusion.dev/helix/components/drawer
  *
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.

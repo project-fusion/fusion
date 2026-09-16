@@ -14,7 +14,7 @@ import { styles } from './tab.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/components/tabs
+ * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tab's label.
  *

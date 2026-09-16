@@ -34,7 +34,7 @@ const ITEMS_ID = 'items'
  * @status experimental
  * @category feedback
  * @aliases NotificationSection, FeedGroup
- * @documentation https://helix.fusion.dev/components/notifications
+ * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications in this group.
  * @slot action - Beside the count, for a link to the rest of them.

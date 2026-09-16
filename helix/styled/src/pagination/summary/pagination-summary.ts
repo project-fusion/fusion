@@ -14,7 +14,7 @@ import { styles } from './pagination-summary.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Result count, Range
- * @documentation https://helix.fusion.dev/components/pagination
+ * @documentation https://fusion.dev/helix/components/pagination
  */
 @customElement('helix-pagination-summary')
 export class HelixPaginationSummary extends HelixHeadlessPaginationSummary {

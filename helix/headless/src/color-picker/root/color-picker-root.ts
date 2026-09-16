@@ -68,7 +68,7 @@ interface EyeDropperConstructor {
  * @status experimental
  * @category forms
  * @aliases Color, ColorArea, Swatch picker
- * @documentation https://helix.fusion.dev/components/color-picker
+ * @documentation https://fusion.dev/helix/components/color-picker
  *
  * @slot eyedropper-icon - The glyph on the screen-sampling control, usually a dropper.
  *

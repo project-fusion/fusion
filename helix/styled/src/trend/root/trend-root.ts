@@ -34,7 +34,7 @@ import { styles } from './trend-root.css.js'
  * @category charts
  * @groups charts
  * @aliases Delta, Change, Movement
- * @documentation https://helix.fusion.dev/components/trend
+ * @documentation https://fusion.dev/helix/components/trend
  *
  * @cssproperty --trend-color - Color of the arrow, overriding the judgment.
  * @cssproperty --trend-icon-size - Size of the arrow.

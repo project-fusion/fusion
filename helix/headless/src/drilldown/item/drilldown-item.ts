@@ -30,7 +30,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Panel item, Drill row
- * @documentation https://helix.fusion.dev/components/drilldown
+ * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @slot - The words naming this row.
  * @slot end - After the words, usually a mark or a count.

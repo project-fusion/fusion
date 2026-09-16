@@ -19,7 +19,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category data
  * @aliases Metric, KPI, Figure
- * @documentation https://helix.fusion.dev/components/stat
+ * @documentation https://fusion.dev/helix/components/stat
  *
  * @slot - The value.
  * @slot label - What the value measures.

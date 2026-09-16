@@ -15,7 +15,7 @@ import { styles } from './table-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @category data
- * @documentation https://helix.fusion.dev/components/table
+ * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
  *

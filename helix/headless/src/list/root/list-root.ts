@@ -14,7 +14,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category data
  * @aliases Rows, Stack, Menu
- * @documentation https://helix.fusion.dev/components/list
+ * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The rows.
  */

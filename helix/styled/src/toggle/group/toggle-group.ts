@@ -23,7 +23,7 @@ import { styles } from './toggle-group.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases SegmentedControl, Segmented, Navigation, Switcher
- * @documentation https://helix.fusion.dev/components/toggle-group
+ * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The group's items.
  *

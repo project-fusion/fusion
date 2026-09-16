@@ -23,7 +23,7 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Stacked Area Chart, Composition Chart, Stream Chart
- * @documentation https://helix.fusion.dev/components/area-chart
+ * @documentation https://fusion.dev/helix/components/area-chart
  *
  * @cssproperty --area-chart-block-size - Height of the drawing.
  * @cssproperty --area-chart-fill-strength - How much of its series' color a band takes, as a percentage mixed toward the page.

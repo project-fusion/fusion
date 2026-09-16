@@ -23,7 +23,7 @@ import '../../tooltip/index.js'
  * @since 0.1.0
  * @status experimental
  * @category charts
- * @documentation https://helix.fusion.dev/components/heatmap
+ * @documentation https://fusion.dev/helix/components/heatmap
  *
  * @slot - The `<table>` this draws, where it is not named by `for`.
  * @slot end - Below the strip, at the trailing edge.

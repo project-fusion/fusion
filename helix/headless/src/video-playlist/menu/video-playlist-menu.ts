@@ -33,7 +33,7 @@ const ITEMS = 'helix-video-playlist-item, helix-headless-video-playlist-item'
  * @status experimental
  * @category media
  * @aliases Episode Menu, Queue Menu, Up Next
- * @documentation https://helix.fusion.dev/components/video-playlist
+ * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot trigger - Replaces the button that opens the menu.
  *

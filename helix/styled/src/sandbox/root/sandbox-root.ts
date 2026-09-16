@@ -53,7 +53,7 @@ const PANEL_MAX = 0.8
  * @status experimental
  * @category tooling
  * @aliases Playground, REPL, Editor
- * @documentation https://helix.fusion.dev/sandbox
+ * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @slot panel - A panel under both panes, usually a terminal.
  * @slot preview - The live preview. Second unless `lead` says otherwise.

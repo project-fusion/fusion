@@ -49,7 +49,7 @@ import { isTime, toMinutes, writeTime } from '../../time-picker/root/time-picker
  * @status experimental
  * @category forms
  * @aliases TimeField, InputTime
- * @documentation https://helix.fusion.dev/components/time-input
+ * @documentation https://fusion.dev/helix/components/time-input
  *
  * @slot feedback - What is wrong with it.
  * @slot hint - Help under the field.

@@ -80,7 +80,7 @@ export interface AreaStack {
  * @status experimental
  * @category charts
  * @aliases Stacked Area Chart, Composition Chart, Stream Chart
- * @documentation https://helix.fusion.dev/components/area-chart
+ * @documentation https://fusion.dev/helix/components/area-chart
  *
  * @csspart area - One part's band.
  * @csspart baseline - The rule at zero, which is the floor of the drawing.

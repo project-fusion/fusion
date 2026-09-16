@@ -24,7 +24,7 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @status stable
  * @category feedback
  * @aliases Gauge, Level, Capacity
- * @documentation https://helix.fusion.dev/components/meter
+ * @documentation https://fusion.dev/helix/components/meter
  *
  * @csspart groove - The unfilled circle, in `ring` and `arc`.
  * @csspart indicator - The part of it the value fills.

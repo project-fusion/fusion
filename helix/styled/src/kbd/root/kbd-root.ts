@@ -18,7 +18,7 @@ import { styles } from './kbd-root.css.js'
  * @status stable
  * @category typography
  * @aliases Key, Shortcut, Hotkey
- * @documentation https://helix.fusion.dev/components/kbd
+ * @documentation https://fusion.dev/helix/components/kbd
  *
  * @cssproperty --kbd-background-color - Fill of the key.
  * @cssproperty --kbd-border-color - Color of the hairline and the edge.

@@ -17,7 +17,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status experimental
  * @aliases OptGroup, Section
- * @documentation https://helix.fusion.dev/components/option-group
+ * @documentation https://fusion.dev/helix/components/option
  *
  * @slot - The options in this run.
  * @slot label - Richer than a string.

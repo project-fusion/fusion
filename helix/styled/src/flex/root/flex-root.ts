@@ -26,7 +26,7 @@ import { styles } from './flex-root.css.js'
  * @status stable
  * @category layout
  * @aliases Stack, Row, Column, HStack, VStack
- * @documentation https://helix.fusion.dev/components/flex
+ * @documentation https://fusion.dev/helix/components/flex
  *
  * @slot - The items to lay out.
  */

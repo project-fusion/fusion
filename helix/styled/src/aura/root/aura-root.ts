@@ -117,7 +117,7 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  * @status experimental
  * @category media
  * @aliases Backdrop, Background, Atmosphere, Gradient
- * @documentation https://helix.fusion.dev/components/aura
+ * @documentation https://fusion.dev/helix/components/aura
  *
  * @csspart canvas - The surface the shader draws into.
  */

@@ -23,6 +23,6 @@ put your own drawing in one place without replacing the package.
 
 Phosphor is MIT and its notice travels in `LICENSE` beside ours.
 
-[Documentation](https://helix.fusion.dev)
+[Documentation](https://fusion.dev/helix)
 
 MIT

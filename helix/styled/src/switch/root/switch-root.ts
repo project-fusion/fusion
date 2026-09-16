@@ -30,7 +30,7 @@ import { styles } from './switch-root.css.js'
  * @status stable
  * @category forms
  * @aliases Toggle switch, On/off
- * @documentation https://helix.fusion.dev/components/switch
+ * @documentation https://fusion.dev/helix/components/switch
  *
  * @cssproperty --switch-block-size - Height of the track. The width follows it.
  * @cssproperty --switch-inline-size - Length of the track, if not the derived one.

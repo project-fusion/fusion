@@ -24,7 +24,7 @@ import { styles } from './time-picker-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Time, TimeList
- * @documentation https://helix.fusion.dev/components/time-picker
+ * @documentation https://fusion.dev/helix/components/time-picker
  *
  * @cssproperty --time-picker-list-block-size - How tall the list is before it scrolls.
  * @cssproperty --time-picker-range-color - Wash behind the times inside a range.

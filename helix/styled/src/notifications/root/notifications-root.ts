@@ -22,7 +22,7 @@ import '../notification/notification.js'
  * @since 0.1.0
  * @status experimental
  * @category feedback
- * @documentation https://helix.fusion.dev/components/notifications
+ * @documentation https://fusion.dev/helix/components/notifications
  *
  * @slot - The notifications, as `helix-notification` children.
  * @slot footer - Below the list, for a link to everything.

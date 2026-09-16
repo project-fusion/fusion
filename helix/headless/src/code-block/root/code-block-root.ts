@@ -49,7 +49,7 @@ import { type DiffFile, type DiffHunk, type DiffLine, pairLines, parsePatch } fr
  * @status stable
  * @category typography
  * @aliases Code block, Snippet, Pre
- * @documentation https://helix.fusion.dev/components/code-block
+ * @documentation https://fusion.dev/helix/components/code-block
  *
  * @slot - The code.
  *

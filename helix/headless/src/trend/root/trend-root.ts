@@ -50,7 +50,7 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @status stable
  * @category charts
  * @aliases Delta, Change, Movement
- * @documentation https://helix.fusion.dev/components/trend
+ * @documentation https://fusion.dev/helix/components/trend
  *
  * @slot - The metric that moved.
  * @slot label - What it moved over.

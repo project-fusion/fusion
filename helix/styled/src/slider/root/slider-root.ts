@@ -23,7 +23,7 @@ import { styles } from './slider-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Range, Range input
- * @documentation https://helix.fusion.dev/components/slider
+ * @documentation https://fusion.dev/helix/components/slider
  *
  * @cssproperty --slider-fill-color - The part behind the thumb.
  * @cssproperty --slider-length - How long a vertical track is. Nine rem by default, and read only when `orientation` is `vertical`, a horizontal track taking the width of its row.

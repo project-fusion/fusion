@@ -12,7 +12,7 @@ import { styles } from './description-list-item.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/components/description-list
+ * @documentation https://fusion.dev/helix/components/description-list
  */
 @customElement('helix-description-list-item')
 export class HelixDescriptionListItem extends HelixHeadlessDescriptionListItem {

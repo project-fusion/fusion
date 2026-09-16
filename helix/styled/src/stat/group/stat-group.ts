@@ -16,7 +16,7 @@ import { styles } from './stat-group.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Metrics, KPIs, Figures
- * @documentation https://helix.fusion.dev/components/stat
+ * @documentation https://fusion.dev/helix/components/stat
  *
  * @cssproperty --stat-group-gap - Space between figures.
  */

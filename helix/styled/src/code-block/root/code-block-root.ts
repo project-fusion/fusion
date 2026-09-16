@@ -23,7 +23,7 @@ import '../../copy-button/index.js'
  * @since 0.1.0
  * @status stable
  * @category typography
- * @documentation https://helix.fusion.dev/components/code-block
+ * @documentation https://fusion.dev/helix/components/code-block
  *
  * @cssproperty --code-block-backdrop - A filter over what shows through the block and its header, for a translucent ground.
  * @cssproperty --code-block-background-color - The ground behind the code, for a block that is not on the page.

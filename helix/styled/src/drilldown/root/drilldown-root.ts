@@ -22,7 +22,7 @@ import { styles } from './drilldown-root.css.js'
  * @status experimental
  * @category navigation
  * @aliases Panel, Nested list, Drill-in
- * @documentation https://helix.fusion.dev/components/drilldown
+ * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @cssproperty --drilldown-background-color - Fill behind the pages.
  * @cssproperty --drilldown-inline-size - Width of the region.

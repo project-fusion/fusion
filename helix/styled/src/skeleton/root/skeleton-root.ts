@@ -16,7 +16,7 @@ import { styles } from './skeleton-root.css.js'
  * @status stable
  * @category feedback
  * @aliases Placeholder, Shimmer, Ghost
- * @documentation https://helix.fusion.dev/components/skeleton
+ * @documentation https://fusion.dev/helix/components/skeleton
  *
  * @csspart skeleton - The placeholder surface.
  *

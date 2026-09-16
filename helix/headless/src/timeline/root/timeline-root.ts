@@ -33,7 +33,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category data
  * @aliases Activity feed, History, Changelog, Audit trail
- * @documentation https://helix.fusion.dev/components/timeline
+ * @documentation https://fusion.dev/helix/components/timeline
  *
  * @slot - The entries.
  */

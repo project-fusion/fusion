@@ -20,7 +20,7 @@ import { HelixElement } from '../helix-element/helix-element.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/core/form-element
+ * @documentation https://fusion.dev/helix/docs/tiers
  */
 export class HelixFormElement extends HelixElement {
   /** Opts the element into form ownership, labels, and submission. */

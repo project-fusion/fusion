@@ -38,7 +38,7 @@ export const FAILED_LABEL = 'Not sent'
  * @status experimental
  * @category feedback
  * @aliases Message, Bubble, Turn
- * @documentation https://helix.fusion.dev/components/chat
+ * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot - What was said.
  * @slot actions - What can be done with it: copy, retry, react.

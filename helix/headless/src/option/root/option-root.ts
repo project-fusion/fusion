@@ -53,7 +53,7 @@ export const optionsAmong = (elements: readonly Element[]): HelixHeadlessOption[
  * @status experimental
  * @category forms
  * @aliases Item, Choice
- * @documentation https://helix.fusion.dev/components/option
+ * @documentation https://fusion.dev/helix/components/option
  *
  * @slot - The words naming this choice.
  * @slot end - After them, for a shortcut or a count.

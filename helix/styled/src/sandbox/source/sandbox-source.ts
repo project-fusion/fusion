@@ -27,7 +27,7 @@ import { styles } from './sandbox-source.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Editor, Code pane
- * @documentation https://helix.fusion.dev/sandbox/source
+ * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves.

@@ -44,7 +44,7 @@ let showing: HelixHeadlessMegamenu | undefined
  * @status experimental
  * @category navigation
  * @aliases Mega menu, Flyout, Nav panel
- * @documentation https://helix.fusion.dev/components/megamenu
+ * @documentation https://fusion.dev/helix/components/megamenu
  *
  * @slot - The panel's contents: the consumer's own lists and headings.
  * @slot trigger - The control that opens it. Falls back to a button named by `label`.

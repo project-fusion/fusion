@@ -19,7 +19,7 @@ import { styles } from './qr-code-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category media
- * @documentation https://helix.fusion.dev/components/qr-code
+ * @documentation https://fusion.dev/helix/components/qr-code
  *
  * @cssproperty --qr-code-background-color - Behind them, including the quiet zone.
  * @cssproperty --qr-code-color - The dark modules. Defaults to the page's ink.

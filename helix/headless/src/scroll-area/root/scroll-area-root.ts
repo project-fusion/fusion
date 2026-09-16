@@ -33,7 +33,7 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * @status stable
  * @category layout
  * @aliases Scroller, Overflow, Scroll container
- * @documentation https://helix.fusion.dev/components/scroll-area
+ * @documentation https://fusion.dev/helix/components/scroll-area
  *
  * @slot - What scrolls.
  *

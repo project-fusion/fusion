@@ -41,7 +41,7 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @status experimental
  * @category charts
  * @aliases Contribution graph, Uptime strip, Calendar heatmap, Activity graph
- * @documentation https://helix.fusion.dev/components/heatmap
+ * @documentation https://fusion.dev/helix/components/heatmap
  *
  * @slot end - Below the strip, at the trailing edge: usually the newest date.
  * @slot start - Below the strip, at the leading edge: usually the oldest date.

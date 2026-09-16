@@ -15,7 +15,7 @@ import { styles } from './toggle-root.css.js'
  * @status experimental
  * @category actions
  * @aliases Segment, NavItem, Option
- * @documentation https://helix.fusion.dev/components/toggle-group
+ * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The item's label.
  *

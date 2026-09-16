@@ -13,7 +13,7 @@ import { styles } from './code-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category typography
- * @documentation https://helix.fusion.dev/components/code
+ * @documentation https://fusion.dev/helix/components/code
  *
  * @cssproperty --code-background-color - Fill behind the fragment. Defaults to a 6%
  * wash of the ink, which composites the same against a light page and a dark one.

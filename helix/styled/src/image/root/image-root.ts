@@ -16,7 +16,7 @@ import { styles } from './image-root.css.js'
  * @status experimental
  * @category media
  * @aliases Picture, Img, Figure
- * @documentation https://helix.fusion.dev/components/image
+ * @documentation https://fusion.dev/helix/components/image
  *
  * @cssproperty --image-aspect - The ratio of the box, as `16 / 9`.
  * @cssproperty --image-fit - How the picture fills it.

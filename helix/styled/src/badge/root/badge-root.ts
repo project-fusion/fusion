@@ -16,7 +16,7 @@ import { styles } from './badge-root.css.js'
  * @status stable
  * @category markers
  * @aliases Count, Indicator, Pip
- * @documentation https://helix.fusion.dev/components/badge
+ * @documentation https://fusion.dev/helix/components/badge
  *
  * @cssproperty --badge-background-color - Fill of the indicator.
  * @cssproperty --badge-offset - Pulls the mark in from the corner, along both axes.

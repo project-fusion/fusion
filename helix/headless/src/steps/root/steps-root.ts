@@ -28,7 +28,7 @@ import type { HelixHeadlessStep } from '../step/step.js'
  * @status experimental
  * @category navigation
  * @aliases Stepper, Wizard, Progress steps
- * @documentation https://helix.fusion.dev/components/steps
+ * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The steps, which are `helix-step` elements.
  *

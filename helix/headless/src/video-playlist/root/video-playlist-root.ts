@@ -34,7 +34,7 @@ import type { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item
  * @status experimental
  * @category media
  * @aliases Playlist, Queue, Up next
- * @documentation https://helix.fusion.dev/components/video-playlist
+ * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entries.
  * @slot player - The `helix-video` they play in.

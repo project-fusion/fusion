@@ -38,7 +38,7 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * @since 0.1.0
  * @status experimental
  * @aliases RadioButtons, Choice group
- * @documentation https://helix.fusion.dev/components/radio-group
+ * @documentation https://fusion.dev/helix/components/radio
  *
  * @slot - The radios.
  * @slot hint - Richer than a string.

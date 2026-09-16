@@ -17,7 +17,7 @@ import { styles } from './checkbox-group-root.css.js'
  * @status stable
  * @category forms
  * @aliases Checkbox list, Multi-select
- * @documentation https://helix.fusion.dev/components/checkbox-group
+ * @documentation https://fusion.dev/helix/components/checkbox-group
  *
  * @cssproperty --checkbox-group-gap - Space between the boxes.
  */

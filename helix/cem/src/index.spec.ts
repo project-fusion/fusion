@@ -15,7 +15,7 @@ import type { HelixContext, HelixDeclaration, HelixManifest } from './types.js'
 const ROOT: HelixDeclaration = {
   description: 'Base class for every Helix element.',
   helix: {
-    documentation: 'https://helix.fusion.dev/core/helix-element',
+    documentation: 'https://example.com/core/helix-element',
     since: '0.1.0',
     status: 'experimental',
   },
@@ -106,7 +106,7 @@ describe('conventionLint', () => {
   /** The metadata @since, @status, and @documentation carry, all required. */
   const DOCUMENTED = {
     helix: {
-      documentation: 'https://helix.fusion.dev/components/thing',
+      documentation: 'https://example.com/components/thing',
       since: '0.1.0',
       status: 'experimental',
     },

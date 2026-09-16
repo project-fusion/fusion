@@ -19,7 +19,7 @@ import '../../copy-button/index.js'
  * @status experimental
  * @category data
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
- * @documentation https://helix.fusion.dev/components/object-inspector
+ * @documentation https://fusion.dev/helix/components/object-inspector
  *
  * @cssproperty --object-inspector-background-color - Ground under the tree.
  * @cssproperty --object-inspector-block-size - Height of the scrolling box, when windowed.

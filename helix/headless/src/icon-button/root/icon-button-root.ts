@@ -25,7 +25,7 @@ import { HelixHeadlessButton } from '../../button/root/button-root.js'
  * @status stable
  * @category actions
  * @aliases Icon button, Square button
- * @documentation https://helix.fusion.dev/components/icon-button
+ * @documentation https://fusion.dev/helix/components/icon-button
  *
  * @slot - The icon.
  *

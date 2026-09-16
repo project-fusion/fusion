@@ -27,7 +27,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status stable
  * @category data
  * @aliases Activity item, History entry, Event
- * @documentation https://helix.fusion.dev/components/timeline
+ * @documentation https://fusion.dev/helix/components/timeline
  *
  * @slot - What happened.
  * @slot marker - The mark on the line. Falls back to a dot, which is the slot's

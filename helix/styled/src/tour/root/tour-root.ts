@@ -12,7 +12,7 @@ import { styles } from './tour-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @category overlays
- * @documentation https://helix.fusion.dev/components/tour
+ * @documentation https://fusion.dev/helix/components/tour
  *
  * @cssproperty --tour-scrim-color - The darkness outside the lit box.
  * @cssproperty --tour-spotlight-radius - Corner radius of the lit box.

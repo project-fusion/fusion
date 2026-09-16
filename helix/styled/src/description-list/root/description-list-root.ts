@@ -27,7 +27,7 @@ import { styles } from './description-list-root.css.js'
  * @status experimental
  * @category data
  * @aliases Data list, Key-value list, Details, Properties
- * @documentation https://helix.fusion.dev/components/description-list
+ * @documentation https://fusion.dev/helix/components/description-list
  *
  * @cssproperty --description-list-gap - Space between one pair and the next.
  */

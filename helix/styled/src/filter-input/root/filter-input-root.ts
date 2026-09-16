@@ -45,7 +45,7 @@ import { styles } from './filter-input-root.css.js'
  * @status experimental
  * @category forms
  * @aliases SearchField, FacetInput, TokenInput
- * @documentation https://helix.fusion.dev/components/filter-input
+ * @documentation https://fusion.dev/helix/components/filter-input
  *
  * @cssproperty --filter-input-action-padding-inline - Space either side of a slotted control's label. Follows `--helix-space-xs`, which is what a token uses.
  * @cssproperty --filter-input-action-size - Height of a control slotted at either end. Follows `--helix-size-tag`, so it matches the tokens beside it rather than the field around them.

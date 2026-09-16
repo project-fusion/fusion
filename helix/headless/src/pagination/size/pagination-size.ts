@@ -46,7 +46,7 @@ import '../../select/index.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Page size, Rows per page
- * @documentation https://helix.fusion.dev/components/pagination
+ * @documentation https://fusion.dev/helix/components/pagination
  *
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the size changes, and cancelable. The only way to refuse one.
  *

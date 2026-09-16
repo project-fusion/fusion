@@ -33,7 +33,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category forms
  * @aliases Multiline, TextArea
- * @documentation https://helix.fusion.dev/components/textarea
+ * @documentation https://fusion.dev/helix/components/textarea
  *
  * @event {Event} change - Relayed from the textarea once the reader has finished.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.

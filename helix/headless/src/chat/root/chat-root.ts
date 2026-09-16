@@ -160,7 +160,7 @@ const spoken = (message: Element): string =>
  * @status experimental
  * @category feedback
  * @aliases Conversation, Transcript, Thread, Messages
- * @documentation https://helix.fusion.dev/components/chat
+ * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot - The turns, as `helix-chat-message` children.
  * @slot actions - Beside the header: what can be done to the conversation itself.

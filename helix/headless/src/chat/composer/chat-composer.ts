@@ -32,7 +32,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status experimental
  * @category forms
  * @aliases Message box, Prompt input
- * @documentation https://helix.fusion.dev/components/chat
+ * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot end - Under the field, beside the send control.
  * @slot start - Under the field, at the leading edge: attachments, a model picker.

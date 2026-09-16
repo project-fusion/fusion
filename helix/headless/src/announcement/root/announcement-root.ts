@@ -37,7 +37,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @status stable
  * @category feedback
  * @aliases Banner, Notification bar, Alert bar
- * @documentation https://helix.fusion.dev/components/announcement
+ * @documentation https://fusion.dev/helix/components/announcement
  *
  * @slot - The message.
  * @slot actions - What to do about it, usually a link or a button.

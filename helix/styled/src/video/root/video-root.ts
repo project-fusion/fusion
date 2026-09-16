@@ -30,7 +30,7 @@ import { styles } from './video-root.css.js'
  * @since 0.1.0
  * @status experimental
  * @category media
- * @documentation https://helix.fusion.dev/components/video
+ * @documentation https://fusion.dev/helix/components/video
  *
  * @cssproperty --video-accent-color - The played part of the scrubber.
  * @cssproperty --video-aspect-ratio - The shape of the box. Defaults to the

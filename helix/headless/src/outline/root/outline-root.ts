@@ -27,7 +27,7 @@ import { property, state } from 'lit/decorators.js'
  * @status experimental
  * @category navigation
  * @aliases Table of contents, On this page, Outline
- * @documentation https://helix.fusion.dev/components/outline
+ * @documentation https://fusion.dev/helix/components/outline
  *
  * @slot - The links, as anchors with fragment hrefs.
  *

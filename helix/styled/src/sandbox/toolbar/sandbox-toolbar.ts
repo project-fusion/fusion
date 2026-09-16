@@ -21,7 +21,7 @@ import { styles } from './sandbox-toolbar.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Action bar
- * @documentation https://helix.fusion.dev/sandbox/toolbar
+ * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @slot - Items at the start, usually the files.
  * @slot end - Items at the end, usually menus.

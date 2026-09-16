@@ -96,7 +96,7 @@ const tracksOf = (list: string, wanted: number): string[] => {
  * @status experimental
  * @category data
  * @aliases DataTable, Grid table
- * @documentation https://helix.fusion.dev/components/table
+ * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
  *

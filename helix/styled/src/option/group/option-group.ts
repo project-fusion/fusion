@@ -14,7 +14,7 @@ import { styles } from './option-group.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases OptGroup, Section
- * @documentation https://helix.fusion.dev/components/option-group
+ * @documentation https://fusion.dev/helix/components/option
  */
 @customElement('helix-option-group')
 export class HelixOptionGroup extends HelixHeadlessOptionGroup {

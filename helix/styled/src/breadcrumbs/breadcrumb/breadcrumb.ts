@@ -19,7 +19,7 @@ import { styles } from './breadcrumb.css.js'
  * @since 0.1.0
  * @status stable
  * @aliases Crumb
- * @documentation https://helix.fusion.dev/components/breadcrumbs
+ * @documentation https://fusion.dev/helix/components/breadcrumbs
  *
  * @slot - The step: a link, or the text of the current page.
  * @slot separator - Replaces the chevron shown before this item.

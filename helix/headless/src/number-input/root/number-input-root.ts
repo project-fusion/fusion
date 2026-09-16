@@ -69,7 +69,7 @@ const SCRUB_FINE = 16
  * @status experimental
  * @category forms
  * @aliases NumberField, Stepper, InputNumber
- * @documentation https://helix.fusion.dev/components/number-input
+ * @documentation https://fusion.dev/helix/components/number-input
  *
  * @slot end - After it.
  * @slot start - Before the number, for a unit or an icon.

@@ -27,7 +27,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status experimental
  * @category media
- * @documentation https://helix.fusion.dev/components/video-playlist
+ * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entry's name.
  * @slot media - A thumbnail. Falls back to an image of `poster`.

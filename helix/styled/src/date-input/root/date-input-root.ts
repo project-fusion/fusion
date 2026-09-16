@@ -36,7 +36,7 @@ import { styles } from './date-input-root.css.js'
  * @status experimental
  * @category forms
  * @aliases DatePicker, DateField, InputDate
- * @documentation https://helix.fusion.dev/components/date-input
+ * @documentation https://fusion.dev/helix/components/date-input
  *
  * @cssproperty --date-input-background-color - Fill behind the field.
  * @cssproperty --date-input-border-color - Color of the panel's edge.

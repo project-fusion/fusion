@@ -16,7 +16,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category actions
  * @aliases Segment, NavItem, Option
- * @documentation https://helix.fusion.dev/components/toggle
+ * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The item's label.
  *

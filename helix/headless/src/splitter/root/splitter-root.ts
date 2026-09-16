@@ -61,7 +61,7 @@ const STACK_BELOW = 512
  * @status experimental
  * @category layout
  * @aliases SplitPane, Resizable, SplitView
- * @documentation https://helix.fusion.dev/components/splitter
+ * @documentation https://fusion.dev/helix/components/splitter
  *
  * @slot end - The pane after it.
  * @slot start - The pane before the divider.

@@ -108,7 +108,7 @@ const onApple = (): boolean =>
  * @status stable
  * @category typography
  * @aliases Key, Shortcut, Hotkey
- * @documentation https://helix.fusion.dev/components/kbd
+ * @documentation https://fusion.dev/helix/components/kbd
  *
  * @slot - The key's label, where `keys` is not set.
  *

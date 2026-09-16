@@ -20,7 +20,7 @@ import { styles } from './button-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category actions
- * @documentation https://helix.fusion.dev/components/button
+ * @documentation https://fusion.dev/helix/components/button
  *
  * @slot - The button's label.
  * @slot end - Content after the label.

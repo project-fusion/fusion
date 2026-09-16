@@ -72,10 +72,10 @@ describe('qr code', () => {
        the path back into cells is the only comparison that proves the drawing
        and the encoding agree. */
     const host = await code(
-      '<helix-headless-qr-code value="https://helix.fusion.dev"></helix-headless-qr-code>',
+      '<helix-headless-qr-code value="https://fusion.dev/helix"></helix-headless-qr-code>',
     )
     const drawn = allCells(host)
-    expect(drawn).toEqual(expected('https://helix.fusion.dev', 'M'))
+    expect(drawn).toEqual(expected('https://fusion.dev/helix', 'M'))
     expect(drawn.size).toBeGreaterThan(100)
   })
 
@@ -83,7 +83,7 @@ describe('qr code', () => {
     // A useful code is a thousand modules. One node per module is a thousand
     // nodes for one picture.
     const host = await code(
-      '<helix-headless-qr-code value="https://helix.fusion.dev"></helix-headless-qr-code>',
+      '<helix-headless-qr-code value="https://fusion.dev/helix"></helix-headless-qr-code>',
     )
     const d = svgOf(host).querySelector('path')?.getAttribute('d') ?? ''
     const subpaths = d.split('M').length - 1
@@ -130,7 +130,7 @@ describe('qr code', () => {
        module, so their subpath starts *are* the modules; `square` joins runs, so
        its starts are fewer and only have to be a subset. The finders are drawn
        square in every case and are checked separately. */
-    const value = 'https://helix.fusion.dev'
+    const value = 'https://fusion.dev/helix'
     const { data, size } = encode(value, { border: 0, ecc: 'M' })
     const finder = (x: number, y: number): boolean =>
       (x < 8 && y < 8) || (size - 1 - x < 8 && y < 8) || (x < 8 && size - 1 - y < 8)

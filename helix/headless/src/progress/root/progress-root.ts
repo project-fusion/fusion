@@ -21,7 +21,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category feedback
  * @aliases Progress bar, Loading bar
- * @documentation https://helix.fusion.dev/components/progress
+ * @documentation https://fusion.dev/helix/components/progress
  *
  * @csspart groove - The unfilled circle, under the ring's own sweep.
  * @csspart indicator - The part of it that is done.

@@ -15,7 +15,7 @@ import { styles } from './scroll-area-root.css.js'
  * @status stable
  * @category layout
  * @aliases Scroller, Overflow, Scroll container
- * @documentation https://helix.fusion.dev/components/scroll-area
+ * @documentation https://fusion.dev/helix/components/scroll-area
  *
  * @cssproperty --scroll-area-fade - How deep the fades are, at both edges.
  * @cssproperty --scroll-area-fade-block-end - And the bottom one.

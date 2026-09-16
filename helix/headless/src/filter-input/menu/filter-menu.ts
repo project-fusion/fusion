@@ -59,7 +59,7 @@ import '../../menu/index.js'
  * @status experimental
  * @category forms
  * @aliases FacetPicker, FilterBuilder
- * @documentation https://helix.fusion.dev/components/filter-input
+ * @documentation https://fusion.dev/helix/components/filter-input
  *
  * @slot - The fields this can filter by, as `FilterField`s. Read rather than rendered.
  * @slot trigger - The control that opens the menu. A `Button` is the usual one.

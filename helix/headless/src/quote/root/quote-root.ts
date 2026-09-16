@@ -18,7 +18,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category typography
  * @aliases Q, InlineQuote
- * @documentation https://helix.fusion.dev/components/quote
+ * @documentation https://fusion.dev/helix/components/quote
  *
  * @slot - The quoted text.
  *

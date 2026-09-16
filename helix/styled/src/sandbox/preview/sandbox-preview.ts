@@ -90,7 +90,7 @@ export type PreviewMessage =
  * @since 0.1.0
  * @status experimental
  * @aliases Result, Output
- * @documentation https://helix.fusion.dev/sandbox/preview
+ * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @event {HelixConsoleEvent} helix-console - Relayed from the frame, one per console call.
  * @event {HelixResizeEvent} helix-resize - How tall the frame's content is, whenever it changes.

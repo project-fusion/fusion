@@ -17,7 +17,7 @@ import { styles } from './list-root.css.js'
  * @status stable
  * @category data
  * @aliases Rows, Stack, Menu
- * @documentation https://helix.fusion.dev/components/list
+ * @documentation https://fusion.dev/helix/components/list
  *
  * @cssproperty --list-gap - Space between rows.
  * @cssproperty --list-marker-gutter - Room the ordered and unordered markers hang into.

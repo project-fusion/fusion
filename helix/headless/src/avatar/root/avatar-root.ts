@@ -39,7 +39,7 @@ export const initialsOf = (name: string): string => {
  * @status stable
  * @category media
  * @aliases Profile picture, Gravatar
- * @documentation https://helix.fusion.dev/components/avatar
+ * @documentation https://fusion.dev/helix/components/avatar
  *
  * @slot - Shown when there is no usable image, in place of the initials.
  *

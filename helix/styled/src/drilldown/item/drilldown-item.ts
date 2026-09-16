@@ -14,7 +14,7 @@ import { styles } from './drilldown-item.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Panel item, Drill row
- * @documentation https://helix.fusion.dev/components/drilldown
+ * @documentation https://fusion.dev/helix/components/drilldown
  *
  * @cssproperty --drilldown-item-hover-color - Fill when a row is under the pointer.
  */

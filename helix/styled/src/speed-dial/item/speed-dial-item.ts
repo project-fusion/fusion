@@ -15,7 +15,7 @@ import { styles } from './speed-dial-item.css.js'
  * @status experimental
  * @category actions
  * @aliases Speed dial action, FAB action, Quick action
- * @documentation https://helix.fusion.dev/components/speed-dial
+ * @documentation https://fusion.dev/helix/components/speed-dial
  *
  * @cssproperty --speed-dial-item-size - Edge length of the mark.
  */

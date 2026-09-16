@@ -13,7 +13,7 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
  * @since 0.1.0
  * @status experimental
  * @aliases Row, TableRow
- * @documentation https://helix.fusion.dev/components/table
+ * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The row's cells.
  */

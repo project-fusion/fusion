@@ -14,7 +14,7 @@ import { styles } from './video-playlist-root.css.js'
  * @status experimental
  * @category media
  * @aliases Playlist, Queue, Up next
- * @documentation https://helix.fusion.dev/components/video-playlist
+ * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @cssproperty --video-playlist-layout - Columns for the player and the list.
  * @cssproperty --video-playlist-size - How tall the list gets before it scrolls.

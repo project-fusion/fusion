@@ -25,7 +25,7 @@ import { property } from 'lit/decorators.js'
  * @status experimental
  * @category forms
  * @aliases Option, Choice
- * @documentation https://helix.fusion.dev/components/radio
+ * @documentation https://fusion.dev/helix/components/radio
  *
  * @slot - The words naming this choice.
  * @slot icon - A mark shown beside them, or instead of them under

@@ -19,7 +19,7 @@ import { styles } from './outline-root.css.js'
  * @status experimental
  * @category navigation
  * @aliases Table of contents, On this page, Outline
- * @documentation https://helix.fusion.dev/components/outline
+ * @documentation https://fusion.dev/helix/components/outline
  *
  * @cssproperty --outline-indent - How far each level is inset from the one above.
  * @cssproperty --outline-rail - Width of the gutter the rule and the traveling mark share.

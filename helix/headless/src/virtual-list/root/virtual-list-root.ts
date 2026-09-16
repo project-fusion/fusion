@@ -34,7 +34,7 @@ type Row = Record<string, string>
  * @since 0.1.0
  * @status stable
  * @category layout
- * @documentation https://helix.fusion.dev/components/virtual-list
+ * @documentation https://fusion.dev/helix/components/virtual-list
  *
  * @csspart after - The space standing in for rows below the window.
  * @csspart before - The space standing in for rows above the window.

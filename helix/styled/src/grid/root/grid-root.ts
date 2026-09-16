@@ -19,7 +19,7 @@ import { styles } from './grid-root.css.js'
  * @status stable
  * @category layout
  * @aliases Layout, Columns
- * @documentation https://helix.fusion.dev/components/grid
+ * @documentation https://fusion.dev/helix/components/grid
  *
  * @slot - The items to lay out.
  *

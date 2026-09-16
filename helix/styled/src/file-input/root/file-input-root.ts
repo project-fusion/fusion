@@ -33,7 +33,7 @@ import { styles } from './file-input-root.css.js'
  * @status stable
  * @category forms
  * @aliases FileUpload, FilePicker, Dropzone, InputFile
- * @documentation https://helix.fusion.dev/components/file-input
+ * @documentation https://fusion.dev/helix/components/file-input
  *
  * @cssproperty --file-input-background-color - Fill behind the field.
  * @cssproperty --file-input-padding - Padding inside the field.

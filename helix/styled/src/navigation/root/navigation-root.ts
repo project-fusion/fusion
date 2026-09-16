@@ -16,7 +16,7 @@ import { styles } from './navigation-root.css.js'
  * @status experimental
  * @category navigation
  * @aliases Nav, NavList, Tabs
- * @documentation https://helix.fusion.dev/components/navigation
+ * @documentation https://fusion.dev/helix/components/navigation
  *
  * @cssproperty --navigation-gap - Space between destinations.
  * @cssproperty --navigation-indicator-color - Fill of the traveling marker.

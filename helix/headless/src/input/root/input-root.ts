@@ -40,7 +40,7 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  * @status experimental
  * @category forms
  * @aliases TextField, Field, TextInput
- * @documentation https://helix.fusion.dev/components/input
+ * @documentation https://fusion.dev/helix/components/input
  *
  * @slot end - After the text, for an icon or a unit.
  * @slot start - Before the text, for an icon or a prefix.

@@ -17,7 +17,7 @@ import { styles } from './loader-root.css.js'
  * @status stable
  * @category feedback
  * @aliases Spinner, Busy, Activity
- * @documentation https://helix.fusion.dev/components/loader
+ * @documentation https://fusion.dev/helix/components/loader
  *
  * @cssproperty --loader-color - Color of the moving arc.
  * @cssproperty --loader-size - Diameter. Defaults to 1.5em.

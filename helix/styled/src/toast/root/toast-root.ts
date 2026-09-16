@@ -24,7 +24,7 @@ import { styles } from './toast-root.css.js'
  * @status experimental
  * @category overlays
  * @aliases Toaster, Snackbar, Notifications
- * @documentation https://helix.fusion.dev/components/toast
+ * @documentation https://fusion.dev/helix/components/toast
  *
  * @cssproperty --toast-gap - Space between one message and the next.
  * @cssproperty --toast-inline-size - Width of a message.

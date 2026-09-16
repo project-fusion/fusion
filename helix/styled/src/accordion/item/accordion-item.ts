@@ -17,7 +17,7 @@ import { styles } from './accordion-item.css.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Collapsible, Expander, Disclosure
- * @documentation https://helix.fusion.dev/components/accordion
+ * @documentation https://fusion.dev/helix/components/accordion
  *
  * @slot - The content revealed when open.
  * @slot summary - The always-visible trigger content.

@@ -16,7 +16,7 @@ import { property } from 'lit/decorators.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/components/description-list
+ * @documentation https://fusion.dev/helix/components/description-list
  *
  * @slot - The value.
  * @slot label - The label, when it is more than text. Falls back to `label`.

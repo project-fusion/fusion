@@ -21,7 +21,7 @@ import '../../tooltip/index.js'
  * @category charts
  * @groups charts
  * @aliases Column Chart, Categorical Chart
- * @documentation https://helix.fusion.dev/components/bar-chart
+ * @documentation https://fusion.dev/helix/components/bar-chart
  *
  * @cssproperty --bar-chart-band-color - The slot the pointer is resting in.
  * @cssproperty --bar-chart-bar-radius - Corner radius at the far end of a column.

@@ -30,7 +30,7 @@ import { property } from 'lit/decorators.js'
  * @status stable
  * @category feedback
  * @aliases Spinner, Busy, Activity
- * @documentation https://helix.fusion.dev/components/loader
+ * @documentation https://fusion.dev/helix/components/loader
  *
  * @slot - A mark to sit still at the center, usually a logo. Empty by default.
  *

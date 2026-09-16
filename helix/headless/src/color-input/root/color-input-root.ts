@@ -49,7 +49,7 @@ import { type ColorFormat, parseColor, toCss } from '../../color-picker/color.js
  * @status experimental
  * @category forms
  * @aliases ColorField, ColourInput, InputColor
- * @documentation https://helix.fusion.dev/components/color-input
+ * @documentation https://fusion.dev/helix/components/color-input
  *
  * @slot end - Content at the trailing end, before the trigger.
  * @slot feedback - What is wrong with it.

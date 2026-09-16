@@ -16,7 +16,7 @@ import { styles } from './option-root.css.js'
  * @status experimental
  * @category forms
  * @aliases Item, Choice
- * @documentation https://helix.fusion.dev/components/option
+ * @documentation https://fusion.dev/helix/components/option
  *
  * @cssproperty --option-active-color - Wash behind the option the keyboard is on.
  * @cssproperty --option-block-padding - Space above and below it. `Command` raises this, a palette being a page of rows read at speed rather than a select's short list.

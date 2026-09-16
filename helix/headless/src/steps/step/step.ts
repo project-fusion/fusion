@@ -31,7 +31,7 @@ import '../../button/index.js'
  * @since 0.1.0
  * @status experimental
  * @aliases Stage
- * @documentation https://helix.fusion.dev/components/steps
+ * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The step's name.
  * @slot content - What the stage holds, shown while it is the current one.

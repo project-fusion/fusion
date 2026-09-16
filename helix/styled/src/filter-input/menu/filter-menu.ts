@@ -21,7 +21,7 @@ import '../../menu/index.js'
  * @status experimental
  * @category forms
  * @aliases FacetPicker, FilterBuilder
- * @documentation https://helix.fusion.dev/components/filter-input
+ * @documentation https://fusion.dev/helix/components/filter-input
  *
  * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: refusing it takes the decision and nothing moves.
  */

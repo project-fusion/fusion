@@ -266,7 +266,7 @@ const LOOK_FOR = 96
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/core/helix-element
+ * @documentation https://fusion.dev/helix/docs/tiers
  *
  * @cssstate settled - Set a frame after the first render. Transitions are held off until it is, so an element never animates its own arrival.
  */

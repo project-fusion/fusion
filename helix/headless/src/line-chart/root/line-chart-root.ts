@@ -57,7 +57,7 @@ const HEIGHT = 100
  * @status experimental
  * @category charts
  * @aliases Time Series, Trend Chart, Multi-line Chart
- * @documentation https://helix.fusion.dev/components/line-chart
+ * @documentation https://fusion.dev/helix/components/line-chart
  *
  * @csspart area - The wash under one line, where `area` is set.
  * @csspart band - The slot the pointer is resting in.

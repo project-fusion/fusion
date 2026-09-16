@@ -14,7 +14,7 @@ import { styles } from './toast-item.css.js'
  *
  * @since 0.1.0
  * @status experimental
- * @documentation https://helix.fusion.dev/components/toast
+ * @documentation https://fusion.dev/helix/components/toast
  *
  * @cssproperty --toast-border-color - Color of the panel's edge.
  * @cssproperty --toast-border-width - Width of the panel's edge. Follows
