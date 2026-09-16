@@ -40,7 +40,6 @@
  * read a label would pull three unrendered pages into the browser bundle. What
  * crosses is two short lists and a record of strings.
  */
-import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { emit } from '@fusion.dev/scripts/emit'
@@ -95,16 +94,15 @@ const say = (state) =>
   `themed page: ${LAYOUTS.length} layouts by ${CONTEXTS.length} contexts, ${size} characters, ${state}`
 
 const check = process.argv.includes('--check')
-/* **Absent is not stale**, the way `token-layer` reads its own outputs. This is
-   a build output rather than a tracked file, so a tree nobody has built has
-   nothing to compare. A shard that runs this check and no writer is exactly
-   that tree. */
-if (check && !existsSync(OUT)) {
-  console.log(say('absent, so nothing to compare'))
-  process.exit(0)
-}
 const hint = 'Run `turbo run themed-page`.'
-if (emit(OUT, formatted(file, 'themed-page-markup.generated.ts'), { check, hint }).stale) {
+/* **Absent is not stale**, which `emit` decides for every generated file and
+   says which one. This is a build output rather than a tracked file, and a
+   shard that runs this check and no writer is a tree with nothing to compare. */
+const { absent, stale } = emit(OUT, formatted(file, 'themed-page-markup.generated.ts'), {
+  check,
+  hint,
+})
+if (stale) {
   process.exit(1)
 }
-console.log(say(check ? 'current' : 'written'))
+console.log(say(absent ? 'absent, so nothing to compare' : check ? 'current' : 'written'))

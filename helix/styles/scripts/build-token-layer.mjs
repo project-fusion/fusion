@@ -24,7 +24,7 @@
  * `turbo run token-layer` writes, `turbo run token-layer -- --check` fails when the
  * outputs and the source disagree.
  */
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { emit } from '@fusion.dev/scripts/emit'
@@ -137,15 +137,16 @@ const json = formatted(
 
 const check = process.argv.includes('--check')
 const hint = 'Run `turbo run token-layer`.'
-/* `tokens.json` is a build output, so a tree that has not been built has no
-   file to compare. Absent is not stale. */
-const stale = [
-  emit(CSS, css, { check, hint }).stale,
-  check && !existsSync(JSON_OUT) ? false : emit(JSON_OUT, json, { check, hint }).stale,
-].some(Boolean)
-if (stale) {
+/* Neither of these is tracked, so a tree nobody has built has nothing to
+   compare: `emit` says which file and passes, and the count line says so too
+   rather than reporting a layer it never read as current. */
+const outcomes = [emit(CSS, css, { check, hint }), emit(JSON_OUT, json, { check, hint })]
+if (outcomes.some((outcome) => outcome.stale)) {
   process.exit(1)
 }
-console.log(
-  `token layer: ${TOKENS.length} tokens in ${categories.length} categories ${check ? 'current' : 'written'}`,
-)
+const state = check
+  ? outcomes.some((outcome) => outcome.absent)
+    ? 'not generated yet'
+    : 'current'
+  : 'written'
+console.log(`token layer: ${TOKENS.length} tokens in ${categories.length} categories ${state}`)
