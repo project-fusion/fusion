@@ -311,6 +311,55 @@ describe('tabs, controlled and uncontrolled', () => {
   })
 })
 
+describe('tabs and the markup a server sent', () => {
+  test('a set served on its third tab is still on it after upgrade', async () => {
+    /* This element cannot choose a tab on the server, having no children to
+       count, so a consumer whose first paint is right wrote `selected` on the
+       tab and the panel themselves. Resolving over the top of that moved the
+       set to the first tab one frame after it painted, which is the promise
+       broken at first paint the server specs exist to catch and which no server
+       spec can see, the move happening after hydration. `Steps` returns early
+       on the same question. */
+    const host = (await mount(
+      `<helix-headless-tabs>
+        <helix-headless-tab value="one">One</helix-headless-tab>
+        <helix-headless-tab value="two">Two</helix-headless-tab>
+        <helix-headless-tab selected value="three">Three</helix-headless-tab>
+        <helix-headless-tab-panel slot="panels" value="one">First</helix-headless-tab-panel>
+        <helix-headless-tab-panel selected slot="panels" value="three">Third</helix-headless-tab-panel>
+      </helix-headless-tabs>`,
+    )) as Updatable
+    await host.updateComplete
+
+    expect(hasState(tabs(host)[2] as Element, 'selected')).toBe(true)
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(false)
+    expect(hasState(panels(host)[1] as Element, 'selected')).toBe(true)
+  })
+
+  test('a written active still overrules it, a declared property being a correction', async () => {
+    const host = (await mount(
+      `<helix-headless-tabs active="one">
+        <helix-headless-tab value="one">One</helix-headless-tab>
+        <helix-headless-tab selected value="two">Two</helix-headless-tab>
+      </helix-headless-tabs>`,
+    )) as Updatable
+    await host.updateComplete
+    expect(hasState(tabs(host)[0] as Element, 'selected')).toBe(true)
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(false)
+  })
+
+  test('a set that says nothing at all still opens on the first enabled tab', async () => {
+    const host = (await mount(
+      `<helix-headless-tabs>
+        <helix-headless-tab disabled value="one">One</helix-headless-tab>
+        <helix-headless-tab value="two">Two</helix-headless-tab>
+      </helix-headless-tabs>`,
+    )) as Updatable
+    await host.updateComplete
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
+  })
+})
+
 describe('tabs modes are decided once', () => {
   test('a script may move a seeded set without taking it over', async () => {
     /* The mode is read at the first update, from what declared one then. A

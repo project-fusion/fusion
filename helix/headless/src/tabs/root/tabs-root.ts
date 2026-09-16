@@ -30,8 +30,8 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @aliases TabList, Segmented control
  * @documentation https://fusion.dev/helix/components/tabs
  *
- * @slot - The tabs.
- * @slot panels - The panels.
+ * @slot - The tabs, which are this element's own children.
+ * @slot panels - The panels, which are this element's own children. A wrapper around them is assigned to the slot and pairs with nothing, since the pairing walks these children rather than the slot's tree.
  *
  * @event {HelixActivateEvent} helix-activate - Fired once the current one has moved, so the element already holds it.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current tab moves, and cancelable. The only way to refuse one.
@@ -120,10 +120,23 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   /** Pushes the current value down to whichever tab and panel own it. */
   private sync(): void {
     const tabs = this.tabs
+    /* **The markup's own answer wins where nothing has set `active`, and that
+       is the case a server renders.** This element cannot choose a tab on the
+       server, having no children to count, so a consumer whose first paint is
+       right wrote `selected` on the tab and the panel themselves. Resolving
+       unconditionally then overruled them one frame later: `active` is `''`,
+       nothing matches it, and the fallback moved a set served on its third tab
+       onto its first. `Steps` answers the same question by returning early, and
+       returning early is not available here, the panels also taking their name
+       from the tab that opens them.
+
+       A written `active` still wins, a declared property being a seed and a
+       correction, and a set with neither still opens on the first enabled tab. */
+    const declared = this.active === '' ? tabs.find((tab) => tab.selected) : undefined
     /* Through the mixin, which also skips a disabled first tab. A hand-written
        fallback to the first child shows a disabled tab as current and opens its
        panel with it. */
-    const value = this.resolveActive(tabs)?.value ?? ''
+    const value = (declared ?? this.resolveActive(tabs))?.value ?? ''
     for (const tab of tabs) {
       tab.selected = tab.value === value
     }
