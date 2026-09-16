@@ -67,8 +67,12 @@
   block-size: auto;
 
   /* `surface-overlay`, which is the token for a surface that sits over the page
-     with a shadow. */
-  background-color: var(--helix-color-surface-overlay);
+     with a shadow. Through the hook, because `--drawer-background-color` is
+     documented as the surface behind the panel and was read only by the two
+     `material` rules below: a consumer setting it on an opaque drawer, which is
+     the resting one, changed nothing and was told nothing. `Card` reads its own
+     the same way in the rule this pair was copied from. */
+  background-color: var(--drawer-background-color, var(--helix-color-surface-overlay));
   /* A drawer's own inset, and nothing about anyone's header. A drawer is
      `position: fixed` with `inset-block: 0`, so it spans the strip a sticky
      header occupies and its first line of content sits behind one. */
