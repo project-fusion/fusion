@@ -19,7 +19,8 @@ import { property } from 'lit/decorators.js'
  * `entries` picks which way to read that table. `series` is one entry per data
  * column, named by the header row, which is a line or a bar chart.
  * `categories` is one entry per body row, which is a donut: its slices are the
- * rows and it has no axis to write their names along.
+ * rows and it has no axis to write their names along. `measures` drops the
+ * first data column, which is a scatter.
  *
  * **The table is resolved on the client and there is no server pass.**
  *
@@ -41,9 +42,22 @@ export class HelixHeadlessLegend extends HelixElement {
    *
    * Absent is `series`, one entry per data column. `categories` reads one entry
    * per body row instead, for a donut, whose slices are the rows.
+   *
+   * **`measures` is `series` without the first column, and it is for a
+   * scatter.** That chart reads its first numeric column as the measure
+   * *across*, so its first plotted series is the table's second and everything
+   * a legend beside it named was one color out: the across column wearing the
+   * color of the first series drawn, and each real series wearing the next
+   * one's. The across gets no entry rather than a shifted one, because it is an
+   * axis and a scatter already writes its name at the end of the scale under
+   * the plot.
+   *
+   * A legend cannot ask the chart which of these it is, `for` naming the table
+   * they share and not each other, so the consumer says it. That is the same
+   * shape `categories` already has.
    */
   @property({ reflect: true })
-  entries?: 'categories' | 'series'
+  entries?: 'categories' | 'measures' | 'series'
 
   /**
    * The id of the table to take the names from.
@@ -78,9 +92,13 @@ export class HelixHeadlessLegend extends HelixElement {
    */
   protected names(): string[] {
     const series: Series[] = this.source.series
-    return this.entries === 'categories'
-      ? (series[0]?.points.map((point) => point.label) ?? [])
-      : series.map((one) => one.name)
+    if (this.entries === 'categories') {
+      return series[0]?.points.map((point) => point.label) ?? []
+    }
+    /* `slice(1)` and not an offset on the index below, so the swatch colors
+       stay one to one with the palette slots the scatter draws its points in:
+       its first plotted series is this list's first entry either way. */
+    return (this.entries === 'measures' ? series.slice(1) : series).map((one) => one.name)
   }
 
   protected override render(): TemplateResult {

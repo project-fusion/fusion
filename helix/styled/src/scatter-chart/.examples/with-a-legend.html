@@ -1,0 +1,75 @@
+<!-- @summary A key beside two series, reading `measures` so the column measured across gets no swatch. -->
+<!-- @min 300 -->
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <table
+    data-hidden-visually
+    id="scatterkeyed"
+  >
+    <caption>Latency under load</caption>
+    <thead>
+      <tr>
+        <th scope="col">Run</th>
+        <th scope="col">Requests a second</th>
+        <th scope="col">p50 (ms)</th>
+        <th scope="col">p95 (ms)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Run 1</th>
+        <td data-value="100">100</td>
+        <td data-value="12">12</td>
+        <td data-value="38">38</td>
+      </tr>
+      <tr>
+        <th scope="row">Run 2</th>
+        <td data-value="250">250</td>
+        <td data-value="13">13</td>
+        <td data-value="44">44</td>
+      </tr>
+      <tr>
+        <th scope="row">Run 3</th>
+        <td data-value="400">400</td>
+        <td data-value="16">16</td>
+        <td data-value="52">52</td>
+      </tr>
+      <tr>
+        <th scope="row">Run 4</th>
+        <td data-value="550">550</td>
+        <td data-value="19">19</td>
+        <td data-value="67">67</td>
+      </tr>
+      <tr>
+        <th scope="row">Run 5</th>
+        <td data-value="700">700</td>
+        <td data-value="25">25</td>
+        <td data-value="92">92</td>
+      </tr>
+      <tr>
+        <th scope="row">Run 6</th>
+        <td data-value="850">850</td>
+        <td data-value="34">34</td>
+        <td data-value="134">134</td>
+      </tr>
+      <tr>
+        <th scope="row">Run 7</th>
+        <td data-value="1000">1,000</td>
+        <td data-value="47">47</td>
+        <td data-value="196">196</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <helix-scatter-chart
+    for="scatterkeyed"
+    gridlines
+  ></helix-scatter-chart>
+  <helix-legend
+    entries="measures"
+    for="scatterkeyed"
+  ></helix-legend>
+</helix-flex>
