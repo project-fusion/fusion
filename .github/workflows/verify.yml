@@ -36,10 +36,22 @@ env:
 jobs:
   # A push to `main` whose tree a pull request's run already verified runs
   # nothing again: [VERIFYING.md](../VERIFYING.md#a-tree-is-verified-once).
-  # Every job below that starts the work waits on this one and skips on `true`;
-  # on a pull request this is skipped and they start at once.
+  # Every job below that starts the work waits on this one and skips on `true`.
+  #
+  # **It runs on a pull request too, where it has nothing to look up, and that
+  # is not a spare ten seconds.** It was `if: github.event_name == 'push'`, and
+  # a skipped job skips every job under it, through jobs that ran: the skip
+  # reaches `types`, `tests`, `rust`, `packaging` and the browser matrix, all of
+  # which wait on a `warm` that succeeded, and a plain `if:` does not stop it.
+  # Only the four status functions do, which is why the jobs that carry
+  # `!cancelled()` survived and the ones with a plain condition did not.  # dialect:quoted, GitHub's own function
+  # Run 35039620254 passed the `verify` gate on a pull request having run
+  # `lint` and three builds and nothing else, green, because a skipped job is
+  # neither a failure nor a cancellation. `proven.sh` answers `false` to an
+  # empty `TREE`, which is what a pull request has, so the cost of never
+  # skipping it is the job's own ten seconds and the certainty that nothing
+  # below it is skipped by accident.
   proven:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -578,6 +590,18 @@ jobs:
         if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')  # dialect:quoted, GitHub's own job result spelled its way
         run: |
           echo "::error::A job in this workflow did not pass."
+          exit 1
+      # **A run where the checks were skipped and nothing said they could be.**
+      # Skipped is neither a failure nor a cancellation, which is what lets the
+      # browser matrix stay out of a diff it cannot fail and what let a run in
+      # which nothing ran at all report green. Two things may skip the work:
+      # `proven` finding a run that verified this tree, and nothing else. So the
+      # jobs every check hangs from have to have run, or `proven` has to say
+      # why they did not.
+      - name: Nothing verified this tree
+        if: needs.proven.outputs.proven != 'true' && (needs.warm.result != 'success' || needs.checks.result != 'success')  # dialect:quoted, GitHub's own job result spelled its way
+        run: |
+          echo "::error::No job verified this tree and no earlier run had."
           exit 1
       - name: All jobs passed
         run: echo "Every job in this workflow passed."
