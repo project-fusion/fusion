@@ -13,7 +13,7 @@ import { styles } from './drawer-root.css.js'
  * rest is flat and the movement is what says something happened.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Sheet, Sidebar, Panel, Off-canvas
  * @documentation https://fusion.dev/helix/components/drawer
@@ -21,13 +21,11 @@ import { styles } from './drawer-root.css.js'
  * @slot - The drawer's content.
  * @slot header - Content pinned above the scrolling area.
  *
- * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the drawer opens or closes. Cancelable: refusing it takes the decision and nothing moves.
- *
  * @csspart content - The scrolling content region.
  * @csspart header - The header region.
  * @csspart panel - The sliding panel.
  *
- * @cssproperty --drawer-backdrop - Filter applied behind a `material="glass"` drawer.
+ * @cssproperty --drawer-backdrop - Filter applied behind a `frosted` or `glass` drawer.
  *   Follows the theme's material policy; set it to override the strength on one drawer.
  * @cssproperty --drawer-background-color - Surface behind the panel.
  * @cssproperty --drawer-border-color - Color of the panel's edge.
@@ -35,7 +33,9 @@ import { styles } from './drawer-root.css.js'
  *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
  *   theme says otherwise.
  * @cssproperty --drawer-padding - Padding inside the panel.
- * @cssproperty --drawer-padding-block-start - Padding above the content, which clears the close control.
+ * @cssproperty --drawer-padding-block-start - Padding above the header, which is a step deeper than
+ *   the other three so the first line clears the window's own edge. Falls back to
+ *   `--drawer-padding`, so setting that alone governs all four sides.
  * @cssproperty --drawer-radius - Corner radius on the edges that face the page.
  * @cssproperty --drawer-scrim - The wash over the page behind the drawer. Set on the host, where a token still resolves: a `var()` written inside `::backdrop` cannot see one.
  * @cssproperty --drawer-shadow - Lift under the panel. Follows `--helix-shadow-floating`: a
