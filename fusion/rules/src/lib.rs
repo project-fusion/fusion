@@ -32,6 +32,7 @@ pub mod error;
 pub mod exit;
 pub mod style;
 pub mod tui;
+pub mod version;
 pub mod walk;
 
 use std::path::Path;

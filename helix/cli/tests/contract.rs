@@ -272,6 +272,75 @@ fn an_incomplete_command_is_a_usage_error() {
     }
 }
 
+/* `--version`, which is the interface a release is checked against.
+
+**It is read from the package beside the binary and not compiled in**, which is
+what lets one build serve every release that changes no Rust: the same five
+platform binaries, two of them macOS, were rebuilt for each number otherwise.
+`binaries.yml` proves the first of these on a runner and `publish.mjs` refuses a
+platform package whose binary disagrees with its manifest. */
+
+/// A copy of the binary in a directory of its own, with `manifest` beside it
+/// where there is one, which is the shape npm installs.
+fn installed(name: &str, manifest: Option<&str>) -> PathBuf {
+    let at = std::env::temp_dir().join(format!("helix-version-{name}"));
+    let _ = std::fs::remove_dir_all(&at);
+    std::fs::create_dir_all(&at).expect("a scratch directory");
+    let binary = at.join(if cfg!(windows) { "helix.exe" } else { "helix" });
+    std::fs::copy(self::binary(), &binary).expect("a copy of the binary");
+    if let Some(manifest) = manifest {
+        std::fs::write(at.join("package.json"), manifest).expect("a manifest");
+    }
+    binary
+}
+
+fn said(binary: &Path) -> String {
+    let mut command = Command::new(binary);
+    command.arg("--version").env("NO_COLOR", "1");
+    out(&command.output().expect("the binary runs"))
+        .trim()
+        .to_owned()
+}
+
+#[test]
+fn the_version_is_the_one_the_package_beside_it_carries() {
+    let platform = installed(
+        "platform",
+        Some(r#"{ "name": "@fusion.dev/helix-cli-darwin-arm64", "version": "9.9.9-proof" }"#),
+    );
+    assert_eq!(said(&platform), "helix 9.9.9-proof");
+
+    /* The wrapper's own manifest answers too, since which of the two sits beside
+    the binary is the package manager's business and not this binary's. */
+    let wrapper = installed(
+        "wrapper",
+        Some(r#"{ "name": "@fusion.dev/helix-cli", "version": "1.2.3" }"#),
+    );
+    assert_eq!(said(&wrapper), "helix 1.2.3");
+}
+
+/// **It says the compiled value rather than guessing**, which is the honest
+/// answer for a binary run out of `target/` in this checkout and for one whose
+/// neighbor is somebody else's manifest or is not a manifest at all.
+#[test]
+fn a_binary_with_nothing_to_read_reports_what_it_was_compiled_at() {
+    let compiled = format!("helix {}", env!("CARGO_PKG_VERSION"));
+    for (name, manifest) in [
+        ("none", None),
+        (
+            "stranger",
+            Some(r#"{ "name": "helix", "version": "4.5.6" }"#),
+        ),
+        ("unparseable", Some("not json")),
+        (
+            "empty",
+            Some(r#"{ "name": "@fusion.dev/helix-cli", "version": "" }"#),
+        ),
+    ] {
+        assert_eq!(said(&installed(name, manifest)), compiled, "{name}");
+    }
+}
+
 /// Discovery walks up, which is what lets a command run from anywhere in a tree.
 #[test]
 fn the_intent_is_found_from_a_subdirectory() {

@@ -44,11 +44,15 @@
  * **A domain spans two package managers.** Its npm packages and its crates carry
  * one version, and each crate holds its own line rather than inheriting one,
  * which the root manifest says why. Stamping writes every crate the workspace
- * lists under the domain's folder, and a binary built afterwards reports the
- * release: `helix --version` read `0.0.0-dev` in every package that shipped it
- * until this did. Note that this leaves `Cargo.lock` naming the old version of
- * those crates, so anything running afterwards must let cargo update it rather
- * than passing `--locked`.
+ * lists under the domain's folder, so a crate taken as a git dependency at the
+ * release's tag names the release. Note that this leaves `Cargo.lock` naming the
+ * old version of those crates, so anything running afterwards must let cargo
+ * update it rather than passing `--locked`.
+ *
+ * **It is no longer what makes `helix --version` right**, and the binaries are
+ * not built here. They read their version from the npm manifest installed beside
+ * them, which is what lets one build serve every release that changes no Rust:
+ * `fusion/rules/src/version.rs` and [RELEASING.md](../../.github/RELEASING.md#the-binary).
  *
  * Pre-release versions are never tagged, so a tag scan ignores anything
  * carrying a `-`. An experimental build off a pull request is

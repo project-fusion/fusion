@@ -42,6 +42,16 @@ use crate::rules::{all, Context, Settings};
 /// The word every printed failure opens with, and the corner of every screen.
 const PRODUCT: &str = "fusion";
 
+/// The npm package this binary ships in, which is what tells it its version.
+const PACKAGE: &str = "@fusion.dev/cli";
+
+/// What `--version` prints: the release this binary was installed as, read from
+/// the package beside it rather than compiled in. `fusion_rules::version`
+/// carries why, and `helix` does the same for the same reason.
+fn shipped() -> &'static str {
+    fusion_rules::version::shipped(PACKAGE, env!("CARGO_PKG_VERSION"))
+}
+
 /* Every rule borrows the one context from its own thread, which is what this
 holds `Context` to. */
 const _: fn() = || {
@@ -53,7 +63,7 @@ const _: fn() = || {
 #[command(
     name = "fusion",
     about = "Rules a workspace can be held to.",
-    version,
+    version = shipped(),
     subcommand_required = true,
     arg_required_else_help = true
 )]
