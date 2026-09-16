@@ -34,7 +34,7 @@ import '../../button/index.js'
  * @documentation https://fusion.dev/helix/components/steps
  *
  * @slot - The step's name.
- * @slot content - What the stage holds, shown while it is the current one.
+ * @slot content - What the stage holds. Always rendered here, a tier with no stylesheet having nothing to fold it with; the styled tier opens it on the current step down a column, and a row has no space under a step to open it into.
  * @slot description - A line under the name, for what the stage is for.
  * @slot marker - Replaces the number, or the check a complete step shows.
  *
