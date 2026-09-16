@@ -18,8 +18,10 @@
  * shared target is common and guessing `./target` would miss it. Then the
  * binary npm installed beside this, which is what a consumer has: after the
  * target, so a checkout runs what it built rather than a binary a release once
- * placed. Then whatever is on `PATH`. Only then a build, and only in this
- * repository, the one place there is a crate to build.
+ * placed. Then whatever is on `PATH`, named out loud in a checkout, because a
+ * binary from somewhere else is about to answer questions about this tree. Only
+ * then a build, and only in this repository, the one place there is a crate to
+ * build.
  *
  * **A build is a fallback and not the plan.** It happens once, prints that it
  * is happening, and a CI pipeline that has already run `cargo build` never
@@ -191,6 +193,26 @@ if (found && existsSync(found)) {
    probed: see `onPath`, where the probe this used to do is what recursed. */
 const installed = onPath()
 if (installed) {
+  /* **In a checkout, say which binary this is before running it.** Getting here
+     means no `target/`, no platform package and no cargo, so what runs is
+     whatever some earlier install left on the path, and it answers about this
+     tree while knowing nothing about it. Measured 14 Sep 2026 in a fresh clone:
+     a `~/.cargo/bin/helix` from August read the configuration file under its
+     previous name and reported "no configuration", which reads as a fault in
+     the checkout and is a fault in the binary that was asked.
+
+     It still runs, because an installed binary is the only one there is and
+     refusing would leave a machine with no Rust unable to run any check at all.
+     What changes is that the answer is attributed. Only in a checkout: for a
+     consumer, a binary on `PATH` is the ordinary way to have one. */
+  if (checkout) {
+    console.error(
+      `helix: nothing built here, so running \`${installed}\` from PATH.\n` +
+        '  It was not built from this checkout and need not agree with it.\n' +
+        '  Install a Rust toolchain to build the one this tree defines, or point\n' +
+        '  `HELIX_BIN` at the binary to run.',
+    )
+  }
   run(installed)
 }
 
