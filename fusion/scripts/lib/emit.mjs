@@ -8,9 +8,8 @@
  * a round trip to learn what moved, and the round trip is the whole build
  * again, so the diff is the part worth sharing.
  *
- * What it leaves to the caller is what to do about it: the exit code, the count
- * line, and whether an absent file is stale are each generator's own, so this
- * returns and the caller decides.
+ * What it leaves to the caller is what to do about it: the exit code and the
+ * count line are each generator's own, so this returns and the caller decides.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, relative } from 'node:path'
@@ -23,20 +22,38 @@ const SHOWN = 20
  * Writes `text` to `path`, or with `check` compares the two and prints the first
  * differing lines and the `hint` when they disagree.
  *
- * Returns `{ stale, written }`: `stale` is true only when checking and the
- * file differs, `written` only when not checking and the file changed. An
- * unchanged file is left alone in both modes.
+ * Returns `{ absent, stale, written }`: `stale` is true only when checking and
+ * the file differs, `written` only when not checking and the file changed, and
+ * `absent` only when checking found no file to compare. An unchanged file is
+ * left alone in both modes.
+ *
+ * **Absent is not stale, and a fresh clone is what made that the answer
+ * everywhere.** No generated file is committed, so one that is not on disk is
+ * one nothing has built yet rather than one behind its sources, and it is not
+ * something a push can carry. Reported as stale it took down the pre-push hook
+ * on the first check a clone reached, and `verify` never saw it, because CI
+ * builds what the checks read before it runs any of them. So this says which
+ * file is missing and what writes it, and passes: what catches a generator that
+ * has stopped writing is the build that reads the file, which cannot start.
+ *
+ * `build-token-layer.mjs` had already reached this for `dist/tokens.json`, in
+ * the days when `src/tokens.css` beside it was tracked and a missing one there
+ * did mean a deletion.
  */
 export const emit = (path, text, { check = false, hint = '' } = {}) => {
   const absent = !existsSync(path)
+  if (check && absent) {
+    console.error(`${relative(root, path)} is not generated yet${hint ? `. ${hint}` : '.'}`)
+    return { absent: true, stale: false, written: false }
+  }
   const held = absent ? '' : readFileSync(path, 'utf8')
   if (!absent && held === text) {
-    return { stale: false, written: false }
+    return { absent: false, stale: false, written: false }
   }
   if (!check) {
     mkdirSync(dirname(path), { recursive: true })
     writeFileSync(path, text)
-    return { stale: false, written: true }
+    return { absent: false, stale: false, written: true }
   }
   const before = held.split('\n')
   const after = text.split('\n')
@@ -48,7 +65,7 @@ export const emit = (path, text, { check = false, hint = '' } = {}) => {
   }
   const name = relative(root, path)
   console.error(
-    `${name} is ${absent ? 'missing' : 'behind its sources'}${hint ? `. ${hint}` : '.'}\n` +
+    `${name} is behind its sources${hint ? `. ${hint}` : '.'}\n` +
       `  ${moved.length} line${moved.length === 1 ? '' : 's'} differ:\n` +
       moved
         .slice(0, SHOWN)
@@ -56,5 +73,5 @@ export const emit = (path, text, { check = false, hint = '' } = {}) => {
         .join('\n') +
       (moved.length > SHOWN ? `\n  ... and ${moved.length - SHOWN} more` : ''),
   )
-  return { stale: true, written: false }
+  return { absent: false, stale: true, written: false }
 }
