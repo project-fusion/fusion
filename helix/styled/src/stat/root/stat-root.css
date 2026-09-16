@@ -20,10 +20,13 @@
    across the slices at every other. Divide the ramp again and the figures
    follow, which a hand-written `3.143em` would not, and a raw value is refused
    anyway. */
-/* *`muted`, not `subtle`, because a label is content.** `subtle` is
-   `neutral-500` in both modes, which paints `#808080` and reads 3.95 against a
-   white card: under the 4.5 that 12px text needs, and measured on this very
-   label. */
+/* **`muted`, not `subtle`, because a label is content.** Both clear the 4.5
+   that 12px text needs: measured 16 Sep 2026, `subtle` is `neutral-550` in
+   light, `#6c6c6c` and 5.25 on a white card, and `muted` is `neutral-600`,
+   `#5b5b5b` and 6.79. So the choice is what the label is rather than what it
+   clears: the figure is the reading and its label names the reading, which is
+   content beside it and not a note under it. `subtle` was `neutral-500` when
+   this was written, `#808080` and 3.95, and the ramp has moved since. */
 slot[name="label"]::slotted(*) {
   color: var(--helix-color-foreground-muted);
   font-size: calc(var(--helix-text-xs) / var(--helix-text-md) * 1em);
