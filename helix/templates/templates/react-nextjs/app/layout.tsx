@@ -4,12 +4,16 @@ import type { ReactNode } from 'react'
 /* Every layer in one import: the tokens, the reset, the utility layer, and the
    `:not(:defined)` rules that keep a tag from arriving unstyled. */
 import '@fusion.dev/helix-styles/helix.css'
+/* After it, so a rule of your own that names the same thing wins. */
+import './app.css'
 
 /* Extensionless, unlike the libraries this imports. Turbopack does not map a
    `.js` specifier back to the `.tsx` beside it, which is webpack's
    `extensionAlias` and has no equivalent there, so `./helix-elements.js` fails
-   the first `next build` with "Module not found". */
+   the first `next build` with "Module not found". Every local import in this
+   template is written the same way for that reason. */
 import { HelixElements } from './helix-elements'
+import { SiteHeader } from './site-header'
 
 export const metadata: Metadata = { title: '__PROJECT_NAME__' }
 export const viewport: Viewport = { initialScale: 1, width: 'device-width' }
@@ -30,7 +34,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <HelixElements />
-        {children}
+        <SiteHeader />
+        <main className="page">{children}</main>
       </body>
     </html>
   )

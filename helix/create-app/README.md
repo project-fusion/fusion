@@ -16,8 +16,12 @@ npm create @fusion.dev/helix-app@latest my-app -- --template react-vite
 
 | Template | What it is |
 |---|---|
-| `react-vite` | React and TypeScript on Vite. The shortest path to a running component. |
-| `react-nextjs` | React and TypeScript on the Next.js App Router, elements registered once. |
+| `react-vite` | React and TypeScript on Vite. The shortest path to a running app. |
+| `react-nextjs` | React and TypeScript on the Next.js App Router, the two pages as real routes. |
+
+Either one lays down the same two pages: an overview holding a sorted, paged,
+selectable data table, and a form a `<form>` reads with `FormData`. What differs
+between them is what the framework forces.
 
 This is `helix new` from
 [`@fusion.dev/helix-cli`](https://www.npmjs.com/package/@fusion.dev/helix-cli),

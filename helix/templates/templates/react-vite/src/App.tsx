@@ -1,24 +1,21 @@
+import { Overview } from './overview.js'
+import { usePathname } from './routes.js'
+import { SignupForm } from './signup-form.js'
+import { SiteHeader } from './site-header.js'
+
 /**
- * Helix components are custom elements, so you write the tags directly. There is
- * no wrapper package and nothing to import per component.
+ * The shell, and the switch between the two pages.
  *
- * Events are props: `onhelix-before-change` reaches `helix-before-change`. React's
- * own bubbling events work as they always do, so `onClick` is fine here.
+ * Helix components are custom elements, so you write the tags directly. There is
+ * no wrapper package and nothing to import per component: `src/main.tsx`
+ * registers them once and every tag in the app is real from then on.
  */
 export function App() {
+  const path = usePathname()
   return (
-    <helix-flex align="center" direction="column" gap="lg">
-      <helix-text as="h1">__PROJECT_NAME__</helix-text>
-      <helix-text>Edit `src/App.tsx` and save.</helix-text>
-      <helix-button
-        emphasis="solid"
-        onClick={() => {
-          console.log('clicked')
-        }}
-        tone="primary"
-      >
-        Get started
-      </helix-button>
-    </helix-flex>
+    <>
+      <SiteHeader />
+      <main className="page">{path === '/join' ? <SignupForm /> : <Overview />}</main>
+    </>
   )
 }
