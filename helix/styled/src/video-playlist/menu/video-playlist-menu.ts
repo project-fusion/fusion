@@ -27,7 +27,7 @@ import '../../menu/index.js'
  * not.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Episode Menu, Queue Menu, Up Next
  * @documentation https://fusion.dev/helix/components/video-playlist

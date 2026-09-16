@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -37,10 +37,14 @@ describe('orb server output', () => {
   })
 
   test('nothing about the cloud reaches the server', () => {
-    /* The contract is that this renders a box and upgrades. A server that
-       emitted dots would be a server pretending to have a canvas. */
-    const output = withoutStyles(ssr(html`<helix-orb state="done"></helix-orb>`))
-    expect(output).not.toContain('rgba(')
-    expect(output).not.toContain('arc(')
+    /* The contract is that this renders a box and upgrades, and a server that
+       emitted dots would be a server pretending to have a canvas.
+
+       Asked as the whole list rather than as the two things a spec author
+       thought to rule out. `not.toContain('rgba(')` goes on passing whatever is
+       added beside the canvas, which is the blind assertion `servedParts` exists
+       to replace: the frame here is one empty canvas, and that is the entire
+       claim. */
+    expect(servedParts(ssr(html`<helix-orb state="done"></helix-orb>`))).toEqual(['canvas'])
   })
 })

@@ -564,6 +564,63 @@ describe('aura', () => {
       expect(draws).not.toBeNull()
       expect(await until(() => (draws?.count ?? 0) >= 2)).toBe(true)
     })
+
+    /* The preference changing under a running field.
+     *
+     * **Stubbed, because the real one cannot be moved from inside the page.** A
+     * browser answers `prefers-reduced-motion` from the platform and there is no
+     * API to set it; what can be replaced is the query the element asks for, and
+     * the wiring is the whole of what was missing. The query was created and
+     * never listened to, so the preference was read at `play` and nowhere else,
+     * and `tick` books its own next frame: a reader who turned it on kept the
+     * shader running for the life of the page.
+     *
+     * Restored on the way out rather than in an `afterEach`, since this is the
+     * one test in the file that touches a global. */
+    test('turning reduce-motion on stops the loop, and turning it off starts it', async () => {
+      const real = window.matchMedia.bind(window)
+      const listeners = new Set<() => void>()
+      const query = {
+        addEventListener: (_name: string, run: () => void) => listeners.add(run),
+        matches: false,
+        removeEventListener: (_name: string, run: () => void) => listeners.delete(run),
+      }
+      const flip = (matches: boolean): void => {
+        query.matches = matches
+        for (const run of listeners) {
+          run()
+        }
+      }
+      window.matchMedia = ((ask: string) =>
+        ask.includes('prefers-reduced-motion')
+          ? query
+          : real(ask)) as unknown as typeof window.matchMedia
+      try {
+        const host = await mount(drawn())
+        const draws = countDraws(host)
+        if (!draws) {
+          return
+        }
+        expect(await until(() => draws.count >= 2)).toBe(true)
+
+        flip(true)
+        expect(await framesBooked(4)).toBe(0)
+        const held = draws.count
+
+        /* One still frame rather than the canvas keeping whatever was mid-drift
+           on it, which is what the class doc block promises a reader who asks
+           for no motion. Asked for from a stopped loop, so the count is the
+           answer and not a race with a frame already in flight. */
+        flip(true)
+        expect(draws.count).toBe(held + 1)
+        expect(await framesBooked(4)).toBe(0)
+
+        flip(false)
+        expect(await until(() => draws.count >= held + 3)).toBe(true)
+      } finally {
+        window.matchMedia = real
+      }
+    })
   }
 })
 

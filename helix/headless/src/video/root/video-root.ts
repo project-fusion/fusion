@@ -97,7 +97,7 @@ const clock = (seconds: number): string => {
  * changes.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Player, Media, Movie
  * @documentation https://fusion.dev/helix/components/video

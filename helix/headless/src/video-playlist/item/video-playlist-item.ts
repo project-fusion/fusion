@@ -25,7 +25,7 @@ import { property } from 'lit/decorators.js'
  * the player is on.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @documentation https://fusion.dev/helix/components/video-playlist
  *

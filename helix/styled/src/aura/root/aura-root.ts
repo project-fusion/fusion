@@ -241,13 +241,17 @@ export class HelixAura extends HelixElement {
    * exaggerating, and a streak whose length has passed through zero is drawn
    * as a bar across the whole frame.
    *
-   * Read by the shapes made of many similar things, whether those are counted
-   * or continuous: `streaks`, whose lanes draw a speed, a length, a width, a
-   * spacing and a weight apiece; `particles`, whose motes draw a size, a
-   * brightness and a wander; and `rays` and `aurora`, whose fan, bundles and
-   * folds widen or even out. `braid`, `waves` and `flow` have a
-   * single subject and nothing to vary, and `threads` is even on purpose, so on
-   * those four this is inert.
+   * Read by four of the eleven shapes, the ones made of many similar things,
+   * whether those are counted or continuous: `streaks`, whose lanes draw a
+   * speed, a length, a width, a spacing and a weight apiece; `particles`, whose
+   * motes draw a size, a brightness and a wander; and `rays` and `aurora`, whose
+   * fan, bundles and folds widen or even out.
+   *
+   * Inert on the other seven, for three different reasons. `braid`, `waves` and
+   * `flow` have a single subject and nothing to vary. `threads` and `lattice`
+   * are even on purpose, a scatter of strands and a regular structure each being
+   * what it is because its members do not differ. `caustics` and `fracture` are
+   * populations this does not reach, which is a gap rather than a refusal.
    */
   @property({ type: Number })
   variance = 1
@@ -484,7 +488,8 @@ export class HelixAura extends HelixElement {
     this.canvas?.addEventListener('webglcontextlost', this.handleLost)
     this.canvas?.addEventListener('webglcontextrestored', this.handleRestored)
 
-    this.motion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    this.motion ??= window.matchMedia('(prefers-reduced-motion: reduce)')
+    this.motion.addEventListener('change', this.handleMotion)
     this.addEventListener('pointermove', this.handlePointer)
     this.addEventListener('pointerleave', this.handleLeave)
 
@@ -751,6 +756,8 @@ export class HelixAura extends HelixElement {
     this.canvas?.removeEventListener('webglcontextrestored', this.handleRestored)
     this.removeEventListener('pointermove', this.handlePointer)
     this.removeEventListener('pointerleave', this.handleLeave)
+    this.motion?.removeEventListener('change', this.handleMotion)
+    this.motion = undefined
     document.removeEventListener('visibilitychange', this.handleVisibility)
     window.removeEventListener('scroll', this.handleScroll, { capture: true })
     this.sized?.disconnect()
@@ -1358,6 +1365,30 @@ export class HelixAura extends HelixElement {
 
   private readonly handleLeave = (): void => {
     this.target.presence = 0
+  }
+
+  /**
+   * Answers the preference changing, rather than only its value at setup.
+   *
+   * **The query was created and never listened to**, so the preference was read
+   * at `play` and at the pointer and nowhere else. `tick` books its own next
+   * frame with no check of its own, which means a reader who turned reduce-motion
+   * on while the page was open kept a full-page shader running for the rest of
+   * it: the one reader the promise at the top of this file is about, and the one
+   * it was broken for. The other direction failed the quieter way, a field frozen
+   * on its opening frame until a scroll or a tab switch happened to ask again.
+   *
+   * The still frame is drawn rather than assumed, because the canvas holds
+   * whatever was on it when the loop stopped and mid-drift is not the opening
+   * shape. `Orb` does the same, on the same two arms.
+   */
+  private readonly handleMotion = (): void => {
+    if (this.motion?.matches) {
+      this.stop()
+      this.paintOnce()
+    } else {
+      this.play()
+    }
   }
 
   private readonly handleVisibility = (): void => {

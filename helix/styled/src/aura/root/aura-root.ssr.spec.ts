@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostAttributes, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -26,11 +26,15 @@ describe('aura server output', () => {
   })
 
   test('nothing about the shader reaches the server', () => {
-    /* The contract is that this renders a box and upgrades. A server that
+    /* The contract is that this renders a box and upgrades, and a server that
        emitted a uniform, a program or a frame would be a server pretending to
-       have a GPU. */
-    const output = withoutStyles(ssr(html`<helix-aura variant="orbit"></helix-aura>`))
-    expect(output).not.toContain('#version')
-    expect(output).not.toContain('gl_')
+       have a GPU.
+
+       Asked as the whole list rather than as the two things a spec author
+       thought to rule out. `not.toContain('#version')` goes on passing whatever
+       is added beside the canvas, which is the blind assertion `servedParts`
+       exists to replace: the frame here is one empty canvas over the host's own
+       gradient, and that is the entire claim. */
+    expect(servedParts(ssr(html`<helix-aura variant="rays"></helix-aura>`))).toEqual(['canvas'])
   })
 })

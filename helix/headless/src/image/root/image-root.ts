@@ -17,7 +17,7 @@ import { property, state } from 'lit/decorators.js'
  * `Skeleton` would make this tier depend on a component it does not ship.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Picture, Img, Figure
  * @documentation https://fusion.dev/helix/components/image
