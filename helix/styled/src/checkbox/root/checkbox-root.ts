@@ -19,17 +19,17 @@ import { styles } from './checkbox-root.css.js'
  * what a native `<label>` wrapping a checkbox gives and what a reader expects.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
- * @aliases Tickbox, Toggle
+ * @aliases Tickbox
  * @documentation https://helix.fusion.dev/components/checkbox
  *
- * @cssproperty --checkbox-background-color - Fill of an unticked box.
+ * @cssproperty --checkbox-background-color - Fill of the box, which does not change when it is ticked.
  * @cssproperty --checkbox-border-color - Edge of the box, in every state.
  * @cssproperty --checkbox-card-background-color - Fill behind a card-shaped choice.
  * @cssproperty --checkbox-card-border-color - Edge around one.
  * @cssproperty --checkbox-card-padding - Inset of the card appearance.
- * @cssproperty --checkbox-checked-color - Fill of a ticked box.
+ * @cssproperty --checkbox-checked-color - Edge of a ticked box, where `--checkbox-border-color` is unset.
  * @cssproperty --checkbox-mark-color - Ink the tick is drawn in.
  * @cssproperty --checkbox-size - Width and height of the box.
  */

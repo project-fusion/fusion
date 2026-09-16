@@ -57,7 +57,7 @@ const readValues = (input: string): number[] =>
  * without measuring anything itself.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://helix.fusion.dev/components/sparkline

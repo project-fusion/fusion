@@ -29,7 +29,7 @@ import { styles } from './sparkline-root.css.js'
  * might want to be bigger.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @groups charts
  * @aliases Micro Chart, Trend Line, Inline Chart
@@ -85,9 +85,11 @@ export class HelixSparkline extends HelixHeadlessSparkline {
    * hydration mismatch.
    *
    * `none` lets the line stop on its own, which suits a series read as a shape
-   * rather than for where it finished. `ring` lets the ground through, for a
-   * chart drawn over something busy. `triangle` points along the axis and reads
-   * as "and onward" rather than as a second claim about the data.
+   * rather than for where it finished. `square` is the same mark with its
+   * corners, for a drawing whose neighbors are square, columns in the table
+   * beside it for instance. `ring` lets the ground through, for a chart drawn
+   * over something busy. `triangle` points along the axis and reads as "and
+   * onward" rather than as a second claim about the data.
    *
    * A `bar` plot draws none of them: the last column already is the last
    * reading, and a mark on top of it would say the same thing twice.

@@ -16,7 +16,7 @@ import '../../tooltip/index.js'
  * it for reassurance reads as a second, accidental press.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @documentation https://helix.fusion.dev/components/copy-button
  */

@@ -73,6 +73,7 @@ pub mod recipes;
 pub mod redeclared;
 pub mod reflected;
 pub mod reflected_defaults;
+pub mod restated;
 pub mod run;
 pub mod seams;
 pub mod seeds;
@@ -671,6 +672,12 @@ pub fn all() -> Vec<Rule> {
             name: "reflected-defaults",
             run: Runner::Source(reflected_defaults::run),
             summary: "a reflected property is silent until something sets it",
+        },
+        Rule {
+            fix: None,
+            name: "restated",
+            run: Runner::Source(restated::run),
+            summary: "a part, a slot and an event are each declared once in the file that owns them",
         },
         Rule {
             fix: None,
