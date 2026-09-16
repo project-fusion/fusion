@@ -21,11 +21,10 @@ import '../../tooltip/index.js'
  * thing two cells can be compared by.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @documentation https://fusion.dev/helix/components/heatmap
  *
- * @slot - The `<table>` this draws, where it is not named by `for`.
  * @slot end - Below the strip, at the trailing edge.
  * @slot start - Below the strip, at the leading edge.
  * @slot summary - Below the strip, in the middle.

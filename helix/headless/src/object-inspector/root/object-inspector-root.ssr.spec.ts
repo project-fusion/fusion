@@ -21,6 +21,26 @@ describe('object inspector server output', () => {
     expect(withoutStyles(markup)).toContain('1 key')
   })
 
+  /**
+   * The other channel, and the one the class doc leads with.
+   *
+   * A `for` names an id and resolving an id wants a document, so the server has
+   * no value to draw. What it serves is the frame: the tree's box, so the sheet's
+   * own height applies and the space the rows will fill is reserved before they
+   * exist, and the script the value is in, which is ordinary markup served whole.
+   */
+  test('a value named by `for` is not drawn, and the box that will hold it is', () => {
+    const markup = ssr(
+      html`<div>
+        <script type="application/json" id="payload">{"a":1}</script>
+        <helix-headless-object-inspector for="payload"></helix-headless-object-inspector>
+      </div>`,
+    )
+    expect(partTag(markup, 'tree')).toContain('role="tree"')
+    expect(partTag(markup, 'tree')).not.toContain('role="treeitem"')
+    expect(withoutStyles(markup)).toContain('{"a":1}')
+  })
+
   test('writes nothing onto the host that the consumer did not', () => {
     const markup = ssr(html`<helix-headless-object-inspector></helix-headless-object-inspector>`)
     expect(hostAttributes(markup, 'helix-headless-object-inspector')).toEqual([])

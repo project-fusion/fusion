@@ -1,11 +1,8 @@
 import { customElement, HelixElement, MixinCollection } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { HelixHeadlessTableColumn } from '../column/table-column.js'
+import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
 import type { HelixHeadlessTableRow } from '../row/table-row.js'
-
-/** The edges a column's `align` may name. */
-const EDGES = new Set(['center', 'end', 'start'])
 
 /**
  * The first `wanted` tracks of a track list, one entry each, so every declared
@@ -297,12 +294,13 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       return
     }
     /* The attribute is a string anybody can write and this is a stylesheet, so
-       only the three edges reach it. */
-    const rules = this.tableColumns.flatMap((column, index) =>
-      column.align && EDGES.has(column.align)
-        ? [`::slotted(:nth-child(${index + 1})) { --table-cell-align: ${column.align}; }`]
-        : [],
-    )
+       only the three edges reach it. `edgeOf` is that guard, shared with
+       `helix-data-table`, which puts the same attribute into the cells it
+       draws. */
+    const rules = this.tableColumns.flatMap((column, index) => {
+      const edge = edgeOf(column.align)
+      return edge ? [`::slotted(:nth-child(${index + 1})) { --table-cell-align: ${edge}; }`] : []
+    })
     const text = ['::slotted(*) { --table-cell-align: initial; }', ...rules].join('\n')
     this.alignment ??= new CSSStyleSheet()
     if (text !== this.aligned) {

@@ -24,12 +24,12 @@ import { styles } from './description-list-root.css.js'
  * figures of one width, which is how a set of totals is read.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases Data list, Key-value list, Details, Properties
  * @documentation https://fusion.dev/helix/components/description-list
  *
- * @cssproperty --description-list-gap - Space between one pair and the next.
+ * @cssproperty --description-list-gap - Space between one pair and the next. Its resting value is tighter with `direction="row"` than stacked, a row of pairs needing less air between them than a column of them does, and setting this takes both.
  */
 @customElement('helix-description-list')
 export class HelixDescriptionList extends HelixHeadlessDescriptionList {

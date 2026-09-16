@@ -95,11 +95,15 @@
   );
 }
 
-[part="tree"]:focus [part~="row"][data-active] {
+/* **The part's second name, not the attribute beside it.** The row the keys are
+   on carries `row-active` for exactly this, and nothing can follow `::part()`
+   with an attribute selector, so a sheet that reached for `[data-active]` drew a
+   state no consumer of this component could draw. */
+[part="tree"]:focus [part~="row-active"] {
   background-color: var(--helix-color-surface-sunken);
 }
 
-[part="tree"]:focus-visible [part~="row"][data-active] {
+[part="tree"]:focus-visible [part~="row-active"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }

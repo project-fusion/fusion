@@ -39,8 +39,10 @@ const press = async (host: Inspector, key: string, init: KeyboardEventInit = {})
   tree(host).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key, ...init }))
   await host.updateComplete
 }
+/* By the part's second name, which is the one a consumer can reach: nothing
+   follows `::part()` with an attribute selector. */
 const active = (host: HTMLElement): HTMLElement | undefined =>
-  rows(host).find((row) => row.hasAttribute('data-active'))
+  rows(host).find((row) => row.getAttribute('part')?.split(' ').includes('row-active'))
 
 describe('an object inspector', () => {
   test('opens the root and nothing under it, so the shape shows before the contents', async () => {

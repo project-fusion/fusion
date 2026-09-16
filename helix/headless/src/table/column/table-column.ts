@@ -48,6 +48,21 @@ export const at = (row: Readonly<Record<string, unknown>>, path: string): unknow
   return cursor
 }
 
+/** The edges a column's `align` may name. */
+const EDGES = new Set(['center', 'end', 'start'])
+
+/**
+ * The edge a column names, where it names one of the three.
+ *
+ * **`align` is a string anybody can write**, the union on the property being a
+ * compile-time claim and nothing else, and both tables put the value straight
+ * into CSS: `helix-table` into a rule in each row's shadow root, `helix-data-table`
+ * into the cell it draws. One guard, here with the property, rather than one in
+ * each table and only one of them written.
+ */
+export const edgeOf = (align: string | undefined): string | undefined =>
+  align && EDGES.has(align) ? align : undefined
+
 /**
  * @summary One column of a table: its heading, how wide it is, and what it reads.
  *

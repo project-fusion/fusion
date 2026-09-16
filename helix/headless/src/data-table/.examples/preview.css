@@ -75,6 +75,11 @@ helix-headless-data-table::part(row) {
   display: contents;
 }
 
+/* The column's edge, which the element publishes as `--data-table-cell-align` and
+   leaves to whoever draws the cell, the same hook a `helix-headless-table`'s
+   cells read under `--table-cell-align`, each family under its own name. Unset
+   under a column that names no edge, so the declaration drops
+   out and the cell keeps the table's own alignment. */
 helix-headless-data-table::part(cell) {
   border-block-start: 1px solid var(--_gray-line);
   color: var(--_gray-strong);
@@ -82,6 +87,7 @@ helix-headless-data-table::part(cell) {
   line-height: 1.5;
   padding-block: 0.75rem;
   padding-inline: 0 1rem;
+  text-align: var(--data-table-cell-align);
 }
 
 helix-headless-table-column:not([hidden]) {

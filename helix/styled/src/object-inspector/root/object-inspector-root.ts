@@ -16,7 +16,7 @@ import '../../copy-button/index.js'
  * never has to measure them one by one.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
  * @documentation https://fusion.dev/helix/components/object-inspector

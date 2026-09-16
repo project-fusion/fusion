@@ -39,7 +39,7 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * here is the dependency the tiers exist to prevent.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @aliases Contribution graph, Uptime strip, Calendar heatmap, Activity graph
  * @documentation https://fusion.dev/helix/components/heatmap
@@ -51,7 +51,7 @@ import { fits, numbers, toneOf, words } from './buckets.js'
  * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, carrying that number.
  *
  * @csspart cell - One reading.
- * @csspart empty - Shown when the table has no readings in it.
+ * @csspart empty - Shown when the table has no readings in it, and not before the table can be read at all: on a server, and while hydrating what one sent, there is no document to resolve `for` in and nothing is known yet.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -98,6 +98,9 @@ import { fits, numbers, toneOf, words } from './buckets.js'
 export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   /**
    * Shown when the table has no readings in it.
+   *
+   * Never shown while the table cannot be read at all, which is a server render
+   * and the hydrating one after it: see `sourceKnown`.
    */
   @property({ attribute: 'empty-text' })
   emptyText = 'No readings'
@@ -237,6 +240,33 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    */
   private get points(): Array<{ label: string; tone?: string | undefined; value: number }> {
     return this.series[0]?.points ?? []
+  }
+
+  /**
+   * Whether this render can tell a table with no readings from one it has not
+   * resolved yet.
+   *
+   * **Unknown is not empty, which is what an empty state must never say.**
+   * `for` names an id and resolving an id wants a document, so a server has
+   * none and a hydrating render must not look either. Without this the server
+   * drew "No readings" over a table holding ninety days of them, a crawler read
+   * that sentence, and the strip flipped to a full one on hydration: the fault
+   * `MixinCollection` names for a slotted collection, arriving through the one
+   * channel that mixin cannot see.
+   *
+   * The same shape as `childrenKnown`, asked of a document rather than of a
+   * tree. An id that resolves to nothing in a browser is still known, and still
+   * empty: a `for` naming no table should say so rather than sit blank.
+   */
+  private get sourceKnown(): boolean {
+    if (this.for === '') {
+      return true
+    }
+    if (this.hydrating) {
+      return false
+    }
+    const root = this.getRootNode() as Document | ShadowRoot
+    return typeof root.getElementById === 'function'
   }
 
   /**
@@ -450,7 +480,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         }
         ${this.renderTooltip()}
       </div>
-      ${cells.length === 0 ? html`<p part="empty">${this.emptyText}</p>` : nothing}
+      ${cells.length === 0 && this.sourceKnown ? html`<p part="empty">${this.emptyText}</p>` : nothing}
       <div part="footer">
         <span part="start"><slot name="start"></slot></span>
         <span part="summary"><slot name="summary"></slot></span>

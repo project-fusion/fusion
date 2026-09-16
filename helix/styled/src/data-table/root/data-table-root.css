@@ -93,6 +93,16 @@
      what `Table` draws too. Symmetric, the words of every column started twelve
      pixels to the end of their heading's. */
   padding-inline: var(--data-table-padding-inline, var(--helix-space-none) var(--helix-space-md));
+  /* The edge the column is set to, which the element publishes rather than
+     deciding: `table-cell.css` does the same for the cells a consumer writes,
+     under `--table-cell-align`, each family under its own name. No
+     fallback, so a column that sets no edge leaves the cell with whatever
+     `text-align` it inherits, and `end` is the inline end in either direction.
+
+     `text-align` alone here, where the cell a consumer writes takes
+     `justify-content` too: that cell is a flex box holding markup somebody else
+     authored, and this one holds one value and is not. */
+  text-align: var(--data-table-cell-align);
 }
 
 /*

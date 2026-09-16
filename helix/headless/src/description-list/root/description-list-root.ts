@@ -23,7 +23,7 @@ import { property } from 'lit/decorators.js'
  * `display: contents` alike.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases Data list, Key-value list, Details, Properties
  * @documentation https://fusion.dev/helix/components/description-list

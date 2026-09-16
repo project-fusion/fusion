@@ -76,7 +76,7 @@ const child = (path: string, key: string): string =>
  * gives it and a headless consumer has to.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
  * @documentation https://fusion.dev/helix/components/object-inspector
@@ -149,8 +149,15 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    *
    * Negative for the reason Code Block's is: a boolean attribute defaulting to
    * true could never be turned off from markup.
+   *
+   * **It does not reflect, where Code Block's does**, and the difference is what
+   * the two sheets need. Code Block reserves the button's width with
+   * `:host(:not([no-copy]))`, so the attribute has to be there for a consumer
+   * who set the property. This button is positioned out of the flow and takes no
+   * room, so nothing selects on it, and reflection exists so that a selector can
+   * reach a value.
    */
-  @property({ attribute: 'no-copy', reflect: true, type: Boolean })
+  @property({ attribute: 'no-copy', type: Boolean })
   noCopy = false
 
   /**
@@ -482,6 +489,16 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     return html`<span part="string" dir="ltr">${String(value)}</span>`
   }
 
+  /**
+   * One entry, named for its state where it holds one.
+   *
+   * **`row-active` and no attribute beside it.** Which row the keys are on is
+   * drawn by a sheet and by nothing else: the accessibility tree hears it from
+   * `aria-activedescendant` on the tree, which points at this row's id, so an
+   * attribute would be a second spelling with no reader. The name is the one a
+   * consumer can reach, nothing being able to follow `::part()` with an
+   * attribute selector.
+   */
   private renderRow(row: Row, index: number): TemplateResult {
     const active = index === this.active
     return html`<div
@@ -489,7 +506,6 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       role="treeitem"
       id=${`row-${index}`}
       data-index=${index}
-      ?data-active=${active}
       aria-level=${row.depth + 1}
       aria-posinset=${row.position}
       aria-setsize=${row.siblings}

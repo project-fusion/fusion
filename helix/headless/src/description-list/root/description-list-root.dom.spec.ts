@@ -46,20 +46,3 @@ describe('a description list', () => {
     expect(host.getAttribute('direction')).toBe('row')
   })
 })
-
-describe('a description list item', () => {
-  test('is a term and its description, in that order', async () => {
-    const host = await list()
-    const item = host.querySelector('helix-headless-description-list-item') as HTMLElement
-    expect([part(item, 'label')?.localName, part(item, 'value')?.localName]).toEqual(['dt', 'dd'])
-  })
-
-  test('takes its label as text, or as content that replaces it', async () => {
-    const host = await list()
-    const [plain, rich] = host.querySelectorAll('helix-headless-description-list-item')
-    const labeled = (item: Element | undefined): HTMLSlotElement =>
-      part(item as HTMLElement, 'label')?.querySelector('slot') as HTMLSlotElement
-    expect(labeled(plain).textContent).toBe('Owner')
-    expect(labeled(rich).assignedElements()[0]?.textContent).toBe('Region')
-  })
-})

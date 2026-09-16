@@ -23,7 +23,7 @@ import { repeat } from 'lit/directives/repeat.js'
    text, which renders an element called `lit$…$` that lays out as nothing.
    Measured: the styled spec read `localName` as `lit$640177303$`. */
 import { html } from 'lit/static-html.js'
-import { at, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
+import { at, edgeOf, type HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
 import {
@@ -86,7 +86,7 @@ import {
  * business, the same as any other file.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category data
  * @aliases Grid, Result table, Data grid
  * @documentation https://fusion.dev/helix/components/data-table
@@ -115,7 +115,7 @@ import {
  * @csspart checkbox-mark - The tick, or the dash while some rows are selected.
  * @csspart checkbox-mark-checked - The mark while its box is checked, beside `checkbox-mark`.
  * @csspart checkbox-mark-indeterminate - The dash while only some rows are selected, beside `checkbox-mark`.
- * @csspart empty - Shown when no rows match.
+ * @csspart empty - Shown when the result has nothing in it, whether it arrived empty or a filter emptied it. A result still on its way is `loading` instead, which wins over this.
  * @csspart footer - The region below the grid.
  * @csspart head - The row the column headings sit in. `display: contents`, so it takes no space.
  * @csspart loading - Shown while the rows are still on their way.
@@ -139,6 +139,7 @@ import {
  * @csspart table - The grid.
  * @csspart toolbar - The region above the grid.
  *
+ * @cssproperty --data-table-cell-align - The edge the column a cell sits under is set to, `start`, `center` or `end`, and unset under a column that sets none. Written by the component onto each cell it draws, read by the sheet that paints one; `helix-table` publishes `--table-cell-align` for the same attribute on the cells a consumer wrote, under its own family's name.
  * @cssproperty --data-table-template - The column track list this element worked out from the columns declared in it. Written by the component, read by the sheet that paints: a stylesheet takes it to lay the grid out, and setting it does nothing, because the component writes it inline on the very element that reads it and an inline declaration beats any sheet. `--data-table-columns` is the one to set.
  */
 @customElement('helix-headless-data-table')
@@ -770,9 +771,21 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     ).length
   }
 
-  /** Emptiness is a fact about the data here, not about slotted children. */
+  /**
+   * Emptiness is a fact about the data here, not about slotted children.
+   *
+   * **The page rather than the window**, which is the difference between the two
+   * counts `view` carries and the reason this reads `available`. A windowed
+   * table draws a slice, and a slice can be short of the rows that are there:
+   * asking whether *this* slice has rows says "nothing matched" about a result
+   * that matched plenty.
+   *
+   * The mixin's own answer counts children with no `slot`, which for this
+   * element is the columns. Left in place, a table with columns and no data
+   * would call itself full.
+   */
   protected override get hasRows(): boolean {
-    return this.view.rows.length > 0
+    return this.view.available > 0
   }
 
   /**
@@ -1148,15 +1161,31 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.requestUpdate()
   }
 
+  /**
+   * One cell, carrying its column's edge as a fact rather than as a decision.
+   *
+   * **A fact published rather than a property chosen**, which is what
+   * `helix-table` does with the same attribute: what lining up *means*, a
+   * `justify-content` for a value that fits or a `text-align` for one that
+   * wraps, belongs to whoever draws the cell. Written here as an inline
+   * `text-align` it was this tier choosing, in the tier that ships no CSS, and a
+   * consumer could not overrule it either, an inline declaration beating any
+   * `::part(cell)` rule they wrote.
+   *
+   * Only the three edges reach it, `align` being a string anybody can write and
+   * this being a style attribute: `edgeOf` is that guard, and `helix-table`
+   * holds the same value to the same three.
+   */
   private renderCell(
     column: HelixHeadlessTableColumn,
     row: DataRow,
     picked: boolean,
   ): TemplateResult {
+    const edge = edgeOf(column.align)
     return html`<span
       part="cell${picked ? ' cell-selected' : ''}"
       role="gridcell"
-      style=${column.align ? `text-align: ${column.align}` : nothing}
+      style=${edge ? `--data-table-cell-align: ${edge}` : nothing}
       >${column.read(row)}</span
     >`
   }
@@ -1315,6 +1344,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   protected override render(): TemplateResult {
     const { available, matched, rows } = this.view
+    /* Through `hasRows`, which every other collection in the library asks and
+       which this one overrode and then never read: two spellings of one
+       question, and the live one was not the documented one. */
+    const filled = this.hasRows
     const template = this.template
     const columns = this.shownColumns
     const pagination = this.tag('pagination')
@@ -1339,7 +1372,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           }
         </div>
         ${this.renderSpacer('before')}${this.renderRows(rows)}${this.renderSpacer('after')}
-        ${this.renderStatus(available > 0)}
+        ${this.renderStatus(filled)}
       </div>
       <div part="footer">
         <slot name="footer"></slot>

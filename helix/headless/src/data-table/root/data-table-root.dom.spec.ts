@@ -73,6 +73,41 @@ const SCHEMA = `
     <helix-headless-table-column field="size" sortable align="end">Size</helix-headless-table-column>
   </helix-headless-data-table>`
 
+/**
+ * A column's edge, handed to the cells this element draws.
+ *
+ * **Published and not drawn**, which is the same side of it `helix-table` takes:
+ * a cell carries its column's `align` as `--data-table-cell-align` and a sheet
+ * decides what lining up means. Written here as an inline `text-align` it was
+ * the tier that ships no CSS deciding, and it beat any `::part(cell)` rule a
+ * consumer wrote, an inline declaration outranking a stylesheet.
+ *
+ * Read off the attribute rather than through `getComputedStyle`, so the
+ * assertion is about what this element wrote and holds in a double with no
+ * cascade.
+ */
+describe("a data table publishing each column's edge to its cells", () => {
+  const edges = (element: HTMLElement): (string | null)[] =>
+    [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])]
+      .slice(0, 2)
+      .map((cell) => cell.getAttribute('style'))
+
+  test('a column that names an edge writes it, and one that does not writes nothing', async () => {
+    const { element } = await mount(SCHEMA)
+    expect(edges(element)).toEqual([null, '--data-table-cell-align: end'])
+  })
+
+  /* `align` is a string anybody can write, and this goes into a style
+     attribute, so only the three edges reach it. `helix-table` holds the same
+     value to the same three and said so first. */
+  test('an edge it does not know is left out rather than written into a style', async () => {
+    const { element } = await mount(SCHEMA)
+    heading(element).setAttribute('align', 'middle')
+    await settled(element)
+    expect(edges(element)[0]).toBe(null)
+  })
+})
+
 describe('the regions around the grid', () => {
   /**
    * A region nobody filled is not laid out, and the element is what says so.
