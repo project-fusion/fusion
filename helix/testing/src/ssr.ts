@@ -124,3 +124,52 @@ export const servedParts = (markup: string): string[] =>
       ),
     ),
   ].sort()
+
+/**
+ * Only what the component rendered: the inlined sheet and the host's own tag
+ * gone.
+ *
+ * **`withoutStyles` is not enough on its own, and the gap is the same shape the
+ * sheet was.** What it leaves behind still opens with the host tag, which is the
+ * consumer's own markup echoed back, so a substring assertion can pass on an
+ * attribute nobody rendered. Measured on the cohort: `<helix-date-input
+ * value="2026-08-18">` renders `August 18, 2026` into its field, by design, and
+ * a spec claiming "the date is already in the field" passed against the whole
+ * document for six weeks because `value="2026-08-18"` was sitting in the host
+ * tag two characters away. Time Input and Color Input had the same test.
+ *
+ * So the rule is that an assertion about what a component *rendered* comes
+ * through here or through `partTag`, and one about what the *consumer* wrote
+ * comes through `hostTag` or `hostAttributes`.
+ *
+ * The host's children are left, being neither: a slotted node is the consumer's
+ * markup and is also what the component chose to project, so a spec asserting on
+ * one should say which it means by reaching for the part that holds it.
+ */
+export const rendered = (markup: string, tagName: string): string => {
+  const shadow = withoutStyles(markup)
+  const host = hostTag(markup, tagName)
+  return host === '' ? shadow : shadow.replace(host, '')
+}
+
+/**
+ * Whether the served markup names its own control, through a `<label for>` that
+ * resolves.
+ *
+ * **The question a field's server output has to answer and the one no substring
+ * can.** `toContain('for="control"')` and `toContain('id="control"')` are two
+ * literals that pass side by side whether or not they are the same element's,
+ * and a `for` naming an id nothing renders is a field a screen reader announces
+ * as "edit text": valid markup, no error anywhere, no name. So this reads the
+ * `for` off the rendered label and asks whether that id is in the same shadow
+ * root, which is the only tree an IDREF resolves in.
+ *
+ * False where a field names itself through `ElementInternals` instead, which is
+ * what a group does and is correct: no server writes internals, so a group's
+ * markup carries no name and a spec should say so rather than assert one.
+ */
+export const namesControl = (markup: string): boolean => {
+  const shadow = withoutStyles(markup)
+  const named = /<label[^>]*\sfor="([^"]+)"/.exec(shadow)?.[1]
+  return named !== undefined && new RegExp(`<[a-z-]+\\s[^>]*id="${named}"`).test(shadow)
+}

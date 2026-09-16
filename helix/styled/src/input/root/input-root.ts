@@ -24,11 +24,14 @@ import { styles } from './input-root.css.js'
  * the platform's.
  *
  * Height comes from the region, like every other control: `data-density` on
- * whatever holds it, not a `size` here. Invalid styling waits for
- * `:user-invalid`, because a field is not wrong before anyone has filled it in.
+ * whatever holds it, not a `size` here. Invalid styling waits for the `invalid`
+ * custom state, because a field is not wrong before anyone has filled it in and
+ * `:user-invalid` cannot answer that here: it tracks the control the reader is
+ * in, which is inside this shadow root, so it never reaches the host the rule
+ * selects on.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases TextField, Field, TextInput
  * @documentation https://fusion.dev/helix/components/input

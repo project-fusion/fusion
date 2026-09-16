@@ -57,7 +57,7 @@ const dates = (value: string): string[] =>
  * worth keeping: a real text field.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases DatePicker, DateField, InputDate
  * @documentation https://fusion.dev/helix/components/date-input

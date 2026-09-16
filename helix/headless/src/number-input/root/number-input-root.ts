@@ -66,7 +66,7 @@ const SCRUB_FINE = 16
  * not corrected under their hands.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases NumberField, Stepper, InputNumber
  * @documentation https://fusion.dev/helix/components/number-input

@@ -130,12 +130,13 @@ const rangeFor = (root: Element, needle: string): Range[] => {
  * `aria-activedescendant` names it while focus stays on the list.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Options, Select list
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @slot - The options, and any groups of them.
+ * @slot filter-icon - The mark in the filter's field. Left empty, a magnifier is drawn.
  * @slot hint - Richer than a string.
  * @slot label - Richer than a string.
  *

@@ -36,7 +36,7 @@ import '../../listbox/index.js'
  * a second place the answer lives.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Dropdown, Picker
  * @documentation https://fusion.dev/helix/components/select

@@ -29,7 +29,7 @@ import { styles } from './time-input-root.css.js'
  * belongs to. That is the same reasoning Select gives for its own list.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases TimeField, InputTime
  * @documentation https://fusion.dev/helix/components/time-input
