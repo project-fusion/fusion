@@ -42,7 +42,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { mkdir } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import { costOf } from '@fusion.dev/scripts/cost'
-import { pool } from '@fusion.dev/scripts/pool'
+import { offline, pool } from '@fusion.dev/scripts/pool'
 import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
@@ -445,10 +445,7 @@ const browser = await chromium.launch()
    differently each time. Given to every worker's context, so each worker's page
    starts with the settings the one shared page had. */
 const CONTEXT = { reducedMotion: 'reduce', viewport: { height: 800, width: WIDTH } }
-const closed = (context) =>
-  context.route('**/*', (route) =>
-    route.request().url().startsWith(origin) ? route.continue() : route.abort(),
-  )
+const closed = offline(origin)
 
 /** A page throttled as asked, with what it says kept, and a way to load it and wait. */
 const watch = async (tab) => {

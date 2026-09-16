@@ -104,7 +104,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { createServer } from 'node:http'
 import { dirname, join, relative } from 'node:path'
 import { costOf } from '@fusion.dev/scripts/cost'
-import { pool } from '@fusion.dev/scripts/pool'
+import { offline, pool } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
@@ -405,11 +405,7 @@ const CONTEXT = { reducedMotion: 'reduce', viewport: { height: 800, width: SHOTS
  *
  * The brand faces are the reason this is an origin test rather than a scheme
  * test: they are served from here, so they continue, and nothing else does. */
-const closed = (context) =>
-  context.route('**/*', (route) => {
-    const url = route.request().url()
-    return url.startsWith(origin) ? route.continue() : route.abort()
-  })
+const closed = offline(origin)
 
 /**
  * One picture of one family, compared with its baseline or written over it.

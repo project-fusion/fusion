@@ -64,6 +64,34 @@ import { availableParallelism } from 'node:os'
 import { argument } from './argv.mjs'
 import { record } from './cost.mjs'
 
+/**
+ * A `prepare` that lets a worker's context reach `origin` and nothing else.
+ *
+ * **Nothing leaves this machine, and four checks had each written that down.**
+ * A handful of examples name assets on other people's servers, and a check that
+ * let them through records whatever those hosts returned that minute: parity and
+ * DSD compare two renders of it, visual stores it as a baseline, and contrast
+ * reads its colors. Blocked, every one of them renders the same missing-media
+ * state, which is deterministic and is still the thing under test.
+ *
+ * **The specs wanted it for the opposite reason, and that is what brought it
+ * here.** `avatar` and `image` each have an events example pointed at
+ * `https://example.invalid/missing.png`, and the spec waits for the `error` it
+ * produces. Nothing about that is a question for the network, and the answer
+ * was arriving in whatever time the runner's resolver took to refuse a name,
+ * raced against the harness's own two seconds: it passed for five commits and
+ * timed out on the sixth, which had touched neither family. Refused at the
+ * context, the `error` is immediate and the same everywhere.
+ *
+ * An origin test rather than a scheme test, because what a check serves itself
+ * is served over http too: the brand faces come from `origin` and continue, the
+ * spec bundles are imported from it, and nothing else is answered at all.
+ */
+export const offline = (origin) => (context) =>
+  context.route('**/*', (route) =>
+    route.request().url().startsWith(origin) ? route.continue() : route.abort(),
+  )
+
 /** How many workers a check runs on: `--workers n`, or every core but one, and four at most. */
 export const workers = () => {
   const asked = argument('workers')

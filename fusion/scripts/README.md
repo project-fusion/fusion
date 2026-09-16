@@ -13,7 +13,7 @@ it is the workspace's own tooling.
 | `./frontmatter` | The `key: value` block at the top of an MDX file, as strings |
 | `./literal` | Text as a quoted string or a template literal in a generated module |
 | `./paint`, `./theme-facts`, `./theme-intents` | The theme engine's shared vocabulary |
-| `./pool` | Running a browser check's families side by side, on a fresh page each or one per worker |
+| `./pool` | Running a browser check's families side by side, on a fresh page each or one per worker, reaching nothing but their own origin |
 | `./scope` | Which families a change reaches, for the checks that compare examples |
 | `./settle` | Waiting for an example to stop changing before it is photographed |
 | `./shard` | Which of a browser check's families a CI job takes, when one check is split across several |

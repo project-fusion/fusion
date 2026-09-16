@@ -42,7 +42,7 @@ import {
 import { createServer } from 'node:http'
 import { join, relative } from 'node:path'
 import { costOf } from '@fusion.dev/scripts/cost'
-import { pool } from '@fusion.dev/scripts/pool'
+import { offline, pool } from '@fusion.dev/scripts/pool'
 import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
@@ -516,15 +516,12 @@ const browser = await chromium.launch()
    settings the one shared page had. */
 const CONTEXT = { reducedMotion: 'reduce', viewport: { height: 800, width: WIDTH } }
 
-/* Nothing leaves this machine, for the reason `check-visual.mjs` gives: three
+/* Nothing leaves this machine, which `offline` carries the argument for: three
    examples name assets on other people's servers, and a comparison that let
    them through would record whatever those hosts returned each time. Blocked,
    both sides render the same missing-media state, which is deterministic and
    still the thing under test. */
-const closed = (context) =>
-  context.route('**/*', (route) =>
-    route.request().url().startsWith(origin) ? route.continue() : route.abort(),
-  )
+const closed = offline(origin)
 
 /* **Nothing is normalized, and normalizing the whitespace is the wrong fix.**
    JSX drops whitespace touching a line break where HTML keeps it, which invites
