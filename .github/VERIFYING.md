@@ -132,17 +132,29 @@ Both install the floor `Cargo.toml` declares rather than stable, so
 
 `fusion/scripts/plan-browser.mjs` decides, in `plan`, and the matrix is what it
 prints. Each check is split into as many shards as its share of the corpus needs
-to finish in about two minutes, measured per example on a runner. Parity and
-hydration are scoped to what a change reaches, so a change to one family plans a
-job apiece and a change to `helix/core` plans the whole corpus; contrast, visual,
-smoke and the specs read every example whatever changed.
+to finish in about three minutes. Parity and hydration are scoped to what a
+change reaches, so a change to one family plans a job apiece and a change to
+`helix/core` plans the whole corpus; contrast, visual, smoke and the specs read
+every example whatever changed.
+
+**What a family costs is measured, not counted.** It was derived from how many
+examples a family holds, and that model is false wherever an example is not a
+unit of work: contrast reads every pair of inks an example paints, and on run
+35041878434 its four shards held 142, 142, 142 and 141 examples and took 118,
+43, 40 and 43 seconds. Aura alone is a sixth of that check. So
+`fusion/scripts/lib/browser-cost.json` holds what each family took each check,
+`measure-browser.mjs` refreshes it, and a family the file does not know falls
+back to the per-example estimate, which is what keeps a family added today from
+weighing nothing. The readings are taken on a desk and the plan is in runner
+seconds, so what the file is trusted for is the shape: each check's families are
+scaled onto what that check took on a runner.
 
 **The planner decides how many and the check decides which.** Each check splits
 its own corpus with `@fusion.dev/scripts/shard`: by family, deterministic,
-balanced by what each family renders. So the shards of a check are its whole
-corpus whatever the count, and a wrong estimate costs time and never coverage.
-A shard with nothing to do passes in seconds and says whose work it left to the
-others.
+heaviest first onto the lightest shard so far, weighed by the same measurement
+the planner sized them with. So the shards of a check are its whole corpus
+whatever the count, and a wrong estimate costs time and never coverage. A shard
+with nothing to do passes in seconds and says whose work it left to the others.
 
 **The share is set by how a runner is billed**, which is per job and rounded up
 to the minute, and the arithmetic counts the jobs as well as the minute each
@@ -151,7 +163,7 @@ measured on run 35040430279. A share of 70 keeps a job inside two minutes and
 plans 29 of them, which billed 63; 125 plans 16 of three minutes, which is 48,
 and the count does not fall again until a job would bill four. What no share
 buys is wall clock: the browser matrix finished 72 seconds before that run did,
-and `warm` and then `rust` are the critical path.
+and `warm` is the critical path.
 
 ## A tree is verified once
 

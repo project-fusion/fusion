@@ -103,6 +103,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { dirname, join, relative } from 'node:path'
+import { costOf } from '@fusion.dev/scripts/cost'
 import { pool } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
@@ -223,7 +224,12 @@ if (total === 0) {
 const asked = shard()
 const ours = owner(
   every.flatMap((tier) => tier.families),
-  (family) => every.filter((tier) => tier.families.includes(family)).length,
+  /* By pictures, which is what `plan-browser.mjs` counts: a family is pictured
+     once per shot in each tier that has one. */
+  costOf(
+    'visual',
+    (family) => SHOTS.length * every.filter((tier) => tier.families.includes(family)).length,
+  ),
   asked,
 )
 const tiers = every.map((tier) => ({ ...tier, families: tier.families.filter(ours) }))
@@ -549,6 +555,7 @@ const units = tiers.flatMap((tier) => tier.families.map((family) => ({ family, t
 const outcomes = await pool(units, {
   browser,
   context: CONTEXT,
+  family: (unit) => unit.family,
   page: 'worker',
   prepare: closed,
   run: async (tab, { family, tier }) => {

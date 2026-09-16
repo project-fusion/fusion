@@ -31,6 +31,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
+import { costOf } from '@fusion.dev/scripts/cost'
 import { pool } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root, SOURCE, TAG_PREFIX } from '@fusion.dev/scripts/workspace'
@@ -86,14 +87,16 @@ if (every.length === 0) {
   process.exit(1)
 }
 
-/* **This run's families, when CI splits the check**, weighed by examples:
-   `@fusion.dev/scripts/shard` argues the split. A shard with none passes before
-   the server and the browser start, and says so in words. */
+/* **This run's families, when CI splits the check**, weighed by what each was
+   measured to cost rather than by how many examples it holds:
+   `@fusion.dev/scripts/cost` argues that and `@fusion.dev/scripts/shard` the
+   split. A shard with none passes before the server and the browser start, and
+   says so in words. */
 const familyOf = (one) => one.name.split('/')[0]
 const asked = shard()
 const ours = owner(
   every.map(familyOf),
-  (family) => every.filter((one) => familyOf(one) === family).length,
+  costOf('smoke', (family) => every.filter((one) => familyOf(one) === family).length),
   asked,
 )
 const examples = every.filter((one) => ours(familyOf(one)))
@@ -157,6 +160,7 @@ const browser = await chromium.launch()
 const families = [...Map.groupBy(examples, (one) => one.name.split('/')[0]).values()]
 const byFamily = await pool(families, {
   browser,
+  family: (group) => familyOf(group[0]),
   open: async (page) => {
     const noise = []
     page.on('pageerror', (error) => noise.push(`threw: ${error.message}`))

@@ -47,6 +47,7 @@
     "helix": "bun helix/cli/npm/bin.mjs",
     "insight": "bun fusion/scripts/new-insight.mjs",
     "lint": "biome lint .",
+    "measure:browser": "turbo run frame specs && bun fusion/scripts/measure-browser.mjs",
     "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "probe:stuck": "bun fusion/scripts/probe-stuck-spec.mjs",
     "queue": "bun fusion/scripts/check-queue.mjs",

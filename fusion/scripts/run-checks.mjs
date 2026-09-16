@@ -44,8 +44,9 @@ const DEDICATED = new Set([
      to avoid exactly that. */
   'bun run check:spec:floors',
   /* Needs a Rust toolchain, which a shard does not have and five of the six
-     would never use. It runs beside `rs:check` and `rs:test`, where the cargo
-     cache is already warm and the binaries it calls have just been built. */
+     would never use. It runs in `cli`, where the cargo cache is warm and the
+     binary it calls has just been built, and which waits for the workspace
+     build these read on top of. */
   'bun run check:cli',
   /* **The CLI's own subcommands, for the reason above.** `bin.mjs` resolves a
      built binary or builds one, so a shard without the cargo cache compiles it,

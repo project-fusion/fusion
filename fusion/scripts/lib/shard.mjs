@@ -22,9 +22,14 @@
  * not a unit of cost: parity's range from two examples to sixteen, and a stripe
  * that dealt families out in name order put the heavy ones where they happened
  * to sort. The heaviest family goes first, each onto the lightest shard so far,
- * ties to the lower index and equal weights in name order. Each check weighs by
- * what it will render, examples or pictures, which is close enough to cost that
- * the shards of one check finish within seconds of each other.
+ * ties to the lower index and equal weights in name order.
+ *
+ * **What a family weighs is `@fusion.dev/scripts/cost`'s to say, and it is
+ * seconds.** Each check weighed by what it would render, examples or pictures,
+ * and an example is not a unit of cost either: contrast's four shards held 142,
+ * 142, 142 and 141 examples on run 35041878434 and took 118, 43, 40 and 43
+ * seconds, one family being a sixth of the check. The packing here was doing its
+ * job on a weight that was not the work.
  *
  * **Counted from 0 on the command line and from 1 in what a run prints.** The
  * argument counts as `run-checks.mjs --shard` does. The printed form never

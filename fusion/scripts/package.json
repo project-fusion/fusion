@@ -12,6 +12,7 @@
   "type": "module",
   "exports": {
     "./argv": "./lib/argv.mjs",
+    "./cost": "./lib/cost.mjs",
     "./emit": "./lib/emit.mjs",
     "./format-open-tags": "./lib/format-open-tags.mjs",
     "./formatted": "./lib/formatted.mjs",

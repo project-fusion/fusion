@@ -44,6 +44,7 @@ import { readFile } from 'node:fs/promises'
  */
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
+import { costOf } from '@fusion.dev/scripts/cost'
 import { pool, workers } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root } from '@fusion.dev/scripts/workspace'
@@ -113,12 +114,15 @@ if (bundles.length === 0) {
   process.exit(1)
 }
 
-/* **This run's families, when CI splits the check**, one weight apiece, since
-   what a family's specs cost is known only by running them:
-   `@fusion.dev/scripts/shard` argues the split. A shard with none passes before
-   the browser starts, and says so in words. */
+/* **This run's families, when CI splits the check**, weighed by what each was
+   measured to cost and one apiece where it was not, since what a family's specs
+   cost is otherwise known only by running them: `@fusion.dev/scripts/cost`
+   argues that and `@fusion.dev/scripts/shard` the split. A shard with none
+   passes before the browser starts, and says so in words. */
+const named = (bundle) => bundle.replace(/\.js$/, '')
+const seconds = costOf('specs', () => 1)
 const asked = shard()
-const ours = owner(bundles, () => 1, asked)
+const ours = owner(bundles, (bundle) => seconds(named(bundle)), asked)
 const families = bundles.filter(ours)
 if (families.length === 0) {
   console.log(
@@ -197,6 +201,7 @@ const failures = []
 const byFamily = await pool(families, {
   browser,
   count: WORKERS,
+  family: named,
   run: async (fresh, family) => {
     /* **A page of its own for every family**, so the custom element registry
        starts empty each time. Each bundle carries its own copy of the headless
