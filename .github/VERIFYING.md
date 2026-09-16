@@ -114,7 +114,7 @@ toolchain installed once, the floor `Cargo.toml` declares rather than stable, so
 
 `fusion/scripts/plan-browser.mjs` decides, in `plan`, and the matrix is what it
 prints. Each check is split into as many shards as its share of the corpus needs
-to finish in about seventy seconds, measured per example on a runner. Parity and
+to finish in about two minutes, measured per example on a runner. Parity and
 hydration are scoped to what a change reaches, so a change to one family plans a
 job apiece and a change to `helix/core` plans the whole corpus; contrast, visual,
 smoke and the specs read every example whatever changed.
@@ -126,10 +126,14 @@ corpus whatever the count, and a wrong estimate costs time and never coverage.
 A shard with nothing to do passes in seconds and says whose work it left to the
 others.
 
-**Seventy seconds because of how a runner is billed**, which is per job and
-rounded up to the minute. A job is its setup and its share, and seventy leaves
-a setup of fifty seconds inside two minutes, where ninety would bill every job
-three.
+**The share is set by how a runner is billed**, which is per job and rounded up
+to the minute, and the arithmetic counts the jobs as well as the minute each
+crosses into. A job is its setup and its share; the setup is 39 seconds,
+measured on run 35040430279. A share of 70 keeps a job inside two minutes and
+plans 29 of them, which billed 63; 125 plans 16 of three minutes, which is 48,
+and the count does not fall again until a job would bill four. What no share
+buys is wall clock: the browser matrix finished 72 seconds before that run did,
+and `warm` and then `rust` are the critical path.
 
 ## A tree is verified once
 
