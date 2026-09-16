@@ -1,4 +1,5 @@
 import {
+  CHART_PLOT,
   customElement,
   drawTooltip,
   HelixElement,
@@ -419,7 +420,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
 
     return html`<div
         part="strip"
-        id="helix-chart-plot"
+        id=${CHART_PLOT}
         style="--heatmap-rows: ${this.rowCount}"
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}

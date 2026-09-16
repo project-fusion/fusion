@@ -1,4 +1,5 @@
 import {
+  CHART_PLOT,
   type Curve,
   customElement,
   drawTooltip,
@@ -234,7 +235,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     const rows = this.sourceRows
     const stack = this.stack
     if (rows.length === 0 || stack.columns.length === 0) {
-      return html`<div id="helix-chart-plot" part="plot"></div>`
+      return html`<div id=${CHART_PLOT} part="plot"></div>`
     }
     const top = this.share ? 1 : Math.max(0, ...stack.totals)
     const domain: [number, number] = [0, top > 0 ? top : 1]
@@ -266,7 +267,7 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
     domain: [number, number],
   ): TemplateResult {
     const order = stack.layers.map((_, depth) => depth).reverse()
-    return html`<div aria-hidden="true" id="helix-chart-plot" part="plot">
+    return html`<div aria-hidden="true" id=${CHART_PLOT} part="plot">
       <svg part="svg"
         data-mirror
         preserveAspectRatio="none"

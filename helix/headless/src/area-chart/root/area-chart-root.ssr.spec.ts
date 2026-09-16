@@ -1,16 +1,20 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('area chart server output', () => {
-  test('serves its plot and no bands, there being no table to read on a server', () => {
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-area-chart for="visits"></helix-headless-area-chart>`),
-    )
-    expect(hasPart(markup, 'plot')).toBe(true)
-    expect(markup).toContain('id="helix-chart-plot"')
-    expect(markup).not.toContain('part="area"')
+  /* The frame and nothing drawn in it, which is what a chart resolving `for`
+     against a document owes a server that has no document. See "A component
+     that resolves a document serves the frame" in helix/CONVENTIONS.md. */
+  test('serves its plot and nothing stacked in it', () => {
+    const markup = ssr(html`<helix-headless-area-chart for="visits"></helix-headless-area-chart>`)
+    expect(servedParts(markup)).toEqual(['plot'])
+  })
+
+  test('the plot is named, so its box is the boundary a bubble is kept inside', () => {
+    const markup = ssr(html`<helix-headless-area-chart for="visits"></helix-headless-area-chart>`)
+    expect(partTag(markup, 'plot')).toContain('id="helix-chart-plot"')
   })
 
   test('the host carries only what the consumer wrote', () => {

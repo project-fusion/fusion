@@ -31,6 +31,16 @@
 //! file is `.mdx`. Resolved relative to the file that holds the link, which is
 //! how a reader follows it, and only for targets that look like a repository
 //! file: anything with a scheme, an anchor alone, or a bare word is left alone.
+//!
+//! **A backticked path in the prose itself is the fifth**, and it was the gap
+//! between the other four: the comment shapes read comments and a paragraph is
+//! not one, the link shape reads link targets and a path a document merely
+//! names is not a link. The sentence in `helix/CONVENTIONS.md` telling every
+//! author of a server spec where the SSR helpers live named a directory that
+//! had moved to a package of its own, and nothing in the tree could say so.
+//! Resolved at the repository and beside the file, the two places a path in a
+//! document means something, and read as a claim only where its first segment
+//! names a directory that is really there at one of them.
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -288,6 +298,48 @@ pub fn run(context: &Context) -> Report {
         let Some(from) = file.parent() else {
             continue;
         };
+
+        /* And a backticked path in the prose itself, which is the fifth shape
+        and the one the other four were blind to. The three comment shapes read
+        comments, and a paragraph is not a comment; the link shape reads link
+        targets, and a path a document merely *names* is not a link. So
+        `helix/CONVENTIONS.md` told every author of a server spec that the
+        helpers live in `styled/src/testing/ssr.ts`, which moved to its own
+        package and has not existed since, with nothing to say so.
+
+        **Rooted at the repository or beside the file**, which are the two
+        places a path in a document can mean something: a document at the root
+        says `helix/styles`, and one inside a domain says `styled/src`, and a
+        reader resolves each the way it is written.
+
+        **The head has to name a directory that is really there**, which is how
+        an illustrative fragment is told from a claim. The comment shape asks
+        whether the first segment is a top-level domain and this asks the same
+        question at both rooting points: `color-picker/color.ts` names no
+        directory under `helix` and is a sketch of where something lives, while
+        `styled/src/testing/ssr.ts` names one and is a claim about a file. */
+        for caught in PATH.captures_iter(&text) {
+            let path = caught[1].to_owned();
+            if !named(&path) {
+                continue;
+            }
+            let head = path.split('/').next().unwrap_or_default();
+            let bases: [&Path; 2] = [&context.root, from];
+            let rooted: Vec<&&Path> = bases
+                .iter()
+                .filter(|base| base.join(head).is_dir())
+                .collect();
+            if rooted.is_empty() || rooted.iter().any(|base| base.join(&path).exists()) {
+                continue;
+            }
+            fault(
+                file,
+                format!("names `{path}`, which is not there"),
+                "Prose is the one part of a file nothing compiles, so a reference in it survives \
+                 the rename that invalidated it.",
+            );
+        }
+
         /* Inline code spans are stripped first, because a link inside one is an
         illustration of the shape rather than a link: a line describing the
         format of a link is not a link to anywhere. */

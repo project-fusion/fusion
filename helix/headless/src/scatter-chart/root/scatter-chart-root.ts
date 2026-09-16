@@ -1,4 +1,5 @@
 import {
+  CHART_PLOT,
   customElement,
   drawTooltip,
   extent,
@@ -266,7 +267,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     this.drawn = field.points
     if (field.points.length === 0) {
       return html`<div dir="ltr" part="plane">
-        <div id="helix-chart-plot" part="plot"></div>
+        <div id=${CHART_PLOT} part="plot"></div>
       </div>`
     }
     const format = formatNumbers('')
@@ -299,7 +300,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     up: (value: number) => number,
   ): TemplateResult {
     const at = this.pointer.at
-    return html`<div aria-hidden="true" id="helix-chart-plot" part="plot">
+    return html`<div aria-hidden="true" id=${CHART_PLOT} part="plot">
       <svg part="svg"
         preserveAspectRatio="none"
         viewBox="0 0 ${WIDTH} ${HEIGHT}"

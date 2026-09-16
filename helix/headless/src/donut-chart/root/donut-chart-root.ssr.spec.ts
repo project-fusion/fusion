@@ -1,25 +1,29 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('donut chart server output', () => {
-  test('serves its track and its middle, so the ring is not a gap that fills in', () => {
-    /* The table is light DOM the server cannot see, so the honest output is the
-       empty ring and whatever the consumer slotted into it. A total in the hole
-       is the consumer's markup and should be readable before hydration. */
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-donut-chart for="traffic"></helix-headless-donut-chart>`),
+  /* The frame and nothing drawn in it, which is what a chart resolving `for`
+     against a document owes a server that has no document. See "A component
+     that resolves a document serves the frame" in helix/CONVENTIONS.md.
+
+     A donut's frame is the fullest of the five, because its box is a ring
+     rather than a rectangle: the empty track is what makes the plot square,
+     and the middle is where the consumer's own total is slotted, which is
+     ordinary markup and should be readable before hydration. */
+  test('serves its track and its middle, and no slices', () => {
+    const markup = ssr(
+      html`<helix-headless-donut-chart for="traffic"></helix-headless-donut-chart>`,
     )
-    expect(hasPart(markup, 'track')).toBe(true)
-    expect(hasPart(markup, 'center')).toBe(true)
+    expect(servedParts(markup)).toEqual(['center', 'plot', 'track'])
   })
 
-  test('serves no slices, there being no table to read on a server', () => {
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-donut-chart for="traffic"></helix-headless-donut-chart>`),
+  test('the plot is named, so its box is the boundary a bubble is kept inside', () => {
+    const markup = ssr(
+      html`<helix-headless-donut-chart for="traffic"></helix-headless-donut-chart>`,
     )
-    expect(markup).not.toContain('part="segment"')
+    expect(partTag(markup, 'plot')).toContain('id="helix-chart-plot"')
   })
 
   test('the host carries only what the consumer wrote', () => {

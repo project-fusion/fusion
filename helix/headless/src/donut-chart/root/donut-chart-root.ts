@@ -1,4 +1,5 @@
 import {
+  CHART_PLOT,
   customElement,
   drawTooltip,
   HelixElement,
@@ -239,7 +240,7 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
        resting thickness. */
     return html`<div
       aria-hidden="true"
-      id="helix-chart-plot"
+      id=${CHART_PLOT}
       part="plot"
       style="--donut-chart-stroke: ${this.thickness}"
     >
