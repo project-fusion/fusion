@@ -67,12 +67,12 @@ printf 'pre-push: generated files\n'
 # literal `bun run` calls.
 for check in \
   "turbo run token-layer -- --check" \
-  "turbo run docs -- --check" \
+  "turbo run docs-check" \
   "turbo run samples -- --check" \
-  "turbo run routes -- --check" \
+  "turbo run routes-check" \
   "turbo run content -- --check" \
   "turbo run register -- --check" \
-  "turbo run themed-page -- --check" \
+  "turbo run themed-page-check" \
   "bun run check:gen:element-events" \
   "bun run check:gen:metrics" \
   "bun run check:gen:eval"; do
