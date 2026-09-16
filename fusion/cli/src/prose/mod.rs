@@ -60,7 +60,7 @@ pub fn all() -> Vec<Rule> {
             fix: None,
             name: "references",
             run: Runner::Source(references::run),
-            summary: "every path and script a comment names is one that is there",
+            summary: "every path and script a comment or a document names is one that is there",
         },
         Rule {
             fix: None,

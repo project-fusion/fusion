@@ -1,4 +1,5 @@
 import {
+  CHART_PLOT,
   type Curve,
   customElement,
   drawTooltip,
@@ -237,7 +238,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
     const series = this.series
     const readings = series[0]?.points.map((point) => point.label) ?? []
     if (readings.length === 0) {
-      return html`<div id="helix-chart-plot" part="plot"></div>`
+      return html`<div id=${CHART_PLOT} part="plot"></div>`
     }
 
     const domain = this.range(series)
@@ -296,7 +297,7 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
 
     return html`<div
       aria-hidden="true"
-      id="helix-chart-plot"
+      id=${CHART_PLOT}
       part="plot"
       style=${holes ? `--_line-chart-holes: ${holes}` : nothing}
     >

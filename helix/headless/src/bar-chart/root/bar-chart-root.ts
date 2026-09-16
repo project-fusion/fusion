@@ -1,4 +1,5 @@
 import {
+  CHART_PLOT,
   customElement,
   drawTooltip,
   extent,
@@ -226,7 +227,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const series = this.series
     const categories = series[0]?.points.map((point) => point.label) ?? []
     if (categories.length === 0) {
-      return html`<div id="helix-chart-plot" part="plot"></div>`
+      return html`<div id=${CHART_PLOT} part="plot"></div>`
     }
 
     /* Zero at both ends, so a series that goes negative gets a baseline inside
@@ -402,7 +403,7 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
 
     return html`<div
       aria-hidden="true"
-      id="helix-chart-plot"
+      id=${CHART_PLOT}
       part="plot"
     >
       <svg part="svg"

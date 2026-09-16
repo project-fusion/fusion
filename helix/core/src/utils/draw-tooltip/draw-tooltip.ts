@@ -29,6 +29,21 @@ import type { Row } from '../read-series/read-series.js'
  * name, which is how every composed tag in the library already resolves. That
  * makes this `static-html` rather than `lit`, a tag being a `StaticValue`.
  */
+/**
+ * The id every chart puts on its plot, and the boundary a bubble is kept inside.
+ *
+ * **A name six templates and this file have to agree on is a name that will
+ * stop agreeing**, which is `PALETTE`'s argument and it holds harder here: the
+ * failure is silent. `within` resolves through `getElementById`, so a plot
+ * renamed on one side returns null, the boundary falls back to the viewport,
+ * and the bubble goes back to hanging past the drawing with nothing reported
+ * anywhere.
+ *
+ * Fixed rather than generated, for the reason the mark's id below gives: it is
+ * scoped to one chart's shadow root, where it is the only one.
+ */
+export const CHART_PLOT = 'helix-chart-plot'
+
 /** Where a tooltip points, in the plot's own percentages, and which side it prefers. */
 export interface TooltipAt {
   /**
@@ -151,7 +166,7 @@ export const drawTooltip = (
       open
       part="tooltip-anchor"
       placement=${place.placement}
-      within="helix-chart-plot"
+      within=${CHART_PLOT}
     >
       <div aria-hidden="true" slot="content">
         <span part="tooltip-label">${row.label}</span>

@@ -1,26 +1,24 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('bar chart server output', () => {
-  test('the plot ships empty, because resolving an id wants a document', () => {
-    /* Every chart reading a table inherits this. The table is ordinary markup
-       and is served whole, so what is missing before hydration is the drawing
-       and nothing a reader needs. */
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-bar-chart for="revenue"></helix-headless-bar-chart>`),
-    )
-    expect(markup).toContain('part="plot"')
-    expect(markup).not.toContain('part="bar"')
+  /* The frame and nothing drawn in it, which is what a chart resolving `for`
+     against a document owes a server that has no document. See "A component
+     that resolves a document serves the frame" in helix/CONVENTIONS.md. */
+  test('serves its plot and no columns', () => {
+    const markup = ssr(html`<helix-headless-bar-chart for="revenue"></helix-headless-bar-chart>`)
+    expect(servedParts(markup)).toEqual(['plot'])
+  })
+
+  test('the plot is named, so its box is the boundary a bubble is kept inside', () => {
+    const markup = ssr(html`<helix-headless-bar-chart for="revenue"></helix-headless-bar-chart>`)
+    expect(partTag(markup, 'plot')).toContain('id="helix-chart-plot"')
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    expect(
-      hostAttributes(
-        ssr(html`<helix-headless-bar-chart></helix-headless-bar-chart>`),
-        'helix-headless-bar-chart',
-      ),
-    ).toEqual([])
+    const markup = ssr(html`<helix-headless-bar-chart></helix-headless-bar-chart>`)
+    expect(hostAttributes(markup, 'helix-headless-bar-chart')).toEqual([])
   })
 })

@@ -48,7 +48,7 @@ procedure.
   first five.
 - Each `@property` gets a one-line description.
 
-New event? Add a class to `helix/core/src/events.ts` carrying its own
+New event? Add a class to `helix/core/src/events/events.ts` carrying its own
 `eventName` and augmenting `HTMLElementEventMap`, then reference it as
 `@event {HelixThingEvent} thing-change - …`.
 

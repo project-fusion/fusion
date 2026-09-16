@@ -1,19 +1,37 @@
 import { describe, expect, test } from 'bun:test'
-import { hasPart, hostAttributes, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
+import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
 describe('scatter chart server output', () => {
-  test('serves its plot and no points, there being no table to read on a server', () => {
-    const markup = withoutStyles(
-      ssr(html`<helix-headless-scatter-chart for="pages"></helix-headless-scatter-chart>`),
+  /* The frame and nothing drawn in it, which is what a chart resolving `for`
+     against a document owes a server that has no document. See "A component
+     that resolves a document serves the frame" in helix/CONVENTIONS.md.
+
+     A scatter's frame is its plane as well as its plot: the axes and their
+     names are read off the table, so their rows stand empty until hydration,
+     and the plane is the box that holds the arrangement. */
+  test('serves its plane and its plot, and no points', () => {
+    const markup = ssr(
+      html`<helix-headless-scatter-chart for="pages"></helix-headless-scatter-chart>`,
     )
-    expect(hasPart(markup, 'plot')).toBe(true)
-    /* In the plane that holds it left to right, so a right-to-left page gets
-       the same layout before a script runs as after. */
-    expect(markup).toMatch(/<div dir="ltr" part="plane">/)
-    expect(markup).toContain('id="helix-chart-plot"')
-    expect(markup).not.toContain('part="point"')
+    expect(servedParts(markup)).toEqual(['plane', 'plot'])
+  })
+
+  test('the plane holds the drawing left to right before a script runs', () => {
+    /* So a right-to-left page gets the same arrangement served as it gets
+       after hydration: here the across is a measure and not the line of text. */
+    const markup = ssr(
+      html`<helix-headless-scatter-chart for="pages"></helix-headless-scatter-chart>`,
+    )
+    expect(partTag(markup, 'plane')).toContain('dir="ltr"')
+  })
+
+  test('the plot is named, so its box is the boundary a bubble is kept inside', () => {
+    const markup = ssr(
+      html`<helix-headless-scatter-chart for="pages"></helix-headless-scatter-chart>`,
+    )
+    expect(partTag(markup, 'plot')).toContain('id="helix-chart-plot"')
   })
 
   test('the host carries only what the consumer wrote', () => {

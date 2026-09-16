@@ -96,3 +96,31 @@ export const partTag = (markup: string, name: string): string =>
   new RegExp(`<[a-z-]+\\s[^>]*part="(?:[^"]* )?${name}(?: [^"]*)?"[^>]*>`).exec(
     withoutStyles(markup),
   )?.[0] ?? ''
+
+/**
+ * Every part the shadow root rendered, each named once and sorted.
+ *
+ * **The whole list rather than a search for one name.** `hasPart` and its
+ * negation answer about a part somebody thought of; this answers about the
+ * render, so a part added to a template nobody meant to change fails here
+ * instead of going unmentioned. It is the shape `hostAttributes` already has,
+ * and for the same reason.
+ *
+ * What it is for is the served frame of a component that cannot be served
+ * whole: a chart resolving `for` against a document has none to resolve on a
+ * server, so what it owes is its box and nothing drawn in it, and "nothing
+ * drawn" is a claim about everything rather than about the marks a spec author
+ * remembered to name.
+ *
+ * `\spart=` rather than `part=`, so `exportparts="arrow: tooltip-arrow, …"` is
+ * not read as a part list: it names parts a component forwards and not ones it
+ * rendered, and every chart here carries one.
+ */
+export const servedParts = (markup: string): string[] =>
+  [
+    ...new Set(
+      [...withoutStyles(markup).matchAll(/\spart="([^"]*)"/g)].flatMap(([, names]) =>
+        (names as string).split(/\s+/).filter((one) => one !== ''),
+      ),
+    ),
+  ].sort()

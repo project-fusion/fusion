@@ -42,11 +42,12 @@ use crate::component::text::COMMENT;
 use crate::component::{specs, Context, Finding, Report};
 
 /// The helpers that narrow a rendered document to something structural.
-const HELPERS: [&str; 6] = [
+const HELPERS: [&str; 7] = [
     "hasPart",
     "hostAttributes",
     "hostTag",
     "partTag",
+    "servedParts",
     /* The counterpart to stripping: a test asserting the sheet is *carried* is
     asking about the styles rather than about the markup, and reaching for the
     whole document to do it reads identically to the fault this rule is for. */

@@ -349,9 +349,45 @@ stylesheet names every part, host attribute, and token the component uses. So
 both saying nothing about what rendered. This has produced a false pass twice,
 once hiding a stale build for several commits.
 
-Use the helpers in `styled/src/testing/ssr.ts`: `withoutStyles`, `hasPart`,
-`partTag`, `hostTag`. Attribute bindings render across multiple lines, so match
-with `/<a\s+part="button"/`, never `'<a part="button"'`.
+Use the helpers in `helix/testing/src/ssr.ts`: `withoutStyles`, `styles`,
+`hasPart`, `partTag`, `hostTag`, `hostAttributes`, `servedParts`. Attribute
+bindings render across multiple lines, so match with `/<a\s+part="button"/`,
+never `'<a part="button"'`.
+
+### A component that resolves a document serves the frame
+
+**Some components genuinely cannot be served whole.** A chart or a legend takes
+`for` and resolves it through `getRootNode()`, and a server render has no
+document to look an id up in, so the marks it would draw do not exist yet. That
+is one answer. `Sparkline` is the other: `values` is an attribute, needs no
+document, and its line is drawn on the server and never appears on hydration.
+The two are settled in `helix/headless/src/sparkline/root/sparkline-root.ssr.spec.ts`
+and `helix/headless/src/legend/root/legend-root.ssr.spec.ts` respectively, and
+every chart here is the legend's case.
+
+What the document-resolved case owes is **the frame**, and that is a different
+served output from nothing at all:
+
+- **The plot's box, empty.** It carries `CHART_PLOT`, so the stylesheet's own
+  `block-size` applies and the space the drawing will fill is reserved before
+  the drawing exists. An empty chart of the right height does not move the page
+  when it fills in; a component that rendered nothing until it had numbers
+  does, every time.
+- **Nothing drawn.** No bands, bars, slices, lines or points. The table they
+  are read from is ordinary markup and is served whole, so what is missing
+  before hydration is the picture and nothing a reader needs.
+- **A host carrying only what the consumer wrote**, which is the general rule
+  above and not this one.
+
+**The words around the drawing are not promised, and cannot be.** A reading's
+name and an axis' ticks are read off the table, so a server has no way to write
+them and the rows that hold them collapse until it can. The box is the part
+worth reserving and the part a stylesheet can reserve without knowing anything.
+
+**Assert the frame whole**, with `servedParts`, rather than naming the marks
+that should be absent. A spec that checks for the three marks it thought of goes
+on passing when a fourth is added to the empty render, which is the failure this
+promise exists to prevent.
 
 ## A content property is its slot's fallback
 
@@ -1149,7 +1185,7 @@ turns out to be, the way `axes` names work rather than blocking on it.
   every archived page point at today's source, which is the one thing a
   versioned reference must not do. What is durable is where a directory sits in
   the repository; what is not is which commit anyone wants to read.
-  `fusion/site/lib/source.ts` is the only file a version selector has to touch.
+  `fusion/site/utils/source/source.ts` is the only file a version selector has to touch.
 
 - **Do not import `custom-elements-manifest/schema`.** The analyzer bundles its
   own copy and two copies produce types `exactOptionalPropertyTypes` will not

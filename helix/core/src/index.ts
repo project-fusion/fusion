@@ -172,7 +172,7 @@ export {
   duplicateRegistrations,
 } from './utils/custom-element/custom-element.js'
 export { type DrawIconOptions, drawIcon } from './utils/draw-icon/draw-icon.js'
-export { drawTooltip } from './utils/draw-tooltip/draw-tooltip.js'
+export { CHART_PLOT, drawTooltip } from './utils/draw-tooltip/draw-tooltip.js'
 export { elapsedTime } from './utils/elapsed-time/elapsed-time.js'
 export {
   deepActiveElement,
