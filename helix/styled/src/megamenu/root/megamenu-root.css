@@ -148,7 +148,7 @@
    `100vw` counts the scrollbar's gutter and `100dvw` is the same measurement
    with browser chrome out of the way, so it fixed nothing. */
 :host([variant="full"]) [part="surface"],
-:host([data-narrow]) [part="surface"] {
+:host(:state(narrow)) [part="surface"] {
   /* The header's ground, so the band reads as it continuing. Both follow the
      hooks, or a glass bar over an opaque band leaves a seam. */
   backdrop-filter: var(--megamenu-backdrop, none);
@@ -186,20 +186,20 @@
 /* The band's resting clip is not the card's: flush to both sides, so they clip
    at zero rather than being let out. */
 :host([variant="full"]) [part="surface"]:popover-open,
-:host([data-narrow]) [part="surface"]:popover-open {
+:host(:state(narrow)) [part="surface"]:popover-open {
   clip-path: inset(0 0 calc(var(--helix-space-xl) * -1) 0);
 }
 
 @starting-style {
   :host([variant="full"]) [part="surface"]:popover-open,
-  :host([data-narrow]) [part="surface"]:popover-open {
+  :host(:state(narrow)) [part="surface"]:popover-open {
     clip-path: inset(0 0 100% 0);
   }
 }
 
 /* A column does not shrink past `--megamenu-column-size`, so four of them ran
-   off the side. `data-narrow` comes from the element: see `full-below`. */
-:host([data-narrow]) [part="surface"] {
+   off the side. `:state(narrow)` comes from the element: see `full-below`. */
+:host(:state(narrow)) [part="surface"] {
   grid-auto-flow: row;
   grid-template-columns: 1fr;
   /* To the bottom of the screen, less where it starts and a margin. */

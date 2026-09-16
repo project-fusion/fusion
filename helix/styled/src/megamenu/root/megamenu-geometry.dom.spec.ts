@@ -236,7 +236,7 @@ if (hasLayout()) {
         updateComplete: Promise<boolean>
       }
       await host.updateComplete
-      expect(host.hasAttribute('data-narrow')).toBe(true)
+      expect(host.matches(':state(narrow)')).toBe(true)
       ;(part(host, 'trigger') as HTMLElement).click()
       await host.updateComplete
       await new Promise((done) => requestAnimationFrame(() => done(null)))
@@ -268,7 +268,7 @@ if (hasLayout()) {
         updateComplete: Promise<boolean>
       }
       await host.updateComplete
-      expect(host.hasAttribute('data-narrow')).toBe(false)
+      expect(host.matches(':state(narrow)')).toBe(false)
       ;(part(host, 'trigger') as HTMLElement).click()
       await host.updateComplete
       const panel = (part(host, 'surface') as HTMLElement).getBoundingClientRect()
