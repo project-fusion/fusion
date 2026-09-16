@@ -421,8 +421,71 @@ jobs:
       - name: Run the specs
         run: bun run test
 
-  # Everything that compiles Rust, in the one job that installs it.
+  # **Cargo, from the first second of the run.** It was one job holding every
+  # step that touches Rust, and `needs: warm` put the toolchain install, the
+  # cache restore and the compile behind a build none of them reads: cargo does
+  # not know what `turbo run build` writes. Measured on run 35041878434, `warm`
+  # ended at 155 seconds and this ended at 262, of which the compile was most.
+  # Nothing here reads the workspace build, so nothing here waits for it.
+  #
+  # **The checks that do read it are `cli` below**, and the two compile the same
+  # workspace twice. That is the trade: a second compile of a cached workspace is
+  # seconds, and the alternative is either this job waiting for `warm` again or
+  # the binary crossing between jobs as an artifact, which buys nothing once the
+  # cache is warm and adds a dependency that makes `cli` wait on clippy.
   rust:
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The specs shell out to `bun` and read the lockfile the repository holds,
+      # so the runtime and the dependencies are wanted here as everywhere else.
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
+        with:
+          components: clippy
+          # The floor rather than stable, so `rust-version` in `Cargo.toml` is
+          # exercised by the jobs that compile: a crate reaching past it fails
+          # here rather than on the first machine that is behind.
+          toolchain: 1.90
+      # **A cache per job, which is what leaving the key alone gives.** The
+      # action keys on the job name, so this one and `cli`'s hold what each of
+      # them actually built: clippy writes metadata where `cargo build` writes a
+      # binary, and one entry shared between them would be whichever job saved
+      # first and a recompile in the other.
+      - name: Restore the Cargo cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - name: Clippy
+        run: bun run rs:check
+      - name: Rust tests
+        run: bun run rs:test
+
+  # The checks that run a Rust binary over what the workspace build wrote, which
+  # is why they wait for `warm` and the job above does not.
+  #
+  # **The build is what `references` reads.** That rule asks whether a path a
+  # comment names is on disk, and several of them name generated files:
+  # `fusion/site/public/sandbox/frame.css` is written by the site build and is
+  # gitignored. A shard had it because the shards build first; the Rust job did
+  # not, so moving the check there turned seven true references into findings.
+  # After `warm`, so it is a restore rather than a build.
+  #
+  # **These are here rather than in the shard pool** because they are the checks
+  # that run a binary: a shard has bun and no cargo, so the npm shim would build
+  # one from cold on whichever of the six drew it, while the other five paid for
+  # a toolchain they never used. Six of them compiling at once also took the
+  # runner's memory: exit 137 on one shard, SIGTERM on another, a third canceled
+  # behind them.
+  #
+  # `check:cli` reads source rather than `dist`. The one thing `dist` buys is
+  # naming the exact subpath in a barrel finding, and without it that advice
+  # degrades to `dependency/<part>` in words rather than silently.
+  cli:
     needs: warm
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -434,49 +497,23 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
-          components: clippy
-          # The floor rather than stable, so `rust-version` in `Cargo.toml` is
-          # exercised by the one job that compiles: a crate reaching past it
-          # fails here rather than on the first machine that is behind.
           toolchain: 1.90
       - name: Restore the Cargo cache
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-      # **The build is what `references` reads.** That rule asks whether a path a
-      # comment names is on disk, and several of them name generated files:
-      # `fusion/site/public/sandbox/frame.css` is written by the site build and
-      # is gitignored. A shard had it because the shards build first; this job
-      # did not, so moving the check here turned seven true references into
-      # findings. After `warm`, so it is a restore rather than a build.
       - name: Build
         run: bun run build
-      # **`check:cli` is here rather than in the shard pool**, because it is the
-      # only check that runs a binary: a shard has bun and no cargo, so
-      # the npm shim would build one from cold on whichever of the six drew it,
-      # while the other five paid for a toolchain they never used. Here the
-      # cache is warm and `rs:build` is the same compile `rs:check` and
-      # `rs:test` were going to do anyway.
-      #
-      # It reads source rather than `dist`. The one thing `dist` buys is naming
-      # the exact subpath in a barrel finding, and without it that advice
-      # degrades to `dependency/<part>` in words rather than silently.
+      # Ahead of the checks rather than left to the npm shim, so one compile
+      # serves all four and a failure to build is reported as one.
       - name: Build the Rust workspace
         run: bun run rs:build
       - name: The rules that ship
         run: bun run check:cli
-      # Beside `check:cli` because they are the same binary. A shard that runs
-      # one compiles Rust to do it, and six doing that at once took the runner's
-      # memory: exit 137 on one shard, SIGTERM on another, a third canceled
-      # behind them. Here the cargo cache is warm and the binary already built.
       - name: Seed tokens
         run: bun run check:css:seeds
       - name: Prose
         run: bun run check:prose
       - name: Spec rules
         run: bun run fusion spec check
-      - name: Clippy
-        run: bun run rs:check
-      - name: Rust tests
-        run: bun run rs:test
 
   # Every example rendered, pictured and measured, in a browser, because
   # `verify` deliberately does not have one: everything in `verify` runs
@@ -588,7 +625,8 @@ jobs:
   # [VERIFYING.md](../VERIFYING.md#one-context-to-require)
   verify:
     if: always()
-    needs: [proven, plan, warm, warm-browser, checks, floors, packaging, lint, types, tests, rust, browser]
+    needs:
+      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, lint, types, tests, rust, browser]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
