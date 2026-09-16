@@ -113,7 +113,10 @@ build that stays red until somebody runs `bun run gen:metrics` and pushes again,
 so `.githooks/pre-push` runs the withheld-name check, `biome ci`, `check:cli`
 and the generated-file checks and nothing else: seconds against minutes.
 It judges and never writes, because a hook that edits the tree during `git push`
-produces a push that does not contain the edits. `git push --no-verify` skips it.
+produces a push that does not contain the edits. A push that only deletes refs
+carries no commits and reaches none of it, since every one of those checks reads
+the working tree and a deletion has nothing to do with the tree.
+`git push --no-verify` skips it.
 
 Installed by `git config core.hooksPath .githooks`, which the `prepare` script
 runs on `bun install`. No hook manager: husky and lefthook would each be a

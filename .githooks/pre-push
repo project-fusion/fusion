@@ -26,8 +26,23 @@ export PATH
 # **Read first, because it is stdin**: git hands the hook one line per ref it
 # is pushing, and those lines are the only way to know which commits a push
 # brings. A step above this that read stdin would leave it nothing.
-printf 'pre-push: withheld names\n'
 pushing=$(cat)
+
+# **A push that only deletes refs carries no commits, so there is nothing here
+# to judge.** git writes one line per ref with an all-zero local sha for a
+# deletion, which is the same zero `check-withheld` already skips when it turns
+# these lines into ranges. Everything below reads the working tree instead, so a
+# `git push --delete` was refused for a tree the deletion has nothing to do
+# with: measured 16 Sep 2026 deleting twenty merged branches, where biome
+# refused another session's half-finished edit and the only way through was
+# `--no-verify`, which is the habit a hook should not teach. No lines at all is
+# the same answer for the same reason: nothing is being transferred.
+if ! printf '%s\n' "$pushing" | awk 'NF >= 4 && $2 !~ /^0+$/ { found = 1 } END { exit found ? 0 : 1 }'; then
+  printf 'pre-push: deletions only, nothing to verify\n'
+  exit 0
+fi
+
+printf 'pre-push: withheld names\n'
 printf '%s\n' "$pushing" | bun fusion/scripts/check-withheld.mjs --pushing >/tmp/pre-push-$$.log 2>&1 || {
   printf '\n'
   sed 's/^/  /' /tmp/pre-push-$$.log
