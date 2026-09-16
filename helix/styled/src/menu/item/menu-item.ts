@@ -7,9 +7,12 @@ import { styles } from './menu-item.css.js'
  * @summary One row in a menu: a command, a choice, or a way into a submenu.
  *
  * @description
- * The tick and the arrow hold their space whether or not they are showing, so
- * the labels in a menu start at one place and the rows read as a column rather
- * than as a ragged list.
+ * A row draws a column beside its label only where it has something to put in
+ * one, and the width is the menu's rather than the row's: the page reserves a
+ * leading or a trailing track as soon as any row on it fills one, so every
+ * label on that page starts at the same edge and a page that fills neither pays
+ * for neither. A row knows about its own slots and nothing about its
+ * neighbors, which is why the reservation is not made here.
  *
  * @since 0.1.0
  * @status experimental
