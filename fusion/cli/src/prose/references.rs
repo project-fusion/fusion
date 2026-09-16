@@ -122,6 +122,12 @@ fn scripts_for(root: &Path, file: &Path) -> BTreeSet<String> {
 }
 
 /// Every task `turbo.json` declares, which is what a `turbo run` may name.
+///
+/// **A key scoped to a package declares the bare name as well**, and the
+/// collection has to hold both or scoping a task takes every reference to it
+/// out of reach. `@fusion.dev/helix-docs#docs-check` is keyed that way so the
+/// packages without the script stop getting a task, and `turbo run docs-check`
+/// still runs it: the spelling a comment uses is the one that works.
 fn tasks(root: &Path) -> BTreeSet<String> {
     /* Line comments, which the format does not have and this file uses. */
     let raw = fs::read_to_string(root.join("turbo.json")).unwrap_or_default();
@@ -132,7 +138,20 @@ fn tasks(root: &Path) -> BTreeSet<String> {
         .join("\n");
     serde_json::from_str::<Value>(&stripped)
         .ok()
-        .and_then(|one| Some(one.get("tasks")?.as_object()?.keys().cloned().collect()))
+        .and_then(|one| {
+            Some(
+                one.get("tasks")?
+                    .as_object()?
+                    .keys()
+                    .flat_map(|key| {
+                        [
+                            key.clone(),
+                            key.rsplit('#').next().unwrap_or_default().to_owned(),
+                        ]
+                    })
+                    .collect(),
+            )
+        })
         .unwrap_or_default()
 }
 

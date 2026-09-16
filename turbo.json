@@ -51,6 +51,39 @@
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
       "outputs": ["dist/**"]
     },
+    // **A task of its own rather than `docs -- --check`, because of what the
+    // flag does to the hash.** Turbo hashes a pass-through argument into every
+    // task of the run, dependencies included, so `turbo run docs -- --check`
+    // asks for a `build` of every package under a key with `--check` in it and
+    // misses all of them after a plain build. Measured on 16 Sep 2026, that was
+    // 105 seconds of rebuilding the workspace to ask one question about one
+    // module, in whichever job asked it. Named here, the check's dependencies
+    // are the generator's dependencies and restore from the build the run
+    // already made. `routes-check` and `themed-page-check` below are the other
+    // two whose graph is the workspace; the remaining `-- --check` runs depend
+    // on nothing and so have nothing to poison.
+    //
+    // **Keyed to this package, because a bare key hands the task to every
+    // package and one of them pulled the writer back in.** A package without
+    // the script still gets a node, commandless and with this `dependsOn`
+    // resolved, and `@fusion.dev/site`'s asked for `@fusion.dev/helix-docs#build`,
+    // which waits on `docs`. The writer then ran in the same invocation as the
+    // check with no edge between them and the check read the file mid-write.
+    // Measured 16 Sep 2026 in a fresh clone, thirty runs with the two generated
+    // modules deleted first: two failed on `pages.generated.ts is behind its
+    // sources`, 297 differing lines in the first of them, and the twenty-eight
+    // that passed did so only because the file was not there yet, which is a
+    // check answering about nothing. Keyed, the same thirty fail none and the
+    // graph is 39 nodes against 129, one `docs-check` against twenty-five, with
+    // the writer not among them. `routes-check` and `themed-page-check` keep
+    // commandless nodes of their own, which cost graph rather than correctness:
+    // neither pulls its own writer.
+    //
+    // Uncached for the reason `wasm-check` is: a check that answers from a
+    // replayed log is a check that did not look. The generator it calls is the
+    // same script with one flag, which is a duplicated command and the price of
+    // the separate key.
+    "@fusion.dev/helix-docs#docs-check": { "cache": false, "dependsOn": ["^build", "metrics"] },
     "@fusion.dev/helix-docs#test": {
       "dependsOn": ["^build", "analyze", "docs"],
       "inputs": ["src/**", "tests/**"],
@@ -307,23 +340,6 @@
     // success from a replayed log. `samples` has the same shape and the same
     // answer.
     "docs": { "cache": false, "dependsOn": ["^build", "metrics"] },
-    // **A task of its own rather than `docs -- --check`, because of what the
-    // flag does to the hash.** Turbo hashes a pass-through argument into every
-    // task of the run, dependencies included, so `turbo run docs -- --check`
-    // asks for a `build` of every package under a key with `--check` in it and
-    // misses all of them after a plain build. Measured on 16 Sep 2026, that was
-    // 105 seconds of rebuilding the workspace to ask one question about one
-    // module, in whichever job asked it. Named here, the check's dependencies
-    // are the generator's dependencies and restore from the build the run
-    // already made. `routes-check` and `themed-page-check` below are the other
-    // two whose graph is the workspace; the remaining `-- --check` runs depend
-    // on nothing and so have nothing to poison.
-    //
-    // Uncached for the reason `wasm-check` is: a check that answers from a
-    // replayed log is a check that did not look. The generator it calls is the
-    // same script with one flag, which is a duplicated command and the price of
-    // the separate key.
-    "docs-check": { "cache": false, "dependsOn": ["^build", "metrics"] },
     // Reads `@customElement('tag')` out of the element sources and writes the
     // sheet that hides each one until it upgrades. A workspace step rather than
     // a package's, because it reads one package and writes another.
