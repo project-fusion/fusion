@@ -294,12 +294,34 @@ fn installed(name: &str, manifest: Option<&str>) -> PathBuf {
     binary
 }
 
+/* **A binary this test just wrote can be refused as busy, and it is not this
+binary's fault.** `installed` copies the executable, and cargo runs the tests in
+this file on threads of one process: another thread forking between the copy's
+`open` and its `close` gives the child a write handle to the file, and Linux
+refuses to execute a file anybody holds open for writing. The copy has long
+returned by then, so there is nothing here to wait on. Measured 16 Sep 2026 on a
+runner, where `--version` came back `ExecutableFileBusy` with the assertion it
+was making unrelated to the fault.
+
+Retried rather than serialized, because the fork that holds the handle belongs
+to a thread this test cannot see, and the window closes as soon as that child
+execs. Three tries at 50ms, and the error is still returned if it outlasts them,
+since a binary that is busy for 150ms is saying something else. */
 fn said(binary: &Path) -> String {
-    let mut command = Command::new(binary);
-    command.arg("--version").env("NO_COLOR", "1");
-    out(&command.output().expect("the binary runs"))
-        .trim()
-        .to_owned()
+    let mut attempt = 0;
+    let output = loop {
+        let mut command = Command::new(binary);
+        command.arg("--version").env("NO_COLOR", "1");
+        match command.output() {
+            Ok(output) => break output,
+            Err(error) if error.kind() == std::io::ErrorKind::ExecutableFileBusy && attempt < 3 => {
+                attempt += 1;
+                std::thread::sleep(std::time::Duration::from_millis(50));
+            }
+            Err(error) => panic!("the binary runs: {error:?}"),
+        }
+    };
+    out(&output).trim().to_owned()
 }
 
 #[test]
