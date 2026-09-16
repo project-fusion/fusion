@@ -26,7 +26,6 @@ import { styles } from './carousel-root.css.js'
  * focus ring is not clipped by it. Defaults to enough for `--helix-shadow-md`, which reaches
  * 16px below the box it is on; a slide on `--helix-shadow-lg` reaches 44px and wants more.
  * @cssproperty --carousel-block-size - Height of a vertical track.
- * @cssproperty --carousel-gap - Space between slides.
  */
 @customElement('helix-carousel')
 export class HelixCarousel extends HelixHeadlessCarousel {

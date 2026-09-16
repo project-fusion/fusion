@@ -1,0 +1,136 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+  --_radius-surface: 0.5rem;
+  --_radius-panel: 0.75rem;
+}
+
+helix-headless-carousel {
+  --_share: calc((100% - 2 * var(--carousel-gap)) / 3);
+  --carousel-gap: 1rem;
+  /* An odd sixty-fourth of a pixel, which is the unit layout keeps: a pane on an
+     exact half rests a pixel apart in the two writing directions. */
+  --carousel-pane: calc(round(var(--_share) - 0.015625px, 0.03125px) + 0.015625px);
+  display: grid;
+  font-size: 0.875rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  line-height: 1.5;
+}
+
+helix-headless-carousel::part(track) {
+  display: flex;
+  gap: var(--carousel-gap);
+  grid-area: 2 / 2;
+  overflow-x: auto;
+  padding: 1rem;
+  scroll-padding-inline: 1rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+helix-headless-carousel::part(slide) {
+  display: flex;
+  flex: 0 0 var(--carousel-pane);
+  margin-inline-end: var(--carousel-run-end, 0px);
+  scroll-snap-align: start;
+}
+
+helix-headless-carousel > * {
+  flex: 1 1 0;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+helix-headless-card {
+  background-color: var(--_gray-surface);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-panel);
+  color: var(--_gray-muted);
+  display: block;
+  padding: 1rem;
+}
+
+helix-headless-carousel::part(controls),
+helix-headless-carousel::part(indicators) {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+  grid-area: 3 / 2;
+  padding: 0.75rem 1rem 0;
+}
+
+helix-headless-carousel::part(indicators) {
+  justify-self: start;
+}
+
+helix-headless-carousel::part(controls) {
+  justify-self: end;
+}
+
+helix-headless-carousel::part(previous),
+helix-headless-carousel::part(next),
+helix-headless-carousel::part(rotation) {
+  all: unset;
+  align-items: center;
+  block-size: 2rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 2rem;
+  justify-content: center;
+}
+
+helix-headless-carousel::part(previous):hover,
+helix-headless-carousel::part(next):hover,
+helix-headless-carousel::part(rotation):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-carousel::part(previous-mark),
+helix-headless-carousel::part(next-mark),
+helix-headless-carousel::part(rotation-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+helix-headless-carousel::part(indicator) {
+  all: unset;
+  background-color: var(--_gray-mark);
+  block-size: 0.5rem;
+  border-radius: 9999px;
+  box-sizing: border-box;
+  cursor: pointer;
+  inline-size: 0.5rem;
+}
+
+helix-headless-carousel::part(indicator-current) {
+  background-color: var(--_gray-strong);
+  inline-size: 1.5rem;
+}
+
+helix-headless-carousel::part(indicator):hover {
+  background-color: var(--_gray-muted);
+}
+
+helix-headless-carousel::part(previous):focus-visible,
+helix-headless-carousel::part(next):focus-visible,
+helix-headless-carousel::part(rotation):focus-visible,
+helix-headless-carousel::part(indicator):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
