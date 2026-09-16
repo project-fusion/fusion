@@ -26,7 +26,7 @@ const CONFIRM = 1600
  * the button exactly as it was.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category actions
  * @aliases Copy, Copy to clipboard
  * @documentation https://helix.fusion.dev/components/copy-button

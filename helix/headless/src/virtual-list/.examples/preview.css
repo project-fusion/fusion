@@ -34,10 +34,11 @@ helix-headless-icon::part(svg) {
   inline-size: 1em;
 }
 
+/* A height, because how tall a list is, is a decision. No `overflow`: the
+   component marks this box as a scroller and `core` gives it one. */
 helix-headless-virtual-list::part(viewport) {
   block-size: 20em;
   margin-inline: -4px;
-  overflow-y: auto;
   overscroll-behavior: contain;
   padding-inline: 4px;
 }

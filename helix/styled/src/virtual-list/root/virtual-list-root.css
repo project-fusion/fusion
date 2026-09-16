@@ -10,14 +10,12 @@
 
 [part="viewport"] {
   block-size: var(--virtual-list-block-size, 20em);
-  /*
- * *Room for a focus ring on a row this component did not write.** Asking for
- *      `overflow-y: auto` alone makes the region a horizontal clipper too, since
- *      CSS computes a `visible` axis to `auto` when the other one is not, and rows
- *      here span the viewport exactly: measured at 693px against a 693px viewport,
- *      no slack either side. A consumer whose row holds a link, or is focusable
- *      itself, would lose both sides of its ring and never learn why.
- */
+  /* *Room for a focus ring on a row this component did not write.** A scrolling
+     region clips both axes, since CSS computes a `visible` axis to `auto` when
+     the other one is not, and rows here span the viewport exactly: measured at
+     693px against a 693px viewport, no slack either side. A consumer whose row
+     holds a link, or is focusable itself, would lose both sides of its ring and
+     never learn why. */
   margin-inline: calc(var(--helix-size-focus-reach) * -1);
   overflow-y: auto;
   overscroll-behavior: contain;

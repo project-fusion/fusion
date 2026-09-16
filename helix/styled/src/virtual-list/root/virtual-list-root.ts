@@ -16,7 +16,7 @@ import { styles } from './virtual-list-root.css.js'
  *
  * @category layout
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://helix.fusion.dev/components/virtual-list
  *
  * @csspart after - The space standing in for rows below the window.

@@ -1529,6 +1529,68 @@ fn reflected_defaults() {
     );
 }
 
+/// Three tags in one rule, so the clean tree carries all three and each is
+/// planted in turn: a rule that counted parts and silently skipped slots would
+/// pass a test that only ever doubled a part.
+///
+/// Comments are read rather than blanked, which is the one thing that could
+/// make this report nothing at all, so the fixture's declarations sit where a
+/// component's do, inside a doc block.
+#[test]
+fn restated() {
+    let card = |parts: &str, slots: &str, events: &str| {
+        format!(
+            "/**
+ * @csspart body - The card's contents.{parts}
+ * @slot - What goes in it.{slots}
+ * @event {{HelixSelectEvent}} helix-select - Fired when it is chosen.{events}
+ */
+export class Card extends HTMLElement {{}}
+"
+        )
+    };
+    let tree = Tree::new("restated");
+    tree.write("helix.json", STYLED)
+        .write("packages/styled/src/card/card.ts", &card("", "", ""));
+    assert_clean("restated", &judge(&tree, "restated", "restated"));
+
+    tree.write(
+        "packages/styled/src/card/card.ts",
+        &card("\n * @csspart body - The body.", "", ""),
+    );
+    assert_found(
+        "restated",
+        &judge(&tree, "restated", "restated"),
+        "`@csspart body` is declared 2 times in one file",
+        "packages/styled/src/card/card.ts",
+    );
+
+    tree.write(
+        "packages/styled/src/card/card.ts",
+        &card("", "\n * @slot - Its contents.", ""),
+    );
+    assert_found(
+        "restated",
+        &judge(&tree, "restated", "restated"),
+        "`@slot -` is declared 2 times in one file",
+        "packages/styled/src/card/card.ts",
+    );
+
+    /* The second one carries no type, because `events` requires the braces and
+    this does not: two declarations are two entries on the page whether or not
+    both of them name a class. */
+    tree.write(
+        "packages/styled/src/card/card.ts",
+        &card("", "", "\n * @event helix-select - Fired on a press."),
+    );
+    assert_found(
+        "restated",
+        &judge(&tree, "restated", "restated"),
+        "`@event helix-select` is declared 2 times in one file",
+        "packages/styled/src/card/card.ts",
+    );
+}
+
 /// The owner is the grandparent directory, and the composed name has to be
 /// declared by another file's `@customElement`.
 #[test]

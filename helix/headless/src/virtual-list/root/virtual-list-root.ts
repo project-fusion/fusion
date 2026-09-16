@@ -25,14 +25,20 @@ type Row = Record<string, string>
  * that share this `for="<id>"` shape: ten thousand rows in one is the cost this
  * exists to avoid. It is the rendered window plus `aria-setsize`.
  *
+ * **The box scrolls on this tier.** The viewport carries `data-scroller` and
+ * `core` ships `[data-scroller] { overflow: auto }` into every shadow root, so
+ * `scrollTop` exists with no stylesheet at all. What a headless consumer still
+ * has to supply is a block size, which is a design decision; the `overflow`
+ * they used to supply was a mechanism they had no way of knowing was missing.
+ *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category layout
  * @documentation https://helix.fusion.dev/components/virtual-list
  *
  * @csspart after - The space standing in for rows below the window.
  * @csspart before - The space standing in for rows above the window.
- * @csspart viewport - The scrolling box. Needs a block size and an overflow on this tier.
+ * @csspart viewport - The scrolling box. Needs a block size on this tier, and nothing else.
  */
 @customElement('helix-headless-virtual-list')
 export class HelixHeadlessVirtualList extends HelixElement {

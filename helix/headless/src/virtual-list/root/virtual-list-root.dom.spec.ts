@@ -9,15 +9,17 @@ import {
 } from '@fusion.dev/helix-testing/dom'
 
 /**
- * The box the headless tier does not draw, and the list cannot work without.
+ * The height the headless tier does not choose, and the list cannot work
+ * without.
  *
- * **A virtual list needs a scroller, and on this tier the consumer provides
- * one.** The styled tier's sheet gives `[part="viewport"]` a `block-size` and
- * `overflow-y: auto`; `helix/headless` ships no CSS at all, so a base list
- * standing alone is a box with no height that does not scroll. `scrollTop` is
- * then always zero and `clientHeight` is whatever was just drawn.
+ * **A block size and nothing else, which is the whole of what a headless
+ * consumer owes this component.** The `overflow` used to be here too and is not
+ * any more: the viewport carries `data-scroller` and `core` ships
+ * `[data-scroller] { overflow: auto }` into every shadow root, so the mechanism
+ * arrives with the element. The geometry block below asserts that directly
+ * rather than trusting this fixture's absence to mean anything.
  *
- * Without those two rules the family cannot run in a browser at all: measuring
+ * Without a bounded box the family cannot run in a browser at all: measuring
  * moves what is being measured, the two settle into a 378/379 oscillation, and
  * the loop runs on microtasks so no timer can interrupt it.
  *
@@ -26,7 +28,6 @@ import {
  */
 const VIEWPORT = `helix-headless-virtual-list::part(viewport) {
   block-size: 12rem;
-  overflow-y: auto;
 }`
 
 beforeAll(async () => {
@@ -124,6 +125,30 @@ if (hasLayout()) {
       await settle(host as Updatable)
       const viewport = part(host, 'viewport') as HTMLElement
       expect(viewport.scrollHeight).toBeGreaterThan(1000 * 32 * 0.9)
+    })
+
+    test('the scrollport comes with the element, and not from a consumer rule', async () => {
+      /* What #175 settled. `overflow` is what makes `scrollTop` exist at all,
+         and this component reads `scrollTop` to decide which rows to draw, so
+         it is the mechanism rather than a decision and `core` ships it into
+         every shadow root against `data-scroller`. The fixture above gives a
+         height and no `overflow`, so if that rule stopped arriving this is the
+         test that says so.
+
+         Asserted by assigning: a box that is not a scrollport takes a
+         `scrollTop` and reports zero back, which `scrollHeight` alone would
+         never distinguish, since it counts overflowing content either way. */
+      const host = await mount(`<helix-headless-virtual-list for="deep" estimate="32" label="Rows">
+          <template><div style="block-size: 32px"></div></template>
+        </helix-headless-virtual-list>
+        <script id="deep" type="application/json">${JSON.stringify(
+          Array.from({ length: 1000 }, (_, at) => ({ name: String(at) })),
+        )}</script>`)
+      await settle(host as Updatable)
+      const viewport = part(host, 'viewport') as HTMLElement
+      expect(getComputedStyle(viewport).overflowY).not.toBe('visible')
+      viewport.scrollTop = 400
+      expect(viewport.scrollTop).toBeGreaterThan(0)
     })
   })
 }

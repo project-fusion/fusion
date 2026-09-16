@@ -8,11 +8,11 @@
   grid-area: 1 / 1;
 }
 
+/* A slot is `display: contents`, which `[hidden]` in the UA sheet does not
+   beat, so hiding one takes a rule. Not scoped to `[part="button"]`: the two
+   marks sit behind `renderCopyIcon` and `renderCopiedIcon`, which a tier may
+   move, and a rule naming where they are today would stop covering them. */
 slot[hidden] {
-  display: none;
-}
-
-[part="button"] > slot[hidden] {
   display: none;
 }
 

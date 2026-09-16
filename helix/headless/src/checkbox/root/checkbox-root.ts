@@ -31,9 +31,9 @@ import { property } from 'lit/decorators.js'
  * third state that survives interaction is a control nobody can finish.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
- * @aliases Tickbox, Toggle
+ * @aliases Tickbox
  * @documentation https://helix.fusion.dev/components/checkbox
  *
  * @slot - The label.

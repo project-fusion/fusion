@@ -1,9 +1,12 @@
-import { customElement, HelixElement, type Series, SourceController } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  type Series,
+  SourceController,
+  seriesIndex,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-
-/** How many colors the series palette has, and so where it starts over. */
-const PALETTE = 24
 
 /**
  * @summary The names a chart draws, each beside the color it is drawn in.
@@ -21,7 +24,7 @@ const PALETTE = 24
  * **The table is resolved on the client and there is no server pass.**
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category charts
  * @aliases Key, Series Key
  * @documentation https://helix.fusion.dev/components/legend
@@ -82,19 +85,20 @@ export class HelixHeadlessLegend extends HelixElement {
 
   protected override render(): TemplateResult {
     /* The index rather than the color, because a color is a token and the
-       headless tier holds none. The styled tier maps one to the other, and it
-       starts over after twenty-four.
+       headless tier holds none. The styled tier maps one to the other.
      *
-     * The palette is eight hues in three tones, so a legend of nine repeats the
-     * first hue in a brighter tone rather than repeating a color outright. It
-     * is still a hue collision and a chart with nine series has a worse problem
-     * than the palette does; twenty-four is where it stops being able to help. */
+     * `seriesIndex`, which is the charts' own, rather than a wrap written out
+     * here. The comment over it in `core` records what a second copy costs:
+     * when the palette went from eight to twenty-four one of five copies was
+     * missed, and a legend naming a ninth series beside a chart painting it in
+     * the first color is the one failure this component exists to prevent. This
+     * was the sixth copy. */
     return html`<ul part="list" role="list">
       ${this.names().map(
         (name, index) => html`<li
-          data-series=${(index % PALETTE) + 1}
+          data-series=${seriesIndex(index)}
           part="entry"
-          style="--chart-series: var(--chart-series-${(index % PALETTE) + 1})"
+          style="--chart-series: var(--chart-series-${seriesIndex(index)})"
           role="listitem"
         >
           <span aria-hidden="true" part="swatch"></span>
