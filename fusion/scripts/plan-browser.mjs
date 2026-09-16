@@ -23,11 +23,24 @@
  * looked at: the shards of a check are its whole corpus whatever `n` is.
  *
  * **The target is set by how a runner is billed**, which is by the minute and
- * rounded up per job. A job is its setup and its share. #22's browser jobs spent
- * 54 seconds before their check, 27 of them installing a browser the cache
- * never held and 12 checking out every blob; with neither, a share of 70 keeps
- * a job inside two minutes, where 90 would bill every job three for twenty
- * seconds of saving.
+ * rounded up per job, and the arithmetic has to count the jobs as well as the
+ * minute each one crosses into. A job is its setup and its share, and the setup
+ * is 39 seconds measured on run 35040430279: 16 of checkout and dependencies,
+ * 23 restoring the browser.
+ *
+ * A share of 70 keeps a job inside two minutes and plans 29 of them, which
+ * billed 63. A share of 90 plans 23 and bills each three, which is 69 and worse
+ * for twenty seconds of saving, and that pair is what the first target was
+ * chosen from. It is the wrong pair: past the two-minute boundary the count
+ * keeps falling, and at 125 the corpus plans 16 jobs of three minutes, which is
+ * 48. The count stops falling there until 150, where a job bills four, so 125
+ * is the knee with 16 seconds of margin before the boundary rather than the one
+ * second a share of 140 leaves.
+ *
+ * **What this cannot buy is wall clock**, which is why the trade is read this
+ * way round. The browser matrix finished 72 seconds before the run did on
+ * 35040430279; `warm` and then `rust` are the critical path, so a larger share
+ * spends some of that headroom and saves real money.
  */
 import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
@@ -52,7 +65,7 @@ import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 console.log = console.error
 
 /** The seconds of work a shard is sized to, before setup. */
-const TARGET = 70
+const TARGET = 125
 
 const TIERS = [
   { name: 'headless', source: join(root, SOURCE.headless) },
