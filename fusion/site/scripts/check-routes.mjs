@@ -118,6 +118,14 @@ const stubs = all.filter((route) => {
   return existsSync(file) && readFileSync(file, 'utf8').includes('renders from a typed module')
 })
 
+if (problems.length > 0) {
+  console.error(`routes: ${problems.length} problem${problems.length === 1 ? '' : 's'}`)
+  for (const problem of problems) {
+    console.error(`  ${problem}`)
+  }
+  process.exit(1)
+}
+
 console.log(
   `routes: ${all.length} routes, every one with a document that says something ` +
     `(${Object.entries(kinds)
