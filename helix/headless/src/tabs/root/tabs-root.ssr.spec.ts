@@ -3,10 +3,22 @@ import { partTag, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
-/* `default-active`, not `value`. This component has no `value` attribute, so a
-   fixture written that way is inert and every assertion below it is made
-   against a set with nothing current at all, and still passes. */
-const markup = ssr(html`<helix-headless-tabs default-active="one">
+/* **`selected` on the tab and the panel, and nothing on the root.**
+ *
+ * This element cannot choose a tab on the server: `children` is undefined
+ * there, so there is nothing to pair and nothing to count. A consumer whose
+ * first paint is right says which tab it is where the server can see it, which
+ * is on the tab and on the panel, and that is what these assertions are about.
+ *
+ * So no `default-active` here, and not because it is wrong: with one the fixture
+ * says the same thing twice and every assertion below would pass on the copy
+ * the server never reads. The client half, that the markup's answer survives
+ * upgrade rather than being resolved over, is in `tabs-root.dom.spec.ts`.
+ *
+ * `value` on the root would be worse still. This component has no such
+ * attribute, so a fixture written that way is inert and every assertion below it
+ * is made against a set with nothing current at all, and still passes. */
+const markup = ssr(html`<helix-headless-tabs>
   <helix-headless-tab selected value="one">One</helix-headless-tab>
   <helix-headless-tab-panel selected slot="panels" value="one">First</helix-headless-tab-panel>
   <helix-headless-tab-panel slot="panels" value="two">Second</helix-headless-tab-panel>
