@@ -2,14 +2,15 @@
 :host {
   --_carousel-bleed: var(--carousel-bleed, var(--helix-space-md));
   --_carousel-gap: var(--carousel-gap, var(--helix-space-md));
-  /* The pane at its exact share, and to the nearest odd sixty-fourth of a
-     pixel, 0.015625: the pane rule below says why. */
-  --_carousel-pane: calc(round(var(--_carousel-share) - 0.015625px, 0.03125px) + 0.015625px);
   --_carousel-per-view: 1;
   --_carousel-share: calc(
     (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
     var(--_carousel-per-view)
   );
+  /* The pane at its exact share, and to the nearest odd sixty-fourth of a
+     pixel, 0.015625: the pane rule below says why. Named rather than private
+     because the component measures the run with it. */
+  --carousel-pane: calc(round(var(--_carousel-share) - 0.015625px, 0.03125px) + 0.015625px);
 }
 
 /* A frame around the track, and each group of chrome placed on a side of it. */
@@ -217,6 +218,12 @@
    padding box, so the leading slide snaps its edge onto the clip edge. Measured
    without it, the track sat at `scrollLeft: 4` with 0px of leading room. */
 [part="track"] {
+  /* The resolved gap, under the name the component's arithmetic reads. Above
+     the track `--carousel-gap` is the consumer's request and may be unset,
+     which would make the run's end invalid rather than zero; here it is the
+     length the panes are actually laid out with. Not on `:host`, where the two
+     names would reference each other and both go invalid. */
+  --carousel-gap: var(--_carousel-gap);
   display: flex;
   gap: var(--_carousel-gap);
   overflow-x: auto;
@@ -258,8 +265,8 @@
 
    **To the sixty-fourth, because that is the unit layout keeps.** Chromium and
    WebKit both hold a length in sixty-fourths of a pixel and floor a third into
-   one: 209.33 is laid out 209.328. The run's end below is computed from this
-   width, so it has to be the width actually laid out.
+   one: 209.33 is laid out 209.328. The run's end is computed from this width,
+   so it has to be the width actually laid out.
 
    **An odd number of them, because a half pixel is rounded two ways.** A
    scroll offset is a whole pixel, and a resting place at an exact half became
@@ -272,41 +279,26 @@
    Asking the scroller for a place another way was measured and changes
    nothing: `scrollIntoView`, a target read off the pane's own box, and one
    rounded in script all come to rest where the engine rounds the snap
-   position it chose, which is where the plain `scrollTo` rests. */
+   position it chose, which is where the plain `scrollTo` rests.
+
+   **The run ends on a whole pixel, because a right-to-left track cannot reach
+   a fraction**, and the correction is the component's rather than this sheet's:
+   the arithmetic needs the slide count, which CSS can ask for only through
+   `sibling-count()` and only from a selector `::part()` cannot write.
+   `runEnd` says the rest, and names the two lengths above as what it reads. The
+   margin is under half a pixel either way, beyond the last pane, where it moves
+   nothing in view, and every pane but the last reads the fallback.
+
+   Measured 15 Sep 2026 in Chromium 151.0.7922.34 and WebKit 26.5, two to four
+   across in both tiers, whole and fractional widths from 340 to 1281, at one
+   and two device pixels: every gap is the gap, the track rests at opposite
+   signs of one number at every place, and its last place is the end of the
+   run. */
 [part="slide"] {
   display: flex;
-  flex: 0 0 var(--_carousel-pane);
+  flex: 0 0 var(--carousel-pane);
+  margin-inline-end: var(--carousel-run-end, 0px);
   scroll-snap-align: start;
-}
-
-/* **The run ends on a whole pixel, because a right-to-left track cannot reach
-   a fraction.** Three across 692 made the run 450.66 longer than the track.
-   Chromium measures a right-to-left scroller from its far end and floors that
-   length, so the track stopped at -450 where a left-to-right one rounded to
-   451, and two thirds of a pixel of the slide before stayed at the leading
-   edge. Ending on a whole pixel, the far end is one number both ways and the
-   last place rests on it in both, so a swipe to the end stops there too.
-
-   The margin is what that takes, under half a pixel either way, beyond the
-   last pane, where it moves nothing in view. Chromium is the engine that needs
-   it and has `sibling-count()` from 138; one without it has no margin and
-   keeps its own reach. Measured 15 Sep 2026 in Chromium 151 and WebKit 26.5,
-   one to five across, whole and fractional widths from 340 to 1300, at one and
-   two device pixels: the track rests at opposite signs of one number at every
-   place.
-
-   The pixel it rounds to is the step a scroll offset takes rather than a
-   spacing, so the margin is named as the correction it is and not as a length
-   a theme would want. */
-:host(:not([orientation="vertical"])) [part="slide"]:last-child {
-  --_carousel-overrun: calc(
-    sibling-count() *
-    (var(--_carousel-pane) + var(--_carousel-gap)) -
-    var(--_carousel-gap) -
-    100%
-  );
-  --_carousel-run-end: calc(round(var(--_carousel-overrun), 1px) - var(--_carousel-overrun));
-  margin-inline-end: var(--_carousel-run-end);
 }
 
 /* The slide fills the pane, and has to be told to. */

@@ -52,6 +52,10 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart rotation-mark - The glyph on the play and pause control.
  * @csspart slide - The pane one slide is shown in, and the box the track snaps to.
  * @csspart track - The scroller the slides sit in.
+ *
+ * @cssproperty --carousel-gap - Space between slides. A sheet sets it and the component measures the run with it.
+ * @cssproperty --carousel-pane - The size one pane is laid out at. A sheet sets it and the component measures the run with it.
+ * @cssproperty --carousel-run-end - How far short of a whole pixel the run ends, on the last slide alone, for a sheet to take up as `margin-inline-end`. See `runEnd`.
  */
 @customElement('helix-headless-carousel')
 export class HelixHeadlessCarousel extends HelixElement {
@@ -749,8 +753,63 @@ export class HelixHeadlessCarousel extends HelixElement {
     })
   }
 
+  /**
+   * How far short of a whole pixel the run of slides ends, for the last one.
+   *
+   * **The run has to end on a whole pixel, because a right-to-left track cannot
+   * reach a fraction.** Three across 692 makes the run 450.66 longer than the
+   * track. Chromium measures a right-to-left scroller from its far end and
+   * floors that length, so the track stops at -450 where a left-to-right one
+   * rounds to 451, and two thirds of a pixel of the slide before stays at the
+   * leading edge. Ending on a whole pixel, the far end is one number both ways
+   * and the last place rests on it in both, so a swipe to the end stops there
+   * too.
+   *
+   * **Here rather than in a stylesheet, because the count is the component's.**
+   * The arithmetic wants how many slides there are, and CSS can only ask
+   * `sibling-count()`, which is Chromium-only, evaluates to 0 through
+   * `::part()`, and needs a `:last-child` that `::part()` cannot carry either.
+   * So the styled tier could correct its run and a consumer writing their own
+   * several-across sheet could not: measured in Chromium at three across, the
+   * headless tier rested at 451 against -450 while the styled tier rested at
+   * one number both ways. Published from here, one declaration reading this
+   * gets both tiers and any consumer to the same place.
+   *
+   * **WebKit takes the margin and does not need it**, which is the reason a
+   * correction written in CSS looked like enough. It has no `sibling-count()`
+   * at all, so nothing reached that engine, and its track rested on one number
+   * both ways anyway. Measured with the margin in place, the same widths:
+   * every resting place is the number it was without it.
+   *
+   * **On the last slide alone, which is what makes that one declaration
+   * enough.** A sheet writes `margin-inline-end: var(--carousel-run-end, 0px)`
+   * across every pane and the fallback answers on all but the last, so nothing
+   * has to select a slide by its position in the run.
+   *
+   * **A sheet says how wide a pane is and how far apart they sit, and this
+   * reads both back.** Set neither and the correction is invalid at
+   * computed-value time, which is the fallback rather than a broken margin. The
+   * percentage resolves where the value is used, on the last pane, so it is the
+   * track's content box and not the track's own containing block: the width the
+   * run is actually measured against.
+   *
+   * Horizontal only. A vertical track scrolls the other axis, `scrollTop`
+   * counts up from zero whatever the writing mode, and there is no far end to
+   * floor.
+   */
+  private runEnd(): string | typeof nothing {
+    if (this.orientation === 'vertical') {
+      return nothing
+    }
+    const run =
+      `${this.slides.length} * (var(--carousel-pane) + var(--carousel-gap))` +
+      ' - var(--carousel-gap) - 100%'
+    return `--carousel-run-end: calc(round(${run}, 1px) - (${run}))`
+  }
+
   protected override render(): TemplateResult {
     const rotating = this.rotating
+    const last = this.slides.length - 1
 
     return html`<div part="controls">
         ${
@@ -815,6 +874,7 @@ export class HelixHeadlessCarousel extends HelixElement {
             role="group"
             aria-roledescription="slide"
             aria-label=${`${index + 1} of ${this.slides.length}`}
+            style=${index === last ? this.runEnd() : nothing}
           >
             <slot
               name=${this.assignsByName ? `slide-${index + 1}` : nothing}
