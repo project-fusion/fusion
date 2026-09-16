@@ -29,7 +29,7 @@ import '../../button/index.js'
  * that are not there.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Stage
  * @documentation https://fusion.dev/helix/components/steps
  *

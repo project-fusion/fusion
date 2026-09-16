@@ -99,7 +99,7 @@ const fill = (
  * slot can only offer one place: at one end of one row, in one order.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Pager, Page nav
  * @documentation https://fusion.dev/helix/components/pagination

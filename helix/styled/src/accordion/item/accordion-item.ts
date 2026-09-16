@@ -15,7 +15,7 @@ import { styles } from './accordion-item.css.js'
  * Usable on its own as a disclosure, with no accordion around it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Collapsible, Expander, Disclosure
  * @documentation https://fusion.dev/helix/components/accordion
  *

@@ -13,7 +13,7 @@ import { styles } from './navigation-root.css.js'
  * says where the current page was as well as where it is.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Nav, NavList, Tabs
  * @documentation https://fusion.dev/helix/components/navigation

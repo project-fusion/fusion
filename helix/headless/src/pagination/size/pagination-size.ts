@@ -44,7 +44,7 @@ import '../../select/index.js'
  * position should survive it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Page size, Rows per page
  * @documentation https://fusion.dev/helix/components/pagination
  *

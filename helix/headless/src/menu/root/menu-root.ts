@@ -40,7 +40,7 @@ import type { HelixHeadlessMenuItem } from '../item/menu-item.js'
  * upgrades is a hydration mismatch waiting to happen.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
  * @aliases Dropdown, Action menu
  * @documentation https://fusion.dev/helix/components/menu

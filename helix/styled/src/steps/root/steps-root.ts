@@ -17,7 +17,7 @@ import { styles } from './steps-root.css.js'
  * second name for it here would be a second thing to keep in step.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Stepper, Wizard, Progress steps
  * @documentation https://fusion.dev/helix/components/steps

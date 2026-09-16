@@ -15,7 +15,7 @@ import { styles } from './menu-item.css.js'
  * neighbors, which is why the reservation is not made here.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Menu option, Menu row
  * @documentation https://fusion.dev/helix/components/menu
  *
