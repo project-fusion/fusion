@@ -45,8 +45,14 @@ export function SiteHeader() {
     <helix-app-header material="glass" sticky>
       {/* The wordmark is the way back to the first page, which is what a reader
           expects of one, so there is no third destination in the bar saying the
-          same thing. */}
-      <Link data-link="quiet" href="/" slot="start">
+          same thing. It is also the only name of the project on the screen: the
+          landing page leads with what this is rather than with what you called
+          it.
+
+          The mark is a placeholder for your own, and it is drawn in
+          `--helix-color-brand-mark`, the token for the brand as a graphic. */}
+      <Link className="wordmark" data-link="quiet" href="/" slot="start">
+        <helix-icon name="cube" />
         <helix-text variant="body-strong">__PROJECT_NAME__</helix-text>
       </Link>
 

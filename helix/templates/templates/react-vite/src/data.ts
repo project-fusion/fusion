@@ -64,3 +64,18 @@ export const members: readonly Member[] = [
 
 /** The teams the form offers, read from the roster so the two cannot disagree. */
 export const teams: readonly string[] = [...new Set(members.map((one) => one.team))].toSorted()
+
+/**
+ * The same roster as three figures, for the panel on the first screen.
+ *
+ * Derived rather than written out, so the panel cannot claim a number the table
+ * does not show.
+ */
+export const roster = {
+  /** How many rows the data view has. */
+  people: members.length,
+  /** Every review on the roster, added up. */
+  reviews: members.reduce((total, one) => total + one.reviews, 0),
+  /** How many teams they are spread across. */
+  teams: teams.length,
+}

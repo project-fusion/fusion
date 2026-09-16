@@ -2,6 +2,7 @@ import { Landing } from './landing.js'
 import { Overview } from './overview.js'
 import { usePathname } from './routes.js'
 import { SignupForm } from './signup-form.js'
+import { SiteFooter } from './site-footer.js'
 import { SiteHeader } from './site-header.js'
 
 /** What answers each path, in the order the bar offers them. */
@@ -21,12 +22,15 @@ const PAGES = {
 export function App() {
   const path = usePathname()
   const Page = PAGES[path as keyof typeof PAGES] ?? Landing
+  /* The bar, the route and the footer, in a column the height of the window.
+     `app.css` says why the footer is worth having and why the column is flex. */
   return (
-    <>
+    <div className="shell">
       <SiteHeader />
       <main className="page">
         <Page />
       </main>
-    </>
+      <SiteFooter />
+    </div>
   )
 }

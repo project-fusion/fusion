@@ -70,7 +70,7 @@ if (templates.length === 0) {
 const failed = []
 for (const id of templates) {
   const project = join(scratch, id)
-  run('bun', ['run', 'helix', 'new', 'probe', '--template', id, '--into', project], root)
+  run('bun', ['run', 'helix', 'new', 'meridian', '--template', id, '--into', project], root)
 
   const file = join(project, 'package.json')
   const manifest = JSON.parse(readFileSync(file, 'utf8'))

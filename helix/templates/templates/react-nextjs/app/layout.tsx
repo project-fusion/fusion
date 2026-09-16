@@ -13,6 +13,7 @@ import './app.css'
    the first `next build` with "Module not found". Every local import in this
    template is written the same way for that reason. */
 import { HelixElements } from './helix-elements'
+import { SiteFooter } from './site-footer'
 import { SiteHeader } from './site-header'
 
 export const metadata: Metadata = { title: '__PROJECT_NAME__' }
@@ -34,8 +35,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <HelixElements />
-        <SiteHeader />
-        <main className="page">{children}</main>
+        {/* The bar, the route and the footer, in a column the height of the
+            window. `app.css` says why the footer is worth having and why the
+            column is flex. */}
+        <div className="shell">
+          <SiteHeader />
+          <main className="page">{children}</main>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   )
