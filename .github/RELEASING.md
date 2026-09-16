@@ -18,9 +18,9 @@ because a version is permanent while a tag moves back.
 **The tag is the record and the npm manifests carry a copy.** The number is
 computed from the tag, stamped seconds before packing, and pushed back to `main`
 by a GitHub App, which is the one thing in the pipeline that writes to a branch.
-The crates are stamped on the runner, so a binary reports the release it shipped
-in, and rest at `0.0.0-dev` in the repository: the stamp-back writes the npm
-manifests and nothing else.
+The crates rest at `0.0.0-dev` and nothing stamps them: a binary reports the
+release it shipped in by reading the manifest npm installed beside it, which is
+the same copy. The stamp-back writes the npm manifests and nothing else.
 
 **Two tag prefixes, and they mean different things.** `helix-attempt-v1.4.0` is
 pushed before publishing and says a number was spent. `helix-v1.4.0` is pushed
@@ -113,12 +113,26 @@ and skips the rest.
 | `helix-cli-win32-x64` | `windows-latest` | `x86_64-pc-windows-msvc` |
 
 **Built before the release computes its number, from the same tags.**
-`binaries.yml` takes the version a release is about to publish, stamps it into
-the crate and builds. The release computes the same number, `place-binaries.sh`
-puts each binary in its package, and `publish.mjs` refuses a platform package
-whose binary is missing, isn't executable, or reports another version. The
-version is checked on the runner's own platform and, before upload, on every
-platform that can run its build.
+`binaries.yml` builds each platform, the release computes the number,
+`place-binaries.sh` puts each binary in its package, and `publish.mjs` refuses a
+platform package whose binary is missing, isn't executable, or reports another
+version. The version is checked on the runner's own platform and, before upload,
+on every platform that can run its build.
+
+**A binary reports the version it is shipped as, and one build serves many
+releases.** It reads the `package.json` npm installed beside it, falling back to
+the `0.0.0-dev` it was compiled at where there is none, so the release number is
+no longer inside the file. That is what lets `binaries.yml` cache the five
+binaries on a hash of the Rust alone: the number used to be in the key because it
+was in the binary, and a release is always at a new number, so every release
+rebuilt all five however little Rust had moved. Measured over four releases in
+September 2026, that was about 53 billed minutes a release, over 40 of them
+macOS, for a build whose output was what the last one had already produced.
+
+The proof moved with it. `binaries.yml` copies each binary next to a manifest at
+the version being published and asks it there, because the bare file reports only
+what it was compiled at; `publish.mjs` asks the real platform package, after the
+release has stamped it, which is the arrangement a consumer installs.
 
 **A Linux binary is static**, linked against musl, so one file runs on a glibc
 distribution and on Alpine alike, and the packages declare no `libc`.
