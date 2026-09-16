@@ -560,6 +560,15 @@ jobs:
     env:
       # What the scoped checks diff against, once for every entry `plan` wrote.
       BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+      # **What each family cost, recorded on the machine that packs these
+      # shards.** `@fusion.dev/scripts/cost` weighs a family by a measurement
+      # and a desk is not a runner and not uniformly: aura is a sixth of
+      # contrast on an M2 and a third of it here, which is most of the gap
+      # between the shards this plans and the shards that finish together. The
+      # file is a shard's own families, so a run's worth of them merged is the
+      # corpus. `pool` writes it only when the variable is set, which is here
+      # and `measure-browser.mjs`.
+      BROWSER_COST: ${{ runner.temp }}/cost/${{ matrix.task }}.json
     steps:
       # **Full history, because parity and hydration scope themselves by
       # diffing against the base and a depth-1 checkout has nothing to diff
@@ -606,6 +615,18 @@ jobs:
       # hidden files are asked for. Nothing says so, `ignore` being the setting:
       # on 13 Sep 2026 the repository held no `visual-diffs` artifact at all,
       # and a Linux-only hydration finding arrived as a count with no picture.
+      # Refreshed with `measure:browser --from`, which merges a run's worth of
+      # these: [VERIFYING.md](../VERIFYING.md#how-many-browser-jobs). A shard
+      # that held no family recorded nothing, which `ignore` covers.
+      - name: What each family cost
+        if: always()  # dialect:quoted, GitHub's own function
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          name: browser-cost-${{ matrix.id }}
+          path: ${{ runner.temp }}/cost
+          retention-days: 14
+
       - name: Upload the visual diffs
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
