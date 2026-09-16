@@ -34,17 +34,34 @@
  * for twenty seconds of saving, and that pair is what the first target was
  * chosen from. It is the wrong pair: past the two-minute boundary the count
  * keeps falling, and at 125 the corpus plans 16 jobs of three minutes, which is
- * 48. The count stops falling there until 150, where a job bills four, so 125
- * is the knee with 16 seconds of margin before the boundary rather than the one
- * second a share of 140 leaves.
+ * 48.
  *
  * **The headroom that trade was made against is gone.** The browser matrix
  * finished 72 seconds before the run did on 35040430279, behind `warm` and then
  * the Rust job; with both off the critical path the matrix is the critical path,
  * and on 35052888764 the gate waited on the longest shard while `warm` had been
- * done for two minutes. So a target moved up now buys money with wall clock
- * rather than with slack, and moved down it buys wall clock with money: 70 plans
- * 29 jobs and bills 63.
+ * done for two minutes. So a target moved up buys money with wall clock rather
+ * than with slack, and moved down it buys wall clock with money.
+ *
+ * **And there is now a third thing a target buys, which is a job that starts at
+ * all.** The matrix runs on the Arm runner, twelve of which run at once, and a
+ * thirteenth job is not a slower job but a queued one: at 125 the corpus planned
+ * 16 and the four over the cap waited 92 seconds each, finishing 58 seconds
+ * after the twelve that started together, on run 35054675780. The other
+ * direction is no better sized by minutes alone, since a shard holds whole
+ * families: at 300 the corpus planned 8 of three billed minutes, 21 against 22,
+ * and the longest ran 171 seconds against 120, on runs 35055167128 and
+ * 35056152634.
+ *
+ * So the target is set by the runner count first and the billing second. 200
+ * plans 11, which is inside the cap with a job to spare and bills two minutes
+ * apiece but one.
+ *
+ * **The arithmetic is in the units the cost file holds, which are a single
+ * worker's.** They were measured on a two-core runner rendering one page at a
+ * time, and an Arm shard renders three, so a share of 200 is about 90 seconds
+ * there. That is what keeps these jobs inside two billed minutes; it is also why
+ * the target reads high against what a shard takes.
  *
  * **What the target cannot fix is a shard that is not the share it was sized
  * for**, which is `@fusion.dev/scripts/cost`'s half of this. A target of 125 and
@@ -75,7 +92,7 @@ import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 console.log = console.error
 
 /** The seconds of work a shard is sized to, before setup. */
-const TARGET = 125
+const TARGET = 200
 
 const TIERS = [
   { name: 'headless', source: join(root, SOURCE.headless) },

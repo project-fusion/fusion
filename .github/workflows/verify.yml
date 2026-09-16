@@ -84,10 +84,19 @@ jobs:
   # looked up first and fetched only when missing, so a hit costs the lookup.
   # Not in the gate's `needs`: it checks nothing, and a cache it could not write
   # is no reason to call a verified tree unverified.
+  #
+  # **Once per architecture, because the keys carry one.** The browser matrix
+  # runs on Arm and every other job on x64, so a single seed on `ubuntu-latest`
+  # would leave the key every browser job reads empty and each of them
+  # downloading Chromium instead of restoring it.
   seed:
     needs: proven
     if: needs.proven.outputs.proven == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, linux-arm-64]
     timeout-minutes: 10
     continue-on-error: true
     steps:
@@ -100,14 +109,14 @@ jobs:
         id: dependencies
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          key: bun-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('bun.lock') }}
           lookup-only: true
           path: ~/.bun/install/cache
       - name: Look up the browser
         id: browser
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
+          key: playwright-${{ runner.os }}-${{ runner.arch }}-${{ steps.version.outputs.version }}
           lookup-only: true
           path: ~/.cache/ms-playwright
       # Saves the dependencies on its way out when they missed.
@@ -547,7 +556,26 @@ jobs:
     # A failed or skipped `plan` still skips this through `needs`, and `plan`'s
     # own failure is what the gate catches, so the safe case is unchanged.
     if: needs.plan.outputs.browser != 'false'
-    runs-on: ubuntu-latest
+    # **Four cores, because `pool` takes one worker per core but one.** On a
+    # two-core `ubuntu-latest` a shard renders one page at a time; the Arm
+    # four-core runner gives it three, and Arm minutes bill at $0.005 against
+    # $0.006 and come off no included allowance. Measured on run 35054675780,
+    # a shard's work fell from 108 seconds to 52 and its setup did not move.
+    # Only this job: nothing else here is short of cores, and moving a job to
+    # Arm costs a second cache lineage for it to read.
+    #
+    # **The pixel check moves too, and it is the one that had to be asked.**
+    # Every other check compares the tree against itself and does not care what
+    # rasterized it; `check:spec:visual` compares against committed pictures.
+    # Against the shader baselines Arm moved `styled/aura` and nothing else, 51
+    # pixels at 640 and 196 at 390 on run 35054675780, which was the shader
+    # compiling differently and not text or layout. A software renderer now
+    # draws the gradient instead, and against the baselines that retook,
+    # 35056152634 matched all 582 examples pixel for pixel on Arm.
+    #
+    # `visual-baselines.yml` retakes them on `ubuntu-latest` and can stay there
+    # for the same reason: the two agree.
+    runs-on: linux-arm-64
     # A shard is sized to about a minute of work, so this is five times that
     # and room for a slow runner. Too low and the job is `cancelled`, which  # dialect:quoted, GitHub spells this conclusion value so
     # reports as neither pass nor fail and reads in the summary as a job that

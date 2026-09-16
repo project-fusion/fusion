@@ -54,9 +54,11 @@
  *
  * **One core is left for the browser process and the script, and four at most.**
  * Measured 14 Sep 2026 on twelve cores, the specs took 44 seconds on one worker,
- * 24 on two and 17 on four. **A GitHub runner is two cores, and gets one**: on
- * the first CI run of the specs pooled, two workers there timed out four Chat
- * specs at the harness's two-second bound. `--workers n` overrides the default,
+ * 24 on two and 17 on four. **A standard GitHub runner is two cores, and gets
+ * one**: on the first CI run of the specs pooled, two workers there timed out
+ * four Chat specs at the harness's two-second bound. The browser matrix runs on
+ * the four-core Arm runner and so gets three, which is the whole reason that job
+ * is the one moved. `--workers n` overrides the default,
  * which is how to reproduce a runner on a desk or take the serial run to compare
  * against.
  */

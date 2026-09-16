@@ -168,18 +168,54 @@ the planner sized them with. So the shards of a check are its whole corpus
 whatever the count, and a wrong estimate costs time and never coverage. A shard
 with nothing to do passes in seconds and says whose work it left to the others.
 
-**The share is set by how a runner is billed**, which is per job and rounded up
-to the minute, and the arithmetic counts the jobs as well as the minute each
-crosses into. A job is its setup and its share; the setup is 39 seconds,
-measured on run 35040430279. A share of 70 keeps a job inside two minutes and
-plans 29 of them, which billed 63; 125 plans 16 of three minutes, which is 48,
-and the count does not fall again until a job would bill four. What no share
-buys is wall clock, and the slack that argument was made against is gone: the
-matrix finished 72 seconds before run 35040430279 did, behind `warm` and then
-the Rust job, and with both of those off the critical path it is the critical
-path. On 35052888764 the gate waited on the longest browser shard with `warm`
-two minutes done. A share moved up now buys money with wall clock, and moved
-down buys wall clock with money.
+**The share is set by how many runners there are, and then by how one is
+billed.** Billing is per job and rounded up to the minute, so the arithmetic
+counts the jobs as well as the minute each crosses into: a share of 70 keeps a
+job inside two minutes and plans 29 of them, which billed 63; 125 plans 16 of
+three minutes, which is 48. What no share buys is wall clock, and the slack that
+argument was made against is gone: the matrix finished 72 seconds before run
+35040430279 did, behind `warm` and then the Rust job, and with both of those off
+the critical path it is the critical path.
+
+**Above twelve, a share buys queueing instead.** These jobs run on the Arm
+runner and twelve of those run at once, so the thirteenth is not slower but
+waiting. At 125 the corpus plans 16, and on run 35054675780 the four over the
+cap waited 92 seconds each and finished 58 seconds behind the twelve that
+started together, while every shard's own work had halved. So the target is 200,
+which plans 11.
+
+The other direction is no better sized by minutes alone, since a shard holds
+whole families: at 300 the corpus plans 8 of three billed minutes, 21 against
+22, and the longest ran 171 seconds against 120, on runs 35055167128 and
+35056152634.
+
+## Which runner a browser job wants
+
+**Four cores, because `pool` takes a worker per core but one.** A shard on
+`ubuntu-latest` renders one page at a time and on the four-core Arm runner
+three: 108 seconds of work a shard against 52, with setup unchanged at 34,
+measured across runs 35052888764 and 35054675780. Arm minutes bill at $0.005
+against $0.006 and come off no included allowance, so the matrix costs $0.16 a
+run there against $0.28. Only the matrix moves; nothing else here is short of
+cores, and a job on Arm reads a cache lineage of its own, which is why the keys
+carry `runner.arch` and `seed` runs once per architecture.
+
+**The pixel check moves too, and it is the one that had to be asked.** Every
+other check compares the tree against itself and does not care what rasterized
+it; `check:spec:visual` compares against committed pictures. Against the shader
+baselines Arm moved `styled/aura` and nothing else, 51 pixels at 640 and 196 at
+390 on run 35054675780, which was the shader compiling differently rather than
+text or layout moving. A software renderer now draws the gradient instead, and
+against the baselines that retook, run 35056152634 matched all 582 examples
+pixel for pixel on Arm. `visual-baselines.yml` retakes them on `ubuntu-latest`
+and can stay there for the same reason.
+
+**What this buys, and where it stops.** The matrix was 168 seconds of the run
+behind `warm-browser` and is 125, and bills 22 Arm minutes where it billed 47
+standard ones, which is $0.11 against $0.28. It is also no longer the critical
+path: on 35056152634 the matrix finished at 195 seconds and the gate waited
+until 252 for `checks`, behind `warm`. Further sharding buys nothing until that
+side moves.
 
 ## A tree is verified once
 

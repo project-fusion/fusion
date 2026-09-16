@@ -11,6 +11,11 @@
 # lockfile that does not match `package.json` fails here rather than being
 # quietly updated in CI and not on the machine that pushed.
 #
+# **And on `runner.arch`, because `runner.os` is `Linux` on x64 and on Arm
+# alike.** What bun downloads is not: the optional dependencies are picked per
+# platform, so one key for both runners is a cache whose Arm half is always
+# missing and whose x64 half is refetched by whichever runner saved last.
+#
 # **`checkout` is not here and cannot be**: a local action is read from the
 # checkout, so the step that fetches it has to run first.
 name: Set up bun and the dependencies
@@ -42,9 +47,9 @@ runs:
       if: inputs.dependencies == 'true'
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
-        key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        key: bun-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('bun.lock') }}
         path: ~/.bun/install/cache
-        restore-keys: bun-${{ runner.os }}-
+        restore-keys: bun-${{ runner.os }}-${{ runner.arch }}-
 
     - name: Install dependencies
       if: inputs.dependencies == 'true'
