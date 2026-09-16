@@ -222,6 +222,36 @@ const SETTLED = css`
 `
 
 /**
+ * How long an element keeps looking for React's props, and how often.
+ *
+ * **Two looks were one short of every Next.js App Router page.** React's props
+ * bag has no arrival event, so the only way to read it is to look, and until
+ * 16 Sep 2026 an element looked twice: once in `firstUpdated` and once a frame
+ * later. Measured on a project scaffolded by `helix new --template
+ * react-nextjs`, a data table whose `rows` is a prop, under `next dev` and under
+ * `next build && next start`, five runs each: the bag landed on the *second*
+ * frame after the first update, around 4.5 ms after the frame the second look
+ * ran on, so both looks missed every time and the table drew its empty state
+ * over data already sitting on the node.
+ * `helix/docs/content/react.mdx` documents that prop as working, and nothing had
+ * rendered a scaffolded project to find out.
+ *
+ * **The later looks are timers and never frames**, which is not a detail. A
+ * component that draws in a loop books its next frame from each one, and that is
+ * how a spec asks whether it is running: `framesBooked` counts every booking on
+ * the page, so an element still looking for React would be read as a loop that
+ * failed to stop. A commit is a task rather than a paint anyway, so a task is
+ * also the thing worth waiting for.
+ *
+ * `LOOK_FOR` is twenty times that gap, and it is stated as a window rather than
+ * as a count of looks so these two constants stay the only place the arithmetic
+ * lives. Where React never appears each look is a key scan, around half a
+ * microsecond, and the looking stops the moment the bag is found.
+ */
+const LOOK_EVERY = 16
+const LOOK_FOR = 96
+
+/**
  * @summary Base class every Helix element extends.
  *
  * @description
@@ -592,47 +622,45 @@ export class HelixElement extends LitElement {
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    /* **The first of two looks, and the one that costs nothing.** It succeeds
-       whenever the definition landed after React hydrated, which is the ordering
-       a deferred or lazily imported element has: the bag is already on the node,
+    /* **The first look, and the one that costs nothing.** It succeeds whenever
+       the definition landed after React hydrated, which is the ordering a
+       deferred or lazily imported element has: the bag is already on the node,
        and the update this assignment schedules is a microtask, so the value is
        rendered in the same task the upgrade happened in. See
        `applyReactProperties`. */
-    const applied = applyReactProperties(this)
+    let applied = applyReactProperties(this)
     requestAnimationFrame(() => {
       /* Through `toggleState`, which carries the feature test. A component that
          cannot record the state keeps its transitions suppressed, which is the
          safe direction to fail: nothing animates that should not. */
       this.toggleState('settled', true)
       this.resolveSettled()
-      /* **Audited here as well as at dispatch, and this is the half that catches
+      /* **The other ordering, and the one this keeps looking for.** A definition
+         evaluated with the client bundle upgrades before React hydrates, so
+         there was no bag to read above and there may be none for a frame or two
+         yet. See `LOOK_EVERY`.
+
+         **Audited here as well as at dispatch, and this is the half that catches
          the real mistake.** From inside `dispatchEvent` alone, an element holding
          a handler prop and sending nothing is never looked at, and a prop on the
          wrong element is exactly the case where that element has no reason to
-         dispatch.
-
-         A frame late, alongside the settled state, because React has to have
-         committed its props for there to be anything to read. Once per element
-         either way: the audit holds its own set. */
-      const props = reactPropsOf(this)
-      if (props !== undefined) {
-        /* **The other ordering, and the second and last look.** A definition
-           evaluated with the client bundle upgrades before React hydrates, so
-           there was no bag to read above. A frame callback runs in the rendering
-           step *before* paint and the Lit update it schedules is a microtask, so
-           the value still reaches the screen in this frame rather than after an
-           empty one.
-
-           Two looks and no loop, because the only ordering neither covers is
-           React splitting hydration across frames, which nothing here has
-           produced. If a component ever shows up empty on a page large enough to
-           do that, this is the line to raise, and the measurement is what should
-           decide by how much rather than a number chosen now. */
+         dispatch. Once per element either way: the audit holds its own set. */
+      let waited = 0
+      const look = (): void => {
+        const props = reactPropsOf(this)
+        if (props === undefined) {
+          if (waited < LOOK_FOR) {
+            waited += LOOK_EVERY
+            setTimeout(look, LOOK_EVERY)
+          }
+          return
+        }
         if (!applied) {
-          applyReactProperties(this)
+          applied = applyReactProperties(this)
         }
         auditReactProps(this, props)
       }
+      look()
     })
   }
 }
