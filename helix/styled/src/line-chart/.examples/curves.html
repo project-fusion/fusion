@@ -1,4 +1,4 @@
-<!-- @summary The three curves over one series: joined, smoothed, and held until the next reading. -->
+<!-- @summary The three curves over one series: joined straight, smoothed, and held until the next reading. The smoothed one is what an absent `curve` draws. -->
 
 <helix-flex
   direction="column"
@@ -43,11 +43,11 @@
     </tbody>
   </table>
 
-  <helix-line-chart for="curved"></helix-line-chart>
   <helix-line-chart
-    curve="smooth"
+    curve="straight"
     for="curved"
   ></helix-line-chart>
+  <helix-line-chart for="curved"></helix-line-chart>
   <helix-line-chart
     curve="step"
     for="curved"

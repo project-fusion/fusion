@@ -161,6 +161,22 @@ describe('donut chart tooltip', () => {
     expect(host.shadowRoot?.querySelector('helix-headless-tooltip')).toBeNull()
   })
 
+  /* **A ring's series are its rows and not its columns.** The bubble is about
+     one slice, so its cells belong to that slice's color. Keyed by column every
+     slice's bubble came out series one, the first slice's own, beside a ring
+     painting the third slice something else, which is the fault the dot exists
+     to prevent. */
+  test('the reading wears the color of the slice it is about', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic"')
+    await hover(host, 2)
+    const cell = host.shadowRoot?.querySelector('[part="tooltip-cell"]')
+    expect(cell?.getAttribute('data-series')).toBe('3')
+    await hover(host, 0)
+    expect(
+      host.shadowRoot?.querySelector('[part="tooltip-cell"]')?.getAttribute('data-series'),
+    ).toBe('1')
+  })
+
   test('the slice under the pointer is marked, so the ring says which one too', async () => {
     const host = await chart(TRAFFIC, 'for="traffic"')
     await hover(host, 2)
@@ -225,5 +241,51 @@ describe('donut chart hole', () => {
     const host = await chart(TRAFFIC, 'for="traffic" hole="large"')
     const total = segments(host).reduce((sum, one) => sum + drawn(one), 0)
     expect(total).toBeCloseTo(2 * Math.PI * radius(host), 6)
+  })
+})
+
+/* `sweep` shipped publicly in `arc.html` and was asserted on neither tier, so
+   the three things it changes were each held up only by the example rendering.
+   They are the three the property's own docblock names. */
+describe('donut chart sweep', () => {
+  const frame = (host: HTMLElement): string | null | undefined =>
+    host.shadowRoot?.querySelector('svg')?.getAttribute('viewBox')
+
+  test('spreads the same shares over half the circle', async () => {
+    const host = await chart(TRAFFIC, 'for="traffic" sweep="half"')
+    const [a, b, c] = segments(host)
+    expect(drawn(a)).toBeCloseTo(CIRCUMFERENCE * 0.5 * 0.5, 2)
+    expect(drawn(b)).toBeCloseTo(CIRCUMFERENCE * 0.3 * 0.5, 2)
+    expect(drawn(c)).toBeCloseTo(CIRCUMFERENCE * 0.2 * 0.5, 2)
+  })
+
+  test('the track is half a ring too, so the shares sit on something', async () => {
+    /* A full track under a half arc is the quiet version of this going wrong:
+       the drawing reads as a ring three quarters empty rather than as an arc. */
+    const host = await chart(TRAFFIC, 'for="traffic" sweep="half"')
+    const track = host.shadowRoot?.querySelector('[part="track"]')
+    const length = Number(track?.getAttribute('stroke-dasharray')?.split(' ')[0] ?? 0)
+    expect(length).toBeCloseTo(CIRCUMFERENCE * 0.5, 6)
+  })
+
+  test('the box is cropped to what is drawn, or a quarter of it is empty', async () => {
+    /* Down from the top of the ring to the center line, plus the half stroke
+       the flat ends hang below it: 40 of radius and 8 of the resting 16. */
+    expect(frame(await chart(TRAFFIC, 'for="traffic" sweep="half"'))).toBe('0 10 100 48')
+    expect(frame(await chart(TRAFFIC, 'for="traffic" sweep="half" hole="large"'))).toBe(
+      '0 10 100 44',
+    )
+    expect(frame(await chart(TRAFFIC, 'for="traffic"'))).toBe('0 0 100 100')
+  })
+
+  test('a half ring turns on a right-to-left page and a whole one does not', async () => {
+    /* `core` flips a drawing marked `data-mirror` there. A half ring is read
+       across, so its first slice belongs where a line of text starts; a whole
+       ring's bearing is a clock's, and a clock does not run backwards in Arabic
+       or Hebrew. */
+    const half = await chart(TRAFFIC, 'for="traffic" sweep="half"')
+    expect(half.shadowRoot?.querySelector('svg')?.hasAttribute('data-mirror')).toBe(true)
+    const whole = await chart(TRAFFIC, 'for="traffic"')
+    expect(whole.shadowRoot?.querySelector('svg')?.hasAttribute('data-mirror')).toBe(false)
   })
 })

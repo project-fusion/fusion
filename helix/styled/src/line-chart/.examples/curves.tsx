@@ -43,11 +43,11 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-line-chart for="curved"></helix-line-chart>
       <helix-line-chart
-        curve="smooth"
+        curve="straight"
         for="curved"
       ></helix-line-chart>
+      <helix-line-chart for="curved"></helix-line-chart>
       <helix-line-chart
         curve="step"
         for="curved"

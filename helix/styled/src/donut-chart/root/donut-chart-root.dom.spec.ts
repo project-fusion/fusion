@@ -103,6 +103,19 @@ describe('donut chart', () => {
     )
   })
 
+  test('the middle is sized off the hole and not off the ring', async () => {
+    /* The stroke sits astride `r`, so the inner edge comes in by the whole
+       thickness and the hole's *diameter* is the ring's less two of them.
+       Taking it off once laid a 64 unit box inside a 48 unit hole at rest, a
+       third too wide, and a total slotted into it painted across four slices.
+       The half ring is the check on it: at `80 - 2t` its opening is twice as
+       wide as it is tall at every thickness, which is what its own comment
+       claims, and at `80 - t` it was 2.67 to 1. */
+    expect(rule('[part="center"]')).toContain(
+      'calc(100% * (var(--_donut-chart-ring) - 2 * var(--donut-chart-stroke, 16)) / 100)',
+    )
+  })
+
   test('the series palette arrives with the sheet, and the hooks the docs name are read by it', async () => {
     const host = await chart()
     expect(part(host, 'segment')?.getAttribute('style')).toContain(
@@ -116,5 +129,38 @@ describe('donut chart', () => {
     ]) {
       expect(sheet()).toMatch(new RegExp(`var\\(\\s*${hook},`))
     }
+  })
+})
+
+/* `sweep` shipped publicly in `arc.html` and was asserted on neither tier. The
+   headless spec holds the drawing; these are the three things this tier has to
+   say about it, and its docblock names all three as the reason it reflects. */
+describe('donut chart sweep', () => {
+  test('reflects, since the sheet has three things to say about it', async () => {
+    const host = (await chart()) as Chart & { sweep?: string }
+    expect(host.hasAttribute('sweep')).toBe(false)
+    host.sweep = 'half'
+    await host.updateComplete
+    expect(host.getAttribute('sweep')).toBe('half')
+  })
+
+  test('the box stops being square, since the drawing is no longer round', () => {
+    expect(rule(':host([sweep="half"]) [part="plot"] svg')).toContain(
+      'aspect-ratio: 100 / calc(40 + var(--donut-chart-stroke, 16) / 2)',
+    )
+  })
+
+  test("the first slice starts at nine o'clock, and the track turns with it", () => {
+    /* One rule over both, so the arc and the ring it sits on cannot part. */
+    expect(rule(':host([sweep="half"]) [part~="segment"]')).toContain('transform: rotate(180deg)')
+    expect(sheet()).toContain(':host([sweep="half"]) [part="track"],')
+  })
+
+  test('the middle sits at the bottom, where the center of the circle now is', () => {
+    /* Cropping put the circle's center on the box's bottom edge, so a middle at
+       fifty per cent of the plot floats inside the arc and over its top. */
+    const half = rule(':host([sweep="half"]) [part="center"]')
+    expect(half).toContain('inset-block-end: 0')
+    expect(half).toContain('inset-block-start: auto')
   })
 })

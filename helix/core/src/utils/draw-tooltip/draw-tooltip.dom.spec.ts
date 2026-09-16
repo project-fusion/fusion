@@ -93,6 +93,34 @@ describe('the color a cell wears', () => {
     const cells = [...drawn(0).querySelectorAll('[part="tooltip-cell"]')]
     expect(cells.map((one) => one.getAttribute('data-series'))).toEqual(['1', null])
   })
+
+  /* A cell's place in its row is its place in the *table*, and a chart's series
+     are what it read off that table. `ScatterChart` splits the first numeric
+     column off as the measure across, so counted from the cell index its bubble
+     painted the across column in series one, the color the points are drawn in,
+     and gave the series actually plotted series two. */
+  test('is the chart’s to decide, since a column is not a series', () => {
+    const into = document.createElement('div')
+    render(
+      drawTooltip(ROWS, 0, unsafeStatic(TAG), undefined, (cell) =>
+        cell === 0 ? undefined : cell + 4,
+      ),
+      into,
+    )
+    const cells = [...into.querySelectorAll('[part="tooltip-cell"]')]
+    expect(cells.map((one) => one.getAttribute('data-series'))).toEqual([null, null])
+  })
+
+  test('and the color travels beside the index, so one rule paints the dot', () => {
+    const into = document.createElement('div')
+    render(
+      drawTooltip(ROWS, 0, unsafeStatic(TAG), undefined, () => 7),
+      into,
+    )
+    const cell = into.querySelector('[part="tooltip-cell"]') as HTMLElement
+    expect(cell.getAttribute('data-series')).toBe('7')
+    expect(cell.getAttribute('style')).toContain('--chart-series: var(--chart-series-7)')
+  })
 })
 
 describe('where the bubble points', () => {

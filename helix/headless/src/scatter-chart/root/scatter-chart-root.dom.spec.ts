@@ -171,3 +171,24 @@ describe('what a reader is told', () => {
     )
   })
 })
+
+describe('the tooltip', () => {
+  /* A scatter's first plotted series is the table's *second* numeric column,
+     the across having been split off the front. Colored by cell index the
+     bubble painted the across column in series one, the color the points
+     themselves are drawn in, and gave the series actually plotted series two. */
+  test('keys each cell to the series the points are drawn in, not to its column', async () => {
+    const host = (await chart(LOAD, 'for="load"')) as Chart & {
+      seriesOf: (cell: number) => number | undefined
+    }
+    expect([0, 1, 2].map((cell) => host.seriesOf(cell))).toEqual([undefined, 1, 2])
+    expect(all(host, 'point').map((one) => one.dataset.series)).toEqual(['1', '1', '1', '2', '2'])
+  })
+
+  test('the measure across gets no dot, being an axis rather than a series', async () => {
+    const host = (await chart(LOAD, 'for="load"')) as Chart & {
+      seriesOf: (cell: number) => number | undefined
+    }
+    expect(host.seriesOf(0)).toBeUndefined()
+  })
+})

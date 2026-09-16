@@ -125,6 +125,7 @@ export const drawTooltip = (
   at: number,
   tag: StaticValue,
   where?: TooltipAt,
+  slotOf?: (cell: number) => number | undefined,
 ): TemplateResult | typeof nothing => {
   const row = rows[at]
   if (!row || rows.length === 0) {
@@ -170,31 +171,48 @@ export const drawTooltip = (
     >
       <div aria-hidden="true" slot="content">
         <span part="tooltip-label">${row.label}</span>
-        ${row.cells.map(
-          (cell, index) =>
-            /* A palette color only where something was plotted in it.
-             *
-             * A cell with no number is a column no chart drew: a note, a status,
-             * a name. Given `data-series` anyway it takes a series color and the
-             * stylesheet draws a dot, so a row reading `Note  Outage` arrived
-             * wearing series three's green while the legend beside the chart said
-             * series three was something else.
-             *
-             * The color travels as `--chart-series` beside the index, the way the
-             * legend and every mark write it: this tier knows which series a cell
-             * belongs to and CSS cannot count it, so the sheet's dot is one rule
-             * reading the property rather than twenty-four keyed on the index.
-             * A fact, not a decision: the name it points at is the styled tier's
-             * to resolve. */
-            html`<span
-              data-series=${cell.value === undefined ? nothing : seriesIndex(index)}
+        ${row.cells.map((cell, index) => {
+          /* A palette color only where something was plotted in it, and the
+           * chart says which color.
+           *
+           * A cell with no number is a column no chart drew: a note, a status,
+           * a name. Given `data-series` anyway it takes a series color and the
+           * stylesheet draws a dot, so a row reading `Note  Outage` arrived
+           * wearing series three's green while the legend beside the chart said
+           * series three was something else.
+           *
+           * **Which is why the slot is the caller's to give and not this
+           * file's to count.** A cell's place in its row is its place in the
+           * *table*, and a chart's series are what it read off that table:
+           * `ScatterChart` splits the first numeric column off as the measure
+           * across, so its first plotted series is the table's second, and
+           * every chart here loses a column of notes among the figures. Counted
+           * from `index` the bubble was off by one on a scatter and off by one
+           * after any unplotted column anywhere else. `seriesIndex` stays as the
+           * answer for a caller whose columns are its series in order.
+           *
+           * The color travels as `--chart-series` beside the index, the way the
+           * legend and every mark write it: this tier knows which series a cell
+           * belongs to and CSS cannot count it, so the sheet's dot is one rule
+           * reading the property rather than twenty-four keyed on the index.
+           * A fact, not a decision: the name it points at is the styled tier's
+           * to resolve. */
+          /* `slotOf?.(…) ?? seriesIndex(…)` was the first spelling and is
+             wrong: a caller answering "no series" answers `undefined`, and the
+             fallback swallowed it, so a scatter's measure across kept the dot
+             it was being told it should not have. Whether there is a caller and
+             what the caller said are two questions. */
+          const answer = slotOf === undefined ? seriesIndex(index) : slotOf(index)
+          const series = cell.value === undefined ? undefined : answer
+          return html`<span
+              data-series=${series ?? nothing}
               part="tooltip-cell"
-              style=${cell.value === undefined ? nothing : `--chart-series: var(--chart-series-${seriesIndex(index)})`}
+              style=${series === undefined ? nothing : `--chart-series: var(--chart-series-${series})`}
             >
               <span part="tooltip-name">${cell.name}</span>
               <span part="tooltip-value">${cell.text}</span>
-            </span>`,
-        )}
+            </span>`
+        })}
       </div>
     </${tag}>`
 }

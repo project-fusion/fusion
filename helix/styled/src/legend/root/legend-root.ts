@@ -1,4 +1,4 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, seriesNames } from '@fusion.dev/helix-core'
 import { HelixHeadlessLegend } from '@fusion.dev/helix-headless/legend'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -143,14 +143,10 @@ export class HelixLegend extends HelixHeadlessLegend {
     const showing = this.names().map((name) => name.trim().toLowerCase())
     const slots = (value: string | undefined): Set<number> =>
       new Set(
-        (value ?? '')
-          .split(/[\s,]+/)
-          .filter(Boolean)
-          .map((name) => name.toLowerCase())
-          .flatMap((name) => {
-            const at = showing.indexOf(name)
-            return at < 0 ? [] : [at]
-          }),
+        seriesNames(value).flatMap((name) => {
+          const at = showing.indexOf(name)
+          return at < 0 ? [] : [at]
+        }),
       )
 
     const mark = (entry: Element, name: string, value: string | undefined): void => {

@@ -10,10 +10,26 @@
 //! the family that owns it: the directory the component sits in, whichever of
 //! its elements declares the hook.
 //!
-//! **One public name, one owner.** Two layers of one family is inheritance; two
-//! families is two components answering to one declaration, and a consumer
-//! setting it on a container holding both sets two different things with neither
-//! component wrong.
+//! **One public name, one owner, except where the vocabulary is registered.**
+//! Two layers of one family is inheritance; two families is two components
+//! answering to one declaration, and a consumer setting it on a container
+//! holding both sets two different things with neither component wrong. A
+//! prefix in `shared` is the decision that they mean one thing: the families
+//! reading it read one rule out of one sheet, so the container case sets one
+//! thing and every page that lists it is right. The naming half of this rule
+//! already took that exemption and the ownership half did not, which made a
+//! family unable to publish a hook its own element reads.
+//!
+//! **And a shared sheet's hooks are API of every family that composes it.**
+//! `terminus.css` is read by `Sparkline` and `LineChart`, and all four
+//! `--chart-terminus-*` names were on `Sparkline`'s page alone: a reader of the
+//! other family's reference page found the property that draws the mark and
+//! nothing that sizes or fills it. A sheet reached through a private is
+//! followed rather than assumed, because a shared sheet publishes different
+//! hooks to different composers: `series.css` resolves `--chart-stroke` into
+//! `--_chart-stroke`, which three of its six composers read and three do not,
+//! and asking a donut to publish a line's thickness would be the same fault in
+//! the other direction.
 //!
 //! **A duplicate declaration pairs with a rule exactly as a single one does**,
 //! so it passes every test here and is invisible to the two-way check. It is
@@ -99,6 +115,16 @@ static PRIVATE_WRITTEN: LazyLock<Regex> =
 static STYLE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"style="([^"]*)""#).expect("a literal pattern compiles"));
 
+/// A shared stylesheet composed into a family, by the path the import names.
+static COMPOSES: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"shared/([a-z0-9-]+)/([a-z0-9-]+)\.css\.js").expect("a literal pattern compiles")
+});
+
+/// A private a shared sheet resolves from a public one, with its value.
+static ALIASES: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?m)^\s*(--_[a-z0-9-]+)\s*:([^;]*)").expect("a literal pattern compiles")
+});
+
 static INTERPOLATED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"var\(\s*(--[a-z0-9-]+)-\$\{").expect("a literal pattern compiles")
 });
@@ -133,10 +159,19 @@ fn owner_of(path: &str) -> String {
 /// Everything read out of the source before anything is judged.
 #[derive(Default)]
 struct Survey {
+    /// Which families compose each shared stylesheet, by `group/name`.
+    composes: BTreeMap<String, BTreeMap<String, String>>,
     declared: BTreeMap<String, String>,
     declared_at: BTreeMap<(String, String), usize>,
     declared_by: BTreeMap<String, BTreeMap<String, String>>,
     families: BTreeSet<String>,
+    /// Which families read each private, so a shared sheet's aliases can be
+    /// followed to the composers that actually take them.
+    private_read_by: BTreeMap<String, BTreeMap<String, String>>,
+    /// A shared sheet's privates, each with the public hooks it resolves.
+    shared_alias: BTreeMap<String, BTreeSet<String>>,
+    /// The public hooks a shared sheet reads outside a private's declaration.
+    shared_direct: BTreeMap<String, BTreeSet<String>>,
     private_declared: BTreeMap<String, BTreeMap<String, String>>,
     private_read: BTreeMap<String, BTreeSet<String>>,
     /// The first file to read each one, so a finding can name somewhere.
@@ -240,10 +275,73 @@ fn survey(context: &Context) -> Survey {
             }
 
             privates(&mut survey, context, &text, &where_, stylesheet);
+            borrowed(&mut survey, &text, &where_, stylesheet);
         }
     }
 
     survey
+}
+
+/// What a shared stylesheet publishes, and who takes it.
+///
+/// Three questions over the same text, and which one a file answers is decided
+/// by where it sits: a sheet under `shared/` publishes, anything else composes
+/// and reads. Comments are stripped, because `series.css` writes
+/// `var(--chart-series-3)` in its own explanation of why the count belongs to
+/// the tier that can count it.
+fn borrowed(survey: &mut Survey, text: &str, where_: &str, stylesheet: bool) {
+    let source = COMMENT.replace_all(text, "");
+    let Some(rest) = where_.split_once("/shared/").map(|(_, one)| one) else {
+        /* A composer, and a reader of whatever privates a sheet gave it. */
+        let owner = owner_of(where_);
+        if owner.is_empty() {
+            return;
+        }
+        for found in COMPOSES.captures_iter(&source) {
+            survey
+                .composes
+                .entry(format!("{}/{}", &found[1], &found[2]))
+                .or_default()
+                .entry(owner.clone())
+                .or_insert_with(|| where_.to_owned());
+        }
+        for found in PRIVATE_READ.captures_iter(&source) {
+            survey
+                .private_read_by
+                .entry(found[1].to_owned())
+                .or_default()
+                .entry(owner.clone())
+                .or_insert_with(|| where_.to_owned());
+        }
+        return;
+    };
+    if !stylesheet {
+        return;
+    }
+    let key = rest.trim_end_matches(".css").to_owned();
+    for found in ALIASES.captures_iter(&source) {
+        for read in READS.captures_iter(&found[2]) {
+            if ours(&read[1]) {
+                survey
+                    .shared_alias
+                    .entry(found[1].to_owned())
+                    .or_default()
+                    .insert(read[1].to_owned());
+            }
+        }
+    }
+    /* A hook this sheet reads for every composer rather than through a private,
+    which is the difference between what the sheet does and what it offers. */
+    let aliased = ALIASES.replace_all(&source, "");
+    for found in READS.captures_iter(&aliased) {
+        if ours(&found[1]) {
+            survey
+                .shared_direct
+                .entry(key.clone())
+                .or_default()
+                .insert(found[1].to_owned());
+        }
+    }
 }
 
 /// The private half of one file, which is three passes over the same text.
@@ -376,10 +474,15 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
                 message: format!("documents `{name}`, which `{owner}` does not own"),
             });
         }
-        if owners.len() > 1 {
+        /* A registered prefix is the decision that the families mean one thing
+        by the name, so several pages listing it is several right pages rather
+        than a collision. Without this a family could not publish a hook its own
+        element reads, which is the fault below. */
+        if owners.len() > 1 && !registered(context, name) {
             findings.push(Finding {
                 detail: "A consumer setting it on a container holding both sets two different \
-                         things, and neither component is wrong. A public name cannot be shared."
+                         things, and neither component is wrong. A public name cannot be shared \
+                         unless its prefix is registered in `shared`."
                     .to_owned(),
                 file: owners.values().next().cloned().unwrap_or_default(),
                 message: format!(
@@ -394,7 +497,76 @@ fn judge(survey: &Survey, context: &Context) -> Vec<Finding> {
         }
     }
 
+    findings.extend(unpublished(survey, context));
     findings.extend(unpaired(survey));
+
+    findings
+}
+
+/// Whether a hook's prefix is a registered shared vocabulary.
+fn registered(context: &Context, name: &str) -> bool {
+    let bare = name.trim_start_matches("--");
+    context
+        .settings
+        .shared
+        .iter()
+        .any(|one| bare.starts_with(&format!("{one}-")))
+}
+
+/// Whether anything in the base package declares a hook.
+///
+/// A hook declared there arrives through a mixin or a controller the family
+/// takes, so the manifest already resolves it onto that family's page and a
+/// restatement would be the duplicate the check above refuses.
+fn from_core(survey: &Survey, name: &str) -> bool {
+    survey
+        .declared
+        .get(name)
+        .is_some_and(|path| path.starts_with("helix/core/"))
+}
+
+/// A shared sheet's hook that a family reads and does not publish.
+fn unpublished(survey: &Survey, context: &Context) -> Vec<Finding> {
+    let mut findings = Vec::new();
+    let mut say = |name: &str, owner: &String, path: &String, how: String| {
+        if !registered(context, name) || from_core(survey, name) {
+            return;
+        }
+        if survey
+            .declared_by
+            .get(name)
+            .is_some_and(|owners| owners.contains_key(owner))
+        {
+            return;
+        }
+        findings.push(Finding {
+            detail: "A reference page is built per family, so a hook left on the other family's \
+                     page is API this one's reader never finds. A registered shared prefix means \
+                     one name with one meaning, which is what makes both pages right."
+                .to_owned(),
+            file: path.clone(),
+            message: format!("{how} and does not document `{name}` with `@cssproperty`"),
+        });
+    };
+
+    for (sheet, owners) in &survey.composes {
+        for name in survey.shared_direct.get(sheet).into_iter().flatten() {
+            for (owner, path) in owners {
+                say(name, owner, path, format!("composes `shared/{sheet}`, which reads `{name}`"));
+            }
+        }
+    }
+
+    /* Followed rather than assumed, a shared sheet offering different hooks to
+    different composers: three of `series.css`'s six read `--_chart-stroke` and
+    three draw no line at all. */
+    for (private, names) in &survey.shared_alias {
+        for name in names {
+            for (owner, path) in survey.private_read_by.get(private).into_iter().flatten() {
+                say(name, owner, path, format!("reads `{private}`, which resolves `{name}`"));
+            }
+        }
+    }
 
     findings
 }

@@ -127,6 +127,7 @@ export {
   type MixinChartSourceInterface,
   PALETTE,
   seriesIndex,
+  seriesNames,
 } from './mixins/mixin-chart-source/mixin-chart-source.js'
 export {
   type CollectionElement,

@@ -418,8 +418,15 @@
    0.88 against glass's 0.62 is the same relationship the surface tokens carry,
    `material-translucent` at 60% against `material-translucent-strong` at 88%,
    so a chart and a card mean the same thing by the word. Absent is still fully
-   opaque, so the three points read glass, frosted, then no attribute at all. */
-[part="bar"][data-material="frosted"],
+   opaque, so the three points read glass, frosted, then no attribute at all.
+
+   **Chart-wide only, and there is no per-bar arm.** The per-series material
+   property is `glass`, which writes `data-material="glass"` or nothing, so a
+   `[part="bar"][data-material="frosted"]` beside the selector below was a rule
+   nothing could ever satisfy: valid CSS matching nothing, no error and no
+   warning, which is the failure the conventions call out by name. Adding one
+   wants a second per-series property rather than a selector, and `glass` is the
+   point of the axis a chart reaches for. */
 :host([material="frosted"]) [part="bar"]:not([data-material]) {
   --_bar-chart-through: calc(0.88 * var(--helix-material-opacity));
 }
