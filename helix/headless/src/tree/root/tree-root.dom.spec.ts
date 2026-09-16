@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -8,7 +8,13 @@ beforeAll(async () => {
 
 type Item = HTMLElement & {
   focusable: boolean
+  level: number
   open: boolean
+  updateComplete: Promise<unknown>
+}
+
+type Tree = HTMLElement & {
+  nesting?: 'peer' | 'subordinate'
   updateComplete: Promise<unknown>
 }
 
@@ -61,5 +67,28 @@ describe('the horizontal arrows', () => {
     expect([branch.focusable, child.focusable]).toEqual([true, false])
     await press(branch, 'ArrowRight')
     expect(branch.open).toBe(false)
+  })
+})
+
+/* The base tier ships no stylesheet, so everything it owes somebody drawing
+   depth is a fact they can select on: what the tree says depth means, and how
+   deep each row sits. Neither is drawn here and both are readable. */
+describe('depth is published, not drawn', () => {
+  test('the tree carries its answer, and carries nothing until it is asked', async () => {
+    const host = (await mount(`
+      <helix-headless-tree label="Files" nesting="subordinate">
+        <helix-headless-tree-item value="branch">Branch</helix-headless-tree-item>
+      </helix-headless-tree>`)) as Tree
+    expect(host.getAttribute('nesting')).toBe('subordinate')
+    host.nesting = undefined
+    await host.updateComplete
+    expect(host.hasAttribute('nesting')).toBe(false)
+  })
+
+  test('and every row says how deep it is, in a property a rule can read', async () => {
+    const { branch, child } = await tree()
+    await child.updateComplete
+    expect([branch.level, child.level]).toEqual([1, 2])
+    expect(part(child, 'row')?.getAttribute('style')).toContain('--tree-level: 2')
   })
 })

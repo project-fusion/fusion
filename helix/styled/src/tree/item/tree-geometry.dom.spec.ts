@@ -99,6 +99,68 @@ describe('tree item geometry', () => {
   })
 })
 
+/* What depth means, which the tree answers once for every row under it. The
+   default is a file explorer, where every row is the same kind of thing, and
+   `subordinate` is a navigation, where a step inward is a change of kind. Both
+   are the sheet's to draw, so both are measured here. */
+describe('depth and the type scale', () => {
+  /** Three levels, plus a top-level leaf to compare the first one against. */
+  const deep = (attrs = ''): string => `
+    <helix-tree label="Docs" ${attrs}>
+      <helix-tree-item default-open value="one">One
+        <helix-tree-item default-open slot="children" value="two">Two
+          <helix-tree-item slot="children" value="three">Three</helix-tree-item>
+        </helix-tree-item>
+      </helix-tree-item>
+      <helix-tree-item value="leaf">Leaf</helix-tree-item>
+    </helix-tree>`
+
+  const size = (item: HTMLElement): number =>
+    Number.parseFloat(getComputedStyle(part(item, 'row') as HTMLElement).fontSize)
+
+  /* Row to row, which is where the gap lives: on the row rather than on the
+     item, or a parent's adds to its last child's and one tree comes out with
+     three different gaps in it. */
+  const gaps = (host: HTMLElement): number[] => {
+    const boxes = items(host).map((item) =>
+      (part(item, 'row') as HTMLElement).getBoundingClientRect(),
+    )
+    return boxes.slice(1).map((box, index) => Math.round(box.top - (boxes[index]?.bottom ?? 0)))
+  }
+
+  geometry('one size at every depth, which is the resting answer', async () => {
+    const [one, two, three, leaf] = items(await mount(deep()))
+    const top = size(one as HTMLElement)
+    expect(top).toBeGreaterThan(0)
+    for (const row of [two, three, leaf]) {
+      expect(size(row as HTMLElement)).toBe(top)
+    }
+  })
+
+  geometry('a subordinate tree steps a nested row down, once and no further', async () => {
+    const [one, two, three, leaf] = items(await mount(deep('nesting="subordinate"')))
+    const top = size(one as HTMLElement)
+    /* The leaf beside the branch is top level too, so it keeps the top size:
+       the step is about depth and not about holding children. */
+    expect(size(leaf as HTMLElement)).toBe(top)
+    expect(size(two as HTMLElement)).toBeLessThan(top)
+    /* The type scale holds one step below a row, so the third level takes the
+       second's size rather than a size the scale does not have. */
+    expect(size(three as HTMLElement)).toBe(size(two as HTMLElement))
+  })
+
+  for (const [what, attrs] of [
+    ['peer', ''],
+    ['subordinate', 'nesting="subordinate"'],
+  ] as const) {
+    geometry(`and the gap stays even, ${what}`, async () => {
+      const measured = gaps(await mount(deep(attrs)))
+      expect(measured.length).toBe(3)
+      expect(new Set(measured).size).toBe(1)
+    })
+  }
+})
+
 /* A shut branch's chevron points along its row into what it holds, which is
    toward its own label: the right on a left-to-right page and the left on a
    right-to-left one. The sheet stands a downward caret on its side, so the

@@ -1,0 +1,106 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-fill: light-dark(#e2e2e5, #2f2f33);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+  --_radius-surface: 0.5rem;
+  --_radius-panel: 0.75rem;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+helix-headless-tree,
+helix-headless-tree-item {
+  display: block;
+}
+
+helix-headless-tree-item::part(item) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+helix-headless-tree-item::part(row) {
+  align-items: center;
+  block-size: max(2rem, calc(1lh + 1rem));
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  gap: 0.25rem;
+  line-height: 1.5;
+  padding: 0.5rem;
+  padding-inline-start: calc(0.5rem + (var(--tree-level, 1) - 1) * 1.25rem);
+  user-select: none;
+}
+
+helix-headless-tree[nesting="subordinate"] [slot="children"]::part(row) {
+  font-size: 0.75rem;
+}
+
+helix-headless-tree-item:not(:has(> [slot="children"]))::part(row) {
+  padding-inline-start: calc(0.5rem + (var(--tree-level, 1) - 1) * 1.25rem + 1.25rem);
+}
+
+helix-headless-tree-item:state(selected)::part(row) {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-tree-item::part(label) {
+  align-self: stretch;
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+helix-headless-tree-item::part(item):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-tree::part(tree),
+helix-headless-tree-item::part(group) {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+helix-headless-tree-item:not(:state(open))::part(group) {
+  display: none;
+}
+
+helix-headless-tree-item::part(toggle) {
+  align-self: center;
+  block-size: 1rem;
+  color: var(--_gray-mark);
+  cursor: pointer;
+  flex: none;
+  inline-size: 1rem;
+  rotate: -90deg;
+}
+
+helix-headless-tree-item:dir(rtl)::part(toggle) {
+  rotate: 90deg;
+}
+
+helix-headless-tree-item:state(open)::part(toggle) {
+  rotate: 0deg;
+}

@@ -1,19 +1,21 @@
 ---
-description: Four words with fixed vocabularies, one escape hatch, and the word that is refused.
+description: Registered words with fixed vocabularies, one escape hatch, and the word that is refused.
 section: Theming
 title: Visual axes
 ---
 
 # Visual axes
 
-A component's visual choices come from four registered axes with fixed
+A component's visual choices come from a registry of axes with fixed
 vocabularies. You cannot invent a value, and a component may take a subset.
 
 | Axis | Values |
 |---|---|
 | `emphasis` | `ghost`, `muted`, `outlined`, `solid`, `subtle` |
 | `material` | `frosted`, `glass`, `transparent` |
+| `nesting` | `peer`, `subordinate` |
 | `separation` | `elevated`, `filled`, `outlined`, `plain` |
+| `shape` | `arc`, `circle`, `dots`, `ring`, `rounded`, `square`, `text` |
 | `tone` | The status and intent words: `primary`, `accent`, `neutral`, `danger`, and so on |
 | `width` | `auto`, `full`, `standard` |
 
@@ -66,8 +68,12 @@ on either tier.
 **What it may not be is a place to put something that is on an axis.** That is
 the failure mode `appearance` demonstrated.
 
-## `tone` is the one axis both tiers carry
+## Some axes are carried by both tiers
 
 A styled axis never appears on the headless tier, which has nothing to paint and
-no box to size. `tone` is the exception and a principled one: it says what a
-thing *means*, and meaning survives having no stylesheet.
+no box to size. The exceptions are the axes that are not about paint. `tone` says
+what a thing *means*, and meaning survives having no stylesheet. `shape` says
+what gets *rendered*: a meter at `ring` emits an arc rather than a bar, so the
+markup differs before any rule is written. `nesting` says what depth *is*: a
+tree at `subordinate` ranks its rows, a file explorer does not, and that is true
+of a tree nobody has styled.
