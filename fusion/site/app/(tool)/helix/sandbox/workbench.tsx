@@ -1124,6 +1124,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             Nothing matches {filter}.
           </helix-text>
         ) : (
+          /* No `nesting`, which is the file explorer's answer and the deliberate
+             one: every row here is an example, a family row being the one that
+             holds the others, so an example is not a lesser thing than the
+             family above it. The indent is the whole of what depth means. */
           <helix-tree
             active={activeValue}
             chevron-placement="end"
