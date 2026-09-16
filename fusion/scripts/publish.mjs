@@ -432,8 +432,15 @@ const strip = (directory) => {
  *
  * **A binary is also held to what it has to be to run**: executable, since an
  * artifact download drops the mode, and reporting this release's version where
- * this machine can run it, since the binary builds from the crate's own version
- * line and that is stamped separately from the manifest.
+ * this machine can run it.
+ *
+ * **The version is asked from inside the package, which is where the answer
+ * is.** The binary reads it at run time from the `package.json` beside it, so
+ * one build serves every release and this is the step that proves the pair
+ * agree: it runs the file that is about to be packed, from the directory it is
+ * about to be packed from, which is exactly the arrangement a consumer
+ * installs. A binary compiled before that change, or one built from another
+ * tree, answers with something else and is refused here.
  */
 const incomplete = (directory, manifest) => {
   const problems = []

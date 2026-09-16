@@ -110,7 +110,7 @@ fn handle(line: &str) -> Option<String> {
             &serde_json::json!({
                 "capabilities": { "tools": {} },
                 "protocolVersion": PROTOCOL,
-                "serverInfo": { "name": "helix", "version": env!("CARGO_PKG_VERSION") },
+                "serverInfo": { "name": "helix", "version": crate::shipped() },
             }),
         )),
         "tools/list" => Some(result(

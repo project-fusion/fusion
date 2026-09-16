@@ -34,6 +34,16 @@ use crate::args::{Cli, Component, Noun, Theme};
 /// The word every printed failure opens with, and the corner of every screen.
 const PRODUCT: &str = "helix";
 
+/// The npm package this binary ships in, which is what tells it its version.
+const PACKAGE: &str = "@fusion.dev/helix-cli";
+
+/// What `--version` prints and what the MCP server calls itself: the release
+/// this binary was installed as, read from the package beside it rather than
+/// compiled in. `fusion_rules::version` carries why.
+fn shipped() -> &'static str {
+    fusion_rules::version::shipped(PACKAGE, env!("CARGO_PKG_VERSION"))
+}
+
 fn main() {
     let cli = Cli::parse();
     let paint = if cli.json {

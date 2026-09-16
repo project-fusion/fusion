@@ -19,7 +19,9 @@ use clap::{Args, Parser, Subcommand};
 #[command(
     name = "helix",
     about = "The Helix command line.",
-    version,
+    /* The release this binary was installed as, not the number it was compiled
+    at: one build then serves every release that changes no Rust. */
+    version = crate::shipped(),
     /* Every subcommand is required, at every level: a bare `helix` or a bare
     `helix theme` prints help and exits 2 rather than guessing. */
     subcommand_required = true,
