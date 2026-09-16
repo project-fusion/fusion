@@ -31,6 +31,11 @@ sentences: the rules, their counts and their findings. `--no-color` is the third
 way to turn color off, for a terminal that reports itself capable and is not.
 Color is already off when stdout is not a terminal and when `NO_COLOR` is set.
 
+`helix --version` is the release you installed, read from the package it came in
+rather than compiled into the binary, so one build serves every release that
+changes no Rust. A binary built from a checkout of this repository has no such
+package beside it and says `0.0.0-dev`, which is what that build is.
+
 ## What it reads
 
 `component` reads the tiers named by a `helix` key in `fusion.json`, or by
