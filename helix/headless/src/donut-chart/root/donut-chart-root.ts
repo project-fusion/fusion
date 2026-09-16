@@ -143,8 +143,16 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
    * `getComputedStyle`, which is client-only: a server would draw a different
    * ring than the client. A plot's proportions are markup for the same reason
    * `curve` is.
+   *
+   * **And so it does not reflect**, which is the same argument read forward. No
+   * selector on either tier asks about it and none can want to: everything the
+   * thickness decides is arithmetic done here and published as
+   * `--donut-chart-stroke`, which is a number a rule can do sums with where the
+   * word is not. Reflected, it wrote a value onto every host a script had set
+   * it on for nothing to read. `sweep` beside it is the converse and reflects,
+   * because three rules select on it.
    */
-  @property({ reflect: true })
+  @property()
   hole?: 'large' | 'none' | 'small'
 
   /**
@@ -438,23 +446,34 @@ export class HelixHeadlessDonutChart extends MixinChartSource(HelixElement) {
        bubble prefers turned to match. */
     const turned = this.sweep === 'half' && this.pointer.mirrored
     const across = Math.cos(angle) > 0 !== turned
-    return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
-      fixed: this.sweep !== 'half',
-      /* The preferred side from the bearing's dominant axis, and
-         `FloatingController` moves it if that side does not fit. A fixed side
-         cannot express a bearing, so the arrow misses the ring; a preference
-         plus flipping can. */
-      placement:
-        Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))
-          ? across
-            ? 'right'
-            : 'left'
-          : Math.sin(angle) > 0
-            ? 'bottom'
-            : 'top',
-      x: `${x}%`,
-      y: `${y}%`,
-    })
+    return drawTooltip(
+      this.sourceRows,
+      at,
+      this.tag('tooltip'),
+      {
+        fixed: this.sweep !== 'half',
+        /* The preferred side from the bearing's dominant axis, and
+           `FloatingController` moves it if that side does not fit. A fixed side
+           cannot express a bearing, so the arrow misses the ring; a preference
+           plus flipping can. */
+        placement:
+          Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))
+            ? across
+              ? 'right'
+              : 'left'
+            : Math.sin(angle) > 0
+              ? 'bottom'
+              : 'top',
+        x: `${x}%`,
+        y: `${y}%`,
+      },
+      /* **A ring's series are its rows and not its columns**, which is the one
+         place the mixin's answer is wrong by more than an offset. The bubble is
+         about one slice, so every cell in it belongs to that slice's color;
+         counted by column every slice's bubble came out series one, the first
+         slice's own, beside a ring painting the third slice something else. */
+      () => seriesIndex(at),
+    )
   }
 }
 

@@ -211,6 +211,26 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     this.removeEventListener('pointerleave', this.handleLeave)
   }
 
+  /**
+   * The palette slot a cell of a row is drawn in, which here is shifted by one.
+   *
+   * **A scatter's first plotted series is the table's *second* numeric
+   * column**, the first having been split off as the measure across. So the
+   * mixin's answer, which is right for a chart whose columns are its series in
+   * order, is one too high on every column here and names a color for the
+   * across, which is drawn in none. Left at that, the bubble painted the across
+   * column in series one, the color the points themselves are drawn in, and
+   * gave the series actually plotted series two.
+   *
+   * The across gets no dot at all rather than a shifted one. It is an axis and
+   * not a series: it has a scale under the plot with its name at the end of it,
+   * which is where a reader is told what it is.
+   */
+  override seriesOf(cell: number): number | undefined {
+    const depth = this.plottedColumns.indexOf(cell)
+    return depth < 1 ? undefined : seriesIndex(depth - 1)
+  }
+
   /** Whether the levels across are ruled. */
   protected get rulesX(): boolean {
     return this.gridlines !== undefined && this.gridlines !== 'y'
@@ -231,10 +251,7 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
    */
   protected get field(): ScatterField {
     const rows = this.sourceRows
-    const width = Math.max(0, ...rows.map((row) => row.cells.length))
-    const columns = Array.from({ length: width }, (_, column) => column).filter((column) =>
-      rows.some((row) => row.cells[column]?.value !== undefined),
-    )
+    const columns = this.plottedColumns
     const [across, ...ups] = columns
     const name = (column: number | undefined): string =>
       column === undefined ? '' : (rows.find((row) => row.cells[column])?.cells[column]?.name ?? '')
@@ -361,15 +378,21 @@ export class HelixHeadlessScatterChart extends MixinChartSource(HelixElement) {
     if (at < 0 || !point) {
       return drawTooltip(this.sourceRows, -1, this.tag('tooltip'))
     }
-    return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
-      /* The host's, which the plane's `dir` does not reach: a bubble of names
-         and values is words, and reads the way the page does. */
-      dir: getComputedStyle(this).direction === 'rtl' ? 'rtl' : 'ltr',
-      fixed: true,
-      placement: 'top',
-      x: `${point.x}%`,
-      y: `${point.y}%`,
-    })
+    return drawTooltip(
+      this.sourceRows,
+      at,
+      this.tag('tooltip'),
+      {
+        /* The host's, which the plane's `dir` does not reach: a bubble of names
+           and values is words, and reads the way the page does. */
+        dir: getComputedStyle(this).direction === 'rtl' ? 'rtl' : 'ltr',
+        fixed: true,
+        placement: 'top',
+        x: `${point.x}%`,
+        y: `${point.y}%`,
+      },
+      (cell) => this.seriesOf(cell),
+    )
   }
 
   /**

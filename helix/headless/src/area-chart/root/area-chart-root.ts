@@ -56,11 +56,27 @@ export interface AreaStack {
  * else draws every part in proportion to nothing. `LineChart` measures from its
  * own range because a line claims a position; a band claims an amount.
  *
+ * **And so it is not a streamgraph**, which is the near neighbor to name.
+ * A streamgraph moves its baseline to center the bands and reads as a river; it
+ * is a real form and it is the one thing the rule above refuses, so this
+ * carries no alias for it. What it has instead is `share`, which answers the
+ * question a streamgraph is usually reached for, how the composition changed,
+ * without giving up a floor a reader can measure against.
+ *
  * **Straight between readings unless asked otherwise.** A band's top edge is a
  * sum, and a curve fitted through one sum can pass under the curve fitted
  * through the sum beneath it, so a smoothed stack can draw a part as less than
  * nothing between two readings. Straight segments between ordered points stay
  * ordered. `curve="smooth"` is there for a stack that is read as a shape.
+ *
+ * `curve="step"` falls on the safe side of that argument rather than being
+ * unanswered by it, and it is worth saying which side because a reader cannot
+ * tell from the argument alone. A step takes no value the readings do not have:
+ * it holds one, jumps at the midpoint, and holds the next. So two stepped edges
+ * that are ordered at every reading are ordered everywhere between them, which
+ * is what `straight` is chosen for. It is the curve for a quantity that changes
+ * at a moment rather than across an interval, a headcount or a price, where a
+ * sloped edge claims a gradual change nothing measured.
  *
  * **`share` draws each reading as a hundred percent**, so the bands are the
  * parts' shares and the top edge is flat. It answers "which part grew" where
@@ -80,7 +96,7 @@ export interface AreaStack {
  * @since 0.1.0
  * @status experimental
  * @category charts
- * @aliases Stacked Area Chart, Composition Chart, Stream Chart
+ * @aliases Stacked Area Chart, Composition Chart, Banded Chart
  * @documentation https://fusion.dev/helix/components/area-chart
  *
  * @csspart area - One part's band.
@@ -115,9 +131,13 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
   /**
    * How a band's edge gets from one reading to the next.
    *
-   * Absent is `straight`, for the reason the class doc gives, and absent rather
-   * than defaulted because a reflecting property with a default writes its
-   * attribute onto every host, including the ones nobody configured.
+   * Three values, and the class doc argues for each: `straight` is absent and
+   * is the default, `smooth` is for a stack read as a shape and is the one that
+   * can draw a part as less than nothing, `step` is for a quantity that changes
+   * at a moment and is ordered the way `straight` is.
+   *
+   * Absent rather than defaulted because a reflecting property with a default
+   * writes its attribute onto every host, including the ones nobody configured.
    */
   @property({ reflect: true })
   curve?: Curve
@@ -171,10 +191,11 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
    */
   protected get stack(): AreaStack {
     const rows = this.sourceRows
-    const width = Math.max(0, ...rows.map((row) => row.cells.length))
-    const columns = Array.from({ length: width }, (_, column) => column).filter((column) =>
-      rows.some((row) => row.cells[column]?.value !== undefined),
-    )
+    /* The mixin's, rather than a third copy of the same filter: the tooltip
+       reads it too, through `seriesOf`, and a chart whose bands and whose
+       bubble disagreed about which column is which is the fault that made it
+       shared. */
+    const columns = this.plottedColumns
     const values = columns.map((column) =>
       rows.map((row) => {
         const value = row.cells[column]?.value ?? 0
@@ -424,11 +445,17 @@ export class HelixHeadlessAreaChart extends MixinChartSource(HelixElement) {
       return drawTooltip(rows, at, this.tag('tooltip'))
     }
     const slot = 100 / rows.length
-    return drawTooltip(rows, at, this.tag('tooltip'), {
-      placement: 'top',
-      x: `${at * slot + slot / 2}%`,
-      y: `${y(stack.layers.at(-1)?.[at] ?? 0)}%`,
-    })
+    return drawTooltip(
+      rows,
+      at,
+      this.tag('tooltip'),
+      {
+        placement: 'top',
+        x: `${at * slot + slot / 2}%`,
+        y: `${y(stack.layers.at(-1)?.[at] ?? 0)}%`,
+      },
+      (cell) => this.seriesOf(cell),
+    )
   }
 }
 

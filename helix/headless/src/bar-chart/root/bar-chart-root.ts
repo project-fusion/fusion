@@ -9,6 +9,7 @@ import {
   MixinChartSource,
   type Series,
   seriesIndex,
+  seriesNames,
   ticks,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
@@ -81,7 +82,7 @@ const HEIGHT = 100
  * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --bar-chart-axis - The color of a single-series axis, taken from that series.
+ * @cssproperty --bar-chart-axis - How wide an axis column is drawn, in `ch`, from the widest number on it. Written on the axis itself, and only where the categories run along the bottom: turned sideways an axis is a row and takes a line's height instead.
  * @cssproperty --bar-chart-secondary - The color of the secondary axis when one series owns it. It resolves a `--helix-color-series-*` token, so on the headless tier alone it names something that is not there. #138.
  * @cssproperty --chart-bar-wash - The gradient a bar would take, named per bar so the
  *   styled tier can point `fill` at it. Drawn whatever the treatment and used only where
@@ -126,22 +127,25 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
    * Which series are drawn as a line instead of as columns, by name.
    *
-   * Space separated, matched against the column headings the table gives, so a
-   * chart says `lines="Margin"` rather than counting columns. Names because
-   * they are what the table already carries and what the legend already shows:
-   * an index is a fourth place the column order is written down and the first
-   * one to go stale when somebody moves a column.
+   * Separated by whitespace or commas and matched against the column headings
+   * the table gives, so a chart says `lines="Margin"` rather than counting
+   * columns. Names because they are what the table already carries and what the
+   * legend already shows: an index is a fourth place the column order is
+   * written down and the first one to go stale when somebody moves a column.
    *
-   * **A combination chart is one scale, and that is the honest half of it.**
-   * Both marks are measured against the same domain, so a line here says
-   * something comparable to the columns beside it. The usual reason to reach
-   * for a combination chart is the other thing, a count against a percentage on
-   * a second axis, and that is deliberately not this: two scales on one frame
-   * let the author put any two shapes in any relation by choosing the ranges,
-   * and the reader has no way to see it happening.
+   * **This says which mark a series takes and nothing about which scale it is
+   * measured on.** Named here alone, a line shares the columns' domain, so it
+   * says something comparable to the columns beside it.
    *
-   * A line among columns still measures from zero, because the columns do and
-   * they share the axis.
+   * The other half of a combination chart, a count against a percentage on a
+   * scale of its own, is `secondary`, which is a separate property because it
+   * is a separate question and because the two compose: `with-a-second-axis`
+   * ships naming one series in both. The argument for why a second scale is opt
+   * in, and why setting it labels both axes, is written there.
+   *
+   * A line among columns measures from zero, because the columns do and they
+   * share the axis. So does a line on the second scale, which is that scale's
+   * own rule rather than this one's.
    */
   @property()
   lines?: string
@@ -149,9 +153,16 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
   /**
    * Which series are measured against a scale of their own, by name.
    *
-   * Space separated and matched the way `lines` is, against the column headings
-   * the table gives. Opt in: absent, every series shares one domain, which is
-   * what makes a chart comparable and is the right default.
+   * Separated and matched the way `lines` is, against the column headings the
+   * table gives. Opt in: absent, every series shares one domain, which is what
+   * makes a chart comparable and is the right default.
+   *
+   * **The scale, and `lines` is the mark.** The two are separate properties
+   * because they answer separate questions and a series usually wants both:
+   * a percentage beside a count is drawn as a line *and* measured on its own
+   * axis, which is what `with-a-second-axis` writes out. Neither implies the
+   * other, so a series can be a line on the shared scale and a column can have
+   * a scale to itself.
    *
    * **Two scales on one frame let an author put any two shapes in any relation
    * by choosing the ranges, and a reader cannot see it happening.** That is not
@@ -178,22 +189,12 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
 
   /** The series names on the second scale, lowercased and trimmed. */
   private get scaled(): Set<string> {
-    return new Set(
-      (this.secondary ?? '')
-        .split(/\s+/)
-        .map((name) => name.trim().toLowerCase())
-        .filter(Boolean),
-    )
+    return new Set(seriesNames(this.secondary))
   }
 
   /** The series names drawn as a line, lowercased and trimmed for matching. */
   private get lined(): Set<string> {
-    return new Set(
-      (this.lines ?? '')
-        .split(/\s+/)
-        .map((name) => name.trim().toLowerCase())
-        .filter(Boolean),
-    )
+    return new Set(seriesNames(this.lines))
   }
 
   /** Whether the levels are ruled, which is every value but `category`. */
@@ -667,11 +668,17 @@ export class HelixHeadlessBarChart extends MixinChartSource(HelixElement) {
     const far = sideways ? Math.max(...ends) : Math.min(...ends)
     const slot = 100 / this.readings
     const across = at * slot + slot / 2
-    return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
-      placement: sideways ? (this.pointer.mirrored ? 'left' : 'right') : 'top',
-      x: sideways ? `${far}%` : `${across}%`,
-      y: sideways ? `${across}%` : `${far}%`,
-    })
+    return drawTooltip(
+      this.sourceRows,
+      at,
+      this.tag('tooltip'),
+      {
+        placement: sideways ? (this.pointer.mirrored ? 'left' : 'right') : 'top',
+        x: sideways ? `${far}%` : `${across}%`,
+        y: sideways ? `${across}%` : `${far}%`,
+      },
+      (cell) => this.seriesOf(cell),
+    )
   }
 }
 

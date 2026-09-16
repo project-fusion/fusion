@@ -1,0 +1,64 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="lg"
+    >
+      <table
+        data-hidden-visually
+        id="areachartcurves"
+      >
+        <caption>Seats in use by plan</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Team</th>
+            <th scope="col">Business</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Jan</th>
+            <td data-value="180">180</td>
+            <td data-value="60">60</td>
+          </tr>
+          <tr>
+            <th scope="row">Feb</th>
+            <td data-value="240">240</td>
+            <td data-value="70">70</td>
+          </tr>
+          <tr>
+            <th scope="row">Mar</th>
+            <td data-value="220">220</td>
+            <td data-value="110">110</td>
+          </tr>
+          <tr>
+            <th scope="row">Apr</th>
+            <td data-value="300">300</td>
+            <td data-value="120">120</td>
+          </tr>
+          <tr>
+            <th scope="row">May</th>
+            <td data-value="360">360</td>
+            <td data-value="180">180</td>
+          </tr>
+          <tr>
+            <th scope="row">Jun</th>
+            <td data-value="340">340</td>
+            <td data-value="230">230</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <helix-area-chart for="areachartcurves"></helix-area-chart>
+      <helix-area-chart
+        curve="smooth"
+        for="areachartcurves"
+      ></helix-area-chart>
+      <helix-area-chart
+        curve="step"
+        for="areachartcurves"
+      ></helix-area-chart>
+    </helix-flex>
+  )
+}

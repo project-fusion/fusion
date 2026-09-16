@@ -152,4 +152,32 @@ describe('what a reader is told', () => {
     /* The total is the sum of the bands, not a band, so it takes no color. */
     expect(all(host, 'tooltip-cell').at(-1)?.hasAttribute('data-series')).toBe(false)
   })
+
+  /* A cell's place in its row is its place in the table, and the series are the
+     columns that parsed. `readSeries` drops a column of notes and `readRows`
+     keeps it, so counted from the cell index every figure after one moved a
+     color along: a band drawn in the second series named in the bubble as the
+     third, beside a legend calling the third something else. */
+  test('a cell wears the color of the band it is in, past a column nothing plotted', async () => {
+    const noted = `<table id="noted">
+      <thead><tr>
+        <th scope="col">Month</th><th scope="col">Search</th>
+        <th scope="col">Note</th><th scope="col">Direct</th>
+      </tr></thead>
+      <tbody>
+        <tr><th scope="row">Jan</th><td data-value="10">10</td><td>Launch</td><td data-value="6">6</td></tr>
+        <tr><th scope="row">Feb</th><td data-value="20">20</td><td>&mdash;</td><td data-value="12">12</td></tr>
+      </tbody>
+    </table>`
+    const host = await chart(noted, 'for="noted"')
+    host.pointer.set(0)
+    await host.updateComplete
+    expect(all(host, 'tooltip-cell').map((cell) => cell.getAttribute('data-series'))).toEqual([
+      '1',
+      null,
+      '2',
+      null,
+    ])
+    expect(all(host, 'area').map((band) => band.getAttribute('data-series'))).toEqual(['2', '1'])
+  })
 })

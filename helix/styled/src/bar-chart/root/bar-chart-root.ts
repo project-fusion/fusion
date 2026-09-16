@@ -1,4 +1,4 @@
-import { customElement, seriesIndex } from '@fusion.dev/helix-core'
+import { customElement, seriesIndex, seriesNames } from '@fusion.dev/helix-core'
 import { HelixHeadlessBarChart } from '@fusion.dev/helix-headless/bar-chart'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -32,6 +32,7 @@ import '../../tooltip/index.js'
  * @cssproperty --bar-chart-gridline-color - One rule across the plot, under `gridlines`.
  * @cssproperty --bar-chart-line-color - A `lines` series, overriding its series color.
  * @cssproperty --bar-chart-line-width - Thickness of a `lines` series, over `--chart-stroke`.
+ * @cssproperty --chart-stroke - Thickness of a `lines` series, one name across this family, Line Chart and Area Chart's top edge, since the three read one shared rule. `--bar-chart-line-width` overrides it here.
  */
 @customElement('helix-bar-chart')
 export class HelixBarChart extends HelixHeadlessBarChart {
@@ -54,6 +55,12 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
    * of the series color with that edge on it, and absent is the filled column,
    * per the rule that a reflected property takes no default.
+   *
+   * `solid` is that filled column written out. It matches no rule in the sheet
+   * and lands on the base one, which is what the resting value of every axis in
+   * the registry does, and it is worth having so a consumer switching a chart
+   * between treatments has a word for the one it started at rather than having
+   * to remove the attribute.
    *
    * **It composes with `material` rather than competing with it.** Emphasis
    * decides what is drawn and material decides how much of it comes through, so
@@ -123,10 +130,15 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   /**
    * Which series are drawn as an outline rather than a fill, by name.
    *
-   * Space separated and matched against the column headings the table gives,
-   * the way `lines` and `secondary` are, so a chart says `outlined="Forecast"`
-   * rather than counting columns. Names because they are what the table already
-   * carries and what the legend already shows.
+   * Separated by whitespace or commas and matched against the column headings
+   * the table gives, the way `lines` and `secondary` are, so a chart says
+   * `outlined="Forecast"` rather than counting columns. Names because they are
+   * what the table already carries and what the legend already shows.
+   *
+   * All five read one splitter, `seriesNames` in `core`, because the sentence
+   * above was true of the matching and false of the splitting: these three took
+   * a comma and those two did not, so `lines="Gateway, Billing"` drew no line
+   * and said nothing.
    *
    * **The case this exists for is a series that is not a measurement.** A
    * forecast, a target, a budget: something drawn on the same axis as the
@@ -183,14 +195,10 @@ export class HelixBarChart extends HelixHeadlessBarChart {
 
     const slots = (list?: string): Set<number> =>
       new Set(
-        (list ?? '')
-          .split(/[\s,]+/)
-          .filter(Boolean)
-          .map((name) => name.toLowerCase())
-          .flatMap((name) => {
-            const at = this.series.findIndex((one) => one.name.trim().toLowerCase() === name)
-            return at < 0 ? [] : [seriesIndex(at)]
-          }),
+        seriesNames(list).flatMap((name) => {
+          const at = this.series.findIndex((one) => one.name.trim().toLowerCase() === name)
+          return at < 0 ? [] : [seriesIndex(at)]
+        }),
       )
 
     const mark = (bar: SVGRectElement, name: string, value: string | undefined): void => {

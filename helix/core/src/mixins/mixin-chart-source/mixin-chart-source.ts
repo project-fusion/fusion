@@ -22,6 +22,30 @@ export const PALETTE = 24
 export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
 
 /**
+ * A list of series names, as the attributes that take one are written.
+ *
+ * **Here because five properties across two tiers read the same list and two of
+ * them read it differently.** `BarChart.lines` and `secondary` split on
+ * whitespace; `outlined`, `subtle` and `glass` on the styled tier split on
+ * whitespace or a comma, under a sentence saying the first three are matched
+ * "the way `lines` and `secondary` are". So `lines="Gateway, Billing"` looked
+ * exactly like `outlined="Gateway, Billing"` and matched nothing, because
+ * `gateway,` is not a column heading: no column drawn as a line, no error, and
+ * nothing to read off the page that says why. That is the undebuggable case
+ * `gridlines` names in its own docblock, arrived at from the other direction.
+ *
+ * A comma is accepted rather than refused because a reader writing a list of
+ * words puts commas between them, and the widest of the spellings already
+ * shipped. Lowercased and trimmed, since the headings are matched
+ * case-insensitively.
+ */
+export const seriesNames = (list: string | undefined): string[] =>
+  (list ?? '')
+    .split(/[\s,]+/)
+    .map((name) => name.trim().toLowerCase())
+    .filter(Boolean)
+
+/**
  * The public surface `MixinChartSource` adds.
  *
  * Declared separately because TypeScript cannot emit declarations for an
@@ -112,6 +136,15 @@ export declare class MixinChartSourceInterface {
    * Every row of the table, with each cell's text as well as its number.
    */
   get sourceRows(): Row[]
+  /**
+   * Which cells of a row hold numbers, by their place in it, in table order.
+   */
+  get plottedColumns(): number[]
+  /**
+   * The palette slot the cell at this place in a row is drawn in, or nothing
+   * where no series was read from that column.
+   */
+  seriesOf(cell: number): number | undefined
   /**
    * How many readings there are, which is what the pointer maps onto.
    */
@@ -225,6 +258,41 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      */
     get sourceRows(): Row[] {
       return this.source.rows
+    }
+
+    /**
+     * Which cells of a row hold numbers, by their place in it, in table order.
+     *
+     * The same test `readSeries` applies when it drops a column of notes: a
+     * column is a series where any row parses, so a series survives one blank
+     * cell and a column of words is never one.
+     */
+    get plottedColumns(): number[] {
+      const rows = this.sourceRows
+      const width = Math.max(0, ...rows.map((row) => row.cells.length))
+      return Array.from({ length: width }, (_, column) => column).filter((column) =>
+        rows.some((row) => row.cells[column]?.value !== undefined),
+      )
+    }
+
+    /**
+     * The palette slot the cell at this place in a row is drawn in.
+     *
+     * **A cell's place in its row is not its series' depth, and the tooltip
+     * spent a while assuming it was.** `readSeries` drops a column nothing
+     * parses and `readRows` keeps it, so one column of notes among the figures
+     * moves every column after it one color along in the bubble: a row reading
+     * `Referral 1,080` wearing series three's green beside a legend that says
+     * series three is something else, which is the one failure the dot exists
+     * to prevent.
+     *
+     * Overridden where a chart reads the table some other way. `ScatterChart`
+     * splits the first plotted column off as the measure across, so its first
+     * *plotted* series is this table's second numeric column.
+     */
+    seriesOf(cell: number): number | undefined {
+      const depth = this.plottedColumns.indexOf(cell)
+      return depth < 0 ? undefined : seriesIndex(depth)
     }
 
     /** How many readings there are, which is what the pointer maps onto. */

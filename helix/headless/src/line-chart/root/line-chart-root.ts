@@ -87,6 +87,9 @@ const HEIGHT = 100
  * @csspart tooltip-right - The bubble while it is right of the reading, beside `tooltip`.
  * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
+ *
+ * @cssproperty --chart-terminus-x - Where a series' last reading sits horizontally, as a percentage. Written by the component.
+ * @cssproperty --chart-terminus-y - Where a series' last reading sits vertically, as a percentage. Written by the component.
  */
 @customElement('helix-headless-line-chart')
 export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
@@ -173,9 +176,20 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
    * the question a sparkline's single mark answers too.
    *
    * `none` lets the lines stop on their own, which suits a chart read for its
-   * shape rather than for where it finished. The shapes come from
+   * shape rather than for where it finished. `square` is the same mark with its
+   * corners, for a drawing whose neighbors are square, the columns of a table
+   * beside it for instance. `ring` lets the ground through, for a chart drawn
+   * over something busy. `triangle` points along the axis and reads as "and
+   * onward" rather than as a second claim about the data.
+   *
+   * The shapes come from
    * `helix/styled/src/shared/chart/terminus.css`, the same sheet `Sparkline` takes, so
-   * the set is identical wherever one appears.
+   * the set is identical wherever one appears. **Which is why every value is
+   * named here.** `Sparkline` shipped `square` implemented, drawn, asserted and
+   * undocumented until the cohort before this one; this family reads the same
+   * four out of the same sheet and had left two of them unwritten, so the
+   * finding arrived twice. A shared vocabulary wants naming at each door into
+   * it, because a reader arrives at one door and not at the set.
    *
    * `ring` is the one that asks something of the drawing. It leaves a hole and a
    * line ends at the reading, which is the hole's center, so the `<svg>` is
@@ -494,11 +508,17 @@ export class HelixHeadlessLineChart extends MixinChartSource(HelixElement) {
       .filter((one): one is number => one !== undefined)
       .map((one) => scale(one))
     const slot = 100 / this.readings
-    return drawTooltip(this.sourceRows, at, this.tag('tooltip'), {
-      placement: 'top',
-      x: `${at * slot + slot / 2}%`,
-      y: `${tops.length > 0 ? Math.min(...tops) : 0}%`,
-    })
+    return drawTooltip(
+      this.sourceRows,
+      at,
+      this.tag('tooltip'),
+      {
+        placement: 'top',
+        x: `${at * slot + slot / 2}%`,
+        y: `${tops.length > 0 ? Math.min(...tops) : 0}%`,
+      },
+      (cell) => this.seriesOf(cell),
+    )
   }
 }
 

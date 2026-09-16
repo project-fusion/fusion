@@ -147,3 +147,45 @@ describe('bar chart', () => {
     expect(bars(host)).toHaveLength(4)
   })
 })
+
+const MIXED = `<table id="mixed">
+  <thead><tr>
+    <th scope="col">Quarter</th><th scope="col">Direct</th>
+    <th scope="col">Partner</th><th scope="col">Conversion</th>
+  </tr></thead>
+  <tbody>
+    <tr><th scope="row">Q1</th><td data-value="820">820</td><td data-value="410">410</td><td data-value="3.2">3.2%</td></tr>
+    <tr><th scope="row">Q2</th><td data-value="940">940</td><td data-value="520">520</td><td data-value="4.1">4.1%</td></tr>
+  </tbody>
+</table>`
+
+/* `lines` and `secondary` split on whitespace where the styled tier's
+   `outlined`, `subtle` and `glass` split on whitespace or a comma, under a
+   sentence saying the first three are matched "the way `lines` and `secondary`
+   are". So a comma-separated list drew no line and labeled no second axis, with
+   nothing to read off the page that said why. One splitter now, in `core`. */
+describe('naming a series', () => {
+  const lines = (host: HTMLElement): number =>
+    host.shadowRoot?.querySelectorAll('[part="line"]').length ?? 0
+
+  test('takes a comma between names as well as a space', async () => {
+    expect(lines(await chart(MIXED, 'for="mixed" lines="Partner Conversion"'))).toBe(2)
+    expect(lines(await chart(MIXED, 'for="mixed" lines="Partner, Conversion"'))).toBe(2)
+  })
+
+  test('and the second scale reads the list the same way, which is the claim', async () => {
+    /* Both axes are drawn the moment `secondary` names a series, so a list it
+       failed to parse is visible as no axes at all. */
+    const axes = async (value: string): Promise<number> =>
+      (await chart(MIXED, `for="mixed" secondary="${value}"`)).shadowRoot?.querySelectorAll(
+        '[part="axis"]',
+      ).length ?? 0
+    expect(await axes('Conversion')).toBe(2)
+    expect(await axes('Partner, Conversion')).toBe(2)
+    expect(await axes('')).toBe(0)
+  })
+
+  test('a name no column carries still leaves a chart rather than a blank', async () => {
+    expect(bars(await chart(MIXED, 'for="mixed" lines="Nothing"'))).toHaveLength(6)
+  })
+})

@@ -16,8 +16,12 @@
   position: relative;
 }
 
+/* One hook over both gaps, because the docblock names it for both. Only the
+   rows read it, and the column between the levels up and the plot was a
+   literal, so a consumer opening the chart out got a wide gap under the plot
+   and the old one beside it. */
 [part="plane"] {
-  column-gap: var(--helix-space-xs);
+  column-gap: var(--scatter-chart-gap, var(--helix-space-xs));
   display: grid;
   grid-template-areas:
     "y-name y-name"

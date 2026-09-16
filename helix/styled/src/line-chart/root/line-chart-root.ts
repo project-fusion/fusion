@@ -20,9 +20,15 @@ import '../../tooltip/index.js'
  * lets one drawing fill a narrow card and a wide panel, and without
  * `vector-effect: non-scaling-stroke` the same line comes out hairline in the
  * first and heavy in the second. It rescues strokes and not geometry, which is
- * why the readings are joined by lines and marked by nothing: a circle in a
- * stretched coordinate space is an ellipse, and there is no vector-effect that
- * answers for a shape.
+ * why nothing inside the drawing marks a reading: a circle in a stretched
+ * coordinate space is an ellipse, and there is no vector-effect that answers
+ * for a shape.
+ *
+ * **The last reading of each series is marked, and that is the same rule rather
+ * than an exception to it.** `terminus` draws an HTML element placed over the
+ * plot by percentage instead of a shape inside it, so it keeps its shape at any
+ * width. It is on by default, as a dot, because the column of marks at the far
+ * edge is where a reader looks for "and what is it now".
  *
  * @since 0.1.0
  * @status experimental
@@ -31,8 +37,11 @@ import '../../tooltip/index.js'
  * @aliases Time Series, Trend Chart, Multi-line Chart
  * @documentation https://fusion.dev/helix/components/line-chart
  *
- * @cssproperty --chart-stroke - Thickness of a series drawn as a line, here and on Area
- *   Chart's top edge and Bar Chart's `lines`. Each family's own width hook overrides it.
+ * @cssproperty --chart-stroke - Thickness of a series drawn as a line, one name across this
+ *   family, Area Chart's top edge and Bar Chart's `lines`, since the three read one shared
+ *   rule. Each family's own width hook overrides it.
+ * @cssproperty --chart-terminus-hole - A fill for the middle of a `ring` terminus, which is otherwise open. One name across this family and Sparkline, the two reading one shared sheet.
+ * @cssproperty --chart-terminus-size - Size of the mark on each series' last reading. One name across this family and Sparkline, the two reading one shared sheet.
  * @cssproperty --line-chart-area-opacity - How much of a line's color its wash takes.
  * @cssproperty --line-chart-band-color - The slot the pointer is resting in.
  * @cssproperty --line-chart-block-size - Height of the drawing.
