@@ -1124,20 +1124,15 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             Nothing matches {filter}.
           </helix-text>
         ) : (
-          /* No `nesting`, which is the file explorer's answer and the deliberate
-             one: every row here is an example, a family row being the one that
-             holds the others, so an example is not a lesser thing than the
-             family above it. The indent is the whole of what depth means.
-
-             `heading` is refused here for a firmer reason than `subordinate`
-             was. A family row is not the name of a list, it is the family's own
-             preview and pressing it shows that, so the two rails on the site
-             that took the value took it because nothing in them that holds rows
-             is somewhere a reader can go, and everything in this one is. */
+          /* `subordinate` rather than `heading`: a family row is not the name of
+             a list, it is the family's own preview and pressing it shows that,
+             so it stays a destination at the size of one. Its examples are
+             variations of that preview, which is what the step below says. */
           <helix-tree
             active={activeValue}
             chevron-placement="end"
             label="Examples"
+            nesting="subordinate"
             onhelix-select={exampleChosen}
             ref={setTree}
           >
