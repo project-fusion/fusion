@@ -81,9 +81,14 @@ describe('depth is published, not drawn', () => {
           <helix-headless-tree-item value="branch">Branch</helix-headless-tree-item>
         </helix-headless-tree>`)) as Tree
       expect(host.getAttribute('nesting')).toBe(answer)
-      host.nesting = undefined
+      /* Cleared by taking the attribute off rather than by assigning undefined,
+         which the repository's strict optional types refuse. Lit hands the
+         property null for an attribute that has gone, which is the resting
+         state a sheet selects on the absence of. */
+      host.removeAttribute('nesting')
       await host.updateComplete
       expect(host.hasAttribute('nesting')).toBe(false)
+      expect(host.nesting).toBeNull()
     })
   }
 
