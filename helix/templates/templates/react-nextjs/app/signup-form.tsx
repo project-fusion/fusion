@@ -9,6 +9,7 @@
 
 import { type FormEvent, useState } from 'react'
 import { teams } from './data'
+import { DOCS } from './docs'
 
 /** One message in the toast region, and what it says. */
 interface Message {
@@ -43,16 +44,21 @@ export function SignupForm() {
   }
 
   return (
-    <helix-flex direction="column" gap="lg">
-      <helix-flex direction="column" gap="2xs">
+    <div className="stack">
+      <header className="hero">
         <helix-text as="h1" variant="heading">
           Join the roster
         </helix-text>
-        <helix-text emphasis="muted">
-          Submit it and the toast shows what a server would have read.
+        <helix-text as="p" className="lede" emphasis="muted" variant="body">
+          Nothing is posted anywhere. Submit it and the message shows exactly what a server would
+          have been handed.
         </helix-text>
-      </helix-flex>
+      </header>
 
+      {/* The form takes a column of its own and the notes take what is left, so a
+          wide window is a page rather than a form with a void beside it. At 390
+          the two stack and the notes read as a postscript. */}
+      <div className="split">
       <form className="form" onSubmit={join}>
         <helix-input autocomplete="name" label="Name" name="name" required />
 
@@ -105,6 +111,25 @@ export function SignupForm() {
         </helix-button>
       </form>
 
+        <aside className="notes">
+          <helix-text as="h2" variant="title">
+            What this is showing
+          </helix-text>
+          <helix-text as="p" emphasis="muted" variant="body">
+            Every control is a form-associated custom element, so the submit reads them with{' '}
+            <helix-code>new FormData(form)</helix-code> and nothing gathers the answers by hand.
+            Reset the form and they all go back, the way an <helix-code>input</helix-code> does.
+          </helix-text>
+          <helix-text as="p" emphasis="muted" variant="body">
+            Leave the email wrong and the complaint is the browser's own, in the reader's language.
+            Handle is the controlled one: it refuses the change and writes back what it will accept.
+          </helix-text>
+          <a data-link href={DOCS.forms}>
+            Forms
+          </a>
+        </aside>
+      </div>
+
       {/* **The region is rendered whether or not there is anything in it.**
           Assistive technology subscribes to a live region, and one that arrives
           already holding its message is frequently never announced. Nothing
@@ -128,6 +153,6 @@ export function SignupForm() {
           </helix-toast-item>
         ))}
       </helix-toast>
-    </helix-flex>
+    </div>
   )
 }

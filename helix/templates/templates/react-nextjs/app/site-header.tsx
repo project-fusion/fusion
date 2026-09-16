@@ -53,14 +53,19 @@ export function SiteHeader() {
 
   return (
     <helix-app-header material="glass" sticky>
-      <span slot="start">__PROJECT_NAME__</span>
+      {/* The wordmark is the way back to the first page, which is what a reader
+          expects of one, so there is no third destination in the bar saying the
+          same thing. */}
+      <Link data-link="quiet" href="/" slot="start">
+        <helix-text variant="body-strong">__PROJECT_NAME__</helix-text>
+      </Link>
 
       {/* The links are yours. Navigation owns the marker that travels between
           them and renders no anchors of its own, because a router renders its
           own and could not render them inside this shadow root. The base layer
           styles them, `aria-current="page"` included. */}
       <helix-navigation label="Pages">
-        <Link aria-current={path === '/' ? 'page' : undefined} href="/">
+        <Link aria-current={path === '/overview' ? 'page' : undefined} href="/overview">
           Overview
         </Link>
         <Link aria-current={path === '/join' ? 'page' : undefined} href="/join">

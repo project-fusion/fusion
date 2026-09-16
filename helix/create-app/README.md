@@ -17,9 +17,10 @@ npm create @fusion.dev/helix-app@latest my-app -- --template react-vite
 | Template | What it is |
 |---|---|
 | `react-vite` | React and TypeScript on Vite. The shortest path to a running app. |
-| `react-nextjs` | React and TypeScript on the Next.js App Router, the two pages as real routes. |
+| `react-nextjs` | React and TypeScript on the Next.js App Router, the three pages as real routes. |
 
-Either one lays down the same two pages: an overview holding a sorted, paged,
+Either one lays down the same three pages: a landing page saying what you have
+and where the rest of it is documented, an overview holding a sorted, paged,
 selectable data table, and a form a `<form>` reads with `FormData`. What differs
 between them is what the framework forces.
 
@@ -38,6 +39,7 @@ pre-release, or when `HELIX_NO_UPDATE_CHECK` is set.
 an unrelated project, so `npm create helix-app` runs somebody else's code.
 `npm create @fusion.dev/helix-app` resolves to this package and no other.
 
-[Documentation](https://helix.fusion.dev)
+[Documentation](https://fusion.dev/helix/docs) ·
+[Components](https://fusion.dev/helix/components)
 
 MIT
