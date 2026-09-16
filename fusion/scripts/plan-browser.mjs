@@ -51,7 +51,7 @@
 import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { argument } from '@fusion.dev/scripts/argv'
-import { costOver } from '@fusion.dev/scripts/cost'
+import { costOf, costOver } from '@fusion.dev/scripts/cost'
 import { OWN, scopeFor } from '@fusion.dev/scripts/scope'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 
@@ -181,8 +181,19 @@ const CHECKS = [
 const matrix = []
 const said = []
 for (const check of CHECKS) {
-  const cost = costOver(check.task, (family) => check.units.get(family) ?? 0, check.units.keys())
-  const of = Math.max(1, Math.min(check.units.size, Math.ceil(cost / TARGET)))
+  const weigh = (family) => check.units.get(family) ?? 0
+  const cost = costOver(check.task, weigh, check.units.keys())
+  /* **Never more shards than the heaviest family allows.** A shard holds whole
+     families, so a check with one big enough cannot be split into shards that
+     finish together whatever the target says: aura is 78 seconds of contrast's
+     215 on run 35052371545, a third of the check, and four shards of 54 would
+     be three jobs billed to finish early while the fourth ran longer than any
+     of them. The cap is where the arithmetic stops helping, not a target of
+     its own. */
+  const seconds = costOf(check.task, weigh)
+  const heaviest = Math.max(0, ...[...check.units.keys()].map(seconds))
+  const most = heaviest > 0 ? Math.ceil(cost / heaviest) : check.units.size
+  const of = Math.max(1, Math.min(check.units.size, most, Math.ceil(cost / TARGET)))
   said.push(
     check.units.size === 0
       ? `${check.task}: no family in scope, one job to say so`

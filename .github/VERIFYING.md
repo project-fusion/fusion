@@ -156,6 +156,11 @@ times a two-core runner and not uniformly. Aura is a sixth of contrast on an M2
 and a third of it here, a software rasterizer against a GPU, and shards packed
 from the M2's reading ran 127 and 84 seconds against 106 each as planned.
 
+**And never more shards than the heaviest family allows**, because a shard holds
+whole families: aura is 78 seconds of contrast's 215, so four shards of 54 would
+be three jobs billed to finish early while the fourth ran longer than any of
+them.
+
 **The planner decides how many and the check decides which.** Each check splits
 its own corpus with `@fusion.dev/scripts/shard`: by family, deterministic,
 heaviest first onto the lightest shard so far, weighed by the same measurement
