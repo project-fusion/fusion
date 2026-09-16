@@ -28,7 +28,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * pressed. Not on the server, which cannot see the children and so cannot know.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases Panel item, Drill row
  * @documentation https://fusion.dev/helix/components/drilldown
  *

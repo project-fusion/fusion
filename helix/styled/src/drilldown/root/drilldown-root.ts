@@ -19,7 +19,7 @@ import { styles } from './drilldown-root.css.js'
  * `prefers-reduced-motion` it becomes the instant swap `Menu` does.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category navigation
  * @aliases Panel, Nested list, Drill-in
  * @documentation https://fusion.dev/helix/components/drilldown
