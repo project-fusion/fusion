@@ -174,8 +174,12 @@ crosses into. A job is its setup and its share; the setup is 39 seconds,
 measured on run 35040430279. A share of 70 keeps a job inside two minutes and
 plans 29 of them, which billed 63; 125 plans 16 of three minutes, which is 48,
 and the count does not fall again until a job would bill four. What no share
-buys is wall clock: the browser matrix finished 72 seconds before that run did,
-and `warm` is the critical path.
+buys is wall clock, and the slack that argument was made against is gone: the
+matrix finished 72 seconds before run 35040430279 did, behind `warm` and then
+the Rust job, and with both of those off the critical path it is the critical
+path. On 35052888764 the gate waited on the longest browser shard with `warm`
+two minutes done. A share moved up now buys money with wall clock, and moved
+down buys wall clock with money.
 
 ## A tree is verified once
 

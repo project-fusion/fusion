@@ -38,10 +38,13 @@
  * is the knee with 16 seconds of margin before the boundary rather than the one
  * second a share of 140 leaves.
  *
- * **What this cannot buy is wall clock**, which is why the trade is read this
- * way round. The browser matrix finished 72 seconds before the run did on
- * 35040430279; `warm` is the critical path, so a larger share spends some of
- * that headroom and saves real money.
+ * **The headroom that trade was made against is gone.** The browser matrix
+ * finished 72 seconds before the run did on 35040430279, behind `warm` and then
+ * the Rust job; with both off the critical path the matrix is the critical path,
+ * and on 35052888764 the gate waited on the longest shard while `warm` had been
+ * done for two minutes. So a target moved up now buys money with wall clock
+ * rather than with slack, and moved down it buys wall clock with money: 70 plans
+ * 29 jobs and bills 63.
  *
  * **What the target cannot fix is a shard that is not the share it was sized
  * for**, which is `@fusion.dev/scripts/cost`'s half of this. A target of 125 and
