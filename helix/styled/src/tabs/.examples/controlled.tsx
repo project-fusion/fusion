@@ -11,10 +11,18 @@ export function Example() {
       <helix-tab value="overview">Overview</helix-tab>
       <helix-tab value="usage">Usage</helix-tab>
 
-      <div slot="panels">
-        <helix-tab-panel value="overview">What the account is doing.</helix-tab-panel>
-        <helix-tab-panel value="usage">Requests, storage and egress.</helix-tab-panel>
-      </div>
+      <helix-tab-panel
+        slot="panels"
+        value="overview"
+      >
+        What the account is doing.
+      </helix-tab-panel>
+      <helix-tab-panel
+        slot="panels"
+        value="usage"
+      >
+        Requests, storage and egress.
+      </helix-tab-panel>
     </helix-tabs>
   )
 }
