@@ -100,9 +100,11 @@ describe('tree item geometry', () => {
 })
 
 /* What depth means, which the tree answers once for every row under it. The
-   default is a file explorer, where every row is the same kind of thing, and
-   `subordinate` is a navigation, where a step inward is a change of kind. Both
-   are the sheet's to draw, so both are measured here. */
+   default is a file explorer, where every row is the same kind of thing;
+   `subordinate` is a categorization, where a step inward is a change of kind;
+   and `heading` is a documentation sidebar, where the branch is the name of the
+   list under it. All three are the sheet's to draw, so all three are measured
+   here. */
 describe('depth and the type scale', () => {
   /** Three levels, plus a top-level leaf to compare the first one against. */
   const deep = (attrs = ''): string => `
@@ -149,7 +151,44 @@ describe('depth and the type scale', () => {
     expect(size(three as HTMLElement)).toBe(size(two as HTMLElement))
   })
 
+  /* The parent moves and the children do not, which is the mirror of the step
+     above rather than a second helping of it. */
+  geometry('a heading tree relabels the branch and leaves the rows alone', async () => {
+    const [one, two, three, leaf] = items(await mount(deep('nesting="heading"')))
+    const resting = size(leaf as HTMLElement)
+    expect(resting).toBeGreaterThan(0)
+    /* A row under a heading is the size every other row is. */
+    expect(size(three as HTMLElement)).toBe(resting)
+    expect(size(one as HTMLElement)).toBeLessThan(resting)
+    /* A heading is a role and not a rung, so nothing runs out: the branch two
+       deep is the same heading as the branch at the top, not a smaller one. */
+    expect(size(two as HTMLElement)).toBe(size(one as HTMLElement))
+  })
+
+  /* And the top-level leaf beside a heading is the one row that proves which
+     question this value asks: `subordinate` would leave it alone for being top
+     level, and this leaves it alone for holding nothing. */
+  geometry('a top-level leaf beside a heading is the row it was', async () => {
+    /* Measured before the second mount, which takes the first tree out of the
+       document: a detached row has no computed size and the comparison would be
+       against `NaN`. */
+    const resting = size(items(await mount(deep()))[3] as HTMLElement)
+    const headed = size(items(await mount(deep('nesting="heading"')))[3] as HTMLElement)
+    expect(headed).toBe(resting)
+  })
+
+  /* The rail heading is a size, an ink and the room a label needs, so the
+     tracking is measured too: at the other two values a row asks for none. */
+  geometry('and the heading takes the tracking a label wants', async () => {
+    const tracking = (item: HTMLElement): number =>
+      Number.parseFloat(getComputedStyle(part(item, 'row') as HTMLElement).letterSpacing) || 0
+    const [one, , three] = items(await mount(deep('nesting="heading"')))
+    expect(tracking(one as HTMLElement)).toBeGreaterThan(0)
+    expect(tracking(three as HTMLElement)).toBe(0)
+  })
+
   for (const [what, attrs] of [
+    ['heading', 'nesting="heading"'],
     ['peer', ''],
     ['subordinate', 'nesting="subordinate"'],
   ] as const) {

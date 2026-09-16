@@ -27,28 +27,66 @@ export function Example() {
       </helix-tree>
 
       <helix-tree
-        label="Documentation"
+        label="Filters"
         nesting="subordinate"
       >
         <helix-tree-item
           default-open
-          value="components"
+          value="status"
         >
-          Components
+          Status
           <helix-tree-item
             slot="children"
-            value="button"
+            value="open"
           >
-            Button
+            Open
           </helix-tree-item>
           <helix-tree-item
             slot="children"
-            value="tree"
+            value="merged"
           >
-            Tree
+            Merged
           </helix-tree-item>
         </helix-tree-item>
-        <helix-tree-item value="tokens">Tokens</helix-tree-item>
+        <helix-tree-item value="mine">Assigned to me</helix-tree-item>
+      </helix-tree>
+
+      <helix-tree
+        label="Documentation"
+        nesting="heading"
+      >
+        <helix-tree-item
+          default-open
+          value="start"
+        >
+          Getting started
+          <helix-tree-item
+            default-open
+            slot="children"
+            value="install"
+          >
+            Installation
+            <helix-tree-item
+              slot="children"
+              value="any-framework"
+            >
+              Any framework
+            </helix-tree-item>
+            <helix-tree-item
+              slot="children"
+              value="react"
+            >
+              React
+            </helix-tree-item>
+          </helix-tree-item>
+          <helix-tree-item
+            slot="children"
+            value="theming"
+          >
+            Theming
+          </helix-tree-item>
+        </helix-tree-item>
+        <helix-tree-item value="changelog">Changelog</helix-tree-item>
       </helix-tree>
     </helix-flex>
   )

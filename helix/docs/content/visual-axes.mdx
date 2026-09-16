@@ -13,7 +13,7 @@ vocabularies. You cannot invent a value, and a component may take a subset.
 |---|---|
 | `emphasis` | `ghost`, `muted`, `outlined`, `solid`, `subtle` |
 | `material` | `frosted`, `glass`, `transparent` |
-| `nesting` | `peer`, `subordinate` |
+| `nesting` | `heading`, `peer`, `subordinate` |
 | `separation` | `elevated`, `filled`, `outlined`, `plain` |
 | `shape` | `arc`, `circle`, `dots`, `ring`, `rounded`, `square`, `text` |
 | `tone` | The status and intent words: `primary`, `accent`, `neutral`, `danger`, and so on |
@@ -75,5 +75,23 @@ no box to size. The exceptions are the axes that are not about paint. `tone` say
 what a thing *means*, and meaning survives having no stylesheet. `shape` says
 what gets *rendered*: a meter at `ring` emits an arc rather than a bar, so the
 markup differs before any rule is written. `nesting` says what depth *is*: a
-tree at `subordinate` ranks its rows, a file explorer does not, and that is true
-of a tree nobody has styled.
+tree at `subordinate` ranks its rows, a tree at `heading` makes each branch the
+name of the list under it, a file explorer does neither, and that is true of a
+tree nobody has styled.
+
+## What a step inward means
+
+`nesting` is the one axis whose values are three readings of the same fact, so
+it is worth saying which tree each is for.
+
+| Value | The tree it suits | What moves |
+|---|---|---|
+| `heading` | A documentation sidebar, where a branch names the list it holds and is not a page | The branch, which takes the rail heading. Its children keep the row they had |
+| `peer` | A file explorer, where every row is the same kind of thing | Nothing. The indent is the whole of what depth says |
+| `subordinate` | Side navigation, a categorization, a facet list | The nested row, one step down the type scale and no further |
+
+`heading` and `subordinate` are not one answer said twice. `subordinate` keys on
+depth and quiets the child; `heading` keys on holding children and relabels the
+parent, which is why a branch at any depth is a heading while the step below
+stops after one, and why a top-level leaf sitting beside a branch is left alone
+by both for opposite reasons.

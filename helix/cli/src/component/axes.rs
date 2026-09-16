@@ -15,8 +15,9 @@
 //! *means*, and meaning survives having no stylesheet; `shape` says what gets
 //! *rendered*, a meter at `ring` emitting an arc rather than a bar, so the
 //! markup differs before any rule is written; and `nesting` says what depth
-//! *is*, a row one step in being either the same kind of thing as the row above
-//! it or a subordinate kind, which is as true of a tree nobody has styled.
+//! *is*, a row one step in being the same kind of thing as the row above it, a
+//! subordinate kind, or a row the one above it is a heading for, which is as
+//! true of a tree nobody has styled.
 //! `emphasis`, `material` and `separation` say how a thing is painted, so on a
 //! base layer they are a promise nobody keeps.
 //!
@@ -49,7 +50,7 @@ const AXES: [(&str, &[&str]); 7] = [
         &["ghost", "muted", "outlined", "solid", "subtle"],
     ),
     ("material", &["frosted", "glass", "transparent"]),
-    ("nesting", &["peer", "subordinate"]),
+    ("nesting", &["heading", "peer", "subordinate"]),
     ("separation", &["elevated", "filled", "outlined", "plain"]),
     (
         "shape",

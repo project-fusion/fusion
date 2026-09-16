@@ -604,7 +604,7 @@ declared in `helix/cli/src/component/axes.rs`, which is the registry:
 |---|---|
 | `emphasis` | `ghost` `muted` `outlined` `solid` `subtle` |
 | `material` | `frosted` `glass` `transparent` |
-| `nesting` | `peer` `subordinate` |
+| `nesting` | `heading` `peer` `subordinate` |
 | `separation` | `elevated` `filled` `outlined` `plain` |
 | `shape` | `arc` `circle` `dots` `ring` `rounded` `square` `text` |
 | `tone` | `accent` `danger` `info` `neutral` `primary` `success` `surface` `warning` |
@@ -626,9 +626,11 @@ and no box to size. The exceptions are each principled: `tone` says what a thing
 means, and meaning survives having no stylesheet; `shape` says what gets
 rendered, a meter at `ring` emitting an arc rather than a bar, so the markup
 differs before any rule is written; and `nesting` says what depth is, a row one
-step in being either the same kind of thing as the row above it (a file
-explorer) or a subordinate kind (a navigation, a categorization), which is as
-true of a tree nobody has styled.
+step in being the same kind of thing as the row above it (`peer`, a file
+explorer), a subordinate kind (`subordinate`, a categorization or a facet
+list), or a row whose parent is the name of the list holding it (`heading`, a
+documentation sidebar, where the branch changes and the rows under it do not),
+which is as true of a tree nobody has styled.
 
 **`appearance` is not a property and must not be reintroduced.** `helix component`'s `axes`
 fails outright on the word, and `visual-axes.mdx` is the page that explains why

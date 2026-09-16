@@ -29,7 +29,9 @@
   display: flex;
   /* The row's own size, which the tree's `nesting` decides. At `peer` nothing
      sets it and every depth is this size, the indent being what says a row is
-     nested; at `subordinate` a nested row is handed the step below. */
+     nested; at `subordinate` a nested row is handed the step below; at
+     `heading` this is what every child keeps while the branch over it is handed
+     the label size below. */
   font-size: var(--_tree-text, var(--helix-text-sm));
   gap: var(--helix-space-2xs);
   /* A hair between rows, and on the row rather than the item. On the item it
@@ -75,9 +77,34 @@
   );
 }
 
-/* A parent reads as a parent, and a leaf as a leaf. */
+/* A parent reads as a parent, and a leaf as a leaf.
+
+   At `nesting="heading"` the parent stops being a row and becomes the name of
+   the list under it, which is the three properties the rail heading adds to the
+   medium weight already here. The row's height and the gap are untouched, so
+   the column of rows is the same column it was.
+
+   **Every branch, at every depth.** `subordinate` steps once and stops because
+   the type scale holds one step below a row while a tree holds any number of
+   depths, so a step per level runs out. Nothing runs out here: a heading is a
+   role and not a rung, and a branch three deep names what is under it exactly
+   as a branch at the top does. A sidebar with a heading inside a heading is the
+   shape this value was asked for.
+
+   **And a leaf keeps the row, wherever it is.** The other two values key on
+   depth; this one keys on holding children, so a top-level leaf beside a
+   heading is left where it was rather than joining it. It has to be: a heading
+   is not a destination and that leaf is, and drawing them alike puts the row
+   you can press and the label you cannot at the same weight.
+
+   The hover and the pointer stay for the reverse of that reason. A branch with
+   no `href` toggles from anywhere in its row, so an affordance taken off a
+   heading would leave the chevron as the only way into what it holds. */
 [part="row"]:has([part="toggle"]) {
+  color: var(--_tree-heading-ink, var(--helix-color-foreground-muted));
+  font-size: var(--_tree-heading-text, var(--_tree-text, var(--helix-text-sm)));
   font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--_tree-heading-tracking, var(--helix-tracking-normal));
 }
 
 /* And a leaf carries the same weight, not a lighter one. */
