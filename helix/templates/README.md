@@ -14,8 +14,14 @@ written against.
 
 | Template | What it is |
 |---|---|
-| `react-vite` | React and TypeScript on Vite. The shortest path to a running component. |
-| `react-nextjs` | React and TypeScript on the Next.js App Router, elements registered once. |
+| `react-vite` | React and TypeScript on Vite. The shortest path to a running app. |
+| `react-nextjs` | React and TypeScript on the Next.js App Router, the two pages as real routes. |
+
+Both lay down the same two pages, in the same order and with the same copy: an
+overview holding a sorted, paged, selectable data table, and a form whose
+controls a `<form>` reads with `FormData` because they are real form
+participants. What differs between them is what the framework forces, which is
+what makes them worth diffing against each other.
 
 **There is no build-free HTML template**, and that is a fact about the packages
 rather than an omission. `@fusion.dev/helix`'s published entry re-exports bare

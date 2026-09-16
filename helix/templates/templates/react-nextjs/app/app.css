@@ -1,0 +1,55 @@
+/*
+ * The page around the components.
+ *
+ * Helix draws its own insides, so what is left to an app stylesheet is the
+ * measure, the rhythm between blocks, and the few things a component
+ * deliberately leaves open. Everything below is a Helix token or a documented
+ * hook, so a theme moves it and both color modes follow without a second copy
+ * of anything.
+ */
+
+/* The same measure the header centers its row in, so the wordmark sits over the
+   first column of the page rather than near it. */
+.page {
+  margin-inline: auto;
+  max-inline-size: 72rem;
+  padding-block: var(--helix-space-2xl);
+  padding-inline: var(--helix-space-lg);
+}
+
+/* A form is read straight down, and a field wider than about this stops being
+   scannable however much room the window has. */
+.form {
+  display: grid;
+  gap: var(--helix-space-lg);
+  justify-items: start;
+  max-inline-size: 28rem;
+}
+
+/* Every control fills the column; the submit is as wide as its own words. */
+.form > :not(helix-button) {
+  inline-size: 100%;
+}
+
+/*
+ * **A documented hook.** The bar draws no line under itself by default, because
+ * a header over a page that already has a surface does not need one. This page
+ * does. A custom property rather than a fork, and a token rather than a color,
+ * so it follows the theme.
+ */
+helix-app-header {
+  --app-header-border-color: var(--helix-color-border);
+}
+
+/*
+ * **The escape hatch, and the reason a component names its parts.** The table
+ * washes a chosen row; whether it also emphasizes one is the page's decision,
+ * and there is no token for that. `::part` reaches the box the component drew
+ * without forking it, and a rule written out here beats the component's own
+ * however specific that one is.
+ *
+ * The value is still the library's, so a theme carries it like everything else.
+ */
+helix-data-table::part(cell-selected) {
+  font-weight: var(--helix-weight-semibold);
+}

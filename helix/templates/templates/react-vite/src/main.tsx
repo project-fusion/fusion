@@ -10,6 +10,8 @@ import '@fusion.dev/helix-styles/helix.css'
    are finding your feet; `@fusion.dev/helix/button` and its siblings are subpath
    exports when you would rather pay for only what you use. */
 import '@fusion.dev/helix'
+/* After both, so a rule of yours that names the same thing wins. */
+import './app.css'
 
 import { App } from './App.js'
 

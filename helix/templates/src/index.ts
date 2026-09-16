@@ -51,16 +51,16 @@ export interface Template {
  */
 export const templates: readonly Template[] = [
   {
-    description: 'React and TypeScript on Vite. The shortest path to a running component.',
+    description: 'React and TypeScript on Vite. The shortest path to a running app.',
     id: 'react-vite',
-    named: ['index.html', 'package.json', 'src/App.tsx'],
+    named: ['index.html', 'package.json', 'src/site-header.tsx'],
     title: 'React (Vite)',
   },
   {
     description:
-      'React and TypeScript on the Next.js App Router, with the elements registered once.',
+      'React and TypeScript on the Next.js App Router, with the two pages as real routes.',
     id: 'react-nextjs',
-    named: ['app/layout.tsx', 'app/page.tsx', 'package.json'],
+    named: ['app/layout.tsx', 'app/site-header.tsx', 'package.json'],
     title: 'React (Next.js)',
   },
 ]
