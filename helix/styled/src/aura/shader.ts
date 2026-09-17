@@ -82,14 +82,15 @@ export const FRAGMENT = `#version 300 es
   uniform float uGain;
 
   /* How much the members of a population differ from one another, 1 being the
-     resting amount and 0 a set that is uniform. Read by four of the eleven
+     resting amount and 0 a set that is uniform. Read by six of the eleven
      shapes, the ones made of many similar things, whether those are counted or
-     continuous: streaks has lanes, particles has motes, rays has a fan, and
-     aurora has bundles and folds. Braid, waves and flow have a single subject
+     continuous: streaks has lanes, particles has motes, rays has a fan, aurora
+     has bundles and folds, caustics has three depths of fold and a pool over
+     them, and fracture has territories and the borders between them. The five
+     that do not read it refuse it. Braid, waves and flow have a single subject
      and nothing to vary. Threads and lattice are even on purpose, a scatter of
      strands and a regular structure each being what it is because its members do
-     not differ. Caustics and fracture are populations this does not reach, which
-     is a gap rather than a refusal. */
+     not differ. */
   uniform float uVariance;
   /* Where the pointer has been, as x, y and age. Age runs 0 at the moment it
      was left to 1 when it has faded, so a spent slot costs a compare.
@@ -821,10 +822,33 @@ export const FRAGMENT = `#version 300 es
     float dropD = length(q - qp);
     float drop = falloff(dropD * dropD, 1.4) * reach;
 
+    /* The layers are the population, and the pool says which of their cells are
+       bright. Three depths of fold, each at its own frequency and carrying its
+       own weight in the sum, are three sizes of the same thing, and the slow
+       depth over the top is how far the lit part of the pool is from the dark
+       part. Each travels toward the middle of its own spread, so a variance of
+       0 is one scale of web lit evenly from edge to edge and a variance of 1 is
+       exactly the water this was tuned to.
+
+       The total weight is the same at either end, three layers of 0.78 being
+       the 1.0, 0.78 and 0.56 they spread into, so evening them out does not
+       also dim the frame.
+
+       The grain is left out of it. It is the texture on the light rather than a
+       member of anything, which is the same reason threads keeps its.
+
+       Clamped, and the upper half of that is not tidying: these are mix()
+       calls, so a value past 1 extrapolates rather than exaggerating. The near
+       layer's frequency runs 2.05 - 0.55v and the far layer's weight 0.78 -
+       0.22v, so at 2 the near web is drawn at 0.95, under half the scale it was
+       tuned at, and past 3.5 the far layer's weight crosses zero and that layer
+       lights everything the folds are not. */
+    float cv = clamp(uVariance, 0.0, 1.0);
+
     float lit = 0.0;
     for (int i = 0; i < 3; i++) {
       float f = float(i);
-      vec2 p = q * (1.5 + f * 0.55);
+      vec2 p = q * mix(2.05, 1.5 + f * 0.55, cv);
 
       /* Warped by the field's own value, so the wavefronts bend the way a
          surface does rather than sliding as a rigid pattern. */
@@ -835,7 +859,7 @@ export const FRAGMENT = `#version 300 es
 
       float sum = sin(w.x * 3.1 + t * 0.7 + drop * 6.0) + sin(w.y * 2.7 - t * 0.55 - drop * 5.0);
       float fold = 1.0 - clamp(abs(sum) * 0.5, 0.0, 1.0);
-      lit += pow(fold, 7.0) * (1.0 - f * 0.22);
+      lit += pow(fold, 7.0) * mix(0.78, 1.0 - f * 0.22, cv);
     }
 
     /* **The pool has a lit part and a dark part.** Three layers of folds at one
@@ -849,7 +873,8 @@ export const FRAGMENT = `#version 300 es
     /* And the stone brightens what it disturbs as well as bending it, or the
        only evidence of a pointer is a phase shift nobody can see. */
     float dim = warped(q * 0.7, t * 0.2);
-    return lit * mix(0.55, 1.25, dim) * mix(0.25, 1.25, pool) *
+    return lit * mix(0.55, 1.25, dim) *
+      mix(mix(0.75, 0.25, cv), mix(0.75, 1.25, cv), pool) *
       (1.0 + drop * 0.9) * falloff(dot(q, q), 0.4);
   }
 
@@ -917,6 +942,34 @@ export const FRAGMENT = `#version 300 es
    * it needs no epsilon and produces no crease.
    */
   float fracture(vec2 q, float t, vec2 qp, float reach) {
+    /* The territories are the population, and how far each site wanders off its
+       own cell center is the whole of what makes one differ from the next: the
+       rates are already shared, so the spread is the amplitude and nothing
+       else. At 0 every site sits at its center and every claim is the same
+       size, which draws the lattice this is a Voronoi of: a grid. That is the
+       answer rather than a collision with the shape above, which is a structure
+       in perspective lit at its joints where this is a set of claims that
+       happen to be equal.
+
+       **The alternative is a shared phase, and it is the wrong uniform.**
+       Keeping the swing and collapsing a and b would leave every site on the
+       same orbit, which is not a set of equal territories but one territory
+       repeated and the whole field sliding rigidly under it. The lanes in
+       streaks say the same thing about a phase from the other side.
+
+       At 0 the seams hold still, which is what a set of equal claims looks
+       like and not a shape that has stopped: the grain still travels over them
+       and the pointer still shoves the sites near it apart, so the one thing
+       that moves a territory is something arriving.
+
+       Clamped for the usual reason, that these are interpolations, and here
+       there is a hard edge as well as an ugly one. Nine cells are visited, so
+       the two nearest sites have to be inside them: the swing reaches
+       0.42 * v * sqrt(2) of a cell at its corner, which passes a whole cell at
+       v = 1.68, and past that a site can be nearer than anything the loop
+       looked at and the seam snaps along the lattice it was drawn to hide. */
+    float fv = clamp(uVariance, 0.0, 1.0);
+
     vec2 g = q * 2.1;
     vec2 base = floor(g);
     vec2 f = g - base;
@@ -932,7 +985,7 @@ export const FRAGMENT = `#version 300 es
            than the whole field sliding. */
         float a = hash(id) * 6.2831853;
         float b = hash(id + 41.7) * 6.2831853;
-        vec2 site = o + 0.5 + 0.42 * vec2(sin(t * 0.5 + a), cos(t * 0.42 + b));
+        vec2 site = o + 0.5 + 0.42 * fv * vec2(sin(t * 0.5 + a), cos(t * 0.42 + b));
 
         /* Sites near the pointer are pushed away from it, which opens the
            cells there: a territory answers by giving ground. */
@@ -957,11 +1010,18 @@ export const FRAGMENT = `#version 300 es
        mosaic of equal cells, which is a texture; what makes a set of
        territories read is that some borders are contested and most are not. A
        slow field decides which, and the dark stretches give the lit ones a
-       shape. */
+       shape.
+
+       Which is the second thing variance answers for here, from the other
+       direction: how far apart the contested borders and the quiet ones are
+       lit. Both ends travel toward the midpoint, so a variance of 0 is that
+       mosaic, every border at one brightness, and the paragraph above is a
+       description of what asking for no variance gets rather than a fault. */
     float contested = smoothstep(0.24, 0.8, noise(vec2(q.x * 0.6 + t * 0.07, q.y * 0.55 - t * 0.05)));
 
     float grain = warped(q * 1.3, t * 0.3);
-    return seam * mix(0.6, 1.25, grain) * mix(0.18, 1.3, contested) *
+    return seam * mix(0.6, 1.25, grain) *
+      mix(mix(0.74, 0.18, fv), mix(0.74, 1.3, fv), contested) *
       falloff(dot(q, q), 0.42);
   }
 

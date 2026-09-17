@@ -241,17 +241,23 @@ export class HelixAura extends HelixElement {
    * exaggerating, and a streak whose length has passed through zero is drawn
    * as a bar across the whole frame.
    *
-   * Read by four of the eleven shapes, the ones made of many similar things,
+   * Read by six of the eleven shapes, the ones made of many similar things,
    * whether those are counted or continuous: `streaks`, whose lanes draw a
    * speed, a length, a width, a spacing and a weight apiece; `particles`, whose
-   * motes draw a size, a brightness and a wander; and `rays` and `aurora`, whose
-   * fan, bundles and folds widen or even out.
+   * motes draw a size, a brightness and a wander; `rays` and `aurora`, whose
+   * fan, bundles and folds widen or even out; `caustics`, whose three depths of
+   * fold close on one scale and one weight while the pool over them flattens to
+   * an even wash; and `fracture`, whose sites come home to their own cell
+   * centers, leaving equal territories and no border more contested than
+   * another.
    *
-   * Inert on the other seven, for three different reasons. `braid`, `waves` and
-   * `flow` have a single subject and nothing to vary. `threads` and `lattice`
-   * are even on purpose, a scatter of strands and a regular structure each being
-   * what it is because its members do not differ. `caustics` and `fracture` are
-   * populations this does not reach, which is a gap rather than a refusal.
+   * Inert on the other five, and every one of them a refusal. `braid`, `waves`
+   * and `flow` have a single subject and nothing to vary. `threads` and
+   * `lattice` are even on purpose, a scatter of strands and a regular structure
+   * each being what it is because its members do not differ: `threads` gives
+   * its seven one amplitude, one thickness, one weight and one frequency on
+   * the argument that alike is what makes a weave read as woven, and a lattice
+   * whose cells differed would be a scatter with straight lines in it.
    */
   @property({ type: Number })
   variance = 1
