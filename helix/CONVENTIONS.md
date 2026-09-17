@@ -1804,9 +1804,18 @@ viewport. Everything else in here is `@media print` or
   cannot come from a media query. It is a component decision driven by a
   `ResizeObserver`, and it is opted into rather than defaulted on: an
   `orientation="auto"` value keeps the resting state explicit, which is the rule
-  the reflected properties already follow. Splitter and Button Group carry it;
-  Carousel is the same shape, a `per-view` of four being a bug on a narrow
-  container rather than a style.
+  the reflected properties already follow. Splitter and Button Group carry it,
+  and Carousel now carries the same shape under its own name, `per-view="auto"`
+  fitting as many slides as the track holds where a declared four was a bug on a
+  narrow container rather than a style.
+
+  **Carousel is also where the third category can be answered in CSS alone**,
+  which is worth saying because the rest of this bullet is about why it usually
+  cannot. Everything the fit takes is a length the sheet already has, so the
+  panes go down at their final width on the first rule that runs, on a server's
+  markup as on the client's, with no observer and no frame to wait for. The
+  component still owns what follows from the count, the positions the track can
+  stop at, and reads the laid-out pane back rather than the declaration.
 - **The input device.** A fourth category, and the one exception to the rule at
   the top of this section. `@media (hover: none) and (pointer: coarse)` is
   honest inside a component because it describes the *pointer*, not the box: a

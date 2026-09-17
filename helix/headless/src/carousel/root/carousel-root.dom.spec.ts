@@ -16,6 +16,7 @@ beforeAll(async () => {
 type Carousel = HTMLElement & {
   index: number
   loop: boolean
+  positions: number
   updateComplete: Promise<unknown>
   internals?: ElementInternals
 }
@@ -670,6 +671,60 @@ describe('carousel across several slides at once', () => {
       <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
     </helix-headless-carousel>`)
     expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(6)
+  })
+
+  /* **A declared count takes places away exactly as a fitted track does**, so
+     the reader has to be brought back inside the run either way. A fitted one
+     is corrected in `readFit` and a declared one was clamped to the slide
+     count, which is the wrong number the moment more than one is across. */
+  test('raising the count brings the reader back inside what it leaves', async () => {
+    const host = (await mount(`<helix-headless-carousel label="Reel" per-view="1">
+      <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+    </helix-headless-carousel>`)) as Carousel
+    host.index = 5
+    await host.updateComplete
+    host.setAttribute('per-view', '4')
+    await host.updateComplete
+    await host.updateComplete
+    expect(host.positions).toBe(3)
+    expect(host.index).toBe(2)
+  })
+
+  test('and the dot for where they are is drawn, with the tab stop on it', async () => {
+    /* The roving tab stop is keyed on `index`, so an index outside the run
+       leaves the whole row unreachable: three dots, none current, and nothing
+       in it a Tab can land on. */
+    const host = (await mount(`<helix-headless-carousel label="Reel" per-view="1">
+      <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+    </helix-headless-carousel>`)) as Carousel
+    host.index = 5
+    await host.updateComplete
+    host.setAttribute('per-view', '4')
+    await host.updateComplete
+    await host.updateComplete
+    const row = part(host, 'indicators')
+    expect(row?.querySelectorAll('[part~="indicator-current"]')).toHaveLength(1)
+    expect(row?.querySelectorAll('[part~="indicator"][tabindex="0"]')).toHaveLength(1)
+  })
+
+  test('and a slide removed under a count is the same correction', async () => {
+    // Six three across is four places; four slides is two, and an index of 3
+    // is inside the slides and outside the run, which clamping to the slide
+    // count could not see.
+    const host = (await mount(`<helix-headless-carousel label="Reel" per-view="3">
+      <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+    </helix-headless-carousel>`)) as Carousel
+    host.index = 3
+    await host.updateComplete
+    host.lastElementChild?.remove()
+    host.lastElementChild?.remove()
+    /* A macrotask, because the slides are watched by a `MutationObserver` and
+       the update it asks for is scheduled from its callback. `updateComplete`
+       alone resolves before the observer has run in either harness. */
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    expect(host.positions).toBe(2)
+    expect(host.index).toBe(1)
   })
 })
 

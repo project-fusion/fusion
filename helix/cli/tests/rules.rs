@@ -1971,6 +1971,59 @@ fn slots() {
     );
 }
 
+/// The padding is kept on the axis the scroller snaps on, and not on the other.
+#[test]
+fn snapped() {
+    let sheet = |room: &str| {
+        format!(
+            "[part=\"track\"] {{\n  padding-block: 16px;\n  padding-inline: 16px;\n{room}  \
+             scroll-padding-inline: 16px;\n  scroll-snap-type: y mandatory;\n}}\n\n\
+             [part=\"slide\"] {{\n  scroll-snap-align: start;\n}}\n"
+        )
+    };
+    plant(
+        "snapped",
+        &[
+            ("helix.json", TIERS),
+            (
+                "src/carousel/carousel.css",
+                &sheet("  scroll-padding-block: 16px;\n"),
+            ),
+        ],
+        |tree| {
+            tree.write("src/carousel/carousel.css", &sheet(""));
+        },
+        "snaps on the block axis and pads it without keeping the room",
+        "src/carousel/carousel.css:5",
+    );
+}
+
+/// A wheel whose rows sit on the middle is padded for reach, not for room.
+///
+/// Out of the corpus rather than clean in it, which `assert_clean` cannot say:
+/// it wants a count, and the whole claim here is that this sheet is not read.
+#[test]
+fn snapped_centered() {
+    let tree = Tree::new("snapped-centered");
+    tree.write("helix.json", TIERS);
+    tree.write(
+        "src/time-picker/time-picker.css",
+        "[part=\"column\"] {\n  padding-block: calc(50% - 1rem);\n  \
+         scroll-snap-type: y mandatory;\n}\n\n[part=\"option\"] {\n  \
+         scroll-snap-align: center;\n}\n",
+    );
+    let verdict = judge(&tree, "snapped", "snapped");
+    assert!(
+        verdict.findings.is_empty(),
+        "`snapped` reported a wheel whose rows snap to the middle: {:?}",
+        verdict.findings
+    );
+    assert_eq!(
+        verdict.checked, 0,
+        "a centered scroller spends no leading room, so it is not in the corpus"
+    );
+}
+
 /// The subject has to be bound above the assertion, and bound to an `ssr(`.
 #[test]
 fn ssr() {

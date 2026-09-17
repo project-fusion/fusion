@@ -573,9 +573,16 @@ export class HelixHeadlessCarousel extends HelixElement {
    * there, which is why both tiers can share the arithmetic below.
    *
    * Physical sides rather than logical, to match the physical `offsetLeft` and
-   * `offsetTop` it is subtracted from. The bleed is one length on all four
-   * sides, so the two agree whatever the writing mode; if that stops being
-   * true, this is the method that has to know.
+   * `offsetTop` it is subtracted from.
+   *
+   * **The side read is the side the track scrolls on, and not one side standing
+   * for four.** They are one length on a track laid out at the defaults and
+   * stop being one the moment a consumer raises `--carousel-bleed`, which the
+   * hook exists to invite: a slide on `--helix-shadow-lg` reaches 44px and is
+   * told to ask for it. So a horizontal track's room is its inline padding and
+   * a vertical one's is its block padding, and each sheet puts the bleed where
+   * the scroller clips. Reading one side for both would have a vertical track
+   * measuring a length nothing on its axis was laid out with.
    */
   private bleed(track: HTMLElement): number {
     const style = getComputedStyle(track)
@@ -968,7 +975,6 @@ export class HelixHeadlessCarousel extends HelixElement {
      * Not from inside `goTo`'s apply callback: that returns early in controlled
      * mode, so the dots update and the slides sit still, and it is not the only
      * path in either, a plain `carousel.index = 2` reaching no apply at all. */
-    const count = this.slides.length
     /* And the first time there are panes to follow it to: a carousel whose
        slides arrived after its first render, which is every carousel that
        hydrated a server's markup, had an `index` and nothing to scroll to, and
@@ -980,15 +986,28 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     this.scrolledFor = drawn
     this.runTimer()
-    /* Back inside the set when the set shrinks.
+    /* Back inside the run of places to stand, when there are fewer of them.
      *
      * The indicators carry a roving tab stop keyed on `index`, so a carousel
      * whose slides are removed under it is left with no tab stop, no current
      * dot and a focus restore pointing at nothing. In `updated` rather than
      * `willUpdate` because `slides` is empty on the server, and through `goTo`
-     * so a controlled consumer is told rather than overwritten. */
-    if (count > 0 && this.index > count - 1) {
-      this.goTo(count - 1)
+     * so a controlled consumer is told rather than overwritten.
+     *
+     * **Positions and not slides, which is the same correction `readFit`
+     * makes and the reason the two are one line apart in what they say.** How
+     * many places the track can stop is `slides - across + 1`, so raising
+     * `per-view` takes places away exactly as widening a fitted track does:
+     * six slides at one across is six places, and at four across it is three.
+     * Measured under `per-view` raised from 1 to 4 with the reader on the
+     * sixth slide: three dots drawn, `index` left at 5, no current dot and no
+     * tab stop anywhere in the row, which is this comment's own fault arrived
+     * at from the other side. Clamping to the slide count could not see it,
+     * and could not see a slide removed under a declared count either, where
+     * six slides three across falling to four leaves two places and an index
+     * of 3 inside the slides and outside the run. */
+    if (this.slides.length > 0 && this.index > this.positions - 1) {
+      this.goTo(this.positions - 1)
     }
     this.watchPane()
     this.assign()

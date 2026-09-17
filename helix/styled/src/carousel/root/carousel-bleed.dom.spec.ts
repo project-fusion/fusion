@@ -58,5 +58,43 @@ if (hasLayout()) {
       const track = part(host, 'track') as HTMLElement
       expect(bleedOf(track)).toBeGreaterThanOrEqual(16)
     })
+
+    /* **A turned track keeps it on the side it now scrolls on**, which is the
+       same fault the two tests above are for, arrived at on the other axis. A
+       vertical track snaps on the block axis, so with no `scroll-padding-block`
+       the leading pane snapped its own edge onto the clip edge: measured at a
+       resting `scrollTop` of 16 against 16px of block padding, the room spent
+       and the component's own arithmetic, which asks for 0 there, 16 out of
+       step with where the scroller actually came to rest. */
+    const tall = async (): Promise<HTMLElement> => {
+      const host = (await mount(`<helix-carousel label="Shots" orientation="vertical"
+        style="--carousel-block-size: 9rem">
+        <div>One</div><div>Two</div><div>Three</div>
+      </helix-carousel>`)) as HTMLElement & { updateComplete: Promise<unknown> }
+      await host.updateComplete
+      return host
+    }
+
+    test('a vertical track keeps its room on the axis it scrolls on', async () => {
+      const host = await tall()
+      const track = part(host, 'track') as HTMLElement
+      const bleed = Number.parseFloat(getComputedStyle(track).paddingTop)
+      expect(bleed).toBeGreaterThan(0)
+      expect(track.scrollTop).toBe(0)
+      const room =
+        at(host.children, 0).getBoundingClientRect().top - track.getBoundingClientRect().top
+      expect(Math.round(room)).toBe(Math.round(bleed))
+    })
+
+    test('and the room turns with it, so a raised bleed is room where it clips', async () => {
+      /* One length for all four sides only while nobody sets the hook, and the
+         hook exists to be set: a slide on `--helix-shadow-lg` reaches 44px. */
+      const host = await tall()
+      host.style.setProperty('--carousel-bleed', '44px')
+      await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+      const track = part(host, 'track') as HTMLElement
+      expect(Number.parseFloat(getComputedStyle(track).paddingTop)).toBe(44)
+      expect(Number.parseFloat(getComputedStyle(track).scrollPaddingTop)).toBe(44)
+    })
   })
 }

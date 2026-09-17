@@ -86,6 +86,7 @@ pub mod selectors;
 pub mod separation;
 pub mod shared;
 pub mod slots;
+pub mod snapped;
 pub mod ssr;
 pub mod stable;
 pub mod states;
@@ -749,6 +750,12 @@ pub fn all() -> Vec<Rule> {
             name: "slots",
             run: Runner::Source(slots::run),
             summary: "every slot a component documents is one its family renders",
+        },
+        Rule {
+            fix: None,
+            name: "snapped",
+            run: Runner::Source(snapped::run),
+            summary: "a scroller that snaps to an edge keeps the room it padded",
         },
         Rule {
             fix: None,
