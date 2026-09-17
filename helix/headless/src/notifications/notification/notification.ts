@@ -1,9 +1,9 @@
 import {
   customElement,
-  HelixDismissEvent,
   HelixElement,
   HelixReadEvent,
   hostAria,
+  MixinDismissible,
   requestChange,
   slotFilled,
 } from '@fusion.dev/helix-core'
@@ -84,7 +84,7 @@ import '../../format-date/index.js'
  * @cssstate read - While it has been read.
  */
 @customElement('helix-headless-notification')
-export class HelixHeadlessNotification extends HelixElement {
+export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   /**
    * When it happened, as anything `Date` parses.
    *
@@ -127,18 +127,6 @@ export class HelixHeadlessNotification extends HelixElement {
    */
   @property({ attribute: 'default-read', type: Boolean })
   defaultRead = false
-
-  /**
-   * Whether a reader may remove it.
-   */
-  @property({ type: Boolean })
-  dismissible = false
-
-  /**
-   * Accessible name for the dismiss control.
-   */
-  @property({ attribute: 'dismiss-label' })
-  dismissLabel = 'Dismiss'
 
   /**
    * Locale for the timestamp.
@@ -341,9 +329,20 @@ export class HelixHeadlessNotification extends HelixElement {
     this.markActions()
   }
 
+  /* `stopPropagation`, because the list this sits in is a feed rather than an
+     owner: a row going away is the row's business and the root has nothing to
+     do about it. `dismiss()` is the mixin's, which is what keeps the label off
+     `this.textContent`: a row reading "Build failed" with a `Retry` in its
+     actions slot announced itself as "Build failed Retry" to the consumer
+     matching on it.
+
+     Removing itself is this family's default action and not the mixin's.
+     `Announcement` and `Tag` own no state and leave the removal to the
+     consumer; a feed row is one entry in a list the reader is clearing, so a
+     dismissal that left the row on screen would be the control doing nothing. */
   private readonly handleDismiss = (event: Event): void => {
     event.stopPropagation()
-    if (this.dispatchEvent(new HelixDismissEvent({ label: this.textContent?.trim() ?? '' }))) {
+    if (this.dismiss()) {
       this.remove()
     }
   }
