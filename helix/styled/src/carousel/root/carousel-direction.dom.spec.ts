@@ -105,4 +105,52 @@ if (hasLayout()) {
       })
     }
   })
+
+  /* The width the sheet gives a pane at a count nobody wrote a rule for.
+
+     This tier enumerated `per-view` two through five and called five the last
+     step. Above it the share fell back to one across while the tier below went
+     on counting positions, so eight slides six across drew three dots over a
+     pane taking the whole track and five slides reachable only by dragging.
+     Six and eight are the two sides of that edge: one just past the old
+     ceiling, one where the track holds everything it has and there is nowhere
+     left to scroll. */
+  describe('a carousel showing more across than the sheet ever enumerated', () => {
+    const shelf = async (across: number): Promise<HTMLElement> => {
+      const host = (await mount(
+        `<helix-carousel label="Shelf" per-view="${across}" style="inline-size: 692px">
+          <div>One</div><div>Two</div><div>Three</div><div>Four</div>
+          <div>Five</div><div>Six</div><div>Seven</div><div>Eight</div>
+        </helix-carousel>`,
+      )) as HTMLElement & { updateComplete: Promise<unknown> }
+      await host.updateComplete
+      return host
+    }
+
+    for (const across of [6, 7, 8]) {
+      test(`lays a pane out at a ${across}th of the track`, async () => {
+        const host = await shelf(across)
+        const track = part(host, 'track') as HTMLElement
+        const style = getComputedStyle(track)
+        const room =
+          track.clientWidth -
+          Number.parseFloat(style.paddingLeft) -
+          Number.parseFloat(style.paddingRight)
+        const gap = Number.parseFloat(style.columnGap)
+        const pane = at(host.children, 0).getBoundingClientRect().width
+        expect(pane).toBeCloseTo((room - (across - 1) * gap) / across, 0)
+      })
+    }
+
+    test('and the dots still count the positions that leaves', async () => {
+      const host = await shelf(6)
+      expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(3)
+    })
+
+    test('showing everything it has leaves nowhere to scroll', async () => {
+      const host = await shelf(8)
+      const track = part(host, 'track') as HTMLElement
+      expect(track.scrollWidth - track.clientWidth).toBeLessThanOrEqual(1)
+    })
+  })
 }

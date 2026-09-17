@@ -631,6 +631,47 @@ describe('carousel across several slides at once', () => {
     </helix-headless-carousel>`)
     expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(3)
   })
+
+  /** The count the track was handed, which is what both tiers divide by. */
+  const handed = (host: HTMLElement): string =>
+    (part(host, 'track') as HTMLElement | undefined)?.style.getPropertyValue(
+      '--carousel-per-view',
+    ) ?? ''
+
+  test('the styles are handed the number the positions were counted from', async () => {
+    // The whole of what keeps a width and a count from disagreeing. A sheet
+    // enumerating values instead had a last one, and a track above it drew one
+    // across while this went on counting.
+    expect(handed(await four())).toBe('4')
+  })
+
+  /* What the track cannot honor it takes to the nearest thing it can, and says
+     so in the one place both tiers read. `abc` is the one that was a fault
+     rather than a curiosity: it parses to `NaN`, which `Math.max` propagates,
+     and the carousel counted `NaN` positions and drew no indicators at all. */
+  const REFUSED: [string, string][] = [
+    ['0', '1'],
+    ['-2', '1'],
+    ['1.5', '1'],
+    ['2.5', '2'],
+    ['abc', '1'],
+  ]
+
+  for (const [asked, honored] of REFUSED) {
+    test(`per-view ${asked} is honored as ${honored} across`, async () => {
+      const host = await mount(`<helix-headless-carousel label="Reel" per-view="${asked}">
+        <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+      </helix-headless-carousel>`)
+      expect(handed(host)).toBe(honored)
+    })
+  }
+
+  test('and the indicators count the honored number, not the asked one', async () => {
+    const host = await mount(`<helix-headless-carousel label="Reel" per-view="abc">
+      <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+    </helix-headless-carousel>`)
+    expect(part(host, 'indicators')?.querySelectorAll('[part~="indicator"]')).toHaveLength(6)
+  })
 })
 
 /* The room the scroller keeps for whatever a slide draws outside itself, which

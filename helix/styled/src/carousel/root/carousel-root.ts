@@ -12,9 +12,12 @@ import { styles } from './carousel-root.css.js'
  * browser's own momentum and the controls only have to scroll.
  *
  * Slides take the full track by default. `per-view` fits more than one across,
- * up to five, and is declared on the tier below because it decides how many
+ * at any count, and is declared on the tier below because it decides how many
  * positions the track has rather than only how wide a slide is,
  * which is what a run of cards wants rather than a run of full-width panels.
+ * This sheet divides the track by the number that tier publishes rather than
+ * enumerating the values it will answer for, so there is no count it silently
+ * draws one across.
  *
  * @since 0.1.0
  * @status experimental

@@ -55,6 +55,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --carousel-gap - Space between slides. A sheet sets it and the component measures the run with it.
  * @cssproperty --carousel-pane - The size one pane is laid out at. A sheet sets it and the component measures the run with it.
+ * @cssproperty --carousel-per-view - How many slides go across, written onto the track by the component so a sheet divides the track by the same number the positions are counted from. Read it rather than selecting on `per-view`, which cannot be enumerated without a ceiling. See `perView`.
  * @cssproperty --carousel-run-end - How far short of a whole pixel the run ends, on the last slide alone, for a sheet to take up as `margin-inline-end`. See `runEnd`.
  */
 @customElement('helix-headless-carousel')
@@ -205,6 +206,27 @@ export class HelixHeadlessCarousel extends HelixElement {
    * offset the track has already reached: pressing next walks the dots to the
    * end while the slides stop moving a third of the way through.
    *
+   * **The number is published to the styles rather than enumerated by them**,
+   * as `--carousel-per-view` on the track, which is what keeps a width and a
+   * count from disagreeing. A sheet can only name a value it wrote a rule for,
+   * so the styled tier enumerated `per-view="2"` through `5` and called five a
+   * judgment; above it the pane fell back to one across while this file went on
+   * counting positions. Measured in Chromium over eight slides, six across gave
+   * three dots, a pane taking the whole track and five slides reachable only by
+   * dragging. Written from here there is no ceiling to exceed, and a consumer's
+   * own sheet reads the same declaration the styled one does. `runEnd` publishes
+   * its correction the same way and for the same reason.
+   *
+   * **On the track and not on the host.** A custom property on the host is a
+   * reflected attribute by another name: it would arrive on upgrade, and a
+   * consumer's server markup never had it. Inside the component's own shadow
+   * root it serializes with the rest of the template on the server, and the
+   * track's own declaration beats anything a consumer inherits in, so the
+   * attribute is the one answer to how wide a pane is.
+   *
+   * A value the track cannot honor is taken to the nearest one it can, by
+   * `across`, and both tiers read that rather than this.
+   *
    * No default, because it reflects. A reflected property with a value writes
    * its attribute on upgrade, and the host then carries something a consumer's
    * server markup never had, which React reports as a mismatch. The one-across
@@ -212,6 +234,30 @@ export class HelixHeadlessCarousel extends HelixElement {
    */
   @property({ attribute: 'per-view', reflect: true, type: Number })
   perView?: number
+
+  /**
+   * `perView` as both tiers use it: a whole number of slides, one at least.
+   *
+   * **The clamp is here because the arithmetic is here**, and the two readers
+   * of this number have to be given the same one. A fraction is floored, since
+   * a position is a whole slide along: one and a half across leaves a last
+   * position the track runs out before reaching, which is the fault `goTo`
+   * already carries a comment about. Zero and a negative divide the track into
+   * nothing and into a pane facing the wrong way, and a non-numeric attribute
+   * parses to `NaN`, which `Math.max` propagates: it counted `NaN` positions,
+   * drew no indicators at all and left `index` at `NaN`. All of them read as
+   * one across, which is what a carousel with nothing sayable asked for.
+   *
+   * Not clamped to the number of slides. Six across four slides is four panes
+   * at a sixth of the track each and the one place to stand, which is what was
+   * asked for as nearly as it can be had, and the slide count is a fact the
+   * server does not have: clamping to it would draw one width there and another
+   * on upgrade.
+   */
+  private get across(): number {
+    const asked = this.perView ?? 1
+    return Number.isFinite(asked) ? Math.max(1, Math.floor(asked)) : 1
+  }
 
   /**
    * How many distinct views the track holds, which is what the indicators count.
@@ -222,8 +268,7 @@ export class HelixHeadlessCarousel extends HelixElement {
    * has the one place to be.
    */
   get positions(): number {
-    const across = Math.max(1, Math.floor(this.perView ?? 1))
-    return Math.max(1, this.slides.length - across + 1)
+    return Math.max(1, this.slides.length - this.across + 1)
   }
 
   /**
@@ -874,6 +919,7 @@ export class HelixHeadlessCarousel extends HelixElement {
       <div
         data-scroller
         part="track"
+        style=${`--carousel-per-view: ${this.across}`}
         @scroll=${this.handleTrackScroll}
         @scrollend=${this.handleScroll}
         @pointerdown=${this.handleTake}
