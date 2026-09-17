@@ -14,7 +14,7 @@ import { styles } from './rating-root.css.js'
  * Everything about what the score is and how it is chosen is the base class.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Stars, Score, Review score
  * @documentation https://fusion.dev/helix/components/rating

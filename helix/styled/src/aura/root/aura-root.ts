@@ -114,7 +114,7 @@ const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software rasterizer|bas
  * consumer could restyle and nothing for a headless twin to hold.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Backdrop, Background, Atmosphere, Gradient
  * @documentation https://fusion.dev/helix/components/aura

@@ -1464,14 +1464,25 @@ form. Four things follow, and the ones a mixin does not do are the component's.
   consumer can set and never see. Take the mixin for what you render, and reach
   for `ElementInternals` directly for the rest.
 
-  **Two families are not there yet**, measured across the twenty-two that apply
-  the mixin on 16 Sep 2026: Date Picker and Time Picker each call
-  `reportRequired` and none of the render seams, so each of them computes a
-  message and drops it. Both are a panel; giving them the label and the message
-  is a layout decision in the styled tier rather than a line in the base, which
-  is why it is written here as owed rather than quietly left out.
+  **Nobody is in debt here, measured 17 Sep 2026**: every family that applies
+  the mixin renders at least one of its seams. Worth saying because this
+  paragraph spent two edits naming families that were never in it. It read
+  "three families are not there yet ... of the twenty-two that apply the mixin:
+  Rating, Date Picker and Time Picker", then "two", and Rating was the only one
+  of the three that had ever taken the mixin: the other two extend
+  `MixinControllerValue(HelixFormElement)` and each carries eight lines saying
+  why. A recount that moves one name out of a list is not a reading of the list.
 
-  **Rating was the third and is the worked example.** It is the one control here
+  **A panel composed into a field does not take the mixin at all**, which is the
+  other answer and not a lesser version of this one. Date Picker, Time Picker
+  and Color Picker are each dropped into a field that already owns the label,
+  the hint and the feedback, so applying it would give one control two of each.
+  What they take instead is five lines: `required` written out, and
+  `setValidity` with the anchor the browser points its bubble at. The rule above
+  is about applying the mixin and then not rendering it, and a component that
+  never applied it owes nothing under it.
+
+  **Rating is the worked example of taking it.** It is the one control here
   whose control is genuinely inline, so the seams could not simply be stacked
   around it: what it does is keep the marks and the readout in a `field` row and
   make the host the column every other field already is, `inline-flex` so a

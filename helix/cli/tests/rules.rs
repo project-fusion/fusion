@@ -1084,6 +1084,50 @@ fn glyphs() {
 
 /// `checked` counts only the correct uses, so the clean tree needs one.
 #[test]
+fn grafted() {
+    plant(
+        "grafted",
+        &[
+            ("helix.json", TIERS),
+            (
+                "src/rating/root/rating-root.ts",
+                "export class HelixRating extends MixinControllerValue(MixinField(HelixFormElement)) {\n  render() {\n    return html`${this.renderGroupLabel()}<div part=\"marks\"></div>`\n  }\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/rating/root/rating-root.ts",
+                "export class HelixRating extends MixinControllerValue(MixinField(HelixFormElement)) {\n  render() {\n    return html`<div part=\"marks\"></div>`\n  }\n}\n",
+            );
+        },
+        "`HelixRating` applies `MixinField` and calls none of `renderLabel`",
+        "src/rating/root/rating-root.ts:1",
+    );
+}
+
+/// A panel that writes `required` out is not in this rule's corpus at all, which
+/// is the half the conventions spent two edits getting wrong.
+#[test]
+fn grafted_skips_a_component_that_never_applied_the_mixin() {
+    let tree = Tree::new("grafted-unapplied");
+    tree.write("helix.json", TIERS);
+    tree.write(
+        "src/date-picker/root/date-picker-root.ts",
+        "export class HelixDatePicker extends MixinControllerValue(HelixFormElement) {\n  render() {\n    return html`<div part=\"calendar\"></div>`\n  }\n}\n",
+    );
+    let verdict = judge(&tree, "grafted", "grafted");
+    assert!(
+        verdict.findings.is_empty(),
+        "`grafted` reported a class that never applied the mixin: {:?}",
+        verdict.findings
+    );
+    assert_eq!(
+        verdict.checked, 0,
+        "a class that never applied the mixin is not in the corpus"
+    );
+}
+
+#[test]
 fn grounds() {
     plant(
         "grounds",

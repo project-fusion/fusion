@@ -8,7 +8,6 @@ export function Example() {
         interactive
         reach={1.6}
         speed={0.6}
-        variance={0.4}
       ></helix-aura>
     </div>
   )

@@ -8,6 +8,7 @@ import {
   registerDom,
 } from '@fusion.dev/helix-testing/dom'
 import { exitOf, tiltFor } from '../axis.js'
+import { FRAGMENT } from '../shader.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
    exactly that reason: `@customElement` runs at evaluation, and a static import
@@ -672,5 +673,68 @@ describe('aura axis', () => {
     const wasDrawn = (Math.atan(0.5 * (1440 / 1800)) * 180) / Math.PI
     expect(exitOf(wasDrawn, aspect)).toBeCloseTo(0.813, 3)
     expect(exitOf(tiltFor(0.5, aspect), aspect)).toBeCloseTo(0.5, 6)
+  })
+})
+
+/* Which shapes read `variance`, held to the shader rather than to a sentence.
+ *
+ * The answer is written in four places and only one of them does anything: the
+ * property's own docblock, the comment over `uVariance`, the bench's `VARIES`,
+ * which decides whether the site offers the knob at all, and the shader. Nothing
+ * held the four to each other, so a shape that starts or stops reading it leaves
+ * three descriptions of the version before, and a bench offering a control that
+ * silently does nothing is the one thing `VARIES` exists to prevent. The shipped
+ * `pointer` example set `variance` on `braid`, which refuses it, for as long as
+ * the property has existed, and no rule could see it: the value is a number the
+ * component declares and the attribute is one it has.
+ *
+ * Read off the bodies, which is where all six reads are. A shape taking its
+ * spread through a helper instead would read as inert here, and the answer then
+ * is to follow the helper rather than to widen the list. */
+describe('aura variance', () => {
+  /** Every shape `variant` offers, which is the set this asks about. */
+  const SHAPES = [
+    'aurora',
+    'braid',
+    'caustics',
+    'flow',
+    'fracture',
+    'lattice',
+    'particles',
+    'rays',
+    'streaks',
+    'threads',
+    'waves',
+  ]
+
+  /** The six the property names. Moving this means moving the other three. */
+  const VARIES = ['aurora', 'caustics', 'fracture', 'particles', 'rays', 'streaks']
+
+  /** One shape's body, brace matched from its own signature. */
+  const bodyOf = (name: string): string => {
+    const signature = FRAGMENT.indexOf(`float ${name}(`)
+    const opens = FRAGMENT.indexOf('{', signature)
+    let depth = 0
+    for (let at = opens; at < FRAGMENT.length; at += 1) {
+      if (FRAGMENT[at] === '{') {
+        depth += 1
+      } else if (FRAGMENT[at] === '}') {
+        depth -= 1
+        if (depth === 0) {
+          return FRAGMENT.slice(opens, at + 1)
+        }
+      }
+    }
+    return ''
+  }
+
+  test('every shape the eleven names is in the shader under that name', () => {
+    for (const name of SHAPES) {
+      expect(bodyOf(name).length).toBeGreaterThan(0)
+    }
+  })
+
+  test('and exactly the six the property names read it', () => {
+    expect(SHAPES.filter((name) => bodyOf(name).includes('uVariance'))).toEqual(VARIES)
   })
 })
