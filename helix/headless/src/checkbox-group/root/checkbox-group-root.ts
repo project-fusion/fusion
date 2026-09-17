@@ -241,7 +241,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
        is what the boxes follow. Before the render too, so the first one has it.
        Client only, the server having no boxes to read, and not while hydrating
        what a server rendered without them. */
-    if (!this.seeded && this.children !== undefined && !this.hydrating) {
+    if (!this.seeded && this.childrenKnown) {
       this.seeded = true
       if (this.value === '') {
         this.seed()

@@ -543,7 +543,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * not while hydrating what a server sent, which renders the same unknown.
    */
   private countRegions(): void {
-    if (this.children === undefined || this.hydrating) {
+    if (!this.childrenKnown) {
       return
     }
     const filled = new Set<string>(REGIONS.filter((name) => this.given(name).length > 0))
