@@ -10,6 +10,7 @@ type Item = HTMLElement & {
   focusable: boolean
   level: number
   open: boolean
+  select(): void
   updateComplete: Promise<unknown>
 }
 

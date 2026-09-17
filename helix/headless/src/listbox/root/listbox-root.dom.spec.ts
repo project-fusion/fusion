@@ -26,8 +26,10 @@ const list = async (extra = ''): Promise<Updatable> => {
   return host
 }
 
-const options = (host: Updatable): (HTMLElement & { active: boolean; selected: boolean })[] =>
-  [...host.children] as (HTMLElement & { active: boolean; selected: boolean })[]
+const options = (
+  host: Updatable,
+): (HTMLElement & { active: boolean; select(): void; selected: boolean })[] =>
+  [...host.children] as (HTMLElement & { active: boolean; select(): void; selected: boolean })[]
 
 const press = async (host: Updatable, key: string): Promise<void> => {
   host.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key }))
