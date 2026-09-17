@@ -300,7 +300,7 @@ export class HelixHeadlessTour extends HelixElement {
    * Written onto the stops, which is the one outward write in this family and
    * is argued for on the class above. The labels go with it, and only where the
    * root was given one, so a stop keeps its own default unless somebody has
-   * localised the tour.
+   * localized the tour.
    */
   private settle(): void {
     const stops = this.stops
