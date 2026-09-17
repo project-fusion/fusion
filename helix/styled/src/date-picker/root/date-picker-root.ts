@@ -14,12 +14,15 @@ import { styles } from './date-picker-root.css.js'
  * difference is the space between days, which belongs to the track rather than
  * to a `gap`, so a range can paint across the whole track and stay continuous.
  *
- * Days from the neighboring months stay in place and stay selectable, marked
- * quieter rather than hidden, so the first and last weeks are whole and the
- * grid reads as a continuous run of dates.
+ * Days from the neighboring months stay in place, marked quieter rather than
+ * hidden, so the first and last weeks are whole rows rather than ragged ones.
+ * They are filler and take no click, which the pointer says: no hover, and the
+ * cursor a box that does nothing has. At `months="2"` the same date is a
+ * trailing cell in one grid and a real one in the next, so a filler day that
+ * could be chosen would put one answer on the page twice.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Calendar, Date grid, Month view
  * @documentation https://fusion.dev/helix/components/date-picker

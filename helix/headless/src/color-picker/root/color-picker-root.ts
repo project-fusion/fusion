@@ -602,8 +602,7 @@ export class HelixHeadlessColorPicker extends MixinControllerValue(HelixFormElem
                   ></button>`
                 })}
               </div>`
-      }
-      </div>`
+      }`
   }
 }
 

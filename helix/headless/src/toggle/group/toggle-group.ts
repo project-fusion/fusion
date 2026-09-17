@@ -27,11 +27,13 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * it has somewhere to be, which is the harmless direction.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @aliases SegmentedControl, Segmented, Navigation, Switcher
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The group's items.
+ * @slot end - Whatever sits after the track on its own line, such as a count or a reset.
+ * @slot start - Whatever sits before the track on its own line, such as an icon or a caption.
  *
  * @event {Event} change - Announced once the value has moved.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the answer moves, and cancelable. The only way to refuse one.
@@ -50,6 +52,57 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  */
 @customElement('helix-headless-toggle-group')
 export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /**
+   * Takes the markup's own answer where nothing has set a value.
+   *
+   * **The case a server renders**, and `Tabs` records the same fault from the
+   * other side. This element cannot choose on the server, having no children to
+   * count, so a consumer whose first paint is right wrote `selected` on the
+   * item: that serves `aria-checked="true"`, and `sync` then cleared it one
+   * frame later, because `value` is `''` and nothing matches it. The shipped
+   * `disabled` example is exactly that markup, and drew both of its groups with
+   * nothing chosen.
+   *
+   * **Onto `defaultValue`, never onto `value`**, which is the same call
+   * `Slider` makes about the midpoint it seeds: what the markup declared is a
+   * fact about the markup, so it is where a reset returns to rather than
+   * something the reader chose. It also makes the group report the answer it is
+   * showing, which marking the item alone would not: a `required` group would
+   * otherwise tell a reader a value is missing while they are looking at one.
+   *
+   * A written `value` still wins, a declared property being a seed and a
+   * correction, and a group with neither still marks nothing at all.
+   *
+   * **The property and never `defaultSelected`, which is the attribute.** React
+   * assigns a JSX prop as a property where the custom element has one, and
+   * writes no attribute at all, so keying on the attribute answers for markup
+   * and not for JSX. Measured by the parity check on the shipped `disabled`
+   * example, whose two syntaxes are the same tree: 192 pixels apart, the HTML
+   * marking `List` and the TSX marking nothing. The attribute seeds the
+   * property at upgrade, so reading the property covers both.
+   *
+   * Read before `sync` writes to it, which is the only moment it still holds
+   * what the consumer declared: after that it holds this group's answer, and
+   * `value` is no longer empty, so this returns above.
+   *
+   * **Called from `willUpdate` and from the slot, never from `sync`**, which
+   * runs in `updated`: a reactive property set there schedules a second update,
+   * and Lit's development build warns about exactly that once per group. From
+   * `willUpdate` the first render already carries the value, which is the pass
+   * that has to be right. `children` is undefined on the server, whose element
+   * shim carries attributes and no tree, and that is the same guard
+   * `MixinCollection` records for the same reason.
+   */
+  private adopt(): void {
+    if (this.value !== '' || this.children === undefined) {
+      return
+    }
+    const declared = this.items.find((item) => item.selected)
+    if (declared) {
+      this.defaultValue = declared.value
+    }
+  }
+
   /** Marks the chosen item, separately from placing the indicator. */
   private sync(): void {
     /* An exact match and nothing else, never `resolveActiveItem`, which falls
@@ -145,6 +198,10 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* Before `setFormValue` below, which reads the value this may have just
+       taken: a group whose answer is on the item would otherwise report nothing
+       on the render that already shows it. */
+    this.adopt()
     // Through internals, so nothing lands on the host as an attribute. A nav
     // renders a real `<nav>` in the shadow root and takes its semantics from
     // that, so the host stays neutral.
@@ -228,6 +285,10 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
         <div part="indicator" aria-hidden="true"></div>
         <slot
           @slotchange=${() => {
+            /* Items that arrive after the first render, which is every item on
+               a page the parser is still reading. Outside an update here, so
+               taking the declaration schedules one rather than warning. */
+            this.adopt()
             this.sync()
             this.indicator.place()
           }}

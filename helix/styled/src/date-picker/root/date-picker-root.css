@@ -156,10 +156,19 @@
   box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
 }
 
-/* Days either side of the month stay in place and stay selectable, so the
-   first and last weeks are whole rows rather than ragged ones. */
+/* Days either side of the month stay in place, so the first and last weeks are
+   whole rows rather than ragged ones. They are filler: the tier below renders
+   them with no click handler at all. */
 [part~="cell"][data-outside] [part~="day"] {
   color: var(--helix-color-foreground-subtle);
+}
+
+/* **And the cursor says so, which the color alone does not.** The base rule
+   above gives every cell a pointer, and a filler day kept it: the one signal a
+   reader gets before pressing said the day could be chosen, and nothing
+   happened when they did. The same answer a barred day already gives. */
+[part~="cell"][data-outside] {
+  cursor: default;
 }
 
 /* `:not([data-outside])` as well, since a filler day takes no click and a cell

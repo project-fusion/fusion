@@ -20,7 +20,7 @@ import { styles } from './slider-root.css.js'
  * the thumb being dragged.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Range, Range input
  * @documentation https://fusion.dev/helix/components/slider

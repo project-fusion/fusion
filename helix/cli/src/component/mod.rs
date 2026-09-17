@@ -42,6 +42,7 @@ pub mod cancelable;
 pub mod categories;
 pub mod composed;
 pub mod compositions;
+pub mod constructed;
 pub mod corners;
 pub mod derived_steps;
 pub mod disabled;
@@ -523,6 +524,12 @@ pub fn all() -> Vec<Rule> {
             name: "composed",
             run: Runner::Source(composed::run),
             summary: "a component renders a tag it imports, and never names one literally",
+        },
+        Rule {
+            fix: None,
+            name: "constructed",
+            run: Runner::Source(constructed::run),
+            summary: "no class field is initialized from the element's own DOM",
         },
         Rule {
             fix: None,
