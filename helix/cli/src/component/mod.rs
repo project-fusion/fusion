@@ -547,6 +547,12 @@ pub fn all() -> Vec<Rule> {
         },
         Rule {
             fix: None,
+            name: "decided",
+            run: Runner::Source(decided::run),
+            summary: "a cancelable event is dispatched where its answer is read",
+        },
+        Rule {
+            fix: None,
             name: "disabled",
             run: Runner::Source(disabled::run),
             summary: "a form control reads `:host(:disabled)` rather than the attribute",
