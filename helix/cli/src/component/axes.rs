@@ -70,8 +70,15 @@ use crate::component::{sources, walk_outside, Context, Finding, Report};
 static WRITTEN: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r#"appearance\s*=\s*["']"#).expect("a literal pattern compiles"));
 
+/// The word this library retired, refused wherever it is written.
+///
+/// Public because a rule about what an example teaches has to know a refusal
+/// from an attribute a component simply does not have, and the registry of what
+/// the library calls things belongs beside the rule that holds it.
+pub const REFUSED: &str = "appearance";
+
 /// The vocabulary. A component takes a subset; nobody invents a value.
-const AXES: [(&str, &[&str]); 7] = [
+pub const AXES: [(&str, &[&str]); 7] = [
     (
         "emphasis",
         &["ghost", "muted", "outlined", "solid", "subtle"],
@@ -219,7 +226,7 @@ fn attribute_of(
                     let Some(name) = attribute.get("name").and_then(Value::as_str) else {
                         continue;
                     };
-                    if name == "appearance" {
+                    if name == REFUSED {
                         findings.push(Finding {
                             detail: "It held four axes at once: `separation` is where a surface \
                                      ends, `emphasis` is how much ink a control claims, \
