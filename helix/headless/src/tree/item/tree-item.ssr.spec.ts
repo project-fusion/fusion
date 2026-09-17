@@ -59,4 +59,38 @@ describe('tree item server output', () => {
       partTag(ssr(html`<helix-headless-tree-item></helix-headless-tree-item>`), 'item'),
     ).toContain('tabindex="0"')
   })
+
+  test('a selected row says so in the served markup, and an unselected one says it too', () => {
+    /* `aria-selected` is written on every row rather than only the chosen one,
+       which is what a `treeitem` in a single-select tree owes: a row with no
+       attribute reads as "not selectable" rather than "not selected", so the
+       reader is told the tree cannot be chosen from.
+
+       Served rather than written on upgrade, because the attribute is the
+       reader's only way to know before the script lands, and because writing it
+       later onto markup React rendered is the mismatch the mirror rules exist
+       to prevent. `selected` mirrors to a custom state for the stylesheet and
+       never to an attribute on the host, which the host assertion below holds. */
+    expect(
+      partTag(
+        ssr(html`<helix-headless-tree-item selected>Docs</helix-headless-tree-item>`),
+        'item',
+      ),
+    ).toContain('aria-selected="true"')
+    expect(
+      partTag(ssr(html`<helix-headless-tree-item>Docs</helix-headless-tree-item>`), 'item'),
+    ).toContain('aria-selected="false"')
+  })
+
+  test('a selected row that is a link carries the state on the link itself', () => {
+    /* The anchor is the `treeitem` when there is one, the box around it taking
+       `role="none"`, so the state has to move with the role or it lands on an
+       element the accessibility tree has been told to ignore. */
+    const linked = ssr(
+      html`<helix-headless-tree-item href="/docs" selected>Docs</helix-headless-tree-item>`,
+    )
+    expect(partTag(linked, 'row')).toContain('aria-selected="true"')
+    expect(partTag(linked, 'item')).toContain('role="none"')
+    expect(partTag(linked, 'item')).not.toContain('aria-selected')
+  })
 })

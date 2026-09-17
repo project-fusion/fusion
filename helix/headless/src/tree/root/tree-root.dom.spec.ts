@@ -142,3 +142,37 @@ describe('depth is published, not drawn', () => {
     ])
   })
 })
+
+/* What this family says where there is nothing in it, and while it is fetching.
+ *
+ * **The words, the moment they appear and which of the two beats the other
+ * belong to `MixinCollection`**, which has its own spec beside it in
+ * `helix/core`. What belongs here is the one thing the mixin cannot decide,
+ * which is what *this* family counts as having rows: every host passes a
+ * different expression, so one that got it wrong says "Nothing to show" over a
+ * full set, or says nothing at all over an empty one, with the mixin behaving
+ * perfectly either way.
+ *
+ * Words the mixin does not default to, since it holds "Nothing to show" and
+ * "Loading": read against those, the assertion is satisfied by the mixin alone
+ * and says nothing about the string reaching it from here. */
+describe('an empty tree', () => {
+  test('says the consumer’s words where there is nothing in it', async () => {
+    const host = await mount(
+      '<helix-headless-tree label="Files" empty-text="Nothing here yet"></helix-headless-tree>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing here yet')
+  })
+
+  test('and says it is fetching instead, which beats being empty', async () => {
+    /* A set that has not arrived is not a set that is empty, so a reader is
+       never told there is nothing while a request is still in flight. */
+    const host = await mount(
+      '<helix-headless-tree label="Files" loading loading-text="Still fetching"></helix-headless-tree>',
+    )
+    await (host as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
+    expect(part(host, 'empty')).toBeNull()
+  })
+})

@@ -116,6 +116,31 @@ const type = (host: Updatable, value: string): void => {
   input.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
+describe('a list with nothing in it', () => {
+  /* The words and the moment they appear belong to `MixinCollection`, which has
+     its own spec beside it in `helix/core`. What belongs here is that the list
+     narrows its own set to nothing and says so in the consumer's words rather
+     than the library's: `emptyText` is overridden on this class to "No
+     matches", so a filter that emptied the list while showing the mixin's own
+     default would be this override silently not applying. */
+  test('says so in the consumer’s words, once it has looked', async () => {
+    document.body.innerHTML =
+      '<helix-headless-listbox label="L" empty-text="Nobody by that name"></helix-headless-listbox>'
+    const host = document.body.firstElementChild as Updatable
+    await settle(host)
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nobody by that name')
+  })
+
+  test('and a filter that matches nothing empties it the same way', async () => {
+    const host = (await list('filterable empty-text="Nobody by that name"')) as Updatable & {
+      requestFilter: (next: string) => boolean
+    }
+    host.requestFilter('zzz')
+    await settle(host)
+    expect(part(host, 'empty')?.textContent?.trim()).toBe('Nobody by that name')
+  })
+})
+
 describe('listbox filtering ownership', () => {
   test('typing is announced, and refusing it leaves the list as it was', async () => {
     const host = (await list('filterable')) as Updatable & { filter: string }

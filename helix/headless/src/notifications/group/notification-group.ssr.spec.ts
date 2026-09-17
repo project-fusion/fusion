@@ -83,6 +83,22 @@ describe('notification group server output', () => {
     expect(partTag(markup, 'trigger')).toContain('aria-expanded="false"')
   })
 
+  test('`default-open` serves it open instead, and the trigger says that', () => {
+    /* A folded group shows one row and an open one shows all of them, so the
+       seed decides how tall the feed is served. Resolved on the first client
+       update instead, the rest of the group arrives after the first paint and
+       pushes everything under it down, and for that window `aria-expanded`
+       disagrees with what is on the screen. */
+    const open = ssr(
+      html`<helix-headless-notification-group
+        collapsible
+        default-open
+        label="Deploys"
+      ></helix-headless-notification-group>`,
+    )
+    expect(partTag(open, 'trigger')).toContain('aria-expanded="true"')
+  })
+
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(markup, TAG)).toEqual(['collapsible', 'label'])
   })

@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
+  at,
   formValue,
   hasLayout,
   part,
@@ -205,6 +206,21 @@ describe('combobox holding several', () => {
     ...(host as HTMLElement).shadowRoot!.querySelectorAll<HTMLElement>('[part="tag"]'),
   ]
 
+  test('each chosen token is removable, and the control says which one it removes', async () => {
+    /* A token's dismiss control is a cross, so `removeLabel` is its whole
+       accessible name. It reaches the token through the `Tag` this renders,
+       which is a different element, so the word has to cross a boundary to get
+       there and nothing else reads it.
+
+       A word the component does not default to, `removeLabel` holding
+       "Remove". */
+    const host = await many('remove-label="Take off"')
+    await type(host, 'ru')
+    await press(host, 'Enter')
+    expect(tags(host)).toHaveLength(1)
+    expect(at(tags(host), 0).getAttribute('dismiss-label')).toBe('Take off')
+  })
+
   test('the panel stays open between picks, and the filter does not', async () => {
     /* A control that shut after each pick is one the reader has to reopen to
        keep using, and one that kept the search is one whose second pick starts
@@ -317,11 +333,18 @@ describe('combobox that takes an answer it was not given', () => {
     (host as HTMLElement).shadowRoot?.querySelector<HTMLElement>('[part="create"]') ?? null
 
   test('the row is offered beside near misses, not only when nothing matches', async () => {
-    // A reader typing "Ruby on Rails" with "Ruby" in the list wants the one
-    // they are typing, not the one they are halfway through.
-    const host = await open()
+    /* A reader typing "Ruby on Rails" with "Ruby" in the list wants the one
+       they are typing, not the one they are halfway through.
+
+       `create-label` is set to a word the component does not default to. Read
+       against `Add`, the assertion passes just as well against a template
+       writing that literal and says nothing about `createLabel` at all: the
+       property interpolates the typed text into the middle of itself, which is
+       why it is a string rather than a slot, and that is the part worth
+       holding. */
+    const host = await open('create-label="Invent"')
     await type(host, 'Rub')
-    expect(row(host)?.textContent?.trim()).toBe('Add "Rub"')
+    expect(row(host)?.textContent?.trim()).toBe('Invent "Rub"')
     expect(shown(host)).toEqual(['Ruby'])
   })
 

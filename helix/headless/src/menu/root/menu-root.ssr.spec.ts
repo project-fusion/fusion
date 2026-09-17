@@ -63,4 +63,24 @@ describe('menu server output', () => {
     expect(partTag(markup, 'item')).toContain('role="menuitemcheckbox"')
     expect(partTag(markup, 'item')).toContain('aria-checked="true"')
   })
+
+  test('`default-open` serves the page showing rather than opening it on upgrade', () => {
+    /* The panel is rendered either way and `open` decides which of the two the
+       reader is served: resolved on the first client update instead, a menu
+       declared open appears after the first paint, over content that had
+       already been laid out without it. */
+    const open = ssr(
+      html`<helix-headless-menu default-open label="Actions"
+        ><button slot="trigger">Open</button></helix-headless-menu
+      >`,
+    )
+    expect(partTag(open, 'surface')).not.toMatch(/\shidden[\s=>]/)
+
+    const shut = ssr(
+      html`<helix-headless-menu label="Actions"
+        ><button slot="trigger">Open</button></helix-headless-menu
+      >`,
+    )
+    expect(partTag(shut, 'surface')).toMatch(/\shidden[\s=>]/)
+  })
 })

@@ -38,3 +38,26 @@ describe('option server output', () => {
     expect(hasPart(markup, 'items')).toBe(true)
   })
 })
+
+describe('an option with a supporting line', () => {
+  test('renders the caption in its own region, served with the row', () => {
+    /* A row's second line is content, so it has to be in the markup a reader
+       gets before anything upgrades: filled in at hydration it changes the
+       height of every row in the list at once. */
+    const markup = ssr(
+      html`<helix-headless-option value="pro" description="Ten seats and audit logs"
+        >Pro</helix-headless-option
+      >`,
+    )
+    expect(hasPart(markup, 'description')).toBe(true)
+    expect(rendered(markup, 'helix-headless-option')).toContain('Ten seats and audit logs')
+  })
+
+  test('and an option with nothing to add renders no empty region for it', () => {
+    /* An empty caption box is a gap under every row in a list that has no
+       captions, which is the reason this is a branch rather than a region that
+       is always drawn. */
+    const markup = ssr(html`<helix-headless-option value="pro">Pro</helix-headless-option>`)
+    expect(hasPart(markup, 'description')).toBe(false)
+  })
+})

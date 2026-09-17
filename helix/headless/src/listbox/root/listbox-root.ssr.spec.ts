@@ -58,13 +58,38 @@ describe('listbox server output', () => {
   })
 
   test('the filter ships with the list, not after it', () => {
-    // A field that arrived on hydration is a list a reader started scrolling
-    // before finding out it could be narrowed.
+    /* A field that arrived on hydration is a list a reader started scrolling
+       before finding out it could be narrowed.
+
+       A word the component does not default to. `filterLabel` holds "Filter",
+       so reading that back passes against a template writing the literal and
+       says nothing about the property at all. It lands twice, as the visible
+       placeholder and as the accessible name, and both are asserted because
+       either could stop being wired without the other noticing. */
     const markup = ssr(
-      html`<helix-headless-listbox filterable label="Owner"></helix-headless-listbox>`,
+      html`<helix-headless-listbox
+        filterable
+        filter-label="Narrow these"
+        label="Owner"
+      ></helix-headless-listbox>`,
     )
     expect(hasPart(markup, 'search-field')).toBe(true)
-    expect(partTag(markup, 'search-field')).toContain('aria-label="Filter"')
+    expect(partTag(markup, 'search-field')).toContain('aria-label="Narrow these"')
+    expect(partTag(markup, 'search-field')).toContain('placeholder="Narrow these"')
+  })
+
+  test('the filter takes its own autofill token, which a list of options wants off', () => {
+    /* It is a plain text input to the browser, so autofill offers it names and
+       addresses over a list that is being narrowed. The token is read off the
+       parsed markup, so forwarding it after the upgrade is forwarding it late. */
+    const markup = ssr(
+      html`<helix-headless-listbox
+        filterable
+        autocomplete="off"
+        label="Owner"
+      ></helix-headless-listbox>`,
+    )
+    expect(partTag(markup, 'search-field')).toContain('autocomplete="off"')
   })
 
   test('the host carries only what the consumer wrote', () => {

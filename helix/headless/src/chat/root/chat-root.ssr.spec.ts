@@ -74,4 +74,32 @@ describe('chat server output', () => {
     expect(hostAttributes(markup, 'helix-headless-chat')).toEqual(['label'])
     expect(hostAttributes(markup, 'helix-headless-chat-composer')).toEqual(['slot'])
   })
+
+  test('a transcript still fetching its older turns says so, in the served markup', () => {
+    /* The line sits above the first message and pushes the transcript down, so
+       a reader who was served without it and given it at hydration watches the
+       conversation jump once on every load that was still fetching.
+
+       `role="status"` rather than a bare line: the arrival of older turns is
+       the thing a reader cannot see happening. A phrase the component does not
+       default to, `historyText` holding "Loading earlier messages", so a
+       template writing that literal would not satisfy this. */
+    const fetching = ssr(
+      html`<helix-headless-chat
+        history="loading"
+        history-text="Fetching what came before"
+        label="Support"
+      ></helix-headless-chat>`,
+    )
+    expect(partTag(fetching, 'history')).toContain('role="status"')
+    expect(rendered(fetching, 'helix-headless-chat')).toContain('Fetching what came before')
+  })
+
+  test('and one with nothing on its way renders no line to hold the place', () => {
+    /* Absent rather than empty: a `role="status"` region that is always there
+       and usually blank is one a screen reader has been told to watch for
+       nothing. */
+    const settled = ssr(html`<helix-headless-chat label="Support"></helix-headless-chat>`)
+    expect(partTag(settled, 'history')).toBe('')
+  })
 })

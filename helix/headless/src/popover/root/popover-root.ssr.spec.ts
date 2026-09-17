@@ -56,4 +56,23 @@ describe('popover server output', () => {
     )
     expect(markup).not.toContain('aria-expanded')
   })
+
+  test('`default-open` serves the panel showing rather than opening it on upgrade', () => {
+    /* The seed has to be resolved by the render the server sends. Served shut
+       and opened on the first client update is a flash on every load that
+       declared it open. */
+    const open = ssr(
+      html`<helix-headless-popover default-open label="Filters"
+        ><button slot="trigger">Go</button>Body</helix-headless-popover
+      >`,
+    )
+    expect(partTag(open, 'popover')).not.toMatch(/\shidden[\s=>]/)
+
+    const shut = ssr(
+      html`<helix-headless-popover label="Filters"
+        ><button slot="trigger">Go</button>Body</helix-headless-popover
+      >`,
+    )
+    expect(partTag(shut, 'popover')).toMatch(/\shidden[\s=>]/)
+  })
 })

@@ -62,4 +62,38 @@ describe('textarea', () => {
     expect(control(host).readOnly).toBe(true)
     expect(formValue(host)).toBe('x')
   })
+
+  test('dirname submits a second entry saying which way the text runs', async () => {
+    /* The platform's `dirname` sends `<name>=value` and `<dirname>=ltr|rtl`
+       together. The inner control has no form owner, so this one is assembled
+       here: what it reports has to be a `FormData` of two entries rather than
+       the plain string every other field reports. */
+    const host = await mount(
+      '<helix-headless-textarea label="A" name="notes" dirname="notes.dir" default-value="hi"></helix-headless-textarea>',
+    )
+    const reported = formValue(host) as FormData
+    expect(reported).toBeInstanceOf(FormData)
+    expect(reported.get('notes')).toBe('hi')
+    expect(reported.get('notes.dir')).toBe('ltr')
+  })
+
+  test('a field with no dirname reports the plain string, not a one-entry FormData', async () => {
+    // The common case, and the reason the branch exists: a `FormData` holding
+    // one entry says the same thing at more cost.
+    const host = await mount(
+      '<helix-headless-textarea label="A" name="notes" default-value="hi"></helix-headless-textarea>',
+    )
+    expect(formValue(host)).toBe('hi')
+  })
+
+  test('auto-grow reflects, which is what the sheet that hides the scrollbar selects on', async () => {
+    /* The measuring half needs a layout box and happy-dom has none: it answers
+       zero to `scrollHeight`, and `grow` returns on zero rather than pinning the
+       field at a hairline. So what is asserted here is the half this environment
+       can see, the attribute a stylesheet reaches. */
+    const host = await mount(
+      '<helix-headless-textarea label="A" auto-grow></helix-headless-textarea>',
+    )
+    expect(host.hasAttribute('auto-grow')).toBe(true)
+  })
 })

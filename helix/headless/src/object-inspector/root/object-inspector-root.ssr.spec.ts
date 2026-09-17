@@ -57,4 +57,26 @@ describe('object inspector server output', () => {
     const markup = ssr(html`<helix-headless-object-inspector></helix-headless-object-inspector>`)
     expect(hostAttributes(markup, 'helix-headless-object-inspector')).toEqual([])
   })
+
+  test('`no-copy` takes the copy control out of the served frame', () => {
+    /* A control removed on the first client update is one a reader can press
+       before the update lands, and one whose space the row was laid out around.
+       Asserted on the whole served frame rather than on the absence of one
+       name: a spec naming the control it thought of goes on passing when the
+       branch starts rendering a second one. */
+    const bare = servedParts(
+      ssr(html`<helix-headless-object-inspector no-copy></helix-headless-object-inspector>`),
+    )
+    const full = servedParts(
+      ssr(html`<helix-headless-object-inspector></helix-headless-object-inspector>`),
+    )
+    expect(bare).not.toEqual(full)
+    expect(full.filter((one) => !bare.includes(one))).toEqual([
+      'arrow',
+      'button',
+      'copy',
+      'mark',
+      'tooltip',
+    ])
+  })
 })

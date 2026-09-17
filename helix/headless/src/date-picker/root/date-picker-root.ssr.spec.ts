@@ -55,6 +55,24 @@ describe('calendar server output', () => {
       'value',
     ])
   })
+
+  test('both month controls are named, their content being a caret apiece', () => {
+    /* Two glyph-only buttons either side of a heading. Unnamed a reader hears
+       "button", "August 2026", "button" and has to guess which way each goes.
+
+       Words the component does not default to, `previousLabel` holding
+       "Previous month" and `nextLabel` "Next month": read against those, the
+       assertion is satisfied by a template writing the literals. */
+    const named = ssr(
+      html`<helix-headless-date-picker
+        default-month="2026-08"
+        next-label="A month on"
+        previous-label="A month back"
+      ></helix-headless-date-picker>`,
+    )
+    expect(partTag(named, 'previous')).toContain('aria-label="A month back"')
+    expect(partTag(named, 'next')).toContain('aria-label="A month on"')
+  })
 })
 
 describe('calendar as a form control, on the server', () => {

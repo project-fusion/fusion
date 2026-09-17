@@ -32,4 +32,17 @@ describe('megamenu server output', () => {
     const markup = ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`)
     expect(hostAttributes(markup, 'helix-headless-megamenu')).toEqual(['label'])
   })
+
+  test('`default-open` serves the panel showing rather than opening it on upgrade', () => {
+    /* A megamenu panel is the width of the page, so a seed resolved on the
+       first client update moves everything under it once on every load that
+       declared one open. */
+    const open = ssr(
+      html`<helix-headless-megamenu default-open label="Products"></helix-headless-megamenu>`,
+    )
+    expect(partTag(open, 'surface')).not.toMatch(/\shidden[\s=>]/)
+
+    const shut = ssr(html`<helix-headless-megamenu label="Products"></helix-headless-megamenu>`)
+    expect(partTag(shut, 'surface')).toMatch(/\shidden[\s=>]/)
+  })
 })

@@ -628,3 +628,51 @@ describe('pressing the picture', () => {
     expect(calls).toEqual(['play'])
   })
 })
+
+/* The four words a player says, each at the one moment it is said.
+ *
+ * Every one of them is a bare string in a template with no attribute and no
+ * state of its own, so the only way to tell the property from a literal is to
+ * set a word the component does not already hold. The three below the start
+ * mark also need a state a server cannot reach, which is why they are here and
+ * not in the server spec. */
+describe('what the player says', () => {
+  const media = async (markup: string): Promise<{ host: Player; video: HTMLVideoElement }> => {
+    const host = await player(markup)
+    const video = host.shadowRoot?.querySelector('video') as HTMLVideoElement
+    return { host, video }
+  }
+
+  test('the play control takes the pause word once it is playing', async () => {
+    /* One control and two names, which is the reason `pauseLabel` exists: a
+       button announcing "Play" while the picture is moving tells a reader the
+       opposite of what pressing it does. */
+    const { host, video } = await media(
+      '<helix-headless-video pause-label="Hold it" play-label="Roll it" src="/clip.mp4"></helix-headless-video>',
+    )
+    expect(part(host, 'play')?.getAttribute('aria-label')).toBe('Roll it')
+
+    Object.defineProperty(video, 'paused', { configurable: true, value: false })
+    video.dispatchEvent(new Event('play'))
+    await host.updateComplete
+    expect(part(host, 'play')?.getAttribute('aria-label')).toBe('Hold it')
+  })
+
+  test('the stall says the consumer words, in the live region that announces them', async () => {
+    const { host, video } = await media(
+      '<helix-headless-video loading-label="Still fetching" src="/clip.mp4"></helix-headless-video>',
+    )
+    video.dispatchEvent(new Event('waiting'))
+    await host.updateComplete
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Still fetching')
+  })
+
+  test('and the refusal does too, in the one that interrupts', async () => {
+    const { host, video } = await media(
+      '<helix-headless-video error-label="No luck with that one" src="/clip.mp4"></helix-headless-video>',
+    )
+    video.dispatchEvent(new Event('error'))
+    await host.updateComplete
+    expect(part(host, 'failure')?.textContent?.trim()).toBe('No luck with that one')
+  })
+})
