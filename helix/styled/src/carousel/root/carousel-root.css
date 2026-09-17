@@ -2,15 +2,6 @@
 :host {
   --_carousel-bleed: var(--carousel-bleed, var(--helix-space-md));
   --_carousel-gap: var(--carousel-gap, var(--helix-space-md));
-  --_carousel-per-view: 1;
-  --_carousel-share: calc(
-    (100% - (var(--_carousel-per-view) - 1) * var(--_carousel-gap)) /
-    var(--_carousel-per-view)
-  );
-  /* The pane at its exact share, and to the nearest odd sixty-fourth of a
-     pixel, 0.015625: the pane rule below says why. Named rather than private
-     because the component measures the run with it. */
-  --carousel-pane: calc(round(var(--_carousel-share) - 0.015625px, 0.03125px) + 0.015625px);
 }
 
 /* A frame around the track, and each group of chrome placed on a side of it. */
@@ -218,12 +209,38 @@
    padding box, so the leading slide snaps its edge onto the clip edge. Measured
    without it, the track sat at `scrollLeft: 4` with 0px of leading room. */
 [part="track"] {
-  /* The resolved gap, under the name the component's arithmetic reads. Above
-     the track `--carousel-gap` is the consumer's request and may be unset,
-     which would make the run's end invalid rather than zero; here it is the
-     length the panes are actually laid out with. Not on `:host`, where the two
-     names would reference each other and both go invalid. */
+  /* A pane's share of the track, from the count the component writes here.
+
+     **The number comes from the tier that counts positions, and this sheet no
+     longer guesses which ones it might be.** A stylesheet can only answer for a
+     value somebody wrote a rule for, so this enumerated `:host([per-view="2"])`
+     through `5` and called five a judgment; above it the share fell back to one
+     across while the positions went on being counted, and six across eight
+     slides drew three dots over a pane taking the whole track. The template
+     writes `--carousel-per-view` onto this element instead, already whole and
+     at least one, so there is no ceiling left to exceed. The fallback answers
+     for a track this sheet reaches before the element upgrades.
+
+     **Here rather than on `:host`, because a custom property is substituted
+     where it is declared.** A share computed on the host would read the host's
+     value of the count, which is not where the count is written. The panes are
+     this element's children and inherit both names.
+
+     The resolved gap goes with it, under the name the component's arithmetic
+     reads. Above the track `--carousel-gap` is the consumer's request and may
+     be unset, which would make the run's end invalid rather than zero; here it
+     is the length the panes are actually laid out with. Not on `:host`, where
+     the two names would reference each other and both go invalid.
+
+     The pane is that share at the nearest odd sixty-fourth of a pixel,
+     0.015625: the pane rule below says why. Named rather than private because
+     the component measures the run with it. */
+  --_carousel-share: calc(
+    (100% - (var(--carousel-per-view, 1) - 1) * var(--_carousel-gap)) /
+    var(--carousel-per-view, 1)
+  );
   --carousel-gap: var(--_carousel-gap);
+  --carousel-pane: calc(round(var(--_carousel-share) - 0.015625px, 0.03125px) + 0.015625px);
   display: flex;
   gap: var(--_carousel-gap);
   overflow-x: auto;
@@ -312,24 +329,6 @@
 :host([orientation="vertical"]) [part="slide"] {
   flex-direction: column;
   flex: 0 0 var(--_carousel-share);
-}
-
-:host([per-view="2"]) {
-  --_carousel-per-view: 2;
-}
-
-:host([per-view="3"]) {
-  --_carousel-per-view: 3;
-}
-
-:host([per-view="4"]) {
-  --_carousel-per-view: 4;
-}
-
-/* Five is the last step, and the ceiling is a judgment rather than a limit of
-   the arithmetic. */
-:host([per-view="5"]) {
-  --_carousel-per-view: 5;
 }
 
 /* *No `scroll-behavior` here, and the track is not what moves.** The scroll that
