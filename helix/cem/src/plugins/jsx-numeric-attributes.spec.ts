@@ -16,6 +16,8 @@ const MANIFEST: HelixManifest = {
             { fieldName: 'pages', name: 'pages', type: { text: 'number' } },
             { fieldName: 'ends', name: 'ends', type: { text: 'boolean' } },
             { fieldName: 'perView', name: 'per-view', type: { text: 'number | undefined' } },
+            { fieldName: 'span', name: 'span-size', type: { text: "number | 'auto' | undefined" } },
+            { fieldName: 'tone', name: 'tone', type: { text: "'loud' | 'quiet' | undefined" } },
             { fieldName: 'defaultSize', name: 'default-size' },
             { fieldName: 'markAll', name: 'mark-all', type: { text: 'boolean' } },
             { fieldName: 'minLength', name: 'minlength', type: { text: 'number | undefined' } },
@@ -40,6 +42,8 @@ const FIXTURE = [
   '  "mark-all"?: HelixPagination["markAll"];',
   '  minlength?: HelixPagination["minLength"];',
   '  minLength?: HelixPagination["minLength"];',
+  '  "span-size"?: HelixPagination["span"];',
+  '  tone?: HelixPagination["tone"];',
   '};',
   'export type HelixPaginationSolidJsProps = {',
   '  "attr:default-page"?: HelixPagination[\'defaultPage\'];',
@@ -93,6 +97,15 @@ describe('a numeric attribute takes the string that spells one', () => {
   test('widens a bare name the generator left unquoted, and not the property it is the attribute of', () => {
     expect(widened).toContain('  minlength?: HelixPagination["minLength"] | `${number}`;\n')
     expect(widened).toContain('  minLength?: HelixPagination["minLength"];\n')
+  })
+
+  /* A count or a keyword is still a count in the markup. Typed as the union
+     alone, `per-view="3"` was refused on the one component that takes both,
+     while `per-view="auto"` passed: the half a converter reads and the half it
+     does not, the wrong way round. */
+  test('widens a count that can also be asked for as a word, and leaves a word that cannot', () => {
+    expect(widened).toContain('"span-size"?: HelixPagination["span"] | `${number}`;')
+    expect(widened).toContain('  tone?: HelixPagination["tone"];\n')
   })
 
   test('reads the type off the member when the attribute records none', () => {

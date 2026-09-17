@@ -1,0 +1,7 @@
+/* The one thing a fitted carousel is told, and it is a width rather than a
+   count: how narrow a card may be laid out. How many go across is then the
+   track's own answer, at whatever width the page gave it, and it is answered by
+   the first rule that runs rather than by a script measuring afterward. */
+helix-carousel {
+  --carousel-slide-min: 14rem;
+}

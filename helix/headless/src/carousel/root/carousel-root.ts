@@ -12,6 +12,30 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
+ * `per-view` as the two things it can be: a count, or the word that is not one.
+ *
+ * Lit's number converter answers `NaN` for a word, and `NaN` is what the clamp
+ * reads as one across, so under `type: Number` a fitted carousel would quietly
+ * be a plain one. A converter and not a bare string property, because every
+ * other value this takes is a number and a consumer reading `perView` back
+ * should get one.
+ *
+ * Out here rather than inside the decorator's options, where `helix component`
+ * reads a property's declaration up to the first closing paren and an arrow
+ * function's would be it.
+ */
+const COUNT_OR_AUTO = {
+  fromAttribute: (value: string | null): number | 'auto' | undefined => {
+    if (value === null) {
+      return undefined
+    }
+    return value === 'auto' ? 'auto' : Number(value)
+  },
+  toAttribute: (value: number | 'auto' | undefined): string | null =>
+    value === undefined ? null : String(value),
+}
+
+/**
  * @summary Shows one slide of several, with controls to move between them.
  *
  * @description
@@ -55,8 +79,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @cssproperty --carousel-gap - Space between slides. A sheet sets it and the component measures the run with it.
  * @cssproperty --carousel-pane - The size one pane is laid out at. A sheet sets it and the component measures the run with it.
- * @cssproperty --carousel-per-view - How many slides go across, written onto the track by the component so a sheet divides the track by the same number the positions are counted from. Read it rather than selecting on `per-view`, which cannot be enumerated without a ceiling. See `perView`.
+ * @cssproperty --carousel-per-view - How many slides go across, written onto the track by the component so a sheet divides the track by the same number the positions are counted from. Read it rather than selecting on `per-view`, which cannot be enumerated without a ceiling. Under `per-view="auto"` the component writes nothing and the sheet declares it instead, so the same name answers in both modes. See `perView`.
  * @cssproperty --carousel-run-end - How far short of a whole pixel the run ends, on the last slide alone, for a sheet to take up as `margin-inline-end`. See `runEnd`.
+ * @cssproperty --carousel-slide-min - The narrowest a slide may be laid out, which is what `per-view="auto"` fits the track with. A length, since the sheet divides by it. Unset is the whole track, which is one across.
  */
 @customElement('helix-headless-carousel')
 export class HelixHeadlessCarousel extends HelixElement {
@@ -227,16 +252,39 @@ export class HelixHeadlessCarousel extends HelixElement {
    * A value the track cannot honor is taken to the nearest one it can, by
    * `across`, and both tiers read that rather than this.
    *
+   * **`auto` fits as many as the track can hold**, at `--carousel-slide-min`
+   * apiece, and nothing is written onto the track: the count is the sheet's,
+   * and the sheet's alone, because it is the one number here CSS can work out
+   * for itself. Everything it takes is a length the sheet already has, so the
+   * panes are laid out at their final width by the first rule that runs, on a
+   * server's markup as on the client's, and no script is waited on. That is the
+   * whole reason a declared count was ever the only option: a carousel that
+   * asks how wide its container is can only ask on the client, so the panes go
+   * down at one width and move to another when the answer arrives. Written
+   * inline the count would outrank the sheet that computes it, which is why an
+   * `auto` track is handed nothing. A count stays for the design that calls for
+   * exactly three.
+   *
+   * The styled sheet says how it divides, and the headless `auto` example
+   * carries the same three lines for a consumer writing their own.
+   *
+   * **A value rather than the resting behavior**, which is what the
+   * responsiveness policy asks of every axis that a box decides: a splitter
+   * turns on `orientation="auto"` and a plain one does not turn at all. Fitting
+   * changes what the carousel *does*, since how many are across is how many
+   * places the track can stop, so a carousel that had not asked for it would
+   * find its position count moving with the window.
+   *
    * No default, because it reflects. A reflected property with a value writes
    * its attribute on upgrade, and the host then carries something a consumer's
    * server markup never had, which React reports as a mismatch. The one-across
    * case is the absent attribute, and the styles read it that way.
    */
-  @property({ attribute: 'per-view', reflect: true, type: Number })
-  perView?: number
+  @property({ attribute: 'per-view', converter: COUNT_OR_AUTO, reflect: true })
+  perView?: number | 'auto'
 
   /**
-   * `perView` as both tiers use it: a whole number of slides, one at least.
+   * A declared `perView` as both tiers use it: a whole number, one at least.
    *
    * **The clamp is here because the arithmetic is here**, and the two readers
    * of this number have to be given the same one. A fraction is floored, since
@@ -248,15 +296,48 @@ export class HelixHeadlessCarousel extends HelixElement {
    * drew no indicators at all and left `index` at `NaN`. All of them read as
    * one across, which is what a carousel with nothing sayable asked for.
    *
+   * **A vertical `auto` is one of them.** Fitting divides the room the page
+   * gave the track, and a vertical track's room is a height the consumer chose
+   * with `--carousel-block-size`: there is nothing there to fit against that
+   * they did not already decide, so the count is theirs to state. It also
+   * cannot be had cheaply, the block axis wanting `container-type: size`, which
+   * lays a track out as empty wherever its height is not definite.
+   *
    * Not clamped to the number of slides. Six across four slides is four panes
    * at a sixth of the track each and the one place to stand, which is what was
    * asked for as nearly as it can be had, and the slide count is a fact the
    * server does not have: clamping to it would draw one width there and another
    * on upgrade.
    */
-  private get across(): number {
+  private get clamped(): number {
     const asked = this.perView ?? 1
-    return Number.isFinite(asked) ? Math.max(1, Math.floor(asked)) : 1
+    return typeof asked === 'number' && Number.isFinite(asked) ? Math.max(1, Math.floor(asked)) : 1
+  }
+
+  /** Whether the track is fitting slides to its own box rather than to a count. */
+  private get fits(): boolean {
+    return this.perView === 'auto' && this.orientation !== 'vertical'
+  }
+
+  /**
+   * How many slides go across, and `undefined` while a fitted track is unlaid.
+   *
+   * **Undefined is the honest answer and the indicators read it as one**, which
+   * is the whole of how a fitted carousel keeps from drawing a run of dots at
+   * one length and correcting it at another. The count a fitted track goes
+   * across is whatever its box resolved to, so nothing knows it until there is
+   * a box: not the server, which has no layout, and not the render that draws
+   * the panes, layout being what follows a render rather than what precedes it.
+   * The dots wait for it, which costs them nothing, because a server serves no
+   * indicators for any carousel, `slides` being empty there.
+   *
+   * Measured 16 Sep 2026 in Chromium 151.0.7922.34 and WebKit 26.5, recording
+   * every run of dots a carousel has from the upgrade on: a fitted one goes
+   * none, then five, and never another number; a declared one goes straight to
+   * six. What a reader can see is the run missing, never the run wrong.
+   */
+  private get across(): number | undefined {
+    return this.fits ? this.fitted : this.clamped
   }
 
   /**
@@ -266,9 +347,145 @@ export class HelixHeadlessCarousel extends HelixElement {
    * `n - perView + 1` times, so six slides four across is three: 0 to 3, 1 to 4,
    * 2 to 5. One at minimum, since a carousel showing everything it has still
    * has the one place to be.
+   *
+   * One across until a fitted track has been laid out, which is the same answer
+   * a carousel that has never been told anything gives, and the dots are
+   * withheld rather than counted from it. See `across`.
    */
   get positions(): number {
-    return Math.max(1, this.slides.length - this.across + 1)
+    return Math.max(1, this.slides.length - (this.across ?? 1) + 1)
+  }
+
+  /**
+   * How many slides the box turned out to hold, from the pane it laid out.
+   *
+   * **The measurement asks what happened rather than what was asked for**, and
+   * that is why it is the pane's width and not the count in the declaration.
+   * The sheet divides the track by `--carousel-per-view`, which under `auto` is
+   * arithmetic rather than a number, and a consumer's own sheet may divide it
+   * some other way entirely or grow the panes to fill a track holding
+   * everything it has. Reading the box back gets the same answer as the
+   * declaration wherever the two agree and the true one wherever they do not,
+   * so a width and a count cannot disagree in either direction.
+   *
+   * The sheet's own arithmetic run backward, on the lengths that were actually
+   * used: a gap added to the room, divided by a pane and a gap. Rounded,
+   * because the pane a sheet lays out is a sixty-fourth off its exact share by
+   * design and the quotient lands a ten-thousandth off a whole number.
+   *
+   * Undefined where there is nothing to measure, which is a harness rather than
+   * a browser: happy-dom lays nothing out and reports zero for every box, and a
+   * count taken from zeros would be a number with no layout behind it.
+   */
+  private measure(): number | undefined {
+    const track = this.partNamed('track')
+    const pane = this.panes[0]?.getBoundingClientRect().width
+    if (!track || pane === undefined) {
+      return undefined
+    }
+    const asked = Number.parseFloat(getComputedStyle(track).columnGap)
+    const gap = Number.isNaN(asked) ? 0 : asked
+    const room = track.clientWidth - 2 * this.bleed(track)
+    if (pane <= 0 || room <= 0) {
+      return undefined
+    }
+    return Math.max(1, Math.round((room + gap) / (pane + gap)))
+  }
+
+  /**
+   * Takes the reading, and puts the index back inside what it leaves.
+   *
+   * **A fitted carousel's last position moves with the window**, which a
+   * declared one's never does: eight slides at one across has eight places to
+   * stand and four across has five, so a track widened while the reader sits on
+   * the last of them is a track resting somewhere it can no longer be. Through
+   * `goTo`, so the correction goes out as the same cancelable announcement
+   * every other index change does and a consumer holding `index` hears it
+   * rather than being overwritten.
+   *
+   * Only on a change, so the observer's own re-render cannot feed itself.
+   */
+  private readonly readFit = (): void => {
+    const fitted = this.measure()
+    if (fitted === undefined || fitted === this.fitted) {
+      return
+    }
+    this.fitted = fitted
+    if (this.index > this.positions - 1) {
+      this.goTo(this.positions - 1)
+    }
+  }
+
+  /**
+   * The count handed to the styles, and nothing at all where they work it out.
+   *
+   * A declared count is this file's: it decides how many places the track can
+   * stop, so the number the panes are divided by has to be the number the
+   * positions were counted from, and writing it on the track inside the
+   * component's own shadow root is what keeps a sheet from having to enumerate
+   * the values it will answer for.
+   *
+   * A fitted one is the sheet's, and handing it anything would take it back: an
+   * inline declaration outranks every rule short of `!important`, so a track
+   * told `1` here could never be told three by the rule that fits it. The
+   * absence is not a gap either, because the rule that computes the count
+   * declares it on this same element, which beats anything a consumer inherits
+   * in exactly as the inline one did.
+   */
+  private handed(): string | typeof nothing {
+    return this.fits ? nothing : `--carousel-per-view: ${this.clamped}`
+  }
+
+  /** What the box resolved to, and `undefined` until it has been laid out. */
+  @state()
+  private fitted: number | undefined
+
+  /** Watches the pane a fitted track laid out, while `auto` is what was asked. */
+  private sizes: ResizeObserver | undefined
+
+  /** The pane being watched, so a re-rendered run moves the watch with it. */
+  private watched: HTMLElement | undefined
+
+  /**
+   * Starts or stops watching, according to what the count was asked to be.
+   *
+   * **The pane and not the track, because both questions move it.** A narrower
+   * track divides into a narrower pane, and so does a slide arriving or leaving
+   * where the panes grow to fill a track holding everything it has. A watch on
+   * the track answers the first and sleeps through the second.
+   *
+   * **An observation is delivered after layout and inside the same rendering
+   * step**, and the update it asks for is a microtask on the end of it, so the
+   * dots are added to a frame that has not been painted. Taking the reading
+   * from `updated` instead would be the same arithmetic one Lit warning
+   * earlier, and the warning is about the right thing: a render that has to
+   * read layout is a render that has to run twice.
+   *
+   * Called from `connectedCallback`, `firstUpdated` and `updated`, so a
+   * consumer switching to `auto` after mount is watched, one switching away
+   * stops being, and a carousel moved in the DOM is watched again. Observing is
+   * what asks for the first reading, so the watch is rebuilt rather than kept
+   * across a mode change.
+   */
+  private watchPane(): void {
+    if (!this.fits || typeof ResizeObserver === 'undefined') {
+      this.sizes?.disconnect()
+      this.sizes = undefined
+      this.watched = undefined
+      return
+    }
+    this.sizes ??= new ResizeObserver(this.readFit)
+    const pane = this.panes[0]
+    if (pane === this.watched) {
+      return
+    }
+    if (this.watched) {
+      this.sizes.unobserve(this.watched)
+    }
+    this.watched = pane
+    if (pane) {
+      this.sizes.observe(pane)
+    }
   }
 
   /**
@@ -682,6 +899,10 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.addEventListener('pointerenter', this.pause)
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, { childList: true })
+    /* A move in the DOM runs this and schedules no update, so a watch dropped on
+       the way out is only rebuilt here. The panes outlive the move, being in the
+       shadow root, so there is one to watch already. */
+    this.watchPane()
   }
 
   override disconnectedCallback(): void {
@@ -694,6 +915,9 @@ export class HelixHeadlessCarousel extends HelixElement {
     this.removeEventListener('pointerenter', this.pause)
     this.watcher?.disconnect()
     this.watcher = undefined
+    this.sizes?.disconnect()
+    this.sizes = undefined
+    this.watched = undefined
     clearInterval(this.timer)
     this.timer = undefined
   }
@@ -719,6 +943,12 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (changed.has('index')) {
       this.showing = undefined
     }
+    /* A count that has been asked for again has not been answered again. The
+       watch is rebuilt in `updated` and the reading arrives with it, and until
+       it does the dots are absent rather than left on the last box's number. */
+    if (changed.has('perView')) {
+      this.fitted = undefined
+    }
     hostAria(this.internals, { label: this.label, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
     // what the controls beside it are for.
@@ -727,6 +957,7 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    this.watchPane()
     this.finishHydration()
   }
 
@@ -759,6 +990,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (count > 0 && this.index > count - 1) {
       this.goTo(count - 1)
     }
+    this.watchPane()
     this.assign()
   }
 
@@ -919,7 +1151,7 @@ export class HelixHeadlessCarousel extends HelixElement {
       <div
         data-scroller
         part="track"
-        style=${`--carousel-per-view: ${this.across}`}
+        style=${this.handed()}
         @scroll=${this.handleTrackScroll}
         @scrollend=${this.handleScroll}
         @pointerdown=${this.handleTake}
@@ -942,7 +1174,13 @@ export class HelixHeadlessCarousel extends HelixElement {
         )}
       </div>
       ${
-        this.slides.length > 1
+        /* A count nobody has yet is not a run of one, so a fitted track serves
+           no dots until its box has been laid out and measured. Drawn from a
+           guess and corrected a frame later, the run would change length under
+           the reader, which is the jump fitting in the sheet exists to avoid,
+           and the roving tab stop and every `aria-label` in the row would move
+           with it. */
+        this.slides.length > 1 && this.across !== undefined
           ? html`<div part="indicators" role="group" aria-label=${`${this.label} slides`}>
               ${
                 /* Plain buttons, not a half-built tablist.
