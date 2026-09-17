@@ -1378,6 +1378,100 @@ property name to derive its attribute rather than dash-casing it, so
 `@property({ attribute: 'remove-label' })`. Nothing warns: the attribute a
 consumer would guess simply does nothing.
 
+## A refusable event has a reader
+
+Everything above says what an event is called and what its description has to
+admit. This says what has to be true behind the sentence, and it is one rule:
+**a cancelable event is dispatched where the library reads the answer.**
+
+**The good pattern is `requestChange` and it is already the library's**: build
+the event carrying the state being *proposed*, dispatch it, and apply only if
+nobody refused. The four controller mixins call it and so does any component
+whose state is not one of theirs, which is what makes a refusal mean the same
+thing in every family. A component that mutated itself and then announced it has
+not published a decision seam, it has published a lie, and nothing about the type
+says which of the two a consumer is holding.
+
+**Refusing must stop something the library was about to do.** If nothing in the
+library would have acted, there is nothing for `preventDefault()` to take, and
+the honest event is a notification: not cancelable, dispatched after the state
+has moved, carrying what happened. `helix-next` says this in its own class
+comment, that an event whose `preventDefault` means nothing is an event that lies
+about what it offers.
+
+**"Already happened" is a reason to move the event, not to keep it and shrug.**
+Two families argued that a reader had dragged something into place and a refusal
+could not un-drag it. One of them is right, because the thing that moved is the
+reader's own scroll of a native control and the component's state only follows;
+that one announces, under a name that does not claim otherwise. The other was
+Carousel, whose track is its own to scroll, so a refusal is honored by putting
+the track back on the slide the index still holds. Ask which of the two it is
+before writing the sentence.
+
+**The decision is taken by whoever owns the default action, which is often one
+file over.** A row announces that it was chosen and holds no state; the set it
+sits in is what moves. So the row dispatches and the root listens and reads
+`defaultPrevented` before it acts, and the root's own `requestActive` or
+`requestValue` then offers the second refusal to a consumer listening on the
+root. Two gates for one act is correct here and is not two answers to one
+question: they are in different positions, the row's and the set's, and a
+listener binds to the one it can reach.
+
+**Where the reader binds decides how it reads the flag.** A root listening in
+the bubble phase for an event from its own child is after every listener on that
+child, so the flag is already set and reading it inline is right. A root
+listening in capture runs *ahead* of a consumer's listener on the same host, and
+reading the flag there reads it before anybody could set it: Menu and Speed Dial
+both close the panel one microtask later for exactly this reason, and the
+dispatch being synchronous is what makes a microtask late enough.
+
+**A `before` event is the request and a plain one is the notification.**
+`helix-before-*` carries the proposed state, fires before anything moves, and is
+cancelable. What comes after is the platform's own word where there is one,
+`input` and `change` on a value control, `toggle` on anything that opens, and it
+carries no detail because by then the state is on the element. The full argument
+is under [JSDoc contract](#jsdoc-contract).
+
+**The rule is `helix component`'s `decided`.** It reads every dispatch of a class
+whose constructor passes `cancelable: true`, and passes when the answer is used
+at the dispatch, read off the event afterwards, or read by a file in the family
+that dispatched it or in a family that composes that one.
+
+### What a form-associated component owes
+
+A component extending `HelixFormElement` has told the browser it takes part in a
+form. Four things follow, and the ones a mixin does not do are the component's.
+
+- **It reports.** `internals.setFormValue` on every change to what it holds, and
+  on the value it was rendered with, or the form submits nothing under a name the
+  consumer wrote and nothing anywhere says so. `null` and not `''` when it holds
+  no answer: that is the difference between a control that submits nothing and
+  one that submits a blank. **`MixinControllerValue` does not do this for you**,
+  and says so: it owns the value and reporting stays with the component, because
+  what goes in the entry list is not always the string (a file input submits
+  `FormData`, a date picker submits what its calendar resolved).
+- **It returns.** `formResetCallback` puts it back to what the markup declared,
+  both halves, the consumer's and the control's. The value mixin has it; a
+  component holding state of its own has to write it.
+- **It restores.** `formStateRestoreCallback` for a browser bringing a form back,
+  falling back to the declared value rather than to empty, a restore with no
+  state being the same situation as a fresh form.
+- **It renders what it took.** `MixinField` grafts `label`, `hint`, `feedback`
+  and `required` onto a control and publishes all four on its reference page.
+  Applying it and then calling none of `renderLabel`, `renderGroupLabel`,
+  `renderHint` and `renderFeedback` leaves a required control computing a
+  validation message with nowhere to put it, and four rows of documented API a
+  consumer can set and never see. Take the mixin for what you render, and reach
+  for `ElementInternals` directly for the rest.
+
+  **Three families are not there yet**, measured across the twenty-two that
+  apply the mixin on 16 Sep 2026: Rating, Date Picker and Time Picker each call
+  `reportRequired` and none of the render seams, so each of them computes a
+  message and drops it. Rating is a row, and the other two are a panel; giving
+  them the label and the message is a layout decision in the styled tier rather
+  than a line in the base, which is why it is written here as owed rather than
+  quietly left out.
+
 ## Use the elements directly
 
 **Write `<helix-card>` in JSX.** Plain custom elements, no wrapper, no patched
