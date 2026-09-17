@@ -13,7 +13,7 @@ import { styles } from './toast-item.css.js'
  * costs contrast for something the mark already says.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @documentation https://fusion.dev/helix/components/toast
  *
  * @cssproperty --toast-border-color - Color of the panel's edge.

@@ -31,9 +31,9 @@ import { property } from 'lit/decorators.js'
  * test, or twice.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category overlays
- * @aliases Toaster, Snackbar, Notifications
+ * @aliases Toaster, Snackbar
  * @documentation https://fusion.dev/helix/components/toast
  *
  * @slot - The messages, as `helix-toast-item` elements.

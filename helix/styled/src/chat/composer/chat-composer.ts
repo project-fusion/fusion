@@ -14,7 +14,7 @@ import { styles } from './chat-composer.css.js'
  * a ceiling eats the transcript it belongs to.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @documentation https://fusion.dev/helix/components/chat
  *

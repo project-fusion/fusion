@@ -23,7 +23,7 @@ import '../message/chat-message.js'
  * offering it.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @documentation https://fusion.dev/helix/components/chat
  *

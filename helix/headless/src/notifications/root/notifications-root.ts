@@ -33,7 +33,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * either of them counting.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Notification feed, Inbox, Activity
  * @documentation https://fusion.dev/helix/components/notifications
@@ -286,8 +286,13 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * tier turns this into a width; this tier ships no stylesheet and is
    * unaffected.
    *
-   * Read off the light DOM rather than off the items, so it does not depend on
-   * which children have upgraded by the time this runs.
+   * **What is asked of each row is its light DOM, not the row.** A notification
+   * publishes no property for this, and asking one would make the answer depend
+   * on the row having drawn itself; a `[slot="media"]` child is there from the
+   * moment the markup is parsed. The rows themselves come from `items`, which
+   * does need them upgraded, and that is the honest limit rather than a claim
+   * this had made the other way: a row that upgrades late is counted on the next
+   * update, which its own `slotchange` asks for.
    */
   private markMedia(): void {
     this.toggleState(

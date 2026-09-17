@@ -35,7 +35,7 @@ export const FAILED_LABEL = 'Not sent'
  * completion is the only version of this that works.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Message, Bubble, Turn
  * @documentation https://fusion.dev/helix/components/chat
@@ -154,9 +154,19 @@ export class HelixHeadlessChatMessage extends HelixElement {
 
        `aria-busy` while it arrives is the whole of the streaming contract on
        this side: the live region above it holds its announcement until the flag
-       clears, so the message is read once, whole, rather than per token. */
+       clears, so the message is read once, whole, rather than per token.
+
+       **Through internals, like the role beside it, and this was an attribute.**
+       `toggleAttribute('aria-busy', …)` put a flag on the host that a consumer
+       never wrote, so a React page server-rendering a streaming turn sent
+       `<helix-chat-message state="streaming">` and got `aria-busy` added the
+       moment the element upgraded: the mismatch React reports and does not patch
+       up, which `Tree.chevronPlacement`, `Toast.placement` and `Image.status`
+       were each caught by. Internals carry it to the accessibility tree and
+       nothing to the markup, which is what `Skeleton`, `Loader` and `Orb`
+       already do with this exact flag. */
     hostAria(this.internals, { role: 'article' })
-    this.toggleAttribute('aria-busy', this.state === 'streaming')
+    this.internals.ariaBusy = this.state === 'streaming' ? 'true' : null
   }
 
   private renderTime(): TemplateResult | typeof nothing {

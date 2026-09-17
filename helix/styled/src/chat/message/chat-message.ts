@@ -17,7 +17,7 @@ import { styles } from './chat-message.css.js'
  * is the signal, and decorating it competes with the thing it is decorating.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @documentation https://fusion.dev/helix/components/chat
  *

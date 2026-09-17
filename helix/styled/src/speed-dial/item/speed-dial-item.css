@@ -3,7 +3,19 @@
 }
 
 /* The name and the mark on one line, the name first so the marks line up on the
-   end the trigger is on. Reversed for a dial that opened to the start. */
+   end the trigger is on. Reversed for a dial that opened to the start.
+
+   **Which way round is handed down rather than read from the panel, and this
+   asked `:host-context()`.** An action is slotted into the dial's `[part=
+   "actions"]`, so the only selector that could see the side the panel landed on
+   was `:host-context([data-placement$="-start"])`, which is Chromium-only:
+   `Steps` records exactly that and hands its own arrangement down as custom
+   properties for exactly that reason. In Firefox and Safari the rule matched
+   nothing, so a dial fanning to the start kept `row-reverse` and drew every mark
+   on the far side of its name, away from the trigger the column hangs under.
+   Valid CSS, no error, and only on two engines. A custom property inherits
+   through the flat tree into slotted content, which is the one portable channel;
+   the panel sets it and this reads it. */
 [part="item"] {
   align-items: center;
   background: none;
@@ -11,14 +23,10 @@
   color: inherit;
   cursor: pointer;
   display: inline-flex;
-  flex-direction: row-reverse;
+  flex-direction: var(--_speed-dial-row, row-reverse);
   font: inherit;
   gap: var(--helix-space-sm);
   padding: var(--helix-space-none);
-}
-
-:host-context([data-placement$="-start"]) [part="item"] {
-  flex-direction: row;
 }
 
 [part="item"]:disabled {

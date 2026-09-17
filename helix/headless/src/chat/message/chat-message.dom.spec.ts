@@ -10,6 +10,7 @@ beforeAll(async () => {
 
 interface Message extends HTMLElement {
   at: string
+  internals?: ElementInternals
   state: string
   updateComplete: Promise<unknown>
 }
@@ -86,13 +87,19 @@ describe('the states', () => {
    * The whole of the streaming contract on this side. The live region above
    * holds its announcement until the flag clears, so a screen reader reads the
    * turn once and whole rather than token by token.
+   *
+   * **Asked of internals, and the host is asserted bare beside it.** The flag
+   * was written as an attribute, which is markup a consumer's server never sent
+   * and which React reports on hydration; this is `Skeleton`'s pair, asserting
+   * the tree has it and the markup does not.
    */
   test('a streaming turn is busy while it arrives, and settles', async () => {
     const element = await message('state="streaming"')
-    expect(element.hasAttribute('aria-busy')).toBe(true)
+    expect(element.internals?.ariaBusy).toBe('true')
+    expect(element.hasAttribute('aria-busy')).toBe(false)
     element.state = 'sent'
     await element.updateComplete
-    expect(element.hasAttribute('aria-busy')).toBe(false)
+    expect(element.internals?.ariaBusy).toBeNull()
   })
 
   test('the state is an attribute, which is how a stylesheet knows', async () => {

@@ -66,8 +66,8 @@ const STACK_BELOW = 512
  * @slot end - The pane after it.
  * @slot start - The pane before the divider.
  *
- * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, and cancelable.
- * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles, and cancelable.
+ * @event {HelixBeforeCollapseEvent} helix-before-collapse - Fired before a pane shuts or reopens, and only where the position it is derived from stood. Cancelable: refusing it leaves the pane as it was and the divider where the gesture put it.
+ * @event {HelixBeforeResizeEvent} helix-before-resize - Fired before the divider settles. Cancelable: refusing it takes the whole of where the gesture ended, so no collapse follows from it either. A drag has already drawn itself by then and holds where it was dropped until the consumer assigns their own.
  *
  * @csspart corner - The handle where two dividers cross, added on the client.
  * @csspart end - The box holding the second.
@@ -510,11 +510,18 @@ export class HelixHeadlessSplitter extends HelixElement {
   }
 
   /**
-   * Asks to move, and applies it where the position is this element's to move.
+   * Moves the divider under a gesture that is still happening.
    *
    * Not announced per step: `helix-before-resize` is the settling, below. A drag that
    * announced every position would be asking a consumer to record a hundred
    * decisions to keep one.
+   *
+   * **A drag only, which is the whole of why applying before announcing is
+   * right here.** The divider has to follow the hand, and the one number worth
+   * a decision is where the hand let go. Nothing discrete calls this: a key and
+   * a double click go straight to `settle`, so their announcement comes before
+   * their change and refusing one takes the decision, and the corner's arrows
+   * already did.
    */
   private move(next: number): void {
     const wanted = this.clamp(next)
@@ -542,11 +549,27 @@ export class HelixHeadlessSplitter extends HelixElement {
    *
    * Through the audited path, so a consumer who owns `position` is told what was
    * asked for and decides, and one who does not has already had it applied.
+   *
+   * **The second announcement is conditional on the first, because it is derived
+   * from it.** `shutAt` reads the position the gesture ended on, so a refused
+   * `helix-before-resize` leaves a collapse computed from a number that was
+   * refused. Announced anyway, the refusal produced the outcome it was refusing:
+   * measured on a divider at 40 with a listener calling `preventDefault`, Home
+   * left `position` reporting 0 and `collapsed` reporting `start`, because the
+   * collapse applied and `position` reads the sliver once a pane is shut. The
+   * return of the first request is what says so, and it was being dropped: a
+   * cancelable event dispatched as a bare statement with nothing reading the
+   * answer, which is the shape the navigation cohort named on `Outline` and left.
+   *
+   * Refusing the collapse alone still leaves the resize, which is the other way
+   * round and is coherent: the divider goes where the drag put it and the pane
+   * is not declared shut. What a consumer cannot have is a pane that collapses
+   * out from under a position they said no to.
    */
   private settle(next: number): void {
     const wanted = this.clamp(next)
     const shut = this.shutAt(wanted)
-    requestChange({
+    const moved = requestChange({
       apply: (value) => {
         const previous = this.position
         this.positionState = value
@@ -556,6 +579,9 @@ export class HelixHeadlessSplitter extends HelixElement {
       host: this,
       next: wanted,
     })
+    if (!moved) {
+      return
+    }
     if (shut !== this.collapsed) {
       /* Two values from one gesture, so two announcements. `ChangeDetail`
          carries a name for exactly this, and a consumer listening for one of
@@ -659,7 +685,14 @@ export class HelixHeadlessSplitter extends HelixElement {
     } else {
       return
     }
-    this.move(next)
+    /* **Straight to the settling, and this called `move` first.** `move` applies
+       without announcing, which is right for a drag: the divider has to follow
+       the hand, and the one decision worth recording is where the hand let go.
+       A key is not a drag. There is one discrete step and nothing to draw ahead
+       of, so moving first put `preventDefault` after the change it was refusing:
+       a reader pressing Home on a splitter whose consumer refuses the resize
+       moved the divider to the edge anyway. The corner's own arrow keys already
+       go straight here, which is the two halves of one file disagreeing. */
     this.settle(next)
     // Or the arrows scroll the page under the divider being moved.
     event.preventDefault()
@@ -695,7 +728,7 @@ export class HelixHeadlessSplitter extends HelixElement {
        Declared rather than remembered, so it is a value a consumer can state
        and change, and it needs no capture at all. */
     const home = this.clamp(this.defaultPosition)
-    this.move(home)
+    // Announced before it is applied, for the reason the key handler records.
     this.settle(home)
   }
 

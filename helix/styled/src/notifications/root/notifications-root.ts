@@ -20,7 +20,7 @@ import '../notification/notification.js'
  * holds thousands wants `helix-data-table` with a custom cell.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @documentation https://fusion.dev/helix/components/notifications
  *

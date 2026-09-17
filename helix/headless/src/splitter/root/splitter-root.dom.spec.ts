@@ -171,6 +171,35 @@ describe('splitter settling', () => {
     expect(host.position).toBe(55)
   })
 
+  /**
+   * **Refusing it takes the whole of where the gesture ended, collapse and all.**
+   *
+   * The two announcements are one gesture: `shutAt` reads the position being
+   * settled, so a collapse derived from a refused number is a collapse of
+   * something that did not happen. Announced regardless, the refusal produced
+   * exactly the outcome it refused: measured on a divider at 40 with a listener
+   * calling `preventDefault`, Home left `position` reporting 0 and `collapsed`
+   * reporting `start`, because the collapse stood and `position` reads the sliver
+   * once a pane is shut.
+   */
+  test('refusing the settling leaves the divider where it was, and open', async () => {
+    const host = (await splitter('default-position="40"')) as Splitter & {
+      collapsed?: 'end' | 'start'
+    }
+    host.addEventListener('helix-before-resize', (event) => event.preventDefault())
+    await press(host, 'Home')
+    expect(host.position).toBe(40)
+    expect(host.collapsed).toBeUndefined()
+  })
+
+  /** And a key announces before it applies, which the corner's own arrows do. */
+  test('refusing a step leaves the divider where it was', async () => {
+    const host = await splitter('default-position="40" step="5"')
+    host.addEventListener('helix-before-resize', (event) => event.preventDefault())
+    await press(host, 'ArrowRight')
+    expect(host.position).toBe(40)
+  })
+
   test('a double click puts it back where the markup put it', async () => {
     const host = await splitter('default-position="30" step="5"')
     await press(host, 'ArrowRight')

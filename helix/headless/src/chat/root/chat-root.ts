@@ -157,7 +157,7 @@ const spoken = (message: Element): string =>
  * turns as children.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Conversation, Transcript, Thread, Messages
  * @documentation https://fusion.dev/helix/components/chat

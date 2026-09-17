@@ -47,7 +47,7 @@ import '../../format-date/index.js'
  * cancelable, and a `read` set by the consumer makes this element defer entirely.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases Notification item, Inbox item
  * @documentation https://fusion.dev/helix/components/notifications
@@ -61,6 +61,8 @@ import '../../format-date/index.js'
  * @slot detail - A block belonging to the row rather than a line about it: a quoted
  * comment, a status moving from one value to another, a preview. Unlike `caption` nothing
  * here sets a size or an ink, because whatever fills it usually brings its own.
+ * @slot dismiss - Replaces the glyph inside the dismiss control, which is drawn
+ * only where the row is `dismissible`.
  * @slot media - An avatar or icon identifying who or what it came from.
  *
  * @event {HelixDismissEvent} helix-dismiss - Fired when a reader asks to remove it, and cancelable.
@@ -325,9 +327,18 @@ export class HelixHeadlessNotification extends HelixElement {
   /* Content arriving from the light DOM changes no property here, so nothing
      would schedule the re-read. Bound to the slot rather than to the host,
      because `slotchange` bubbles and is not composed: it reaches the shadow root
-     that owns the slot and stops there. */
+     that owns the slot and stops there.
+
+     **`markActions`, which is the answer this slot feeds.** It called
+     `markControls` and that reads `dismissible` and nothing else, so the
+     listener recomputed a state from a property that had not changed and left
+     the one it was bound for alone: a row whose actions arrive after the first
+     render, which is every row a consumer fills from a response, kept
+     `:state(actions)` off and drew its buttons hard against the words above
+     them. The two were one answer until `markControls` stopped counting the
+     slot, and the listener was not moved with it. */
   private readonly handleActions = (): void => {
-    this.markControls()
+    this.markActions()
   }
 
   private readonly handleDismiss = (event: Event): void => {

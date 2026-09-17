@@ -29,7 +29,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * of what the reader wrote.
  *
  * @since 0.1.0
- * @status experimental
+ * @status stable
  * @category forms
  * @aliases Message box, Prompt input
  * @documentation https://fusion.dev/helix/components/chat

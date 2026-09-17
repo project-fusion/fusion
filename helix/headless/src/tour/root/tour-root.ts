@@ -43,9 +43,26 @@ import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
  * @event {HelixCompleteEvent} helix-complete - Fired when the last stop is
  * finished.
  * @event {HelixTourAskEvent} helix-tour-ask - A stop's own controls asking the tour to move, dispatched by the stop and heard here because the tour is what moves.
- * @event {Event} toggle - Says the state moved, carrying `newState` and `oldState`.
  *
  * @csspart spotlight - The box over the current target, which paints the scrim.
+ */
+/*
+ * **There is no `toggle` here, and this element declared one for months.**
+ *
+ * `toggle` is announced by `MixinControllerOpen`, once, for the sixteen families
+ * whose open state that mixin owns. A tour does not apply it: `open` is a plain
+ * reflected property a consumer sets to start the run, and the two ways it comes
+ * back down each announce themselves already, `helix-before-close` for leaving
+ * early and `helix-complete` for reaching the end. So the declaration was a
+ * channel nothing had ever sent on, and the shipped events example bound a
+ * listener to it whose row could not appear.
+ *
+ * The `events` rule cannot see this, and says so: "declared and never dispatched
+ * here" has two legitimate shapes, a parent declaring its children's bubbling
+ * event and a control relaying a native one, and enforcing it flagged fifteen of
+ * those and nothing else. `applied` is the narrow form that does see it, an
+ * event built only inside a mixin being declared only by a component that
+ * applies it, and this was its one hit in the library.
  */
 @customElement('helix-headless-tour')
 export class HelixHeadlessTour extends HelixElement {

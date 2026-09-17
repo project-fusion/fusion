@@ -31,7 +31,7 @@ const ITEMS_ID = 'items'
  * Left off, it is the number of rows.
  *
  * @since 0.24.0
- * @status experimental
+ * @status stable
  * @category feedback
  * @aliases NotificationSection, FeedGroup
  * @documentation https://fusion.dev/helix/components/notifications
@@ -127,6 +127,25 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
     return this.count ?? this.items.length
   }
 
+  /**
+   * The same number where anything can know it, and nothing where nothing can.
+   *
+   * **A server has no rows to count and must not say zero.** `items` reads
+   * `knownChildren`, which is empty on a server and while hydrating what one
+   * sent, so a group written around three notifications with no `count` of its
+   * own served `<span part="count">0</span>`: a crawler, and a reader before the
+   * page has run, given a group that says it holds nothing over the three rows
+   * underneath it. Not knowing is not zero, which is the rule `MixinCollection`
+   * already states about an empty list.
+   *
+   * A declared `count` is a fact about the group rather than about its children,
+   * so it serves whole, which is the shape a feed trimmed by a server already
+   * wants: it is the number the rows were cut from.
+   */
+  private get counted(): number | undefined {
+    return this.count ?? (this.childrenKnown ? this.items.length : undefined)
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* A group of rows in a feed, named. `group` rather than `region`, which is a
@@ -191,13 +210,23 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
     this.toggleOpen()
   }
 
-  /** How many rows the collapse is hiding, for the control to say so. */
-  private get folded(): number {
-    return Math.max(this.items.length - 1, 0)
-  }
-
+  /*
+   * The rows region carries no name, and that is not an omission.
+   *
+   * It held `aria-label="3 more"` while folded, on a `<div>` with no role. A
+   * generic element prohibits naming, so every engine drops the name and the
+   * sentence reached nobody: valid markup, no warning, and a promise on the
+   * accessibility side of the component with nothing behind it. The trigger
+   * beside it already says the group's name, its count and that it is collapsed,
+   * which is where a reader is when they need to know, and it is a control they
+   * can act on rather than a region they have to be moved to.
+   */
   protected override render(): TemplateResult {
-    const collapsed = this.collapsible && !this.open
+    const counted = this.counted
+    /* The box either way, so the count arriving after hydration fills a space
+       the server already reserved rather than widening the header under the
+       reader. */
+    const count = html`<span part="count">${counted ?? nothing}</span>`
     return html`<div part="header">
         ${
           this.collapsible
@@ -210,18 +239,14 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
                 @click=${this.handleToggle}
               >
                 <span part="label"><slot name="label">${this.label}</slot></span>
-                <span part="count">${this.total}</span>
+                ${count}
               </button>`
             : html`<span part="label"><slot name="label">${this.label}</slot></span>
-                <span part="count">${this.total}</span>`
+                ${count}`
         }
         <span part="action"><slot name="action"></slot></span>
       </div>
-      <div
-        id=${ITEMS_ID}
-        part="items"
-        aria-label=${collapsed && this.folded > 0 ? `${this.folded} more` : nothing}
-      >
+      <div id=${ITEMS_ID} part="items">
         <slot></slot>
       </div>`
   }
